@@ -7,11 +7,24 @@
     </div>
     <links />
     <hero />
+    <middle-menu />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  head: () => {
+    return {
+      htmlAttrs: {
+        class:
+          'bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat',
+      },
+      bodyAttrs: {
+        class: 'bg-rotki-logo bg-local bg-left-top bg-no-repeat',
+      },
+    }
+  },
+})
 </script>

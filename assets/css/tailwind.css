@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .btn {
+    @apply h-16 font-serif text-xl uppercase rounded-full border-2 w-72 p-3 focus:outline-none focus:ring-2 focus:ring-shade12 focus:ring-opacity-75;
+  }
+
+  .btn--primary {
+    @apply text-white bg-primary hover:bg-shade12;
+  }
+
+  .btn--secondary {
+    @apply text-primary border-primary hover:bg-shade1;
+  }
+}
+
 /* source-sans-pro-300 - latin */
 @font-face {
   font-family: 'Source Sans Pro';
@@ -42,5 +56,18 @@
   url('../fonts/alverata_w01_bold.woff') format('woff'), /* Modern Browsers */
   url('../fonts/alverata_w01_bold.ttf') format('truetype'), /* Safari, Android, iOS */
   url('../fonts/alverata_w01_bold.svg#SourceSansPro') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'Alverata W01 Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/alverata_w01_regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+  url('../fonts/alverata_w01_regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/alverata_w01_regular.woff2') format('woff2'), /* Super Modern Browsers */
+  url('../fonts/alverata_w01_regular.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/alverata_w01_regular.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/alverata_w01_regular.svg#SourceSansPro') format('svg'); /* Legacy iOS */
 }
 
