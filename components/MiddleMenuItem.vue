@@ -1,7 +1,5 @@
 <template>
-  <button class="btn" :class="primary ? 'btn--primary' : 'btn--secondary'">
-    {{ text }}
-  </button>
+  <div :class="active ? activeClass : null"><slot></slot></div>
 </template>
 
 <script lang="ts">
@@ -9,14 +7,15 @@ import Vue from 'vue'
 
 export default Vue.extend({
   props: {
-    text: {
-      type: String,
-      required: true,
-    },
-    primary: {
+    active: {
       type: Boolean,
       required: false,
       default: false,
+    },
+    activeClass: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
 })
