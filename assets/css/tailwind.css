@@ -14,6 +14,51 @@
   .btn--secondary {
     @apply text-primary border-primary hover:bg-shade1;
   }
+
+  .feature-header {
+    @apply font-serif font-bold  text-5.5xl text-shade11;
+
+    margin-bottom: 3.625rem;
+  }
+
+  .feature-description {
+    @apply font-sans text-2xl text-primary2;
+  }
+
+  .feature-subtitle {
+    @apply font-serif font-bold text-xl text-primary2;
+
+    font-size: 1.563rem;
+    line-height: 2.875rem;
+    letter-spacing: -0.01rem;
+    margin-bottom: 2rem;
+  }
+
+  .feature-details {
+    margin-bottom: 5rem;
+  }
+
+  .feature-list {
+    @apply font-sans font-light text-black;
+
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .feature-list li::before {
+    @apply text-primary;
+
+    content: "•";
+    font-size: 2.5rem;
+    line-height: 2rem;
+  }
+
+  .feature-caption {
+    @apply text-shade7 font-sans font-normal;
+
+    font-size: 1.125rem;
+    line-height: 2rem;
+  }
 }
 
 /* source-sans-pro-300 - latin */
