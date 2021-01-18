@@ -8,6 +8,7 @@
     <links />
     <hero />
     <middle-menu />
+    <features />
   </div>
 </template>
 
