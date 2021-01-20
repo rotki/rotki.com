@@ -15,6 +15,10 @@
     @apply text-primary border-primary hover:bg-shade1;
   }
 
+  .btn--filled {
+    @apply text-primary border-transparent hover:bg-shade1 bg-white;
+  }
+
   .feature-header {
     @apply font-serif font-bold  text-5.5xl text-shade11;
 

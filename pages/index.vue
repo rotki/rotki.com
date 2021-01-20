@@ -1,14 +1,17 @@
 <template>
-  <div class="container mx-auto">
-    <div class="mt-24 flex flex-row justify-center">
-      <div class="header text-primary font-serif flex-col col-auto text-5xl">
-        Rotki
+  <div>
+    <div class="container mx-auto">
+      <div class="mt-24 flex flex-row justify-center">
+        <div class="header text-primary font-serif flex-col col-auto text-5xl">
+          Rotki
+        </div>
       </div>
     </div>
     <links />
     <hero />
     <middle-menu />
     <features />
+    <premium />
   </div>
 </template>
 
