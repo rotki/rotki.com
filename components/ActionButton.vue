@@ -1,5 +1,12 @@
 <template>
-  <button class="btn" :class="primary ? 'btn--primary' : 'btn--secondary'">
+  <button
+    class="btn"
+    :class="{
+      'btn--primary': primary,
+      'btn--secondary': !primary,
+      'btn--filled': filled,
+    }"
+  >
     {{ text }}
   </button>
 </template>
@@ -14,6 +21,11 @@ export default Vue.extend({
       required: true,
     },
     primary: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    filled: {
       type: Boolean,
       required: false,
       default: false,

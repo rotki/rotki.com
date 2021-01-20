@@ -41,5 +41,13 @@ export default {
   axios: {},
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
-  build: {},
+  build: {
+    loaders: {
+      cssModules: {
+        modules: {
+          localIdentName: 'rotki_[hash:base64:4]',
+        },
+      },
+    },
+  },
 }
