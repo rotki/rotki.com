@@ -45,7 +45,7 @@ export default {
     loaders: {
       cssModules: {
         modules: {
-          localIdentName: 'rotki_[hash:base64:4]',
+          localIdentName: '[local]_[hash:base64:4]',
         },
       },
     },
