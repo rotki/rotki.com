@@ -6,13 +6,16 @@
           Rotki
         </div>
       </div>
+      <div :class="$style.links">
+        <links />
+      </div>
     </div>
-    <links />
     <hero />
     <middle-menu />
     <features />
     <premium />
     <plans />
+    <page-footer />
   </div>
 </template>
 
@@ -22,6 +25,15 @@ import Vue from 'vue'
 export default Vue.extend({
   head: () => {
     return {
+      title: 'Rotki',
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content:
+            'A portfolio tracking, analytics, accounting and tax reporting application that protects your privacy',
+        },
+      ],
       htmlAttrs: {
         class:
           'bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat',
@@ -33,3 +45,11 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style module>
+.links {
+  @apply flex flex-row justify-center;
+
+  margin-top: 2.7777rem;
+}
+</style>
