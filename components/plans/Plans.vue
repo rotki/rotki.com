@@ -24,8 +24,8 @@ export default Vue.extend({
 .wrapper {
   @apply container mx-auto;
 
-  margin-top: 7.6875rem;
-  padding-bottom: 4.25rem;
+  margin-top: 6.83333rem;
+  padding-bottom: 1.2rem;
 }
 
 .header {
@@ -33,9 +33,8 @@ export default Vue.extend({
 
   text-align: center;
   letter-spacing: -0.03em;
-  font-size: 5.25rem;
-  line-height: 6.75rem;
-  margin-bottom: 5.8125rem;
+  font-size: 4.66666rem;
+  line-height: 6rem;
 }
 
 .content {

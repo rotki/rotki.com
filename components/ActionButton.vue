@@ -1,10 +1,10 @@
 <template>
   <button
-    class="btn"
     :class="{
-      'btn--primary': primary,
-      'btn--secondary': !primary,
-      'btn--filled': filled,
+      [$style.button]: true,
+      [$style.primary]: primary,
+      [$style.secondary]: !primary,
+      [$style.filled]: filled,
     }"
     @click="$emit('click')"
   >
@@ -34,3 +34,27 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style module>
+.button {
+  @apply font-serif uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
+
+  font-size: 1rem;
+  line-height: 1.27777rem;
+  height: 3.61111rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.primary {
+  @apply text-white bg-primary hover:bg-shade12;
+}
+
+.secondary {
+  @apply text-primary border-primary hover:bg-shade1;
+}
+
+.filled {
+  @apply text-primary border-transparent hover:bg-shade1 bg-white;
+}
+</style>
