@@ -30,27 +30,27 @@ export default Vue.extend({
 .plan {
   @apply flex flex-col col-span-12 md:col-span-4 flex-shrink;
 
-  margin-top: 4.25rem;
+  margin-top: 5.16666rem;
 }
 
 .title {
   @apply font-bold text-primary2 font-serif text-center;
 
   letter-spacing: -0.01em;
-  font-size: 2em;
-  line-height: 2.9375rem;
+  font-size: 1.77777em;
+  line-height: 2.61111rem;
 }
 
 .body {
   @apply font-sans text-center text-primary2 flex flex-col self-center;
 
-  font-size: 1.5rem;
-  line-height: 2rem;
-  margin-top: 2.8125rem;
-  max-width: 23rem;
+  font-size: 1.33333rem;
+  line-height: 1.77777rem;
+  margin-top: 2.5rem;
+  max-width: 21rem;
 }
 
 .button {
-  margin-top: 4.6875rem;
+  margin-top: 4.16666rem;
 }
 </style>
