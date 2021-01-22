@@ -12,6 +12,7 @@
     <middle-menu />
     <features />
     <premium />
+    <plans />
   </div>
 </template>
 

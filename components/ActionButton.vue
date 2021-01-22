@@ -6,6 +6,7 @@
       'btn--secondary': !primary,
       'btn--filled': filled,
     }"
+    @click="$emit('click')"
   >
     {{ text }}
   </button>
