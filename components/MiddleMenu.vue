@@ -1,5 +1,8 @@
 <template>
-  <div class="flex flex-row font-sans text-2xl justify-center font-light">
+  <div
+    id="features"
+    class="flex flex-row font-sans text-2xl justify-center font-light"
+  >
     <div class="flex-col w-48">Dashboard</div>
     <div class="flex-col w-48">Exchanges</div>
     <div class="flex-col w-48">DeFi</div>
