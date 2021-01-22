@@ -7,6 +7,7 @@
       <free-plan />
       <basic-plan />
       <advanced-plan />
+      <custom-plan />
     </div>
   </div>
 </template>
