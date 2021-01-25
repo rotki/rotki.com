@@ -39,7 +39,8 @@ export default Vue.extend({
           'bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat',
       },
       bodyAttrs: {
-        class: 'bg-rotki-logo bg-local bg-left-top bg-no-repeat',
+        class:
+          'bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden',
       },
     }
   },
