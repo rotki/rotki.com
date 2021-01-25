@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.container">
-    <action-button filled text="Get Premium" />
+    <action-button :class="$style.button" filled text="Get Premium" />
   </div>
 </template>
 
@@ -18,6 +18,10 @@ export default Vue.extend({
 
   margin-top: 4.75rem;
   width: 100%;
-  max-width: 31rem;
+  max-width: 29rem;
+}
+
+.button {
+  max-width: 16rem;
 }
 </style>
