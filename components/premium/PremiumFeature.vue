@@ -1,9 +1,9 @@
 <template>
-  <div class="premium-feature">
-    <div class="premium-feature__title">
+  <div :class="$style.wrapper">
+    <div :class="$style.title">
       <slot name="title"></slot>
     </div>
-    <div class="premium-feature__details">
+    <div :class="$style.description">
       <slot></slot>
     </div>
   </div>
@@ -17,25 +17,27 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped>
-.premium-feature {
-  @apply font-bold font-serif text-white flex flex-col col-span-6 flex-shrink;
+<style module>
+.wrapper {
+  @apply flex flex-col col-span-6 flex-shrink;
 
   margin-top: 5.75rem;
-  font-size: 2rem;
-  line-height: 2.938rem;
-  letter-spacing: -0.01em;
-  max-width: 31rem;
+  max-width: 29rem;
 }
 
-.premium-feature__title {
+.title {
+  @apply font-bold font-serif text-white;
+
   margin-bottom: 2.375rem;
+  font-size: 1.77777rem;
+  line-height: 2.61111rem;
+  letter-spacing: -0.01em;
 }
 
-.premium-feature__details {
+.description {
   @apply font-sans font-light text-white;
 
-  font-size: 1.5rem;
-  line-height: 1.875rem;
+  font-size: 1.33333rem;
+  line-height: 1.67611rem;
 }
 </style>
