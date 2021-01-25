@@ -1,5 +1,5 @@
 <template>
-  <feature>
+  <feature id="eth2staking">
     <template #title> Eth2 staking</template>
     <div class="flex flex-row feature-details feature-description">
       Premium users can set watchers for various protocol so that they can be
@@ -11,5 +11,7 @@
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  name: 'BasicEth2Staking',
+})
 </script>

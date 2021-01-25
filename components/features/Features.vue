@@ -1,16 +1,38 @@
 <template>
-  <div class="flex flex-col">
+  <div :class="$style.wrapper">
+    <middle-menu />
     <dashboard />
     <exchanges />
     <defi />
     <defi-details />
-    <eth2-staking />
-    <profit-loss-report />
+    <basic-eth2-staking />
+    <profit-loss-report :class="$style.last" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  name: 'Features',
+})
 </script>
+
+<style module>
+.wrapper {
+  @apply container mx-auto;
+}
+
+.last {
+  margin-left: 23.8rem;
+  padding-bottom: 4.8rem;
+
+  @media only screen and (max-width: 767px) {
+    margin-left: 0;
+  }
+
+  @media only screen and (min-width: 768px) and (max-width: 1023px) {
+    margin-left: 10rem;
+  }
+}
+</style>

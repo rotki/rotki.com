@@ -1,9 +1,9 @@
 <template>
-  <feature>
+  <feature id="defi-details">
     <template #title> Ethereum DeFi protocol details </template>
-    <div class="flex flex-row feature-details feature-description">
+    <feature-details>
       Details per protocol are supported for the following protocols:
-    </div>
+    </feature-details>
   </feature>
 </template>
 
