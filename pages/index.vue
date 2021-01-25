@@ -11,7 +11,6 @@
       </div>
     </div>
     <hero />
-    <middle-menu />
     <features />
     <premium />
     <plans />
