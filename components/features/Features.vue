@@ -5,7 +5,7 @@
     <exchanges />
     <defi />
     <defi-details />
-    <basic-eth2-staking />
+    <eth2-staking />
     <profit-loss-report :class="$style.last" />
   </div>
 </template>

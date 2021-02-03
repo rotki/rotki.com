@@ -11,9 +11,9 @@
         <div :class="$style.content">
           <GraphsStatistics />
           <Transactions />
-          <Defi />
+          <PremiumDefi />
           <Uniswap />
-          <Eth2Staking />
+          <PremiumEth2Staking />
           <GetPremium />
         </div>
       </div>
@@ -26,15 +26,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import GraphsStatistics from '~/components/premium/GraphsStatistics.vue'
-import Transactions from '~/components/premium/Transactions.vue'
-import Defi from '~/components/premium/Defi.vue'
-import Uniswap from '~/components/premium/Uniswap.vue'
-import Eth2Staking from '~/components/premium/Eth2Staking.vue'
 
 export default Vue.extend({
   name: 'Premium',
-  components: { Defi, Transactions, GraphsStatistics, Uniswap, Eth2Staking },
 })
 </script>
 
