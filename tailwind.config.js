@@ -16,6 +16,7 @@ module.exports = {
         shade5: '#BFBFBF',
         shade8: '#808080',
         shade7: '#7E7E91',
+        shade10: '#B6B6D1',
         shade11: '#404040',
         shade12: '#E36039',
         primary: '#D65C36',
