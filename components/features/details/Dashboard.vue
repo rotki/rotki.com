@@ -43,7 +43,7 @@ export default Vue.extend({
   @media only screen and (min-width: 3000px) {
     right: 25rem;
   }
-  @media only screen and (max-width: 855px) {
+  @media only screen and (max-width: 768px) {
     position: relative;
   }
 }
