@@ -26,6 +26,16 @@
     margin-bottom: 5rem;
   }
 
+  .page {
+    @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
+
+    scroll-behavior: smooth;
+  }
+
+  .body {
+    @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
+  }
+
 }
 
 /* source-sans-pro-300 - latin */
