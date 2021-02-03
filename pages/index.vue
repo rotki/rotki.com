@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header />
+    <Header />
     <hero />
     <features />
     <premium />
@@ -34,15 +34,3 @@ export default Vue.extend({
   },
 })
 </script>
-
-<style>
-.page {
-  @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
-
-  scroll-behavior: smooth;
-}
-
-.body {
-  @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
-}
-</style>
