@@ -1,15 +1,16 @@
 <template>
-  <div :class="$style.wrapper" v-bind="$attrs">
+  <div v-bind="$attrs">
     <div :class="$style.content">
-      <div :class="$style.column1">
+      <div :class="$slots.image ? $style.column1 : $style.column">
         <div :class="$style.title">
           <div :class="$style.column">
+            <anchor :id="id"></anchor>
             <slot name="title"></slot>
           </div>
         </div>
         <slot></slot>
       </div>
-      <div :class="$style.column2">
+      <div v-if="$slots.image" :class="$style.column2">
         <slot name="image"></slot>
       </div>
     </div>
@@ -19,16 +20,19 @@
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+  },
+})
 </script>
 
 <style module>
-.wrapper {
-  top: 0;
-}
-
 .content {
-  @apply flex flex-row mt-37;
+  @apply flex flex-row mt-37 flex-wrap-reverse;
 }
 
 .title {
@@ -48,10 +52,9 @@ export default Vue.extend({})
   @apply flex flex-col col-span-12 md:col-span-7;
 
   max-width: 38.33333rem;
-  margin-left: 3.8rem;
 }
 
 .column2 {
-  @apply flex flex-col col-span-full md:col-span-5;
+  @apply flex flex-col col-span-12 md:col-span-5;
 }
 </style>

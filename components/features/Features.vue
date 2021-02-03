@@ -1,12 +1,13 @@
 <template>
   <div :class="$style.wrapper">
+    <anchor id="features" />
     <middle-menu />
     <dashboard />
     <exchanges />
     <defi />
     <defi-details />
-    <eth2-staking />
-    <profit-loss-report :class="$style.last" />
+    <Eth2Staking />
+    <ProfitLossReport :class="$style.last" />
   </div>
 </template>
 

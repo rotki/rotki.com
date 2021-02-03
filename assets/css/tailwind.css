@@ -26,27 +26,6 @@
     margin-bottom: 5rem;
   }
 
-  .feature-list {
-    @apply font-sans font-light text-black;
-
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-
-  .feature-list li::before {
-    @apply text-primary;
-
-    content: "•";
-    font-size: 2.5rem;
-    line-height: 2rem;
-  }
-
-  .feature-caption {
-    @apply text-shade7 font-sans font-normal;
-
-    font-size: 1.125rem;
-    line-height: 2rem;
-  }
 }
 
 /* source-sans-pro-300 - latin */

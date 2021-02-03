@@ -1,15 +1,6 @@
 <template>
   <div>
-    <div class="container mx-auto">
-      <div class="mt-24 flex flex-row justify-center">
-        <div class="header text-primary font-serif flex-col col-auto text-5xl">
-          Rotki
-        </div>
-      </div>
-      <div :class="$style.links">
-        <links />
-      </div>
-    </div>
+    <header />
     <hero />
     <features />
     <premium />
@@ -34,22 +25,24 @@ export default Vue.extend({
         },
       ],
       htmlAttrs: {
-        class:
-          'bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat',
+        class: 'page',
       },
       bodyAttrs: {
-        class:
-          'bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden',
+        class: 'body',
       },
     }
   },
 })
 </script>
 
-<style module>
-.links {
-  @apply flex flex-row justify-center;
+<style>
+.page {
+  @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
 
-  margin-top: 2.7777rem;
+  scroll-behavior: smooth;
+}
+
+.body {
+  @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
 }
 </style>
