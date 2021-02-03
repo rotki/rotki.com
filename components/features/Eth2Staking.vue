@@ -12,6 +12,6 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'BasicEth2Staking',
+  name: 'Eth2Staking',
 })
 </script>
