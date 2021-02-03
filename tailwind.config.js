@@ -29,6 +29,7 @@ module.exports = {
       backgroundImage: () => ({
         'rotki-pattern': "url('/img/background.svg')",
         'rotki-logo': "url('/img/rotki.svg')",
+        'crypto-pattern': "url('/img/crypto.svg')",
       }),
       fontFamily: {
         sans: ['Source San Pro', 'sans-serif'],

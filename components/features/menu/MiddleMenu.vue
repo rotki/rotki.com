@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="features"
-    class="flex flex-row font-sans text-2xl justify-center font-light"
-  >
+  <div :class="$style.menu">
     <div class="flex-col w-48">
       <a href="#dashboard">Dashboard</a>
     </div>
@@ -13,13 +10,13 @@
       <a href="#defi">DeFi</a>
     </div>
     <div class="flex-col w-56">
-      <a href="#defidetails">Ethereum Protocols</a>
+      <a href="#defi-details">Ethereum Protocols</a>
     </div>
     <div class="flex-col w-56">
-      <a href="#eth2staking">ETH2 Staking</a>
+      <a href="#eth2-staking">ETH2 Staking</a>
     </div>
     <div class="flex-col w-56">
-      <a href="#profitlossreport">Profit/Loss Report</a>
+      <a href="#profitloss-report">Profit/Loss Report</a>
     </div>
   </div>
 </template>
@@ -31,3 +28,9 @@ export default Vue.extend({
   name: 'MiddleMenu',
 })
 </script>
+
+<style module>
+.menu {
+  @apply flex flex-row font-sans text-2xl justify-center font-light;
+}
+</style>
