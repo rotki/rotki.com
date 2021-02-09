@@ -2,7 +2,7 @@
   <div :class="$style.wrapper">
     <anchor id="features" />
     <middle-menu />
-    <dashboard />
+    <dashboard @download="$emit('download')" />
     <exchanges />
     <defi />
     <defi-details />

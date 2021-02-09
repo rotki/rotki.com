@@ -1,18 +1,29 @@
 <template>
-  <div>
+  <fragment>
     <Header />
-    <hero />
-    <features />
+    <hero @download="visible = true" />
+    <features @download="visible = true" />
     <premium />
     <plans />
     <page-footer />
-  </div>
+    <download-dialog v-if="visible" @dismiss="visible = false" />
+  </fragment>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 
 export default Vue.extend({
+  data() {
+    return {
+      visible: false,
+    }
+  },
+  watch: {
+    visible(visible: boolean) {
+      document.body.style.overflowY = visible ? 'hidden' : 'auto'
+    },
+  },
   head: () => {
     return {
       title: 'Rotki',
