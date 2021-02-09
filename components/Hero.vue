@@ -19,8 +19,8 @@
       </div>
     </div>
     <div class="flex flex-row justify-center mt-16">
-      <action-button text="Start now for free" primary></action-button>
-      <action-button class="ml-8" text="Get Premium"></action-button>
+      <download-button @click="$emit('download')" />
+      <action-button class="ml-8" text="Get Premium" />
     </div>
     <div class="flex flex-row justify-center mt-32">
       <img src="~/assets/img/macbook.png" />
@@ -75,11 +75,7 @@
             are. Either on a blockchain or on one of the supported exchanges.
           </div>
         </div>
-        <action-button
-          text="Start now for free"
-          primary
-          class="mt-14"
-        ></action-button>
+        <download-button class="mt-14" @click="$emit('download')" />
       </div>
     </div>
   </div>

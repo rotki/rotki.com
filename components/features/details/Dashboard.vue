@@ -19,7 +19,7 @@
       the last 2 weeks.
     </feature-details>
     <div class="flex flex-row">
-      <action-button text="Start now for free" primary />
+      <download-button @click="$emit('download')" />
     </div>
   </feature>
 </template>
