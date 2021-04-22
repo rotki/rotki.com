@@ -22,11 +22,6 @@ module.exports = {
         primary: '#D65C36',
         primary2: '#3D3D46',
       },
-      spacing: {
-        21: '5.188rem',
-        37: '9.064rem',
-        101: '31.25rem',
-      },
       backgroundImage: () => ({
         'rotki-pattern': "url('/img/background.svg')",
         'rotki-logo': "url('/img/rotki.svg')",
@@ -36,9 +31,6 @@ module.exports = {
         sans: ['Source San Pro', 'sans-serif'],
         serif: ['Alverata W01 Bold', 'serif'],
         regular: ['Alverata W01 Regular', 'serif'],
-      },
-      fontSize: {
-        '5.5xl': '3.25rem',
       },
     },
   },

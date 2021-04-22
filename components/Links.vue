@@ -37,14 +37,14 @@ export default Vue.extend({
 .row {
   @apply flex flex-row justify-around;
 
-  max-width: 25.1666rem;
+  max-width: 453px;
 }
 
 .column {
   @apply flex flex-col font-sans uppercase justify-center text-primary2;
 
-  margin-left: 0.8888rem;
-  margin-right: 0.8888rem;
+  margin-left: 16px;
+  margin-right: 16px;
 }
 
 .link {

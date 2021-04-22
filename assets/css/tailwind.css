@@ -3,28 +3,6 @@
 @tailwind utilities;
 
 @layer components {
-  .feature-header {
-    @apply font-serif font-bold  text-5.5xl text-shade11;
-
-    margin-bottom: 3.625rem;
-  }
-
-  .feature-description {
-    @apply font-sans text-2xl text-primary2;
-  }
-
-  .feature-subtitle {
-    @apply font-serif font-bold text-xl text-primary2;
-
-    font-size: 1.563rem;
-    line-height: 2.875rem;
-    letter-spacing: -0.01rem;
-    margin-bottom: 2rem;
-  }
-
-  .feature-details {
-    margin-bottom: 5rem;
-  }
 
   .page {
     @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
@@ -34,6 +12,11 @@
 
   .body {
     @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
+  }
+
+  .rotki-margin {
+    margin-left: 151px;
+    margin-right: 151px;
   }
 
 }

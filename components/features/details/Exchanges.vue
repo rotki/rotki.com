@@ -12,7 +12,7 @@
       Connect to a big number of centralized exchanges and inspect current
       balances, historical trades, deposits and withdrawals.
     </feature-details>
-    <div :class="$style['list-container']">
+    <div :class="$style.list">
       <item-list :list="column1" />
       <item-list :list="column2" />
     </div>
@@ -39,11 +39,11 @@ export default Vue.extend({
 <style module>
 .image {
   z-index: -1;
-  width: 41.94rem;
-  height: 29.26666rem;
+  width: 755px;
+  height: 527px;
   position: absolute;
-  margin-top: -4.5rem;
-  right: -5rem;
+  margin-top: -60px;
+  right: -93px;
 
   @media only screen and (min-width: 2200px) {
     position: relative;
@@ -59,9 +59,9 @@ export default Vue.extend({
   }
 }
 
-.list-container {
+.list {
   @apply flex flex-row justify-between;
 
-  padding-right: 8rem;
+  padding-right: 120px;
 }
 </style>

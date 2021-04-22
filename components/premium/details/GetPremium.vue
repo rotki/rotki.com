@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.container">
-    <action-button :class="$style.button" filled text="Get Premium" />
+    <action-button filled text="Get Premium" />
   </div>
 </template>
 
@@ -14,14 +14,9 @@ export default Vue.extend({
 
 <style module>
 .container {
-  @apply flex flex-col col-span-6 flex-shrink align-middle self-center;
+  @apply flex flex-col align-middle self-center;
 
-  margin-top: 4.75rem;
-  width: 100%;
-  max-width: 29rem;
-}
-
-.button {
-  max-width: 16rem;
+  margin-top: 105px;
+  width: 40%;
 }
 </style>

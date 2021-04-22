@@ -24,7 +24,7 @@ export default Vue.extend({
 .wrapper {
   @apply container mx-auto;
 
-  padding-bottom: 3.3333rem;
+  padding-bottom: 57px;
 }
 
 .row {
@@ -38,6 +38,6 @@ export default Vue.extend({
 }
 
 .logo {
-  margin-right: 3.3333rem;
+  margin-right: 60px;
 }
 </style>

@@ -8,6 +8,7 @@
       Premium users can set watchers for various protocol so that they can be
       informed via email when certain conditions are met.
     </feature-details>
+    <download-button />
   </feature>
 </template>
 
@@ -21,18 +22,18 @@ export default Vue.extend({
 
 <style module>
 .image {
-  width: 10.66666rem;
-  height: 17.33333rem;
-  margin-left: 9rem;
+  width: 192px;
+  height: 312px;
+  margin-top: -55px;
+  margin-left: 174px;
 
-  @media only screen and (min-width: 2200px) {
-    margin-left: 19rem;
+  @media only screen and (max-width: 755px) {
+    padding-bottom: 120px;
   }
-  @media only screen and (min-width: 3000px) {
-    right: 45rem;
-  }
-  @media only screen and (max-width: 855px) {
-    padding-bottom: 4rem;
+
+  @media only screen and (min-width: 756px) and (max-width: 1600px) {
+    position: absolute;
+    margin-left: 0;
   }
 }
 </style>

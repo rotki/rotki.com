@@ -42,8 +42,8 @@ export default Vue.extend({
 .column {
   @apply flex flex-col;
 
-  margin-left: 0.8rem;
-  margin-right: 0.8rem;
+  margin-left: 16px;
+  margin-right: 16px;
 }
 
 .link {

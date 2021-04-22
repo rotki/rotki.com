@@ -25,15 +25,11 @@ export default Vue.extend({
 }
 
 .last {
-  margin-left: 23.8rem;
-  padding-bottom: 4.8rem;
+  margin-left: 280px;
+  padding-bottom: 134px;
 
   @media only screen and (max-width: 767px) {
     margin-left: 0;
-  }
-
-  @media only screen and (min-width: 768px) and (max-width: 1023px) {
-    margin-left: 10rem;
   }
 }
 </style>
