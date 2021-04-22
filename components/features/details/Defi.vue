@@ -21,6 +21,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'Defi',
   data() {
     return {
       defi: ['MakerDAO', 'Aave', 'Compound', 'Yearn vaults', 'Uniswap'],
