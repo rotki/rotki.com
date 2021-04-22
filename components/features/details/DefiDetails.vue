@@ -37,7 +37,9 @@
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  name: 'DefiDetails',
+})
 </script>
 
 <style module>

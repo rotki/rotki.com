@@ -26,6 +26,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'Exchanges',
   data() {
     return {
       column1: ['Kraken', 'Poloniex', 'Bittrex', 'Binance'],
