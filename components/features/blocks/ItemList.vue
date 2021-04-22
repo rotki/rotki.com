@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.wrapper">
     <ul :class="$style.list">
-      <li v-for="item in list" :key="item">{{ item }}</li>
+      <li v-for="item in list" :key="item" :class="$style.row">{{ item }}</li>
     </ul>
   </div>
 </template>
@@ -28,15 +28,22 @@ export default Vue.extend({
 .list {
   @apply font-sans font-light text-black;
 
-  font-size: 1.5rem;
-  line-height: 2rem;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.list .row {
+  display: flex;
+  flex-direction: row;
 }
 
 .list li::before {
   @apply text-primary;
 
+  margin-top: 12px;
+  margin-right: 8px;
   content: '•';
-  font-size: 2.5rem;
-  line-height: 2rem;
+  font-size: 38px;
+  line-height: 8px;
 }
 </style>

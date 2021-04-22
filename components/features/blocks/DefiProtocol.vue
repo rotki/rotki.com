@@ -33,10 +33,10 @@ export default Vue.extend({
 
 <style module>
 .wrapper {
-  @apply flex flex-col col-span-12 md:col-span-4;
+  @apply flex flex-col;
 
   width: 33%;
-  margin-top: 2.66666rem;
+  margin-top: 48px;
 
   @media only screen and (max-width: 855px) {
     width: 100%;
@@ -44,7 +44,7 @@ export default Vue.extend({
 }
 
 .protocol {
-  width: 19rem;
+  width: 320px;
 }
 
 .image {
@@ -58,17 +58,17 @@ export default Vue.extend({
 .title {
   @apply font-serif font-bold text-shade11 flex-col flex self-center;
 
-  margin-left: 0.94444rem;
-  font-size: 1.33333rem;
-  line-height: 1.72222rem;
+  margin-left: 18px;
+  font-size: 24px;
+  line-height: 31px;
   letter-spacing: -0.03em;
 }
 
 .description {
   @apply font-sans text-primary2;
 
-  margin-top: 0.94444rem;
-  font-size: 1.11111rem;
-  line-height: 1.77777rem;
+  margin-top: 27px;
+  font-size: 20px;
+  line-height: 32px;
 }
 </style>

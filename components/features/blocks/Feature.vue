@@ -33,16 +33,24 @@ export default Vue.extend({
 
 <style module>
 .content {
-  @apply flex flex-row mt-37 flex-wrap-reverse;
+  @apply flex flex-row flex-wrap-reverse;
+
+  margin-top: 191px;
+  margin-left: 151px;
+  margin-right: 151px;
+  @media only screen and (max-width: 767px) {
+    margin-left: 80px;
+    margin-right: 80px;
+  }
 }
 
 .title {
-  @apply flex flex-row font-serif font-bold text-5.5xl text-shade11;
+  @apply flex flex-row font-serif font-bold text-shade11;
 
-  font-size: 2.88888rem;
-  line-height: 3.72222rem;
+  font-size: 52px;
+  line-height: 67px;
   letter-spacing: -0.03em;
-  margin-bottom: 3.22222rem;
+  margin-bottom: 27px;
 }
 
 .column {
@@ -52,7 +60,7 @@ export default Vue.extend({
 .column1 {
   @apply flex flex-col col-span-12 md:col-span-7;
 
-  max-width: 38.33333rem;
+  max-width: 660px;
 }
 
 .column2 {

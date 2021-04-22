@@ -16,7 +16,7 @@ export default Vue.extend({
 .caption {
   @apply flex flex-row mt-16 text-shade7 font-sans font-normal;
 
-  font-size: 1.125rem;
-  line-height: 2rem;
+  font-size: 18px;
+  line-height: 32px;
 }
 </style>

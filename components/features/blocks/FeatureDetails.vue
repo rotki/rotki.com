@@ -23,7 +23,7 @@ export default Vue.extend({
 .wrapper {
   @apply flex flex-row;
 
-  margin-bottom: 5rem;
+  margin-bottom: 40px;
 }
 
 .column {
@@ -33,16 +33,17 @@ export default Vue.extend({
 .subtitle {
   @apply flex flex-row font-serif font-bold text-primary2;
 
-  font-size: 1.388888rem;
-  line-height: 2.555556rem;
+  font-size: 25px;
+  line-height: 46px;
   letter-spacing: -0.01em;
-  margin-bottom: 0.88888rem;
+  margin-top: 58px;
+  margin-bottom: 16px;
 }
 
 .description {
   @apply flex flex-row font-sans text-primary2;
 
-  font-size: 1.33333rem;
-  line-height: 1.777777rem;
+  font-size: 24px;
+  line-height: 32px;
 }
 </style>
