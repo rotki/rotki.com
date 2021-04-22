@@ -40,11 +40,10 @@ export default Vue.extend({
 .button {
   @apply font-serif uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
 
-  font-size: 1rem;
-  line-height: 1.27777rem;
-  height: 3.61111rem;
-  padding-left: 3rem;
-  padding-right: 3rem;
+  font-size: 18px;
+  line-height: 32px;
+  height: 65px;
+  width: 275px;
 }
 
 .primary {

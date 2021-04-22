@@ -27,16 +27,16 @@ export default Vue.extend({
 
 <style module>
 .image {
-  width: 20.5rem;
-  height: 16.11111rem;
+  width: 358px;
+  height: 347px;
   position: absolute;
-  margin-top: -5.5rem;
-  right: -5rem;
+  margin-top: -125px;
+  right: -45px;
   z-index: -1;
 
   @media only screen and (min-width: 2200px) {
     position: relative;
-    right: -10rem;
+    right: -300px;
   }
 
   @media only screen and (max-width: 855px) {

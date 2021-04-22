@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div :class="$style['icon-wrapper']">
+    <div :class="$style.image">
       <img :class="$style.top" src="~/assets/img/rotki-og.svg" />
     </div>
     <div :class="$style.wrapper">
+      <div>
+        <div :class="$style.title">Premium Features</div>
+      </div>
       <div :class="$style.main">
-        <div>
-          <div :class="$style.title">Premium Features</div>
-        </div>
         <div :class="$style.content">
           <GraphsStatistics />
           <Transactions />
@@ -18,7 +18,7 @@
         </div>
       </div>
     </div>
-    <div :class="$style['icon-wrapper']">
+    <div :class="$style.image">
       <img :class="$style.bottom" src="~/assets/img/rotki-og.svg" />
     </div>
   </div>
@@ -36,66 +36,64 @@ export default Vue.extend({
 .wrapper {
   @apply bg-primary2 bg-repeat;
 
-  padding-bottom: 4.5rem;
+  padding-bottom: 100px;
+  @media only screen and (max-width: 855px) {
+    padding-bottom: 400px;
+  }
 }
 
 .main {
-  @apply container mx-auto;
+  @apply container;
+
+  margin-left: 151px;
+  margin-right: 151px;
 }
 
 .title {
   @apply text-primary font-serif font-bold;
 
-  padding-top: 5.688rem;
-  margin-bottom: 3.188rem;
-  font-size: 3.66666rem;
-  line-height: 4.22222rem;
+  padding-top: 91px;
+  margin-bottom: 10px;
+  font-size: 66px;
+  line-height: 76px;
   align-items: center;
   text-align: center;
   letter-spacing: -0.03em;
 }
 
 .content {
-  @apply flex-wrap flex-row flex justify-evenly;
+  @apply flex-wrap flex-row flex justify-between;
 }
 
-.icon-wrapper {
+.image {
   position: relative;
 }
 
 .top {
   position: absolute;
-  top: -17.6rem;
-  left: -3rem;
+  top: -317px;
+  left: -40px;
   width: 358px;
   height: 347px;
+
   @media only screen and (max-width: 855px) {
     position: relative;
-    top: 1.7rem;
+    top: 31px;
   }
   @media only screen and (min-width: 2200px) {
-    left: 10rem;
-  }
-  @media only screen and (min-width: 3000px) {
-    left: 35rem;
+    left: 300px;
   }
 }
 
 .bottom {
   position: absolute;
-  bottom: -3.5rem;
-  right: -10.5rem;
+  bottom: -63px;
+  right: -212px;
   transform: matrix(-1, 0, 0, 1, 0, 0);
-  width: 23.94444rem;
-  height: 23.22222rem;
+  width: 431px;
+  height: 418px;
   @media only screen and (min-width: 2200px) {
-    right: 10rem;
-  }
-  @media only screen and (min-width: 3000px) {
-    right: 35rem;
-  }
-  @media only screen and (max-width: 855px) {
-    position: relative;
+    right: 300px;
   }
 }
 </style>

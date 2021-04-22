@@ -3,12 +3,14 @@
     <div>
       <div :class="$style.header">Start using Rotki today!</div>
     </div>
-    <div :class="$style.content">
-      <free-plan />
-      <basic-plan />
-      <advanced-plan />
-      <custom-plan />
+    <div :class="$style.basic">
+      <div :class="$style.content">
+        <free-plan />
+        <basic-plan />
+        <advanced-plan />
+      </div>
     </div>
+    <custom-plan />
   </div>
 </template>
 
@@ -22,10 +24,8 @@ export default Vue.extend({
 
 <style module>
 .wrapper {
-  @apply container mx-auto;
-
-  margin-top: 6.83333rem;
-  padding-bottom: 1.2rem;
+  margin-top: 123px;
+  padding-bottom: 30px;
 }
 
 .header {
@@ -33,8 +33,12 @@ export default Vue.extend({
 
   text-align: center;
   letter-spacing: -0.03em;
-  font-size: 4.66666rem;
-  line-height: 6rem;
+  font-size: 84px;
+  line-height: 108px;
+}
+
+.basic {
+  @apply container mx-auto;
 }
 
 .content {

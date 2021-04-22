@@ -33,6 +33,6 @@ export default Vue.extend({
 .links {
   @apply flex flex-row justify-center;
 
-  margin-top: 2.7777rem;
+  margin-top: 50px;
 }
 </style>

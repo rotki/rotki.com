@@ -13,10 +13,8 @@
     </feature-details>
     <feature-details>
       <template #subtitle> Networth fairing </template>
-      View all of the assets and liabilities you own, how much of each and the
-      total % the asset consists of your net worth. Users can also see a graph
-      of how their total networth is faring over time. Free users are limited to
-      the last 2 weeks.
+      Users can also see a graph of how their total networth is faring over
+      time. Free users are limited to the last 2 weeks.
     </feature-details>
     <div class="flex flex-row">
       <download-button @click="$emit('download')" />
@@ -35,16 +33,21 @@ export default Vue.extend({
 <style module>
 .image {
   position: absolute;
-  right: -25rem;
 
-  @media only screen and (min-width: 2200px) {
-    right: 10rem;
+  @media only screen and (max-width: 767px) {
+    position: relative;
+    margin-bottom: 60px;
+  }
+
+  @media only screen and (min-width: 1440px) {
+    right: -200px;
   }
   @media only screen and (min-width: 3000px) {
-    right: 25rem;
+    right: 200px;
   }
-  @media only screen and (max-width: 768px) {
-    position: relative;
+
+  @media only screen and (min-width: 768px) and (max-width: 1440px) {
+    right: -460px;
   }
 }
 </style>
