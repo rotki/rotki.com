@@ -19,11 +19,6 @@ export default Vue.extend({
       visible: false,
     }
   },
-  watch: {
-    visible(visible: boolean) {
-      document.body.style.overflowY = visible ? 'hidden' : 'auto'
-    },
-  },
   head: () => {
     return {
       title: 'Rotki',
@@ -42,6 +37,11 @@ export default Vue.extend({
         class: 'body',
       },
     }
+  },
+  watch: {
+    visible(visible: boolean) {
+      document.body.style.overflowY = visible ? 'hidden' : 'auto'
+    },
   },
 })
 </script>

@@ -84,5 +84,7 @@
 <script lang="ts">
 import Vue from 'vue'
 
-export default Vue.extend({})
+export default Vue.extend({
+  name: 'Hero',
+})
 </script>
