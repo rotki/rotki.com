@@ -1,5 +1,5 @@
 <template>
-  <feature id="exchanges">
+  <feature id="exchanges" :sticky="sticky">
     <template #title>
       Connect to a big number of centralized exchanges
     </template>
@@ -27,6 +27,12 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Exchanges',
+  props: {
+    sticky: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       column1: ['Kraken', 'Poloniex', 'Bittrex', 'Binance'],

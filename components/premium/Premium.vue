@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="premium">
     <div :class="$style.image">
       <img :class="$style.top" src="~/assets/img/rotki-og.svg" />
     </div>

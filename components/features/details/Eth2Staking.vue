@@ -1,5 +1,5 @@
 <template>
-  <feature id="eth2-staking">
+  <feature id="eth2-staking" :sticky="sticky">
     <template #title> Eth2 staking</template>
     <template #image>
       <img src="~/assets/img/ethereum.svg" :class="$style.image" />
@@ -17,6 +17,12 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Eth2Staking',
+  props: {
+    sticky: {
+      type: Boolean,
+      required: true,
+    },
+  },
 })
 </script>
 
