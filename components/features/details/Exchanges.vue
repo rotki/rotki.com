@@ -42,14 +42,20 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
+$image-width: 755px;
+$image-height: 527px;
+
 .image {
   z-index: -1;
-  width: 755px;
-  height: 527px;
   position: absolute;
   margin-top: -60px;
   right: -93px;
+  height: $image-height;
+  width: $image-width;
 
   @media only screen and (min-width: 2200px) {
     position: relative;
@@ -59,7 +65,10 @@ export default Vue.extend({
     position: relative;
     right: 0;
   }
-  @media only screen and (max-width: 855px) {
+
+  @include for-size(phone-only) {
+    height: $image-height * $mobile-image-percentage;
+    width: $image-width * $mobile-image-percentage;
     position: relative;
     right: 0;
   }
@@ -69,5 +78,9 @@ export default Vue.extend({
   @apply flex flex-row justify-between;
 
   padding-right: 120px;
+
+  @include for-size(phone-only) {
+    padding-right: 40px;
+  }
 }
 </style>

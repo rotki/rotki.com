@@ -26,12 +26,26 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
+$image-width: 192px;
+$image-height: 312px;
+
 .image {
-  width: 192px;
-  height: 312px;
   margin-top: -55px;
   margin-left: 174px;
+  width: $image-width;
+  height: $image-height;
+
+  @include for-size(phone-only) {
+    margin-top: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: $image-width;
+    height: $image-height;
+  }
 
   @media only screen and (max-width: 755px) {
     padding-bottom: 120px;
