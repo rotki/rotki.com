@@ -1,5 +1,5 @@
 <template>
-  <feature id="profitloss-report">
+  <feature id="profitloss-report" :sticky="sticky">
     <template #title> Profit/Loss Report </template>
     <template #image>
       <img src="~/assets/img/crypto.svg" :class="$style.image" />
@@ -22,6 +22,12 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'ProfitLossReport',
+  props: {
+    sticky: {
+      type: Boolean,
+      required: true,
+    },
+  },
 })
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <feature id="defi">
+  <feature id="defi" :sticky="sticky">
     <template #title> DeFi </template>
     <template #image>
       <img src="~/assets/img/defi.png" :class="$style.image" />
@@ -22,6 +22,12 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Defi',
+  props: {
+    sticky: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       defi: ['MakerDAO', 'Aave', 'Compound', 'Yearn vaults', 'Uniswap'],
