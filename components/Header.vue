@@ -23,7 +23,9 @@ export default Vue.extend({
 }
 
 .header {
-  @apply mt-24 flex flex-row justify-center;
+  @apply flex flex-row justify-center;
+
+  margin-top: 94px;
 }
 
 .title {
