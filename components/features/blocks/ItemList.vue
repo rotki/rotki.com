@@ -20,16 +20,27 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .wrapper {
-  @apply flex flex-col col-span-6;
+  @apply flex flex-col;
 }
+
+$list-font-size: 24px;
+$list-line-height: 32px;
 
 .list {
   @apply font-sans font-light text-black;
 
-  font-size: 24px;
-  line-height: 32px;
+  font-size: $list-font-size;
+  line-height: $list-line-height;
+
+  @include for-size(phone-only) {
+    font-size: $list-font-size * $mobile-font-percentage;
+    line-height: $list-line-height * $mobile-font-percentage;
+  }
 }
 
 .list .row {
@@ -45,5 +56,9 @@ export default Vue.extend({
   content: '•';
   font-size: 38px;
   line-height: 8px;
+
+  @include for-size(phone-only) {
+    margin-top: 8px;
+  }
 }
 </style>

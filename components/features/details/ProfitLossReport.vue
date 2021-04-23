@@ -33,8 +33,6 @@ export default Vue.extend({
 
 <style module>
 .image {
-  width: 358px;
-  height: 347px;
   position: absolute;
   margin-top: -125px;
   right: -45px;
@@ -45,7 +43,7 @@ export default Vue.extend({
     right: -300px;
   }
 
-  @media only screen and (max-width: 855px) {
+  @include for-size(phone-only) {
     position: relative;
     right: 0;
   }

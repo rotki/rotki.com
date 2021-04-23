@@ -36,14 +36,27 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media.scss';
+@import '~assets/css/main.scss';
+
+$font-size: 18px;
+$line-height: 32px;
+
 .button {
   @apply font-serif uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
 
-  font-size: 18px;
-  line-height: 32px;
+  font-size: $font-size;
+  line-height: $line-height;
   height: 65px;
   width: 275px;
+
+  @include for-size(phone-only) {
+    font-size: $font-size * $mobile-font-percentage;
+    line-height: $font-size * $mobile-font-percentage;
+    margin-left: $mobile_margin;
+    margin-right: $mobile_margin;
+  }
 }
 
 .primary {

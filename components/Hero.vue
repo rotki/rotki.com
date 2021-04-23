@@ -50,7 +50,16 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
+$title-font-size: 66px;
+$title-line-height: 84px;
+
+$subtitle-font-size: 32px;
+$subtitle-line-height: 42px;
+
 .wrapper {
   margin-top: 83px;
 }
@@ -58,16 +67,26 @@ export default Vue.extend({
 .title {
   @apply flex flex-row justify-center font-serif text-primary2;
 
-  font-size: 66px;
-  line-height: 84px;
+  font-size: $title-font-size;
+  line-height: $title-line-height;
+
+  @include for-size(phone-only) {
+    font-size: $title-font-size * $mobile-font-percentage;
+    line-height: $title-line-height * $mobile-font-percentage;
+  }
 }
 
 .subtitle {
   @apply flex flex-row justify-center font-sans font-light text-primary2;
 
-  font-size: 32px;
-  line-height: 42px;
+  font-size: $subtitle-font-size;
+  line-height: $subtitle-line-height;
   margin-top: 36px;
+
+  @include for-size(phone-only) {
+    font-size: $subtitle-font-size * $mobile-font-percentage;
+    line-height: $subtitle-line-height * $mobile-font-percentage;
+  }
 }
 
 .motto {
@@ -88,16 +107,30 @@ export default Vue.extend({
   @apply flex flex-row justify-center;
 
   margin-top: 64px;
+
+  @include for-size(phone-only) {
+    @apply flex-wrap;
+  }
 }
 
 .premium {
   margin-left: 32px;
+
+  @include for-size(phone-only) {
+    margin-left: 16px;
+  }
 }
 
 .screenshot {
   @apply flex flex-row justify-center;
 
   margin-top: 124px;
+
+  @include for-size(phone-only) {
+    margin-left: $mobile_margin;
+    margin-right: $mobile_margin;
+    margin-top: 64px;
+  }
 }
 
 .description {
@@ -108,6 +141,18 @@ export default Vue.extend({
   > * {
     margin-left: 73px;
     margin-right: 73px;
+
+    @include for-size(phone-only) {
+      margin-left: $mobile_margin;
+      margin-right: $mobile_margin;
+      margin-top: 32px;
+    }
+  }
+
+  @include for-size(phone-only) {
+    @apply flex-wrap text-center;
+
+    margin-top: 32px;
   }
 }
 </style>

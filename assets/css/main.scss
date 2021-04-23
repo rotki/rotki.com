@@ -1,0 +1,20 @@
+@import "media";
+
+.page {
+  @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
+
+  scroll-behavior: smooth;
+}
+
+.body {
+  @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
+}
+
+$mobile_margin: 16px;
+$mobile-font-percentage: 0.7;
+$mobile-image-percentage: 0.4;
+
+.mobile-margin {
+  margin-left: $mobile_margin;
+  margin-right: $mobile_margin;
+}
