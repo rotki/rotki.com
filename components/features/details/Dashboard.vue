@@ -1,5 +1,5 @@
 <template>
-  <feature id="dashboard">
+  <feature id="dashboard" :sticky="sticky">
     <template #title> Dashboard 360 degree overview of your holdings </template>
     <template #image>
       <div>
@@ -27,6 +27,12 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Dashboard',
+  props: {
+    sticky: {
+      type: Boolean,
+      required: true,
+    },
+  },
 })
 </script>
 
