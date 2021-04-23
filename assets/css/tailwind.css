@@ -3,22 +3,10 @@
 @tailwind utilities;
 
 @layer components {
-
-  .page {
-    @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
-
-    scroll-behavior: smooth;
-  }
-
-  .body {
-    @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
-  }
-
   .rotki-margin {
     margin-left: 151px;
     margin-right: 151px;
   }
-
 }
 
 /* source-sans-pro-300 - latin */

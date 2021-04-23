@@ -33,11 +33,19 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media.scss';
+
 .row {
   @apply flex flex-row justify-around;
 
   max-width: 453px;
+
+  @include for-size(phone-only) {
+    @apply flex-wrap;
+
+    max-width: 100%;
+  }
 }
 
 .column {

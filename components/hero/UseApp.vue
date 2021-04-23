@@ -23,11 +23,21 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .wrapper {
   @apply flex flex-row justify-center align-middle;
 
   margin-top: 129px;
+
+  @include for-size(phone-only) {
+    @apply flex-wrap;
+
+    margin-left: $mobile_margin;
+    margin-right: $mobile_margin;
+  }
 }
 
 .row {
@@ -35,21 +45,34 @@ export default Vue.extend({
 }
 
 .col {
-  @apply flex-col;
+  @apply flex flex-col;
 }
 
 .column2 {
-  @apply flex-col col-auto self-center;
+  @apply flex flex-col self-center;
 
   margin-left: 200px;
   max-width: 650px;
+
+  @include for-size(phone-only) {
+    margin-left: 0;
+    margin-top: 48px;
+  }
 }
+
+$text-font-size: 32px;
+$text-line-height: 50px;
 
 .text {
   @apply flex-col text-shade8 font-regular align-middle;
 
-  font-size: 32px;
-  line-height: 50px;
+  font-size: $text-font-size;
+  line-height: $text-line-height;
+
+  @include for-size(phone-only) {
+    font-size: $text-font-size * $mobile-font-percentage;
+    line-height: $text-line-height * $mobile-font-percentage;
+  }
 }
 
 .button {

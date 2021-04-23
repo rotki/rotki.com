@@ -17,7 +17,12 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/main';
+@import '~assets/css/media';
+
+$title-font-size: 52px;
+
 .wrapper {
   @apply container mx-auto;
 }
@@ -26,10 +31,19 @@ export default Vue.extend({
   @apply flex flex-row justify-center;
 
   margin-top: 94px;
+  @include for-size(phone-only) {
+    margin-top: 42px;
+  }
 }
 
 .title {
-  @apply header text-primary font-serif flex-col col-auto text-5xl;
+  @apply header text-primary font-serif flex-col col-auto;
+
+  font-size: $title-font-size;
+
+  @include for-size(phone-only) {
+    font-size: $title-font-size * $mobile-font-percentage;
+  }
 }
 
 .links {

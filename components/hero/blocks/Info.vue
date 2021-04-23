@@ -21,24 +21,43 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .wrapper {
   @apply flex flex-row justify-center;
 }
 
+$title-font-size: 32px;
+$title-line-height: 47px;
+
 .title {
   @apply flex-col font-serif text-primary2 text-4xl;
 
-  font-size: 32px;
-  line-height: 47px;
+  font-size: $title-font-size;
+  line-height: $title-line-height;
   letter-spacing: -0.01em;
+
+  @include for-size(phone-only) {
+    font-size: $title-font-size * $mobile-font-percentage;
+    line-height: $title-line-height * $mobile-font-percentage;
+  }
 }
+
+$subtitle-font-size: 24px;
+$subtitle-line-height: 30px;
 
 .subtitle {
   @apply flex-col font-sans text-primary2 text-center;
 
-  font-size: 24px;
-  line-height: 30px;
+  font-size: $subtitle-font-size;
+  line-height: $subtitle-line-height;
+
+  @include for-size(phone-only) {
+    font-size: $subtitle-font-size * $mobile-font-percentage;
+    line-height: $subtitle-line-height * $mobile-font-percentage;
+  }
 }
 
 .bottom {

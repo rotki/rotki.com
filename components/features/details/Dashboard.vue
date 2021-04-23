@@ -36,11 +36,14 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .image {
   position: absolute;
 
-  @media only screen and (max-width: 767px) {
+  @include for-size(phone-only) {
     position: relative;
     margin-bottom: 60px;
   }

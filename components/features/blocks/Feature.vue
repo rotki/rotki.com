@@ -35,26 +35,40 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .content {
   @apply flex flex-row flex-wrap-reverse;
 
   margin-top: 191px;
   margin-left: 151px;
   margin-right: 151px;
-  @media only screen and (max-width: 767px) {
-    margin-left: 80px;
-    margin-right: 80px;
+
+  @include for-size(phone-only) {
+    @apply justify-center;
+
+    margin-left: $mobile_margin;
+    margin-right: $mobile_margin;
   }
 }
+
+$title-font-size: 52px;
+$title-line-height: 67px;
 
 .title {
   @apply flex flex-row font-serif font-bold text-shade11;
 
-  font-size: 52px;
-  line-height: 67px;
+  font-size: $title-font-size;
+  line-height: $title-line-height;
   letter-spacing: -0.03em;
   margin-bottom: 27px;
+
+  @include for-size(phone-only) {
+    font-size: $title-font-size * $mobile-font-percentage;
+    line-height: $title-line-height * $mobile-font-percentage;
+  }
 }
 
 .column {
@@ -62,12 +76,16 @@ export default Vue.extend({
 }
 
 .column1 {
-  @apply flex flex-col col-span-12 md:col-span-7;
+  @apply flex flex-col;
 
   max-width: 660px;
+
+  @include for-size(phone-only) {
+    width: 100%;
+  }
 }
 
 .column2 {
-  @apply flex flex-col col-span-12 md:col-span-5;
+  @apply flex flex-col;
 }
 </style>
