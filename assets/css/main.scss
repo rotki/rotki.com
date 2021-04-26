@@ -4,17 +4,26 @@
   @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
 
   scroll-behavior: smooth;
+
+  @include for-size(phone-only) {
+    background-size: 100px;
+  }
 }
 
 .body {
   @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
+
+  @include for-size(phone-only) {
+    background-size: 70px;
+  }
 }
 
-$mobile_margin: 16px;
+$mobile-margin: 16px;
 $mobile-font-percentage: 0.7;
+$mobile-button-percentage: 0.8;
 $mobile-image-percentage: 0.4;
 
 .mobile-margin {
-  margin-left: $mobile_margin;
-  margin-right: $mobile_margin;
+  margin-left: $mobile-margin;
+  margin-right: $mobile-margin;
 }

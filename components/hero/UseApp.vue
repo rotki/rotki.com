@@ -35,8 +35,8 @@ export default Vue.extend({
   @include for-size(phone-only) {
     @apply flex-wrap;
 
-    margin-left: $mobile_margin;
-    margin-right: $mobile_margin;
+    margin-left: $mobile-margin;
+    margin-right: $mobile-margin;
   }
 }
 

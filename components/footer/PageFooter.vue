@@ -20,7 +20,10 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/main';
+@import '~assets/css/media';
+
 .wrapper {
   @apply container mx-auto;
 
@@ -32,12 +35,13 @@ export default Vue.extend({
 }
 
 .links {
-  @apply flex flex-row justify-between;
+  @apply flex flex-row justify-between flex-wrap;
 
   width: 100%;
 }
 
 .logo {
+  margin-left: 16px;
   margin-right: 60px;
 }
 </style>
