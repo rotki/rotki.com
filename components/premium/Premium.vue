@@ -32,12 +32,16 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/main';
+@import '~assets/css/media';
+
 .wrapper {
   @apply bg-primary2 bg-repeat;
 
   padding-bottom: 100px;
-  @media only screen and (max-width: 855px) {
+
+  @include for-size(phone-only) {
     padding-bottom: 400px;
   }
 }
@@ -45,20 +49,33 @@ export default Vue.extend({
 .main {
   @apply container;
 
-  margin-left: 151px;
-  margin-right: 151px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include for-size(phone-only) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
+
+$title-font-size: 66px;
+$title-line-height: 76px;
 
 .title {
   @apply text-primary font-serif font-bold;
 
   padding-top: 91px;
   margin-bottom: 10px;
-  font-size: 66px;
-  line-height: 76px;
+  font-size: $title-font-size;
+  line-height: $title-line-height;
   align-items: center;
   text-align: center;
   letter-spacing: -0.03em;
+
+  @include for-size(phone-only) {
+    font-size: $title-font-size * $mobile-font-percentage;
+    line-height: $title-line-height * $mobile-font-percentage;
+  }
 }
 
 .content {
@@ -76,7 +93,7 @@ export default Vue.extend({
   width: 358px;
   height: 347px;
 
-  @media only screen and (max-width: 855px) {
+  @include for-size(phone-only) {
     position: relative;
     top: 31px;
   }
@@ -92,6 +109,10 @@ export default Vue.extend({
   transform: matrix(-1, 0, 0, 1, 0, 0);
   width: 431px;
   height: 418px;
+
+  @include for-size(phone-only) {
+    bottom: -88px;
+  }
   @media only screen and (min-width: 2200px) {
     right: 300px;
   }

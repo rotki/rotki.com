@@ -34,9 +34,16 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/main';
+@import '~assets/css/media';
+
 .wrapper {
   @apply flex flex-row;
+
+  @include for-size(phone-only) {
+    margin-top: 40px;
+  }
 }
 
 .column {

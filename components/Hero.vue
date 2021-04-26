@@ -117,7 +117,8 @@ $subtitle-line-height: 42px;
   margin-left: 32px;
 
   @include for-size(phone-only) {
-    margin-left: 16px;
+    margin-left: $mobile-margin;
+    margin-top: $mobile-margin;
   }
 }
 
@@ -127,8 +128,8 @@ $subtitle-line-height: 42px;
   margin-top: 124px;
 
   @include for-size(phone-only) {
-    margin-left: $mobile_margin;
-    margin-right: $mobile_margin;
+    margin-left: $mobile-margin;
+    margin-right: $mobile-margin;
     margin-top: 64px;
   }
 }
@@ -143,8 +144,8 @@ $subtitle-line-height: 42px;
     margin-right: 73px;
 
     @include for-size(phone-only) {
-      margin-left: $mobile_margin;
-      margin-right: $mobile_margin;
+      margin-left: $mobile-margin;
+      margin-right: $mobile-margin;
       margin-top: 32px;
     }
   }
