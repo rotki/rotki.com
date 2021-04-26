@@ -43,19 +43,24 @@ export default Vue.extend({
 $font-size: 18px;
 $line-height: 32px;
 
+$button-height: 65px;
+$button-width: 275px;
+
 .button {
   @apply font-serif uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
 
   font-size: $font-size;
   line-height: $line-height;
-  height: 65px;
-  width: 275px;
+  height: $button-height;
+  width: $button-width;
 
   @include for-size(phone-only) {
     font-size: $font-size * $mobile-font-percentage;
     line-height: $font-size * $mobile-font-percentage;
-    margin-left: $mobile_margin;
-    margin-right: $mobile_margin;
+    margin-left: $mobile-margin;
+    margin-right: $mobile-margin;
+    height: $button-height * $mobile-button-percentage;
+    width: $button-width * $mobile-button-percentage;
   }
 }
 

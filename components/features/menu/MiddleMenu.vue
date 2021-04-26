@@ -127,17 +127,28 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/main';
+@import '~assets/css/media';
+
 .wrapper {
   padding-top: 16px;
   margin-top: calc(145px - 16px);
 }
 
+$menu-font-size: 24px;
+$menu-line-height: 32px;
+
 .menu {
   @apply flex flex-row font-sans justify-center font-light text-center;
 
-  font-size: 24px;
-  line-height: 32px;
+  font-size: $menu-font-size;
+  line-height: $menu-line-height;
+
+  @include for-size(phone-only) {
+    font-size: $menu-font-size * $mobile-font-percentage;
+    line-height: $menu-line-height * $mobile-font-percentage;
+  }
 }
 
 .sticky {

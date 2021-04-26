@@ -42,7 +42,7 @@ export default Vue.extend({
   max-width: 453px;
 
   @include for-size(phone-only) {
-    @apply flex-wrap;
+    @apply flex-wrap justify-center;
 
     max-width: 100%;
   }
@@ -53,6 +53,11 @@ export default Vue.extend({
 
   margin-left: 16px;
   margin-right: 16px;
+
+  @include for-size(phone-only) {
+    width: 100%;
+    margin: 0 auto;
+  }
 }
 
 .link {
