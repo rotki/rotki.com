@@ -21,8 +21,6 @@ export default Vue.extend({
 @import '~assets/css/main';
 @import '~assets/css/media';
 
-$title-font-size: 52px;
-
 .wrapper {
   @apply container mx-auto;
 }
@@ -39,11 +37,7 @@ $title-font-size: 52px;
 .title {
   @apply header text-primary font-serif flex-col col-auto;
 
-  font-size: $title-font-size;
-
-  @include for-size(phone-only) {
-    font-size: $title-font-size * $mobile-font-percentage;
-  }
+  @include text-size(52px, 67px);
 }
 
 .links {

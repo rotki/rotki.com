@@ -36,37 +36,21 @@ export default Vue.extend({
   margin-top: 93px;
 }
 
-$title-font-size: 32px;
-$title-line-height: 47px;
-
 .title {
   @apply font-bold text-primary2 font-serif text-center;
 
   letter-spacing: -0.01em;
-  font-size: $title-font-size;
-  line-height: $title-line-height;
 
-  @include for-size(phone-only) {
-    font-size: $title-font-size * $mobile-font-percentage;
-    line-height: $title-line-height * $mobile-font-percentage;
-  }
+  @include text-size(32px, 47px);
 }
-
-$body-font-size: 24px;
-$body-line-height: 32px;
 
 .description {
   @apply font-sans text-center text-primary2 flex flex-col self-center;
 
-  font-size: $body-font-size;
-  line-height: $body-line-height;
   margin-top: 45px;
   max-width: 370px;
 
-  @include for-size(phone-only) {
-    font-size: $body-font-size * $mobile-font-percentage;
-    line-height: $body-line-height * $mobile-font-percentage;
-  }
+  @include text-size(24px, 32px);
 }
 
 .button {

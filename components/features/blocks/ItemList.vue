@@ -28,19 +28,10 @@ export default Vue.extend({
   @apply flex flex-col;
 }
 
-$list-font-size: 24px;
-$list-line-height: 32px;
-
 .list {
   @apply font-sans font-light text-black;
 
-  font-size: $list-font-size;
-  line-height: $list-line-height;
-
-  @include for-size(phone-only) {
-    font-size: $list-font-size * $mobile-font-percentage;
-    line-height: $list-line-height * $mobile-font-percentage;
-  }
+  @include text-size(24px, 32px);
 }
 
 .list .row {

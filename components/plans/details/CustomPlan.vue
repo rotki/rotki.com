@@ -43,36 +43,20 @@ export default Vue.extend({
   }
 }
 
-$title-font-size: 52px;
-$title-line-height: 67px;
-
 .title {
   @apply font-bold font-serif text-shade11;
 
-  font-size: $title-font-size;
-  line-height: $title-line-height;
   letter-spacing: -0.03em;
 
-  @include for-size(phone-only) {
-    font-size: $title-font-size * $mobile-font-percentage;
-    line-height: $title-line-height * $mobile-font-percentage;
-  }
+  @include text-size(52px, 67px);
 }
-
-$description-font-size: 24px;
-$description-line-height: 32px;
 
 .description {
   @apply font-sans text-primary2 flex flex-col;
 
-  font-size: $description-font-size;
-  line-height: $description-line-height;
   margin-top: 22px;
 
-  @include for-size(phone-only) {
-    font-size: $description-font-size * $mobile-font-percentage;
-    line-height: $description-line-height * $mobile-font-percentage;
-  }
+  @include text-size(24px, 32px);
 }
 
 .button {
