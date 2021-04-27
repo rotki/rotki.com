@@ -43,32 +43,20 @@ export default Vue.extend({
   @apply flex flex-row flex-wrap-reverse;
 
   margin-top: 191px;
-  margin-left: 151px;
-  margin-right: 151px;
+  @include margins();
 
   @include for-size(phone-only) {
     @apply justify-center;
-
-    margin-left: $mobile-margin;
-    margin-right: $mobile-margin;
   }
 }
-
-$title-font-size: 52px;
-$title-line-height: 67px;
 
 .title {
   @apply flex flex-row font-serif font-bold text-shade11;
 
-  font-size: $title-font-size;
-  line-height: $title-line-height;
   letter-spacing: -0.03em;
   margin-bottom: 27px;
 
-  @include for-size(phone-only) {
-    font-size: $title-font-size * $mobile-font-percentage;
-    line-height: $title-line-height * $mobile-font-percentage;
-  }
+  @include text-size(52px, 67px);
 }
 
 .column {

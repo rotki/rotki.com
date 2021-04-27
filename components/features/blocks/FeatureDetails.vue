@@ -33,31 +33,19 @@ export default Vue.extend({
   @apply flex flex-col;
 }
 
-$subtitle-font-size: 25px;
-$subtitle-line-height: 46px;
-
 .subtitle {
   @apply flex flex-row font-serif font-bold text-primary2;
 
-  font-size: $subtitle-font-size;
-  line-height: $subtitle-line-height;
   letter-spacing: -0.01em;
   margin-top: 58px;
   margin-bottom: 16px;
 
-  @include for-size(phone-only) {
-    font-size: $subtitle-font-size * $mobile-font-percentage;
-    line-height: $subtitle-line-height * $mobile-font-percentage;
-  }
+  @include text-size(25px, 46px);
 }
-
-$description-font-size: 24px;
-$description-line-height: 32px;
 
 .description {
   @apply flex flex-row font-sans text-primary2;
 
-  font-size: $description-font-size * $mobile-font-percentage;
-  line-height: $description-line-height * $mobile-font-percentage;
+  @include text-size(24px, 32px);
 }
 </style>

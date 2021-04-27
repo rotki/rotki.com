@@ -32,11 +32,10 @@ export default Vue.extend({
 
   margin-top: 129px;
 
+  @include margins();
+
   @include for-size(phone-only) {
     @apply flex-wrap;
-
-    margin-left: $mobile-margin;
-    margin-right: $mobile-margin;
   }
 }
 
@@ -60,19 +59,10 @@ export default Vue.extend({
   }
 }
 
-$text-font-size: 32px;
-$text-line-height: 50px;
-
 .text {
   @apply flex-col text-shade8 font-regular align-middle;
 
-  font-size: $text-font-size;
-  line-height: $text-line-height;
-
-  @include for-size(phone-only) {
-    font-size: $text-font-size * $mobile-font-percentage;
-    line-height: $text-line-height * $mobile-font-percentage;
-  }
+  @include text-size(32px, 50px);
 }
 
 .button {

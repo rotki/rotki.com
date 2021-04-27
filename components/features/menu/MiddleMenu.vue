@@ -136,19 +136,10 @@ export default Vue.extend({
   margin-top: calc(145px - 16px);
 }
 
-$menu-font-size: 24px;
-$menu-line-height: 32px;
-
 .menu {
   @apply flex flex-row font-sans justify-center font-light text-center;
 
-  font-size: $menu-font-size;
-  line-height: $menu-line-height;
-
-  @include for-size(phone-only) {
-    font-size: $menu-font-size * $mobile-font-percentage;
-    line-height: $menu-line-height * $mobile-font-percentage;
-  }
+  @include text-size(24px, 32px);
 }
 
 .sticky {
