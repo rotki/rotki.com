@@ -49,33 +49,19 @@ export default Vue.extend({
 .main {
   @apply container;
 
-  margin-left: auto;
-  margin-right: auto;
-
-  @include for-size(phone-only) {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
+  @include margins();
 }
-
-$title-font-size: 66px;
-$title-line-height: 76px;
 
 .title {
   @apply text-primary font-serif font-bold;
 
   padding-top: 91px;
   margin-bottom: 10px;
-  font-size: $title-font-size;
-  line-height: $title-line-height;
   align-items: center;
   text-align: center;
   letter-spacing: -0.03em;
 
-  @include for-size(phone-only) {
-    font-size: $title-font-size * $mobile-font-percentage;
-    line-height: $title-line-height * $mobile-font-percentage;
-  }
+  @include text-size(66px, 76px);
 }
 
 .content {

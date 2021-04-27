@@ -29,28 +29,16 @@ export default Vue.extend({
 .wrapper {
   margin-top: 123px;
   padding-bottom: 30px;
-
-  @include for-size(phone-only) {
-    padding-left: $mobile-margin;
-    padding-right: $mobile-margin;
-  }
+  @include margins();
 }
-
-$header-font-size: 84px;
-$header-line-height: 108px;
 
 .header {
   @apply font-bold font-serif text-primary2;
 
   text-align: center;
   letter-spacing: -0.03em;
-  font-size: $header-font-size;
-  line-height: $header-line-height;
 
-  @include for-size(phone-only) {
-    font-size: $header-font-size * $mobile-font-percentage;
-    line-height: $header-line-height * $mobile-font-percentage;
-  }
+  @include text-size(84px, 108px);
 }
 
 .basic {

@@ -54,9 +54,6 @@ export default Vue.extend({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
-$title-font-size: 66px;
-$title-line-height: 84px;
-
 $subtitle-font-size: 32px;
 $subtitle-line-height: 42px;
 
@@ -67,26 +64,15 @@ $subtitle-line-height: 42px;
 .title {
   @apply flex flex-row justify-center font-serif text-primary2;
 
-  font-size: $title-font-size;
-  line-height: $title-line-height;
-
-  @include for-size(phone-only) {
-    font-size: $title-font-size * $mobile-font-percentage;
-    line-height: $title-line-height * $mobile-font-percentage;
-  }
+  @include text-size(66px, 84px);
 }
 
 .subtitle {
   @apply flex flex-row justify-center font-sans font-light text-primary2;
 
-  font-size: $subtitle-font-size;
-  line-height: $subtitle-line-height;
   margin-top: 36px;
 
-  @include for-size(phone-only) {
-    font-size: $subtitle-font-size * $mobile-font-percentage;
-    line-height: $subtitle-line-height * $mobile-font-percentage;
-  }
+  @include text-size(32px, 42px);
 }
 
 .motto {
@@ -127,9 +113,8 @@ $subtitle-line-height: 42px;
 
   margin-top: 124px;
 
+  @include margins();
   @include for-size(phone-only) {
-    margin-left: $mobile-margin;
-    margin-right: $mobile-margin;
     margin-top: 64px;
   }
 }
@@ -144,9 +129,14 @@ $subtitle-line-height: 42px;
     margin-right: 73px;
 
     @include for-size(phone-only) {
-      margin-left: $mobile-margin;
-      margin-right: $mobile-margin;
+      margin-left: 16px;
+      margin-right: 16px;
       margin-top: 32px;
+    }
+
+    @include for-size(tablet-portrait-up) {
+      margin-left: 16px;
+      margin-right: 16px;
     }
   }
 

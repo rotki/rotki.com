@@ -11,3 +11,74 @@
     @media (min-width: 1800px) { @content; }
   }
 }
+
+$mobile-font-percentage: 0.7;
+$tablet-font-percentage: 0.8;
+$tablet-landscape-font-percentage: 0.9;
+$desktop-up-font-percentage: 1;
+$big-desktop-font-percentage: 1.1;
+
+@mixin text-size($font-size, $line-height) {
+  font-size: $font-size;
+  line-height: $line-height;
+
+  @include for-size(phone-only) {
+    font-size: $font-size * $mobile-font-percentage;
+    line-height: $line-height * $mobile-font-percentage;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    font-size: $font-size * $tablet-font-percentage;
+    line-height: $line-height * $tablet-font-percentage;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    font-size: $font-size * $tablet-landscape-font-percentage;
+    line-height: $line-height * $tablet-landscape-font-percentage;
+  }
+
+  @include for-size(desktop-up) {
+    font-size: $font-size * $desktop-up-font-percentage;
+    line-height: $line-height * $desktop-up-font-percentage;
+  }
+
+  @include for-size(big-desktop-up) {
+    font-size: $font-size * $big-desktop-font-percentage;
+    line-height: $line-height * $big-desktop-font-percentage;
+  }
+}
+
+$margin-mobile: 16px;
+$margin-tablet: 32px;
+$margin-desktop: auto;
+
+@mixin margins() {
+  margin-left: auto;
+  margin-right: auto;
+
+  @include for-size(phone-only) {
+    margin-left: $margin-mobile;
+    margin-right: $margin-mobile;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    font-size: $margin-tablet;
+    line-height: $margin-tablet;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    font-size: $margin-tablet;
+    line-height: $margin-tablet;
+  }
+
+  @include for-size(desktop-up) {
+    font-size: $margin-desktop;
+    line-height: $margin-desktop;
+  }
+
+  @include for-size(big-desktop-up) {
+    font-size: $margin-desktop;
+    line-height: $margin-desktop;
+  }
+}
+

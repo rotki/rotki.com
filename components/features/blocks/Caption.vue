@@ -16,18 +16,9 @@ export default Vue.extend({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
-$font-size: 18px;
-$line-height: 32px;
-
 .caption {
   @apply flex flex-row mt-16 text-shade7 font-sans font-normal;
 
-  font-size: $font-size;
-  line-height: $line-height;
-
-  @include for-size(phone-only) {
-    font-size: $font-size * $mobile-font-percentage;
-    line-height: $line-height * $mobile-font-percentage;
-  }
+  @include text-size(18px, 32px);
 }
 </style>

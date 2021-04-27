@@ -48,7 +48,10 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media.scss';
+@import '~assets/css/main.scss';
+
 .overlay {
   @apply w-screen h-screen overflow-y-hidden bg-opacity-50 bg-black z-30 fixed top-0;
 }
@@ -84,18 +87,17 @@ export default Vue.extend({
 .title {
   @apply font-serif font-bold text-shade11;
 
-  font-size: 52px;
-  line-height: 67px;
   letter-spacing: -0.03em;
+
+  @include text-size(52px, 67px);
 }
 
 .description {
   @apply font-sans text-primary2;
 
   margin-top: 30px;
-  font-size: 24px;
-  line-height: 34px;
   letter-spacing: -0.03em;
+  @include text-size(24px, 34px);
 }
 
 .row {
@@ -114,8 +116,8 @@ export default Vue.extend({
   @apply flex flex-row flex-wrap justify-center font-sans items-center;
 
   margin-top: 22px;
-  font-size: 16px;
-  line-height: 34px;
   text-align: center;
+
+  @include text-size(16px, 34px);
 }
 </style>
