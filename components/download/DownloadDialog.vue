@@ -65,8 +65,8 @@ export default Vue.extend({
 </script>
 
 <style module lang="scss">
-@import '~assets/css/media.scss';
-@import '~assets/css/main.scss';
+@import '~assets/css/media';
+@import '~assets/css/main';
 
 .overlay {
   @apply w-screen h-screen overflow-y-hidden bg-opacity-50 bg-black z-30 fixed top-0;
