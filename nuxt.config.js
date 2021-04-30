@@ -35,6 +35,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/recaptcha',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
@@ -49,5 +50,16 @@ export default {
         },
       },
     },
+  },
+
+  publicRuntimeConfig: {
+    recaptcha: {
+      /* reCAPTCHA options */
+      siteKey: process.env.RECAPTCHA_SITE_KEY, // for example
+    },
+  },
+
+  recaptcha: {
+    version: 2,
   },
 }
