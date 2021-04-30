@@ -27,7 +27,7 @@
               src="~/assets/img/dl/linux.svg"
             />
           </a>
-          <a :href="osxUrl" :class="$style.link" target="_blank">
+          <a :href="macOSUrl" :class="$style.link" target="_blank">
             <img
               alt="macOS Download button"
               :class="$style.link"
@@ -42,7 +42,9 @@
             />
           </a>
         </div>
-        <div :class="$style.row3">Latest Release: {{ version }}</div>
+        <div v-if="version" :class="$style.row3">
+          Latest Release: {{ version }}
+        </div>
       </div>
     </div>
   </div>
@@ -51,15 +53,38 @@
 <script lang="ts">
 import Vue from 'vue'
 
+const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
+
 export default Vue.extend({
   name: 'DownloadDialog',
   data() {
     return {
-      version: 'v1.13.2',
-      linuxUrl: '',
-      osxUrl: '',
-      windowsUrl: '',
+      version: '',
+      linuxUrl: LATEST,
+      macOSUrl: LATEST,
+      windowsUrl: LATEST,
     }
+  },
+  async mounted() {
+    await this.fetchLatestRelease()
+  },
+  methods: {
+    async fetchLatestRelease() {
+      const latestRelease = await this.$axios.$get(
+        'https://api.github.com/repos/rotki/rotki/releases/latest'
+      )
+      this.version = latestRelease.tag_name
+      const assets = latestRelease.assets
+      const dmgs = assets.filter(({ name }) => name.endsWith('.dmg'))
+      const exes = assets.filter(
+        ({ name }) => name.endsWith('.exe') && name.startsWith('rotki-win32')
+      )
+      const appImages = assets.filter(({ name }) => name.endsWith('.AppImage'))
+
+      this.macOSUrl = dmgs[0].browser_download_url
+      this.linuxUrl = appImages[0].browser_download_url
+      this.windowsUrl = exes[0].browser_download_url
+    },
   },
 })
 </script>
