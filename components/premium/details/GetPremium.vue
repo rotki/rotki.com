@@ -12,11 +12,22 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .container {
   @apply flex flex-col align-middle self-center;
 
   margin-top: 105px;
-  width: 40%;
+
+  @include for-size(phone-only) {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    width: 40%;
+  }
 }
 </style>

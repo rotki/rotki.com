@@ -2,13 +2,19 @@
   <feature id="eth2-staking" :sticky="sticky">
     <template #title> Eth2 staking</template>
     <template #image>
-      <img src="~/assets/img/ethereum.svg" :class="$style.image" />
+      <img
+        alt="Ethereum"
+        src="~/assets/img/ethereum.svg"
+        :class="$style.image"
+      />
     </template>
     <feature-details>
       Premium users can set watchers for various protocol so that they can be
       informed via email when certain conditions are met.
     </feature-details>
-    <download-button />
+    <div :class="$style.button">
+      <download-button @click="$emit('download')" />
+    </div>
   </feature>
 </template>
 
@@ -34,26 +40,24 @@ $image-width: 192px;
 $image-height: 312px;
 
 .image {
-  margin-top: -55px;
-  margin-left: 174px;
   width: $image-width;
   height: $image-height;
 
   @include for-size(phone-only) {
-    margin-top: 0;
-    margin-left: auto;
-    margin-right: auto;
     width: $image-width;
     height: $image-height;
-  }
-
-  @media only screen and (max-width: 755px) {
     padding-bottom: 120px;
   }
 
-  @media only screen and (min-width: 756px) and (max-width: 1600px) {
+  @include for-size(desktop-up) {
     position: absolute;
-    margin-left: 0;
+    right: 100px;
+  }
+}
+
+.button {
+  @include for-size(phone-only) {
+    @include margin-x(auto);
   }
 }
 </style>

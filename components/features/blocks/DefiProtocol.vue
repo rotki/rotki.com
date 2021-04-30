@@ -3,7 +3,11 @@
     <div :class="$style.protocol">
       <div :class="$style['title-wrapper']">
         <div v-if="image">
-          <img :src="image" :class="$style.image" />
+          <img
+            alt="Supported DeFi protocol"
+            :src="image"
+            :class="$style.image"
+          />
         </div>
         <div :class="$style.title">
           <slot name="name" />
@@ -38,16 +42,24 @@ export default Vue.extend({
 .wrapper {
   @apply flex flex-col;
 
-  width: 33%;
+  width: 320px;
   margin-top: 48px;
 
   @include for-size(phone-only) {
     width: 100%;
   }
+
+  @include for-size(tablet-portait-up) {
+    width: 50%;
+  }
+
+  @include for-size(desktop-up) {
+    width: 33%;
+  }
 }
 
 .protocol {
-  width: 320px;
+  height: 140px;
 }
 
 .image {
@@ -71,6 +83,7 @@ export default Vue.extend({
   @apply font-sans text-primary2;
 
   margin-top: 27px;
+  padding-right: 16px;
   @include text-size(20px, 32px);
 }
 </style>

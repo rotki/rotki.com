@@ -1,17 +1,23 @@
 <template>
-  <div :class="$style.row">
-    <div :class="$style.column1">
-      <img :class="$style.image" src="~/assets/img/space.svg" />
+  <div>
+    <div :class="$style.space">
+      <img
+        alt="rotki in Space"
+        :class="$style.image"
+        src="~/assets/img/space.svg"
+      />
     </div>
-    <div :class="$style.wrapper">
-      <div :class="$style.row">
-        <div :class="$style.column2">
-          <div :class="$style.title">Want a custom tailored plan?</div>
-          <div :class="$style.description">
-            Get in touch with us to tailor the plan to your needs.
-          </div>
-          <div :class="$style.button">
-            <action-button text="Get in touch now" />
+    <div :class="$style.row">
+      <div :class="$style.wrapper">
+        <div :class="$style.row">
+          <div :class="$style.column2">
+            <div :class="$style.title">Want a custom tailored plan?</div>
+            <div :class="$style.description">
+              Get in touch with us to tailor the plan to your needs.
+            </div>
+            <div :class="$style.button">
+              <action-button text="Get in touch now" />
+            </div>
           </div>
         </div>
       </div>
@@ -61,42 +67,58 @@ export default Vue.extend({
 
 .button {
   margin-top: 48px;
+
+  @include for-size(phone-only) {
+    margin-right: auto;
+    margin-left: auto;
+  }
 }
 
 .row {
   @apply flex flex-row align-middle flex-wrap;
 }
 
-.column1 {
+.space {
   position: relative;
-}
-
-.column2 {
-  @apply flex flex-col col-span-12 md:col-span-7  self-center;
-
-  margin-left: 400px;
 
   @include for-size(phone-only) {
-    margin-left: 0;
+    padding-top: 24px;
   }
 }
 
-$image-width: 625px;
-$image-height: 603px;
+.column2 {
+  @apply flex flex-col self-center;
 
-.image {
-  position: absolute;
-  left: -233px;
-  top: -150px;
-  width: $image-width;
-  height: $image-height;
+  width: 100%;
 
   @include for-size(phone-only) {
+    @include margin-x($mobile-margin);
+  }
+
+  @include for-size(tablet-portrait-up) {
+    @include margin-x($mobile-margin);
+  }
+
+  @include for-size(tablet-landscape-up) {
+    margin-left: 400px;
+  }
+}
+
+.image {
+  @include for-size(phone-only) {
     position: relative;
-    left: 0;
-    top: 0;
-    width: $image-width * 0.9;
-    height: $image-height * 0.9;
+    width: 100%;
+    padding: $mobile-margin;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    margin-top: 48px;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    top: 60px;
+    left: -250px;
+    position: absolute;
   }
 }
 </style>

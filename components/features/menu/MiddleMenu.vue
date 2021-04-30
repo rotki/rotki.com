@@ -134,6 +134,10 @@ export default Vue.extend({
 .wrapper {
   padding-top: 16px;
   margin-top: calc(145px - 16px);
+
+  @include for-size(phone-only) {
+    display: none;
+  }
 }
 
 .menu {

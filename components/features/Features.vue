@@ -7,12 +7,14 @@
         [$style.wrapper]: true,
       }"
     >
-      <dashboard :sticky="sticky" @download="$emit('download')" />
-      <exchanges :sticky="sticky" />
-      <defi :sticky="sticky" />
-      <defi-details :sticky="sticky" />
-      <Eth2Staking :sticky="sticky" />
-      <ProfitLossReport :sticky="sticky" :class="$style.last" />
+      <div>
+        <dashboard :sticky="sticky" @download="$emit('download')" />
+        <exchanges :sticky="sticky" />
+        <defi :sticky="sticky" />
+        <defi-details :sticky="sticky" />
+        <Eth2Staking :sticky="sticky" @download="$emit('download')" />
+        <ProfitLossReport :sticky="sticky" :class="$style.last" />
+      </div>
     </div>
   </fragment>
 </template>
@@ -30,17 +32,31 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .wrapper {
   @apply container mx-auto;
 }
 
 .last {
-  margin-left: 280px;
-  padding-bottom: 134px;
-
-  @media only screen and (max-width: 767px) {
+  @include for-size(phone-only) {
     margin-left: 0;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    margin-left: 0;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    margin-left: 280px !important;
+    margin-bottom: -150px;
+  }
+
+  @include for-size(desktop-up) {
+    margin-left: 280px;
+    margin-bottom: -150px;
   }
 }
 </style>

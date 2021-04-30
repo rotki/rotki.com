@@ -4,9 +4,11 @@
       Connect to a big number of centralized exchanges
     </template>
     <template #image>
-      <div>
-        <img src="~/assets/img/exchanges.png" :class="$style.image" />
-      </div>
+      <img
+        alt="Supported Exchanges"
+        src="~/assets/img/exchanges.png"
+        :class="$style.image"
+      />
     </template>
     <feature-details>
       Connect to a big number of centralized exchanges and inspect current
@@ -46,31 +48,31 @@ export default Vue.extend({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
-$image-width: 755px;
-$image-height: 527px;
-
 .image {
   z-index: -1;
   position: absolute;
-  margin-top: -60px;
-  right: -93px;
-  height: $image-height;
-  width: $image-width;
-
-  @media only screen and (min-width: 2200px) {
-    position: relative;
-    right: 0;
-  }
-  @media only screen and (min-width: 3000px) {
-    position: relative;
-    right: 0;
-  }
 
   @include for-size(phone-only) {
-    height: $image-height * $mobile-image-percentage;
-    width: $image-width * $mobile-image-percentage;
+    max-width: 100%;
     position: relative;
     right: 0;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    position: relative;
+    max-width: 100%;
+    top: 0;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    margin-top: -60px;
+    right: -93px;
+    max-width: 755px;
+  }
+
+  @include for-size(desktop-up) {
+    position: absolute;
+    right: -150px;
   }
 }
 

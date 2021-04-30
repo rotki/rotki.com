@@ -2,7 +2,7 @@
   <div :class="$style.wrapper">
     <div :class="$style.row">
       <div :class="$style.logo">
-        <img src="~/assets/img/logo-small.svg" />
+        <img alt="rotki" src="~/assets/img/logo-small.svg" />
       </div>
       <div :class="$style.links">
         <links />
@@ -38,6 +38,10 @@ export default Vue.extend({
   @apply flex flex-row justify-between flex-wrap;
 
   width: 100%;
+
+  @include for-size(phone-only) {
+    @apply justify-end;
+  }
 }
 
 .logo {

@@ -48,37 +48,8 @@ $big-desktop-font-percentage: 1.1;
   }
 }
 
-$margin-mobile: 16px;
-$margin-tablet: 32px;
-$margin-desktop: auto;
 
-@mixin margins() {
-  margin-left: auto;
-  margin-right: auto;
-
-  @include for-size(phone-only) {
-    margin-left: $margin-mobile;
-    margin-right: $margin-mobile;
-  }
-
-  @include for-size(tablet-portrait-up) {
-    font-size: $margin-tablet;
-    line-height: $margin-tablet;
-  }
-
-  @include for-size(tablet-landscape-up) {
-    font-size: $margin-tablet;
-    line-height: $margin-tablet;
-  }
-
-  @include for-size(desktop-up) {
-    font-size: $margin-desktop;
-    line-height: $margin-desktop;
-  }
-
-  @include for-size(big-desktop-up) {
-    font-size: $margin-desktop;
-    line-height: $margin-desktop;
-  }
+@mixin margin-x($margin) {
+  margin-left: $margin;
+  margin-right: $margin;
 }
-

@@ -26,11 +26,22 @@ export default Vue.extend({
 .wrapper {
   @apply flex flex-col;
 
-  width: 40%;
   margin-top: 160px;
 
   @include for-size(phone-only) {
     width: 100%;
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    width: 100%;
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    width: 40%;
   }
 }
 

@@ -13,6 +13,10 @@
    background-size: 150px;
   }
 
+  @include for-size(desktop-up) {
+    background-size: 200px;
+  }
+
 }
 
 .body {
@@ -25,16 +29,21 @@
   @include for-size(tablet-portrait-up) {
     background-size: 120px;
   }
+
+  @include for-size(desktop-up) {
+    background-size: 180px;
+  }
+
+  @include for-size(desktop-up) {
+    background-size: 180px;
+  }
+
 }
 
 $mobile-margin: 16px;
+
 $mobile-font-percentage: 0.7;
 $tablet-font-percentage: 0.8;
 
 $mobile-button-percentage: 0.8;
 $mobile-image-percentage: 0.4;
-
-.mobile-margin {
-  margin-left: $mobile-margin;
-  margin-right: $mobile-margin;
-}

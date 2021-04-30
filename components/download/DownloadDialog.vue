@@ -4,7 +4,11 @@
       <div :class="$style.dialog">
         <div :class="$style.row">
           <div :class="$style['icon-column']">
-            <img :class="$style.icon" src="~/assets/img/partial-logo.svg" />
+            <img
+              alt="partial rotki logo"
+              :class="$style.icon"
+              src="~/assets/img/partial-logo.svg"
+            />
           </div>
           <div :class="$style['title-column']">
             <div :class="$style.title">Download Rotki</div>
@@ -17,13 +21,25 @@
         </div>
         <div :class="$style.row2">
           <a :href="linuxUrl" :class="$style.link" target="_blank">
-            <img :class="$style.link" src="~/assets/img/dl/linux.svg" />
+            <img
+              alt="Linux Download button"
+              :class="$style.link"
+              src="~/assets/img/dl/linux.svg"
+            />
           </a>
           <a :href="osxUrl" :class="$style.link" target="_blank">
-            <img :class="$style.link" src="~/assets/img/dl/mac.svg" />
+            <img
+              alt="macOS Download button"
+              :class="$style.link"
+              src="~/assets/img/dl/mac.svg"
+            />
           </a>
           <a :href="windowsUrl" :class="$style.link" target="_blank">
-            <img :class="$style.link" src="~/assets/img/dl/windows.svg" />
+            <img
+              alt="Windows Download button"
+              :class="$style.link"
+              src="~/assets/img/dl/windows.svg"
+            />
           </a>
         </div>
         <div :class="$style.row3">Latest Release: {{ version }}</div>
@@ -64,12 +80,17 @@ export default Vue.extend({
   @apply bg-white flex flex-col;
 
   border-radius: 40px;
+  margin: 16px;
   width: 800px;
   height: 539px;
 }
 
 .icon-column {
   @apply flex flex-col col-auto;
+
+  @include for-size(phone-only) {
+    display: none;
+  }
 }
 
 .title-column {
@@ -77,6 +98,10 @@ export default Vue.extend({
 
   padding-left: 61px;
   margin-top: 85px;
+
+  @include for-size(phone-only) {
+    padding-left: 16px;
+  }
 }
 
 .icon {
@@ -97,6 +122,7 @@ export default Vue.extend({
 
   margin-top: 30px;
   letter-spacing: -0.03em;
+  padding-right: 16px;
   @include text-size(24px, 34px);
 }
 
@@ -110,6 +136,29 @@ export default Vue.extend({
   margin-top: 90px;
   padding-left: 40px;
   padding-right: 40px;
+
+  > * {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  @include for-size(phone-only) {
+    @apply flex-wrap;
+
+    margin-top: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+
+    > * {
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 8px;
+
+      > img {
+        height: 50px;
+      }
+    }
+  }
 }
 
 .row3 {

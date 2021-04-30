@@ -44,5 +44,9 @@ export default Vue.extend({
   @apply flex flex-row justify-center;
 
   margin-top: 50px;
+
+  @include for-size(phone-only) {
+    @include margin-x($mobile-margin * 2);
+  }
 }
 </style>
