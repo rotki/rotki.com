@@ -3,8 +3,10 @@
     <div :class="$style.header">
       <div :class="$style.title">Rotki</div>
     </div>
+    <slot name="subtitle" />
     <div :class="$style.links">
       <links />
+      <slot />
     </div>
   </div>
 </template>
