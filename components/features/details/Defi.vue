@@ -2,7 +2,11 @@
   <feature id="defi" :sticky="sticky">
     <template #title> DeFi </template>
     <template #image>
-      <img src="~/assets/img/defi.png" :class="$style.image" />
+      <img
+        alt="DeFi protocols"
+        src="~/assets/img/defi.png"
+        :class="$style.image"
+      />
     </template>
     <feature-details>
       Overview of all of your DeFi holdings in various protocols, historical
@@ -40,22 +44,27 @@ export default Vue.extend({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
-$width: 732px;
-$height: 506px;
-
 .image {
-  width: $width;
-  height: $height;
   z-index: -1;
-  position: absolute;
-  margin-top: 38px;
-  right: -50px;
-
   @include for-size(phone-only) {
+    width: 100%;
     position: relative;
     right: 0;
-    width: $width * $mobile-image-percentage;
-    height: $height * $mobile-image-percentage;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    position: relative;
+    margin-bottom: 60px;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    max-width: 732px;
+  }
+
+  @include for-size(desktop-up) {
+    position: absolute;
+    margin-top: 38px;
+    right: -100px;
   }
 }
 </style>

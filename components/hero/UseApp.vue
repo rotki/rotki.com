@@ -1,7 +1,11 @@
 <template>
   <div :class="$style.wrapper">
     <div :class="$style.col">
-      <img src="~/assets/img/accountant.svg" :class="$style.image" />
+      <img
+        alt="rotki accountant"
+        src="~/assets/img/accountant.svg"
+        :class="$style.image"
+      />
     </div>
     <div :class="$style.column2">
       <div :class="$style.row">
@@ -32,8 +36,6 @@ export default Vue.extend({
 
   margin-top: 129px;
 
-  @include margins();
-
   @include for-size(phone-only) {
     @apply flex-wrap;
   }
@@ -45,17 +47,47 @@ export default Vue.extend({
 
 .col {
   @apply flex flex-col;
+
+  @include for-size(phone-only) {
+    padding-left: $mobile-margin;
+    padding-right: $mobile-margin;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    padding-left: $mobile-margin;
+    padding-right: $mobile-margin;
+  }
+
+  @include for-size(tablet-lanscape-up) {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .column2 {
   @apply flex flex-col self-center;
 
-  margin-left: 200px;
   max-width: 650px;
 
   @include for-size(phone-only) {
     margin-left: 0;
     margin-top: 48px;
+    padding-left: $mobile-margin;
+    padding-right: $mobile-margin;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    padding-left: $mobile-margin;
+    padding-right: $mobile-margin;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  @include for-size(desktop-up) {
+    margin-left: 200px;
   }
 }
 
@@ -67,6 +99,10 @@ export default Vue.extend({
 
 .button {
   margin-top: 64px;
+
+  @include for-size(phone-only) {
+    @include margin-x(auto);
+  }
 }
 
 .image {

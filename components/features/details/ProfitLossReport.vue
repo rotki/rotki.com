@@ -2,7 +2,11 @@
   <feature id="profitloss-report" :sticky="sticky">
     <template #title> Profit/Loss Report </template>
     <template #image>
-      <img src="~/assets/img/crypto.svg" :class="$style.image" />
+      <img
+        alt="Cryptocurrencies"
+        src="~/assets/img/crypto.svg"
+        :class="$style.image"
+      />
     </template>
     <feature-details>
       A profit/loss report across all the user’s assets, protocols, exchanges
@@ -31,21 +35,26 @@ export default Vue.extend({
 })
 </script>
 
-<style module>
-.image {
-  position: absolute;
-  margin-top: -125px;
-  right: -45px;
-  z-index: -1;
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
 
-  @media only screen and (min-width: 2200px) {
-    position: relative;
-    right: -300px;
-  }
+.image {
+  z-index: -1;
 
   @include for-size(phone-only) {
     position: relative;
     right: 0;
+  }
+
+  @include for-size(tablet-portait-up) {
+    position: relative;
+  }
+
+  @include for-size(desktop-up) {
+    position: absolute;
+    margin-top: -70px;
+    right: -45px;
   }
 }
 </style>

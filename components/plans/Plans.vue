@@ -29,7 +29,6 @@ export default Vue.extend({
 .wrapper {
   margin-top: 123px;
   padding-bottom: 30px;
-  @include margins();
 }
 
 .header {
