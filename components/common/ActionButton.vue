@@ -37,8 +37,8 @@ export default Vue.extend({
 </script>
 
 <style module lang="scss">
-@import '~assets/css/media.scss';
-@import '~assets/css/main.scss';
+@import '~assets/css/media';
+@import '~assets/css/main';
 
 $button-height: 65px;
 $button-width: 275px;
