@@ -55,6 +55,18 @@ import Vue from 'vue'
 
 const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
 
+type Asset = {
+  readonly name: string
+  // eslint-disable-next-line camelcase
+  readonly browser_download_url: string
+}
+
+type GithubRelease = {
+  // eslint-disable-next-line camelcase
+  readonly tag_name: string
+  readonly assets: Asset[]
+}
+
 export default Vue.extend({
   name: 'DownloadDialog',
   data() {
@@ -70,7 +82,7 @@ export default Vue.extend({
   },
   methods: {
     async fetchLatestRelease() {
-      const latestRelease = await this.$axios.$get(
+      const latestRelease = await this.$axios.$get<GithubRelease>(
         'https://api.github.com/repos/rotki/rotki/releases/latest'
       )
       this.version = latestRelease.tag_name
