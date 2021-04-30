@@ -1,5 +1,5 @@
 <template>
-  <div v-bind="$attrs">
+  <div v-bind="$attrs" :class="$style.wrapper">
     <div :class="$style.content">
       <div :class="$slots.image ? $style.column1 : $style.column">
         <div :class="$style.title">
@@ -39,14 +39,40 @@ export default Vue.extend({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
+.wrapper {
+  @include for-size(phone-only) {
+    @include margin-x($mobile-margin);
+  }
+
+  @include for-size(tablet-portrait-up) {
+    @include margin-x($mobile-margin);
+  }
+}
+
 .content {
   @apply flex flex-row flex-wrap-reverse;
 
-  margin-top: 191px;
-  @include margins();
+  width: 100%;
+  overflow-x: hidden;
+  padding-top: 191px;
 
   @include for-size(phone-only) {
     @apply justify-center;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    height: 100%;
+    overflow-x: visible;
+  }
+
+  @include for-size(tablet-landscape-up) {
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  @include for-size(desktop-up) {
+    height: 100%;
+    overflow-x: visible;
   }
 }
 
@@ -66,14 +92,21 @@ export default Vue.extend({
 .column1 {
   @apply flex flex-col;
 
-  max-width: 660px;
-
   @include for-size(phone-only) {
     width: 100%;
+  }
+
+  @include for-size(desktop-up) {
+    max-width: 720px;
   }
 }
 
 .column2 {
   @apply flex flex-col;
+
+  @include for-size(tablet-portrait-up) {
+    width: 100%;
+    @apply relative block;
+  }
 }
 </style>

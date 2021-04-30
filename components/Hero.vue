@@ -21,7 +21,7 @@
       <action-button :class="$style.premium" text="Get Premium" />
     </div>
     <div :class="$style.screenshot">
-      <img src="~/assets/img/macbook.png" />
+      <img alt="rotki screenshot" src="~/assets/img/macbook.png" />
     </div>
     <div :class="$style.description">
       <info>
@@ -38,7 +38,7 @@
         your financial history to a centralized third party.
       </info>
     </div>
-    <use-app />
+    <use-app @download="$emit('download')" />
   </div>
 </template>
 
@@ -65,6 +65,9 @@ $subtitle-line-height: 42px;
   @apply flex flex-row justify-center font-serif text-primary2;
 
   @include text-size(66px, 84px);
+  @include for-size(phone-only) {
+    @include margin-x($mobile-margin);
+  }
 }
 
 .subtitle {
@@ -73,6 +76,9 @@ $subtitle-line-height: 42px;
   margin-top: 36px;
 
   @include text-size(32px, 42px);
+  @include for-size(phone-only) {
+    @include margin-x($mobile-margin);
+  }
 }
 
 .motto {
@@ -90,21 +96,21 @@ $subtitle-line-height: 42px;
 }
 
 .buttons {
-  @apply flex flex-row justify-center;
+  @apply flex flex-row justify-center flex-wrap;
 
   margin-top: 64px;
+  > * {
+    margin-right: $mobile-margin;
+    margin-left: $mobile-margin;
+
+    @include for-size(phone-only) {
+      margin-top: $mobile-margin;
+      margin-bottom: $mobile-margin;
+    }
+  }
 
   @include for-size(phone-only) {
     @apply flex-wrap;
-  }
-}
-
-.premium {
-  margin-left: 32px;
-
-  @include for-size(phone-only) {
-    margin-left: $mobile-margin;
-    margin-top: $mobile-margin;
   }
 }
 
@@ -113,30 +119,34 @@ $subtitle-line-height: 42px;
 
   margin-top: 124px;
 
-  @include margins();
   @include for-size(phone-only) {
     margin-top: 64px;
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
+  }
+
+  @include for-size(tablet-portrait-up) {
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
   }
 }
 
 .description {
-  @apply flex flex-row justify-center;
+  @apply flex flex-row justify-center flex-wrap;
 
   margin-top: 127px;
 
   > * {
-    margin-left: 73px;
-    margin-right: 73px;
+    @include margin-x(73px);
 
     @include for-size(phone-only) {
-      margin-left: 16px;
-      margin-right: 16px;
       margin-top: 32px;
+
+      @include margin-x($mobile-margin);
     }
 
     @include for-size(tablet-portrait-up) {
-      margin-left: 16px;
-      margin-right: 16px;
+      margin: $mobile-margin;
     }
   }
 

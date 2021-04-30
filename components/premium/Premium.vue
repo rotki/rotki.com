@@ -1,7 +1,7 @@
 <template>
-  <div id="premium">
+  <div id="premium" :class="$style.premium">
     <div :class="$style.image">
-      <img :class="$style.top" src="~/assets/img/rotki-og.svg" />
+      <img alt="rotki og" :class="$style.top" src="~/assets/img/rotki-og.svg" />
     </div>
     <div :class="$style.wrapper">
       <div>
@@ -19,7 +19,11 @@
       </div>
     </div>
     <div :class="$style.image">
-      <img :class="$style.bottom" src="~/assets/img/rotki-og.svg" />
+      <img
+        alt="rotki og"
+        :class="$style.bottom"
+        src="~/assets/img/rotki-og.svg"
+      />
     </div>
   </div>
 </template>
@@ -36,6 +40,18 @@ export default Vue.extend({
 @import '~assets/css/main';
 @import '~assets/css/media';
 
+.premium {
+  padding-top: 350px;
+  padding-bottom: 70px;
+  width: 100%;
+  overflow-x: hidden;
+
+  @include for-size(phone-only) {
+    padding-top: 200px;
+    overflow-y: hidden;
+  }
+}
+
 .wrapper {
   @apply bg-primary2 bg-repeat;
 
@@ -47,9 +63,7 @@ export default Vue.extend({
 }
 
 .main {
-  @apply container;
-
-  @include margins();
+  @apply container mx-auto;
 }
 
 .title {
@@ -66,10 +80,17 @@ export default Vue.extend({
 
 .content {
   @apply flex-wrap flex-row flex justify-between;
+
+  > * {
+    @include for-size(tablet-landscape-up) {
+      width: 50%;
+    }
+  }
 }
 
 .image {
   position: relative;
+  width: 100%;
 }
 
 .top {
@@ -90,17 +111,15 @@ export default Vue.extend({
 
 .bottom {
   position: absolute;
-  bottom: -63px;
   right: -212px;
   transform: matrix(-1, 0, 0, 1, 0, 0);
-  width: 431px;
-  height: 418px;
 
   @include for-size(phone-only) {
-    bottom: -88px;
+    bottom: -55px;
   }
-  @media only screen and (min-width: 2200px) {
-    right: 300px;
+
+  @include for-size(tablet-portrait-up) {
+    bottom: -63px;
   }
 }
 </style>

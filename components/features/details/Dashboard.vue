@@ -2,9 +2,11 @@
   <feature id="dashboard" :sticky="sticky">
     <template #title> Dashboard 360 degree overview of your holdings </template>
     <template #image>
-      <div>
-        <img src="~/assets/img/macbook.png" :class="$style.image" />
-      </div>
+      <img
+        alt="Rotki Dashboard"
+        src="~/assets/img/macbook.png"
+        :class="$style.image"
+      />
     </template>
     <feature-details>
       <template #subtitle> Assets and Liabilities </template>
@@ -41,22 +43,24 @@ export default Vue.extend({
 @import '~assets/css/main';
 
 .image {
-  position: absolute;
-
   @include for-size(phone-only) {
     position: relative;
     margin-bottom: 60px;
   }
 
-  @media only screen and (min-width: 1440px) {
-    right: -200px;
-  }
-  @media only screen and (min-width: 3000px) {
-    right: 200px;
+  @include for-size(tablet-portrait-up) {
+    position: relative;
+    margin-bottom: 60px;
   }
 
-  @media only screen and (min-width: 768px) and (max-width: 1440px) {
-    right: -460px;
+  @include for-size(desktop-up) {
+    top: -40px;
+    position: absolute;
+    right: -600px;
+  }
+
+  @include for-size(big-desktop-up) {
+    right: -300px;
   }
 }
 </style>
