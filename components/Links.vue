@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.row">
     <div :class="$style.column">
-      <a href="#features" :class="$style.link"> Features </a>
+      <a href="/#features" :class="$style.link"> Features </a>
     </div>
     <div :class="$style.column">
       <a

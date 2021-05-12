@@ -93,8 +93,8 @@ export default Vue.extend({
 }
 
 .label {
-  @apply tracking-wide font-sans font-medium uppercase;
+  @apply tracking-wide font-serif font-medium uppercase;
 
-  @include text-size(18px, 24px);
+  @include text-size(14px, 20px);
 }
 </style>
