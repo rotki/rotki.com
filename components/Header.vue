@@ -34,6 +34,10 @@ export default Vue.extend({
   @include for-size(phone-only) {
     margin-top: 42px;
   }
+
+  @media only screen and (max-height: 750px) {
+    margin-top: 24px;
+  }
 }
 
 .title {
