@@ -1,5 +1,5 @@
 <template>
-  <a :class="$style.link" :href="url" target="_blank">
+  <a :class="$style.link" :href="url" :target="sameTab ? '_self' : '_blank'">
     {{ display }}
   </a>
 </template>
@@ -18,6 +18,11 @@ export default Vue.extend({
       required: false,
       type: String,
       default: '',
+    },
+    sameTab: {
+      required: false,
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

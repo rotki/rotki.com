@@ -24,7 +24,7 @@
     <paragraph>
       The terms used in this Privacy Policy have the same meanings as in our
       Terms and Conditions, which is accessible
-      <external-link url="/tos" text="here" />
+      <external-link url="/tos" text="here" same-tab />
       , unless otherwise defined in this Privacy Policy.
     </paragraph>
 
@@ -144,8 +144,8 @@ export default Vue.extend({
 </script>
 
 <style module lang="scss">
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '~assets/css/media.scss';
+@import '~assets/css/main.scss';
 
 .list {
   list-style-type: circle;
