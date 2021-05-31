@@ -68,6 +68,8 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/recaptcha',
+    '@nuxtjs/sitemap',
+    '@nuxtjs/robots',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
@@ -93,5 +95,16 @@ export default {
 
   recaptcha: {
     version: 2,
+  },
+
+  sitemap: {
+    hostname: 'https://rotki.com',
+    gzip: true,
+    routes: ['/login/', '/products/'],
+  },
+
+  robots: {
+    UserAgent: '*',
+    Disallow: '/home',
   },
 }
