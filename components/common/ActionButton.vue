@@ -32,6 +32,11 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    href: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
   },
 })
 </script>
