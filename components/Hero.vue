@@ -94,6 +94,10 @@ $subtitle-line-height: 42px;
   @apply flex-col;
 
   max-width: 770px;
+
+  @include for-size(desktop-up) {
+    max-width: 820px;
+  }
 }
 
 .column {
@@ -156,6 +160,10 @@ $subtitle-line-height: 42px;
 
     @include for-size(tablet-portrait-up) {
       margin: $mobile-margin;
+    }
+
+    @include for-size(desktop-up) {
+      margin: 56px;
     }
   }
 

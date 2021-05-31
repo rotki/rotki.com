@@ -47,6 +47,10 @@ export default Vue.extend({
 
 .content {
   max-width: 500px;
+
+  @include for-size(desktop-up) {
+    max-width: 600px;
+  }
 }
 
 .title {
