@@ -52,6 +52,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
 
@@ -65,6 +66,23 @@ type GithubRelease = {
   // eslint-disable-next-line camelcase
   readonly tag_name: string
   readonly assets: Asset[]
+}
+
+function getUrl(assets: Asset[], filter: (asset: Asset) => boolean): string {
+  const matched = assets.filter(filter)
+  return matched.length === 0 ? LATEST : matched[0].browser_download_url
+}
+
+function isWindowApp(name: string): boolean {
+  return name.endsWith('.exe') && name.startsWith('rotki-win32')
+}
+
+function isLinuxApp(name: string): boolean {
+  return name.endsWith('.AppImage')
+}
+
+function isMacOsApp(name: string): boolean {
+  return name.endsWith('.dmg')
 }
 
 export default Vue.extend({
@@ -82,20 +100,19 @@ export default Vue.extend({
   },
   methods: {
     async fetchLatestRelease() {
-      const latestRelease = await this.$axios.$get<GithubRelease>(
+      // For some reason while the typescript instructions are followed
+      // generate fails because it it can't find the $axios property.
+      // This means that the merge of the context somehow fails
+      const comp = this as any
+      const $axios = comp.$axios as NuxtAxiosInstance
+      const latestRelease: GithubRelease = await $axios.$get<GithubRelease>(
         'https://api.github.com/repos/rotki/rotki/releases/latest'
       )
       this.version = latestRelease.tag_name
-      const assets = latestRelease.assets
-      const dmgs = assets.filter(({ name }) => name.endsWith('.dmg'))
-      const exes = assets.filter(
-        ({ name }) => name.endsWith('.exe') && name.startsWith('rotki-win32')
-      )
-      const appImages = assets.filter(({ name }) => name.endsWith('.AppImage'))
-
-      this.macOSUrl = dmgs[0].browser_download_url
-      this.linuxUrl = appImages[0].browser_download_url
-      this.windowsUrl = exes[0].browser_download_url
+      const assets: Asset[] = latestRelease.assets
+      this.macOSUrl = getUrl(assets, ({ name }) => isMacOsApp(name))
+      this.linuxUrl = getUrl(assets, ({ name }) => isLinuxApp(name))
+      this.windowsUrl = getUrl(assets, ({ name }) => isWindowApp(name))
     },
   },
 })
