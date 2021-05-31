@@ -12,8 +12,8 @@
           <GraphsStatistics />
           <Transactions />
           <PremiumDefi />
-          <Uniswap />
-          <PremiumEth2Staking />
+          <DexSupport />
+          <PremiumStaking />
           <GetPremium />
         </div>
       </div>
