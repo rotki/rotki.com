@@ -2,7 +2,7 @@
   <feature id="defi-details" :sticky="sticky">
     <template #title> Ethereum DeFi protocol details </template>
     <feature-details>
-      Details per protocol are supported for the following protocols:
+      Details per protocol for some of the supported protocols:
     </feature-details>
     <div :class="$style.protocols">
       <DefiProtocol :image="require('~/assets/img/defi/makerdao.png')">
@@ -23,9 +23,12 @@
       </DefiProtocol>
       <DefiProtocol :image="require('~/assets/img/defi/uniswap.png')">
         <template #name>Uniswap</template>
-        Your current LP balances
+        Your current LP balances, and v2 trades
       </DefiProtocol>
-      <DefiProtocol />
+      <DefiProtocol :image="require('~/assets/img/defi/balancer.png')">
+        <template #name>Balancer</template>
+        Your current LP balances, and trades
+      </DefiProtocol>
     </div>
     <Caption>
       * Premium users can set watchers for various protocol so that they can be
