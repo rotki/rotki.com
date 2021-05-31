@@ -5,12 +5,12 @@
     </div>
     <div :class="$style.basic">
       <div :class="$style.content">
-        <free-plan />
+        <free-plan @download="$emit('download')" />
         <basic-plan />
-        <advanced-plan />
+        <advanced-plan v-if="false" />
       </div>
     </div>
-    <custom-plan />
+    <custom-plan v-if="false" />
   </div>
 </template>
 
@@ -28,7 +28,7 @@ export default Vue.extend({
 
 .wrapper {
   margin-top: 123px;
-  padding-bottom: 30px;
+  padding-bottom: 200px; // 30px with custom plan;
 }
 
 .header {

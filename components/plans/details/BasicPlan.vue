@@ -1,6 +1,6 @@
 <template>
-  <plan action="Get basic plan">
-    <template #title>Basic</template>
+  <plan action="Get Premium plan" url="/products/">
+    <template #title>Premium</template>
     Premium users can set watchers for various protocol so that they can be
     informed via email when certain conditions are met.
   </plan>

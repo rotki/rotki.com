@@ -1,8 +1,8 @@
 <template>
-  <plan action="Get free plan">
+  <plan action="Start now for free" @click="$emit('download')">
     <template #title>Free</template>
-    Premium users can set watchers for various protocol so that they can be
-    informed via email when certain conditions are met.
+    Users can download the application and start using it for free.
+    <div :class="$style.filler"></div>
   </plan>
 </template>
 
@@ -13,3 +13,12 @@ export default Vue.extend({
   name: 'FreePlan',
 })
 </script>
+
+<style module lang="scss">
+@import '~assets/css/main';
+@import '~assets/css/media';
+
+.filler {
+  height: 100%;
+}
+</style>

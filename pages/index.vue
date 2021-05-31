@@ -4,7 +4,7 @@
     <hero @download="visible = true" />
     <features @download="visible = true" />
     <premium />
-    <plans />
+    <plans @download="visible = true" />
     <page-footer />
     <download-dialog v-if="visible" @dismiss="visible = false" />
   </fragment>

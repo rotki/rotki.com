@@ -6,7 +6,7 @@
     <div :class="$style.description">
       <slot></slot>
       <div :class="$style.button">
-        <action-button :text="action"></action-button>
+        <action-button :text="action" @click="buttonClicked" />
       </div>
     </div>
   </div>
@@ -21,6 +21,20 @@ export default Vue.extend({
     action: {
       type: String,
       required: true,
+    },
+    url: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
+  },
+  methods: {
+    buttonClicked() {
+      if (this.url) {
+        window.location.href = this.url
+      } else {
+        this.$emit('click')
+      }
     },
   },
 })
@@ -49,6 +63,7 @@ export default Vue.extend({
 
   margin-top: 45px;
   max-width: 370px;
+  height: 100%;
 
   @include text-size(24px, 32px);
 }
