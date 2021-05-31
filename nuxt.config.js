@@ -8,9 +8,41 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'Rotki is an open source portfolio tracker, accounting and analytics tool that respects your privacy.',
+      },
+      { name: 'msapplication-TileColor', content: '#00aba9' },
+      { name: 'theme-color', content: '#ffffff' },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      {
+        rel: 'apple-touch-icon',
+        href: '/apple-touch-icon.png',
+        sizes: '180x180',
+      },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        href: '/favicon-32x32.png',
+        sizes: '32x32',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        href: '/favicon-16x16.png',
+        sizes: '16x16',
+      },
+      { rel: 'manifest', href: '/site.webmanifest' },
+      {
+        rel: 'mask-icon',
+        href: '/safari-pinned-tab.svg',
+        color: '#5bbad5',
+      },
+    ],
   },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)

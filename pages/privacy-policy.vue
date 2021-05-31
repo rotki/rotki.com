@@ -13,7 +13,8 @@ export default Vue.extend({
         {
           hid: 'description',
           name: 'description',
-          content: 'Read the privacy policy',
+          content:
+            'Information for the website visitors regarding our policies with the collection, use, and disclosure of Personal Information regarding the service usage',
         },
       ],
       htmlAttrs: {
