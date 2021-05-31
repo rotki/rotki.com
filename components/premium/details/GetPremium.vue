@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.container">
-    <action-button filled text="Get Premium" />
+    <action-button filled text="Get Premium" @click="navigateTo" />
   </div>
 </template>
 
@@ -9,6 +9,11 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'GetPremium',
+  methods: {
+    navigateTo() {
+      window.location.href = '/products'
+    },
+  },
 })
 </script>
 
