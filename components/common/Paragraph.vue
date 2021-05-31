@@ -32,6 +32,8 @@ export default Vue.extend({
   @apply font-sans text-shade11 text-justify;
 
   margin-top: 16px;
+
+  @include text-size(18px, 26px);
 }
 
 .small {
