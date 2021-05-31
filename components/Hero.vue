@@ -10,7 +10,7 @@
       <div :class="$style.column">
         <div :class="$style.row">
           <div :class="$style.motto">
-            Rotki is an open source portfolio tracker, accounting and analytics
+            rotki is an open source portfolio tracker, accounting and analytics
             tool that respects your privacy.
           </div>
         </div>
@@ -26,11 +26,11 @@
     <div :class="$style.description">
       <info>
         <template #title> Open source </template>
-        Rotki is a local application. And its basic version is free.
+        rotki's source code is available to inspect, modify and enhance.
       </info>
       <info>
         <template #title> Local app </template>
-        Rotki is a local application. And its basic version is also free.
+        rotki is a local application. And its basic version is also free.
       </info>
       <info>
         <template #title> Own your data </template>
