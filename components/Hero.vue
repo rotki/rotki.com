@@ -18,7 +18,11 @@
     </div>
     <div :class="$style.buttons">
       <download-button @click="$emit('download')" />
-      <action-button :class="$style.premium" text="Get Premium" />
+      <action-button
+        :class="$style.premium"
+        text="Get Premium"
+        @click="navigateTo"
+      />
     </div>
     <div :class="$style.screenshot">
       <img alt="rotki screenshot" src="~/assets/img/macbook.png" />
@@ -47,6 +51,11 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Hero',
+  methods: {
+    navigateTo() {
+      window.location.href = '/products'
+    },
+  },
 })
 </script>
 
