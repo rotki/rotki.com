@@ -16,6 +16,9 @@ import Vue from 'vue'
 const description =
   'Rotki is an open source portfolio tracker, accounting and analytics tool that respects your privacy.'
 
+const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
+privacy,opensource,accounting,asset-management,taxes,tax-reporting`
+
 export default Vue.extend({
   data() {
     return {
@@ -30,6 +33,10 @@ export default Vue.extend({
           hid: 'description',
           name: 'description',
           content: description,
+        },
+        {
+          name: 'keywords',
+          content: keywords,
         },
         // Open graph/FB sharing metadata
         { property: 'og:type', content: 'website' },
