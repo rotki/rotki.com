@@ -13,7 +13,8 @@ export default Vue.extend({
         {
           hid: 'description',
           name: 'description',
-          content: 'The terms and conditions',
+          content:
+            'The terms and conditions outline the rules and regulations for the use of rotki.com Website and all services offered in the Premium Rotki subscription.',
         },
       ],
       htmlAttrs: {

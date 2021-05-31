@@ -13,7 +13,7 @@ export default Vue.extend({
         {
           hid: 'description',
           name: 'description',
-          content: 'Impressum',
+          content: 'Impressum - DE',
         },
       ],
       htmlAttrs: {

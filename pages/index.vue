@@ -13,6 +13,9 @@
 <script lang="ts">
 import Vue from 'vue'
 
+const description =
+  'Rotki is an open source portfolio tracker, accounting and analytics tool that respects your privacy.'
+
 export default Vue.extend({
   data() {
     return {
@@ -26,9 +29,26 @@ export default Vue.extend({
         {
           hid: 'description',
           name: 'description',
-          content:
-            'A portfolio tracking, analytics, accounting and tax reporting application that protects your privacy',
+          content: description,
         },
+        // Open graph/FB sharing metadata
+        { property: 'og:type', content: 'website' },
+        { property: 'og:url', content: 'https://rotki.com/' },
+        { property: 'og:title', content: 'rotki' },
+        {
+          property: 'og:description',
+          content: description,
+        },
+        { property: 'og:image', content: '/img/rotki-media.png' },
+        // Twitter sharing metadata
+        { property: 'twitter:card', content: 'summary_large_image' },
+        { property: 'twitter:url', content: 'https://rotki.com/' },
+        { property: 'twitter:title', content: 'rotki' },
+        {
+          property: 'twitter:description',
+          content: description,
+        },
+        { property: 'twitter:image', content: '/img/rotki-media.png' },
       ],
       htmlAttrs: {
         class: 'page',
