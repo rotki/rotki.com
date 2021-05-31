@@ -18,6 +18,9 @@
       </a>
     </div>
     <div :class="$style.column">
+      <a href="/login" target="_blank" :class="$style.link"> Manage Premium </a>
+    </div>
+    <div :class="$style.column">
       <a href="mailto:info@rotki.com" target="_blank" :class="$style.link">
         Contact
       </a>
@@ -38,8 +41,6 @@ export default Vue.extend({
 
 .row {
   @apply flex flex-row justify-around;
-
-  max-width: 453px;
 
   @include for-size(phone-only) {
     @apply flex-wrap justify-center;
