@@ -1,26 +1,21 @@
 <template>
-  <div :class="$style.wrapper">
-    <Header>
-      <template #subtitle>
-        <div :class="$style.subtitle">Create a rotki premium Account</div>
-      </template>
-    </Header>
+  <page>
+    <template #title> Create a rotki premium Account </template>
 
     <div :class="$style.row">
       <div :class="$style.column">
         <div :class="$style.hint">
           <span :class="$style.important">Important</span> Note: Creating an
           account in rotki.com is only needed to purchase a
-          <a href="/products" :class="$style.link">premium subscription</a> .
+          <external-link url="/products" text="premium subscription" same-tab />
           Rotki is a local application and the account you create when you use
           it is stored on your computer. This is not the same account as premium
           and credentials for one account don't work for the other. To use Rotki
           simply
-          <a
-            href=" https://github.com/rotki/rotki/releases/tag/latest"
-            :class="$style.link"
-            >download</a
-          >
+          <external-link
+            url="https://github.com/rotki/rotki/releases/latest"
+            text="download"
+          />
           and run it. Proceed only if you intend to purchase premium and unlock
           the premium features of the application.
         </div>
@@ -145,15 +140,16 @@
           <input type="checkbox" :class="$style.checkbox" checked />
           <span :class="$style.terms">
             I have read and agreed to the
-            <a href="/terms" :class="$style.link">Terms of Service</a> and the
-            <a href="/privacy-policy" :class="$style.link">Privacy Policy</a>
+            <external-link text="Terms of Service" url="/tos" />
+            and the
+            <external-link text="Privacy Policy" url="/privacy-policy" />
           </span>
         </label>
 
         <action-button primary text="Create Account" :class="$style.button" />
       </div>
     </div>
-  </div>
+  </page>
 </template>
 
 <script lang="ts">
@@ -186,22 +182,6 @@ export default Vue.extend({
 <style module lang="scss">
 @import '~assets/css/media';
 @import '~assets/css/main';
-
-.wrapper {
-  @apply container mx-auto;
-
-  @include for-size(phone-only) {
-    padding: $mobile-margin / 2;
-  }
-}
-
-.subtitle {
-  @apply font-sans text-primary2 font-medium;
-
-  font-size: 0.66rem;
-  text-align: center;
-  text-transform: uppercase;
-}
 
 .row {
   @apply flex flex-row mx-auto;
@@ -265,10 +245,6 @@ export default Vue.extend({
   list-style-type: circle;
   padding-left: $mobile-margin * 2;
   color: #808080;
-}
-
-.link {
-  @apply hover:text-shade8 text-primary;
 }
 
 .button {

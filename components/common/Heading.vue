@@ -12,7 +12,10 @@ export default Vue.extend({
 })
 </script>
 
-<style scoped module>
+<style module lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .heading {
   @apply font-serif text-primary2 font-medium;
 
