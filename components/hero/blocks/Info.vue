@@ -47,6 +47,6 @@ export default Vue.extend({
   @apply flex flex-row justify-center;
 
   margin-top: 25px;
-  max-width: 290px;
+  max-width: 350px;
 }
 </style>
