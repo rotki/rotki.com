@@ -41,9 +41,10 @@ export default Vue.extend({
 .subtitle {
   @apply font-sans text-primary2 font-medium;
 
-  font-size: 0.66rem;
   text-align: center;
   text-transform: uppercase;
+
+  @include text-size(16px, 20px);
 }
 
 .content {
