@@ -34,7 +34,14 @@ export default Vue.extend({
   },
   data() {
     return {
-      defi: ['MakerDAO', 'Aave', 'Compound', 'Yearn vaults', 'Uniswap'],
+      defi: [
+        'MakerDAO',
+        'Aave',
+        'Compound',
+        'Yearn vaults',
+        'Uniswap',
+        'Balancer',
+      ],
     }
   },
 })

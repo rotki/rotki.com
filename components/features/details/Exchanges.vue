@@ -37,8 +37,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      column1: ['Kraken', 'Poloniex', 'Bittrex', 'Binance'],
-      column2: ['Bitmex', 'Coinbase', 'Coinbase Pro', 'Gemini'],
+      column1: ['Kraken', 'KuCoin', 'Binance', 'Poloniex', 'Bittrex'],
+      column2: ['FTX', 'Coinbase', 'Coinbase Pro', 'Gemini', 'Bitmex'],
     }
   },
 })
