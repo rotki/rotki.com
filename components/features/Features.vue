@@ -1,19 +1,19 @@
 <template>
   <fragment>
     <anchor id="features" />
-    <middle-menu @sticky="sticky = $event" />
+    <middle-menu />
     <div
       :class="{
         [$style.wrapper]: true,
       }"
     >
       <div>
-        <dashboard :sticky="sticky" @download="$emit('download')" />
-        <exchanges :sticky="sticky" />
-        <defi :sticky="sticky" />
-        <defi-details :sticky="sticky" />
-        <Eth2Staking :sticky="sticky" @download="$emit('download')" />
-        <ProfitLossReport :sticky="sticky" :class="$style.last" />
+        <dashboard @download="$emit('download')" />
+        <exchanges />
+        <defi />
+        <defi-details />
+        <Eth2Staking @download="$emit('download')" />
+        <ProfitLossReport :class="$style.last" />
       </div>
     </div>
   </fragment>
@@ -24,11 +24,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Features',
-  data() {
-    return {
-      sticky: false,
-    }
-  },
 })
 </script>
 

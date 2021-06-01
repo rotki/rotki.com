@@ -1,5 +1,5 @@
 <template>
-  <feature id="profitloss-report" :sticky="sticky">
+  <feature id="profitloss-report">
     <template #title> Profit/Loss Report </template>
     <template #image>
       <img
@@ -26,12 +26,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'ProfitLossReport',
-  props: {
-    sticky: {
-      type: Boolean,
-      required: true,
-    },
-  },
 })
 </script>
 
@@ -53,7 +47,7 @@ export default Vue.extend({
 
   @include for-size(desktop-up) {
     position: absolute;
-    margin-top: -70px;
+    margin-top: 40px;
     right: -45px;
   }
 }

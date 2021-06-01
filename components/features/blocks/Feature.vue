@@ -4,7 +4,7 @@
       <div :class="$slots.image ? $style.column1 : $style.column">
         <div :class="$style.title">
           <div :class="$style.column">
-            <anchor :id="id" :sticky="sticky" />
+            <anchor :id="id" />
             <slot name="title" />
           </div>
         </div>
@@ -25,10 +25,6 @@ export default Vue.extend({
   props: {
     id: {
       type: String,
-      required: true,
-    },
-    sticky: {
-      type: Boolean,
       required: true,
     },
   },

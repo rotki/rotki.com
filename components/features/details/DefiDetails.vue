@@ -1,5 +1,5 @@
 <template>
-  <feature id="defi-details" :sticky="sticky">
+  <feature id="defi-details">
     <template #title> Ethereum DeFi protocol details </template>
     <feature-details>
       Details per protocol for some of the supported protocols:
@@ -42,12 +42,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'DefiDetails',
-  props: {
-    sticky: {
-      type: Boolean,
-      required: true,
-    },
-  },
 })
 </script>
 

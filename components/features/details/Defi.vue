@@ -1,5 +1,5 @@
 <template>
-  <feature id="defi" :sticky="sticky">
+  <feature id="defi">
     <template #title> DeFi </template>
     <template #image>
       <img
@@ -26,12 +26,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Defi',
-  props: {
-    sticky: {
-      type: Boolean,
-      required: true,
-    },
-  },
   data() {
     return {
       defi: [
