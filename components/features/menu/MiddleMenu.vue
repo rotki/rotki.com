@@ -1,7 +1,21 @@
 <template>
-  <div v-show="visible" :class="$style.wrapper">
+  <div :class="$style.wrapper">
+    <div ref="menu" :class="$style.menu">
+      <div
+        v-for="section in sections"
+        :key="section.id"
+        :class="{
+          [$style.wide]: section.wide,
+          [$style.normal]: !section.wide,
+          [$style.active]: section.id === active,
+        }"
+      >
+        <a :href="section.id">{{ section.name }}</a>
+      </div>
+    </div>
     <div
-      ref="menu"
+      v-if="sticky && visible"
+      ref="sticky"
       :class="{
         [$style.menu]: true,
         [$style.sticky]: sticky,

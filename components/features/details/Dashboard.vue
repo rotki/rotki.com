@@ -1,5 +1,5 @@
 <template>
-  <feature id="dashboard" :sticky="sticky">
+  <feature id="dashboard">
     <template #title> Dashboard 360 degree overview of your holdings </template>
     <template #image>
       <img
@@ -29,12 +29,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Dashboard',
-  props: {
-    sticky: {
-      type: Boolean,
-      required: true,
-    },
-  },
 })
 </script>
 
@@ -54,7 +48,7 @@ export default Vue.extend({
   }
 
   @include for-size(desktop-up) {
-    top: -40px;
+    top: 80px;
     position: absolute;
     right: -600px;
   }
