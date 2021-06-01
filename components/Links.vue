@@ -18,7 +18,7 @@
       </a>
     </div>
     <div :class="$style.column">
-      <a :href="loginUrl" target="_blank" :class="$style.link">
+      <a :href="loginUrl" target="_self" :class="$style.link">
         Manage Premium
       </a>
     </div>
