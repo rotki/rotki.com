@@ -25,7 +25,7 @@
       />
     </div>
     <div :class="$style.screenshot">
-      <img alt="rotki screenshot" src="~/assets/img/macbook.png" />
+      <img alt="rotki screenshot" src="~/assets/img/screenshot.png" />
     </div>
     <div :class="$style.description">
       <info>
