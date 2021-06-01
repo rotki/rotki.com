@@ -12,7 +12,7 @@ export default {
         hid: 'description',
         name: 'description',
         content:
-          'Rotki is an open source portfolio tracker, accounting and analytics tool that respects your privacy.',
+          'Rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.',
       },
       { name: 'msapplication-TileColor', content: '#00aba9' },
       { name: 'theme-color', content: '#ffffff' },
