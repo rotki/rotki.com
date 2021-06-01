@@ -4,7 +4,7 @@
     <template #image>
       <img
         alt="Rotki Dashboard"
-        src="~/assets/img/macbook.png"
+        src="~/assets/img/dashboard.png"
         :class="$style.image"
       />
     </template>
