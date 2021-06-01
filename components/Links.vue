@@ -18,7 +18,9 @@
       </a>
     </div>
     <div :class="$style.column">
-      <a href="/login" target="_blank" :class="$style.link"> Manage Premium </a>
+      <a :href="loginUrl" target="_blank" :class="$style.link">
+        Manage Premium
+      </a>
     </div>
     <div :class="$style.column">
       <a href="mailto:info@rotki.com" target="_blank" :class="$style.link">
@@ -33,6 +35,18 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Links',
+  data() {
+    return {
+      loginUrl: '',
+    }
+  },
+  created() {
+    // https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-generate#routes
+    // To work around:  ERROR  Error generating route "/login": This page could not be found.
+    new Promise<string>((resolve) => resolve('/login')).then(
+      (url) => (this.loginUrl = url)
+    )
+  },
 })
 </script>
 
