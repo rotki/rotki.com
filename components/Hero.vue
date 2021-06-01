@@ -3,7 +3,7 @@
     <div :class="$style.title">
       <div :class="$style.column">
         <div :class="$style.row">Portfolio manager that</div>
-        <div :class="$style.row">respects your privacy</div>
+        <div :class="$style.row">protects your privacy</div>
       </div>
     </div>
     <div :class="$style.subtitle">
@@ -11,7 +11,7 @@
         <div :class="$style.row">
           <div :class="$style.motto">
             rotki is an open source portfolio tracker, accounting and analytics
-            tool that respects your privacy.
+            tool that protects your privacy.
           </div>
         </div>
       </div>
