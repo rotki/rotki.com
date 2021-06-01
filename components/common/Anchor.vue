@@ -1,11 +1,5 @@
 <template>
-  <span
-    :class="{
-      [$style.anchor]: true,
-      [$style.sticky]: sticky,
-    }"
-    v-bind="$attrs"
-  />
+  <span :class="$style.anchor" v-bind="$attrs" />
 </template>
 
 <script lang="ts">
@@ -13,13 +7,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Anchor',
-  props: {
-    sticky: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
 })
 </script>
 
@@ -31,9 +18,6 @@ export default Vue.extend({
   width: 285px;
   visibility: hidden;
   pointer-events: none;
-}
-
-.sticky {
-  padding-top: 64px;
+  padding-top: 100px;
 }
 </style>
