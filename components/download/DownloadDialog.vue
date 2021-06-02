@@ -21,21 +21,21 @@
             </div>
           </div>
           <div :class="$style.row2">
-            <a :href="linuxUrl" :class="$style.link" target="_blank">
+            <a :href="linuxUrl" :class="$style.link" download>
               <img
                 alt="Linux Download button"
                 :class="$style.link"
                 src="~/assets/img/dl/linux.svg"
               />
             </a>
-            <a :href="macOSUrl" :class="$style.link" target="_blank">
+            <a :href="macOSUrl" :class="$style.link" download>
               <img
                 alt="macOS Download button"
                 :class="$style.link"
                 src="~/assets/img/dl/mac.svg"
               />
             </a>
-            <a :href="windowsUrl" :class="$style.link" target="_blank">
+            <a :href="windowsUrl" :class="$style.link" download>
               <img
                 alt="Windows Download button"
                 :class="$style.link"
