@@ -48,6 +48,11 @@ export default Vue.extend({
   @apply flex flex-col col-span-12 md:col-span-4 flex-shrink;
 
   margin-top: 93px;
+
+  @include for-size(phone-only) {
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
+  }
 }
 
 .title {

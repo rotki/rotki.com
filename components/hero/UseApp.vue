@@ -35,9 +35,14 @@ export default Vue.extend({
   @apply flex flex-row justify-center align-middle;
 
   margin-top: 129px;
+  padding-right: $mobile-margin * 2;
+  padding-left: $mobile-margin * 2;
 
   @include for-size(phone-only) {
     @apply flex-wrap;
+
+    padding-right: $mobile-margin / 2;
+    padding-left: $mobile-margin / 2;
   }
 }
 

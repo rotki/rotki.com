@@ -150,20 +150,11 @@ $subtitle-line-height: 42px;
   margin-top: 127px;
 
   > * {
-    @include margin-x(73px);
+    padding-left: 16px;
+    padding-right: 16px;
 
     @include for-size(phone-only) {
       margin-top: 32px;
-
-      @include margin-x($mobile-margin);
-    }
-
-    @include for-size(tablet-portrait-up) {
-      margin: $mobile-margin;
-    }
-
-    @include for-size(desktop-up) {
-      margin: 56px;
     }
   }
 

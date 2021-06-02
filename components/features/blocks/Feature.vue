@@ -59,6 +59,8 @@ export default Vue.extend({
   @include for-size(tablet-portrait-up) {
     height: 100%;
     overflow-x: visible;
+    padding-right: $mobile-margin * 2;
+    padding-left: $mobile-margin * 2;
   }
 
   @include for-size(tablet-landscape-up) {
