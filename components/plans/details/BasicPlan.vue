@@ -1,8 +1,7 @@
 <template>
   <plan action="Get Premium plan" url="/products/">
     <template #title>Premium</template>
-    Premium users can set watchers for various protocol so that they can be
-    informed via email when certain conditions are met.
+    Premium users unlock the full potential of rotki by removing all limits and unlocking all features.
   </plan>
 </template>
 

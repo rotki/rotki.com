@@ -31,7 +31,7 @@
       </DefiProtocol>
     </div>
     <Caption>
-      * Premium users can set watchers for various protocol so that they can be
+      * Premium users can set watchers for various protocols so that they can be
       informed via email when certain conditions are met.
     </Caption>
   </feature>
