@@ -16,7 +16,7 @@
       <item-list :list="defi" />
     </div>
     <Caption>
-      * More protocols are being supported with new releases of Rotki.
+      * This is but a subset of the supported protocols
     </Caption>
   </feature>
 </template>

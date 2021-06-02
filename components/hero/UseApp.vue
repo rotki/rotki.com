@@ -10,8 +10,8 @@
     <div :class="$style.column2">
       <div :class="$style.row">
         <div :class="$style.text">
-          Rotki offers tracking of all your crypto assets no matter where they
-          are. Either on a blockchain or on one of the supported exchanges.
+          Rotki offers tracking of all your crypto assets no matter where they are.
+          Be it on a blockchain, a DeFi protocol or on one of the supported exchanges.
         </div>
       </div>
       <download-button :class="$style.button" @click="$emit('download')" />
