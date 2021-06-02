@@ -6,6 +6,7 @@
     <external-link
       url="https://rotki.readthedocs.io/en/latest/faq.html"
       text="FAQ"
+      no-referrer
     />
   </div>
 </template>
