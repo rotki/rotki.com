@@ -1,5 +1,10 @@
 <template>
-  <a :class="$style.link" :href="url" :target="sameTab ? '_self' : '_blank'">
+  <a
+    :class="$style.link"
+    :href="url"
+    :target="sameTab ? '_self' : '_blank'"
+    :rel="noReferrer ? 'noreferrer' : undefined"
+  >
     {{ display }}
   </a>
 </template>
@@ -20,6 +25,11 @@ export default Vue.extend({
       default: '',
     },
     sameTab: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+    noReferrer: {
       required: false,
       type: Boolean,
       default: false,

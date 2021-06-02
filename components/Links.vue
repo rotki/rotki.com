@@ -1,19 +1,25 @@
 <template>
   <div :class="$style.row">
     <div :class="$style.column">
-      <a href="/#features" :class="$style.link"> Features </a>
+      <a href="/#features" :class="$style.link" rel="noreferrer"> Features </a>
     </div>
     <div :class="$style.column">
       <a
         href="https://rotki.readthedocs.io/en/latest/index.html"
         target="_blank"
+        rel="noreferrer"
         :class="$style.link"
       >
         Documentation
       </a>
     </div>
     <div :class="$style.column">
-      <a href="https://blog.rotki.com/" target="_blank" :class="$style.link">
+      <a
+        href="https://blog.rotki.com/"
+        target="_blank"
+        :class="$style.link"
+        rel="noreferrer"
+      >
         Blog
       </a>
     </div>

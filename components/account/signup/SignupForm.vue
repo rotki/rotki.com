@@ -15,6 +15,7 @@
           <external-link
             url="https://github.com/rotki/rotki/releases/latest"
             text="download"
+            noreferrer
           />
           and run it. Proceed only if you intend to purchase premium and unlock
           the premium features of the application.
