@@ -1,12 +1,12 @@
 <template>
   <div :class="$style.wrapper">
     <div :class="$style.column">
-      <a href="https://github.com/rotki" target="_blank">
+      <a href="https://github.com/rotki" target="_blank" rel="noreferrer">
         <img src="~/assets/img/github.svg" alt="Github" :class="$style.link" />
       </a>
     </div>
     <div :class="$style.column">
-      <a href="https://twitter.com/rotkiapp" target="_blank">
+      <a href="https://twitter.com/rotkiapp" target="_blank" rel="noreferrer">
         <img
           src="~/assets/img/twitter.svg"
           alt="Twitter"
@@ -15,7 +15,7 @@
       </a>
     </div>
     <div :class="$style.column">
-      <a href="https://discord.gg/aGCxHG7" target="_blank">
+      <a href="https://discord.gg/aGCxHG7" target="_blank" rel="noreferrer">
         <img
           src="~/assets/img/discord.svg"
           alt="Discord"
