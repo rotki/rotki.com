@@ -36,6 +36,8 @@ export default Vue.extend({
 
   text-align: center;
   letter-spacing: -0.03em;
+  padding-right: $mobile-margin;
+  padding-left: $mobile-margin;
 
   @include text-size(84px, 108px);
 }
