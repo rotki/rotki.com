@@ -1,3 +1,5 @@
+const dev = process.env.NODE_ENV !== 'production'
+
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
   target: 'static',
@@ -80,7 +82,9 @@ export default {
     loaders: {
       cssModules: {
         modules: {
-          localIdentName: '[name]_[local]_[hash:base64:4]',
+          localIdentName: dev
+            ? '[name]_[local]_[hash:base64:4]'
+            : '[hash:base64:4]',
         },
       },
     },
