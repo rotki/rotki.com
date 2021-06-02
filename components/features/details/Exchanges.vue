@@ -60,13 +60,12 @@ export default Vue.extend({
 
   @include for-size(tablet-landscape-up) {
     margin-top: 20px;
-    right: -93px;
     max-width: 755px;
   }
 
   @include for-size(desktop-up) {
     position: absolute;
-    right: -150px;
+    right: -250px;
   }
 }
 

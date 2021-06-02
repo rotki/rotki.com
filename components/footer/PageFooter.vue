@@ -46,12 +46,22 @@ export default Vue.extend({
 
 .row {
   @apply flex flex-row items-end;
+
+  padding-right: $mobile-margin * 2;
+  padding-left: $mobile-margin * 2;
+
+  @include for-size(phone-only) {
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
+  }
 }
 
 .secondRow {
   @apply flex flex-row justify-between flex-wrap;
 
   margin-top: 48px;
+  padding-right: $mobile-margin * 2;
+  padding-left: $mobile-margin * 2;
 
   > * {
     height: 36px;
@@ -59,6 +69,9 @@ export default Vue.extend({
 
   @include for-size(phone-only) {
     @apply justify-center;
+
+    padding-right: $mobile-margin;
+    padding-left: $mobile-margin;
   }
 }
 

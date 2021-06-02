@@ -176,9 +176,15 @@ export default Vue.extend({
 .wide {
   @apply flex-col;
 
-  width: 230px;
   margin-left: 20px;
   margin-right: 20px;
+
+  @include for-size(desktop-up) {
+    width: 200px;
+  }
+  @include for-size(big-desktop-up) {
+    width: 250px;
+  }
 }
 
 .normal {

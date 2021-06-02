@@ -48,7 +48,7 @@ export default Vue.extend({
   @include for-size(desktop-up) {
     position: absolute;
     margin-top: 40px;
-    right: -45px;
+    right: -80px;
   }
 }
 </style>

@@ -81,6 +81,9 @@ export default Vue.extend({
 .content {
   @apply flex-wrap flex-row flex justify-between;
 
+  margin-left: $mobile-margin;
+  margin-right: $mobile-margin * 2;
+
   > * {
     @include for-size(tablet-landscape-up) {
       width: 50%;
@@ -96,7 +99,7 @@ export default Vue.extend({
 .top {
   position: absolute;
   top: -317px;
-  left: -40px;
+  left: -50px;
   width: 358px;
   height: 347px;
 
@@ -104,6 +107,7 @@ export default Vue.extend({
     position: relative;
     top: 31px;
   }
+
   @media only screen and (min-width: 2200px) {
     left: 300px;
   }

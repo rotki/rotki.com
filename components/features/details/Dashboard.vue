@@ -54,7 +54,7 @@ export default Vue.extend({
   }
 
   @include for-size(big-desktop-up) {
-    right: -300px;
+    right: -400px;
   }
 }
 </style>

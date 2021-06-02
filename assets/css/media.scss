@@ -15,7 +15,7 @@
 $mobile-font-percentage: 0.7;
 $tablet-font-percentage: 0.8;
 $tablet-landscape-font-percentage: 0.9;
-$desktop-up-font-percentage: 1;
+$desktop-up-font-percentage: 0.9;
 $big-desktop-font-percentage: 1.1;
 
 @mixin text-size($font-size, $line-height) {
