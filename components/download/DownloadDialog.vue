@@ -1,53 +1,55 @@
 <template>
-  <div :class="$style.overlay" @click="$emit('dismiss')">
-    <div :class="$style.wrapper">
-      <div :class="$style.dialog">
-        <div :class="$style.row">
-          <div :class="$style['icon-column']">
-            <img
-              alt="partial rotki logo"
-              :class="$style.icon"
-              src="~/assets/img/partial-logo.svg"
-            />
-          </div>
-          <div :class="$style['title-column']">
-            <div :class="$style.title">Download Rotki</div>
-            <div :class="$style.description">
-              You can download Rotki in your computer and start using it for
-              free right now. Binaries available for all major Operating
-              Systems.
+  <transition name="fade">
+    <div :class="$style.overlay" @click="$emit('dismiss')">
+      <div :class="$style.wrapper">
+        <div :class="$style.dialog">
+          <div :class="$style.row">
+            <div :class="$style['icon-column']">
+              <img
+                alt="partial rotki logo"
+                :class="$style.icon"
+                src="~/assets/img/partial-logo.svg"
+              />
+            </div>
+            <div :class="$style['title-column']">
+              <div :class="$style.title">Download Rotki</div>
+              <div :class="$style.description">
+                You can download Rotki in your computer and start using it for
+                free right now. Binaries available for all major Operating
+                Systems.
+              </div>
             </div>
           </div>
-        </div>
-        <div :class="$style.row2">
-          <a :href="linuxUrl" :class="$style.link" target="_blank">
-            <img
-              alt="Linux Download button"
-              :class="$style.link"
-              src="~/assets/img/dl/linux.svg"
-            />
-          </a>
-          <a :href="macOSUrl" :class="$style.link" target="_blank">
-            <img
-              alt="macOS Download button"
-              :class="$style.link"
-              src="~/assets/img/dl/mac.svg"
-            />
-          </a>
-          <a :href="windowsUrl" :class="$style.link" target="_blank">
-            <img
-              alt="Windows Download button"
-              :class="$style.link"
-              src="~/assets/img/dl/windows.svg"
-            />
-          </a>
-        </div>
-        <div v-if="version" :class="$style.row3">
-          Latest Release: {{ version }}
+          <div :class="$style.row2">
+            <a :href="linuxUrl" :class="$style.link" target="_blank">
+              <img
+                alt="Linux Download button"
+                :class="$style.link"
+                src="~/assets/img/dl/linux.svg"
+              />
+            </a>
+            <a :href="macOSUrl" :class="$style.link" target="_blank">
+              <img
+                alt="macOS Download button"
+                :class="$style.link"
+                src="~/assets/img/dl/mac.svg"
+              />
+            </a>
+            <a :href="windowsUrl" :class="$style.link" target="_blank">
+              <img
+                alt="Windows Download button"
+                :class="$style.link"
+                src="~/assets/img/dl/windows.svg"
+              />
+            </a>
+          </div>
+          <div v-if="version" :class="$style.row3">
+            Latest Release: {{ version }}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script lang="ts">
