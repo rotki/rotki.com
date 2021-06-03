@@ -18,9 +18,7 @@
       <item-list :list="column1" />
       <item-list :list="column2" />
     </div>
-    <Caption>
-      * This is but a subset of the supported exchanges
-    </Caption>
+    <Caption> * This is but a subset of the supported exchanges </Caption>
   </feature>
 </template>
 

@@ -38,7 +38,8 @@
       </info>
       <info>
         <template #title> Own your data </template>
-        Your financial data is kept encrypted in your system and not shared with third parties.
+        Your financial data is kept encrypted in your system and not shared with
+        third parties.
       </info>
     </div>
     <use-app @download="$emit('download')" />
