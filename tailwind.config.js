@@ -28,7 +28,7 @@ module.exports = {
         'crypto-pattern': "url('/img/crypto.svg')",
       }),
       fontFamily: {
-        sans: ['Source San Pro', 'sans-serif'],
+        sans: ['Source Sans Pro', 'sans-serif'],
         serif: ['Alverata W01 Bold', 'serif'],
         regular: ['Alverata W01 Regular', 'serif'],
       },
