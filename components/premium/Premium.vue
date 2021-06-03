@@ -115,23 +115,21 @@ export default Vue.extend({
     position: relative;
     top: 31px;
   }
-
-  @media only screen and (min-width: 2200px) {
-    left: 300px;
-  }
 }
 
 .bottom {
   position: absolute;
-  right: -212px;
+  right: -200px;
   transform: matrix(-1, 0, 0, 1, 0, 0);
+  width: 358px;
+  height: 347px;
 
   @include for-size(phone-only) {
     bottom: -55px;
   }
 
   @include for-size(tablet-portrait-up) {
-    bottom: -63px;
+    bottom: -56px;
   }
 }
 </style>
