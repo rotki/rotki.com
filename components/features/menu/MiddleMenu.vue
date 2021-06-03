@@ -73,11 +73,6 @@ const sections: Section[] = [
     wide: true,
   },
   {
-    id: '#eth2-staking',
-    name: 'ETH2 Staking',
-    wide: true,
-  },
-  {
     id: '#profitloss-report',
     name: 'Profit/Loss Report',
     wide: true,
