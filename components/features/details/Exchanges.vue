@@ -18,9 +18,7 @@
       <item-list :list="column1" />
       <item-list :list="column2" />
     </div>
-    <Caption>
-      * More exchanges are being supported with new releases of Rotki.
-    </Caption>
+    <Caption> * This is but a subset of the supported exchanges </Caption>
   </feature>
 </template>
 
@@ -31,7 +29,7 @@ export default Vue.extend({
   name: 'Exchanges',
   data() {
     return {
-      column1: ['Kraken', 'KuCoin', 'Binance', 'Poloniex', 'Bittrex'],
+      column1: ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex'],
       column2: ['FTX', 'Coinbase', 'Coinbase Pro', 'Gemini', 'Bitmex'],
     }
   },

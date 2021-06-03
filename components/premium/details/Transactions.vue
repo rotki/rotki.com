@@ -3,8 +3,8 @@
     <template #title>
       Unlimited trades, transactions, deposits and withdrawals
     </template>
-    Free users have a limit of the 250 most recent ethereum transactions and as
-    a premium user there is no limit in the amount of transactions you can see.
+    Free users have a limit on the number of transactions, deposits, withdrawals
+    and other events they can see and process. Premium users have no such limit.
   </premium-feature>
 </template>
 <script lang="ts">

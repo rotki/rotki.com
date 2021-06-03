@@ -17,4 +17,31 @@ $ yarn start
 $ yarn generate
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+## Run
+
+Make sure the environment file exists
+
+```bash
+$ touch .env
+```
+
+And input the RECAPTCHA public key there.
+
+```
+RECAPTCHA_SITE_KEY=XXXX
+```
+
+Run with
+
+```bash
+$ yarn dev
+```
+
+
+## Lint
+
+To fix any lint errors you have to run
+
+```bash
+yarn lint:js --fix
+```

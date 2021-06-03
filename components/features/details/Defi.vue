@@ -15,9 +15,7 @@
     <div :class="$style['list-container']">
       <item-list :list="defi" />
     </div>
-    <Caption>
-      * More protocols are being supported with new releases of Rotki.
-    </Caption>
+    <Caption> * This is but a subset of the supported protocols </Caption>
   </feature>
 </template>
 

@@ -12,7 +12,6 @@
         <exchanges />
         <defi />
         <defi-details />
-        <Eth2Staking @download="$emit('download')" />
         <ProfitLossReport :class="$style.last" />
       </div>
     </div>

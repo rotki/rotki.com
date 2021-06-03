@@ -1,6 +1,6 @@
 <template>
   <feature id="dashboard">
-    <template #title> Dashboard 360 degree overview of your holdings </template>
+    <template #title> A 360° overview of your assets</template>
     <template #image>
       <img
         alt="Rotki Dashboard"
@@ -10,12 +10,12 @@
     </template>
     <feature-details>
       <template #subtitle> Assets and Liabilities </template>
-      View all of the assets and liabilities you own, how much of each and the
-      total % the asset consists of your net worth.
+      View all of your assets and liabilities and your exposure to each as a
+      percentage of your net worth.
     </feature-details>
     <feature-details>
-      <template #subtitle> Networth fairing </template>
-      Users can also see a graph of how their total networth is faring over
+      <template #subtitle> Net worth over time</template>
+      Users can also see a graph of how their total net worth is evolving over
       time. Free users are limited to the last 2 weeks.
     </feature-details>
     <div class="flex flex-row">

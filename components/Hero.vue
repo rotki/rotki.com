@@ -2,7 +2,7 @@
   <div :class="$style.wrapper">
     <div :class="$style.title">
       <div :class="$style.column">
-        <div :class="$style.row">Portfolio manager that</div>
+        <div :class="$style.row">The portfolio manager that</div>
         <div :class="$style.row">protects your privacy</div>
       </div>
     </div>
@@ -34,12 +34,12 @@
       </info>
       <info>
         <template #title> Local app </template>
-        rotki is a local application. And its basic version is also free.
+        rotki is a local-first application with a strong focus on user privacy.
       </info>
       <info>
         <template #title> Own your data </template>
-        A local application allows you to own your data. You don’t need to give
-        your financial history to a centralized third party.
+        Your financial data is kept encrypted in your system and not shared with
+        third parties.
       </info>
     </div>
     <use-app @download="$emit('download')" />
