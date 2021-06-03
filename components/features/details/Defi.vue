@@ -15,9 +15,7 @@
     <div :class="$style['list-container']">
       <item-list :list="defi" />
     </div>
-    <Caption>
-      * This is but a subset of the supported protocols
-    </Caption>
+    <Caption> * This is but a subset of the supported protocols </Caption>
   </feature>
 </template>
 
