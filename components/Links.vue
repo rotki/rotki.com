@@ -49,7 +49,7 @@ export default Vue.extend({
   created() {
     // https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-generate#routes
     // To work around:  ERROR  Error generating route "/login": This page could not be found.
-    new Promise<string>((resolve) => resolve('/login')).then(
+    new Promise<string>((resolve) => resolve('/home/')).then(
       (url) => (this.loginUrl = url)
     )
   },
