@@ -41,7 +41,7 @@ export default Vue.extend({
   }
 
   @include for-size(tablet-landscape-up) {
-    width: 40%;
+    width: 42%;
   }
 }
 

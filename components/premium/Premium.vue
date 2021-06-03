@@ -89,6 +89,14 @@ export default Vue.extend({
       width: 50%;
     }
   }
+
+  @include for-size(tablet-portrait-up) {
+    @apply justify-evenly;
+  }
+
+  @include for-size(big-desktop-up) {
+    @apply justify-between;
+  }
 }
 
 .image {
