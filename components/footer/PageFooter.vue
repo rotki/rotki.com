@@ -10,9 +10,10 @@
       </div>
     </div>
     <div :class="$style.secondRow">
-      <span :class="$style.copyright">
-        © Rotki Solutions GmbH 2018-{{ year }}. All Rights Reserved.
-      </span>
+      <div :class="$style.copyright">
+        <div>© Rotki Solutions GmbH 2018-{{ year }}.</div>
+        <div>All Rights Reserved.</div>
+      </div>
       <footer-legalese />
     </div>
   </div>
@@ -91,9 +92,21 @@ export default Vue.extend({
 }
 
 .copyright {
-  @apply font-sans text-shade11;
+  @apply font-sans text-shade11 flex-row flex;
+
+  > * {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
 
   @include text-size(14px, 20px);
+  @include for-size(phone-only) {
+    @apply flex-col text-center;
+
+    > * {
+      padding-top: 2px;
+    }
+  }
 }
 
 .logo {
