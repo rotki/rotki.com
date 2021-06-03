@@ -10,8 +10,8 @@
     </template>
     <feature-details>
       <template #subtitle> Assets and Liabilities </template>
-      View all of your assets and liabilities and your exposure
-      to each as a percentage of your net worth.
+      View all of your assets and liabilities and your exposure to each as a
+      percentage of your net worth.
     </feature-details>
     <feature-details>
       <template #subtitle> Net worth over time</template>

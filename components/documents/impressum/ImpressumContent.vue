@@ -21,7 +21,7 @@
     <paragraph>
       Die Europäische Kommission stellt eine Plattform zur
       Online-Streitbeilegung (OS) bereit:
-      <external-link url="https://ec.europa.eu/consumers/odr" no-referrer/>
+      <external-link url="https://ec.europa.eu/consumers/odr" no-referrer />
       . Unsere E-Mail-Adresse finden Sie oben im Impressum
     </paragraph>
 
