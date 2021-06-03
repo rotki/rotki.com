@@ -36,3 +36,12 @@ Run with
 ```bash
 $ yarn dev
 ```
+
+
+## Lint
+
+To fix any lint errors you have to run
+
+```bash
+yarn lint:js --fix
+```
