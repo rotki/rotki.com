@@ -29,6 +29,9 @@
       </a>
     </div>
     <div :class="$style.column">
+      <NuxtLink to="/jobs" :class="$style.link"> Jobs </NuxtLink>
+    </div>
+    <div :class="$style.column">
       <a href="mailto:info@rotki.com" target="_blank" :class="$style.link">
         Contact
       </a>
