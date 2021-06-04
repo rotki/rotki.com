@@ -1,6 +1,6 @@
 <template>
   <div>
-    <heading>Role requirements</heading>
+    <heading>Python Backend Developer - Role requirements</heading>
 
     <paragraph>
       We are looking for a backend developer to help us improve Rotki. You will
@@ -22,7 +22,8 @@
 
     <paragraph>
       Since this is a startup you will probably wear a lot of hats and may need
-      to also help with the backend/infrastructure of our website and API.
+      to also help with the backend/infrastructure of our website and API. The
+      best fit would be someone who shares our values on opensource and privacy.
     </paragraph>
 
     <heading subheading> Technical requirements: </heading>
@@ -44,15 +45,11 @@
         </li>
         <li>
           [Optional] Similar knowledge of another blockchain protocol (e.g.
-          Bitcoin).
+          Bitcoin, Substrate etc.).
         </li>
         <li>
-          [Semi-Optional] Experience in django (should be easy to learn for a
-          python dev).
-        </li>
-        <li>
-          [Optional] Understanding of frontend tech used in rotki: Typescript +
-          vue.js + electron.
+          [Optional] Understanding of the frontend tech used in rotki:
+          Typescript + vue.js + electron.
         </li>
         <li>
           [Optional] Good understanding of docker and generally infrastructure
@@ -72,9 +69,9 @@
           start You will be guided for most tasks and there is always going to
           be mentoring when required but the more you manage to fend off by
           yourself the smoother the whole team will work. Eventually this job is
-          a for an individual who is both willing and capable to take on a lot
-          of responsibility and take ownership of a big part of the codebase. No
-          hand-holding.
+          for an individual who is both willing and capable to take on a lot of
+          responsibility and take ownership of a big part of the codebase. The
+          goal is to reach a state where no hand holding will be needed.
         </li>
         <li>
           Be user-minded. The user is king. Everything we implement in Rotki, we
@@ -100,7 +97,7 @@
         <li>
           WFH/Working remotely. We don’t care (as long as we meet up from time
           to time!) where you live, if you travel all the time, if you are in
-          your underwear when coding etc.
+          your underpants when coding etc.
         </li>
         <li>
           Flexible working hours. Nobody will count your hours. As long as the
@@ -111,10 +108,13 @@
           space.
         </li>
         <li>
+          Opportunity to learn and grow your skills in the fast moving sector of
+          cryptocurrencies and decentralized finance.
+        </li>
+        <li>
           Opportunity to work in opensource, have your code visible and running
           at the systems of the ever-increasing Rotki userbase.
         </li>
-        <li>Potential for equity options in the company.</li>
         <li>Working on a lean and mean team without micromanagement.</li>
       </ul>
     </paragraph>
@@ -144,5 +144,6 @@ export default {
 
 .points {
   list-style-type: disc;
+  margin-left: 32px;
 }
 </style>
