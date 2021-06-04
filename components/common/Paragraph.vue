@@ -1,12 +1,12 @@
 <template>
-  <p
+  <div
     :class="{
       [$style.text]: true,
       [$style.small]: small,
     }"
   >
     <slot />
-  </p>
+  </div>
 </template>
 
 <script lang="ts">
