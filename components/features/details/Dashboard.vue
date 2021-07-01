@@ -56,5 +56,9 @@ export default Vue.extend({
   @include for-size(big-desktop-up) {
     right: -400px;
   }
+
+  @media only screen and (min-width: 1190px) and (max-width: 1270px) {
+    right: -750px;
+  }
 }
 </style>
