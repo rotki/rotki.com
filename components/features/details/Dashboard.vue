@@ -37,6 +37,18 @@ export default Vue.extend({
 @import '~assets/css/main';
 
 .image {
+  @media only screen and (min-width: 1190px) {
+    right: -750px !important;
+  }
+
+  @media only screen and (min-width: 1280px) {
+    right: -680px;
+  }
+
+  @media only screen and (min-width: 1500px) {
+    right: -400px;
+  }
+
   @include for-size(phone-only) {
     position: relative;
     margin-bottom: 60px;
@@ -50,15 +62,10 @@ export default Vue.extend({
   @include for-size(desktop-up) {
     top: 80px;
     position: absolute;
-    right: -600px;
   }
 
   @include for-size(big-desktop-up) {
     right: -400px;
-  }
-
-  @media only screen and (min-width: 1190px) and (max-width: 1270px) {
-    right: -750px;
   }
 }
 </style>
