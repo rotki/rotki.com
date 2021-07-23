@@ -129,16 +129,28 @@
           <input-field
             id="country"
             v-model="country"
+            :items="countries"
             type="select"
             label="Country"
+            placeholder="Select country"
             hint="Required. Will only be used for invoice of payments."
           />
         </div>
 
-        <recaptcha :class="$style.recaptcha" />
+        <recaptcha
+          :class="$style.recaptcha"
+          @success="onSuccess"
+          @error="onError"
+          @expired="onExpired"
+        />
 
         <label :class="$style.termsCheck">
-          <input type="checkbox" :class="$style.checkbox" checked />
+          <input
+            :value="termsAccepted"
+            type="checkbox"
+            :class="$style.checkbox"
+            @click="termsAccepted = !termsAccepted"
+          />
           <span :class="$style.terms">
             I have read and agreed to the
             <external-link text="Terms of Service" url="/tos" />
@@ -147,17 +159,49 @@
           </span>
         </label>
 
-        <action-button primary text="Create Account" :class="$style.button" />
+        <action-button
+          :disabled="!valid"
+          primary
+          text="Create Account"
+          :class="$style.button"
+        />
       </div>
     </div>
   </page>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { computed, defineComponent, ref } from '@nuxtjs/composition-api'
+import { setupCSRF } from '~/composables/csrf-token'
+import { loadCountries } from '~/composables/countries'
+import { setupRecaptcha } from '~/composables/repatcha'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SignupForm',
+  setup() {
+    const termsAccepted = ref(false)
+    const valid = computed(
+      (ctx) =>
+        ctx.username !== '' &&
+        ctx.password !== '' &&
+        ctx.passwordConfirmation !== '' &&
+        ctx.firstName !== '' &&
+        ctx.lastName !== '' &&
+        ctx.address1 !== '' &&
+        ctx.city !== '' &&
+        ctx.postal !== '' &&
+        ctx.country !== '' &&
+        ctx.termsAccepted &&
+        ctx.recaptchaPassed
+    )
+    setupCSRF()
+    return {
+      ...loadCountries(),
+      ...setupRecaptcha(),
+      valid,
+      termsAccepted,
+    }
+  },
   data() {
     return {
       username: '',

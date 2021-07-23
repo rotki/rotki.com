@@ -6,6 +6,7 @@
       [$style.secondary]: !primary,
       [$style.filled]: filled,
     }"
+    :disabled="disabled"
     @click="$emit('click')"
   >
     {{ text }}
@@ -13,9 +14,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'ActionButton',
   props: {
     text: {
@@ -36,6 +37,11 @@ export default Vue.extend({
       type: String,
       required: false,
       default: undefined,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
 })
@@ -59,6 +65,10 @@ $button-width: 275px;
     height: $button-height * $mobile-button-percentage;
     width: $button-width * $mobile-button-percentage;
   }
+}
+
+.button:disabled {
+  @apply bg-gray-400 hover:bg-gray-400;
 }
 
 .primary {
