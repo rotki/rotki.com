@@ -13,21 +13,36 @@
     <input
       v-model="username"
       type="text"
-      :class="$style.input"
+      :class="{
+        [$style.input]: true,
+        [$style.hasError]: !!error,
+      }"
       placeholder="Username"
+      @focus="error = ''"
     />
     <input
       v-model="password"
       type="password"
-      :class="$style.input"
+      :class="{
+        [$style.input]: true,
+        [$style.hasError]: !!error,
+      }"
       placeholder="Password"
+      @focus="error = ''"
+      @keypress.enter="login"
     />
+
+    <div :class="$style.errorWrapper">
+      <div v-if="error" :class="$style.error">{{ error }}</div>
+    </div>
 
     <div :class="$style.reset">
       <a href="/forgotpassword">Forgot password</a>
     </div>
 
-    <button :class="$style.button">Sign in</button>
+    <button :class="$style.button" :disabled="!valid" @click="login">
+      Sign in
+    </button>
     <div :class="$style.create">
       First time premium?
       <a href="/signup" :class="$style.signup"> Sign Up here </a>
@@ -36,14 +51,42 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  useContext,
+  useStore,
+} from '@nuxtjs/composition-api'
+import { Actions, LoginCredentials, RootState } from '~/store'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Login',
-  data() {
+  setup() {
+    const username = ref('')
+    const password = ref('')
+    const valid = computed(({ username, password }) => !!username && !!password)
+    const error = ref('')
+    const { $axios } = useContext()
+    const getCSRFToken = async () => {
+      await $axios.get('/webapi/csrf/')
+    }
+    onMounted(getCSRFToken)
+    const { dispatch } = useStore<RootState>()
+    const login = async () => {
+      const credentials: LoginCredentials = {
+        username: username.value,
+        password: password.value,
+      }
+      error.value = await dispatch(Actions.LOGIN, credentials)
+    }
     return {
-      username: '',
-      password: '',
+      username,
+      password,
+      valid,
+      error,
+      login,
     }
   },
 })
@@ -90,6 +133,10 @@ export default Vue.extend({
   }
 }
 
+.button:disabled {
+  @apply bg-gray-400;
+}
+
 .reset {
   @apply flex flex-row justify-end text-primary focus:text-yellow-800;
 
@@ -108,5 +155,17 @@ export default Vue.extend({
 
 .create {
   padding-top: 16px;
+}
+
+.error {
+  @apply p-2 mt-1 text-red-500 text-xs;
+}
+
+.hasError {
+  @apply border-red-500;
+}
+
+.errorWrapper {
+  min-height: 40px;
 }
 </style>
