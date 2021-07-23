@@ -3,10 +3,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-export default Vue.extend({
-  head: () => {
-    return {
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+
+export default defineComponent({
+  setup() {
+    useMeta({
       title: 'Rotki: Login',
       meta: [
         {
@@ -21,8 +22,9 @@ export default Vue.extend({
       bodyAttrs: {
         class: 'body',
       },
-    }
+    })
   },
+  head: {},
 })
 </script>
 
