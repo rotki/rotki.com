@@ -3,7 +3,7 @@
     :class="$style.link"
     :href="url"
     :target="sameTab ? '_self' : '_blank'"
-    :rel="noReferrer ? 'noreferrer' : undefined"
+    :rel="noRef ? 'noreferrer' : null"
   >
     <slot>
       {{ display }}
@@ -12,9 +12,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'ExternalLink',
   props: {
     url: {
@@ -31,7 +31,7 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-    noReferrer: {
+    noRef: {
       required: false,
       type: Boolean,
       default: false,
