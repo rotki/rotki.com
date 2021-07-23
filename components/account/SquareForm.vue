@@ -24,10 +24,10 @@
   </fragment>
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SquareForm',
 })
 </script>
