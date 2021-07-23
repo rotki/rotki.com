@@ -54,7 +54,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: [],
+  plugins: ['~/plugins/axios.ts'],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: [{ path: '~/components', pathPrefix: false }],
@@ -66,6 +66,7 @@ export default {
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/composition-api/module',
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
@@ -78,7 +79,9 @@ export default {
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    baseURL: process.env.BROWSER_BASE_URL,
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
@@ -97,6 +100,9 @@ export default {
     recaptcha: {
       /* reCAPTCHA options */
       siteKey: process.env.RECAPTCHA_SITE_KEY, // for example
+    },
+    axios: {
+      browserBaseURL: process.env.BROWSER_BASE_URL,
     },
   },
 
