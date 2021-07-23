@@ -1,7 +1,27 @@
 <template>
   <div :class="$style.wrapper">
     <label v-if="label" :for="id" :class="$style.label"> {{ label }}</label>
+    <select
+      v-if="type === 'select'"
+      :id="id"
+      v-model="selection"
+      :class="$style.input"
+      @input="input($event)"
+    >
+      <option v-if="placeholder" selected disabled :class="$style.option">
+        {{ placeholder }}
+      </option>
+      <option
+        v-for="country in items"
+        :key="country.code"
+        :class="$style.option"
+        :value="country.code"
+      >
+        {{ country.name }}
+      </option>
+    </select>
     <input
+      v-else
       :id="id"
       :value="value"
       :type="type"
@@ -9,6 +29,7 @@
       :placeholder="placeholder"
       @input="input($event)"
     />
+
     <span :class="$style.caption">
       {{ hint }}
     </span>
@@ -17,9 +38,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent, PropType, ref, watch } from '@nuxtjs/composition-api'
+import { Country } from '~/composables/countries'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'InputField',
   props: {
     id: {
@@ -50,16 +72,25 @@ export default Vue.extend({
       default: '',
       required: false,
     },
-  },
-  data() {
-    return {
-      username: '',
-    }
-  },
-  methods: {
-    input(event: any) {
-      this.$emit('input', event.value ?? '')
+    items: {
+      type: Array as PropType<Country[]>,
+      required: false,
+      default: () => [],
     },
+  },
+  setup(props, { emit }) {
+    const selection = ref('')
+    const input = (event: InputEvent) => {
+      emit('input', event.target?.value ?? '')
+    }
+    if (props.type === 'select') {
+      watch(selection, (newValue) => emit('input', newValue))
+    }
+
+    return {
+      selection,
+      input,
+    }
   },
 })
 </script>
@@ -73,7 +104,7 @@ export default Vue.extend({
 }
 
 .input {
-  @apply border-shade10 box-border border-solid focus:outline-none focus:border-primary py-2 px-3 appearance-none w-full;
+  @apply border-shade10 box-border border-solid focus:outline-none focus:border-primary py-2 px-3 appearance-none w-full bg-white;
 
   margin-top: 8px;
   border-width: 1px;
@@ -96,5 +127,9 @@ export default Vue.extend({
   @apply tracking-wide font-serif font-medium uppercase;
 
   @include text-size(14px, 20px);
+}
+
+.option {
+  @apply py-2 px-2;
 }
 </style>

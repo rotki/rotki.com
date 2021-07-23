@@ -54,12 +54,11 @@
 import {
   computed,
   defineComponent,
-  onMounted,
   ref,
-  useContext,
   useStore,
 } from '@nuxtjs/composition-api'
 import { Actions, LoginCredentials, RootState } from '~/store'
+import { setupCSRF } from '~/composables/csrf-token'
 
 export default defineComponent({
   name: 'Login',
@@ -68,11 +67,7 @@ export default defineComponent({
     const password = ref('')
     const valid = computed(({ username, password }) => !!username && !!password)
     const error = ref('')
-    const { $axios } = useContext()
-    const getCSRFToken = async () => {
-      await $axios.get('/webapi/csrf/')
-    }
-    onMounted(getCSRFToken)
+    setupCSRF()
     const { dispatch } = useStore<RootState>()
     const login = async () => {
       const credentials: LoginCredentials = {
