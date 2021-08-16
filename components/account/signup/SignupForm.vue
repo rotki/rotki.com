@@ -190,9 +190,10 @@ import {
   ref,
   toRef,
   useContext,
+  useRouter,
 } from '@nuxtjs/composition-api'
 import { email, minLength, required, sameAs } from '@vuelidate/validators'
-import useVuelidate from '@vuelidate/core'
+import { useVuelidate } from '@vuelidate/core'
 import { setupCSRF } from '~/composables/csrf-token'
 import { loadCountries } from '~/composables/countries'
 import { setupRecaptcha } from '~/composables/repatcha'
@@ -249,6 +250,7 @@ export default defineComponent({
 
     const setupSignup = (captcha: Ref<string>, $externalResults: Ref<any>) => {
       const { $api } = useContext()
+      const router = useRouter()
       const signup = async (payload: SignupPayload) => {
         const response = await $api.post(
           '/webapi/signup/',
@@ -266,7 +268,7 @@ export default defineComponent({
         }
 
         if (response.status === 200) {
-          console.log('acti')
+          router.push({ path: '/activation' })
         }
       }
       return {

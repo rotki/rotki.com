@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.wrapper">
-    <Header>
+    <Header no-margin>
       <template #subtitle>
         <div :class="$style.subtitle">
           <slot name="title" />
@@ -26,12 +26,14 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
 .wrapper {
-  @apply container mx-auto;
+  @apply container mx-auto flex flex-col flex-grow justify-between;
+
+  min-height: 100vh;
 
   @include for-size(phone-only) {
     padding: $mobile-margin / 2;
