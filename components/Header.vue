@@ -1,6 +1,12 @@
 <template>
   <div :class="$style.wrapper">
-    <div :class="$style.header">
+    <div
+      :class="{
+        [$style.header]: true,
+        [$style.margin]: !noMargin,
+        [$style.padding]: noMargin,
+      }"
+    >
       <div :class="$style.title">Rotki</div>
     </div>
     <slot name="subtitle" />
@@ -12,14 +18,21 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Header',
+  props: {
+    noMargin: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
+  },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 
@@ -29,7 +42,9 @@ export default Vue.extend({
 
 .header {
   @apply flex flex-row justify-center;
+}
 
+.margin {
   margin-top: 94px;
   @include for-size(phone-only) {
     margin-top: 42px;
@@ -37,6 +52,17 @@ export default Vue.extend({
 
   @media only screen and (max-height: 750px) {
     margin-top: 24px;
+  }
+}
+
+.padding {
+  padding-top: 94px;
+  @include for-size(phone-only) {
+    padding-top: 42px;
+  }
+
+  @media only screen and (max-height: 750px) {
+    padding-top: 24px;
   }
 }
 
