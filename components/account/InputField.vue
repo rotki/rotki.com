@@ -1,14 +1,15 @@
 <template>
   <div :class="$style.wrapper">
-    <label v-if="label" :for="id" :class="$style.label"> {{ label }}</label>
+    <label v-if="label" :class="$style.label" :for="id"> {{ label }}</label>
     <select
       v-if="type === 'select'"
       :id="id"
+      ref="inputField"
       v-model="selection"
       :class="$style.input"
       @input="input($event)"
     >
-      <option v-if="placeholder" selected disabled :class="$style.option">
+      <option v-if="placeholder" :class="$style.option" disabled selected>
         {{ placeholder }}
       </option>
       <option
@@ -23,14 +24,24 @@
     <input
       v-else
       :id="id"
-      :value="value"
-      :type="type"
+      ref="inputField"
+      :aria-describedby="`${id}-error`"
       :class="$style.input"
       :placeholder="placeholder"
+      :type="type"
+      :value="value"
       @input="input($event)"
     />
 
-    <span :class="$style.caption">
+    <span
+      v-if="errorMessages && errorMessages.length > 0"
+      :id="`${id}-error`"
+      :class="$style.error"
+    >
+      {{ errorMessages[0].$message }}
+    </span>
+
+    <span v-else :class="$style.caption">
       {{ hint }}
     </span>
     <slot />
@@ -38,7 +49,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, watch } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  PropType,
+  ref,
+  toRef,
+  watch,
+} from '@nuxtjs/composition-api'
 import { Country } from '~/composables/countries'
 
 export default defineComponent({
@@ -72,6 +89,11 @@ export default defineComponent({
       default: '',
       required: false,
     },
+    errorMessages: {
+      type: Array,
+      default: () => [],
+      required: false,
+    },
     items: {
       type: Array as PropType<Country[]>,
       required: false,
@@ -80,22 +102,33 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const selection = ref('')
+    const inputField = ref<HTMLInputElement | null>(null)
     const input = (event: InputEvent) => {
-      emit('input', event.target?.value ?? '')
+      const target = event.target
+      if (target) {
+        emit('input', (target as HTMLInputElement).value ?? '')
+      }
     }
     if (props.type === 'select') {
       watch(selection, (newValue) => emit('input', newValue))
     }
 
+    watch(toRef(props, 'errorMessages'), (value) => {
+      if (value.length > 0) {
+        inputField.value?.focus()
+      }
+    })
+
     return {
       selection,
+      inputField,
       input,
     }
   },
 })
 </script>
 
-<style scoped module lang="scss">
+<style lang="scss" module scoped>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
@@ -121,6 +154,12 @@ export default defineComponent({
 
   color: #808080;
   margin-top: 8px;
+}
+
+.error {
+  color: #e53935;
+
+  @extend .caption;
 }
 
 .label {
