@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'ExternalLink',
@@ -37,10 +37,12 @@ export default defineComponent({
       default: false,
     },
   },
-  computed: {
-    display() {
-      return this.text ? this.text : this.url
-    },
+  setup(props) {
+    const { text, url } = toRefs(props)
+    const display = computed(() => (text.value ? text.value : url.value))
+    return {
+      display,
+    }
   },
 })
 </script>
