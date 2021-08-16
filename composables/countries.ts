@@ -1,4 +1,4 @@
-import { onMounted, ref, useContext } from '@nuxtjs/composition-api'
+import { onMounted, Ref, ref, useContext } from '@nuxtjs/composition-api'
 import { ApiResponse } from '~/types'
 
 export interface Country {
@@ -7,7 +7,7 @@ export interface Country {
 }
 
 export const loadCountries = () => {
-  const countries = ref<Country[]>([])
+  const countries: Ref<Country[]> = ref([])
   const countriesLoadError = ref('')
   const { $axios } = useContext()
   const loadCountries = async () => {
@@ -15,7 +15,7 @@ export const loadCountries = () => {
       const response = await $axios.get<ApiResponse<Country[]>>(
         '/webapi/countries/'
       )
-      countries.value = response.data.result
+      countries.value = response.data.result ?? []
     } catch (e) {
       countriesLoadError.value = e.message
     }

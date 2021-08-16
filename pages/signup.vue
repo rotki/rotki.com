@@ -7,7 +7,7 @@ import Vue from 'vue'
 export default Vue.extend({
   head: () => {
     return {
-      title: 'Rotki: Login',
+      title: 'Rotki: Signup',
       meta: [
         {
           hid: 'description',
