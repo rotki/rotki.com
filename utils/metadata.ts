@@ -26,3 +26,17 @@ export function getMetadata(title: string, description: string, url: string) {
     { property: 'twitter:image', content: imageUrl },
   ]
 }
+
+export const noIndex = () => ({
+  name: 'robots',
+  content: 'noindex',
+})
+
+export const commonAttrs = () => ({
+  htmlAttrs: {
+    class: 'page',
+  },
+  bodyAttrs: {
+    class: 'body',
+  },
+})
