@@ -12,22 +12,22 @@
 
     <input
       v-model="username"
-      type="text"
       :class="{
         [$style.input]: true,
         [$style.hasError]: !!error,
       }"
       placeholder="Username"
+      type="text"
       @focus="error = ''"
     />
     <input
       v-model="password"
-      type="password"
       :class="{
         [$style.input]: true,
         [$style.hasError]: !!error,
       }"
       placeholder="Password"
+      type="password"
       @focus="error = ''"
       @keypress.enter="login"
     />
@@ -37,7 +37,7 @@
     </div>
 
     <div :class="$style.reset">
-      <a href="/forgotpassword">Forgot password</a>
+      <a href="/password/recover">Forgot password</a>
     </div>
 
     <button :class="$style.button" :disabled="!valid" @click="login">
@@ -45,7 +45,7 @@
     </button>
     <div :class="$style.create">
       First time premium?
-      <a href="/signup" :class="$style.signup"> Sign Up here </a>
+      <a :class="$style.signup" href="/signup"> Sign Up here </a>
     </div>
   </square-form>
 </template>
@@ -87,7 +87,7 @@ export default defineComponent({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
