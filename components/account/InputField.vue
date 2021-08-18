@@ -113,9 +113,11 @@ export default defineComponent({
       watch(selection, (newValue) => emit('input', newValue))
     }
 
+    const lastMessage = ref('')
     watch(toRef(props, 'errorMessages'), (value) => {
-      if (value.length > 0) {
+      if (value.length > 0 && lastMessage.value !== value[0].$message) {
         inputField.value?.focus()
+        lastMessage.value = value[0].$message
       }
     })
 
