@@ -1,53 +1,60 @@
 <template>
-  <square-form>
-    <template #subtitle> Premium account management </template>
+  <page>
+    <template #title> Premium account management </template>
     <template #hint>
-      Here you can create or login to your premium account. A premium account is
-      only needed to unlock the premium features of the application and is not
-      the same as the account you use in the Rotki application. Credentials for
-      one account can not be used for the other.
+      <div :class="$style.hint">
+        Here you can create or login to your premium account. A premium account
+        is only needed to unlock the premium features of the application and is
+        not the same as the account you use in the Rotki application.
+        Credentials for one account can not be used for the other.
+      </div>
     </template>
 
-    <div :class="$style.signin">Sign in</div>
+    <div :class="$style.box">
+      <div :class="$style.label">Sign in</div>
 
-    <input
-      v-model="username"
-      :class="{
-        [$style.input]: true,
-        [$style.hasError]: !!error,
-      }"
-      placeholder="Username"
-      type="text"
-      @focus="error = ''"
-    />
-    <input
-      v-model="password"
-      :class="{
-        [$style.input]: true,
-        [$style.hasError]: !!error,
-      }"
-      placeholder="Password"
-      type="password"
-      @focus="error = ''"
-      @keypress.enter="login"
-    />
+      <input-field
+        id="username"
+        v-model="username"
+        placeholder="Username"
+        type="text"
+        @focus="error = ''"
+      />
+      <input-field
+        id="password"
+        v-model="password"
+        placeholder="Password"
+        type="password"
+        @focus="error = ''"
+        @keypress.enter="login"
+      />
 
-    <div :class="$style.errorWrapper">
-      <div v-if="error" :class="$style.error">{{ error }}</div>
+      <div :class="$style.errorWrapper">
+        <div v-if="error" :class="$style.error">{{ error }}</div>
+      </div>
+
+      <div :class="$style.reset">
+        <external-link
+          same-tab
+          text="Forgot password"
+          url="/password/recover"
+        />
+      </div>
+
+      <div :class="$style.button">
+        <action-button
+          :disabled="!valid"
+          primary
+          text="Sign in"
+          @click="login"
+        />
+      </div>
+      <div :class="$style.create">
+        First time premium?
+        <external-link same-tab text="Sign Up here" url="/signup" />
+      </div>
     </div>
-
-    <div :class="$style.reset">
-      <a href="/password/recover">Forgot password</a>
-    </div>
-
-    <button :class="$style.button" :disabled="!valid" @click="login">
-      Sign in
-    </button>
-    <div :class="$style.create">
-      First time premium?
-      <a :class="$style.signup" href="/signup"> Sign Up here </a>
-    </div>
-  </square-form>
+  </page>
 </template>
 
 <script lang="ts">
@@ -91,45 +98,23 @@ export default defineComponent({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
-.input {
-  @apply border-shade10 box-border border-solid focus:outline-none focus:border-primary py-2 px-3 appearance-none;
+.box {
+  @apply border p-6 rounded;
 
-  margin-top: 16px;
-  border-width: 1px;
-  border-radius: 8px;
-  height: 56px;
-  width: 336px;
-
+  width: 450px;
   @include for-size(phone-only) {
     width: 100%;
   }
 }
 
-.signin {
-  @apply font-serif font-bold text-primary2;
+.label {
+  @apply text-shade11 font-serif mb-4;
 
-  letter-spacing: -0.01em;
-
-  @include text-size(32px, 47px);
-  @include for-size(phone-only) {
-    margin-top: 20px;
-  }
+  @include text-size(24px, 32px);
 }
 
 .button {
-  @apply text-white bg-primary hover:bg-shade12 font-sans focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
-
-  height: 56px;
-  width: 336px;
-  border-radius: 8px;
-
-  @include for-size(phone-only) {
-    width: 100%;
-  }
-}
-
-.button:disabled {
-  @apply bg-gray-400;
+  @apply flex flex-row align-middle justify-center;
 }
 
 .reset {
@@ -144,11 +129,9 @@ export default defineComponent({
   }
 }
 
-.signup {
-  @apply text-primary focus:text-yellow-800;
-}
-
 .create {
+  @apply flex flex-row align-middle justify-center;
+
   padding-top: 16px;
 }
 
@@ -156,11 +139,13 @@ export default defineComponent({
   @apply p-2 mt-1 text-red-500 text-xs;
 }
 
-.hasError {
-  @apply border-red-500;
-}
-
 .errorWrapper {
   min-height: 40px;
+}
+
+.hint {
+  max-width: 500px;
+  align-items: center;
+  text-align: justify;
 }
 </style>
