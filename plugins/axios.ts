@@ -35,7 +35,7 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
       return pop.split(';').shift()
     }
   }
-  const $api = $axios.create()
+  const $api = $axios.create({ baseURL: process.env.baseUrl })
 
   $api.interceptors.request.use(
     (config: AxiosRequestConfig) => {
