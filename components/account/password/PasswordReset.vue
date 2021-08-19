@@ -32,13 +32,15 @@
         label="Password Confirmation"
         type="password"
       />
-      <action-button
-        :class="$style.button"
-        :disabled="!valid"
-        primary
-        text="Submit"
-        @click="submit"
-      />
+      <div :class="$style.buttonWrapper">
+        <action-button
+          :class="$style.button"
+          :disabled="!valid"
+          primary
+          text="Submit"
+          @click="submit"
+        />
+      </div>
     </div>
     <div v-else />
   </page>
@@ -182,6 +184,10 @@ export default defineComponent({
   margin-top: 48px;
 }
 
+.buttonWrapper {
+  @apply flex flex-row align-middle justify-center;
+}
+
 .subtitle {
   @apply font-sans text-primary2 font-medium;
 
@@ -199,11 +205,17 @@ export default defineComponent({
 }
 
 .box {
-  @apply border p-12 rounded;
+  @apply border p-6  rounded;
+
+  width: 450px;
+
+  @include for-size(phone-only) {
+    width: 100%;
+  }
 }
 
 .label {
-  @apply text-shade11 font-sans mb-4;
+  @apply text-shade11 font-serif mb-4;
 
   @include text-size(24px, 32px);
 }

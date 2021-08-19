@@ -2,7 +2,7 @@
   <page>
     <template #title> Reset your password </template>
     <div :class="$style.box">
-      <div :class="$style.label">Provide your account's email address</div>
+      <div :class="$style.label">Recover password</div>
       <input-field id="email" v-model="emailAddress" label="Email" />
       <recaptcha
         :class="$style.recaptcha"
@@ -84,11 +84,17 @@ export default defineComponent({
 @import '~assets/css/media';
 
 .box {
-  @apply border p-12 rounded;
+  @apply border p-6 rounded;
+
+  width: 450px;
+
+  @include for-size(phone-only) {
+    width: 100%;
+  }
 }
 
 .label {
-  @apply text-shade11 font-sans mb-4;
+  @apply text-shade11 font-serif mb-4;
 
   @include text-size(24px, 32px);
 }
