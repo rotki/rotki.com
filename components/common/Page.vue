@@ -14,6 +14,10 @@
       </div>
     </div>
 
+    <div v-if="$slots.hint" :class="$style.hint">
+      <slot name="hint"></slot>
+    </div>
+
     <page-footer />
   </div>
 </template>
@@ -61,6 +65,26 @@ export default Vue.extend({
 
   @include for-size(phone-only) {
     width: 96%;
+  }
+}
+
+.hint {
+  align-items: center;
+  text-align: justify;
+  color: #808080;
+  bottom: 40px;
+  width: 100%;
+
+  div {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+  }
+
+  @include text-size(14px, 21px);
+  @include for-size(phone-only) {
+    bottom: $mobile-margin / 2;
+    padding: $mobile-margin / 2;
   }
 }
 </style>
