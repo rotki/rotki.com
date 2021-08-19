@@ -1,4 +1,5 @@
 import { ActionTree, MutationTree } from 'vuex'
+import { Account, ApiResponse } from '~/types'
 
 export interface LoginCredentials {
   readonly username: string
@@ -11,6 +12,7 @@ enum Mutations {
 
 export enum Actions {
   LOGIN = 'login',
+  ACCOUNT = 'account',
 }
 
 export const state = () => ({
@@ -26,6 +28,9 @@ export const mutations: MutationTree<RootState> = {
 }
 
 export const actions: ActionTree<RootState, RootState> = {
+  async nuxtServerInit({ dispatch }) {
+    await dispatch(Actions.ACCOUNT)
+  },
   async [Actions.LOGIN](
     { commit },
     { username, password }: LoginCredentials
@@ -52,5 +57,19 @@ export const actions: ActionTree<RootState, RootState> = {
     } catch (e) {
       return e.message
     }
+  },
+  async [Actions.ACCOUNT]({ commit }) {
+    try {
+      const response = await this.$api.get<ApiResponse<Account>>(
+        '/webapi/account/',
+        {
+          validateStatus: (status) => [200, 401].includes(status),
+        }
+      )
+
+      if (response.status === 200) {
+        commit(Mutations.UPDATE_AUTHENTICATED, true)
+      }
+    } catch (e) {}
   },
 }

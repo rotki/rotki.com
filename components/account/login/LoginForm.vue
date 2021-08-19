@@ -62,6 +62,7 @@ import {
   computed,
   defineComponent,
   ref,
+  useRouter,
   useStore,
 } from '@nuxtjs/composition-api'
 import { Actions, LoginCredentials, RootState } from '~/store'
@@ -76,12 +77,17 @@ export default defineComponent({
     const error = ref('')
     setupCSRF()
     const { dispatch } = useStore<RootState>()
+    const router = useRouter()
     const login = async () => {
       const credentials: LoginCredentials = {
         username: username.value,
         password: password.value,
       }
       error.value = await dispatch(Actions.LOGIN, credentials)
+
+      if (!error.value) {
+        router.push('/home')
+      }
     }
     return {
       username,
