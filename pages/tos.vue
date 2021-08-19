@@ -4,19 +4,18 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { getMetadata } from '~/utils/metadata'
+
+const title = 'Rotki: Terms of service'
+const description =
+  'The terms and conditions outline the rules and regulations for the use of rotki.com Website and all services offered in the Premium Rotki subscription.'
+
 export default Vue.extend({
   name: 'TOS',
   head: () => {
     return {
-      title: 'Rotki: Terms of service',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content:
-            'The terms and conditions outline the rules and regulations for the use of rotki.com Website and all services offered in the Premium Rotki subscription.',
-        },
-      ],
+      title,
+      meta: getMetadata(title, description, process.env.baseUrl + '/tos'),
       htmlAttrs: {
         class: 'page',
       },

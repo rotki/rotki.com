@@ -4,18 +4,20 @@
 
 <script>
 import Vue from 'vue'
+import { getMetadata } from '@/utils/metadata'
+
+const title = 'Rotki: Impressum'
+const description = 'Impressum - DE'
 
 export default Vue.extend({
   head: () => {
     return {
-      title: 'Rotki: Impressum',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Impressum - DE',
-        },
-      ],
+      title,
+      meta: getMetadata(
+        title,
+        description,
+        `${process.env.baseUrl}/impressum/`
+      ),
       htmlAttrs: {
         class: 'page',
       },
