@@ -24,7 +24,7 @@ function metadata(route: string) {
   }
 
   return [
-    getMetadata(title, description, `https://rotki.com/jobs/${path}`),
+    getMetadata(title, description, `${process.env.BASE_URL}/jobs/${path}`),
     title,
   ] as const
 }

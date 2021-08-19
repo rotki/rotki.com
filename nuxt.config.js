@@ -114,4 +114,8 @@ export default {
     UserAgent: '*',
     Disallow: '/home',
   },
+
+  env: {
+    baseUrl: process.env.BASE_URL || 'https://rotki.com',
+  },
 }
