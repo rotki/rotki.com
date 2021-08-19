@@ -12,6 +12,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { getMetadata } from '~/utils/metadata'
 
 const description =
   'Rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.'
@@ -30,32 +31,10 @@ export default Vue.extend({
       title: 'Rotki',
       meta: [
         {
-          hid: 'description',
-          name: 'description',
-          content: description,
-        },
-        {
           name: 'keywords',
           content: keywords,
         },
-        // Open graph/FB sharing metadata
-        { property: 'og:type', content: 'website' },
-        { property: 'og:url', content: 'https://rotki.com/' },
-        { property: 'og:title', content: 'rotki' },
-        {
-          property: 'og:description',
-          content: description,
-        },
-        { property: 'og:image', content: '/img/rotki-media.png' },
-        // Twitter sharing metadata
-        { property: 'twitter:card', content: 'summary_large_image' },
-        { property: 'twitter:url', content: 'https://rotki.com/' },
-        { property: 'twitter:title', content: 'rotki' },
-        {
-          property: 'twitter:description',
-          content: description,
-        },
-        { property: 'twitter:image', content: '/img/rotki-media.png' },
+        ...getMetadata('Rotki', description, `${process.env.baseUrl}`),
       ],
       htmlAttrs: {
         class: 'page',

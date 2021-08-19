@@ -1,4 +1,5 @@
 export function getMetadata(title: string, description: string, url: string) {
+  const imageUrl = `${process.env.baseUrl}/img/media.png`
   return [
     {
       hid: 'description',
@@ -13,7 +14,7 @@ export function getMetadata(title: string, description: string, url: string) {
       property: 'og:description',
       content: description,
     },
-    { property: 'og:image', content: '/img/rotki-media.png' },
+    { property: 'og:image', content: imageUrl },
     // Twitter sharing metadata
     { property: 'twitter:card', content: 'summary_large_image' },
     { property: 'twitter:url', content: url },
@@ -22,6 +23,6 @@ export function getMetadata(title: string, description: string, url: string) {
       property: 'twitter:description',
       content: description,
     },
-    { property: 'twitter:image', content: '/img/rotki-media.png' },
+    { property: 'twitter:image', content: imageUrl },
   ]
 }
