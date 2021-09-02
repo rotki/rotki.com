@@ -10,9 +10,8 @@
       </div>
     </template>
 
-    <div :class="$style.box">
-      <div :class="$style.label">Sign in</div>
-
+    <box>
+      <template #label>Sign in</template>
       <input-field
         id="username"
         v-model="username"
@@ -53,7 +52,7 @@
         First time premium?
         <external-link same-tab text="Sign Up here" url="/signup" />
       </div>
-    </div>
+    </box>
   </page>
 </template>
 
@@ -103,21 +102,6 @@ export default defineComponent({
 <style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
-
-.box {
-  @apply border p-6 rounded;
-
-  width: 450px;
-  @include for-size(phone-only) {
-    width: 100%;
-  }
-}
-
-.label {
-  @apply text-shade11 font-serif mb-4;
-
-  @include text-size(24px, 32px);
-}
 
 .button {
   @apply flex flex-row align-middle justify-center;
