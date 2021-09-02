@@ -1,8 +1,8 @@
 <template>
   <page>
     <template #title> Reset your password </template>
-    <div :class="$style.box">
-      <div :class="$style.label">Recover password</div>
+    <box>
+      <template #label> Recover password </template>
       <input-field id="email" v-model="emailAddress" label="Email" />
       <recaptcha
         :class="$style.recaptcha"
@@ -17,7 +17,7 @@
         text="Submit"
         @click="reset"
       />
-    </div>
+    </box>
   </page>
 </template>
 
@@ -81,24 +81,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-
-.box {
-  @apply border p-6 rounded;
-
-  width: 450px;
-
-  @include for-size(phone-only) {
-    width: 100%;
-  }
-}
-
-.label {
-  @apply text-shade11 font-serif mb-4;
-
-  @include text-size(24px, 32px);
-}
-
 .button {
   margin-top: 48px;
 }
