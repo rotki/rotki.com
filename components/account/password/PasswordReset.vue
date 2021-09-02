@@ -2,8 +2,8 @@
   <page>
     <template #title> Reset your password </template>
 
-    <div v-if="!validating" :class="$style.box">
-      <div :class="$style.label">Provide your new password</div>
+    <box v-if="!validating">
+      <template #label> Provide your new password </template>
       <input-field
         id="password"
         v-model="password"
@@ -41,7 +41,7 @@
           @click="submit"
         />
       </div>
-    </div>
+    </box>
     <div v-else />
   </page>
 </template>
