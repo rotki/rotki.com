@@ -8,6 +8,7 @@ export interface LoginCredentials {
 
 enum Mutations {
   UPDATE_AUTHENTICATED = 'UPDATE_AUTHENTICATED',
+  ACCOUNT_DATA = 'ACCOUNT_DATA',
 }
 
 export enum Actions {
@@ -17,6 +18,7 @@ export enum Actions {
 
 export const state = () => ({
   authenticated: false,
+  account: null as Account | null,
 })
 
 export type RootState = ReturnType<typeof state>
@@ -25,6 +27,9 @@ export const mutations: MutationTree<RootState> = {
   [Mutations.UPDATE_AUTHENTICATED](state, authenticated: boolean) {
     state.authenticated = authenticated
   },
+  [Mutations.ACCOUNT_DATA](state, account: Account) {
+    state.account = account
+  },
 }
 
 export const actions: ActionTree<RootState, RootState> = {
@@ -32,7 +37,7 @@ export const actions: ActionTree<RootState, RootState> = {
     await dispatch(Actions.ACCOUNT)
   },
   async [Actions.LOGIN](
-    { commit },
+    { commit, dispatch },
     { username, password }: LoginCredentials
   ): Promise<string> {
     try {
@@ -51,6 +56,7 @@ export const actions: ActionTree<RootState, RootState> = {
         commit(Mutations.UPDATE_AUTHENTICATED, false)
         return response.data.message
       } else {
+        await dispatch(Actions.ACCOUNT)
         commit(Mutations.UPDATE_AUTHENTICATED, true)
         return ''
       }
@@ -69,6 +75,7 @@ export const actions: ActionTree<RootState, RootState> = {
 
       if (response.status === 200) {
         commit(Mutations.UPDATE_AUTHENTICATED, true)
+        commit(Mutations.ACCOUNT_DATA, response.data.result)
       }
     } catch (e) {}
   },
