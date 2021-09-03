@@ -9,7 +9,12 @@
     </Header>
 
     <div :class="$style.content">
-      <div :class="$style.details">
+      <div
+        :class="{
+          [$style.details]: true,
+          [$style.wideBody]: wide,
+        }"
+      >
         <slot />
       </div>
     </div>
@@ -22,11 +27,18 @@
   </div>
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Page',
+  props: {
+    wide: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
 })
 </script>
 
@@ -58,6 +70,10 @@ export default Vue.extend({
 
   padding-top: 56px;
   padding-bottom: 48px;
+}
+
+.wideBody {
+  max-width: 85% !important;
 }
 
 .details {
