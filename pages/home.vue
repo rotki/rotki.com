@@ -1,5 +1,5 @@
 <template>
-  <div>Login</div>
+  <overview />
 </template>
 
 <script lang="ts">
@@ -12,3 +12,8 @@ export default defineComponent({
   head: {},
 })
 </script>
+
+<style lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+</style>
