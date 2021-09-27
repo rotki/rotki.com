@@ -27,16 +27,10 @@ export interface Subscription {
 }
 
 export interface Payment {
-  readonly payment_provider: string
-  readonly item_name: string
-  readonly subscription: string
-  readonly created_at: string
-  readonly currency: string
-  readonly amount: string
+  readonly identifier: string
+  readonly plan: string
+  readonly paid_at: string
   readonly eur_amount: string
-  readonly vat: string
-  readonly external_id: string
-  readonly address_details: number
 }
 
 export interface Account {
