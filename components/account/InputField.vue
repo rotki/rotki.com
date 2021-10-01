@@ -28,6 +28,7 @@
       :aria-describedby="`${id}-error`"
       :class="$style.input"
       :placeholder="placeholder"
+      :readonly="readonly"
       :type="type"
       :value="value"
       @input="input($event)"
@@ -100,6 +101,11 @@ export default defineComponent({
       required: false,
       default: () => [],
     },
+    readonly: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['input', 'enter'],
   setup(props, { emit }) {
@@ -136,7 +142,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" module scoped>
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
