@@ -31,6 +31,7 @@
       :type="type"
       :value="value"
       @input="input($event)"
+      @keypress.enter="enter()"
     />
 
     <span
@@ -100,6 +101,7 @@ export default defineComponent({
       default: () => [],
     },
   },
+  emits: ['input', 'enter'],
   setup(props, { emit }) {
     const selection = ref('')
     const inputField = ref<HTMLInputElement | null>(null)
@@ -128,6 +130,7 @@ export default defineComponent({
       selection,
       inputField,
       input,
+      enter: () => emit('enter'),
     }
   },
 })
