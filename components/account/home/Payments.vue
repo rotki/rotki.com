@@ -41,13 +41,18 @@
                 <div :class="$style.text">Paid</div>
               </td>
               <td :class="$style.action">
-                <div>
+                <div :class="$style.actionContainer">
                   <a
                     :class="$style.actionButton"
                     :href="`/webapi/download/receipt/${payment.identifier}`"
                     download
                   >
-                    Download Receipt
+                    <tooltip>
+                      <template #activator>
+                        <receipt />
+                      </template>
+                      Download Receipt
+                    </tooltip>
                   </a>
                 </div>
               </td>
@@ -136,6 +141,10 @@ export default defineComponent({
 
 .action {
   @apply px-6 py-4 whitespace-nowrap text-right text-sm font-medium;
+}
+
+.actionContainer {
+  @apply flex flex-row-reverse;
 }
 
 .actionButton {
