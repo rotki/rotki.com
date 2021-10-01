@@ -24,8 +24,8 @@
         v-model="password"
         placeholder="Password"
         type="password"
+        @enter="login"
         @focus="error = ''"
-        @keypress.enter="login"
       />
 
       <div :class="$style.errorWrapper">
