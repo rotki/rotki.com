@@ -1,5 +1,5 @@
 import { ActionTree, MutationTree } from 'vuex'
-import { Account, ApiResponse } from '~/types'
+import { Account, ApiKeys, ApiResponse } from '~/types'
 
 export interface LoginCredentials {
   readonly username: string
@@ -14,6 +14,7 @@ enum Mutations {
 export enum Actions {
   LOGIN = 'login',
   ACCOUNT = 'account',
+  UPDATE_KEYS = 'update_keys',
 }
 
 export const state = () => ({
@@ -76,6 +77,22 @@ export const actions: ActionTree<RootState, RootState> = {
       if (response.status === 200) {
         commit(Mutations.UPDATE_AUTHENTICATED, true)
         commit(Mutations.ACCOUNT_DATA, response.data.result)
+      }
+    } catch (e) {}
+  },
+
+  async [Actions.UPDATE_KEYS]({ commit, state }) {
+    try {
+      const response = await this.$api.patch<ApiResponse<ApiKeys>>(
+        '/webapi/regenerate-keys/',
+        {},
+        {
+          validateStatus: (status) => [200, 401].includes(status),
+        }
+      )
+      if (response.status === 200) {
+        const account = { ...state.account, ...response.data.result }
+        commit(Mutations.ACCOUNT_DATA, account)
       }
     } catch (e) {}
   },

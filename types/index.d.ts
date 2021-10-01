@@ -46,3 +46,8 @@ export interface Account {
   readonly payments: Payment[]
   readonly date_now: string
 }
+
+export interface ApiKeys {
+  readonly api_key: string
+  readonly api_secret: string
+}
