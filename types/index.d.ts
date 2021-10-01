@@ -35,6 +35,7 @@ export interface Payment {
 
 export interface Account {
   readonly username: string
+  readonly email: string
   readonly github_username: string
   readonly api_key: string
   readonly api_secret: string
