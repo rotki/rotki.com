@@ -27,6 +27,7 @@
       ref="inputField"
       :aria-describedby="`${id}-error`"
       :class="$style.input"
+      :disabled="disabled"
       :placeholder="placeholder"
       :readonly="readonly"
       :type="type"
@@ -106,6 +107,11 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    disabled: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['input', 'enter'],
   setup(props, { emit }) {
@@ -147,7 +153,7 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .wrapper {
-  @apply flex flex-col;
+  @apply flex flex-col pt-2.5;
 }
 
 .input {
@@ -177,7 +183,9 @@ export default defineComponent({
 }
 
 .label {
-  @apply tracking-wide font-serif font-medium uppercase;
+  @apply tracking-wide font-sans uppercase;
+
+  font-weight: 600;
 
   @include text-size(14px, 20px);
 }
