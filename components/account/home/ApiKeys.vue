@@ -1,42 +1,38 @@
 <template>
-  <div :class="$style.col">
-    <div :class="$style.row">
-      <heading :class="$style.heading">Api Credentials</heading>
-      <div :class="$style.card">
-        <div :class="$style.entry">
-          <input-field
-            id="api-key"
-            :class="$style.input"
-            :value="apiKey"
-            label="API Key"
-            readonly
-          />
-          <div :class="$style.col">
-            <copy-button :class="$style.button" :value="apiKey" />
-          </div>
-        </div>
-        <div :class="$style.entry">
-          <input-field
-            id="api-key"
-            :class="$style.input"
-            :value="apiSecret"
-            label="API Secret"
-            readonly
-          />
-          <div :class="$style.col">
-            <copy-button :class="$style.button" :value="apiSecret" />
-          </div>
-        </div>
-        <action-button
-          :class="$style.button"
-          primary
-          small
-          text="Regenerate"
-          @click="regenerateKeys"
-        />
+  <card>
+    <heading :class="$style.heading" subheading>API Credentials</heading>
+    <div :class="$style.entry">
+      <input-field
+        id="api-key"
+        :class="$style.input"
+        :value="apiKey"
+        label="API Key"
+        readonly
+      />
+      <div :class="$style.col">
+        <copy-button :class="$style.button" :value="apiKey" />
       </div>
     </div>
-  </div>
+    <div :class="$style.entry">
+      <input-field
+        id="api-key"
+        :class="$style.input"
+        :value="apiSecret"
+        label="API Secret"
+        readonly
+      />
+      <div :class="$style.col">
+        <copy-button :class="$style.button" :value="apiSecret" />
+      </div>
+    </div>
+    <action-button
+      :class="$style.button"
+      primary
+      small
+      text="Regenerate"
+      @click="regenerateKeys"
+    />
+  </card>
 </template>
 
 <script lang="ts">
@@ -71,10 +67,6 @@ export default defineComponent({
 
 .row {
   @apply py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8;
-}
-
-.card {
-  @apply shadow overflow-hidden border-b border-gray-200 sm:rounded-lg mt-2 p-4 bg-white;
 }
 
 .entry {
