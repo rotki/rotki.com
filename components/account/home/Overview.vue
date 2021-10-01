@@ -1,9 +1,10 @@
 <template>
   <page wide>
     <template #title> Account Management </template>
-    <subscriptions />
-    <payments />
-    <api-keys v-if="premium" />
+    <subscriptions :class="$style.category" />
+    <payments :class="$style.category" />
+    <api-keys v-if="premium" :class="$style.category" />
+    <account-details :class="$style.category" />
   </page>
 </template>
 
@@ -24,3 +25,9 @@ export default defineComponent({
   },
 })
 </script>
+
+<style lang="scss" module>
+.category {
+  @apply mt-8;
+}
+</style>
