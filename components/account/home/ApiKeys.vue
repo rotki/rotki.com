@@ -15,7 +15,7 @@
     </div>
     <div :class="$style.entry">
       <input-field
-        id="api-key"
+        id="api-secret"
         :class="$style.input"
         :value="apiSecret"
         label="API Secret"
@@ -45,8 +45,8 @@ export default defineComponent({
   setup() {
     const store = useStore<RootState>()
 
-    const apiKey = computed(() => store.state.account?.api_key ?? '')
-    const apiSecret = computed(() => store.state.account?.api_secret ?? '')
+    const apiKey = computed(() => store.state.account?.apiKey ?? '')
+    const apiSecret = computed(() => store.state.account?.apiSecret ?? '')
 
     const regenerateKeys = async () => {
       await store.dispatch(Actions.UPDATE_KEYS)

@@ -19,21 +19,21 @@
           <tbody :class="$style.tbody">
             <tr v-for="(sub, index) in subscriptions" :key="index">
               <td :class="$style.td">
-                {{ sub.plan_name }}
+                {{ sub.planName }}
               </td>
               <td :class="$style.td">
                 <div :class="$style.text">
-                  {{ sub.created_date }}
+                  {{ sub.createdDate }}
                 </div>
               </td>
               <td :class="$style.td">
                 <div :class="$style.text">
-                  {{ sub.next_action_date }}
+                  {{ sub.nextActionDate }}
                 </div>
               </td>
               <td :class="$style.td">
                 <div :class="$style.text">
-                  {{ sub.next_billing_amount }}
+                  {{ sub.nextBillingAmount }}
                 </div>
               </td>
               <td :class="$style.td">
