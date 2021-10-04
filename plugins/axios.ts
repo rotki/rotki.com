@@ -114,14 +114,15 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
   const transformRequest = getDefaultTransformers(
     $axios.defaults.transformRequest
   )
-  const transformResponse = getDefaultTransformers(
-    $axios.defaults.transformResponse
-  )
   const $api = $axios.create({
     baseURL: process.env.baseUrl,
-    transformRequest: [...transformRequest, axiosSnakeCaseTransformer],
-    transformResponse: [...transformResponse, axiosCamelCaseTransformer],
+    transformResponse: [axiosCamelCaseTransformer],
   })
+
+  $api.defaults.transformRequest = [
+    axiosSnakeCaseTransformer,
+    ...transformRequest,
+  ]
 
   $api.interceptors.request.use(
     (config: AxiosRequestConfig) => {
