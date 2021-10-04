@@ -1,43 +1,6 @@
 <template>
   <div>
-    <card>
-      <heading subheading>Account Details</heading>
-      <input-field
-        id="email"
-        v-model="state.email"
-        disabled
-        hint="At the moment user email can't be changed. Email us support@rotki.com if you need to do so."
-        label="Email"
-        type="email"
-      />
-
-      <heading subheading>Change Password</heading>
-
-      <input-field
-        id="current-password"
-        v-model="state.currentPassword"
-        hint="Enter your current account password. Only needed if you want to change password"
-        label="Current Password"
-        type="password"
-      />
-
-      <input-field
-        id="current-password"
-        v-model="state.newPassword"
-        hint="Enter a new password for your account"
-        label="New Password"
-        type="password"
-      />
-
-      <input-field
-        id="password-confirmation"
-        v-model="state.passwordConfirm"
-        hint="Enter the same password as before, for verification."
-        label="Password Confirmation"
-        type="password"
-      />
-      <action-button primary small text="Change Password" />
-    </card>
+    <change-password :state="state" />
     <card :class="$style.info">
       <heading subheading> Customer Information </heading>
       <input-field
@@ -124,9 +87,11 @@ import {
 import { useVuelidate } from '@vuelidate/core'
 import { RootState } from '~/store'
 import { loadCountries } from '~/composables/countries'
+import ChangePassword from '~/components/account/home/ChangePassword.vue'
 
 export default defineComponent({
   name: 'AccountDetails',
+  components: { ChangePassword },
   setup() {
     const store = useStore<RootState>()
     const state = reactive({
@@ -147,7 +112,7 @@ export default defineComponent({
     })
 
     const movedOffline = computed(
-      () => store.state.account?.address.moved_offline ?? false
+      () => store.state.account?.address.movedOffline ?? false
     )
 
     onMounted(() => {
@@ -157,13 +122,13 @@ export default defineComponent({
       }
 
       state.email = account.email
-      state.githubUsername = account.github_username
-      state.firstName = account.address.first_name
-      state.lastName = account.address.last_name
-      state.companyName = account.address.company_name
-      state.vatId = account.address.vat_id
-      state.addressLine1 = account.address.address_1
-      state.addressLine2 = account.address.address_2
+      state.githubUsername = account.githubUsername
+      state.firstName = account.address.firstName
+      state.lastName = account.address.lastName
+      state.companyName = account.address.companyName
+      state.vatId = account.address.vatId
+      state.addressLine1 = account.address.address1
+      state.addressLine2 = account.address.address2
       state.city = account.address.city
       state.postcode = account.address.postcode
       state.country = account.address.country

@@ -17,7 +17,7 @@ export default defineComponent({
   setup() {
     const store = useStore<RootState>()
     const premium = computed(() => {
-      return store.state.account?.can_use_premium ?? false
+      return store.state.account?.canUsePremium ?? false
     })
     return {
       premium,

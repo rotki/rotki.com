@@ -7766,6 +7766,11 @@ log-update@^4.0.0:
     slice-ansi "^4.0.0"
     wrap-ansi "^6.2.0"
 
+loglevel@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.7.1.tgz#005fde2f5e6e47068f935ff28573e125ef72f197"
+  integrity sha512-Hesni4s5UkWkwCGJMQGAh71PaLUmKFM60dHvq0zi/vDhhrzuk+4GgNbTXJ12YYQJn6ZKBDNIjYcuQGKudvqrIw==
+
 longest-streak@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/longest-streak/-/longest-streak-2.0.4.tgz#b8599957da5b5dab64dee3fe316fa774597d90e4"
@@ -12865,6 +12870,11 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zod@^3.9.5:
+  version "3.9.5"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.9.5.tgz#11ebe51bf0c0356cea4465177e917db5f71768f4"
+  integrity sha512-n8zC7CLFi/aOhKKrdczg8sCL8myY/mMa0Y6w6uKOFRaHZOD62bqMR2ah3rltZy381/JakY0TTh5IilHqH0BLBw==
 
 zwitch@^1.0.0:
   version "1.0.5"
