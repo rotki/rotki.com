@@ -28,12 +28,12 @@
               </td>
               <td :class="$style.td">
                 <div :class="$style.text">
-                  {{ payment.paid_at }}
+                  {{ payment.paidAt }}
                 </div>
               </td>
               <td :class="$style.td">
                 <div :class="$style.text">
-                  {{ payment.eur_amount }}
+                  {{ payment.eurAmount }}
                 </div>
               </td>
 
