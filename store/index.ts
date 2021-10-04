@@ -1,5 +1,6 @@
 import { ActionTree, MutationTree } from 'vuex'
 import { Account, ApiKeys, ApiResponse } from '~/types'
+import { logger } from '~/utils/logger'
 
 export interface LoginCredentials {
   readonly username: string
@@ -76,9 +77,11 @@ export const actions: ActionTree<RootState, RootState> = {
 
       if (response.status === 200) {
         commit(Mutations.UPDATE_AUTHENTICATED, true)
-        commit(Mutations.ACCOUNT_DATA, response.data.result)
+        commit(Mutations.ACCOUNT_DATA, Account.parse(response.data.result))
       }
-    } catch (e) {}
+    } catch (e) {
+      logger.error(e)
+    }
   },
 
   async [Actions.UPDATE_KEYS]({ commit, state }) {
@@ -91,9 +94,14 @@ export const actions: ActionTree<RootState, RootState> = {
         }
       )
       if (response.status === 200) {
-        const account = { ...state.account, ...response.data.result }
+        const account = {
+          ...state.account,
+          ...ApiKeys.parse(response.data.result),
+        }
         commit(Mutations.ACCOUNT_DATA, account)
       }
-    } catch (e) {}
+    } catch (e) {
+      logger.error(e)
+    }
   },
 }
