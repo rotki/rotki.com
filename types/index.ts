@@ -6,6 +6,12 @@ export interface ApiResponse<T> {
   readonly message: string
 }
 
+const StringArray = z.array(z.string())
+export const ApiError = z.union([z.string(), z.record(StringArray)])
+
+// eslint-disable-next-line no-redeclare
+export type ApiError = z.infer<typeof ApiError>
+
 export const Address = z.object({
   firstName: z.string(),
   lastName: z.string(),
@@ -28,7 +34,7 @@ export const Subscription = z.object({
   createdDate: z.string(),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
-  actions: z.array(z.string()),
+  actions: StringArray,
 })
 
 // eslint-disable-next-line no-redeclare
@@ -69,3 +75,11 @@ export const ApiKeys = z.object({
 
 // eslint-disable-next-line no-redeclare
 export type ApiKeys = z.infer<typeof ApiKeys>
+
+export const ChangePasswordResponse = z.object({
+  result: z.boolean().optional(),
+  message: ApiError.optional(),
+})
+
+// eslint-disable-next-line no-redeclare
+export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>
