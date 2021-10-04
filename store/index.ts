@@ -1,10 +1,27 @@
 import { ActionTree, MutationTree } from 'vuex'
-import { Account, ApiKeys, ApiResponse } from '~/types'
+import {
+  Account,
+  ApiError,
+  ApiKeys,
+  ApiResponse,
+  ChangePasswordResponse,
+} from '~/types'
 import { logger } from '~/utils/logger'
 
 export interface LoginCredentials {
   readonly username: string
   readonly password: string
+}
+
+export interface PasswordChangePayload {
+  readonly currentPassword: string
+  readonly newPassword: string
+  readonly passwordConfirmation: string
+}
+
+export type ActionResult = {
+  readonly success: boolean
+  readonly message?: ApiError
 }
 
 enum Mutations {
@@ -16,6 +33,7 @@ export enum Actions {
   LOGIN = 'login',
   ACCOUNT = 'account',
   UPDATE_KEYS = 'update_keys',
+  CHANGE_PASSWORD = 'changePassword',
 }
 
 export const state = () => ({
@@ -102,6 +120,38 @@ export const actions: ActionTree<RootState, RootState> = {
       }
     } catch (e) {
       logger.error(e)
+    }
+  },
+  async [Actions.CHANGE_PASSWORD](
+    _,
+    payload: PasswordChangePayload
+  ): Promise<ActionResult> {
+    try {
+      const response = await this.$api.patch<ChangePasswordResponse>(
+        '/webapi/change-password/',
+        payload,
+        {
+          validateStatus: (status) => [200, 400].includes(status),
+        }
+      )
+      const data = ChangePasswordResponse.parse(response.data)
+      if (response.status === 200) {
+        return {
+          success: data.result ?? false,
+          message: '',
+        }
+      } else {
+        return {
+          success: false,
+          message: data.message,
+        }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        success: false,
+        message: e.message,
+      }
     }
   },
 }
