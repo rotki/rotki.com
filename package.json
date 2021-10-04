@@ -31,8 +31,10 @@
     "@vuelidate/validators": "^2.0.0-alpha.21",
     "autoprefixer": "10.2.5",
     "core-js": "3.10.2",
+    "loglevel": "^1.7.1",
     "nuxt": "2.15.4",
-    "postcss": "8.2.10"
+    "postcss": "8.2.10",
+    "zod": "^3.9.5"
   },
   "devDependencies": {
     "@nuxt/types": "2.15.4",

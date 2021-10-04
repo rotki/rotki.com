@@ -1,7 +1,70 @@
-import { AxiosError, AxiosRequestConfig } from 'axios'
+import { AxiosError, AxiosRequestConfig, AxiosTransformer } from 'axios'
 import { Plugin } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 import { defineNuxtPlugin } from '@nuxtjs/composition-api'
+
+const isObject = (data: any): boolean =>
+  typeof data === 'object' &&
+  data !== null &&
+  !(data instanceof RegExp) &&
+  !(data instanceof Error) &&
+  !(data instanceof Date)
+
+function getUpdatedKey(key: string, camelCase: boolean) {
+  if (camelCase) {
+    return key.includes('_')
+      ? key.replace(/_(.)/gu, (_, p1) => p1.toUpperCase())
+      : key
+  }
+
+  return key.replace(/([A-Z])/gu, (_, p1, offset, string) => {
+    const nextCharOffset = offset + 1
+    if (
+      (nextCharOffset < string.length &&
+        /([A-Z])/.test(string[nextCharOffset])) ||
+      nextCharOffset === string.length
+    ) {
+      return p1
+    }
+    return `_${p1.toLowerCase()}`
+  })
+}
+
+export const convertKeys = (
+  data: any,
+  camelCase: boolean,
+  skipKey: boolean
+): any => {
+  if (Array.isArray(data)) {
+    return data.map((entry) => convertKeys(entry, camelCase, false))
+  }
+
+  if (!isObject(data)) {
+    return data
+  }
+
+  const converted: { [key: string]: any } = {}
+  for (const key in data) {
+    const datum = data[key]
+    const updatedKey = skipKey ? key : getUpdatedKey(key, camelCase)
+
+    converted[updatedKey] = isObject(datum)
+      ? convertKeys(datum, camelCase, skipKey && key === 'result')
+      : datum
+  }
+  return converted
+}
+
+export const axiosSnakeCaseTransformer: AxiosTransformer = (data, _headers) =>
+  convertKeys(data, false, false)
+
+export const axiosCamelCaseTransformer: AxiosTransformer = (data, _headers) =>
+  convertKeys(data, true, false)
+
+export const axiosNoRootCamelCaseTransformer: AxiosTransformer = (
+  data,
+  _headers
+) => convertKeys(data, true, true)
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -13,6 +76,7 @@ declare module '@nuxt/types' {
   interface NuxtAppOptions {
     $api: NuxtAxiosInstance
   }
+
   interface Context {
     $api: NuxtAxiosInstance
   }
@@ -35,7 +99,29 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
       return pop.split(';').shift()
     }
   }
-  const $api = $axios.create({ baseURL: process.env.baseUrl })
+
+  function getDefaultTransformers(
+    defaults?: AxiosTransformer | AxiosTransformer[]
+  ): AxiosTransformer[] {
+    if (Array.isArray(defaults)) {
+      return defaults
+    } else if (!defaults) {
+      return []
+    }
+    return [defaults]
+  }
+
+  const transformRequest = getDefaultTransformers(
+    $axios.defaults.transformRequest
+  )
+  const transformResponse = getDefaultTransformers(
+    $axios.defaults.transformResponse
+  )
+  const $api = $axios.create({
+    baseURL: process.env.baseUrl,
+    transformRequest: [...transformRequest, axiosSnakeCaseTransformer],
+    transformResponse: [...transformResponse, axiosCamelCaseTransformer],
+  })
 
   $api.interceptors.request.use(
     (config: AxiosRequestConfig) => {
