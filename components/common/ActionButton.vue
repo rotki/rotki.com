@@ -1,16 +1,21 @@
 <template>
   <button
     :class="{
+      [$style.loading]: loading,
       [$style.button]: !small,
       [$style.primary]: primary,
       [$style.secondary]: !primary,
       [$style.filled]: filled,
       [$style.small]: small,
+      'cursor-not-allowed': loading,
     }"
     :disabled="disabled"
     @click="$emit('click')"
   >
-    {{ text }}
+    <span :class="$style.row">
+      <slot />
+      {{ text }}
+    </span>
   </button>
 </template>
 
@@ -49,6 +54,11 @@ export default defineComponent({
       default: false,
       type: Boolean,
     },
+    loading: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
   },
 })
 </script>
@@ -58,18 +68,16 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .small {
-  @apply font-serif uppercase rounded focus:outline-none;
+  @apply font-serif uppercase rounded focus:outline-none px-4;
 
   $button-height: 48px;
-  $button-width: 220px;
 
   height: $button-height !important;
-  width: $button-width !important;
-  @include text-size(18px, 26px);
+
+  @include text-size(16px, 24px);
 
   @include for-size(phone-only) {
     height: $button-height * $mobile-button-percentage;
-    width: $button-width * $mobile-button-percentage;
   }
 }
 
@@ -89,10 +97,12 @@ export default defineComponent({
   }
 }
 
-.button:disabled {
-  @apply bg-gray-400 hover:bg-gray-400;
+.button:disabled,
+.small:disabled {
+  @apply bg-shade5 hover:bg-shade5;
 }
 
+.loading:disabled,
 .primary {
   @apply text-white bg-primary hover:bg-shade12;
 }
@@ -103,5 +113,9 @@ export default defineComponent({
 
 .filled {
   @apply text-primary border-transparent hover:bg-shade1 bg-white;
+}
+
+.row {
+  @apply inline-flex items-center align-middle;
 }
 </style>

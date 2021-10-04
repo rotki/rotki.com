@@ -95,10 +95,6 @@ export default defineComponent({
   setup() {
     const store = useStore<RootState>()
     const state = reactive({
-      email: '',
-      currentPassword: '',
-      newPassword: '',
-      passwordConfirm: '',
       githubUsername: '',
       firstName: '',
       lastName: '',
@@ -121,7 +117,6 @@ export default defineComponent({
         return
       }
 
-      state.email = account.email
       state.githubUsername = account.githubUsername
       state.firstName = account.address.firstName
       state.lastName = account.address.lastName
