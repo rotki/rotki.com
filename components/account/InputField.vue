@@ -7,8 +7,12 @@
       ref="inputField"
       v-model="selection"
       :class="$style.input"
+      :disabled="disabled"
       @input="input($event)"
     >
+      <option v-if="disabled" :class="$style.option" disabled selected>
+        {{ selection }}
+      </option>
       <option v-if="placeholder" :class="$style.option" disabled selected>
         {{ placeholder }}
       </option>
@@ -26,7 +30,10 @@
       :id="id"
       ref="inputField"
       :aria-describedby="`${id}-error`"
-      :class="$style.input"
+      :class="{
+        [$style.input]: true,
+        [$style.inputText]: true,
+      }"
       :disabled="disabled"
       :placeholder="placeholder"
       :readonly="readonly"
@@ -54,6 +61,7 @@
 <script lang="ts">
 import {
   defineComponent,
+  onMounted,
   PropType,
   ref,
   toRef,
@@ -123,8 +131,10 @@ export default defineComponent({
         emit('input', (target as HTMLInputElement).value ?? '')
       }
     }
+    const value = toRef(props, 'value')
     if (props.type === 'select') {
       watch(selection, (newValue) => emit('input', newValue))
+      onMounted(() => (selection.value = value.value))
     }
 
     const lastMessage = ref('')
@@ -167,6 +177,14 @@ export default defineComponent({
   @include for-size(phone-only) {
     width: 100%;
   }
+}
+
+.input:disabled {
+  @apply bg-gray-200;
+}
+
+.inputText:read-only {
+  @apply bg-gray-50;
 }
 
 .caption {
