@@ -5,8 +5,10 @@ import {
   ApiKeys,
   ApiResponse,
   ChangePasswordResponse,
+  UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
+import { assert } from '~/components/utils/assertions'
 
 export interface LoginCredentials {
   readonly username: string
@@ -17,6 +19,19 @@ export interface PasswordChangePayload {
   readonly currentPassword: string
   readonly newPassword: string
   readonly passwordConfirmation: string
+}
+
+export interface ProfilePayload {
+  readonly githubUsername: string
+  readonly firstName?: string
+  readonly lastName?: string
+  readonly companyName?: string
+  readonly vatId?: string
+  readonly address1?: string
+  readonly address2?: string
+  readonly city?: string
+  readonly postcode?: string
+  readonly country?: string
 }
 
 export type ActionResult = {
@@ -32,8 +47,10 @@ enum Mutations {
 export enum Actions {
   LOGIN = 'login',
   ACCOUNT = 'account',
-  UPDATE_KEYS = 'update_keys',
+  UPDATE_KEYS = 'updateKeys',
   CHANGE_PASSWORD = 'changePassword',
+  UPDATE_PROFILE = 'updateProfile',
+  LOGOUT = 'logout',
 }
 
 export const state = () => ({
@@ -153,5 +170,56 @@ export const actions: ActionTree<RootState, RootState> = {
         message: e.message,
       }
     }
+  },
+  async [Actions.UPDATE_PROFILE](
+    { commit, state },
+    payload: ProfilePayload
+  ): Promise<ActionResult> {
+    try {
+      const response = await this.$api.patch<UpdateProfileResponse>(
+        '/webapi/account/',
+        payload,
+        {
+          validateStatus: (status) => [200, 400].includes(status),
+        }
+      )
+
+      const { result, message } = UpdateProfileResponse.parse(response.data)
+      if (response.status === 200) {
+        assert(result)
+        const account = {
+          ...state.account,
+          ...result,
+        }
+        commit(Mutations.ACCOUNT_DATA, account)
+        return { success: true }
+      } else {
+        assert(message)
+        return {
+          success: false,
+          message,
+        }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        success: false,
+        message: e.message,
+      }
+    }
+  },
+  async [Actions.LOGOUT](
+    { commit },
+    logoutFirst: boolean = false
+  ): Promise<void> {
+    if (logoutFirst) {
+      try {
+        await this.$api.patch<UpdateProfileResponse>('/webapi/logout')
+      } catch (e) {
+        logger.error(e)
+      }
+    }
+    commit(Mutations.UPDATE_AUTHENTICATED, false)
+    commit(Mutations.ACCOUNT_DATA, null)
   },
 }
