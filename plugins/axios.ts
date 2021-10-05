@@ -1,7 +1,13 @@
-import { AxiosError, AxiosRequestConfig, AxiosTransformer } from 'axios'
+import {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosTransformer,
+} from 'axios'
 import { Plugin } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { defineNuxtPlugin } from '@nuxtjs/composition-api'
+import { defineNuxtPlugin, useRouter, useStore } from '@nuxtjs/composition-api'
+import { Actions } from '~/store'
 
 const isObject = (data: any): boolean =>
   typeof data === 'object' &&
@@ -17,17 +23,25 @@ function getUpdatedKey(key: string, camelCase: boolean) {
       : key
   }
 
-  return key.replace(/([A-Z])/gu, (_, p1, offset, string) => {
-    const nextCharOffset = offset + 1
-    if (
-      (nextCharOffset < string.length &&
-        /([A-Z])/.test(string[nextCharOffset])) ||
-      nextCharOffset === string.length
-    ) {
-      return p1
-    }
-    return `_${p1.toLowerCase()}`
-  })
+  return key
+    .replace(/([A-Z])/gu, (_, p1, offset, string) => {
+      const nextCharOffset = offset + 1
+      if (
+        (nextCharOffset < string.length &&
+          /([A-Z])/.test(string[nextCharOffset])) ||
+        nextCharOffset === string.length
+      ) {
+        return p1
+      }
+      return `_${p1.toLowerCase()}`
+    })
+    .replace(/([0-9])/gu, (_, p1, offset, string) => {
+      const previousOffset = offset - 1
+      if (previousOffset >= 0 && /([0-9])/.test(string[previousOffset])) {
+        return p1
+      }
+      return `_${p1.toLowerCase()}`
+    })
 }
 
 export const convertKeys = (
@@ -60,11 +74,6 @@ export const axiosSnakeCaseTransformer: AxiosTransformer = (data, _headers) =>
 
 export const axiosCamelCaseTransformer: AxiosTransformer = (data, _headers) =>
   convertKeys(data, true, false)
-
-export const axiosNoRootCamelCaseTransformer: AxiosTransformer = (
-  data,
-  _headers
-) => convertKeys(data, true, true)
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -148,32 +157,23 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
     }
   )
 
-  // function handleSuccess(response) {
-  //   return { data: response.data }
-  // }
-  //
-  // function handleError(error) {
-  //   // console.log(error)
-  //   switch (error.response.status) {
-  //     case 400:
-  //       break
-  //     case 401:
-  //       // Log out user, remove token, clear state and redirect to login
-  //       break
-  //     case 404:
-  //       // Show 404 page
-  //       break
-  //     case 500:
-  //       // Server error redirect to 500
-  //       break
-  //     default:
-  //       // Unknow error
-  //       break
-  //   }
-  //   return Promise.reject(error)
-  // }
-  //
-  // $api.interceptors.response.use(handleSuccess, handleError)
+  function handleError(error: AxiosError) {
+    const router = useRouter()
+    const store = useStore()
+    switch (error.response?.status) {
+      case 401:
+        store.dispatch(Actions.LOGOUT)
+        router.push('/login')
+        break
+      default:
+        break
+    }
+    return Promise.reject(error)
+  }
+
+  $api.interceptors.response.use(function <T>(response: AxiosResponse<T>) {
+    return response
+  }, handleError)
 
   inject('api', $api)
 })

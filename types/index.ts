@@ -83,3 +83,16 @@ export const ChangePasswordResponse = z.object({
 
 // eslint-disable-next-line no-redeclare
 export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>
+
+const UpdateProfile = z.object({
+  address: Address,
+  githubUsername: z.string(),
+})
+
+export const UpdateProfileResponse = z.object({
+  result: UpdateProfile.optional(),
+  message: ApiError.optional(),
+})
+
+// eslint-disable-next-line no-redeclare
+export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponse>
