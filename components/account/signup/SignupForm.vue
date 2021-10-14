@@ -41,7 +41,8 @@
           />
           <input-field
             id="github"
-            v-model="state.github_username"
+            v-model="state.githubUsername"
+            :error-messages="v$.githubUsername.$errors"
             hint="Optional. Provide Github username for in-Github support."
             label="Github Username"
           />
@@ -66,8 +67,8 @@
 
           <input-field
             id="password-confirmation"
-            v-model="state.confirm_password"
-            :error-messages="v$.confirm_password.$errors"
+            v-model="state.confirmPassword"
+            :error-messages="v$.confirmPassword.$errors"
             hint="Enter the same password as before, for verification."
             label="Password Confirmation"
             type="password"
@@ -79,27 +80,28 @@
         <div :class="$style.inputs">
           <input-field
             id="first-name"
-            v-model="state.firstname"
-            :error-messages="v$.firstname.$errors"
+            v-model="state.firstName"
+            :error-messages="v$.firstName.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="First Name"
           />
           <input-field
             id="last-name"
-            v-model="state.lastname"
-            :error-messages="v$.lastname.$errors"
+            v-model="state.lastName"
+            :error-messages="v$.lastName.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Last Name"
           />
           <input-field
             id="company-name"
-            v-model="state.companyname"
+            v-model="state.companyName"
             hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
             label="Company Name"
           />
           <input-field
             id="vat-id"
-            v-model="state.vat_id"
+            v-model="state.vatId"
+            :error-messages="v$.vatId.$errors"
             hint="Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
             label="VAT ID"
           />
@@ -110,14 +112,15 @@
         <div :class="$style.inputs">
           <input-field
             id="address-1"
-            v-model="state.address_1"
-            :error-messages="v$.address_1.$errors"
+            v-model="state.address1"
+            :error-messages="v$.address1.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Address line 1"
           />
           <input-field
             id="address-2"
-            v-model="state.address_2"
+            v-model="state.address2"
+            :error-messages="v$.address2.$errors"
             hint="Optional. Additional data for the address."
             label="Address line 2"
           />
@@ -205,15 +208,15 @@ export default defineComponent({
     const state = reactive<SignupPayload>({
       username: '',
       password: '',
-      confirm_password: '',
+      confirmPassword: '',
       email: '',
-      github_username: '',
-      firstname: '',
-      lastname: '',
-      companyname: '',
-      vat_id: '',
-      address_1: '',
-      address_2: '',
+      githubUsername: '',
+      firstName: '',
+      lastName: '',
+      companyName: '',
+      vatId: '',
+      address1: '',
+      address2: '',
       city: '',
       postcode: '',
       country: '',
@@ -222,14 +225,18 @@ export default defineComponent({
     const rules = {
       username: { required },
       password: { required, minLength: minLength(8) },
-      confirm_password: {
+      confirmPassword: {
         required,
         sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
       },
       email: { required, email },
-      firstname: { required },
-      lastname: { required },
-      address_1: { required },
+      githubUsername: {},
+      firstName: { required },
+      lastName: { required },
+      companyName: {},
+      vatId: {},
+      address1: { required },
+      address2: {},
       city: { required },
       postcode: { required },
       country: { required },
