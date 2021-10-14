@@ -1,6 +1,7 @@
 <template>
   <page wide>
     <template #title> Account Management </template>
+    <heading> Welcome {{ username }}</heading>
     <subscriptions :class="$style.category" />
     <payments :class="$style.category" />
     <api-keys v-if="premium" :class="$style.category" />
@@ -20,7 +21,11 @@ export default defineComponent({
     const premium = computed(() => {
       return store.state.account?.canUsePremium ?? false
     })
+    const username = computed(() => {
+      return store.state.account?.username
+    })
     return {
+      username,
       premium,
     }
   },
