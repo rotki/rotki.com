@@ -1,67 +1,65 @@
 <template>
-  <div :class="$style.col">
-    <div :class="$style.row">
-      <div :class="$style.heading">Your latest payments</div>
-      <div :class="$style.tableWrapper">
-        <table :class="$style.table">
-          <thead :class="$style.thead">
-            <tr>
-              <th :class="$style.header" scope="col">Plan</th>
-              <th :class="$style.header" scope="col">Paid at</th>
-              <th :class="$style.header" scope="col">Amount in €</th>
-              <th :class="$style.header" scope="col">Status</th>
-              <th
-                :class="{
-                  [$style.header]: true,
-                  [$style.last]: true,
-                }"
-                scope="col"
-              >
-                Receipt
-              </th>
-            </tr>
-          </thead>
-          <tbody :class="$style.tbody">
-            <tr v-for="(payment, index) in payments" :key="index">
-              <td :class="$style.td">
-                {{ payment.plan }}
-              </td>
-              <td :class="$style.td">
-                <div :class="$style.text">
-                  {{ payment.paidAt }}
-                </div>
-              </td>
-              <td :class="$style.td">
-                <div :class="$style.text">
-                  {{ payment.eurAmount }}
-                </div>
-              </td>
+  <card>
+    <heading :class="$style.heading" subheading>Your latest payments</heading>
+    <div :class="$style.tableWrapper">
+      <table :class="$style.table">
+        <thead :class="$style.thead">
+          <tr>
+            <th :class="$style.header" scope="col">Plan</th>
+            <th :class="$style.header" scope="col">Paid at</th>
+            <th :class="$style.header" scope="col">Amount in €</th>
+            <th :class="$style.header" scope="col">Status</th>
+            <th
+              :class="{
+                [$style.header]: true,
+                [$style.last]: true,
+              }"
+              scope="col"
+            >
+              Receipt
+            </th>
+          </tr>
+        </thead>
+        <tbody :class="$style.tbody">
+          <tr v-for="(payment, index) in payments" :key="index">
+            <td :class="$style.td">
+              {{ payment.plan }}
+            </td>
+            <td :class="$style.td">
+              <div :class="$style.text">
+                {{ payment.paidAt }}
+              </div>
+            </td>
+            <td :class="$style.td">
+              <div :class="$style.text">
+                {{ payment.eurAmount }}
+              </div>
+            </td>
 
-              <td :class="$style.td">
-                <div :class="$style.text">Paid</div>
-              </td>
-              <td :class="$style.action">
-                <div :class="$style.actionContainer">
-                  <a
-                    :class="$style.actionButton"
-                    :href="`/webapi/download/receipt/${payment.identifier}`"
-                    download
-                  >
-                    <tooltip>
-                      <template #activator>
-                        <receipt />
-                      </template>
-                      Download Receipt
-                    </tooltip>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <td :class="$style.td">
+              <div :class="$style.text">Paid</div>
+            </td>
+            <td :class="$style.action">
+              <div :class="$style.actionContainer">
+                <a
+                  :class="$style.actionButton"
+                  :href="`/webapi/download/receipt/${payment.identifier}`"
+                  download
+                >
+                  <tooltip>
+                    <template #activator>
+                      <receipt />
+                    </template>
+                    Download Receipt
+                  </tooltip>
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
+  </card>
 </template>
 
 <script lang="ts">
@@ -103,24 +101,14 @@ export default defineComponent({
 
 .heading {
   @apply font-serif text-shade11 mb-4;
-
-  @include text-size(20px, 28px);
 }
 
 .actionHeader {
   @apply relative px-6 py-3;
 }
 
-.col {
-  @apply flex flex-col;
-}
-
-.row {
-  @apply py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8;
-}
-
 .tableWrapper {
-  @apply shadow overflow-hidden border-b border-gray-200 sm:rounded-lg;
+  @apply overflow-hidden border border-gray-200 sm:rounded-lg;
 }
 
 .thead {
@@ -148,7 +136,7 @@ export default defineComponent({
 }
 
 .actionButton {
-  @apply text-indigo-600 hover:text-indigo-900;
+  @apply text-primary hover:text-yellow-600;
 }
 
 .status {
