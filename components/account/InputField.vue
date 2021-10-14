@@ -52,7 +52,7 @@
     </span>
 
     <span v-else :class="$style.caption">
-      {{ hint }}
+      <slot name="hint">{{ hint }}</slot>
     </span>
     <slot />
   </div>
