@@ -7,6 +7,7 @@
       [$style.secondary]: !primary,
       [$style.filled]: filled,
       [$style.small]: small,
+      [$style.warning]: warning,
       'cursor-not-allowed': loading,
     }"
     :disabled="disabled"
@@ -59,6 +60,11 @@ export default defineComponent({
       default: false,
       type: Boolean,
     },
+    warning: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
   },
 })
 </script>
@@ -105,6 +111,10 @@ export default defineComponent({
 .loading:disabled,
 .primary {
   @apply text-white bg-primary hover:bg-shade12;
+}
+
+.warning {
+  @apply text-white bg-red-600 hover:bg-red-500;
 }
 
 .secondary {
