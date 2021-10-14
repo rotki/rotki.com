@@ -6,6 +6,7 @@
           <slot name="title" />
         </div>
       </template>
+      <slot name="links" />
     </Header>
 
     <div :class="$style.content">

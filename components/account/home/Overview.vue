@@ -1,6 +1,11 @@
 <template>
   <page wide>
-    <template #title> Account Management </template>
+    <template #title> Account Management</template>
+    <template #links>
+      <link-text>
+        <span @click="logout">Logout</span>
+      </link-text>
+    </template>
     <heading> Welcome {{ username }}</heading>
     <subscriptions :class="$style.category" />
     <payments :class="$style.category" />
@@ -11,8 +16,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
-import { RootState } from '~/store'
+import {
+  computed,
+  defineComponent,
+  useRouter,
+  useStore,
+} from '@nuxtjs/composition-api'
+import { Actions, RootState } from '~/store'
 
 export default defineComponent({
   name: 'Overview',
@@ -24,9 +34,16 @@ export default defineComponent({
     const username = computed(() => {
       return store.state.account?.username
     })
+
+    const router = useRouter()
+    const logout = async () => {
+      await store.dispatch(Actions.LOGOUT)
+      router.push('/login')
+    }
     return {
       username,
       premium,
+      logout,
     }
   },
 })
