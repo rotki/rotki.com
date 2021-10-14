@@ -5,6 +5,7 @@
     <payments :class="$style.category" />
     <api-keys v-if="premium" :class="$style.category" />
     <account-details :class="$style.category" />
+    <danger-zone :class="$style.category" />
   </page>
 </template>
 
