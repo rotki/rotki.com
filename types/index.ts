@@ -96,3 +96,11 @@ export const UpdateProfileResponse = z.object({
 
 // eslint-disable-next-line no-redeclare
 export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponse>
+
+export const DeleteAccountResponse = z.object({
+  result: z.boolean().optional(),
+  message: z.string().optional(),
+})
+
+// eslint-disable-next-line no-redeclare
+export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>
