@@ -5,6 +5,7 @@ import {
   ApiKeys,
   ApiResponse,
   ChangePasswordResponse,
+  DeleteAccountResponse,
   UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
@@ -34,6 +35,10 @@ export interface ProfilePayload {
   readonly country?: string
 }
 
+export type DeleteAccountPayload = {
+  username: string
+}
+
 export type ActionResult = {
   readonly success: boolean
   readonly message?: ApiError
@@ -50,6 +55,7 @@ export enum Actions {
   UPDATE_KEYS = 'updateKeys',
   CHANGE_PASSWORD = 'changePassword',
   UPDATE_PROFILE = 'updateProfile',
+  DELETE_ACCOUNT = 'deleteAccount',
   LOGOUT = 'logout',
 }
 
@@ -199,6 +205,33 @@ export const actions: ActionTree<RootState, RootState> = {
           success: false,
           message,
         }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        success: false,
+        message: e.message,
+      }
+    }
+  },
+  async [Actions.DELETE_ACCOUNT](
+    _,
+    payload: DeleteAccountPayload
+  ): Promise<ActionResult> {
+    try {
+      const response = await this.$api.delete<DeleteAccountResponse>(
+        '/webapi/account/',
+
+        {
+          data: payload,
+          validateStatus: (status) => [200, 400].includes(status),
+        }
+      )
+
+      const data = DeleteAccountResponse.parse(response.data)
+      return {
+        success: data.result ?? false,
+        message: data.message,
       }
     } catch (e: any) {
       logger.error(e)
