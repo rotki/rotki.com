@@ -7,7 +7,12 @@
       will not be able to recover your account!
     </p>
 
+    <p v-if="isSubscriber" :class="$style.warning">
+      You cannot delete your account while you have an active subscription.
+    </p>
+
     <action-button
+      :disabled="isSubscriber"
       primary
       small
       text="Delete My Account"
@@ -42,17 +47,28 @@
           small
           text="Confirm"
           warning
-          @click="confirm = true"
+          @click="deleteAccount"
         />
       </div>
     </modal-dialog>
+    <transition name="fade">
+      <notification-message v-if="error">
+        <div>
+          <error-icon />
+        </div>
+        <div :class="$style.errorText">
+          <div :class="$style.errorTitle">Account deletion failed</div>
+          <div :class="$style.errorDescription">{{ error }}</div>
+        </div>
+      </notification-message>
+    </transition>
   </card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
-import { computed, ref, useStore } from '@nuxtjs/composition-api'
-import { RootState } from '~/store'
+import { computed, ref, useRouter, useStore } from '@nuxtjs/composition-api'
+import { ActionResult, Actions, RootState } from '~/store'
 
 export default defineComponent({
   name: 'DangerZone',
@@ -60,13 +76,38 @@ export default defineComponent({
     const confirm = ref(false)
     const usernameConfirmation = ref('')
     const store = useStore<RootState>()
+    const router = useRouter()
+    const error = ref('')
     const username = computed(() => {
       return store.state.account?.username
     })
+
+    const isSubscriber = computed(() => {
+      return store.state.account?.hasActiveSubscription ?? false
+    })
+
+    const deleteAccount = async () => {
+      confirm.value = false
+      const result: ActionResult = await store.dispatch(
+        Actions.DELETE_ACCOUNT,
+        {
+          username: usernameConfirmation.value,
+        }
+      )
+      if (result.success) {
+        router.push('/login')
+      } else {
+        error.value = typeof result.message === 'string' ? result.message : ''
+        setTimeout(() => (error.value = ''), 4500)
+      }
+    }
     return {
       confirm,
+      error,
       username,
       usernameConfirmation,
+      isSubscriber,
+      deleteAccount,
     }
   },
 })
@@ -87,5 +128,21 @@ export default defineComponent({
 
 .buttons {
   @apply flex flex-row mt-4 justify-end;
+}
+
+.warning {
+  @apply mb-2 text-shade11 font-bold;
+}
+
+.errorText {
+  @apply ml-2;
+}
+
+.errorTitle {
+  @apply font-sans font-bold;
+}
+
+.errorDescription {
+  @apply font-sans text-shade11;
 }
 </style>
