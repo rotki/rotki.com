@@ -4,8 +4,10 @@ import {
   ApiError,
   ApiKeys,
   ApiResponse,
+  CancelSubscriptionResponse,
   ChangePasswordResponse,
   DeleteAccountResponse,
+  Subscription,
   UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
@@ -56,6 +58,7 @@ export enum Actions {
   CHANGE_PASSWORD = 'changePassword',
   UPDATE_PROFILE = 'updateProfile',
   DELETE_ACCOUNT = 'deleteAccount',
+  CANCEL_SUBSCRIPTION = 'cancelSubscription',
   LOGOUT = 'logout',
 }
 
@@ -239,6 +242,24 @@ export const actions: ActionTree<RootState, RootState> = {
         success: false,
         message: e.message,
       }
+    }
+  },
+  async [Actions.CANCEL_SUBSCRIPTION](
+    { dispatch },
+    subscription: Subscription
+  ) {
+    try {
+      const response = await this.$api.delete<CancelSubscriptionResponse>(
+        `/webapi/subscription/${subscription.identifier}`
+      )
+      const data = CancelSubscriptionResponse.parse(response.data)
+      if (data.result) {
+        await dispatch(Actions.ACCOUNT)
+      } else {
+        // TODO: handle error
+      }
+    } catch (e) {
+      logger.error(e)
     }
   },
   async [Actions.LOGOUT](
