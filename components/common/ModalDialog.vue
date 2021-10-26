@@ -69,9 +69,6 @@ export default defineComponent({
 }
 
 .dialog {
-  @apply bg-white flex flex-col;
-
-  border-radius: 40px;
-  margin: 16px;
+  @apply bg-white flex flex-col rounded-lg mb-2;
 }
 </style>
