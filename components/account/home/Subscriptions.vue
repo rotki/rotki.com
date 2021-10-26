@@ -51,7 +51,7 @@
             <td :class="$style.action">
               <div v-if="sub.actions.length === 0">Nothing to do</div>
               <div v-else>
-                <a :class="$style.actionButton" href="#"> Cancel </a>
+                <cancel-subscription :subscription="sub" />
                 <a
                   v-if="sub.actions.includes('renew')"
                   :class="$style.actionButton"
@@ -71,9 +71,11 @@
 <script lang="ts">
 import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
 import { RootState } from '~/store'
+import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 
 export default defineComponent({
   name: 'Subscriptions',
+  components: { CancelSubscription },
   setup() {
     const store = useStore<RootState>()
     const subscriptions = computed(() => {

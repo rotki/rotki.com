@@ -29,6 +29,7 @@ export const Address = z.object({
 export type Address = z.infer<typeof Address>
 
 export const Subscription = z.object({
+  identifier: z.string().nonempty(),
   planName: z.string(),
   status: z.enum(['Active', 'Cancelled', 'Pending', 'Past Due'] as const),
   createdDate: z.string(),
@@ -104,3 +105,13 @@ export const DeleteAccountResponse = z.object({
 
 // eslint-disable-next-line no-redeclare
 export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>
+
+export const CancelSubscriptionResponse = z.object({
+  result: z.boolean().optional(),
+  message: z.string().optional(),
+})
+
+// eslint-disable-next-line no-redeclare
+export type CancelSubscriptionResponse = z.infer<
+  typeof CancelSubscriptionResponse
+>
