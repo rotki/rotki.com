@@ -1,7 +1,7 @@
 <template>
   <div>
     <button :class="$style.actionButton" @click="confirm = true">Cancel</button>
-    <modal-dialog v-if="confirm" padding="1rem" @dismiss="confirm = false">
+    <modal-dialog v-model="confirm" padding="1rem">
       <div :class="$style.body">
         <h2 :class="$style.title">Canceling Your Rotki Subscription</h2>
         <p :class="$style.text">
