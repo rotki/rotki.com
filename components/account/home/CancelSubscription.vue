@@ -1,7 +1,7 @@
 <template>
   <div>
     <button :class="$style.actionButton" @click="confirm = true">Cancel</button>
-    <modal-dialog v-if="confirm" @dismiss="confirm = false">
+    <modal-dialog v-if="confirm" padding="1rem" @dismiss="confirm = false">
       <div :class="$style.body">
         <h2 :class="$style.title">Canceling Your Rotki Subscription</h2>
         <p :class="$style.text">
@@ -119,9 +119,7 @@ export default defineComponent({
 }
 
 .title {
-  @apply font-sans text-primary2 font-bold;
-
-  @include text-size(20px, 28px);
+  @apply font-sans text-primary2 font-bold text-xl;
 }
 
 .text {
@@ -135,7 +133,7 @@ export default defineComponent({
 }
 
 .body {
-  @apply p-6 text-left;
+  @apply text-left;
 }
 
 .buttons {

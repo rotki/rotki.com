@@ -28,7 +28,7 @@ export default defineComponent({
     height: {
       type: String,
       required: false,
-      default: '539px',
+      default: undefined,
     },
     padding: {
       type: String,
@@ -44,9 +44,10 @@ export default defineComponent({
     }
 
     const style = computed(() => ({
-      width: width.value,
+      'max-width': width.value,
       height: height.value,
       padding: padding.value,
+      margin: '0.5rem',
     }))
     return {
       style,
