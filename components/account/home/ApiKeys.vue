@@ -26,7 +26,7 @@
       </div>
     </div>
     <action-button
-      :class="$style.button"
+      :class="$style.actionButton"
       primary
       small
       text="Regenerate"
@@ -70,7 +70,7 @@ export default defineComponent({
 }
 
 .entry {
-  @apply flex flex-row min-w-full items-center;
+  @apply flex flex-row min-w-full items-end;
 }
 
 .input {
@@ -78,7 +78,11 @@ export default defineComponent({
 }
 
 .button {
-  @apply ml-2 mt-4;
+  @apply ml-3 mb-2.5;
+}
+
+.actionButton {
+  @apply mt-3;
 }
 
 .heading {

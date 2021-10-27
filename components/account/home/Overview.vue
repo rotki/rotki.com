@@ -6,7 +6,7 @@
         <span @click="logout">Logout</span>
       </link-text>
     </template>
-    <heading> Welcome {{ username }}</heading>
+    <heading :class="$style.header"> Welcome {{ username }}</heading>
     <subscriptions :class="$style.category" />
     <payments :class="$style.category" />
     <api-keys v-if="premium" :class="$style.category" />
@@ -52,5 +52,9 @@ export default defineComponent({
 <style lang="scss" module>
 .category {
   @apply mt-8;
+}
+
+.header {
+  @apply pb-2;
 }
 </style>
