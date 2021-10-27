@@ -20,7 +20,7 @@
       @click="confirm = true"
     />
 
-    <modal-dialog v-if="confirm" padding="1rem" @dismiss="confirm = false">
+    <modal-dialog v-model="confirm" padding="1rem">
       <div :class="$style.title">Delete Account</div>
       <p :class="$style.description">
         By proceeding you will delete your account and all its accompanying data
