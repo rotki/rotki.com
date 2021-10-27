@@ -51,10 +51,6 @@ export default defineComponent({
   @apply container mx-auto flex flex-col flex-grow justify-between;
 
   min-height: 100vh;
-
-  @include for-size(phone-only) {
-    padding: $mobile-margin / 2;
-  }
 }
 
 .subtitle {
@@ -73,15 +69,19 @@ export default defineComponent({
   padding-bottom: 48px;
 }
 
-.wideBody {
-  max-width: 85% !important;
+.details.wideBody {
+  max-width: 85%;
+
+  @include for-size(phone-only) {
+    max-width: 90%;
+  }
 }
 
 .details {
   max-width: 800px;
 
   @include for-size(phone-only) {
-    width: 96%;
+    width: 90%;
   }
 }
 
