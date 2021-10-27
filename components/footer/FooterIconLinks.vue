@@ -1,25 +1,25 @@
 <template>
   <div :class="$style.wrapper">
     <div :class="$style.column">
-      <a href="https://github.com/rotki" target="_blank" rel="noreferrer">
-        <img src="~/assets/img/github.svg" alt="Github" :class="$style.link" />
+      <a href="https://github.com/rotki" rel="noreferrer" target="_blank">
+        <img :class="$style.link" alt="Github" src="~/assets/img/github.svg" />
       </a>
     </div>
     <div :class="$style.column">
-      <a href="https://twitter.com/rotkiapp" target="_blank" rel="noreferrer">
+      <a href="https://twitter.com/rotkiapp" rel="noreferrer" target="_blank">
         <img
-          src="~/assets/img/twitter.svg"
-          alt="Twitter"
           :class="$style.link"
+          alt="Twitter"
+          src="~/assets/img/twitter.svg"
         />
       </a>
     </div>
     <div :class="$style.column">
-      <a href="https://discord.gg/aGCxHG7" target="_blank" rel="noreferrer">
+      <a href="https://discord.gg/aGCxHG7" rel="noreferrer" target="_blank">
         <img
-          src="~/assets/img/discord.svg"
-          alt="Discord"
           :class="$style.link"
+          alt="Discord"
+          src="~/assets/img/discord.svg"
         />
       </a>
     </div>
@@ -27,14 +27,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'FooterIconLinks',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 

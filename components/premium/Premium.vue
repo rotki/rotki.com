@@ -1,7 +1,7 @@
 <template>
   <div id="premium" :class="$style.premium">
     <div :class="$style.image">
-      <img alt="rotki og" :class="$style.top" src="~/assets/img/rotki-og.svg" />
+      <img :class="$style.top" alt="rotki og" src="~/assets/img/rotki-og.svg" />
     </div>
     <div :class="$style.wrapper">
       <div>
@@ -20,8 +20,8 @@
     </div>
     <div :class="$style.image">
       <img
-        alt="rotki og"
         :class="$style.bottom"
+        alt="rotki og"
         src="~/assets/img/rotki-og.svg"
       />
     </div>
@@ -29,14 +29,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Premium',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 

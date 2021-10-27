@@ -1,11 +1,11 @@
 <template>
-  <action-button text="Start now for free" primary @click="$emit('click')" />
+  <action-button primary text="Start now for free" @click="$emit('click')" />
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'DownloadButton',
 })
 </script>

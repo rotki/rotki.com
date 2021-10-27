@@ -66,8 +66,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
-import { computed, ref, useRouter, useStore } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  ref,
+  useRouter,
+  useStore,
+} from '@nuxtjs/composition-api'
 import { ActionResult, Actions, RootState } from '~/store'
 
 export default defineComponent({

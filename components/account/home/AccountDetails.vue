@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent } from '@nuxtjs/composition-api'
 import ChangePassword from '~/components/account/home/ChangePassword.vue'
 import AccountInformation from '~/components/account/home/AccountInformation.vue'
 
