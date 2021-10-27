@@ -1,73 +1,59 @@
 <template>
-  <card>
-    <heading :class="$style.heading" subheading>Your latest payments</heading>
-    <div :class="$style.tableWrapper">
-      <table :class="$style.table">
-        <thead :class="$style.thead">
-          <tr>
-            <th :class="$style.header" scope="col">Plan</th>
-            <th :class="$style.header" scope="col">Paid at</th>
-            <th :class="$style.header" scope="col">Amount in €</th>
-            <th :class="$style.header" scope="col">Status</th>
-            <th
-              :class="{
-                [$style.header]: true,
-                [$style.last]: true,
-              }"
-              scope="col"
-            >
-              Receipt
-            </th>
-          </tr>
-        </thead>
-        <tbody :class="$style.tbody">
-          <tr v-for="(payment, index) in payments" :key="index">
-            <td :class="$style.td">
-              {{ payment.plan }}
-            </td>
-            <td :class="$style.td">
-              <div :class="$style.text">
-                {{ payment.paidAt }}
-              </div>
-            </td>
-            <td :class="$style.td">
-              <div :class="$style.text">
-                {{ payment.eurAmount }}
-              </div>
-            </td>
+  <data-table :headers="headers" :items="payments">
+    <template #title>Your latest payments</template>
+    <template #item="{ item }">
+      <td :class="$style.td">
+        {{ item.plan }}
+      </td>
+      <td :class="$style.td">
+        <div :class="$style.text">
+          {{ item.paidAt }}
+        </div>
+      </td>
+      <td :class="$style.td">
+        <div :class="$style.text">
+          {{ item.eurAmount }}
+        </div>
+      </td>
 
-            <td :class="$style.td">
-              <div :class="$style.text">Paid</div>
-            </td>
-            <td :class="$style.action">
-              <div :class="$style.actionContainer">
-                <a
-                  :class="$style.actionButton"
-                  :href="`/webapi/download/receipt/${payment.identifier}`"
-                  download
-                >
-                  <tooltip>
-                    <template #activator>
-                      <receipt />
-                    </template>
-                    Download Receipt
-                  </tooltip>
-                </a>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </card>
+      <td :class="$style.td">
+        <div :class="$style.text">Paid</div>
+      </td>
+      <td :class="$style.action">
+        <div :class="$style.actionContainer">
+          <a
+            :class="$style.actionButton"
+            :href="`/webapi/download/receipt/${item.identifier}`"
+            download
+          >
+            <tooltip>
+              <template #activator>
+                <receipt />
+              </template>
+              Download Receipt
+            </tooltip>
+          </a>
+        </div>
+      </td>
+    </template>
+  </data-table>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
 import { RootState } from '~/store'
+import { DataTableHeader } from '~/components/common/DataTable.vue'
+
+const headers: DataTableHeader[] = [
+  { text: 'Plan', value: '' },
+  { text: 'Paid at', value: '', sortable: true },
+  { text: 'Amount in €', value: '', sortable: true },
+  { text: 'Status', value: '' },
+  { text: 'Receipt', value: '', className: 'text-right' },
+]
 
 export default defineComponent({
-  name: 'Subscriptions',
+  name: 'Payments',
   setup() {
     const store = useStore<RootState>()
     const payments = computed(() => {
@@ -78,6 +64,7 @@ export default defineComponent({
     })
 
     return {
+      headers,
       payments,
     }
   },
@@ -86,38 +73,6 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '~assets/css/media';
-
-.table {
-  @apply min-w-full divide-y divide-gray-200;
-}
-
-.header {
-  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
-}
-
-.last {
-  @apply text-right;
-}
-
-.heading {
-  @apply font-serif text-shade11 mb-4;
-}
-
-.actionHeader {
-  @apply relative px-6 py-3;
-}
-
-.tableWrapper {
-  @apply overflow-hidden border border-gray-200 sm:rounded-lg;
-}
-
-.thead {
-  @apply bg-gray-50;
-}
-
-.tbody {
-  @apply bg-white divide-y divide-gray-200;
-}
 
 .td {
   @apply px-6 py-4 whitespace-nowrap;
@@ -137,25 +92,5 @@ export default defineComponent({
 
 .actionButton {
   @apply text-primary hover:text-yellow-600;
-}
-
-.status {
-  @apply px-2 inline-flex text-xs leading-5 font-semibold rounded-full;
-}
-
-.active {
-  @apply bg-green-100 text-green-800;
-}
-
-.cancelled {
-  @apply bg-red-100 text-red-600;
-}
-
-.pending {
-  @apply bg-yellow-100 text-yellow-600;
-}
-
-.pastDue {
-  @apply bg-yellow-300 text-yellow-800;
 }
 </style>
