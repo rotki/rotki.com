@@ -2,14 +2,14 @@
   <impressum-content />
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
 import { getMetadata } from '@/utils/metadata'
+import { defineComponent } from '@nuxtjs/composition-api'
 
 const title = 'Rotki: Impressum'
 const description = 'Impressum - DE'
 
-export default Vue.extend({
+export default defineComponent({
   head: () => {
     return {
       title,

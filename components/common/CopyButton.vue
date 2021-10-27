@@ -12,8 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
-import { ref, toRefs } from '@nuxtjs/composition-api'
+import { defineComponent, ref, toRefs } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'CopyButton',

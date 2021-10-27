@@ -3,9 +3,9 @@
     <template #title> Profit/Loss Report </template>
     <template #image>
       <img
+        :class="$style.image"
         alt="Cryptocurrencies"
         src="~/assets/img/crypto.svg"
-        :class="$style.image"
       />
     </template>
     <feature-details>
@@ -22,14 +22,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'ProfitLossReport',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

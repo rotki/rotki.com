@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 import { getMetadata } from '~/utils/metadata'
 
 function metadata(route: string) {
@@ -29,7 +29,7 @@ function metadata(route: string) {
   ] as const
 }
 
-export default Vue.extend({
+export default defineComponent({
   middleware: [
     function ({ redirect, route }) {
       if (['/jobs', '/jobs/'].includes(route.path)) {
