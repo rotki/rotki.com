@@ -6,8 +6,8 @@
           <div :class="$style.row">
             <div :class="$style['icon-column']">
               <img
-                alt="partial rotki logo"
                 :class="$style.icon"
+                alt="partial rotki logo"
                 src="~/assets/img/partial-logo.svg"
               />
             </div>
@@ -21,24 +21,24 @@
             </div>
           </div>
           <div :class="$style.row2">
-            <a :href="linuxUrl" :class="$style.link" download>
+            <a :class="$style.link" :href="linuxUrl" download>
               <img
-                alt="Linux Download button"
                 :class="$style.link"
+                alt="Linux Download button"
                 src="~/assets/img/dl/linux.svg"
               />
             </a>
-            <a :href="macOSUrl" :class="$style.link" download>
+            <a :class="$style.link" :href="macOSUrl" download>
               <img
-                alt="macOS Download button"
                 :class="$style.link"
+                alt="macOS Download button"
                 src="~/assets/img/dl/mac.svg"
               />
             </a>
-            <a :href="windowsUrl" :class="$style.link" download>
+            <a :class="$style.link" :href="windowsUrl" download>
               <img
-                alt="Windows Download button"
                 :class="$style.link"
+                alt="Windows Download button"
                 src="~/assets/img/dl/windows.svg"
               />
             </a>
@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
+import { defineComponent } from '@nuxtjs/composition-api'
 
 const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
 
@@ -87,7 +87,7 @@ function isMacOsApp(name: string): boolean {
   return name.endsWith('.dmg')
 }
 
-export default Vue.extend({
+export default defineComponent({
   name: 'DownloadDialog',
   data() {
     return {
@@ -120,7 +120,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
