@@ -3,9 +3,9 @@
     <template #title> A 360° overview of your assets</template>
     <template #image>
       <img
+        :class="$style.image"
         alt="Rotki Dashboard"
         src="~/assets/img/dashboard.png"
-        :class="$style.image"
       />
     </template>
     <feature-details>
@@ -25,14 +25,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Dashboard',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

@@ -3,14 +3,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 import { getMetadata } from '~/utils/metadata'
 
 const title = 'Rotki: Privacy Policy'
 const description =
   'Information for the website visitors regarding our policies with the collection, use, and disclosure of Personal Information regarding the service usage'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'PrivacyPolicy',
   head: () => {
     return {
