@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 import { getMetadata } from '~/utils/metadata'
 
 const description =
@@ -20,7 +20,7 @@ const description =
 const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`
 
-export default Vue.extend({
+export default defineComponent({
   data() {
     return {
       visible: false,

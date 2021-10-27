@@ -2,8 +2,8 @@
   <div>
     <div :class="$style.space">
       <img
-        alt="rotki in Space"
         :class="$style.image"
+        alt="rotki in Space"
         src="~/assets/img/space.svg"
       />
     </div>
@@ -26,14 +26,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'CustomPlan',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 

@@ -36,8 +36,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
-import { computed, useStore } from '@nuxtjs/composition-api'
+import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
 import { Actions, RootState } from '~/store'
 
 export default defineComponent({
