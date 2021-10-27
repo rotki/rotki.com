@@ -20,13 +20,8 @@
       @click="confirm = true"
     />
 
-    <modal-dialog
-      v-if="confirm"
-      height="400px"
-      padding="24px"
-      @dismiss="confirm = false"
-    >
-      <heading>Delete Account</heading>
+    <modal-dialog v-if="confirm" padding="1rem" @dismiss="confirm = false">
+      <div :class="$style.title">Delete Account</div>
       <p :class="$style.description">
         By proceeding you will delete your account and all its accompanying data
         from our servers. This action is not reversible. Are you sure you want
@@ -149,5 +144,9 @@ export default defineComponent({
 
 .errorDescription {
   @apply font-sans text-shade11;
+}
+
+.title {
+  @apply font-sans text-primary2 font-bold text-xl;
 }
 </style>
