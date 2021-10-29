@@ -1,20 +1,20 @@
 <template>
-  <shop />
+  <plan-selection-page />
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 
 export default defineComponent({
-  name: 'Products',
-  head: () => {
-    return {
-      title: 'Rotki: Premium Subscription',
+  name: 'Plan',
+  setup() {
+    useMeta({
+      title: 'Rotki: Select premium plan',
       meta: [
         {
           hid: 'description',
           name: 'description',
-          content: 'Purchase a premium rotki subscription',
+          content: 'Select your rotki premium plan',
         },
       ],
       htmlAttrs: {
@@ -23,7 +23,8 @@ export default defineComponent({
       bodyAttrs: {
         class: 'body',
       },
-    }
+    })
   },
+  head: {},
 })
 </script>

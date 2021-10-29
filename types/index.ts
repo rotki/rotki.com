@@ -115,3 +115,27 @@ export const CancelSubscriptionResponse = z.object({
 export type CancelSubscriptionResponse = z.infer<
   typeof CancelSubscriptionResponse
 >
+
+const Plan = z.object({
+  months: z.number(),
+  priceFiat: z.string(),
+  priceCrypto: z.string(),
+  discount: z.number(),
+})
+
+// eslint-disable-next-line no-redeclare
+export type Plan = z.infer<typeof Plan>
+
+const PremiumData = z.object({
+  plans: z.array(Plan),
+})
+
+// eslint-disable-next-line no-redeclare
+export type PremiumData = z.infer<typeof PremiumData>
+
+export const PremiumResponse = z.object({
+  result: PremiumData,
+})
+
+// eslint-disable-next-line no-redeclare
+export type PremiumResponse = z.infer<typeof PremiumResponse>
