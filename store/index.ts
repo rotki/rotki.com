@@ -7,6 +7,8 @@ import {
   CancelSubscriptionResponse,
   ChangePasswordResponse,
   DeleteAccountResponse,
+  PremiumData,
+  PremiumResponse,
   Subscription,
   UpdateProfileResponse,
 } from '~/types'
@@ -59,6 +61,7 @@ export enum Actions {
   UPDATE_PROFILE = 'updateProfile',
   DELETE_ACCOUNT = 'deleteAccount',
   CANCEL_SUBSCRIPTION = 'cancelSubscription',
+  PREMIUM = 'premium',
   LOGOUT = 'logout',
 }
 
@@ -260,6 +263,15 @@ export const actions: ActionTree<RootState, RootState> = {
       }
     } catch (e) {
       logger.error(e)
+    }
+  },
+  async [Actions.PREMIUM](): Promise<PremiumData | Error> {
+    try {
+      const response = await this.$api.get<PremiumResponse>('/webapi/premium')
+      return PremiumResponse.parse(response.data).result
+    } catch (e) {
+      logger.error(e)
+      return e
     }
   },
   async [Actions.LOGOUT](
