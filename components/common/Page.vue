@@ -65,8 +65,7 @@ export default defineComponent({
 .content {
   @apply flex-row flex items-center justify-center;
 
-  padding-top: 56px;
-  padding-bottom: 48px;
+  height: 100%;
 }
 
 .details.wideBody {
