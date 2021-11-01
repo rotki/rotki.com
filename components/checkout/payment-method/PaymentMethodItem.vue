@@ -5,9 +5,7 @@
       [$style.selected]: selected,
     }"
   >
-    <div :class="$style.mark">
-      <check-icon v-if="selected" :class="$style.check" />
-    </div>
+    <check-mark :selected="selected" />
 
     <div :class="$style.icon">
       <slot />
@@ -20,9 +18,11 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api'
+import CheckMark from '~/components/checkout/payment-method/CheckMark.vue'
 
 export default defineComponent({
   name: 'PaymentMethodItem',
+  components: { CheckMark },
   props: {
     selected: {
       required: true,
@@ -57,21 +57,6 @@ export default defineComponent({
 .icon {
   width: 48px;
   height: 48px;
-}
-
-.mark {
-  @apply flex flex-row justify-end;
-
-  padding-right: 3px;
-  height: 0;
-  width: 100%;
-}
-
-.check {
-  display: inline;
-  margin-top: -18px;
-  height: 24px;
-  width: 24px;
 }
 
 .text {
