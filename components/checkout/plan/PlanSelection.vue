@@ -60,8 +60,14 @@ export default defineComponent({
 
     const router = useRouter()
     const next = () => {
-      router.push('/checkout/payment-method')
+      router.push({
+        path: '/checkout/payment-method',
+        query: {
+          p: selected.value!.months.toString(),
+        },
+      })
     }
+
     return {
       next,
       cryptoPrice,
