@@ -74,13 +74,13 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .small {
-  @apply font-serif uppercase rounded focus:outline-none px-4;
+  @apply font-sans rounded focus:outline-none px-4 bg-primary3 font-bold;
 
   $button-height: 48px;
 
   height: $button-height !important;
 
-  @include text-size(16px, 24px);
+  @include text-size(16px, 19px);
 
   @include for-size(phone-only) {
     height: $button-height * $mobile-button-percentage;
