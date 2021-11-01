@@ -6,10 +6,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import {
+  defineComponent,
+  onBeforeMount,
+  useRoute,
+  useRouter,
+} from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'PaymentMethodPage',
+  setup() {
+    const route = useRoute()
+    const router = useRouter()
+    onBeforeMount(() => {
+      if (!('p' in route.value.query)) {
+        router.push('/checkout/plan')
+      }
+    })
+  },
 })
 </script>
 

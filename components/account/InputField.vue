@@ -1,47 +1,62 @@
 <template>
   <div :class="$style.wrapper">
-    <label v-if="label" :class="$style.label" :for="id"> {{ label }}</label>
-    <select
-      v-if="type === 'select'"
-      :id="id"
-      ref="inputField"
-      v-model="selection"
-      :class="$style.input"
-      :disabled="disabled"
-      @input="input($event)"
-    >
-      <option v-if="disabled" :class="$style.option" disabled selected>
-        {{ selection }}
-      </option>
-      <option v-if="placeholder" :class="$style.option" disabled selected>
-        {{ placeholder }}
-      </option>
-      <option
-        v-for="country in items"
-        :key="country.code"
-        :class="$style.option"
-        :value="country.code"
+    <div v-if="type === 'select'">
+      <label v-if="label" :class="$style.label" :for="id"> {{ label }}</label>
+      <select
+        :id="id"
+        ref="inputField"
+        v-model="selection"
+        :class="$style.input"
+        :disabled="disabled"
+        @input="input($event)"
       >
-        {{ country.name }}
-      </option>
-    </select>
-    <input
+        <option v-if="disabled" :class="$style.option" disabled selected>
+          {{ selection }}
+        </option>
+        <option v-if="placeholder" :class="$style.option" disabled selected>
+          {{ placeholder }}
+        </option>
+        <option
+          v-for="country in items"
+          :key="country.code"
+          :class="$style.option"
+          :value="country.code"
+        >
+          {{ country.name }}
+        </option>
+      </select>
+    </div>
+    <div
       v-else
-      :id="id"
-      ref="inputField"
-      :aria-describedby="`${id}-error`"
       :class="{
-        [$style.input]: true,
-        [$style.inputText]: true,
+        [$style.field]: true,
+        [$style.filled]: filled,
       }"
-      :disabled="disabled"
-      :placeholder="placeholder"
-      :readonly="readonly"
-      :type="type"
-      :value="value"
-      @input="input($event)"
-      @keypress.enter="enter()"
-    />
+    >
+      <slot v-if="$slots.prepend" name="prepend" />
+      <div :class="$style.inputContainer">
+        <input
+          :id="id"
+          ref="inputField"
+          :aria-describedby="`${id}-error`"
+          :class="{
+            [$style.input]: true,
+            [$style.inputText]: true,
+            [$style.filled]: filled,
+            [$style.empty]: isEmpty,
+          }"
+          :disabled="disabled"
+          :placeholder="placeholder"
+          :readonly="readonly"
+          :type="type"
+          :value="value"
+          @input="input($event)"
+          @keypress.enter="enter()"
+        />
+        <label v-if="label" :class="$style.label" :for="id"> {{ label }}</label>
+      </div>
+      <slot v-if="$slots.append" name="append" />
+    </div>
 
     <span
       v-if="errorMessages && errorMessages.length > 0"
@@ -60,6 +75,7 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   onMounted,
   PropType,
@@ -120,6 +136,11 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    filled: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['input', 'enter'],
   setup(props, { emit }) {
@@ -148,9 +169,15 @@ export default defineComponent({
       }
     })
 
+    const isEmpty = computed(() => {
+      const currentValue = value.value
+      return !currentValue || currentValue.trim().length === 0
+    })
+
     return {
       selection,
       inputField,
+      isEmpty,
       input,
       enter: () => emit('enter'),
     }
@@ -166,7 +193,7 @@ export default defineComponent({
   @apply flex flex-col pt-2.5;
 }
 
-.input {
+.input:not(.filled) {
   @apply border-shade10 box-border border-solid focus:outline-none focus:border-primary py-2 px-3 appearance-none w-full bg-white;
 
   margin-top: 8px;
@@ -177,6 +204,35 @@ export default defineComponent({
   @include for-size(phone-only) {
     width: 100%;
   }
+}
+
+.input.filled {
+  @apply block w-full appearance-none focus:outline-none bg-transparent px-2;
+
+  height: 56px;
+
+  &:focus-within ~ label {
+    @apply transform scale-75 -translate-y-4 -translate-x-1.5 text-primary3 duration-300;
+  }
+
+  &:not(.empty):not(:focus-within) ~ label {
+    @apply transform scale-75 -translate-y-4 -translate-x-1.5 text-label duration-300;
+  }
+}
+
+.field.filled {
+  @apply flex flex-row  border-b-2 border-transparent;
+
+  background: #f0f0f0 0 0 no-repeat padding-box;
+  border-radius: 4px 4px 0 0;
+
+  &:focus-within {
+    @apply border-b-2 border-primary3;
+  }
+}
+
+.inputContainer {
+  @apply relative w-full;
 }
 
 .input:disabled {
@@ -201,9 +257,7 @@ export default defineComponent({
 }
 
 .label {
-  @apply tracking-wide font-sans uppercase;
-
-  font-weight: 600;
+  @apply font-sans absolute top-3.5 text-label px-2;
 
   @include text-size(14px, 20px);
 }
