@@ -3,7 +3,7 @@
     <template #title> Reset your password </template>
     <box>
       <template #label> Recover password </template>
-      <input-field id="email" v-model="emailAddress" label="Email" />
+      <input-field id="email" v-model="emailAddress" filled label="Email" />
       <recaptcha
         :class="$style.recaptcha"
         @error="onError"
@@ -14,6 +14,7 @@
         :class="$style.button"
         :disabled="!valid"
         primary
+        small
         text="Submit"
         @click="reset"
       />
