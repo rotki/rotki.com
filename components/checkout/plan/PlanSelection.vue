@@ -15,6 +15,13 @@
       />
     </div>
 
+    <div :class="$style.hint">
+      <span v-if="selected">
+        * When paying with crypto the monthly price is
+        {{ cryptoPrice }} €
+      </span>
+    </div>
+
     <div :class="$style.continue">
       <selection-button selected @click="next">Continue</selection-button>
     </div>
@@ -23,10 +30,10 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   PropType,
   ref,
-  toRefs,
   useRouter,
 } from '@nuxtjs/composition-api'
 import { Plan } from '~/types'
@@ -39,10 +46,17 @@ export default defineComponent({
       type: Array as PropType<Plan[]>,
     },
   },
-  setup(props) {
-    const { plans } = toRefs(props)
-    const selected = ref(plans.value[0])
+  setup() {
+    const selected = ref<Plan | null>(null)
     const isSelected = (plan: Plan) => plan === selected.value
+
+    const cryptoPrice = computed(() => {
+      const plan = selected.value
+      if (!plan) {
+        return 0
+      }
+      return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2)
+    })
 
     const router = useRouter()
     const next = () => {
@@ -50,6 +64,7 @@ export default defineComponent({
     }
     return {
       next,
+      cryptoPrice,
       isSelected,
       selected,
     }
@@ -68,11 +83,16 @@ $text-color: #212529;
   margin-right: 32px;
 }
 
+.text {
+  letter-spacing: 0;
+  color: $text-color;
+}
+
 .price {
   font-size: 28px;
   line-height: 33px;
-  letter-spacing: 0;
-  color: $text-color;
+
+  @extend .text;
 }
 
 .description {
@@ -80,8 +100,19 @@ $text-color: #212529;
 
   font-size: 15px;
   line-height: 19px;
-  letter-spacing: 0;
-  color: $text-color;
+
+  @extend .text;
+}
+
+.hint {
+  @apply mt-2;
+
+  height: 21px;
+  line-height: 21px;
+  font-size: 15px;
+  font-style: italic;
+
+  @extend .text;
 }
 
 .continue {

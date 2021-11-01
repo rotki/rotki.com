@@ -6,7 +6,7 @@
     }"
     @click="click"
   >
-    <div></div>
+    <check-mark :selected="selected" mt="4px" />
     <div
       :class="{
         [$style.emphasis]: true,
@@ -21,7 +21,7 @@
         [$style.for]: true,
       }"
     >
-      for
+      for *
     </div>
     <div :class="$style.emphasis">{{ price }}€</div>
     <div
