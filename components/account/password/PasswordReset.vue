@@ -8,6 +8,7 @@
         id="password"
         v-model="password"
         :error-messages="v$.password.$errors"
+        filled
         label="Password"
         type="password"
       >
@@ -28,6 +29,7 @@
         v-model="passwordConfirmation"
         :class="$style.confirmation"
         :error-messages="v$.passwordConfirmation.$errors"
+        filled
         hint="Enter the same password as before, for verification."
         label="Password Confirmation"
         type="password"
@@ -37,6 +39,7 @@
           :class="$style.button"
           :disabled="!valid"
           primary
+          small
           text="Submit"
           @click="submit"
         />

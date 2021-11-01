@@ -4,6 +4,7 @@
       [$style.content]: true,
       [$style.selected]: selected,
     }"
+    @click="click"
   >
     <check-mark :selected="selected" />
 
@@ -28,6 +29,15 @@ export default defineComponent({
       required: true,
       type: Boolean,
     },
+  },
+  emits: ['click'],
+  setup(_, { emit }) {
+    const click = () => {
+      emit('click')
+    }
+    return {
+      click,
+    }
   },
 })
 </script>

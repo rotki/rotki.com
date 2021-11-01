@@ -19,10 +19,10 @@ export default {
 @import '~assets/css/main';
 
 .box {
-  @apply border p-8 rounded-xl bg-white;
+  @apply border p-7 rounded-sm bg-white;
 
-  box-shadow: 0 2px 12px rgba(74, 91, 120, 0.1) !important;
-  width: 550px;
+  box-shadow: 0 4px 8px #0003;
+  width: 392px;
 
   @include for-size(phone-only) {
     @apply p-6;
@@ -32,8 +32,8 @@ export default {
 }
 
 .label {
-  @apply text-shade11 font-serif mb-8;
+  @apply text-typography font-sans mb-4 font-bold;
 
-  @include text-size(24px, 32px);
+  @include text-size(32px, 38px);
 }
 </style>
