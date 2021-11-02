@@ -3,7 +3,10 @@
     <div :class="$style.overlay" @click="dismiss">
       <div :class="$style.wrapper">
         <div
-          :class="$style.dialog"
+          :class="{
+            [$style.dialog]: true,
+            [$style.boxless]: boxless,
+          }"
           :style="style"
           @click="($event) => $event.stopPropagation()"
         >
@@ -47,6 +50,11 @@ export default defineComponent({
       required: false,
       default: '0px',
     },
+    boxless: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   emits: ['input'],
   setup(props, { emit }) {
@@ -64,7 +72,7 @@ export default defineComponent({
         nextTick(() => {
           setTimeout(() => {
             visible.value = false
-          }, 400)
+          }, 800)
         })
       }
     })
@@ -93,7 +101,9 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .overlay {
-  @apply w-screen h-screen overflow-y-hidden bg-opacity-50 bg-black z-30 fixed top-0 right-0;
+  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0;
+
+  background-color: #0000002e;
 }
 
 .wrapper {
@@ -101,7 +111,9 @@ export default defineComponent({
 }
 
 .dialog {
-  @apply bg-white flex flex-col rounded-lg mb-2;
+  &:not(.boxless) {
+    @apply bg-white flex flex-col rounded-lg mb-2;
+  }
 
   transform: scale(0);
   animation: zoomIn 0.5s 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
@@ -112,13 +124,13 @@ export default defineComponent({
 }
 
 .container {
-  @apply w-screen h-screen overflow-y-hidden bg-opacity-50 bg-black z-30 fixed top-0 right-0;
+  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0;
 
   transform: scaleY(0.01) scaleX(0);
   animation: unfoldIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
-.container .out {
+.out.container {
   transform: scale(1);
   animation: unfoldOut 1s 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
