@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.box">
+  <div :class="$style.box" @click="stop($event)">
     <div v-if="$slots.label" :class="$style.label">
       <slot name="label" />
     </div>
@@ -8,10 +8,19 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
+
+export default defineComponent({
   name: 'Box',
-}
+  setup() {
+    const stop = (event: any) => {
+      event.stopPropagation()
+    }
+
+    return { stop }
+  },
+})
 </script>
 
 <style lang="scss" module>
