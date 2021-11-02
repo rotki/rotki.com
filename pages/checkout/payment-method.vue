@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'PaymentMethod',
@@ -16,13 +17,9 @@ export default defineComponent({
           name: 'description',
           content: 'Select how to pay for your rotki premium subscription',
         },
+        noIndex(),
       ],
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
+      ...commonAttrs(),
     })
   },
   head: {},
