@@ -23,7 +23,9 @@
     </div>
 
     <div :class="$style.continue">
-      <selection-button selected @click="next">Continue</selection-button>
+      <selection-button :disabled="!selected" selected @click="next">
+        Continue
+      </selection-button>
     </div>
   </div>
 </template>

@@ -280,7 +280,7 @@ export const actions: ActionTree<RootState, RootState> = {
   ): Promise<void> {
     if (logoutFirst) {
       try {
-        await this.$api.patch<UpdateProfileResponse>('/webapi/logout')
+        await this.$api.post<UpdateProfileResponse>('/webapi/logout/')
       } catch (e) {
         logger.error(e)
       }
