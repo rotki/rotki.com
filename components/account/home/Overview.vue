@@ -37,7 +37,7 @@ export default defineComponent({
 
     const router = useRouter()
     const logout = async () => {
-      await store.dispatch(Actions.LOGOUT)
+      await store.dispatch(Actions.LOGOUT, true)
       router.push('/login')
     }
     return {

@@ -76,17 +76,25 @@ import {
   computed,
   defineComponent,
   ref,
+  toRefs,
   useRouter,
   useStore,
 } from '@nuxtjs/composition-api'
 import { setupCSRF } from '~/composables/csrf-token'
 import { Actions, LoginCredentials, RootState } from '~/store'
-import UserIcon from '~/components/account/login/icons/PasswordIcon.vue'
 
 export default defineComponent({
   name: 'LoginForm',
-  components: { UserIcon },
-  setup() {
+  props: {
+    modal: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['complete'],
+  setup(props, { emit }) {
+    const { modal } = toRefs(props)
     const username = ref('')
     const password = ref('')
     const showPassword = ref(false)
@@ -103,7 +111,11 @@ export default defineComponent({
       error.value = await dispatch(Actions.LOGIN, credentials)
 
       if (!error.value) {
-        router.push('/home')
+        if (modal.value) {
+          emit('complete')
+        } else {
+          router.push('/home')
+        }
       }
     }
     return {
@@ -123,7 +135,7 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .buttonContainer {
-  @apply flex flex-row align-middle justify-center mt-4;
+  @apply flex flex-row align-middle justify-center mt-8;
 }
 
 .button {
@@ -166,7 +178,7 @@ export default defineComponent({
 }
 
 .create {
-  @apply flex flex-row align-middle justify-center mt-6 mb-6;
+  @apply flex flex-row align-middle justify-center mt-6 mb-8;
 }
 
 .signup {
@@ -174,10 +186,12 @@ export default defineComponent({
 }
 
 .error {
-  @apply p-2 mt-1 text-error text-xs tracking-tight;
+  @apply text-error text-xs tracking-tight;
 }
 
 .errorWrapper {
-  min-height: 40px;
+  @apply flex flex-row justify-center -mt-1.5;
+
+  height: 18px;
 }
 </style>

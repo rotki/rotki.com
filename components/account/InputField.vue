@@ -33,29 +33,33 @@
         [$style.filled]: filled,
       }"
     >
-      <slot v-if="$slots.prepend" name="prepend" />
-      <div :class="$style.inputContainer">
-        <input
-          :id="id"
-          ref="inputField"
-          :aria-describedby="`${id}-error`"
-          :class="{
-            [$style.input]: true,
-            [$style.inputText]: true,
-            [$style.filled]: filled,
-            [$style.empty]: isEmpty,
-          }"
-          :disabled="disabled"
-          :placeholder="placeholder"
-          :readonly="readonly"
-          :type="type"
-          :value="value"
-          @input="input($event)"
-          @keypress.enter="enter()"
-        />
-        <label v-if="label" :class="$style.label" :for="id"> {{ label }}</label>
+      <div :class="$style.slot">
+        <slot v-if="$slots.prepend" name="prepend" />
+        <div :class="$style.inputContainer">
+          <input
+            :id="id"
+            ref="inputField"
+            :aria-describedby="`${id}-error`"
+            :class="{
+              [$style.input]: true,
+              [$style.inputText]: true,
+              [$style.filled]: filled,
+              [$style.empty]: isEmpty,
+            }"
+            :disabled="disabled"
+            :placeholder="placeholder"
+            :readonly="readonly"
+            :type="type"
+            :value="value"
+            @input="input($event)"
+            @keypress.enter="enter()"
+          />
+          <label v-if="label" :class="$style.label" :for="id">
+            {{ label }}</label
+          >
+        </div>
+        <slot v-if="$slots.append" name="append" />
       </div>
-      <slot v-if="$slots.append" name="append" />
     </div>
 
     <span
@@ -201,12 +205,18 @@ export default defineComponent({
   border-radius: 8px;
   height: 56px;
 
+  & ~ label {
+    @apply top-6;
+
+    left: 16px;
+  }
+
   &:focus-within ~ label {
-    @apply transform scale-75 -translate-y-4 -translate-x-1.5 text-primary3 duration-300;
+    @apply transform scale-75 -translate-y-4 text-primary3 duration-300;
   }
 
   &:not(.empty):not(:focus-within) ~ label {
-    @apply transform scale-75 -translate-y-4 -translate-x-1.5 text-label duration-300;
+    @apply transform scale-75 -translate-y-4 text-label duration-300;
   }
 
   @include for-size(phone-only) {
@@ -220,22 +230,43 @@ export default defineComponent({
   height: 56px;
 
   &:focus-within ~ label {
-    @apply transform scale-75 -translate-y-4 -translate-x-1.5 text-primary3 duration-300;
+    @apply transform scale-75 -translate-y-4 text-primary3 duration-300;
   }
 
   &:not(.empty):not(:focus-within) ~ label {
-    @apply transform scale-75 -translate-y-4 -translate-x-1.5 text-label duration-300;
+    @apply transform scale-75 -translate-y-4 text-label duration-300;
   }
 }
 
+.slot {
+  @apply flex flex-row;
+}
+
 .field.filled {
-  @apply flex flex-row  border-b-2 border-transparent;
+  @apply relative;
 
   background: #f0f0f0 0 0 no-repeat padding-box;
   border-radius: 4px 4px 0 0;
 
-  &:focus-within {
-    @apply border-b-2 border-primary3;
+  &::before,
+  &::after {
+    @apply absolute bottom-0 w-0 bg-primary3 transition-all ease-in-out;
+
+    content: '';
+    height: 2px;
+  }
+
+  &::before {
+    @apply left-1/2;
+  }
+
+  &::after {
+    @apply right-1/2;
+  }
+
+  &:focus-within::after,
+  &:focus-within::before {
+    @apply w-1/2;
   }
 }
 
@@ -265,7 +296,7 @@ export default defineComponent({
 }
 
 .label {
-  @apply font-sans absolute top-3.5 text-label px-2;
+  @apply font-sans absolute top-3.5 text-label;
 
   @include text-size(14px, 20px);
 }

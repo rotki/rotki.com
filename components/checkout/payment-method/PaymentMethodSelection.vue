@@ -16,30 +16,32 @@
       </payment-method-item>
     </div>
     <div :class="$style.continue">
-      <selection-button selected @click="next">
+      <selection-button :disabled="!selected" selected @click="next">
         Continue to Checkout
       </selection-button>
     </div>
-    <login-modal v-if="loginRequired" @dismiss="loginRequired = false" />
+    <login-modal v-model="loginRequired" />
   </div>
 </template>
 
 <script lang="ts">
 import {
   defineComponent,
+  Ref,
   ref,
   useRoute,
   useRouter,
   useStore,
 } from '@nuxtjs/composition-api'
 import { RootState } from '~/store'
+import { assert } from '~/components/utils/assertions'
 
 enum PaymentMethod {
-  ETH,
-  BTC,
-  DAI,
-  CARD,
-  PAYPAL,
+  ETH = 1,
+  BTC = 2,
+  DAI = 3,
+  CARD = 4,
+  PAYPAL = 5,
 }
 
 type PaymentMethodItem = {
@@ -79,6 +81,7 @@ const paymentMethods: PaymentMethodItem[] = [
 export default defineComponent({
   name: 'PaymentMethodSelection',
   setup() {
+    const selected: Ref<PaymentMethod | null> = ref(null)
     const loginRequired = ref(false)
     const store = useStore<RootState>()
     const router = useRouter()
@@ -86,17 +89,29 @@ export default defineComponent({
 
     const next = () => {
       if (store.state.authenticated) {
+        const query: { p: string; c?: string } = {
+          p: route.value.query.p as string,
+        }
+        let path: string
+        const value = selected.value
+        assert(value)
+        if (value === PaymentMethod.CARD) {
+          path = '/checkout/card'
+        } else if (value === PaymentMethod.PAYPAL) {
+          path = '/checkout/paypal'
+        } else {
+          path = '/checkout/crypto'
+          query.c = PaymentMethod[value]
+        }
+
         router.push({
-          path: '',
-          query: {
-            p: route.value.query.p,
-          },
+          path,
+          query,
         })
       } else {
         loginRequired.value = true
       }
     }
-    const selected = ref(PaymentMethod.ETH)
 
     const isSelected = (method: PaymentMethod) => {
       return selected.value === method
