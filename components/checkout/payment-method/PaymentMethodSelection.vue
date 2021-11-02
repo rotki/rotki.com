@@ -1,9 +1,9 @@
 <template>
   <div :class="$style.content">
-    <div :class="$style.title">Payment Method</div>
-    <div :class="$style.description">
+    <checkout-title>Payment Method</checkout-title>
+    <checkout-description>
       Please select one of the following payment methods.
-    </div>
+    </checkout-description>
     <div :class="$style.methods">
       <payment-method-item
         v-for="item in paymentMethods"
@@ -35,6 +35,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { RootState } from '~/store'
 import { assert } from '~/components/utils/assertions'
+import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue'
 
 enum PaymentMethod {
   ETH = 1,
@@ -80,6 +81,7 @@ const paymentMethods: PaymentMethodItem[] = [
 
 export default defineComponent({
   name: 'PaymentMethodSelection',
+  components: { CheckoutTitle },
   setup() {
     const selected: Ref<PaymentMethod | null> = ref(null)
     const loginRequired = ref(false)
@@ -96,11 +98,11 @@ export default defineComponent({
         const value = selected.value
         assert(value)
         if (value === PaymentMethod.CARD) {
-          path = '/checkout/card'
+          path = '/checkout/pay/card'
         } else if (value === PaymentMethod.PAYPAL) {
-          path = '/checkout/paypal'
+          path = '/checkout/pay/paypal'
         } else {
-          path = '/checkout/crypto'
+          path = '/checkout/pay/crypto'
           query.c = PaymentMethod[value]
         }
 
@@ -156,25 +158,5 @@ $text-color: #212529;
   & > button {
     width: 187px;
   }
-}
-
-.text {
-  letter-spacing: 0;
-}
-
-.title {
-  line-height: 33px;
-  font-size: 28px;
-  margin-bottom: 16px;
-
-  @extend .text;
-}
-
-.description {
-  line-height: 18px;
-  font-size: 15px;
-  margin-bottom: 56px;
-
-  @extend .text;
 }
 </style>

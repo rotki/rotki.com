@@ -1,10 +1,14 @@
 <template>
   <div>
-    <div :class="$style.price">Price</div>
-    <div :class="$style.description">
-      Depending on customer's country of residence an additional +19% VAT tax
-      may be applicable.
-    </div>
+    <checkout-title>Price</checkout-title>
+    <checkout-description>
+      <span v-if="!vat">
+        Depending on customer's country of residence an additional +19% VAT tax
+        may be applicable.
+      </span>
+      <span v-else>The prices include a +{{ vat }}% VAT tax</span>
+    </checkout-description>
+
     <div :class="$style.selection">
       <selectable-plan
         v-for="plan in plans"
@@ -37,8 +41,10 @@ import {
   PropType,
   ref,
   useRouter,
+  useStore,
 } from '@nuxtjs/composition-api'
 import { Plan } from '~/types'
+import { RootState } from '~/store'
 
 export default defineComponent({
   name: 'PlanSelection',
@@ -70,9 +76,15 @@ export default defineComponent({
       })
     }
 
+    const store = useStore<RootState>()
+    const vat = computed(() => {
+      return store.state.account?.vat
+    })
+
     return {
       next,
       cryptoPrice,
+      vat,
       isSelected,
       selected,
     }
@@ -81,7 +93,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-$text-color: #212529;
 .selection {
   @apply flex flex-row content-between container;
 }
@@ -92,24 +103,9 @@ $text-color: #212529;
 }
 
 .text {
+  @apply text-typography;
+
   letter-spacing: 0;
-  color: $text-color;
-}
-
-.price {
-  font-size: 28px;
-  line-height: 33px;
-
-  @extend .text;
-}
-
-.description {
-  @apply mt-2 mb-12;
-
-  font-size: 15px;
-  line-height: 19px;
-
-  @extend .text;
 }
 
 .hint {
