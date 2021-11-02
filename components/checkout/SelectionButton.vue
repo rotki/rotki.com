@@ -4,6 +4,7 @@
       [$style.button]: true,
       [$style.selected]: selected,
     }"
+    :disabled="disabled"
     @click="click"
   >
     <span
@@ -26,6 +27,11 @@ export default defineComponent({
     selected: {
       required: true,
       type: Boolean,
+    },
+    disabled: {
+      required: false,
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['click'],
@@ -64,6 +70,15 @@ $color: #da4e24;
   border-radius: 24px;
   padding: 6px 16px;
   border: 1px solid $color;
+
+  &:disabled {
+    background-color: #f0f0f0 !important;
+    border-color: #f0f0f0;
+
+    & .text {
+      color: #878787 !important;
+    }
+  }
 
   &.selected {
     background-color: $color;
