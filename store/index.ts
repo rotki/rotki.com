@@ -5,6 +5,8 @@ import {
   ApiKeys,
   ApiResponse,
   CancelSubscriptionResponse,
+  CardCheckout,
+  CardCheckoutResponse,
   ChangePasswordResponse,
   DeleteAccountResponse,
   PremiumData,
@@ -62,6 +64,7 @@ export enum Actions {
   DELETE_ACCOUNT = 'deleteAccount',
   CANCEL_SUBSCRIPTION = 'cancelSubscription',
   PREMIUM = 'premium',
+  CHECKOUT = 'checkout',
   LOGOUT = 'logout',
 }
 
@@ -109,7 +112,7 @@ export const actions: ActionTree<RootState, RootState> = {
         commit(Mutations.UPDATE_AUTHENTICATED, true)
         return ''
       }
-    } catch (e) {
+    } catch (e: any) {
       return e.message
     }
   },
@@ -269,7 +272,19 @@ export const actions: ActionTree<RootState, RootState> = {
     try {
       const response = await this.$api.get<PremiumResponse>('/webapi/premium')
       return PremiumResponse.parse(response.data).result
-    } catch (e) {
+    } catch (e: any) {
+      logger.error(e)
+      return e
+    }
+  },
+  async [Actions.CHECKOUT](_, plan: number): Promise<CardCheckout> {
+    try {
+      const response = await this.$api.get<CardCheckoutResponse>(
+        `/webapi/checkout/card/${plan}`
+      )
+      const data = CardCheckoutResponse.parse(response.data)
+      return data.result
+    } catch (e: any) {
       logger.error(e)
       return e
     }
