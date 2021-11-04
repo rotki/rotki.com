@@ -208,6 +208,7 @@ export default defineComponent({
   & ~ label {
     @apply top-6;
 
+    transform-origin: 0 0;
     left: 16px;
   }
 
@@ -228,6 +229,10 @@ export default defineComponent({
   @apply block w-full appearance-none focus:outline-none bg-transparent px-2;
 
   height: 56px;
+
+  & ~ label {
+    left: 16px;
+  }
 
   &:focus-within ~ label {
     @apply transform scale-75 -translate-y-4 text-primary3 duration-300;

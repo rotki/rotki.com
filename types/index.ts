@@ -139,3 +139,30 @@ export const PremiumResponse = z.object({
 
 // eslint-disable-next-line no-redeclare
 export type PremiumResponse = z.infer<typeof PremiumResponse>
+
+const SelectedPlan = z.object({
+  dateNow: z.number(),
+  vat: z.number(),
+  priceInEur: z.string(),
+  months: z.number(),
+  finalPriceInEur: z.string(),
+})
+
+// eslint-disable-next-line no-redeclare
+export type SelectedPlan = z.infer<typeof SelectedPlan>
+
+const CardCheckout = z
+  .object({
+    braintreeClientToken: z.string(),
+  })
+  .merge(SelectedPlan)
+
+// eslint-disable-next-line no-redeclare
+export type CardCheckout = z.infer<typeof CardCheckout>
+
+export const CardCheckoutResponse = z.object({
+  result: CardCheckout,
+})
+
+// eslint-disable-next-line no-redeclare
+export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>
