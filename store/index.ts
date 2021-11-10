@@ -11,11 +11,13 @@ import {
   DeleteAccountResponse,
   PremiumData,
   PremiumResponse,
+  Result,
   Subscription,
   UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
 import { assert } from '~/components/utils/assertions'
+import { axiosSnakeCaseTransformer } from '~/plugins/axios'
 
 export interface LoginCredentials {
   readonly username: string
@@ -65,6 +67,7 @@ export enum Actions {
   CANCEL_SUBSCRIPTION = 'cancelSubscription',
   PREMIUM = 'premium',
   CHECKOUT = 'checkout',
+  PAY = 'pay',
   LOGOUT = 'logout',
 }
 
@@ -277,18 +280,37 @@ export const actions: ActionTree<RootState, RootState> = {
       return e
     }
   },
-  async [Actions.CHECKOUT](_, plan: number): Promise<CardCheckout> {
+  async [Actions.CHECKOUT](_, plan: number): Promise<Result<CardCheckout>> {
     try {
       const response = await this.$api.get<CardCheckoutResponse>(
         `/webapi/checkout/card/${plan}`
       )
       const data = CardCheckoutResponse.parse(response.data)
-      return data.result
+      return {
+        isError: false,
+        result: data.result,
+      }
     } catch (e: any) {
       logger.error(e)
-      return e
+      return {
+        isError: true,
+        error: e,
+      }
     }
   },
+
+  async [Actions.PAY](_, data: any): Promise<any> {
+    try {
+      await this.$api.post<any>(
+        '/webapi/payment/',
+        axiosSnakeCaseTransformer(data)
+      )
+    } catch (e: any) {
+      logger.error(e)
+    }
+    return null
+  },
+
   async [Actions.LOGOUT](
     { commit },
     logoutFirst: boolean = false

@@ -1,6 +1,18 @@
 /* eslint-disable camelcase */
 import { z } from 'zod'
 
+type ResultError = {
+  isError: true
+  error: Error
+}
+
+type ResultSuccess<T> = {
+  isError: false
+  result: T
+}
+
+export type Result<T> = ResultError | ResultSuccess<T>
+
 export interface ApiResponse<T> {
   readonly result: T | null
   readonly message: string
