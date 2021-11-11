@@ -1,54 +1,57 @@
 <template>
   <fragment>
-    <div :class="$style.inputs">
-      <hosted-field
-        id="card-number"
-        :class="$style.number"
-        :empty="empty.number"
-        :focused="focused === 'number'"
-        :valid="!numberError"
-        label="Card Number"
-        number
-        @click="focus('number')"
-      />
-      <hosted-field
-        id="expiration"
-        :class="$style.expiration"
-        :empty="empty.expirationDate"
-        :focused="focused === 'expirationDate'"
-        :valid="!expirationError"
-        label="Expiration"
-        @click="focus('expirationDate')"
-      />
-      <hosted-field
-        id="cvv"
-        :class="$style.cvv"
-        :empty="empty.cvv"
-        :focused="focused === 'cvv'"
-        :valid="!cvvError"
-        label="CVV"
-        @click="focus('cvv')"
-      />
+    <div v-show="!verify">
+      <div :class="$style.inputs">
+        <hosted-field
+          id="card-number"
+          :class="$style.number"
+          :empty="empty.number"
+          :focused="focused === 'number'"
+          :valid="!numberError"
+          label="Card Number"
+          number
+          @click="focus('number')"
+        />
+        <hosted-field
+          id="expiration"
+          :class="$style.expiration"
+          :empty="empty.expirationDate"
+          :focused="focused === 'expirationDate'"
+          :valid="!expirationError"
+          label="Expiration"
+          @click="focus('expirationDate')"
+        />
+        <hosted-field
+          id="cvv"
+          :class="$style.cvv"
+          :empty="empty.cvv"
+          :focused="focused === 'cvv'"
+          :valid="!cvvError"
+          label="CVV"
+          @click="focus('cvv')"
+        />
+      </div>
+      <selected-plan-overview :plan="plan" />
+      <div>
+        <selection-button
+          :class="$style.button"
+          :disabled="!valid || paying"
+          selected
+          @click="submit"
+        >
+          Start subscription
+        </selection-button>
+      </div>
+      <custom-checkbox id="refund" v-model="accepted">
+        <span>
+          I have read and agreed to the
+          <nuxt-link :class="$style.link" target="_blank" to="/refund-policy">
+            Refunds/Cancellation Policy
+          </nuxt-link>
+        </span>
+      </custom-checkbox>
     </div>
-    <selected-plan-overview :plan="plan" />
-    <div>
-      <selection-button
-        :class="$style.button"
-        :disabled="!valid"
-        selected
-        @click="submit"
-      >
-        Start subscription
-      </selection-button>
-    </div>
-    <custom-checkbox id="refund" v-model="accepted">
-      <span>
-        I have read and agreed to the
-        <nuxt-link :class="$style.link" target="_blank" to="/refund-policy">
-          Refunds/Cancellation Policy
-        </nuxt-link>
-      </span>
-    </custom-checkbox>
+    <div v-show="verify" ref="threedsecure" :class="$style.verification"></div>
   </fragment>
 </template>
 
@@ -64,8 +67,10 @@ import {
   toRefs,
 } from '@nuxtjs/composition-api'
 import braintree, { HostedFields, ThreeDSecure } from 'braintree-web'
+import { ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
 import { SelectedPlan } from '~/types'
 import { assert } from '~/components/utils/assertions'
+import { logger } from '~/utils/logger'
 
 type FieldStatus = {
   valid: boolean
@@ -197,10 +202,16 @@ const setupHostedFields = () => {
     setupEmptyStateMonitoring(get(), empty)
     setupValidityMonitoring(get(), status)
   }
+
+  const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
+    _fields?.focus(field)
+  }
+
   return {
     create,
     setup,
     get,
+    focus,
     teardown,
   }
 }
@@ -215,6 +226,8 @@ export default defineComponent({
   setup(props, { emit }) {
     const { token, plan } = toRefs(props)
     const fields = setupHostedFields()
+    const threedsecure = ref<HTMLDivElement | null>(null)
+    const verify = ref(false)
 
     const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
       fields.get().focus(field)
@@ -255,12 +268,25 @@ export default defineComponent({
       })
 
       threeDSecure = await braintree.threeDSecure.create({
-        version: 2,
+        version: '2-inline-iframe',
         client,
       })
+      // set up iframe listener
+      // @ts-ignore
+      threeDSecure.on(
+        'authentication-iframe-available',
+        function (event: any, next: Function) {
+          const element = event.element
+
+          threedsecure.value?.appendChild(element)
+          verify.value = true
+          next()
+        }
+      )
     })
 
     onUnmounted(() => {
+      threeDSecure?.teardown()
       fields.teardown()
     })
 
@@ -271,22 +297,50 @@ export default defineComponent({
         expirationDateStatus.value.valid &&
         cvvStatus.value.valid
     )
-
+    const paying = ref(false)
     const submit = async () => {
-      const selectedPlan = plan.value
-      const token = await fields.get().tokenize()
-      await threeDSecure.verifyCard({
-        amount: parseFloat(selectedPlan.finalPriceInEur),
-        nonce: token.nonce,
-        bin: token.details.bin,
-      })
-      emit('pay', {
-        months: plan.value.months,
-        nonce: token.nonce,
-      })
+      paying.value = true
+      try {
+        const selectedPlan = plan.value
+        const token = await fields.get().tokenize()
+
+        const options: ThreeDSecureVerifyOptions = {
+          // @ts-ignore
+          onLookupComplete(_: any, next: any) {
+            next()
+          },
+          amount: parseFloat(selectedPlan.finalPriceInEur),
+          nonce: token.nonce,
+          bin: token.details.bin,
+        }
+
+        const payload = await threeDSecure.verifyCard(options)
+
+        if (payload.liabilityShifted) {
+          emit('pay', {
+            months: plan.value.months,
+            nonce: token.nonce,
+          })
+        } else {
+          logger.error('didnt shift')
+        }
+      } catch (e) {
+        logger.error(e)
+      } finally {
+        paying.value = false
+        verify.value = false
+        const host = threedsecure.value
+        if (host) {
+          const children = host.children
+          for (let i = 0; i < children.length; i++) {
+            children.item(i)?.remove()
+          }
+        }
+      }
     }
 
     return {
+      paying,
       empty,
       numberError,
       expirationError,
@@ -294,6 +348,8 @@ export default defineComponent({
       accepted,
       focused,
       valid,
+      threedsecure,
+      verify,
       focus,
       submit,
     }
@@ -325,5 +381,10 @@ export default defineComponent({
 
 .button {
   margin-top: 51px;
+}
+
+.verification {
+  min-height: 400px;
+  width: 100%;
 }
 </style>

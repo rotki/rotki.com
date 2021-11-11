@@ -9,7 +9,8 @@
           <braintree-icon :class="$style.braintree" />
         </div>
       </checkout-description>
-      <card-payment :plan="plan" :token="token" @pay="submit($event)" />
+      <loader v-if="!token" :class="$style.loader" />
+      <card-payment v-else :plan="plan" :token="token" @pay="submit($event)" />
     </div>
   </page>
 </template>
@@ -96,5 +97,9 @@ export default defineComponent({
 
 .description {
   @apply flex flex-row;
+}
+
+.loader {
+  min-height: 400px;
 }
 </style>
