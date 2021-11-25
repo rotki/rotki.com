@@ -1,5 +1,5 @@
 export function getMetadata(title: string, description: string, url: string) {
-  const imageUrl = `${process.env.baseUrl}/img/media.png`
+  const imageUrl = `${process.env.baseUrl}/img/share.png`
   return [
     {
       hid: 'description',
