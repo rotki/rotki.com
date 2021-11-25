@@ -19,7 +19,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 
@@ -41,7 +41,7 @@ export default Vue.extend({
 }
 
 .title {
-  @apply header text-primary font-serif flex-col col-auto;
+  @apply header text-primary font-serif flex-col col-auto font-bold;
 
   @include text-size(52px, 67px);
 }

@@ -24,12 +24,12 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
 .heading {
-  @apply font-serif text-primary2 font-medium;
+  @apply font-serif text-primary2 font-medium font-bold;
 
   margin-top: 24px;
 

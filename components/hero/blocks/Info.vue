@@ -21,7 +21,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
@@ -30,7 +30,7 @@ export default Vue.extend({
 }
 
 .title {
-  @apply flex-col font-serif text-primary2 text-4xl;
+  @apply flex-col font-serif text-primary2 text-4xl font-bold;
 
   letter-spacing: -0.01em;
 

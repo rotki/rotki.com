@@ -21,7 +21,7 @@
     <paragraph>
       Die Europäische Kommission stellt eine Plattform zur
       Online-Streitbeilegung (OS) bereit:
-      <external-link url="https://ec.europa.eu/consumers/odr" no-referrer />
+      <external-link no-referrer url="https://ec.europa.eu/consumers/odr" />
       . Unsere E-Mail-Adresse finden Sie oben im Impressum
     </paragraph>
 
@@ -100,12 +100,12 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media.scss';
 @import '~assets/css/main.scss';
 
 .subheading {
-  @apply font-serif text-primary2 font-medium;
+  @apply font-serif text-primary2 font-medium font-bold;
 
   margin-top: 24px;
 

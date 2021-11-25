@@ -62,11 +62,11 @@ $button-width: 275px;
 }
 
 .primary {
-  @apply text-white bg-primary hover:bg-shade12;
+  @apply text-white bg-primary hover:bg-shade12 font-bold;
 }
 
 .secondary {
-  @apply text-primary border-primary hover:bg-shade1;
+  @apply text-primary border-primary hover:bg-shade1 font-bold;
 }
 
 .filled {
