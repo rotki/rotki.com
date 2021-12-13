@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-import { getMetadata } from '@/utils/metadata'
 import { defineComponent } from '@nuxtjs/composition-api'
+import { getMetadata } from '@/utils/metadata'
 
 const title = 'Rotki: Impressum'
 const description = 'Impressum - DE'

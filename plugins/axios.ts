@@ -6,8 +6,9 @@ import {
 } from 'axios'
 import { Plugin } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { defineNuxtPlugin, useRouter, useStore } from '@nuxtjs/composition-api'
-import { Actions } from '~/store'
+import { defineNuxtPlugin, useRouter } from '@nuxtjs/composition-api'
+import { useMainStore } from '~/store'
+import { assert } from '~/components/utils/assertions'
 
 const isObject = (data: any): boolean =>
   typeof data === 'object' &&
@@ -98,6 +99,13 @@ declare module 'vuex/types/index' {
   }
 }
 
+let apiInstance: NuxtAxiosInstance | null = null
+
+export const useApi = (): NuxtAxiosInstance => {
+  assert(apiInstance)
+  return apiInstance
+}
+
 const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
   // https://stackoverflow.com/a/15724300
   const getCookie = (name: string) => {
@@ -127,6 +135,7 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
     baseURL: process.env.baseUrl,
     transformResponse: [axiosCamelCaseTransformer],
   })
+  apiInstance = $api
 
   $api.defaults.transformRequest = [
     axiosSnakeCaseTransformer,
@@ -157,12 +166,12 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
     }
   )
 
+  const { logout } = useMainStore()
   function handleError(error: AxiosError) {
     const router = useRouter()
-    const store = useStore()
     switch (error.response?.status) {
       case 401:
-        store.dispatch(Actions.LOGOUT)
+        logout()
         router.push('/login')
         break
       default:

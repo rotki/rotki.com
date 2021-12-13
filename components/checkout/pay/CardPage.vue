@@ -21,19 +21,20 @@ import {
   defineComponent,
   useAsync,
   useRoute,
-  useStore,
 } from '@nuxtjs/composition-api'
-import { Actions } from '~/store'
+import { useMainStore } from '~/store'
 import { CardCheckout, Result, SelectedPlan } from '~/types'
 
 export default defineComponent({
   name: 'CardPage',
   setup() {
-    const store = useStore()
+    const store = useMainStore()
     const route = useRoute()
-    const checkout = useAsync<Result<CardCheckout>>(() =>
-      store.dispatch(Actions.CHECKOUT, route.value.query.p)
-    )
+
+    const checkout = useAsync<Result<CardCheckout>>(() => {
+      // TODO properly check and navigate way on invalid plan
+      return store.checkout(parseInt(route.value.query.p as string))
+    })
     const plan = computed<SelectedPlan | null>(() => {
       const payload = checkout.value
       if (!payload || payload.isError) {
@@ -59,7 +60,7 @@ export default defineComponent({
       months: number
       nonce: string
     }) => {
-      await store.dispatch(Actions.PAY, {
+      await store.pay({
         months,
         paymentMethodNonce: nonce,
       })
