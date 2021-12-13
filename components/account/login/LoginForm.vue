@@ -78,10 +78,9 @@ import {
   ref,
   toRefs,
   useRouter,
-  useStore,
 } from '@nuxtjs/composition-api'
 import { setupCSRF } from '~/composables/csrf-token'
-import { Actions, LoginCredentials, RootState } from '~/store'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'LoginForm',
@@ -101,14 +100,13 @@ export default defineComponent({
     const valid = computed(({ username, password }) => !!username && !!password)
     const error = ref('')
     setupCSRF()
-    const { dispatch } = useStore<RootState>()
+    const { login } = useMainStore()
     const router = useRouter()
-    const login = async () => {
-      const credentials: LoginCredentials = {
+    const performLogin = async () => {
+      error.value = await login({
         username: username.value,
         password: password.value,
-      }
-      error.value = await dispatch(Actions.LOGIN, credentials)
+      })
 
       if (!error.value) {
         if (modal.value) {
@@ -124,7 +122,7 @@ export default defineComponent({
       showPassword,
       valid,
       error,
-      login,
+      login: performLogin,
     }
   },
 })

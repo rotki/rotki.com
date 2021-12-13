@@ -40,8 +40,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
-import { RootState } from '~/store'
+import { computed, defineComponent } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
+import { useMainStore } from '~/store'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 
 const headers: DataTableHeader[] = [
@@ -55,12 +56,13 @@ const headers: DataTableHeader[] = [
 export default defineComponent({
   name: 'Payments',
   setup() {
-    const store = useStore<RootState>()
+    const store = useMainStore()
+    const { account } = storeToRefs(store)
     const payments = computed(() => {
-      if (!store.state.account) {
+      if (!account.value) {
         return []
       }
-      return store.state.account.payments
+      return account.value.payments
     })
 
     return {

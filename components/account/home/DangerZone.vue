@@ -66,34 +66,31 @@ import {
   defineComponent,
   ref,
   useRouter,
-  useStore,
 } from '@nuxtjs/composition-api'
-import { ActionResult, Actions, RootState } from '~/store'
+import { storeToRefs } from 'pinia'
+import { ActionResult, useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'DangerZone',
   setup() {
     const confirm = ref(false)
     const usernameConfirmation = ref('')
-    const store = useStore<RootState>()
-    const router = useRouter()
     const error = ref('')
-    const username = computed(() => {
-      return store.state.account?.username
-    })
 
-    const isSubscriber = computed(() => {
-      return store.state.account?.hasActiveSubscription ?? false
-    })
+    const store = useMainStore()
+    const router = useRouter()
+    const { account } = storeToRefs(store)
+
+    const username = computed(() => account.value?.username)
+    const isSubscriber = computed(
+      () => account.value?.hasActiveSubscription ?? false
+    )
 
     const deleteAccount = async () => {
       confirm.value = false
-      const result: ActionResult = await store.dispatch(
-        Actions.DELETE_ACCOUNT,
-        {
-          username: usernameConfirmation.value,
-        }
-      )
+      const result: ActionResult = await store.deleteAccount({
+        username: usernameConfirmation.value,
+      })
       if (result.success) {
         router.push('/login')
       } else {
@@ -101,6 +98,7 @@ export default defineComponent({
         setTimeout(() => (error.value = ''), 4500)
       }
     }
+
     return {
       confirm,
       error,

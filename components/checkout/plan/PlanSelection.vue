@@ -41,10 +41,10 @@ import {
   PropType,
   ref,
   useRouter,
-  useStore,
 } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
 import { Plan } from '~/types'
-import { RootState } from '~/store'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'PlanSelection',
@@ -76,9 +76,10 @@ export default defineComponent({
       })
     }
 
-    const store = useStore<RootState>()
+    const store = useMainStore()
+    const { account } = storeToRefs(store)
     const vat = computed(() => {
-      return store.state.account?.vat
+      return account.value?.vat
     })
 
     return {

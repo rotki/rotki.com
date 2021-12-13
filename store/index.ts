@@ -1,4 +1,5 @@
-import { ActionTree, MutationTree } from 'vuex'
+import { defineStore } from 'pinia'
+import { ref } from '@nuxtjs/composition-api'
 import {
   Account,
   ApiError,
@@ -17,7 +18,7 @@ import {
 } from '~/types'
 import { logger } from '~/utils/logger'
 import { assert } from '~/components/utils/assertions'
-import { axiosSnakeCaseTransformer } from '~/plugins/axios'
+import { axiosSnakeCaseTransformer, useApi } from '~/plugins/axios'
 
 export interface LoginCredentials {
   readonly username: string
@@ -52,51 +53,35 @@ export type ActionResult = {
   readonly message?: ApiError
 }
 
-enum Mutations {
-  UPDATE_AUTHENTICATED = 'UPDATE_AUTHENTICATED',
-  ACCOUNT_DATA = 'ACCOUNT_DATA',
-}
+export const useMainStore = defineStore('main', () => {
+  const authenticated = ref(false)
+  const account = ref<Account | null>(null)
+  const $api = useApi()
 
-export enum Actions {
-  LOGIN = 'login',
-  ACCOUNT = 'account',
-  UPDATE_KEYS = 'updateKeys',
-  CHANGE_PASSWORD = 'changePassword',
-  UPDATE_PROFILE = 'updateProfile',
-  DELETE_ACCOUNT = 'deleteAccount',
-  CANCEL_SUBSCRIPTION = 'cancelSubscription',
-  PREMIUM = 'premium',
-  CHECKOUT = 'checkout',
-  PAY = 'pay',
-  LOGOUT = 'logout',
-}
-
-export const state = () => ({
-  authenticated: false,
-  account: null as Account | null,
-})
-
-export type RootState = ReturnType<typeof state>
-
-export const mutations: MutationTree<RootState> = {
-  [Mutations.UPDATE_AUTHENTICATED](state, authenticated: boolean) {
-    state.authenticated = authenticated
-  },
-  [Mutations.ACCOUNT_DATA](state, account: Account) {
-    state.account = account
-  },
-}
-
-export const actions: ActionTree<RootState, RootState> = {
-  async nuxtServerInit({ dispatch }) {
-    await dispatch(Actions.ACCOUNT)
-  },
-  async [Actions.LOGIN](
-    { commit, dispatch },
-    { username, password }: LoginCredentials
-  ): Promise<string> {
+  const getAccount = async () => {
     try {
-      const response = await this.$api.post(
+      const response = await $api.get<ApiResponse<Account>>(
+        '/webapi/account/',
+        {
+          validateStatus: (status) => [200, 401].includes(status),
+        }
+      )
+
+      if (response.status === 200) {
+        authenticated.value = true
+        account.value = Account.parse(response.data.result)
+      }
+    } catch (e) {
+      logger.error(e)
+    }
+  }
+
+  const login = async ({
+    username,
+    password,
+  }: LoginCredentials): Promise<string> => {
+    try {
+      const response = await $api.post(
         '/webapi/login/',
         {
           username,
@@ -108,38 +93,21 @@ export const actions: ActionTree<RootState, RootState> = {
         }
       )
       if (response.status === 400) {
-        commit(Mutations.UPDATE_AUTHENTICATED, false)
+        authenticated.value = false
         return response.data.message
       } else {
-        await dispatch(Actions.ACCOUNT)
-        commit(Mutations.UPDATE_AUTHENTICATED, true)
+        await getAccount()
+        authenticated.value = true
         return ''
       }
     } catch (e: any) {
       return e.message
     }
-  },
-  async [Actions.ACCOUNT]({ commit }) {
-    try {
-      const response = await this.$api.get<ApiResponse<Account>>(
-        '/webapi/account/',
-        {
-          validateStatus: (status) => [200, 401].includes(status),
-        }
-      )
+  }
 
-      if (response.status === 200) {
-        commit(Mutations.UPDATE_AUTHENTICATED, true)
-        commit(Mutations.ACCOUNT_DATA, Account.parse(response.data.result))
-      }
-    } catch (e) {
-      logger.error(e)
-    }
-  },
-
-  async [Actions.UPDATE_KEYS]({ commit, state }) {
+  const updateKeys = async () => {
     try {
-      const response = await this.$api.patch<ApiResponse<ApiKeys>>(
+      const response = await $api.patch<ApiResponse<ApiKeys>>(
         '/webapi/regenerate-keys/',
         {},
         {
@@ -147,22 +115,22 @@ export const actions: ActionTree<RootState, RootState> = {
         }
       )
       if (response.status === 200) {
-        const account = {
-          ...state.account,
+        assert(account.value)
+        account.value = {
+          ...account.value,
           ...ApiKeys.parse(response.data.result),
         }
-        commit(Mutations.ACCOUNT_DATA, account)
       }
     } catch (e) {
       logger.error(e)
     }
-  },
-  async [Actions.CHANGE_PASSWORD](
-    _,
+  }
+
+  const changePassword = async (
     payload: PasswordChangePayload
-  ): Promise<ActionResult> {
+  ): Promise<ActionResult> => {
     try {
-      const response = await this.$api.patch<ChangePasswordResponse>(
+      const response = await $api.patch<ChangePasswordResponse>(
         '/webapi/change-password/',
         payload,
         {
@@ -188,13 +156,13 @@ export const actions: ActionTree<RootState, RootState> = {
         message: e.message,
       }
     }
-  },
-  async [Actions.UPDATE_PROFILE](
-    { commit, state },
+  }
+
+  const updateProfile = async (
     payload: ProfilePayload
-  ): Promise<ActionResult> {
+  ): Promise<ActionResult> => {
     try {
-      const response = await this.$api.patch<UpdateProfileResponse>(
+      const response = await $api.patch<UpdateProfileResponse>(
         '/webapi/account/',
         payload,
         {
@@ -205,11 +173,11 @@ export const actions: ActionTree<RootState, RootState> = {
       const { result, message } = UpdateProfileResponse.parse(response.data)
       if (response.status === 200) {
         assert(result)
-        const account = {
-          ...state.account,
+        assert(account.value)
+        account.value = {
+          ...account.value,
           ...result,
         }
-        commit(Mutations.ACCOUNT_DATA, account)
         return { success: true }
       } else {
         assert(message)
@@ -225,13 +193,13 @@ export const actions: ActionTree<RootState, RootState> = {
         message: e.message,
       }
     }
-  },
-  async [Actions.DELETE_ACCOUNT](
-    _,
+  }
+
+  const deleteAccount = async (
     payload: DeleteAccountPayload
-  ): Promise<ActionResult> {
+  ): Promise<ActionResult> => {
     try {
-      const response = await this.$api.delete<DeleteAccountResponse>(
+      const response = await $api.delete<DeleteAccountResponse>(
         '/webapi/account/',
 
         {
@@ -252,37 +220,44 @@ export const actions: ActionTree<RootState, RootState> = {
         message: e.message,
       }
     }
-  },
-  async [Actions.CANCEL_SUBSCRIPTION](
-    { dispatch },
-    subscription: Subscription
-  ) {
+  }
+
+  const cancelSubscription = async (subscription: Subscription) => {
     try {
-      const response = await this.$api.delete<CancelSubscriptionResponse>(
+      const response = await $api.delete<CancelSubscriptionResponse>(
         `/webapi/subscription/${subscription.identifier}`
       )
       const data = CancelSubscriptionResponse.parse(response.data)
       if (data.result) {
-        await dispatch(Actions.ACCOUNT)
+        await getAccount()
       } else {
         // TODO: handle error
       }
     } catch (e) {
       logger.error(e)
     }
-  },
-  async [Actions.PREMIUM](): Promise<PremiumData | Error> {
+  }
+
+  const premium = async (): Promise<Result<PremiumData>> => {
     try {
-      const response = await this.$api.get<PremiumResponse>('/webapi/premium')
-      return PremiumResponse.parse(response.data).result
+      const response = await $api.get<PremiumResponse>('/webapi/premium')
+      const data = PremiumResponse.parse(response.data)
+      return {
+        isError: false,
+        result: data.result,
+      }
     } catch (e: any) {
       logger.error(e)
-      return e
+      return {
+        isError: true,
+        error: e,
+      }
     }
-  },
-  async [Actions.CHECKOUT](_, plan: number): Promise<Result<CardCheckout>> {
+  }
+
+  const checkout = async (plan: number): Promise<Result<CardCheckout>> => {
     try {
-      const response = await this.$api.get<CardCheckoutResponse>(
+      const response = await $api.get<CardCheckoutResponse>(
         `/webapi/checkout/card/${plan}`
       )
       const data = CardCheckoutResponse.parse(response.data)
@@ -297,32 +272,42 @@ export const actions: ActionTree<RootState, RootState> = {
         error: e,
       }
     }
-  },
+  }
 
-  async [Actions.PAY](_, data: any): Promise<any> {
+  const pay = async (data: any) => {
     try {
-      await this.$api.post<any>(
-        '/webapi/payment/',
-        axiosSnakeCaseTransformer(data)
-      )
+      await $api.post<any>('/webapi/payment/', axiosSnakeCaseTransformer(data))
     } catch (e: any) {
       logger.error(e)
     }
     return null
-  },
+  }
 
-  async [Actions.LOGOUT](
-    { commit },
-    logoutFirst: boolean = false
-  ): Promise<void> {
-    if (logoutFirst) {
+  const logout = async (callApi: boolean = false) => {
+    if (callApi) {
       try {
-        await this.$api.post<UpdateProfileResponse>('/webapi/logout/')
+        await $api.post<UpdateProfileResponse>('/webapi/logout/')
       } catch (e) {
         logger.error(e)
       }
     }
-    commit(Mutations.UPDATE_AUTHENTICATED, false)
-    commit(Mutations.ACCOUNT_DATA, null)
-  },
-}
+    authenticated.value = false
+    account.value = null
+  }
+
+  return {
+    authenticated,
+    account,
+    login,
+    getAccount,
+    changePassword,
+    updateKeys,
+    updateProfile,
+    deleteAccount,
+    cancelSubscription,
+    premium,
+    checkout,
+    pay,
+    logout,
+  }
+})

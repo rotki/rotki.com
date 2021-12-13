@@ -16,28 +16,25 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  useRouter,
-  useStore,
-} from '@nuxtjs/composition-api'
-import { Actions, RootState } from '~/store'
+import { computed, defineComponent, useRouter } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'Overview',
   setup() {
-    const store = useStore<RootState>()
+    const store = useMainStore()
+    const { account } = storeToRefs(store)
     const premium = computed(() => {
-      return store.state.account?.canUsePremium ?? false
+      return account.value?.canUsePremium ?? false
     })
     const username = computed(() => {
-      return store.state.account?.username
+      return account.value?.username
     })
 
     const router = useRouter()
     const logout = async () => {
-      await store.dispatch(Actions.LOGOUT, true)
+      await store.logout(true)
       router.push('/login')
     }
     return {
