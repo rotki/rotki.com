@@ -9,18 +9,27 @@
 import {
   computed,
   defineComponent,
-  useAsync,
-  useStore,
+  onBeforeMount,
+  ref,
 } from '@nuxtjs/composition-api'
 import { PremiumData } from '~/types'
-import { Actions } from '~/store'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'PlanSelectionPage',
   setup() {
-    const { dispatch } = useStore()
-    const premium = useAsync<PremiumData>(() => dispatch(Actions.PREMIUM))
-    const plans = computed(() => premium.value?.plans ?? [])
+    const { premium } = useMainStore()
+    const data = ref<PremiumData | null>(null)
+    onBeforeMount(async () => {
+      const availablePlans = await premium()
+      if (!availablePlans.isError) {
+        data.value = availablePlans.result
+      }
+
+      // TODO properly handle errors
+    })
+
+    const plans = computed(() => data.value?.plans ?? [])
     return {
       plans,
     }

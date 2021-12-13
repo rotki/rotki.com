@@ -36,20 +36,20 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
-import { Actions, RootState } from '~/store'
+import { computed, defineComponent } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'ApiKeys',
   setup() {
-    const store = useStore<RootState>()
+    const store = useMainStore()
+    const { account } = storeToRefs(store)
 
-    const apiKey = computed(() => store.state.account?.apiKey ?? '')
-    const apiSecret = computed(() => store.state.account?.apiSecret ?? '')
+    const apiKey = computed(() => account.value?.apiKey ?? '')
+    const apiSecret = computed(() => account.value?.apiSecret ?? '')
+    const regenerateKeys = async () => await store.updateKeys()
 
-    const regenerateKeys = async () => {
-      await store.dispatch(Actions.UPDATE_KEYS)
-    }
     return {
       regenerateKeys,
       apiKey,

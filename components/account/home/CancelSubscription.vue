@@ -81,10 +81,9 @@ import {
   PropType,
   ref,
   toRefs,
-  useStore,
 } from '@nuxtjs/composition-api'
 import { Subscription } from '~/types'
-import { Actions, RootState } from '~/store'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'CancelSubscription',
@@ -98,10 +97,10 @@ export default defineComponent({
     const { subscription } = toRefs(props)
     const isPending = computed(() => subscription.value.status === 'Pending')
     const confirm = ref(false)
-    const store = useStore<RootState>()
+    const store = useMainStore()
     const cancelSubscription = async () => {
       confirm.value = false
-      await store.dispatch(Actions.CANCEL_SUBSCRIPTION, subscription.value)
+      await store.cancelSubscription(subscription.value)
     }
     return {
       cancelSubscription,

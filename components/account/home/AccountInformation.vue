@@ -106,17 +106,17 @@ import {
   onMounted,
   reactive,
   ref,
-  useStore,
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import { ActionResult, Actions, RootState } from '~/store'
+import { storeToRefs } from 'pinia'
+import { useMainStore } from '~/store'
 import { loadCountries } from '~/composables/countries'
 
 export default defineComponent({
   name: 'AccountInformation',
   setup() {
-    const store = useStore<RootState>()
+    const store = useMainStore()
     const state = reactive({
       githubUsername: '',
       firstName: '',
@@ -130,13 +130,15 @@ export default defineComponent({
       country: '',
     })
 
+    const { account } = storeToRefs(store)
+
     const movedOffline = computed(
-      () => store.state.account?.address.movedOffline ?? false
+      () => account.value?.address.movedOffline ?? false
     )
 
     onMounted(() => {
-      const account = store.state.account
-      if (!account) {
+      const userAccount = account.value
+      if (!userAccount) {
         return
       }
 
@@ -145,16 +147,18 @@ export default defineComponent({
 
       const unavailable = movedOffline.value
 
-      state.githubUsername = account.githubUsername
-      state.firstName = unavailable ? offline : account.address.firstName
-      state.lastName = unavailable ? offline : account.address.lastName
-      state.companyName = unavailable ? offline : account.address.companyName
-      state.vatId = unavailable ? offline : account.address.vatId
-      state.address1 = unavailable ? offline : account.address.address1
-      state.address2 = unavailable ? offline : account.address.address2
-      state.city = unavailable ? offline : account.address.city
-      state.postcode = unavailable ? offline : account.address.postcode
-      state.country = unavailable ? offline : account.address.country
+      state.githubUsername = userAccount.githubUsername
+      state.firstName = unavailable ? offline : userAccount.address.firstName
+      state.lastName = unavailable ? offline : userAccount.address.lastName
+      state.companyName = unavailable
+        ? offline
+        : userAccount.address.companyName
+      state.vatId = unavailable ? offline : userAccount.address.vatId
+      state.address1 = unavailable ? offline : userAccount.address.address1
+      state.address2 = unavailable ? offline : userAccount.address.address2
+      state.city = unavailable ? offline : userAccount.address.city
+      state.postcode = unavailable ? offline : userAccount.address.postcode
+      state.country = unavailable ? offline : userAccount.address.country
     })
 
     const rules = {
@@ -179,10 +183,7 @@ export default defineComponent({
     const done = ref(false)
     const update = async () => {
       loading.value = true
-      const { success, message } = (await store.dispatch(
-        Actions.UPDATE_PROFILE,
-        state
-      )) as ActionResult
+      const { success, message } = await store.updateProfile(state)
       if (success) {
         done.value = true
       } else if (message && typeof message !== 'string') {
