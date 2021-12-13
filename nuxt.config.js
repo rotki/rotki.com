@@ -67,6 +67,7 @@ export default {
     '@nuxtjs/stylelint-module',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/composition-api/module',
+    ['@pinia/nuxt', { disableVuex: true }],
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)

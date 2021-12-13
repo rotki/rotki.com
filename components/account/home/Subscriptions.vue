@@ -51,10 +51,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useStore } from '@nuxtjs/composition-api'
-import { RootState } from '~/store'
+import { computed, defineComponent } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
 import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
+import { useMainStore } from '~/store'
 
 const subHeaders: DataTableHeader[] = [
   { text: 'Plan', value: '' },
@@ -69,12 +70,13 @@ export default defineComponent({
   name: 'Subscriptions',
   components: { CancelSubscription },
   setup() {
-    const store = useStore<RootState>()
+    const store = useMainStore()
+    const { account } = storeToRefs(store)
     const subscriptions = computed(() => {
-      if (!store.state.account) {
+      if (!account.value) {
         return []
       }
-      return store.state.account.subscriptions
+      return account.value.subscriptions
     })
 
     return {

@@ -65,26 +65,22 @@ import {
   reactive,
   ref,
   toRefs,
-  useStore,
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { minLength, required, sameAs } from '@vuelidate/validators'
-import {
-  ActionResult,
-  Actions,
-  PasswordChangePayload,
-  RootState,
-} from '~/store'
+import { storeToRefs } from 'pinia'
+import { ActionResult, useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'ChangePassword',
   setup() {
     const loading = ref(false)
     const success = ref(false)
-    const store = useStore<RootState>()
+    const store = useMainStore()
+    const { account } = storeToRefs(store)
     const email = computed(() => {
-      const account = store.state.account
-      return !account ? '' : account.email
+      const userAccount = account.value
+      return !userAccount ? '' : userAccount.email
     })
     const state = reactive({
       currentPassword: '',
@@ -112,10 +108,7 @@ export default defineComponent({
 
     const changePassword = async () => {
       loading.value = true
-      const result: ActionResult = await store.dispatch(
-        Actions.CHANGE_PASSWORD,
-        state as PasswordChangePayload
-      )
+      const result: ActionResult = await store.changePassword(state)
       loading.value = false
       if (result.message && typeof result.message !== 'string') {
         $externalResults.value = result.message
