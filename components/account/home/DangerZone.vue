@@ -65,9 +65,9 @@ import {
   computed,
   defineComponent,
   ref,
+  toRefs,
   useRouter,
 } from '@nuxtjs/composition-api'
-import { storeToRefs } from 'pinia'
 import { ActionResult, useMainStore } from '~/store'
 
 export default defineComponent({
@@ -79,7 +79,8 @@ export default defineComponent({
 
     const store = useMainStore()
     const router = useRouter()
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
 
     const username = computed(() => account.value?.username)
     const isSubscriber = computed(

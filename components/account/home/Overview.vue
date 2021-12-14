@@ -16,15 +16,20 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, useRouter } from '@nuxtjs/composition-api'
-import { storeToRefs } from 'pinia'
+import {
+  computed,
+  defineComponent,
+  toRefs,
+  useRouter,
+} from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'Overview',
   setup() {
     const store = useMainStore()
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
     const premium = computed(() => {
       return account.value?.canUsePremium ?? false
     })

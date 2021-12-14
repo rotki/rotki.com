@@ -8,7 +8,7 @@ import { Plugin } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 import { defineNuxtPlugin, useRouter } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
-import { assert } from '~/components/utils/assertions'
+import { assert } from '~/utils/assert'
 
 const isObject = (data: any): boolean =>
   typeof data === 'object' &&

@@ -106,10 +106,10 @@ import {
   onMounted,
   reactive,
   ref,
+  toRefs,
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import { storeToRefs } from 'pinia'
 import { useMainStore } from '~/store'
 import { loadCountries } from '~/composables/countries'
 
@@ -130,7 +130,8 @@ export default defineComponent({
       country: '',
     })
 
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
 
     const movedOffline = computed(
       () => account.value?.address.movedOffline ?? false

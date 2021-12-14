@@ -17,8 +17,8 @@ import {
   UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
-import { assert } from '~/components/utils/assertions'
 import { axiosSnakeCaseTransformer, useApi } from '~/plugins/axios'
+import { assert } from '~/utils/assert'
 
 export interface LoginCredentials {
   readonly username: string
