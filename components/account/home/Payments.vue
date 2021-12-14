@@ -40,8 +40,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@nuxtjs/composition-api'
-import { storeToRefs } from 'pinia'
+import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 
@@ -57,7 +56,8 @@ export default defineComponent({
   name: 'Payments',
   setup() {
     const store = useMainStore()
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
     const payments = computed(() => {
       if (!account.value) {
         return []

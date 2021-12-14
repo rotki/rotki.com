@@ -40,9 +40,9 @@ import {
   defineComponent,
   PropType,
   ref,
+  toRefs,
   useRouter,
 } from '@nuxtjs/composition-api'
-import { storeToRefs } from 'pinia'
 import { Plan } from '~/types'
 import { useMainStore } from '~/store'
 
@@ -71,13 +71,14 @@ export default defineComponent({
       router.push({
         path: '/checkout/payment-method',
         query: {
-          p: selected.value!.months.toString(),
+          p: selected.value?.months.toString(),
         },
       })
     }
 
     const store = useMainStore()
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
     const vat = computed(() => {
       return account.value?.vat
     })

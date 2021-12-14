@@ -29,13 +29,13 @@ import {
   defineComponent,
   Ref,
   ref,
+  toRefs,
   useRoute,
   useRouter,
 } from '@nuxtjs/composition-api'
-import { storeToRefs } from 'pinia'
-import { assert } from '~/components/utils/assertions'
 import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue'
 import { useMainStore } from '~/store'
+import { assert } from '~/utils/assert'
 
 enum PaymentMethod {
   ETH = 1,
@@ -89,7 +89,8 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
 
-    const { authenticated } = storeToRefs(store)
+    // pinia#852
+    const { authenticated } = toRefs(store)
 
     const next = () => {
       if (authenticated.value) {
