@@ -68,7 +68,6 @@ import {
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { minLength, required, sameAs } from '@vuelidate/validators'
-import { storeToRefs } from 'pinia'
 import { ActionResult, useMainStore } from '~/store'
 
 export default defineComponent({
@@ -77,7 +76,8 @@ export default defineComponent({
     const loading = ref(false)
     const success = ref(false)
     const store = useMainStore()
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
     const email = computed(() => {
       const userAccount = account.value
       return !userAccount ? '' : userAccount.email
