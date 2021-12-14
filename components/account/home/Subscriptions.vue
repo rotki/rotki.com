@@ -51,8 +51,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@nuxtjs/composition-api'
-import { storeToRefs } from 'pinia'
+import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
 import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 import { useMainStore } from '~/store'
@@ -71,7 +70,8 @@ export default defineComponent({
   components: { CancelSubscription },
   setup() {
     const store = useMainStore()
-    const { account } = storeToRefs(store)
+    // pinia#852
+    const { account } = toRefs(store)
     const subscriptions = computed(() => {
       if (!account.value) {
         return []

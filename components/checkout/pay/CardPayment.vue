@@ -69,8 +69,8 @@ import {
 import braintree, { HostedFields, ThreeDSecure } from 'braintree-web'
 import { ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
 import { SelectedPlan } from '~/types'
-import { assert } from '~/components/utils/assertions'
 import { logger } from '~/utils/logger'
+import { assert } from '~/utils/assert'
 
 type FieldStatus = {
   valid: boolean
