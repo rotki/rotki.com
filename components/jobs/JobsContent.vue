@@ -5,18 +5,18 @@
     <ul :class="$style.tabs">
       <li :class="$style.tab">
         <nuxt-link
-          to="/jobs/backend"
-          :class="$style.link"
           :active-class="$style.active"
+          :class="$style.link"
+          to="/jobs/backend"
         >
           Python Backend Developer
         </nuxt-link>
       </li>
       <li :class="$style.tab">
         <nuxt-link
-          to="/jobs/frontend"
-          :class="$style.link"
           :active-class="$style.active"
+          :class="$style.link"
+          to="/jobs/frontend"
         >
           Vue.js/TypeScript Developer
         </nuxt-link>
@@ -26,13 +26,15 @@
   </page>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
+
+export default defineComponent({
   name: 'JobsContent',
-}
+})
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 .tabs {
   @apply flex mb-0 list-none flex-wrap pt-6 pb-6 flex-row;
 }
