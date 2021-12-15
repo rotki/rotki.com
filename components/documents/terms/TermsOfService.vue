@@ -70,7 +70,7 @@
     <paragraph>
       We employ the use of cookies. By using rotki's website you consent to the
       use of cookies in accordance with its
-      <external-link url="/privacy-policy" text="privacy policy" same-tab />.
+      <external-link same-tab text="privacy policy" url="/privacy-policy" />.
     </paragraph>
 
     <paragraph>
@@ -431,13 +431,15 @@
   </page>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
+
+export default defineComponent({
   name: 'TermsOfService',
-}
+})
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media.scss';
 @import '~assets/css/main.scss';
 

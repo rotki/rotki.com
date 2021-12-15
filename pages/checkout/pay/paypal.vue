@@ -1,5 +1,5 @@
 <template>
-  <div>paypal</div>
+  <paypal-page />
 </template>
 
 <script lang="ts">
