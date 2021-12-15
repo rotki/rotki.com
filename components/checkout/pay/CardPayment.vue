@@ -1,5 +1,6 @@
 <template>
-  <fragment>
+  <error-display v-if="error" :message="error" title="Initialization error" />
+  <fragment v-else>
     <div v-show="!verify">
       <div :class="$style.inputs">
         <hosted-field
@@ -252,37 +253,42 @@ export default defineComponent({
     })
 
     const focused = ref('')
+    const error = ref('')
 
     let threeDSecure: ThreeDSecure
 
     onMounted(async () => {
-      const client = await braintree.client.create({
-        authorization: token.value,
-      })
+      try {
+        const client = await braintree.client.create({
+          authorization: token.value,
+        })
 
-      await fields.create(client)
-      fields.setup(focused, empty, {
-        numberStatus,
-        expirationDateStatus,
-        cvvStatus,
-      })
+        await fields.create(client)
+        fields.setup(focused, empty, {
+          numberStatus,
+          expirationDateStatus,
+          cvvStatus,
+        })
 
-      threeDSecure = await braintree.threeDSecure.create({
-        version: '2-inline-iframe',
-        client,
-      })
-      // set up iframe listener
-      // @ts-ignore
-      threeDSecure.on(
-        'authentication-iframe-available',
-        function (event: any, next: Function) {
-          const element = event.element
+        threeDSecure = await braintree.threeDSecure.create({
+          version: '2-inline-iframe',
+          client,
+        })
+        // set up iframe listener
+        // @ts-ignore
+        threeDSecure.on(
+          'authentication-iframe-available',
+          function (event: any, next: Function) {
+            const element = event.element
 
-          threedsecure.value?.appendChild(element)
-          verify.value = true
-          next()
-        }
-      )
+            threedsecure.value?.appendChild(element)
+            verify.value = true
+            next()
+          }
+        )
+      } catch (e: any) {
+        error.value = e.message
+      }
     })
 
     onUnmounted(() => {
@@ -350,6 +356,7 @@ export default defineComponent({
       valid,
       threedsecure,
       verify,
+      error,
       focus,
       submit,
     }
