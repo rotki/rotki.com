@@ -3,11 +3,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs } from '~/utils/metadata'
 
 export default defineComponent({
-  head: () => {
-    return {
+  name: 'Signup',
+  setup() {
+    useMeta({
       title: 'Rotki: Signup',
       meta: [
         {
@@ -16,14 +18,10 @@ export default defineComponent({
           content: 'Create a new rotki premium account',
         },
       ],
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
   },
+  head: {},
 })
 </script>
 
