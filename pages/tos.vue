@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
 
 const title = 'Rotki: Terms of service'
 const description =
@@ -12,18 +12,14 @@ const description =
 
 export default defineComponent({
   name: 'TOS',
-  head: () => {
-    return {
+  setup() {
+    useMeta({
       title,
       meta: getMetadata(title, description, process.env.baseUrl + '/tos'),
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
   },
+  head: {},
 })
 </script>
 

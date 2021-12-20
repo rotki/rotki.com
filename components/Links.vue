@@ -24,9 +24,7 @@
       </a>
     </div>
     <div :class="$style.column">
-      <a :class="$style.link" :href="loginUrl" target="_self">
-        Manage Premium
-      </a>
+      <nuxt-link :class="$style.link" to="/login"> Manage Premium</nuxt-link>
     </div>
     <div :class="$style.column">
       <NuxtLink :class="$style.link" to="/jobs"> Jobs </NuxtLink>
@@ -44,18 +42,6 @@ import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'Links',
-  data() {
-    return {
-      loginUrl: '',
-    }
-  },
-  created() {
-    // https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-generate#routes
-    // To work around:  ERROR  Error generating route "/login": This page could not be found.
-    new Promise<string>((resolve) => resolve('/home/')).then(
-      (url) => (this.loginUrl = url)
-    )
-  },
 })
 </script>
 
