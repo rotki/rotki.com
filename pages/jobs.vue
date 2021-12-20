@@ -3,8 +3,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta, useRoute } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { setupOverflow } from '~/composables/overflow'
 
 function metadata(route: string) {
   let title = 'Rotki: Jobs'
@@ -30,6 +31,7 @@ function metadata(route: string) {
 }
 
 export default defineComponent({
+  name: 'Jobs',
   middleware: [
     function ({ redirect, route }) {
       if (['/jobs', '/jobs/'].includes(route.path)) {
@@ -37,30 +39,17 @@ export default defineComponent({
       }
     },
   ],
-  data() {
-    return {
-      visible: false,
-    }
-  },
-  head() {
-    // TODO: figure out why type augmentation fails when running generate
-    const [meta, title] = metadata((this as any).$route.path)
-    return {
+  setup() {
+    const route = useRoute()
+    const [meta, title] = metadata(route.value.path)
+    useMeta({
       title,
       meta,
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
+    return setupOverflow()
   },
-  watch: {
-    visible(visible: boolean) {
-      document.body.style.overflowY = visible ? 'hidden' : 'auto'
-    },
-  },
+  head: {},
 })
 </script>
 

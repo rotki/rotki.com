@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
-import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, onBeforeMount, ref } from '@nuxtjs/composition-api'
+import { useApi } from '~/plugins/axios'
 
 const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
 
@@ -89,33 +89,31 @@ function isMacOsApp(name: string): boolean {
 
 export default defineComponent({
   name: 'DownloadDialog',
-  data() {
-    return {
-      version: '',
-      linuxUrl: LATEST,
-      macOSUrl: LATEST,
-      windowsUrl: LATEST,
-    }
-  },
-  async mounted() {
-    await this.fetchLatestRelease()
-  },
-  methods: {
-    async fetchLatestRelease() {
-      // For some reason while the typescript instructions are followed
-      // generate fails because it it can't find the $axios property.
-      // This means that the merge of the context somehow fails
-      const comp = this as any
-      const $axios = comp.$axios as NuxtAxiosInstance
-      const latestRelease: GithubRelease = await $axios.$get<GithubRelease>(
+  setup() {
+    const version = ref('')
+    const linuxUrl = ref(LATEST)
+    const macOSUrl = ref(LATEST)
+    const windowsUrl = ref(LATEST)
+
+    const fetchLatestRelease = async () => {
+      const api = useApi()
+      const latestRelease = await api.$get<GithubRelease>(
         'https://api.github.com/repos/rotki/rotki/releases/latest'
       )
-      this.version = latestRelease.tag_name
+      version.value = latestRelease.tag_name
       const assets: Asset[] = latestRelease.assets
-      this.macOSUrl = getUrl(assets, ({ name }) => isMacOsApp(name))
-      this.linuxUrl = getUrl(assets, ({ name }) => isLinuxApp(name))
-      this.windowsUrl = getUrl(assets, ({ name }) => isWindowApp(name))
-    },
+      macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name))
+      linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name))
+      windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name))
+    }
+    onBeforeMount(async () => await fetchLatestRelease())
+
+    return {
+      version,
+      linuxUrl,
+      macOSUrl,
+      windowsUrl,
+    }
   },
 })
 </script>

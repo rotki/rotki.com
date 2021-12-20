@@ -24,13 +24,9 @@ import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'PageFooter',
-  data() {
-    return {
-      year: '2021',
-    }
-  },
-  created() {
-    this.year = new Date().getFullYear().toString()
+  setup() {
+    const year = new Date().getFullYear().toString()
+    return { year }
   },
 })
 </script>
