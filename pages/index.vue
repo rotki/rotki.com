@@ -11,8 +11,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { setupOverflow } from '~/composables/overflow'
 
 const description =
   'Rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.'
@@ -21,13 +22,9 @@ const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`
 
 export default defineComponent({
-  data() {
-    return {
-      visible: false,
-    }
-  },
-  head: () => {
-    return {
+  name: 'Index',
+  setup() {
+    useMeta({
       title: 'Rotki',
       meta: [
         {
@@ -36,19 +33,11 @@ export default defineComponent({
         },
         ...getMetadata('Rotki', description, `${process.env.baseUrl}`),
       ],
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
+    return setupOverflow()
   },
-  watch: {
-    visible(visible: boolean) {
-      document.body.style.overflowY = visible ? 'hidden' : 'auto'
-    },
-  },
+  head: {},
 })
 </script>
 
