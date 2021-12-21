@@ -6,7 +6,7 @@ import {
 } from 'axios'
 import { Plugin } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { defineNuxtPlugin, useRouter } from '@nuxtjs/composition-api'
+import { defineNuxtPlugin } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 import { assert } from '~/utils/assert'
 
@@ -106,7 +106,7 @@ export const useApi = (): NuxtAxiosInstance => {
   return apiInstance
 }
 
-const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
+const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios, app }, inject) => {
   // https://stackoverflow.com/a/15724300
   const getCookie = (name: string) => {
     const value = `; ${document.cookie}`
@@ -168,11 +168,11 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios }, inject) => {
 
   const { logout } = useMainStore()
   function handleError(error: AxiosError) {
-    const router = useRouter()
+    const router = app.router
     switch (error.response?.status) {
       case 401:
         logout()
-        router.push('/login')
+        router?.push('/login')
         break
       default:
         break

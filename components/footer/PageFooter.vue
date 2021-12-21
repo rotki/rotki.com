@@ -38,7 +38,7 @@ export default defineComponent({
 .wrapper {
   @apply container mx-auto;
 
-  padding-bottom: 57px;
+  padding-bottom: 16px;
 }
 
 .row {

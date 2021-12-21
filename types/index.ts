@@ -1,5 +1,6 @@
-/* eslint-disable camelcase */
+/* eslint-disable no-redeclare */
 import { z } from 'zod'
+import { supportedCurrencies } from '~/composables/plan'
 
 type ResultError = {
   isError: true
@@ -21,7 +22,6 @@ export interface ApiResponse<T> {
 const StringArray = z.array(z.string())
 export const ApiError = z.union([z.string(), z.record(StringArray)])
 
-// eslint-disable-next-line no-redeclare
 export type ApiError = z.infer<typeof ApiError>
 
 export const Address = z.object({
@@ -37,7 +37,6 @@ export const Address = z.object({
   movedOffline: z.boolean(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type Address = z.infer<typeof Address>
 
 export const Subscription = z.object({
@@ -50,7 +49,6 @@ export const Subscription = z.object({
   actions: StringArray,
 })
 
-// eslint-disable-next-line no-redeclare
 export type Subscription = z.infer<typeof Subscription>
 
 export const Payment = z.object({
@@ -60,7 +58,6 @@ export const Payment = z.object({
   eurAmount: z.string(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type Payment = z.infer<typeof Payment>
 
 export const Account = z.object({
@@ -78,7 +75,6 @@ export const Account = z.object({
   dateNow: z.string(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type Account = z.infer<typeof Account>
 
 export const ApiKeys = z.object({
@@ -86,7 +82,6 @@ export const ApiKeys = z.object({
   apiSecret: z.string().nonempty(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type ApiKeys = z.infer<typeof ApiKeys>
 
 export const ChangePasswordResponse = z.object({
@@ -94,7 +89,6 @@ export const ChangePasswordResponse = z.object({
   message: ApiError.optional(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>
 
 const UpdateProfile = z.object({
@@ -107,7 +101,6 @@ export const UpdateProfileResponse = z.object({
   message: ApiError.optional(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponse>
 
 export const DeleteAccountResponse = z.object({
@@ -115,7 +108,6 @@ export const DeleteAccountResponse = z.object({
   message: z.string().optional(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>
 
 export const CancelSubscriptionResponse = z.object({
@@ -123,7 +115,6 @@ export const CancelSubscriptionResponse = z.object({
   message: z.string().optional(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type CancelSubscriptionResponse = z.infer<
   typeof CancelSubscriptionResponse
 >
@@ -135,21 +126,18 @@ const Plan = z.object({
   discount: z.number(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type Plan = z.infer<typeof Plan>
 
 const PremiumData = z.object({
   plans: z.array(Plan),
 })
 
-// eslint-disable-next-line no-redeclare
 export type PremiumData = z.infer<typeof PremiumData>
 
 export const PremiumResponse = z.object({
   result: PremiumData,
 })
 
-// eslint-disable-next-line no-redeclare
 export type PremiumResponse = z.infer<typeof PremiumResponse>
 
 const SelectedPlan = z.object({
@@ -160,7 +148,6 @@ const SelectedPlan = z.object({
   finalPriceInEur: z.string(),
 })
 
-// eslint-disable-next-line no-redeclare
 export type SelectedPlan = z.infer<typeof SelectedPlan>
 
 const CardCheckout = z
@@ -169,12 +156,51 @@ const CardCheckout = z
   })
   .merge(SelectedPlan)
 
-// eslint-disable-next-line no-redeclare
 export type CardCheckout = z.infer<typeof CardCheckout>
 
 export const CardCheckoutResponse = z.object({
   result: CardCheckout,
 })
 
-// eslint-disable-next-line no-redeclare
 export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>
+
+const CryptoPayment = z.object({
+  vat: z.number(),
+  finalPriceInEur: z.string().nonempty(),
+  cryptocurrency: z.enum(supportedCurrencies),
+  finalPriceInCrypto: z.string().nonempty(),
+  cryptoAddress: z.string(),
+  tokenAddress: z.string().optional(),
+  startDate: z.string(),
+  hoursForPayment: z.number(),
+  months: z.number(),
+})
+
+export type CryptoPayment = z.infer<typeof CryptoPayment>
+
+export const CryptoPaymentResponse = z.object({
+  result: CryptoPayment.optional(),
+  message: ApiError.optional(),
+})
+
+export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>
+
+interface Request {
+  readonly method: string
+  readonly params: { [key: string]: any }[]
+}
+
+interface Caveat {
+  readonly name: string
+  readonly value: string[]
+}
+
+interface Permission {
+  readonly parentCapability: string
+  readonly caveats: Caveat[]
+}
+
+export interface Provider {
+  readonly isMetaMask?: boolean
+  readonly request: (request: Request) => Promise<Permission[]>
+}
