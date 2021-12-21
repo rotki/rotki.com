@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.wrapper">
     <div :class="$style.header">
-      <alert-icon height="48px" width="48px" />
+      <check-circle :class="$style.icon" height="48px" width="48px" />
     </div>
     <div :class="$style.body">
       <div :class="$style.title">{{ title }}</div>
@@ -14,7 +14,7 @@
 import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
-  name: 'ErrorDisplay',
+  name: 'SuccessDisplay',
   props: {
     message: {
       required: true,
@@ -30,7 +30,7 @@ export default defineComponent({
 
 <style lang="scss" module>
 .header {
-  @apply shadow-lg bg-red-400 rounded-t flex flex-row items-center justify-center;
+  @apply shadow-lg bg-green-400 rounded-t flex flex-row items-center justify-center;
 
   height: 120px;
 }

@@ -9,6 +9,8 @@ import {
   CardCheckout,
   CardCheckoutResponse,
   ChangePasswordResponse,
+  CryptoPayment,
+  CryptoPaymentResponse,
   DeleteAccountResponse,
   PremiumData,
   PremiumResponse,
@@ -19,6 +21,7 @@ import {
 import { logger } from '~/utils/logger'
 import { axiosSnakeCaseTransformer, useApi } from '~/plugins/axios'
 import { assert } from '~/utils/assert'
+import { Currency } from '~/composables/plan'
 
 export interface LoginCredentials {
   readonly username: string
@@ -276,11 +279,51 @@ export const useMainStore = defineStore('main', () => {
 
   const pay = async (data: any) => {
     try {
-      await $api.post<any>('/webapi/payment/', axiosSnakeCaseTransformer(data))
+      await $api.post<any>(
+        '/webapi/payment/btr',
+        axiosSnakeCaseTransformer(data)
+      )
     } catch (e: any) {
       logger.error(e)
     }
     return null
+  }
+
+  const cryptoPayment = async (
+    plan: number,
+    currency: Currency
+  ): Promise<Result<CryptoPayment>> => {
+    try {
+      const response = await $api.post<CryptoPaymentResponse>(
+        '/webapi/payment/crypto',
+        {
+          currency,
+          months: plan,
+        },
+        {
+          validateStatus: (status) => [200, 400].includes(status),
+        }
+      )
+
+      const { result, message } = CryptoPaymentResponse.parse(response.data)
+      if (result) {
+        return {
+          result,
+          isError: false,
+        }
+      } else {
+        return {
+          error: new Error(message?.toString()),
+          isError: true,
+        }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        error: e,
+        isError: true,
+      }
+    }
   }
 
   const logout = async (callApi: boolean = false) => {
@@ -308,6 +351,7 @@ export const useMainStore = defineStore('main', () => {
     premium,
     checkout,
     pay,
+    cryptoPayment,
     logout,
   }
 })

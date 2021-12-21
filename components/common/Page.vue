@@ -9,7 +9,13 @@
       <slot name="links" />
     </Header>
 
-    <div :class="$style.content">
+    <div
+      :class="{
+        [$style.content]: true,
+        [$style['center-vertically']]: centerVertically,
+        [$style['center-horizontally']]: centerHorizontally,
+      }"
+    >
       <div
         :class="{
           [$style.details]: true,
@@ -39,6 +45,16 @@ export default defineComponent({
       required: false,
       default: false,
     },
+    centerVertically: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    centerHorizontally: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
 })
 </script>
@@ -48,7 +64,7 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .wrapper {
-  @apply container mx-auto flex flex-col flex-grow justify-between;
+  @apply container mx-auto flex flex-col flex-grow;
 
   min-height: 100vh;
 }
@@ -62,8 +78,16 @@ export default defineComponent({
   @include text-size(16px, 20px);
 }
 
+.content.center-vertically {
+  @apply items-center;
+}
+
+.content.center-horizontally {
+  @apply justify-center;
+}
+
 .content {
-  @apply flex-row flex items-center justify-center;
+  @apply flex-row flex flex-grow;
 
   height: 100%;
 }
