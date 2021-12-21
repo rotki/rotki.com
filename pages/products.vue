@@ -1,5 +1,7 @@
 <template>
-  <login-page />
+  <page wide>
+    <nuxt-link to="/checkout/plan"> Checkout </nuxt-link>
+  </page>
 </template>
 
 <script lang="ts">

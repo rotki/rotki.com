@@ -1,16 +1,19 @@
 <template>
-  <page wide>
+  <page :center-vertically="false" wide>
     <div :class="$style.content">
       <checkout-title>Payment Details</checkout-title>
 
-      <checkout-description>
-        <div :class="$style.description">
-          <span :class="$style.text">Payments are safely processed with</span>
-          <braintree-icon :class="$style.braintree" />
-        </div>
-      </checkout-description>
+      <slot name="description">
+        <checkout-description>
+          <div :class="$style.description">
+            <span :class="$style.text">Payments are safely processed with</span>
+            <braintree-icon :class="$style.braintree" />
+          </div>
+        </checkout-description>
+      </slot>
+
       <loader v-if="loading" :class="$style.loader" />
-      <slot v-else />
+      <slot v-else :class="$style.slot" />
     </div>
   </page>
 </template>
@@ -49,6 +52,7 @@ export default defineComponent({
 }
 
 .content {
+  margin-top: 24px;
   padding: 0;
 }
 </style>
