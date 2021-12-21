@@ -56,7 +56,7 @@ export default defineComponent({
 }
 
 .padding {
-  padding-top: 94px;
+  padding-top: 48px;
   @include for-size(phone-only) {
     padding-top: 42px;
   }

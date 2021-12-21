@@ -1,5 +1,5 @@
 <template>
-  <div>Crypto</div>
+  <crypto-page />
 </template>
 
 <script lang="ts">
