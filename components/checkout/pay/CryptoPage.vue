@@ -29,6 +29,7 @@ import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'CryptoPage',
+  middleware: [],
   setup() {
     const store = useMainStore()
     const { plan } = setupPlanParams()
@@ -40,9 +41,26 @@ export default defineComponent({
     onMounted(async () => {
       if (plan.value > 0 && currency.value) {
         loading.value = true
-        const result = await store.cryptoPayment(plan.value, currency.value)
-        if (result.isError) {
-          error.value = result.error.message
+        // // const result = await store.cryptoPayment(plan.value, currency.value)
+        // if (result.isError) {
+        //   error.value = result.error.message
+        // }
+        const euroPrice = plan.value * 10
+        const currencyPrice = currency.value === 'ETH' ? 3616.18 : 0.888856
+        const price = (euroPrice / currencyPrice).toFixed(4)
+        data.value = {
+          vat: 19,
+          finalPriceInEur: euroPrice.toFixed(2),
+          cryptoAddress: '0x80fF317C5989ac8416336c27237110728Ce87430',
+          tokenAddress:
+            currency.value === 'DAI'
+              ? '0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844'
+              : '',
+          finalPriceInCrypto: price,
+          months: plan.value,
+          cryptocurrency: currency.value,
+          hoursForPayment: 1,
+          startDate: '',
         }
         loading.value = false
       } else {
