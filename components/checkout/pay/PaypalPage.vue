@@ -12,6 +12,7 @@ import PaypalPayment from '~/components/checkout/pay/PaypalPayment.vue'
 export default defineComponent({
   name: 'PaypalPage',
   components: { PaypalPayment },
+  middleware: ['subscription', 'authentication'],
   setup() {
     return setupBraintree()
   },
