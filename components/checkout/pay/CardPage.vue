@@ -15,6 +15,7 @@ import { setupBraintree } from '~/composables/braintree'
 
 export default defineComponent({
   name: 'CardPage',
+  middleware: ['subscription'],
   setup() {
     return setupBraintree()
   },

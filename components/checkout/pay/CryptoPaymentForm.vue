@@ -1,11 +1,24 @@
 <template>
-  <error-display v-if="error" :message="error" title="Error">
-    <button @click="clearError">close</button>
+  <error-display
+    v-if="error"
+    :class="$style.body"
+    :message="error"
+    title="Error"
+  >
+    <div :class="$style['action-wrapper']">
+      <button :class="$style.action" @click="clearError">Close</button>
+    </div>
   </error-display>
-  <div v-else-if="!pending" :class="$style.wrapper">
+  <div
+    v-else-if="!pending"
+    :class="{
+      [$style.wrapper]: true,
+      [$style.body]: true,
+    }"
+  >
     <div :class="$style.row">
       <div :class="$style.qrcode">
-        <canvas ref="canvas" />
+        <canvas ref="canvas" @click="copyToClipboard" />
       </div>
       <div :class="$style.inputs">
         <input-field
@@ -36,7 +49,7 @@
         </input-field>
       </div>
     </div>
-    <div :class="$style.button">
+    <div v-if="!isBtc" :class="$style.button">
       <action-button
         :disabled="!metamaskSupport"
         text="Pay with Metamask"
@@ -46,17 +59,24 @@
       </action-button>
     </div>
   </div>
-  <div v-else>
-    <div v-if="!done">
-      <loader> Please wait for the transaction </loader>
-    </div>
-    <div v-else>
-      <success-display
-        message="Transaction done, you will receive an e-mail confirming the activation of
+  <div v-else :class="$style.body">
+    <pending-display
+      v-if="!done"
+      message="Please wait for the transaction to be confirmed"
+      title="Pending Transaction"
+    />
+    <success-display
+      v-else
+      message="Transaction done, you will receive an e-mail confirming the activation of
       your subscription"
-        title="Transaction Confirmed"
-      />
-    </div>
+      title="Transaction Confirmed"
+    >
+      <div :class="$style['action-wrapper']">
+        <nuxt-link :class="$style.action" to="/home">
+          Account Management
+        </nuxt-link>
+      </div>
+    </success-display>
   </div>
 </template>
 
@@ -68,6 +88,7 @@ import {
   PropType,
   ref,
   toRefs,
+  watch,
 } from '@nuxtjs/composition-api'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { ethers } from 'ethers'
@@ -95,6 +116,7 @@ async function createPaymentQR(
 
   logger.info(qrText)
   await toCanvas(canvas, qrText)
+  return qrText
 }
 
 export default defineComponent({
@@ -109,6 +131,7 @@ export default defineComponent({
     const { data } = toRefs(props)
     const metamaskSupport = ref(false)
     const canvas = ref<HTMLCanvasElement>()
+    const qrText = ref('')
 
     const paymentAmount = computed(() => {
       const { cryptocurrency, finalPriceInCrypto } = data.value
@@ -116,14 +139,21 @@ export default defineComponent({
     })
     let provider: Provider | null = null
 
+    watch(canvas, async (canvas) => {
+      if (!canvas) {
+        return
+      }
+      qrText.value = await createPaymentQR(data.value, canvas)
+    })
+
     onMounted(async () => {
       provider = (await detectEthereumProvider()) as Provider | null
       metamaskSupport.value = !!provider
-      const payment = data.value
-      if (canvas.value) {
-        await createPaymentQR(payment, canvas.value)
-      }
     })
+
+    const copyToClipboard = () => {
+      navigator.clipboard.writeText(qrText.value)
+    }
 
     const { payWithMetamask, state, error, clearError } = setupWeb3Payments(
       data,
@@ -133,17 +163,15 @@ export default defineComponent({
       }
     )
 
-    const pending = computed(() => {
-      return state.value !== PaymentState.NONE
-    })
-
-    const done = computed(() => {
-      return state.value === PaymentState.DONE
-    })
+    const pending = computed(() => state.value !== PaymentState.NONE)
+    const done = computed(() => state.value === PaymentState.DONE)
+    const isBtc = computed(() => data.value.cryptocurrency === 'BTC')
 
     return {
+      isBtc,
       metamaskSupport,
       payWithMetamask,
+      copyToClipboard,
       canvas,
       paymentAmount,
       pending,
@@ -188,5 +216,18 @@ export default defineComponent({
   width: 24px;
   height: 24px;
   margin-right: 8px;
+}
+
+.body {
+  margin-top: 48px;
+  margin-bottom: 48px;
+}
+
+.action {
+  @apply text-primary3 text-center mt-3 mb-1;
+}
+
+.action-wrapper {
+  @apply flex flex-row justify-center;
 }
 </style>

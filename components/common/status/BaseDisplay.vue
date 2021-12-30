@@ -1,21 +1,38 @@
 <template>
   <div :class="$style.wrapper">
-    <div :class="$style.header">
-      <check-circle :class="$style.icon" height="48px" width="48px" />
+    <div
+      :class="{
+        [$style.header]: true,
+        [$style.error]: status === 'error',
+        [$style.success]: status === 'success',
+        [$style.neutral]: status === 'neutral',
+      }"
+    >
+      <slot name="icon" />
     </div>
     <div :class="$style.body">
       <div :class="$style.title">{{ title }}</div>
       <div :class="$style.message">{{ message }}</div>
+      <slot />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, PropType } from '@nuxtjs/composition-api'
+
+const status = ['success', 'error', 'neutral'] as const
+
+type Status = typeof status[number]
 
 export default defineComponent({
-  name: 'SuccessDisplay',
+  name: 'ErrorDisplay',
   props: {
+    status: {
+      required: true,
+      type: String as PropType<Status>,
+      validate: (value: any) => status.includes(value),
+    },
     message: {
       required: true,
       type: String,
@@ -30,9 +47,21 @@ export default defineComponent({
 
 <style lang="scss" module>
 .header {
-  @apply shadow-lg bg-green-400 rounded-t flex flex-row items-center justify-center;
+  @apply shadow-lg rounded-t flex flex-row items-center justify-center;
 
   height: 120px;
+}
+
+.header.error {
+  @apply bg-red-400;
+}
+
+.header.success {
+  @apply bg-green-400;
+}
+
+.header.neutral {
+  @apply bg-blue-400;
 }
 
 .wrapper {
