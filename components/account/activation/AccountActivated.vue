@@ -1,15 +1,14 @@
 <template>
-  <page>
-    <template #title> Account Activated </template>
-    <div :class="$style.body">
-      <p :class="$style.header">Welcome to rotki</p>
-      <p>Your rotki account has been successfully activated.</p>
-      <p>
-        To see your dashboard click
-        <external-link same-tab text="here" url="/home" />
-      </p>
+  <div :class="$style.body">
+    <p :class="$style.header">Welcome to rotki</p>
+    <p :class="$style.text">
+      Your rotki account has been successfully activated.
+    </p>
+    <div>
+      To see your dashboard click
+      <external-link same-tab text="here" url="/home" />
     </div>
-  </page>
+  </div>
 </template>
 
 <script lang="ts">
@@ -32,8 +31,12 @@ export default defineComponent({
 }
 
 .header {
-  @apply font-serif text-shade11 pb-2;
+  @apply font-serif font-bold text-shade11 pb-2;
 
   @include text-size(24px, 32px);
+}
+
+.text {
+  @apply mt-4;
 }
 </style>

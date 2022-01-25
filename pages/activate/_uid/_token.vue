@@ -1,5 +1,5 @@
 <template>
-  <invalid-activation-code />
+  <activate />
 </template>
 
 <script lang="ts">
@@ -7,15 +7,14 @@ import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
-  name: 'Activated',
   setup() {
     useMeta({
-      title: 'Rotki: Account activation failed',
+      title: 'Rotki: Activate account',
       meta: [
         {
           hid: 'description',
           name: 'description',
-          content: '',
+          content: 'Reset your rotki account',
         },
         noIndex(),
       ],
@@ -27,5 +26,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '~assets/css/main';
+@import '~~/assets/css/main';
 </style>
