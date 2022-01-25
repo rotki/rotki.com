@@ -1,12 +1,9 @@
 <template>
-  <page>
-    <template #title> Invalid code </template>
-    <div :class="$style.body">
-      <p :class="$style.header">Could not use this code</p>
-      <p>The activation link is not valid.</p>
-      <p>This can happen if you have already confirmed your account.</p>
-    </div>
-  </page>
+  <div :class="$style.body">
+    <p :class="$style.header">Invalid Link</p>
+    <p :class="$style.text">The activation link is not valid.</p>
+    <p>This can happen if you have already confirmed your account.</p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -24,13 +21,18 @@ export default defineComponent({
   @apply font-sans text-shade11;
 
   height: 100%;
+  max-width: 550px;
 
   @include text-size(18px, 26px);
 }
 
 .header {
-  @apply font-serif text-shade11 pb-2;
+  @apply font-serif font-bold text-shade11 pb-2;
 
   @include text-size(24px, 32px);
+}
+
+.text {
+  @apply mt-4;
 }
 </style>
