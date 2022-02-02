@@ -1,30 +1,48 @@
 <template>
   <div :class="$style.wrapper">
-    <div v-if="type === 'select'">
-      <label v-if="label" :class="$style.label" :for="id"> {{ label }}</label>
-      <select
-        :id="id"
-        ref="inputField"
-        v-model="selection"
-        :class="$style.input"
-        :disabled="disabled"
-        @input="input($event)"
-      >
-        <option v-if="disabled" :class="$style.option" disabled selected>
-          {{ selection }}
-        </option>
-        <option v-if="placeholder" :class="$style.option" disabled selected>
-          {{ placeholder }}
-        </option>
-        <option
-          v-for="country in items"
-          :key="country.code"
-          :class="$style.option"
-          :value="country.code"
+    <div
+      v-if="type === 'select'"
+      :class="{
+        [$style.field]: true,
+        [$style.filled]: filled,
+      }"
+    >
+      <div :class="$style.inputContainer">
+        <select
+          :id="id"
+          ref="inputField"
+          v-model="selection"
+          :class="$style.input"
+          :disabled="disabled"
+          @input="input($event)"
         >
-          {{ country.name }}
-        </option>
-      </select>
+          <option v-if="disabled" :class="$style.option" disabled selected>
+            <span>{{ selection }}</span>
+          </option>
+          <option v-if="placeholder" :class="$style.option" disabled selected>
+            {{ placeholder }}
+          </option>
+          <option
+            v-for="country in items"
+            :key="country.code"
+            :class="$style.option"
+            :value="country.code"
+          >
+            <span>{{ getFlagEmoji(country.code) }}</span>
+            <span>{{ country.name }}</span>
+          </option>
+        </select>
+        <label
+          v-if="label"
+          :class="{
+            [$style.label]: true,
+            [$style.select]: true,
+          }"
+          :for="id"
+        >
+          {{ label }}</label
+        >
+      </div>
     </div>
     <div
       v-else
@@ -178,10 +196,19 @@ export default defineComponent({
       return !currentValue || currentValue.trim().length === 0
     })
 
+    const getFlagEmoji = (code: string) => {
+      const codePoints = code
+        .toUpperCase()
+        .split('')
+        .map((char) => 127397 + char.charCodeAt(0))
+      return String.fromCodePoint(...codePoints)
+    }
+
     return {
       selection,
       inputField,
       isEmpty,
+      getFlagEmoji,
       input,
       enter: () => emit('enter'),
     }
@@ -210,6 +237,10 @@ export default defineComponent({
 
     transform-origin: 0 0;
     left: 16px;
+
+    &.select {
+      @apply top-4;
+    }
   }
 
   &:focus-within ~ label {
