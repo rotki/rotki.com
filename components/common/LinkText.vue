@@ -1,6 +1,8 @@
 <template>
   <div :class="$style.column">
-    <slot :class="$style.link" />
+    <div :class="$style.link">
+      <slot />
+    </div>
   </div>
 </template>
 
