@@ -1,5 +1,5 @@
 <template>
-  <data-table :headers="headers" :items="payments">
+  <data-table v-if="payments.length > 0" :headers="headers" :items="payments">
     <template #title>Your latest payments</template>
     <template #item="{ item }">
       <td :class="$style.td">

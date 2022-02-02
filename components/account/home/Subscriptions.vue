@@ -1,5 +1,9 @@
 <template>
-  <data-table :headers="headers" :items="subscriptions">
+  <data-table
+    v-if="subscriptions.length > 0"
+    :headers="headers"
+    :items="subscriptions"
+  >
     <template #title>Subscriptions</template>
     <template #item="{ item }">
       <td :class="$style.td">
@@ -48,6 +52,7 @@
       </td>
     </template>
   </data-table>
+  <PremiumPlaceholder v-else />
 </template>
 
 <script lang="ts">
@@ -55,6 +60,7 @@ import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
 import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 import { useMainStore } from '~/store'
+import PremiumPlaceholder from '~/components/account/home/PremiumPlaceholder.vue'
 
 const subHeaders: DataTableHeader[] = [
   { text: 'Plan', value: '' },
@@ -67,7 +73,7 @@ const subHeaders: DataTableHeader[] = [
 
 export default defineComponent({
   name: 'Subscriptions',
-  components: { CancelSubscription },
+  components: { PremiumPlaceholder, CancelSubscription },
   setup() {
     const store = useMainStore()
     // pinia#852

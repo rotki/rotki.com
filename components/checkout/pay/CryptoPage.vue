@@ -12,7 +12,7 @@
       :message="error"
       title="Crypto Payment Failed"
     />
-    <crypto-payment-form v-if="data" :data="data" />
+    <crypto-payment-form v-else-if="data" :data="data" />
   </payment-frame>
 </template>
 
