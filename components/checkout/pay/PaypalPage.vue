@@ -1,6 +1,11 @@
 <template>
-  <payment-frame :loading="false">
-    <paypal-payment v-if="token" :plan="plan" :token="token" />
+  <payment-frame :loading="!token">
+    <paypal-payment
+      v-if="token"
+      :plan="plan"
+      :token="token"
+      @pay="submit($event)"
+    />
   </payment-frame>
 </template>
 

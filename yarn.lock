@@ -2444,10 +2444,15 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/paypal-checkout-components@*", "@types/paypal-checkout-components@4.0.2":
+"@types/paypal-checkout-components@*":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/paypal-checkout-components/-/paypal-checkout-components-4.0.2.tgz#5d11d010f4fc794a38213c67be25923e578b8661"
   integrity sha512-vGyeEPPf9PegMjjt7TAJX0La4Udz26/V3otOSQsGpvXgGpnHbWuaTDo0AAlIB/DQVKOTFeY7czhzFuIxobTqGQ==
+
+"@types/paypal-checkout-components@4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/paypal-checkout-components/-/paypal-checkout-components-4.0.3.tgz#6eb7e090548bf58f2df662a473445ff74540b785"
+  integrity sha512-i4Hmw7lEyThjhMxfrwtaPdtca8e5CaoIZpZrgpFMnszODBz7PDqJxHHJsrVEtmRdRPpknFuUJbSSirUwl6ObyA==
 
 "@types/prettier@^2.0.0":
   version "2.4.2"
