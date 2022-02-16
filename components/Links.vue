@@ -24,7 +24,7 @@
       </a>
     </div>
     <div :class="$style.column">
-      <nuxt-link :class="$style.link" to="/login"> Manage Premium</nuxt-link>
+      <nuxt-link :class="$style.link" to="/home"> Manage Premium</nuxt-link>
     </div>
     <div :class="$style.column">
       <NuxtLink :class="$style.link" to="/jobs"> Jobs </NuxtLink>

@@ -43,14 +43,7 @@
           Start subscription
         </selection-button>
       </div>
-      <custom-checkbox id="refund" v-model="accepted">
-        <span>
-          I have read and agreed to the
-          <nuxt-link :class="$style.link" target="_blank" to="/refund-policy">
-            Refunds/Cancellation Policy
-          </nuxt-link>
-        </span>
-      </custom-checkbox>
+      <accept-refund-policy v-model="accepted" />
     </div>
     <div v-show="verify" ref="threedsecure" :class="$style.verification"></div>
   </fragment>
@@ -380,10 +373,6 @@ export default defineComponent({
 .cvv,
 .expiration {
   width: 128px;
-}
-
-.link {
-  @apply text-primary3;
 }
 
 .button {

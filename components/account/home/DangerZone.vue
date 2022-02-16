@@ -46,17 +46,10 @@
         />
       </div>
     </modal-dialog>
-    <transition name="fade">
-      <notification-message v-if="error">
-        <div>
-          <error-icon />
-        </div>
-        <div :class="$style.errorText">
-          <div :class="$style.errorTitle">Account deletion failed</div>
-          <div :class="$style.errorDescription">{{ error }}</div>
-        </div>
-      </notification-message>
-    </transition>
+    <error-notification :visible="!!error">
+      <template #title> Account deletion failed </template>
+      <template #description>{{ error }}</template>
+    </error-notification>
   </card>
 </template>
 
@@ -69,9 +62,11 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 import { ActionResult, useMainStore } from '~/store'
+import ErrorNotification from '~/components/account/home/ErrorNotification.vue'
 
 export default defineComponent({
   name: 'DangerZone',
+  components: { ErrorNotification },
   setup() {
     const confirm = ref(false)
     const usernameConfirmation = ref('')
@@ -131,18 +126,6 @@ export default defineComponent({
 
 .warning {
   @apply mb-2 text-shade11 font-bold;
-}
-
-.errorText {
-  @apply ml-2;
-}
-
-.errorTitle {
-  @apply font-sans font-bold;
-}
-
-.errorDescription {
-  @apply font-sans text-shade11;
 }
 
 .title {
