@@ -42,6 +42,7 @@ export type Address = z.infer<typeof Address>
 export const Subscription = z.object({
   identifier: z.string().nonempty(),
   planName: z.string(),
+  durationInMonths: z.number().nonnegative(),
   status: z.enum(['Active', 'Cancelled', 'Pending', 'Past Due'] as const),
   createdDate: z.string(),
   nextActionDate: z.string(),
@@ -170,7 +171,7 @@ const CryptoPayment = z.object({
   cryptocurrency: z.enum(supportedCurrencies),
   finalPriceInCrypto: z.string().nonempty(),
   cryptoAddress: z.string(),
-  tokenAddress: z.string().optional(),
+  tokenAddress: z.string().nullish(),
   startDate: z.string(),
   hoursForPayment: z.number(),
   months: z.number(),
@@ -184,6 +185,22 @@ export const CryptoPaymentResponse = z.object({
 })
 
 export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>
+
+const PendingCryptoPayment = z.object({
+  pending: z.boolean(),
+  currency: z.enum(['ETH', 'BTC', 'DAI']).optional(),
+})
+
+export type PendingCryptoPayment = z.infer<typeof PendingCryptoPayment>
+
+export const PendingCryptoPaymentResponse = z.object({
+  result: PendingCryptoPayment.optional(),
+  message: z.string().optional(),
+})
+
+export type PendingCryptoPaymentResponse = z.infer<
+  typeof PendingCryptoPaymentResponse
+>
 
 interface Request {
   readonly method: string
