@@ -12,6 +12,8 @@ import {
   CryptoPayment,
   CryptoPaymentResponse,
   DeleteAccountResponse,
+  PendingCryptoPayment,
+  PendingCryptoPaymentResponse,
   PremiumData,
   PremiumResponse,
   Result,
@@ -291,15 +293,17 @@ export const useMainStore = defineStore('main', () => {
 
   const cryptoPayment = async (
     plan: number,
-    currency: Currency
+    currency: Currency,
+    subscriptionId?: string
   ): Promise<Result<CryptoPayment>> => {
     try {
       const response = await $api.post<CryptoPaymentResponse>(
         '/webapi/payment/crypto',
-        {
+        axiosSnakeCaseTransformer({
           currency,
           months: plan,
-        },
+          subscriptionId,
+        }),
         {
           validateStatus: (status) => [200, 400].includes(status),
         }
@@ -314,6 +318,37 @@ export const useMainStore = defineStore('main', () => {
       } else {
         return {
           error: new Error(message?.toString()),
+          isError: true,
+        }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        error: e,
+        isError: true,
+      }
+    }
+  }
+
+  const checkPendingCryptoPayment = async (
+    subscriptionId: string
+  ): Promise<Result<PendingCryptoPayment>> => {
+    try {
+      const response = await $api.get<PendingCryptoPaymentResponse>(
+        'webapi/payment/pending',
+        {
+          params: axiosSnakeCaseTransformer({ subscriptionId }),
+        }
+      )
+      const data = PendingCryptoPaymentResponse.parse(response.data)
+      if (data.result) {
+        return {
+          result: data.result,
+          isError: false,
+        }
+      } else {
+        return {
+          error: new Error(data.message),
           isError: true,
         }
       }
@@ -352,6 +387,7 @@ export const useMainStore = defineStore('main', () => {
     checkout,
     pay,
     cryptoPayment,
+    checkPendingCryptoPayment,
     logout,
   }
 })

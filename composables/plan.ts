@@ -1,4 +1,5 @@
 import { computed, useRoute } from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
 
 const availablePlans = [1, 3, 6, 12]
 export const supportedCurrencies = ['ETH', 'BTC', 'DAI'] as const
@@ -40,4 +41,13 @@ export const setupCurrencyParams = () => {
   })
 
   return { currency }
+}
+
+export const useSubscriptionIdParam = () => {
+  const route = useRoute()
+  const subscriptionId = computed(() => {
+    const query = get(route).query
+    return typeof query.id === 'string' ? query.id : undefined
+  })
+  return { subscriptionId }
 }

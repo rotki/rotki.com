@@ -19,6 +19,7 @@
 import {
   computed,
   defineComponent,
+  onMounted,
   toRefs,
   useRouter,
 } from '@nuxtjs/composition-api'
@@ -36,6 +37,8 @@ export default defineComponent({
     const username = computed(() => {
       return account.value?.username
     })
+
+    onMounted(async () => await store.getAccount())
 
     const router = useRouter()
     const logout = async () => {

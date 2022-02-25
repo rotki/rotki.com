@@ -41,13 +41,13 @@
         <div v-if="item.actions.length === 0">Nothing to do</div>
         <div v-else>
           <cancel-subscription :subscription="item" />
-          <a
+          <nuxt-link
             v-if="item.actions.includes('renew')"
             :class="$style.actionButton"
-            href="#"
+            :to="renewLink"
           >
             Renew
-          </a>
+          </nuxt-link>
         </div>
       </td>
     </template>
@@ -56,7 +56,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  toRefs,
+} from '@nuxtjs/composition-api'
+import { get, set } from '@vueuse/core'
 import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 import { useMainStore } from '~/store'
@@ -78,16 +85,52 @@ export default defineComponent({
     const store = useMainStore()
     // pinia#852
     const { account } = toRefs(store)
+    const renewLink = ref<{ path: string; query: Record<string, string> }>({
+      path: '/checkout/payment-method',
+      query: {},
+    })
     const subscriptions = computed(() => {
-      if (!account.value) {
+      const userAccount = get(account)
+      if (!userAccount) {
         return []
       }
-      return account.value.subscriptions
+      return userAccount.subscriptions
+    })
+
+    onMounted(async () => {
+      const renewableSubscriptions = get(subscriptions).filter(({ actions }) =>
+        actions.includes('renew')
+      )
+      if (renewableSubscriptions.length) {
+        const subscription = renewableSubscriptions[0]
+        const result = await store.checkPendingCryptoPayment(
+          subscription.identifier
+        )
+        if (result.isError || !result.result.pending) {
+          set(renewLink, {
+            path: '/checkout/payment-method',
+            query: {
+              p: subscription.durationInMonths.toString(),
+              id: subscription.identifier,
+            },
+          })
+        } else {
+          set(renewLink, {
+            path: '/checkout/pay/crypto',
+            query: {
+              p: subscription.durationInMonths.toString(),
+              id: subscription.identifier,
+              c: result.result.currency ?? '',
+            },
+          })
+        }
+      }
     })
 
     return {
       headers: subHeaders,
       subscriptions,
+      renewLink,
     }
   },
 })
