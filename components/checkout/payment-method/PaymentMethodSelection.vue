@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import {
+  computed,
   defineComponent,
   Ref,
   ref,
@@ -33,6 +34,7 @@ import {
   useRoute,
   useRouter,
 } from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
 import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue'
 import { useMainStore } from '~/store'
 import { assert } from '~/utils/assert'
@@ -49,6 +51,7 @@ type PaymentMethodItem = {
   id: PaymentMethod
   label: string
   component: string
+  crypto?: true
 }
 
 const paymentMethods: PaymentMethodItem[] = [
@@ -56,16 +59,19 @@ const paymentMethods: PaymentMethodItem[] = [
     id: PaymentMethod.ETH,
     label: 'Ethereum',
     component: 'ethereum-icon',
+    crypto: true,
   },
   {
     id: PaymentMethod.BTC,
     label: 'Bitcoin',
     component: 'bitcoin-icon',
+    crypto: true,
   },
   {
     id: PaymentMethod.DAI,
     label: 'DAI',
     component: 'dai-icon',
+    crypto: true,
   },
   {
     id: PaymentMethod.CARD,
@@ -82,7 +88,11 @@ const paymentMethods: PaymentMethodItem[] = [
 export default defineComponent({
   name: 'PaymentMethodSelection',
   components: { CheckoutTitle },
-  setup() {
+  props: {
+    identifier: { required: false, type: String, default: undefined },
+  },
+  setup(props) {
+    const { identifier } = toRefs(props)
     const selected: Ref<PaymentMethod | null> = ref(null)
     const loginRequired = ref(false)
     const store = useMainStore()
@@ -94,7 +104,7 @@ export default defineComponent({
 
     const next = () => {
       if (authenticated.value) {
-        const query: { p: string; c?: string } = {
+        const query: { p: string; c?: string; id?: string } = {
           p: route.value.query.p as string,
         }
         let path: string
@@ -107,6 +117,11 @@ export default defineComponent({
         } else {
           path = '/checkout/pay/crypto'
           query.c = PaymentMethod[value]
+        }
+
+        const id = get(identifier)
+        if (id) {
+          query.id = id
         }
 
         router.push({
@@ -126,8 +141,15 @@ export default defineComponent({
       selected.value = method
     }
 
+    const availablePaymentMethods = computed(() => {
+      if (!get(identifier)) {
+        return paymentMethods
+      }
+      return paymentMethods.filter((value) => value.crypto)
+    })
+
     return {
-      paymentMethods,
+      paymentMethods: availablePaymentMethods,
       method: PaymentMethod,
       loginRequired,
       next,

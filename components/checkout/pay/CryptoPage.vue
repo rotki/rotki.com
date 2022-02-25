@@ -12,7 +12,7 @@
       :message="error"
       title="Crypto Payment Failed"
     />
-    <crypto-payment-form v-else-if="data" :data="data" />
+    <crypto-payment-form v-else-if="data" :data="data" :plan="plan" />
   </payment-frame>
 </template>
 
@@ -22,9 +22,15 @@ import {
   defineComponent,
   onMounted,
   ref,
+  useRouter,
 } from '@nuxtjs/composition-api'
+import { get, set } from '@vueuse/core'
 import { CryptoPayment } from '~/types'
-import { setupCurrencyParams, setupPlanParams } from '~/composables/plan'
+import {
+  setupCurrencyParams,
+  setupPlanParams,
+  useSubscriptionIdParam,
+} from '~/composables/plan'
 import { useMainStore } from '~/store'
 
 export default defineComponent({
@@ -34,37 +40,32 @@ export default defineComponent({
     const store = useMainStore()
     const { plan } = setupPlanParams()
     const { currency } = setupCurrencyParams()
+    const { subscriptionId } = useSubscriptionIdParam()
     const error = ref('')
     const loading = ref(false)
     const data = ref<CryptoPayment | null>(null)
+    const router = useRouter()
 
     onMounted(async () => {
-      if (plan.value > 0 && currency.value) {
-        loading.value = true
-        const result = await store.cryptoPayment(plan.value, currency.value)
+      const selectedPlan = get(plan)
+      const selectedCurrency = get(currency)
+      if (selectedPlan > 0 && selectedCurrency) {
+        set(loading, true)
+        const subId = get(subscriptionId)
+        const result = await store.cryptoPayment(
+          selectedPlan,
+          selectedCurrency,
+          subId
+        )
         if (result.isError) {
-          error.value = result.error.message
+          set(error, result.error.message)
+        } else {
+          set(data, result.result)
         }
-        const euroPrice = plan.value * 10
-        const currencyPrice = currency.value === 'ETH' ? 3616.18 : 0.888856
-        const price = (euroPrice / currencyPrice).toFixed(4)
-        data.value = {
-          vat: 19,
-          finalPriceInEur: euroPrice.toFixed(2),
-          cryptoAddress: '0x80fF317C5989ac8416336c27237110728Ce87430',
-          tokenAddress:
-            currency.value === 'DAI'
-              ? '0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844'
-              : '',
-          finalPriceInCrypto: price,
-          months: plan.value,
-          cryptocurrency: currency.value,
-          hoursForPayment: 1,
-          startDate: '',
-        }
-        loading.value = false
+
+        set(loading, false)
       } else {
-        // todo invalid plan
+        router.push('/products')
       }
     })
 
