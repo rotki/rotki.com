@@ -69,11 +69,12 @@ export default defineComponent({
       }
     })
 
-    const isBtc = computed(() => data.value?.cryptocurrency === 'BTC')
+    const isBtc = computed(() => get(data)?.cryptocurrency === 'BTC')
 
     return {
       isBtc,
       data,
+      plan,
       error,
       loading,
     }

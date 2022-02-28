@@ -169,7 +169,7 @@ $text-color: #212529;
 }
 
 .methods {
-  @apply flex flex-row;
+  @apply flex flex-row max-w-full overflow-x-auto;
 
   > * {
     margin-left: 23px;

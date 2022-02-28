@@ -21,7 +21,7 @@
           the premium features of the application.
         </div>
 
-        <div :class="$style.section">Account</div>
+        <heading :class="$style.heading">Account</heading>
 
         <div :class="$style.inputs">
           <input-field
@@ -75,7 +75,7 @@
           />
         </div>
 
-        <div :class="$style.section">Customer Information</div>
+        <heading :class="$style.heading">Customer Information</heading>
 
         <div :class="$style.inputs">
           <input-field
@@ -107,7 +107,7 @@
           />
         </div>
 
-        <div :class="$style.section">Address</div>
+        <heading :class="$style.heading">Address</heading>
 
         <div :class="$style.inputs">
           <input-field
@@ -328,19 +328,15 @@ export default defineComponent({
   }
 }
 
-.section {
-  @apply font-serif;
-
-  margin-top: 48px;
-
-  @include text-size(24px, 32px);
-}
-
 .inputs {
   margin-top: 12px;
   > * {
     margin-top: 24px;
   }
+}
+
+.heading {
+  margin-top: 40px;
 }
 
 .checkbox {
