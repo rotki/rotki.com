@@ -49,14 +49,32 @@
         </input-field>
       </div>
     </div>
+    <plan-overview>
+      <div>{{ getPlanName(plan) }} Plan</div>
+      <div>
+        {{ data.finalPriceInEur }}€ ({{ data.finalPriceInCrypto }}
+        {{ data.cryptocurrency }})
+        <span v-if="data.vat">includes {{ data.vat }}% VAT</span>
+      </div>
+    </plan-overview>
     <div v-if="!isBtc" :class="$style.button">
+      <accept-refund-policy
+        v-model="refundPolicyAccepted"
+        :class="$style.policy"
+      />
       <action-button
-        :disabled="!metamaskSupport"
+        :disabled="!metamaskSupport || !refundPolicyAccepted"
         text="Pay with Metamask"
         @click="payWithMetamask"
       >
         <metamask-icon :class="$style.icon" />
       </action-button>
+    </div>
+    <div v-else>
+      Before proceeding with the payment please read our
+      <nuxt-link :class="$style.link" target="_blank" to="/refund-policy">
+        Refunds/Cancellation Policy
+      </nuxt-link>
     </div>
   </div>
   <div v-else :class="$style.body">
@@ -93,10 +111,12 @@ import {
 import detectEthereumProvider from '@metamask/detect-provider'
 import { ethers } from 'ethers'
 import { toCanvas } from 'qrcode'
+import { get } from '@vueuse/core'
 import { CryptoPayment, Provider } from '~/types'
 import { assert } from '~/utils/assert'
 import { logger } from '~/utils/logger'
 import { PaymentState, setupWeb3Payments } from '~/composables/crypto-payment'
+import { getPlanName } from '~/components/checkout/plan/utils'
 
 async function createPaymentQR(
   payment: CryptoPayment,
@@ -126,10 +146,15 @@ export default defineComponent({
       required: true,
       type: Object as PropType<CryptoPayment>,
     },
+    plan: {
+      required: true,
+      type: Number,
+    },
   },
   setup(props) {
     const { data } = toRefs(props)
     const metamaskSupport = ref(false)
+    const refundPolicyAccepted = ref(false)
     const canvas = ref<HTMLCanvasElement>()
     const qrText = ref('')
 
@@ -163,13 +188,14 @@ export default defineComponent({
       }
     )
 
-    const pending = computed(() => state.value !== PaymentState.NONE)
-    const done = computed(() => state.value === PaymentState.DONE)
-    const isBtc = computed(() => data.value.cryptocurrency === 'BTC')
+    const pending = computed(() => get(state) !== PaymentState.NONE)
+    const done = computed(() => get(state) === PaymentState.DONE)
+    const isBtc = computed(() => get(data).cryptocurrency === 'BTC')
 
     return {
       isBtc,
       metamaskSupport,
+      refundPolicyAccepted,
       payWithMetamask,
       copyToClipboard,
       canvas,
@@ -177,6 +203,7 @@ export default defineComponent({
       pending,
       done,
       error,
+      getPlanName,
       clearError,
     }
   },
@@ -229,5 +256,15 @@ export default defineComponent({
 
 .action-wrapper {
   @apply flex flex-row justify-center;
+}
+
+.policy {
+  margin-bottom: 24px;
+}
+
+.link {
+  @apply text-primary3;
+
+  margin-top: 24px;
 }
 </style>

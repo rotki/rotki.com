@@ -47,6 +47,7 @@ export default defineComponent({
   @apply flex flex-col justify-center text-center items-center;
 
   width: 200px;
+  min-width: 150px;
   height: 130px;
   background: 0 0 no-repeat padding-box;
   border: 1px solid;

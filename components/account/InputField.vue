@@ -105,6 +105,7 @@ import {
   toRef,
   watch,
 } from '@nuxtjs/composition-api'
+import { debouncedWatch, set } from '@vueuse/core'
 import { Country } from '~/composables/countries'
 
 export default defineComponent({
@@ -178,6 +179,7 @@ export default defineComponent({
     if (props.type === 'select') {
       watch(selection, (newValue) => emit('input', newValue))
       onMounted(() => (selection.value = value.value))
+      debouncedWatch(value, (value) => set(selection, value), { debounce: 800 })
     }
 
     const lastMessage = ref('')
@@ -262,7 +264,7 @@ export default defineComponent({
   height: 56px;
 
   & ~ label {
-    left: 16px;
+    left: 0;
   }
 
   &:focus-within ~ label {

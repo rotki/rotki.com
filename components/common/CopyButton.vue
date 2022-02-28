@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, toRefs } from '@nuxtjs/composition-api'
+import { set, useTimeoutFn } from '@vueuse/core'
 
 export default defineComponent({
   name: 'CopyButton',
@@ -25,12 +26,12 @@ export default defineComponent({
   setup(props) {
     const { value } = toRefs(props)
     const copied = ref(false)
+    const { start, stop } = useTimeoutFn(() => set(copied, false), 4000)
     const copyToClipboard = () => {
+      stop()
       navigator.clipboard.writeText(value.value)
-      copied.value = true
-      setTimeout(() => {
-        copied.value = false
-      }, 800)
+      set(copied, true)
+      start()
     }
 
     return {

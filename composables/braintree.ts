@@ -4,7 +4,9 @@ import {
   ref,
   useRoute,
   useRouter,
+  watch,
 } from '@nuxtjs/composition-api'
+import { get, set } from '@vueuse/core'
 import { useMainStore } from '~/store'
 import { CardCheckout, SelectedPlan } from '~/types'
 
@@ -14,18 +16,24 @@ export const setupBraintree = () => {
   const router = useRouter()
   const checkout = ref<CardCheckout | null>(null)
 
-  onBeforeMount(async () => {
-    const plan = parseInt(route.value.query.p as string)
+  watch(route, async (route) => await loadPlan(route.query.p as string))
+
+  async function loadPlan(months: string) {
+    const plan = parseInt(months)
     const data = await store.checkout(plan)
     if (data.isError) {
       router.back()
     } else {
-      checkout.value = data.result
+      set(checkout, data.result)
     }
+  }
+
+  onBeforeMount(async () => {
+    await loadPlan(get(route).query.p as string)
   })
 
   const plan = computed<SelectedPlan | null>(() => {
-    const payload = checkout.value
+    const payload = get(checkout)
     if (!payload) {
       return null
     }
@@ -35,7 +43,7 @@ export const setupBraintree = () => {
   })
 
   const token = computed(() => {
-    const payload = checkout.value
+    const payload = get(checkout)
     if (!payload) {
       return ''
     }
