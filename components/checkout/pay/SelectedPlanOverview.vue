@@ -1,16 +1,19 @@
 <template>
-  <div :class="$style.content">
-    <div :class="$style.title">Your Plan</div>
-    <div :class="$style.body">
-      <div :class="$style.description">
-        {{ name }} Plan. Starting from ({{ date }}) {{ plan.finalPriceInEur }}€
-        ({{ plan.priceInEur }}€
-        <span v-if="plan.vat">+ {{ plan.vat }}% VAT</span>) every
-        {{ plan.months }} months
-      </div>
-      <div :class="$style.change">Change</div>
-    </div>
-  </div>
+  <plan-overview>
+    {{ name }} Plan. Starting from ({{ date }}) {{ plan.finalPriceInEur }}€ ({{
+      plan.priceInEur
+    }}€ <span v-if="plan.vat">+ {{ plan.vat }}% VAT</span>) every
+    {{ plan.months }} months
+
+    <template #body>
+      <div :class="$style.change" @click="select">Change</div>
+      <change-plan-dialog
+        :visible="selection"
+        @cancel="selection = false"
+        @select="switchTo($event)"
+      />
+    </template>
+  </plan-overview>
 </template>
 
 <script lang="ts">
@@ -18,9 +21,13 @@ import {
   computed,
   defineComponent,
   PropType,
+  ref,
   toRefs,
+  useRouter,
 } from '@nuxtjs/composition-api'
+import { get, set } from '@vueuse/core'
 import { SelectedPlan } from '~/types'
+import { getPlanName } from '~/components/checkout/plan/utils'
 
 export default defineComponent({
   name: 'SelectedPlanOverview',
@@ -33,53 +40,44 @@ export default defineComponent({
 
   setup(props) {
     const { plan } = toRefs(props)
-    const name = computed(() => {
-      if (plan.value.months === 1) {
-        return 'Monthly'
-      } else if (plan.value.months === 12) {
-        return 'Yearly'
-      } else {
-        return `${plan.value.months}`
-      }
-    })
+    const router = useRouter()
+
+    const selection = ref(false)
+
+    const name = computed(() => getPlanName(get(plan).months))
     const date = computed(() => {
-      return new Date(plan.value.dateNow * 1000).toLocaleDateString()
+      return new Date(get(plan).dateNow * 1000).toLocaleDateString()
     })
+
+    const select = () => {
+      set(selection, true)
+    }
+
+    const switchTo = (months: number) => {
+      set(selection, false)
+      const currentRoute = router.currentRoute
+
+      router.push({
+        path: currentRoute.path,
+        query: {
+          p: months.toString(),
+        },
+      })
+    }
+
     return {
       name,
       date,
+      selection,
+      select,
+      getPlanName,
+      switchTo,
     }
   },
 })
 </script>
 
 <style lang="scss" module>
-.content {
-  margin-top: 32px;
-}
-
-.body {
-  @apply flex-row flex items-center;
-}
-
-.title {
-  @apply text-typography;
-
-  font-size: 18px;
-  line-height: 21px;
-  letter-spacing: 0;
-}
-
-.description {
-  @apply text-typography;
-
-  padding-top: 8px;
-  font-size: 15px;
-  line-height: 21px;
-  opacity: 0.78;
-  max-width: 288px;
-}
-
 .change {
   @apply font-bold;
 

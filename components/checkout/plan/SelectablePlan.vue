@@ -49,7 +49,9 @@ import {
   PropType,
   toRefs,
 } from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
 import { Plan } from '~/types'
+import { getPlanName } from '~/components/checkout/plan/utils'
 
 export default defineComponent({
   name: 'SelectablePlan',
@@ -66,21 +68,14 @@ export default defineComponent({
   emits: ['click'],
   setup(props, { emit }) {
     const { plan } = toRefs(props)
-    const name = computed(() => {
-      const months = plan.value.months
-      if (months === 1) {
-        return 'Monthly'
-      } else if (months === 12) {
-        return 'Yearly'
-      } else {
-        return `${months} Months`
-      }
+
+    const name = computed(() => getPlanName(get(plan).months))
+    const totalPrice = computed(() => get(plan).priceFiat)
+    const price = computed(() => {
+      const { months, priceFiat } = get(plan)
+      return (parseFloat(priceFiat) / months).toFixed(2)
     })
 
-    const price = computed(() =>
-      (parseFloat(plan.value.priceFiat) / plan.value.months).toFixed(2)
-    )
-    const totalPrice = computed(() => plan.value.priceFiat)
     const click = () => {
       emit('click')
     }

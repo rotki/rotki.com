@@ -124,8 +124,9 @@ export default defineComponent({
 }
 
 .container {
-  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0;
+  @apply w-screen h-screen overflow-y-hidden fixed top-0 right-0;
 
+  z-index: 101;
   transform: scaleY(0.01) scaleX(0);
   animation: unfoldIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
