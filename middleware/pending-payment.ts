@@ -10,15 +10,18 @@ export default <Middleware>async function ({ redirect }) {
     )
     if (pending.length > 0) {
       const subscription = pending[0]
-      const response = await store.checkPendingCryptoPayment(
-        subscription.identifier
-      )
+      const identifier =
+        subscription.status === 'Pending' ? undefined : subscription.identifier
+      const response = await store.checkPendingCryptoPayment(identifier)
       if (!response.isError && response.result.pending) {
-        redirect('/checkout/pay/crypto', {
+        const queryParams: { p: string; c: string; id?: string } = {
           p: subscription.durationInMonths.toString(),
-          id: subscription.identifier,
           c: response.result.currency ?? '',
-        })
+        }
+        if (identifier) {
+          queryParams.id = identifier
+        }
+        redirect('/checkout/pay/crypto', queryParams)
       }
     }
   }

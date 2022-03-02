@@ -35,7 +35,6 @@ import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'CryptoPage',
-  middleware: [],
   setup() {
     const store = useMainStore()
     const { plan } = setupPlanParams()

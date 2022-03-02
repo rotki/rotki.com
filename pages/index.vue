@@ -1,11 +1,11 @@
 <template>
   <fragment>
-    <Header />
+    <Header landing />
     <hero @download="visible = true" />
     <features @download="visible = true" />
     <premium />
     <plans @download="visible = true" />
-    <page-footer />
+    <page-footer landing />
     <download-dialog v-if="visible" @dismiss="visible = false" />
   </fragment>
 </template>
