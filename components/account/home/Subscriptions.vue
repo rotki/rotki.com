@@ -1,58 +1,63 @@
 <template>
-  <data-table
-    v-if="subscriptions.length > 0"
-    :headers="headers"
-    :items="subscriptions"
-  >
-    <template #title>Subscriptions</template>
-    <template #item="{ item }">
-      <td :class="$style.td">
-        {{ item.planName }}
-      </td>
-      <td :class="$style.td">
-        <div :class="$style.text">
-          {{ item.createdDate }}
-        </div>
-      </td>
-      <td :class="$style.td">
-        <div :class="$style.text">
-          {{ item.nextActionDate }}
-        </div>
-      </td>
-      <td :class="$style.td">
-        <div :class="$style.text">
-          {{ item.nextBillingAmount }}
-        </div>
-      </td>
-      <td :class="$style.td">
-        <span
-          :class="{
-            [$style.status]: true,
-            [$style.active]: item.status === 'Active',
-            [$style.cancelled]: item.status === 'Cancelled',
-            [$style.pending]: item.status === 'Pending',
-            [$style.pastDue]: item.status === 'Past Due',
-          }"
-        >
-          {{ item.status }}
-        </span>
-      </td>
-      <td :class="$style.action">
-        <div v-if="item.actions.length === 0">Nothing to do</div>
-        <div v-else>
-          <cancel-subscription :subscription="item" />
-          <nuxt-link
-            v-if="item.actions.includes('renew')"
-            :class="$style.actionButton"
-            :to="renewLink"
+  <div>
+    <PremiumPlaceholder
+      v-if="!hasActiveSubscription"
+      :class="$style.purchase"
+    />
+    <data-table
+      v-if="subscriptions.length > 0"
+      :headers="headers"
+      :items="subscriptions"
+    >
+      <template #title>Subscription History</template>
+      <template #item="{ item }">
+        <td :class="$style.td">
+          {{ item.planName }}
+        </td>
+        <td :class="$style.td">
+          <div :class="$style.text">
+            {{ item.createdDate }}
+          </div>
+        </td>
+        <td :class="$style.td">
+          <div :class="$style.text">
+            {{ item.nextActionDate }}
+          </div>
+        </td>
+        <td :class="$style.td">
+          <div :class="$style.text">
+            {{ item.nextBillingAmount }}
+          </div>
+        </td>
+        <td :class="$style.td">
+          <span
+            :class="{
+              [$style.status]: true,
+              [$style.active]: item.status === 'Active',
+              [$style.cancelled]: item.status === 'Cancelled',
+              [$style.pending]: item.status === 'Pending',
+              [$style.pastDue]: item.status === 'Past Due',
+            }"
           >
-            Renew
-          </nuxt-link>
-        </div>
-      </td>
-    </template>
-  </data-table>
-  <PremiumPlaceholder v-else />
+            {{ item.status }}
+          </span>
+        </td>
+        <td :class="$style.action">
+          <div v-if="item.actions.length === 0">Nothing to do</div>
+          <div v-else>
+            <cancel-subscription :subscription="item" />
+            <nuxt-link
+              v-if="item.actions.includes('renew')"
+              :class="$style.actionButton"
+              :to="renewLink"
+            >
+              Renew
+            </nuxt-link>
+          </div>
+        </td>
+      </template>
+    </data-table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -89,6 +94,11 @@ export default defineComponent({
       path: '/checkout/payment-method',
       query: {},
     })
+
+    const hasActiveSubscription = computed(() => {
+      return get(account)?.hasActiveSubscription
+    })
+
     const subscriptions = computed(() => {
       const userAccount = get(account)
       if (!userAccount) {
@@ -131,6 +141,7 @@ export default defineComponent({
       headers: subHeaders,
       subscriptions,
       renewLink,
+      hasActiveSubscription,
     }
   },
 })
@@ -173,5 +184,9 @@ export default defineComponent({
 
 .pastDue {
   @apply bg-yellow-300 text-yellow-800;
+}
+
+.purchase {
+  @apply mb-8;
 }
 </style>

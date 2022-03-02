@@ -1,7 +1,9 @@
 <template>
-  <page wide>
+  <page wide :center-vertically="false">
     <template #title> Select a Payment method </template>
-    <payment-method-selection :identifier="subscriptionIdentifier" />
+    <page-content>
+      <payment-method-selection :identifier="subscriptionIdentifier" />
+    </page-content>
   </page>
 </template>
 
@@ -28,7 +30,9 @@ export default defineComponent({
 
     const subscriptionIdentifier = computed(() => {
       const currentRoute = get(route)
-      return 'id' in currentRoute.query ? currentRoute.query.id : undefined
+      return 'id' in currentRoute.query
+        ? (currentRoute.query.id as string)
+        : undefined
     })
     return {
       subscriptionIdentifier,

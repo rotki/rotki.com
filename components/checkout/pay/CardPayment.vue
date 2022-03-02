@@ -216,7 +216,7 @@ export default defineComponent({
     token: { required: true, type: String },
     plan: { required: true, type: Object as PropType<SelectedPlan> },
   },
-  emits: ['pay'],
+  emits: ['pay', 'update:payment'],
   setup(props, { emit }) {
     const { token, plan } = toRefs(props)
     const fields = setupHostedFields()
@@ -224,7 +224,7 @@ export default defineComponent({
     const verify = ref(false)
 
     const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
-      fields.get().focus(field)
+      fields.focus(field)
     }
     const accepted = ref(false)
     const defaultStatus: FieldStatus = {
@@ -297,6 +297,11 @@ export default defineComponent({
         cvvStatus.value.valid
     )
     const paying = ref(false)
+
+    const updatePending = () => {
+      emit('update:pending', true)
+    }
+
     const submit = async () => {
       paying.value = true
       try {
@@ -308,17 +313,17 @@ export default defineComponent({
           onLookupComplete(_: any, next: any) {
             next()
           },
+          removeFrame: () => updatePending(),
           amount: parseFloat(selectedPlan.finalPriceInEur),
           nonce: token.nonce,
           bin: token.details.bin,
         }
-
         const payload = await threeDSecure.verifyCard(options)
 
         if (payload.liabilityShifted) {
           emit('pay', {
             months: plan.value.months,
-            nonce: token.nonce,
+            nonce: payload.nonce,
           })
         } else {
           logger.error('didnt shift')

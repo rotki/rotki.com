@@ -8,7 +8,7 @@ import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'Plan',
-  middleware: ['pending-payment'],
+  middleware: ['pending-payment', 'subscriber'],
   setup() {
     useMeta({
       title: 'Rotki: Select premium plan',

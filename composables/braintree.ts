@@ -15,6 +15,9 @@ export const setupBraintree = () => {
   const route = useRoute()
   const router = useRouter()
   const checkout = ref<CardCheckout | null>(null)
+  const pending = ref(false)
+  const paymentSuccess = ref(false)
+  const paymentError = ref('')
 
   watch(route, async (route) => await loadPlan(route.query.p as string))
 
@@ -57,14 +60,24 @@ export const setupBraintree = () => {
     months: number
     nonce: string
   }) => {
-    await store.pay({
+    set(pending, true)
+    const result = await store.pay({
       months,
       paymentMethodNonce: nonce,
     })
+    if (result.isError) {
+      set(paymentError, result.error.message)
+    } else {
+      set(paymentSuccess, true)
+    }
+    set(pending, false)
   }
   return {
     plan,
     token,
+    paymentSuccess,
+    paymentError,
+    pending,
     submit,
   }
 }

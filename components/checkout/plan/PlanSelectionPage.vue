@@ -1,9 +1,11 @@
 <template>
-  <page wide>
+  <page wide :center-vertically="false">
     <template #title>Select a Plan</template>
     <error-display v-if="error" title="Error" :message="error" />
-    <loader v-else-if="plans.length === 0" />
-    <plan-selection v-else :plans="plans" />
+    <loader v-else-if="plans.length === 0" full />
+    <page-content v-else>
+      <plan-selection :plans="plans" />
+    </page-content>
   </page>
 </template>
 

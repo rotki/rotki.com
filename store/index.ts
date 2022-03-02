@@ -8,6 +8,7 @@ import {
   CancelSubscriptionResponse,
   CardCheckout,
   CardCheckoutResponse,
+  CardPaymentRequest,
   ChangePasswordResponse,
   CryptoPayment,
   CryptoPaymentResponse,
@@ -279,16 +280,24 @@ export const useMainStore = defineStore('main', () => {
     }
   }
 
-  const pay = async (data: any) => {
+  const pay = async (data: CardPaymentRequest): Promise<Result<true>> => {
     try {
       await $api.post<any>(
         '/webapi/payment/btr',
         axiosSnakeCaseTransformer(data)
       )
+      getAccount().then()
+      return {
+        isError: false,
+        result: true,
+      }
     } catch (e: any) {
       logger.error(e)
+      return {
+        isError: true,
+        error: e,
+      }
     }
-    return null
   }
 
   const cryptoPayment = async (
@@ -331,7 +340,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   const checkPendingCryptoPayment = async (
-    subscriptionId: string
+    subscriptionId?: string
   ): Promise<Result<PendingCryptoPayment>> => {
     try {
       const response = await $api.get<PendingCryptoPaymentResponse>(
