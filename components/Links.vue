@@ -1,7 +1,10 @@
 <template>
   <div :class="$style.row">
     <div :class="$style.column">
-      <a :class="$style.link" href="/#features" rel="noreferrer"> Features </a>
+      <a v-if="landing" :class="$style.link" href="/#features" rel="noreferrer">
+        Features
+      </a>
+      <a v-else :class="$style.link" href="/" rel="noreferrer"> Home </a>
     </div>
     <div :class="$style.column">
       <a
@@ -42,6 +45,9 @@ import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'Links',
+  props: {
+    landing: { required: false, default: false, type: Boolean },
+  },
 })
 </script>
 

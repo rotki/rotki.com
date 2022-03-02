@@ -202,6 +202,11 @@ export type PendingCryptoPaymentResponse = z.infer<
   typeof PendingCryptoPaymentResponse
 >
 
+export type CardPaymentRequest = {
+  months: number
+  paymentMethodNonce: string
+}
+
 interface Request {
   readonly method: string
   readonly params: { [key: string]: any }[]

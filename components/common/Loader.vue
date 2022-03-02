@@ -1,5 +1,10 @@
 <template>
-  <div :class="$style.container">
+  <div
+    :class="{
+      [$style.container]: true,
+      [$style.full]: full,
+    }"
+  >
     <div :class="$style.loader">
       <svg :class="$style.circular" viewBox="25 25 50 50">
         <circle
@@ -21,12 +26,23 @@ import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'Loader',
+  props: {
+    full: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+  },
 })
 </script>
 
 <style lang="scss" module>
 .container {
   padding: 5%;
+
+  &.full {
+    @apply h-full w-full flex flex-row items-center;
+  }
 }
 
 .loader {

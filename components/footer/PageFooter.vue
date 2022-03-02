@@ -5,7 +5,7 @@
         <img alt="rotki" src="~/assets/img/logo-small.svg" />
       </div>
       <div :class="$style.links">
-        <links />
+        <links landing />
         <footer-icon-links />
       </div>
     </div>
@@ -24,6 +24,13 @@ import { defineComponent } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'PageFooter',
+  props: {
+    landing: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+  },
   setup() {
     const year = new Date().getFullYear().toString()
     return { year }

@@ -11,7 +11,7 @@
     </div>
     <slot name="subtitle" />
     <div :class="$style.links">
-      <links />
+      <links :landing="landing" />
       <slot />
     </div>
   </div>
@@ -27,6 +27,11 @@ export default defineComponent({
       required: false,
       default: false,
       type: Boolean,
+    },
+    landing: {
+      required: false,
+      type: Boolean,
+      default: false,
     },
   },
 })
