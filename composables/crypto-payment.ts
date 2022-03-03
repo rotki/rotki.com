@@ -34,10 +34,6 @@ export const setupWeb3Payments = (
   const state = ref<PaymentState>(PaymentState.NONE)
   const error = ref('')
 
-  const clearError = () => {
-    error.value = ''
-  }
-
   async function payWithEth(signer: ethers.Signer) {
     const value = ethers.utils.parseEther(data.value.finalPriceInCrypto)
     const to = data.value.cryptoAddress
@@ -104,7 +100,6 @@ export const setupWeb3Payments = (
 
   return {
     payWithMetamask,
-    clearError,
     state,
     error,
   }

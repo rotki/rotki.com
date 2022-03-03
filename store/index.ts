@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from '@nuxtjs/composition-api'
+import { get, set } from '@vueuse/core'
 import {
   Account,
   ApiError,
@@ -15,7 +16,7 @@ import {
   DeleteAccountResponse,
   PendingCryptoPayment,
   PendingCryptoPaymentResponse,
-  PremiumData,
+  Plan,
   PremiumResponse,
   Result,
   Subscription,
@@ -62,6 +63,7 @@ export type ActionResult = {
 export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false)
   const account = ref<Account | null>(null)
+  const plans = ref<Plan[] | null>(null)
   const $api = useApi()
 
   const getAccount = async () => {
@@ -244,20 +246,18 @@ export const useMainStore = defineStore('main', () => {
     }
   }
 
-  const premium = async (): Promise<Result<PremiumData>> => {
+  const getPlans = async (): Promise<void> => {
+    if (get(plans)) {
+      logger.debug('plans already loaded')
+      return
+    }
+
     try {
       const response = await $api.get<PremiumResponse>('/webapi/premium')
       const data = PremiumResponse.parse(response.data)
-      return {
-        isError: false,
-        result: data.result,
-      }
+      set(plans, data.result.plans)
     } catch (e: any) {
       logger.error(e)
-      return {
-        isError: true,
-        error: e,
-      }
     }
   }
 
@@ -385,6 +385,7 @@ export const useMainStore = defineStore('main', () => {
   return {
     authenticated,
     account,
+    plans,
     login,
     getAccount,
     changePassword,
@@ -392,7 +393,7 @@ export const useMainStore = defineStore('main', () => {
     updateProfile,
     deleteAccount,
     cancelSubscription,
-    premium,
+    getPlans,
     checkout,
     pay,
     cryptoPayment,

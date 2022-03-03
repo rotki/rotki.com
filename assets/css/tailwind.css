@@ -79,3 +79,17 @@
   url('../fonts/maven-pro-v25-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
   url('../fonts/maven-pro-v25-latin-700.svg#MavenPro') format('svg'); /* Legacy iOS */
 }
+
+/* source-serif-pro-regular - latin */
+@font-face {
+  font-family: 'Source Serif Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/source-serif-pro-v11-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+  url('../fonts/source-serif-pro-v11-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/source-serif-pro-v11-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+  url('../fonts/source-serif-pro-v11-latin-regular.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/source-serif-pro-v11-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/source-serif-pro-v11-latin-regular.svg#SourceSerifPro') format('svg'); /* Legacy iOS */
+}

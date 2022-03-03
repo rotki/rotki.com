@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
-import { asyncComputed } from '@vueuse/core'
-import { defineComponent } from '@nuxtjs/composition-api'
+import { toRefs } from '@vueuse/core'
+import { defineComponent, onMounted } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 import { getPlanName } from '~/components/checkout/plan/utils'
 
@@ -37,17 +37,12 @@ export default defineComponent({
   },
   emits: ['cancel', 'select'],
   setup(_, { emit }) {
-    const { premium } = useMainStore()
-    const plans = asyncComputed(async () => {
-      const response = await premium()
-      if (response.isError) {
-        return []
-      }
-      return response.result.plans
-    })
+    const store = useMainStore()
+    const { plans } = toRefs(store)
 
     const cancel = () => emit('cancel')
     const select = (months: number) => emit('select', months)
+    onMounted(async () => await store.getPlans())
 
     return {
       plans,
