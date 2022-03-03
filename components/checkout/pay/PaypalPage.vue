@@ -1,5 +1,5 @@
 <template>
-  <payment-frame :loading="!token">
+  <payment-frame :loading="!token" :step="step">
     <paypal-payment
       v-if="token"
       :plan="plan"
@@ -11,14 +11,14 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api'
-import { setupBraintree } from '~/composables/braintree'
+import { useBraintree } from '~/composables/braintree'
 import PaypalPayment from '~/components/checkout/pay/PaypalPayment.vue'
 
 export default defineComponent({
   name: 'PaypalPage',
   components: { PaypalPayment },
   setup() {
-    return setupBraintree()
+    return useBraintree()
   },
 })
 </script>

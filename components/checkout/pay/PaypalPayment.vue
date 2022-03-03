@@ -55,6 +55,9 @@ async function initializeBraintree(
 
   await paypalCheckout.loadPayPalSDK({
     currency: 'EUR',
+    vault: true,
+    commit: true,
+    intent: 'tokenize',
   })
 
   const paypal = window.paypal
@@ -62,10 +65,10 @@ async function initializeBraintree(
 
   paypal
     .Buttons({
-      createOrder: () => {
+      createBillingAgreement: () => {
         logger.debug(`Creating payment for ${plan.value.finalPriceInEur} EUR`)
         return paypalCheckout.createPayment({
-          flow: 'checkout' as any,
+          flow: 'vault' as any,
           amount: plan.value.finalPriceInEur,
           currency: 'EUR',
         })

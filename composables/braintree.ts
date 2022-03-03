@@ -8,9 +8,9 @@ import {
 } from '@nuxtjs/composition-api'
 import { get, set } from '@vueuse/core'
 import { useMainStore } from '~/store'
-import { CardCheckout, SelectedPlan } from '~/types'
+import { CardCheckout, PaymentStep, SelectedPlan } from '~/types'
 
-export const setupBraintree = () => {
+export const useBraintree = () => {
   const store = useMainStore()
   const route = useRoute()
   const router = useRouter()
@@ -18,6 +18,31 @@ export const setupBraintree = () => {
   const pending = ref(false)
   const paymentSuccess = ref(false)
   const paymentError = ref('')
+
+  const step = computed<PaymentStep>(() => {
+    const isPending = get(pending)
+    const isSuccess = get(paymentSuccess)
+    const isFailure = get(paymentError)
+
+    if (isPending) {
+      return {
+        type: 'pending',
+        title: 'Payment in progress',
+        message: 'Please wait while your payment is processed...',
+      }
+    } else if (isFailure) {
+      return { type: 'failure', title: 'Payment Failure', message: isFailure }
+    } else if (isSuccess) {
+      return {
+        type: 'success',
+        title: 'Payment Success',
+        message:
+          'Your payment was processed successfully. Visit the account management page to manage your account.',
+      }
+    } else {
+      return { type: 'idle' }
+    }
+  })
 
   watch(route, async (route) => await loadPlan(route.query.p as string))
 
@@ -75,8 +100,7 @@ export const setupBraintree = () => {
   return {
     plan,
     token,
-    paymentSuccess,
-    paymentError,
+    step,
     pending,
     submit,
   }

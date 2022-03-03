@@ -1,16 +1,5 @@
 <template>
-  <error-display
-    v-if="error"
-    :class="$style.body"
-    :message="error"
-    title="Error"
-  >
-    <div :class="$style['action-wrapper']">
-      <button :class="$style.action" @click="clearError">Close</button>
-    </div>
-  </error-display>
   <div
-    v-else-if="!pending"
     :class="{
       [$style.wrapper]: true,
       [$style.body]: true,
@@ -49,52 +38,24 @@
         </input-field>
       </div>
     </div>
-    <plan-overview>
-      <div>{{ getPlanName(plan) }} Plan</div>
-      <div>
-        {{ data.finalPriceInEur }}€ ({{ data.finalPriceInCrypto }}
-        {{ data.cryptocurrency }})
-        <span v-if="data.vat">includes {{ data.vat }}% VAT</span>
-      </div>
-    </plan-overview>
+    <div :class="$style.hint">
+      You can pay with metamask, your mobile wallet or manually send the exact
+      amount to the following address above. Once the whole amount is sent and
+      manually processed, then a receipt will be sent to your email and your
+      subscription will be activated.
+    </div>
     <div v-if="!isBtc" :class="$style.button">
-      <accept-refund-policy
-        v-model="refundPolicyAccepted"
-        :class="$style.policy"
-      />
-      <action-button
-        :disabled="!metamaskSupport || !refundPolicyAccepted"
-        text="Pay with Metamask"
+      <selection-button
+        :selected="false"
+        :disabled="!metamaskSupport"
         @click="payWithMetamask"
       >
-        <metamask-icon :class="$style.icon" />
-      </action-button>
+        <div :class="$style.row">
+          <metamask-icon :class="$style.icon" />
+          Pay with Metamask
+        </div>
+      </selection-button>
     </div>
-    <div v-else>
-      Before proceeding with the payment please read our
-      <nuxt-link :class="$style.link" target="_blank" to="/refund-policy">
-        Refunds/Cancellation Policy
-      </nuxt-link>
-    </div>
-  </div>
-  <div v-else :class="$style.body">
-    <pending-display
-      v-if="!done"
-      message="Please wait for the transaction to be confirmed"
-      title="Pending Transaction"
-    />
-    <success-display
-      v-else
-      message="Transaction done, you will receive an e-mail confirming the activation of
-      your subscription"
-      title="Transaction Confirmed"
-    >
-      <div :class="$style['action-wrapper']">
-        <nuxt-link :class="$style.action" to="/home">
-          Account Management
-        </nuxt-link>
-      </div>
-    </success-display>
   </div>
 </template>
 
@@ -112,7 +73,7 @@ import detectEthereumProvider from '@metamask/detect-provider'
 import { ethers } from 'ethers'
 import { toCanvas } from 'qrcode'
 import { get } from '@vueuse/core'
-import { CryptoPayment, Provider } from '~/types'
+import { CryptoPayment, IdleStep, Provider, StepType } from '~/types'
 import { assert } from '~/utils/assert'
 import { logger } from '~/utils/logger'
 import { PaymentState, setupWeb3Payments } from '~/composables/crypto-payment'
@@ -151,7 +112,8 @@ export default defineComponent({
       type: Number,
     },
   },
-  setup(props) {
+  emits: ['update:state', 'update:error'],
+  setup(props, { emit }) {
     const { data } = toRefs(props)
     const metamaskSupport = ref(false)
     const refundPolicyAccepted = ref(false)
@@ -180,16 +142,23 @@ export default defineComponent({
       navigator.clipboard.writeText(qrText.value)
     }
 
-    const { payWithMetamask, state, error, clearError } = setupWeb3Payments(
-      data,
-      () => {
-        assert(provider)
-        return provider
-      }
-    )
+    const { payWithMetamask, state, error } = setupWeb3Payments(data, () => {
+      assert(provider)
+      return provider
+    })
 
-    const pending = computed(() => get(state) !== PaymentState.NONE)
-    const done = computed(() => get(state) === PaymentState.DONE)
+    watch(error, (error) => emit('update:error', error))
+
+    watch(state, (state) => {
+      let paymentState: StepType | IdleStep = 'idle'
+      if (state === PaymentState.WAIT) {
+        paymentState = 'pending'
+      } else if (state === PaymentState.DONE) {
+        paymentState = 'success'
+      }
+      emit('update:state', paymentState)
+    })
+
     const isBtc = computed(() => get(data).cryptocurrency === 'BTC')
 
     return {
@@ -200,11 +169,7 @@ export default defineComponent({
       copyToClipboard,
       canvas,
       paymentAmount,
-      pending,
-      done,
-      error,
       getPlanName,
-      clearError,
     }
   },
 })
@@ -212,7 +177,7 @@ export default defineComponent({
 
 <style lang="scss" module>
 .wrapper {
-  @apply flex flex-col;
+  @apply flex flex-col mt-4;
 }
 
 .row {
@@ -236,7 +201,7 @@ export default defineComponent({
 }
 
 .button {
-  @apply mt-2;
+  @apply mt-4;
 }
 
 .icon {
@@ -245,26 +210,7 @@ export default defineComponent({
   margin-right: 8px;
 }
 
-.body {
-  margin-top: 48px;
-  margin-bottom: 48px;
-}
-
-.action {
-  @apply text-primary3 text-center mt-3 mb-1;
-}
-
-.action-wrapper {
-  @apply flex flex-row justify-center;
-}
-
-.policy {
-  margin-bottom: 24px;
-}
-
-.link {
-  @apply text-primary3;
-
-  margin-top: 24px;
+.hint {
+  @apply text-shade8 mt-4 mb-4;
 }
 </style>
