@@ -1,8 +1,7 @@
 <template>
   <page wide :center-vertically="false">
     <template #title>Select a Plan</template>
-    <error-display v-if="error" title="Error" :message="error" />
-    <loader v-else-if="plans.length === 0" full />
+    <loader v-if="!plans" full />
     <page-content v-else>
       <plan-selection :plans="plans" />
     </page-content>
@@ -10,35 +9,18 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  ref,
-} from '@nuxtjs/composition-api'
-import { get, set } from '@vueuse/core'
-import { PremiumData } from '~/types'
+import { defineComponent, onMounted } from '@nuxtjs/composition-api'
+import { toRefs } from '@vueuse/core'
 import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'PlanSelectionPage',
   setup() {
-    const { premium } = useMainStore()
-    const data = ref<PremiumData | null>(null)
-    const error = ref('')
-    onBeforeMount(async () => {
-      const availablePlans = await premium()
-      if (!availablePlans.isError) {
-        set(data, availablePlans.result)
-      } else {
-        set(error, availablePlans.error.message)
-      }
-    })
-
-    const plans = computed(() => get(data)?.plans ?? [])
+    const store = useMainStore()
+    const { plans } = toRefs(store)
+    onMounted(async () => await store.getPlans())
     return {
       plans,
-      error,
     }
   },
 })

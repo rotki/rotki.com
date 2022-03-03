@@ -226,3 +226,15 @@ export interface Provider {
   readonly isMetaMask?: boolean
   readonly request: (request: Request) => Promise<Permission[]>
 }
+
+export type StepType = 'pending' | 'failure' | 'success'
+export type IdleStep = 'idle'
+export type PaymentStep =
+  | {
+      type: StepType
+      title: string
+      message: string
+    }
+  | {
+      type: IdleStep
+    }

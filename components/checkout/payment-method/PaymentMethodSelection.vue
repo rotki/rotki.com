@@ -115,7 +115,7 @@ export default defineComponent({
         } else if (value === PaymentMethod.PAYPAL) {
           path = '/checkout/pay/paypal'
         } else {
-          path = '/checkout/pay/crypto'
+          path = '/checkout/request/crypto'
           query.c = PaymentMethod[value]
         }
 

@@ -67,7 +67,13 @@ export default defineComponent({
 .wrapper {
   @apply border rounded;
 
-  max-width: 600px;
+  @media only screen and (max-width: 600px) {
+    width: 100%;
+  }
+
+  @media only screen and (min-width: 601px) {
+    width: 600px;
+  }
 }
 
 .body {

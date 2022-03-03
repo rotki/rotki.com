@@ -1,9 +1,13 @@
 <template>
   <plan-overview>
-    {{ name }} Plan. Starting from ({{ date }}) {{ plan.finalPriceInEur }}€ ({{
-      plan.priceInEur
-    }}€ <span v-if="plan.vat">+ {{ plan.vat }}% VAT</span>) every
-    {{ plan.months }} months
+    <span :class="$style.plan">{{ name }} Plan.</span>
+    <span>
+      Starting from ({{ date }}) {{ plan.finalPriceInEur }}€
+      <span v-if="plan.vat">
+        ({{ plan.priceInEur }}€ + {{ plan.vat }}% VAT)
+      </span>
+    </span>
+    <span>every {{ plan.months }} months</span>
 
     <template #body>
       <div :class="$style.change" @click="select">Change</div>
@@ -35,6 +39,11 @@ export default defineComponent({
     plan: {
       required: true,
       type: Object as PropType<SelectedPlan>,
+    },
+    crypto: {
+      required: false,
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -78,6 +87,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+.plan {
+  @apply font-bold;
+}
+
 .change {
   @apply font-bold;
 

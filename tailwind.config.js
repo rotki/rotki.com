@@ -38,6 +38,7 @@ module.exports = {
         sans: ['Source Sans Pro', 'sans-serif'],
         serif: ['Maven Pro', 'serif'],
         regular: ['Maven Pro', 'serif'],
+        source: ['Source Serif Pro', 'serif'],
       },
     },
   },
