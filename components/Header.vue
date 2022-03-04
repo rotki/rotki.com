@@ -50,40 +50,18 @@ export default defineComponent({
 }
 
 .margin {
-  margin-top: 94px;
-  @include for-size(phone-only) {
-    margin-top: 42px;
-  }
-
-  @media only screen and (max-height: 750px) {
-    margin-top: 24px;
-  }
+  @apply 2xl:mt-24 mt-6;
 }
 
 .padding {
-  padding-top: 48px;
-  @include for-size(phone-only) {
-    padding-top: 42px;
-  }
-
-  @media only screen and (max-height: 750px) {
-    padding-top: 24px;
-  }
+  @apply 2xl:pt-12 pt-6;
 }
 
 .title {
-  @apply header text-primary font-serif flex-col col-auto font-bold;
-
-  @include text-size(52px, 67px);
+  @apply header text-primary font-serif flex-col col-auto font-bold text-5xl;
 }
 
 .links {
-  @apply flex flex-row justify-center;
-
-  margin-top: 50px;
-
-  @include for-size(phone-only) {
-    @include margin-x($mobile-margin * 2);
-  }
+  @apply flex flex-row justify-center mt-6 2xl:mt-12 mx-4 md:mx-auto;
 }
 </style>
