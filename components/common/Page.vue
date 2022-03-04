@@ -64,18 +64,11 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .wrapper {
-  @apply container mx-auto flex flex-col flex-grow;
-
-  min-height: 100vh;
+  @apply container mx-auto flex flex-col flex-grow min-h-screen;
 }
 
 .subtitle {
-  @apply font-sans text-primary2 font-medium;
-
-  text-align: center;
-  text-transform: uppercase;
-
-  @include text-size(16px, 20px);
+  @apply font-sans text-primary2 font-medium text-center uppercase text-base;
 }
 
 .content.center-vertically {
@@ -87,9 +80,7 @@ export default defineComponent({
 }
 
 .content {
-  @apply flex-row flex flex-grow;
-
-  height: 100%;
+  @apply flex-row flex flex-grow h-full;
 }
 
 .details.wideBody {
@@ -101,7 +92,7 @@ export default defineComponent({
 }
 
 .details {
-  max-width: 800px;
+  @apply w-full max-w-3xl;
 
   @include for-size(phone-only) {
     width: 90%;
@@ -109,22 +100,10 @@ export default defineComponent({
 }
 
 .hint {
-  align-items: center;
-  text-align: justify;
-  color: #808080;
-  bottom: 40px;
-  width: 100%;
+  @apply items-center text-justify w-full bottom-10 text-shade8 text-sm sm:p-2 sm:bottom-2;
 
   div {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 500px;
-  }
-
-  @include text-size(14px, 21px);
-  @include for-size(phone-only) {
-    bottom: $mobile-margin / 2;
-    padding: $mobile-margin / 2;
+    @apply ml-auto mr-auto max-w-lg;
   }
 }
 </style>

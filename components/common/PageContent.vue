@@ -14,6 +14,6 @@ export default defineComponent({
 
 <style lang="scss" module>
 .content {
-  @apply flex-row flex flex-grow h-full w-full mt-12;
+  @apply flex-row flex flex-grow h-full w-full mt-6 2xl:mt-12;
 }
 </style>
