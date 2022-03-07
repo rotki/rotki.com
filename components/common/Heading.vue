@@ -3,6 +3,7 @@
     :class="{
       [$style.heading]: !subheading,
       [$style.subheading]: subheading,
+      [$style.secondary]: secondary,
     }"
   >
     <slot />
@@ -20,6 +21,11 @@ export default Vue.extend({
       default: false,
       type: Boolean,
     },
+    secondary: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
   },
 })
 </script>
@@ -29,18 +35,14 @@ export default Vue.extend({
 @import '~assets/css/main';
 
 .heading {
-  @apply font-serif text-primary2 font-medium font-bold;
+  @apply font-serif text-primary2 font-bold mt-6 text-2xl;
+}
 
-  margin-top: 24px;
-
-  @include text-size(24px, 32px);
+.secondary {
+  @apply font-serif text-primary2 font-bold mt-6 text-xl;
 }
 
 .subheading {
-  @apply font-serif text-primary2 font-medium;
-
-  margin-top: 18px;
-
-  @include text-size(18px, 26px);
+  @apply font-serif text-primary2 font-medium mt-4 text-lg;
 }
 </style>
