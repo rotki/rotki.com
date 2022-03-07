@@ -5,7 +5,9 @@
     :target="sameTab ? '_self' : '_blank'"
     :rel="noReferrer ? 'noreferrer' : undefined"
   >
-    {{ display }}
+    <slot>
+      {{ display }}
+    </slot>
   </a>
 </template>
 
