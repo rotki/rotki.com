@@ -1,7 +1,5 @@
 <template>
-  <page wide>
-    <nuxt-link to="/checkout/plan"> Checkout </nuxt-link>
-  </page>
+  <products-page />
 </template>
 
 <script lang="ts">

@@ -28,7 +28,8 @@ export default defineComponent({
   props: {
     text: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     primary: {
       type: Boolean,

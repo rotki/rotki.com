@@ -4,16 +4,19 @@
     <checkout-description>
       Please select one of the following payment methods.
     </checkout-description>
-    <div :class="$style.methods">
-      <payment-method-item
-        v-for="item in paymentMethods"
-        :key="item.id"
-        :selected="isSelected(item.id)"
-        @click="select(item.id)"
-      >
-        <component :is="item.component" />
-        <template #label> {{ item.label }} </template>
-      </payment-method-item>
+    <div :class="$style.wrapper">
+      <div :class="$style.methods">
+        <payment-method-item
+          v-for="item in paymentMethods"
+          :key="item.id"
+          :class="$style.method"
+          :selected="isSelected(item.id)"
+          @click="select(item.id)"
+        >
+          <component :is="item.component" />
+          <template #label> {{ item.label }} </template>
+        </payment-method-item>
+      </div>
     </div>
     <div :class="$style.continue">
       <selection-button :disabled="!selected" selected @click="next">
@@ -165,16 +168,19 @@ export default defineComponent({
 $text-color: #212529;
 
 .content {
-  padding: 0;
+  @apply w-full;
+}
+
+.wrapper {
+  @apply flex flex-row w-full justify-center;
 }
 
 .methods {
   @apply flex flex-row max-w-full overflow-x-auto;
+}
 
-  > * {
-    margin-left: 23px;
-    margin-right: 23px;
-  }
+.method {
+  @apply mx-4;
 }
 
 .continue {

@@ -128,6 +128,6 @@ export default {
   },
 
   env: {
-    baseUrl: process.env.BASE_URL || 'https://rotki.com',
+    baseUrl: process.env.BASE_URL || '',
   },
 }
