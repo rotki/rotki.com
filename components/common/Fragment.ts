@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { assert } from '~/components/utils/assertions'
+import { assert } from '~/utils/assert'
 
 const freeze = (object: any, property: any, value: any) => {
   Object.defineProperty(object, property, {

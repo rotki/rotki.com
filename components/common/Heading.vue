@@ -3,6 +3,8 @@
     :class="{
       [$style.heading]: !subheading,
       [$style.subheading]: subheading,
+      [$style.secondary]: secondary,
+      [$style['no-margin']]: noMargin,
     }"
   >
     <slot />
@@ -10,12 +12,22 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Heading',
   props: {
     subheading: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
+    noMargin: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
+    secondary: {
       required: false,
       default: false,
       type: Boolean,
@@ -29,18 +41,28 @@ export default Vue.extend({
 @import '~assets/css/main';
 
 .heading {
-  @apply font-serif text-primary2 font-medium font-bold;
+  @apply font-serif text-primary2 font-bold text-2xl;
 
-  margin-top: 24px;
+  &:not(.no-margin) {
+    @apply mt-6;
+  }
+}
+
+.secondary {
+  @apply font-serif text-primary2 font-bold text-xl;
+
+  &:not(.no-margin) {
+    @apply mt-6;
+  }
 
   @include text-size(24px, 32px);
 }
 
 .subheading {
-  @apply font-serif text-primary2 font-medium;
+  @apply font-serif text-primary2 font-medium text-lg;
 
-  margin-top: 18px;
-
-  @include text-size(18px, 26px);
+  &:not(.no-margin) {
+    @apply mt-4;
+  }
 }
 </style>

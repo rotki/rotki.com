@@ -7,47 +7,51 @@
         <div :class="$style.hint">
           <span :class="$style.important">Important</span> Note: Creating an
           account in rotki.com is only needed to purchase a
-          <external-link url="/products" text="premium subscription" same-tab />
+          <external-link same-tab text="premium subscription" url="/products" />
           Rotki is a local application and the account you create when you use
           it is stored on your computer. This is not the same account as premium
           and credentials for one account don't work for the other. To use Rotki
           simply
           <external-link
-            url="https://github.com/rotki/rotki/releases/latest"
-            text="download"
             noreferrer
+            text="download"
+            url="https://github.com/rotki/rotki/releases/latest"
           />
           and run it. Proceed only if you intend to purchase premium and unlock
           the premium features of the application.
         </div>
 
-        <div :class="$style.section">Account</div>
+        <heading :class="$style.heading">Account</heading>
 
         <div :class="$style.inputs">
           <input-field
             id="username"
-            v-model="username"
-            label="Username"
+            v-model="state.username"
+            :error-messages="v$.username.$errors"
             hint="Required: Provide a unique username for your new account."
+            label="Username"
           />
           <input-field
             id="email"
-            v-model="email"
-            type="email"
-            label="Email"
+            v-model="state.email"
+            :error-messages="v$.email.$errors"
             hint="Required. Provide a valid email address."
+            label="Email"
+            type="email"
           />
           <input-field
             id="github"
-            v-model="github"
-            label="Github Username"
+            v-model="state.githubUsername"
+            :error-messages="v$.githubUsername.$errors"
             hint="Optional. Provide Github username for in-Github support."
+            label="Github Username"
           />
           <input-field
             id="password"
-            v-model="password"
-            type="password"
+            v-model="state.password"
+            :error-messages="v$.password.$errors"
             label="Password"
+            type="password"
           >
             <ul :class="$style.list">
               <li>
@@ -63,82 +67,103 @@
 
           <input-field
             id="password-confirmation"
-            v-model="passwordConfirmation"
-            type="password"
-            label="Password Confirmation"
+            v-model="state.confirmPassword"
+            :error-messages="v$.confirmPassword.$errors"
             hint="Enter the same password as before, for verification."
+            label="Password Confirmation"
+            type="password"
           />
         </div>
 
-        <div :class="$style.section">Customer Information</div>
+        <heading :class="$style.heading">Customer Information</heading>
 
         <div :class="$style.inputs">
           <input-field
             id="first-name"
-            v-model="firstName"
-            label="First Name"
+            v-model="state.firstName"
+            :error-messages="v$.firstName.$errors"
             hint="Required. Will only be used for invoice of payments."
+            label="First Name"
           />
           <input-field
             id="last-name"
-            v-model="lastName"
-            label="Last Name"
+            v-model="state.lastName"
+            :error-messages="v$.lastName.$errors"
             hint="Required. Will only be used for invoice of payments."
+            label="Last Name"
           />
           <input-field
             id="company-name"
-            v-model="companyName"
-            label="Company Name"
+            v-model="state.companyName"
             hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
+            label="Company Name"
           />
           <input-field
             id="vat-id"
-            v-model="vatId"
-            label="VAT ID"
+            v-model="state.vatId"
+            :error-messages="v$.vatId.$errors"
             hint="Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
+            label="VAT ID"
           />
         </div>
 
-        <div :class="$style.section">Address</div>
+        <heading :class="$style.heading">Address</heading>
 
         <div :class="$style.inputs">
           <input-field
             id="address-1"
-            v-model="address1"
-            label="Address line 1"
+            v-model="state.address1"
+            :error-messages="v$.address1.$errors"
             hint="Required. Will only be used for invoice of payments."
+            label="Address line 1"
           />
           <input-field
             id="address-2"
-            v-model="address2"
-            label="Address line 2"
+            v-model="state.address2"
+            :error-messages="v$.address2.$errors"
             hint="Optional. Additional data for the address."
+            label="Address line 2"
           />
           <input-field
             id="city"
-            v-model="city"
-            label="City"
+            v-model="state.city"
+            :error-messages="v$.city.$errors"
             hint="Required. Will only be used for invoice of payments."
+            label="City"
           />
           <input-field
             id="postal"
-            v-model="postal"
-            label="Postal code"
+            v-model="state.postcode"
+            :error-messages="v$.postcode.$errors"
             hint="Required. Will only be used for invoice of payments."
+            label="Postal code"
           />
           <input-field
             id="country"
-            v-model="country"
-            type="select"
-            label="Country"
+            v-model="state.country"
+            :error-messages="v$.country.$errors"
+            :items="countries"
             hint="Required. Will only be used for invoice of payments."
+            label="Country"
+            placeholder="Select country"
+            type="select"
           />
         </div>
 
-        <recaptcha :class="$style.recaptcha" />
+        <recaptcha
+          :class="$style.recaptcha"
+          @error="onError"
+          @expired="onExpired"
+          @success="onSuccess"
+        />
 
         <label :class="$style.termsCheck">
-          <input type="checkbox" :class="$style.checkbox" checked />
+          <input
+            :class="$style.checkbox"
+            :value="termsAccepted"
+            type="checkbox"
+            @click="termsAccepted = !termsAccepted"
+          />
           <span :class="$style.terms">
             I have read and agreed to the
             <external-link text="Terms of Service" url="/tos" />
@@ -147,25 +172,45 @@
           </span>
         </label>
 
-        <action-button primary text="Create Account" :class="$style.button" />
+        <action-button
+          :class="$style.button"
+          :disabled="!valid"
+          primary
+          text="Create Account"
+          @click="signup(state)"
+        />
       </div>
     </div>
   </page>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  Ref,
+  ref,
+  toRef,
+  useContext,
+  useRouter,
+} from '@nuxtjs/composition-api'
+import { email, minLength, required, sameAs } from '@vuelidate/validators'
+import { useVuelidate } from '@vuelidate/core'
+import { setupCSRF } from '~/composables/csrf-token'
+import { loadCountries } from '~/composables/countries'
+import { setupRecaptcha } from '~/composables/repatcha'
+import { SignupPayload } from '~/components/account/signup/types'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'SignupForm',
-  data() {
-    return {
+  setup() {
+    const state = reactive<SignupPayload>({
       username: '',
       password: '',
-      passwordConfirmation: '',
+      confirmPassword: '',
       email: '',
-      github: '',
-      confirmation: '',
+      githubUsername: '',
       firstName: '',
       lastName: '',
       companyName: '',
@@ -173,14 +218,84 @@ export default Vue.extend({
       address1: '',
       address2: '',
       city: '',
-      postal: '',
+      postcode: '',
       country: '',
+    })
+
+    const rules = {
+      username: { required },
+      password: { required, minLength: minLength(8) },
+      confirmPassword: {
+        required,
+        sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
+      },
+      email: { required, email },
+      githubUsername: {},
+      firstName: { required },
+      lastName: { required },
+      companyName: {},
+      vatId: {},
+      address1: { required },
+      address2: {},
+      city: { required },
+      postcode: { required },
+      country: { required },
+    }
+
+    const $externalResults = ref({})
+    const v$ = useVuelidate(rules, state, {
+      $autoDirty: true,
+      $externalResults,
+    })
+    const termsAccepted = ref(false)
+    const valid = computed(
+      (ctx) => !v$.value.$invalid && ctx.termsAccepted && ctx.recaptchaPassed
+    )
+    setupCSRF()
+
+    const recaptcha = setupRecaptcha()
+
+    const setupSignup = (captcha: Ref<string>, $externalResults: Ref<any>) => {
+      const { $api } = useContext()
+      const router = useRouter()
+      const signup = async (payload: SignupPayload) => {
+        const response = await $api.post(
+          '/webapi/signup/',
+          {
+            captcha: captcha.value,
+            ...payload,
+          },
+          {
+            validateStatus: (status) => [200, 400].includes(status),
+          }
+        )
+
+        if (response.data && typeof response.data.message === 'object') {
+          $externalResults.value = response.data.message
+        }
+
+        if (response.status === 200) {
+          router.push({ path: '/activation' })
+        }
+      }
+      return {
+        signup,
+      }
+    }
+    return {
+      ...loadCountries(),
+      ...recaptcha,
+      ...setupSignup(recaptcha.recaptchaToken, $externalResults),
+      valid,
+      termsAccepted,
+      state,
+      v$,
     }
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
@@ -213,19 +328,15 @@ export default Vue.extend({
   }
 }
 
-.section {
-  @apply font-serif;
-
-  margin-top: 48px;
-
-  @include text-size(24px, 32px);
-}
-
 .inputs {
   margin-top: 12px;
   > * {
     margin-top: 24px;
   }
+}
+
+.heading {
+  margin-top: 40px;
 }
 
 .checkbox {

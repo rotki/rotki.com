@@ -54,7 +54,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: [],
+  plugins: ['~/plugins/axios.ts', { ssr: false, src: '~/plugins/startup.ts' }],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: [{ path: '~/components', pathPrefix: false }],
@@ -66,6 +66,8 @@ export default {
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/composition-api/module',
+    ['@pinia/nuxt', { disableVuex: true }],
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
@@ -78,7 +80,9 @@ export default {
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    baseURL: process.env.BASE_URL,
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
@@ -98,6 +102,14 @@ export default {
       /* reCAPTCHA options */
       siteKey: process.env.RECAPTCHA_SITE_KEY, // for example
     },
+    axios: {
+      browserBaseURL: process.env.BROWSER_BASE_URL,
+    },
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL,
+    },
   },
 
   recaptcha: {
@@ -116,6 +128,6 @@ export default {
   },
 
   env: {
-    baseUrl: process.env.BASE_URL || 'https://rotki.com',
+    baseUrl: process.env.BASE_URL || '',
   },
 }

@@ -3,16 +3,18 @@
     :class="$style.link"
     :href="url"
     :target="sameTab ? '_self' : '_blank'"
-    :rel="noReferrer ? 'noreferrer' : undefined"
+    :rel="noRef ? 'noreferrer' : null"
   >
-    {{ display }}
+    <slot>
+      {{ display }}
+    </slot>
   </a>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'ExternalLink',
   props: {
     url: {
@@ -29,16 +31,18 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-    noReferrer: {
+    noRef: {
       required: false,
       type: Boolean,
       default: false,
     },
   },
-  computed: {
-    display() {
-      return this.text ? this.text : this.url
-    },
+  setup(props) {
+    const { text, url } = toRefs(props)
+    const display = computed(() => (text.value ? text.value : url.value))
+    return {
+      display,
+    }
   },
 })
 </script>

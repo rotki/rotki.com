@@ -3,27 +3,23 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
 
 const title = 'Rotki: Terms of service'
 const description =
   'The terms and conditions outline the rules and regulations for the use of rotki.com Website and all services offered in the Premium Rotki subscription.'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'TOS',
-  head: () => {
-    return {
+  setup() {
+    useMeta({
       title,
       meta: getMetadata(title, description, process.env.baseUrl + '/tos'),
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
   },
+  head: {},
 })
 </script>
 

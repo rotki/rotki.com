@@ -1,21 +1,39 @@
 <template>
   <div :class="$style.wrapper">
-    <div :class="$style.header">
+    <div
+      :class="{
+        [$style.header]: true,
+        [$style.margin]: !noMargin,
+        [$style.padding]: noMargin,
+      }"
+    >
       <div :class="$style.title">Rotki</div>
     </div>
     <slot name="subtitle" />
     <div :class="$style.links">
-      <links />
+      <links :landing="landing" />
       <slot />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Header',
+  props: {
+    noMargin: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
+    landing: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+  },
 })
 </script>
 
@@ -29,30 +47,21 @@ export default Vue.extend({
 
 .header {
   @apply flex flex-row justify-center;
+}
 
-  margin-top: 94px;
-  @include for-size(phone-only) {
-    margin-top: 42px;
-  }
+.margin {
+  @apply 2xl:mt-24 mt-6;
+}
 
-  @media only screen and (max-height: 750px) {
-    margin-top: 24px;
-  }
+.padding {
+  @apply 2xl:pt-12 pt-6;
 }
 
 .title {
-  @apply header text-primary font-serif flex-col col-auto font-bold;
-
-  @include text-size(52px, 67px);
+  @apply header text-primary font-serif flex-col col-auto font-bold text-5xl;
 }
 
 .links {
-  @apply flex flex-row justify-center;
-
-  margin-top: 50px;
-
-  @include for-size(phone-only) {
-    @include margin-x($mobile-margin * 2);
-  }
+  @apply flex flex-row justify-center mt-6 2xl:mt-12 mx-4 md:mx-auto;
 }
 </style>

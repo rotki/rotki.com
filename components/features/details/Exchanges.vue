@@ -5,9 +5,9 @@
     </template>
     <template #image>
       <img
+        :class="$style.image"
         alt="Supported Exchanges"
         src="~/assets/img/exchanges.png"
-        :class="$style.image"
       />
     </template>
     <feature-details>
@@ -23,11 +23,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Exchanges',
-  data() {
+  setup() {
     return {
       column1: ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex'],
       column2: ['FTX', 'Coinbase', 'Coinbase Pro', 'Gemini', 'Bitmex'],
@@ -36,7 +36,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

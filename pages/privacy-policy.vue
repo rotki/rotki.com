@@ -3,31 +3,27 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
 
 const title = 'Rotki: Privacy Policy'
 const description =
   'Information for the website visitors regarding our policies with the collection, use, and disclosure of Personal Information regarding the service usage'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'PrivacyPolicy',
-  head: () => {
-    return {
+  setup() {
+    useMeta({
       title,
       meta: getMetadata(
         title,
         description,
         `${process.env.baseUrl}/privacy-policy/`
       ),
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
   },
+  head: {},
 })
 </script>
 

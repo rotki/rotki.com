@@ -2,30 +2,27 @@
   <impressum-content />
 </template>
 
-<script>
-import Vue from 'vue'
-import { getMetadata } from '@/utils/metadata'
+<script lang="ts">
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '@/utils/metadata'
 
 const title = 'Rotki: Impressum'
 const description = 'Impressum - DE'
 
-export default Vue.extend({
-  head: () => {
-    return {
+export default defineComponent({
+  name: 'Impressum',
+  setup() {
+    useMeta({
       title,
       meta: getMetadata(
         title,
         description,
         `${process.env.baseUrl}/impressum/`
       ),
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
   },
+  head: {},
 })
 </script>
 

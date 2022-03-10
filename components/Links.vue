@@ -1,38 +1,39 @@
 <template>
   <div :class="$style.row">
     <div :class="$style.column">
-      <a href="/#features" :class="$style.link" rel="noreferrer"> Features </a>
+      <a v-if="landing" :class="$style.link" href="/#features" rel="noreferrer">
+        Features
+      </a>
+      <a v-else :class="$style.link" href="/" rel="noreferrer"> Home </a>
     </div>
     <div :class="$style.column">
       <a
-        href="https://rotki.readthedocs.io/en/latest/index.html"
-        target="_blank"
-        rel="noreferrer"
         :class="$style.link"
+        href="https://rotki.readthedocs.io/en/latest/index.html"
+        rel="noreferrer"
+        target="_blank"
       >
         Documentation
       </a>
     </div>
     <div :class="$style.column">
       <a
-        href="https://blog.rotki.com/"
-        target="_blank"
         :class="$style.link"
+        href="https://blog.rotki.com/"
         rel="noreferrer"
+        target="_blank"
       >
         Blog
       </a>
     </div>
     <div :class="$style.column">
-      <a :href="loginUrl" target="_self" :class="$style.link">
-        Manage Premium
-      </a>
+      <nuxt-link :class="$style.link" to="/home"> Manage Premium</nuxt-link>
     </div>
     <div :class="$style.column">
-      <NuxtLink to="/jobs" :class="$style.link"> Jobs </NuxtLink>
+      <NuxtLink :class="$style.link" to="/jobs"> Jobs </NuxtLink>
     </div>
     <div :class="$style.column">
-      <a href="mailto:info@rotki.com" target="_blank" :class="$style.link">
+      <a :class="$style.link" href="mailto:info@rotki.com" target="_blank">
         Contact
       </a>
     </div>
@@ -40,26 +41,17 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Links',
-  data() {
-    return {
-      loginUrl: '',
-    }
-  },
-  created() {
-    // https://nuxtjs.org/docs/2.x/configuration-glossary/configuration-generate#routes
-    // To work around:  ERROR  Error generating route "/login": This page could not be found.
-    new Promise<string>((resolve) => resolve('/home/')).then(
-      (url) => (this.loginUrl = url)
-    )
+  props: {
+    landing: { required: false, default: false, type: Boolean },
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media.scss';
 
 .row {

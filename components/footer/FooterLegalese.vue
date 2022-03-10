@@ -1,25 +1,25 @@
 <template>
   <div :class="$style.links">
-    <external-link same-tab url="/impressum" text="Impressum" />
-    <external-link same-tab url="/privacy-policy" text="Privacy Policy" />
-    <external-link same-tab url="/tos" text="Terms of Service" />
+    <external-link same-tab text="Impressum" url="/impressum" />
+    <external-link same-tab text="Privacy Policy" url="/privacy-policy" />
+    <external-link same-tab text="Terms of Service" url="/tos" />
     <external-link
-      url="https://rotki.readthedocs.io/en/latest/faq.html"
+      no-ref
       text="FAQ"
-      no-referrer
+      url="https://rotki.readthedocs.io/en/latest/faq.html"
     />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'FooterLegalese',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 

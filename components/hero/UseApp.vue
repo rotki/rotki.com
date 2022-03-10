@@ -2,9 +2,9 @@
   <div :class="$style.wrapper">
     <div :class="$style.col">
       <img
+        :class="$style.image"
         alt="rotki accountant"
         src="~/assets/img/accountant.svg"
-        :class="$style.image"
       />
     </div>
     <div :class="$style.column2">
@@ -20,15 +20,15 @@
   </div>
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'UseApp',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

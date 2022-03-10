@@ -37,21 +37,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import {
+  defineComponent,
+  onBeforeMount,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from '@nuxtjs/composition-api'
 
 type Section = {
   id: string
   name: string
   wide?: boolean
-}
-type Data = {
-  sticky: Boolean
-  visible: Boolean
-  active: string
-  offsetTop: number
-  premium: HTMLElement | null
-  sections: Section[]
-  offsets: { [id: string]: number }
 }
 
 const sections: Section[] = [
@@ -79,64 +76,75 @@ const sections: Section[] = [
   },
 ]
 
-export default Vue.extend({
+export default defineComponent({
   name: 'MiddleMenu',
-  data(): Data {
-    return {
-      sticky: false,
-      visible: true,
-      active: '',
-      offsetTop: 0,
-      premium: null,
-      sections,
-      offsets: {},
-    }
-  },
-  computed: {
-    sectionIds() {
-      return sections.map(({ id }) => id).reverse()
-    },
-  },
-  beforeMount() {
-    document.addEventListener('scroll', this.handleScroll)
-    this.premium = document.getElementById('premium')
-  },
-  beforeDestroy() {
-    document.removeEventListener('scroll', this.handleScroll)
-  },
-  mounted() {
-    this.offsetTop = (this.$refs.menu as HTMLElement).offsetTop
+  emits: ['sticky'],
+  setup(_, { emit }) {
+    const sticky = ref(false)
+    const visible = ref(true)
+    const active = ref('')
+    const offsetTop = ref(0)
+    const premium = ref<HTMLElement | null>(null)
+    const menu = ref<HTMLDivElement | null>(null)
+    const offsets = ref<Record<string, number>>({})
 
-    for (let i = 0; i < this.sectionIds.length; i++) {
-      const section = this.sectionIds[i]
-      const sectionElement = document.getElementById(section.replace('#', ''))
-      this.offsets[section] = sectionElement?.offsetTop ?? 0
-    }
-  },
-  methods: {
-    handleScroll() {
-      const offset = window.pageYOffset
-      const premium = this.premium as HTMLElement
-      this.sticky = offset >= this.offsetTop
-      this.visible = offset < premium.offsetTop
-      this.$emit('sticky', this.sticky)
+    const sectionIds = sections.map(({ id }) => id).reverse()
 
-      if (!this.visible && !this.sticky) {
+    const handleScroll = () => {
+      const offset = window.scrollY
+      sticky.value = offset >= offsetTop.value
+      visible.value = offset < (premium.value?.offsetTop ?? 0)
+      emit('sticky', sticky.value)
+
+      if (!visible.value && !sticky.value) {
         return
       }
 
-      for (const sectionId of this.sectionIds) {
-        if (this.offsets[sectionId] <= offset) {
-          this.active = sectionId
+      for (const sectionId of sectionIds) {
+        if (offsets.value[sectionId] <= offset) {
+          active.value = sectionId
           break
         }
       }
-    },
+    }
+
+    onMounted(() => {
+      offsetTop.value = menu.value?.offsetTop ?? 0
+
+      for (let i = 0; i < sectionIds.length; i++) {
+        const section = sectionIds[i]
+        const sectionElement = document.getElementById(section.replace('#', ''))
+        offsets.value = {
+          ...offsets.value,
+          [section]: sectionElement?.offsetTop ?? 0,
+        }
+      }
+    })
+
+    onBeforeMount(() => {
+      document.addEventListener('scroll', handleScroll)
+      premium.value = document.getElementById('premium')
+    })
+
+    onBeforeUnmount(() => {
+      document.removeEventListener('scroll', handleScroll)
+    })
+    return {
+      sticky,
+      visible,
+      active,
+      offsetTop,
+      premium,
+      menu,
+      sections,
+      sectionIds,
+      offsets: {},
+    }
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 

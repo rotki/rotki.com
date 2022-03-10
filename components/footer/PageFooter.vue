@@ -5,7 +5,7 @@
         <img alt="rotki" src="~/assets/img/logo-small.svg" />
       </div>
       <div :class="$style.links">
-        <links />
+        <links landing />
         <footer-icon-links />
       </div>
     </div>
@@ -20,97 +20,65 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'PageFooter',
-  data() {
-    return {
-      year: '2021',
-    }
+  props: {
+    landing: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
   },
-  created() {
-    this.year = new Date().getFullYear().toString()
+  setup() {
+    const year = new Date().getFullYear().toString()
+    return { year }
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 
 .wrapper {
-  @apply container mx-auto;
-
-  padding-bottom: 57px;
+  @apply container mx-auto pb-0 2xl:pb-4;
 }
 
 .row {
-  @apply flex flex-row items-end;
-
-  padding-right: $mobile-margin * 2;
-  padding-left: $mobile-margin * 2;
-
-  @include for-size(phone-only) {
-    padding-right: $mobile-margin;
-    padding-left: $mobile-margin;
-  }
+  @apply flex flex-row items-end md:px-8 px-4;
 }
 
 .secondRow {
-  @apply flex flex-row justify-between flex-wrap;
-
-  margin-top: 48px;
-  padding-right: $mobile-margin * 2;
-  padding-left: $mobile-margin * 2;
+  @apply flex flex-row justify-center md:justify-between flex-wrap mt-6 2xl:mt-12 md:px-8 px-4;
 
   > * {
-    height: 36px;
-  }
-
-  @include for-size(phone-only) {
-    @apply justify-center;
-
-    padding-right: $mobile-margin;
-    padding-left: $mobile-margin;
+    @apply h-9;
   }
 }
 
 .links {
-  @apply flex flex-row justify-between flex-wrap;
+  @apply flex flex-row md:justify-between flex-wrap w-full justify-end;
 
-  width: 100%;
-
-  > * {
-    margin-top: 8px;
-    margin-bottom: 8px;
+  &:first-child {
+    @apply hidden 2xl:visible;
   }
 
-  @include for-size(phone-only) {
-    @apply justify-end;
+  > * {
+    @apply my-2;
   }
 }
 
 .copyright {
-  @apply font-sans text-shade11 flex-row flex;
+  @apply font-sans text-shade11 md:flex-row flex text-sm flex-col w-full md:w-max text-center md:text-left my-4 md:my-0;
 
   > * {
-    padding-left: 4px;
-    padding-right: 4px;
-  }
-
-  @include text-size(14px, 20px);
-  @include for-size(phone-only) {
-    @apply flex-col text-center;
-
-    > * {
-      padding-top: 2px;
-    }
+    @apply md:px-1 pt-0.5;
   }
 }
 
 .logo {
-  margin-left: 16px;
-  margin-right: 60px;
+  @apply ml-4 mr-14;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div v-bind="$attrs" :class="$style.wrapper">
+  <div :class="$style.wrapper" v-bind="$attrs">
     <div :class="$style.content">
       <div :class="$slots.image ? $style.column1 : $style.column">
         <div :class="$style.title">
@@ -18,9 +18,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Feature',
   props: {
     id: {
@@ -31,7 +31,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
