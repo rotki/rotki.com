@@ -92,7 +92,7 @@ export default defineComponent({
 }
 
 .details {
-  @apply w-full max-w-3xl;
+  @apply w-full 2xl:max-w-5xl xl:max-w-3xl;
 
   @include for-size(phone-only) {
     width: 90%;

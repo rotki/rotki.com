@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="$style.container">
     <checkout-title>Price</checkout-title>
     <checkout-description>
       <span v-if="!vat">
@@ -10,13 +10,16 @@
     </checkout-description>
 
     <div :class="$style.selection">
-      <selectable-plan
-        v-for="plan in plans"
-        :key="plan.months"
-        :plan="plan"
-        :selected="isSelected(plan)"
-        @click="selected = plan"
-      />
+      <div :class="$style.selectable">
+        <selectable-plan
+          v-for="plan in plans"
+          :key="plan.months"
+          :class="$style.plan"
+          :plan="plan"
+          :selected="isSelected(plan)"
+          @click="selected = plan"
+        />
+      </div>
     </div>
 
     <div :class="$style.hint">
@@ -95,30 +98,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+.container {
+  @apply w-full;
+}
+
 .selection {
-  @apply flex flex-row content-between container;
+  @apply flex flex-row w-full justify-center;
 }
 
-.selection > * {
-  margin-left: 32px;
-  margin-right: 32px;
+.selectable {
+  @apply flex flex-row justify-between;
 }
 
-.text {
-  @apply text-typography;
-
-  letter-spacing: 0;
+.plan {
+  @apply mx-4;
 }
 
 .hint {
-  @apply mt-2;
-
-  height: 21px;
-  line-height: 21px;
-  font-size: 15px;
-  font-style: italic;
-
-  @extend .text;
+  @apply mt-4 text-base italic h-5 text-typography;
 }
 
 .continue {
