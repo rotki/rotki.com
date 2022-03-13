@@ -37,7 +37,7 @@ export default defineComponent({
 
 <style module lang="scss">
 .container {
-  @apply flex flex-col lg:h-52 items-center lg:mb-20 my-12 lg:mt-0 justify-between lg:flex-row;
+  @apply flex flex-col items-center lg:mb-20 my-12 lg:mt-0 justify-between lg:flex-row space-x-0 md:space-x-8 max-w-full;
 
   &.reverse {
     @apply flex-col-reverse lg:flex-row;
@@ -48,10 +48,6 @@ export default defineComponent({
   @apply flex flex-col;
 
   max-width: 40rem;
-}
-
-.left {
-  @apply mr-8;
 }
 
 .left,
@@ -66,7 +62,7 @@ export default defineComponent({
 }
 
 .title {
-  @apply font-serif text-3xl text-typography font-medium mt-4 md:mt-0;
+  @apply font-serif text-3xl text-typography font-medium mt-4 lg:mt-0;
 }
 
 .description {

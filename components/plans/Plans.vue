@@ -27,8 +27,7 @@ export default defineComponent({
 @import '~assets/css/media';
 
 .wrapper {
-  margin-top: 123px;
-  padding-bottom: 200px; // 30px with custom plan;
+  padding: 7.5rem 0;
 }
 
 .header {
@@ -43,7 +42,7 @@ export default defineComponent({
 }
 
 .basic {
-  @apply container mx-auto;
+  @apply container;
 }
 
 .content {

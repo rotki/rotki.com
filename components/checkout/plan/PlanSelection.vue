@@ -14,7 +14,6 @@
         <selectable-plan
           v-for="plan in plans"
           :key="plan.months"
-          :class="$style.plan"
           :plan="plan"
           :selected="isSelected(plan)"
           @click="selected = plan"
@@ -33,6 +32,28 @@
       <selection-button :disabled="!selected" selected @click="next">
         Continue
       </selection-button>
+    </div>
+
+    <div class="mt-8">
+      <heading secondary class="mb-4">Notes</heading>
+      <ul :class="$style.notes">
+        <li>
+          The selected payment method will be billed the total amount for the
+          subscription immediately.
+        </li>
+        <li>
+          New billing cycle starts at UTC midnight after the subscription has
+          ran out.
+        </li>
+        <li>
+          An invoice is generated for each payment and you can access it from
+          your account page.
+        </li>
+        <li>
+          Subscriptions can be canceled from the account page at any point in
+          time.
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -107,11 +128,7 @@ export default defineComponent({
 }
 
 .selectable {
-  @apply flex flex-row justify-between;
-}
-
-.plan {
-  @apply mx-4;
+  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-8;
 }
 
 .hint {
@@ -124,5 +141,9 @@ export default defineComponent({
   & > button {
     width: 180px;
   }
+}
+
+.notes {
+  @apply list-disc pl-6;
 }
 </style>

@@ -2,11 +2,7 @@
   <fragment>
     <anchor id="features" />
     <middle-menu />
-    <div
-      :class="{
-        [$style.wrapper]: true,
-      }"
-    >
+    <div :class="$style.wrapper">
       <div>
         <dashboard @download="$emit('download')" />
         <exchanges />
@@ -31,7 +27,7 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .wrapper {
-  @apply container mx-auto;
+  @apply container;
 }
 
 .last {
