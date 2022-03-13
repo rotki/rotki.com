@@ -1,8 +1,9 @@
 <template>
   <button
     :class="{
+      [$style.button]: true,
       [$style.loading]: loading,
-      [$style.button]: !small,
+      [$style.large]: !small,
       [$style.primary]: primary,
       [$style.secondary]: !primary,
       [$style.filled]: filled,
@@ -74,6 +75,29 @@ export default defineComponent({
 @import '~assets/css/media';
 @import '~assets/css/main';
 
+.button {
+  @apply relative overflow-hidden transition transform hover:scale-110;
+
+  &::after {
+    content: '';
+    width: 300px;
+    height: 300px;
+    @apply absolute z-10 left-1/2 top-1/2 bg-black bg-opacity-10 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 scale-0 rounded-full;
+  }
+
+  &:hover::after {
+    @apply scale-100;
+  }
+
+  &:disabled {
+    @apply hover:scale-100;
+
+    &::after {
+      content: unset;
+    }
+  }
+}
+
 .small {
   @apply font-sans rounded focus:outline-none px-4 bg-primary3 font-bold;
 
@@ -88,7 +112,7 @@ export default defineComponent({
   }
 }
 
-.button {
+.large {
   @apply font-serif uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
 
   $button-height: 65px;
@@ -104,14 +128,14 @@ export default defineComponent({
   }
 }
 
-.button:disabled,
+.large:disabled,
 .small:disabled {
   @apply bg-shade5 hover:bg-shade5;
 }
 
 .loading:disabled,
 .primary {
-  @apply text-white bg-primary hover:bg-shade12 font-bold;
+  @apply text-white bg-primary font-bold;
 }
 
 .warning {
@@ -127,6 +151,6 @@ export default defineComponent({
 }
 
 .row {
-  @apply inline-flex items-center align-middle;
+  @apply inline-flex items-center align-middle relative z-20;
 }
 </style>

@@ -6,7 +6,7 @@
     }"
     @click="click"
   >
-    <check-mark :selected="selected" mt="4px" />
+    <check-mark class="-mr-12" :selected="selected" mt="-18px" />
     <div
       :class="{
         [$style.emphasis]: true,
@@ -97,12 +97,10 @@ export default defineComponent({
 }
 
 .plan {
-  @apply border border-solid border flex flex-col items-center;
+  @apply border border-solid border flex flex-col items-center w-full h-full p-8;
 
   background: 0 0 no-repeat padding-box;
   border-radius: 4px;
-  width: 200px;
-  height: 300px;
   border: 1px solid;
 
   &.selected {
@@ -115,10 +113,6 @@ export default defineComponent({
     background-color: #f0f0f0;
     border-color: #d2d2d2;
   }
-}
-
-.name {
-  margin-top: 32px;
 }
 
 .emphasis {

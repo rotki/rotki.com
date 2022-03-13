@@ -334,7 +334,7 @@ export default defineComponent({
 }
 
 .label {
-  @apply font-sans absolute top-3.5 text-label;
+  @apply font-sans absolute top-4 text-label;
 
   @include text-size(14px, 20px);
 }

@@ -33,9 +33,8 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .wrapper {
-  @apply flex flex-row justify-center align-middle;
+  @apply flex flex-row justify-center align-middle mt-16 lg:mt-32;
 
-  margin-top: 129px;
   padding-right: $mobile-margin * 2;
   padding-left: $mobile-margin * 2;
 

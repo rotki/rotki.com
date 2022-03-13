@@ -38,14 +38,14 @@ export default defineComponent({
 @import '~assets/css/media';
 
 .wrapper {
-  @apply container mx-auto;
+  @apply container;
 
   margin-top: 247px;
-  padding-bottom: 400px;
+  padding-bottom: 200px;
 
   @include for-size(phone-only) {
     margin-top: 47px;
-    padding-bottom: 100px;
+    padding-bottom: 0;
   }
 }
 

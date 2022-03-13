@@ -64,7 +64,7 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .wrapper {
-  @apply container mx-auto flex flex-col flex-grow min-h-screen;
+  @apply container flex flex-col flex-grow min-h-screen px-4;
 }
 
 .subtitle {

@@ -145,23 +145,10 @@ $subtitle-line-height: 42px;
 }
 
 .description {
-  @apply flex flex-row justify-center flex-wrap;
-
-  margin-top: 127px;
+  @apply flex flex-row justify-center flex-wrap mt-16 lg:mt-32;
 
   > * {
-    padding-left: 16px;
-    padding-right: 16px;
-
-    @include for-size(phone-only) {
-      margin-top: 32px;
-    }
-  }
-
-  @include for-size(phone-only) {
-    @apply flex-wrap text-center;
-
-    margin-top: 32px;
+    @apply p-8;
   }
 }
 </style>

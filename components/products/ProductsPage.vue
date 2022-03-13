@@ -1,15 +1,15 @@
 <template>
   <page :center-vertically="false">
     <page-content>
-      <div>
-        <div :class="$style.title">Features</div>
+      <div class="w-full">
+        <div :class="$style.title">Premium Features</div>
         <div :class="$style.details">
           <product-description>
             <template #left>
               <img
-                src="~/assets/img/products/staking.svg"
-                alt="Staking"
                 :class="$style.image"
+                alt="Staking"
+                src="~/assets/img/products/staking.svg"
               />
             </template>
             <template #title>Staking</template>
@@ -20,7 +20,7 @@
           </product-description>
           <product-description>
             <template #right>
-              <img src="~/assets/img/products/crypto.svg" alt="Higher limits" />
+              <img alt="Higher limits" src="~/assets/img/products/crypto.svg" />
             </template>
             <template #title>Higher Limits</template>
             rotki has limits for multiple things that the free version can
@@ -30,7 +30,7 @@
           </product-description>
           <product-description>
             <template #left>
-              <img src="~/assets/img/products/dark.svg" alt="Customizations" />
+              <img alt="Customizations" src="~/assets/img/products/dark.svg" />
             </template>
             <template #title>Dark mode and more perks</template>
             Premium gives you access to various perks such as dark mode and
@@ -40,7 +40,7 @@
           </product-description>
           <product-description>
             <template #right>
-              <img src="~/assets/img/products/trades.svg" alt="Graphs" />
+              <img alt="Graphs" src="~/assets/img/products/trades.svg" />
             </template>
             <template #title>Graphs</template>
             Rotki premium gives you access to an array of analytics in the form
@@ -51,8 +51,8 @@
           <product-description>
             <template #left>
               <img
-                src="~/assets/img/products/sync.svg"
                 alt="Encrypted Synchronization"
+                src="~/assets/img/products/sync.svg"
               />
             </template>
             <template #title>Synchronization</template>
@@ -64,8 +64,8 @@
           <product-description>
             <template #right>
               <img
-                src="~/assets/img/products/eth@2x.png"
                 alt="DeFi protocols"
+                src="~/assets/img/products/eth@2x.png"
               />
             </template>
             <template #title>Information per DeFi protocol</template>
@@ -74,10 +74,13 @@
             positions. Analysis of your yearn vaults. Breakdown of the swaps
             made in uniswap, sushiswap, balancer and more.
           </product-description>
-          <div :class="$style.action">
-            <action-button primary @click="navigate()"
-              >Subscribe now</action-button
-            >
+          <div :class="$style.actions">
+            <action-button primary @click="goToCheckoutPlan()">
+              Subscribe now
+            </action-button>
+            <action-button @click="goToProductsDetail">
+              More Details
+            </action-button>
           </div>
         </div>
       </div>
@@ -92,24 +95,43 @@ export default defineComponent({
   name: 'ProductsPage',
   setup() {
     const router = useRouter()
-    const navigate = () => router.push('/checkout/plan')
+    const goToCheckoutPlan = () => router.push('/checkout/plan')
+    const goToProductsDetail = () => router.push('/products/detail')
     return {
-      navigate,
+      goToCheckoutPlan,
+      goToProductsDetail,
     }
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
+@import '~assets/css/media';
+@import '~assets/css/main';
+
 .title {
   @apply font-serif font-bold text-3xl text-typography;
 }
 
 .details {
-  @apply mt-16;
+  @apply flex flex-col items-center mt-16 w-full;
 }
 
-.action {
-  @apply flex flex-row justify-center mb-16;
+.actions {
+  @apply flex flex-row justify-center flex-wrap;
+
+  > * {
+    margin-right: $mobile-margin;
+    margin-left: $mobile-margin;
+
+    @include for-size(phone-only) {
+      margin-top: $mobile-margin;
+      margin-bottom: $mobile-margin;
+    }
+  }
+
+  @include for-size(phone-only) {
+    @apply flex-wrap;
+  }
 }
 </style>

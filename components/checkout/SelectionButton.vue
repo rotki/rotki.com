@@ -67,9 +67,19 @@ $color: #da4e24;
 
 .button {
   background: 0 0 no-repeat padding-box;
-  border-radius: 24px;
-  padding: 6px 16px;
   border: 1px solid $color;
+  @apply relative overflow-hidden rounded-full py-1.5 px-4;
+
+  &::after {
+    content: '';
+    width: 200px;
+    height: 200px;
+    @apply absolute z-10 left-1/2 top-1/2 bg-black bg-opacity-10 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 scale-0 rounded-full;
+  }
+
+  &:hover::after {
+    @apply scale-100;
+  }
 
   &:disabled {
     background-color: #f0f0f0 !important;
@@ -78,10 +88,22 @@ $color: #da4e24;
     & .text {
       color: #878787 !important;
     }
+
+    @apply hover:scale-100;
+
+    &::after {
+      content: unset;
+    }
   }
 
   &.selected {
     background-color: $color;
+
+    @apply hover:scale-100;
+
+    &::after {
+      content: unset;
+    }
   }
 
   &:focus {
