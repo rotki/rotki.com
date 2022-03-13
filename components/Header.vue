@@ -42,7 +42,7 @@ export default defineComponent({
 @import '~assets/css/media';
 
 .wrapper {
-  @apply container mx-auto;
+  @apply container;
 }
 
 .header {
@@ -50,7 +50,7 @@ export default defineComponent({
 }
 
 .margin {
-  @apply 2xl:mt-24 mt-6;
+  @apply 2xl:mt-24 mt-12;
 }
 
 .padding {

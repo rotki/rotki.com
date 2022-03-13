@@ -1,5 +1,5 @@
 <template>
-  <products-page />
+  <products-detail-page />
 </template>
 
 <script lang="ts">
@@ -24,7 +24,3 @@ export default defineComponent({
   head: {},
 })
 </script>
-
-<style lang="scss">
-@import '~assets/css/main';
-</style>

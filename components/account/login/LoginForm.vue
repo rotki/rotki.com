@@ -141,7 +141,7 @@ export default defineComponent({
 }
 
 .reset {
-  @apply flex flex-row justify-center text-primary focus:text-yellow-800 mt-10 mb-6;
+  @apply flex flex-row justify-center text-primary focus:text-yellow-800 my-6;
 
   width: 100%;
 
@@ -152,7 +152,7 @@ export default defineComponent({
 }
 
 .prepend {
-  @apply p-3;
+  @apply p-3 flex items-center;
 }
 
 .password {
@@ -176,7 +176,7 @@ export default defineComponent({
 }
 
 .create {
-  @apply flex flex-row align-middle justify-center mt-6 mb-8;
+  @apply flex flex-row align-middle justify-center mt-6 mb-2;
 }
 
 .signup {

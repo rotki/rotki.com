@@ -26,12 +26,12 @@ export default defineComponent({
 
 <style lang="scss" module>
 .hint {
+  @apply items-center text-justify mb-16;
+
   max-width: 500px;
-  align-items: center;
-  text-align: justify;
 }
 
 .container {
-  @apply flex flex-row align-middle justify-center w-full h-full items-center;
+  @apply flex flex-row align-middle justify-center w-full h-full items-center py-16;
 }
 </style>

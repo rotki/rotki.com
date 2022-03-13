@@ -58,7 +58,7 @@ export default defineComponent({
   @apply flex flex-row justify-around;
 
   @include for-size(phone-only) {
-    @apply flex-wrap justify-center;
+    @apply flex-wrap justify-center text-center;
 
     max-width: 100%;
   }
@@ -78,5 +78,9 @@ export default defineComponent({
 
 .link {
   @apply hover:text-shade8;
+
+  @include for-size(phone-only) {
+    @apply py-2;
+  }
 }
 </style>

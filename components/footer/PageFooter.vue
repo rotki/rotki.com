@@ -4,8 +4,10 @@
       <div :class="$style.logo">
         <img alt="rotki" src="~/assets/img/logo-small.svg" />
       </div>
-      <div :class="$style.links">
+      <div :class="$style.menus">
         <links landing />
+      </div>
+      <div :class="$style.links">
         <footer-icon-links />
       </div>
     </div>
@@ -43,11 +45,25 @@ export default defineComponent({
 @import '~assets/css/media';
 
 .wrapper {
-  @apply container mx-auto pb-0 2xl:pb-4;
+  @apply container pb-0 pb-4;
 }
 
 .row {
-  @apply flex flex-row items-end md:px-8 px-4;
+  @apply flex flex-wrap flex-col lg:flex-row items-center justify-center xl:justify-start md:px-8 px-4 space-y-8;
+}
+
+.logo {
+  @apply ml-4;
+}
+
+.menus {
+  @apply flex flex-1 mx-0 lg:mx-14;
+}
+
+.links {
+  > * {
+    @apply my-2;
+  }
 }
 
 .secondRow {
@@ -58,27 +74,11 @@ export default defineComponent({
   }
 }
 
-.links {
-  @apply flex flex-row md:justify-between flex-wrap w-full justify-end;
-
-  &:first-child {
-    @apply hidden 2xl:visible;
-  }
-
-  > * {
-    @apply my-2;
-  }
-}
-
 .copyright {
   @apply font-sans text-shade11 md:flex-row flex text-sm flex-col w-full md:w-max text-center md:text-left my-4 md:my-0;
 
   > * {
     @apply md:px-1 pt-0.5;
   }
-}
-
-.logo {
-  @apply ml-4 mr-14;
 }
 </style>

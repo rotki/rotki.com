@@ -1,14 +1,15 @@
 <template>
-  <div>
+  <div :class="$style.wrapper">
     <span @mouseenter="on" @mouseleave="off">
       <slot name="activator" />
     </span>
-    <div v-show="visible" :class="$style.tooltip">
-      <div>
-        <div :class="$style.content">
-          <slot />
-        </div>
-      </div>
+    <div
+      :class="{
+        [$style.tooltip]: true,
+        [$style.active]: visible,
+      }"
+    >
+      <slot />
     </div>
   </div>
 </template>
@@ -43,13 +44,22 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-.tooltip {
-  @apply border-0 mb-3 block z-50 font-normal leading-normal text-sm max-w-xs text-left no-underline break-words rounded-lg absolute -mt-24;
-
-  transform: translateX(-40%);
-  background: #a3a3a3;
+.wrapper {
+  @apply relative inline-block;
 }
-.content {
-  @apply text-white opacity-75 p-3 mb-0 border border-solid rounded;
+
+.tooltip {
+  @apply block z-50 font-normal leading-normal text-sm w-max max-w-xs text-left no-underline rounded-lg absolute bg-white shadow-md p-3 left-1/2 transform -translate-x-1/2 bottom-full mb-4 invisible opacity-0 transition-all;
+
+  &::after {
+    content: '';
+    border-color: white transparent transparent transparent;
+
+    @apply absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-solid;
+  }
+
+  &.active {
+    @apply visible opacity-100;
+  }
 }
 </style>

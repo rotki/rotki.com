@@ -63,7 +63,7 @@ export default defineComponent({
 }
 
 .main {
-  @apply container mx-auto;
+  @apply container;
 }
 
 .title {
