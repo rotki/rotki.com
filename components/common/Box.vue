@@ -28,21 +28,12 @@ export default defineComponent({
 @import '~assets/css/main';
 
 .box {
-  @apply border p-7 rounded-sm bg-white;
+  @apply border p-4 md:p-7 rounded-sm bg-white w-full md:w-96;
 
   box-shadow: 0 4px 8px #0003;
-  width: 392px;
-
-  @include for-size(phone-only) {
-    @apply p-6;
-
-    width: 100%;
-  }
 }
 
 .label {
-  @apply text-typography font-sans mb-4 font-bold;
-
-  @include text-size(32px, 38px);
+  @apply text-typography font-serif mb-6 font-bold text-2xl;
 }
 </style>

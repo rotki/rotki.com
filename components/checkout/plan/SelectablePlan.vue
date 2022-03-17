@@ -51,7 +51,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { get } from '@vueuse/core'
 import { Plan } from '~/types'
-import { getPlanName } from '~/components/checkout/plan/utils'
+import { getPlanName } from '~/utils/plans'
 
 export default defineComponent({
   name: 'SelectablePlan',

@@ -77,7 +77,7 @@ import { CryptoPayment, IdleStep, Provider, StepType } from '~/types'
 import { assert } from '~/utils/assert'
 import { logger } from '~/utils/logger'
 import { PaymentState, setupWeb3Payments } from '~/composables/crypto-payment'
-import { getPlanName } from '~/components/checkout/plan/utils'
+import { getPlanName } from '~/utils/plans'
 
 async function createPaymentQR(
   payment: CryptoPayment,
