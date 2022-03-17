@@ -2,50 +2,58 @@
   <page>
     <template #title> Reset your password </template>
 
-    <box v-if="!validating">
-      <template #label> Provide your new password </template>
-      <input-field
-        id="password"
-        v-model="password"
-        :error-messages="v$.password.$errors"
-        filled
-        label="Password"
-        type="password"
-      >
-        <ul :class="$style.list">
-          <li>
-            Your password can't be too similar to your other personal
-            information.
-          </li>
-          <li>Your password must contain at least 8 characters.</li>
-          <li>Your password can't be a commonly used password.</li>
+    <div :class="$style.content">
+      <loader v-if="validating" />
+      <user-action-message v-else-if="!isValid">
+        <template #header>Invalid password reset link.</template>
+        <p>
+          The link you followed doesn't seem like a valid password reset link.
+        </p>
+      </user-action-message>
+      <box v-else>
+        <template #label> Provide your new password </template>
+        <input-field
+          id="password"
+          v-model="password"
+          :error-messages="v$.password.$errors"
+          filled
+          label="Password"
+          type="password"
+        >
+          <ul :class="$style.list">
+            <li>
+              Your password can't be too similar to your other personal
+              information.
+            </li>
+            <li>Your password must contain at least 8 characters.</li>
+            <li>Your password can't be a commonly used password.</li>
 
-          <li>Your password can't be entirely numeric.</li>
-        </ul>
-      </input-field>
+            <li>Your password can't be entirely numeric.</li>
+          </ul>
+        </input-field>
 
-      <input-field
-        id="password-confirmation"
-        v-model="passwordConfirmation"
-        :class="$style.confirmation"
-        :error-messages="v$.passwordConfirmation.$errors"
-        filled
-        hint="Enter the same password as before, for verification."
-        label="Password Confirmation"
-        type="password"
-      />
-      <div :class="$style.buttonWrapper">
-        <action-button
-          :class="$style.button"
-          :disabled="!valid"
-          primary
-          small
-          text="Submit"
-          @click="submit"
+        <input-field
+          id="password-confirmation"
+          v-model="passwordConfirmation"
+          :class="$style.confirmation"
+          :error-messages="v$.passwordConfirmation.$errors"
+          filled
+          hint="Enter the same password as before, for verification."
+          label="Password Confirmation"
+          type="password"
         />
-      </div>
-    </box>
-    <div v-else />
+        <div :class="$style.buttonWrapper">
+          <action-button
+            :class="$style.button"
+            :disabled="!valid"
+            primary
+            small
+            text="Submit"
+            @click="submit"
+          />
+        </div>
+      </box>
+    </div>
   </page>
 </template>
 
@@ -62,17 +70,17 @@ import {
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { minLength, required, sameAs } from '@vuelidate/validators'
+import { set } from '@vueuse/core'
 import { setupCSRF } from '~/composables/csrf-token'
 
 function setupTokenValidation() {
   const { $api } = useContext()
   const { value } = useRoute()
-  const router = useRouter()
   const { uid, token } = value.params
-  const validating = ref(false)
+  const validating = ref(true)
+  const isValid = ref(true)
 
   async function validateToken() {
-    validating.value = true
     const response = await $api.post(
       '/webapi/password-reset/validate/',
       {
@@ -85,16 +93,14 @@ function setupTokenValidation() {
     )
 
     if (response.status === 400 || response.status === 404) {
-      router.push({
-        path: '/password/invalid-link',
-      })
-    } else {
-      validating.value = false
+      set(isValid, false)
     }
+
+    set(validating, false)
   }
 
   onMounted(async () => await validateToken())
-  return { validating }
+  return { validating, isValid }
 }
 
 function setupFormValidation(
@@ -180,11 +186,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
-
 .button {
-  margin-top: 48px;
+  @apply mt-16;
 }
 
 .buttonWrapper {
@@ -192,38 +195,26 @@ export default defineComponent({
 }
 
 .subtitle {
-  @apply font-sans text-primary2 font-medium;
-
-  font-size: 0.66rem;
-  text-align: center;
-  text-transform: uppercase;
+  @apply font-sans text-primary2 font-medium text-center uppercase text-xs;
 }
 
 .list {
-  @apply text-xs;
-
-  list-style-type: circle;
-  padding-left: $mobile-margin * 2;
-  color: #808080;
+  @apply text-xs list-disc pl-6 text-shade8;
 }
 
 .box {
-  @apply border p-6  rounded;
-
-  width: 450px;
-
-  @include for-size(phone-only) {
-    width: 100%;
-  }
+  @apply border p-6 rounded w-full lg:w-96;
 }
 
 .label {
-  @apply text-shade11 font-serif mb-4;
-
-  @include text-size(24px, 32px);
+  @apply text-shade11 font-serif mb-4 text-lg;
 }
 
 .confirmation {
   @apply mt-2;
+}
+
+.content {
+  @apply flex flex-row justify-center;
 }
 </style>

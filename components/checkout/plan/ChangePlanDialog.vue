@@ -25,7 +25,7 @@
 import { toRefs } from '@vueuse/core'
 import { defineComponent, onMounted } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
-import { getPlanName } from '~/components/checkout/plan/utils'
+import { getPlanName } from '~/utils/plans'
 
 export default defineComponent({
   name: 'PlanSwitchDialog',

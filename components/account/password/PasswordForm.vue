@@ -1,24 +1,26 @@
 <template>
   <page>
     <template #title> Reset your password </template>
-    <box>
-      <template #label> Recover password </template>
-      <input-field id="email" v-model="emailAddress" filled label="Email" />
-      <recaptcha
-        :class="$style.recaptcha"
-        @error="onError"
-        @expired="onExpired"
-        @success="onSuccess"
-      />
-      <action-button
-        :class="$style.button"
-        :disabled="!valid"
-        primary
-        small
-        text="Submit"
-        @click="reset"
-      />
-    </box>
+    <div :class="$style.content">
+      <box>
+        <template #label> Recover password </template>
+        <input-field id="email" v-model="emailAddress" filled label="Email" />
+        <recaptcha
+          :class="$style.recaptcha"
+          @error="onError"
+          @expired="onExpired"
+          @success="onSuccess"
+        />
+        <action-button
+          :class="$style.button"
+          :disabled="!valid"
+          primary
+          small
+          text="Submit"
+          @click="reset"
+        />
+      </box>
+    </div>
   </page>
 </template>
 
@@ -83,10 +85,14 @@ export default defineComponent({
 
 <style lang="scss" module>
 .button {
-  margin-top: 48px;
+  @apply mt-12;
 }
 
 .recaptcha {
-  margin-top: 16px;
+  @apply mt-4 h-20;
+}
+
+.content {
+  @apply flex flex-row justify-center;
 }
 </style>

@@ -1,15 +1,17 @@
 <template>
   <page>
     <template #title> Almost Done </template>
-    <div :class="$style.body">
-      <p :class="$style.header">Thank you for registering.</p>
-      <p>
-        To use your new rotki account you have to first confirm your e-mail.
-      </p>
-      <p>
-        Please check your mailbox and follow the instructions to activate your
-        account.
-      </p>
+    <div :class="$style.content">
+      <user-action-message>
+        <template #header>Thank you for registering.</template>
+        <p>
+          To use your new rotki account you have to first confirm your e-mail.
+        </p>
+        <p>
+          Please check your mailbox and follow the instructions to activate your
+          account.
+        </p>
+      </user-action-message>
     </div>
   </page>
 </template>
@@ -23,19 +25,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-
-.body {
-  @apply font-sans text-shade11;
-
-  height: 100%;
-
-  @include text-size(18px, 26px);
-}
-
-.header {
-  @apply font-serif text-shade11 pb-2;
-
-  @include text-size(24px, 32px);
+.content {
+  @apply flex flex-row justify-center;
 }
 </style>
