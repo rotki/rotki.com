@@ -49,6 +49,7 @@
       :class="{
         [$style.field]: true,
         [$style.filled]: filled,
+        [$style['only-text']]: !$slots.prepend,
       }"
     >
       <div :class="$style.slot">
@@ -334,9 +335,11 @@ export default defineComponent({
 }
 
 .label {
-  @apply font-sans absolute top-4 text-label;
+  @apply font-sans absolute top-4 text-label text-sm;
+}
 
-  @include text-size(14px, 20px);
+.only-text label {
+  @apply mx-2;
 }
 
 .option {
