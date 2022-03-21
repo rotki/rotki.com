@@ -1,7 +1,7 @@
 const dev = process.env.NODE_ENV !== 'production'
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
-  target: 'static',
+  target: 'server',
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
@@ -53,7 +53,8 @@ export default {
   css: [],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: ['~/plugins/axios.ts', { ssr: false, src: '~/plugins/startup.ts' }],
+  plugins: ['~/plugins/axios.ts', { ssr: true, src: '~/plugins/startup.ts' }],
+  ssr: true,
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: [{ path: '~/components', pathPrefix: false }],
