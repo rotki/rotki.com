@@ -8,7 +8,7 @@
         <exchanges />
         <defi />
         <defi-details />
-        <ProfitLossReport :class="$style.last" />
+        <profit-loss-report :class="$style.last" />
       </div>
     </div>
   </fragment>

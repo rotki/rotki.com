@@ -1,6 +1,6 @@
 <template>
   <feature id="defi">
-    <template #title> DeFi </template>
+    <template #title> {{ $t('home.defi.title') }} </template>
     <template #image>
       <img
         :class="$style.image"
@@ -9,13 +9,12 @@
       />
     </template>
     <feature-details>
-      Overview of all of your DeFi holdings in various protocols, historical
-      activity details and profit loss calculation.
+      {{ $t('home.defi.detail') }}
     </feature-details>
     <div :class="$style['list-container']">
       <item-list :list="defi" />
     </div>
-    <Caption> * This is but a subset of the supported protocols </Caption>
+    <Caption> * {{ $t('home.defi.subset_note') }}</Caption>
   </feature>
 </template>
 

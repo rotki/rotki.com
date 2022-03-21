@@ -1,6 +1,10 @@
 <template>
   <div :class="$style.container">
-    <action-button filled text="Get Premium" @click="navigateTo" />
+    <action-button
+      filled
+      :text="$tc('actions.get_premium')"
+      @click="navigateTo"
+    />
   </div>
 </template>
 
