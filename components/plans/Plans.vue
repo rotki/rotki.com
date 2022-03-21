@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.wrapper">
     <div>
-      <div :class="$style.header">Start using Rotki today!</div>
+      <div :class="$style.header">{{ $t('home.plans.title') }}</div>
     </div>
     <div :class="$style.basic">
       <div :class="$style.content">

@@ -1,5 +1,9 @@
 <template>
-  <action-button primary text="Start now for free" @click="$emit('click')" />
+  <action-button
+    primary
+    :text="$t('actions.download')"
+    @click="$emit('click')"
+  />
 </template>
 
 <script lang="ts">

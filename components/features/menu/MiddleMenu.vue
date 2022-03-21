@@ -66,12 +66,12 @@ const sections: Section[] = [
   },
   {
     id: '#defi-details',
-    name: 'Ethereum Protocols',
+    name: 'Ethereum protocols',
     wide: true,
   },
   {
     id: '#profitloss-report',
-    name: 'Profit/Loss Report',
+    name: 'Profit/loss report',
     wide: true,
   },
 ]

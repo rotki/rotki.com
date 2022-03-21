@@ -7,7 +7,7 @@
         [$style.padding]: noMargin,
       }"
     >
-      <div :class="$style.title">Rotki</div>
+      <div :class="$style.title">rotki</div>
     </div>
     <slot name="subtitle" />
     <div :class="$style.links">

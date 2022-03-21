@@ -1,6 +1,6 @@
 <template>
   <feature id="profitloss-report">
-    <template #title> Profit/Loss Report </template>
+    <template #title> {{ $t('home.profit_loss_report.title') }}</template>
     <template #image>
       <img
         :class="$style.image"
@@ -9,14 +9,9 @@
       />
     </template>
     <feature-details>
-      A profit/loss report across all the user’s assets, protocols, exchanges
-      and blockchains is created for the given time range. The results can be
-      exported into a CSV file which can later be imported to a spreadsheet or
-      shared directly with your accountant.
-    </feature-details>
-    <feature-details>
-      Profit/Loss report for free users has a transaction limit and does not
-      take into account all possible protocols.
+      <i18n path="home.profit_loss_report.detail">
+        <br />
+      </i18n>
     </feature-details>
   </feature>
 </template>

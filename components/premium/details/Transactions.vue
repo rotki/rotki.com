@@ -1,10 +1,10 @@
 <template>
   <premium-feature>
     <template #title>
-      Unlimited trades, transactions, deposits and withdrawals
+      {{ $t('home.premium_features.features.unlimited_histories.title') }}
     </template>
-    Free users have a limit on the number of transactions, deposits, withdrawals
-    and other events they can see and process. Premium users have no such limit.
+
+    {{ $t('home.premium_features.features.unlimited_histories.detail') }}
   </premium-feature>
 </template>
 <script lang="ts">

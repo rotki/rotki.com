@@ -1,7 +1,7 @@
 <template>
   <feature id="exchanges">
     <template #title>
-      Connect to a big number of centralized exchanges
+      {{ $t('home.exchanges.title') }}
     </template>
     <template #image>
       <img
@@ -11,14 +11,13 @@
       />
     </template>
     <feature-details>
-      Connect to a big number of centralized exchanges and inspect current
-      balances, historical trades, deposits and withdrawals.
+      {{ $t('home.exchanges.detail') }}
     </feature-details>
     <div :class="$style.list">
       <item-list :list="column1" />
       <item-list :list="column2" />
     </div>
-    <Caption> * This is but a subset of the supported exchanges </Caption>
+    <Caption> * {{ $t('home.exchanges.subset_note') }} </Caption>
   </feature>
 </template>
 

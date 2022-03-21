@@ -5,7 +5,7 @@
     </div>
     <div :class="$style.wrapper">
       <div>
-        <div :class="$style.title">Premium Features</div>
+        <div :class="$style.title">{{ $t('home.premium_features.title') }}</div>
       </div>
       <div :class="$style.main">
         <div :class="$style.content">

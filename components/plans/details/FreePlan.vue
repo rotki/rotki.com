@@ -1,7 +1,7 @@
 <template>
-  <plan action="Start now for free" @click="$emit('download')">
-    <template #title>Free</template>
-    Anyone can download the application and start using it for free.
+  <plan :action="$tc('actions.download')" @click="$emit('download')">
+    <template #title>{{ $t('home.plans.details.free.title') }}</template>
+    {{ $t('home.plans.details.free.subtitle') }}
     <div :class="$style.filler"></div>
   </plan>
 </template>

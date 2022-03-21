@@ -1,5 +1,4 @@
 const dev = process.env.NODE_ENV !== 'production'
-
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
   target: 'static',
@@ -77,7 +76,18 @@ export default {
     '@nuxtjs/recaptcha',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
+    '@nuxtjs/i18n',
   ],
+
+  i18n: {
+    locales: [{ code: 'en', iso: 'en-US', file: 'en.json' }],
+    defaultLocale: 'en',
+    strategy: 'no_prefix',
+    langDir: '~/locales',
+    vueI18n: {
+      fallbackLocale: 'en',
+    },
+  },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
