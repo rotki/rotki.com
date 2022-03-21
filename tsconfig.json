@@ -27,6 +27,7 @@
       "@nuxt/types",
       "@nuxtjs/axios",
       "@pinia/nuxt",
+      "@nuxtjs/i18n",
     ]
   },
   "exclude": [

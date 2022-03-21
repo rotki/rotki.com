@@ -11,12 +11,14 @@
       <div :class="$style.wrapper">
         <div :class="$style.row">
           <div :class="$style.column2">
-            <div :class="$style.title">Want a custom tailored plan?</div>
+            <div :class="$style.title">
+              {{ $t('home.plans.details.custom.title') }}
+            </div>
             <div :class="$style.description">
-              Get in touch with us to tailor the plan to your needs.
+              {{ $t('home.plans.details.custom.subtitle') }}
             </div>
             <div :class="$style.button">
-              <action-button text="Get in touch now" />
+              <action-button :text="$tc('actions.get_in_touch')" />
             </div>
           </div>
         </div>

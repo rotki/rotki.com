@@ -1,8 +1,7 @@
 <template>
-  <plan action="Get Premium plan" url="/products/">
-    <template #title>Premium</template>
-    Premium users unlock the full potential of rotki by removing all limits and
-    unlocking all features.
+  <plan :action="$tc('actions.get_premium_plan')" url="/products/">
+    <template #title>{{ $t('home.plans.details.premium.title') }}</template>
+    {{ $t('home.plans.details.premium.subtitle') }}
   </plan>
 </template>
 

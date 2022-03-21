@@ -1,9 +1,10 @@
 <template>
   <premium-feature>
-    <template #title> Defi Historical accounting, profit and loss </template>
-    See the entire list of activities you have done when interacting with a Defi
-    protocol. Get the profit/loss report for each protocol. Set watchers for
-    various protocol to be informed via email when certain conditions are met.
+    <template #title>
+      {{ $t('home.premium_features.features.premium_defi.title') }}
+    </template>
+
+    {{ $t('home.premium_features.features.premium_defi.detail') }}
   </premium-feature>
 </template>
 <script lang="ts">

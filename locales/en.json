@@ -1,0 +1,135 @@
+{
+  "actions": {
+    "download": "Start now for free",
+    "get_premium": "Get Premium",
+    "get_premium_plan": "Get Premium Plan",
+    "get_advanced_plan": "Get Advanced Plan",
+    "get_in_touch": "Get In Touch Now"
+  },
+  "home": {
+    "hero": {
+      "title": "The portfolio manager that{0}protects your privacy",
+      "motto": "rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy."
+    },
+    "advantages": {
+      "open_source": {
+        "title": "Open source",
+        "description": "rotki's source code is available to inspect, modify and enhance."
+      },
+      "local_app": {
+        "title": "Local app",
+        "description": "rotki is a local-first application with a strong focus on user privacy."
+      },
+      "own_your_data": {
+        "title": "Own your data",
+        "description": "Your financial data is kept encrypted in your system and not shared with third parties."
+      }
+    },
+    "use_app": "rotki offers tracking of all your crypto assets no matter where they are. Be it on a blockchain,{0}a DeFi protocol or on one of the supported  exchanges.",
+    "dashboard": {
+      "title": "A 360° overview of your assets",
+      "details": {
+        "asset_and_liabilities": {
+          "title": "Assets and Liabilities",
+          "description": "View all of your assets and liabilities and your exposure to each as a percentage of your net worth."
+        },
+        "net_worth_over_time": {
+          "title": "Net worth over time",
+          "description": "Users can also see a graph of how their total net worth is evolving over time. Free users are limited to the last 2 weeks."
+        }
+      }
+    },
+    "exchanges": {
+      "title": "Connect to a big number of centralized exchanges",
+      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals.",
+      "subset_note": "This is but a subset of the supported exchanges"
+    },
+    "defi": {
+      "title": "DeFi",
+      "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation.",
+      "subset_note": "This is but a subset of the supported protocols"
+    },
+    "eth_protocols": {
+      "title": "Ethereum DeFi protocol details",
+      "detail": "Details per protocol for some of the supported protocols:",
+      "protocols": {
+        "maker_dao": {
+          "title": "Maker DAO",
+          "description": "Which vaults you have open, how much you have in DSR"
+        },
+        "aave": {
+          "title": "AAVE",
+          "description": "Your current balances and liabilities"
+        },
+        "compound": {
+          "title": "Compound",
+          "description": "Your current balances and liabilities"
+        },
+        "yearn_vaults": {
+          "title": "Yearn vaults",
+          "description": "Your current balances"
+        },
+        "uniswap": {
+          "title": "Uniswap",
+          "description": "Your current LP balances, and v2 trades"
+        },
+        "balancer": {
+          "title": "Balancer",
+          "description": "Your current LP balances, and trades"
+        }
+      },
+      "watcher_note": "Premium users can set watchers for various protocols so that they can be informed via email when certain conditions are met."
+    },
+    "profit_loss_report": {
+      "title": "Profit/loss report",
+      "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.{0}{0}Profit/loss report for free users has a transaction limit and does not take into account all possible protocols."
+    },
+    "premium_features": {
+      "title": "Premium features",
+      "features": {
+        "graphs_and_statistics": {
+          "title": "Graphs and statistics",
+          "subtitle": "Premium users can visit the graphs/statistics page and get graphs for:",
+          "detail": "Premium users can visit the graphs/statistics page and get graphs for:{0}{0}Net worth over time{0}Asset amount and total asset value over time{0}Breakdown of total net worth per location{0}Breakdown of total net worth per asset"
+        },
+        "unlimited_histories": {
+          "title": "Unlimited trades, transactions, deposits and withdrawals",
+          "detail": "Free users have a limit on the number of transactions, deposits, withdrawals and other events they can see and process. Premium users have no such limit."
+        },
+        "premium_defi": {
+          "title": "DeFi historical accounting, profit and loss",
+          "detail": " See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocol to be informed via email when certain conditions are met."
+        },
+        "dex_support": {
+          "title": "Decentralized exchanges",
+          "detail": "See how much you have in each liquidity pool. All your Uniswap and Balancer LP join/exit events are shown along with the total profit/loss per pool.{0}{0}Uniswap and Balancer trades are taken into account in the tax report for premium users."
+        },
+        "premium_staking": {
+          "title": "Advanced staking",
+          "detail": "See how much of the token is staked per account.{0}What is the expected APR.{0}How much of the token you have earned by staking across all accounts.{0}{0}See a list of all your staking events with links to the corresponding transactions."
+        }
+      }
+    },
+    "plans": {
+      "title": "Start using rotki today!",
+      "details": {
+        "free": {
+          "title": "Free",
+          "subtitle": "Anyone can download the application and start using it for free."
+        },
+        "premium": {
+          "title": "Premium",
+          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features."
+        },
+        "advanced": {
+          "title": "Advanced",
+          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features."
+        },
+        "custom": {
+          "title": "Want a custom tailored plan?",
+          "subtitle": "Get in touch with us to tailor the plan to your needs."
+        }
+      }
+    }
+  }
+}

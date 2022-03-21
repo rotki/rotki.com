@@ -1,17 +1,12 @@
 <template>
   <premium-feature>
-    <template #title> Advanced Staking </template>
-    <div>
-      <div>See how much of the token is staked per account.</div>
-      <div>What is the expected APR.</div>
-      <div>
-        How much of the token you have earned by staking across all accounts.
-      </div>
-    </div>
-    <div class="mt-8">
-      See a list of all your staking events with links to the corresponding
-      transactions.
-    </div>
+    <template #title>
+      {{ $t('home.premium_features.features.premium_staking.title') }}
+    </template>
+
+    <i18n path="home.premium_features.features.premium_staking.detail">
+      <br />
+    </i18n>
   </premium-feature>
 </template>
 <script lang="ts">
