@@ -1,0 +1,10 @@
+.github
+.nuxt
+.output
+.git
+.idea
+test
+node_modules
+yarn-error.log
+.dockerignore
+.gitignore
