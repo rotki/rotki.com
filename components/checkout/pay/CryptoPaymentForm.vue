@@ -63,20 +63,16 @@
 import {
   computed,
   defineComponent,
-  onMounted,
   PropType,
   ref,
   toRefs,
   watch,
 } from '@nuxtjs/composition-api'
-import detectEthereumProvider from '@metamask/detect-provider'
 import { ethers } from 'ethers'
 import { toCanvas } from 'qrcode'
-import { get } from '@vueuse/core'
-import { CryptoPayment, IdleStep, Provider, StepType } from '~/types'
-import { assert } from '~/utils/assert'
+import { get, useClipboard } from '@vueuse/core'
+import { CryptoPayment } from '~/types'
 import { logger } from '~/utils/logger'
-import { PaymentState, setupWeb3Payments } from '~/composables/crypto-payment'
 import { getPlanName } from '~/utils/plans'
 
 async function createPaymentQR(
@@ -111,11 +107,14 @@ export default defineComponent({
       required: true,
       type: Number,
     },
+    metamaskSupport: {
+      required: true,
+      type: Boolean,
+    },
   },
-  emits: ['update:state', 'update:error'],
+  emits: ['pay'],
   setup(props, { emit }) {
     const { data } = toRefs(props)
-    const metamaskSupport = ref(false)
     const refundPolicyAccepted = ref(false)
     const canvas = ref<HTMLCanvasElement>()
     const qrText = ref('')
@@ -124,7 +123,6 @@ export default defineComponent({
       const { cryptocurrency, finalPriceInCrypto } = data.value
       return `${finalPriceInCrypto} ${cryptocurrency}`
     })
-    let provider: Provider | null = null
 
     watch(canvas, async (canvas) => {
       if (!canvas) {
@@ -133,37 +131,13 @@ export default defineComponent({
       qrText.value = await createPaymentQR(data.value, canvas)
     })
 
-    onMounted(async () => {
-      provider = (await detectEthereumProvider()) as Provider | null
-      metamaskSupport.value = !!provider
-    })
-
-    const copyToClipboard = () => {
-      navigator.clipboard.writeText(qrText.value)
-    }
-
-    const { payWithMetamask, state, error } = setupWeb3Payments(data, () => {
-      assert(provider)
-      return provider
-    })
-
-    watch(error, (error) => emit('update:error', error))
-
-    watch(state, (state) => {
-      let paymentState: StepType | IdleStep = 'idle'
-      if (state === PaymentState.WAIT) {
-        paymentState = 'pending'
-      } else if (state === PaymentState.DONE) {
-        paymentState = 'success'
-      }
-      emit('update:state', paymentState)
-    })
-
+    const { copy: copyToClipboard } = useClipboard({ source: qrText })
     const isBtc = computed(() => get(data).cryptocurrency === 'BTC')
+
+    const payWithMetamask = () => emit('pay')
 
     return {
       isBtc,
-      metamaskSupport,
       refundPolicyAccepted,
       payWithMetamask,
       copyToClipboard,

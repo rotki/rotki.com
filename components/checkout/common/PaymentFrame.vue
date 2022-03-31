@@ -111,7 +111,7 @@ export default defineComponent({
 }
 
 .content {
-  padding: 0;
+  @apply p-0 w-full;
 }
 
 .action {

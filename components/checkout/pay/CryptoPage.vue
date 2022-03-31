@@ -11,8 +11,8 @@
           v-if="data"
           :data="data"
           :plan="plan"
-          @update:state="currentState = $event"
-          @update:error="error = $event"
+          :metamask-support="metamaskSupport"
+          @pay="payWithMetamask"
         />
       </div>
     </div>
@@ -28,13 +28,16 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 import { get, set } from '@vueuse/core'
-import { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types'
+import detectEthereumProvider from '@metamask/detect-provider'
+import { CryptoPayment, PaymentStep, Provider } from '~/types'
 import {
   useCurrencyParams,
   usePlanParams,
   useSubscriptionIdParam,
 } from '~/composables/plan'
 import { useMainStore } from '~/store'
+import { setupWeb3Payments } from '~/composables/crypto-payment'
+import { assert } from '~/utils/assert'
 
 export default defineComponent({
   name: 'CryptoPage',
@@ -43,16 +46,18 @@ export default defineComponent({
     const { plan } = usePlanParams()
     const { currency } = useCurrencyParams()
     const { subscriptionId } = useSubscriptionIdParam()
-    const error = ref('')
-    const currentState = ref<StepType | IdleStep>('idle')
     const loading = ref(false)
     const data = ref<CryptoPayment | null>(null)
     const router = useRouter()
+    const metamaskSupport = ref(false)
+    let provider: Provider | null = null
 
     onMounted(async () => {
       const selectedPlan = get(plan)
       const selectedCurrency = get(currency)
       if (selectedPlan > 0 && selectedCurrency) {
+        provider = (await detectEthereumProvider()) as Provider | null
+        metamaskSupport.value = !!provider
         set(loading, true)
         const subId = get(subscriptionId)
         const result = await store.cryptoPayment(
@@ -86,12 +91,12 @@ export default defineComponent({
         return {
           type: 'pending',
           title: 'Payment in Progress',
-          message: 'Please wait for your transaction...',
+          message: 'Please confirm your transaction...',
         }
       } else if (state === 'success') {
         return {
           type: 'success',
-          title: 'Transaction Done',
+          title: 'Transaction Pending',
           message:
             'You should receive an e-mail confirming the activation of your subscription in the near future.',
         }
@@ -99,6 +104,14 @@ export default defineComponent({
         return { type: 'idle' }
       }
     })
+
+    const { payWithMetamask, state: currentState, error } = setupWeb3Payments(
+      data,
+      () => {
+        assert(provider)
+        return provider
+      }
+    )
 
     return {
       isBtc,
@@ -108,6 +121,8 @@ export default defineComponent({
       loading,
       error,
       currentState,
+      metamaskSupport,
+      payWithMetamask,
     }
   },
 })

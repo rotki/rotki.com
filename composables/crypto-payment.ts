@@ -1,7 +1,8 @@
 import { ethers } from 'ethers'
 import { ref, Ref } from '@nuxtjs/composition-api'
+import { get, set, useTimeoutFn } from '@vueuse/core'
 import { logger } from '~/utils/logger'
-import { CryptoPayment, Provider } from '~/types'
+import { CryptoPayment, IdleStep, Provider, StepType } from '~/types'
 import { assert } from '~/utils/assert'
 
 const abi = [
@@ -19,62 +20,66 @@ const abi = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ]
 
-const WAIT_CONFIRMATIONS = 1
-
-export enum PaymentState {
-  NONE,
-  WAIT,
-  DONE,
-}
-
 export const setupWeb3Payments = (
-  data: Ref<CryptoPayment>,
+  data: Ref<CryptoPayment | null>,
   getProvider: () => Provider
 ) => {
-  const state = ref<PaymentState>(PaymentState.NONE)
+  const state = ref<StepType | IdleStep>('idle')
   const error = ref('')
+  const { start, stop } = useTimeoutFn(
+    () => {
+      logger.info('change to done')
+      set(state, 'success')
+    },
+    5000,
+    { immediate: false }
+  )
 
   async function payWithEth(signer: ethers.Signer) {
-    const value = ethers.utils.parseEther(data.value.finalPriceInCrypto)
-    const to = data.value.cryptoAddress
+    stop()
+    const payment = get(data)
+    assert(payment)
+    const value = ethers.utils.parseEther(payment.finalPriceInCrypto)
+    const to = payment.cryptoAddress
     logger.info(
-      `preparing to send ${data.value.finalPriceInCrypto}(${value}) ETH to ${to}`
+      `preparing to send ${payment.finalPriceInCrypto}(${value}) ETH to ${to}`
     )
+    set(state, 'pending')
     const tx = await signer.sendTransaction({
       to,
       value,
     })
-    state.value = PaymentState.WAIT
-    logger.info(`waiting for transaction confirmation: ${tx.hash}`)
-    await tx.wait(WAIT_CONFIRMATIONS)
-    state.value = PaymentState.DONE
-    logger.info(`confirmed transaction: ${tx.hash}`)
+    logger.info(`transaction is pending: ${tx.hash}`)
+    start()
   }
 
   async function payWithDai(signer: ethers.Signer) {
+    stop()
+    const payment = get(data)
+    assert(payment)
     const {
       cryptoAddress,
       finalPriceInCrypto,
       tokenAddress: contractAddress,
-    } = data.value
+    } = payment
     assert(contractAddress)
     const contract = new ethers.Contract(contractAddress, abi, signer.provider)
     const contractWithSigner = contract.connect(signer)
     const price = ethers.utils.parseEther(finalPriceInCrypto)
     logger.info(`preparing to send ${price} DAI to ${cryptoAddress}`)
+    set(state, 'pending')
     const tx = await (contractWithSigner.transfer(
       cryptoAddress,
       price
     ) as Promise<ethers.providers.TransactionResponse>)
-    state.value = PaymentState.WAIT
-    logger.info(`waiting for transaction confirmation: ${tx.hash}`)
-    await tx.wait(WAIT_CONFIRMATIONS)
-    state.value = PaymentState.DONE
-    logger.info(`confirmed transaction: ${tx.hash}`)
+    logger.info(`transaction is pending: ${tx.hash}`)
+    start()
   }
 
   const payWithMetamask = async () => {
     try {
+      const payment = get(data)
+      assert(payment)
       const provider = getProvider()
       const accounts = await provider.request({
         method: 'eth_requestAccounts',
@@ -87,9 +92,10 @@ export const setupWeb3Payments = (
       }
       const web3Provider = new ethers.providers.Web3Provider(provider as any)
       const signer = web3Provider.getSigner()
-      if (data.value.cryptocurrency === 'ETH') {
+
+      if (payment.cryptocurrency === 'ETH') {
         await payWithEth(signer)
-      } else if (data.value.cryptocurrency === 'DAI') {
+      } else if (payment.cryptocurrency === 'DAI') {
         await payWithDai(signer)
       }
     } catch (e: any) {
