@@ -1,19 +1,21 @@
 <template>
-  <div :class="$style.wrapper">
-    <div
-      :class="{
-        [$style.header]: true,
-        [$style.error]: status === 'error',
-        [$style.success]: status === 'success',
-        [$style.neutral]: status === 'neutral',
-      }"
-    >
-      <slot name="icon" />
-    </div>
-    <div :class="$style.body">
-      <div :class="$style.title">{{ title }}</div>
-      <div :class="$style.message">{{ message }}</div>
-      <slot />
+  <div :class="$style.container">
+    <div :class="$style.wrapper">
+      <div
+        :class="{
+          [$style.header]: true,
+          [$style.error]: status === 'error',
+          [$style.success]: status === 'success',
+          [$style.neutral]: status === 'neutral',
+        }"
+      >
+        <slot name="icon" />
+      </div>
+      <div :class="$style.body">
+        <div :class="$style.title">{{ title }}</div>
+        <div :class="$style.message">{{ message }}</div>
+        <slot />
+      </div>
     </div>
   </div>
 </template>
@@ -65,7 +67,7 @@ export default defineComponent({
 }
 
 .wrapper {
-  @apply border rounded;
+  @apply border rounded mt-4;
 
   @media only screen and (max-width: 600px) {
     width: 100%;
@@ -74,6 +76,10 @@ export default defineComponent({
   @media only screen and (min-width: 601px) {
     width: 600px;
   }
+}
+
+.container {
+  @apply w-full flex flex-row justify-center;
 }
 
 .body {
