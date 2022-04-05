@@ -8,6 +8,7 @@ import { commonAttrs } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'Signup',
+  middleware: 'maintenance',
   setup() {
     useMeta({
       title: 'Rotki: Signup',

@@ -8,7 +8,7 @@ import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'PaymentMethod',
-  middleware: ['pending-payment', 'subscriber'],
+  middleware: ['maintenance', 'pending-payment', 'subscriber'],
   setup() {
     useMeta({
       title: 'Rotki: Select payment method',
