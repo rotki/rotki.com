@@ -8,7 +8,12 @@ import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'Crypto',
-  middleware: ['authentication', 'subscriber', 'pending-payment'],
+  middleware: [
+    'maintenance',
+    'authentication',
+    'subscriber',
+    'pending-payment',
+  ],
   setup() {
     useMeta({
       title: 'Rotki: Crypto Payment request',

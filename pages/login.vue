@@ -6,6 +6,8 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 
 export default defineComponent({
+  name: 'Login',
+  middleware: 'maintenance',
   setup() {
     useMeta({
       title: 'Rotki: Login',

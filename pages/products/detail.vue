@@ -13,11 +13,7 @@ export default defineComponent({
   setup() {
     useMeta({
       title,
-      meta: getMetadata(
-        title,
-        description,
-        `${process.env.BASE_URL}/products/`
-      ),
+      meta: getMetadata(title, description, `${process.env.baseUrl}/products/`),
       ...commonAttrs(),
     })
   },

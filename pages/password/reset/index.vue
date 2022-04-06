@@ -7,6 +7,7 @@ import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
+  middleware: 'maintenance',
   setup() {
     useMeta({
       title: 'Rotki: Reset Password',
