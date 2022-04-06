@@ -24,6 +24,7 @@
           <a
             :class="$style.actionButton"
             :href="`/webapi/download/receipt/${item.identifier}`"
+            target="_blank"
             download
           >
             <tooltip>

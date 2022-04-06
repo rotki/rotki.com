@@ -45,7 +45,10 @@
         <td :class="$style.action">
           <div v-if="item.actions.length === 0">Nothing to do</div>
           <div v-else>
-            <cancel-subscription :subscription="item" />
+            <cancel-subscription v-if="notPending(item)" :subscription="item" />
+            <nuxt-link v-else :class="$style.actionButton" :to="renewLink">
+              Details
+            </nuxt-link>
             <nuxt-link
               v-if="item.actions.includes('renew')"
               :class="$style.actionButton"
@@ -73,6 +76,7 @@ import CancelSubscription from '~/components/account/home/CancelSubscription.vue
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 import { useMainStore } from '~/store'
 import PremiumPlaceholder from '~/components/account/home/PremiumPlaceholder.vue'
+import { Subscription } from '~/types'
 
 const subHeaders: DataTableHeader[] = [
   { text: 'Plan', value: '' },
@@ -140,7 +144,12 @@ export default defineComponent({
       }
     })
 
+    const notPending = (sub: Subscription) => {
+      return sub.status !== 'Pending'
+    }
+
     return {
+      notPending,
       headers: subHeaders,
       subscriptions,
       renewLink,

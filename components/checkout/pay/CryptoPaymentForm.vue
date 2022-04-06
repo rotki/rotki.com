@@ -43,6 +43,15 @@
       amount to the following address above. Once the whole amount is sent and
       manually processed, then a receipt will be sent to your email and your
       subscription will be activated.
+
+      <div :class="$style.info">
+        If you already have a made a transaction you don't need to do anything
+        more.
+        <div>
+          You will be notified about your subscription via e-mail as soon as
+          your transaction is confirmed.
+        </div>
+      </div>
     </div>
     <div v-if="!isBtc" :class="$style.button">
       <selection-button
@@ -186,5 +195,9 @@ export default defineComponent({
 
 .hint {
   @apply text-shade8 mt-4 mb-4;
+}
+
+.info {
+  @apply font-bold mt-3;
 }
 </style>
