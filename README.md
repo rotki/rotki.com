@@ -31,6 +31,12 @@ And input the RECAPTCHA public key there.
 RECAPTCHA_SITE_KEY=XXXX
 ```
 
+if you are running behing an https proxy make sure to also add
+```
+BASE_URL=https://localhost
+NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
 Run with
 
 ```bash

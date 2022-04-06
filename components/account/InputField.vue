@@ -1,51 +1,6 @@
 <template>
   <div :class="$style.wrapper">
     <div
-      v-if="type === 'select'"
-      :class="{
-        [$style.field]: true,
-        [$style.filled]: filled,
-      }"
-    >
-      <div :class="$style.inputContainer">
-        <select
-          :id="id"
-          ref="inputField"
-          v-model="selection"
-          :class="$style.input"
-          :disabled="disabled"
-          @input="input($event)"
-        >
-          <option v-if="disabled" :class="$style.option" disabled selected>
-            <span>{{ selection }}</span>
-          </option>
-          <option v-if="placeholder" :class="$style.option" disabled selected>
-            {{ placeholder }}
-          </option>
-          <option
-            v-for="country in items"
-            :key="country.code"
-            :class="$style.option"
-            :value="country.code"
-          >
-            <span>{{ getFlagEmoji(country.code) }}</span>
-            <span>{{ country.name }}</span>
-          </option>
-        </select>
-        <label
-          v-if="label"
-          :class="{
-            [$style.label]: true,
-            [$style.select]: true,
-          }"
-          :for="id"
-        >
-          {{ label }}</label
-        >
-      </div>
-    </div>
-    <div
-      v-else
       :class="{
         [$style.field]: true,
         [$style.filled]: filled,
@@ -100,14 +55,10 @@
 import {
   computed,
   defineComponent,
-  onMounted,
-  PropType,
   ref,
   toRef,
   watch,
 } from '@nuxtjs/composition-api'
-import { debouncedWatch, set } from '@vueuse/core'
-import { Country } from '~/composables/countries'
 
 export default defineComponent({
   name: 'InputField',
@@ -145,11 +96,6 @@ export default defineComponent({
       default: () => [],
       required: false,
     },
-    items: {
-      type: Array as PropType<Country[]>,
-      required: false,
-      default: () => [],
-    },
     readonly: {
       required: false,
       type: Boolean,
@@ -177,12 +123,6 @@ export default defineComponent({
       }
     }
     const value = toRef(props, 'value')
-    if (props.type === 'select') {
-      watch(selection, (newValue) => emit('input', newValue))
-      onMounted(() => (selection.value = value.value))
-      debouncedWatch(value, (value) => set(selection, value), { debounce: 800 })
-    }
-
     const lastMessage = ref('')
     watch(toRef(props, 'errorMessages'), (value) => {
       if (
@@ -199,19 +139,10 @@ export default defineComponent({
       return !currentValue || currentValue.trim().length === 0
     })
 
-    const getFlagEmoji = (code: string) => {
-      const codePoints = code
-        .toUpperCase()
-        .split('')
-        .map((char) => 127397 + char.charCodeAt(0))
-      return String.fromCodePoint(...codePoints)
-    }
-
     return {
       selection,
       inputField,
       isEmpty,
-      getFlagEmoji,
       input,
       enter: () => emit('enter'),
     }
@@ -240,10 +171,6 @@ export default defineComponent({
 
     transform-origin: 0 0;
     left: 16px;
-
-    &.select {
-      @apply top-4;
-    }
   }
 
   &:focus-within ~ label {
@@ -340,9 +267,5 @@ export default defineComponent({
 
 .only-text label {
   @apply mx-2;
-}
-
-.option {
-  @apply py-2 px-2;
 }
 </style>

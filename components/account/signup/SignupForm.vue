@@ -138,15 +138,14 @@
             hint="Required. Will only be used for invoice of payments."
             label="Postal code"
           />
-          <input-field
+
+          <country-select
             id="country"
             v-model="state.country"
             :error-messages="v$.country.$errors"
-            :items="countries"
+            :countries="countries"
             hint="Required. Will only be used for invoice of payments."
             label="Country"
-            placeholder="Select country"
-            type="select"
           />
         </div>
 

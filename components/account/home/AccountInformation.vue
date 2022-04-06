@@ -76,17 +76,17 @@
       hint="Required. Will only be used for invoice of payments."
       label="Postal code"
     />
-    <input-field
+
+    <country-select
       id="country"
       v-model="state.country"
+      :countries="countries"
       :disabled="movedOffline"
       :error-messages="v$.country.$errors"
-      :items="countries"
       hint="Required. Will only be used for invoice of payments."
       label="Country"
-      placeholder="Select country"
-      type="select"
     />
+
     <action-button
       :class="$style.confirm"
       :loading="loading"
