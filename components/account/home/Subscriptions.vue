@@ -96,7 +96,10 @@ export default defineComponent({
     })
 
     const hasActiveSubscription = computed(() => {
-      return get(account)?.hasActiveSubscription
+      const pending = get(subscriptions).filter(
+        (sub) => sub.status === 'Pending'
+      )
+      return get(account)?.hasActiveSubscription || pending.length > 0
     })
 
     const subscriptions = computed(() => {
