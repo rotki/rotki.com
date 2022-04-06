@@ -23,6 +23,7 @@ import {
   toRefs,
   useRouter,
 } from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
 import { useMainStore } from '~/store'
 
 export default defineComponent({
@@ -32,10 +33,11 @@ export default defineComponent({
     // pinia#852
     const { account } = toRefs(store)
     const premium = computed(() => {
-      return account.value?.canUsePremium ?? false
+      return get(account)?.hasActiveSubscription ?? false
     })
+
     const username = computed(() => {
-      return account.value?.username
+      return get(account)?.username
     })
 
     onMounted(async () => await store.getAccount())

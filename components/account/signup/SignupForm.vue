@@ -30,6 +30,7 @@
             :error-messages="v$.username.$errors"
             hint="Required: Provide a unique username for your new account."
             label="Username"
+            @blur="v$.username.$touch()"
           />
           <input-field
             id="email"
@@ -38,6 +39,7 @@
             hint="Required. Provide a valid email address."
             label="Email"
             type="email"
+            @blur="v$.email.$touch()"
           />
           <input-field
             id="github"
@@ -45,6 +47,7 @@
             :error-messages="v$.githubUsername.$errors"
             hint="Optional. Provide Github username for in-Github support."
             label="Github Username"
+            @blur="v$.githubUsername.$touch()"
           />
           <input-field
             id="password"
@@ -52,6 +55,7 @@
             :error-messages="v$.password.$errors"
             label="Password"
             type="password"
+            @blur="v$.password.$touch()"
           >
             <ul :class="$style.list">
               <li>
@@ -72,6 +76,7 @@
             hint="Enter the same password as before, for verification."
             label="Password Confirmation"
             type="password"
+            @blur="v$.confirmPassword.$touch()"
           />
         </div>
 
@@ -84,6 +89,7 @@
             :error-messages="v$.firstName.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="First Name"
+            @blur="v$.firstName.$touch()"
           />
           <input-field
             id="last-name"
@@ -91,12 +97,14 @@
             :error-messages="v$.lastName.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Last Name"
+            @blur="v$.lastName.$touch()"
           />
           <input-field
             id="company-name"
             v-model="state.companyName"
             hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
             label="Company Name"
+            @blur="v$.companyName.$touch()"
           />
           <input-field
             id="vat-id"
@@ -104,6 +112,7 @@
             :error-messages="v$.vatId.$errors"
             hint="Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
             label="VAT ID"
+            @blur="v$.vatId.$touch()"
           />
         </div>
 
@@ -116,6 +125,7 @@
             :error-messages="v$.address1.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Address line 1"
+            @blur="v$.address1.$touch()"
           />
           <input-field
             id="address-2"
@@ -123,6 +133,7 @@
             :error-messages="v$.address2.$errors"
             hint="Optional. Additional data for the address."
             label="Address line 2"
+            @blur="v$.address2.$touch()"
           />
           <input-field
             id="city"
@@ -130,6 +141,7 @@
             :error-messages="v$.city.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="City"
+            @blur="v$.city.$touch()"
           />
           <input-field
             id="postal"
@@ -137,16 +149,17 @@
             :error-messages="v$.postcode.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Postal code"
+            @blur="v$.postcode.$touch()"
           />
-          <input-field
+
+          <country-select
             id="country"
             v-model="state.country"
             :error-messages="v$.country.$errors"
-            :items="countries"
+            :countries="countries"
             hint="Required. Will only be used for invoice of payments."
             label="Country"
-            placeholder="Select country"
-            type="select"
+            @blur="v$.country.$touch()"
           />
         </div>
 
@@ -173,8 +186,8 @@
         </label>
 
         <action-button
+          :disabled="!termsAccepted || !recaptchaPassed"
           :class="$style.button"
-          :disabled="!valid"
           primary
           text="Create Account"
           @click="signup(state)"
@@ -186,7 +199,6 @@
 
 <script lang="ts">
 import {
-  computed,
   defineComponent,
   reactive,
   Ref,
@@ -197,6 +209,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { email, minLength, required, sameAs } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
+import { get } from '@vueuse/core'
 import { setupCSRF } from '~/composables/csrf-token'
 import { loadCountries } from '~/composables/countries'
 import { setupRecaptcha } from '~/composables/repatcha'
@@ -248,9 +261,6 @@ export default defineComponent({
       $externalResults,
     })
     const termsAccepted = ref(false)
-    const valid = computed(
-      (ctx) => !v$.value.$invalid && ctx.termsAccepted && ctx.recaptchaPassed
-    )
     setupCSRF()
 
     const recaptcha = setupRecaptcha()
@@ -259,6 +269,12 @@ export default defineComponent({
       const { $api } = useContext()
       const router = useRouter()
       const signup = async (payload: SignupPayload) => {
+        const isValid = await get(v$).$validate()
+
+        if (!isValid) {
+          return
+        }
+
         const response = await $api.post(
           '/webapi/signup/',
           {
@@ -286,7 +302,6 @@ export default defineComponent({
       ...loadCountries(),
       ...recaptcha,
       ...setupSignup(recaptcha.recaptchaToken, $externalResults),
-      valid,
       termsAccepted,
       state,
       v$,
