@@ -111,7 +111,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['input'],
+  emits: ['input', 'blur'],
   setup(props, { emit }) {
     const { countries, value, disabled } = toRefs(props)
     const selected = ref<Country | null>(null)
@@ -146,7 +146,7 @@ export default defineComponent({
 
     const exit = () => {
       const filtered = get(filteredOptions)
-      if (filtered.length > 0) {
+      if (filtered.length > 0 && get(searchFilter)) {
         selectOption(filtered[0])
       } else {
         const selection = get(selected)
@@ -157,6 +157,7 @@ export default defineComponent({
         }
       }
       set(optionsShown, false)
+      emit('blur')
     }
 
     const keyMonitor = (event: KeyboardEvent) => {

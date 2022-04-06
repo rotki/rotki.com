@@ -7,6 +7,7 @@
       :error-messages="v$.githubUsername.$errors"
       hint="Optional. Provide Github username for in-Github support."
       label="Github Username"
+      @blur="v$.githubUsername.$touch()"
     />
 
     <input-field
@@ -16,7 +17,9 @@
       :error-messages="v$.firstName.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="First Name"
+      @blur="v$.firstName.$touch()"
     />
+
     <input-field
       id="last-name"
       v-model="state.lastName"
@@ -24,7 +27,9 @@
       :error-messages="v$.lastName.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Last Name"
+      @blur="v$.lastName.$touch()"
     />
+
     <input-field
       id="company-name"
       v-model="state.companyName"
@@ -32,7 +37,9 @@
       :error-messages="v$.companyName.$errors"
       hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
       label="Company Name"
+      @blur="v$.companyName.$touch()"
     />
+
     <input-field
       id="vat-id"
       v-model="state.vatId"
@@ -40,6 +47,7 @@
       :error-messages="v$.vatId.$errors"
       hint="Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
       label="VAT ID"
+      @blur="v$.vatId.$touch()"
     />
 
     <heading subheading>Address</heading>
@@ -51,7 +59,9 @@
       :error-messages="v$.address1.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Address line 1"
+      @blur="v$.address1.$touch()"
     />
+
     <input-field
       id="address-2"
       v-model="state.address2"
@@ -59,7 +69,9 @@
       :error-messages="v$.address2.$errors"
       hint="Optional. Additional data for the address."
       label="Address line 2"
+      @blur="v$.address2.$touch()"
     />
+
     <input-field
       id="city"
       v-model="state.city"
@@ -67,7 +79,9 @@
       :error-messages="v$.city.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="City"
+      @blur="v$.city.$touch()"
     />
+
     <input-field
       id="postal"
       v-model="state.postcode"
@@ -75,6 +89,7 @@
       :error-messages="v$.postcode.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Postal code"
+      @blur="v$.postcode.$touch()"
     />
 
     <country-select
@@ -85,6 +100,7 @@
       :error-messages="v$.country.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Country"
+      @blur="v$.country.$touch()"
     />
 
     <action-button
@@ -110,6 +126,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
+import { get, set } from '@vueuse/core'
 import { useMainStore } from '~/store'
 import { loadCountries } from '~/composables/countries'
 
@@ -134,11 +151,11 @@ export default defineComponent({
     const { account } = toRefs(store)
 
     const movedOffline = computed(
-      () => account.value?.address.movedOffline ?? false
+      () => get(account)?.address.movedOffline ?? false
     )
 
     onMounted(() => {
-      const userAccount = account.value
+      const userAccount = get(account)
       if (!userAccount) {
         return
       }
@@ -146,7 +163,7 @@ export default defineComponent({
       const offline =
         'Moved offline. For editing please contact support@rotki.com.'
 
-      const unavailable = movedOffline.value
+      const unavailable = get(movedOffline)
 
       state.githubUsername = userAccount.githubUsername
       state.firstName = unavailable ? offline : userAccount.address.firstName
@@ -183,14 +200,18 @@ export default defineComponent({
     const loading = ref(false)
     const done = ref(false)
     const update = async () => {
-      loading.value = true
+      const isValid = await get(v$).$validate()
+      if (!isValid) {
+        return
+      }
+      set(loading, true)
       const { success, message } = await store.updateProfile(state)
       if (success) {
-        done.value = true
+        set(done, true)
       } else if (message && typeof message !== 'string') {
-        $externalResults.value = message
+        set($externalResults, message)
       }
-      loading.value = false
+      set(loading, false)
     }
     return {
       update,

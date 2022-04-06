@@ -25,6 +25,7 @@
             :readonly="readonly"
             :type="type"
             :value="value"
+            @blur="blur()"
             @input="input($event)"
             @keypress.enter="enter()"
           />
@@ -112,7 +113,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['input', 'enter'],
+  emits: ['input', 'enter', 'blur'],
   setup(props, { emit }) {
     const selection = ref('')
     const inputField = ref<HTMLInputElement | null>(null)
@@ -138,11 +139,15 @@ export default defineComponent({
       const currentValue = value.value
       return !currentValue || currentValue.trim().length === 0
     })
+    const blur = () => {
+      emit('blur')
+    }
 
     return {
       selection,
       inputField,
       isEmpty,
+      blur,
       input,
       enter: () => emit('enter'),
     }
