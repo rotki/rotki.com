@@ -141,5 +141,6 @@ export default {
   env: {
     baseUrl: process.env.BASE_URL || '',
     maintenance: process.env.MAINTENANCE || 'false',
+    testing: process.env.TESTING,
   },
 }
