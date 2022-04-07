@@ -9,12 +9,12 @@ import { commonAttrs, noIndex } from '~/utils/metadata'
 export default defineComponent({
   setup() {
     useMeta({
-      title: 'Rotki: Activate account',
+      title: 'activate account | rotki',
       meta: [
         {
           hid: 'description',
           name: 'description',
-          content: 'Reset your rotki account',
+          content: 'Activate your new account',
         },
         noIndex(),
       ],
@@ -26,5 +26,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '~~/assets/css/main';
+@import '~/assets/css/main';
 </style>

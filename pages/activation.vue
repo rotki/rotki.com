@@ -4,25 +4,22 @@
 
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'Activation',
   setup() {
     useMeta({
-      title: 'Rotki: Account activation',
+      title: 'account activation | rotki',
       meta: [
         {
           hid: 'description',
           name: 'description',
           content: '',
         },
+        noIndex(),
       ],
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
+      ...commonAttrs(),
     })
   },
   head: {},

@@ -6,7 +6,7 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
 
-const title = 'Rotki: Terms of service'
+const title = 'terms of service | rotki'
 const description =
   'The terms and conditions outline the rules and regulations for the use of rotki.com Website and all services offered in the Premium Rotki subscription.'
 

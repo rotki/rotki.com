@@ -8,17 +8,17 @@ import { commonAttrs, getMetadata } from '~/utils/metadata'
 import { setupOverflow } from '~/composables/overflow'
 
 function metadata(route: string) {
-  let title = 'Rotki: Jobs'
+  let title = 'jobs | rotki'
   let description = 'Available roles and positions in the rotki team'
   let path = ''
 
   if (route.includes('backend')) {
-    title = 'Rotki: Position for a Python Backend Developer'
+    title = 'python backend developer | rotki'
     description =
       'We are looking for a backend developer to help us improve Rotki.'
     path = 'backend'
   } else if (route.includes('frontend')) {
-    title = 'Rotki: Position for a Vue.js/TypeScript Developer'
+    title = 'vue/typescript frontend developer | rotki'
     description =
       'We are looking for a passionate Vue.js developer with excellent knowledge of Typescript.'
     path = 'frontend'

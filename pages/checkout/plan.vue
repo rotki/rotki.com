@@ -11,7 +11,7 @@ export default defineComponent({
   middleware: ['maintenance', 'pending-payment', 'subscriber'],
   setup() {
     useMeta({
-      title: 'Rotki: Select premium plan',
+      title: 'select premium plan | rotki',
       meta: [
         {
           hid: 'description',

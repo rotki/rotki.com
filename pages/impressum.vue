@@ -6,7 +6,7 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '@/utils/metadata'
 
-const title = 'Rotki: Impressum'
+const title = 'impressum | rotki'
 const description = 'Impressum - DE'
 
 export default defineComponent({

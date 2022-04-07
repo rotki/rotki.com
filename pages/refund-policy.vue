@@ -16,7 +16,7 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
 
-const title = 'Rotki: Refund Policy'
+const title = 'refund policy | rotki'
 const description = 'Rotki Refund and Cancellation Policy'
 export default defineComponent({
   setup() {

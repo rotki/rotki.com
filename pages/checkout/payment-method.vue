@@ -11,7 +11,7 @@ export default defineComponent({
   middleware: ['maintenance', 'pending-payment', 'subscriber'],
   setup() {
     useMeta({
-      title: 'Rotki: Select payment method',
+      title: 'select payment method | rotki',
       meta: [
         {
           hid: 'description',

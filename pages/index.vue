@@ -25,7 +25,7 @@ export default defineComponent({
   name: 'Index',
   setup() {
     useMeta({
-      title: 'Rotki',
+      title: 'rotki',
       meta: [
         {
           name: 'keywords',

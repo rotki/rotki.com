@@ -9,7 +9,7 @@ import { commonAttrs, noIndex } from '~/utils/metadata'
 export default defineComponent({
   setup() {
     useMeta({
-      title: 'Rotki: Reset Password',
+      title: 'reset password | rotki',
       meta: [
         {
           hid: 'description',

@@ -6,7 +6,7 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
 
-const title = 'Rotki: Premium Subscription'
+const title = 'premium subscription | rotki'
 const description = 'Features included with a premium rotki subscription'
 
 export default defineComponent({

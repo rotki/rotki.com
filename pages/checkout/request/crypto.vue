@@ -16,7 +16,7 @@ export default defineComponent({
   ],
   setup() {
     useMeta({
-      title: 'Rotki: Crypto Payment request',
+      title: 'pay with crypto | rotki',
       meta: [
         {
           hid: 'description',
