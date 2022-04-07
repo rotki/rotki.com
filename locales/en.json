@@ -131,5 +131,10 @@
         }
       }
     }
+  },
+  "selected_plan_overview": {
+    "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
+    "vat":"({priceInEur}€ + {vat}% VAT)",
+    "renew_period":  "every {months} month | every {months} months"
   }
 }

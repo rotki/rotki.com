@@ -1,13 +1,31 @@
 <template>
   <plan-overview>
     <span :class="$style.plan">{{ name }} Plan.</span>
+    <i18n path="selected_plan_overview.plan">
+      <template #date>
+        {{ date }}
+      </template>
+      <template #finalPriceInEur>
+        {{ plan.finalPriceInEur }}
+      </template>
+      <template #vat>
+        <span v-if="plan.vat">
+          {{
+            $t('selected_plan_overview.vat', {
+              vat: plan.vat,
+              priceInEur: plan.priceInEur,
+            })
+          }}
+        </span>
+      </template>
+    </i18n>
     <span>
-      Starting from ({{ date }}) {{ plan.finalPriceInEur }}€
-      <span v-if="plan.vat">
-        ({{ plan.priceInEur }}€ + {{ plan.vat }}% VAT)
-      </span>
+      {{
+        $tc('selected_plan_overview.renew_period', plan.months, {
+          months: plan.months,
+        })
+      }}
     </span>
-    <span>every {{ plan.months }} months</span>
 
     <template #body>
       <div :class="$style.change" @click="select">Change</div>
