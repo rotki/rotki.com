@@ -12,11 +12,6 @@ export default defineComponent({
 </script>
 <style lang="scss" module>
 .title {
-  @apply text-typography;
-
-  line-height: 33px;
-  font-size: 28px;
-  letter-spacing: 0;
-  margin-bottom: 16px;
+  @apply font-serif font-bold text-3xl text-typography;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.content">
-    <checkout-title>Payment Method</checkout-title>
+    <checkout-title>Payment Methods</checkout-title>
     <checkout-description>
       Please select one of the following payment methods.
     </checkout-description>
