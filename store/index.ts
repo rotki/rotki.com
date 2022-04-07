@@ -382,8 +382,8 @@ export const useMainStore = defineStore('main', () => {
         logger.error(e)
       }
     }
-    authenticated.value = false
-    account.value = null
+    set(authenticated, false)
+    set(account, null)
   }
 
   return {

@@ -88,7 +88,8 @@ export default defineComponent({
         username: usernameConfirmation.value,
       })
       if (result.success) {
-        router.push('/login')
+        await store.logout()
+        router.push('/account-deleted')
       } else {
         error.value = typeof result.message === 'string' ? result.message : ''
         setTimeout(() => (error.value = ''), 4500)
