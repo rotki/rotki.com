@@ -1,8 +1,7 @@
 import { Middleware } from '@nuxt/types'
 
-export default <Middleware>function ({ redirect }) {
-  const isOnMaintenanceMode = process.env.maintenance === 'true'
-  if (isOnMaintenanceMode) {
+export default <Middleware>function ({ redirect, $config }) {
+  if ($config.maintenance) {
     return redirect('/maintenance')
   }
 }

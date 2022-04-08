@@ -13,17 +13,21 @@
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { useRuntimeConfig } from '~/composables/utils'
 
 const title = 'refund policy | rotki'
 const description = 'Rotki Refund and Cancellation Policy'
 export default defineComponent({
   setup() {
+    const config = useRuntimeConfig()
+    const baseUrl = config.baseUrl
     useMeta({
       title,
       meta: getMetadata(
         title,
         description,
-        `${process.env.baseUrl}/refund-policy/`
+        `${baseUrl}/refund-policy/`,
+        baseUrl
       ),
       ...commonAttrs(),
     })

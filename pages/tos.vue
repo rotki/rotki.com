@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { useRuntimeConfig } from '~/composables/utils'
 
 const title = 'terms of service | rotki'
 const description =
@@ -13,9 +14,11 @@ const description =
 export default defineComponent({
   name: 'TOS',
   setup() {
+    const config = useRuntimeConfig()
+    const baseUrl = config.baseUrl
     useMeta({
       title,
-      meta: getMetadata(title, description, process.env.baseUrl + '/tos'),
+      meta: getMetadata(title, description, `${baseUrl}/tos`, baseUrl),
       ...commonAttrs(),
     })
   },

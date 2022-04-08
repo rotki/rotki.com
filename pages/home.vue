@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
-import { commonAttrs } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'Home',
@@ -18,6 +18,7 @@ export default defineComponent({
           name: 'description',
           content: 'Manage your rotki premium account',
         },
+        noIndex(),
       ],
       ...commonAttrs(),
     })

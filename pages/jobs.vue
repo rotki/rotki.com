@@ -6,8 +6,9 @@
 import { defineComponent, useMeta, useRoute } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
 import { setupOverflow } from '~/composables/overflow'
+import { useRuntimeConfig } from '~/composables/utils'
 
-function metadata(route: string) {
+function metadata(route: string, baseUrl: string) {
   let title = 'jobs | rotki'
   let description = 'Available roles and positions in the rotki team'
   let path = ''
@@ -25,7 +26,7 @@ function metadata(route: string) {
   }
 
   return [
-    getMetadata(title, description, `${process.env.baseUrl}/jobs/${path}`),
+    getMetadata(title, description, `${baseUrl}/jobs/${path}`, baseUrl),
     title,
   ] as const
 }
@@ -41,7 +42,8 @@ export default defineComponent({
   ],
   setup() {
     const route = useRoute()
-    const [meta, title] = metadata(route.value.path)
+    const config = useRuntimeConfig()
+    const [meta, title] = metadata(route.value.path, config.baseUrl)
     useMeta({
       title,
       meta,

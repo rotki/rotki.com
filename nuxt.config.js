@@ -114,8 +114,11 @@ export default {
       siteKey: process.env.RECAPTCHA_SITE_KEY, // for example
     },
     axios: {
-      browserBaseURL: process.env.BROWSER_BASE_URL,
+      browserBaseURL: process.env.BASE_URL,
     },
+    baseUrl: process.env.BASE_URL || '',
+    maintenance: process.env.MAINTENANCE || 'false',
+    testing: process.env.TESTING,
   },
   privateRuntimeConfig: {
     axios: {
@@ -130,17 +133,10 @@ export default {
   sitemap: {
     hostname: 'https://rotki.com',
     gzip: true,
-    routes: ['/login/', '/products/'],
   },
 
   robots: {
     UserAgent: '*',
     Disallow: '/home',
-  },
-
-  env: {
-    baseUrl: process.env.BASE_URL || '',
-    maintenance: process.env.MAINTENANCE || 'false',
-    testing: process.env.TESTING,
   },
 }

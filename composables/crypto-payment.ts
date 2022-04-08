@@ -22,7 +22,8 @@ const abi = [
 
 export const setupWeb3Payments = (
   data: Ref<CryptoPayment | null>,
-  getProvider: () => Provider
+  getProvider: () => Provider,
+  testing: boolean
 ) => {
   const state = ref<StepType | IdleStep>('idle')
   const error = ref('')
@@ -93,8 +94,8 @@ export const setupWeb3Payments = (
       const web3Provider = new ethers.providers.Web3Provider(provider as any)
       const network = await web3Provider.getNetwork()
 
-      const expected = process.env.testing ? 5 : 1
-      const name = process.env.testing ? 'Görli' : 'Mainnet'
+      const expected = testing ? 5 : 1
+      const name = testing ? 'Görli' : 'Mainnet'
       if (network.chainId !== expected) {
         set(
           error,

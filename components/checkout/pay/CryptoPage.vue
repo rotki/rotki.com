@@ -38,6 +38,7 @@ import {
 import { useMainStore } from '~/store'
 import { setupWeb3Payments } from '~/composables/crypto-payment'
 import { assert } from '~/utils/assert'
+import { useRuntimeConfig } from '~/composables/utils'
 
 export default defineComponent({
   name: 'CryptoPage',
@@ -111,12 +112,14 @@ export default defineComponent({
       set(error, '')
     }
 
+    const config = useRuntimeConfig()
     const { payWithMetamask, state: currentState, error } = setupWeb3Payments(
       data,
       () => {
         assert(provider)
         return provider
-      }
+      },
+      !!config.testing
     )
 
     return {
