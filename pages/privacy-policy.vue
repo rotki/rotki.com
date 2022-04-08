@@ -5,20 +5,24 @@
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { useRuntimeConfig } from '~/composables/utils'
 
-const title = 'Rotki: Privacy Policy'
+const title = 'privacy policy | rotki'
 const description =
   'Information for the website visitors regarding our policies with the collection, use, and disclosure of Personal Information regarding the service usage'
 
 export default defineComponent({
   name: 'PrivacyPolicy',
   setup() {
+    const config = useRuntimeConfig()
+    const baseUrl = config.baseUrl
     useMeta({
       title,
       meta: getMetadata(
         title,
         description,
-        `${process.env.baseUrl}/privacy-policy/`
+        `${baseUrl}/privacy-policy/`,
+        baseUrl
       ),
       ...commonAttrs(),
     })

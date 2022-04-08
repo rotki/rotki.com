@@ -10,7 +10,7 @@ export default defineComponent({
   middleware: 'maintenance',
   setup() {
     useMeta({
-      title: 'Rotki: Recover password',
+      title: 'password recovery | rotki',
       meta: [
         {
           hid: 'description',

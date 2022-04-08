@@ -11,7 +11,7 @@ export default defineComponent({
   middleware: ['maintenance', 'authentication', 'subscriber'],
   setup() {
     useMeta({
-      title: 'Rotki: Premium Pay with Credit Card',
+      title: 'pay with credit card | rotki',
       meta: [
         {
           hid: 'description',

@@ -1,12 +1,8 @@
 <template>
   <div :class="$style.container">
-    <checkout-title>Price</checkout-title>
+    <checkout-title> Premium Plans </checkout-title>
     <checkout-description>
-      <span v-if="!vat">
-        Depending on customer's country of residence an additional +19% VAT tax
-        may be applicable.
-      </span>
-      <span v-else>The prices include a +{{ vat }}% VAT tax</span>
+      <span v-if="vat">The prices include a +{{ vat }}% VAT tax</span>
     </checkout-description>
 
     <div :class="$style.selection">

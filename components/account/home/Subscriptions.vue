@@ -43,7 +43,7 @@
           </span>
         </td>
         <td :class="$style.action">
-          <div v-if="item.actions.length === 0">Nothing to do</div>
+          <div v-if="item.actions.length === 0">None</div>
           <div v-else>
             <cancel-subscription v-if="notPending(item)" :subscription="item" />
             <nuxt-link v-else :class="$style.actionButton" :to="renewLink">

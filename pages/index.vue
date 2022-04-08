@@ -14,9 +14,10 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, getMetadata } from '~/utils/metadata'
 import { setupOverflow } from '~/composables/overflow'
+import { useRuntimeConfig } from '~/composables/utils'
 
 const description =
-  'Rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.'
+  'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.'
 
 const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`
@@ -24,14 +25,16 @@ privacy,opensource,accounting,asset-management,taxes,tax-reporting`
 export default defineComponent({
   name: 'Index',
   setup() {
+    const config = useRuntimeConfig()
+    const baseUrl = config.baseUrl
     useMeta({
-      title: 'Rotki',
+      title: 'rotki',
       meta: [
         {
           name: 'keywords',
           content: keywords,
         },
-        ...getMetadata('Rotki', description, `${process.env.baseUrl}`),
+        ...getMetadata('rotki', description, baseUrl, baseUrl),
       ],
       ...commonAttrs(),
     })

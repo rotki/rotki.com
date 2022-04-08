@@ -9,7 +9,7 @@ import { commonAttrs, noIndex } from '~/utils/metadata'
 export default defineComponent({
   setup() {
     useMeta({
-      title: 'Rotki: Recovery e-mail send',
+      title: 'recovery e-mail send | rotki',
       meta: [
         {
           hid: 'description',

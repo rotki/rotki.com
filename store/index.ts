@@ -180,11 +180,15 @@ export const useMainStore = defineStore('main', () => {
 
       const { result, message } = UpdateProfileResponse.parse(response.data)
       if (response.status === 200) {
+        const country = get(account)?.address?.country ?? ''
         assert(result)
         assert(account.value)
         account.value = {
           ...account.value,
           ...result,
+        }
+        if (payload.country !== country) {
+          await getAccount()
         }
         return { success: true }
       } else {
@@ -378,8 +382,8 @@ export const useMainStore = defineStore('main', () => {
         logger.error(e)
       }
     }
-    authenticated.value = false
-    account.value = null
+    set(authenticated, false)
+    set(account, null)
   }
 
   return {

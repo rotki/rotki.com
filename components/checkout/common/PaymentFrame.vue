@@ -28,7 +28,13 @@
           v-else-if="isFailure"
           :message="text.message"
           :title="text.title"
-        />
+        >
+          <div v-if="text.closable" :class="$style.close">
+            <selection-button :selected="false" @click="close">
+              OK
+            </selection-button>
+          </div>
+        </error-display>
         <success-display
           v-else-if="isSuccess"
           :message="text.message"
@@ -62,7 +68,8 @@ export default defineComponent({
       type: Object as PropType<PaymentStep>,
     },
   },
-  setup(props) {
+  emits: ['close'],
+  setup(props, { emit }) {
     const { step } = toRefs(props)
     const useType = (type: StepType | IdleStep) => {
       return computed(() => get(step).type === type)
@@ -78,14 +85,21 @@ export default defineComponent({
       return {
         title: currentStep.title,
         message: currentStep.message,
+        closable: currentStep.closeable,
       }
     })
+
+    const close = () => {
+      emit('close')
+    }
+
     return {
       text,
       isPending: useType('pending'),
       isSuccess: useType('success'),
       isFailure: useType('failure'),
       userInteraction: useType('idle'),
+      close,
     }
   },
 })
@@ -120,5 +134,9 @@ export default defineComponent({
 
 .action-wrapper {
   @apply flex flex-row justify-center;
+}
+
+.close {
+  @apply flex flex-row justify-center mt-4;
 }
 </style>

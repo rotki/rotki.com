@@ -1,5 +1,5 @@
 <template>
-  <plan-selection-page />
+  <account-deleted-page />
 </template>
 
 <script lang="ts">
@@ -7,16 +7,15 @@ import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
 export default defineComponent({
-  name: 'Plan',
-  middleware: ['maintenance', 'pending-payment', 'subscriber'],
+  name: 'AccountDeleted',
   setup() {
     useMeta({
-      title: 'select premium plan | rotki',
+      title: 'account deleted | rotki',
       meta: [
         {
           hid: 'description',
           name: 'description',
-          content: 'Select your rotki premium plan',
+          content: 'Your account has been successfully deleted',
         },
         noIndex(),
       ],
@@ -26,3 +25,8 @@ export default defineComponent({
   head: {},
 })
 </script>
+
+<style lang="scss">
+@import '~assets/css/media';
+@import '~assets/css/main';
+</style>

@@ -5,6 +5,10 @@
 .idea
 test
 node_modules
+dist
 yarn-error.log
 .dockerignore
 .gitignore
+.env
+.env.example
+.editorconfig

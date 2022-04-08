@@ -7,15 +7,19 @@
   overflow-x: hidden;
 
   @include for-size(phone-only) {
-    background-size: 100px;
+    background-size: 4.5rem;
   }
 
   @include for-size(tablet-portrait-up) {
-   background-size: 150px;
+   background-size: 5rem;
   }
 
   @include for-size(desktop-up) {
-    background-size: 200px;
+    background-size: 7.5rem;
+  }
+
+  @include for-size(big-desktop-up) {
+    background-size: 12rem;
   }
 
 }
@@ -24,19 +28,19 @@
   @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden;
 
   @include for-size(phone-only) {
-    background-size: 70px;
+    background-size: 4rem;
   }
 
   @include for-size(tablet-portrait-up) {
-    background-size: 120px;
+    background-size: 5rem;
   }
 
   @include for-size(desktop-up) {
-    background-size: 180px;
+    background-size: 6.5rem;
   }
 
-  @include for-size(desktop-up) {
-    background-size: 180px;
+  @include for-size(big-desktop-up) {
+    background-size: 11rem;
   }
 
 }

@@ -137,5 +137,9 @@ export default defineComponent({
 
 .buttons {
   @apply flex flex-row mt-4 justify-end;
+
+  button:first-child {
+    @apply mr-2;
+  }
 }
 </style>

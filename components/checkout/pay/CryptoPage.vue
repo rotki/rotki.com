@@ -1,5 +1,5 @@
 <template>
-  <payment-frame :loading="loading" :step="step">
+  <payment-frame :loading="loading" :step="step" @close="reset">
     <template #description>
       <div :class="$style.description">
         Payments by crypto can have slower processing times.
@@ -38,6 +38,7 @@ import {
 import { useMainStore } from '~/store'
 import { setupWeb3Payments } from '~/composables/crypto-payment'
 import { assert } from '~/utils/assert'
+import { useRuntimeConfig } from '~/composables/utils'
 
 export default defineComponent({
   name: 'CryptoPage',
@@ -86,6 +87,7 @@ export default defineComponent({
           type: 'failure',
           title: 'Payment Failure',
           message: errorMessage,
+          closeable: true,
         }
       } else if (state === 'pending') {
         return {
@@ -105,12 +107,19 @@ export default defineComponent({
       }
     })
 
+    const reset = () => {
+      set(currentState, 'idle')
+      set(error, '')
+    }
+
+    const config = useRuntimeConfig()
     const { payWithMetamask, state: currentState, error } = setupWeb3Payments(
       data,
       () => {
         assert(provider)
         return provider
-      }
+      },
+      !!config.testing
     )
 
     return {
@@ -123,6 +132,7 @@ export default defineComponent({
       currentState,
       metamaskSupport,
       payWithMetamask,
+      reset,
     }
   },
 })

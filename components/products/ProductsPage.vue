@@ -1,5 +1,6 @@
 <template>
   <page :center-vertically="false">
+    <template #title>Premium</template>
     <page-content>
       <div class="w-full">
         <div :class="$style.title">Premium Features</div>

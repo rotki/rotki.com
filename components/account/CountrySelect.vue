@@ -12,6 +12,8 @@
           <input
             :id="id"
             v-model="searchFilter"
+            :name="id"
+            autocomplete="off"
             :class="{
               [$style.input]: true,
               [$style.empty]: isEmpty,
@@ -312,6 +314,6 @@ export default defineComponent({
 }
 
 .flag {
-  @apply absolute top-3.5 left-3;
+  @apply absolute top-4 left-3;
 }
 </style>

@@ -234,6 +234,7 @@ export type PaymentStep =
       type: StepType
       title: string
       message: string
+      closeable?: boolean
     }
   | {
       type: IdleStep

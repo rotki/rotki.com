@@ -19,18 +19,34 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, useRouter } from '@nuxtjs/composition-api'
+import { defineComponent, useMeta, useRouter } from '@nuxtjs/composition-api'
+import { commonAttrs, noIndex } from '~/utils/metadata'
+import { useRuntimeConfig } from '~/composables/utils'
 
 export default defineComponent({
   name: 'Maintenance',
   setup() {
+    useMeta({
+      title: 'maintenance | rotki',
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content:
+            'rotki is currently undergoing maintenance please come back later',
+        },
+        noIndex(),
+      ],
+      ...commonAttrs(),
+    })
     const router = useRouter()
+    const config = useRuntimeConfig()
 
-    const isOnMaintenanceMode = process.env.maintenance === 'true'
-    if (!isOnMaintenanceMode) {
+    if (!config.maintenance) {
       router.push('/')
     }
   },
+  head: {},
 })
 </script>
 <style lang="scss" module>

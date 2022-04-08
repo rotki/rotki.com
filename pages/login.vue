@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
+import { commonAttrs } from '~/utils/metadata'
 
 export default defineComponent({
   name: 'Login',
@@ -19,7 +20,7 @@ export default defineComponent({
   middleware: 'maintenance',
   setup() {
     useMeta({
-      title: 'Rotki: Login',
+      title: 'login | rotki',
       meta: [
         {
           hid: 'description',
@@ -27,12 +28,7 @@ export default defineComponent({
           content: 'Manage your rotki premium account',
         },
       ],
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
+      ...commonAttrs(),
     })
   },
   head: {},

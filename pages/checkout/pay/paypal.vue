@@ -11,7 +11,7 @@ export default defineComponent({
   middleware: ['maintenance', 'authentication', 'subscriber'],
   setup() {
     useMeta({
-      title: 'Rotki: Premium Pay with Paypal',
+      title: 'pay with paypal | rotki',
       meta: [
         {
           hid: 'description',
