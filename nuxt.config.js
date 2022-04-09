@@ -40,7 +40,11 @@ export default {
         href: '/favicon-16x16.png',
         sizes: '16x16',
       },
-      { rel: 'manifest', href: '/site.webmanifest' },
+      {
+        rel: 'manifest',
+        href: '/site.webmanifest',
+        crossorigin: 'use-credentials',
+      },
       {
         rel: 'mask-icon',
         href: '/safari-pinned-tab.svg',
