@@ -30,6 +30,7 @@
     <template #body>
       <div :class="$style.change" @click="select">Change</div>
       <change-plan-dialog
+        :crypto="crypto"
         :visible="selection"
         @cancel="selection = false"
         @select="switchTo($event)"
@@ -110,11 +111,8 @@ export default defineComponent({
 }
 
 .change {
-  @apply font-bold;
+  @apply font-bold text-base cursor-pointer;
 
-  line-height: 19px;
-  font-size: 16px;
-  letter-spacing: 0;
   color: #351404;
 }
 </style>

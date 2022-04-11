@@ -8,10 +8,8 @@
         :class="$style.plan"
         @click="select(plan.months)"
       >
-        <heading subheading no-margin>
-          {{ getPlanName(plan.months) }} Plan.
-        </heading>
-        {{ plan.priceFiat }}€ <span v-if="false">+ {{ plan }}% VAT</span> every
+        <div :class="$style.name">{{ getPlanName(plan.months) }} Plan.</div>
+        {{ getPrice(plan) }}€ <span v-if="false">+ {{ plan }}% VAT</span> every
         {{ plan.months }} months
       </div>
       <div :class="$style.buttons">
@@ -22,10 +20,11 @@
 </template>
 
 <script lang="ts">
-import { toRefs } from '@vueuse/core'
+import { get, toRefs } from '@vueuse/core'
 import { defineComponent, onMounted } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 import { getPlanName } from '~/utils/plans'
+import { Plan } from '~/types'
 
 export default defineComponent({
   name: 'PlanSwitchDialog',
@@ -34,18 +33,29 @@ export default defineComponent({
       required: true,
       type: Boolean,
     },
+    crypto: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['cancel', 'select'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const store = useMainStore()
     const { plans } = toRefs(store)
+    const { crypto } = toRefs(props)
 
     const cancel = () => emit('cancel')
     const select = (months: number) => emit('select', months)
     onMounted(async () => await store.getPlans())
 
+    const getPrice = (plan: Plan) => {
+      return get(crypto) ? plan.priceCrypto : plan.priceFiat
+    }
+
     return {
       plans,
+      getPrice,
       getPlanName,
       select,
       cancel,
@@ -77,6 +87,10 @@ export default defineComponent({
     background-size: 100%;
     transition: background 0s;
   }
+}
+
+.name {
+  @apply font-bold;
 }
 
 .buttons {

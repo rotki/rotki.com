@@ -7,7 +7,7 @@
   >
     <div :class="$style.row">
       <div :class="$style.qrcode">
-        <canvas ref="canvas" @click="copyToClipboard" />
+        <canvas ref="canvas" @click="copyToClipboard()" />
       </div>
       <div :class="$style.inputs">
         <input-field
@@ -79,7 +79,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { ethers } from 'ethers'
 import { toCanvas } from 'qrcode'
-import { get, useClipboard } from '@vueuse/core'
+import { get, set, useClipboard } from '@vueuse/core'
 import { CryptoPayment } from '~/types'
 import { logger } from '~/utils/logger'
 import { getPlanName } from '~/utils/plans'
@@ -129,7 +129,7 @@ export default defineComponent({
     const qrText = ref('')
 
     const paymentAmount = computed(() => {
-      const { cryptocurrency, finalPriceInCrypto } = data.value
+      const { cryptocurrency, finalPriceInCrypto } = get(data)
       return `${finalPriceInCrypto} ${cryptocurrency}`
     })
 
@@ -137,7 +137,7 @@ export default defineComponent({
       if (!canvas) {
         return
       }
-      qrText.value = await createPaymentQR(data.value, canvas)
+      set(qrText, await createPaymentQR(get(data), canvas))
     })
 
     const { copy: copyToClipboard } = useClipboard({ source: qrText })
@@ -198,6 +198,6 @@ export default defineComponent({
 }
 
 .info {
-  @apply font-bold mt-3;
+  @apply font-bold mt-3 text-shade12;
 }
 </style>
