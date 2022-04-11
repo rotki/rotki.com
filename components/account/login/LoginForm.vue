@@ -146,8 +146,8 @@ export default defineComponent({
   width: 100%;
 
   @include for-size(phone-only) {
-    margin-top: $mobile-margin / 2;
-    margin-bottom: $mobile-margin / 2;
+    margin-top: calc($mobile-margin / 2);
+    margin-bottom: calc($mobile-margin / 2);
   }
 }
 
