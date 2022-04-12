@@ -142,7 +142,7 @@ export const PremiumResponse = z.object({
 export type PremiumResponse = z.infer<typeof PremiumResponse>
 
 const SelectedPlan = z.object({
-  dateNow: z.number(),
+  startDate: z.number(),
   vat: z.number(),
   priceInEur: z.string(),
   months: z.number(),
@@ -172,9 +172,10 @@ const CryptoPayment = z.object({
   finalPriceInCrypto: z.string().nonempty(),
   cryptoAddress: z.string(),
   tokenAddress: z.string().nullish(),
-  startDate: z.string(),
+  startDate: z.number(),
   hoursForPayment: z.number(),
   months: z.number(),
+  transactionStarted: z.boolean(),
 })
 
 export type CryptoPayment = z.infer<typeof CryptoPayment>
@@ -188,6 +189,7 @@ export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>
 
 const PendingCryptoPayment = z.object({
   pending: z.boolean(),
+  transactionStarted: z.boolean(),
   currency: z.enum(['ETH', 'BTC', 'DAI']).optional(),
 })
 
@@ -200,6 +202,15 @@ export const PendingCryptoPaymentResponse = z.object({
 
 export type PendingCryptoPaymentResponse = z.infer<
   typeof PendingCryptoPaymentResponse
+>
+
+export const PendingCryptoPaymentResultResponse = z.object({
+  result: z.boolean().optional(),
+  message: z.string().optional(),
+})
+
+export type PendingCryptoPaymentResultResponse = z.infer<
+  typeof PendingCryptoPaymentResultResponse
 >
 
 export type CardPaymentRequest = {

@@ -26,6 +26,7 @@ import {
   onMounted,
   ref,
   useRouter,
+  watch,
 } from '@nuxtjs/composition-api'
 import { get, set } from '@vueuse/core'
 import detectEthereumProvider from '@metamask/detect-provider'
@@ -36,7 +37,7 @@ import {
   useSubscriptionIdParam,
 } from '~/composables/plan'
 import { useMainStore } from '~/store'
-import { setupWeb3Payments } from '~/composables/crypto-payment'
+import { useWeb3Payment } from '~/composables/crypto-payment'
 import { assert } from '~/utils/assert'
 import { useRuntimeConfig } from '~/composables/utils'
 
@@ -68,6 +69,8 @@ export default defineComponent({
         )
         if (result.isError) {
           set(error, result.error.message)
+        } else if (result.result.transactionStarted) {
+          router.push('/home')
         } else {
           set(data, result.result)
         }
@@ -113,7 +116,11 @@ export default defineComponent({
     }
 
     const config = useRuntimeConfig()
-    const { payWithMetamask, state: currentState, error } = setupWeb3Payments(
+    const {
+      payWithMetamask,
+      state: currentState,
+      error,
+    } = useWeb3Payment(
       data,
       () => {
         assert(provider)
@@ -121,6 +128,17 @@ export default defineComponent({
       },
       !!config.testing
     )
+
+    watch(plan, async (plan) => {
+      const selectedCurrency = get(currency)
+      assert(selectedCurrency)
+      const response = await store.switchCryptoPlan(plan, selectedCurrency)
+      if (!response.isError) {
+        set(data, response.result)
+      } else {
+        set(error, response.error.message)
+      }
+    })
 
     return {
       isBtc,

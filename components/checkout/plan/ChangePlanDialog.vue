@@ -5,12 +5,26 @@
       <div
         v-for="plan in plans"
         :key="plan.months.toString()"
-        :class="$style.plan"
+        :class="{
+          [$style.plan]: true,
+          [$style.disabled]: !confirmed,
+        }"
         @click="select(plan.months)"
       >
         <div :class="$style.name">{{ getPlanName(plan.months) }} Plan.</div>
         {{ getPrice(plan) }}€ <span v-if="false">+ {{ plan }}% VAT</span> every
         {{ plan.months }} months
+      </div>
+      <div v-if="crypto && warning" :class="$style.warning">
+        <span>
+          Switching a plan after sending a payment can lead to problems with the
+          activation of your subscription. Please only switch a plan if no
+          payment has been send.
+        </span>
+        <custom-checkbox v-model="confirmed">
+          I confirm that no payment has been send. <br />
+          Allow me to switch the plan
+        </custom-checkbox>
       </div>
       <div :class="$style.buttons">
         <action-button text="Cancel" primary small @click="cancel" />
@@ -20,8 +34,8 @@
 </template>
 
 <script lang="ts">
-import { get, toRefs } from '@vueuse/core'
-import { defineComponent, onMounted } from '@nuxtjs/composition-api'
+import { get, set, toRefs } from '@vueuse/core'
+import { defineComponent, onMounted, ref, watch } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 import { getPlanName } from '~/utils/plans'
 import { Plan } from '~/types'
@@ -38,23 +52,41 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    warning: {
+      required: true,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['cancel', 'select'],
   setup(props, { emit }) {
     const store = useMainStore()
     const { plans } = toRefs(store)
-    const { crypto } = toRefs(props)
+    const { crypto, visible } = toRefs(props)
+    const confirmed = ref(false)
 
     const cancel = () => emit('cancel')
-    const select = (months: number) => emit('select', months)
+    const select = (months: number) => {
+      if (!get(confirmed)) {
+        return
+      }
+      return emit('select', months)
+    }
     onMounted(async () => await store.getPlans())
 
     const getPrice = (plan: Plan) => {
       return get(crypto) ? plan.priceCrypto : plan.priceFiat
     }
 
+    watch(visible, (visible) => {
+      if (!visible) {
+        set(confirmed, false)
+      }
+    })
+
     return {
       plans,
+      confirmed,
       getPrice,
       getPlanName,
       select,
@@ -66,6 +98,7 @@ export default defineComponent({
 
 <style module lang="scss">
 .body {
+  max-width: 450px;
   padding: 24px;
 }
 
@@ -75,17 +108,21 @@ export default defineComponent({
   background-position: center;
   transition: background 0.8s;
 
-  &:hover {
+  &:not(.disabled):hover {
     background: rgba(218, 78, 36, 0.3)
       radial-gradient(circle, transparent 1%, rgba(218, 78, 36, 0.3) 1%)
       center/15000%;
   }
 
-  &:active {
+  &:not(.disabled):active {
     @apply bg-primary3;
 
     background-size: 100%;
     transition: background 0s;
+  }
+
+  &.disabled {
+    @apply bg-gray-50 cursor-not-allowed;
   }
 }
 
@@ -95,5 +132,9 @@ export default defineComponent({
 
 .buttons {
   @apply flex flex-row justify-end mt-2;
+}
+
+.warning {
+  @apply mt-4 text-justify;
 }
 </style>

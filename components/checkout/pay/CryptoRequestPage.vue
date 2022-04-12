@@ -52,7 +52,7 @@ export default defineComponent({
         (plan) => plan.months === months
       )
       return {
-        dateNow: get(useTimestamp()) / 1000,
+        startDate: get(useTimestamp()) / 1000,
         finalPriceInEur: selectedPlan?.priceCrypto ?? '0',
         priceInEur: selectedPlan?.priceCrypto ?? '0',
         months,

@@ -42,6 +42,6 @@ export default defineComponent({
   font-size: 15px;
   line-height: 21px;
   opacity: 0.78;
-  max-width: 288px;
+  max-width: 280px;
 }
 </style>

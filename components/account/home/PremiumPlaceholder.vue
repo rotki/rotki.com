@@ -5,7 +5,7 @@
         <img alt="rotki" src="~/assets/img/logo-small.svg" />
       </div>
       <div>
-        <heading subheading> Rotki Premium</heading>
+        <heading subheading> Rotki Premium </heading>
         <div :class="$style.premium">
           No premium subscription found. Select your
           <nuxt-link :class="$style.link" to="/checkout/plan">

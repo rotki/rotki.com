@@ -38,6 +38,7 @@
         </input-field>
       </div>
     </div>
+    <selected-plan-overview :plan="data" crypto warning />
     <div :class="$style.hint">
       You can pay with metamask, your mobile wallet or manually send the exact
       amount to the following address above. Once the whole amount is sent and
