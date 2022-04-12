@@ -41,8 +41,8 @@ export default defineComponent({
   @include for-size(phone-only) {
     @apply flex-wrap;
 
-    padding-right: $mobile-margin / 2;
-    padding-left: $mobile-margin / 2;
+    padding-right: calc($mobile-margin / 2);
+    padding-left: calc($mobile-margin / 2);
   }
 }
 

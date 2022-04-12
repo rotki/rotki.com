@@ -56,19 +56,12 @@
         </p>
 
         <div :class="$style.buttons">
-          <action-button
-            filled
-            small
-            text="No don't cancel"
-            @click="confirm = false"
-          />
-          <action-button
-            primary
-            small
-            text="Yes, cancel my subscription"
-            warning
-            @click="cancelSubscription"
-          />
+          <action-button filled small @click="confirm = false">
+            No don't cancel
+          </action-button>
+          <action-button primary small warning @click="cancelSubscription">
+            Yes, cancel my subscription
+          </action-button>
         </div>
       </div>
     </modal-dialog>

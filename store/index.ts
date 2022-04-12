@@ -16,6 +16,7 @@ import {
   DeleteAccountResponse,
   PendingCryptoPayment,
   PendingCryptoPaymentResponse,
+  PendingCryptoPaymentResultResponse,
   Plan,
   PremiumResponse,
   Result,
@@ -374,6 +375,65 @@ export const useMainStore = defineStore('main', () => {
     }
   }
 
+  const markTransactionStarted = async (): Promise<Result<boolean>> => {
+    try {
+      const response = await $api.patch<PendingCryptoPaymentResultResponse>(
+        'webapi/payment/pending'
+      )
+      const data = PendingCryptoPaymentResultResponse.parse(response.data)
+      if (data.result) {
+        return {
+          result: data.result,
+          isError: false,
+        }
+      } else {
+        return {
+          error: new Error(data.message),
+          isError: true,
+        }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        error: e,
+        isError: true,
+      }
+    }
+  }
+
+  const switchCryptoPlan = async (
+    plan: number,
+    currency: Currency
+  ): Promise<Result<CryptoPayment>> => {
+    try {
+      const response = await $api.delete<PendingCryptoPaymentResultResponse>(
+        'webapi/payment/pending'
+      )
+      const data = PendingCryptoPaymentResultResponse.parse(response.data)
+      if (data.result) {
+        const payment = await cryptoPayment(plan, currency)
+        if (payment.isError) {
+          return payment
+        }
+        return {
+          isError: false,
+          result: payment.result,
+        }
+      } else {
+        return {
+          error: Error(data.message),
+          isError: true,
+        }
+      }
+    } catch (e: any) {
+      logger.error(e)
+      return {
+        error: e,
+        isError: true,
+      }
+    }
+  }
+
   const logout = async (callApi: boolean = false) => {
     if (callApi) {
       try {
@@ -402,6 +462,8 @@ export const useMainStore = defineStore('main', () => {
     pay,
     cryptoPayment,
     checkPendingCryptoPayment,
+    switchCryptoPlan,
+    markTransactionStarted,
     logout,
   }
 })

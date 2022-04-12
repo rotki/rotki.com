@@ -271,12 +271,12 @@ export default defineComponent({
         // @ts-ignore
         threeDSecure.on(
           'authentication-iframe-available',
-          function (event: any, next: Function) {
+          function (event: any, next?: () => void) {
             const element = event.element
 
             threedsecure.value?.appendChild(element)
             verify.value = true
-            next()
+            next?.()
           }
         )
       } catch (e: any) {

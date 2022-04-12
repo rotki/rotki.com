@@ -1,5 +1,6 @@
 <template>
   <page :center-vertically="false">
+    <template #title>Subscription Payment</template>
     <page-content>
       <div :class="$style.content">
         <checkout-title>Payment Details</checkout-title>

@@ -338,8 +338,8 @@ export default defineComponent({
 
   @include text-size(14px, 21px);
   @include for-size(phone-only) {
-    bottom: $mobile-margin / 2;
-    padding: $mobile-margin / 2;
+    bottom: calc($mobile-margin / 2);
+    padding: calc($mobile-margin / 2);
   }
 }
 

@@ -4,6 +4,7 @@ import { get, set, useTimeoutFn } from '@vueuse/core'
 import { logger } from '~/utils/logger'
 import { CryptoPayment, IdleStep, Provider, StepType } from '~/types'
 import { assert } from '~/utils/assert'
+import { useMainStore } from '~/store'
 
 const abi = [
   // Some details about the token
@@ -20,11 +21,12 @@ const abi = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ]
 
-export const setupWeb3Payments = (
+export const useWeb3Payment = (
   data: Ref<CryptoPayment | null>,
   getProvider: () => Provider,
   testing: boolean
 ) => {
+  const { markTransactionStarted } = useMainStore()
   const state = ref<StepType | IdleStep>('idle')
   const error = ref('')
   const { start, stop } = useTimeoutFn(
@@ -51,6 +53,7 @@ export const setupWeb3Payments = (
       value,
     })
     logger.info(`transaction is pending: ${tx.hash}`)
+    await markTransactionStarted()
     start()
   }
 
@@ -74,6 +77,7 @@ export const setupWeb3Payments = (
       price
     ) as Promise<ethers.providers.TransactionResponse>)
     logger.info(`transaction is pending: ${tx.hash}`)
+    await markTransactionStarted()
     start()
   }
 

@@ -47,6 +47,6 @@ export default defineComponent({
 }
 
 .label {
-  margin-left: 8px;
+  @apply ml-4;
 }
 </style>

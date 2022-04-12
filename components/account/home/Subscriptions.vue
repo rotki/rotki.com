@@ -43,20 +43,20 @@
           </span>
         </td>
         <td :class="$style.action">
-          <div v-if="item.actions.length === 0">None</div>
-          <div v-else>
-            <cancel-subscription v-if="notPending(item)" :subscription="item" />
-            <nuxt-link v-else :class="$style.actionButton" :to="renewLink">
-              Details
-            </nuxt-link>
+          <div v-if="displayActions(item)">
+            <cancel-subscription
+              v-if="hasAction(item, 'cancel')"
+              :subscription="item"
+            />
             <nuxt-link
-              v-if="item.actions.includes('renew')"
+              v-if="hasAction(item, 'renew')"
               :class="$style.actionButton"
               :to="renewLink"
             >
               Renew
             </nuxt-link>
           </div>
+          <div v-else>None</div>
         </td>
       </template>
     </data-table>
@@ -144,12 +144,22 @@ export default defineComponent({
       }
     })
 
-    const notPending = (sub: Subscription) => {
-      return sub.status !== 'Pending'
+    const hasAction = (sub: Subscription, action: 'renew' | 'cancel') => {
+      if (action === 'cancel') {
+        return sub.status !== 'Pending' && sub.actions.includes('cancel')
+      } else if (action === 'renew') {
+        return sub.actions.includes('renew')
+      }
+      return false
+    }
+
+    const displayActions = (sub: Subscription) => {
+      return hasAction(sub, 'renew') || hasAction(sub, 'cancel')
     }
 
     return {
-      notPending,
+      hasAction,
+      displayActions,
       headers: subHeaders,
       subscriptions,
       renewLink,

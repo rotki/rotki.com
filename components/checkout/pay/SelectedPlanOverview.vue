@@ -9,11 +9,18 @@
         {{ plan.finalPriceInEur }}
       </template>
       <template #vat>
-        <span v-if="plan.vat">
+        <span v-if="plan.vat && !crypto">
           {{
             $t('selected_plan_overview.vat', {
               vat: plan.vat,
               priceInEur: plan.priceInEur,
+            })
+          }}
+        </span>
+        <span v-else-if="plan.vat">
+          {{
+            $t('selected_plan_overview.includes_vat', {
+              vat: plan.vat,
             })
           }}
         </span>
@@ -30,6 +37,8 @@
     <template #body>
       <div :class="$style.change" @click="select">Change</div>
       <change-plan-dialog
+        :crypto="crypto"
+        :warning="warning"
         :visible="selection"
         @cancel="selection = false"
         @select="switchTo($event)"
@@ -48,7 +57,7 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 import { get, set } from '@vueuse/core'
-import { SelectedPlan } from '~/types'
+import { CryptoPayment, SelectedPlan } from '~/types'
 import { getPlanName } from '~/utils/plans'
 
 export default defineComponent({
@@ -56,9 +65,14 @@ export default defineComponent({
   props: {
     plan: {
       required: true,
-      type: Object as PropType<SelectedPlan>,
+      type: Object as PropType<SelectedPlan | CryptoPayment>,
     },
     crypto: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+    warning: {
       required: false,
       type: Boolean,
       default: false,
@@ -73,7 +87,9 @@ export default defineComponent({
 
     const name = computed(() => getPlanName(get(plan).months))
     const date = computed(() => {
-      return new Date(get(plan).dateNow * 1000).toLocaleDateString()
+      const currentPlan = get(plan)
+      const date = new Date(currentPlan.startDate * 1000)
+      return date.toLocaleDateString()
     })
 
     const select = () => {
@@ -87,6 +103,7 @@ export default defineComponent({
       router.push({
         path: currentRoute.path,
         query: {
+          ...currentRoute.query,
           p: months.toString(),
         },
       })
@@ -110,11 +127,8 @@ export default defineComponent({
 }
 
 .change {
-  @apply font-bold;
+  @apply font-bold text-base cursor-pointer p-4;
 
-  line-height: 19px;
-  font-size: 16px;
-  letter-spacing: 0;
   color: #351404;
 }
 </style>
