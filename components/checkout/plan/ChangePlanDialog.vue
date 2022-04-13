@@ -7,7 +7,7 @@
         :key="plan.months.toString()"
         :class="{
           [$style.plan]: true,
-          [$style.disabled]: !confirmed,
+          [$style.disabled]: warning && !confirmed,
         }"
         @click="select(plan.months)"
       >
@@ -62,12 +62,12 @@ export default defineComponent({
   setup(props, { emit }) {
     const store = useMainStore()
     const { plans } = toRefs(store)
-    const { crypto, visible } = toRefs(props)
+    const { crypto, visible, warning } = toRefs(props)
     const confirmed = ref(false)
 
     const cancel = () => emit('cancel')
     const select = (months: number) => {
-      if (!get(confirmed)) {
+      if (get(warning) && !get(confirmed)) {
         return
       }
       return emit('select', months)

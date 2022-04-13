@@ -97,7 +97,7 @@ export default defineComponent({
 }
 
 .plan {
-  @apply border border-solid border flex flex-col items-center w-full h-full p-8;
+  @apply border border-solid border flex flex-col items-center w-full h-full p-8 cursor-pointer;
 
   background: 0 0 no-repeat padding-box;
   border-radius: 4px;
