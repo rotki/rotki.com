@@ -17,7 +17,9 @@
             By being a premium user you have the option to upload your account's
             encrypted database to our server. It can then be synchronized
             between different devices. It also serves as a backup. The data is
-            encrypted with your password and we can not read it.
+            encrypted with your password and we can not read it. Synced
+            databases are automatically deleted a month after your subscription
+            expires
           </product-detail-description>
 
           <heading :class="$style.subtitle">Analytics</heading>
@@ -61,19 +63,19 @@
             readability of text and prolong the battery life of your device.
           </product-detail-description>
 
-          <heading :class="$style.subtitle">Unlimited Histories</heading>
+          <heading :class="$style.subtitle">Increased event limits</heading>
           <product-detail-description>
             <template #left>
               <img
                 :class="$style.image"
-                alt="Unlimited ETH Transactions"
-                src="~/assets/img/products/details/unlimited_transactions.jpg"
+                alt="ETH Transactions"
+                src="~/assets/img/products/details/transactions.jpg"
               />
             </template>
-            <template #title>Unlimited Ethereum transactions</template>
-            Free users have a limit of the 250 most recent ethereum transactions
-            in the transactions viewer. As a premium user there is no limit in
-            the amount of transactions you can see.
+            <template #title>Ethereum transactions</template>
+            Free users have a limit of the 100 most recent ethereum transactions
+            in the transactions viewer. As a premium user you have higher limits
+            in the amount of transactions you can see.
           </product-detail-description>
 
           <product-detail-description>
@@ -81,13 +83,13 @@
               <img
                 :class="$style.image"
                 alt="Unlimited Trades"
-                src="~/assets/img/products/details/unlimited_trades.jpg"
+                src="~/assets/img/products/details/trades.jpg"
               />
             </template>
-            <template #title>Unlimited trades</template>
+            <template #title>Trades</template>
             Free users have a limit of the 250 most recent trades in the trades
-            viewer. As a premium user there is no limit in the amount of trades
-            you can see.
+            viewer. As a premium user you have higher limits in the amount of
+            trades you can see.
           </product-detail-description>
 
           <product-detail-description>
@@ -95,13 +97,13 @@
               <img
                 :class="$style.image"
                 alt="Unlimited Deposits and Withdrawals"
-                src="~/assets/img/products/details/unlimited_deposits_and_withdrawals.jpg"
+                src="~/assets/img/products/details/deposits_and_withdrawals.jpg"
               />
             </template>
-            <template #title>Unlimited deposit/withdrawals</template>
+            <template #title>Deposit/withdrawals</template>
             Free users have a limit of the 100 most recent exchange
             deposits/withdrawals in the deposits/withdrawals viewer. As a
-            premium user there is no limit in the amount of exchange
+            premium user there are higher limits in the amount of exchange
             deposits/withdrawals you can see
           </product-detail-description>
 
@@ -110,16 +112,16 @@
             <template #left>
               <img
                 :class="$style.image"
-                alt="Compound Detail"
+                alt="Compound Details"
                 src="~/assets/img/products/details/sc_compound1.jpg"
               />
             </template>
-            <template #title>Compound Finance Historical Accounting</template>
+            <template #title>Compound Finance Historical Analysis</template>
             As a premium user you can see how much you have earned/lost by using
             the Compound Finance protocol. For earning, how much you earned by
             lending and COMP rewards. For losses, how much you lost by borrowing
-            or liquidations.</product-detail-description
-          >
+            or liquidations.
+          </product-detail-description>
 
           <product-detail-description>
             <template #left>
@@ -130,8 +132,7 @@
               />
             </template>
             As a premium user you can also see a history of all your
-            interactions with the Compound Finance protocol for all assets. All
-            interactions are also included in the tax report.
+            interactions with the Compound Finance protocol for all assets.
           </product-detail-description>
 
           <product-detail-description>
@@ -147,8 +148,7 @@
             auto-detected and you can see all of the information per vault,
             including the interest rate owed in DAI. You can also see all the
             historical vault information about the actions you have taken for
-            each one of your vaults. Finally by using premium, MakerDAO vault
-            actions are taken into account in the tax report.
+            each one of your vaults.
           </product-detail-description>
 
           <product-detail-description>
@@ -180,7 +180,7 @@
                 src="~/assets/img/products/details/sc_aave.jpg"
               />
             </template>
-            <template #title>Aave Historical Accounting</template>
+            <template #title>Aave Historical Analysis</template>
             All Aave historical accounting data for lending/borrowing along with
             how much interest you have earned by lending from the Aave protocol
             can be inspected when you are using a premium account.
@@ -194,9 +194,9 @@
                 src="~/assets/img/products/details/sc_yearn_vaults1.jpg"
               />
             </template>
-            <template #title
-              >Yearn Finance Vaults Historical Accounting</template
-            >
+            <template #title>
+              Yearn Finance Vaults Historical Analysis
+            </template>
             As a premium user you can see how much you have earned in each of
             the yearn.finance vaults.
           </product-detail-description>
@@ -205,17 +205,24 @@
             <template #left>
               <img
                 :class="$style.image"
-                alt="Yearn Histories"
+                alt="Yearn History"
                 src="~/assets/img/products/details/sc_yearn_vaults2.jpg"
               />
             </template>
             You can also see a history of all your vault actions
-            (deposits/withdrawals) and have them included in the tax report.
+            (deposits/withdrawals).
           </product-detail-description>
 
           <div :class="$style.actions">
-            <action-button primary @click="goToCheckoutPlan()">
+            <action-button
+              v-if="!hasActiveSubscription"
+              primary
+              @click="goToCheckoutPlan()"
+            >
               Subscribe now
+            </action-button>
+            <action-button v-else primary @click="goToAccount()">
+              Manage Premium
             </action-button>
           </div>
         </div>
@@ -225,15 +232,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useRouter } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  toRefs,
+  useRouter,
+} from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'ProductsDetailPage',
   setup() {
     const router = useRouter()
+    const store = useMainStore()
+    const { account } = toRefs(store)
+    const hasActiveSubscription = computed(
+      () => !!get(account)?.hasActiveSubscription
+    )
     const goToCheckoutPlan = () => router.push('/checkout/plan')
+    const goToAccount = () => router.push('/home')
     return {
+      hasActiveSubscription,
       goToCheckoutPlan,
+      goToAccount,
     }
   },
 })

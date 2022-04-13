@@ -53,7 +53,7 @@
         <spinner v-if="loading" class="animate-spin" />
       </action-button>
       <span v-if="success" :class="$style.success">
-        <check /> Your password has changed was successfully.
+        <check /> Your password has been changed.
       </span>
     </div>
   </card>

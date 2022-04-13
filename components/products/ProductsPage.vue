@@ -76,8 +76,15 @@
             made in uniswap, sushiswap, balancer and more.
           </product-description>
           <div :class="$style.actions">
-            <action-button primary @click="goToCheckoutPlan()">
+            <action-button
+              v-if="!hasActiveSubscription"
+              primary
+              @click="goToCheckoutPlan()"
+            >
               Subscribe now
+            </action-button>
+            <action-button v-else primary @click="goToAccount()">
+              Manage Premium
             </action-button>
             <action-button @click="goToProductsDetail">
               More Details
@@ -90,17 +97,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, useRouter } from '@nuxtjs/composition-api'
+import {
+  computed,
+  defineComponent,
+  toRefs,
+  useRouter,
+} from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
+import { useMainStore } from '~/store'
 
 export default defineComponent({
   name: 'ProductsPage',
   setup() {
     const router = useRouter()
+
+    const store = useMainStore()
+    const { account } = toRefs(store)
+    const hasActiveSubscription = computed(
+      () => !!get(account)?.hasActiveSubscription
+    )
     const goToCheckoutPlan = () => router.push('/checkout/plan')
-    const goToProductsDetail = () => router.push('/products/detail')
+    const goToProductsDetail = () => router.push('/products/details')
+    const goToAccount = () => router.push('/home')
     return {
+      hasActiveSubscription,
       goToCheckoutPlan,
       goToProductsDetail,
+      goToAccount,
     }
   },
 })

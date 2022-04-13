@@ -92,9 +92,9 @@
           "subtitle": "Premium users can visit the graphs/statistics page and get graphs for:",
           "detail": "Premium users can visit the graphs/statistics page and get graphs for:{0}{0}Net worth over time{0}Asset amount and total asset value over time{0}Breakdown of total net worth per location{0}Breakdown of total net worth per asset"
         },
-        "unlimited_histories": {
-          "title": "Unlimited trades, transactions, deposits and withdrawals",
-          "detail": "Free users have a limit on the number of transactions, deposits, withdrawals and other events they can see and process. Premium users have no such limit."
+        "history": {
+          "title": "Higher limits for trades, transactions, deposits and withdrawals",
+          "detail": "Free users have a limit on the number of transactions, deposits, withdrawals and other events they can see and process. Premium users have higher limits."
         },
         "premium_defi": {
           "title": "DeFi historical accounting, profit and loss",

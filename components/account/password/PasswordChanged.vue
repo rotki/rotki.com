@@ -4,7 +4,7 @@
     <user-action-message>
       <template #header>Password changed.</template>
       <div>
-        Your password has been changed.
+        Your password has been changed. Go to your
         <external-link same-tab text="account" url="/home" />.
       </div>
     </user-action-message>

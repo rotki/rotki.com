@@ -1,10 +1,10 @@
 <template>
   <premium-feature>
     <template #title>
-      {{ $t('home.premium_features.features.unlimited_histories.title') }}
+      {{ $t('home.premium_features.features.history.title') }}
     </template>
 
-    {{ $t('home.premium_features.features.unlimited_histories.detail') }}
+    {{ $t('home.premium_features.features.history.detail') }}
   </premium-feature>
 </template>
 <script lang="ts">
