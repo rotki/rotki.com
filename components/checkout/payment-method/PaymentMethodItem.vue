@@ -44,7 +44,7 @@ export default defineComponent({
 
 <style lang="scss" module>
 .content {
-  @apply flex flex-col justify-center text-center items-center;
+  @apply flex flex-col justify-center text-center items-center cursor-pointer;
 
   width: 200px;
   min-width: 150px;

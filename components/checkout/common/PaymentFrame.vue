@@ -43,7 +43,7 @@
         >
           <div :class="$style['action-wrapper']">
             <nuxt-link :class="$style.action" to="/home">
-              Account Management
+              Manage Premium
             </nuxt-link>
           </div>
         </success-display>
