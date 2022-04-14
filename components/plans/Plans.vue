@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.wrapper">
     <div>
-      <div :class="$style.header">Start using Rotki today!</div>
+      <div :class="$style.header">{{ $t('home.plans.title') }}</div>
     </div>
     <div :class="$style.basic">
       <div :class="$style.content">
@@ -15,20 +15,19 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Plans',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 
 .wrapper {
-  margin-top: 123px;
-  padding-bottom: 200px; // 30px with custom plan;
+  padding: 7.5rem 0;
 }
 
 .header {
@@ -43,7 +42,7 @@ export default Vue.extend({
 }
 
 .basic {
-  @apply container mx-auto;
+  @apply container;
 }
 
 .content {

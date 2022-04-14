@@ -3,33 +3,36 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta, useRoute } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { setupOverflow } from '~/composables/overflow'
+import { useRuntimeConfig } from '~/composables/utils'
 
-function metadata(route: string) {
-  let title = 'Rotki: Jobs'
+function metadata(route: string, baseUrl: string) {
+  let title = 'jobs | rotki'
   let description = 'Available roles and positions in the rotki team'
   let path = ''
 
   if (route.includes('backend')) {
-    title = 'Rotki: Position for a Python Backend Developer'
+    title = 'python backend developer | rotki'
     description =
       'We are looking for a backend developer to help us improve Rotki.'
     path = 'backend'
   } else if (route.includes('frontend')) {
-    title = 'Rotki: Position for a Vue.js/TypeScript Developer'
+    title = 'vue/typescript frontend developer | rotki'
     description =
       'We are looking for a passionate Vue.js developer with excellent knowledge of Typescript.'
     path = 'frontend'
   }
 
   return [
-    getMetadata(title, description, `${process.env.BASE_URL}/jobs/${path}`),
+    getMetadata(title, description, `${baseUrl}/jobs/${path}`, baseUrl),
     title,
   ] as const
 }
 
-export default Vue.extend({
+export default defineComponent({
+  name: 'Jobs',
   middleware: [
     function ({ redirect, route }) {
       if (['/jobs', '/jobs/'].includes(route.path)) {
@@ -37,30 +40,18 @@ export default Vue.extend({
       }
     },
   ],
-  data() {
-    return {
-      visible: false,
-    }
-  },
-  head() {
-    // TODO: figure out why type augmentation fails when running generate
-    const [meta, title] = metadata((this as any).$route.path)
-    return {
+  setup() {
+    const route = useRoute()
+    const config = useRuntimeConfig()
+    const [meta, title] = metadata(route.value.path, config.baseUrl)
+    useMeta({
       title,
       meta,
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
+    return setupOverflow()
   },
-  watch: {
-    visible(visible: boolean) {
-      document.body.style.overflowY = visible ? 'hidden' : 'auto'
-    },
-  },
+  head: {},
 })
 </script>
 

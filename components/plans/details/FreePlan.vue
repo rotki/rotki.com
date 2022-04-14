@@ -1,20 +1,20 @@
 <template>
-  <plan action="Start now for free" @click="$emit('download')">
-    <template #title>Free</template>
-    Anyone can download the application and start using it for free.
+  <plan :action="$tc('actions.download')" @click="$emit('download')">
+    <template #title>{{ $t('home.plans.details.free.title') }}</template>
+    {{ $t('home.plans.details.free.subtitle') }}
     <div :class="$style.filler"></div>
   </plan>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'FreePlan',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 

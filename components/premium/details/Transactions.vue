@@ -1,16 +1,16 @@
 <template>
   <premium-feature>
     <template #title>
-      Unlimited trades, transactions, deposits and withdrawals
+      {{ $t('home.premium_features.features.history.title') }}
     </template>
-    Free users have a limit on the number of transactions, deposits, withdrawals
-    and other events they can see and process. Premium users have no such limit.
+
+    {{ $t('home.premium_features.features.history.detail') }}
   </premium-feature>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Transactions',
 })
 </script>

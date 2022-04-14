@@ -1,8 +1,7 @@
 const dev = process.env.NODE_ENV !== 'production'
-
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
-  target: 'static',
+  target: 'server',
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
@@ -41,7 +40,11 @@ export default {
         href: '/favicon-16x16.png',
         sizes: '16x16',
       },
-      { rel: 'manifest', href: '/site.webmanifest' },
+      {
+        rel: 'manifest',
+        href: '/site.webmanifest',
+        crossorigin: 'use-credentials',
+      },
       {
         rel: 'mask-icon',
         href: '/safari-pinned-tab.svg',
@@ -54,7 +57,8 @@ export default {
   css: [],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: [],
+  plugins: ['~/plugins/axios.ts', { ssr: true, src: '~/plugins/startup.ts' }],
+  ssr: true,
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: [{ path: '~/components', pathPrefix: false }],
@@ -66,6 +70,8 @@ export default {
     // https://go.nuxtjs.dev/stylelint
     '@nuxtjs/stylelint-module',
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/composition-api/module',
+    ['@pinia/nuxt', { disableVuex: true }],
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
@@ -75,10 +81,23 @@ export default {
     '@nuxtjs/recaptcha',
     '@nuxtjs/sitemap',
     '@nuxtjs/robots',
+    '@nuxtjs/i18n',
   ],
 
+  i18n: {
+    locales: [{ code: 'en', iso: 'en-US', file: 'en.json' }],
+    defaultLocale: 'en',
+    strategy: 'no_prefix',
+    langDir: '~/locales',
+    vueI18n: {
+      fallbackLocale: 'en',
+    },
+  },
+
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    baseURL: process.env.BASE_URL,
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
@@ -98,6 +117,17 @@ export default {
       /* reCAPTCHA options */
       siteKey: process.env.RECAPTCHA_SITE_KEY, // for example
     },
+    axios: {
+      browserBaseURL: process.env.BASE_URL,
+    },
+    baseUrl: process.env.BASE_URL || '',
+    maintenance: process.env.MAINTENANCE || 'false',
+    testing: process.env.TESTING,
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL,
+    },
   },
 
   recaptcha: {
@@ -107,15 +137,10 @@ export default {
   sitemap: {
     hostname: 'https://rotki.com',
     gzip: true,
-    routes: ['/login/', '/products/'],
   },
 
   robots: {
     UserAgent: '*',
     Disallow: '/home',
-  },
-
-  env: {
-    baseUrl: process.env.BASE_URL || 'https://rotki.com',
   },
 }

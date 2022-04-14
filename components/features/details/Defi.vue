@@ -1,30 +1,29 @@
 <template>
   <feature id="defi">
-    <template #title> DeFi </template>
+    <template #title> {{ $t('home.defi.title') }} </template>
     <template #image>
       <img
+        :class="$style.image"
         alt="DeFi protocols"
         src="~/assets/img/defi.png"
-        :class="$style.image"
       />
     </template>
     <feature-details>
-      Overview of all of your DeFi holdings in various protocols, historical
-      activity details and profit loss calculation.
+      {{ $t('home.defi.detail') }}
     </feature-details>
     <div :class="$style['list-container']">
       <item-list :list="defi" />
     </div>
-    <Caption> * This is but a subset of the supported protocols </Caption>
+    <Caption> * {{ $t('home.defi.subset_note') }}</Caption>
   </feature>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Defi',
-  data() {
+  setup() {
     return {
       defi: [
         'MakerDAO',
@@ -39,7 +38,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

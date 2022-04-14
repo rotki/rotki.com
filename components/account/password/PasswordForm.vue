@@ -1,65 +1,98 @@
 <template>
-  <square-form>
-    <template #subtitle> Reset your password </template>
-    <input-field id="email" v-model="email" label="Email" />
-    <recaptcha :class="$style.recaptcha" />
-    <action-button primary text="Submit" :class="$style.button" />
-  </square-form>
+  <page>
+    <template #title> Reset your password </template>
+    <div :class="$style.content">
+      <box>
+        <template #label> Recover password </template>
+        <input-field id="email" v-model="emailAddress" filled label="Email" />
+        <recaptcha
+          :class="$style.recaptcha"
+          @error="onError"
+          @expired="onExpired"
+          @success="onSuccess"
+        />
+        <action-button
+          :class="$style.button"
+          :disabled="!valid"
+          primary
+          small
+          text="Submit"
+          @click="reset"
+        />
+      </box>
+    </div>
+  </page>
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
+import {
+  computed,
+  defineComponent,
+  ref,
+  useContext,
+  useRouter,
+} from '@nuxtjs/composition-api'
+import { useVuelidate } from '@vuelidate/core'
+import { email, required } from '@vuelidate/validators'
+import { setupRecaptcha } from '~/composables/repatcha'
+import { setupCSRF } from '~/composables/csrf-token'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'PasswordForm',
-  data() {
+  setup() {
+    const emailAddress = ref('')
+    const recaptcha = setupRecaptcha()
+
+    const rules = {
+      email: { required, email },
+    }
+
+    const $externalResults = ref({})
+    const v$ = useVuelidate(
+      rules,
+      { email: emailAddress },
+      {
+        $autoDirty: true,
+        $externalResults,
+      }
+    )
+
+    const valid = computed((ctx) => !v$.value.$invalid && ctx.recaptchaPassed)
+
+    const { $api } = useContext()
+    const router = useRouter()
+
+    const reset = async () => {
+      await $api.post('/webapi/password-reset/request/', {
+        captcha: recaptcha.recaptchaToken.value,
+        email: emailAddress.value,
+      })
+      router.push({
+        path: '/password/send',
+      })
+    }
+    setupCSRF()
     return {
-      email: '',
+      ...recaptcha,
+      emailAddress,
+      valid,
+      v$,
+      reset,
     }
   },
 })
 </script>
 
-<style module lang="scss">
-@import '~assets/css/media';
-@import '~assets/css/main';
-
-.wrapper {
-  @apply w-screen h-screen flex flex-col;
-
-  @include for-size(phone-only) {
-    padding: $mobile-margin / 2;
-  }
-}
-
-.content {
-  @apply flex flex-row items-center justify-center;
-
-  height: 100%;
-}
-
-.inputs {
-  max-width: 500px;
-  height: 500px;
-
-  @media only screen and (max-height: 800px) {
-    margin-top: 48px;
-  }
-}
-
+<style lang="scss" module>
 .button {
-  margin-top: 48px;
-}
-
-.subtitle {
-  @apply font-sans text-primary2 font-medium;
-
-  font-size: 0.66rem;
-  text-align: center;
-  text-transform: uppercase;
+  @apply mt-12;
 }
 
 .recaptcha {
-  margin-top: 16px;
+  @apply mt-4 h-20;
+}
+
+.content {
+  @apply flex flex-row justify-center;
 }
 </style>

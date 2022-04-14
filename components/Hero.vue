@@ -2,16 +2,16 @@
   <div :class="$style.wrapper">
     <div :class="$style.title">
       <div :class="$style.column">
-        <div :class="$style.row">The portfolio manager that</div>
-        <div :class="$style.row">protects your privacy</div>
+        <i18n path="home.hero.title">
+          <br />
+        </i18n>
       </div>
     </div>
     <div :class="$style.subtitle">
       <div :class="$style.column">
         <div :class="$style.row">
           <div :class="$style.motto">
-            rotki is an open source portfolio tracker, accounting and analytics
-            tool that protects your privacy.
+            {{ $t('home.hero.motto') }}
           </div>
         </div>
       </div>
@@ -20,7 +20,7 @@
       <download-button @click="$emit('download')" />
       <action-button
         :class="$style.premium"
-        text="Get Premium"
+        :text="$tc('actions.get_premium')"
         @click="navigateTo"
       />
     </div>
@@ -29,17 +29,20 @@
     </div>
     <div :class="$style.description">
       <info>
-        <template #title> Open source </template>
-        rotki's source code is available to inspect, modify and enhance.
+        <template #title
+          >{{ $t('home.advantages.open_source.title') }}
+        </template>
+        <div>{{ $t('home.advantages.open_source.description') }}</div>
       </info>
       <info>
-        <template #title> Local app </template>
-        rotki is a local-first application with a strong focus on user privacy.
+        <template #title>{{ $t('home.advantages.local_app.title') }}</template>
+        <div>{{ $t('home.advantages.local_app.description') }}</div>
       </info>
       <info>
-        <template #title> Own your data </template>
-        Your financial data is kept encrypted in your system and not shared with
-        third parties.
+        <template #title
+          >{{ $t('home.advantages.own_your_data.title') }}
+        </template>
+        <div>{{ $t('home.advantages.own_your_data.description') }}</div>
       </info>
     </div>
     <use-app @download="$emit('download')" />
@@ -47,9 +50,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Hero',
   methods: {
     navigateTo() {
@@ -59,7 +62,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
@@ -145,23 +148,10 @@ $subtitle-line-height: 42px;
 }
 
 .description {
-  @apply flex flex-row justify-center flex-wrap;
-
-  margin-top: 127px;
+  @apply flex flex-row justify-center flex-wrap mt-16 lg:mt-32;
 
   > * {
-    padding-left: 16px;
-    padding-right: 16px;
-
-    @include for-size(phone-only) {
-      margin-top: 32px;
-    }
-  }
-
-  @include for-size(phone-only) {
-    @apply flex-wrap text-center;
-
-    margin-top: 32px;
+    @apply p-8;
   }
 }
 </style>

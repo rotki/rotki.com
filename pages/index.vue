@@ -1,54 +1,46 @@
 <template>
   <fragment>
-    <Header />
+    <Header landing />
     <hero @download="visible = true" />
     <features @download="visible = true" />
     <premium />
     <plans @download="visible = true" />
-    <page-footer />
+    <page-footer landing />
     <download-dialog v-if="visible" @dismiss="visible = false" />
   </fragment>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { setupOverflow } from '~/composables/overflow'
+import { useRuntimeConfig } from '~/composables/utils'
 
 const description =
-  'Rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.'
+  'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.'
 
 const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`
 
-export default Vue.extend({
-  data() {
-    return {
-      visible: false,
-    }
-  },
-  head: () => {
-    return {
-      title: 'Rotki',
+export default defineComponent({
+  name: 'Index',
+  setup() {
+    const config = useRuntimeConfig()
+    const baseUrl = config.baseUrl
+    useMeta({
+      title: 'rotki',
       meta: [
         {
           name: 'keywords',
           content: keywords,
         },
-        ...getMetadata('Rotki', description, `${process.env.baseUrl}`),
+        ...getMetadata('rotki', description, baseUrl, baseUrl),
       ],
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
+    return setupOverflow()
   },
-  watch: {
-    visible(visible: boolean) {
-      document.body.style.overflowY = visible ? 'hidden' : 'auto'
-    },
-  },
+  head: {},
 })
 </script>
 

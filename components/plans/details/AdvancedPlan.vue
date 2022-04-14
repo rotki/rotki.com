@@ -1,15 +1,14 @@
 <template>
-  <plan action="Get advanced plan">
-    <template #title>Advanced</template>
-    Premium users unlock the full potential of rotki by removing all limits and
-    unlocking all features.
+  <plan :action="$tc('actions.get_advanced_plan')">
+    <template #title>{{ $t('home.plans.details.advanced.title') }}</template>
+    {{ $t('home.plans.details.advanced.subtitle') }}
   </plan>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'AdvancedPlan',
 })
 </script>

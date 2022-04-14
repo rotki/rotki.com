@@ -4,6 +4,7 @@
       [$style.heading]: !subheading,
       [$style.subheading]: subheading,
       [$style.secondary]: secondary,
+      [$style['no-margin']]: noMargin,
     }"
   >
     <slot />
@@ -11,12 +12,17 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Heading',
   props: {
     subheading: {
+      required: false,
+      default: false,
+      type: Boolean,
+    },
+    noMargin: {
       required: false,
       default: false,
       type: Boolean,
@@ -35,14 +41,28 @@ export default Vue.extend({
 @import '~assets/css/main';
 
 .heading {
-  @apply font-serif text-primary2 font-bold mt-6 text-2xl;
+  @apply font-serif text-primary2 font-bold text-2xl;
+
+  &:not(.no-margin) {
+    @apply mt-6;
+  }
 }
 
 .secondary {
-  @apply font-serif text-primary2 font-bold mt-6 text-xl;
+  @apply font-serif text-primary2 font-bold text-xl;
+
+  &:not(.no-margin) {
+    @apply mt-6;
+  }
+
+  @include text-size(24px, 32px);
 }
 
 .subheading {
-  @apply font-serif text-primary2 font-medium mt-4 text-lg;
+  @apply font-serif text-primary2 font-medium text-lg;
+
+  &:not(.no-margin) {
+    @apply mt-4;
+  }
 }
 </style>

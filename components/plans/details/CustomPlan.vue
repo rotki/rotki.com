@@ -2,8 +2,8 @@
   <div>
     <div :class="$style.space">
       <img
-        alt="rotki in Space"
         :class="$style.image"
+        alt="rotki in Space"
         src="~/assets/img/space.svg"
       />
     </div>
@@ -11,12 +11,14 @@
       <div :class="$style.wrapper">
         <div :class="$style.row">
           <div :class="$style.column2">
-            <div :class="$style.title">Want a custom tailored plan?</div>
+            <div :class="$style.title">
+              {{ $t('home.plans.details.custom.title') }}
+            </div>
             <div :class="$style.description">
-              Get in touch with us to tailor the plan to your needs.
+              {{ $t('home.plans.details.custom.subtitle') }}
             </div>
             <div :class="$style.button">
-              <action-button text="Get in touch now" />
+              <action-button :text="$tc('actions.get_in_touch')" />
             </div>
           </div>
         </div>
@@ -26,26 +28,26 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'CustomPlan',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/main';
 @import '~assets/css/media';
 
 .wrapper {
-  @apply container mx-auto;
+  @apply container;
 
   margin-top: 247px;
-  padding-bottom: 400px;
+  padding-bottom: 200px;
 
   @include for-size(phone-only) {
     margin-top: 47px;
-    padding-bottom: 100px;
+    padding-bottom: 0;
   }
 }
 

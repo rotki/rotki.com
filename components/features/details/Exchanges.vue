@@ -1,33 +1,32 @@
 <template>
   <feature id="exchanges">
     <template #title>
-      Connect to a big number of centralized exchanges
+      {{ $t('home.exchanges.title') }}
     </template>
     <template #image>
       <img
+        :class="$style.image"
         alt="Supported Exchanges"
         src="~/assets/img/exchanges.png"
-        :class="$style.image"
       />
     </template>
     <feature-details>
-      Connect to a big number of centralized exchanges and inspect current
-      balances, historical trades, deposits and withdrawals.
+      {{ $t('home.exchanges.detail') }}
     </feature-details>
     <div :class="$style.list">
       <item-list :list="column1" />
       <item-list :list="column2" />
     </div>
-    <Caption> * This is but a subset of the supported exchanges </Caption>
+    <Caption> * {{ $t('home.exchanges.subset_note') }} </Caption>
   </feature>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Exchanges',
-  data() {
+  setup() {
     return {
       column1: ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex'],
       column2: ['FTX', 'Coinbase', 'Coinbase Pro', 'Gemini', 'Bitmex'],
@@ -36,7 +35,7 @@ export default Vue.extend({
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

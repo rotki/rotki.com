@@ -1,112 +1,195 @@
 <template>
-  <square-form>
-    <template #subtitle> Premium account management </template>
-    <template #hint>
-      Here you can create or login to your premium account. A premium account is
-      only needed to unlock the premium features of the application and is not
-      the same as the account you use in the Rotki application. Credentials for
-      one account can not be used for the other.
-    </template>
-
-    <div :class="$style.signin">Sign in</div>
-
-    <input
+  <box>
+    <template #label>Sign in</template>
+    <input-field
+      id="username"
       v-model="username"
+      filled
+      label="Username"
       type="text"
-      :class="$style.input"
-      placeholder="Username"
-    />
-    <input
+      @focus="error = ''"
+    >
+      <template #prepend>
+        <span :class="$style.prepend">
+          <user-icon />
+        </span>
+      </template>
+    </input-field>
+    <input-field
+      id="password"
       v-model="password"
-      type="password"
-      :class="$style.input"
-      placeholder="Password"
-    />
+      :class="$style.password"
+      :type="showPassword ? 'text' : 'password'"
+      filled
+      label="Password"
+      @enter="login"
+      @focus="error = ''"
+    >
+      <template #prepend>
+        <span :class="$style.prepend">
+          <password-icon />
+        </span>
+      </template>
+      <template #append>
+        <button :class="$style.show" @click="showPassword = !showPassword">
+          <span v-if="showPassword">HIDE</span>
+          <span v-else>SHOW</span>
+        </button>
+      </template>
+    </input-field>
+
+    <div :class="$style.errorWrapper">
+      <div v-if="error" :class="$style.error">{{ error }}</div>
+    </div>
+
+    <div :class="$style.buttonContainer">
+      <action-button
+        :class="$style.button"
+        :disabled="!valid"
+        primary
+        small
+        text="Sign in"
+        @click="login"
+      />
+    </div>
 
     <div :class="$style.reset">
-      <a href="/forgotpassword">Forgot password</a>
+      <external-link same-tab text="Forgot password?" url="/password/recover" />
     </div>
 
-    <button :class="$style.button">Sign in</button>
+    <div :class="$style.divider" />
+
     <div :class="$style.create">
       First time premium?
-      <a href="/signup" :class="$style.signup"> Sign Up here </a>
+      <external-link
+        :class="$style.signup"
+        same-tab
+        text="Sign up now"
+        url="/signup"
+      />
     </div>
-  </square-form>
+  </box>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import {
+  computed,
+  defineComponent,
+  ref,
+  toRefs,
+  useRouter,
+} from '@nuxtjs/composition-api'
+import { setupCSRF } from '~/composables/csrf-token'
+import { useMainStore } from '~/store'
 
-export default Vue.extend({
-  name: 'Login',
-  data() {
+export default defineComponent({
+  name: 'LoginForm',
+  props: {
+    modal: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['complete'],
+  setup(props, { emit }) {
+    const { modal } = toRefs(props)
+    const username = ref('')
+    const password = ref('')
+    const showPassword = ref(false)
+    const valid = computed(({ username, password }) => !!username && !!password)
+    const error = ref('')
+    setupCSRF()
+    const { login } = useMainStore()
+    const router = useRouter()
+    const performLogin = async () => {
+      error.value = await login({
+        username: username.value,
+        password: password.value,
+      })
+
+      if (!error.value) {
+        if (modal.value) {
+          emit('complete')
+        } else {
+          router.push('/home')
+        }
+      }
+    }
     return {
-      username: '',
-      password: '',
+      username,
+      password,
+      showPassword,
+      valid,
+      error,
+      login: performLogin,
     }
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
-.input {
-  @apply border-shade10 box-border border-solid focus:outline-none focus:border-primary py-2 px-3 appearance-none;
-
-  margin-top: 16px;
-  border-width: 1px;
-  border-radius: 8px;
-  height: 56px;
-  width: 336px;
-
-  @include for-size(phone-only) {
-    width: 100%;
-  }
-}
-
-.signin {
-  @apply font-serif font-bold text-primary2;
-
-  letter-spacing: -0.01em;
-
-  @include text-size(32px, 47px);
-  @include for-size(phone-only) {
-    margin-top: 20px;
-  }
+.buttonContainer {
+  @apply flex flex-row align-middle justify-center mt-8;
 }
 
 .button {
-  @apply text-white bg-primary hover:bg-shade12 font-sans focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
-
-  height: 56px;
-  width: 336px;
-  border-radius: 8px;
-
-  @include for-size(phone-only) {
-    width: 100%;
-  }
+  width: 288px;
 }
 
 .reset {
-  @apply flex flex-row justify-end text-primary focus:text-yellow-800;
+  @apply flex flex-row justify-center text-primary focus:text-yellow-800 my-6;
 
   width: 100%;
-  margin-top: 24px;
-  margin-bottom: 24px;
+
   @include for-size(phone-only) {
-    margin-top: $mobile-margin / 2;
-    margin-bottom: $mobile-margin / 2;
+    margin-top: calc($mobile-margin / 2);
+    margin-bottom: calc($mobile-margin / 2);
   }
 }
 
-.signup {
-  @apply text-primary focus:text-yellow-800;
+.prepend {
+  @apply p-3 flex items-center;
+}
+
+.password {
+  @apply mt-5;
+}
+
+.show {
+  @apply m-2 focus:outline-none;
+
+  width: 56px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0;
+  color: #363f41;
+}
+
+.divider {
+  @apply border border-solid border-typography opacity-20;
+
+  width: 328px;
 }
 
 .create {
-  padding-top: 16px;
+  @apply flex flex-row align-middle justify-center mt-6 mb-2;
+}
+
+.signup {
+  @apply font-bold ml-2;
+}
+
+.error {
+  @apply text-error text-xs tracking-tight;
+}
+
+.errorWrapper {
+  @apply flex flex-row justify-center -mt-1.5;
+
+  height: 18px;
 }
 </style>

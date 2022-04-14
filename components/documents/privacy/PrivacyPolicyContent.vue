@@ -24,7 +24,7 @@
     <paragraph>
       The terms used in this Privacy Policy have the same meanings as in our
       Terms and Conditions, which is accessible
-      <external-link url="/tos" text="here" same-tab />
+      <external-link same-tab text="here" url="/tos" />
       , unless otherwise defined in this Privacy Policy.
     </paragraph>
 
@@ -135,15 +135,15 @@
   </page>
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'PrivacyPolicyContent',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media.scss';
 @import '~assets/css/main.scss';
 

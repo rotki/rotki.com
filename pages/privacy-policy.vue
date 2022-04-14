@@ -3,31 +3,31 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { getMetadata } from '~/utils/metadata'
+import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+import { commonAttrs, getMetadata } from '~/utils/metadata'
+import { useRuntimeConfig } from '~/composables/utils'
 
-const title = 'Rotki: Privacy Policy'
+const title = 'privacy policy | rotki'
 const description =
   'Information for the website visitors regarding our policies with the collection, use, and disclosure of Personal Information regarding the service usage'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'PrivacyPolicy',
-  head: () => {
-    return {
+  setup() {
+    const config = useRuntimeConfig()
+    const baseUrl = config.baseUrl
+    useMeta({
       title,
       meta: getMetadata(
         title,
         description,
-        `${process.env.baseUrl}/privacy-policy/`
+        `${baseUrl}/privacy-policy/`,
+        baseUrl
       ),
-      htmlAttrs: {
-        class: 'page',
-      },
-      bodyAttrs: {
-        class: 'body',
-      },
-    }
+      ...commonAttrs(),
+    })
   },
+  head: {},
 })
 </script>
 

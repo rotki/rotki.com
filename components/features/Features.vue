@@ -2,36 +2,32 @@
   <fragment>
     <anchor id="features" />
     <middle-menu />
-    <div
-      :class="{
-        [$style.wrapper]: true,
-      }"
-    >
+    <div :class="$style.wrapper">
       <div>
         <dashboard @download="$emit('download')" />
         <exchanges />
         <defi />
         <defi-details />
-        <ProfitLossReport :class="$style.last" />
+        <profit-loss-report :class="$style.last" />
       </div>
     </div>
   </fragment>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'Features',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
 .wrapper {
-  @apply container mx-auto;
+  @apply container;
 }
 
 .last {

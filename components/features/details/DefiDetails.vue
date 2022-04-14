@@ -1,46 +1,55 @@
 <template>
   <feature id="defi-details">
-    <template #title> Ethereum DeFi protocol details </template>
+    <template #title> {{ $t('home.eth_protocols.title') }} </template>
     <feature-details>
-      Details per protocol for some of the supported protocols:
+      {{ $t('home.eth_protocols.detail') }}
     </feature-details>
     <div :class="$style.protocols">
       <DefiProtocol :image="require('~/assets/img/defi/makerdao.png')">
-        <template #name>Maker DAO</template>
-        Which vaults you have open, how much you have in DSR
+        <template #name>
+          {{ $t('home.eth_protocols.protocols.maker_dao.title') }}
+        </template>
+        {{ $t('home.eth_protocols.protocols.maker_dao.description') }}
       </DefiProtocol>
       <DefiProtocol :image="require('~/assets/img/defi/aave.png')">
-        <template #name>AAVE</template>
-        Your current balances and liabilities
+        <template #name>
+          {{ $t('home.eth_protocols.protocols.aave.title') }}
+        </template>
+        {{ $t('home.eth_protocols.protocols.aave.description') }}
       </DefiProtocol>
       <DefiProtocol :image="require('~/assets/img/defi/compound.png')">
-        <template #name>Compound</template>
-        Your current balances and liabilities
+        <template #name>
+          {{ $t('home.eth_protocols.protocols.compound.title') }}
+        </template>
+        {{ $t('home.eth_protocols.protocols.compound.description') }}
       </DefiProtocol>
       <DefiProtocol :image="require('~/assets/img/defi/yearn.png')">
-        <template #name>Yearn vaults</template>
-        Your current balances
+        <template #name>
+          {{ $t('home.eth_protocols.protocols.yearn_vaults.title') }}
+        </template>
+        {{ $t('home.eth_protocols.protocols.yearn_vaults.description') }}
       </DefiProtocol>
       <DefiProtocol :image="require('~/assets/img/defi/uniswap.png')">
-        <template #name>Uniswap</template>
-        Your current LP balances, and v2 trades
+        <template #name>
+          {{ $t('home.eth_protocols.protocols.uniswap.title') }}
+        </template>
+        {{ $t('home.eth_protocols.protocols.uniswap.description') }}
       </DefiProtocol>
       <DefiProtocol :image="require('~/assets/img/defi/balancer.png')">
-        <template #name>Balancer</template>
-        Your current LP balances, and trades
+        <template #name>
+          {{ $t('home.eth_protocols.protocols.balancer.title') }}
+        </template>
+        {{ $t('home.eth_protocols.protocols.balancer.description') }}
       </DefiProtocol>
     </div>
-    <Caption>
-      * Premium users can set watchers for various protocols so that they can be
-      informed via email when certain conditions are met.
-    </Caption>
+    <Caption> * {{ $t('home.eth_protocols.watcher_note') }} </Caption>
   </feature>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'DefiDetails',
 })
 </script>

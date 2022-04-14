@@ -6,8 +6,8 @@
           <div :class="$style.row">
             <div :class="$style['icon-column']">
               <img
-                alt="partial rotki logo"
                 :class="$style.icon"
+                alt="partial rotki logo"
                 src="~/assets/img/partial-logo.svg"
               />
             </div>
@@ -21,24 +21,24 @@
             </div>
           </div>
           <div :class="$style.row2">
-            <a :href="linuxUrl" :class="$style.link" download>
+            <a :class="$style.link" :href="linuxUrl" download>
               <img
-                alt="Linux Download button"
                 :class="$style.link"
+                alt="Linux Download button"
                 src="~/assets/img/dl/linux.svg"
               />
             </a>
-            <a :href="macOSUrl" :class="$style.link" download>
+            <a :class="$style.link" :href="macOSUrl" download>
               <img
-                alt="macOS Download button"
                 :class="$style.link"
+                alt="macOS Download button"
                 src="~/assets/img/dl/mac.svg"
               />
             </a>
-            <a :href="windowsUrl" :class="$style.link" download>
+            <a :class="$style.link" :href="windowsUrl" download>
               <img
-                alt="Windows Download button"
                 :class="$style.link"
+                alt="Windows Download button"
                 src="~/assets/img/dl/windows.svg"
               />
             </a>
@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { NuxtAxiosInstance } from '@nuxtjs/axios'
+import { defineComponent, onBeforeMount, ref } from '@nuxtjs/composition-api'
+import { useAxios } from '~/plugins/axios'
 
 const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
 
@@ -87,40 +87,38 @@ function isMacOsApp(name: string): boolean {
   return name.endsWith('.dmg')
 }
 
-export default Vue.extend({
+export default defineComponent({
   name: 'DownloadDialog',
-  data() {
-    return {
-      version: '',
-      linuxUrl: LATEST,
-      macOSUrl: LATEST,
-      windowsUrl: LATEST,
-    }
-  },
-  async mounted() {
-    await this.fetchLatestRelease()
-  },
-  methods: {
-    async fetchLatestRelease() {
-      // For some reason while the typescript instructions are followed
-      // generate fails because it it can't find the $axios property.
-      // This means that the merge of the context somehow fails
-      const comp = this as any
-      const $axios = comp.$axios as NuxtAxiosInstance
-      const latestRelease: GithubRelease = await $axios.$get<GithubRelease>(
+  setup() {
+    const version = ref('')
+    const linuxUrl = ref(LATEST)
+    const macOSUrl = ref(LATEST)
+    const windowsUrl = ref(LATEST)
+
+    const fetchLatestRelease = async () => {
+      const api = useAxios()
+      const latestRelease = await api.$get<GithubRelease>(
         'https://api.github.com/repos/rotki/rotki/releases/latest'
       )
-      this.version = latestRelease.tag_name
+      version.value = latestRelease.tag_name
       const assets: Asset[] = latestRelease.assets
-      this.macOSUrl = getUrl(assets, ({ name }) => isMacOsApp(name))
-      this.linuxUrl = getUrl(assets, ({ name }) => isLinuxApp(name))
-      this.windowsUrl = getUrl(assets, ({ name }) => isWindowApp(name))
-    },
+      macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name))
+      linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name))
+      windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name))
+    }
+    onBeforeMount(async () => await fetchLatestRelease())
+
+    return {
+      version,
+      linuxUrl,
+      macOSUrl,
+      windowsUrl,
+    }
   },
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 

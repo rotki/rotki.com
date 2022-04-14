@@ -2,17 +2,17 @@
   <div :class="$style.wrapper">
     <div :class="$style.col">
       <img
+        :class="$style.image"
         alt="rotki accountant"
         src="~/assets/img/accountant.svg"
-        :class="$style.image"
       />
     </div>
     <div :class="$style.column2">
       <div :class="$style.row">
         <div :class="$style.text">
-          Rotki offers tracking of all your crypto assets no matter where they
-          are. Be it on a blockchain, a DeFi protocol or on one of the supported
-          exchanges.
+          <i18n path="home.use_app">
+            <br />
+          </i18n>
         </div>
       </div>
       <download-button :class="$style.button" @click="$emit('download')" />
@@ -20,30 +20,29 @@
   </div>
 </template>
 
-<script>
-import Vue from 'vue'
+<script lang="ts">
+import { defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'UseApp',
 })
 </script>
 
-<style module lang="scss">
+<style lang="scss" module>
 @import '~assets/css/media';
 @import '~assets/css/main';
 
 .wrapper {
-  @apply flex flex-row justify-center align-middle;
+  @apply flex flex-row justify-center align-middle mt-16 lg:mt-32;
 
-  margin-top: 129px;
   padding-right: $mobile-margin * 2;
   padding-left: $mobile-margin * 2;
 
   @include for-size(phone-only) {
     @apply flex-wrap;
 
-    padding-right: $mobile-margin / 2;
-    padding-left: $mobile-margin / 2;
+    padding-right: calc($mobile-margin / 2);
+    padding-left: calc($mobile-margin / 2);
   }
 }
 
