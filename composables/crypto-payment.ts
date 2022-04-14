@@ -117,7 +117,12 @@ export const useWeb3Payment = (
       }
     } catch (e: any) {
       logger.error(e)
-      error.value = e.message
+
+      if ('reason' in e) {
+        set(error, e.reason)
+      } else {
+        set(error, e.message)
+      }
     }
   }
 

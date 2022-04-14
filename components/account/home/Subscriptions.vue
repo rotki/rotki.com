@@ -1,9 +1,6 @@
 <template>
   <div>
-    <PremiumPlaceholder
-      v-if="!hasActiveSubscription"
-      :class="$style.purchase"
-    />
+    <PremiumPlaceholder v-if="!canUsePremium" :class="$style.purchase" />
     <data-table
       v-if="subscriptions.length > 0"
       :headers="headers"
@@ -60,6 +57,12 @@
         </td>
       </template>
     </data-table>
+    <error-notification :visible="!!cancellationError">
+      <template #title>Cancellation Failure</template>
+      <template #description>
+        {{ cancellationError }}
+      </template>
+    </error-notification>
   </div>
 </template>
 
@@ -93,17 +96,17 @@ export default defineComponent({
   setup() {
     const store = useMainStore()
     // pinia#852
-    const { account } = toRefs(store)
+    const { account, cancellationError } = toRefs(store)
     const renewLink = ref<{ path: string; query: Record<string, string> }>({
       path: '/checkout/payment-method',
       query: {},
     })
 
-    const hasActiveSubscription = computed(() => {
+    const canUsePremium = computed(() => {
       const pending = get(subscriptions).filter(
         (sub) => sub.status === 'Pending'
       )
-      return get(account)?.hasActiveSubscription || pending.length > 0
+      return get(account)?.canUsePremium || pending.length > 0
     })
 
     const subscriptions = computed(() => {
@@ -163,7 +166,8 @@ export default defineComponent({
       headers: subHeaders,
       subscriptions,
       renewLink,
-      hasActiveSubscription,
+      canUsePremium,
+      cancellationError,
     }
   },
 })

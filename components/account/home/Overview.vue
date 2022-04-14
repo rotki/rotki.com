@@ -33,7 +33,7 @@ export default defineComponent({
     // pinia#852
     const { account } = toRefs(store)
     const premium = computed(() => {
-      return get(account)?.hasActiveSubscription ?? false
+      return get(account)?.canUsePremium ?? false
     })
 
     const username = computed(() => {

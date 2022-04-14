@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from '@nuxtjs/composition-api'
-import { get, set } from '@vueuse/core'
+import { get, set, useTimeoutFn } from '@vueuse/core'
 import {
   Account,
   ApiError,
@@ -21,6 +21,7 @@ import {
   PremiumResponse,
   Result,
   Subscription,
+  SubStatus,
   UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
@@ -65,6 +66,7 @@ export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false)
   const account = ref<Account | null>(null)
   const plans = ref<Plan[] | null>(null)
+  const cancellationError = ref('')
   const $api = useApi()
 
   const getAccount = async () => {
@@ -235,19 +237,56 @@ export const useMainStore = defineStore('main', () => {
     }
   }
 
+  const { stop, start } = useTimeoutFn(() => set(cancellationError, ''), 7000)
+
   const cancelSubscription = async (subscription: Subscription) => {
+    const acc = get(account)
+    assert(acc)
+    const subscriptions = [...acc.subscriptions]
+    const subIndex = subscriptions.findIndex(
+      (sub) => sub.identifier === subscription.identifier
+    )
+    const sub = subscriptions[subIndex]
+    const { actions, status, nextActionDate } = sub
+    function updateSub(
+      actions: string[],
+      status: SubStatus,
+      nextActionDate: string
+    ) {
+      sub.actions = actions
+      sub.status = status
+      sub.nextActionDate = nextActionDate
+      assert(acc)
+      set(account, {
+        ...acc,
+        subscriptions,
+      })
+    }
+
     try {
+      updateSub([], 'Cancelled', 'Never')
       const response = await $api.delete<CancelSubscriptionResponse>(
-        `/webapi/subscription/${subscription.identifier}`
+        `/webapi/subscription/${subscription.identifier}`,
+        {
+          validateStatus: (status) => [200, 404].includes(status),
+        }
       )
       const data = CancelSubscriptionResponse.parse(response.data)
       if (data.result) {
         await getAccount()
       } else {
-        // TODO: handle error
+        updateSub(actions, status, nextActionDate)
+        logger.error(data.message)
+        stop()
+        set(cancellationError, data.message)
+        start()
       }
-    } catch (e) {
+    } catch (e: any) {
+      updateSub(actions, status, nextActionDate)
       logger.error(e)
+      stop()
+      set(cancellationError, e.message)
+      start()
     }
   }
 
@@ -450,6 +489,7 @@ export const useMainStore = defineStore('main', () => {
     authenticated,
     account,
     plans,
+    cancellationError,
     login,
     getAccount,
     changePassword,

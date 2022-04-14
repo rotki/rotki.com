@@ -39,11 +39,19 @@ export const Address = z.object({
 
 export type Address = z.infer<typeof Address>
 
+const SubStatus = z.enum([
+  'Active',
+  'Cancelled',
+  'Pending',
+  'Past Due',
+] as const)
+export type SubStatus = z.infer<typeof SubStatus>
+
 export const Subscription = z.object({
   identifier: z.string().nonempty(),
   planName: z.string(),
   durationInMonths: z.number().nonnegative(),
-  status: z.enum(['Active', 'Cancelled', 'Pending', 'Past Due'] as const),
+  status: SubStatus,
   createdDate: z.string(),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
