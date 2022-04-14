@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from '@nuxtjs/composition-api'
-import { useApi } from '~/plugins/axios'
+import { useAxios } from '~/plugins/axios'
 
 const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
 
@@ -96,7 +96,7 @@ export default defineComponent({
     const windowsUrl = ref(LATEST)
 
     const fetchLatestRelease = async () => {
-      const api = useApi()
+      const api = useAxios()
       const latestRelease = await api.$get<GithubRelease>(
         'https://api.github.com/repos/rotki/rotki/releases/latest'
       )

@@ -6,7 +6,7 @@ import {
 } from 'axios'
 import { Plugin } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { defineNuxtPlugin } from '@nuxtjs/composition-api'
+import { defineNuxtPlugin, useContext } from '@nuxtjs/composition-api'
 import { useMainStore } from '~/store'
 import { assert } from '~/utils/assert'
 
@@ -104,6 +104,11 @@ let apiInstance: NuxtAxiosInstance | null = null
 export const useApi = (): NuxtAxiosInstance => {
   assert(apiInstance)
   return apiInstance
+}
+
+export const useAxios = (): NuxtAxiosInstance => {
+  const context = useContext()
+  return context.$axios
 }
 
 const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios, app }, inject) => {
