@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs } from '~/utils/metadata'
 
 export default defineComponent({
   middleware: 'maintenance',
@@ -17,7 +17,6 @@ export default defineComponent({
           name: 'description',
           content: 'Recover your rotki.com account password',
         },
-        noIndex(),
       ],
       ...commonAttrs(),
     })

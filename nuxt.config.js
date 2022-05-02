@@ -1,4 +1,20 @@
 const dev = process.env.NODE_ENV !== 'production'
+const nonIndexed = [
+  '/activation',
+  '/home',
+  '/maintenance',
+  '/password/changed',
+  '/password/send',
+  '/password/reset',
+  '/checkout/plan',
+  '/checkout/payment-method',
+  '/checkout/pay/card',
+  '/checkout/pay/crypto',
+  '/checkout/pay/paypal',
+  '/checkout/request/crypto',
+  '/account-deleted',
+]
+
 export default {
   // Target (https://go.nuxtjs.dev/config-target)
   target: 'server',
@@ -137,10 +153,11 @@ export default {
   sitemap: {
     hostname: 'https://rotki.com',
     gzip: true,
+    exclude: nonIndexed,
   },
 
   robots: {
     UserAgent: '*',
-    Disallow: '/home',
+    Disallow: () => nonIndexed,
   },
 }
