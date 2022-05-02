@@ -265,6 +265,10 @@ export default defineComponent({
   &:not(.empty):not(:focus-within) ~ label {
     @apply transform scale-75 -translate-y-4 text-label duration-300;
   }
+
+  &:disabled {
+    @apply bg-gray-200;
+  }
 }
 
 .label {

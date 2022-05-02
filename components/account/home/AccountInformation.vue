@@ -96,9 +96,9 @@
       id="country"
       v-model="state.country"
       :countries="countries"
-      :disabled="movedOffline"
+      disabled
       :error-messages="v$.country.$errors"
-      hint="Required. Will only be used for invoice of payments."
+      hint="Email us at support@rotki.com if you need to change your billing country."
       label="Country"
       @blur="v$.country.$touch()"
     />
