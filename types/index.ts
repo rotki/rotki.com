@@ -197,7 +197,7 @@ export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>
 
 const PendingCryptoPayment = z.object({
   pending: z.boolean(),
-  transactionStarted: z.boolean(),
+  transactionStarted: z.boolean().optional(),
   currency: z.enum(['ETH', 'BTC', 'DAI']).optional(),
 })
 

@@ -33,7 +33,11 @@ import {
   useRouter,
 } from '@nuxtjs/composition-api'
 import { get, toRefs, useTimestamp } from '@vueuse/core'
-import { useCurrencyParams, usePlanParams } from '~/composables/plan'
+import {
+  useCurrencyParams,
+  usePlanParams,
+  useSubscriptionIdParam,
+} from '~/composables/plan'
 import { SelectedPlan } from '~/types'
 import { useMainStore } from '~/store'
 
@@ -45,6 +49,7 @@ export default defineComponent({
     const acceptRefundPolicy = ref(false)
     const { plan } = usePlanParams()
     const { currency } = useCurrencyParams()
+    const { subscriptionId } = useSubscriptionIdParam()
     const selectedPlan = computed<SelectedPlan>(() => {
       const availablePlans = get(plans)
       const months = get(plan)
@@ -68,6 +73,7 @@ export default defineComponent({
         query: {
           p: get(plan).toString(),
           c: get(currency),
+          id: get(subscriptionId),
         },
       })
     }
