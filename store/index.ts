@@ -29,6 +29,8 @@ import { axiosSnakeCaseTransformer, useApi } from '~/plugins/axios'
 import { assert } from '~/utils/assert'
 import { Currency } from '~/composables/plan'
 
+const SESSION_TIMEOUT = 3600000
+
 export interface LoginCredentials {
   readonly username: string
   readonly password: string
@@ -485,6 +487,19 @@ export const useMainStore = defineStore('main', () => {
     set(account, null)
   }
 
+  const { stop: stopCountdown, start: startCountdown } = useTimeoutFn(
+    async () => {
+      logger.debug('session expired, logging out')
+      await logout()
+    },
+    SESSION_TIMEOUT
+  )
+
+  const refreshSession = () => {
+    stopCountdown()
+    startCountdown()
+  }
+
   return {
     authenticated,
     account,
@@ -505,5 +520,6 @@ export const useMainStore = defineStore('main', () => {
     switchCryptoPlan,
     markTransactionStarted,
     logout,
+    refreshSession,
   }
 })

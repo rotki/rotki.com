@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, noIndex } from '~/utils/metadata'
+import { useAutoLogout } from '~/composables/autologout'
 
 export default defineComponent({
   name: 'Home',
@@ -22,6 +23,7 @@ export default defineComponent({
       ],
       ...commonAttrs(),
     })
+    useAutoLogout()
   },
   head: {},
 })

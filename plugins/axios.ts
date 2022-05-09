@@ -147,6 +147,7 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios, app }, inject) => {
     ...transformRequest,
   ]
 
+  const { logout, refreshSession } = useMainStore()
   $api.interceptors.request.use(
     (config: AxiosRequestConfig) => {
       // Do something before each request is sent
@@ -171,7 +172,6 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios, app }, inject) => {
     }
   )
 
-  const { logout } = useMainStore()
   function handleError(error: AxiosError) {
     const router = app.router
     switch (error.response?.status) {
@@ -186,6 +186,7 @@ const axiosPlugin: Plugin = defineNuxtPlugin(({ $axios, app }, inject) => {
   }
 
   $api.interceptors.response.use(function <T>(response: AxiosResponse<T>) {
+    refreshSession()
     return response
   }, handleError)
 
