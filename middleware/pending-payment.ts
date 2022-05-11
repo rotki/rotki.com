@@ -21,7 +21,7 @@ export default <Middleware>async function ({ redirect }) {
       return
     }
 
-    if (response.result.transactionStarted) {
+    if (response.result?.transactionStarted) {
       redirect('/home')
     } else if (response.result.pending) {
       const queryParams: { p: string; c: string; id?: string } = {

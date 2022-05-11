@@ -71,10 +71,12 @@ import {
   computed,
   defineComponent,
   onMounted,
+  onUnmounted,
   ref,
-  toRefs,
+  watch,
 } from '@nuxtjs/composition-api'
-import { get, set } from '@vueuse/core'
+import { get, set, useIntervalFn } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 import { useMainStore } from '~/store'
@@ -95,18 +97,10 @@ export default defineComponent({
   components: { PremiumPlaceholder, CancelSubscription },
   setup() {
     const store = useMainStore()
-    // pinia#852
-    const { account, cancellationError } = toRefs(store)
+    const { account, cancellationError } = storeToRefs(store)
     const renewLink = ref<{ path: string; query: Record<string, string> }>({
       path: '/checkout/payment-method',
       query: {},
-    })
-
-    const canUsePremium = computed(() => {
-      const pending = get(subscriptions).filter(
-        (sub) => sub.status === 'Pending'
-      )
-      return get(account)?.canUsePremium || pending.length > 0
     })
 
     const subscriptions = computed(() => {
@@ -115,6 +109,30 @@ export default defineComponent({
         return []
       }
       return userAccount.subscriptions
+    })
+
+    const pending = computed(() =>
+      get(subscriptions).filter((sub) => sub.pending)
+    )
+
+    const { pause, resume, isActive } = useIntervalFn(
+      async () => await store.getAccount(),
+      60000
+    )
+
+    watch(pending, (pending) => {
+      if (pending.length === 0) {
+        pause()
+      } else if (!get(isActive)) {
+        resume()
+      }
+    })
+
+    onUnmounted(() => pause())
+
+    const canUsePremium = computed(() => {
+      const arePending = get(pending)
+      return get(account)?.canUsePremium || arePending.length > 0
     })
 
     onMounted(async () => {

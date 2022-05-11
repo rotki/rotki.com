@@ -11,6 +11,7 @@ const title = 'premium subscription | rotki'
 const description = 'Features included with a premium rotki subscription'
 
 export default defineComponent({
+  name: 'Products',
   setup() {
     const config = useRuntimeConfig()
     const baseUrl = config.baseUrl

@@ -52,6 +52,7 @@ export const Subscription = z.object({
   planName: z.string(),
   durationInMonths: z.number().nonnegative(),
   status: SubStatus,
+  pending: z.boolean().default(false),
   createdDate: z.string(),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
@@ -197,7 +198,7 @@ export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>
 
 const PendingCryptoPayment = z.object({
   pending: z.boolean(),
-  transactionStarted: z.boolean(),
+  transactionStarted: z.boolean().optional(),
   currency: z.enum(['ETH', 'BTC', 'DAI']).optional(),
 })
 

@@ -41,7 +41,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
+import { computed, defineComponent } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
+import { get } from '@vueuse/core'
 import { useMainStore } from '~/store'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
 
@@ -57,13 +59,15 @@ export default defineComponent({
   name: 'Payments',
   setup() {
     const store = useMainStore()
-    // pinia#852
-    const { account } = toRefs(store)
+    const { account } = storeToRefs(store)
     const payments = computed(() => {
-      if (!account.value) {
+      const userAccount = get(account)
+      if (!userAccount) {
         return []
       }
-      return account.value.payments
+      return userAccount.payments.sort(
+        (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime()
+      )
     })
 
     return {

@@ -132,7 +132,11 @@ export default defineComponent({
     watch(plan, async (plan) => {
       const selectedCurrency = get(currency)
       assert(selectedCurrency)
-      const response = await store.switchCryptoPlan(plan, selectedCurrency)
+      const response = await store.switchCryptoPlan(
+        plan,
+        selectedCurrency,
+        get(subscriptionId)
+      )
       if (!response.isError) {
         set(data, response.result)
       } else {
