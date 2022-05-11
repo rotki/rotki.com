@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { ref } from '@nuxtjs/composition-api'
-import { get, set, useTimeoutFn } from '@vueuse/core'
+import { get, isClient, set, useTimeoutFn } from '@vueuse/core'
 import {
   Account,
   ApiError,
@@ -81,8 +81,8 @@ export const useMainStore = defineStore('main', () => {
       )
 
       if (response.status === 200) {
-        authenticated.value = true
-        account.value = Account.parse(response.data.result)
+        set(authenticated, true)
+        set(account, Account.parse(response.data.result))
       }
     } catch (e) {
       logger.error(e)
@@ -106,11 +106,11 @@ export const useMainStore = defineStore('main', () => {
         }
       )
       if (response.status === 400) {
-        authenticated.value = false
+        set(authenticated, false)
         return response.data.message
       } else {
         await getAccount()
-        authenticated.value = true
+        set(authenticated, true)
         return ''
       }
     } catch (e: any) {
@@ -128,11 +128,12 @@ export const useMainStore = defineStore('main', () => {
         }
       )
       if (response.status === 200) {
-        assert(account.value)
-        account.value = {
-          ...account.value,
+        const acc = get(account)
+        assert(acc)
+        set(account, {
+          ...acc,
           ...ApiKeys.parse(response.data.result),
-        }
+        })
       }
     } catch (e) {
       logger.error(e)
@@ -185,13 +186,15 @@ export const useMainStore = defineStore('main', () => {
 
       const { result, message } = UpdateProfileResponse.parse(response.data)
       if (response.status === 200) {
-        const country = get(account)?.address?.country ?? ''
+        const acc = get(account)
         assert(result)
-        assert(account.value)
-        account.value = {
-          ...account.value,
+        assert(acc)
+        const country = acc.address?.country ?? ''
+        set(account, {
+          ...acc,
           ...result,
-        }
+        })
+
         if (payload.country !== country) {
           await getAccount()
         }
@@ -444,7 +447,8 @@ export const useMainStore = defineStore('main', () => {
 
   const switchCryptoPlan = async (
     plan: number,
-    currency: Currency
+    currency: Currency,
+    subscriptionId?: string
   ): Promise<Result<CryptoPayment>> => {
     try {
       const response = await $api.delete<PendingCryptoPaymentResultResponse>(
@@ -452,7 +456,7 @@ export const useMainStore = defineStore('main', () => {
       )
       const data = PendingCryptoPaymentResultResponse.parse(response.data)
       if (data.result) {
-        const payment = await cryptoPayment(plan, currency)
+        const payment = await cryptoPayment(plan, currency, subscriptionId)
         if (payment.isError) {
           return payment
         }
@@ -475,7 +479,16 @@ export const useMainStore = defineStore('main', () => {
     }
   }
 
+  const { stop: stopCountdown, start: startCountdown } = useTimeoutFn(
+    async () => {
+      logger.debug('session expired, logging out')
+      await logout()
+    },
+    SESSION_TIMEOUT
+  )
+
   const logout = async (callApi: boolean = false) => {
+    stopCountdown()
     if (callApi) {
       try {
         await $api.post<UpdateProfileResponse>('/webapi/logout/')
@@ -487,15 +500,10 @@ export const useMainStore = defineStore('main', () => {
     set(account, null)
   }
 
-  const { stop: stopCountdown, start: startCountdown } = useTimeoutFn(
-    async () => {
-      logger.debug('session expired, logging out')
-      await logout()
-    },
-    SESSION_TIMEOUT
-  )
-
   const refreshSession = () => {
+    if (!isClient) {
+      return
+    }
     stopCountdown()
     startCountdown()
   }
@@ -523,3 +531,9 @@ export const useMainStore = defineStore('main', () => {
     refreshSession,
   }
 })
+
+// @ts-ignore
+if (module.hot) {
+  // @ts-ignore
+  module.hot.accept(acceptHMRUpdate(useMainStore, module.hot))
+}

@@ -52,6 +52,7 @@ export const Subscription = z.object({
   planName: z.string(),
   durationInMonths: z.number().nonnegative(),
   status: SubStatus,
+  pending: z.boolean().default(false),
   createdDate: z.string(),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
