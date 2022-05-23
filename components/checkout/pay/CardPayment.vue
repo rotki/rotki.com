@@ -1,51 +1,63 @@
 <template>
-  <error-display v-if="error" :message="error" title="Initialization error" />
-  <fragment v-else>
-    <div v-show="!verify">
-      <div :class="$style.inputs">
-        <hosted-field
-          id="card-number"
-          :class="$style.number"
-          :empty="empty.number"
-          :focused="focused === 'number'"
-          :valid="!numberError"
-          label="Card Number"
-          number
-          @click="focus('number')"
-        />
-        <hosted-field
-          id="expiration"
-          :class="$style.expiration"
-          :empty="empty.expirationDate"
-          :focused="focused === 'expirationDate'"
-          :valid="!expirationError"
-          label="Expiration"
-          @click="focus('expirationDate')"
-        />
-        <hosted-field
-          id="cvv"
-          :class="$style.cvv"
-          :empty="empty.cvv"
-          :focused="focused === 'cvv'"
-          :valid="!cvvError"
-          label="CVV"
-          @click="focus('cvv')"
-        />
-      </div>
-      <selected-plan-overview :plan="plan" />
-      <div>
-        <selection-button
-          :class="$style.button"
-          :disabled="!valid || paying"
-          selected
-          @click="submit"
-        >
-          Start subscription
+  <fragment>
+    <error-display v-if="error" :message="error.message" :title="error.title">
+      <div :class="$style.close">
+        <selection-button :selected="false" @click="close">
+          OK
         </selection-button>
       </div>
-      <accept-refund-policy v-model="accepted" />
+    </error-display>
+    <div v-show="!error">
+      <div v-show="!verify">
+        <div :class="$style.inputs">
+          <hosted-field
+            id="card-number"
+            :class="$style.number"
+            :empty="empty.number"
+            :focused="focused === 'number'"
+            :valid="!numberError"
+            label="Card Number"
+            number
+            @click="focus('number')"
+          />
+          <hosted-field
+            id="expiration"
+            :class="$style.expiration"
+            :empty="empty.expirationDate"
+            :focused="focused === 'expirationDate'"
+            :valid="!expirationError"
+            label="Expiration"
+            @click="focus('expirationDate')"
+          />
+          <hosted-field
+            id="cvv"
+            :class="$style.cvv"
+            :empty="empty.cvv"
+            :focused="focused === 'cvv'"
+            :valid="!cvvError"
+            label="CVV"
+            @click="focus('cvv')"
+          />
+        </div>
+        <selected-plan-overview :plan="plan" />
+        <div>
+          <selection-button
+            :class="$style.button"
+            :disabled="!valid || paying"
+            selected
+            @click="submit"
+          >
+            Start subscription
+          </selection-button>
+        </div>
+        <accept-refund-policy v-model="accepted" />
+      </div>
+      <div
+        v-show="verify"
+        ref="threedsecure"
+        :class="$style.verification"
+      ></div>
     </div>
-    <div v-show="verify" ref="threedsecure" :class="$style.verification"></div>
   </fragment>
 </template>
 
@@ -62,6 +74,7 @@ import {
 } from '@nuxtjs/composition-api'
 import braintree, { HostedFields, ThreeDSecure } from 'braintree-web'
 import { ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
+import { get, set } from '@vueuse/core'
 import { SelectedPlan } from '~/types'
 import { logger } from '~/utils/logger'
 import { assert } from '~/utils/assert'
@@ -79,12 +92,12 @@ function setupEmptyStateMonitoring(
 ) {
   hostedFields.on('notEmpty', (event) => {
     const field = event.fields[event.emittedBy]
-    empty.value = { ...empty.value, [event.emittedBy]: field.isEmpty }
+    set(empty, { ...get(empty), [event.emittedBy]: field.isEmpty })
   })
 
   hostedFields.on('empty', (event) => {
     const field = event.fields[event.emittedBy]
-    empty.value = { ...empty.value, [event.emittedBy]: field.isEmpty }
+    set(empty, { ...get(empty), [event.emittedBy]: field.isEmpty })
   })
 }
 
@@ -104,11 +117,11 @@ function setupValidityMonitoring(
     const field = event.emittedBy
     const valid = event.fields[field].isValid
     if (field === 'number') {
-      numberStatus.value = { ...numberStatus.value, valid }
+      set(numberStatus, { ...get(numberStatus), valid })
     } else if (field === 'expirationDate') {
-      expirationDateStatus.value = { ...expirationDateStatus.value, valid }
+      set(expirationDateStatus, { ...get(expirationDateStatus), valid })
     } else if (field === 'cvv') {
-      cvvStatus.value = { ...cvvStatus.value, valid }
+      set(cvvStatus, { ...get(cvvStatus), valid })
     }
   })
 }
@@ -128,29 +141,29 @@ function setupFocusManagement(
 ) {
   hostedFields.on('focus', (event) => {
     const field = event.emittedBy
-    focused.value = field
+    set(focused, field)
     if (field === 'number') {
-      numberStatus.value = { ...numberStatus.value, touched: true }
+      set(numberStatus, { ...get(numberStatus), touched: true })
     } else if (field === 'expirationDate') {
-      expirationDateStatus.value = {
-        ...expirationDateStatus.value,
+      set(expirationDateStatus, {
+        ...get(expirationDateStatus),
         touched: true,
-      }
+      })
     } else if (field === 'cvv') {
-      cvvStatus.value = { ...cvvStatus.value, touched: true }
+      set(cvvStatus, { ...get(cvvStatus), touched: true })
     }
   })
   hostedFields.on('blur', (event) => {
-    if (focused.value === event.emittedBy) {
-      focused.value = ''
+    if (get(focused) === event.emittedBy) {
+      set(focused, '')
     }
   })
 }
 
 const hasError = (status: Ref<FieldStatus>) =>
   computed(() => {
-    const value = status.value
-    return value.touched && !value.valid
+    const { touched, valid } = get(status)
+    return touched && !valid
   })
 
 const setupHostedFields = () => {
@@ -210,6 +223,11 @@ const setupHostedFields = () => {
   }
 }
 
+type ErrorMessage = {
+  title: string
+  message: string
+}
+
 export default defineComponent({
   name: 'CardPayment',
   props: {
@@ -246,14 +264,14 @@ export default defineComponent({
     })
 
     const focused = ref('')
-    const error = ref('')
+    const error = ref<ErrorMessage | null>(null)
 
     let threeDSecure: ThreeDSecure
 
     onMounted(async () => {
       try {
         const client = await braintree.client.create({
-          authorization: token.value,
+          authorization: get(token),
         })
 
         await fields.create(client)
@@ -274,13 +292,16 @@ export default defineComponent({
           function (event: any, next?: () => void) {
             const element = event.element
 
-            threedsecure.value?.appendChild(element)
-            verify.value = true
+            get(threedsecure)?.appendChild(element)
+            set(verify, true)
             next?.()
           }
         )
       } catch (e: any) {
-        error.value = e.message
+        set(error, {
+          title: 'Initialization Error',
+          message: e.message,
+        })
       }
     })
 
@@ -291,10 +312,10 @@ export default defineComponent({
 
     const valid = computed(
       () =>
-        accepted.value &&
-        numberStatus.value.valid &&
-        expirationDateStatus.value.valid &&
-        cvvStatus.value.valid
+        get(accepted) &&
+        get(numberStatus).valid &&
+        get(expirationDateStatus).valid &&
+        get(cvvStatus).valid
     )
     const paying = ref(false)
 
@@ -303,9 +324,9 @@ export default defineComponent({
     }
 
     const submit = async () => {
-      paying.value = true
+      set(paying, true)
       try {
-        const selectedPlan = plan.value
+        const selectedPlan = get(plan)
         const token = await fields.get().tokenize()
 
         const options: ThreeDSecureVerifyOptions = {
@@ -320,20 +341,33 @@ export default defineComponent({
         }
         const payload = await threeDSecure.verifyCard(options)
 
-        if (payload.liabilityShifted) {
+        const threeDSecureInfo = payload.threeDSecureInfo
+        if (threeDSecureInfo.liabilityShifted) {
           emit('pay', {
-            months: plan.value.months,
+            months: get(plan).months,
             nonce: payload.nonce,
           })
         } else {
-          logger.error('didnt shift')
+          const status = (threeDSecureInfo as any)?.status as string | undefined
+          set(error, {
+            title: '3D Secure authentication failed',
+            message: `The 3D Secure authentication of your card failed (${status?.replaceAll(
+              '_',
+              ' '
+            )}). Please try a different payment method.`,
+          })
+          logger.error(`liability did not shift, due to status: ${status}`)
         }
-      } catch (e) {
+      } catch (e: any) {
+        set(error, {
+          title: 'Payment Error',
+          message: e.message,
+        })
         logger.error(e)
       } finally {
-        paying.value = false
-        verify.value = false
-        const host = threedsecure.value
+        set(paying, false)
+        set(verify, false)
+        const host = get(threedsecure)
         if (host) {
           const children = host.children
           for (let i = 0; i < children.length; i++) {
@@ -341,6 +375,9 @@ export default defineComponent({
           }
         }
       }
+    }
+    const close = () => {
+      set(error, null)
     }
 
     return {
@@ -355,6 +392,7 @@ export default defineComponent({
       threedsecure,
       verify,
       error,
+      close,
       focus,
       submit,
     }
@@ -387,5 +425,9 @@ export default defineComponent({
 .verification {
   min-height: 400px;
   width: 100%;
+}
+
+.close {
+  @apply flex flex-row justify-center mt-4;
 }
 </style>
