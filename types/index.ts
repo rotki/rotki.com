@@ -174,6 +174,13 @@ export const CardCheckoutResponse = z.object({
 
 export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>
 
+export const CardPaymentResponse = z.object({
+  result: z.boolean().optional(),
+  message: z.string().optional(),
+})
+
+export type CardPaymentResponse = z.infer<typeof CardPaymentResponse>
+
 const CryptoPayment = z.object({
   vat: z.number(),
   finalPriceInEur: z.string().nonempty(),

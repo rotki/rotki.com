@@ -10,6 +10,7 @@ import {
   CardCheckout,
   CardCheckoutResponse,
   CardPaymentRequest,
+  CardPaymentResponse,
   ChangePasswordResponse,
   CryptoPayment,
   CryptoPaymentResponse,
@@ -329,13 +330,25 @@ export const useMainStore = defineStore('main', () => {
     }
   }
 
-  const pay = async (data: CardPaymentRequest): Promise<Result<true>> => {
+  const pay = async (request: CardPaymentRequest): Promise<Result<true>> => {
     try {
-      await $api.post<any>(
+      const response = await $api.post<CardPaymentResponse>(
         '/webapi/payment/btr',
-        axiosSnakeCaseTransformer(data)
+        axiosSnakeCaseTransformer(request),
+        {
+          validateStatus: (status) => [200, 400].includes(status),
+        }
       )
       getAccount().then()
+
+      const data = CardPaymentResponse.parse(response.data)
+
+      if (response.status !== 200) {
+        return {
+          isError: true,
+          error: new Error(data.message),
+        }
+      }
       return {
         isError: false,
         result: true,
