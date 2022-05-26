@@ -9,14 +9,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, useRouter } from '@nuxtjs/composition-api'
 
 export default defineComponent({
   name: 'GetPremium',
-  methods: {
-    navigateTo() {
-      window.location.href = '/products'
-    },
+  setup() {
+    const router = useRouter()
+    const navigateTo = () => {
+      router.push('/products')
+    }
+    return {
+      navigateTo,
+    }
   },
 })
 </script>

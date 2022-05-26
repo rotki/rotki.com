@@ -13,7 +13,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+import { defineComponent, toRefs, useRouter } from '@nuxtjs/composition-api'
+import { get } from '@vueuse/core'
 
 export default defineComponent({
   name: 'Plan',
@@ -28,14 +29,20 @@ export default defineComponent({
       default: undefined,
     },
   },
-  methods: {
-    buttonClicked() {
-      if (this.url) {
-        window.location.href = this.url
+  setup(props, { emit }) {
+    const { url } = toRefs(props)
+    const router = useRouter()
+    const buttonClicked = () => {
+      const targetUrl = get(url)
+      if (targetUrl) {
+        router.push(targetUrl)
       } else {
-        this.$emit('click')
+        emit('click')
       }
-    },
+    }
+    return {
+      buttonClicked,
+    }
   },
 })
 </script>
