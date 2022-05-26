@@ -1,7 +1,7 @@
 <template>
   <error-display v-if="error" :message="error" title="Initialization Error" />
   <div v-else>
-    <div id="paypal-button" />
+    <div id="paypal-button" :class="$style.buttons" />
     <selected-plan-overview :plan="plan" />
     <accept-refund-policy v-model="accepted" />
     <error-notification :visible="mustAcceptRefund">
@@ -149,5 +149,9 @@ export default defineComponent({
 <style lang="scss" module>
 .warning {
   @apply font-medium text-red-600;
+}
+
+.buttons {
+  min-height: 175px;
 }
 </style>

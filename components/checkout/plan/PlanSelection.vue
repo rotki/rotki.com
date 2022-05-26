@@ -3,6 +3,9 @@
     <checkout-title> Premium Plans </checkout-title>
     <checkout-description>
       <span v-if="vat">The prices include a +{{ vat }}% VAT tax</span>
+      <span v-if="!authenticated">
+        VAT may apply depending on your jurisdiction
+      </span>
     </checkout-description>
 
     <div :class="$style.selection">
@@ -98,7 +101,7 @@ export default defineComponent({
 
     const store = useMainStore()
     // pinia#852
-    const { account } = toRefs(store)
+    const { account, authenticated } = toRefs(store)
     const vat = computed(() => {
       return account.value?.vat
     })
@@ -107,6 +110,7 @@ export default defineComponent({
       next,
       cryptoPrice,
       vat,
+      authenticated,
       isSelected,
       selected,
     }

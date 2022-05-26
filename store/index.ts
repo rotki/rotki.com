@@ -69,6 +69,7 @@ export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false)
   const account = ref<Account | null>(null)
   const plans = ref<Plan[] | null>(null)
+  const authenticatedOnPlansLoad = ref(false)
   const cancellationError = ref('')
   const $api = useApi()
 
@@ -297,7 +298,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   const getPlans = async (): Promise<void> => {
-    if (get(plans)) {
+    if (get(plans) && get(authenticated) === get(authenticatedOnPlansLoad)) {
       logger.debug('plans already loaded')
       return
     }
@@ -306,6 +307,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await $api.get<PremiumResponse>('/webapi/premium')
       const data = PremiumResponse.parse(response.data)
       set(plans, data.result.plans)
+      set(authenticatedOnPlansLoad, get(authenticated))
     } catch (e: any) {
       logger.error(e)
     }
