@@ -3,7 +3,7 @@ const UNSAFE_INLINE = "'unsafe-inline'"
 const UNSAFE_EVAL = "'unsafe-eval'"
 const NONE = "'none'"
 
-const policy: Record<string, string[]> = {
+const policy = {
   'frame-ancestors': [SELF],
   'block-all-mixed-content': [],
   'default-src': [SELF],
@@ -34,9 +34,7 @@ const policy: Record<string, string[]> = {
   'font-src': [SELF, 'fonts.gstatic.com'],
 }
 
-type Page = 'card' | 'paypal'
-
-function getCSP(page?: Page): string {
+function getCSP(page) {
   let csp = ''
   const finalPolicy = { ...policy }
   if (page === 'card') {
@@ -77,7 +75,7 @@ function getCSP(page?: Page): string {
 
 const defaultCSP = getCSP()
 
-export default function (req: any, res: any, next: Function) {
+export default function (req, res, next) {
   const url = req.url
   let csp = defaultCSP
   if (url.startsWith('/checkout/pay/card')) {
