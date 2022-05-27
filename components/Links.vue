@@ -1,10 +1,17 @@
 <template>
   <div :class="$style.row">
     <div :class="$style.column">
-      <a v-if="landing" :class="$style.link" href="/#features" rel="noreferrer">
+      <nuxt-link
+        v-if="landing"
+        :class="$style.link"
+        to="/#features"
+        rel="noreferrer"
+      >
         Features
-      </a>
-      <a v-else :class="$style.link" href="/" rel="noreferrer"> Home </a>
+      </nuxt-link>
+      <nuxt-link v-else :class="$style.link" to="/" rel="noreferrer">
+        Home
+      </nuxt-link>
     </div>
     <div :class="$style.column">
       <a
@@ -30,7 +37,7 @@
       <nuxt-link :class="$style.link" to="/home"> Manage Premium</nuxt-link>
     </div>
     <div :class="$style.column">
-      <NuxtLink :class="$style.link" to="/jobs"> Jobs </NuxtLink>
+      <nuxt-link :class="$style.link" to="/jobs"> Jobs </nuxt-link>
     </div>
     <div :class="$style.column">
       <a :class="$style.link" href="mailto:info@rotki.com" target="_blank">

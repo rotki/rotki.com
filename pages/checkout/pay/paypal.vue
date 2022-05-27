@@ -6,9 +6,12 @@
 import { defineComponent, useMeta } from '@nuxtjs/composition-api'
 import { commonAttrs, noIndex } from '~/utils/metadata'
 import { useAutoLogout } from '~/composables/autologout'
+import { beforeRouteEnter, beforeRouteLeave } from '~/utils/csp-guard'
 
 export default defineComponent({
   name: 'Crypto',
+  beforeRouteEnter,
+  beforeRouteLeave,
   middleware: ['maintenance', 'authentication', 'subscriber'],
   setup() {
     useMeta({

@@ -52,11 +52,7 @@
         </div>
         <accept-refund-policy v-model="accepted" />
       </div>
-      <div
-        v-show="verify"
-        ref="threedsecure"
-        :class="$style.verification"
-      ></div>
+      <loader v-if="verify && !challengeVisible" :class="$style.loader" />
     </div>
   </fragment>
 </template>
@@ -238,8 +234,8 @@ export default defineComponent({
   setup(props, { emit }) {
     const { token, plan } = toRefs(props)
     const fields = setupHostedFields()
-    const threedsecure = ref<HTMLDivElement | null>(null)
     const verify = ref(false)
+    const challengeVisible = ref(false)
 
     const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
       fields.focus(field)
@@ -282,21 +278,9 @@ export default defineComponent({
         })
 
         threeDSecure = await braintree.threeDSecure.create({
-          version: '2-inline-iframe',
+          version: '2',
           client,
         })
-        // set up iframe listener
-        // @ts-ignore
-        threeDSecure.on(
-          'authentication-iframe-available',
-          function (event: any, next?: () => void) {
-            const element = event.element
-
-            get(threedsecure)?.appendChild(element)
-            set(verify, true)
-            next?.()
-          }
-        )
       } catch (e: any) {
         set(error, {
           title: 'Initialization Error',
@@ -325,6 +309,10 @@ export default defineComponent({
 
     const submit = async () => {
       set(paying, true)
+
+      const onClose = () => set(challengeVisible, false)
+      const onRender = () => set(challengeVisible, true)
+
       try {
         const selectedPlan = get(plan)
         const token = await fields.get().tokenize()
@@ -339,7 +327,13 @@ export default defineComponent({
           nonce: token.nonce,
           bin: token.details.bin,
         }
+        set(verify, true)
+
+        threeDSecure.on('authentication-modal-close', onClose)
+        threeDSecure.on('authentication-modal-render', onRender)
+
         const payload = await threeDSecure.verifyCard(options)
+        set(challengeVisible, false)
 
         const threeDSecureInfo = payload.threeDSecureInfo
         if (threeDSecureInfo.liabilityShifted) {
@@ -367,13 +361,9 @@ export default defineComponent({
       } finally {
         set(paying, false)
         set(verify, false)
-        const host = get(threedsecure)
-        if (host) {
-          const children = host.children
-          for (let i = 0; i < children.length; i++) {
-            children.item(i)?.remove()
-          }
-        }
+        set(challengeVisible, false)
+        threeDSecure.off('authentication-modal-close', onClose)
+        threeDSecure.off('authentication-modal-render', onRender)
       }
     }
     const close = () => {
@@ -389,8 +379,8 @@ export default defineComponent({
       accepted,
       focused,
       valid,
-      threedsecure,
       verify,
+      challengeVisible,
       error,
       close,
       focus,
@@ -422,12 +412,11 @@ export default defineComponent({
   margin-top: 51px;
 }
 
-.verification {
-  min-height: 400px;
-  width: 100%;
-}
-
 .close {
   @apply flex flex-row justify-center mt-4;
+}
+
+.loader {
+  min-height: 400px;
 }
 </style>
