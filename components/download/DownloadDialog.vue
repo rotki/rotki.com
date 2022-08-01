@@ -28,13 +28,21 @@
                 src="~/assets/img/dl/linux.svg"
               />
             </a>
+            <a :class="$style.link" :href="macOSArmUrl" download>
+              <img
+                :class="$style.link"
+                alt="macOS Apple Silicon Mac Download button"
+                src="~/assets/img/dl/mac_apple.svg"
+              />
+            </a>
             <a :class="$style.link" :href="macOSUrl" download>
               <img
                 :class="$style.link"
-                alt="macOS Download button"
+                alt="macOS Intel Mac Download button"
                 src="~/assets/img/dl/mac.svg"
               />
             </a>
+
             <a :class="$style.link" :href="windowsUrl" download>
               <img
                 :class="$style.link"
@@ -83,8 +91,10 @@ function isLinuxApp(name: string): boolean {
   return name.endsWith('.AppImage')
 }
 
-function isMacOsApp(name: string): boolean {
-  return name.endsWith('.dmg')
+function isMacOsApp(name: string, arm64: boolean = false): boolean {
+  const archMatch =
+    (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'))
+  return archMatch && name.endsWith('.dmg')
 }
 
 export default defineComponent({
@@ -93,6 +103,7 @@ export default defineComponent({
     const version = ref('')
     const linuxUrl = ref(LATEST)
     const macOSUrl = ref(LATEST)
+    const macOSArmUrl = ref(LATEST)
     const windowsUrl = ref(LATEST)
 
     const fetchLatestRelease = async () => {
@@ -103,6 +114,7 @@ export default defineComponent({
       version.value = latestRelease.tag_name
       const assets: Asset[] = latestRelease.assets
       macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name))
+      macOSArmUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name, true))
       linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name))
       windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name))
     }
@@ -112,6 +124,7 @@ export default defineComponent({
       version,
       linuxUrl,
       macOSUrl,
+      macOSArmUrl,
       windowsUrl,
     }
   },
@@ -188,12 +201,16 @@ export default defineComponent({
   @apply flex flex-row items-center justify-between;
 
   margin-top: 90px;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 30px;
+  padding-right: 30px;
 
   > * {
     margin-left: 8px;
     margin-right: 8px;
+    > img {
+      height: 100%;
+      max-height: 60px;
+    }
   }
 
   @include for-size(phone-only) {
