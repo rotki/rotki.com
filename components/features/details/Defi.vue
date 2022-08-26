@@ -14,7 +14,12 @@
     <div :class="$style['list-container']">
       <item-list :list="defi" />
     </div>
-    <Caption> * {{ $t('home.defi.subset_note') }}</Caption>
+    <external-link
+      :class="$style.link"
+      same-tab
+      :text="$t('home.more_information')"
+      url="/supported#defi"
+    />
   </feature>
 </template>
 
@@ -32,6 +37,7 @@ export default defineComponent({
         'Yearn vaults',
         'Uniswap',
         'Balancer',
+        'and many more...',
       ],
     }
   },
@@ -64,5 +70,9 @@ export default defineComponent({
     margin-top: 38px;
     right: -200px;
   }
+}
+
+.link {
+  @apply mt-6 text-2xl;
 }
 </style>
