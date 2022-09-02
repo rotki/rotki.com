@@ -67,10 +67,10 @@ export default defineComponent({
 }
 
 .secondRow {
-  @apply flex flex-row justify-center md:justify-between flex-wrap mt-6 2xl:mt-12 md:px-8 px-4;
+  @apply flex flex-row justify-center lg:justify-between flex-wrap mt-6 2xl:mt-12 md:px-8 px-4;
 
   > * {
-    @apply h-9;
+    @apply py-2;
   }
 }
 

@@ -6,7 +6,15 @@
     "get_advanced_plan": "Get Advanced Plan",
     "get_in_touch": "Get In Touch Now"
   },
+  "supported_defi": {
+    "title": "Dedicated DeFi support for",
+    "caption": "* All DeFi protocols are supported, these are just the ones we have dedicated views for."
+  },
+  "supported_exchanges": {
+    "title": "Supported Exchanges"
+  },
   "home": {
+    "more_information": "More Information",
     "hero": {
       "title": "The portfolio manager that{0}protects your privacy",
       "motto": "rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy."
@@ -41,13 +49,11 @@
     },
     "exchanges": {
       "title": "Connect to a big number of centralized exchanges",
-      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals.",
-      "subset_note": "This is but a subset of the supported exchanges"
+      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals."
     },
     "defi": {
       "title": "DeFi",
-      "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation.",
-      "subset_note": "This is but a subset of the supported protocols"
+      "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation."
     },
     "eth_protocols": {
       "title": "Ethereum DeFi protocol details",

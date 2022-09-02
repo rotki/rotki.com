@@ -24,11 +24,7 @@ export default defineComponent({
 @import '~assets/css/media';
 
 .links {
-  @apply flex flex-row flex-wrap;
-
-  @include for-size(phone-only) {
-    @apply justify-center;
-  }
+  @apply flex flex-row flex-wrap justify-center md:justify-start;
 
   > * {
     margin-left: 8px;

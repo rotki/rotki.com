@@ -17,7 +17,12 @@
       <item-list :list="column1" />
       <item-list :list="column2" />
     </div>
-    <Caption> * {{ $t('home.exchanges.subset_note') }} </Caption>
+    <external-link
+      :class="$style.link"
+      same-tab
+      :text="$t('home.more_information')"
+      url="/supported"
+    />
   </feature>
 </template>
 
@@ -29,7 +34,13 @@ export default defineComponent({
   setup() {
     return {
       column1: ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex'],
-      column2: ['FTX', 'Coinbase', 'Coinbase Pro', 'Gemini', 'Bitmex'],
+      column2: [
+        'FTX',
+        'Coinbase',
+        'Coinbase Pro',
+        'Gemini',
+        'and many more...',
+      ],
     }
   },
 })
@@ -74,5 +85,9 @@ export default defineComponent({
   @include for-size(phone-only) {
     padding-right: 40px;
   }
+}
+
+.link {
+  @apply mt-6 text-2xl;
 }
 </style>
