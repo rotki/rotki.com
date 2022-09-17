@@ -47,10 +47,6 @@
         }
       }
     },
-    "exchanges": {
-      "title": "Connect to a big number of centralized exchanges",
-      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals."
-    },
     "defi": {
       "title": "DeFi",
       "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation."
@@ -84,6 +80,10 @@
           "description": "Your current LP balances, and trades"
         }
       },
+    "exchanges": {
+      "title": "Connect to a big number of centralized exchanges",
+      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals."
+    },
       "watcher_note": "Premium users can set watchers for various protocols so that they can be informed via email when certain conditions are met."
     },
     "profit_loss_report": {
