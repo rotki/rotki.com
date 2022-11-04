@@ -64,7 +64,7 @@
 import { defineComponent, onBeforeMount, ref } from '@nuxtjs/composition-api'
 import { useAxios } from '~/plugins/axios'
 
-const LATEST = 'https://github.com/rotki/rotki/releases/tag/latest'
+const LATEST = 'https://github.com/rotki/rotki/releases/latest'
 
 type Asset = {
   readonly name: string
