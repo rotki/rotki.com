@@ -135,11 +135,10 @@
     </paragraph>
 
     <paragraph>
-      If you have any questions hit us up on Twitter (<external-link
-        url="https://twitter.com/rotkiapp"
-        no-referrer
-        >@rotkiapp</external-link
-      >)
+      If you have any questions hit us up on discord:
+      <external-link url="https://discord.gg/aGCxHG7" no-ref>
+        https://discord.gg/aGCxHG7
+      </external-link>
     </paragraph>
   </div>
 </template>

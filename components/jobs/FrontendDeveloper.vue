@@ -109,6 +109,11 @@
       the most proud about. Tell us why that is. If it’s opensource also include
       a link.
     </paragraph>
+
+    If you have any questions hit us up on discord:
+    <external-link url="https://discord.gg/aGCxHG7" no-ref>
+      https://discord.gg/aGCxHG7
+    </external-link>
   </div>
 </template>
 
