@@ -34,7 +34,7 @@ async function initializeBraintree(
   plan: Ref<SelectedPlan>,
   accepted: Ref<boolean>,
   mustAcceptRefund: Ref<boolean>,
-  emit: (event: string, ...args: any[]) => void
+  emit: (event: 'pay', ...args: any[]) => void
 ) {
   let paypalActions: any = null
   watch(accepted, (accepted) => {
