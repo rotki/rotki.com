@@ -230,7 +230,7 @@ export default defineComponent({
     token: { required: true, type: String },
     plan: { required: true, type: Object as PropType<SelectedPlan> },
   },
-  emits: ['pay', 'update:payment'],
+  emits: ['pay', 'update:payment', 'update:pending'],
   setup(props, { emit }) {
     const { token, plan } = toRefs(props)
     const fields = setupHostedFields()

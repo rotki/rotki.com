@@ -113,7 +113,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['input', 'blur'],
+  emits: ['input', 'blur', 'selected'],
   setup(props, { emit }) {
     const { countries, value, disabled } = toRefs(props)
     const selected = ref<Country | null>(null)
