@@ -2,113 +2,126 @@
   <div>
     <heading>Vue.js/TypeScript Developer - Role requirements</heading>
 
+    <heading secondary> What is rotki?</heading>
+
+    <paragraph>
+      Rotki helps manage accounts and blockchain transactions. It’s local-first,
+      privacy focused and all open source. We are long time contributors to the
+      Ethereum ecosystem and general crypto space. In order to support more
+      blockchains (Cosmos, Roll Ups, etc.), and to continue to ship new features
+      we need the help of a Vue.js/Typescript developer. Our project is open
+      source, so feel free to take a look at our codebase here:
+
+      <external-link url="https://github.com/rotki/rotki">
+        https://github.com/rotki/rotki
+      </external-link>
+    </paragraph>
+
+    <heading secondary> How your work with us will look like?</heading>
+
     <paragraph>
       We are looking for a passionate Vue.js developer with excellent knowledge
       of Typescript. Your primary focus will be to assist in implementing new
       features, improving the frontend quality and performance. You will also
       assist in modularizing a monolithic Vue.js app to make it scalable and
-      maintainable.
+      maintainable. The position requires an understanding of blockchains, DeFi
+      protocols, and exchanges in order to implement features that will provide
+      the best experience to our users. We are looking for candidates that share
+      our values on opensource and privacy and are focused on building robust
+      applications that provide value to our users.
     </paragraph>
 
-    <paragraph>
-      The position requires an understanding of blockchains, DeFi protocols, and
-      exchanges in order to implement features that will provide the best
-      experience to our users.
-    </paragraph>
-
-    <paragraph>
-      We are looking for candidates that share our values on opensource and
-      privacy and are focused on building robust applications that provide value
-      to our users.
-    </paragraph>
-
-    <heading subheading> Technical requirements: </heading>
+    <heading secondary> Technical requirements:</heading>
 
     <paragraph>
       <ul :class="$style.points">
         <li>Excellent knowledge of TypeScript.</li>
-        <li>Excellent knowledge of Vue.js & Vuex</li>
-        <li>Experience with automated JavaScript testing (Jest, Cypress)</li>
+        <li>Excellent knowledge of Vue.js & Vuex (or pinia)</li>
+        <li>
+          Experience with automated JavaScript testing (Jest, vitest, Cypress)
+        </li>
         <li>Experience with consuming RESTful APIs</li>
         <li>
           Any experience building modular Vue.js applications with reusable
           components
         </li>
-        <li>[Optional] Python backend development experience</li>
-        <li>[Optional] DevOps experience</li>
       </ul>
     </paragraph>
 
-    <heading subheading> Non-Technical requirements: </heading>
+    <heading secondary> Bonus points:</heading>
 
     <paragraph>
       <ul :class="$style.points">
-        <li>Don’t be an asshole.</li>
-        <li>Be a team player.</li>
-        <li>
-          Be an independent thinker and have a proactive can-do attitude. In the
-          start You will be guided for most tasks and there is always going to
-          be mentoring when required but the more you manage to fend off by
-          yourself the smoother the whole team will work. Eventually this job is
-          for an individual who is both willing and capable to take on a lot of
-          responsibility and take ownership of a big part of the codebase. The
-          goal is to reach a state where no hand holding will be needed.
-        </li>
-        <li>
-          Be user-minded. The user is king. Everything we implement in Rotki, we
-          do so that our end users are happy and have their problems solved.
-        </li>
-        <li>Have excellent English speaking skills.</li>
-        <li>
-          [Optional] Be located in Berlin or somewhere close. 2 other full time
-          members of Rotki are here and meeting face to face is valuable.
-        </li>
+        <li>Python backend development experience</li>
+        <li>DevOps experience</li>
       </ul>
     </paragraph>
 
-    <heading> What we can offer </heading>
-
-    <paragraph>
-      This position can be for either a half-time (50%) or a full-time (100%)
-      role.
-    </paragraph>
+    <heading secondary> Non-technical bonus points:</heading>
 
     <paragraph>
       <ul :class="$style.points">
         <li>
-          WFH/Working remotely. We don’t care (as long as we meet up from time
-          to time!) where you live, if you travel all the time, if you are in
-          your underpants when coding etc.
+          4 hours daily overlap with European working hours 1000 CET - 1800 CET
+          for smoother teamwork
         </li>
+        <li>The ability to work independently and as a part of a team</li>
         <li>
-          Flexible working hours. Nobody will count your hours. As long as the
-          output is there and the result is good, we don’t care.
+          Proactive can-do attitude and self-confidence to propose new solutions
+          and take charge in their execution.
         </li>
+        <li>Customer-oriented approach.</li>
+        <li>Excellent English speaking skills.</li>
         <li>
-          Opportunity to work with some OGs in the Ethereum and general crypto
-          space.
+          Located in Berlin or somewhere close. 2 other full time members of
+          Rotki are here and meeting face to face is valuable.
         </li>
-        <li>
-          Opportunity to learn and grow your skills in the fast moving sector of
-          cryptocurrencies and decentralized finance.
-        </li>
-        <li>
-          Opportunity to work in opensource, have your code visible and running
-          at the systems of the ever-increasing Rotki userbase.
-        </li>
-        <li>Working on a lean and mean team without micromanagement.</li>
       </ul>
     </paragraph>
 
-    <heading> How to apply / More Info </heading>
+    <heading secondary>What we offer:</heading>
 
     <paragraph>
-      Send an email to careers@rotki.com with your CV, a link to your Github
-      profile and a small text about yourself and why you are interested to work
-      with us on Rotki. Please include a link to a project you worked on and are
-      the most proud about. Tell us why that is. If it’s opensource also include
-      a link.
+      <ul :class="$style.points">
+        <li>
+          A full-time position, but are open to part-time contributors as well.
+          If located in Germany we can provide full employment with insurance
+          and social benefits.
+        </li>
+        <li>
+          Flexible working hours. We sync once per day, but other than that you
+          decide when you work.
+        </li>
+        <li>Remote / WFH</li>
+        <li>
+          Training in the specifics of the project and guidance through the
+          sector of cryptocurrencies and decentralized finance
+        </li>
+        <li>
+          Participation in conferences and events to represent rotki and get to
+          know other fascinating projects from the field (travel expenses are on
+          us)
+        </li>
+        <li>
+          Up to €2k for hardware allowance (laptop, dappnode, office equipment
+          etc) upon passed probation period
+        </li>
+      </ul>
     </paragraph>
+
+    <heading secondary> Apply </heading>
+
+    <paragraph>
+      Send your CV, a link to your GitHub profile and a cover letter to
+      careers@rotki.com. In the cover letter tell us what you think of rotki’s
+      codebase and include a link to a project you worked on and are most proud
+      about and tell us why.
+    </paragraph>
+
+    If you have any questions hit us up on discord:
+    <external-link url="https://discord.gg/aGCxHG7" no-ref>
+      https://discord.gg/aGCxHG7
+    </external-link>
   </div>
 </template>
 
