@@ -127,6 +127,22 @@ export default {
         },
       },
     },
+    // https://github.com/nuxt-community/composition-api/issues/672
+    extend(config) {
+      config.module.rules.push({
+        test: /\.(cjs|mjs)$/,
+        exclude: {
+          and: [/node_modules/],
+          not: [/pathe/],
+        },
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [['@babel/preset-env', { targets: 'ie 11' }]],
+          },
+        },
+      })
+    },
   },
 
   publicRuntimeConfig: {
