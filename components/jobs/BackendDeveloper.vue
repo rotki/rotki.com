@@ -1,7 +1,7 @@
 <template>
   <div>
     <heading>Python Backend Developer</heading>
-    <heading>What is rotki?</heading>
+    <heading secondary>What is rotki?</heading>
 
     <paragraph>
       Rotki helps manage accounts and blockchain transactions. It’s local-first,
