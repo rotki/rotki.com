@@ -118,10 +118,12 @@
       about and tell us why.
     </paragraph>
 
-    If you have any questions hit us up on discord:
-    <external-link url="https://discord.gg/aGCxHG7" no-ref>
-      https://discord.gg/aGCxHG7
-    </external-link>
+    <paragraph>
+      If you have any questions hit us up on discord:
+      <external-link url="https://discord.gg/aGCxHG7" no-ref>
+        https://discord.gg/aGCxHG7
+      </external-link>
+    </paragraph>
   </div>
 </template>
 
