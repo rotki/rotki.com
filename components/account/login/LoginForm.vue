@@ -77,6 +77,7 @@ import {
   defineComponent,
   ref,
   toRefs,
+  unref,
   useRouter,
 } from '@nuxtjs/composition-api'
 import { setupCSRF } from '~/composables/csrf-token'
@@ -97,7 +98,7 @@ export default defineComponent({
     const username = ref('')
     const password = ref('')
     const showPassword = ref(false)
-    const valid = computed(({ username, password }) => !!username && !!password)
+    const valid = computed(() => !!unref(username) && !!unref(password))
     const error = ref('')
     setupCSRF()
     const { login } = useMainStore()
