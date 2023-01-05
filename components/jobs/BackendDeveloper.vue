@@ -112,10 +112,7 @@
         </li>
         <li>
           Up to €2k for hardware allowance (laptop, dappnode, office equipment
-          etc) after passed probation period
-        </li>
-        <li>
-          Up to $80K/€71K for a senior full time (depending on experience)
+          etc.) after passed probation period
         </li>
       </ul>
     </paragraph>
