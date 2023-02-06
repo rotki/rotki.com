@@ -1,32 +1,25 @@
 <template>
-  <account-deleted-page />
+  <AccountDeletedPage />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
-export default defineComponent({
-  name: 'AccountDeleted',
-  setup() {
-    useMeta({
-      title: 'account deleted | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Your account has been successfully deleted',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+useHead({
+  title: 'account deleted | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Your account has been successfully deleted',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 </style>

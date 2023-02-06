@@ -1,36 +1,23 @@
 <template>
-  <privacy-policy-content />
+  <PrivacyPolicyContent />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata'
-import { useRuntimeConfig } from '~/composables/utils'
 
 const title = 'privacy policy | rotki'
 const description =
   'Information for the website visitors regarding our policies with the collection, use, and disclosure of Personal Information regarding the service usage'
 
-export default defineComponent({
-  name: 'PrivacyPolicy',
-  setup() {
-    const config = useRuntimeConfig()
-    const baseUrl = config.baseUrl
-    useMeta({
-      title,
-      meta: getMetadata(
-        title,
-        description,
-        `${baseUrl}/privacy-policy/`,
-        baseUrl
-      ),
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+const config = useRuntimeConfig()
+const baseUrl = config.public.baseUrl
+useHead({
+  title,
+  meta: getMetadata(title, description, `${baseUrl}/privacy-policy/`, baseUrl),
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

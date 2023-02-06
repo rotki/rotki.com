@@ -1,7 +1,7 @@
 <template>
-  <box>
+  <BoxContainer>
     <template #label>Sign in</template>
-    <input-field
+    <InputField
       id="username"
       v-model="username"
       filled
@@ -10,128 +10,107 @@
       @focus="error = ''"
     >
       <template #prepend>
-        <span :class="$style.prepend">
-          <user-icon />
+        <span :class="css.prepend">
+          <UserIcon />
         </span>
       </template>
-    </input-field>
-    <input-field
+    </InputField>
+    <InputField
       id="password"
       v-model="password"
-      :class="$style.password"
+      :class="css.password"
       :type="showPassword ? 'text' : 'password'"
       filled
       label="Password"
-      @enter="login"
+      @enter="performLogin"
       @focus="error = ''"
     >
       <template #prepend>
-        <span :class="$style.prepend">
-          <password-icon />
+        <span :class="css.prepend">
+          <PasswordIcon />
         </span>
       </template>
       <template #append>
-        <button :class="$style.show" @click="showPassword = !showPassword">
+        <button :class="css.show" @click="showPassword = !showPassword">
           <span v-if="showPassword">HIDE</span>
           <span v-else>SHOW</span>
         </button>
       </template>
-    </input-field>
+    </InputField>
 
-    <div :class="$style.errorWrapper">
-      <div v-if="error" :class="$style.error">{{ error }}</div>
+    <div :class="css.errorWrapper">
+      <div v-if="error" :class="css.error">{{ error }}</div>
     </div>
 
-    <div :class="$style.buttonContainer">
-      <action-button
-        :class="$style.button"
+    <div :class="css.buttonContainer">
+      <ActionButton
+        :class="css.button"
         :disabled="!valid"
         primary
         small
         text="Sign in"
-        @click="login"
+        @click="performLogin"
       />
     </div>
 
-    <div :class="$style.reset">
-      <external-link same-tab text="Forgot password?" url="/password/recover" />
+    <div :class="css.reset">
+      <ExternalLink same-tab text="Forgot password?" url="/password/recover" />
     </div>
 
-    <div :class="$style.divider" />
+    <div :class="css.divider" />
 
-    <div :class="$style.create">
+    <div :class="css.create">
       First time premium?
-      <external-link
-        :class="$style.signup"
+      <ExternalLink
+        :class="css.signup"
         same-tab
         text="Sign up now"
         url="/signup"
       />
     </div>
-  </box>
+  </BoxContainer>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  ref,
-  toRefs,
-  unref,
-  useRouter,
-} from '@nuxtjs/composition-api'
-import { setupCSRF } from '~/composables/csrf-token'
+<script setup lang="ts">
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'LoginForm',
-  props: {
-    modal: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['complete'],
-  setup(props, { emit }) {
-    const { modal } = toRefs(props)
-    const username = ref('')
-    const password = ref('')
-    const showPassword = ref(false)
-    const valid = computed(() => !!unref(username) && !!unref(password))
-    const error = ref('')
-    setupCSRF()
-    const { login } = useMainStore()
-    const router = useRouter()
-    const performLogin = async () => {
-      error.value = await login({
-        username: username.value,
-        password: password.value,
-      })
-
-      if (!error.value) {
-        if (modal.value) {
-          emit('complete')
-        } else {
-          router.push('/home')
-        }
-      }
-    }
-    return {
-      username,
-      password,
-      showPassword,
-      valid,
-      error,
-      login: performLogin,
-    }
-  },
+const props = withDefaults(defineProps<{ modal?: boolean }>(), {
+  modal: false,
 })
+
+const emit = defineEmits<{ (e: 'complete'): void }>()
+
+const { modal } = toRefs(props)
+const username = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const error = ref('')
+
+const valid = computed(() => !!unref(username) && !!unref(password))
+
+const { login } = useMainStore()
+
+const performLogin = async () => {
+  error.value = await login({
+    username: username.value,
+    password: password.value,
+  })
+
+  if (!error.value) {
+    if (modal.value) {
+      emit('complete')
+    } else {
+      await navigateTo('/home')
+    }
+  }
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .buttonContainer {
   @apply flex flex-row align-middle justify-center mt-8;

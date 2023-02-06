@@ -1,6 +1,4 @@
-/* eslint-disable no-redeclare */
 import { z } from 'zod'
-import { supportedCurrencies } from '~/composables/plan'
 
 type ResultError = {
   isError: true

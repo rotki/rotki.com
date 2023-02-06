@@ -1,15 +1,11 @@
 <template>
-  <div :class="$style.content">
+  <div :class="css.content">
     <slot />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PageContent',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

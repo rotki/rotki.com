@@ -1,35 +1,31 @@
 <template>
-  <overview />
+  <AccountOverview />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
-import { useAutoLogout } from '~/composables/autologout'
 
-export default defineComponent({
-  name: 'Home',
+definePageMeta({
   middleware: ['maintenance', 'authentication'],
-  setup() {
-    useMeta({
-      title: 'account | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Manage your rotki premium account',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-    useAutoLogout()
-  },
-  head: {},
 })
+
+useHead({
+  title: 'account | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Manage your rotki premium account',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
+})
+
+useAutoLogout()
 </script>
 
 <style lang="scss">
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 </style>

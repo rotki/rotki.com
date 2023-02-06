@@ -1,24 +1,20 @@
 <template>
   <div>
-    <div :class="$style.space">
-      <img
-        :class="$style.image"
-        alt="rotki in Space"
-        src="~/assets/img/space.svg"
-      />
+    <div :class="css.space">
+      <img :class="css.image" alt="rotki in Space" src="/img/space.svg" />
     </div>
-    <div :class="$style.row">
-      <div :class="$style.wrapper">
-        <div :class="$style.row">
-          <div :class="$style.column2">
-            <div :class="$style.title">
-              {{ $t('home.plans.details.custom.title') }}
+    <div :class="css.row">
+      <div :class="css.wrapper">
+        <div :class="css.row">
+          <div :class="css.column2">
+            <div :class="css.title">
+              {{ t('home.plans.details.custom.title') }}
             </div>
-            <div :class="$style.description">
-              {{ $t('home.plans.details.custom.subtitle') }}
+            <div :class="css.description">
+              {{ t('home.plans.details.custom.subtitle') }}
             </div>
-            <div :class="$style.button">
-              <action-button :text="$tc('actions.get_in_touch')" />
+            <div :class="css.button">
+              <ActionButton :text="t('actions.get_in_touch')" />
             </div>
           </div>
         </div>
@@ -27,17 +23,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'CustomPlan',
-})
+<script setup lang="ts">
+const { t } = useI18n()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/main';
-@import '~assets/css/media';
+@import '@/assets/css/main.scss';
+@import '@/assets/css/media.scss';
 
 .wrapper {
   @apply container;

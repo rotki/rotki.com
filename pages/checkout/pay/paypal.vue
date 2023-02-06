@@ -1,33 +1,31 @@
 <template>
-  <paypal-page />
+  <PaypalPage />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
-import { useAutoLogout } from '~/composables/autologout'
-import { beforeRouteEnter, beforeRouteLeave } from '~/utils/csp-guard'
 
-export default defineComponent({
-  name: 'Crypto',
-  beforeRouteEnter,
-  beforeRouteLeave,
-  middleware: ['maintenance', 'authentication', 'subscriber'],
-  setup() {
-    useMeta({
-      title: 'pay with paypal | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Pay with Paypal for your rotki premium subscription',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-    useAutoLogout()
-  },
-  head: {},
+definePageMeta({
+  middleware: ['maintenance', 'authentication', 'subscriber', 'csp'],
+})
+
+useHead({
+  title: 'pay with paypal | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Pay with Paypal for your rotki premium subscription',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
+})
+
+useAutoLogout()
+
+onBeforeRouteLeave((to, _from, next) => {
+  next(false)
+  window.location.href = to.fullPath
 })
 </script>

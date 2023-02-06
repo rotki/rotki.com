@@ -1,31 +1,27 @@
 <template>
-  <signup-form />
+  <SignupForm />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs } from '~/utils/metadata'
 
-export default defineComponent({
-  name: 'Signup',
+definePageMeta({
   middleware: 'maintenance',
-  setup() {
-    useMeta({
-      title: 'signup | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Create a new rotki premium account',
-        },
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+})
+
+useHead({
+  title: 'signup | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Create a new rotki premium account',
+    },
+  ],
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

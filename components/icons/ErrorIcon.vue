@@ -1,6 +1,6 @@
 <template>
   <svg
-    :class="$style.warning"
+    :class="css.warning"
     style="width: 24px; height: 24px"
     viewBox="0 0 24 24"
   >
@@ -11,12 +11,8 @@
   </svg>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'ErrorIcon',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

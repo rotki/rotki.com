@@ -1,33 +1,21 @@
 <template>
-  <div :class="$style.container">
-    <action-button
+  <div :class="css.container">
+    <ActionButton
       filled
-      :text="$tc('actions.get_premium')"
-      @click="navigateTo"
+      :text="t('actions.get_premium')"
+      @click="navigateTo('/products')"
     />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, useRouter } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'GetPremium',
-  setup() {
-    const router = useRouter()
-    const navigateTo = () => {
-      router.push('/products')
-    }
-    return {
-      navigateTo,
-    }
-  },
-})
+<script setup lang="ts">
+const { t } = useI18n()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .container {
   @apply flex flex-col align-middle self-center;

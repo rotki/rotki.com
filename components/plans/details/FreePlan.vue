@@ -1,22 +1,21 @@
 <template>
-  <plan :action="$tc('actions.download')" @click="$emit('download')">
-    <template #title>{{ $t('home.plans.details.free.title') }}</template>
-    {{ $t('home.plans.details.free.subtitle') }}
-    <div :class="$style.filler"></div>
-  </plan>
+  <PlanBox :action="t('actions.download')" @click="emit('download')">
+    <template #title>{{ t('home.plans.details.free.title') }}</template>
+    {{ t('home.plans.details.free.subtitle') }}
+    <div :class="css.filler"></div>
+  </PlanBox>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'download'): void }>()
 
-export default defineComponent({
-  name: 'FreePlan',
-})
+const { t } = useI18n()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/main';
-@import '~assets/css/media';
+@import '@/assets/css/main.scss';
+@import '@/assets/css/media.scss';
 
 .filler {
   height: 100%;

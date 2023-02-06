@@ -1,28 +1,24 @@
 <template>
-  <plan-selection-page />
+  <PlanSelectionPage />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
-export default defineComponent({
-  name: 'Plan',
+definePageMeta({
   middleware: ['maintenance', 'pending-payment', 'subscriber'],
-  setup() {
-    useMeta({
-      title: 'select premium plan | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Select your rotki premium plan',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+})
+
+useHead({
+  title: 'select premium plan | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Select your rotki premium plan',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
 })
 </script>

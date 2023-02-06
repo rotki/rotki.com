@@ -1,10 +1,10 @@
 <template>
   <div>
-    <heading>Vue.js/TypeScript Developer - Role requirements</heading>
+    <TextHeading>Vue.js/TypeScript Developer - Role requirements</TextHeading>
 
-    <heading secondary> What is rotki?</heading>
+    <TextHeading secondary> What is rotki?</TextHeading>
 
-    <paragraph>
+    <TextParagraph>
       Rotki helps manage accounts and blockchain transactions. It’s local-first,
       privacy focused and all open source. We are long time contributors to the
       Ethereum ecosystem and general crypto space. In order to support more
@@ -12,14 +12,14 @@
       we need the help of a Vue.js/Typescript developer. Our project is open
       source, so feel free to take a look at our codebase here:
 
-      <external-link url="https://github.com/rotki/rotki">
+      <ExternalLink url="https://github.com/rotki/rotki">
         https://github.com/rotki/rotki
-      </external-link>
-    </paragraph>
+      </ExternalLink>
+    </TextParagraph>
 
-    <heading secondary> How your work with us will look like?</heading>
+    <TextHeading secondary> How your work with us will look like?</TextHeading>
 
-    <paragraph>
+    <TextParagraph>
       We are looking for a passionate Vue.js developer with excellent knowledge
       of Typescript. Your primary focus will be to assist in implementing new
       features, improving the frontend quality and performance. You will also
@@ -29,12 +29,12 @@
       the best experience to our users. We are looking for candidates that share
       our values on opensource and privacy and are focused on building robust
       applications that provide value to our users.
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Technical requirements:</heading>
+    <TextHeading secondary> Technical requirements:</TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>Excellent knowledge of TypeScript.</li>
         <li>Excellent knowledge of Vue.js & Vuex (or pinia)</li>
         <li>
@@ -46,21 +46,21 @@
           components
         </li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Bonus points:</heading>
+    <TextHeading secondary> Bonus points:</TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>Python backend development experience</li>
         <li>DevOps experience</li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Non-technical bonus points:</heading>
+    <TextHeading secondary> Non-technical bonus points:</TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>
           4 hours daily overlap with European working hours 1000 CET - 1800 CET
           for smoother teamwork
@@ -77,12 +77,12 @@
           Rotki are here and meeting face to face is valuable.
         </li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary>What we offer:</heading>
+    <TextHeading secondary>What we offer:</TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>
           A full-time position, but are open to part-time contributors as well.
           If located in Germany we can provide full employment with insurance
@@ -107,32 +107,28 @@
           etc) upon passed probation period
         </li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Apply </heading>
+    <TextHeading secondary> Apply </TextHeading>
 
-    <paragraph>
+    <TextParagraph>
       Send your CV, a link to your GitHub profile and a cover letter to
       careers@rotki.com. In the cover letter tell us what you think of rotki’s
       codebase and include a link to a project you worked on and are most proud
       about and tell us why.
-    </paragraph>
+    </TextParagraph>
 
-    <paragraph>
+    <TextParagraph>
       If you have any questions hit us up on discord:
-      <external-link url="https://discord.gg/aGCxHG7" no-ref>
+      <ExternalLink url="https://discord.gg/aGCxHG7" no-ref>
         https://discord.gg/aGCxHG7
-      </external-link>
-    </paragraph>
+      </ExternalLink>
+    </TextParagraph>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'FrontendDeveloper',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style module>

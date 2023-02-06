@@ -1,50 +1,37 @@
 <template>
-  <div :class="$style.container">
-    <div :class="$style.wrapper">
+  <div :class="css.container">
+    <div :class="css.wrapper">
       <div
         :class="{
-          [$style.header]: true,
-          [$style.error]: status === 'error',
-          [$style.success]: status === 'success',
-          [$style.neutral]: status === 'neutral',
+          [css.header]: true,
+          [css.error]: status === 'error',
+          [css.success]: status === 'success',
+          [css.neutral]: status === 'neutral',
         }"
       >
         <slot name="icon" />
       </div>
-      <div :class="$style.body">
-        <div :class="$style.title">{{ title }}</div>
-        <div :class="$style.message">{{ message }}</div>
+      <div :class="css.body">
+        <div :class="css.title">{{ title }}</div>
+        <div :class="css.message">{{ message }}</div>
         <slot />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from '@nuxtjs/composition-api'
-
+<script setup lang="ts">
 const status = ['success', 'error', 'neutral'] as const
 
-type Status = typeof status[number]
+type Status = (typeof status)[number]
 
-export default defineComponent({
-  name: 'ErrorDisplay',
-  props: {
-    status: {
-      required: true,
-      type: String as PropType<Status>,
-      validate: (value: any) => status.includes(value),
-    },
-    message: {
-      required: true,
-      type: String,
-    },
-    title: {
-      required: true,
-      type: String,
-    },
-  },
-})
+defineProps<{
+  status: Status
+  message: string
+  title: string
+}>()
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

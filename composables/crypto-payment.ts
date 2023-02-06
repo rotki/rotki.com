@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
-import { ref, Ref } from '@nuxtjs/composition-api'
 import { get, set, useTimeoutFn } from '@vueuse/core'
+import { Ref } from 'vue'
 import { logger } from '~/utils/logger'
 import { CryptoPayment, IdleStep, Provider, StepType } from '~/types'
 import { assert } from '~/utils/assert'

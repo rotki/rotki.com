@@ -1,16 +1,14 @@
 <template>
-  <div :class="$style.body">
-    <p :class="$style.header">
+  <div :class="css.body">
+    <p :class="css.header">
       <slot name="header" />
     </p>
     <slot />
   </div>
 </template>
 
-<script>
-export default {
-  name: 'UserActionMessage',
-}
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style module lang="scss">

@@ -1,28 +1,24 @@
 <template>
-  <payment-method-page />
+  <PaymentMethodPage />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
-export default defineComponent({
-  name: 'PaymentMethod',
+definePageMeta({
   middleware: ['maintenance', 'pending-payment', 'subscriber'],
-  setup() {
-    useMeta({
-      title: 'select payment method | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Select how to pay for your rotki premium subscription',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+})
+
+useHead({
+  title: 'select payment method | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Select how to pay for your rotki premium subscription',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
 })
 </script>

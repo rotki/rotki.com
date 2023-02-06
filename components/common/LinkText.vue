@@ -1,21 +1,17 @@
 <template>
-  <div :class="$style.column">
-    <div :class="$style.link">
+  <div :class="css.column">
+    <div :class="css.link">
       <slot />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'LinkText',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media.scss';
+@import '~/assets/css/media';
 .column {
   @apply flex flex-col font-sans uppercase justify-center text-primary2;
 

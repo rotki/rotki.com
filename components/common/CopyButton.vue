@@ -1,47 +1,34 @@
 <template>
-  <tooltip>
+  <InfoTooltip>
     <template #activator>
-      <button :class="$style.button" @click="copyToClipboard">
-        <copy />
+      <button :class="css.button" @click="copyToClipboard">
+        <Copy />
       </button>
     </template>
 
     <span v-if="copied">Copied to clipboard</span>
     <span v-else> Copy to clipboard </span>
-  </tooltip>
+  </InfoTooltip>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, toRefs } from '@nuxtjs/composition-api'
-import { set, useClipboard, useTimeoutFn } from '@vueuse/core'
+<script setup lang="ts">
+import { set } from '@vueuse/core'
 
-export default defineComponent({
-  name: 'CopyButton',
-  props: {
-    value: {
-      required: true,
-      type: String,
-    },
-  },
-  setup(props) {
-    const { value } = toRefs(props)
-    const copied = ref(false)
-    const { start, stop } = useTimeoutFn(() => set(copied, false), 4000)
-    const { copy } = useClipboard({ source: value })
+const props = defineProps<{ value: string }>()
 
-    const copyToClipboard = () => {
-      stop()
-      copy()
-      set(copied, true)
-      start()
-    }
+const { value } = toRefs(props)
+const copied = ref(false)
+const { start, stop } = useTimeoutFn(() => set(copied, false), 4000)
+const { copy } = useClipboard({ source: value })
 
-    return {
-      copyToClipboard,
-      copied,
-    }
-  },
-})
+const copyToClipboard = () => {
+  stop()
+  copy()
+  set(copied, true)
+  start()
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

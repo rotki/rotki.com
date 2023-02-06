@@ -1,42 +1,30 @@
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.column">
+  <div :class="css.wrapper">
+    <div :class="css.column">
       <a href="https://github.com/rotki" rel="noreferrer" target="_blank">
-        <img :class="$style.link" alt="Github" src="~/assets/img/github.svg" />
+        <img :class="css.link" alt="Github" src="/img/github.svg" />
       </a>
     </div>
-    <div :class="$style.column">
+    <div :class="css.column">
       <a href="https://twitter.com/rotkiapp" rel="noreferrer" target="_blank">
-        <img
-          :class="$style.link"
-          alt="Twitter"
-          src="~/assets/img/twitter.svg"
-        />
+        <img :class="css.link" alt="Twitter" src="/img/twitter.svg" />
       </a>
     </div>
-    <div :class="$style.column">
+    <div :class="css.column">
       <a href="https://discord.gg/aGCxHG7" rel="noreferrer" target="_blank">
-        <img
-          :class="$style.link"
-          alt="Discord"
-          src="~/assets/img/discord.svg"
-        />
+        <img :class="css.link" alt="Discord" src="/img/discord.svg" />
       </a>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'FooterIconLinks',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/main';
-@import '~assets/css/media';
+@import '@/assets/css/main.scss';
+@import '@/assets/css/media.scss';
 
 .wrapper {
   @apply flex flex-row;

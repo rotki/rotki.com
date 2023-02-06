@@ -1,15 +1,9 @@
 <template>
-  <action-button
-    primary
-    :text="$t('actions.download')"
-    @click="$emit('click')"
-  />
+  <ActionButton primary :text="t('actions.download')" @click="emit('click')" />
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'click'): void }>()
 
-export default defineComponent({
-  name: 'DownloadButton',
-})
+const { t } = useI18n()
 </script>

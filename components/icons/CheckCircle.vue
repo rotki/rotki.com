@@ -7,22 +7,15 @@
   </svg>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'CheckCircle',
-  props: {
-    width: {
-      required: false,
-      type: String,
-      default: '24px',
-    },
-    height: {
-      required: false,
-      type: String,
-      default: '24px',
-    },
-  },
-})
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    width?: string
+    height?: string
+  }>(),
+  {
+    height: '24px',
+    width: '24px',
+  }
+)
 </script>

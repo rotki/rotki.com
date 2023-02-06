@@ -1,11 +1,11 @@
 <template>
-  <div v-if="visible" :class="{ [$style.container]: true, [$style.out]: out }">
-    <div :class="$style.overlay" @click="dismiss">
-      <div :class="$style.wrapper">
+  <div v-if="visible" :class="{ [css.container]: true, [css.out]: out }">
+    <div :class="css.overlay" @click="dismiss">
+      <div :class="css.wrapper">
         <div
           :class="{
-            [$style.dialog]: true,
-            [$style.boxless]: boxless,
+            [css.dialog]: true,
+            [css.boxless]: boxless,
           }"
           :style="style"
           @click="($event) => $event.stopPropagation()"
@@ -17,88 +17,62 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  nextTick,
-  onMounted,
-  ref,
-  toRefs,
-  watch,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
+import { get, set } from '@vueuse/core'
 
-export default defineComponent({
-  name: 'ModalDialog',
-  props: {
-    value: {
-      type: Boolean,
-      required: true,
-    },
-    width: {
-      type: String,
-      required: false,
-      default: '800px',
-    },
-    height: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
-    padding: {
-      type: String,
-      required: false,
-      default: '0px',
-    },
-    boxless: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  emits: ['input'],
-  setup(props, { emit }) {
-    const { width, height, padding, value } = toRefs(props)
-    const out = ref(false)
-    const visible = ref(false)
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean
+    width?: string
+    height?: string
+    padding?: string
+    boxless?: boolean
+  }>(),
+  {
+    width: '800px',
+    padding: '0px',
+    boxless: false,
+    height: '400px',
+  }
+)
 
-    onMounted(() => (visible.value = value.value))
-    watch(value, (display) => {
-      if (display) {
-        out.value = false
-        visible.value = true
-      } else {
-        out.value = true
-        nextTick(() => {
-          setTimeout(() => {
-            visible.value = false
-          }, 800)
-        })
-      }
+const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>()
+
+const { width, height, padding, modelValue } = toRefs(props)
+const out = ref(false)
+const visible = ref(false)
+
+onMounted(() => set(visible, get(modelValue)))
+watch(modelValue, (display) => {
+  if (display) {
+    out.value = false
+    visible.value = true
+  } else {
+    out.value = true
+    nextTick(() => {
+      setTimeout(() => {
+        visible.value = false
+      }, 800)
     })
-    const dismiss = () => {
-      emit('input', false)
-    }
-
-    const style = computed(() => ({
-      'max-width': width.value,
-      height: height.value,
-      padding: padding.value,
-      margin: '0.5rem',
-    }))
-    return {
-      out,
-      style,
-      visible,
-      dismiss,
-    }
-  },
+  }
 })
+const dismiss = () => {
+  emit('update:modelValue', false)
+}
+
+const style = computed(() => ({
+  'max-width': width.value,
+  height: height.value,
+  padding: padding.value,
+  margin: '0.5rem',
+}))
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .overlay {
   @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0;

@@ -1,8 +1,8 @@
 <template>
-  <page>
+  <PageContainer>
     <template #title> Premium account management </template>
     <template #hint>
-      <div :class="$style.hint">
+      <div :class="css.hint">
         Here you can create or login to your premium account. A premium account
         is only needed to unlock the premium features of the application and is
         not the same as the account you use in the Rotki application.
@@ -10,18 +10,14 @@
       </div>
     </template>
 
-    <div :class="$style.container">
-      <login-form />
+    <div :class="css.container">
+      <LoginForm />
     </div>
-  </page>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'LoginPage',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

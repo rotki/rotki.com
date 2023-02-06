@@ -1,78 +1,53 @@
 <template>
   <div
     :class="{
-      [$style.field]: true,
-      [$style.focused]: focused,
-      [$style.error]: !valid,
+      [css.field]: true,
+      [css.focused]: focused,
+      [css.error]: !valid,
     }"
-    @click="click"
+    @click="emit('click')"
   >
     <div
       :id="id"
       :class="{
-        [$style.input]: true,
-        [$style.focused]: focused,
-        [$style.empty]: empty,
-        [$style.error]: !valid,
+        [css.input]: true,
+        [css.focused]: focused,
+        [css.empty]: empty,
+        [css.error]: !valid,
       }"
     />
-    <label :class="$style.label" :for="id">{{ label }}</label>
-    <span v-if="number" :class="$style.append">
-      <card-icon :class="$style.icon" />
+    <label :class="css.label" :for="id">{{ label }}</label>
+    <span v-if="number" :class="css.append">
+      <CardIcon :class="css.icon" />
     </span>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script lang="ts" setup>
+withDefaults(
+  defineProps<{
+    id: string
+    label?: string
+    focused?: boolean
+    valid?: boolean
+    number?: boolean
+    empty?: boolean
+  }>(),
+  {
+    label: '',
+    focused: false,
+    valid: false,
+    number: false,
+    empty: false,
+  }
+)
 
-export default defineComponent({
-  name: 'HostedField',
-  props: {
-    id: {
-      required: true,
-      type: String,
-    },
-    label: {
-      required: false,
-      type: String,
-      default: '',
-    },
-    focused: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    valid: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    number: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    empty: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['click'],
-  setup(_, { emit }) {
-    const click = () => {
-      emit('click')
-    }
-    return {
-      click,
-    }
-  },
-})
+const emit = defineEmits<{ (e: 'click'): void }>()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-.floating {
+%floating {
   @apply transform scale-75 -translate-y-3.5 duration-300;
 }
 
@@ -92,7 +67,7 @@ export default defineComponent({
   }
 
   &.focused ~ label {
-    @extend .floating;
+    @extend %floating;
   }
 
   &.focused:not(.error) ~ label {
@@ -100,7 +75,7 @@ export default defineComponent({
   }
 
   &:not(.empty):not(.focused) ~ label {
-    @extend .floating;
+    @extend %floating;
   }
 
   &:not(.empty):not(.focused):not(.error) ~ label {

@@ -1,7 +1,6 @@
-import { Middleware } from '@nuxt/types'
-
-export default <Middleware>function ({ redirect, $config }) {
-  if ($config.maintenance) {
-    return redirect('/maintenance')
+export default defineNuxtRouteMiddleware(() => {
+  const config = useRuntimeConfig()
+  if (config.public.maintenance !== 'false') {
+    return navigateTo('/maintenance')
   }
-}
+})

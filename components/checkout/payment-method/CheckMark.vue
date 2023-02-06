@@ -1,33 +1,24 @@
 <template>
-  <div :class="$style.mark">
-    <check-icon v-if="selected" :class="$style.check" :style="checkStyle" />
+  <div :class="css.mark">
+    <CheckIcon v-if="selected" :class="css.check" :style="checkStyle" />
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, toRefs } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    selected: boolean
+    mt?: string
+  }>(),
+  {
+    mt: '-18px',
+  }
+)
+const { mt } = toRefs(props)
+const checkStyle = computed(() => ({
+  'margin-top': mt.value,
+}))
 
-export default defineComponent({
-  name: 'CheckMark',
-  props: {
-    selected: {
-      required: true,
-      type: Boolean,
-    },
-    mt: {
-      required: false,
-      type: String,
-      default: '-18px',
-    },
-  },
-  setup(props) {
-    const { mt } = toRefs(props)
-    return {
-      checkStyle: {
-        'margin-top': mt.value,
-      },
-    }
-  },
-})
+const css = useCssModule()
 </script>
 <style lang="scss" module>
 .mark {

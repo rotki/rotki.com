@@ -1,8 +1,8 @@
 <template>
-  <page>
+  <PageContainer>
     <template #title> Almost Done </template>
-    <div :class="$style.content">
-      <user-action-message>
+    <div :class="css.content">
+      <UserActionMessage>
         <template #header>Thank you for registering.</template>
         <p>
           To use your new rotki account you have to first confirm your e-mail.
@@ -11,17 +11,13 @@
           Please check your mailbox and follow the instructions to activate your
           account.
         </p>
-      </user-action-message>
+      </UserActionMessage>
     </div>
-  </page>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PendingActivation',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

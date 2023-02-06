@@ -1,16 +1,12 @@
 <template>
-  <div :class="$style.ripple">
+  <div :class="css.ripple">
     <div />
     <div />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'RippleLoader',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

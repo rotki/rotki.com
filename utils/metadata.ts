@@ -7,7 +7,7 @@ export function getMetadata(
   const imageUrl = `${baseUrl}/img/share.png`
   return [
     {
-      hid: 'description',
+      key: 'description',
       name: 'description',
       content: description,
     },

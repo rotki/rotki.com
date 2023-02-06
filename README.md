@@ -4,18 +4,14 @@
 
 ```bash
 # install dependencies
-$ yarn install
+$ pnpm install
 
 # serve with hot reload at localhost:3000
-$ yarn dev
+$ pnpm run dev
 
 # build for production and launch server
-$ yarn build
-$ yarn start
-
-# generate static project
-$ yarn generate
-```
+$ pnpm run build
+$ pnpm start
 
 ## Run
 
@@ -31,7 +27,9 @@ And input the RECAPTCHA public key there.
 RECAPTCHA_SITE_KEY=XXXX
 ```
 
-if you are running behing an https proxy make sure to also add
+You can get a testing key from [developers google](https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do).
+
+if you are running behind https make sure to also add:
 ```
 BASE_URL=https://localhost
 NODE_TLS_REJECT_UNAUTHORIZED=0
@@ -40,7 +38,7 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 Run with
 
 ```bash
-$ yarn dev
+$ pnpm run dev
 ```
 
 
@@ -49,5 +47,5 @@ $ yarn dev
 To fix any lint errors you have to run
 
 ```bash
-yarn lint:js --fix
+pnpm lint:js --fix
 ```

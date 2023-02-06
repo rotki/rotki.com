@@ -1,27 +1,23 @@
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.content">
-      <div :class="$style.title">
+  <div :class="css.wrapper">
+    <div :class="css.content">
+      <div :class="css.title">
         <slot name="title"></slot>
       </div>
-      <div :class="$style.description">
+      <div :class="css.description">
         <slot></slot>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PremiumFeature',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/main';
-@import '~assets/css/media';
+@import '@/assets/css/main.scss';
+@import '@/assets/css/media.scss';
 
 .wrapper {
   @apply flex flex-col;

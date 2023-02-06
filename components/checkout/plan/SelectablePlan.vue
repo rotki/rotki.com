@@ -1,96 +1,77 @@
 <template>
   <div
     :class="{
-      [$style.plan]: true,
-      [$style.selected]: selected,
+      [css.plan]: true,
+      [css.selected]: selected,
     }"
     @click="click"
   >
-    <check-mark class="-mr-12" :selected="selected" mt="-18px" />
+    <CheckMark class="-mr-12" :selected="selected" mt="-18px" />
     <div
       :class="{
-        [$style.emphasis]: true,
-        [$style.name]: true,
+        [css.emphasis]: true,
+        [css.name]: true,
       }"
     >
       {{ name }}
     </div>
     <div
       :class="{
-        [$style.filler]: true,
-        [$style.for]: true,
+        [css.filler]: true,
+        [css.for]: true,
       }"
     >
       for *
     </div>
-    <div :class="$style.emphasis">{{ price }}€</div>
+    <div :class="css.emphasis">{{ price }}€</div>
     <div
       :class="{
-        [$style.filler]: true,
-        [$style.monthly]: true,
+        [css.filler]: true,
+        [css.monthly]: true,
       }"
     >
       per month
     </div>
-    <div :class="$style.total">Total: {{ totalPrice }}€</div>
-    <selection-button :class="$style.button" :selected="selected">
+    <div :class="css.total">Total: {{ totalPrice }}€</div>
+    <SelectionButton :class="css.button" :selected="selected">
       Choose Plan
-    </selection-button>
-    <div v-if="plan.discount" :class="$style.discount">
+    </SelectionButton>
+    <div v-if="plan.discount" :class="css.discount">
       Save {{ plan.discount }}%
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  PropType,
-  toRefs,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { get } from '@vueuse/core'
 import { Plan } from '~/types'
 import { getPlanName } from '~/utils/plans'
 
-export default defineComponent({
-  name: 'SelectablePlan',
-  props: {
-    plan: {
-      required: true,
-      type: Object as PropType<Plan>,
-    },
-    selected: {
-      required: true,
-      type: Boolean,
-    },
-  },
-  emits: ['click'],
-  setup(props, { emit }) {
-    const { plan } = toRefs(props)
+const props = defineProps<{
+  plan: Plan
+  selected: boolean
+}>()
 
-    const name = computed(() => getPlanName(get(plan).months))
-    const totalPrice = computed(() => get(plan).priceFiat)
-    const price = computed(() => {
-      const { months, priceFiat } = get(plan)
-      return (parseFloat(priceFiat) / months).toFixed(2)
-    })
+const emit = defineEmits<{ (e: 'click'): void }>()
 
-    const click = () => {
-      emit('click')
-    }
-    return {
-      click,
-      name,
-      price,
-      totalPrice,
-    }
-  },
+const { plan } = toRefs(props)
+
+const name = computed(() => getPlanName(get(plan).months))
+const totalPrice = computed(() => get(plan).priceFiat)
+const price = computed(() => {
+  const { months, priceFiat } = get(plan)
+  return (parseFloat(priceFiat) / months).toFixed(2)
 })
+
+const click = () => {
+  emit('click')
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-.small {
+%small {
   font-size: 16px;
   line-height: 19px;
   letter-spacing: 0;
@@ -140,20 +121,20 @@ export default defineComponent({
   color: #545454;
   opacity: 1;
 
-  @extend .small;
+  @extend %small;
 }
 
 .total {
   font-weight: bold;
   color: #212529;
 
-  @extend .small;
+  @extend %small;
 }
 
 .discount {
   color: #878787;
 
-  @extend .small;
+  @extend %small;
 }
 
 .button {

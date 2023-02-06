@@ -1,25 +1,21 @@
 <template>
-  <div :class="$style.container">
-    <div v-if="$slots.left" :class="$style.left">
+  <div :class="css.container">
+    <div v-if="$slots.left" :class="css.left">
       <slot name="left" />
     </div>
-    <div :class="$style.text">
-      <div :class="$style.title">
+    <div :class="css.text">
+      <div :class="css.title">
         <slot name="title" />
       </div>
-      <div :class="$style.description">
+      <div :class="css.description">
         <slot />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'ProductDescription',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

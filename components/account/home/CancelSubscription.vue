@@ -1,17 +1,17 @@
 <template>
   <div>
-    <button :class="$style.actionButton" @click="confirm = true">Cancel</button>
-    <modal-dialog v-model="confirm" padding="1rem">
-      <div :class="$style.body">
-        <h2 :class="$style.title">Canceling Your Rotki Subscription</h2>
-        <p :class="$style.text">
+    <button :class="css.actionButton" @click="confirm = true">Cancel</button>
+    <ModalDialog v-model="confirm" padding="1rem">
+      <div :class="css.body">
+        <h2 :class="css.title">Canceling Your Rotki Subscription</h2>
+        <p :class="css.text">
           Are you sure you want to cancel your currently running subscription?
           Here are some reasons to make you stay with us:
         </p>
         <ul
           :class="{
-            [$style.text]: true,
-            [$style.list]: true,
+            [css.text]: true,
+            [css.list]: true,
           }"
         >
           <li>
@@ -21,7 +21,7 @@
           <li>
             Did you know that as a premium user by providing your Github
             username you have priority for all issues reported in our
-            <external-link
+            <ExternalLink
               no-ref
               text="bug tracker"
               url="https://github.com/rotki/rotki/issues"
@@ -38,15 +38,15 @@
           </li>
         </ul>
 
-        <h2 :class="$style.title">Subscription</h2>
+        <h2 :class="css.title">Subscription</h2>
 
-        <p v-if="isPending" :class="$style.text">
+        <p v-if="isPending" :class="css.text">
           Your pending subscription which was created on
           {{ subscription.createdDate }} will never be billed if you cancel. We
           are sad to see you go. Are you sure you want to cancel the
           subscription?
         </p>
-        <p v-else :class="$style.text">
+        <p v-else :class="css.text">
           Your subscription which was created on
           {{ subscription.createdDate }} will run until
           {{ subscription.nextActionDate }}
@@ -55,56 +55,39 @@
           cancel the subscription?
         </p>
 
-        <div :class="$style.buttons">
-          <action-button filled small @click="confirm = false">
+        <div :class="css.buttons">
+          <ActionButton filled small @click="confirm = false">
             No don't cancel
-          </action-button>
-          <action-button primary small warning @click="cancelSubscription">
+          </ActionButton>
+          <ActionButton primary small warning @click="cancelSubscription">
             Yes, cancel my subscription
-          </action-button>
+          </ActionButton>
         </div>
       </div>
-    </modal-dialog>
+    </ModalDialog>
   </div>
 </template>
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  PropType,
-  ref,
-  toRefs,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { Subscription } from '~/types'
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'CancelSubscription',
-  props: {
-    subscription: {
-      required: true,
-      type: Object as PropType<Subscription>,
-    },
-  },
-  setup(props) {
-    const { subscription } = toRefs(props)
-    const isPending = computed(() => subscription.value.status === 'Pending')
-    const confirm = ref(false)
-    const store = useMainStore()
-    const cancelSubscription = async () => {
-      confirm.value = false
-      await store.cancelSubscription(subscription.value)
-    }
-    return {
-      cancelSubscription,
-      isPending,
-      confirm,
-    }
-  },
-})
+const props = defineProps<{
+  subscription: Subscription
+}>()
+
+const { subscription } = toRefs(props)
+const isPending = computed(() => subscription.value.status === 'Pending')
+const confirm = ref(false)
+const store = useMainStore()
+const cancelSubscription = async () => {
+  confirm.value = false
+  await store.cancelSubscription(subscription.value)
+}
+
+const css = useCssModule()
 </script>
 <style lang="scss" module>
-@import '~assets/css/media';
+@import '@/assets/css/media.scss';
 
 .actionButton {
   @apply text-primary hover:text-yellow-500 focus:outline-none;

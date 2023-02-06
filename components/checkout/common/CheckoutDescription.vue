@@ -1,15 +1,13 @@
 <template>
-  <div :class="$style.description">
+  <div :class="css.description">
     <slot />
   </div>
 </template>
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
 
-export default defineComponent({
-  name: 'CheckoutDescription',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
+
 <style lang="scss" module>
 .description {
   @apply text-typography;

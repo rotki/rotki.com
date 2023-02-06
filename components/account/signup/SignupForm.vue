@@ -1,18 +1,18 @@
 <template>
-  <page>
+  <PageContainer>
     <template #title> Create a rotki premium Account </template>
 
-    <div :class="$style.row">
-      <div :class="$style.column">
-        <div :class="$style.hint">
-          <span :class="$style.important">Important</span> Note: Creating an
+    <div :class="css.row">
+      <div :class="css.column">
+        <div :class="css.hint">
+          <span :class="css.important">Important</span> Note: Creating an
           account in rotki.com is only needed to purchase a
-          <external-link same-tab text="premium subscription" url="/products" />
+          <ExternalLink same-tab text="premium subscription" url="/products" />
           Rotki is a local application and the account you create when you use
           it is stored on your computer. This is not the same account as premium
           and credentials for one account don't work for the other. To use Rotki
           simply
-          <external-link
+          <ExternalLink
             noreferrer
             text="download"
             url="https://github.com/rotki/rotki/releases/latest"
@@ -21,10 +21,10 @@
           the premium features of the application.
         </div>
 
-        <heading :class="$style.heading">Account</heading>
+        <TextHeading :class="css.heading">Account</TextHeading>
 
-        <div :class="$style.inputs">
-          <input-field
+        <div :class="css.inputs">
+          <InputField
             id="username"
             v-model="state.username"
             :error-messages="v$.username.$errors"
@@ -32,7 +32,7 @@
             label="Username"
             @blur="v$.username.$touch()"
           />
-          <input-field
+          <InputField
             id="email"
             v-model="state.email"
             :error-messages="v$.email.$errors"
@@ -41,7 +41,7 @@
             type="email"
             @blur="v$.email.$touch()"
           />
-          <input-field
+          <InputField
             id="github"
             v-model="state.githubUsername"
             :error-messages="v$.githubUsername.$errors"
@@ -49,7 +49,7 @@
             label="Github Username"
             @blur="v$.githubUsername.$touch()"
           />
-          <input-field
+          <InputField
             id="password"
             v-model="state.password"
             :error-messages="v$.password.$errors"
@@ -57,7 +57,7 @@
             type="password"
             @blur="v$.password.$touch()"
           >
-            <ul :class="$style.list">
+            <ul :class="css.list">
               <li>
                 Your password can't be too similar to your other personal
                 information.
@@ -67,9 +67,9 @@
 
               <li>Your password can't be entirely numeric.</li>
             </ul>
-          </input-field>
+          </InputField>
 
-          <input-field
+          <InputField
             id="password-confirmation"
             v-model="state.confirmPassword"
             :error-messages="v$.confirmPassword.$errors"
@@ -80,10 +80,10 @@
           />
         </div>
 
-        <heading :class="$style.heading">Customer Information</heading>
+        <TextHeading :class="css.heading">Customer Information</TextHeading>
 
-        <div :class="$style.inputs">
-          <input-field
+        <div :class="css.inputs">
+          <InputField
             id="first-name"
             v-model="state.firstName"
             :error-messages="v$.firstName.$errors"
@@ -91,7 +91,7 @@
             label="First Name"
             @blur="v$.firstName.$touch()"
           />
-          <input-field
+          <InputField
             id="last-name"
             v-model="state.lastName"
             :error-messages="v$.lastName.$errors"
@@ -99,14 +99,14 @@
             label="Last Name"
             @blur="v$.lastName.$touch()"
           />
-          <input-field
+          <InputField
             id="company-name"
             v-model="state.companyName"
             hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
             label="Company Name"
             @blur="v$.companyName.$touch()"
           />
-          <input-field
+          <InputField
             id="vat-id"
             v-model="state.vatId"
             :error-messages="v$.vatId.$errors"
@@ -116,10 +116,10 @@
           />
         </div>
 
-        <heading :class="$style.heading">Address</heading>
+        <TextHeading :class="css.heading">Address</TextHeading>
 
-        <div :class="$style.inputs">
-          <input-field
+        <div :class="css.inputs">
+          <InputField
             id="address-1"
             v-model="state.address1"
             :error-messages="v$.address1.$errors"
@@ -127,7 +127,7 @@
             label="Address line 1"
             @blur="v$.address1.$touch()"
           />
-          <input-field
+          <InputField
             id="address-2"
             v-model="state.address2"
             :error-messages="v$.address2.$errors"
@@ -135,7 +135,7 @@
             label="Address line 2"
             @blur="v$.address2.$touch()"
           />
-          <input-field
+          <InputField
             id="city"
             v-model="state.city"
             :error-messages="v$.city.$errors"
@@ -143,7 +143,7 @@
             label="City"
             @blur="v$.city.$touch()"
           />
-          <input-field
+          <InputField
             id="postal"
             v-model="state.postcode"
             :error-messages="v$.postcode.$errors"
@@ -152,7 +152,7 @@
             @blur="v$.postcode.$touch()"
           />
 
-          <country-select
+          <CountrySelect
             id="country"
             v-model="state.country"
             :error-messages="v$.country.$errors"
@@ -163,156 +163,136 @@
           />
         </div>
 
-        <recaptcha
-          :class="$style.recaptcha"
+        <Recaptcha
+          :class="css.recaptcha"
           @error="onError"
           @expired="onExpired"
           @success="onSuccess"
         />
 
-        <label :class="$style.termsCheck">
+        <label :class="css.termsCheck">
           <input
-            :class="$style.checkbox"
-            :value="termsAccepted"
+            :class="css.checkbox"
+            :modelValue="termsAccepted"
             type="checkbox"
             @click="termsAccepted = !termsAccepted"
           />
-          <span :class="$style.terms">
+          <span :class="css.terms">
             I have read and agreed to the
-            <external-link text="Terms of Service" url="/tos" />
+            <ExternalLink text="Terms of Service" url="/tos" />
             and the
-            <external-link text="Privacy Policy" url="/privacy-policy" />
+            <ExternalLink text="Privacy Policy" url="/privacy-policy" />
           </span>
         </label>
 
-        <action-button
+        <ActionButton
           :disabled="!termsAccepted || !recaptchaPassed"
-          :class="$style.button"
+          :class="css.button"
           primary
           text="Create Account"
           @click="signup(state)"
         />
       </div>
     </div>
-  </page>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  reactive,
-  Ref,
-  ref,
-  toRef,
-  useContext,
-  useRouter,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { email, minLength, required, sameAs } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { get } from '@vueuse/core'
-import { setupCSRF } from '~/composables/csrf-token'
-import { loadCountries } from '~/composables/countries'
-import { setupRecaptcha } from '~/composables/repatcha'
-import { SignupPayload } from '~/components/account/signup/types'
+import { Ref } from 'vue'
+import { FetchError } from 'ofetch'
+import { SignupPayload } from '~/types/signup'
+import { fetchWithCsrf } from '~/utils/api'
 
-export default defineComponent({
-  name: 'SignupForm',
-  setup() {
-    const state = reactive<SignupPayload>({
-      username: '',
-      password: '',
-      confirmPassword: '',
-      email: '',
-      githubUsername: '',
-      firstName: '',
-      lastName: '',
-      companyName: '',
-      vatId: '',
-      address1: '',
-      address2: '',
-      city: '',
-      postcode: '',
-      country: '',
-    })
-
-    const rules = {
-      username: { required },
-      password: { required, minLength: minLength(8) },
-      confirmPassword: {
-        required,
-        sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
-      },
-      email: { required, email },
-      githubUsername: {},
-      firstName: { required },
-      lastName: { required },
-      companyName: {},
-      vatId: {},
-      address1: { required },
-      address2: {},
-      city: { required },
-      postcode: { required },
-      country: { required },
-    }
-
-    const $externalResults = ref({})
-    const v$ = useVuelidate(rules, state, {
-      $autoDirty: true,
-      $externalResults,
-    })
-    const termsAccepted = ref(false)
-    setupCSRF()
-
-    const recaptcha = setupRecaptcha()
-
-    const setupSignup = (captcha: Ref<string>, $externalResults: Ref<any>) => {
-      const { $api } = useContext()
-      const router = useRouter()
-      const signup = async (payload: SignupPayload) => {
-        const isValid = await get(v$).$validate()
-
-        if (!isValid) {
-          return
-        }
-
-        const response = await $api.post(
-          '/webapi/signup/',
-          {
-            captcha: captcha.value,
-            ...payload,
-          },
-          {
-            validateStatus: (status) => [200, 400].includes(status),
-          }
-        )
-
-        if (response.data && typeof response.data.message === 'object') {
-          $externalResults.value = response.data.message
-        }
-
-        if (response.status === 200) {
-          router.push({ path: '/activation' })
-        }
-      }
-      return {
-        signup,
-      }
-    }
-    return {
-      ...loadCountries(),
-      ...recaptcha,
-      ...setupSignup(recaptcha.recaptchaToken, $externalResults),
-      termsAccepted,
-      state,
-      v$,
-    }
-  },
+const state = reactive<SignupPayload>({
+  username: '',
+  password: '',
+  confirmPassword: '',
+  email: '',
+  githubUsername: '',
+  firstName: '',
+  lastName: '',
+  companyName: '',
+  vatId: '',
+  address1: '',
+  address2: '',
+  city: '',
+  postcode: '',
+  country: '',
 })
+
+const rules = {
+  username: { required },
+  password: { required, minLength: minLength(8) },
+  confirmPassword: {
+    required,
+    sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
+  },
+  email: { required, email },
+  githubUsername: {},
+  firstName: { required },
+  lastName: { required },
+  companyName: {},
+  vatId: {},
+  address1: { required },
+  address2: {},
+  city: { required },
+  postcode: { required },
+  country: { required },
+}
+
+const $externalResults = ref({})
+const v$ = useVuelidate(rules, state, {
+  $autoDirty: true,
+  $externalResults,
+})
+const termsAccepted = ref(false)
+
+const recaptcha = useRecaptcha()
+const { recaptchaPassed, onError, onSuccess, onExpired } = recaptcha
+
+const useSignup = (
+  captcha: Ref<string>,
+  $externalResults: Ref<Record<string, string>>
+) => {
+  const signup = async (payload: SignupPayload) => {
+    const isValid = await get(v$).$validate()
+
+    if (!isValid) {
+      return
+    }
+
+    try {
+      await fetchWithCsrf('/webapi/signup/', {
+        body: {
+          captcha: captcha.value,
+          ...payload,
+        },
+      })
+      await navigateTo({ path: '/activation' })
+    } catch (e: any) {
+      if (e instanceof FetchError && e.status === 400) {
+        if (e.data && typeof e.data.message === 'object') {
+          $externalResults.value = e.data.message
+        }
+      }
+    }
+  }
+  return {
+    signup,
+  }
+}
+
+const { countries } = useCountries()
+const { signup } = useSignup(recaptcha.recaptchaToken, $externalResults)
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .row {
   @apply flex flex-row mx-auto;

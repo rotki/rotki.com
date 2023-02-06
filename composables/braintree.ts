@@ -1,11 +1,3 @@
-import {
-  computed,
-  onBeforeMount,
-  ref,
-  useRoute,
-  useRouter,
-  watch,
-} from '@nuxtjs/composition-api'
 import { get, set } from '@vueuse/core'
 import { useMainStore } from '~/store'
 import { CardCheckout, PaymentStep, SelectedPlan } from '~/types'

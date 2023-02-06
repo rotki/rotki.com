@@ -1,30 +1,28 @@
 <template>
-  <password-link-send />
+  <PasswordLinkSend />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
-export default defineComponent({
-  setup() {
-    useMeta({
-      title: 'recovery e-mail send | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'The password recovery link has been send to your address',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+definePageMeta({
+  middleware: 'maintenance',
+})
+
+useHead({
+  title: 'recovery e-mail send | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'The password recovery link has been send to your address',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~~/assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

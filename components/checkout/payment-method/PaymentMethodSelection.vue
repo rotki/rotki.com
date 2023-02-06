@@ -1,44 +1,36 @@
 <template>
-  <div :class="$style.content">
-    <checkout-title>Payment Methods</checkout-title>
-    <checkout-description>
+  <div :class="css.content">
+    <CheckoutTitle>Payment Methods</CheckoutTitle>
+    <CheckoutDescription>
       Please select one of the following payment methods.
-    </checkout-description>
-    <div :class="$style.wrapper">
-      <div :class="$style.methods">
-        <payment-method-item
-          v-for="item in paymentMethods"
+    </CheckoutDescription>
+    <div :class="css.wrapper">
+      <div :class="css.methods">
+        <PaymentMethodItem
+          v-for="item in availablePaymentMethods"
           :key="item.id"
-          :class="$style.method"
+          :class="css.method"
           :selected="isSelected(item.id)"
           @click="select(item.id)"
         >
-          <component :is="item.component" />
+          <Component :is="item.component" />
           <template #label> {{ item.label }} </template>
-        </payment-method-item>
+        </PaymentMethodItem>
       </div>
     </div>
-    <div :class="$style.continue">
-      <selection-button :disabled="!selected" selected @click="next">
+    <div :class="css.continue">
+      <SelectionButton :disabled="!selected" selected @click="next">
         Continue to Checkout
-      </selection-button>
+      </SelectionButton>
     </div>
-    <login-modal v-model="loginRequired" />
+    <LoginModal v-model="loginRequired" />
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  Ref,
-  ref,
-  toRefs,
-  useRoute,
-  useRouter,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { get } from '@vueuse/core'
-import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue'
+import { Ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useMainStore } from '~/store'
 import { assert } from '~/utils/assert'
 
@@ -88,80 +80,63 @@ const paymentMethods: PaymentMethodItem[] = [
   },
 ]
 
-export default defineComponent({
-  name: 'PaymentMethodSelection',
-  components: { CheckoutTitle },
-  props: {
-    identifier: { required: false, type: String, default: undefined },
-  },
-  setup(props) {
-    const { identifier } = toRefs(props)
-    const selected: Ref<PaymentMethod | null> = ref(null)
-    const loginRequired = ref(false)
-    const store = useMainStore()
-    const router = useRouter()
-    const route = useRoute()
+const props = defineProps<{ identifier?: string }>()
 
-    // pinia#852
-    const { authenticated } = toRefs(store)
+const { identifier } = toRefs(props)
+const selected: Ref<PaymentMethod | null> = ref(null)
+const loginRequired = ref(false)
+const store = useMainStore()
+const route = useRoute()
 
-    const next = () => {
-      if (authenticated.value) {
-        const query: { p: string; c?: string; id?: string } = {
-          p: route.value.query.p as string,
-        }
-        let path: string
-        const value = selected.value
-        assert(value)
-        if (value === PaymentMethod.CARD) {
-          path = '/checkout/pay/card'
-        } else if (value === PaymentMethod.PAYPAL) {
-          path = '/checkout/pay/paypal'
-        } else {
-          path = '/checkout/request/crypto'
-          query.c = PaymentMethod[value]
-        }
+const { authenticated } = storeToRefs(store)
 
-        const id = get(identifier)
-        if (id) {
-          query.id = id
-        }
-
-        router.push({
-          path,
-          query,
-        })
-      } else {
-        loginRequired.value = true
-      }
+const next = () => {
+  if (authenticated.value) {
+    const query: { p: string; c?: string; id?: string } = {
+      p: route.query.p as string,
+    }
+    let path: string
+    const value = selected.value
+    assert(value)
+    if (value === PaymentMethod.CARD) {
+      path = '/checkout/pay/card'
+    } else if (value === PaymentMethod.PAYPAL) {
+      path = '/checkout/pay/paypal'
+    } else {
+      path = '/checkout/request/crypto'
+      query.c = PaymentMethod[value]
     }
 
-    const isSelected = (method: PaymentMethod) => {
-      return selected.value === method
+    const id = get(identifier)
+    if (id) {
+      query.id = id
     }
 
-    const select = (method: PaymentMethod) => {
-      selected.value = method
-    }
-
-    const availablePaymentMethods = computed(() => {
-      if (!get(identifier)) {
-        return paymentMethods
-      }
-      return paymentMethods.filter((value) => value.crypto)
+    navigateTo({
+      path,
+      query,
     })
+  } else {
+    loginRequired.value = true
+  }
+}
 
-    return {
-      paymentMethods: availablePaymentMethods,
-      method: PaymentMethod,
-      loginRequired,
-      next,
-      selected,
-      select,
-      isSelected,
-    }
-  },
+const isSelected = (method: PaymentMethod) => {
+  return selected.value === method
+}
+
+const select = (method: PaymentMethod) => {
+  selected.value = method
+}
+
+const availablePaymentMethods = computed(() => {
+  if (!get(identifier)) {
+    return paymentMethods
+  }
+  return paymentMethods.filter((value) => value.crypto)
 })
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

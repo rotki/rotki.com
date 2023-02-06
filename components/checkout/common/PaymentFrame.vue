@@ -1,109 +1,96 @@
 <template>
-  <page :center-vertically="false">
+  <PageContainer :center-vertically="false">
     <template #title>Subscription Payment</template>
-    <page-content>
-      <div :class="$style.content">
-        <checkout-title>Payment Details</checkout-title>
+    <PageContent>
+      <div :class="css.content">
+        <CheckoutTitle>Payment Details</CheckoutTitle>
 
         <slot name="description">
-          <checkout-description>
-            <div :class="$style.description">
-              <span :class="$style.text">
+          <CheckoutDescription>
+            <div :class="css.description">
+              <span :class="css.text">
                 Payments are safely processed with
               </span>
-              <braintree-icon :class="$style.braintree" />
+              <BraintreeIcon :class="css.braintree" />
             </div>
-          </checkout-description>
+          </CheckoutDescription>
         </slot>
 
-        <loader v-if="loading" :class="$style.loader" />
+        <LoadingIndicator v-if="loading" :class="css.loader" />
         <div v-if="userInteraction">
           <slot />
         </div>
-        <pending-display
+        <PendingDisplay
           v-if="isPending"
           :message="text.message"
           :title="text.title"
         />
-        <error-display
+        <ErrorDisplay
           v-else-if="isFailure"
           :message="text.message"
           :title="text.title"
         >
-          <div v-if="text.closable" :class="$style.close">
-            <selection-button :selected="false" @click="close">
+          <div v-if="text.closable" :class="css.close">
+            <SelectionButton :selected="false" @click="close">
               OK
-            </selection-button>
+            </SelectionButton>
           </div>
-        </error-display>
-        <success-display
+        </ErrorDisplay>
+        <SuccessDisplay
           v-else-if="isSuccess"
           :message="text.message"
           :title="text.title"
         >
-          <div :class="$style['action-wrapper']">
-            <nuxt-link :class="$style.action" to="/home">
-              Manage Premium
-            </nuxt-link>
+          <div :class="css['action-wrapper']">
+            <NuxtLink :class="css.action" to="/home"> Manage Premium </NuxtLink>
           </div>
-        </success-display>
+        </SuccessDisplay>
       </div>
-    </page-content>
-  </page>
+    </PageContent>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { get, toRefs } from '@vueuse/core'
 import { IdleStep, PaymentStep, StepType } from '~/types'
 
-export default defineComponent({
-  name: 'PaymentFrame',
-  props: {
-    loading: {
-      required: true,
-      type: Boolean,
-    },
-    step: {
-      required: true,
-      type: Object as PropType<PaymentStep>,
-    },
-  },
-  emits: ['close'],
-  setup(props, { emit }) {
-    const { step } = toRefs(props)
-    const useType = (type: StepType | IdleStep) => {
-      return computed(() => get(step).type === type)
-    }
-    const text = computed(() => {
-      const currentStep = get(step)
-      if (currentStep.type === 'idle') {
-        return {
-          title: '',
-          message: '',
-        }
-      }
-      return {
-        title: currentStep.title,
-        message: currentStep.message,
-        closable: currentStep.closeable,
-      }
-    })
+const props = defineProps<{
+  loading: boolean
+  step: PaymentStep
+}>()
 
-    const close = () => {
-      emit('close')
-    }
+const emit = defineEmits<{ (e: 'close'): void }>()
 
+const { step } = toRefs(props)
+const useType = (type: StepType | IdleStep) => {
+  return computed(() => get(step).type === type)
+}
+const text = computed(() => {
+  const currentStep = get(step)
+  if (currentStep.type === 'idle') {
     return {
-      text,
-      isPending: useType('pending'),
-      isSuccess: useType('success'),
-      isFailure: useType('failure'),
-      userInteraction: useType('idle'),
-      close,
+      title: '',
+      message: '',
+      closable: false,
     }
-  },
+  }
+  return {
+    title: currentStep.title,
+    message: currentStep.message,
+    closable: currentStep.closeable,
+  }
 })
+
+const close = () => {
+  emit('close')
+}
+
+const isPending = useType('pending')
+const isSuccess = useType('success')
+const isFailure = useType('failure')
+const userInteraction = useType('idle')
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

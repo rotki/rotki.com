@@ -1,15 +1,14 @@
-import { computed, useRoute } from '@nuxtjs/composition-api'
 import { get } from '@vueuse/core'
 
 const availablePlans = [1, 3, 6, 12]
 export const supportedCurrencies = ['ETH', 'BTC', 'DAI'] as const
-export type Currency = typeof supportedCurrencies[number]
+export type Currency = (typeof supportedCurrencies)[number]
 type CurrencyParam = Currency | null
 
 export const usePlanParams = () => {
   const route = useRoute()
   const plan = computed(() => {
-    const plan = route.value.query.p
+    const plan = route.query.p
     if (typeof plan !== 'string') {
       return -1
     }
@@ -30,7 +29,7 @@ export const usePlanParams = () => {
 export const useCurrencyParams = () => {
   const route = useRoute()
   const currency = computed<CurrencyParam>(() => {
-    const currency = route.value.query.c
+    const currency = route.query.c
     if (
       typeof currency !== 'string' ||
       !supportedCurrencies.includes(currency as any)

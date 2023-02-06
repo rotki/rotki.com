@@ -1,18 +1,17 @@
 <template>
-  <premium-feature>
+  <PremiumFeature>
     <template #title>
-      {{ $t('home.premium_features.features.premium_staking.title') }}
+      {{ t('home.premium_features.features.premium_staking.title') }}
     </template>
 
-    <i18n path="home.premium_features.features.premium_staking.detail">
+    <i18n-t
+      keypath="home.premium_features.features.premium_staking.detail"
+      scope="global"
+    >
       <br />
-    </i18n>
-  </premium-feature>
+    </i18n-t>
+  </PremiumFeature>
 </template>
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PremiumStaking',
-})
+<script setup lang="ts">
+const { t } = useI18n()
 </script>

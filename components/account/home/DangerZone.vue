@@ -1,17 +1,17 @@
 <template>
-  <card warning>
-    <heading>Danger Zone</heading>
+  <CardContainer warning>
+    <TextHeading>Danger Zone</TextHeading>
 
-    <p :class="$style.text">
+    <p :class="css.text">
       Proceeding will completely delete your account data. If you proceed you
       will not be able to recover your account!
     </p>
 
-    <p v-if="isSubscriber" :class="$style.warning">
+    <p v-if="isSubscriber" :class="css.warning">
       You cannot delete your account while you have an active subscription.
     </p>
 
-    <action-button
+    <ActionButton
       :disabled="isSubscriber"
       primary
       small
@@ -20,9 +20,9 @@
       @click="confirm = true"
     />
 
-    <modal-dialog v-model="confirm" padding="1rem">
-      <div :class="$style.title">Delete Account</div>
-      <p :class="$style.description">
+    <ModalDialog v-model="confirm" padding="1rem">
+      <div :class="css.title">Delete Account</div>
+      <p :class="css.description">
         By proceeding you will delete your account and all its accompanying data
         from our servers. This action is not reversible. Are you sure you want
         to perform the deletion?
@@ -30,13 +30,13 @@
 
       <p>
         Type your username to continue:
-        <span :class="$style.username">{{ username }}</span>
+        <span :class="css.username">{{ username }}</span>
       </p>
-      <input-field id="user-confirm" v-model="usernameConfirmation" />
+      <InputField id="user-confirm" v-model="usernameConfirmation" />
 
-      <div :class="$style.buttons">
-        <action-button filled small text="Cancel" @click="confirm = false" />
-        <action-button
+      <div :class="css.buttons">
+        <ActionButton filled small text="Cancel" @click="confirm = false" />
+        <ActionButton
           :disabled="username !== usernameConfirmation"
           primary
           small
@@ -45,67 +45,46 @@
           @click="deleteAccount"
         />
       </div>
-    </modal-dialog>
-    <error-notification :visible="!!error">
+    </ModalDialog>
+    <ErrorNotification :visible="!!error">
       <template #title> Account deletion failed </template>
       <template #description>{{ error }}</template>
-    </error-notification>
-  </card>
+    </ErrorNotification>
+  </CardContainer>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  ref,
-  toRefs,
-  useRouter,
-} from '@nuxtjs/composition-api'
-import { ActionResult, useMainStore } from '~/store'
-import ErrorNotification from '~/components/account/home/ErrorNotification.vue'
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { useMainStore } from '~/store'
+import { ActionResult } from '~/types/common'
 
-export default defineComponent({
-  name: 'DangerZone',
-  components: { ErrorNotification },
-  setup() {
-    const confirm = ref(false)
-    const usernameConfirmation = ref('')
-    const error = ref('')
+const confirm = ref(false)
+const usernameConfirmation = ref('')
+const error = ref('')
 
-    const store = useMainStore()
-    const router = useRouter()
-    // pinia#852
-    const { account } = toRefs(store)
+const store = useMainStore()
+const { account } = storeToRefs(store)
 
-    const username = computed(() => account.value?.username)
-    const isSubscriber = computed(
-      () => account.value?.hasActiveSubscription ?? false
-    )
+const username = computed(() => account.value?.username)
+const isSubscriber = computed(
+  () => account.value?.hasActiveSubscription ?? false
+)
 
-    const deleteAccount = async () => {
-      confirm.value = false
-      const result: ActionResult = await store.deleteAccount({
-        username: usernameConfirmation.value,
-      })
-      if (result.success) {
-        await store.logout()
-        router.push('/account-deleted')
-      } else {
-        error.value = typeof result.message === 'string' ? result.message : ''
-        setTimeout(() => (error.value = ''), 4500)
-      }
-    }
+const deleteAccount = async () => {
+  confirm.value = false
+  const result: ActionResult = await store.deleteAccount({
+    username: usernameConfirmation.value,
+  })
+  if (result.success) {
+    await store.logout()
+    await navigateTo('/account-deleted')
+  } else {
+    error.value = typeof result.message === 'string' ? result.message : ''
+    setTimeout(() => (error.value = ''), 4500)
+  }
+}
 
-    return {
-      confirm,
-      error,
-      username,
-      usernameConfirmation,
-      isSubscriber,
-      deleteAccount,
-    }
-  },
-})
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

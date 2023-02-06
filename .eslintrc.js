@@ -12,5 +12,15 @@ module.exports = {
   ],
   plugins: ['prettier'],
   // add your custom rules here
-  rules: {},
+  rules: {
+    'vue/component-name-in-template-casing': [
+      'error',
+      'PascalCase',
+      {
+        registeredComponentsOnly: false,
+        ignores: ['i18n-t'],
+      },
+    ],
+    'vue/no-multiple-template-root': 'off',
+  },
 }

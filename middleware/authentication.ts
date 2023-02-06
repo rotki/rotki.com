@@ -1,9 +1,10 @@
-import { Middleware } from '@nuxt/types'
+import { storeToRefs } from 'pinia'
+import { get } from '@vueuse/core'
 import { useMainStore } from '~/store'
 
-export default <Middleware>function ({ redirect }) {
-  const { authenticated } = useMainStore()
-  if (!authenticated) {
-    return redirect('/login')
+export default defineNuxtRouteMiddleware(() => {
+  const { authenticated } = storeToRefs(useMainStore())
+  if (!get(authenticated)) {
+    return navigateTo('/login')
   }
-}
+})

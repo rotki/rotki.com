@@ -1,45 +1,28 @@
 <template>
   <div
     :class="{
-      [$style.content]: true,
-      [$style.selected]: selected,
+      [css.content]: true,
+      [css.selected]: selected,
     }"
-    @click="click"
+    @click="emit('click')"
   >
-    <check-mark :selected="selected" />
+    <CheckMark :selected="selected" />
 
-    <div :class="$style.icon">
+    <div :class="css.icon">
       <slot />
     </div>
-    <div :class="$style.text">
+    <div :class="css.text">
       <slot name="label"></slot>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-import CheckMark from '~/components/checkout/payment-method/CheckMark.vue'
+<script setup lang="ts">
+defineProps<{ selected: boolean }>()
 
-export default defineComponent({
-  name: 'PaymentMethodItem',
-  components: { CheckMark },
-  props: {
-    selected: {
-      required: true,
-      type: Boolean,
-    },
-  },
-  emits: ['click'],
-  setup(_, { emit }) {
-    const click = () => {
-      emit('click')
-    }
-    return {
-      click,
-    }
-  },
-})
+const emit = defineEmits<{ (e: 'click'): void }>()
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

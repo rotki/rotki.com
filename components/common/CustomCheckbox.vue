@@ -1,38 +1,39 @@
 <template>
-  <div :class="$style.checkbox">
-    <input :id="id" :value="value" type="checkbox" @click="input(!value)" />
-    <label :class="$style.label" :for="id">
+  <div :class="css.checkbox">
+    <input
+      :id="id"
+      :modelValue="modelValue"
+      type="checkbox"
+      @click="update(!modelValue)"
+    />
+    <label :class="css.label" :for="id">
       <slot></slot>
     </label>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
 
-export default defineComponent({
-  name: 'CustomCheckbox',
-  props: {
-    value: {
-      required: true,
-      type: Boolean,
-    },
-    id: {
-      required: false,
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['input'],
-  setup(_, { emit }) {
-    const input = (checked: boolean) => {
-      emit('input', checked)
-    }
-    return {
-      input,
-    }
-  },
-})
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    id?: string
+    modelValue: boolean
+  }>(),
+  {
+    id: '',
+  }
+)
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+}>()
+
+const update = (checked: boolean) => {
+  emit('update:modelValue', checked)
+}
+
+const css = useCssModule()
 </script>
+
 <style lang="scss" module>
 .checkbox {
   @apply flex flex-row items-center;

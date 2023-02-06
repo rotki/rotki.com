@@ -1,99 +1,92 @@
 <template>
-  <modal-dialog :value="visible">
-    <div :class="$style.body">
-      <heading no-margin>Change Plan</heading>
+  <ModalDialog :model-value="visible">
+    <div :class="css.body">
+      <TextHeading no-margin>Change Plan</TextHeading>
       <div
-        v-for="plan in plans"
+        v-for="plan in availablePlans"
         :key="plan.months.toString()"
         :class="{
-          [$style.plan]: true,
-          [$style.disabled]: warning && !confirmed,
+          [css.plan]: true,
+          [css.disabled]: warning && !confirmed,
         }"
         @click="select(plan.months)"
       >
-        <div :class="$style.name">{{ getPlanName(plan.months) }} Plan.</div>
+        <div :class="css.name">{{ getPlanName(plan.months) }} Plan.</div>
         {{ getPrice(plan) }}€ <span v-if="false">+ {{ plan }}% VAT</span> every
         {{ plan.months }} months
       </div>
-      <div v-if="crypto && warning" :class="$style.warning">
+      <div v-if="crypto && warning" :class="css.warning">
         <span>
           Switching a plan after sending a payment can lead to problems with the
           activation of your subscription. Please only switch a plan if no
           payment has been send.
         </span>
-        <custom-checkbox v-model="confirmed">
+        <CustomCheckbox v-model="confirmed">
           I confirm that no payment has been send. <br />
           Allow me to switch the plan
-        </custom-checkbox>
+        </CustomCheckbox>
       </div>
-      <div :class="$style.buttons">
-        <action-button text="Cancel" primary small @click="cancel" />
+      <div :class="css.buttons">
+        <ActionButton text="Cancel" primary small @click="cancel" />
       </div>
     </div>
-  </modal-dialog>
+  </ModalDialog>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { get, set, toRefs } from '@vueuse/core'
-import { defineComponent, onMounted, ref, watch } from '@nuxtjs/composition-api'
+import { storeToRefs } from 'pinia'
+import { ComputedRef } from 'vue'
 import { useMainStore } from '~/store'
 import { getPlanName } from '~/utils/plans'
 import { Plan } from '~/types'
 
-export default defineComponent({
-  name: 'PlanSwitchDialog',
-  props: {
-    visible: {
-      required: true,
-      type: Boolean,
-    },
-    crypto: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    warning: {
-      required: true,
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['cancel', 'select'],
-  setup(props, { emit }) {
-    const store = useMainStore()
-    const { plans } = toRefs(store)
-    const { crypto, visible, warning } = toRefs(props)
-    const confirmed = ref(false)
+const props = withDefaults(
+  defineProps<{
+    visible: boolean
+    crypto?: boolean
+    warning?: boolean
+  }>(),
+  {
+    crypto: false,
+    warning: false,
+  }
+)
 
-    const cancel = () => emit('cancel')
-    const select = (months: number) => {
-      if (get(warning) && !get(confirmed)) {
-        return
-      }
-      return emit('select', months)
-    }
-    onMounted(async () => await store.getPlans())
+const emit = defineEmits<{
+  (e: 'cancel'): void
+  (e: 'select', months: number): void
+}>()
+const store = useMainStore()
+const { plans } = storeToRefs(store)
+const { crypto, visible, warning } = toRefs(props)
+const confirmed = ref(false)
 
-    const getPrice = (plan: Plan) => {
-      return get(crypto) ? plan.priceCrypto : plan.priceFiat
-    }
-
-    watch(visible, (visible) => {
-      if (!visible) {
-        set(confirmed, false)
-      }
-    })
-
-    return {
-      plans,
-      confirmed,
-      getPrice,
-      getPlanName,
-      select,
-      cancel,
-    }
-  },
+const availablePlans: ComputedRef<Plan[]> = computed(() => {
+  return get(plans) ?? []
 })
+
+const cancel = () => emit('cancel')
+const select = (months: number) => {
+  if (get(warning) && !get(confirmed)) {
+    return
+  }
+  return emit('select', months)
+}
+
+const getPrice = (plan: Plan) => {
+  return get(crypto) ? plan.priceCrypto : plan.priceFiat
+}
+
+watch(visible, (visible) => {
+  if (!visible) {
+    set(confirmed, false)
+  }
+})
+
+onMounted(async () => await store.getPlans())
+
+const css = useCssModule()
 </script>
 
 <style module lang="scss">

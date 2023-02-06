@@ -1,13 +1,13 @@
 <template>
-  <div :class="$style.wrapper">
-    <div ref="menu" :class="$style.menu">
+  <div :class="css.wrapper">
+    <div ref="menu" :class="css.menu">
       <div
         v-for="section in sections"
         :key="section.id"
         :class="{
-          [$style.wide]: section.wide,
-          [$style.normal]: !section.wide,
-          [$style.active]: section.id === active,
+          [css.wide]: section.wide,
+          [css.normal]: !section.wide,
+          [css.active]: section.id === active,
         }"
       >
         <a :href="section.id">{{ section.name }}</a>
@@ -17,17 +17,17 @@
       v-if="sticky && visible"
       ref="sticky"
       :class="{
-        [$style.menu]: true,
-        [$style.sticky]: sticky,
+        [css.menu]: true,
+        [css.sticky]: sticky,
       }"
     >
       <div
         v-for="section in sections"
         :key="section.id"
         :class="{
-          [$style.wide]: section.wide,
-          [$style.normal]: !section.wide,
-          [$style.active]: section.id === active,
+          [css.wide]: section.wide,
+          [css.normal]: !section.wide,
+          [css.active]: section.id === active,
         }"
       >
         <a :href="section.id">{{ section.name }}</a>
@@ -36,14 +36,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  onBeforeMount,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'sticky', value: boolean): void }>()
 
 type Section = {
   id: string
@@ -76,77 +70,62 @@ const sections: Section[] = [
   },
 ]
 
-export default defineComponent({
-  name: 'MiddleMenu',
-  emits: ['sticky'],
-  setup(_, { emit }) {
-    const sticky = ref(false)
-    const visible = ref(true)
-    const active = ref('')
-    const offsetTop = ref(0)
-    const premium = ref<HTMLElement | null>(null)
-    const menu = ref<HTMLDivElement | null>(null)
-    const offsets = ref<Record<string, number>>({})
+const sticky = ref(false)
+const visible = ref(true)
+const active = ref('')
+const offsetTop = ref(0)
+const premium = ref<HTMLElement | null>(null)
+const menu = ref<HTMLDivElement | null>(null)
+const offsets = ref<Record<string, number>>({})
 
-    const sectionIds = sections.map(({ id }) => id).reverse()
+const sectionIds = sections.map(({ id }) => id).reverse()
 
-    const handleScroll = () => {
-      const offset = window.scrollY
-      sticky.value = offset >= offsetTop.value
-      visible.value = offset < (premium.value?.offsetTop ?? 0)
-      emit('sticky', sticky.value)
+const handleScroll = () => {
+  const offset = window.scrollY
+  sticky.value = offset >= offsetTop.value
+  visible.value = offset < (premium.value?.offsetTop ?? 0)
+  emit('sticky', sticky.value)
 
-      if (!visible.value && !sticky.value) {
-        return
-      }
+  if (!visible.value && !sticky.value) {
+    return
+  }
 
-      for (const sectionId of sectionIds) {
-        if (offsets.value[sectionId] <= offset) {
-          active.value = sectionId
-          break
-        }
-      }
+  for (const sectionId of sectionIds) {
+    if (offsets.value[sectionId] <= offset) {
+      active.value = sectionId
+      break
     }
+  }
+}
 
-    onMounted(() => {
-      offsetTop.value = menu.value?.offsetTop ?? 0
+onMounted(() => {
+  offsetTop.value = menu.value?.offsetTop ?? 0
 
-      for (let i = 0; i < sectionIds.length; i++) {
-        const section = sectionIds[i]
-        const sectionElement = document.getElementById(section.replace('#', ''))
-        offsets.value = {
-          ...offsets.value,
-          [section]: sectionElement?.offsetTop ?? 0,
-        }
-      }
-    })
-
-    onBeforeMount(() => {
-      document.addEventListener('scroll', handleScroll)
-      premium.value = document.getElementById('premium')
-    })
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('scroll', handleScroll)
-    })
-    return {
-      sticky,
-      visible,
-      active,
-      offsetTop,
-      premium,
-      menu,
-      sections,
-      sectionIds,
-      offsets: {},
+  for (let i = 0; i < sectionIds.length; i++) {
+    const section = sectionIds[i]
+    const sectionElement = document.getElementById(section.replace('#', ''))
+    offsets.value = {
+      ...offsets.value,
+      [section]: sectionElement?.offsetTop ?? 0,
     }
-  },
+  }
 })
+
+onBeforeMount(() => {
+  document.addEventListener('scroll', handleScroll)
+  premium.value = document.getElementById('premium')
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('scroll', handleScroll)
+})
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/main';
-@import '~assets/css/media';
+@import '@/assets/css/main.scss';
+@import '@/assets/css/media.scss';
 
 .wrapper {
   padding-top: 16px;
