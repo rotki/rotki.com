@@ -35,7 +35,6 @@ export default defineComponent({
     return {
       column1: ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex'],
       column2: [
-        'FTX',
         'Coinbase',
         'Coinbase Pro',
         'Gemini',
