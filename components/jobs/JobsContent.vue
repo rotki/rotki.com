@@ -22,15 +22,6 @@
             Vue.js/TypeScript Developer
           </nuxt-link>
         </li>
-        <li :class="$style.tab">
-          <nuxt-link
-            :active-class="$style.active"
-            :class="$style.link"
-            to="/jobs/ui-ux"
-          >
-            UI/UX Designer
-          </nuxt-link>
-        </li>
       </ul>
       <NuxtChild />
     </div>
