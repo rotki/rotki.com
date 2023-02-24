@@ -70,12 +70,10 @@
 import {
   computed,
   defineComponent,
-  onMounted,
   onUnmounted,
-  ref,
   watch,
 } from '@nuxtjs/composition-api'
-import { get, set, useIntervalFn } from '@vueuse/core'
+import { computedAsync, get, isDefined, useIntervalFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import CancelSubscription from '~/components/account/home/CancelSubscription.vue'
 import { DataTableHeader } from '~/components/common/DataTable.vue'
@@ -98,10 +96,6 @@ export default defineComponent({
   setup() {
     const store = useMainStore()
     const { account, cancellationError } = storeToRefs(store)
-    const renewLink = ref<{ path: string; query: Record<string, string> }>({
-      path: '/checkout/payment-method',
-      query: {},
-    })
 
     const subscriptions = computed(() => {
       const userAccount = get(account)
@@ -113,6 +107,54 @@ export default defineComponent({
 
     const pending = computed(() =>
       get(subscriptions).filter((sub) => sub.pending)
+    )
+
+    const renewableSubscriptions = computed(() => {
+      return get(subscriptions).filter(({ actions }) =>
+        actions.includes('renew')
+      )
+    })
+
+    const pendingPaymentCurrency = computedAsync(async () => {
+      const subs = get(renewableSubscriptions)
+      if (subs.length === 0) {
+        return undefined
+      }
+      const response = await store.checkPendingCryptoPayment(subs[0].identifier)
+
+      if (response.isError || !response.result.pending) {
+        return undefined
+      }
+
+      return response.result.currency
+    })
+
+    const renewLink = computed<{ path: string; query: Record<string, string> }>(
+      () => {
+        const link = {
+          path: '/checkout/payment-method',
+          query: {},
+        }
+
+        const subs = get(renewableSubscriptions)
+
+        if (subs.length > 0) {
+          const sub = subs[0]
+          link.query = {
+            p: sub.durationInMonths.toString(),
+            id: sub.identifier,
+          }
+        }
+
+        if (isDefined(pendingPaymentCurrency)) {
+          link.query = {
+            ...link.query,
+            c: get(pendingPaymentCurrency),
+          }
+        }
+
+        return link
+      }
     )
 
     const { pause, resume, isActive } = useIntervalFn(
@@ -133,36 +175,6 @@ export default defineComponent({
     const canUsePremium = computed(() => {
       const arePending = get(pending)
       return get(account)?.canUsePremium || arePending.length > 0
-    })
-
-    onMounted(async () => {
-      const renewableSubscriptions = get(subscriptions).filter(({ actions }) =>
-        actions.includes('renew')
-      )
-      if (renewableSubscriptions.length) {
-        const subscription = renewableSubscriptions[0]
-        const result = await store.checkPendingCryptoPayment(
-          subscription.identifier
-        )
-        if (result.isError || !result.result.pending) {
-          set(renewLink, {
-            path: '/checkout/payment-method',
-            query: {
-              p: subscription.durationInMonths.toString(),
-              id: subscription.identifier,
-            },
-          })
-        } else {
-          set(renewLink, {
-            path: '/checkout/pay/crypto',
-            query: {
-              p: subscription.durationInMonths.toString(),
-              id: subscription.identifier,
-              c: result.result.currency ?? '',
-            },
-          })
-        }
-      }
     })
 
     const hasAction = (sub: Subscription, action: 'renew' | 'cancel') => {
