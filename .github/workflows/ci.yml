@@ -6,11 +6,13 @@ on:
       - main
       - staging
       - develop
+      - next
   pull_request:
     branches:
       - main
       - staging
       - develop
+      - next
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
