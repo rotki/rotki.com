@@ -27,12 +27,6 @@ export default defineNuxtConfig({
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      {
-        key: 'description',
-        name: 'description',
-        content:
-          'Rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.',
-      },
       { name: 'msapplication-TileColor', content: '#00aba9' },
       { name: 'theme-color', content: '#ffffff' },
     ],
@@ -75,13 +69,13 @@ export default defineNuxtConfig({
 
   modules: [
     // '@nuxtjs/recaptcha',
-    // '@nuxtjs/sitemap',
     '@nuxt/devtools',
     '@nuxtjs/robots',
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
+    'nuxt-simple-sitemap',
   ],
 
   i18n: {
@@ -129,7 +123,6 @@ export default defineNuxtConfig({
 
   sitemap: {
     hostname: 'https://rotki.com',
-    gzip: true,
     exclude: nonIndexed,
   },
 
