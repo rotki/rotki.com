@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'rotki.com',
-      script: './node_modules/nuxt/bin/nuxt.js',
+      script: './server/index.mjs',
       args: 'start',
     },
   ],
