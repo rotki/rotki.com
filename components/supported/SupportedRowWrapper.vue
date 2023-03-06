@@ -1,6 +1,6 @@
 <template>
-  <div :class="$style.wrapper">
-    <supported-icon-wrapper
+  <div :class="css.wrapper">
+    <SupportedIconWrapper
       v-for="item in items"
       :key="item.name"
       :name="item.name"
@@ -8,18 +8,11 @@
     />
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, PropType } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'SupportedRowWrapper',
-  props: {
-    items: {
-      required: true,
-      type: Array as PropType<{ name: string; img: string }[]>,
-    },
-  },
-})
+<script setup lang="ts">
+defineProps<{
+  items: { name: string; img: string }[]
+}>()
+const css = useCssModule()
 </script>
 <style lang="scss" module>
 .wrapper {

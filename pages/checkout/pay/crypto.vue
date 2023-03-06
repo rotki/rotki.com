@@ -1,30 +1,26 @@
 <template>
-  <crypto-page />
+  <CryptoPage />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
-import { useAutoLogout } from '~/composables/autologout'
 
-export default defineComponent({
-  name: 'Crypto',
+definePageMeta({
   middleware: ['maintenance', 'authentication', 'subscriber'],
-  setup() {
-    useMeta({
-      title: 'pay with crypto | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Pay with Crypto for your rotki premium subscription',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-    useAutoLogout()
-  },
-  head: {},
 })
+
+useHead({
+  title: 'pay with crypto | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Pay with Crypto for your rotki premium subscription',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
+})
+
+useAutoLogout()
 </script>

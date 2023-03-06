@@ -1,11 +1,11 @@
 <template>
-  <div :class="$style.wrapper">
+  <div :class="css.wrapper">
     <div>
-      <div :class="$style.inputContainer">
-        <div v-if="countries" :class="$style.dropdown">
+      <div :class="css.inputContainer">
+        <div v-if="countries" :class="css.dropdown">
           <span
             v-if="selected && searchFilter === selected.name"
-            :class="$style.flag"
+            :class="css.flag"
           >
             {{ getFlagEmoji(selected.code) }}</span
           >
@@ -15,8 +15,8 @@
             :name="id"
             autocomplete="off"
             :class="{
-              [$style.input]: true,
-              [$style.empty]: isEmpty,
+              [css.input]: true,
+              [css.empty]: isEmpty,
             }"
             :disabled="disabled"
             @focus="showOptions()"
@@ -26,19 +26,19 @@
           <label
             v-if="label"
             :class="{
-              [$style.label]: true,
-              [$style.select]: true,
+              [css.label]: true,
+              [css.select]: true,
             }"
             :for="id"
           >
             {{ label }}
           </label>
 
-          <div v-show="optionsShown" :class="$style.content">
+          <div v-show="optionsShown" :class="css.content">
             <div
               v-for="(option, index) in filteredOptions"
               :key="index"
-              :class="$style.item"
+              :class="css.item"
               @mousedown="selectOption(option)"
             >
               {{ getFlagEmoji(option.code) }}
@@ -52,182 +52,143 @@
     <span
       v-if="errorMessages && errorMessages.length > 0"
       :id="`${id}-error`"
-      :class="$style.error"
+      :class="css.error"
     >
       {{ errorMessages[0].$message }}
     </span>
 
-    <span v-else :class="$style.caption">
+    <span v-else :class="css.caption">
       <slot name="hint">{{ hint }}</slot>
     </span>
     <slot />
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  PropType,
-  ref,
-  toRefs,
-  watch,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { debouncedWatch, get, set } from '@vueuse/core'
 import { Country } from '~/composables/countries'
 
-export default defineComponent({
-  name: 'CountrySelect',
-  props: {
-    value: {
-      type: String,
-      required: true,
-    },
-    countries: {
-      type: Array as PropType<Country[]>,
-      required: true,
-      default: () => [],
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    errorMessages: {
-      type: Array,
-      required: true,
-      default: () => [],
-    },
-    hint: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    id: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['input', 'blur', 'selected'],
-  setup(props, { emit }) {
-    const { countries, value, disabled } = toRefs(props)
-    const selected = ref<Country | null>(null)
-    const optionsShown = ref(false)
-    const searchFilter = ref('')
+const props = withDefaults(
+  defineProps<{
+    modelValue: string
+    id: string
+    label: string
+    countries?: Country[]
+    hint?: string
+    disabled?: boolean
+    errorMessages?: { $message: string }[]
+  }>(),
+  {
+    countries: () => [],
+    hint: '',
+    disabled: false,
+    errorMessages: () => [],
+  }
+)
 
-    const filteredOptions = computed(() => {
-      const filtered: Country[] = []
-      const filter = get(searchFilter)
-      const regOption = new RegExp(filter, 'ig')
-      for (const option of get(countries)) {
-        if (filter.length < 1 || option.name.match(regOption)) {
-          filtered.push(option)
-        }
-      }
-      return filtered
-    })
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+  (e: 'blur'): void
+  (e: 'selected', country: Country | null): void
+}>()
 
-    const selectOption = (option: Country) => {
-      set(selected, option)
-      set(optionsShown, false)
-      set(searchFilter, option.name)
-      emit('input', option.code)
+const { countries, modelValue: value, disabled } = toRefs(props)
+const selected = ref<Country | null>(null)
+const optionsShown = ref(false)
+const searchFilter = ref('')
+
+const filteredOptions = computed(() => {
+  const filtered: Country[] = []
+  const filter = get(searchFilter)
+  const regOption = new RegExp(filter, 'ig')
+  for (const option of get(countries)) {
+    if (filter.length < 1 || option.name.match(regOption)) {
+      filtered.push(option)
     }
-
-    const showOptions = () => {
-      if (!get(disabled)) {
-        set(searchFilter, '')
-        set(optionsShown, true)
-      }
-    }
-
-    const exit = () => {
-      const filtered = get(filteredOptions)
-      if (filtered.length > 0 && get(searchFilter)) {
-        selectOption(filtered[0])
-      } else {
-        const selection = get(selected)
-        if (selection) {
-          selectOption(selection)
-        } else {
-          set(searchFilter, '')
-        }
-      }
-      set(optionsShown, false)
-      emit('blur')
-    }
-
-    const keyMonitor = (event: KeyboardEvent) => {
-      const filtered = get(filteredOptions)
-      if (event.key === 'Enter' && filtered[0]) {
-        selectOption(filtered[0])
-      }
-    }
-
-    const getFlagEmoji = (code: string) => {
-      const codePoints = code
-        .toUpperCase()
-        .split('')
-        .map((char) => 127397 + char.charCodeAt(0))
-      return String.fromCodePoint(...codePoints)
-    }
-
-    const isEmpty = computed(() => {
-      const filter = get(searchFilter)
-      const selection = get(selected)
-      return !filter || selection?.name !== filter
-    })
-
-    watch(selected, (newValue, oldValue) => {
-      if (newValue && newValue !== oldValue) {
-        emit('input', newValue?.code ?? '')
-      }
-    })
-    onMounted(() => setCountryUsingCode(get(value)))
-
-    function setCountryUsingCode(value: string) {
-      const cnt = get(countries)
-      const country = cnt.find(({ code }) => code === value)
-      if (country && country !== get(selected)) {
-        selectOption(country)
-      }
-    }
-
-    debouncedWatch(
-      value,
-      (value) => {
-        if (!value) {
-          set(selected, null)
-        } else {
-          setCountryUsingCode(value)
-        }
-      },
-      { debounce: 800 }
-    )
-
-    return {
-      isEmpty,
-      selected,
-      optionsShown,
-      searchFilter,
-      filteredOptions,
-      getFlagEmoji,
-      selectOption,
-      showOptions,
-      exit,
-      keyMonitor,
-    }
-  },
-
-  created() {
-    this.$emit('selected', this.selected)
-  },
+  }
+  return filtered
 })
+
+const selectOption = (option: Country) => {
+  set(selected, option)
+  set(optionsShown, false)
+  set(searchFilter, option.name)
+  emit('update:modelValue', option.code)
+}
+
+const showOptions = () => {
+  if (!get(disabled)) {
+    set(searchFilter, '')
+    set(optionsShown, true)
+  }
+}
+
+const exit = () => {
+  const filtered = get(filteredOptions)
+  if (filtered.length > 0 && get(searchFilter)) {
+    selectOption(filtered[0])
+  } else {
+    const selection = get(selected)
+    if (selection) {
+      selectOption(selection)
+    } else {
+      set(searchFilter, '')
+    }
+  }
+  set(optionsShown, false)
+  emit('blur')
+}
+
+const keyMonitor = (event: KeyboardEvent) => {
+  const filtered = get(filteredOptions)
+  if (event.key === 'Enter' && filtered[0]) {
+    selectOption(filtered[0])
+  }
+}
+
+const getFlagEmoji = (code: string) => {
+  const codePoints = code
+    .toUpperCase()
+    .split('')
+    .map((char) => 127397 + char.charCodeAt(0))
+  return String.fromCodePoint(...codePoints)
+}
+
+const isEmpty = computed(() => {
+  const filter = get(searchFilter)
+  const selection = get(selected)
+  return !filter || selection?.name !== filter
+})
+
+watch(selected, (newValue, oldValue) => {
+  if (newValue && newValue !== oldValue) {
+    emit('update:modelValue', newValue?.code ?? '')
+  }
+})
+onMounted(() => setCountryUsingCode(get(value)))
+
+function setCountryUsingCode(value: string) {
+  const cnt = get(countries)
+  const country = cnt.find(({ code }) => code === value)
+  if (country && country !== get(selected)) {
+    selectOption(country)
+  }
+}
+
+debouncedWatch(
+  value,
+  (value) => {
+    if (!value) {
+      set(selected, null)
+    } else {
+      setCountryUsingCode(value)
+    }
+  },
+  { debounce: 800 }
+)
+
+emit('selected', get(selected))
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
@@ -300,7 +261,7 @@ export default defineComponent({
   }
 }
 
-.caption {
+%caption {
   @apply text-xs font-sans;
 
   color: #808080;
@@ -310,7 +271,7 @@ export default defineComponent({
 .error {
   color: #e53935;
 
-  @extend .caption;
+  @extend %caption;
 }
 
 .empty {

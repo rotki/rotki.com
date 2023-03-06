@@ -1,38 +1,35 @@
 <template>
   <div
     :class="{
-      [$style.container]: true,
-      [$style.reverse]: $slots.right,
+      [css.container]: true,
+      [css.reverse]: slots.right,
     }"
   >
-    <div v-if="$slots.left" :class="$style.left">
+    <div v-if="slots.left" :class="css.left">
       <slot name="left" />
     </div>
     <div
       :class="{
-        [$style.text]: true,
-        [$style.ps]: $slots.right,
+        [css.text]: true,
+        [css.ps]: slots.right,
       }"
     >
-      <div :class="$style.title">
+      <div :class="css.title">
         <slot name="title" />
       </div>
-      <div :class="$style.description">
+      <div :class="css.description">
         <slot />
       </div>
     </div>
-    <div v-if="$slots.right" :class="$style.right">
+    <div v-if="slots.right" :class="css.right">
       <slot name="right" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'ProductDescription',
-})
+<script setup lang="ts">
+const css = useCssModule()
+const slots = useSlots()
 </script>
 
 <style module lang="scss">

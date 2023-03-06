@@ -1,9 +1,9 @@
 <template>
-  <card>
-    <heading subheading>Account Details</heading>
-    <input-field
+  <CardContainer>
+    <TextHeading subheading>Account Details</TextHeading>
+    <InputField
       id="email"
-      :value="email"
+      :model-value="email"
       disabled
       hint="At the moment user email can't be changed. Email us support@rotki.com if you need to do so."
       label="Email"
@@ -11,9 +11,9 @@
       type="email"
     />
 
-    <heading subheading>Change Password</heading>
+    <TextHeading subheading>Change Password</TextHeading>
 
-    <input-field
+    <InputField
       id="current-password"
       v-model="state.currentPassword"
       :error-messages="v$.currentPassword.$errors"
@@ -22,7 +22,7 @@
       type="password"
     />
 
-    <input-field
+    <InputField
       id="new-password"
       v-model="state.newPassword"
       :error-messages="v$.newPassword.$errors"
@@ -31,7 +31,7 @@
       type="password"
     />
 
-    <input-field
+    <InputField
       id="password-confirmation"
       v-model="state.passwordConfirmation"
       :error-messages="v$.passwordConfirmation.$errors"
@@ -40,9 +40,9 @@
       type="password"
     />
 
-    <div :class="$style.row">
-      <action-button
-        :class="$style.confirm"
+    <div :class="css.row">
+      <ActionButton
+        :class="css.confirm"
         :disabled="v$.$invalid"
         :loading="loading"
         primary
@@ -50,96 +50,81 @@
         text="Change Password"
         @click="changePassword"
       >
-        <spinner v-if="loading" class="animate-spin" />
-      </action-button>
-      <span v-if="success" :class="$style.success">
-        <check /> Your password has been changed.
+        <SpinnerIcon v-if="loading" class="animate-spin" />
+      </ActionButton>
+      <span v-if="success" :class="css.success">
+        <CheckMarkIcon /> Your password has been changed.
       </span>
     </div>
-  </card>
+  </CardContainer>
 </template>
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  reactive,
-  ref,
-  toRefs,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core'
 import { minLength, required, sameAs } from '@vuelidate/validators'
-import { ActionResult, useMainStore } from '~/store'
+import { storeToRefs } from 'pinia'
+import { useMainStore } from '~/store'
+import { ActionResult } from '~/types/common'
 
-export default defineComponent({
-  name: 'ChangePassword',
-  setup() {
-    const loading = ref(false)
-    const success = ref(false)
-    const store = useMainStore()
-    // pinia#852
-    const { account } = toRefs(store)
-    const email = computed(() => {
-      const userAccount = account.value
-      return !userAccount ? '' : userAccount.email
-    })
-    const state = reactive({
-      currentPassword: '',
-      newPassword: '',
-      passwordConfirmation: '',
-    })
+const loading = ref(false)
+const success = ref(false)
 
-    const { newPassword } = toRefs(state)
+const store = useMainStore()
+const { account } = storeToRefs(store)
 
-    const rules = {
-      currentPassword: { required, minLength: minLength(8) },
-      newPassword: { required, minLength: minLength(8) },
-      passwordConfirmation: {
-        required,
-        sameAsPassword: sameAs(newPassword, 'new password'),
-      },
-    }
-    const $externalResults = ref({})
-    const v$ = useVuelidate(rules, state, {
-      $autoDirty: true,
-      $externalResults,
-    })
-
-    let pendingTimeout: any
-
-    const changePassword = async () => {
-      loading.value = true
-      const result: ActionResult = await store.changePassword(state)
-      loading.value = false
-      if (result.message && typeof result.message !== 'string') {
-        $externalResults.value = result.message
-      }
-
-      if (result.success) {
-        success.value = true
-        if (pendingTimeout) {
-          clearTimeout(pendingTimeout)
-          pendingTimeout = undefined
-        }
-        pendingTimeout = setTimeout(() => {
-          success.value = false
-        }, 4000)
-        state.currentPassword = ''
-        state.newPassword = ''
-        state.passwordConfirmation = ''
-        v$.value.$reset()
-      }
-    }
-
-    return {
-      email,
-      state,
-      loading,
-      success,
-      changePassword,
-      v$,
-    }
-  },
+const email = computed(() => {
+  const userAccount = account.value
+  return !userAccount ? '' : userAccount.email
 })
+
+const state = reactive({
+  currentPassword: '',
+  newPassword: '',
+  passwordConfirmation: '',
+})
+
+const { newPassword } = toRefs(state)
+
+const rules = {
+  currentPassword: { required, minLength: minLength(8) },
+  newPassword: { required, minLength: minLength(8) },
+  passwordConfirmation: {
+    required,
+    sameAsPassword: sameAs(newPassword, 'new password'),
+  },
+}
+const $externalResults = ref({})
+const v$ = useVuelidate(rules, state, {
+  $autoDirty: true,
+  $externalResults,
+})
+
+let pendingTimeout: any
+
+const changePassword = async () => {
+  loading.value = true
+  const result: ActionResult = await store.changePassword(state)
+  loading.value = false
+  if (result.message && typeof result.message !== 'string') {
+    $externalResults.value = result.message
+  }
+
+  if (result.success) {
+    success.value = true
+    if (pendingTimeout) {
+      clearTimeout(pendingTimeout)
+      pendingTimeout = undefined
+    }
+    pendingTimeout = setTimeout(() => {
+      success.value = false
+    }, 4000)
+    state.currentPassword = ''
+    state.newPassword = ''
+    state.passwordConfirmation = ''
+    v$.value.$reset()
+  }
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

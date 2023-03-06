@@ -1,43 +1,37 @@
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.protocol">
-      <div :class="$style['title-wrapper']">
+  <div :class="css.wrapper">
+    <div :class="css.protocol">
+      <div :class="css['title-wrapper']">
         <div v-if="image">
-          <img
-            :class="$style.image"
-            :src="image"
-            alt="Supported DeFi protocol"
-          />
+          <img :class="css.image" :src="image" alt="Supported DeFi protocol" />
         </div>
-        <div :class="$style.title">
+        <div :class="css.title">
           <slot name="name" />
         </div>
       </div>
-      <div :class="$style.description">
+      <div :class="css.description">
         <slot></slot>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    image?: string
+  }>(),
+  {
+    image: '',
+  }
+)
 
-export default defineComponent({
-  name: 'DefiProtocol',
-  props: {
-    image: {
-      required: false,
-      default: '',
-      type: String,
-    },
-  },
-})
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .wrapper {
   @apply flex flex-col;

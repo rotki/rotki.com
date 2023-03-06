@@ -1,31 +1,28 @@
 <template>
-  <password-reset />
+  <PasswordReset />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
-export default defineComponent({
+definePageMeta({
   middleware: 'maintenance',
-  setup() {
-    useMeta({
-      title: 'password rest | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Reset your rotki password',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+})
+
+useHead({
+  title: 'password rest | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Reset your rotki password',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~~/assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

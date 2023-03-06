@@ -1,23 +1,18 @@
 <template>
-  <page>
+  <PageContainer>
     <template #title>Password recovery</template>
-    <div :class="$style.content">
-      <user-action-message>
+    <div :class="css.content">
+      <UserActionMessage>
         <template #header>Please check your email</template>
         <p>A recovery link has been send to your account's address.</p>
         <p>Please check your mailbox to proceed.</p>
-      </user-action-message>
+      </UserActionMessage>
     </div>
-  </page>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PasswordLinkSend',
-  setup() {},
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

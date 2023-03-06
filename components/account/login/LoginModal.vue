@@ -1,28 +1,15 @@
 <template>
-  <modal-dialog :value="value" boxless @input="dismiss">
-    <login-form modal @complete="dismiss" />
-  </modal-dialog>
+  <ModalDialog :model-value="modelValue" boxless @update:model-value="dismiss">
+    <LoginForm modal @complete="dismiss" />
+  </ModalDialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+defineProps<{ modelValue: boolean }>()
 
-export default defineComponent({
-  name: 'LoginModal',
-  props: {
-    value: {
-      required: true,
-      type: Boolean,
-    },
-  },
-  emits: ['input'],
-  setup(_, { emit }) {
-    const dismiss = () => {
-      emit('input', false)
-    }
-    return {
-      dismiss,
-    }
-  },
-})
+const emit = defineEmits<{ (e: 'update:modelValue', dismiss: boolean): void }>()
+
+const dismiss = () => {
+  emit('update:modelValue', false)
+}
 </script>

@@ -1,7 +1,7 @@
 <template>
-  <card :class="$style.info">
-    <heading subheading> Customer Information</heading>
-    <input-field
+  <CardContainer :class="css.info">
+    <TextHeading subheading> Customer Information</TextHeading>
+    <InputField
       id="github"
       v-model="state.githubUsername"
       :error-messages="v$.githubUsername.$errors"
@@ -10,7 +10,7 @@
       @blur="v$.githubUsername.$touch()"
     />
 
-    <input-field
+    <InputField
       id="first-name"
       v-model="state.firstName"
       :disabled="movedOffline"
@@ -20,7 +20,7 @@
       @blur="v$.firstName.$touch()"
     />
 
-    <input-field
+    <InputField
       id="last-name"
       v-model="state.lastName"
       :disabled="movedOffline"
@@ -30,7 +30,7 @@
       @blur="v$.lastName.$touch()"
     />
 
-    <input-field
+    <InputField
       id="company-name"
       v-model="state.companyName"
       :disabled="movedOffline"
@@ -40,7 +40,7 @@
       @blur="v$.companyName.$touch()"
     />
 
-    <input-field
+    <InputField
       id="vat-id"
       v-model="state.vatId"
       :disabled="movedOffline"
@@ -50,9 +50,9 @@
       @blur="v$.vatId.$touch()"
     />
 
-    <heading subheading>Address</heading>
+    <TextHeading subheading>Address</TextHeading>
 
-    <input-field
+    <InputField
       id="address-1"
       v-model="state.address1"
       :disabled="movedOffline"
@@ -62,7 +62,7 @@
       @blur="v$.address1.$touch()"
     />
 
-    <input-field
+    <InputField
       id="address-2"
       v-model="state.address2"
       :disabled="movedOffline"
@@ -72,7 +72,7 @@
       @blur="v$.address2.$touch()"
     />
 
-    <input-field
+    <InputField
       id="city"
       v-model="state.city"
       :disabled="movedOffline"
@@ -82,7 +82,7 @@
       @blur="v$.city.$touch()"
     />
 
-    <input-field
+    <InputField
       id="postal"
       v-model="state.postcode"
       :disabled="movedOffline"
@@ -92,7 +92,7 @@
       @blur="v$.postcode.$touch()"
     />
 
-    <country-select
+    <CountrySelect
       id="country"
       v-model="state.country"
       :countries="countries"
@@ -103,127 +103,105 @@
       @blur="v$.country.$touch()"
     />
 
-    <action-button
-      :class="$style.confirm"
+    <ActionButton
+      :class="css.confirm"
       :loading="loading"
       primary
       small
       text="Update"
       @click="update"
     >
-      <spinner v-if="loading" class="animate-spin" />
-    </action-button>
-  </card>
+      <SpinnerIcon v-if="loading" class="animate-spin" />
+    </ActionButton>
+  </CardContainer>
 </template>
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  reactive,
-  ref,
-  toRefs,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { get, set } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { useMainStore } from '~/store'
-import { loadCountries } from '~/composables/countries'
 
-export default defineComponent({
-  name: 'AccountInformation',
-  setup() {
-    const store = useMainStore()
-    const state = reactive({
-      githubUsername: '',
-      firstName: '',
-      lastName: '',
-      companyName: '',
-      vatId: '',
-      address1: '',
-      address2: '',
-      city: '',
-      postcode: '',
-      country: '',
-    })
-
-    // pinia#852
-    const { account } = toRefs(store)
-
-    const movedOffline = computed(
-      () => get(account)?.address.movedOffline ?? false
-    )
-
-    onMounted(() => {
-      const userAccount = get(account)
-      if (!userAccount) {
-        return
-      }
-
-      const offline =
-        'Moved offline. For editing please contact support@rotki.com.'
-
-      const unavailable = get(movedOffline)
-
-      state.githubUsername = userAccount.githubUsername
-      state.firstName = unavailable ? offline : userAccount.address.firstName
-      state.lastName = unavailable ? offline : userAccount.address.lastName
-      state.companyName = unavailable
-        ? offline
-        : userAccount.address.companyName
-      state.vatId = unavailable ? offline : userAccount.address.vatId
-      state.address1 = unavailable ? offline : userAccount.address.address1
-      state.address2 = unavailable ? offline : userAccount.address.address2
-      state.city = unavailable ? offline : userAccount.address.city
-      state.postcode = unavailable ? offline : userAccount.address.postcode
-      state.country = unavailable ? offline : userAccount.address.country
-    })
-
-    const rules = {
-      githubUsername: {},
-      firstName: { required },
-      lastName: { required },
-      companyName: {},
-      vatId: {},
-      address1: { required },
-      address2: {},
-      city: { required },
-      postcode: { required },
-      country: { required },
-    }
-    const $externalResults = ref<Record<string, string[]>>({})
-    const v$ = useVuelidate(rules, state, {
-      $autoDirty: true,
-      $externalResults,
-    })
-
-    const loading = ref(false)
-    const done = ref(false)
-    const update = async () => {
-      const isValid = await get(v$).$validate()
-      if (!isValid) {
-        return
-      }
-      set(loading, true)
-      const { success, message } = await store.updateProfile(state)
-      if (success) {
-        set(done, true)
-      } else if (message && typeof message !== 'string') {
-        set($externalResults, message)
-      }
-      set(loading, false)
-    }
-    return {
-      update,
-      loading,
-      done,
-      movedOffline,
-      state,
-      v$,
-      ...loadCountries(),
-    }
-  },
+const store = useMainStore()
+const state = reactive({
+  githubUsername: '',
+  firstName: '',
+  lastName: '',
+  companyName: '',
+  vatId: '',
+  address1: '',
+  address2: '',
+  city: '',
+  postcode: '',
+  country: '',
 })
+
+const loading = ref(false)
+const done = ref(false)
+
+const { account } = storeToRefs(store)
+
+const movedOffline = computed(() => get(account)?.address.movedOffline ?? false)
+
+onMounted(() => {
+  const userAccount = get(account)
+  if (!userAccount) {
+    return
+  }
+
+  const offline = 'Moved offline. For editing please contact support@rotki.com.'
+
+  const unavailable = get(movedOffline)
+
+  state.githubUsername = userAccount.githubUsername
+  state.firstName = unavailable ? offline : userAccount.address.firstName
+  state.lastName = unavailable ? offline : userAccount.address.lastName
+  state.companyName = unavailable ? offline : userAccount.address.companyName
+  state.vatId = unavailable ? offline : userAccount.address.vatId
+  state.address1 = unavailable ? offline : userAccount.address.address1
+  state.address2 = unavailable ? offline : userAccount.address.address2
+  state.city = unavailable ? offline : userAccount.address.city
+  state.postcode = unavailable ? offline : userAccount.address.postcode
+  state.country = unavailable ? offline : userAccount.address.country
+})
+
+const rules = {
+  githubUsername: {},
+  firstName: { required },
+  lastName: { required },
+  companyName: {},
+  vatId: {},
+  address1: { required },
+  address2: {},
+  city: { required },
+  postcode: { required },
+  country: { required },
+}
+
+const $externalResults = ref<Record<string, string[]>>({})
+
+const v$ = useVuelidate(rules, state, {
+  $autoDirty: true,
+  $externalResults,
+})
+
+const update = async () => {
+  const isValid = await get(v$).$validate()
+  if (!isValid) {
+    return
+  }
+  set(loading, true)
+  const { success, message } = await store.updateProfile(state)
+  if (success) {
+    set(done, true)
+  } else if (message && typeof message !== 'string') {
+    set($externalResults, message)
+  }
+  set(loading, false)
+}
+
+const { countries } = useCountries()
+const css = useCssModule()
 </script>
 <style lang="scss" module>
 .info {

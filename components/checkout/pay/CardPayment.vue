@@ -1,76 +1,69 @@
 <template>
-  <fragment>
-    <error-display v-if="error" :message="error.message" :title="error.title">
-      <div :class="$style.close">
-        <selection-button :selected="false" @click="close">
-          OK
-        </selection-button>
-      </div>
-    </error-display>
-    <div v-show="!error">
-      <div v-show="!verify">
-        <div :class="$style.inputs">
-          <hosted-field
-            id="card-number"
-            :class="$style.number"
-            :empty="empty.number"
-            :focused="focused === 'number'"
-            :valid="!numberError"
-            label="Card Number"
-            number
-            @click="focus('number')"
-          />
-          <hosted-field
-            id="expiration"
-            :class="$style.expiration"
-            :empty="empty.expirationDate"
-            :focused="focused === 'expirationDate'"
-            :valid="!expirationError"
-            label="Expiration"
-            @click="focus('expirationDate')"
-          />
-          <hosted-field
-            id="cvv"
-            :class="$style.cvv"
-            :empty="empty.cvv"
-            :focused="focused === 'cvv'"
-            :valid="!cvvError"
-            label="CVV"
-            @click="focus('cvv')"
-          />
-        </div>
-        <selected-plan-overview :plan="plan" />
-        <div>
-          <selection-button
-            :class="$style.button"
-            :disabled="!valid || paying"
-            selected
-            @click="submit"
-          >
-            Start subscription
-          </selection-button>
-        </div>
-        <accept-refund-policy v-model="accepted" />
-      </div>
-      <loader v-if="verify && !challengeVisible" :class="$style.loader" />
+  <ErrorDisplay v-if="error" :message="error.message" :title="error.title">
+    <div :class="css.close">
+      <SelectionButton :selected="false" @click="close"> OK </SelectionButton>
     </div>
-  </fragment>
+  </ErrorDisplay>
+  <div v-show="!error">
+    <div v-show="!verify">
+      <div :class="css.inputs">
+        <HostedField
+          id="card-number"
+          :class="css.number"
+          :empty="empty.number"
+          :focused="focused === 'number'"
+          :valid="!numberError"
+          label="Card Number"
+          number
+          @click="focus('number')"
+        />
+        <HostedField
+          id="expiration"
+          :class="css.expiration"
+          :empty="empty.expirationDate"
+          :focused="focused === 'expirationDate'"
+          :valid="!expirationError"
+          label="Expiration"
+          @click="focus('expirationDate')"
+        />
+        <HostedField
+          id="cvv"
+          :class="css.cvv"
+          :empty="empty.cvv"
+          :focused="focused === 'cvv'"
+          :valid="!cvvError"
+          label="CVV"
+          @click="focus('cvv')"
+        />
+      </div>
+      <SelectedPlanOverview :plan="plan" />
+      <div>
+        <SelectionButton
+          :class="css.button"
+          :disabled="!valid || paying"
+          selected
+          @click="submit"
+        >
+          Start subscription
+        </SelectionButton>
+      </div>
+      <AcceptRefundPolicy v-model="accepted" />
+    </div>
+    <LoadingIndicator v-if="verify && !challengeVisible" :class="css.loader" />
+  </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-  computed,
-  defineComponent,
-  onMounted,
-  onUnmounted,
-  PropType,
-  Ref,
-  ref,
-  toRefs,
-} from '@nuxtjs/composition-api'
-import braintree, { HostedFields, ThreeDSecure } from 'braintree-web'
+  client,
+  hostedFields,
+  HostedFields,
+  threeDSecure,
+  ThreeDSecure,
+} from 'braintree-web'
 import { ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
 import { get, set } from '@vueuse/core'
+import { Ref } from 'vue'
 import { SelectedPlan } from '~/types'
 import { logger } from '~/utils/logger'
 import { assert } from '~/utils/assert'
@@ -82,10 +75,10 @@ type FieldStatus = {
 
 type EmptyState = { number: boolean; cvv: boolean; expirationDate: boolean }
 
-function setupEmptyStateMonitoring(
+const setupEmptyStateMonitoring = (
   hostedFields: HostedFields,
   empty: Ref<EmptyState>
-) {
+) => {
   hostedFields.on('notEmpty', (event) => {
     const field = event.fields[event.emittedBy]
     set(empty, { ...get(empty), [event.emittedBy]: field.isEmpty })
@@ -97,7 +90,7 @@ function setupEmptyStateMonitoring(
   })
 }
 
-function setupValidityMonitoring(
+const setupValidityMonitoring = (
   hostedFields: HostedFields,
   {
     cvvStatus,
@@ -108,7 +101,7 @@ function setupValidityMonitoring(
     expirationDateStatus: Ref<FieldStatus>
     cvvStatus: Ref<FieldStatus>
   }
-) {
+) => {
   hostedFields.on('validityChange', (event) => {
     const field = event.emittedBy
     const valid = event.fields[field].isValid
@@ -122,7 +115,7 @@ function setupValidityMonitoring(
   })
 }
 
-function setupFocusManagement(
+const setupFocusManagement = (
   hostedFields: HostedFields,
   focused: Ref<string>,
   {
@@ -134,7 +127,7 @@ function setupFocusManagement(
     expirationDateStatus: Ref<FieldStatus>
     cvvStatus: Ref<FieldStatus>
   }
-) {
+) => {
   hostedFields.on('focus', (event) => {
     const field = event.emittedBy
     set(focused, field)
@@ -171,18 +164,18 @@ const setupHostedFields = () => {
   }
 
   const create = async (client: braintree.Client) => {
-    _fields = await braintree.hostedFields.create({
+    _fields = await hostedFields.create({
       client,
       styles: {},
       fields: {
         number: {
-          selector: '#card-number',
+          container: '#card-number',
         },
         cvv: {
-          selector: '#cvv',
+          container: '#cvv',
         },
         expirationDate: {
-          selector: '#expiration',
+          container: '#expiration',
         },
       },
     })
@@ -224,170 +217,157 @@ type ErrorMessage = {
   message: string
 }
 
-export default defineComponent({
-  name: 'CardPayment',
-  props: {
-    token: { required: true, type: String },
-    plan: { required: true, type: Object as PropType<SelectedPlan> },
-  },
-  emits: ['pay', 'update:payment', 'update:pending'],
-  setup(props, { emit }) {
-    const { token, plan } = toRefs(props)
-    const fields = setupHostedFields()
-    const verify = ref(false)
-    const challengeVisible = ref(false)
+const props = defineProps<{
+  token: string
+  plan: SelectedPlan
+}>()
 
-    const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
-      fields.focus(field)
-    }
-    const accepted = ref(false)
-    const defaultStatus: FieldStatus = {
-      valid: false,
-      touched: false,
-    }
-    const numberStatus = ref<FieldStatus>(defaultStatus)
-    const expirationDateStatus = ref<FieldStatus>(defaultStatus)
-    const cvvStatus = ref<FieldStatus>(defaultStatus)
+const emit = defineEmits<{
+  (e: 'pay', payment: { months: number; nonce: string }): void
+  (e: 'update:pending', pending: boolean): void
+}>()
 
-    const numberError = hasError(numberStatus)
-    const expirationError = hasError(expirationDateStatus)
-    const cvvError = hasError(cvvStatus)
+const { token, plan } = toRefs(props)
+const fields = setupHostedFields()
+const verify = ref(false)
+const challengeVisible = ref(false)
 
-    const empty = ref({
-      number: true,
-      cvv: true,
-      expirationDate: true,
-    })
+const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
+  fields.focus(field)
+}
+const accepted = ref(false)
+const defaultStatus: FieldStatus = {
+  valid: false,
+  touched: false,
+}
+const numberStatus = ref<FieldStatus>(defaultStatus)
+const expirationDateStatus = ref<FieldStatus>(defaultStatus)
+const cvvStatus = ref<FieldStatus>(defaultStatus)
 
-    const focused = ref('')
-    const error = ref<ErrorMessage | null>(null)
+const numberError = hasError(numberStatus)
+const expirationError = hasError(expirationDateStatus)
+const cvvError = hasError(cvvStatus)
 
-    let threeDSecure: ThreeDSecure
-
-    onMounted(async () => {
-      try {
-        const client = await braintree.client.create({
-          authorization: get(token),
-        })
-
-        await fields.create(client)
-        fields.setup(focused, empty, {
-          numberStatus,
-          expirationDateStatus,
-          cvvStatus,
-        })
-
-        threeDSecure = await braintree.threeDSecure.create({
-          version: '2',
-          client,
-        })
-      } catch (e: any) {
-        set(error, {
-          title: 'Initialization Error',
-          message: e.message,
-        })
-      }
-    })
-
-    onUnmounted(() => {
-      threeDSecure?.teardown()
-      fields.teardown()
-    })
-
-    const valid = computed(
-      () =>
-        get(accepted) &&
-        get(numberStatus).valid &&
-        get(expirationDateStatus).valid &&
-        get(cvvStatus).valid
-    )
-    const paying = ref(false)
-
-    const updatePending = () => {
-      emit('update:pending', true)
-    }
-
-    const submit = async () => {
-      set(paying, true)
-
-      const onClose = () => set(challengeVisible, false)
-      const onRender = () => set(challengeVisible, true)
-
-      try {
-        const selectedPlan = get(plan)
-        const token = await fields.get().tokenize()
-
-        const options: ThreeDSecureVerifyOptions = {
-          // @ts-ignore
-          onLookupComplete(_: any, next: any) {
-            next()
-          },
-          removeFrame: () => updatePending(),
-          amount: parseFloat(selectedPlan.finalPriceInEur),
-          nonce: token.nonce,
-          bin: token.details.bin,
-        }
-        set(verify, true)
-
-        threeDSecure.on('authentication-modal-close', onClose)
-        threeDSecure.on('authentication-modal-render', onRender)
-
-        const payload = await threeDSecure.verifyCard(options)
-        set(challengeVisible, false)
-
-        const threeDSecureInfo = payload.threeDSecureInfo
-        if (threeDSecureInfo.liabilityShifted) {
-          emit('pay', {
-            months: get(plan).months,
-            nonce: payload.nonce,
-          })
-        } else {
-          const status = (threeDSecureInfo as any)?.status as string | undefined
-          set(error, {
-            title: '3D Secure authentication failed',
-            message: `The 3D Secure authentication of your card failed (${status?.replaceAll(
-              '_',
-              ' '
-            )}). Please try a different payment method.`,
-          })
-          logger.error(`liability did not shift, due to status: ${status}`)
-        }
-      } catch (e: any) {
-        set(error, {
-          title: 'Payment Error',
-          message: e.message,
-        })
-        logger.error(e)
-      } finally {
-        set(paying, false)
-        set(verify, false)
-        set(challengeVisible, false)
-        threeDSecure.off('authentication-modal-close', onClose)
-        threeDSecure.off('authentication-modal-render', onRender)
-      }
-    }
-    const close = () => {
-      set(error, null)
-    }
-
-    return {
-      paying,
-      empty,
-      numberError,
-      expirationError,
-      cvvError,
-      accepted,
-      focused,
-      valid,
-      verify,
-      challengeVisible,
-      error,
-      close,
-      focus,
-      submit,
-    }
-  },
+const empty = ref({
+  number: true,
+  cvv: true,
+  expirationDate: true,
 })
+
+const focused = ref('')
+const error = ref<ErrorMessage | null>(null)
+
+let btThreeDSecure: ThreeDSecure
+
+onMounted(async () => {
+  try {
+    const btClient = await client.create({
+      authorization: get(token),
+    })
+
+    await fields.create(btClient)
+    fields.setup(focused, empty, {
+      numberStatus,
+      expirationDateStatus,
+      cvvStatus,
+    })
+
+    btThreeDSecure = await threeDSecure.create({
+      version: '2',
+      client: btClient,
+    })
+  } catch (e: any) {
+    set(error, {
+      title: 'Initialization Error',
+      message: e.message,
+    })
+  }
+})
+
+onUnmounted(() => {
+  btThreeDSecure?.teardown()
+  fields.teardown()
+})
+
+const valid = computed(
+  () =>
+    get(accepted) &&
+    get(numberStatus).valid &&
+    get(expirationDateStatus).valid &&
+    get(cvvStatus).valid
+)
+const paying = ref(false)
+
+const updatePending = () => {
+  emit('update:pending', true)
+}
+
+const submit = async () => {
+  set(paying, true)
+
+  const onClose = () => set(challengeVisible, false)
+  const onRender = () => set(challengeVisible, true)
+
+  try {
+    const selectedPlan = get(plan)
+    const token = await fields.get().tokenize()
+
+    const options: ThreeDSecureVerifyOptions = {
+      // @ts-ignore
+      onLookupComplete(_: any, next: any) {
+        next()
+      },
+      removeFrame: () => updatePending(),
+      amount: parseFloat(selectedPlan.finalPriceInEur),
+      nonce: token.nonce,
+      bin: token.details.bin,
+    }
+    set(verify, true)
+
+    btThreeDSecure.on('authentication-modal-close', onClose)
+    btThreeDSecure.on('authentication-modal-render', onRender)
+
+    const payload = await btThreeDSecure.verifyCard(options)
+    set(challengeVisible, false)
+
+    const threeDSecureInfo = payload.threeDSecureInfo
+    if (threeDSecureInfo.liabilityShifted) {
+      const months = get(plan).months
+      assert(months)
+      emit('pay', {
+        months,
+        nonce: payload.nonce,
+      })
+    } else {
+      const status = (threeDSecureInfo as any)?.status as string | undefined
+      set(error, {
+        title: '3D Secure authentication failed',
+        message: `The 3D Secure authentication of your card failed (${status?.replaceAll(
+          '_',
+          ' '
+        )}). Please try a different payment method.`,
+      })
+      logger.error(`liability did not shift, due to status: ${status}`)
+    }
+  } catch (e: any) {
+    set(error, {
+      title: 'Payment Error',
+      message: e.message,
+    })
+    logger.error(e)
+  } finally {
+    set(paying, false)
+    set(verify, false)
+    set(challengeVisible, false)
+    btThreeDSecure.off('authentication-modal-close', onClose)
+    btThreeDSecure.off('authentication-modal-render', onRender)
+  }
+}
+const close = () => {
+  set(error, null)
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

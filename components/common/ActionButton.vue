@@ -1,79 +1,60 @@
 <template>
   <button
     :class="{
-      [$style.button]: true,
-      [$style.loading]: loading,
-      [$style.large]: !small,
-      [$style.primary]: primary,
-      [$style.secondary]: !primary,
-      [$style.filled]: filled,
-      [$style.small]: small,
-      [$style.warning]: warning,
+      [css.button]: true,
+      [css.loading]: loading,
+      [css.large]: !small,
+      [css.primary]: primary,
+      [css.secondary]: !primary,
+      [css.filled]: filled,
+      [css.small]: small,
+      [css.warning]: warning,
       'cursor-not-allowed': loading,
     }"
     :disabled="disabled"
-    @click="$emit('click')"
+    @click="emit('click')"
   >
-    <span :class="$style.row">
+    <span :class="css.row">
       <slot />
       {{ text }}
     </span>
   </button>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    text?: string | null
+    primary?: boolean
+    filled?: boolean
+    href?: string
+    disabled?: boolean
+    small?: boolean
+    loading?: boolean
+    warning?: boolean
+  }>(),
+  {
+    text: null,
+    primary: false,
+    filled: false,
+    disabled: false,
+    small: false,
+    loading: false,
+    warning: false,
+    href: '',
+  }
+)
 
-export default defineComponent({
-  name: 'ActionButton',
-  props: {
-    text: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    primary: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    filled: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    href: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    small: {
-      required: false,
-      default: false,
-      type: Boolean,
-    },
-    loading: {
-      required: false,
-      default: false,
-      type: Boolean,
-    },
-    warning: {
-      required: false,
-      default: false,
-      type: Boolean,
-    },
-  },
-})
+const emit = defineEmits<{
+  (e: 'click'): void
+}>()
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .button {
   @apply relative overflow-hidden transition transform hover:scale-110;

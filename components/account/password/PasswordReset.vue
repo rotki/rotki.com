@@ -1,18 +1,18 @@
 <template>
-  <page>
+  <PageContainer>
     <template #title> Reset your password </template>
 
-    <div :class="$style.content">
-      <loader v-if="validating" />
-      <user-action-message v-else-if="!isValid">
+    <div :class="css.content">
+      <LoadingIndicator v-if="validating" />
+      <UserActionMessage v-else-if="!isValid">
         <template #header>Invalid password reset link.</template>
         <p>
           The link you followed doesn't seem like a valid password reset link.
         </p>
-      </user-action-message>
-      <box v-else>
+      </UserActionMessage>
+      <BoxContainer v-else>
         <template #label> Provide your new password </template>
-        <input-field
+        <InputField
           id="password"
           v-model="password"
           :error-messages="v$.password.$errors"
@@ -20,7 +20,7 @@
           label="Password"
           type="password"
         >
-          <ul :class="$style.list">
+          <ul :class="css.list">
             <li>
               Your password can't be too similar to your other personal
               information.
@@ -30,21 +30,21 @@
 
             <li>Your password can't be entirely numeric.</li>
           </ul>
-        </input-field>
+        </InputField>
 
-        <input-field
+        <InputField
           id="password-confirmation"
           v-model="passwordConfirmation"
-          :class="$style.confirmation"
+          :class="css.confirmation"
           :error-messages="v$.passwordConfirmation.$errors"
           filled
           hint="Enter the same password as before, for verification."
           label="Password Confirmation"
           type="password"
         />
-        <div :class="$style.buttonWrapper">
-          <action-button
-            :class="$style.button"
+        <div :class="css.buttonWrapper">
+          <ActionButton
+            :class="css.button"
             :disabled="!valid"
             primary
             small
@@ -52,47 +52,34 @@
             @click="submit"
           />
         </div>
-      </box>
+      </BoxContainer>
     </div>
-  </page>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  Ref,
-  ref,
-  useContext,
-  useRoute,
-  useRouter,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core'
 import { minLength, required, sameAs } from '@vuelidate/validators'
 import { set } from '@vueuse/core'
-import { setupCSRF } from '~/composables/csrf-token'
+import { Ref } from 'vue'
+import { FetchError } from 'ofetch'
+import { fetchWithCsrf } from '~/utils/api'
 
 function setupTokenValidation() {
-  const { $api } = useContext()
-  const { value } = useRoute()
-  const { uid, token } = value.params
+  const route = useRoute()
+  const { uid, token } = route.params
   const validating = ref(true)
   const isValid = ref(true)
 
-  async function validateToken() {
-    const response = await $api.post(
-      '/webapi/password-reset/validate/',
-      {
-        uid,
-        token,
-      },
-      {
-        validateStatus: (status) => [200, 400, 404].includes(status),
-      }
-    )
-
-    if (response.status === 400 || response.status === 404) {
+  const validateToken = async () => {
+    try {
+      await fetchWithCsrf('/webapi/password-reset/validate/', {
+        body: {
+          uid,
+          token,
+        },
+      })
+    } catch (e: any) {
       set(isValid, false)
     }
 
@@ -129,60 +116,53 @@ function setupFormValidation(
   return { v$, valid }
 }
 
-export default defineComponent({
-  name: 'PasswordForm',
-  setup() {
-    const password = ref('')
-    const passwordConfirmation = ref('')
-    const $externalResults = ref({})
+const password = ref('')
+const passwordConfirmation = ref('')
+const $externalResults = ref({})
 
-    const router = useRouter()
-    const { $api } = useContext()
-    const { value } = useRoute()
-    const { uid, token } = value.params
-    const submit = async () => {
-      const response = await $api.post(
-        '/webapi/password-reset/confirm/',
-        {
-          uid,
-          token,
-          password: password.value,
-          password_confirmation: passwordConfirmation.value,
-        },
-        {
-          validateStatus: (status) => [200, 400, 404].includes(status),
-        }
-      )
-
-      if (response.status === 404) {
-        router.push({
+const route = useRoute()
+const { uid, token } = route.params
+const submit = async () => {
+  try {
+    await fetchWithCsrf('/webapi/password-reset/confirm/', {
+      body: {
+        uid,
+        token,
+        password: password.value,
+        password_confirmation: passwordConfirmation.value,
+      },
+    })
+    await navigateTo({
+      path: '/password/changed',
+    })
+  } catch (e: any) {
+    if (e instanceof FetchError) {
+      const status = e.status ?? -1
+      if (status === 404) {
+        await navigateTo({
           path: '/password/invalid-link',
         })
-      } else if (response.status === 400) {
-        const message = response.data.message
+      } else if (status === 400) {
+        const message = e.data.message
         if (message && typeof message === 'object') {
           $externalResults.value = {
             password: message.password,
             passwordConfirmation: message.password_confirmation,
           }
         }
-      } else {
-        router.push({
-          path: '/password/changed',
-        })
       }
     }
+  }
+}
 
-    setupCSRF()
-    return {
-      password,
-      passwordConfirmation,
-      ...setupTokenValidation(),
-      submit,
-      ...setupFormValidation(password, passwordConfirmation, $externalResults),
-    }
-  },
-})
+const { validating, isValid } = setupTokenValidation()
+const { valid, v$ } = setupFormValidation(
+  password,
+  passwordConfirmation,
+  $externalResults
+)
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

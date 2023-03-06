@@ -1,28 +1,20 @@
 <template>
-  <div :class="$style.wrapper">
-    <ul :class="$style.list">
-      <li v-for="item in list" :key="item" :class="$style.row">{{ item }}</li>
+  <div :class="css.wrapper">
+    <ul :class="css.list">
+      <li v-for="item in list" :key="item" :class="css.row">{{ item }}</li>
     </ul>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+defineProps<{ list: string[] }>()
 
-export default defineComponent({
-  name: 'ItemList',
-  props: {
-    list: {
-      type: Array,
-      required: true,
-    },
-  },
-})
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .wrapper {
   @apply flex flex-col;

@@ -1,52 +1,52 @@
 <template>
   <div>
-    <heading>Python Backend Developer</heading>
-    <heading secondary>What is rotki?</heading>
+    <TextHeading>Python Backend Developer</TextHeading>
+    <TextHeading secondary>What is rotki?</TextHeading>
 
-    <paragraph>
+    <TextParagraph>
       Rotki helps manage accounts and blockchain transactions. It’s local-first,
       privacy focused and all open source. We are long time contributors to the
       Ethereum ecosystem and general crypto space. In order to support more
       blockchains (Cosmos, Roll Ups, etc.), and to continue to ship new features
       we need the help of a backend Python developer.
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary>How your work with us will look like?</heading>
+    <TextHeading secondary>How your work with us will look like?</TextHeading>
 
-    <paragraph>
+    <TextParagraph>
       You will be developing new features, supporting more exchanges, more
       blockchains, and more DeFi protocols. There is also always a lot of
       troubleshooting of user reported issues, bugs, and feature requests that
       are coming our way. You can improve our current Python backend
       implementation and help us get Rotki to the next level!
-    </paragraph>
+    </TextParagraph>
 
-    <paragraph>
+    <TextParagraph>
       As an open source project, we work collaboratively on our codebase on
       GitHub in a style that should be familiar to anyone who has participated
       in an OSS community before. If you haven’t — we’re happy to support you in
       defining and writing great feature descriptions, and breaking them down
       into dev tasks, and shipping them to customers around the world.
-    </paragraph>
+    </TextParagraph>
 
-    <paragraph>
+    <TextParagraph>
       This is an early stage open source company, so there is an opportunity to
       take on a variety of tasks beyond the app, such as the backend of the
       website, and our API.
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Requirements: </heading>
+    <TextHeading secondary> Requirements: </TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>Excellent command of python.</li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Bonus Points: </heading>
+    <TextHeading secondary> Bonus Points: </TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>
           Write tests for features you code and bugs you fix. Not strict TDD,
           but we’re always looking to increase test coverage
@@ -70,12 +70,12 @@
         </li>
         <li>Sharing our values on open source, data ownership and privacy</li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading> Non-technical bonus points: </heading>
+    <TextHeading> Non-technical bonus points: </TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>
           4 hours daily overlap with European working hours 0900 CET - 1700 CET
           for smoother teamwork
@@ -85,12 +85,12 @@
         </li>
         <li>Proactive and customer-oriented</li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> What we offer </heading>
+    <TextHeading secondary> What we offer </TextHeading>
 
-    <paragraph>
-      <ul :class="$style.points">
+    <TextParagraph>
+      <ul :class="css.points">
         <li>
           A full-time position, but are open to part-time contributors as well.
           If located in Germany we can provide full employment with insurance
@@ -115,37 +115,33 @@
           etc.) after passed probation period
         </li>
       </ul>
-    </paragraph>
+    </TextParagraph>
 
-    <heading secondary> Apply </heading>
+    <TextHeading secondary> Apply </TextHeading>
 
-    <paragraph>
+    <TextParagraph>
       We are looking for both senior and junior developers, so if you are coding
       in Python, don’t hesitate to apply!
-    </paragraph>
+    </TextParagraph>
 
-    <paragraph>
+    <TextParagraph>
       Send your CV, a link to your GitHub profile and a cover letter to
       careers@rotki.com. In the cover letter tell us what you think of rotki’s
       codebase and include a link to a project you worked on and are most proud
       about and tell us why.
-    </paragraph>
+    </TextParagraph>
 
-    <paragraph>
+    <TextParagraph>
       If you have any questions hit us up on discord:
-      <external-link url="https://discord.gg/aGCxHG7" no-ref>
+      <ExternalLink url="https://discord.gg/aGCxHG7" no-ref>
         https://discord.gg/aGCxHG7
-      </external-link>
-    </paragraph>
+      </ExternalLink>
+    </TextParagraph>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'BackendDeveloper',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style module>

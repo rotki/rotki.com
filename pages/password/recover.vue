@@ -1,30 +1,27 @@
 <template>
-  <password-form />
+  <PasswordForm />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs } from '~/utils/metadata'
 
-export default defineComponent({
+definePageMeta({
   middleware: 'maintenance',
-  setup() {
-    useMeta({
-      title: 'password recovery | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: 'Recover your rotki.com account password',
-        },
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+})
+
+useHead({
+  title: 'password recovery | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: 'Recover your rotki.com account password',
+    },
+  ],
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~~/assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

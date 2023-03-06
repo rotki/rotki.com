@@ -1,8 +1,12 @@
 module.exports = {
-  extends: ['stylelint-config-standard', 'stylelint-config-prettier'],
-  plugins: ['stylelint-scss'],
-  // add your custom config here
-  // https://stylelint.io/user-guide/configuration
+  plugins: ['stylelint-scss', 'stylelint-order'],
+  extends: ['stylelint-config-recommended-vue/scss'],
+  overrides: [
+    {
+      files: ['**/*.scss'],
+      customSyntax: 'postcss-scss',
+    },
+  ],
   rules: {
     'at-rule-no-unknown': null,
     'scss/at-rule-no-unknown': [
@@ -21,7 +25,7 @@ module.exports = {
         ],
       },
     ],
-    'declaration-block-trailing-semicolon': null,
     'no-descending-specificity': null,
+    'scss/at-import-partial-extension': null,
   },
 }

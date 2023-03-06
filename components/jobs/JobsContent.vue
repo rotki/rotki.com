@@ -1,39 +1,35 @@
 <template>
-  <page>
+  <PageContainer>
     <template #title> Jobs </template>
-    <div :class="$style.container">
-      <heading>Available Roles</heading>
-      <ul :class="$style.tabs">
-        <li :class="$style.tab">
-          <nuxt-link
-            :active-class="$style.active"
-            :class="$style.link"
+    <div :class="css.container">
+      <TextHeading>Available Roles</TextHeading>
+      <ul :class="css.tabs">
+        <li :class="css.tab">
+          <NuxtLink
+            :active-class="css.active"
+            :class="css.link"
             to="/jobs/backend"
           >
             Python Backend Developer
-          </nuxt-link>
+          </NuxtLink>
         </li>
-        <li :class="$style.tab">
-          <nuxt-link
-            :active-class="$style.active"
-            :class="$style.link"
+        <li :class="css.tab">
+          <NuxtLink
+            :active-class="css.active"
+            :class="css.link"
             to="/jobs/frontend"
           >
             Vue.js/TypeScript Developer
-          </nuxt-link>
+          </NuxtLink>
         </li>
       </ul>
-      <NuxtChild />
+      <NuxtPage />
     </div>
-  </page>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'JobsContent',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

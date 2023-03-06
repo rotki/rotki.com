@@ -1,26 +1,18 @@
 <template>
-  <div :class="$style.container">
-    <div :class="$style.box" @click="dismiss">
+  <div :class="css.container">
+    <div :class="css.box" @click="dismiss">
       <slot />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'dismiss'): void }>()
 
-export default defineComponent({
-  name: 'NotificationMessage',
-  emits: ['dismiss'],
-  setup(_, { emit }) {
-    const dismiss = () => {
-      emit('dismiss')
-    }
-    return {
-      dismiss,
-    }
-  },
-})
+const dismiss = () => {
+  emit('dismiss')
+}
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

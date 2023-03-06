@@ -1,31 +1,24 @@
 <template>
-  <pending-activation />
+  <PendingActivation />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, noIndex } from '~/utils/metadata'
 
-export default defineComponent({
-  name: 'Activation',
-  setup() {
-    useMeta({
-      title: 'account activation | rotki',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: '',
-        },
-        noIndex(),
-      ],
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+useHead({
+  title: 'account activation | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content: '',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
 })
 </script>
 
 <style lang="scss">
-@import '~assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

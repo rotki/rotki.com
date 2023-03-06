@@ -1,36 +1,34 @@
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.col">
+  <div :class="css.wrapper">
+    <div :class="css.col">
       <img
-        :class="$style.image"
+        :class="css.image"
         alt="rotki accountant"
-        src="~/assets/img/accountant.svg"
+        src="/img/accountant.svg"
       />
     </div>
-    <div :class="$style.column2">
-      <div :class="$style.row">
-        <div :class="$style.text">
-          <i18n path="home.use_app">
+    <div :class="css.column2">
+      <div :class="css.row">
+        <div :class="css.text">
+          <i18n-t keypath="home.use_app" scope="global">
             <br />
-          </i18n>
+          </i18n-t>
         </div>
       </div>
-      <download-button :class="$style.button" @click="$emit('download')" />
+      <DownloadButton :class="css.button" @click="emit('download')" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'download'): void }>()
 
-export default defineComponent({
-  name: 'UseApp',
-})
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .wrapper {
   @apply flex flex-row justify-center align-middle mt-16 lg:mt-32;

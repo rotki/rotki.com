@@ -1,62 +1,52 @@
 <template>
-  <card>
-    <heading :class="$style.heading" subheading>API Credentials</heading>
-    <div :class="$style.entry">
-      <input-field
+  <CardContainer>
+    <TextHeading :class="css.heading" subheading>API Credentials</TextHeading>
+    <div :class="css.entry">
+      <InputField
         id="api-key"
-        :class="$style.input"
-        :value="apiKey"
+        :class="css.input"
+        :model-value="apiKey"
         label="API Key"
         readonly
       />
-      <div :class="$style.col">
-        <copy-button :class="$style.button" :value="apiKey" />
+      <div :class="css.col">
+        <CopyButton :class="css.button" :model-value="apiKey" />
       </div>
     </div>
-    <div :class="$style.entry">
-      <input-field
+    <div :class="css.entry">
+      <InputField
         id="api-secret"
-        :class="$style.input"
-        :value="apiSecret"
+        :class="css.input"
+        :model-value="apiSecret"
         label="API Secret"
         readonly
       />
-      <div :class="$style.col">
-        <copy-button :class="$style.button" :value="apiSecret" />
+      <div :class="css.col">
+        <CopyButton :class="css.button" :model-value="apiSecret" />
       </div>
     </div>
-    <action-button
-      :class="$style.actionButton"
+    <ActionButton
+      :class="css.actionButton"
       primary
       small
       text="Regenerate"
       @click="regenerateKeys"
     />
-  </card>
+  </CardContainer>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'ApiKeys',
-  setup() {
-    const store = useMainStore()
-    // pinia#852
-    const { account } = toRefs(store)
+const store = useMainStore()
+const { account } = storeToRefs(store)
 
-    const apiKey = computed(() => account.value?.apiKey ?? '')
-    const apiSecret = computed(() => account.value?.apiSecret ?? '')
-    const regenerateKeys = async () => await store.updateKeys()
+const apiKey = computed(() => account.value?.apiKey ?? '')
+const apiSecret = computed(() => account.value?.apiSecret ?? '')
+const regenerateKeys = async () => await store.updateKeys()
 
-    return {
-      regenerateKeys,
-      apiKey,
-      apiSecret,
-    }
-  },
-})
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

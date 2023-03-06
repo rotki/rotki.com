@@ -1,6 +1,6 @@
 <template>
   <a
-    :class="$style.link"
+    :class="css.link"
     :href="url"
     :target="sameTab ? '_self' : '_blank'"
     :rel="noRef ? 'noreferrer' : null"
@@ -11,40 +11,24 @@
   </a>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, toRefs } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    url: string
+    text?: string
+    sameTab?: boolean
+    noRef?: boolean
+  }>(),
+  {
+    text: '',
+    sameTab: false,
+    noRef: false,
+  }
+)
 
-export default defineComponent({
-  name: 'ExternalLink',
-  props: {
-    url: {
-      required: true,
-      type: String,
-    },
-    text: {
-      required: false,
-      type: String,
-      default: '',
-    },
-    sameTab: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    noRef: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup(props) {
-    const { text, url } = toRefs(props)
-    const display = computed(() => (text.value ? text.value : url.value))
-    return {
-      display,
-    }
-  },
-})
+const { text, url } = toRefs(props)
+const display = computed(() => (text.value ? text.value : url.value))
+const css = useCssModule()
 </script>
 
 <style module>

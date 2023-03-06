@@ -1,97 +1,69 @@
 <template>
-  <page :center-vertically="false">
+  <PageContainer :center-vertically="false">
     <template #title>Crypto Payment</template>
-    <page-content>
-      <div :class="$style.content">
-        <checkout-title>Payment Details</checkout-title>
+    <PageContent>
+      <div :class="css.content">
+        <CheckoutTitle>Payment Details</CheckoutTitle>
         <div>Payments by crypto can have slower processing times.</div>
-        <crypto-payment-info />
-        <selected-plan-overview :plan="selectedPlan" crypto />
-        <accept-refund-policy
-          v-model="acceptRefundPolicy"
-          :class="$style.policy"
-        />
-        <selection-button
-          :class="$style.button"
+        <CryptoPaymentInfo />
+        <SelectedPlanOverview :plan="selectedPlan" crypto />
+        <AcceptRefundPolicy v-model="acceptRefundPolicy" :class="css.policy" />
+        <SelectionButton
+          :class="css.button"
           :disabled="!acceptRefundPolicy"
           selected
           @click="submit"
         >
           Submit Request
-        </selection-button>
+        </SelectionButton>
       </div>
-    </page-content>
-  </page>
+    </PageContent>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  ref,
-  useRouter,
-} from '@nuxtjs/composition-api'
-import { get, toRefs, useTimestamp } from '@vueuse/core'
-import {
-  useCurrencyParams,
-  usePlanParams,
-  useSubscriptionIdParam,
-} from '~/composables/plan'
+<script setup lang="ts">
+import { get, useTimestamp } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { SelectedPlan } from '~/types'
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'CryptoRequestPage',
-  setup() {
-    const store = useMainStore()
-    const { account, plans } = toRefs(store)
-    const acceptRefundPolicy = ref(false)
-    const { plan } = usePlanParams()
-    const { currency } = useCurrencyParams()
-    const { subscriptionId } = useSubscriptionIdParam()
-    const selectedPlan = computed<SelectedPlan>(() => {
-      const availablePlans = get(plans)
-      const months = get(plan)
-      const selectedPlan = availablePlans?.find(
-        (plan) => plan.months === months
-      )
-      return {
-        startDate: get(useTimestamp()) / 1000,
-        finalPriceInEur: selectedPlan?.priceCrypto ?? '0',
-        priceInEur: selectedPlan?.priceCrypto ?? '0',
-        months,
-        vat: get(account)?.vat || 0,
-      }
-    })
+const store = useMainStore()
+const { account, plans } = storeToRefs(store)
+const acceptRefundPolicy = ref(false)
 
-    const router = useRouter()
-
-    const submit = () => {
-      router.push({
-        path: '/checkout/pay/crypto',
-        query: {
-          p: get(plan).toString(),
-          c: get(currency),
-          id: get(subscriptionId),
-        },
-      })
-    }
-
-    onMounted(async () => await store.getPlans())
-
-    return {
-      plan,
-      selectedPlan,
-      acceptRefundPolicy,
-      submit,
-    }
-  },
+const { plan } = usePlanParams()
+const { currency } = useCurrencyParams()
+const { subscriptionId } = useSubscriptionIdParam()
+const selectedPlan = computed<SelectedPlan>(() => {
+  const availablePlans = get(plans)
+  const months = get(plan)
+  const selectedPlan = availablePlans?.find((plan) => plan.months === months)
+  return {
+    startDate: get(useTimestamp()) / 1000,
+    finalPriceInEur: selectedPlan?.priceCrypto ?? '0',
+    priceInEur: selectedPlan?.priceCrypto ?? '0',
+    months,
+    vat: get(account)?.vat || 0,
+  }
 })
+
+const submit = () => {
+  navigateTo({
+    path: '/checkout/pay/crypto',
+    query: {
+      p: get(plan).toString(),
+      c: get(currency),
+      id: get(subscriptionId),
+    },
+  })
+}
+
+onMounted(async () => await store.getPlans())
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
+@import '@/assets/css/media.scss';
 
 .content {
   padding: 0;

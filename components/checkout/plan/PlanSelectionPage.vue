@@ -1,27 +1,18 @@
 <template>
-  <page wide :center-vertically="false">
+  <PageContainer wide :center-vertically="false">
     <template #title>Select a Plan</template>
-    <loader v-if="!plans" full />
-    <page-content v-else>
-      <plan-selection :plans="plans" />
-    </page-content>
-  </page>
+    <LoadingIndicator v-if="!plans" full />
+    <PageContent v-else>
+      <PlanSelection :plans="plans" />
+    </PageContent>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted } from '@nuxtjs/composition-api'
-import { toRefs } from '@vueuse/core'
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'PlanSelectionPage',
-  setup() {
-    const store = useMainStore()
-    const { plans } = toRefs(store)
-    onMounted(async () => await store.getPlans())
-    return {
-      plans,
-    }
-  },
-})
+const store = useMainStore()
+const { plans } = storeToRefs(store)
+onMounted(async () => await store.getPlans())
 </script>

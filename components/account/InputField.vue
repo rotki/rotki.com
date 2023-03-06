@@ -1,24 +1,24 @@
 <template>
-  <div :class="$style.wrapper">
+  <div :class="css.wrapper">
     <div
       :class="{
-        [$style.field]: true,
-        [$style.filled]: filled,
-        [$style['only-text']]: !$slots.prepend,
+        [css.field]: true,
+        [css.filled]: filled,
+        [css['only-text']]: !slots.prepend,
       }"
     >
-      <div :class="$style.slot">
-        <slot v-if="$slots.prepend" name="prepend" />
-        <div :class="$style.inputContainer">
+      <div :class="css.slot">
+        <slot v-if="slots.prepend" name="prepend" />
+        <div :class="css.inputContainer">
           <input
             :id="id"
             ref="inputField"
             :aria-describedby="`${id}-error`"
             :class="{
-              [$style.input]: true,
-              [$style.inputText]: true,
-              [$style.filled]: filled,
-              [$style.empty]: isEmpty,
+              [css.input]: true,
+              [css.inputText]: true,
+              [css.filled]: filled,
+              [css.empty]: isEmpty,
             }"
             :disabled="disabled"
             :placeholder="placeholder"
@@ -29,9 +29,7 @@
             @input="input($event)"
             @keypress.enter="enter()"
           />
-          <label v-if="label" :class="$style.label" :for="id">
-            {{ label }}</label
-          >
+          <label v-if="label" :class="css.label" :for="id"> {{ label }}</label>
         </div>
         <slot v-if="$slots.append" name="append" />
       </div>
@@ -40,124 +38,81 @@
     <span
       v-if="errorMessages && errorMessages.length > 0"
       :id="`${id}-error`"
-      :class="$style.error"
+      :class="css.error"
     >
       {{ errorMessages[0].$message }}
     </span>
 
-    <span v-else :class="$style.caption">
+    <span v-else :class="css.caption">
       <slot name="hint">{{ hint }}</slot>
     </span>
     <slot />
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  ref,
-  toRef,
-  watch,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    id: string
+    modelValue: string
+    type?: string
+    label?: string
+    hint?: string
+    placeholder?: string
+    errorMessages?: { $message: string }[]
+    readonly?: boolean
+    disabled?: boolean
+    filled?: boolean
+  }>(),
+  {
+    type: 'text',
+    label: '',
+    hint: '',
+    placeholder: '',
+    errorMessages: () => [],
+    readonly: false,
+    disabled: false,
+    filled: false,
+  }
+)
 
-export default defineComponent({
-  name: 'InputField',
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-    value: {
-      type: String,
-      required: true,
-    },
-    type: {
-      required: false,
-      type: String,
-      default: 'text',
-    },
-    label: {
-      type: String,
-      default: '',
-      required: false,
-    },
-    hint: {
-      type: String,
-      default: '',
-      required: false,
-    },
-    placeholder: {
-      type: String,
-      default: '',
-      required: false,
-    },
-    errorMessages: {
-      type: Array,
-      default: () => [],
-      required: false,
-    },
-    readonly: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    disabled: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    filled: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['input', 'enter', 'blur'],
-  setup(props, { emit }) {
-    const selection = ref('')
-    const inputField = ref<HTMLInputElement | null>(null)
-    const input = (event: InputEvent) => {
-      const target = event.target
-      if (target) {
-        emit('input', (target as HTMLInputElement).value ?? '')
-      }
-    }
-    const value = toRef(props, 'value')
-    const lastMessage = ref('')
-    watch(toRef(props, 'errorMessages'), (value) => {
-      if (
-        value.length > 0 &&
-        lastMessage.value !== (value[0] as any).$message
-      ) {
-        inputField.value?.focus()
-        lastMessage.value = (value[0] as any).$message
-      }
-    })
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+  (e: 'enter'): void
+  (e: 'blur'): void
+}>()
 
-    const isEmpty = computed(() => {
-      const currentValue = value.value
-      return !currentValue || currentValue.trim().length === 0
-    })
-    const blur = () => {
-      emit('blur')
-    }
-
-    return {
-      selection,
-      inputField,
-      isEmpty,
-      blur,
-      input,
-      enter: () => emit('enter'),
-    }
-  },
+const inputField = ref<HTMLInputElement | null>(null)
+const input = (event: InputEvent) => {
+  const target = event.target
+  if (target) {
+    emit('update:modelValue', (target as HTMLInputElement).value ?? '')
+  }
+}
+const value = toRef(props, 'modelValue')
+const lastMessage = ref('')
+watch(toRef(props, 'errorMessages'), (value) => {
+  if (value.length > 0 && lastMessage.value !== (value[0] as any).$message) {
+    inputField.value?.focus()
+    lastMessage.value = (value[0] as any).$message
+  }
 })
+
+const isEmpty = computed(() => {
+  const currentValue = value.value
+  return !currentValue || currentValue.trim().length === 0
+})
+
+const blur = () => emit('blur')
+const enter = () => emit('enter')
+
+const css = useCssModule()
+const slots = useSlots()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .wrapper {
   @apply flex flex-col pt-2.5;
@@ -253,7 +208,7 @@ export default defineComponent({
   @apply bg-gray-50;
 }
 
-.caption {
+%caption {
   @apply text-xs font-sans;
 
   color: #808080;
@@ -263,7 +218,7 @@ export default defineComponent({
 .error {
   color: #e53935;
 
-  @extend .caption;
+  @extend %caption;
 }
 
 .label {

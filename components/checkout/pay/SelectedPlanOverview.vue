@@ -1,7 +1,7 @@
 <template>
-  <plan-overview>
-    <span :class="$style.plan">{{ name }} Plan.</span>
-    <i18n path="selected_plan_overview.plan">
+  <PlanOverview>
+    <span :class="css.plan">{{ name }} Plan.</span>
+    <i18n-t keypath="selected_plan_overview.plan" scope="global">
       <template #date>
         {{ date }}
       </template>
@@ -11,7 +11,7 @@
       <template #vat>
         <span v-if="plan.vat && !crypto">
           {{
-            $t('selected_plan_overview.vat', {
+            t('selected_plan_overview.vat', {
               vat: plan.vat,
               priceInEur: plan.priceInEur,
             })
@@ -19,24 +19,24 @@
         </span>
         <span v-else-if="plan.vat">
           {{
-            $t('selected_plan_overview.includes_vat', {
+            t('selected_plan_overview.includes_vat', {
               vat: plan.vat,
             })
           }}
         </span>
       </template>
-    </i18n>
+    </i18n-t>
     <span>
       {{
-        $tc('selected_plan_overview.renew_period', plan.months, {
+        t('selected_plan_overview.renew_period', plan.months, {
           months: plan.months,
         })
       }}
     </span>
 
     <template #body>
-      <div :class="$style.change" @click="select">Change</div>
-      <change-plan-dialog
+      <div :class="css.change" @click="select">Change</div>
+      <ChangePlanDialog
         :crypto="crypto"
         :warning="warning"
         :visible="selection"
@@ -44,81 +44,57 @@
         @select="switchTo($event)"
       />
     </template>
-  </plan-overview>
+  </PlanOverview>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  PropType,
-  ref,
-  toRefs,
-  useRouter,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { get, set } from '@vueuse/core'
 import { CryptoPayment, SelectedPlan } from '~/types'
 import { getPlanName } from '~/utils/plans'
 
-export default defineComponent({
-  name: 'SelectedPlanOverview',
-  props: {
-    plan: {
-      required: true,
-      type: Object as PropType<SelectedPlan | CryptoPayment>,
-    },
-    crypto: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    warning: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
+const props = withDefaults(
+  defineProps<{
+    plan: SelectedPlan | CryptoPayment
+    crypto?: boolean
+    warning?: boolean
+  }>(),
+  {
+    crypto: false,
+    warning: false,
+  }
+)
 
-  setup(props) {
-    const { plan } = toRefs(props)
-    const router = useRouter()
+const { plan } = toRefs(props)
+const router = useRouter()
 
-    const selection = ref(false)
+const selection = ref(false)
 
-    const name = computed(() => getPlanName(get(plan).months))
-    const date = computed(() => {
-      const currentPlan = get(plan)
-      const date = new Date(currentPlan.startDate * 1000)
-      return date.toLocaleDateString()
-    })
-
-    const select = () => {
-      set(selection, true)
-    }
-
-    const switchTo = (months: number) => {
-      set(selection, false)
-      const currentRoute = router.currentRoute
-
-      router.push({
-        path: currentRoute.path,
-        query: {
-          ...currentRoute.query,
-          p: months.toString(),
-        },
-      })
-    }
-
-    return {
-      name,
-      date,
-      selection,
-      select,
-      getPlanName,
-      switchTo,
-    }
-  },
+const name = computed(() => getPlanName(get(plan).months))
+const date = computed(() => {
+  const currentPlan = get(plan)
+  const date = new Date(currentPlan.startDate * 1000)
+  return date.toLocaleDateString()
 })
+
+const select = () => {
+  set(selection, true)
+}
+
+const switchTo = (months: number) => {
+  set(selection, false)
+  const currentRoute = router.currentRoute
+
+  navigateTo({
+    path: currentRoute.path,
+    query: {
+      ...currentRoute.query,
+      p: months.toString(),
+    },
+  })
+}
+
+const { t } = useI18n()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

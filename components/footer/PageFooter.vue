@@ -1,48 +1,43 @@
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.row">
-      <div :class="$style.logo">
-        <img alt="rotki" src="~/assets/img/logo-small.svg" />
+  <div :class="css.wrapper">
+    <div :class="css.row">
+      <div :class="css.logo">
+        <img alt="rotki" src="/img/logo-small.svg" />
       </div>
-      <div :class="$style.menus">
-        <links landing />
+      <div :class="css.menus">
+        <LinksArea landing />
       </div>
-      <div :class="$style.links">
-        <footer-icon-links />
+      <div :class="css.links">
+        <FooterIconLinks />
       </div>
     </div>
-    <div :class="$style.secondRow">
-      <div :class="$style.copyright">
+    <div :class="css.secondRow">
+      <div :class="css.copyright">
         <div>© Rotki Solutions GmbH 2018-{{ year }}.</div>
         <div>All Rights Reserved.</div>
       </div>
-      <footer-legalese />
+      <FooterLegalese />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    landing?: boolean
+  }>(),
+  {
+    landing: false,
+  }
+)
 
-export default defineComponent({
-  name: 'PageFooter',
-  props: {
-    landing: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup() {
-    const year = new Date().getFullYear().toString()
-    return { year }
-  },
-})
+const year = new Date().getFullYear().toString()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/main';
-@import '~assets/css/media';
+@import '@/assets/css/main.scss';
+@import '@/assets/css/media.scss';
 
 .wrapper {
   @apply container pb-0 pb-4;

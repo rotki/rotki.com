@@ -1,30 +1,26 @@
 <template>
-  <card>
-    <div :class="$style.row">
-      <div :class="$style.logo">
-        <img alt="rotki" src="~/assets/img/logo-small.svg" />
+  <CardContainer>
+    <div :class="css.row">
+      <div :class="css.logo">
+        <img alt="rotki" src="/img/logo-small.svg" />
       </div>
       <div>
-        <heading subheading> Rotki Premium </heading>
-        <div :class="$style.premium">
+        <TextHeading subheading> Rotki Premium </TextHeading>
+        <div :class="css.premium">
           No premium subscription found. Select your
-          <nuxt-link :class="$style.link" to="/checkout/plan">
+          <NuxtLink :class="css.link" to="/checkout/plan">
             premium subscription plan.
-          </nuxt-link>
+          </NuxtLink>
         </div>
       </div>
     </div>
-  </card>
+  </CardContainer>
 </template>
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PremiumPlaceholder',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 <style lang="scss" module>
-@import '~assets/css/media';
+@import '@/assets/css/media.scss';
 
 .row {
   @apply flex flex-row items-center;

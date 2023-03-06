@@ -1,27 +1,24 @@
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.column">
-      <div v-if="$slots.subtitle" :class="$style.subtitle">
+  <div :class="css.wrapper">
+    <div :class="css.column">
+      <div v-if="slots.subtitle" :class="css.subtitle">
         <slot name="subtitle" />
       </div>
-      <div :class="$style.description">
+      <div :class="css.description">
         <slot />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'FeatureDetails',
-})
+<script setup lang="ts">
+const css = useCssModule()
+const slots = useSlots()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .wrapper {
   @apply flex flex-row;

@@ -1,6 +1,4 @@
-import { ref } from '@nuxtjs/composition-api'
-
-export const setupRecaptcha = () => {
+export const useRecaptcha = () => {
   const recaptchaPassed = ref(false)
   const recaptchaToken = ref('')
   const onSuccess = (token: string) => {

@@ -1,28 +1,23 @@
 <template>
-  <custom-checkbox id="refund" :value="value" @input="input">
+  <CustomCheckbox
+    id="refund"
+    :model-value="value"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
     <span>
       I have read and agreed to the
-      <nuxt-link :class="$style.link" target="_blank" to="/refund-policy">
+      <NuxtLink :class="css.link" target="_blank" to="/refund-policy">
         Refunds/Cancellation Policy
-      </nuxt-link>
+      </NuxtLink>
     </span>
-  </custom-checkbox>
+  </CustomCheckbox>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+defineProps<{ value: boolean }>()
 
-export default defineComponent({
-  name: 'AcceptRefundPolicy',
-  props: {
-    value: { required: true, type: Boolean },
-  },
-  emits: ['input'],
-  setup(_, { emit }) {
-    const input = (value: boolean) => emit('input', value)
-    return { input }
-  },
-})
+const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>()
+const css = useCssModule()
 </script>
 
 <style module lang="scss">

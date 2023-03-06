@@ -1,13 +1,16 @@
-import { Middleware } from '@nuxt/types'
+import { storeToRefs } from 'pinia'
+import { get } from '@vueuse/core'
 import { useMainStore } from '~/store'
 
-export default <Middleware>async function ({ redirect }) {
+export default defineNuxtRouteMiddleware(async () => {
   const store = useMainStore()
-  if (!store.account?.subscriptions) {
+  const { account } = storeToRefs(store)
+  if (!isDefined(account)) {
     return
   }
 
-  const subscriptions = store.account.subscriptions
+  const { subscriptions } = get(account)
+
   const pending = subscriptions.filter(
     ({ actions, status }) => actions.includes('renew') || status === 'Pending'
   )
@@ -22,7 +25,7 @@ export default <Middleware>async function ({ redirect }) {
     }
 
     if (response.result?.transactionStarted) {
-      redirect('/home')
+      navigateTo('/home')
     } else if (response.result.pending) {
       const queryParams: { p: string; c: string; id?: string } = {
         p: durationInMonths.toString(),
@@ -31,7 +34,10 @@ export default <Middleware>async function ({ redirect }) {
       if (id) {
         queryParams.id = id
       }
-      redirect('/checkout/pay/crypto', queryParams)
+      navigateTo({
+        path: '/checkout/pay/crypto',
+        query: queryParams,
+      })
     }
   }
-}
+})

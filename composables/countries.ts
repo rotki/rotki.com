@@ -1,4 +1,4 @@
-import { onMounted, Ref, ref, useContext } from '@nuxtjs/composition-api'
+import { Ref } from 'vue'
 import { ApiResponse } from '~/types'
 
 export interface Country {
@@ -6,10 +6,10 @@ export interface Country {
   readonly name: string
 }
 
-export const loadCountries = () => {
+export const useCountries = () => {
   const countries: Ref<Country[]> = ref([])
   const countriesLoadError = ref('')
-  const { $axios } = useContext()
+  const { $axios } = useNuxtApp()
   const loadCountries = async () => {
     try {
       const response = await $axios.get<ApiResponse<Country[]>>(

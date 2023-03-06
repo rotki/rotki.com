@@ -1,15 +1,13 @@
 <template>
-  <div :class="$style.title">
+  <div :class="css.title">
     <slot />
   </div>
 </template>
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
 
-export default defineComponent({
-  name: 'CheckoutTitle',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
+
 <style lang="scss" module>
 .title {
   @apply font-serif font-bold text-3xl text-typography;

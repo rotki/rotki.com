@@ -1,16 +1,16 @@
 <template>
-  <page :center-vertically="false">
+  <PageContainer :center-vertically="false">
     <template #title>Premium</template>
-    <page-content>
+    <PageContent>
       <div class="w-full">
-        <div :class="$style.title">Premium Features</div>
-        <div :class="$style.details">
-          <product-description>
+        <div :class="css.title">Premium Features</div>
+        <div :class="css.details">
+          <ProductDescription>
             <template #left>
               <img
-                :class="$style.image"
+                :class="css.image"
                 alt="Staking"
-                src="~/assets/img/products/staking.svg"
+                src="/img/products/staking.svg"
               />
             </template>
             <template #title>Staking</template>
@@ -18,42 +18,42 @@
             locations (ETH, LQTY, Kraken and more). Information like total
             gained in a period and individual staking deposit/withdrawal/income
             events.
-          </product-description>
-          <product-description>
+          </ProductDescription>
+          <ProductDescription>
             <template #right>
-              <img alt="Higher limits" src="~/assets/img/products/crypto.svg" />
+              <img alt="Higher limits" src="/img/products/crypto.svg" />
             </template>
             <template #title>Higher Limits</template>
             rotki has limits for multiple things that the free version can
             process. Number of trades, number of transactions,
             deposits/withdrawals, historic events and more. With premium these
             limits are increasing depending on the tier you have bought.
-          </product-description>
-          <product-description>
+          </ProductDescription>
+          <ProductDescription>
             <template #left>
-              <img alt="Customizations" src="~/assets/img/products/dark.svg" />
+              <img alt="Customizations" src="/img/products/dark.svg" />
             </template>
             <template #title>Dark mode and more perks</template>
             Premium gives you access to various perks such as dark mode and
             customizable color layout in the app. Some other perks include
             watchers for your makerdao CDP position that can warn you when by
             email when it goes over or below a certain collateralization ratio.
-          </product-description>
-          <product-description>
+          </ProductDescription>
+          <ProductDescription>
             <template #right>
-              <img alt="Graphs" src="~/assets/img/products/trades.svg" />
+              <img alt="Graphs" src="/img/products/trades.svg" />
             </template>
             <template #title>Graphs</template>
             Rotki premium gives you access to an array of analytics in the form
             of graphs. You can see, among others, the analysis of total net
             value over time, amount and value per asset over time, distribution
             of your total worth per asset or per location.
-          </product-description>
-          <product-description>
+          </ProductDescription>
+          <ProductDescription>
             <template #left>
               <img
                 alt="Encrypted Synchronization"
-                src="~/assets/img/products/sync.svg"
+                src="/img/products/sync.svg"
               />
             </template>
             <template #title>Synchronization</template>
@@ -61,77 +61,57 @@
             our server. It can then be synchronized between different devices.
             It also serves as a backup. The data is encrypted with your password
             and we can not read it.
-          </product-description>
-          <product-description>
+          </ProductDescription>
+          <ProductDescription>
             <template #right>
-              <img
-                alt="DeFi protocols"
-                src="~/assets/img/products/eth@2x.png"
-              />
+              <img alt="DeFi protocols" src="/img/products/eth@2x.png" />
             </template>
             <template #title>Information per DeFi protocol</template>
             You can see extra information per supported DeFi protocols. For
             example analysis of your liquity, aave, compound, makerdao
             positions. Analysis of your yearn vaults. Breakdown of the swaps
             made in uniswap, sushiswap, balancer and more.
-          </product-description>
-          <div :class="$style.actions">
-            <action-button
+          </ProductDescription>
+          <div :class="css.actions">
+            <ActionButton
               v-if="!hasActiveSubscription"
               primary
               @click="goToCheckoutPlan()"
             >
               Subscribe now
-            </action-button>
-            <action-button v-else primary @click="goToAccount()">
+            </ActionButton>
+            <ActionButton v-else primary @click="goToAccount()">
               Manage Premium
-            </action-button>
-            <action-button @click="goToProductsDetail">
+            </ActionButton>
+            <ActionButton @click="goToProductsDetail">
               More Details
-            </action-button>
+            </ActionButton>
           </div>
         </div>
       </div>
-    </page-content>
-  </page>
+    </PageContent>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  toRefs,
-  useRouter,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { get } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'ProductsPage',
-  setup() {
-    const router = useRouter()
-
-    const store = useMainStore()
-    const { account } = toRefs(store)
-    const hasActiveSubscription = computed(
-      () => !!get(account)?.hasActiveSubscription
-    )
-    const goToCheckoutPlan = () => router.push('/checkout/plan')
-    const goToProductsDetail = () => router.push('/products/details')
-    const goToAccount = () => router.push('/home')
-    return {
-      hasActiveSubscription,
-      goToCheckoutPlan,
-      goToProductsDetail,
-      goToAccount,
-    }
-  },
-})
+const store = useMainStore()
+const { account } = storeToRefs(store)
+const hasActiveSubscription = computed(
+  () => !!get(account)?.hasActiveSubscription
+)
+const goToCheckoutPlan = () => navigateTo('/checkout/plan')
+const goToProductsDetail = () => navigateTo('/products/details')
+const goToAccount = () => navigateTo('/home')
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .title {
   @apply font-serif font-bold text-3xl text-typography;

@@ -1,8 +1,8 @@
 <template>
   <div
     :class="{
-      [$style.btn]: true,
-      [$style.disabled]: disabled,
+      [css.btn]: true,
+      [css.disabled]: disabled,
     }"
     @click="click"
   >
@@ -10,33 +10,30 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, toRefs } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    disabled?: boolean
+  }>(),
+  {
+    disabled: false,
+  }
+)
 
-export default defineComponent({
-  name: 'IconButton',
-  props: {
-    disabled: {
-      required: false,
-      default: false,
-      type: Boolean,
-    },
-  },
-  emits: ['click'],
-  setup(props, { emit }) {
-    const { disabled } = toRefs(props)
-    const click = () => {
-      if (disabled.value) {
-        return
-      }
+const emit = defineEmits<{
+  (e: 'click'): void
+}>()
 
-      emit('click')
-    }
-    return {
-      click,
-    }
-  },
-})
+const { disabled } = toRefs(props)
+const click = () => {
+  if (disabled.value) {
+    return
+  }
+
+  emit('click')
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

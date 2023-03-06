@@ -1,57 +1,54 @@
 <template>
-  <feature id="defi-details">
-    <template #title> {{ $t('home.eth_protocols.title') }} </template>
-    <feature-details>
-      {{ $t('home.eth_protocols.detail') }}
-    </feature-details>
-    <div :class="$style.protocols">
-      <DefiProtocol :image="require('~/assets/img/defi/makerdao.png')">
+  <FeatureContainer id="defi-details">
+    <template #title> {{ t('home.eth_protocols.title') }} </template>
+    <FeatureDetails>
+      {{ t('home.eth_protocols.detail') }}
+    </FeatureDetails>
+    <div :class="css.protocols">
+      <DefiProtocol image="/img/defi/makerdao.png">
         <template #name>
-          {{ $t('home.eth_protocols.protocols.maker_dao.title') }}
+          {{ t('home.eth_protocols.protocols.maker_dao.title') }}
         </template>
-        {{ $t('home.eth_protocols.protocols.maker_dao.description') }}
+        {{ t('home.eth_protocols.protocols.maker_dao.description') }}
       </DefiProtocol>
-      <DefiProtocol :image="require('~/assets/img/defi/aave.png')">
+      <DefiProtocol image="/img/defi/aave.png">
         <template #name>
-          {{ $t('home.eth_protocols.protocols.aave.title') }}
+          {{ t('home.eth_protocols.protocols.aave.title') }}
         </template>
-        {{ $t('home.eth_protocols.protocols.aave.description') }}
+        {{ t('home.eth_protocols.protocols.aave.description') }}
       </DefiProtocol>
-      <DefiProtocol :image="require('~/assets/img/defi/compound.png')">
+      <DefiProtocol image="/img/defi/compound.png">
         <template #name>
-          {{ $t('home.eth_protocols.protocols.compound.title') }}
+          {{ t('home.eth_protocols.protocols.compound.title') }}
         </template>
-        {{ $t('home.eth_protocols.protocols.compound.description') }}
+        {{ t('home.eth_protocols.protocols.compound.description') }}
       </DefiProtocol>
-      <DefiProtocol :image="require('~/assets/img/defi/yearn.png')">
+      <DefiProtocol image="/img/defi/yearn.png">
         <template #name>
-          {{ $t('home.eth_protocols.protocols.yearn_vaults.title') }}
+          {{ t('home.eth_protocols.protocols.yearn_vaults.title') }}
         </template>
-        {{ $t('home.eth_protocols.protocols.yearn_vaults.description') }}
+        {{ t('home.eth_protocols.protocols.yearn_vaults.description') }}
       </DefiProtocol>
-      <DefiProtocol :image="require('~/assets/img/defi/uniswap.png')">
+      <DefiProtocol image="/img/defi/uniswap.png">
         <template #name>
-          {{ $t('home.eth_protocols.protocols.uniswap.title') }}
+          {{ t('home.eth_protocols.protocols.uniswap.title') }}
         </template>
-        {{ $t('home.eth_protocols.protocols.uniswap.description') }}
+        {{ t('home.eth_protocols.protocols.uniswap.description') }}
       </DefiProtocol>
-      <DefiProtocol :image="require('~/assets/img/defi/balancer.png')">
+      <DefiProtocol image="/img/defi/balancer.png">
         <template #name>
-          {{ $t('home.eth_protocols.protocols.balancer.title') }}
+          {{ t('home.eth_protocols.protocols.balancer.title') }}
         </template>
-        {{ $t('home.eth_protocols.protocols.balancer.description') }}
+        {{ t('home.eth_protocols.protocols.balancer.description') }}
       </DefiProtocol>
     </div>
-    <Caption> * {{ $t('home.eth_protocols.watcher_note') }} </Caption>
-  </feature>
+    <CaptionText> * {{ t('home.eth_protocols.watcher_note') }} </CaptionText>
+  </FeatureContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'DefiDetails',
-})
+<script setup lang="ts">
+const { t } = useI18n()
+const css = useCssModule()
 </script>
 
 <style module>

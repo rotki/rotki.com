@@ -1,48 +1,22 @@
 <template>
-  <page wide :center-vertically="false">
+  <PageContainer wide :center-vertically="false">
     <template #title> Select a Payment method </template>
-    <page-content>
-      <payment-method-selection :identifier="subscriptionIdentifier" />
-    </page-content>
-  </page>
+    <PageContent>
+      <PaymentMethodSelection :identifier="subscriptionIdentifier" />
+    </PageContent>
+  </PageContainer>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  useRoute,
-  useRouter,
-} from '@nuxtjs/composition-api'
-import { get } from '@vueuse/core'
+<script setup lang="ts">
+const route = useRoute()
 
-export default defineComponent({
-  name: 'PaymentMethodPage',
-  setup() {
-    const route = useRoute()
-    const router = useRouter()
-    onBeforeMount(() => {
-      if (!('p' in route.value.query)) {
-        router.push('/checkout/plan')
-      }
-    })
+onBeforeMount(() => {
+  if (!('p' in route.query)) {
+    navigateTo('/checkout/plan')
+  }
+})
 
-    const subscriptionIdentifier = computed(() => {
-      const currentRoute = get(route)
-      return 'id' in currentRoute.query
-        ? (currentRoute.query.id as string)
-        : undefined
-    })
-    return {
-      subscriptionIdentifier,
-    }
-  },
+const subscriptionIdentifier = computed(() => {
+  return 'id' in route.query ? (route.query.id as string) : undefined
 })
 </script>
-
-<style lang="scss" module>
-.methods {
-  padding: 0;
-}
-</style>

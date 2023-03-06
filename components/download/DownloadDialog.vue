@@ -1,79 +1,79 @@
 <template>
-  <transition name="fade">
-    <div :class="$style.overlay" @click="$emit('dismiss')">
-      <div :class="$style.wrapper">
-        <div :class="$style.dialog">
-          <div :class="$style.row">
-            <div :class="$style['icon-column']">
+  <Transition name="fade">
+    <div :class="css.overlay" @click="emit('dismiss')">
+      <div :class="css.wrapper">
+        <div :class="css.dialog">
+          <div :class="css.row">
+            <div :class="css['icon-column']">
               <img
-                :class="$style.icon"
+                :class="css.icon"
                 alt="partial rotki logo"
-                src="~/assets/img/partial-logo.svg"
+                src="/img/partial-logo.svg"
               />
             </div>
-            <div :class="$style['title-column']">
-              <div :class="$style.title">Download Rotki</div>
-              <div :class="$style.description">
+            <div :class="css['title-column']">
+              <div :class="css.title">Download Rotki</div>
+              <div :class="css.description">
                 You can download Rotki in your computer and start using it for
                 free right now. Binaries available for all major Operating
                 Systems.
               </div>
             </div>
           </div>
-          <div :class="$style.row2">
-            <a :class="$style.link" :href="linuxUrl" download>
+          <div :class="css.row2">
+            <a :class="css.link" :href="linuxUrl" download>
               <img
-                :class="$style.link"
+                :class="css.link"
                 alt="Linux Download button"
-                src="~/assets/img/dl/linux.svg"
+                src="/img/dl/linux.svg"
               />
             </a>
-            <a :class="$style.link" :href="macOSArmUrl" download>
+            <a :class="css.link" :href="macOSArmUrl" download>
               <img
-                :class="$style.link"
+                :class="css.link"
                 alt="macOS Apple Silicon Mac Download button"
-                src="~/assets/img/dl/mac_apple.svg"
+                src="/img/dl/mac_apple.svg"
               />
             </a>
-            <a :class="$style.link" :href="macOSUrl" download>
+            <a :class="css.link" :href="macOSUrl" download>
               <img
-                :class="$style.link"
+                :class="css.link"
                 alt="macOS Intel Mac Download button"
-                src="~/assets/img/dl/mac.svg"
+                src="/img/dl/mac.svg"
               />
             </a>
 
-            <a :class="$style.link" :href="windowsUrl" download>
+            <a :class="css.link" :href="windowsUrl" download>
               <img
-                :class="$style.link"
+                :class="css.link"
                 alt="Windows Download button"
-                src="~/assets/img/dl/windows.svg"
+                src="/img/dl/windows.svg"
               />
             </a>
           </div>
-          <div v-if="version" :class="$style.row3">
+          <div v-if="version" :class="css.row3">
             Latest Release: {{ version }}
           </div>
         </div>
       </div>
     </div>
-  </transition>
+  </Transition>
 </template>
 
-<script lang="ts">
-import { defineComponent, onBeforeMount, ref } from '@nuxtjs/composition-api'
-import { useAxios } from '~/plugins/axios'
+<script setup lang="ts">
+import { get } from '@vueuse/core'
+
+const emit = defineEmits<{ (e: 'dismiss'): void }>()
 
 const LATEST = 'https://github.com/rotki/rotki/releases/latest'
 
 type Asset = {
   readonly name: string
-  // eslint-disable-next-line camelcase
+
   readonly browser_download_url: string
 }
 
 type GithubRelease = {
-  // eslint-disable-next-line camelcase
   readonly tag_name: string
   readonly assets: Asset[]
 }
@@ -91,49 +91,40 @@ function isLinuxApp(name: string): boolean {
   return name.endsWith('.AppImage')
 }
 
-function isMacOsApp(name: string, arm64: boolean = false): boolean {
+function isMacOsApp(name: string, arm64 = false): boolean {
   const archMatch =
     (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'))
   return archMatch && name.endsWith('.dmg')
 }
 
-export default defineComponent({
-  name: 'DownloadDialog',
-  setup() {
-    const version = ref('')
-    const linuxUrl = ref(LATEST)
-    const macOSUrl = ref(LATEST)
-    const macOSArmUrl = ref(LATEST)
-    const windowsUrl = ref(LATEST)
+const version = ref('')
+const linuxUrl = ref(LATEST)
+const macOSUrl = ref(LATEST)
+const macOSArmUrl = ref(LATEST)
+const windowsUrl = ref(LATEST)
 
-    const fetchLatestRelease = async () => {
-      const api = useAxios()
-      const latestRelease = await api.$get<GithubRelease>(
-        'https://api.github.com/repos/rotki/rotki/releases/latest'
-      )
-      version.value = latestRelease.tag_name
-      const assets: Asset[] = latestRelease.assets
-      macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name))
-      macOSArmUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name, true))
-      linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name))
-      windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name))
-    }
-    onBeforeMount(async () => await fetchLatestRelease())
+const fetchLatestRelease = async () => {
+  const { data } = await useFetch<GithubRelease>(
+    'https://api.github.com/repos/rotki/rotki/releases/latest'
+  )
+  const latestRelease = get(data)
+  if (latestRelease) {
+    version.value = latestRelease.tag_name
+    const assets: Asset[] = latestRelease.assets
+    macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name))
+    macOSArmUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name, true))
+    linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name))
+    windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name))
+  }
+}
+onBeforeMount(async () => await fetchLatestRelease())
 
-    return {
-      version,
-      linuxUrl,
-      macOSUrl,
-      macOSArmUrl,
-      windowsUrl,
-    }
-  },
-})
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .overlay {
   @apply w-screen h-screen overflow-y-hidden bg-opacity-50 bg-black z-30 fixed top-0;

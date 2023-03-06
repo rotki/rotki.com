@@ -1,51 +1,51 @@
 <template>
   <div
     :class="{
-      [$style.wrapper]: true,
-      [$style.body]: true,
+      [css.wrapper]: true,
+      [css.body]: true,
     }"
   >
-    <div :class="$style.row">
-      <div :class="$style.qrcode">
-        <canvas ref="canvas" @click="copyToClipboard()" />
+    <div :class="css.row">
+      <div :class="css.qrcode">
+        <canvas ref="canvas" @click="copyToClipboard(qrText)" />
       </div>
-      <div :class="$style.inputs">
-        <input-field
+      <div :class="css.inputs">
+        <InputField
           id="price"
-          :class="$style.fields"
-          :value="paymentAmount"
+          :class="css.fields"
+          :model-value="paymentAmount"
           label="Amount"
           readonly
         >
           <template #append>
-            <div :class="$style.copy">
-              <copy-button :value="data.finalPriceInCrypto" />
+            <div :class="css.copy">
+              <CopyButton :model-value="data.finalPriceInCrypto" />
             </div>
           </template>
-        </input-field>
-        <input-field
+        </InputField>
+        <InputField
           id="address"
-          :class="$style.fields"
-          :value="data.cryptoAddress"
+          :class="css.fields"
+          :model-value="data.cryptoAddress"
           label="Address"
           readonly
         >
           <template #append>
-            <div :class="$style.copy">
-              <copy-button :value="data.cryptoAddress" />
+            <div :class="css.copy">
+              <CopyButton :model-value="data.cryptoAddress" />
             </div>
           </template>
-        </input-field>
+        </InputField>
       </div>
     </div>
-    <selected-plan-overview :plan="data" crypto warning />
-    <div :class="$style.hint">
+    <SelectedPlanOverview :plan="data" crypto warning />
+    <div :class="css.hint">
       You can pay with metamask, your mobile wallet or manually send the exact
       amount to the following address above. Once the whole amount is sent and
       manually processed, then a receipt will be sent to your email and your
       subscription will be activated.
 
-      <div :class="$style.info">
+      <div :class="css.info">
         If you already have a made a transaction you don't need to do anything
         more.
         <div>
@@ -54,41 +54,32 @@
         </div>
       </div>
     </div>
-    <div v-if="!isBtc" :class="$style.button">
-      <selection-button
+    <div v-if="!isBtc" :class="css.button">
+      <SelectionButton
         :selected="false"
         :disabled="!metamaskSupport"
         @click="payWithMetamask"
       >
-        <div :class="$style.row">
-          <metamask-icon :class="$style.icon" />
+        <div :class="css.row">
+          <MetamaskIcon :class="css.icon" />
           Pay with Metamask
         </div>
-      </selection-button>
+      </SelectionButton>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  PropType,
-  ref,
-  toRefs,
-  watch,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { ethers } from 'ethers'
 import { toCanvas } from 'qrcode'
 import { get, set, useClipboard } from '@vueuse/core'
 import { CryptoPayment } from '~/types'
 import { logger } from '~/utils/logger'
-import { getPlanName } from '~/utils/plans'
 
-async function createPaymentQR(
+const createPaymentQR = async (
   payment: CryptoPayment,
   canvas: HTMLCanvasElement
-) {
+) => {
   const dai = '0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844'
   let qrText = ''
   if (payment.cryptocurrency === 'BTC') {
@@ -106,57 +97,35 @@ async function createPaymentQR(
   return qrText
 }
 
-export default defineComponent({
-  name: 'CryptoPaymentForm',
-  props: {
-    data: {
-      required: true,
-      type: Object as PropType<CryptoPayment>,
-    },
-    plan: {
-      required: true,
-      type: Number,
-    },
-    metamaskSupport: {
-      required: true,
-      type: Boolean,
-    },
-  },
-  emits: ['pay'],
-  setup(props, { emit }) {
-    const { data } = toRefs(props)
-    const refundPolicyAccepted = ref(false)
-    const canvas = ref<HTMLCanvasElement>()
-    const qrText = ref('')
+const props = defineProps<{
+  data: CryptoPayment
+  plan: number
+  metamaskSupport: boolean
+}>()
 
-    const paymentAmount = computed(() => {
-      const { cryptocurrency, finalPriceInCrypto } = get(data)
-      return `${finalPriceInCrypto} ${cryptocurrency}`
-    })
+const emit = defineEmits<{ (e: 'pay'): void }>()
 
-    watch(canvas, async (canvas) => {
-      if (!canvas) {
-        return
-      }
-      set(qrText, await createPaymentQR(get(data), canvas))
-    })
+const { data } = toRefs(props)
+const canvas = ref<HTMLCanvasElement>()
+const qrText = ref<string>('')
 
-    const { copy: copyToClipboard } = useClipboard({ source: qrText })
-    const isBtc = computed(() => get(data).cryptocurrency === 'BTC')
-
-    const payWithMetamask = () => emit('pay')
-
-    return {
-      isBtc,
-      refundPolicyAccepted,
-      payWithMetamask,
-      copyToClipboard,
-      canvas,
-      paymentAmount,
-      getPlanName,
-    }
-  },
+const paymentAmount = computed(() => {
+  const { cryptocurrency, finalPriceInCrypto } = get(data)
+  return `${finalPriceInCrypto} ${cryptocurrency}`
 })
+
+watch(canvas, async (canvas) => {
+  if (!canvas) {
+    return
+  }
+  set(qrText, await createPaymentQR(get(data), canvas))
+})
+
+const { copy: copyToClipboard } = useClipboard({ source: qrText })
+const isBtc = computed(() => get(data).cryptocurrency === 'BTC')
+
+const payWithMetamask = () => emit('pay')
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

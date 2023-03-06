@@ -1,14 +1,11 @@
 <template>
-  <jobs-content />
+  <JobsContent />
 </template>
 
-<script lang="ts">
-import { defineComponent, useMeta, useRoute } from '@nuxtjs/composition-api'
+<script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata'
-import { setupOverflow } from '~/composables/overflow'
-import { useRuntimeConfig } from '~/composables/utils'
 
-function metadata(route: string, baseUrl: string) {
+const metadata = (route: string, baseUrl: string) => {
   let title = 'jobs | rotki'
   let description = 'Available roles and positions in the rotki team'
   let path = ''
@@ -31,30 +28,21 @@ function metadata(route: string, baseUrl: string) {
   ] as const
 }
 
-export default defineComponent({
-  name: 'Jobs',
-  middleware: [
-    function ({ redirect, route }) {
-      if (['/jobs', '/jobs/'].includes(route.path)) {
-        redirect('/jobs/backend')
-      }
-    },
-  ],
-  setup() {
-    const route = useRoute()
-    const config = useRuntimeConfig()
-    const [meta, title] = metadata(route.value.path, config.baseUrl)
-    useMeta({
-      title,
-      meta,
-      ...commonAttrs(),
-    })
-    return setupOverflow()
-  },
-  head: {},
+const route = useRoute()
+const config = useRuntimeConfig()
+const [meta, title] = metadata(route.path, config.baseUrl)
+
+useHead({
+  title,
+  meta,
+  ...commonAttrs(),
+})
+
+definePageMeta({
+  redirect: '/jobs/backend',
 })
 </script>
 
 <style lang="scss">
-@import '~assets/css/main';
+@import '@/assets/css/main.scss';
 </style>

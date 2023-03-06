@@ -1,16 +1,16 @@
 <template>
   <button
     :class="{
-      [$style.button]: true,
-      [$style.selected]: selected,
+      [css.button]: true,
+      [css.selected]: selected,
     }"
     :disabled="disabled"
     @click="click"
   >
     <span
       :class="{
-        [$style.text]: true,
-        [$style.selected]: selected,
+        [css.text]: true,
+        [css.selected]: selected,
       }"
     >
       <slot />
@@ -18,32 +18,24 @@
   </button>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    selected: boolean
+    disabled?: boolean
+  }>(),
+  {
+    disabled: false,
+  }
+)
 
-export default defineComponent({
-  name: 'SelectionButton',
-  props: {
-    selected: {
-      required: true,
-      type: Boolean,
-    },
-    disabled: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['click'],
-  setup(_, { emit }) {
-    const click = () => {
-      emit('click')
-    }
-    return {
-      click,
-    }
-  },
-})
+const emit = defineEmits<{ (e: 'click'): void }>()
+
+const click = () => {
+  emit('click')
+}
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

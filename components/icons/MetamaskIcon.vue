@@ -1,67 +1,5 @@
 <template>
-  <svg version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-    <style type="text/css">
-      .st0 {
-        fill: #e2761b;
-        stroke: #e2761b;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st1 {
-        fill: #e4761b;
-        stroke: #e4761b;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st2 {
-        fill: #d7c1b3;
-        stroke: #d7c1b3;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st3 {
-        fill: #233447;
-        stroke: #233447;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st4 {
-        fill: #cd6116;
-        stroke: #cd6116;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st5 {
-        fill: #e4751f;
-        stroke: #e4751f;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st6 {
-        fill: #f6851b;
-        stroke: #f6851b;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st7 {
-        fill: #c0ad9e;
-        stroke: #c0ad9e;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st8 {
-        fill: #161616;
-        stroke: #161616;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .st9 {
-        fill: #763d16;
-        stroke: #763d16;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-    </style>
+  <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
     <g transform="matrix(.17188 0 0 .17188 -3.3797 -2.4172)">
       <polygon class="st0" points="193 65.8 274.1 35.5 174.6 109.4" />
       <polygon class="st1" points="125.6 65.8 44.4 35.5 143.1 110.1" />
@@ -153,10 +91,65 @@
   </svg>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'MetamaskIcon',
-})
-</script>
+<style lang="css">
+.st0 {
+  fill: #e2761b;
+  stroke: #e2761b;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st1 {
+  fill: #e4761b;
+  stroke: #e4761b;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st2 {
+  fill: #d7c1b3;
+  stroke: #d7c1b3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st3 {
+  fill: #233447;
+  stroke: #233447;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st4 {
+  fill: #cd6116;
+  stroke: #cd6116;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st5 {
+  fill: #e4751f;
+  stroke: #e4751f;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st6 {
+  fill: #f6851b;
+  stroke: #f6851b;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st7 {
+  fill: #c0ad9e;
+  stroke: #c0ad9e;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st8 {
+  fill: #161616;
+  stroke: #161616;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.st9 {
+  fill: #763d16;
+  stroke: #763d16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+</style>

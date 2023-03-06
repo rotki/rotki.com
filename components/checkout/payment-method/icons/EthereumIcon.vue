@@ -29,13 +29,3 @@
     </g>
   </svg>
 </template>
-
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-const EthereumIcon = defineComponent({
-  name: 'EthereumIcon',
-})
-
-export default EthereumIcon
-</script>

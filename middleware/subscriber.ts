@@ -1,15 +1,22 @@
-import { Middleware } from '@nuxt/types'
+import { storeToRefs } from 'pinia'
+import { get } from '@vueuse/core'
 import { useMainStore } from '~/store'
 
-export default <Middleware>function ({ redirect }) {
-  const { account } = useMainStore()
-  if (account && account.hasActiveSubscription) {
-    const renewableSubscriptions = account.subscriptions.filter(({ actions }) =>
+export default defineNuxtRouteMiddleware(() => {
+  const { account } = storeToRefs(useMainStore())
+
+  if (!isDefined(account)) {
+    return
+  }
+
+  const { hasActiveSubscription, subscriptions } = get(account)
+  if (hasActiveSubscription) {
+    const renewableSubscriptions = subscriptions.filter(({ actions }) =>
       actions.includes('renew')
     )
 
     if (!renewableSubscriptions) {
-      return redirect('/home')
+      return navigateTo('/home')
     }
   }
-}
+})

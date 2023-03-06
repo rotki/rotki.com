@@ -1,16 +1,16 @@
 <template>
-  <div :class="$style.container">
-    <checkout-title> Premium Plans </checkout-title>
-    <checkout-description>
+  <div :class="css.container">
+    <CheckoutTitle> Premium Plans </CheckoutTitle>
+    <CheckoutDescription>
       <span v-if="vat">The prices include a +{{ vat }}% VAT tax</span>
       <span v-if="!authenticated">
         VAT may apply depending on your jurisdiction
       </span>
-    </checkout-description>
+    </CheckoutDescription>
 
-    <div :class="$style.selection">
-      <div :class="$style.selectable">
-        <selectable-plan
+    <div :class="css.selection">
+      <div :class="css.selectable">
+        <SelectablePlan
           v-for="plan in plans"
           :key="plan.months"
           :plan="plan"
@@ -20,22 +20,22 @@
       </div>
     </div>
 
-    <div :class="$style.hint">
+    <div :class="css.hint">
       <span v-if="selected">
         * When paying with crypto the monthly price is
         {{ cryptoPrice }} €
       </span>
     </div>
 
-    <div :class="$style.continue">
-      <selection-button :disabled="!selected" selected @click="next">
+    <div :class="css.continue">
+      <SelectionButton :disabled="!selected" selected @click="next">
         Continue
-      </selection-button>
+      </SelectionButton>
     </div>
 
     <div class="mt-8">
-      <heading secondary class="mb-4">Notes</heading>
-      <ul :class="$style.notes">
+      <TextHeading secondary class="mb-4">Notes</TextHeading>
+      <ul :class="css.notes">
         <li>
           The selected payment method will be billed the total amount for the
           subscription immediately.
@@ -57,65 +57,40 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  PropType,
-  ref,
-  toRefs,
-  useRouter,
-} from '@nuxtjs/composition-api'
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { Plan } from '~/types'
 import { useMainStore } from '~/store'
 
-export default defineComponent({
-  name: 'PlanSelection',
-  props: {
-    plans: {
-      required: true,
-      type: Array as PropType<Plan[]>,
-    },
-  },
-  setup() {
-    const selected = ref<Plan | null>(null)
-    const isSelected = (plan: Plan) => plan === selected.value
+defineProps<{ plans: Plan[] }>()
 
-    const cryptoPrice = computed(() => {
-      const plan = selected.value
-      if (!plan) {
-        return 0
-      }
-      return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2)
-    })
+const selected = ref<Plan | null>(null)
+const isSelected = (plan: Plan) => plan === selected.value
 
-    const router = useRouter()
-    const next = () => {
-      router.push({
-        path: '/checkout/payment-method',
-        query: {
-          p: selected.value?.months.toString(),
-        },
-      })
-    }
-
-    const store = useMainStore()
-    // pinia#852
-    const { account, authenticated } = toRefs(store)
-    const vat = computed(() => {
-      return account.value?.vat
-    })
-
-    return {
-      next,
-      cryptoPrice,
-      vat,
-      authenticated,
-      isSelected,
-      selected,
-    }
-  },
+const cryptoPrice = computed(() => {
+  const plan = selected.value
+  if (!plan) {
+    return 0
+  }
+  return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2)
 })
+
+const next = () => {
+  navigateTo({
+    path: '/checkout/payment-method',
+    query: {
+      p: selected.value?.months.toString(),
+    },
+  })
+}
+
+const { account, authenticated } = storeToRefs(useMainStore())
+
+const vat = computed(() => {
+  return account.value?.vat
+})
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

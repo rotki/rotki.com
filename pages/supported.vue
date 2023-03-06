@@ -1,30 +1,22 @@
 <template>
-  <page>
+  <PageContainer>
     <div class="mb-8">
-      <supported-exchanges />
-      <supported-defi />
+      <SupportedExchanges />
+      <SupportedDefi />
     </div>
-  </page>
+  </PageContainer>
 </template>
-<script lang="ts">
-import { defineComponent, useMeta } from '@nuxtjs/composition-api'
-import { useRuntimeConfig } from '~/composables/utils'
+<script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata'
 
 const title = 'supported exchanges and DeFi | rotki'
 const description = 'Supported Exchanges and DeFi by Rotki'
+const config = useRuntimeConfig()
+const baseUrl = config.public.baseUrl
 
-export default defineComponent({
-  name: 'Supported',
-  setup() {
-    const config = useRuntimeConfig()
-    const baseUrl = config.baseUrl
-    useMeta({
-      title,
-      meta: getMetadata(title, description, `${baseUrl}/tos`, baseUrl),
-      ...commonAttrs(),
-    })
-  },
-  head: {},
+useHead({
+  title,
+  meta: getMetadata(title, description, `${baseUrl}/tos`, baseUrl),
+  ...commonAttrs(),
 })
 </script>

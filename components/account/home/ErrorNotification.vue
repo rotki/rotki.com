@@ -1,29 +1,24 @@
 <template>
-  <transition name="fade">
-    <notification-message v-if="visible">
-      <div :class="$style.icon">
-        <error-icon />
+  <Transition name="fade">
+    <NotificationMessage v-if="visible">
+      <div :class="css.icon">
+        <ErrorIcon />
       </div>
-      <div :class="$style.errorText">
-        <div :class="$style.errorTitle">
+      <div :class="css.errorText">
+        <div :class="css.errorTitle">
           <slot name="title" />
         </div>
-        <div :class="$style.errorDescription">
+        <div :class="css.errorDescription">
           <slot name="description" />
         </div>
       </div>
-    </notification-message>
-  </transition>
+    </NotificationMessage>
+  </Transition>
 </template>
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
+<script setup lang="ts">
+defineProps<{ visible: boolean }>()
 
-export default defineComponent({
-  name: 'ErrorNotification',
-  props: {
-    visible: { required: true, type: Boolean },
-  },
-})
+const css = useCssModule()
 </script>
 <style lang="scss" module>
 .icon {

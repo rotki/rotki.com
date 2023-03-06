@@ -1,32 +1,25 @@
 <template>
-  <feature id="profitloss-report">
-    <template #title> {{ $t('home.profit_loss_report.title') }}</template>
+  <FeatureContainer id="profitloss-report">
+    <template #title> {{ t('home.profit_loss_report.title') }}</template>
     <template #image>
-      <img
-        :class="$style.image"
-        alt="Cryptocurrencies"
-        src="~/assets/img/crypto.svg"
-      />
+      <img :class="css.image" alt="Cryptocurrencies" src="/img/crypto.svg" />
     </template>
-    <feature-details>
-      <i18n path="home.profit_loss_report.detail">
+    <FeatureDetails>
+      <i18n-t keypath="home.profit_loss_report.detail" scope="global">
         <br />
-      </i18n>
-    </feature-details>
-  </feature>
+      </i18n-t>
+    </FeatureDetails>
+  </FeatureContainer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'ProfitLossReport',
-})
+<script setup lang="ts">
+const { t } = useI18n()
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>
-@import '~assets/css/media';
-@import '~assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .image {
   z-index: -1;

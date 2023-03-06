@@ -1,41 +1,31 @@
 <template>
-  <error-display v-if="error" :message="error" title="Initialization Error" />
+  <ErrorDisplay v-if="error" :message="error" title="Initialization Error" />
   <div v-else>
-    <div id="paypal-button" :class="$style.buttons" />
-    <selected-plan-overview :plan="plan" />
-    <accept-refund-policy v-model="accepted" />
-    <error-notification :visible="mustAcceptRefund">
+    <div id="paypal-button" :class="css.buttons" />
+    <SelectedPlanOverview :plan="plan" />
+    <AcceptRefundPolicy v-model="accepted" />
+    <ErrorNotification :visible="mustAcceptRefund">
       <template #title> Refund policy </template>
       <template #description>
         You need to accept the refund policy before proceeding
       </template>
-    </error-notification>
+    </ErrorNotification>
   </div>
 </template>
-<script lang="ts">
-import {
-  defineComponent,
-  onMounted,
-  onUnmounted,
-  PropType,
-  Ref,
-  ref,
-  toRefs,
-  unref,
-  watch,
-} from '@nuxtjs/composition-api'
-import braintree from 'braintree-web'
+<script setup lang="ts">
+import { client, paypalCheckout } from 'braintree-web'
+import { Ref } from 'vue'
 import { SelectedPlan } from '~/types'
 import { assert } from '~/utils/assert'
 import { logger } from '~/utils/logger'
 
-async function initializeBraintree(
+const initializeBraintree = async (
   token: Ref<string>,
   plan: Ref<SelectedPlan>,
   accepted: Ref<boolean>,
   mustAcceptRefund: Ref<boolean>,
-  emit: (event: 'pay', ...args: any[]) => void
-) {
+  pay: (plan: { months: number; nonce: string }) => void
+) => {
   let paypalActions: any = null
   watch(accepted, (accepted) => {
     if (accepted) {
@@ -45,15 +35,15 @@ async function initializeBraintree(
       paypalActions?.disable()
     }
   })
-  const client = await braintree.client.create({
+  const btClient = await client.create({
     authorization: token.value,
   })
 
-  const paypalCheckout = await braintree.paypalCheckout.create({
-    client,
+  const btPaypaylCheckout = await paypalCheckout.create({
+    client: btClient,
   })
 
-  await paypalCheckout.loadPayPalSDK({
+  await btPaypaylCheckout.loadPayPalSDK({
     currency: 'EUR',
     vault: true,
     commit: true,
@@ -67,7 +57,7 @@ async function initializeBraintree(
     .Buttons({
       createBillingAgreement: () => {
         logger.debug(`Creating payment for ${plan.value.finalPriceInEur} EUR`)
-        return paypalCheckout.createPayment({
+        return btPaypaylCheckout.createPayment({
           flow: 'vault' as any,
           amount: plan.value.finalPriceInEur,
           currency: 'EUR',
@@ -75,8 +65,8 @@ async function initializeBraintree(
       },
       onApprove: async (data) => {
         logger.debug(`User approved PayPal payment`)
-        const token = await paypalCheckout.tokenizePayment(data)
-        emit('pay', {
+        const token = await btPaypaylCheckout.tokenizePayment(data)
+        pay({
           months: plan.value.months,
           nonce: token.nonce,
         })
@@ -104,46 +94,42 @@ async function initializeBraintree(
     })
     .render('#paypal-button')
 
-  return client
+  return btClient
 }
 
-export default defineComponent({
-  name: 'PaypalPayment',
-  props: {
-    token: { required: true, type: String },
-    plan: { required: true, type: Object as PropType<SelectedPlan> },
-  },
-  emits: ['pay'],
-  setup(props, { emit }) {
-    const { token, plan } = toRefs(props)
-    const error = ref('')
-    const accepted = ref(false)
-    const mustAcceptRefund = ref(false)
-    let client: braintree.Client | null = null
-    onMounted(async () => {
-      try {
-        client = await initializeBraintree(
-          token,
-          plan,
-          accepted,
-          mustAcceptRefund,
-          emit
-        )
-      } catch (e: any) {
-        error.value = e.message
-      }
-    })
+const props = defineProps<{
+  token: string
+  plan: SelectedPlan
+}>()
 
-    onUnmounted(async () => {
-      await client?.teardown(() => {})
-    })
-    return {
-      error,
+const emit = defineEmits<{ (e: 'pay', plan: {}): void }>()
+
+const { token, plan } = toRefs(props)
+const error = ref('')
+const accepted = ref(false)
+const mustAcceptRefund = ref(false)
+
+let btClient: braintree.Client | null = null
+
+onMounted(async () => {
+  try {
+    btClient = await initializeBraintree(
+      token,
+      plan,
       accepted,
       mustAcceptRefund,
-    }
-  },
+      (p) => emit('pay', p)
+    )
+  } catch (e: any) {
+    error.value = e.message
+  }
 })
+
+onUnmounted(async () => {
+  await btClient?.teardown(() => {})
+})
+
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

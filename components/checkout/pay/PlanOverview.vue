@@ -1,8 +1,8 @@
 <template>
-  <div :class="$style.content">
-    <div :class="$style.title">Your Plan</div>
-    <div :class="$style.body">
-      <div :class="$style.description">
+  <div :class="css.content">
+    <div :class="css.title">Your Plan</div>
+    <div :class="css.body">
+      <div :class="css.description">
         <slot />
       </div>
       <slot name="body" />
@@ -10,12 +10,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@nuxtjs/composition-api'
-
-export default defineComponent({
-  name: 'PlanOverview',
-})
+<script setup lang="ts">
+const css = useCssModule()
 </script>
 
 <style lang="scss" module>

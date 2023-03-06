@@ -1,9 +1,15 @@
-import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref } from '@nuxtjs/composition-api'
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core'
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { FetchError } from 'ofetch'
+import {
+  DeleteAccountPayload,
+  PasswordChangePayload,
+  ProfilePayload,
+} from '~/types/account'
+import { ActionResult } from '~/types/common'
+import { LoginCredentials } from '~/types/login'
 import {
   Account,
-  ApiError,
   ApiKeys,
   ApiResponse,
   CancelSubscriptionResponse,
@@ -26,44 +32,11 @@ import {
   UpdateProfileResponse,
 } from '~/types'
 import { logger } from '~/utils/logger'
-import { axiosSnakeCaseTransformer, useApi } from '~/plugins/axios'
 import { assert } from '~/utils/assert'
 import { Currency } from '~/composables/plan'
+import { fetchWithCsrf } from '~/utils/api'
 
 const SESSION_TIMEOUT = 3600000
-
-export interface LoginCredentials {
-  readonly username: string
-  readonly password: string
-}
-
-export interface PasswordChangePayload {
-  readonly currentPassword: string
-  readonly newPassword: string
-  readonly passwordConfirmation: string
-}
-
-export interface ProfilePayload {
-  readonly githubUsername: string
-  readonly firstName?: string
-  readonly lastName?: string
-  readonly companyName?: string
-  readonly vatId?: string
-  readonly address1?: string
-  readonly address2?: string
-  readonly city?: string
-  readonly postcode?: string
-  readonly country?: string
-}
-
-export type DeleteAccountPayload = {
-  username: string
-}
-
-export type ActionResult = {
-  readonly success: boolean
-  readonly message?: ApiError
-}
 
 export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false)
@@ -71,21 +44,17 @@ export const useMainStore = defineStore('main', () => {
   const plans = ref<Plan[] | null>(null)
   const authenticatedOnPlansLoad = ref(false)
   const cancellationError = ref('')
-  const $api = useApi()
 
-  const getAccount = async () => {
+  const getAccount = async (): Promise<void> => {
     try {
-      const response = await $api.get<ApiResponse<Account>>(
+      const response = await fetchWithCsrf<ApiResponse<Account>>(
         '/webapi/account/',
         {
-          validateStatus: (status) => [200, 401].includes(status),
+          method: 'get',
         }
       )
-
-      if (response.status === 200) {
-        set(authenticated, true)
-        set(account, Account.parse(response.data.result))
-      }
+      set(authenticated, true)
+      set(account, Account.parse(response.result))
     } catch (e) {
       logger.error(e)
     }
@@ -96,47 +65,44 @@ export const useMainStore = defineStore('main', () => {
     password,
   }: LoginCredentials): Promise<string> => {
     try {
-      const response = await $api.post(
-        '/webapi/login/',
-        {
+      await fetchWithCsrf<string>('/webapi/login/', {
+        method: 'post',
+        credentials: 'include',
+        body: {
           username,
           password,
         },
-        {
-          withCredentials: true,
-          validateStatus: (status) => [200, 400].includes(status),
-        }
-      )
-      if (response.status === 400) {
-        set(authenticated, false)
-        return response.data.message
-      } else {
-        await getAccount()
-        set(authenticated, true)
-        return ''
-      }
+      })
+      await getAccount()
+      set(authenticated, true)
+      return ''
     } catch (e: any) {
-      return e.message
+      let message = e.message
+      if (e instanceof FetchError) {
+        const status = e?.status || -1
+        if (status === 400 && e.response) {
+          message = e.data.message || ''
+        }
+      }
+      set(authenticated, false)
+      return message
     }
   }
 
   const updateKeys = async () => {
     try {
-      const response = await $api.patch<ApiResponse<ApiKeys>>(
+      const response = await fetchWithCsrf<ApiResponse<ApiKeys>>(
         '/webapi/regenerate-keys/',
-        {},
         {
-          validateStatus: (status) => [200, 401].includes(status),
+          method: 'patch',
         }
       )
-      if (response.status === 200) {
-        const acc = get(account)
-        assert(acc)
-        set(account, {
-          ...acc,
-          ...ApiKeys.parse(response.data.result),
-        })
-      }
+      const acc = get(account)
+      assert(acc)
+      set(account, {
+        ...acc,
+        ...ApiKeys.parse(response.result),
+      })
     } catch (e) {
       logger.error(e)
     }
@@ -146,30 +112,30 @@ export const useMainStore = defineStore('main', () => {
     payload: PasswordChangePayload
   ): Promise<ActionResult> => {
     try {
-      const response = await $api.patch<ChangePasswordResponse>(
+      const response = await fetchWithCsrf<ChangePasswordResponse>(
         '/webapi/change-password/',
-        payload,
         {
-          validateStatus: (status) => [200, 400].includes(status),
+          method: 'patch',
+          body: payload,
         }
       )
-      const data = ChangePasswordResponse.parse(response.data)
-      if (response.status === 200) {
-        return {
-          success: data.result ?? false,
-          message: '',
-        }
-      } else {
-        return {
-          success: false,
-          message: data.message,
-        }
+      const data = ChangePasswordResponse.parse(response)
+      return {
+        success: data.result ?? false,
+        message: '',
       }
     } catch (e: any) {
       logger.error(e)
+      let message = e.message
+      if (e instanceof FetchError) {
+        if (e.status === 400) {
+          const data = ChangePasswordResponse.parse(e.data)
+          message = data.message
+        }
+      }
       return {
         success: false,
-        message: e.message,
+        message,
       }
     }
   }
@@ -178,41 +144,39 @@ export const useMainStore = defineStore('main', () => {
     payload: ProfilePayload
   ): Promise<ActionResult> => {
     try {
-      const response = await $api.patch<UpdateProfileResponse>(
+      const response = await fetchWithCsrf<UpdateProfileResponse>(
         '/webapi/account/',
-        payload,
         {
-          validateStatus: (status) => [200, 400].includes(status),
+          method: 'patch',
+          body: payload,
         }
       )
 
-      const { result, message } = UpdateProfileResponse.parse(response.data)
-      if (response.status === 200) {
-        const acc = get(account)
-        assert(result)
-        assert(acc)
-        const country = acc.address?.country ?? ''
-        set(account, {
-          ...acc,
-          ...result,
-        })
+      const { result } = UpdateProfileResponse.parse(response)
+      const acc = get(account)
+      assert(result)
+      assert(acc)
+      const country = acc.address?.country ?? ''
+      set(account, {
+        ...acc,
+        ...result,
+      })
 
-        if (payload.country !== country) {
-          await getAccount()
-        }
-        return { success: true }
-      } else {
-        assert(message)
-        return {
-          success: false,
-          message,
-        }
+      if (payload.country !== country) {
+        await getAccount()
       }
+      return { success: true }
     } catch (e: any) {
       logger.error(e)
+      let message = e.message
+      if (e instanceof FetchError) {
+        if (e.status === 400) {
+          message = UpdateProfileResponse.parse(e.data).message
+        }
+      }
       return {
         success: false,
-        message: e.message,
+        message,
       }
     }
   }
@@ -221,25 +185,28 @@ export const useMainStore = defineStore('main', () => {
     payload: DeleteAccountPayload
   ): Promise<ActionResult> => {
     try {
-      const response = await $api.delete<DeleteAccountResponse>(
+      const response = await fetchWithCsrf<DeleteAccountResponse>(
         '/webapi/account/',
-
         {
-          data: payload,
-          validateStatus: (status) => [200, 400].includes(status),
+          body: payload,
+          method: 'delete',
         }
       )
 
-      const data = DeleteAccountResponse.parse(response.data)
+      const data = DeleteAccountResponse.parse(response)
       return {
         success: data.result ?? false,
         message: data.message,
       }
     } catch (e: any) {
+      let message = e.message
+      if (e instanceof FetchError && e.status === 400) {
+        message = DeleteAccountResponse.parse(e.data).message
+      }
       logger.error(e)
       return {
         success: false,
-        message: e.message,
+        message,
       }
     }
   }
@@ -272,27 +239,25 @@ export const useMainStore = defineStore('main', () => {
 
     try {
       updateSub([], 'Cancelled', 'Never')
-      const response = await $api.delete<CancelSubscriptionResponse>(
+      const response = await fetchWithCsrf<CancelSubscriptionResponse>(
         `/webapi/subscription/${subscription.identifier}`,
         {
-          validateStatus: (status) => [200, 404].includes(status),
+          method: 'delete',
         }
       )
-      const data = CancelSubscriptionResponse.parse(response.data)
+      const data = CancelSubscriptionResponse.parse(response)
       if (data.result) {
         await getAccount()
-      } else {
-        updateSub(actions, status, nextActionDate)
-        logger.error(data.message)
-        stop()
-        set(cancellationError, data.message)
-        start()
       }
     } catch (e: any) {
+      let message = e.message
+      if (e instanceof FetchError && e.status === 404) {
+        message = CancelSubscriptionResponse.parse(e.data).message
+      }
       updateSub(actions, status, nextActionDate)
       logger.error(e)
       stop()
-      set(cancellationError, e.message)
+      set(cancellationError, message)
       start()
     }
   }
@@ -304,8 +269,10 @@ export const useMainStore = defineStore('main', () => {
     }
 
     try {
-      const response = await $api.get<PremiumResponse>('/webapi/premium')
-      const data = PremiumResponse.parse(response.data)
+      const response = await fetchWithCsrf<PremiumResponse>('/webapi/premium', {
+        method: 'get',
+      })
+      const data = PremiumResponse.parse(response)
       set(plans, data.result.plans)
       set(authenticatedOnPlansLoad, get(authenticated))
     } catch (e: any) {
@@ -315,10 +282,13 @@ export const useMainStore = defineStore('main', () => {
 
   const checkout = async (plan: number): Promise<Result<CardCheckout>> => {
     try {
-      const response = await $api.get<CardCheckoutResponse>(
-        `/webapi/checkout/card/${plan}`
+      const response = await fetchWithCsrf<CardCheckoutResponse>(
+        `/webapi/checkout/card/${plan}`,
+        {
+          method: 'get',
+        }
       )
-      const data = CardCheckoutResponse.parse(response.data)
+      const data = CardCheckoutResponse.parse(response)
       return {
         isError: false,
         result: data.result,
@@ -334,32 +304,30 @@ export const useMainStore = defineStore('main', () => {
 
   const pay = async (request: CardPaymentRequest): Promise<Result<true>> => {
     try {
-      const response = await $api.post<CardPaymentResponse>(
+      const response = await fetchWithCsrf<CardPaymentResponse>(
         '/webapi/payment/btr',
-        axiosSnakeCaseTransformer(request),
         {
-          validateStatus: (status) => [200, 400].includes(status),
+          method: 'post',
+          body: request,
         }
       )
       getAccount().then()
 
-      const data = CardPaymentResponse.parse(response.data)
-
-      if (response.status !== 200) {
-        return {
-          isError: true,
-          error: new Error(data.message),
-        }
-      }
+      const data = CardPaymentResponse.parse(response)
+      assert(data.result)
       return {
         isError: false,
         result: true,
       }
     } catch (e: any) {
+      let error = e
+      if (e instanceof FetchError && e.status === 400) {
+        error = new Error(CardPaymentResponse.parse(e.data).message)
+      }
       logger.error(e)
       return {
         isError: true,
-        error: e,
+        error,
       }
     }
   }
@@ -370,34 +338,36 @@ export const useMainStore = defineStore('main', () => {
     subscriptionId?: string
   ): Promise<Result<CryptoPayment>> => {
     try {
-      const response = await $api.post<CryptoPaymentResponse>(
+      const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/payment/crypto',
-        axiosSnakeCaseTransformer({
-          currency,
-          months: plan,
-          subscriptionId,
-        }),
         {
-          validateStatus: (status) => [200, 400].includes(status),
+          method: 'post',
+          body: convertKeys(
+            {
+              currency,
+              months: plan,
+              subscriptionId,
+            },
+            false,
+            false
+          ),
         }
       )
 
-      const { result, message } = CryptoPaymentResponse.parse(response.data)
-      if (result) {
-        return {
-          result,
-          isError: false,
-        }
-      } else {
-        return {
-          error: new Error(message?.toString()),
-          isError: true,
-        }
+      const { result } = CryptoPaymentResponse.parse(response)
+      assert(result)
+      return {
+        result,
+        isError: false,
       }
     } catch (e: any) {
+      let error = e
+      if (e instanceof FetchError && e.status === 400) {
+        error = new Error(CardPaymentResponse.parse(e.data).message)
+      }
       logger.error(e)
       return {
-        error: e,
+        error,
         isError: true,
       }
     }
@@ -407,13 +377,13 @@ export const useMainStore = defineStore('main', () => {
     subscriptionId?: string
   ): Promise<Result<PendingCryptoPayment>> => {
     try {
-      const response = await $api.get<PendingCryptoPaymentResponse>(
-        'webapi/payment/pending',
+      const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(
+        '/webapi/payment/pending',
         {
-          params: axiosSnakeCaseTransformer({ subscriptionId }),
+          params: convertKeys({ subscriptionId }, false, false),
         }
       )
-      const data = PendingCryptoPaymentResponse.parse(response.data)
+      const data = PendingCryptoPaymentResponse.parse(response)
       if (data.result) {
         return {
           result: data.result,
@@ -436,10 +406,13 @@ export const useMainStore = defineStore('main', () => {
 
   const markTransactionStarted = async (): Promise<Result<boolean>> => {
     try {
-      const response = await $api.patch<PendingCryptoPaymentResultResponse>(
-        'webapi/payment/pending'
+      const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
+        'webapi/payment/pending',
+        {
+          method: 'patch',
+        }
       )
-      const data = PendingCryptoPaymentResultResponse.parse(response.data)
+      const data = PendingCryptoPaymentResultResponse.parse(response)
       if (data.result) {
         return {
           result: data.result,
@@ -466,10 +439,13 @@ export const useMainStore = defineStore('main', () => {
     subscriptionId?: string
   ): Promise<Result<CryptoPayment>> => {
     try {
-      const response = await $api.delete<PendingCryptoPaymentResultResponse>(
-        'webapi/payment/pending'
+      const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
+        'webapi/payment/pending',
+        {
+          method: 'delete',
+        }
       )
-      const data = PendingCryptoPaymentResultResponse.parse(response.data)
+      const data = PendingCryptoPaymentResultResponse.parse(response)
       if (data.result) {
         const payment = await cryptoPayment(plan, currency, subscriptionId)
         if (payment.isError) {
@@ -502,11 +478,13 @@ export const useMainStore = defineStore('main', () => {
     SESSION_TIMEOUT
   )
 
-  const logout = async (callApi: boolean = false) => {
+  const logout = async (callApi = false): Promise<void> => {
     stopCountdown()
     if (callApi) {
       try {
-        await $api.post<UpdateProfileResponse>('/webapi/logout/')
+        await fetchWithCsrf<UpdateProfileResponse>('/webapi/logout/', {
+          method: 'post',
+        })
       } catch (e) {
         logger.error(e)
       }
@@ -547,8 +525,6 @@ export const useMainStore = defineStore('main', () => {
   }
 })
 
-// @ts-ignore
-if (module.hot) {
-  // @ts-ignore
-  module.hot.accept(acceptHMRUpdate(useMainStore, module.hot))
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useMainStore, import.meta.hot))
 }
