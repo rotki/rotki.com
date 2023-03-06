@@ -69,7 +69,6 @@ export default defineNuxtConfig({
 
   modules: [
     // '@nuxtjs/recaptcha',
-    // '@nuxtjs/sitemap',
     '@nuxt/devtools',
     '@nuxtjs/robots',
     '@nuxtjs/i18n',
