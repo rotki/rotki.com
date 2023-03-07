@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const css = useCssModule()
+const css = useCssModule();
 </script>
 
 <template>

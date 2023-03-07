@@ -1,18 +1,20 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    href: string
-    target?: string
-    rel?: string
+    href: string;
+    target?: string;
+    rel?: string;
   }>(),
+
   {
     href: '#',
     target: '_self',
+
     rel: undefined,
   }
-)
+);
 
-const css = useCssModule()
+const css = useCssModule();
 </script>
 
 <template>

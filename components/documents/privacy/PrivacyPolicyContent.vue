@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { data } = await useAsyncData('/', () =>
   queryContent('/documents/privacy-policy').findOne()
-)
+);
 </script>
 
 <template>

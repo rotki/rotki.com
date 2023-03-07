@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { useRuntimeConfig } from '#imports'
+import { useRuntimeConfig } from '#imports';
 
 withDefaults(
   defineProps<{
-    id?: string
+    id?: string;
   }>(),
   {
     id: undefined,
   }
-)
+);
 
-const { anchorLinks } = useRuntimeConfig().public.content
-const heading = 2
+const { anchorLinks } = useRuntimeConfig().public.content;
+const heading = 2;
 
 const generate =
-  anchorLinks?.depth >= heading && !anchorLinks?.exclude.includes(heading)
+  anchorLinks?.depth >= heading && !anchorLinks?.exclude.includes(heading);
 
-const css = useCssModule()
+const css = useCssModule();
 </script>
 
 <template>

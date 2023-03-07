@@ -1,14 +1,14 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    small?: boolean
+    small?: boolean;
   }>(),
   {
     small: false,
   }
-)
+);
 
-const css = useCssModule()
+const css = useCssModule();
 </script>
 
 <template>
