@@ -99,8 +99,8 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '~/assets/css/media';
-@import '~/assets/css/main';
+@import '@/assets/css/media.scss';
+@import '@/assets/css/main.scss';
 
 .subheading {
   @apply font-serif text-primary2 font-medium font-bold;

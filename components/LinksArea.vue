@@ -53,7 +53,7 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '~/assets/css/media.scss';
+@import '@/assets/css/media.scss';
 
 .row {
   @apply flex flex-row justify-around;
