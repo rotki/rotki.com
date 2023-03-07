@@ -1,9 +1,3 @@
-<template>
-  <NuxtLink :class="css.link" :href="href" :target="target" :rel="rel">
-    <slot />
-  </NuxtLink>
-</template>
-
 <script setup lang="ts">
 withDefaults(
   defineProps<{
@@ -20,6 +14,12 @@ withDefaults(
 
 const css = useCssModule()
 </script>
+
+<template>
+  <NuxtLink :class="css.link" :href="href" :target="target" :rel="rel">
+    <slot />
+  </NuxtLink>
+</template>
 
 <style module lang="scss">
 .link {

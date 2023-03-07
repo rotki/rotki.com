@@ -1,16 +1,3 @@
-<template>
-  <ul
-    :class="[
-      css.list,
-      {
-        [css.small]: small,
-      },
-    ]"
-  >
-    <slot />
-  </ul>
-</template>
-
 <script setup lang="ts">
 withDefaults(
   defineProps<{
@@ -23,6 +10,19 @@ withDefaults(
 
 const css = useCssModule()
 </script>
+
+<template>
+  <ul
+    :class="[
+      css.list,
+      {
+        [css.small]: small,
+      },
+    ]"
+  >
+    <slot />
+  </ul>
+</template>
 
 <style lang="scss" module>
 .list {

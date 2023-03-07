@@ -1,12 +1,3 @@
-<template>
-  <h2 :id="id" :class="css.heading">
-    <a v-if="id && generate" :href="`#${id}`">
-      <slot />
-    </a>
-    <slot v-else />
-  </h2>
-</template>
-
 <script setup lang="ts">
 import { useRuntimeConfig } from '#imports'
 
@@ -27,6 +18,15 @@ const generate =
 
 const css = useCssModule()
 </script>
+
+<template>
+  <h2 :id="id" :class="css.heading">
+    <a v-if="id && generate" :href="`#${id}`">
+      <slot />
+    </a>
+    <slot v-else />
+  </h2>
+</template>
 
 <style lang="scss" module>
 .heading {

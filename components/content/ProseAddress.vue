@@ -1,12 +1,12 @@
+<script setup lang="ts">
+const css = useCssModule()
+</script>
+
 <template>
   <address :class="css.address">
     <ContentSlot :use="$slots.default" unwrap="p" />
   </address>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .address {

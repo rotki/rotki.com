@@ -1,12 +1,3 @@
-<template>
-  <h3 :id="id" :class="css.heading">
-    <a v-if="id && generate" :href="`#${id}`">
-      <slot />
-    </a>
-    <slot v-else />
-  </h3>
-</template>
-
 <script setup lang="ts">
 withDefaults(
   defineProps<{
@@ -25,6 +16,15 @@ const generate =
 
 const css = useCssModule()
 </script>
+
+<template>
+  <h3 :id="id" :class="css.heading">
+    <a v-if="id && generate" :href="`#${id}`">
+      <slot />
+    </a>
+    <slot v-else />
+  </h3>
+</template>
 
 <style lang="scss" module>
 .heading {

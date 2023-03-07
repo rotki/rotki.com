@@ -1,16 +1,3 @@
-<template>
-  <p
-    :class="[
-      css.text,
-      {
-        [css.small]: small,
-      },
-    ]"
-  >
-    <slot />
-  </p>
-</template>
-
 <script setup lang="ts">
 withDefaults(
   defineProps<{
@@ -23,6 +10,19 @@ withDefaults(
 
 const css = useCssModule()
 </script>
+
+<template>
+  <p
+    :class="[
+      css.text,
+      {
+        [css.small]: small,
+      },
+    ]"
+  >
+    <slot />
+  </p>
+</template>
 
 <style lang="scss" module>
 .text {
