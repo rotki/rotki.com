@@ -1,3 +1,10 @@
+<script setup lang="ts">
+defineProps<{
+  title: string;
+  message: string;
+}>();
+</script>
+
 <template>
   <BaseDisplay :message="message" :title="title" status="error">
     <template #icon>
@@ -6,10 +13,3 @@
     <slot />
   </BaseDisplay>
 </template>
-
-<script setup lang="ts">
-defineProps<{
-  title: string
-  message: string
-}>()
-</script>

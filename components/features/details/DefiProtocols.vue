@@ -1,3 +1,18 @@
+<script setup lang="ts">
+const defi = [
+  'MakerDAO',
+  'Aave',
+  'Compound',
+  'Yearn vaults',
+  'Uniswap',
+  'Balancer',
+  'and many more...',
+];
+
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <FeatureContainer id="defi">
     <template #title> {{ t('home.defi.title') }} </template>
@@ -18,21 +33,6 @@
     />
   </FeatureContainer>
 </template>
-
-<script setup lang="ts">
-const defi = [
-  'MakerDAO',
-  'Aave',
-  'Compound',
-  'Yearn vaults',
-  'Uniswap',
-  'Balancer',
-  'and many more...',
-]
-
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

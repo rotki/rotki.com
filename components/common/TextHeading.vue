@@ -1,3 +1,20 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    subheading?: boolean;
+    noMargin?: boolean;
+    secondary?: boolean;
+  }>(),
+  {
+    subheading: false,
+    noMargin: false,
+    secondary: false,
+  }
+);
+
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -10,23 +27,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    subheading?: boolean
-    noMargin?: boolean
-    secondary?: boolean
-  }>(),
-  {
-    subheading: false,
-    noMargin: false,
-    secondary: false,
-  }
-)
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

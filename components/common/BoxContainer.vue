@@ -1,3 +1,11 @@
+<script setup lang="ts">
+const stop = (event: any) => {
+  event.stopPropagation();
+};
+const slots = useSlots();
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.box" @click="stop($event)">
     <div v-if="slots.label" :class="css.label">
@@ -7,14 +15,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-const stop = (event: any) => {
-  event.stopPropagation()
-}
-const slots = useSlots()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

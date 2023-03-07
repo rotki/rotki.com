@@ -1,3 +1,89 @@
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'sticky', value: boolean): void }>();
+
+type Section = {
+  id: string;
+  name: string;
+  wide?: boolean;
+};
+
+const sections: Section[] = [
+  {
+    id: '#dashboard',
+    name: 'Dashboard',
+  },
+  {
+    id: '#exchanges',
+    name: 'Exchanges',
+  },
+  {
+    id: '#defi',
+    name: 'DeFi',
+  },
+  {
+    id: '#defi-details',
+    name: 'Ethereum protocols',
+    wide: true,
+  },
+  {
+    id: '#profitloss-report',
+    name: 'Profit/loss report',
+    wide: true,
+  },
+];
+
+const sticky = ref(false);
+const visible = ref(true);
+const active = ref('');
+const offsetTop = ref(0);
+const premium = ref<HTMLElement | null>(null);
+const menu = ref<HTMLDivElement | null>(null);
+const offsets = ref<Record<string, number>>({});
+
+const sectionIds = sections.map(({ id }) => id).reverse();
+
+const handleScroll = () => {
+  const offset = window.scrollY;
+  sticky.value = offset >= offsetTop.value;
+  visible.value = offset < (premium.value?.offsetTop ?? 0);
+  emit('sticky', sticky.value);
+
+  if (!visible.value && !sticky.value) {
+    return;
+  }
+
+  for (const sectionId of sectionIds) {
+    if (offsets.value[sectionId] <= offset) {
+      active.value = sectionId;
+      break;
+    }
+  }
+};
+
+onMounted(() => {
+  offsetTop.value = menu.value?.offsetTop ?? 0;
+
+  for (const section of sectionIds) {
+    const sectionElement = document.getElementById(section.replace('#', ''));
+    offsets.value = {
+      ...offsets.value,
+      [section]: sectionElement?.offsetTop ?? 0,
+    };
+  }
+});
+
+onBeforeMount(() => {
+  document.addEventListener('scroll', handleScroll);
+  premium.value = document.getElementById('premium');
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('scroll', handleScroll);
+});
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div ref="menu" :class="css.menu">
@@ -35,93 +121,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const emit = defineEmits<{ (e: 'sticky', value: boolean): void }>()
-
-type Section = {
-  id: string
-  name: string
-  wide?: boolean
-}
-
-const sections: Section[] = [
-  {
-    id: '#dashboard',
-    name: 'Dashboard',
-  },
-  {
-    id: '#exchanges',
-    name: 'Exchanges',
-  },
-  {
-    id: '#defi',
-    name: 'DeFi',
-  },
-  {
-    id: '#defi-details',
-    name: 'Ethereum protocols',
-    wide: true,
-  },
-  {
-    id: '#profitloss-report',
-    name: 'Profit/loss report',
-    wide: true,
-  },
-]
-
-const sticky = ref(false)
-const visible = ref(true)
-const active = ref('')
-const offsetTop = ref(0)
-const premium = ref<HTMLElement | null>(null)
-const menu = ref<HTMLDivElement | null>(null)
-const offsets = ref<Record<string, number>>({})
-
-const sectionIds = sections.map(({ id }) => id).reverse()
-
-const handleScroll = () => {
-  const offset = window.scrollY
-  sticky.value = offset >= offsetTop.value
-  visible.value = offset < (premium.value?.offsetTop ?? 0)
-  emit('sticky', sticky.value)
-
-  if (!visible.value && !sticky.value) {
-    return
-  }
-
-  for (const sectionId of sectionIds) {
-    if (offsets.value[sectionId] <= offset) {
-      active.value = sectionId
-      break
-    }
-  }
-}
-
-onMounted(() => {
-  offsetTop.value = menu.value?.offsetTop ?? 0
-
-  for (let i = 0; i < sectionIds.length; i++) {
-    const section = sectionIds[i]
-    const sectionElement = document.getElementById(section.replace('#', ''))
-    offsets.value = {
-      ...offsets.value,
-      [section]: sectionElement?.offsetTop ?? 0,
-    }
-  }
-})
-
-onBeforeMount(() => {
-  document.addEventListener('scroll', handleScroll)
-  premium.value = document.getElementById('premium')
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('scroll', handleScroll)
-})
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

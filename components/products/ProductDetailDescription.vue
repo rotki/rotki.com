@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.container">
     <div v-if="$slots.left" :class="css.left">
@@ -13,10 +17,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .container {

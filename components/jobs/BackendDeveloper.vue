@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div>
     <TextHeading>Python Backend Developer</TextHeading>
@@ -139,10 +143,6 @@
     </TextParagraph>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style module>
 .points {

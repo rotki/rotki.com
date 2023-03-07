@@ -1,3 +1,11 @@
+<script setup lang="ts">
+defineProps<{ selected: boolean }>();
+
+const emit = defineEmits<{ (e: 'click'): void }>();
+
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -12,18 +20,10 @@
       <slot />
     </div>
     <div :class="css.text">
-      <slot name="label"></slot>
+      <slot name="label" />
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-defineProps<{ selected: boolean }>()
-
-const emit = defineEmits<{ (e: 'click'): void }>()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .content {

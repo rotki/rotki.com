@@ -1,3 +1,18 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    noMargin?: boolean;
+    landing?: boolean;
+  }>(),
+  {
+    noMargin: false,
+    landing: false,
+  }
+);
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div
@@ -16,21 +31,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    noMargin?: boolean
-    landing?: boolean
-  }>(),
-  {
-    noMargin: false,
-    landing: false,
-  }
-)
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

@@ -1,3 +1,17 @@
+<script setup lang="ts">
+const status = ['success', 'error', 'neutral'] as const;
+
+type Status = (typeof status)[number];
+
+defineProps<{
+  status: Status;
+  message: string;
+  title: string;
+}>();
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.container">
     <div :class="css.wrapper">
@@ -19,20 +33,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const status = ['success', 'error', 'neutral'] as const
-
-type Status = (typeof status)[number]
-
-defineProps<{
-  status: Status
-  message: string
-  title: string
-}>()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .header {

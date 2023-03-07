@@ -1,9 +1,3 @@
-<template>
-  <div class="py-12">
-    <TextHeading>{{ t('supported_exchanges.title') }}</TextHeading>
-    <SupportedRowWrapper :items="exchanges" />
-  </div>
-</template>
 <script setup lang="ts">
 const exchanges = [
   {
@@ -78,7 +72,13 @@ const exchanges = [
     name: 'Independent Reserve',
     img: '/img/exchanges/independentreserve.svg',
   },
-]
+];
 
-const { t } = useI18n()
+const { t } = useI18n();
 </script>
+<template>
+  <div class="py-12">
+    <TextHeading>{{ t('supported_exchanges.title') }}</TextHeading>
+    <SupportedRowWrapper :items="exchanges" />
+  </div>
+</template>

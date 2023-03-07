@@ -1,3 +1,15 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    full?: boolean;
+  }>(),
+  {
+    full: false,
+  }
+);
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -20,18 +32,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    full?: boolean
-  }>(),
-  {
-    full: false,
-  }
-)
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .container {

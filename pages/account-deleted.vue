@@ -1,9 +1,5 @@
-<template>
-  <AccountDeletedPage />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 useHead({
   title: 'account deleted | rotki',
@@ -16,8 +12,12 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <AccountDeletedPage />
+</template>
 
 <style lang="scss">
 @import '@/assets/css/media.scss';

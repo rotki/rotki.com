@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <div>
     <div :class="css.space">
@@ -22,11 +27,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

@@ -1,3 +1,40 @@
+<script setup lang="ts">
+import { useMainStore } from '~/store';
+
+const props = withDefaults(defineProps<{ modal?: boolean }>(), {
+  modal: false,
+});
+
+const emit = defineEmits<{ (e: 'complete'): void }>();
+
+const { modal } = toRefs(props);
+const username = ref('');
+const password = ref('');
+const showPassword = ref(false);
+const error = ref('');
+
+const valid = computed(() => !!unref(username) && !!unref(password));
+
+const { login } = useMainStore();
+
+const performLogin = async () => {
+  error.value = await login({
+    username: username.value,
+    password: password.value,
+  });
+
+  if (!error.value) {
+    if (modal.value) {
+      emit('complete');
+    } else {
+      await navigateTo('/home');
+    }
+  }
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <BoxContainer>
     <template #label>Sign in</template>
@@ -70,43 +107,6 @@
     </div>
   </BoxContainer>
 </template>
-
-<script setup lang="ts">
-import { useMainStore } from '~/store'
-
-const props = withDefaults(defineProps<{ modal?: boolean }>(), {
-  modal: false,
-})
-
-const emit = defineEmits<{ (e: 'complete'): void }>()
-
-const { modal } = toRefs(props)
-const username = ref('')
-const password = ref('')
-const showPassword = ref(false)
-const error = ref('')
-
-const valid = computed(() => !!unref(username) && !!unref(password))
-
-const { login } = useMainStore()
-
-const performLogin = async () => {
-  error.value = await login({
-    username: username.value,
-    password: password.value,
-  })
-
-  if (!error.value) {
-    if (modal.value) {
-      emit('complete')
-    } else {
-      await navigateTo('/home')
-    }
-  }
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

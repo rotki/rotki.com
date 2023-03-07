@@ -1,3 +1,18 @@
+<script setup lang="ts">
+import { get } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
+
+const store = useMainStore();
+const { account } = storeToRefs(store);
+const hasActiveSubscription = computed(
+  () => !!get(account)?.hasActiveSubscription
+);
+const goToCheckoutPlan = () => navigateTo('/checkout/plan');
+const goToAccount = () => navigateTo('/home');
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer :center-vertically="false">
     <template #title> Premium Features </template>
@@ -232,21 +247,6 @@
     </PageContent>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-import { get } from '@vueuse/core'
-import { storeToRefs } from 'pinia'
-import { useMainStore } from '~/store'
-
-const store = useMainStore()
-const { account } = storeToRefs(store)
-const hasActiveSubscription = computed(
-  () => !!get(account)?.hasActiveSubscription
-)
-const goToCheckoutPlan = () => navigateTo('/checkout/plan')
-const goToAccount = () => navigateTo('/home')
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

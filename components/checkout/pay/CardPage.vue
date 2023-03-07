@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { token, step, plan, pending, submit } = useBraintree();
+</script>
+
 <template>
   <PaymentFrame :loading="!token" :step="step">
     <CardPayment
@@ -9,7 +13,3 @@
     />
   </PaymentFrame>
 </template>
-
-<script setup lang="ts">
-const { token, step, plan, pending, submit } = useBraintree()
-</script>

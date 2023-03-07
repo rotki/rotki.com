@@ -1,11 +1,11 @@
+<script setup lang="ts">
+const css = useCssModule();
+const attrs = useAttrs();
+</script>
+
 <template>
   <span :class="css.anchor" v-bind="attrs" />
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-const attrs = useAttrs()
-</script>
 
 <style module>
 .anchor {

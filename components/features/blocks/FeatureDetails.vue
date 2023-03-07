@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const css = useCssModule();
+const slots = useSlots();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div :class="css.column">
@@ -10,11 +15,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-const slots = useSlots()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

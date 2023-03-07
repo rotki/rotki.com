@@ -1,3 +1,27 @@
+<script setup lang="ts">
+import { get, set } from '@vueuse/core';
+import { fetchWithCsrf } from '~/utils/api';
+
+const route = useRoute();
+const { uid, token } = route.params;
+const validating = ref(true);
+const isValid = ref(false);
+
+const validateToken = async () => {
+  const response = await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`);
+
+  if (!get(response).error) {
+    set(isValid, true);
+  }
+
+  set(validating, false);
+};
+
+onBeforeMount(async () => await validateToken());
+
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer>
     <template #title> Account Activation </template>
@@ -24,30 +48,6 @@
     </div>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-import { get, set } from '@vueuse/core'
-import { fetchWithCsrf } from '~/utils/api'
-
-const route = useRoute()
-const { uid, token } = route.params
-const validating = ref(true)
-const isValid = ref(false)
-
-const validateToken = async () => {
-  const response = await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`)
-
-  if (!get(response).error) {
-    set(isValid, true)
-  }
-
-  set(validating, false)
-}
-
-onBeforeMount(async () => await validateToken())
-
-const css = useCssModule()
-</script>
 
 <style module lang="scss">
 .content {

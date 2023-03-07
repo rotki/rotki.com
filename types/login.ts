@@ -1,4 +1,4 @@
 export interface LoginCredentials {
-  readonly username: string
-  readonly password: string
+  readonly username: string;
+  readonly password: string;
 }

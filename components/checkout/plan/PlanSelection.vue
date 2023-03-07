@@ -1,3 +1,39 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { type Plan } from '~/types';
+import { useMainStore } from '~/store';
+
+defineProps<{ plans: Plan[] }>();
+
+const selected = ref<Plan | null>(null);
+const isSelected = (plan: Plan) => plan === selected.value;
+
+const cryptoPrice = computed(() => {
+  const plan = selected.value;
+  if (!plan) {
+    return 0;
+  }
+  return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2);
+});
+
+const next = () => {
+  navigateTo({
+    path: '/checkout/payment-method',
+    query: {
+      p: selected.value?.months.toString(),
+    },
+  });
+};
+
+const { account, authenticated } = storeToRefs(useMainStore());
+
+const vat = computed(() => {
+  return account.value?.vat;
+});
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.container">
     <CheckoutTitle> Premium Plans </CheckoutTitle>
@@ -56,42 +92,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { Plan } from '~/types'
-import { useMainStore } from '~/store'
-
-defineProps<{ plans: Plan[] }>()
-
-const selected = ref<Plan | null>(null)
-const isSelected = (plan: Plan) => plan === selected.value
-
-const cryptoPrice = computed(() => {
-  const plan = selected.value
-  if (!plan) {
-    return 0
-  }
-  return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2)
-})
-
-const next = () => {
-  navigateTo({
-    path: '/checkout/payment-method',
-    query: {
-      p: selected.value?.months.toString(),
-    },
-  })
-}
-
-const { account, authenticated } = storeToRefs(useMainStore())
-
-const vat = computed(() => {
-  return account.value?.vat
-})
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .container {

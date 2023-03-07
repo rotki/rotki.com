@@ -1,49 +1,49 @@
-import { get, isClient, set, useTimeoutFn } from '@vueuse/core'
-import { acceptHMRUpdate, defineStore } from 'pinia'
-import { FetchError } from 'ofetch'
+import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
+import { acceptHMRUpdate, defineStore } from 'pinia';
+import { FetchError } from 'ofetch';
 import {
-  DeleteAccountPayload,
-  PasswordChangePayload,
-  ProfilePayload,
-} from '~/types/account'
-import { ActionResult } from '~/types/common'
-import { LoginCredentials } from '~/types/login'
+  type DeleteAccountPayload,
+  type PasswordChangePayload,
+  type ProfilePayload,
+} from '~/types/account';
+import { type ActionResult } from '~/types/common';
+import { type LoginCredentials } from '~/types/login';
 import {
   Account,
   ApiKeys,
-  ApiResponse,
+  type ApiResponse,
   CancelSubscriptionResponse,
-  CardCheckout,
+  type CardCheckout,
   CardCheckoutResponse,
-  CardPaymentRequest,
+  type CardPaymentRequest,
   CardPaymentResponse,
   ChangePasswordResponse,
-  CryptoPayment,
+  type CryptoPayment,
   CryptoPaymentResponse,
   DeleteAccountResponse,
-  PendingCryptoPayment,
+  type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
   PendingCryptoPaymentResultResponse,
-  Plan,
+  type Plan,
   PremiumResponse,
-  Result,
-  Subscription,
-  SubStatus,
+  type Result,
+  type SubStatus,
+  type Subscription,
   UpdateProfileResponse,
-} from '~/types'
-import { logger } from '~/utils/logger'
-import { assert } from '~/utils/assert'
-import { Currency } from '~/composables/plan'
-import { fetchWithCsrf } from '~/utils/api'
+} from '~/types';
+import { logger } from '~/utils/logger';
+import { assert } from '~/utils/assert';
+import { type Currency } from '~/composables/plan';
+import { fetchWithCsrf } from '~/utils/api';
 
-const SESSION_TIMEOUT = 3600000
+const SESSION_TIMEOUT = 3600000;
 
 export const useMainStore = defineStore('main', () => {
-  const authenticated = ref(false)
-  const account = ref<Account | null>(null)
-  const plans = ref<Plan[] | null>(null)
-  const authenticatedOnPlansLoad = ref(false)
-  const cancellationError = ref('')
+  const authenticated = ref(false);
+  const account = ref<Account | null>(null);
+  const plans = ref<Plan[] | null>(null);
+  const authenticatedOnPlansLoad = ref(false);
+  const cancellationError = ref('');
 
   const getAccount = async (): Promise<void> => {
     try {
@@ -52,13 +52,13 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'get',
         }
-      )
-      set(authenticated, true)
-      set(account, Account.parse(response.result))
+      );
+      set(authenticated, true);
+      set(account, Account.parse(response.result));
     } catch (e) {
-      logger.error(e)
+      logger.error(e);
     }
-  }
+  };
 
   const login = async ({
     username,
@@ -72,22 +72,22 @@ export const useMainStore = defineStore('main', () => {
           username,
           password,
         },
-      })
-      await getAccount()
-      set(authenticated, true)
-      return ''
+      });
+      await getAccount();
+      set(authenticated, true);
+      return '';
     } catch (e: any) {
-      let message = e.message
+      let message = e.message;
       if (e instanceof FetchError) {
-        const status = e?.status || -1
+        const status = e?.status || -1;
         if (status === 400 && e.response) {
-          message = e.data.message || ''
+          message = e.data.message || '';
         }
       }
-      set(authenticated, false)
-      return message
+      set(authenticated, false);
+      return message;
     }
-  }
+  };
 
   const updateKeys = async () => {
     try {
@@ -96,17 +96,17 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'patch',
         }
-      )
-      const acc = get(account)
-      assert(acc)
+      );
+      const acc = get(account);
+      assert(acc);
       set(account, {
         ...acc,
         ...ApiKeys.parse(response.result),
-      })
+      });
     } catch (e) {
-      logger.error(e)
+      logger.error(e);
     }
-  }
+  };
 
   const changePassword = async (
     payload: PasswordChangePayload
@@ -118,27 +118,25 @@ export const useMainStore = defineStore('main', () => {
           method: 'patch',
           body: payload,
         }
-      )
-      const data = ChangePasswordResponse.parse(response)
+      );
+      const data = ChangePasswordResponse.parse(response);
       return {
         success: data.result ?? false,
         message: '',
-      }
+      };
     } catch (e: any) {
-      logger.error(e)
-      let message = e.message
-      if (e instanceof FetchError) {
-        if (e.status === 400) {
-          const data = ChangePasswordResponse.parse(e.data)
-          message = data.message
-        }
+      logger.error(e);
+      let message = e.message;
+      if (e instanceof FetchError && e.status === 400) {
+        const data = ChangePasswordResponse.parse(e.data);
+        message = data.message;
       }
       return {
         success: false,
         message,
-      }
+      };
     }
-  }
+  };
 
   const updateProfile = async (
     payload: ProfilePayload
@@ -150,36 +148,34 @@ export const useMainStore = defineStore('main', () => {
           method: 'patch',
           body: payload,
         }
-      )
+      );
 
-      const { result } = UpdateProfileResponse.parse(response)
-      const acc = get(account)
-      assert(result)
-      assert(acc)
-      const country = acc.address?.country ?? ''
+      const { result } = UpdateProfileResponse.parse(response);
+      const acc = get(account);
+      assert(result);
+      assert(acc);
+      const country = acc.address?.country ?? '';
       set(account, {
         ...acc,
         ...result,
-      })
+      });
 
       if (payload.country !== country) {
-        await getAccount()
+        await getAccount();
       }
-      return { success: true }
+      return { success: true };
     } catch (e: any) {
-      logger.error(e)
-      let message = e.message
-      if (e instanceof FetchError) {
-        if (e.status === 400) {
-          message = UpdateProfileResponse.parse(e.data).message
-        }
+      logger.error(e);
+      let message = e.message;
+      if (e instanceof FetchError && e.status === 400) {
+        message = UpdateProfileResponse.parse(e.data).message;
       }
       return {
         success: false,
         message,
-      }
+      };
     }
-  }
+  };
 
   const deleteAccount = async (
     payload: DeleteAccountPayload
@@ -191,94 +187,94 @@ export const useMainStore = defineStore('main', () => {
           body: payload,
           method: 'delete',
         }
-      )
+      );
 
-      const data = DeleteAccountResponse.parse(response)
+      const data = DeleteAccountResponse.parse(response);
       return {
         success: data.result ?? false,
         message: data.message,
-      }
+      };
     } catch (e: any) {
-      let message = e.message
+      let message = e.message;
       if (e instanceof FetchError && e.status === 400) {
-        message = DeleteAccountResponse.parse(e.data).message
+        message = DeleteAccountResponse.parse(e.data).message;
       }
-      logger.error(e)
+      logger.error(e);
       return {
         success: false,
         message,
-      }
+      };
     }
-  }
+  };
 
-  const { stop, start } = useTimeoutFn(() => set(cancellationError, ''), 7000)
+  const { stop, start } = useTimeoutFn(() => set(cancellationError, ''), 7000);
 
   const cancelSubscription = async (subscription: Subscription) => {
-    const acc = get(account)
-    assert(acc)
-    const subscriptions = [...acc.subscriptions]
+    const acc = get(account);
+    assert(acc);
+    const subscriptions = [...acc.subscriptions];
     const subIndex = subscriptions.findIndex(
       (sub) => sub.identifier === subscription.identifier
-    )
-    const sub = subscriptions[subIndex]
-    const { actions, status, nextActionDate } = sub
+    );
+    const sub = subscriptions[subIndex];
+    const { actions, status, nextActionDate } = sub;
     function updateSub(
       actions: string[],
       status: SubStatus,
       nextActionDate: string
     ) {
-      sub.actions = actions
-      sub.status = status
-      sub.nextActionDate = nextActionDate
-      assert(acc)
+      sub.actions = actions;
+      sub.status = status;
+      sub.nextActionDate = nextActionDate;
+      assert(acc);
       set(account, {
         ...acc,
         subscriptions,
-      })
+      });
     }
 
     try {
-      updateSub([], 'Cancelled', 'Never')
+      updateSub([], 'Cancelled', 'Never');
       const response = await fetchWithCsrf<CancelSubscriptionResponse>(
         `/webapi/subscription/${subscription.identifier}`,
         {
           method: 'delete',
         }
-      )
-      const data = CancelSubscriptionResponse.parse(response)
+      );
+      const data = CancelSubscriptionResponse.parse(response);
       if (data.result) {
-        await getAccount()
+        await getAccount();
       }
     } catch (e: any) {
-      let message = e.message
+      let message = e.message;
       if (e instanceof FetchError && e.status === 404) {
-        message = CancelSubscriptionResponse.parse(e.data).message
+        message = CancelSubscriptionResponse.parse(e.data).message;
       }
-      updateSub(actions, status, nextActionDate)
-      logger.error(e)
-      stop()
-      set(cancellationError, message)
-      start()
+      updateSub(actions, status, nextActionDate);
+      logger.error(e);
+      stop();
+      set(cancellationError, message);
+      start();
     }
-  }
+  };
 
   const getPlans = async (): Promise<void> => {
     if (get(plans) && get(authenticated) === get(authenticatedOnPlansLoad)) {
-      logger.debug('plans already loaded')
-      return
+      logger.debug('plans already loaded');
+      return;
     }
 
     try {
       const response = await fetchWithCsrf<PremiumResponse>('/webapi/premium', {
         method: 'get',
-      })
-      const data = PremiumResponse.parse(response)
-      set(plans, data.result.plans)
-      set(authenticatedOnPlansLoad, get(authenticated))
+      });
+      const data = PremiumResponse.parse(response);
+      set(plans, data.result.plans);
+      set(authenticatedOnPlansLoad, get(authenticated));
     } catch (e: any) {
-      logger.error(e)
+      logger.error(e);
     }
-  }
+  };
 
   const checkout = async (plan: number): Promise<Result<CardCheckout>> => {
     try {
@@ -287,20 +283,20 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'get',
         }
-      )
-      const data = CardCheckoutResponse.parse(response)
+      );
+      const data = CardCheckoutResponse.parse(response);
       return {
         isError: false,
         result: data.result,
-      }
+      };
     } catch (e: any) {
-      logger.error(e)
+      logger.error(e);
       return {
         isError: true,
         error: e,
-      }
+      };
     }
-  }
+  };
 
   const pay = async (request: CardPaymentRequest): Promise<Result<true>> => {
     try {
@@ -310,27 +306,27 @@ export const useMainStore = defineStore('main', () => {
           method: 'post',
           body: request,
         }
-      )
-      getAccount().then()
+      );
+      getAccount().then();
 
-      const data = CardPaymentResponse.parse(response)
-      assert(data.result)
+      const data = CardPaymentResponse.parse(response);
+      assert(data.result);
       return {
         isError: false,
         result: true,
-      }
+      };
     } catch (e: any) {
-      let error = e
+      let error = e;
       if (e instanceof FetchError && e.status === 400) {
-        error = new Error(CardPaymentResponse.parse(e.data).message)
+        error = new Error(CardPaymentResponse.parse(e.data).message);
       }
-      logger.error(e)
+      logger.error(e);
       return {
         isError: true,
         error,
-      }
+      };
     }
-  }
+  };
 
   const cryptoPayment = async (
     plan: number,
@@ -352,26 +348,26 @@ export const useMainStore = defineStore('main', () => {
             false
           ),
         }
-      )
+      );
 
-      const { result } = CryptoPaymentResponse.parse(response)
-      assert(result)
+      const { result } = CryptoPaymentResponse.parse(response);
+      assert(result);
       return {
         result,
         isError: false,
-      }
+      };
     } catch (e: any) {
-      let error = e
+      let error = e;
       if (e instanceof FetchError && e.status === 400) {
-        error = new Error(CardPaymentResponse.parse(e.data).message)
+        error = new Error(CardPaymentResponse.parse(e.data).message);
       }
-      logger.error(e)
+      logger.error(e);
       return {
         error,
         isError: true,
-      }
+      };
     }
-  }
+  };
 
   const checkPendingCryptoPayment = async (
     subscriptionId?: string
@@ -382,27 +378,26 @@ export const useMainStore = defineStore('main', () => {
         {
           params: convertKeys({ subscriptionId }, false, false),
         }
-      )
-      const data = PendingCryptoPaymentResponse.parse(response)
+      );
+      const data = PendingCryptoPaymentResponse.parse(response);
       if (data.result) {
         return {
           result: data.result,
           isError: false,
-        }
-      } else {
-        return {
-          error: new Error(data.message),
-          isError: true,
-        }
+        };
       }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
     } catch (e: any) {
-      logger.error(e)
+      logger.error(e);
       return {
         error: e,
         isError: true,
-      }
+      };
     }
-  }
+  };
 
   const markTransactionStarted = async (): Promise<Result<boolean>> => {
     try {
@@ -411,27 +406,26 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'patch',
         }
-      )
-      const data = PendingCryptoPaymentResultResponse.parse(response)
+      );
+      const data = PendingCryptoPaymentResultResponse.parse(response);
       if (data.result) {
         return {
           result: data.result,
           isError: false,
-        }
-      } else {
-        return {
-          error: new Error(data.message),
-          isError: true,
-        }
+        };
       }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
     } catch (e: any) {
-      logger.error(e)
+      logger.error(e);
       return {
         error: e,
         isError: true,
-      }
+      };
     }
-  }
+  };
 
   const switchCryptoPlan = async (
     plan: number,
@@ -444,62 +438,61 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'delete',
         }
-      )
-      const data = PendingCryptoPaymentResultResponse.parse(response)
+      );
+      const data = PendingCryptoPaymentResultResponse.parse(response);
       if (data.result) {
-        const payment = await cryptoPayment(plan, currency, subscriptionId)
+        const payment = await cryptoPayment(plan, currency, subscriptionId);
         if (payment.isError) {
-          return payment
+          return payment;
         }
         return {
           isError: false,
           result: payment.result,
-        }
-      } else {
-        return {
-          error: Error(data.message),
-          isError: true,
-        }
+        };
       }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
     } catch (e: any) {
-      logger.error(e)
+      logger.error(e);
       return {
         error: e,
         isError: true,
-      }
+      };
     }
-  }
+  };
 
   const { stop: stopCountdown, start: startCountdown } = useTimeoutFn(
     async () => {
-      logger.debug('session expired, logging out')
-      await logout()
+      logger.debug('session expired, logging out');
+      await logout();
     },
     SESSION_TIMEOUT
-  )
+  );
 
   const logout = async (callApi = false): Promise<void> => {
-    stopCountdown()
+    stopCountdown();
     if (callApi) {
       try {
         await fetchWithCsrf<UpdateProfileResponse>('/webapi/logout/', {
           method: 'post',
-        })
+        });
       } catch (e) {
-        logger.error(e)
+        logger.error(e);
       }
     }
-    set(authenticated, false)
-    set(account, null)
-  }
+    set(authenticated, false);
+    set(account, null);
+  };
 
   const refreshSession = () => {
     if (!isClient) {
-      return
+      return;
     }
-    stopCountdown()
-    startCountdown()
-  }
+    stopCountdown();
+    startCountdown();
+  };
 
   return {
     authenticated,
@@ -522,9 +515,9 @@ export const useMainStore = defineStore('main', () => {
     markTransactionStarted,
     logout,
     refreshSession,
-  }
-})
+  };
+});
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useMainStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useMainStore, import.meta.hot));
 }

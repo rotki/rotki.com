@@ -1,13 +1,13 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.ripple">
     <div />
     <div />
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .ripple {

@@ -12,7 +12,7 @@ const nonIndexed = [
   '/checkout/pay/paypal',
   '/checkout/request/crypto',
   '/account-deleted',
-]
+];
 
 export default defineNuxtConfig({
   // Target (https://go.nuxtjs.dev/config-target)
@@ -130,4 +130,4 @@ export default defineNuxtConfig({
     UserAgent: '*',
     Disallow: () => nonIndexed,
   },
-})
+});

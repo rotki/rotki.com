@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.body">
     <p :class="css.header">
@@ -6,10 +10,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style module lang="scss">
 .body {

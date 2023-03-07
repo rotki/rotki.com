@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div>
     <div :class="css.wrapper">
@@ -12,10 +16,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

@@ -4,7 +4,7 @@ export function getMetadata(
   url: string,
   baseUrl: string
 ) {
-  const imageUrl = `${baseUrl}/img/share.png`
+  const imageUrl = `${baseUrl}/img/share.png`;
   return [
     {
       key: 'description',
@@ -29,13 +29,13 @@ export function getMetadata(
       content: description,
     },
     { property: 'twitter:image', content: imageUrl },
-  ]
+  ];
 }
 
 export const noIndex = () => ({
   name: 'robots',
   content: 'noindex',
-})
+});
 
 export const commonAttrs = () => ({
   htmlAttrs: {
@@ -44,4 +44,4 @@ export const commonAttrs = () => ({
   bodyAttrs: {
     class: 'body',
   },
-})
+});

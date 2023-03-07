@@ -1,7 +1,7 @@
-import logger from 'loglevel'
+import logger from 'loglevel';
 
 if (process.env.NODE_ENV === 'development') {
-  logger.setDefaultLevel('DEBUG')
+  logger.setDefaultLevel('DEBUG');
 }
 
-export { logger }
+export { logger };

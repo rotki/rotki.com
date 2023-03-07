@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.content">
     <div :class="css.title">Your Plan</div>
@@ -9,10 +13,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .content {

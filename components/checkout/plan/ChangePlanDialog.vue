@@ -1,3 +1,59 @@
+<script setup lang="ts">
+import { get, set, toRefs } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { type ComputedRef } from 'vue';
+import { useMainStore } from '~/store';
+import { getPlanName } from '~/utils/plans';
+import { type Plan } from '~/types';
+
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    crypto?: boolean;
+    warning?: boolean;
+  }>(),
+  {
+    crypto: false,
+    warning: false,
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'cancel'): void;
+  (e: 'select', months: number): void;
+}>();
+const store = useMainStore();
+const { plans } = storeToRefs(store);
+const { crypto, visible, warning } = toRefs(props);
+const confirmed = ref(false);
+
+const availablePlans: ComputedRef<Plan[]> = computed(() => {
+  return get(plans) ?? [];
+});
+
+const cancel = () => emit('cancel');
+const select = (months: number) => {
+  if (get(warning) && !get(confirmed)) {
+    return;
+  }
+  return emit('select', months);
+};
+
+const getPrice = (plan: Plan) => {
+  return get(crypto) ? plan.priceCrypto : plan.priceFiat;
+};
+
+watch(visible, (visible) => {
+  if (!visible) {
+    set(confirmed, false);
+  }
+});
+
+onMounted(async () => await store.getPlans());
+
+const css = useCssModule();
+</script>
+
 <template>
   <ModalDialog :model-value="visible">
     <div :class="css.body">
@@ -32,62 +88,6 @@
     </div>
   </ModalDialog>
 </template>
-
-<script setup lang="ts">
-import { get, set, toRefs } from '@vueuse/core'
-import { storeToRefs } from 'pinia'
-import { ComputedRef } from 'vue'
-import { useMainStore } from '~/store'
-import { getPlanName } from '~/utils/plans'
-import { Plan } from '~/types'
-
-const props = withDefaults(
-  defineProps<{
-    visible: boolean
-    crypto?: boolean
-    warning?: boolean
-  }>(),
-  {
-    crypto: false,
-    warning: false,
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'cancel'): void
-  (e: 'select', months: number): void
-}>()
-const store = useMainStore()
-const { plans } = storeToRefs(store)
-const { crypto, visible, warning } = toRefs(props)
-const confirmed = ref(false)
-
-const availablePlans: ComputedRef<Plan[]> = computed(() => {
-  return get(plans) ?? []
-})
-
-const cancel = () => emit('cancel')
-const select = (months: number) => {
-  if (get(warning) && !get(confirmed)) {
-    return
-  }
-  return emit('select', months)
-}
-
-const getPrice = (plan: Plan) => {
-  return get(crypto) ? plan.priceCrypto : plan.priceFiat
-}
-
-watch(visible, (visible) => {
-  if (!visible) {
-    set(confirmed, false)
-  }
-})
-
-onMounted(async () => await store.getPlans())
-
-const css = useCssModule()
-</script>
 
 <style module lang="scss">
 .body {

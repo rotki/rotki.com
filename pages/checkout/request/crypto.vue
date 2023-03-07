@@ -1,9 +1,5 @@
-<template>
-  <CryptoRequestPage />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: [
@@ -12,7 +8,7 @@ definePageMeta({
     'subscriber',
     'pending-payment',
   ],
-})
+});
 
 useHead({
   title: 'pay with crypto | rotki',
@@ -26,6 +22,10 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
-useAutoLogout()
+});
+useAutoLogout();
 </script>
+
+<template>
+  <CryptoRequestPage />
+</template>

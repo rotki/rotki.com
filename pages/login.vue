@@ -1,13 +1,9 @@
-<template>
-  <LoginPage />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs } from '~/utils/metadata'
+import { commonAttrs } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['maintenance', 'authenticated'],
-})
+});
 
 useHead({
   title: 'login | rotki',
@@ -19,8 +15,12 @@ useHead({
     },
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <LoginPage />
+</template>
 
 <style lang="scss">
 @import '@/assets/css/main.scss';

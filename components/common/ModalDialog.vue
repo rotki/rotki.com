@@ -1,3 +1,56 @@
+<script setup lang="ts">
+import { get, set } from '@vueuse/core';
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean;
+    width?: string;
+    height?: string;
+    padding?: string;
+    boxless?: boolean;
+  }>(),
+  {
+    width: '800px',
+    padding: '0px',
+    boxless: false,
+    height: '400px',
+  }
+);
+
+const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
+
+const { width, height, padding, modelValue } = toRefs(props);
+const out = ref(false);
+const visible = ref(false);
+
+onMounted(() => set(visible, get(modelValue)));
+watch(modelValue, (display) => {
+  if (display) {
+    out.value = false;
+    visible.value = true;
+  } else {
+    out.value = true;
+    nextTick(() => {
+      setTimeout(() => {
+        visible.value = false;
+      }, 800);
+    });
+  }
+});
+const dismiss = () => {
+  emit('update:modelValue', false);
+};
+
+const style = computed(() => ({
+  'max-width': width.value,
+  height: height.value,
+  padding: padding.value,
+  margin: '0.5rem',
+}));
+
+const css = useCssModule();
+</script>
+
 <template>
   <div v-if="visible" :class="{ [css.container]: true, [css.out]: out }">
     <div :class="css.overlay" @click="dismiss">
@@ -10,65 +63,12 @@
           :style="style"
           @click="($event) => $event.stopPropagation()"
         >
-          <slot></slot>
+          <slot />
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { get, set } from '@vueuse/core'
-
-const props = withDefaults(
-  defineProps<{
-    modelValue: boolean
-    width?: string
-    height?: string
-    padding?: string
-    boxless?: boolean
-  }>(),
-  {
-    width: '800px',
-    padding: '0px',
-    boxless: false,
-    height: '400px',
-  }
-)
-
-const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>()
-
-const { width, height, padding, modelValue } = toRefs(props)
-const out = ref(false)
-const visible = ref(false)
-
-onMounted(() => set(visible, get(modelValue)))
-watch(modelValue, (display) => {
-  if (display) {
-    out.value = false
-    visible.value = true
-  } else {
-    out.value = true
-    nextTick(() => {
-      setTimeout(() => {
-        visible.value = false
-      }, 800)
-    })
-  }
-})
-const dismiss = () => {
-  emit('update:modelValue', false)
-}
-
-const style = computed(() => ({
-  'max-width': width.value,
-  height: height.value,
-  padding: padding.value,
-  margin: '0.5rem',
-}))
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

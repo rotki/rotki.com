@@ -1,13 +1,9 @@
-<template>
-  <PlanSelectionPage />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['maintenance', 'pending-payment', 'subscriber'],
-})
+});
 
 useHead({
   title: 'select premium plan | rotki',
@@ -20,5 +16,9 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <PlanSelectionPage />
+</template>

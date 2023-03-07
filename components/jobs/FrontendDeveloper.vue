@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div>
     <TextHeading>Vue.js/TypeScript Developer - Role requirements</TextHeading>
@@ -126,10 +130,6 @@
     </TextParagraph>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style module>
 .points {

@@ -1,3 +1,10 @@
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'download'): void }>();
+
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div>
@@ -13,13 +20,6 @@
     <CustomPlan v-if="false" />
   </div>
 </template>
-
-<script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>()
-
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

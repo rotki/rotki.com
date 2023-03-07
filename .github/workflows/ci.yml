@@ -53,7 +53,7 @@ jobs:
         run: pnpm install
 
       - name: Run linter 👀
-        run: pnpm run lint
+        run: pnpm run lint:all
 
       - name: Build 🚧
         run: pnpm run build

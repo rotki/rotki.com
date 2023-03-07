@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <FeatureContainer id="profitloss-report">
     <template #title> {{ t('home.profit_loss_report.title') }}</template>
@@ -11,11 +16,6 @@
     </FeatureDetails>
   </FeatureContainer>
 </template>
-
-<script setup lang="ts">
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

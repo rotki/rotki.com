@@ -1,3 +1,63 @@
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    id: string;
+    modelValue: string;
+    type?: string;
+    label?: string;
+    hint?: string;
+    placeholder?: string;
+    errorMessages?: { $message: string }[];
+    readonly?: boolean;
+    disabled?: boolean;
+    filled?: boolean;
+  }>(),
+  {
+    type: 'text',
+    label: '',
+    hint: '',
+    placeholder: '',
+    errorMessages: () => [],
+    readonly: false,
+    disabled: false,
+    filled: false,
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void;
+  (e: 'enter'): void;
+  (e: 'blur'): void;
+}>();
+
+const inputField = ref<HTMLInputElement | null>(null);
+const input = (event: InputEvent) => {
+  const target = event.target;
+  if (target) {
+    emit('update:modelValue', (target as HTMLInputElement).value ?? '');
+  }
+};
+const value = toRef(props, 'modelValue');
+const lastMessage = ref('');
+watch(toRef(props, 'errorMessages'), (value) => {
+  if (value.length > 0 && lastMessage.value !== (value[0] as any).$message) {
+    inputField.value?.focus();
+    lastMessage.value = (value[0] as any).$message;
+  }
+});
+
+const isEmpty = computed(() => {
+  const currentValue = value.value;
+  return !currentValue || currentValue.trim().length === 0;
+});
+
+const blur = () => emit('blur');
+const enter = () => emit('enter');
+
+const css = useCssModule();
+const slots = useSlots();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div
@@ -49,66 +109,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-const props = withDefaults(
-  defineProps<{
-    id: string
-    modelValue: string
-    type?: string
-    label?: string
-    hint?: string
-    placeholder?: string
-    errorMessages?: { $message: string }[]
-    readonly?: boolean
-    disabled?: boolean
-    filled?: boolean
-  }>(),
-  {
-    type: 'text',
-    label: '',
-    hint: '',
-    placeholder: '',
-    errorMessages: () => [],
-    readonly: false,
-    disabled: false,
-    filled: false,
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  (e: 'enter'): void
-  (e: 'blur'): void
-}>()
-
-const inputField = ref<HTMLInputElement | null>(null)
-const input = (event: InputEvent) => {
-  const target = event.target
-  if (target) {
-    emit('update:modelValue', (target as HTMLInputElement).value ?? '')
-  }
-}
-const value = toRef(props, 'modelValue')
-const lastMessage = ref('')
-watch(toRef(props, 'errorMessages'), (value) => {
-  if (value.length > 0 && lastMessage.value !== (value[0] as any).$message) {
-    inputField.value?.focus()
-    lastMessage.value = (value[0] as any).$message
-  }
-})
-
-const isEmpty = computed(() => {
-  const currentValue = value.value
-  return !currentValue || currentValue.trim().length === 0
-})
-
-const blur = () => emit('blur')
-const enter = () => emit('enter')
-
-const css = useCssModule()
-const slots = useSlots()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

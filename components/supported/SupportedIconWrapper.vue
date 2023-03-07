@@ -1,18 +1,18 @@
+<script setup lang="ts">
+defineProps<{
+  img: string;
+  name: string;
+}>();
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <img :src="img" :class="css.img" />
     <div :class="css.name">{{ name }}</div>
   </div>
 </template>
-
-<script setup lang="ts">
-defineProps<{
-  img: string
-  name: string
-}>()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .wrapper {

@@ -1,3 +1,9 @@
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'download'): void }>();
+const css = useCssModule();
+const { t } = useI18n();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div :class="css.title">
@@ -48,12 +54,6 @@
     <UseApp @download="emit('download')" />
   </div>
 </template>
-
-<script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>()
-const css = useCssModule()
-const { t } = useI18n()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

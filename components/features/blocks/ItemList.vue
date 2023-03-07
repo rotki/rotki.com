@@ -1,3 +1,9 @@
+<script setup lang="ts">
+defineProps<{ list: string[] }>();
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <ul :class="css.list">
@@ -5,12 +11,6 @@
     </ul>
   </div>
 </template>
-
-<script setup lang="ts">
-defineProps<{ list: string[] }>()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

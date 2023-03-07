@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(() => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   if (config.public.maintenance !== 'false') {
-    return navigateTo('/maintenance')
+    return navigateTo('/maintenance');
   }
-})
+});

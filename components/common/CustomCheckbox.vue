@@ -1,3 +1,25 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    id?: string;
+    modelValue: boolean;
+  }>(),
+  {
+    id: '',
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void;
+}>();
+
+const update = (checked: boolean) => {
+  emit('update:modelValue', checked);
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.checkbox">
     <input
@@ -7,32 +29,10 @@
       @click="update(!modelValue)"
     />
     <label :class="css.label" :for="id">
-      <slot></slot>
+      <slot />
     </label>
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    id?: string
-    modelValue: boolean
-  }>(),
-  {
-    id: '',
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-}>()
-
-const update = (checked: boolean) => {
-  emit('update:modelValue', checked)
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .checkbox {

@@ -1,12 +1,12 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.title">
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .title {

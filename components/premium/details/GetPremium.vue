@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.container">
     <ActionButton
@@ -7,11 +12,6 @@
     />
   </div>
 </template>
-
-<script setup lang="ts">
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

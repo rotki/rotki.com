@@ -1,3 +1,17 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
+
+const store = useMainStore();
+const { account } = storeToRefs(store);
+
+const apiKey = computed(() => account.value?.apiKey ?? '');
+const apiSecret = computed(() => account.value?.apiSecret ?? '');
+const regenerateKeys = async () => await store.updateKeys();
+
+const css = useCssModule();
+</script>
+
 <template>
   <CardContainer>
     <TextHeading :class="css.heading" subheading>API Credentials</TextHeading>
@@ -34,20 +48,6 @@
     />
   </CardContainer>
 </template>
-
-<script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useMainStore } from '~/store'
-
-const store = useMainStore()
-const { account } = storeToRefs(store)
-
-const apiKey = computed(() => account.value?.apiKey ?? '')
-const apiSecret = computed(() => account.value?.apiSecret ?? '')
-const regenerateKeys = async () => await store.updateKeys()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .col {

@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <FeatureContainer id="defi-details">
     <template #title> {{ t('home.eth_protocols.title') }} </template>
@@ -45,11 +50,6 @@
     <CaptionText> * {{ t('home.eth_protocols.watcher_note') }} </CaptionText>
   </FeatureContainer>
 </template>
-
-<script setup lang="ts">
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style module>
 .protocols {

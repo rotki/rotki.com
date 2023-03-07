@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer>
     <template #title> Jobs </template>
@@ -27,10 +31,6 @@
     </div>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .container {

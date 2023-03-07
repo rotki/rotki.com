@@ -1,3 +1,12 @@
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'dismiss'): void }>();
+
+const dismiss = () => {
+  emit('dismiss');
+};
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.container">
     <div :class="css.box" @click="dismiss">
@@ -5,15 +14,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const emit = defineEmits<{ (e: 'dismiss'): void }>()
-
-const dismiss = () => {
-  emit('dismiss')
-}
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .container {

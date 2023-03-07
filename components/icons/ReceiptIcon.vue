@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const css = useCssModule();
+const attrs = useAttrs();
+</script>
+
 <template>
   <svg
     :class="css.icon"
@@ -16,11 +21,6 @@
     />
   </svg>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-const attrs = useAttrs()
-</script>
 
 <style lang="scss" module>
 .icon {

@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const css = useCssModule();
+const slots = useSlots();
+</script>
+
 <template>
   <div
     :class="{
@@ -26,11 +31,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-const slots = useSlots()
-</script>
 
 <style module lang="scss">
 .container {

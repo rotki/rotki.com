@@ -1,3 +1,6 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
 <template>
   <CardContainer>
     <div :class="css.row">
@@ -16,9 +19,6 @@
     </div>
   </CardContainer>
 </template>
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 <style lang="scss" module>
 @import '@/assets/css/media.scss';
 

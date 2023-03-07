@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer>
     <template #title> Impressum </template>
@@ -93,10 +97,6 @@
     </TextParagraph>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '~/assets/css/media';

@@ -1,3 +1,16 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    width?: string;
+    height?: string;
+  }>(),
+  {
+    height: '24px',
+    width: '24px',
+  }
+);
+</script>
+
 <template>
   <svg :style="{ width, height }" viewBox="0 0 24 24">
     <path
@@ -6,16 +19,3 @@
     />
   </svg>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    width?: string
-    height?: string
-  }>(),
-  {
-    height: '24px',
-    width: '24px',
-  }
-)
-</script>

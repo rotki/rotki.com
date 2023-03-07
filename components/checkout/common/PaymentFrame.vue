@@ -1,3 +1,46 @@
+<script setup lang="ts">
+import { get, toRefs } from '@vueuse/core';
+import { type IdleStep, type PaymentStep, type StepType } from '~/types';
+
+const props = defineProps<{
+  loading: boolean;
+  step: PaymentStep;
+}>();
+
+const emit = defineEmits<{ (e: 'close'): void }>();
+
+const { step } = toRefs(props);
+const useType = (type: StepType | IdleStep) => {
+  return computed(() => get(step).type === type);
+};
+const text = computed(() => {
+  const currentStep = get(step);
+  if (currentStep.type === 'idle') {
+    return {
+      title: '',
+      message: '',
+      closable: false,
+    };
+  }
+  return {
+    title: currentStep.title,
+    message: currentStep.message,
+    closable: currentStep.closeable,
+  };
+});
+
+const close = () => {
+  emit('close');
+};
+
+const isPending = useType('pending');
+const isSuccess = useType('success');
+const isFailure = useType('failure');
+const userInteraction = useType('idle');
+
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer :center-vertically="false">
     <template #title>Subscription Payment</template>
@@ -49,49 +92,6 @@
     </PageContent>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-import { get, toRefs } from '@vueuse/core'
-import { IdleStep, PaymentStep, StepType } from '~/types'
-
-const props = defineProps<{
-  loading: boolean
-  step: PaymentStep
-}>()
-
-const emit = defineEmits<{ (e: 'close'): void }>()
-
-const { step } = toRefs(props)
-const useType = (type: StepType | IdleStep) => {
-  return computed(() => get(step).type === type)
-}
-const text = computed(() => {
-  const currentStep = get(step)
-  if (currentStep.type === 'idle') {
-    return {
-      title: '',
-      message: '',
-      closable: false,
-    }
-  }
-  return {
-    title: currentStep.title,
-    message: currentStep.message,
-    closable: currentStep.closeable,
-  }
-})
-
-const close = () => {
-  emit('close')
-}
-
-const isPending = useType('pending')
-const isSuccess = useType('success')
-const isFailure = useType('failure')
-const userInteraction = useType('idle')
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .loader {

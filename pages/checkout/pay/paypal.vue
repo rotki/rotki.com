@@ -1,13 +1,9 @@
-<template>
-  <PaypalPage />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['maintenance', 'authentication', 'subscriber', 'csp'],
-})
+});
 
 useHead({
   title: 'pay with paypal | rotki',
@@ -20,12 +16,16 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 
-useAutoLogout()
+useAutoLogout();
 
 onBeforeRouteLeave((to, _from, next) => {
-  next(false)
-  window.location.href = to.fullPath
-})
+  next(false);
+  window.location.href = to.fullPath;
+});
 </script>
+
+<template>
+  <PaypalPage />
+</template>

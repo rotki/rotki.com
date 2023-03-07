@@ -1,3 +1,26 @@
+<script setup lang="ts">
+import { set } from '@vueuse/core';
+
+const visible = ref(false);
+
+const { start, stop } = useTimeoutFn(
+  () => {
+    set(visible, true);
+  },
+  400,
+  { immediate: false }
+);
+
+const on = () => start();
+
+const off = () => {
+  set(visible, false);
+  stop();
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <span @mouseenter="on" @mouseleave="off">
@@ -13,29 +36,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { set } from '@vueuse/core'
-
-const visible = ref(false)
-
-const { start, stop } = useTimeoutFn(
-  () => {
-    set(visible, true)
-  },
-  400,
-  { immediate: false }
-)
-
-const on = () => start()
-
-const off = () => {
-  set(visible, false)
-  stop()
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .wrapper {
