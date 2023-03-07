@@ -1,3 +1,65 @@
+<script setup lang="ts">
+import { get } from '@vueuse/core';
+
+const emit = defineEmits<{ (e: 'dismiss'): void }>();
+
+const LATEST = 'https://github.com/rotki/rotki/releases/latest';
+
+type Asset = {
+  readonly name: string;
+
+  readonly browser_download_url: string;
+};
+
+type GithubRelease = {
+  readonly tag_name: string;
+  readonly assets: Asset[];
+};
+
+function getUrl(assets: Asset[], filter: (asset: Asset) => boolean): string {
+  const matched = assets.filter(filter);
+  return matched.length === 0 ? LATEST : matched[0].browser_download_url;
+}
+
+function isWindowApp(name: string): boolean {
+  return name.endsWith('.exe') && name.startsWith('rotki-win32');
+}
+
+function isLinuxApp(name: string): boolean {
+  return name.endsWith('.AppImage');
+}
+
+function isMacOsApp(name: string, arm64 = false): boolean {
+  const archMatch =
+    (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'));
+  return archMatch && name.endsWith('.dmg');
+}
+
+const version = ref('');
+const linuxUrl = ref(LATEST);
+const macOSUrl = ref(LATEST);
+const macOSArmUrl = ref(LATEST);
+const windowsUrl = ref(LATEST);
+
+const fetchLatestRelease = async () => {
+  const { data } = await useFetch<GithubRelease>(
+    'https://api.github.com/repos/rotki/rotki/releases/latest'
+  );
+  const latestRelease = get(data);
+  if (latestRelease) {
+    version.value = latestRelease.tag_name;
+    const assets: Asset[] = latestRelease.assets;
+    macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name));
+    macOSArmUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name, true));
+    linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name));
+    windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name));
+  }
+};
+onBeforeMount(async () => await fetchLatestRelease());
+
+const css = useCssModule();
+</script>
+
 <template>
   <Transition name="fade">
     <div :class="css.overlay" @click="emit('dismiss')">
@@ -59,68 +121,6 @@
     </div>
   </Transition>
 </template>
-
-<script setup lang="ts">
-import { get } from '@vueuse/core'
-
-const emit = defineEmits<{ (e: 'dismiss'): void }>()
-
-const LATEST = 'https://github.com/rotki/rotki/releases/latest'
-
-type Asset = {
-  readonly name: string
-
-  readonly browser_download_url: string
-}
-
-type GithubRelease = {
-  readonly tag_name: string
-  readonly assets: Asset[]
-}
-
-function getUrl(assets: Asset[], filter: (asset: Asset) => boolean): string {
-  const matched = assets.filter(filter)
-  return matched.length === 0 ? LATEST : matched[0].browser_download_url
-}
-
-function isWindowApp(name: string): boolean {
-  return name.endsWith('.exe') && name.startsWith('rotki-win32')
-}
-
-function isLinuxApp(name: string): boolean {
-  return name.endsWith('.AppImage')
-}
-
-function isMacOsApp(name: string, arm64 = false): boolean {
-  const archMatch =
-    (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'))
-  return archMatch && name.endsWith('.dmg')
-}
-
-const version = ref('')
-const linuxUrl = ref(LATEST)
-const macOSUrl = ref(LATEST)
-const macOSArmUrl = ref(LATEST)
-const windowsUrl = ref(LATEST)
-
-const fetchLatestRelease = async () => {
-  const { data } = await useFetch<GithubRelease>(
-    'https://api.github.com/repos/rotki/rotki/releases/latest'
-  )
-  const latestRelease = get(data)
-  if (latestRelease) {
-    version.value = latestRelease.tag_name
-    const assets: Asset[] = latestRelease.assets
-    macOSUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name))
-    macOSArmUrl.value = getUrl(assets, ({ name }) => isMacOsApp(name, true))
-    linuxUrl.value = getUrl(assets, ({ name }) => isLinuxApp(name))
-    windowsUrl.value = getUrl(assets, ({ name }) => isWindowApp(name))
-  }
-}
-onBeforeMount(async () => await fetchLatestRelease())
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

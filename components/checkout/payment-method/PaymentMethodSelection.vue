@@ -1,38 +1,9 @@
-<template>
-  <div :class="css.content">
-    <CheckoutTitle>Payment Methods</CheckoutTitle>
-    <CheckoutDescription>
-      Please select one of the following payment methods.
-    </CheckoutDescription>
-    <div :class="css.wrapper">
-      <div :class="css.methods">
-        <PaymentMethodItem
-          v-for="item in availablePaymentMethods"
-          :key="item.id"
-          :class="css.method"
-          :selected="isSelected(item.id)"
-          @click="select(item.id)"
-        >
-          <Component :is="item.component" />
-          <template #label> {{ item.label }} </template>
-        </PaymentMethodItem>
-      </div>
-    </div>
-    <div :class="css.continue">
-      <SelectionButton :disabled="!selected" selected @click="next">
-        Continue to Checkout
-      </SelectionButton>
-    </div>
-    <LoginModal v-model="loginRequired" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { get } from '@vueuse/core'
-import { Ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useMainStore } from '~/store'
-import { assert } from '~/utils/assert'
+import { get } from '@vueuse/core';
+import { type Ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
+import { assert } from '~/utils/assert';
 
 enum PaymentMethod {
   ETH = 1,
@@ -43,11 +14,11 @@ enum PaymentMethod {
 }
 
 type PaymentMethodItem = {
-  id: PaymentMethod
-  label: string
-  component: string
-  crypto?: true
-}
+  id: PaymentMethod;
+  label: string;
+  component: string;
+  crypto?: true;
+};
 
 const paymentMethods: PaymentMethodItem[] = [
   {
@@ -78,66 +49,95 @@ const paymentMethods: PaymentMethodItem[] = [
     label: 'Paypal',
     component: 'paypal-icon',
   },
-]
+];
 
-const props = defineProps<{ identifier?: string }>()
+const props = defineProps<{ identifier?: string }>();
 
-const { identifier } = toRefs(props)
-const selected: Ref<PaymentMethod | null> = ref(null)
-const loginRequired = ref(false)
-const store = useMainStore()
-const route = useRoute()
+const { identifier } = toRefs(props);
+const selected: Ref<PaymentMethod | null> = ref(null);
+const loginRequired = ref(false);
+const store = useMainStore();
+const route = useRoute();
 
-const { authenticated } = storeToRefs(store)
+const { authenticated } = storeToRefs(store);
 
 const next = () => {
   if (authenticated.value) {
     const query: { p: string; c?: string; id?: string } = {
       p: route.query.p as string,
-    }
-    let path: string
-    const value = selected.value
-    assert(value)
+    };
+    let path: string;
+    const value = selected.value;
+    assert(value);
     if (value === PaymentMethod.CARD) {
-      path = '/checkout/pay/card'
+      path = '/checkout/pay/card';
     } else if (value === PaymentMethod.PAYPAL) {
-      path = '/checkout/pay/paypal'
+      path = '/checkout/pay/paypal';
     } else {
-      path = '/checkout/request/crypto'
-      query.c = PaymentMethod[value]
+      path = '/checkout/request/crypto';
+      query.c = PaymentMethod[value];
     }
 
-    const id = get(identifier)
+    const id = get(identifier);
     if (id) {
-      query.id = id
+      query.id = id;
     }
 
     navigateTo({
       path,
       query,
-    })
+    });
   } else {
-    loginRequired.value = true
+    loginRequired.value = true;
   }
-}
+};
 
 const isSelected = (method: PaymentMethod) => {
-  return selected.value === method
-}
+  return selected.value === method;
+};
 
 const select = (method: PaymentMethod) => {
-  selected.value = method
-}
+  selected.value = method;
+};
 
 const availablePaymentMethods = computed(() => {
   if (!get(identifier)) {
-    return paymentMethods
+    return paymentMethods;
   }
-  return paymentMethods.filter((value) => value.crypto)
-})
+  return paymentMethods.filter((value) => value.crypto);
+});
 
-const css = useCssModule()
+const css = useCssModule();
 </script>
+
+<template>
+  <div :class="css.content">
+    <CheckoutTitle>Payment Methods</CheckoutTitle>
+    <CheckoutDescription>
+      Please select one of the following payment methods.
+    </CheckoutDescription>
+    <div :class="css.wrapper">
+      <div :class="css.methods">
+        <PaymentMethodItem
+          v-for="item in availablePaymentMethods"
+          :key="item.id"
+          :class="css.method"
+          :selected="isSelected(item.id)"
+          @click="select(item.id)"
+        >
+          <Component :is="item.component" />
+          <template #label> {{ item.label }} </template>
+        </PaymentMethodItem>
+      </div>
+    </div>
+    <div :class="css.continue">
+      <SelectionButton :disabled="!selected" selected @click="next">
+        Continue to Checkout
+      </SelectionButton>
+    </div>
+    <LoginModal v-model="loginRequired" />
+  </div>
+</template>
 
 <style lang="scss" module>
 $text-color: #212529;

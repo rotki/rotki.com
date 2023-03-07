@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { t } = useI18n();
+</script>
+
 <template>
   <PremiumFeature>
     <template #title>
@@ -12,7 +16,3 @@
     </i18n-t>
   </PremiumFeature>
 </template>
-
-<script setup lang="ts">
-const { t } = useI18n()
-</script>

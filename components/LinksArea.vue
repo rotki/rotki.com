@@ -1,3 +1,8 @@
+<script setup lang="ts">
+withDefaults(defineProps<{ landing?: boolean }>(), { landing: false });
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.row">
     <div :class="css.column">
@@ -46,11 +51,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(defineProps<{ landing?: boolean }>(), { landing: false })
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '~/assets/css/media.scss';

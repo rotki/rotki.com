@@ -1,3 +1,108 @@
+<script setup lang="ts">
+import { get, set } from '@vueuse/core';
+import detectEthereumProvider from '@metamask/detect-provider';
+import { type CryptoPayment, type PaymentStep, type Provider } from '~/types';
+import { useMainStore } from '~/store';
+import { assert } from '~/utils/assert';
+
+const loading = ref(false);
+const data = ref<CryptoPayment | null>(null);
+const metamaskSupport = ref(false);
+
+const { cryptoPayment, switchCryptoPlan } = useMainStore();
+const { plan } = usePlanParams();
+const { currency } = useCurrencyParams();
+const { subscriptionId } = useSubscriptionIdParam();
+
+let provider: Provider | null = null;
+
+onMounted(async () => {
+  const selectedPlan = get(plan);
+  const selectedCurrency = get(currency);
+  if (selectedPlan > 0 && selectedCurrency) {
+    provider = (await detectEthereumProvider()) as Provider | null;
+    metamaskSupport.value = !!provider;
+    set(loading, true);
+    const subId = get(subscriptionId);
+    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
+    if (result.isError) {
+      set(error, result.error.message);
+    } else if (result.result.transactionStarted) {
+      await navigateTo('/home');
+    } else {
+      set(data, result.result);
+    }
+
+    set(loading, false);
+  } else {
+    await navigateTo('/products');
+  }
+});
+
+const step = computed<PaymentStep>(() => {
+  const errorMessage = get(error);
+  const state = get(currentState);
+  if (errorMessage) {
+    return {
+      type: 'failure',
+      title: 'Payment Failure',
+      message: errorMessage,
+      closeable: true,
+    };
+  } else if (state === 'pending') {
+    return {
+      type: 'pending',
+      title: 'Payment in Progress',
+      message: 'Please confirm your transaction...',
+    };
+  } else if (state === 'success') {
+    return {
+      type: 'success',
+      title: 'Transaction Pending',
+      message:
+        'You should receive an e-mail confirming the activation of your subscription in the near future.',
+    };
+  }
+  return { type: 'idle' };
+});
+
+const reset = () => {
+  set(currentState, 'idle');
+  set(error, '');
+};
+
+const config = useRuntimeConfig();
+const {
+  payWithMetamask,
+  state: currentState,
+  error,
+} = useWeb3Payment(
+  data,
+  () => {
+    assert(provider);
+    return provider;
+  },
+  !!config.testing
+);
+
+watch(plan, async (plan) => {
+  const selectedCurrency = get(currency);
+  assert(selectedCurrency);
+  const response = await switchCryptoPlan(
+    plan,
+    selectedCurrency,
+    get(subscriptionId)
+  );
+  if (!response.isError) {
+    set(data, response.result);
+  } else {
+    set(error, response.error.message);
+  }
+});
+
+const css = useCssModule();
+</script>
+
 <template>
   <PaymentFrame :loading="loading" :step="step" @close="reset">
     <template #description>
@@ -18,112 +123,6 @@
     </div>
   </PaymentFrame>
 </template>
-
-<script setup lang="ts">
-import { get, set } from '@vueuse/core'
-import detectEthereumProvider from '@metamask/detect-provider'
-import { CryptoPayment, PaymentStep, Provider } from '~/types'
-import { useMainStore } from '~/store'
-import { assert } from '~/utils/assert'
-
-const loading = ref(false)
-const data = ref<CryptoPayment | null>(null)
-const metamaskSupport = ref(false)
-
-const { cryptoPayment, switchCryptoPlan } = useMainStore()
-const { plan } = usePlanParams()
-const { currency } = useCurrencyParams()
-const { subscriptionId } = useSubscriptionIdParam()
-
-let provider: Provider | null = null
-
-onMounted(async () => {
-  const selectedPlan = get(plan)
-  const selectedCurrency = get(currency)
-  if (selectedPlan > 0 && selectedCurrency) {
-    provider = (await detectEthereumProvider()) as Provider | null
-    metamaskSupport.value = !!provider
-    set(loading, true)
-    const subId = get(subscriptionId)
-    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId)
-    if (result.isError) {
-      set(error, result.error.message)
-    } else if (result.result.transactionStarted) {
-      await navigateTo('/home')
-    } else {
-      set(data, result.result)
-    }
-
-    set(loading, false)
-  } else {
-    await navigateTo('/products')
-  }
-})
-
-const step = computed<PaymentStep>(() => {
-  const errorMessage = get(error)
-  const state = get(currentState)
-  if (errorMessage) {
-    return {
-      type: 'failure',
-      title: 'Payment Failure',
-      message: errorMessage,
-      closeable: true,
-    }
-  } else if (state === 'pending') {
-    return {
-      type: 'pending',
-      title: 'Payment in Progress',
-      message: 'Please confirm your transaction...',
-    }
-  } else if (state === 'success') {
-    return {
-      type: 'success',
-      title: 'Transaction Pending',
-      message:
-        'You should receive an e-mail confirming the activation of your subscription in the near future.',
-    }
-  } else {
-    return { type: 'idle' }
-  }
-})
-
-const reset = () => {
-  set(currentState, 'idle')
-  set(error, '')
-}
-
-const config = useRuntimeConfig()
-const {
-  payWithMetamask,
-  state: currentState,
-  error,
-} = useWeb3Payment(
-  data,
-  () => {
-    assert(provider)
-    return provider
-  },
-  !!config.testing
-)
-
-watch(plan, async (plan) => {
-  const selectedCurrency = get(currency)
-  assert(selectedCurrency)
-  const response = await switchCryptoPlan(
-    plan,
-    selectedCurrency,
-    get(subscriptionId)
-  )
-  if (!response.isError) {
-    set(data, response.result)
-  } else {
-    set(error, response.error.message)
-  }
-})
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

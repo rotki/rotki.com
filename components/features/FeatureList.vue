@@ -1,3 +1,9 @@
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'download'): void }>();
+
+const css = useCssModule();
+</script>
+
 <template>
   <NavigationAnchor id="features" />
   <MiddleMenu />
@@ -11,12 +17,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

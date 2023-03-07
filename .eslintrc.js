@@ -1,17 +1,7 @@
+process.env.ESLINT_TSCONFIG = '.nuxt/tsconfig.json';
+
 module.exports = {
-  root: true,
-  env: {
-    browser: true,
-    node: true,
-  },
-  extends: [
-    '@nuxtjs/eslint-config-typescript',
-    'prettier',
-    'plugin:prettier/recommended',
-    'plugin:nuxt/recommended',
-  ],
-  plugins: ['prettier'],
-  // add your custom rules here
+  extends: ['plugin:nuxt/recommended', '@rotki'],
   rules: {
     'vue/component-name-in-template-casing': [
       'error',
@@ -21,6 +11,5 @@ module.exports = {
         ignores: ['i18n-t'],
       },
     ],
-    'vue/no-multiple-template-root': 'off',
   },
-}
+};

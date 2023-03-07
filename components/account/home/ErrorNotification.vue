@@ -1,3 +1,8 @@
+<script setup lang="ts">
+defineProps<{ visible: boolean }>();
+
+const css = useCssModule();
+</script>
 <template>
   <Transition name="fade">
     <NotificationMessage v-if="visible">
@@ -15,11 +20,6 @@
     </NotificationMessage>
   </Transition>
 </template>
-<script setup lang="ts">
-defineProps<{ visible: boolean }>()
-
-const css = useCssModule()
-</script>
 <style lang="scss" module>
 .icon {
   @apply flex items-center;

@@ -1,3 +1,19 @@
+<script setup lang="ts">
+import { commonAttrs, getMetadata } from '~/utils/metadata';
+
+const title = 'refund policy | rotki';
+const description = 'Rotki Refund and Cancellation Policy';
+
+const config = useRuntimeConfig();
+const baseUrl = config.public.baseUrl;
+
+useHead({
+  title,
+  meta: getMetadata(title, description, `${baseUrl}/refund-policy/`, baseUrl),
+  ...commonAttrs(),
+});
+</script>
+
 <template>
   <PageContainer>
     <template #title> Rotki Refund and Cancellation Policy </template>
@@ -9,22 +25,6 @@
     subscription and from that point on no more payments will be made.
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-import { commonAttrs, getMetadata } from '~/utils/metadata'
-
-const title = 'refund policy | rotki'
-const description = 'Rotki Refund and Cancellation Policy'
-
-const config = useRuntimeConfig()
-const baseUrl = config.public.baseUrl
-
-useHead({
-  title,
-  meta: getMetadata(title, description, `${baseUrl}/refund-policy/`, baseUrl),
-  ...commonAttrs(),
-})
-</script>
 
 <style lang="scss">
 @import '@/assets/css/media.scss';

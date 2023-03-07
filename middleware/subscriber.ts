@@ -1,22 +1,22 @@
-import { storeToRefs } from 'pinia'
-import { get } from '@vueuse/core'
-import { useMainStore } from '~/store'
+import { storeToRefs } from 'pinia';
+import { get } from '@vueuse/core';
+import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(() => {
-  const { account } = storeToRefs(useMainStore())
+  const { account } = storeToRefs(useMainStore());
 
   if (!isDefined(account)) {
-    return
+    return;
   }
 
-  const { hasActiveSubscription, subscriptions } = get(account)
+  const { hasActiveSubscription, subscriptions } = get(account);
   if (hasActiveSubscription) {
     const renewableSubscriptions = subscriptions.filter(({ actions }) =>
       actions.includes('renew')
-    )
+    );
 
     if (!renewableSubscriptions) {
-      return navigateTo('/home')
+      return navigateTo('/home');
     }
   }
-})
+});

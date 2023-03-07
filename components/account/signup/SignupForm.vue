@@ -1,3 +1,99 @@
+<script setup lang="ts">
+import { email, minLength, required, sameAs } from '@vuelidate/validators';
+import { useVuelidate } from '@vuelidate/core';
+import { get } from '@vueuse/core';
+import { type Ref } from 'vue';
+import { FetchError } from 'ofetch';
+import { type SignupPayload } from '~/types/signup';
+import { fetchWithCsrf } from '~/utils/api';
+
+const state = reactive<SignupPayload>({
+  username: '',
+  password: '',
+  confirmPassword: '',
+  email: '',
+  githubUsername: '',
+  firstName: '',
+  lastName: '',
+  companyName: '',
+  vatId: '',
+  address1: '',
+  address2: '',
+  city: '',
+  postcode: '',
+  country: '',
+});
+
+const rules = {
+  username: { required },
+  password: { required, minLength: minLength(8) },
+  confirmPassword: {
+    required,
+    sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
+  },
+  email: { required, email },
+  githubUsername: {},
+  firstName: { required },
+  lastName: { required },
+  companyName: {},
+  vatId: {},
+  address1: { required },
+  address2: {},
+  city: { required },
+  postcode: { required },
+  country: { required },
+};
+
+const $externalResults = ref({});
+const v$ = useVuelidate(rules, state, {
+  $autoDirty: true,
+  $externalResults,
+});
+const termsAccepted = ref(false);
+
+const recaptcha = useRecaptcha();
+const { recaptchaPassed, onError, onSuccess, onExpired } = recaptcha;
+
+const useSignup = (
+  captcha: Ref<string>,
+  $externalResults: Ref<Record<string, string>>
+) => {
+  const signup = async (payload: SignupPayload) => {
+    const isValid = await get(v$).$validate();
+
+    if (!isValid) {
+      return;
+    }
+
+    try {
+      await fetchWithCsrf('/webapi/signup/', {
+        body: {
+          captcha: captcha.value,
+          ...payload,
+        },
+      });
+      await navigateTo({ path: '/activation' });
+    } catch (e: any) {
+      if (
+        e instanceof FetchError &&
+        e.status === 400 &&
+        e.data &&
+        typeof e.data.message === 'object'
+      ) {
+        $externalResults.value = e.data.message;
+      }
+    }
+  };
+  return {
+    signup,
+  };
+};
+
+const { countries } = useCountries();
+const { signup } = useSignup(recaptcha.recaptchaToken, $externalResults);
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer>
     <template #title> Create a rotki premium Account </template>
@@ -196,99 +292,6 @@
     </div>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-import { email, minLength, required, sameAs } from '@vuelidate/validators'
-import { useVuelidate } from '@vuelidate/core'
-import { get } from '@vueuse/core'
-import { Ref } from 'vue'
-import { FetchError } from 'ofetch'
-import { SignupPayload } from '~/types/signup'
-import { fetchWithCsrf } from '~/utils/api'
-
-const state = reactive<SignupPayload>({
-  username: '',
-  password: '',
-  confirmPassword: '',
-  email: '',
-  githubUsername: '',
-  firstName: '',
-  lastName: '',
-  companyName: '',
-  vatId: '',
-  address1: '',
-  address2: '',
-  city: '',
-  postcode: '',
-  country: '',
-})
-
-const rules = {
-  username: { required },
-  password: { required, minLength: minLength(8) },
-  confirmPassword: {
-    required,
-    sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
-  },
-  email: { required, email },
-  githubUsername: {},
-  firstName: { required },
-  lastName: { required },
-  companyName: {},
-  vatId: {},
-  address1: { required },
-  address2: {},
-  city: { required },
-  postcode: { required },
-  country: { required },
-}
-
-const $externalResults = ref({})
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-})
-const termsAccepted = ref(false)
-
-const recaptcha = useRecaptcha()
-const { recaptchaPassed, onError, onSuccess, onExpired } = recaptcha
-
-const useSignup = (
-  captcha: Ref<string>,
-  $externalResults: Ref<Record<string, string>>
-) => {
-  const signup = async (payload: SignupPayload) => {
-    const isValid = await get(v$).$validate()
-
-    if (!isValid) {
-      return
-    }
-
-    try {
-      await fetchWithCsrf('/webapi/signup/', {
-        body: {
-          captcha: captcha.value,
-          ...payload,
-        },
-      })
-      await navigateTo({ path: '/activation' })
-    } catch (e: any) {
-      if (e instanceof FetchError && e.status === 400) {
-        if (e.data && typeof e.data.message === 'object') {
-          $externalResults.value = e.data.message
-        }
-      }
-    }
-  }
-  return {
-    signup,
-  }
-}
-
-const { countries } = useCountries()
-const { signup } = useSignup(recaptcha.recaptchaToken, $externalResults)
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

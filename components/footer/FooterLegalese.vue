@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.links">
     <ExternalLink same-tab text="Impressum" url="/impressum" />
@@ -10,10 +14,6 @@
     />
   </div>
 </template>
-
-<script setup lang="ts">
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

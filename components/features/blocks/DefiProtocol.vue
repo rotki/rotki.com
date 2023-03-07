@@ -1,3 +1,16 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    image?: string;
+  }>(),
+  {
+    image: '',
+  }
+);
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div :class="css.protocol">
@@ -10,24 +23,11 @@
         </div>
       </div>
       <div :class="css.description">
-        <slot></slot>
+        <slot />
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    image?: string
-  }>(),
-  {
-    image: '',
-  }
-)
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

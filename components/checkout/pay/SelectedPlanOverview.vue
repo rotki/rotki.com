@@ -1,3 +1,53 @@
+<script setup lang="ts">
+import { get, set } from '@vueuse/core';
+import { type CryptoPayment, type SelectedPlan } from '~/types';
+import { getPlanName } from '~/utils/plans';
+
+const props = withDefaults(
+  defineProps<{
+    plan: SelectedPlan | CryptoPayment;
+    crypto?: boolean;
+    warning?: boolean;
+  }>(),
+  {
+    crypto: false,
+    warning: false,
+  }
+);
+
+const { plan } = toRefs(props);
+const router = useRouter();
+
+const selection = ref(false);
+
+const name = computed(() => getPlanName(get(plan).months));
+const date = computed(() => {
+  const currentPlan = get(plan);
+  const date = new Date(currentPlan.startDate * 1000);
+  return date.toLocaleDateString();
+});
+
+const select = () => {
+  set(selection, true);
+};
+
+const switchTo = (months: number) => {
+  set(selection, false);
+  const currentRoute = router.currentRoute;
+
+  navigateTo({
+    path: currentRoute.path,
+    query: {
+      ...currentRoute.query,
+      p: months.toString(),
+    },
+  });
+};
+
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <PlanOverview>
     <span :class="css.plan">{{ name }} Plan.</span>
@@ -46,56 +96,6 @@
     </template>
   </PlanOverview>
 </template>
-
-<script setup lang="ts">
-import { get, set } from '@vueuse/core'
-import { CryptoPayment, SelectedPlan } from '~/types'
-import { getPlanName } from '~/utils/plans'
-
-const props = withDefaults(
-  defineProps<{
-    plan: SelectedPlan | CryptoPayment
-    crypto?: boolean
-    warning?: boolean
-  }>(),
-  {
-    crypto: false,
-    warning: false,
-  }
-)
-
-const { plan } = toRefs(props)
-const router = useRouter()
-
-const selection = ref(false)
-
-const name = computed(() => getPlanName(get(plan).months))
-const date = computed(() => {
-  const currentPlan = get(plan)
-  const date = new Date(currentPlan.startDate * 1000)
-  return date.toLocaleDateString()
-})
-
-const select = () => {
-  set(selection, true)
-}
-
-const switchTo = (months: number) => {
-  set(selection, false)
-  const currentRoute = router.currentRoute
-
-  navigateTo({
-    path: currentRoute.path,
-    query: {
-      ...currentRoute.query,
-      p: months.toString(),
-    },
-  })
-}
-
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .plan {

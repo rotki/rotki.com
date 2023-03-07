@@ -1,3 +1,28 @@
+<script setup lang="ts">
+import { commonAttrs, noIndex } from '~/utils/metadata';
+
+useHead({
+  title: 'maintenance | rotki',
+  meta: [
+    {
+      key: 'description',
+      name: 'description',
+      content:
+        'rotki is currently undergoing maintenance please come back later',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
+});
+
+const config = useRuntimeConfig();
+
+if (!config.maintenance) {
+  navigateTo('/');
+}
+
+const css = useCssModule();
+</script>
 <template>
   <div :class="css.wrapper">
     <img
@@ -18,31 +43,6 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
-
-useHead({
-  title: 'maintenance | rotki',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content:
-        'rotki is currently undergoing maintenance please come back later',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-})
-
-const config = useRuntimeConfig()
-
-if (!config.maintenance) {
-  navigateTo('/')
-}
-
-const css = useCssModule()
-</script>
 <style lang="scss" module>
 .wrapper {
   @apply w-full min-h-full flex flex-col items-center justify-center text-center py-28 px-8;

@@ -1,3 +1,22 @@
+<script setup lang="ts">
+import { type Subscription } from '~/types';
+import { useMainStore } from '~/store';
+
+const props = defineProps<{
+  subscription: Subscription;
+}>();
+
+const { subscription } = toRefs(props);
+const isPending = computed(() => subscription.value.status === 'Pending');
+const confirm = ref(false);
+const store = useMainStore();
+const cancelSubscription = async () => {
+  confirm.value = false;
+  await store.cancelSubscription(subscription.value);
+};
+
+const css = useCssModule();
+</script>
 <template>
   <div>
     <button :class="css.actionButton" @click="confirm = true">Cancel</button>
@@ -67,25 +86,6 @@
     </ModalDialog>
   </div>
 </template>
-<script setup lang="ts">
-import { Subscription } from '~/types'
-import { useMainStore } from '~/store'
-
-const props = defineProps<{
-  subscription: Subscription
-}>()
-
-const { subscription } = toRefs(props)
-const isPending = computed(() => subscription.value.status === 'Pending')
-const confirm = ref(false)
-const store = useMainStore()
-const cancelSubscription = async () => {
-  confirm.value = false
-  await store.cancelSubscription(subscription.value)
-}
-
-const css = useCssModule()
-</script>
 <style lang="scss" module>
 @import '@/assets/css/media.scss';
 

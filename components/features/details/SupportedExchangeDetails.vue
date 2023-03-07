@@ -1,3 +1,10 @@
+<script setup lang="ts">
+const column1 = ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex'];
+const column2 = ['Coinbase', 'Coinbase Pro', 'Gemini', 'and many more...'];
+const css = useCssModule();
+const { t } = useI18n();
+</script>
+
 <template>
   <FeatureContainer id="exchanges">
     <template #title>
@@ -25,13 +32,6 @@
     />
   </FeatureContainer>
 </template>
-
-<script setup lang="ts">
-const column1 = ['Kraken', 'KuCoin', 'Binance', 'Binance US', 'Bittrex']
-const column2 = ['Coinbase', 'Coinbase Pro', 'Gemini', 'and many more...']
-const css = useCssModule()
-const { t } = useI18n()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

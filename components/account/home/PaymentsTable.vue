@@ -1,3 +1,32 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { get } from '@vueuse/core';
+import { useMainStore } from '~/store';
+import { type DataTableHeader } from '~/types/common';
+
+const headers: DataTableHeader[] = [
+  { text: 'Plan', value: '' },
+  { text: 'Paid at', value: '', sortable: true },
+  { text: 'Amount in €', value: '', sortable: true },
+  { text: 'Status', value: '' },
+  { text: 'Receipt', value: '', className: 'text-right' },
+];
+
+const store = useMainStore();
+const { account } = storeToRefs(store);
+const payments = computed(() => {
+  const userAccount = get(account);
+  if (!userAccount) {
+    return [];
+  }
+  return userAccount.payments.sort(
+    (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime()
+  );
+});
+
+const css = useCssModule();
+</script>
+
 <template>
   <DataTable v-if="payments.length > 0" :headers="headers" :items="payments">
     <template #title>Your latest payments</template>
@@ -39,35 +68,6 @@
     </template>
   </DataTable>
 </template>
-
-<script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { get } from '@vueuse/core'
-import { useMainStore } from '~/store'
-import { DataTableHeader } from '~/types/common'
-
-const headers: DataTableHeader[] = [
-  { text: 'Plan', value: '' },
-  { text: 'Paid at', value: '', sortable: true },
-  { text: 'Amount in €', value: '', sortable: true },
-  { text: 'Status', value: '' },
-  { text: 'Receipt', value: '', className: 'text-right' },
-]
-
-const store = useMainStore()
-const { account } = storeToRefs(store)
-const payments = computed(() => {
-  const userAccount = get(account)
-  if (!userAccount) {
-    return []
-  }
-  return userAccount.payments.sort(
-    (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime()
-  )
-})
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

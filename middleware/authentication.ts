@@ -1,10 +1,10 @@
-import { storeToRefs } from 'pinia'
-import { get } from '@vueuse/core'
-import { useMainStore } from '~/store'
+import { storeToRefs } from 'pinia';
+import { get } from '@vueuse/core';
+import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(() => {
-  const { authenticated } = storeToRefs(useMainStore())
+  const { authenticated } = storeToRefs(useMainStore());
   if (!get(authenticated)) {
-    return navigateTo('/login')
+    return navigateTo('/login');
   }
-})
+});

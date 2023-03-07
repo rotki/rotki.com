@@ -1,3 +1,29 @@
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    disabled?: boolean;
+  }>(),
+  {
+    disabled: false,
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'click'): void;
+}>();
+
+const { disabled } = toRefs(props);
+const click = () => {
+  if (disabled.value) {
+    return;
+  }
+
+  emit('click');
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -9,32 +35,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-const props = withDefaults(
-  defineProps<{
-    disabled?: boolean
-  }>(),
-  {
-    disabled: false,
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'click'): void
-}>()
-
-const { disabled } = toRefs(props)
-const click = () => {
-  if (disabled.value) {
-    return
-  }
-
-  emit('click')
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .btn {

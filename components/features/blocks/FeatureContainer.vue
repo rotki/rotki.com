@@ -1,3 +1,10 @@
+<script setup lang="ts">
+defineProps<{ id: string }>();
+const css = useCssModule();
+const slots = useSlots();
+const attrs = useAttrs();
+</script>
+
 <template>
   <div :class="css.wrapper" v-bind="attrs">
     <div :class="css.content">
@@ -8,7 +15,7 @@
             <slot name="title" />
           </div>
         </div>
-        <slot></slot>
+        <slot />
       </div>
       <div v-if="slots.image" :class="css.column2">
         <slot name="image" />
@@ -16,13 +23,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-defineProps<{ id: string }>()
-const css = useCssModule()
-const slots = useSlots()
-const attrs = useAttrs()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

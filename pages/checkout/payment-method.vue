@@ -1,13 +1,9 @@
-<template>
-  <PaymentMethodPage />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['maintenance', 'pending-payment', 'subscriber'],
-})
+});
 
 useHead({
   title: 'select payment method | rotki',
@@ -20,5 +16,9 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <PaymentMethodPage />
+</template>

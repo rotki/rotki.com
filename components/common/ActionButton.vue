@@ -1,3 +1,34 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    text?: string | null;
+    primary?: boolean;
+    filled?: boolean;
+    href?: string;
+    disabled?: boolean;
+    small?: boolean;
+    loading?: boolean;
+    warning?: boolean;
+  }>(),
+  {
+    text: null,
+    primary: false,
+    filled: false,
+    disabled: false,
+    small: false,
+    loading: false,
+    warning: false,
+    href: '',
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'click'): void;
+}>();
+
+const css = useCssModule();
+</script>
+
 <template>
   <button
     :class="{
@@ -20,37 +51,6 @@
     </span>
   </button>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    text?: string | null
-    primary?: boolean
-    filled?: boolean
-    href?: string
-    disabled?: boolean
-    small?: boolean
-    loading?: boolean
-    warning?: boolean
-  }>(),
-  {
-    text: null,
-    primary: false,
-    filled: false,
-    disabled: false,
-    small: false,
-    loading: false,
-    warning: false,
-    href: '',
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'click'): void
-}>()
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

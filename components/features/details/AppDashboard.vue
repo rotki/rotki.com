@@ -1,3 +1,9 @@
+<script setup lang="ts">
+const emit = defineEmits<{ (e: 'download'): void }>();
+const { t } = useI18n();
+const css = useCssModule();
+</script>
+
 <template>
   <FeatureContainer id="dashboard">
     <template #title>{{ t('home.dashboard.title') }}</template>
@@ -21,12 +27,6 @@
     </div>
   </FeatureContainer>
 </template>
-
-<script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>()
-const { t } = useI18n()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '~/assets/css/media';

@@ -1,11 +1,3 @@
-<template>
-  <div id="defi" class="py-12">
-    <TextHeading>{{ t('supported_defi.title') }}</TextHeading>
-    <SupportedRowWrapper :items="defi" />
-    <CaptionText>{{ t('supported_defi.caption') }}</CaptionText>
-  </div>
-</template>
-
 <script setup lang="ts">
 const defi = [
   {
@@ -44,7 +36,15 @@ const defi = [
     name: 'Sushiswap',
     img: '/img/defi/sushiswap.svg',
   },
-]
+];
 
-const { t } = useI18n()
+const { t } = useI18n();
 </script>
+
+<template>
+  <div id="defi" class="py-12">
+    <TextHeading>{{ t('supported_defi.title') }}</TextHeading>
+    <SupportedRowWrapper :items="defi" />
+    <CaptionText>{{ t('supported_defi.caption') }}</CaptionText>
+  </div>
+</template>

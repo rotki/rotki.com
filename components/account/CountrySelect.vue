@@ -1,3 +1,130 @@
+<script setup lang="ts">
+import { debouncedWatch, get, set } from '@vueuse/core';
+import { type Country } from '~/composables/countries';
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+    id: string;
+    label: string;
+    countries?: Country[];
+    hint?: string;
+    disabled?: boolean;
+    errorMessages?: { $message: string }[];
+  }>(),
+  {
+    countries: () => [],
+    hint: '',
+    disabled: false,
+    errorMessages: () => [],
+  }
+);
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void;
+  (e: 'blur'): void;
+  (e: 'selected', country: Country | null): void;
+}>();
+
+const { countries, modelValue: value, disabled } = toRefs(props);
+const selected = ref<Country | null>(null);
+const optionsShown = ref(false);
+const searchFilter = ref('');
+
+const filteredOptions = computed(() => {
+  const filtered: Country[] = [];
+  const filter = get(searchFilter);
+  const regOption = new RegExp(filter, 'ig');
+  for (const option of get(countries)) {
+    if (filter.length === 0 || option.name.match(regOption)) {
+      filtered.push(option);
+    }
+  }
+  return filtered;
+});
+
+const selectOption = (option: Country) => {
+  set(selected, option);
+  set(optionsShown, false);
+  set(searchFilter, option.name);
+  emit('update:modelValue', option.code);
+};
+
+const showOptions = () => {
+  if (!get(disabled)) {
+    set(searchFilter, '');
+    set(optionsShown, true);
+  }
+};
+
+const exit = () => {
+  const filtered = get(filteredOptions);
+  if (filtered.length > 0 && get(searchFilter)) {
+    selectOption(filtered[0]);
+  } else {
+    const selection = get(selected);
+    if (selection) {
+      selectOption(selection);
+    } else {
+      set(searchFilter, '');
+    }
+  }
+  set(optionsShown, false);
+  emit('blur');
+};
+
+const keyMonitor = (event: KeyboardEvent) => {
+  const filtered = get(filteredOptions);
+  if (event.key === 'Enter' && filtered[0]) {
+    selectOption(filtered[0]);
+  }
+};
+
+const getFlagEmoji = (code: string) => {
+  const codePoints = code
+    .toUpperCase()
+    .split('')
+    .map((char) => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+};
+
+const isEmpty = computed(() => {
+  const filter = get(searchFilter);
+  const selection = get(selected);
+  return !filter || selection?.name !== filter;
+});
+
+watch(selected, (newValue, oldValue) => {
+  if (newValue && newValue !== oldValue) {
+    emit('update:modelValue', newValue?.code ?? '');
+  }
+});
+onMounted(() => setCountryUsingCode(get(value)));
+
+function setCountryUsingCode(value: string) {
+  const cnt = get(countries);
+  const country = cnt.find(({ code }) => code === value);
+  if (country && country !== get(selected)) {
+    selectOption(country);
+  }
+}
+
+debouncedWatch(
+  value,
+  (value) => {
+    if (!value) {
+      set(selected, null);
+    } else {
+      setCountryUsingCode(value);
+    }
+  },
+  { debounce: 800 }
+);
+
+emit('selected', get(selected));
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div>
@@ -63,133 +190,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-import { debouncedWatch, get, set } from '@vueuse/core'
-import { Country } from '~/composables/countries'
-
-const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    id: string
-    label: string
-    countries?: Country[]
-    hint?: string
-    disabled?: boolean
-    errorMessages?: { $message: string }[]
-  }>(),
-  {
-    countries: () => [],
-    hint: '',
-    disabled: false,
-    errorMessages: () => [],
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  (e: 'blur'): void
-  (e: 'selected', country: Country | null): void
-}>()
-
-const { countries, modelValue: value, disabled } = toRefs(props)
-const selected = ref<Country | null>(null)
-const optionsShown = ref(false)
-const searchFilter = ref('')
-
-const filteredOptions = computed(() => {
-  const filtered: Country[] = []
-  const filter = get(searchFilter)
-  const regOption = new RegExp(filter, 'ig')
-  for (const option of get(countries)) {
-    if (filter.length < 1 || option.name.match(regOption)) {
-      filtered.push(option)
-    }
-  }
-  return filtered
-})
-
-const selectOption = (option: Country) => {
-  set(selected, option)
-  set(optionsShown, false)
-  set(searchFilter, option.name)
-  emit('update:modelValue', option.code)
-}
-
-const showOptions = () => {
-  if (!get(disabled)) {
-    set(searchFilter, '')
-    set(optionsShown, true)
-  }
-}
-
-const exit = () => {
-  const filtered = get(filteredOptions)
-  if (filtered.length > 0 && get(searchFilter)) {
-    selectOption(filtered[0])
-  } else {
-    const selection = get(selected)
-    if (selection) {
-      selectOption(selection)
-    } else {
-      set(searchFilter, '')
-    }
-  }
-  set(optionsShown, false)
-  emit('blur')
-}
-
-const keyMonitor = (event: KeyboardEvent) => {
-  const filtered = get(filteredOptions)
-  if (event.key === 'Enter' && filtered[0]) {
-    selectOption(filtered[0])
-  }
-}
-
-const getFlagEmoji = (code: string) => {
-  const codePoints = code
-    .toUpperCase()
-    .split('')
-    .map((char) => 127397 + char.charCodeAt(0))
-  return String.fromCodePoint(...codePoints)
-}
-
-const isEmpty = computed(() => {
-  const filter = get(searchFilter)
-  const selection = get(selected)
-  return !filter || selection?.name !== filter
-})
-
-watch(selected, (newValue, oldValue) => {
-  if (newValue && newValue !== oldValue) {
-    emit('update:modelValue', newValue?.code ?? '')
-  }
-})
-onMounted(() => setCountryUsingCode(get(value)))
-
-function setCountryUsingCode(value: string) {
-  const cnt = get(countries)
-  const country = cnt.find(({ code }) => code === value)
-  if (country && country !== get(selected)) {
-    selectOption(country)
-  }
-}
-
-debouncedWatch(
-  value,
-  (value) => {
-    if (!value) {
-      set(selected, null)
-    } else {
-      setCountryUsingCode(value)
-    }
-  },
-  { debounce: 800 }
-)
-
-emit('selected', get(selected))
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .wrapper {

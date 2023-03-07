@@ -1,10 +1,10 @@
-import { storeToRefs } from 'pinia'
-import { useMainStore } from '~/store'
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(() => {
-  const { account } = storeToRefs(useMainStore())
+  const { account } = storeToRefs(useMainStore());
 
   if (isDefined(account)) {
-    navigateTo('/home')
+    navigateTo('/home');
   }
-})
+});

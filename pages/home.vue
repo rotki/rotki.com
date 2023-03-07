@@ -1,13 +1,9 @@
-<template>
-  <AccountOverview />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['maintenance', 'authentication'],
-})
+});
 
 useHead({
   title: 'account | rotki',
@@ -20,10 +16,14 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 
-useAutoLogout()
+useAutoLogout();
 </script>
+
+<template>
+  <AccountOverview />
+</template>
 
 <style lang="scss">
 @import '@/assets/css/media.scss';

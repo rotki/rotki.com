@@ -1,3 +1,111 @@
+<script setup lang="ts">
+import { useVuelidate } from '@vuelidate/core';
+import { minLength, required, sameAs } from '@vuelidate/validators';
+import { set } from '@vueuse/core';
+import { type Ref } from 'vue';
+import { FetchError } from 'ofetch';
+import { fetchWithCsrf } from '~/utils/api';
+
+function setupTokenValidation() {
+  const route = useRoute();
+  const { uid, token } = route.params;
+  const validating = ref(true);
+  const isValid = ref(true);
+
+  const validateToken = async () => {
+    try {
+      await fetchWithCsrf('/webapi/password-reset/validate/', {
+        body: {
+          uid,
+          token,
+        },
+      });
+    } catch {
+      set(isValid, false);
+    }
+
+    set(validating, false);
+  };
+
+  onMounted(async () => await validateToken());
+  return { validating, isValid };
+}
+
+function setupFormValidation(
+  password: Ref<string>,
+  passwordConfirmation: Ref<string>,
+  $externalResults: Ref<{}>
+) {
+  const rules = {
+    password: { required, minLength: minLength(8) },
+    passwordConfirmation: {
+      required,
+      sameAsPassword: sameAs(password, 'password'),
+    },
+  };
+
+  const v$ = useVuelidate(
+    rules,
+    { password, passwordConfirmation },
+    {
+      $autoDirty: true,
+      $externalResults,
+    }
+  );
+
+  const valid = computed(() => !v$.value.$invalid);
+  return { v$, valid };
+}
+
+const password = ref('');
+const passwordConfirmation = ref('');
+const $externalResults = ref({});
+
+const route = useRoute();
+const { uid, token } = route.params;
+const submit = async () => {
+  try {
+    await fetchWithCsrf('/webapi/password-reset/confirm/', {
+      body: {
+        uid,
+        token,
+        password: password.value,
+        password_confirmation: passwordConfirmation.value,
+      },
+    });
+    await navigateTo({
+      path: '/password/changed',
+    });
+  } catch (e: any) {
+    if (e instanceof FetchError) {
+      const status = e.status ?? -1;
+      if (status === 404) {
+        await navigateTo({
+          path: '/password/invalid-link',
+        });
+      } else if (status === 400) {
+        const message = e.data.message;
+        if (message && typeof message === 'object') {
+          $externalResults.value = {
+            password: message.password,
+            passwordConfirmation: message.password_confirmation,
+          };
+        }
+      }
+    }
+  }
+};
+
+const { validating, isValid } = setupTokenValidation();
+const { valid, v$ } = setupFormValidation(
+  password,
+  passwordConfirmation,
+  $externalResults
+);
+
+const css = useCssModule();
+</script>
+
 <template>
   <PageContainer>
     <template #title> Reset your password </template>
@@ -56,114 +164,6 @@
     </div>
   </PageContainer>
 </template>
-
-<script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core'
-import { minLength, required, sameAs } from '@vuelidate/validators'
-import { set } from '@vueuse/core'
-import { Ref } from 'vue'
-import { FetchError } from 'ofetch'
-import { fetchWithCsrf } from '~/utils/api'
-
-function setupTokenValidation() {
-  const route = useRoute()
-  const { uid, token } = route.params
-  const validating = ref(true)
-  const isValid = ref(true)
-
-  const validateToken = async () => {
-    try {
-      await fetchWithCsrf('/webapi/password-reset/validate/', {
-        body: {
-          uid,
-          token,
-        },
-      })
-    } catch (e: any) {
-      set(isValid, false)
-    }
-
-    set(validating, false)
-  }
-
-  onMounted(async () => await validateToken())
-  return { validating, isValid }
-}
-
-function setupFormValidation(
-  password: Ref<string>,
-  passwordConfirmation: Ref<string>,
-  $externalResults: Ref<{}>
-) {
-  const rules = {
-    password: { required, minLength: minLength(8) },
-    passwordConfirmation: {
-      required,
-      sameAsPassword: sameAs(password, 'password'),
-    },
-  }
-
-  const v$ = useVuelidate(
-    rules,
-    { password, passwordConfirmation },
-    {
-      $autoDirty: true,
-      $externalResults,
-    }
-  )
-
-  const valid = computed(() => !v$.value.$invalid)
-  return { v$, valid }
-}
-
-const password = ref('')
-const passwordConfirmation = ref('')
-const $externalResults = ref({})
-
-const route = useRoute()
-const { uid, token } = route.params
-const submit = async () => {
-  try {
-    await fetchWithCsrf('/webapi/password-reset/confirm/', {
-      body: {
-        uid,
-        token,
-        password: password.value,
-        password_confirmation: passwordConfirmation.value,
-      },
-    })
-    await navigateTo({
-      path: '/password/changed',
-    })
-  } catch (e: any) {
-    if (e instanceof FetchError) {
-      const status = e.status ?? -1
-      if (status === 404) {
-        await navigateTo({
-          path: '/password/invalid-link',
-        })
-      } else if (status === 400) {
-        const message = e.data.message
-        if (message && typeof message === 'object') {
-          $externalResults.value = {
-            password: message.password,
-            passwordConfirmation: message.password_confirmation,
-          }
-        }
-      }
-    }
-  }
-}
-
-const { validating, isValid } = setupTokenValidation()
-const { valid, v$ } = setupFormValidation(
-  password,
-  passwordConfirmation,
-  $externalResults
-)
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .button {

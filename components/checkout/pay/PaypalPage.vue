@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { token, step, plan, submit } = useBraintree();
+</script>
+
 <template>
   <PaymentFrame :loading="!token" :step="step">
     <PaypalPayment
@@ -8,7 +12,3 @@
     />
   </PaymentFrame>
 </template>
-
-<script setup lang="ts">
-const { token, step, plan, submit } = useBraintree()
-</script>

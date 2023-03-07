@@ -1,3 +1,23 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    selected: boolean;
+    disabled?: boolean;
+  }>(),
+  {
+    disabled: false,
+  }
+);
+
+const emit = defineEmits<{ (e: 'click'): void }>();
+
+const click = () => {
+  emit('click');
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <button
     :class="{
@@ -17,26 +37,6 @@
     </span>
   </button>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    selected: boolean
-    disabled?: boolean
-  }>(),
-  {
-    disabled: false,
-  }
-)
-
-const emit = defineEmits<{ (e: 'click'): void }>()
-
-const click = () => {
-  emit('click')
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 $color: #da4e24;

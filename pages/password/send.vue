@@ -1,13 +1,9 @@
-<template>
-  <PasswordLinkSend />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: 'maintenance',
-})
+});
 
 useHead({
   title: 'recovery e-mail send | rotki',
@@ -20,8 +16,12 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <PasswordLinkSend />
+</template>
 
 <style lang="scss">
 @import '@/assets/css/main.scss';

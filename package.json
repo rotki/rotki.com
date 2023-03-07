@@ -2,25 +2,17 @@
   "name": "rotki.com",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@7.28.0",
+  "packageManager": "pnpm@7.29.0",
   "scripts": {
     "dev": "nuxi dev",
     "build": "nuxi build",
     "start": "nuxi start",
     "generate": "nuxi generate",
     "postinstall": "nuxi prepare",
-    "lint:js": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "lint:style": "stylelint **/*.{vue,css,scss} --ignore-path .gitignore",
-    "lint": "pnpm lint:js && pnpm lint:style"
-  },
-  "lint-staged": {
-    "*.{js,ts,vue}": "eslint",
-    "*.{css,vue}": "stylelint"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "lint:all": "pnpm lint && pnpm lint:style"
   },
   "dependencies": {
     "@metamask/detect-provider": "1.2.0",
@@ -53,15 +45,14 @@
     "@nuxtjs/eslint-config-typescript": "12.0.0",
     "@nuxtjs/eslint-module": "3.1.0",
     "@nuxtjs/i18n": "8.0.0-beta.10",
+    "@rotki/eslint-config": "1.0.3",
     "@types/braintree-web": "3.75.22",
     "@types/paypal-checkout-components": "4.0.5",
     "@types/qrcode": "1.5.0",
     "@typescript-eslint/eslint-plugin": "5.54.0",
     "@typescript-eslint/parser": "5.54.0",
     "eslint": "8.35.0",
-    "eslint-config-prettier": "8.6.0",
     "eslint-plugin-nuxt": "4.0.0",
-    "eslint-plugin-prettier": "4.2.1",
     "husky": "8.0.3",
     "lint-staged": "13.1.2",
     "nuxt": "3.2.3",
@@ -82,5 +73,14 @@
     "typescript": "4.9.5",
     "vite": "4.1.4",
     "webpack": "5.75.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": "eslint",
+    "*.{css,vue}": "stylelint"
   }
 }

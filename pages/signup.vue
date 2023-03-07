@@ -1,13 +1,9 @@
-<template>
-  <SignupForm />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs } from '~/utils/metadata'
+import { commonAttrs } from '~/utils/metadata';
 
 definePageMeta({
   middleware: 'maintenance',
-})
+});
 
 useHead({
   title: 'signup | rotki',
@@ -19,8 +15,12 @@ useHead({
     },
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <SignupForm />
+</template>
 
 <style lang="scss">
 @import '@/assets/css/main.scss';

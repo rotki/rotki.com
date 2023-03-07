@@ -1,3 +1,17 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    landing?: boolean;
+  }>(),
+  {
+    landing: false,
+  }
+);
+
+const year = new Date().getFullYear().toString();
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <div :class="css.row">
@@ -20,20 +34,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    landing?: boolean
-  }>(),
-  {
-    landing: false,
-  }
-)
-
-const year = new Date().getFullYear().toString()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

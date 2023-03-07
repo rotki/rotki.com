@@ -1,13 +1,9 @@
-<template>
-  <PasswordChanged />
-</template>
-
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata'
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: 'maintenance',
-})
+});
 
 useHead({
   title: 'password changed | rotki',
@@ -20,8 +16,12 @@ useHead({
     noIndex(),
   ],
   ...commonAttrs(),
-})
+});
 </script>
+
+<template>
+  <PasswordChanged />
+</template>
 
 <style lang="scss">
 @import '@/assets/css/main.scss';

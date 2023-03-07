@@ -1,3 +1,23 @@
+<script setup lang="ts">
+import { set } from '@vueuse/core';
+
+const props = defineProps<{ value: string }>();
+
+const { value } = toRefs(props);
+const copied = ref(false);
+const { start, stop } = useTimeoutFn(() => set(copied, false), 4000);
+const { copy } = useClipboard({ source: value });
+
+const copyToClipboard = () => {
+  stop();
+  copy();
+  set(copied, true);
+  start();
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <InfoTooltip>
     <template #activator>
@@ -10,26 +30,6 @@
     <span v-else> Copy to clipboard </span>
   </InfoTooltip>
 </template>
-
-<script setup lang="ts">
-import { set } from '@vueuse/core'
-
-const props = defineProps<{ value: string }>()
-
-const { value } = toRefs(props)
-const copied = ref(false)
-const { start, stop } = useTimeoutFn(() => set(copied, false), 4000)
-const { copy } = useClipboard({ source: value })
-
-const copyToClipboard = () => {
-  stop()
-  copy()
-  set(copied, true)
-  start()
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .button {

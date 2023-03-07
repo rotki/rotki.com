@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
+import { type ActionResult } from '~/types/common';
+
+const confirm = ref(false);
+const usernameConfirmation = ref('');
+const error = ref('');
+
+const store = useMainStore();
+const { account } = storeToRefs(store);
+
+const username = computed(() => account.value?.username);
+const isSubscriber = computed(
+  () => account.value?.hasActiveSubscription ?? false
+);
+
+const deleteAccount = async () => {
+  confirm.value = false;
+  const result: ActionResult = await store.deleteAccount({
+    username: usernameConfirmation.value,
+  });
+  if (result.success) {
+    await store.logout();
+    await navigateTo('/account-deleted');
+  } else {
+    error.value = typeof result.message === 'string' ? result.message : '';
+    setTimeout(() => (error.value = ''), 4500);
+  }
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <CardContainer warning>
     <TextHeading>Danger Zone</TextHeading>
@@ -52,40 +86,6 @@
     </ErrorNotification>
   </CardContainer>
 </template>
-
-<script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useMainStore } from '~/store'
-import { ActionResult } from '~/types/common'
-
-const confirm = ref(false)
-const usernameConfirmation = ref('')
-const error = ref('')
-
-const store = useMainStore()
-const { account } = storeToRefs(store)
-
-const username = computed(() => account.value?.username)
-const isSubscriber = computed(
-  () => account.value?.hasActiveSubscription ?? false
-)
-
-const deleteAccount = async () => {
-  confirm.value = false
-  const result: ActionResult = await store.deleteAccount({
-    username: usernameConfirmation.value,
-  })
-  if (result.success) {
-    await store.logout()
-    await navigateTo('/account-deleted')
-  } else {
-    error.value = typeof result.message === 'string' ? result.message : ''
-    setTimeout(() => (error.value = ''), 4500)
-  }
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .text {

@@ -1,3 +1,71 @@
+<script setup lang="ts">
+import { useVuelidate } from '@vuelidate/core';
+import { minLength, required, sameAs } from '@vuelidate/validators';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
+import { type ActionResult } from '~/types/common';
+
+const loading = ref(false);
+const success = ref(false);
+
+const store = useMainStore();
+const { account } = storeToRefs(store);
+
+const email = computed(() => {
+  const userAccount = account.value;
+  return !userAccount ? '' : userAccount.email;
+});
+
+const state = reactive({
+  currentPassword: '',
+  newPassword: '',
+  passwordConfirmation: '',
+});
+
+const { newPassword } = toRefs(state);
+
+const rules = {
+  currentPassword: { required, minLength: minLength(8) },
+  newPassword: { required, minLength: minLength(8) },
+  passwordConfirmation: {
+    required,
+    sameAsPassword: sameAs(newPassword, 'new password'),
+  },
+};
+const $externalResults = ref({});
+const v$ = useVuelidate(rules, state, {
+  $autoDirty: true,
+  $externalResults,
+});
+
+let pendingTimeout: any;
+
+const changePassword = async () => {
+  loading.value = true;
+  const result: ActionResult = await store.changePassword(state);
+  loading.value = false;
+  if (result.message && typeof result.message !== 'string') {
+    $externalResults.value = result.message;
+  }
+
+  if (result.success) {
+    success.value = true;
+    if (pendingTimeout) {
+      clearTimeout(pendingTimeout);
+      pendingTimeout = undefined;
+    }
+    pendingTimeout = setTimeout(() => {
+      success.value = false;
+    }, 4000);
+    state.currentPassword = '';
+    state.newPassword = '';
+    state.passwordConfirmation = '';
+    v$.value.$reset();
+  }
+};
+
+const css = useCssModule();
+</script>
 <template>
   <CardContainer>
     <TextHeading subheading>Account Details</TextHeading>
@@ -58,74 +126,6 @@
     </div>
   </CardContainer>
 </template>
-<script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core'
-import { minLength, required, sameAs } from '@vuelidate/validators'
-import { storeToRefs } from 'pinia'
-import { useMainStore } from '~/store'
-import { ActionResult } from '~/types/common'
-
-const loading = ref(false)
-const success = ref(false)
-
-const store = useMainStore()
-const { account } = storeToRefs(store)
-
-const email = computed(() => {
-  const userAccount = account.value
-  return !userAccount ? '' : userAccount.email
-})
-
-const state = reactive({
-  currentPassword: '',
-  newPassword: '',
-  passwordConfirmation: '',
-})
-
-const { newPassword } = toRefs(state)
-
-const rules = {
-  currentPassword: { required, minLength: minLength(8) },
-  newPassword: { required, minLength: minLength(8) },
-  passwordConfirmation: {
-    required,
-    sameAsPassword: sameAs(newPassword, 'new password'),
-  },
-}
-const $externalResults = ref({})
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-})
-
-let pendingTimeout: any
-
-const changePassword = async () => {
-  loading.value = true
-  const result: ActionResult = await store.changePassword(state)
-  loading.value = false
-  if (result.message && typeof result.message !== 'string') {
-    $externalResults.value = result.message
-  }
-
-  if (result.success) {
-    success.value = true
-    if (pendingTimeout) {
-      clearTimeout(pendingTimeout)
-      pendingTimeout = undefined
-    }
-    pendingTimeout = setTimeout(() => {
-      success.value = false
-    }, 4000)
-    state.currentPassword = ''
-    state.newPassword = ''
-    state.passwordConfirmation = ''
-    v$.value.$reset()
-  }
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .confirm {

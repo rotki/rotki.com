@@ -1,3 +1,62 @@
+<script setup lang="ts">
+import { ethers } from 'ethers';
+import { toCanvas } from 'qrcode';
+import { get, set, useClipboard } from '@vueuse/core';
+import { type CryptoPayment } from '~/types';
+import { logger } from '~/utils/logger';
+
+const createPaymentQR = async (
+  payment: CryptoPayment,
+  canvas: HTMLCanvasElement
+) => {
+  const dai = '0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844';
+  let qrText = '';
+  if (payment.cryptocurrency === 'BTC') {
+    qrText = `bitcoin:${payment.cryptoAddress}?amount=${payment.finalPriceInCrypto}&label=Rotki`;
+  } else if (payment.cryptocurrency === 'ETH') {
+    const ethPrice = ethers.utils.parseEther(payment.finalPriceInCrypto);
+    qrText = `ethereum:${payment.cryptoAddress}?value=${ethPrice.toString()}`;
+  } else if (payment.cryptocurrency === 'DAI') {
+    const daiPrice = ethers.utils.parseUnits(payment.finalPriceInCrypto, 18);
+    qrText = `ethereum:${payment.cryptoAddress}/transfer?address=${dai}&uint256=${daiPrice}`;
+  }
+
+  logger.info(qrText);
+  await toCanvas(canvas, qrText);
+  return qrText;
+};
+
+const props = defineProps<{
+  data: CryptoPayment;
+  plan: number;
+  metamaskSupport: boolean;
+}>();
+
+const emit = defineEmits<{ (e: 'pay'): void }>();
+
+const { data } = toRefs(props);
+const canvas = ref<HTMLCanvasElement>();
+const qrText = ref<string>('');
+
+const paymentAmount = computed(() => {
+  const { cryptocurrency, finalPriceInCrypto } = get(data);
+  return `${finalPriceInCrypto} ${cryptocurrency}`;
+});
+
+watch(canvas, async (canvas) => {
+  if (!canvas) {
+    return;
+  }
+  set(qrText, await createPaymentQR(get(data), canvas));
+});
+
+const { copy: copyToClipboard } = useClipboard({ source: qrText });
+const isBtc = computed(() => get(data).cryptocurrency === 'BTC');
+
+const payWithMetamask = () => emit('pay');
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -68,65 +127,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ethers } from 'ethers'
-import { toCanvas } from 'qrcode'
-import { get, set, useClipboard } from '@vueuse/core'
-import { CryptoPayment } from '~/types'
-import { logger } from '~/utils/logger'
-
-const createPaymentQR = async (
-  payment: CryptoPayment,
-  canvas: HTMLCanvasElement
-) => {
-  const dai = '0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844'
-  let qrText = ''
-  if (payment.cryptocurrency === 'BTC') {
-    qrText = `bitcoin:${payment.cryptoAddress}?amount=${payment.finalPriceInCrypto}&label=Rotki`
-  } else if (payment.cryptocurrency === 'ETH') {
-    const ethPrice = ethers.utils.parseEther(payment.finalPriceInCrypto)
-    qrText = `ethereum:${payment.cryptoAddress}?value=${ethPrice.toString()}`
-  } else if (payment.cryptocurrency === 'DAI') {
-    const daiPrice = ethers.utils.parseUnits(payment.finalPriceInCrypto, 18)
-    qrText = `ethereum:${payment.cryptoAddress}/transfer?address=${dai}&uint256=${daiPrice}`
-  }
-
-  logger.info(qrText)
-  await toCanvas(canvas, qrText)
-  return qrText
-}
-
-const props = defineProps<{
-  data: CryptoPayment
-  plan: number
-  metamaskSupport: boolean
-}>()
-
-const emit = defineEmits<{ (e: 'pay'): void }>()
-
-const { data } = toRefs(props)
-const canvas = ref<HTMLCanvasElement>()
-const qrText = ref<string>('')
-
-const paymentAmount = computed(() => {
-  const { cryptocurrency, finalPriceInCrypto } = get(data)
-  return `${finalPriceInCrypto} ${cryptocurrency}`
-})
-
-watch(canvas, async (canvas) => {
-  if (!canvas) {
-    return
-  }
-  set(qrText, await createPaymentQR(get(data), canvas))
-})
-
-const { copy: copyToClipboard } = useClipboard({ source: qrText })
-const isBtc = computed(() => get(data).cryptocurrency === 'BTC')
-
-const payWithMetamask = () => emit('pay')
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .wrapper {

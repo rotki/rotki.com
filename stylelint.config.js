@@ -28,4 +28,4 @@ module.exports = {
     'no-descending-specificity': null,
     'scss/at-import-partial-extension': null,
   },
-}
+};

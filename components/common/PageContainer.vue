@@ -1,3 +1,21 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    wide?: boolean;
+    centerVertically?: boolean;
+    centerHorizontally?: boolean;
+  }>(),
+  {
+    wide: false,
+    centerHorizontally: true,
+    centerVertically: true,
+  }
+);
+
+const css = useCssModule();
+const slots = useSlots();
+</script>
+
 <template>
   <div :class="css.wrapper">
     <HeaderArea no-margin>
@@ -27,30 +45,12 @@
     </div>
 
     <div v-if="slots.hint" :class="css.hint">
-      <slot name="hint"></slot>
+      <slot name="hint" />
     </div>
 
     <PageFooter />
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    wide?: boolean
-    centerVertically?: boolean
-    centerHorizontally?: boolean
-  }>(),
-  {
-    wide: false,
-    centerHorizontally: true,
-    centerVertically: true,
-  }
-)
-
-const css = useCssModule()
-const slots = useSlots()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

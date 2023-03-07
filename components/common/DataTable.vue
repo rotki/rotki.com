@@ -1,3 +1,23 @@
+<script setup lang="ts">
+import { type DataTableHeader } from '~/types/common';
+
+const props = defineProps<{
+  headers: DataTableHeader[];
+  items: unknown[];
+}>();
+
+const { items } = toRefs(props);
+const itemsPerPage = 5;
+const page = ref(1);
+const pages = computed(() => Math.ceil(items.value.length / itemsPerPage));
+const visibleItems = computed(() => {
+  const start = (page.value - 1) * itemsPerPage;
+  return items.value.slice(start, start + itemsPerPage);
+});
+
+const css = useCssModule();
+</script>
+
 <template>
   <CardContainer>
     <TextHeading :class="css.heading" subheading>
@@ -30,26 +50,6 @@
     <PaginationControl v-model="page" :pages="pages" />
   </CardContainer>
 </template>
-
-<script setup lang="ts">
-import { DataTableHeader } from '~/types/common'
-
-const props = defineProps<{
-  headers: DataTableHeader[]
-  items: unknown[]
-}>()
-
-const { items } = toRefs(props)
-const itemsPerPage = 5
-const page = ref(1)
-const pages = computed(() => Math.ceil(items.value.length / itemsPerPage))
-const visibleItems = computed(() => {
-  const start = (page.value - 1) * itemsPerPage
-  return items.value.slice(start, start + itemsPerPage)
-})
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';

@@ -1,7 +1,7 @@
-const SELF = "'self'"
-const UNSAFE_INLINE = "'unsafe-inline'"
-const UNSAFE_EVAL = "'unsafe-eval'"
-const NONE = "'none'"
+const SELF = "'self'";
+const UNSAFE_INLINE = "'unsafe-inline'";
+const UNSAFE_EVAL = "'unsafe-eval'";
+const NONE = "'none'";
 
 const ContentPolicy = {
   FRAME_ANCESTORS: 'frame-ancestors',
@@ -18,9 +18,9 @@ const ContentPolicy = {
   FORM_ACTION: 'form-action',
   WORKER_SRC: 'worker-src',
   FONT_SRC: 'font-src',
-} as const
+} as const;
 
-type ContentPolicy = (typeof ContentPolicy)[keyof typeof ContentPolicy]
+type ContentPolicy = (typeof ContentPolicy)[keyof typeof ContentPolicy];
 
 const policy: Record<ContentPolicy, string[]> = {
   [ContentPolicy.FRAME_ANCESTORS]: [SELF],
@@ -56,21 +56,21 @@ const policy: Record<ContentPolicy, string[]> = {
   [ContentPolicy.FORM_ACTION]: [SELF],
   [ContentPolicy.WORKER_SRC]: [SELF, 'www.recaptcha.net'],
   [ContentPolicy.FONT_SRC]: [SELF, 'fonts.gstatic.com'],
-}
+};
 
 function getCSP(page?: 'card' | 'paypal') {
-  let csp = ''
-  const finalPolicy = { ...policy }
+  let csp = '';
+  const finalPolicy = { ...policy };
   if (page === 'card') {
-    finalPolicy[ContentPolicy.FRAME_SRC] = ['*']
+    finalPolicy[ContentPolicy.FRAME_SRC] = ['*'];
     finalPolicy[ContentPolicy.SCRIPT_SRC] = [
       SELF,
       UNSAFE_INLINE,
       UNSAFE_EVAL,
       '*',
-    ]
-    finalPolicy[ContentPolicy.CONNECT_SRC] = [SELF, '*']
-    finalPolicy[ContentPolicy.FORM_ACTION] = [SELF, '*']
+    ];
+    finalPolicy[ContentPolicy.CONNECT_SRC] = [SELF, '*'];
+    finalPolicy[ContentPolicy.FORM_ACTION] = [SELF, '*'];
   } else if (page === 'paypal') {
     finalPolicy[ContentPolicy.SCRIPT_SRC] = [
       ...finalPolicy[ContentPolicy.SCRIPT_SRC],
@@ -78,20 +78,20 @@ function getCSP(page?: 'card' | 'paypal') {
       'assets.braintreegateway.com',
       '*.paypal.com',
       'www.paypalobjects.com',
-    ]
+    ];
     finalPolicy[ContentPolicy.IMG_SRC] = [
       ...finalPolicy[ContentPolicy.IMG_SRC],
       'assets.braintreegateway.com',
       'checkout.paypal.com',
-    ]
+    ];
     finalPolicy[ContentPolicy.CHILD_SRC] = [
       '*.paypal.com',
       'assets.braintreegateway.com',
-    ]
+    ];
     finalPolicy[ContentPolicy.FRAME_SRC] = [
       '*.paypal.com',
       'assets.braintreegateway.com',
-    ]
+    ];
     finalPolicy[ContentPolicy.CONNECT_SRC] = [
       SELF,
       'api.sandbox.braintreegateway.com',
@@ -100,26 +100,26 @@ function getCSP(page?: 'card' | 'paypal') {
       'client-analytics.braintreegateway.com',
       '*.braintree-api.com',
       '*.paypal.com',
-    ]
+    ];
   }
   for (const policyKey in finalPolicy) {
-    csp += `${policyKey} ${finalPolicy[policyKey as ContentPolicy].join(' ')};`
+    csp += `${policyKey} ${finalPolicy[policyKey as ContentPolicy].join(' ')};`;
   }
-  return csp
+  return csp;
 }
 
-const defaultCSP = getCSP()
+const defaultCSP = getCSP();
 
 export default defineEventHandler((event) => {
-  const url = event.node.req.url
+  const url = event.node.req.url;
   if (!url || import.meta.env.SKIP_CSP === 'true') {
-    return
+    return;
   }
-  let csp = defaultCSP
+  let csp = defaultCSP;
   if (url.startsWith('/checkout/pay/card')) {
-    csp = getCSP('card')
+    csp = getCSP('card');
   } else if (url.startsWith('/checkout/pay/paypal')) {
-    csp = getCSP('paypal')
+    csp = getCSP('paypal');
   }
-  event.node.res.setHeader('content-security-policy', csp)
-})
+  event.node.res.setHeader('content-security-policy', csp);
+});

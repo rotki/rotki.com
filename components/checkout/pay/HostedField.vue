@@ -1,3 +1,26 @@
+<script lang="ts" setup>
+withDefaults(
+  defineProps<{
+    id: string;
+    label?: string;
+    focused?: boolean;
+    valid?: boolean;
+    number?: boolean;
+    empty?: boolean;
+  }>(),
+  {
+    label: '',
+    focused: false,
+    valid: false,
+    number: false,
+    empty: false,
+  }
+);
+
+const emit = defineEmits<{ (e: 'click'): void }>();
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -22,29 +45,6 @@
     </span>
   </div>
 </template>
-
-<script lang="ts" setup>
-withDefaults(
-  defineProps<{
-    id: string
-    label?: string
-    focused?: boolean
-    valid?: boolean
-    number?: boolean
-    empty?: boolean
-  }>(),
-  {
-    label: '',
-    focused: false,
-    valid: false,
-    number: false,
-    empty: false,
-  }
-)
-
-const emit = defineEmits<{ (e: 'click'): void }>()
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 %floating {

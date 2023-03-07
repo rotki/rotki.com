@@ -1,3 +1,21 @@
+<script setup lang="ts">
+const props = defineProps<{
+  modelValue: number;
+  pages: number;
+}>();
+
+const emit = defineEmits<{ (e: 'update:modelValue', value: number): void }>();
+
+const { modelValue, pages } = toRefs(props);
+const isFirstPage = computed(() => modelValue.value === 1);
+const isLastPage = computed(() => modelValue.value === pages.value);
+const gotoPage = (page: number) => {
+  emit('update:modelValue', page);
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.pagination">
     <IconButton :disabled="isFirstPage" @click="gotoPage(1)">
@@ -15,24 +33,6 @@
     </IconButton>
   </div>
 </template>
-
-<script setup lang="ts">
-const props = defineProps<{
-  modelValue: number
-  pages: number
-}>()
-
-const emit = defineEmits<{ (e: 'update:modelValue', value: number): void }>()
-
-const { modelValue, pages } = toRefs(props)
-const isFirstPage = computed(() => modelValue.value === 1)
-const isLastPage = computed(() => modelValue.value === pages.value)
-const gotoPage = (page: number) => {
-  emit('update:modelValue', page)
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '~/assets/css/media.scss';

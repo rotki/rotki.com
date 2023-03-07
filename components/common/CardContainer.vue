@@ -1,3 +1,11 @@
+<script setup lang="ts">
+withDefaults(defineProps<{ warning?: boolean }>(), {
+  warning: false,
+});
+
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -8,14 +16,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(defineProps<{ warning?: boolean }>(), {
-  warning: false,
-})
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 .card {

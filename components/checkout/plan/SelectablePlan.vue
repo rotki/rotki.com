@@ -1,3 +1,31 @@
+<script setup lang="ts">
+import { get } from '@vueuse/core';
+import { type Plan } from '~/types';
+import { getPlanName } from '~/utils/plans';
+
+const props = defineProps<{
+  plan: Plan;
+  selected: boolean;
+}>();
+
+const emit = defineEmits<{ (e: 'click'): void }>();
+
+const { plan } = toRefs(props);
+
+const name = computed(() => getPlanName(get(plan).months));
+const totalPrice = computed(() => get(plan).priceFiat);
+const price = computed(() => {
+  const { months, priceFiat } = get(plan);
+  return (parseFloat(priceFiat) / months).toFixed(2);
+});
+
+const click = () => {
+  emit('click');
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -41,34 +69,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { get } from '@vueuse/core'
-import { Plan } from '~/types'
-import { getPlanName } from '~/utils/plans'
-
-const props = defineProps<{
-  plan: Plan
-  selected: boolean
-}>()
-
-const emit = defineEmits<{ (e: 'click'): void }>()
-
-const { plan } = toRefs(props)
-
-const name = computed(() => getPlanName(get(plan).months))
-const totalPrice = computed(() => get(plan).priceFiat)
-const price = computed(() => {
-  const { months, priceFiat } = get(plan)
-  return (parseFloat(priceFiat) / months).toFixed(2)
-})
-
-const click = () => {
-  emit('click')
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 %small {

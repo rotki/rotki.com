@@ -1,28 +1,28 @@
-import { Ref } from 'vue'
-import { ApiResponse } from '~/types'
+import { type Ref } from 'vue';
+import { type ApiResponse } from '~/types';
 
 export interface Country {
-  readonly code: string
-  readonly name: string
+  readonly code: string;
+  readonly name: string;
 }
 
 export const useCountries = () => {
-  const countries: Ref<Country[]> = ref([])
-  const countriesLoadError = ref('')
-  const { $axios } = useNuxtApp()
+  const countries: Ref<Country[]> = ref([]);
+  const countriesLoadError: Ref<string> = ref('');
+
   const loadCountries = async () => {
     try {
-      const response = await $axios.get<ApiResponse<Country[]>>(
+      const response = await fetchWithCsrf<ApiResponse<Country[]>>(
         '/webapi/countries/'
-      )
-      countries.value = response.data.result ?? []
-    } catch (e) {
-      countriesLoadError.value = e.message
+      );
+      countries.value = response.result ?? [];
+    } catch (e: any) {
+      countriesLoadError.value = e.message;
     }
-  }
-  onMounted(loadCountries)
+  };
+  onMounted(loadCountries);
   return {
     countries,
     countriesLoadError,
-  }
-}
+  };
+};

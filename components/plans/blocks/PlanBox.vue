@@ -1,40 +1,40 @@
+<script setup lang="ts">
+import { get } from '@vueuse/core';
+
+const props = defineProps<{
+  action: string;
+  url?: string;
+}>();
+
+const emit = defineEmits<{ (e: 'click'): void }>();
+
+const { url } = toRefs(props);
+
+const buttonClicked = () => {
+  const targetUrl = get(url);
+  if (targetUrl) {
+    navigateTo(targetUrl);
+  } else {
+    emit('click');
+  }
+};
+
+const css = useCssModule();
+</script>
+
 <template>
   <div :class="css.plan">
     <div :class="css.title">
-      <slot name="title"></slot>
+      <slot name="title" />
     </div>
     <div :class="css.description">
-      <slot></slot>
+      <slot />
       <div :class="css.button">
         <ActionButton :text="action" @click="buttonClicked" />
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { get } from '@vueuse/core'
-
-const props = defineProps<{
-  action: string
-  url?: string
-}>()
-
-const emit = defineEmits<{ (e: 'click'): void }>()
-
-const { url } = toRefs(props)
-
-const buttonClicked = () => {
-  const targetUrl = get(url)
-  if (targetUrl) {
-    navigateTo(targetUrl)
-  } else {
-    emit('click')
-  }
-}
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/main.scss';

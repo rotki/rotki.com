@@ -1,3 +1,16 @@
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    small?: boolean;
+  }>(),
+  {
+    small: false,
+  }
+);
+
+const css = useCssModule();
+</script>
+
 <template>
   <div
     :class="{
@@ -8,19 +21,6 @@
     <slot />
   </div>
 </template>
-
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    small?: boolean
-  }>(),
-  {
-    small: false,
-  }
-)
-
-const css = useCssModule()
-</script>
 
 <style lang="scss" module>
 @import '@/assets/css/media.scss';
