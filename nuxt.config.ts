@@ -70,6 +70,7 @@ export default defineNuxtConfig({
   modules: [
     // '@nuxtjs/recaptcha',
     '@nuxt/devtools',
+    '@nuxt/content',
     '@nuxtjs/robots',
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
