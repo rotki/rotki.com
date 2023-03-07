@@ -8,6 +8,6 @@
 
 <script setup lang="ts">
 const { data } = await useAsyncData('/', () =>
-  queryContent('/privacy-policy').findOne()
+  queryContent('/documents/privacy-policy').findOne()
 )
 </script>
