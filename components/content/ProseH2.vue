@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useRuntimeConfig } from '#imports';
-
 withDefaults(
   defineProps<{
     id?: string;
