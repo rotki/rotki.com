@@ -4,13 +4,12 @@ title: Impressum
 
 ## Angaben gemäß § 5 TMG
 
-::prose-address
-Rotki Solutions GmbH  
+<address>Rotki Solutions GmbH  
 Matthiasstr. 11  
 10249 Berlin  
 Handelsregister: HRB221065B  
 Registergericht: Amtsgericht Charlottenburg
-::
+</address>
 
 ### Vertreten durch:
 

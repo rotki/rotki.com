@@ -131,4 +131,14 @@ export default defineNuxtConfig({
     UserAgent: '*',
     Disallow: () => nonIndexed,
   },
+
+  content: {
+    // https://content.nuxtjs.org/api/configuration
+    markdown: {
+      // https://content.nuxtjs.org/api/configuration#tags
+      tags: {
+        address: 'ProseAddress',
+      },
+    },
+  },
 });

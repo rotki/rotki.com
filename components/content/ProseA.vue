@@ -5,11 +5,9 @@ withDefaults(
     target?: string;
     rel?: string;
   }>(),
-
   {
     href: '#',
     target: '_self',
-
     rel: undefined,
   }
 );

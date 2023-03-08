@@ -11,6 +11,6 @@ const slots = useSlots();
 
 <style lang="scss" module>
 .address {
-  @apply font-sans text-shade11 mt-6 font-normal not-italic;
+  @apply font-sans text-shade11 mt-6 font-normal not-italic whitespace-pre;
 }
 </style>
