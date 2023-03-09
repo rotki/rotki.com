@@ -208,7 +208,7 @@ const slots = useSlots();
   @apply bg-gray-50;
 }
 
-%caption {
+.caption {
   @apply text-xs font-sans;
 
   color: #808080;
@@ -218,7 +218,7 @@ const slots = useSlots();
 .error {
   color: #e53935;
 
-  @extend %caption;
+  @extend .caption;
 }
 
 .label {
