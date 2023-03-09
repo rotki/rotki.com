@@ -5,7 +5,7 @@ import { fetchWithCsrf } from '~/utils/api';
 
 const emailAddress = ref('');
 const recaptcha = useRecaptcha();
-const { onError, onExpired, onSuccess } = recaptcha;
+// const { onError, onExpired, onSuccess } = recaptcha;
 
 const rules = {
   email: { required, email },
@@ -37,20 +37,30 @@ const reset = async () => {
 };
 
 const css = useCssModule();
+const {
+  public: {
+    recaptcha: { siteKey },
+  },
+} = useRuntimeConfig();
 </script>
 
 <template>
   <PageContainer>
-    <template #title> Reset your password </template>
+    <template #title> Reset your password</template>
     <div :class="css.content">
       <BoxContainer>
-        <template #label> Recover password </template>
+        <template #label> Recover password</template>
         <InputField id="email" v-model="emailAddress" filled label="Email" />
-        <Recaptcha
+        <!--        <Recaptcha-->
+        <!--          :class="css.recaptcha"-->
+        <!--          @error="onError"-->
+        <!--          @expired="onExpired"-->
+        <!--          @success="onSuccess"-->
+        <!--        />-->
+        <div
+          class="g-recaptcha"
           :class="css.recaptcha"
-          @error="onError"
-          @expired="onExpired"
-          @success="onSuccess"
+          :data-sitekey="siteKey"
         />
         <ActionButton
           :class="css.button"
