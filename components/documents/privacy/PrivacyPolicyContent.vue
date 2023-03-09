@@ -11,3 +11,9 @@ const { data } = await useAsyncData('/', () =>
     <ContentRenderer :value="data" />
   </PageContainer>
 </template>
+
+<style scoped>
+:deep(ul) {
+  @apply text-[#808080] list-[circle];
+}
+</style>
