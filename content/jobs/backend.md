@@ -1,0 +1,82 @@
+## Python Backend Developer
+
+## What is rotki?
+
+Rotki helps manage accounts and blockchain transactions. It’s local-first,
+privacy focused and all open source. We are long time contributors to the
+Ethereum ecosystem and general crypto space. In order to support more
+blockchains (Cosmos, Roll Ups, etc.), and to continue to ship new features
+we need the help of a backend Python developer.
+
+## How your work with us will look like?
+
+You will be developing new features, supporting more exchanges, more
+blockchains, and more DeFi protocols. There is also always a lot of
+troubleshooting of user reported issues, bugs, and feature requests that
+are coming our way. You can improve our current Python backend
+implementation and help us get Rotki to the next level!
+
+As an open source project, we work collaboratively on our codebase on
+GitHub in a style that should be familiar to anyone who has participated
+in an OSS community before. If you haven’t — we’re happy to support you in
+defining and writing great feature descriptions, and breaking them down
+into dev tasks, and shipping them to customers around the world.
+
+This is an early stage open source company, so there is an opportunity to
+take on a variety of tasks beyond the app, such as the backend of the
+website, and our API.
+
+## Requirements:
+
+* Excellent command of python.
+
+## Bonus points:
+
+* Write tests for features you code and bugs you fix. Not strict TDD,
+  but we’re always looking to increase test coverage
+* Understanding of the frontend tech used in Rotki: Typescript + vue.js +
+  electron. This role doesn't require you to be a front end expert,
+  but understanding of these technologies will help you.
+* Experience with distributed systems: we connect to API endpoints and
+  nodes for various blockchains.
+* Understanding of Ethereum blockchain structures, nodes, and API
+  endpoints
+* Experience with any other blockchain stack — e.g. Cosmos, Substrate,
+  etc.
+* Sharing our values on open source, data ownership and privacy
+
+## Non-technical bonus points:
+
+* 4 hours daily overlap with European working hours 0900 CET - 1700 CET
+  for smoother teamwork
+* Can work independently, but co-operates well with other team members.
+* Proactive and customer-oriented
+
+## What we offer:
+
+* A full-time position, but are open to part-time contributors as well.
+  If located in Germany we can provide full employment with insurance
+  and social benefits.
+* Flexible working hours. We sync once per day, but other than that you
+  decide when you work.
+* Remote / WFH
+* Training in the specifics of the project and guidance through the
+  sector of cryptocurrencies and decentralized finance
+* Participation in conferences and events to represent rotki and get to
+  know other fascinating projects from the field (travel expenses are on
+  us)
+* Up to €2k for hardware allowance (laptop, dappnode, office equipment
+  etc.) after passed probation period
+
+## Apply
+
+We are looking for both senior and junior developers, so if you are coding
+in Python, don’t hesitate to apply!
+
+Send your CV, a link to your GitHub profile and a cover letter to
+careers@rotki.com. In the cover letter tell us what you think of rotki’s
+codebase and include a link to a project you worked on and are most proud
+about and tell us why.
+
+If you have any questions hit us up on discord:
+[https://discord.gg/aGCxHG7](https://discord.gg/aGCxHG7){target="_blank"}

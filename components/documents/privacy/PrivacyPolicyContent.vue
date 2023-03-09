@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const css = useCssModule();
+
 const { data } = await useAsyncData('/', () =>
   queryContent('/documents/privacy-policy').findOne()
 );
@@ -8,6 +10,14 @@ const { data } = await useAsyncData('/', () =>
   <PageContainer>
     <template #title> {{ data?.title ?? '' }}</template>
 
-    <ContentRenderer :value="data" />
+    <ContentRenderer :value="data" :class="css.content" />
   </PageContainer>
 </template>
+
+<style module lang="scss">
+.content {
+  ul {
+    @apply text-[#808080] list-[circle];
+  }
+}
+</style>
