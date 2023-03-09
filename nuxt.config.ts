@@ -70,6 +70,7 @@ export default defineNuxtConfig({
   modules: [
     // '@nuxtjs/recaptcha',
     '@nuxt/devtools',
+    '@nuxt/content',
     '@nuxtjs/robots',
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
@@ -129,5 +130,15 @@ export default defineNuxtConfig({
   robots: {
     UserAgent: '*',
     Disallow: () => nonIndexed,
+  },
+
+  content: {
+    // https://content.nuxtjs.org/api/configuration
+    markdown: {
+      // https://content.nuxtjs.org/api/configuration#tags
+      tags: {
+        address: 'ProseAddress',
+      },
+    },
   },
 });

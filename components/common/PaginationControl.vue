@@ -35,7 +35,7 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '~/assets/css/media.scss';
+@import '@/assets/css/media.scss';
 
 .pagination {
   @apply flex flex-row justify-end p-2 pt-3 items-center;
