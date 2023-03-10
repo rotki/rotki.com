@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 const css = useCssModule();
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     theme?: 'light' | 'dark';
     size?: 'compact' | 'normal';
     invalid?: boolean;
+    useRecaptchaNet?: boolean;
   }>(),
   {
     theme: 'light',
     size: 'normal',
+    useRecaptchaNet: false,
   }
 );
 
@@ -30,7 +32,7 @@ const recaptchaEl = ref<HTMLElement | null>(null);
 const rendered = ref(false);
 
 // this will be populated once the deferred captcha script is loaded
-const grecaptcha = computed(() => window.grecaptcha);
+const grecaptcha = toRef(window, 'grecaptcha');
 
 /**
  * Renders the captcha if not rendered and required fields are available
@@ -45,27 +47,40 @@ const renderCaptcha = () => {
     callback: (token: string) => emit('success', token),
     'expired-callback': () => emit('expired'),
     'error-callback': () => emit('error'),
+    theme: props.theme,
+    size: props.size,
   });
 
   emit('captcha-id', id);
   rendered.value = true;
 };
 
-onMounted(() => {
-  nextTick(renderCaptcha);
-});
+window.onRecaptchaLoaded = renderCaptcha;
 
-watch(grecaptcha, renderCaptcha);
+onMounted(() => {
+  if (!grecaptcha.value) {
+    useHead({
+      script: [
+        {
+          src: `${
+            props.useRecaptchaNet
+              ? 'https://www.recaptcha.net/recaptcha'
+              : 'https://www.google.com/recaptcha'
+          }/api.js?onload=onRecaptchaLoaded&render=explicit`,
+          defer: true,
+          async: true,
+        },
+      ],
+    });
+  } else {
+    nextTick(renderCaptcha);
+  }
+});
 </script>
 
 <template>
   <div :class="css.wrapper">
-    <div
-      ref="recaptchaEl"
-      :class="css.recaptcha"
-      :data-size="size"
-      :data-theme="theme"
-    />
+    <div ref="recaptchaEl" :class="css.recaptcha" />
 
     <p v-if="invalid" :class="css.error">
       Invalid or expired captcha, please try again

@@ -14,6 +14,8 @@ declare global {
       ): number;
       reset(id?: number): void;
     };
+
+    onRecaptchaLoaded(): void;
   }
 }
 
