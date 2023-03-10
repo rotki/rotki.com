@@ -261,7 +261,7 @@ const css = useCssModule();
   }
 }
 
-%caption {
+.caption {
   @apply text-xs font-sans;
 
   color: #808080;
@@ -271,7 +271,7 @@ const css = useCssModule();
 .error {
   color: #e53935;
 
-  @extend %caption;
+  @extend .caption;
 }
 
 .empty {
