@@ -261,17 +261,21 @@ const css = useCssModule();
   }
 }
 
-.caption {
+%text-style {
   @apply text-xs font-sans;
 
   color: #808080;
   margin-top: 8px;
 }
 
+.caption {
+  @extend %text-style;
+}
+
 .error {
   color: #e53935;
 
-  @extend .caption;
+  @extend %text-style;
 }
 
 .empty {
