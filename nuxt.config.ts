@@ -63,7 +63,7 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: 'https://www.google.com/recaptcha/api.js',
+          src: 'https://www.google.com/recaptcha/api.js?render=explicit',
           defer: true,
           async: true,
         },
@@ -125,10 +125,6 @@ export default defineNuxtConfig({
       maintenance: process.env.MAINTENANCE || 'false',
       testing: process.env.TESTING,
     },
-  },
-
-  recaptcha: {
-    version: 2,
   },
 
   sitemap: {
