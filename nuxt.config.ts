@@ -61,13 +61,6 @@ export default defineNuxtConfig({
           color: '#5bbad5',
         },
       ],
-      script: [
-        {
-          src: 'https://www.google.com/recaptcha/api.js?render=explicit',
-          defer: true,
-          async: true,
-        },
-      ],
     },
   },
 
