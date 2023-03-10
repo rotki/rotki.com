@@ -6,7 +6,7 @@ import { fetchWithCsrf } from '~/utils/api';
 import { logger } from '~/utils/logger';
 
 const emailAddress = ref('');
-const processing = ref(false);
+const loading = ref(false);
 const captchaId = ref<number>();
 const recaptcha = useRecaptcha();
 const { onError, onExpired, onSuccess } = recaptcha;
@@ -31,7 +31,7 @@ const setCaptchaId = (v: number) => {
 };
 
 const reset = async () => {
-  processing.value = true;
+  loading.value = true;
   try {
     await fetchWithCsrf('/webapi/password-reset/request/', {
       method: 'post',
@@ -56,7 +56,7 @@ const reset = async () => {
 
     logger.error(e);
   }
-  processing.value = false;
+  loading.value = false;
 };
 
 const css = useCssModule();
@@ -79,13 +79,15 @@ const css = useCssModule();
 
         <ActionButton
           :class="css.button"
-          :disabled="v$.$invalid || processing"
-          :loading="processing"
+          :disabled="v$.$invalid || loading"
+          :loading="loading"
           primary
           small
           text="Submit"
           @click="reset"
-        />
+        >
+          <SpinnerIcon v-if="loading" class="animate-spin" />
+        </ActionButton>
       </BoxContainer>
     </div>
   </PageContainer>

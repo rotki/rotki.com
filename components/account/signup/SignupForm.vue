@@ -48,7 +48,7 @@ const rules = {
   captcha: { required },
 };
 
-const processing = ref(false);
+const loading = ref(false);
 const captchaId = ref<number>();
 const $externalResults = ref({});
 const v$ = useVuelidate(rules, state, {
@@ -74,7 +74,7 @@ const useSignup = (
       return;
     }
 
-    processing.value = true;
+    loading.value = true;
 
     try {
       await fetchWithCsrf('/webapi/signup/', {
@@ -97,7 +97,7 @@ const useSignup = (
         $externalResults.value = e.data.message;
       }
     }
-    processing.value = false;
+    loading.value = false;
   };
   return {
     signup,
@@ -300,12 +300,14 @@ const css = useCssModule();
 
         <ActionButton
           :class="css.button"
-          :disabled="!termsAccepted || !recaptchaPassed || processing"
-          :loading="processing"
+          :disabled="!termsAccepted || !recaptchaPassed || loading"
+          :loading="loading"
           primary
           text="Create Account"
           @click="signup(state)"
-        />
+        >
+          <SpinnerIcon v-if="loading" class="animate-spin" />
+        </ActionButton>
       </div>
     </div>
   </PageContainer>
