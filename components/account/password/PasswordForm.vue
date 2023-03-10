@@ -79,7 +79,7 @@ const css = useCssModule();
 
         <ActionButton
           :class="css.button"
-          :disabled="!v$.$invalid || processing"
+          :disabled="v$.$invalid || processing"
           :loading="processing"
           primary
           small
