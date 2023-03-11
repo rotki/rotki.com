@@ -208,17 +208,21 @@ const slots = useSlots();
   @apply bg-gray-50;
 }
 
-%caption {
+%text-style {
   @apply text-xs font-sans;
 
   color: #808080;
   margin-top: 8px;
 }
 
+.caption {
+  @extend %text-style;
+}
+
 .error {
   color: #e53935;
 
-  @extend %caption;
+  @extend %text-style;
 }
 
 .label {

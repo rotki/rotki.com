@@ -19,7 +19,7 @@ const css = useCssModule();
 </script>
 
 <template>
-  <a
+  <NuxtLink
     :class="css.link"
     :href="url"
     :target="sameTab ? '_self' : '_blank'"
@@ -28,7 +28,7 @@ const css = useCssModule();
     <slot>
       {{ display }}
     </slot>
-  </a>
+  </NuxtLink>
 </template>
 
 <style module>

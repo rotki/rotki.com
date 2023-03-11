@@ -6,6 +6,7 @@ export const useRecaptcha = () => {
     recaptchaPassed.value = true;
   };
   const onExpired = () => {
+    recaptchaToken.value = '';
     recaptchaPassed.value = false;
   };
   const onError = () => {

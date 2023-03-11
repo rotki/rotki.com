@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { email, minLength, required, sameAs } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { get } from '@vueuse/core';
@@ -7,7 +7,9 @@ import { FetchError } from 'ofetch';
 import { type SignupPayload } from '~/types/signup';
 import { fetchWithCsrf } from '~/utils/api';
 
-const state = reactive<SignupPayload>({
+const recaptcha = useRecaptcha();
+
+const state = reactive<SignupPayload & { captcha: Ref<string> }>({
   username: '',
   password: '',
   confirmPassword: '',
@@ -22,6 +24,7 @@ const state = reactive<SignupPayload>({
   city: '',
   postcode: '',
   country: '',
+  captcha: recaptcha.recaptchaToken,
 });
 
 const rules = {
@@ -42,8 +45,11 @@ const rules = {
   city: { required },
   postcode: { required },
   country: { required },
+  captcha: { required },
 };
 
+const loading = ref(false);
+const captchaId = ref<number>();
 const $externalResults = ref({});
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
@@ -51,8 +57,11 @@ const v$ = useVuelidate(rules, state, {
 });
 const termsAccepted = ref(false);
 
-const recaptcha = useRecaptcha();
 const { recaptchaPassed, onError, onSuccess, onExpired } = recaptcha;
+
+const setCaptchaId = (v: number) => {
+  captchaId.value = v;
+};
 
 const useSignup = (
   captcha: Ref<string>,
@@ -65,8 +74,11 @@ const useSignup = (
       return;
     }
 
+    loading.value = true;
+
     try {
       await fetchWithCsrf('/webapi/signup/', {
+        method: 'post',
         body: {
           captcha: captcha.value,
           ...payload,
@@ -80,9 +92,12 @@ const useSignup = (
         e.data &&
         typeof e.data.message === 'object'
       ) {
+        window.grecaptcha?.reset(captchaId.value);
+        onExpired();
         $externalResults.value = e.data.message;
       }
     }
+    loading.value = false;
   };
   return {
     signup,
@@ -96,7 +111,7 @@ const css = useCssModule();
 
 <template>
   <PageContainer>
-    <template #title> Create a rotki premium Account </template>
+    <template #title> Create a rotki premium Account</template>
 
     <div :class="css.row">
       <div :class="css.column">
@@ -251,8 +266,8 @@ const css = useCssModule();
           <CountrySelect
             id="country"
             v-model="state.country"
-            :error-messages="v$.country.$errors"
             :countries="countries"
+            :error-messages="v$.country.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Country"
             @blur="v$.country.$touch()"
@@ -261,15 +276,17 @@ const css = useCssModule();
 
         <Recaptcha
           :class="css.recaptcha"
+          :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
           @error="onError"
           @expired="onExpired"
           @success="onSuccess"
+          @captcha-id="setCaptchaId"
         />
 
         <label :class="css.termsCheck">
           <input
             :class="css.checkbox"
-            :modelValue="termsAccepted"
+            :value="termsAccepted"
             type="checkbox"
             @click="termsAccepted = !termsAccepted"
           />
@@ -282,12 +299,15 @@ const css = useCssModule();
         </label>
 
         <ActionButton
-          :disabled="!termsAccepted || !recaptchaPassed"
           :class="css.button"
+          :disabled="!termsAccepted || !recaptchaPassed || loading"
+          :loading="loading"
           primary
           text="Create Account"
           @click="signup(state)"
-        />
+        >
+          <SpinnerIcon v-if="loading" class="animate-spin" />
+        </ActionButton>
       </div>
     </div>
   </PageContainer>
@@ -328,6 +348,7 @@ const css = useCssModule();
 
 .inputs {
   margin-top: 12px;
+
   > * {
     margin-top: 24px;
   }
@@ -362,6 +383,6 @@ const css = useCssModule();
 }
 
 .recaptcha {
-  margin-top: 48px;
+  @apply mt-12;
 }
 </style>

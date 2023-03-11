@@ -1,39 +1,62 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
+import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
+import { logger } from '~/utils/logger';
 
 const emailAddress = ref('');
+const loading = ref(false);
+const captchaId = ref<number>();
 const recaptcha = useRecaptcha();
 const { onError, onExpired, onSuccess } = recaptcha;
 
 const rules = {
   email: { required, email },
+  captcha: { required },
 };
 
 const $externalResults = ref({});
 const v$ = useVuelidate(
   rules,
-  { email: emailAddress },
+  { email: emailAddress, captcha: recaptcha.recaptchaToken },
   {
     $autoDirty: true,
     $externalResults,
   }
 );
 
-const valid = computed((ctx) => !v$.value.$invalid && ctx.recaptchaPassed);
+const setCaptchaId = (v: number) => {
+  captchaId.value = v;
+};
 
 const reset = async () => {
-  await fetchWithCsrf('/webapi/password-reset/request/', {
-    method: 'post',
-    body: {
-      captcha: recaptcha.recaptchaToken.value,
-      email: emailAddress.value,
-    },
-  });
-  await navigateTo({
-    path: '/password/send',
-  });
+  loading.value = true;
+  try {
+    await fetchWithCsrf('/webapi/password-reset/request/', {
+      method: 'post',
+      body: {
+        captcha: recaptcha.recaptchaToken.value,
+        email: emailAddress.value,
+      },
+    });
+    await navigateTo({
+      path: '/password/send',
+    });
+  } catch (e: any) {
+    if (
+      e instanceof FetchError &&
+      e.status === 400 &&
+      e.data?.message?.captcha
+    ) {
+      window.grecaptcha?.reset(captchaId.value);
+      onExpired();
+      $externalResults.value = e.data.message;
+    }
+
+    logger.error(e);
+  }
+  loading.value = false;
 };
 
 const css = useCssModule();
@@ -41,25 +64,30 @@ const css = useCssModule();
 
 <template>
   <PageContainer>
-    <template #title> Reset your password </template>
+    <template #title> Reset your password</template>
     <div :class="css.content">
       <BoxContainer>
-        <template #label> Recover password </template>
+        <template #label> Recover password</template>
         <InputField id="email" v-model="emailAddress" filled label="Email" />
         <Recaptcha
-          :class="css.recaptcha"
+          :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
           @error="onError"
           @expired="onExpired"
           @success="onSuccess"
+          @captcha-id="setCaptchaId"
         />
+
         <ActionButton
           :class="css.button"
-          :disabled="!valid"
+          :disabled="v$.$invalid || loading"
+          :loading="loading"
           primary
           small
           text="Submit"
           @click="reset"
-        />
+        >
+          <SpinnerIcon v-if="loading" class="animate-spin" />
+        </ActionButton>
       </BoxContainer>
     </div>
   </PageContainer>
