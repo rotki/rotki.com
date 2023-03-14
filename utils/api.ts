@@ -76,7 +76,7 @@ export const setHooks = (hooks: {
   set(refresh, hooks.refresh);
 };
 
-const sleep = (ms = 0, signal: AbortSignal): Promise<void> =>
+export const sleep = (ms = 0, signal: AbortSignal): Promise<void> =>
   new Promise((resolve, reject) => {
     const id = setTimeout(() => resolve(), ms);
     signal?.addEventListener('abort', () => {
