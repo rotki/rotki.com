@@ -1,5 +1,5 @@
 <script setup lang="ts">
-//
+// todo: remove
 </script>
 
 <template>
@@ -7,5 +7,5 @@
 </template>
 
 <style lang="scss">
-//
+// todo: remove
 </style>
