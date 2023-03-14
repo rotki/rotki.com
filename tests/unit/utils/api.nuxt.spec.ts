@@ -1,18 +1,16 @@
 import { assert, describe, it } from 'vitest';
-import { sleep } from '~/utils/api';
+import { fetchWithCsrf, sleep } from '~/utils/api';
+import { type ApiResponse } from '~/types';
+import { type Country } from '~/composables/countries';
 
 const { BASE_URL } = import.meta.env;
 describe('api utilities', () => {
   it('fetchWithCsrf: fetch countries runs correctly', async () => {
-    // todo: revert this to fetchWithCsrf
-    const response = await fetch(`${BASE_URL}/countries`);
+    const response = await fetchWithCsrf<ApiResponse<Country[]>>(
+      `${BASE_URL}/countries`
+    );
 
-    assert.isTrue(response.ok);
-    assert.equal(response.status, 200);
-
-    const json = await response.json();
-
-    assert.isArray(json.result);
+    assert.isArray(response.result);
   }, 5000);
 
   it('sleep: resolves with the exact timeout', async () => {
