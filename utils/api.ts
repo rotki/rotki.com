@@ -76,7 +76,7 @@ export const setHooks = (hooks: {
   set(refresh, hooks.refresh);
 };
 
-const sleep = (ms = 0, signal: AbortSignal): Promise<void> =>
+export const sleep = (ms = 0, signal: AbortSignal): Promise<void> =>
   new Promise((resolve, reject) => {
     const id = setTimeout(() => resolve(), ms);
     signal?.addEventListener('abort', () => {
@@ -110,7 +110,7 @@ export async function fetchWithCsrf<
     'content-type': 'application/json',
   };
 
-  if (process.server) {
+  if (process.server || process.env.NODE_ENV === 'test') {
     headers = {
       ...headers,
       ...useRequestHeaders(['cookie']),
@@ -180,7 +180,7 @@ async function initCsrf(): Promise<void> {
   const controller = new AbortController();
   try {
     const aborter = sleep(30000, controller.signal);
-    const csrf = await $fetch('/webapi/csrf/', {
+    const csrf = $fetch('/webapi/csrf/', {
       baseURL: backendUrl,
       credentials: 'include',
       signal: controller.signal,

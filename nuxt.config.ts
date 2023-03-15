@@ -79,6 +79,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
     'nuxt-simple-sitemap',
+    'nuxt-vitest',
   ],
 
   i18n: {
