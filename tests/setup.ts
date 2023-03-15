@@ -1,10 +1,20 @@
-// import { afterAll, afterEach, beforeAll } from 'vitest';
-import fetch from 'cross-fetch';
-// import { server } from '~/tests/mocks/server';
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { mockNuxtImport } from 'nuxt-vitest/utils';
+import { server } from '~/tests/mocks/server';
 
-// Add `fetch` polyfill.
-global.fetch = fetch;
+const { BACKEND_URL } = import.meta.env;
 
-// beforeAll(() => server.listen({ onUnhandledRequest: `error` }));
-// afterAll(() => server.close());
-// afterEach(() => server.resetHandlers());
+mockNuxtImport('useRuntimeConfig', () => {
+  return () => {
+    return {
+      public: { baseUrl: BACKEND_URL, backendUrl: BACKEND_URL },
+      app: { baseURL: '/' },
+    };
+  };
+});
+
+beforeAll(() => server.listen({ onUnhandledRequest: `error` }));
+
+afterAll(() => server.close());
+
+afterEach(() => server.resetHandlers());
