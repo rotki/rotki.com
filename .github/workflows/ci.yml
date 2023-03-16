@@ -55,11 +55,11 @@ jobs:
       - name: Run linter 👀
         run: pnpm run lint:all
 
-      - name: Run tests ✅
-        run: pnpm run test
-
       - name: Build 🚧
         run: pnpm run build
+
+      - name: Run tests ✅
+        run: pnpm run test
 
   build-docker:
     runs-on: ubuntu-latest
