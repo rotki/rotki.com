@@ -14,6 +14,15 @@ const nonIndexed = [
   '/account-deleted',
 ];
 
+const domain = process.env.PROXY_DOMAIN || 'rotki.com';
+const baseUrl = `https://${domain}`;
+
+const proxy = {
+  host: domain,
+  referrer: baseUrl,
+  target: `${baseUrl}/webapi`,
+};
+
 export default defineNuxtConfig({
   // Target (https://go.nuxtjs.dev/config-target)
   target: 'server',
@@ -70,7 +79,6 @@ export default defineNuxtConfig({
   components: [{ path: '~/components', pathPrefix: false }],
 
   modules: [
-    // '@nuxtjs/recaptcha',
     '@nuxt/devtools',
     '@nuxt/content',
     '@nuxtjs/robots',
@@ -96,11 +104,11 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       '/webapi': {
-        target: process.env.BACKEND_URL || 'https://rotki.com/webapi',
+        target: proxy.target,
         changeOrigin: true,
         headers: {
-          host: process.env.BACKEND_HOST || 'rotki.com',
-          referer: process.env.BACKEND_REFERER || 'https://rotki.com',
+          host: proxy.host,
+          referer: proxy.referrer,
         },
       },
     },
@@ -113,11 +121,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       recaptcha: {
-        siteKey: process.env.RECAPTCHA_SITE_KEY,
+        siteKey: '',
       },
-      baseUrl: process.env.BASE_URL || '',
-      maintenance: process.env.MAINTENANCE || 'false',
-      testing: process.env.TESTING,
+      baseUrl: '',
+      maintenance: 'false',
+      testing: 'false',
     },
   },
 

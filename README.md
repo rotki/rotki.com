@@ -24,14 +24,14 @@ $ touch .env
 And input the RECAPTCHA public key there.
 
 ```
-RECAPTCHA_SITE_KEY=XXXX
+NUXT_PUBLIC_RECAPTCHA_SITE_KEY=XXXX
 ```
 
 You can get a testing key from [developers google](https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do).
 
 if you are running behind https make sure to also add:
 ```
-BASE_URL=https://localhost
+NUXT_PUBLIC_BASE_URL=https://localhost
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
