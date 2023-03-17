@@ -5,6 +5,6 @@ export default defineNuxtRouteMiddleware(() => {
   const { account } = storeToRefs(useMainStore());
 
   if (isDefined(account)) {
-    navigateTo('/home');
+    return navigateTo('/home');
   }
 });

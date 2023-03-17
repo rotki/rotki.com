@@ -25,7 +25,7 @@ export default defineNuxtRouteMiddleware(async () => {
     }
 
     if (response.result?.transactionStarted) {
-      navigateTo('/home');
+      return navigateTo('/home');
     } else if (response.result.pending) {
       const queryParams: { p: string; c: string; id?: string } = {
         p: durationInMonths.toString(),
@@ -34,7 +34,7 @@ export default defineNuxtRouteMiddleware(async () => {
       if (id) {
         queryParams.id = id;
       }
-      navigateTo({
+      return navigateTo({
         path: '/checkout/pay/crypto',
         query: queryParams,
       });
