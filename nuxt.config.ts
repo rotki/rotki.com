@@ -124,8 +124,8 @@ export default defineNuxtConfig({
         siteKey: '',
       },
       baseUrl: '',
-      maintenance: 'false',
-      testing: 'false',
+      maintenance: false,
+      testing: false,
     },
   },
 
