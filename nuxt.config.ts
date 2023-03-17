@@ -130,7 +130,7 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
-    hostname: 'https://rotki.com',
+    siteUrl: 'https://rotki.com',
     exclude: nonIndexed,
   },
 
