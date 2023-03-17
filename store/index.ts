@@ -218,6 +218,7 @@ export const useMainStore = defineStore('main', () => {
     );
     const sub = subscriptions[subIndex];
     const { actions, status, nextActionDate } = sub;
+
     function updateSub(
       actions: string[],
       status: SubStatus,

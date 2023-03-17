@@ -63,6 +63,7 @@ export const convertKeys = (
 };
 
 const CSRF_COOKIE = 'csrftoken';
+export const SESSION_COOKIE = 'sessionid';
 const CSRF_HEADER = 'X-CSRFToken';
 
 const logout = ref<() => Promise<void>>();
