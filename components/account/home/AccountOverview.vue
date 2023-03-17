@@ -14,8 +14,6 @@ const username = computed(() => {
   return get(account)?.username;
 });
 
-onMounted(async () => await store.getAccount());
-
 const logout = async () => {
   await store.logout(true);
   await navigateTo('/login');
@@ -28,7 +26,7 @@ const css = useCssModule();
   <PageContainer wide>
     <template #title> Account Management</template>
     <template #links>
-      <LinkText>
+      <LinkText class="cursor-pointer">
         <span @click="logout">Logout</span>
       </LinkText>
     </template>
