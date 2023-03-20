@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { email, minLength, required, sameAs } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { get } from '@vueuse/core';

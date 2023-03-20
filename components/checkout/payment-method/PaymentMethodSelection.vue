@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
-import { type Ref } from 'vue';
+import { type Component, type Ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import {
+  BitcoinIcon,
+  CardIcon,
+  DaiIcon,
+  EthereumIcon,
+  PaypalIcon,
+} from '#components';
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
 
@@ -16,7 +23,7 @@ enum PaymentMethod {
 type PaymentMethodItem = {
   id: PaymentMethod;
   label: string;
-  component: string;
+  component: Component;
   crypto?: true;
 };
 
@@ -24,30 +31,30 @@ const paymentMethods: PaymentMethodItem[] = [
   {
     id: PaymentMethod.ETH,
     label: 'Ethereum',
-    component: 'ethereum-icon',
+    component: EthereumIcon,
     crypto: true,
   },
   {
     id: PaymentMethod.BTC,
     label: 'Bitcoin',
-    component: 'bitcoin-icon',
+    component: BitcoinIcon,
     crypto: true,
   },
   {
     id: PaymentMethod.DAI,
     label: 'DAI',
-    component: 'dai-icon',
+    component: DaiIcon,
     crypto: true,
   },
   {
     id: PaymentMethod.CARD,
     label: 'Card',
-    component: 'card-icon',
+    component: CardIcon,
   },
   {
     id: PaymentMethod.PAYPAL,
     label: 'Paypal',
-    component: 'paypal-icon',
+    component: PaypalIcon,
   },
 ];
 
@@ -61,7 +68,7 @@ const route = useRoute();
 
 const { authenticated } = storeToRefs(store);
 
-const next = () => {
+const proceed = async () => {
   if (authenticated.value) {
     const query: { p: string; c?: string; id?: string } = {
       p: route.query.p as string,
@@ -83,7 +90,7 @@ const next = () => {
       query.id = id;
     }
 
-    navigateTo({
+    await navigateTo({
       path,
       query,
     });
@@ -131,7 +138,7 @@ const css = useCssModule();
       </div>
     </div>
     <div :class="css.continue">
-      <SelectionButton :disabled="!selected" selected @click="next">
+      <SelectionButton :disabled="!selected" selected @click="proceed">
         Continue to Checkout
       </SelectionButton>
     </div>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { set } from '@vueuse/core';
 
-const props = defineProps<{ value: string }>();
+const props = defineProps<{ modelValue: string }>();
 
-const { value } = toRefs(props);
+const { modelValue } = toRefs(props);
 const copied = ref(false);
 const { start, stop } = useTimeoutFn(() => set(copied, false), 4000);
-const { copy } = useClipboard({ source: value });
+const { copy } = useClipboard({ source: modelValue });
 
 const copyToClipboard = () => {
   stop();
@@ -22,7 +22,7 @@ const css = useCssModule();
   <InfoTooltip>
     <template #activator>
       <button :class="css.button" @click="copyToClipboard">
-        <Copy />
+        <CopyIcon />
       </button>
     </template>
 

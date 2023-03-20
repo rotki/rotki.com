@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ value: boolean }>();
+defineProps<{ modelValue: boolean }>();
 
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
 const css = useCssModule();
@@ -8,7 +8,7 @@ const css = useCssModule();
 <template>
   <CustomCheckbox
     id="refund"
-    :model-value="value"
+    :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <span>

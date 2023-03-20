@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const status = ['success', 'error', 'neutral'] as const;
+const statuses = ['success', 'error', 'neutral'] as const;
 
-type Status = (typeof status)[number];
+type Status = (typeof statuses)[number];
 
 defineProps<{
   status: Status;

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { defaultIconSize } from '~/utils/icon-size';
 </script>
 
