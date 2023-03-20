@@ -103,8 +103,8 @@ export const useWeb3Payment = (
       const web3Provider = new ethers.providers.Web3Provider(provider as any);
       const network = await web3Provider.getNetwork();
 
-      const expected = testing ? 5 : 1;
-      const name = testing ? 'Görli' : 'Mainnet';
+      const expected = testing ? 11155111 : 1;
+      const name = testing ? 'Sepolia' : 'Mainnet';
       if (network.chainId !== expected) {
         set(
           error,
