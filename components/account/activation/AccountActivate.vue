@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
+import { set } from '@vueuse/core';
+import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
 
 const route = useRoute();
@@ -8,13 +9,16 @@ const validating = ref(true);
 const isValid = ref(false);
 
 const validateToken = async () => {
-  const response = await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`);
-
-  if (!get(response).error) {
+  try {
+    await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`);
     set(isValid, true);
+  } catch (e: any) {
+    if (!(e instanceof FetchError && e.status === 404)) {
+      logger.debug(e);
+    }
+  } finally {
+    set(validating, false);
   }
-
-  set(validating, false);
 };
 
 onBeforeMount(async () => await validateToken());
