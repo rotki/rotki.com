@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const css = useCssModule();
 
-const { data } = await useAsyncData('/', () =>
+const { data } = await useAsyncData('/documents/tos', () =>
   queryContent('/documents/terms-of-service').findOne()
 );
 </script>
@@ -10,7 +10,9 @@ const { data } = await useAsyncData('/', () =>
   <PageContainer>
     <template #title> {{ data?.title ?? '' }}</template>
 
-    <ContentRenderer :value="data" :class="css.content" />
+    <ContentRenderer :value="data" :class="css.content">
+      <ContentRendererMarkdown :value="data" />
+    </ContentRenderer>
   </PageContainer>
 </template>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data } = await useAsyncData('/', () =>
+const { data } = await useAsyncData('/documents/impressum', () =>
   queryContent('/documents/impressum').findOne()
 );
 </script>
@@ -8,6 +8,8 @@ const { data } = await useAsyncData('/', () =>
   <PageContainer>
     <template #title> {{ data?.title ?? '' }}</template>
 
-    <ContentRenderer :value="data" />
+    <ContentRenderer :value="data">
+      <ContentRendererMarkdown :value="data" />
+    </ContentRenderer>
   </PageContainer>
 </template>

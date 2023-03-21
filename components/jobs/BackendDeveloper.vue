@@ -1,11 +1,11 @@
 <script setup lang="ts">
-const { data } = await useAsyncData('/', () =>
+const { data } = await useAsyncData('/jobs/backend', () =>
   queryContent('/jobs/backend').findOne()
 );
 </script>
 
 <template>
-  <div>
-    <ContentRenderer :value="data" />
-  </div>
+  <ContentRenderer :value="data">
+    <ContentRendererMarkdown :value="data" />
+  </ContentRenderer>
 </template>
