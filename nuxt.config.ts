@@ -147,5 +147,8 @@ export default defineNuxtConfig({
         address: 'ProseAddress',
       },
     },
+    api: {
+      baseURL: '/md/_content',
+    },
   },
 });
