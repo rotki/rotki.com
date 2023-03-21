@@ -88,6 +88,7 @@ const css = useCssModule();
       hint="Enter your current account password. Only needed if you want to change password"
       label="Current Password"
       type="password"
+      autocomplete="current-password"
     />
 
     <InputField
@@ -97,6 +98,7 @@ const css = useCssModule();
       hint="Enter a new password for your account"
       label="New Password"
       type="password"
+      autocomplete="new-password"
     />
 
     <InputField
@@ -106,6 +108,7 @@ const css = useCssModule();
       hint="Enter the same password as before, for verification."
       label="Password Confirmation"
       type="password"
+      autocomplete="new-password"
     />
 
     <div :class="css.row">

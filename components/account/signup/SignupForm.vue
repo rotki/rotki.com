@@ -141,6 +141,7 @@ const css = useCssModule();
             :error-messages="v$.username.$errors"
             hint="Required: Provide a unique username for your new account."
             label="Username"
+            autocomplete="username"
             @blur="v$.username.$touch()"
           />
           <InputField
@@ -150,6 +151,7 @@ const css = useCssModule();
             hint="Required. Provide a valid email address."
             label="Email"
             type="email"
+            autocomplete="email"
             @blur="v$.email.$touch()"
           />
           <InputField
@@ -166,6 +168,7 @@ const css = useCssModule();
             :error-messages="v$.password.$errors"
             label="Password"
             type="password"
+            autocomplete="new-password"
             @blur="v$.password.$touch()"
           >
             <ul :class="css.list">
@@ -187,6 +190,7 @@ const css = useCssModule();
             hint="Enter the same password as before, for verification."
             label="Password Confirmation"
             type="password"
+            autocomplete="new-password"
             @blur="v$.confirmPassword.$touch()"
           />
         </div>
@@ -200,6 +204,7 @@ const css = useCssModule();
             :error-messages="v$.firstName.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="First Name"
+            autocomplete="given-name"
             @blur="v$.firstName.$touch()"
           />
           <InputField
@@ -208,6 +213,7 @@ const css = useCssModule();
             :error-messages="v$.lastName.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Last Name"
+            autocomplete="family-name"
             @blur="v$.lastName.$touch()"
           />
           <InputField
@@ -215,6 +221,7 @@ const css = useCssModule();
             v-model="state.companyName"
             hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
             label="Company Name"
+            autocomplete="organization"
             @blur="v$.companyName.$touch()"
           />
           <InputField
@@ -236,6 +243,7 @@ const css = useCssModule();
             :error-messages="v$.address1.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Address line 1"
+            autocomplete="address-line1"
             @blur="v$.address1.$touch()"
           />
           <InputField
@@ -244,6 +252,7 @@ const css = useCssModule();
             :error-messages="v$.address2.$errors"
             hint="Optional. Additional data for the address."
             label="Address line 2"
+            autocomplete="address-line2"
             @blur="v$.address2.$touch()"
           />
           <InputField
@@ -252,6 +261,7 @@ const css = useCssModule();
             :error-messages="v$.city.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="City"
+            autocomplete="address-level2"
             @blur="v$.city.$touch()"
           />
           <InputField
@@ -260,6 +270,7 @@ const css = useCssModule();
             :error-messages="v$.postcode.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Postal code"
+            autocomplete="postal-code"
             @blur="v$.postcode.$touch()"
           />
 
@@ -270,6 +281,7 @@ const css = useCssModule();
             :error-messages="v$.country.$errors"
             hint="Required. Will only be used for invoice of payments."
             label="Country"
+            autocomplete="country"
             @blur="v$.country.$touch()"
           />
         </div>

@@ -44,6 +44,7 @@ const css = useCssModule();
       filled
       label="Username"
       type="text"
+      autocomplete="username"
       @focus="error = ''"
     >
       <template #prepend>
@@ -58,6 +59,7 @@ const css = useCssModule();
       :class="css.password"
       :type="showPassword ? 'text' : 'password'"
       filled
+      autocomplete="current-password"
       label="Password"
       @enter="performLogin"
       @focus="error = ''"

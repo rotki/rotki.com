@@ -126,6 +126,7 @@ const css = useCssModule();
           :error-messages="v$.password.$errors"
           filled
           label="Password"
+          autocomplete="new-password"
           type="password"
         >
           <ul :class="css.list">
@@ -149,6 +150,7 @@ const css = useCssModule();
           hint="Enter the same password as before, for verification."
           label="Password Confirmation"
           type="password"
+          autocomplete="new-password"
         />
         <div :class="css.buttonWrapper">
           <ActionButton

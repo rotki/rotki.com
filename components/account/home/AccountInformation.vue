@@ -108,6 +108,7 @@ const css = useCssModule();
       :error-messages="v$.firstName.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="First Name"
+      autocomplete="given-name"
       @blur="v$.firstName.$touch()"
     />
 
@@ -118,6 +119,7 @@ const css = useCssModule();
       :error-messages="v$.lastName.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Last Name"
+      autocomplete="family-name"
       @blur="v$.lastName.$touch()"
     />
 
@@ -128,6 +130,7 @@ const css = useCssModule();
       :error-messages="v$.companyName.$errors"
       hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
       label="Company Name"
+      autocomplete="organization"
       @blur="v$.companyName.$touch()"
     />
 
@@ -150,6 +153,7 @@ const css = useCssModule();
       :error-messages="v$.address1.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Address line 1"
+      autocomplete="address-line1"
       @blur="v$.address1.$touch()"
     />
 
@@ -160,6 +164,7 @@ const css = useCssModule();
       :error-messages="v$.address2.$errors"
       hint="Optional. Additional data for the address."
       label="Address line 2"
+      autocomplete="address-line2"
       @blur="v$.address2.$touch()"
     />
 
@@ -170,6 +175,7 @@ const css = useCssModule();
       :error-messages="v$.city.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="City"
+      autocomplete="address-level2"
       @blur="v$.city.$touch()"
     />
 
@@ -180,6 +186,7 @@ const css = useCssModule();
       :error-messages="v$.postcode.$errors"
       hint="Required. Will only be used for invoice of payments."
       label="Postal code"
+      autocomplete="postal-code"
       @blur="v$.postcode.$touch()"
     />
 
@@ -191,6 +198,7 @@ const css = useCssModule();
       :error-messages="v$.country.$errors"
       hint="Email us at support@rotki.com if you need to change your billing country."
       label="Country"
+      autocomplete="country"
       @blur="v$.country.$touch()"
     />
 

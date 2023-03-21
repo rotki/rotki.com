@@ -11,12 +11,14 @@ const props = withDefaults(
     hint?: string;
     disabled?: boolean;
     errorMessages?: { $message: string }[];
+    autocomplete?: string;
   }>(),
   {
     countries: () => [],
     hint: '',
     disabled: false,
     errorMessages: () => [],
+    autocomplete: undefined,
   }
 );
 

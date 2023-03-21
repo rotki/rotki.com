@@ -68,7 +68,13 @@ const css = useCssModule();
     <div :class="css.content">
       <BoxContainer>
         <template #label> Recover password</template>
-        <InputField id="email" v-model="emailAddress" filled label="Email" />
+        <InputField
+          id="email"
+          v-model="emailAddress"
+          filled
+          label="Email"
+          autocomplete="email"
+        />
         <Recaptcha
           :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
           @error="onError"

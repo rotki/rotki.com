@@ -8,6 +8,7 @@ const props = withDefaults(
     hint?: string;
     placeholder?: string;
     errorMessages?: { $message: string }[];
+    autocomplete?: string;
     readonly?: boolean;
     disabled?: boolean;
     filled?: boolean;
@@ -18,6 +19,7 @@ const props = withDefaults(
     hint: '',
     placeholder: '',
     errorMessages: () => [],
+    autocomplete: undefined,
     readonly: false,
     disabled: false,
     filled: false,
@@ -85,6 +87,7 @@ const slots = useSlots();
             :readonly="readonly"
             :type="type"
             :value="value"
+            :autocomplete="autocomplete"
             @blur="blur()"
             @input="input($event)"
             @keypress.enter="enter()"
