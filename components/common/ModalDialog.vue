@@ -13,7 +13,7 @@ const props = withDefaults(
     width: '800px',
     padding: '0px',
     boxless: false,
-    height: '400px',
+    height: undefined,
   }
 );
 
