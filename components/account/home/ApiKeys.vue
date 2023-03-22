@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
-import VisibilityButton from '~/components/common/VisibilityButton.vue';
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
