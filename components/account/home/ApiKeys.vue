@@ -7,6 +7,7 @@ const { account } = storeToRefs(store);
 
 const apiKey = computed(() => account.value?.apiKey ?? '');
 const apiSecret = computed(() => account.value?.apiSecret ?? '');
+const hasApiKeys = computed(() => apiKey.value && apiSecret.value);
 const showKey = ref(false);
 const showSecret = ref(false);
 
@@ -50,7 +51,7 @@ const css = useCssModule();
       :class="css.actionButton"
       primary
       small
-      text="Regenerate"
+      :text="hasApiKeys ? 'Regenerate' : 'Generate'"
       @click="regenerateKeys"
     />
   </CardContainer>
