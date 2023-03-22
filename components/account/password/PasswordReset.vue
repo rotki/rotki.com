@@ -15,16 +15,20 @@ function setupTokenValidation() {
   const validateToken = async () => {
     try {
       await fetchWithCsrf('/webapi/password-reset/validate/', {
+        method: 'post',
         body: {
           uid,
           token,
         },
       });
-    } catch {
+    } catch (e: any) {
+      if (!(e instanceof FetchError && e.status === 404)) {
+        logger.error(e);
+      }
       set(isValid, false);
+    } finally {
+      set(validating, false);
     }
-
-    set(validating, false);
   };
 
   onMounted(async () => await validateToken());
@@ -66,6 +70,7 @@ const { uid, token } = route.params;
 const submit = async () => {
   try {
     await fetchWithCsrf('/webapi/password-reset/confirm/', {
+      method: 'post',
       body: {
         uid,
         token,
@@ -77,21 +82,16 @@ const submit = async () => {
       path: '/password/changed',
     });
   } catch (e: any) {
-    if (e instanceof FetchError) {
-      const status = e.status ?? -1;
-      if (status === 404) {
-        await navigateTo({
-          path: '/password/invalid-link',
-        });
-      } else if (status === 400) {
-        const message = e.data.message;
-        if (message && typeof message === 'object') {
-          $externalResults.value = {
-            password: message.password,
-            passwordConfirmation: message.password_confirmation,
-          };
-        }
+    if (e instanceof FetchError && e.status === 400) {
+      const message = e.data.message;
+      if (message && typeof message === 'object') {
+        $externalResults.value = {
+          password: message.password,
+          passwordConfirmation: message.password_confirmation,
+        };
       }
+    } else {
+      logger.error(e);
     }
   }
 };
@@ -159,7 +159,7 @@ const css = useCssModule();
             primary
             small
             text="Submit"
-            @click="submit"
+            @click="submit()"
           />
         </div>
       </BoxContainer>
