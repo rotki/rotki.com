@@ -32,7 +32,7 @@ const css = useCssModule();
 <template>
   <InfoTooltip :class="css.tooltip">
     <template #activator>
-      <button :class="css.button" @click="toggle">
+      <button :class="css.button" :disabled="disabled" @click="toggle">
         <VisibilityIcon :visible="modelValue" />
       </button>
     </template>
@@ -49,6 +49,6 @@ const css = useCssModule();
 
 .button {
   @apply focus:outline-none flex items-center justify-center;
-  @apply w-10 h-10 rounded-full hover:bg-shade1 transition;
+  @apply w-10 h-10 rounded-full hover:bg-shade1 transition disabled:text-gray-400 disabled:cursor-not-allowed;
 }
 </style>
