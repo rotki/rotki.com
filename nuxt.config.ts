@@ -1,6 +1,7 @@
 const nonIndexed = [
   '/activation',
   '/home',
+  '/blank',
   '/maintenance',
   '/password/changed',
   '/password/send',
