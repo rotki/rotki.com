@@ -6,13 +6,9 @@ import { useMainStore } from '~/store';
 const store = useMainStore();
 const { account } = storeToRefs(store);
 
-const premium = computed(() => {
-  return get(account)?.canUsePremium ?? false;
-});
+const premium = computed(() => get(account)?.canUsePremium ?? false);
 
-const username = computed(() => {
-  return get(account)?.username;
-});
+const username = computed(() => get(account)?.username);
 
 const logout = async () => {
   await store.logout(true);

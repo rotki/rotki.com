@@ -27,9 +27,9 @@ const subscriptions = computed(() => {
 
 const pending = computed(() => get(subscriptions).filter((sub) => sub.pending));
 
-const renewableSubscriptions = computed(() => {
-  return get(subscriptions).filter(({ actions }) => actions.includes('renew'));
-});
+const renewableSubscriptions = computed(() =>
+  get(subscriptions).filter(({ actions }) => actions.includes('renew'))
+);
 
 const pendingPaymentCurrency = computedAsync(async () => {
   const subs = get(renewableSubscriptions);
@@ -102,9 +102,8 @@ const hasAction = (sub: Subscription, action: 'renew' | 'cancel') => {
   return false;
 };
 
-const displayActions = (sub: Subscription) => {
-  return hasAction(sub, 'renew') || hasAction(sub, 'cancel');
-};
+const displayActions = (sub: Subscription) =>
+  hasAction(sub, 'renew') || hasAction(sub, 'cancel');
 
 const css = useCssModule();
 </script>

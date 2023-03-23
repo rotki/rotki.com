@@ -10,9 +10,8 @@ const props = defineProps<{
 const emit = defineEmits<{ (e: 'close'): void }>();
 
 const { step } = toRefs(props);
-const useType = (type: StepType | IdleStep) => {
-  return computed(() => get(step).type === type);
-};
+const useType = (type: StepType | IdleStep) =>
+  computed(() => get(step).type === type);
 const text = computed(() => {
   const currentStep = get(step);
   if (currentStep.type === 'idle') {
