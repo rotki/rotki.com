@@ -27,9 +27,7 @@ const { plans } = storeToRefs(store);
 const { crypto, visible, warning } = toRefs(props);
 const confirmed = ref(false);
 
-const availablePlans: ComputedRef<Plan[]> = computed(() => {
-  return get(plans) ?? [];
-});
+const availablePlans: ComputedRef<Plan[]> = computed(() => get(plans) ?? []);
 
 const cancel = () => emit('cancel');
 const select = (months: number) => {
@@ -39,9 +37,8 @@ const select = (months: number) => {
   return emit('select', months);
 };
 
-const getPrice = (plan: Plan) => {
-  return get(crypto) ? plan.priceCrypto : plan.priceFiat;
-};
+const getPrice = (plan: Plan) =>
+  get(crypto) ? plan.priceCrypto : plan.priceFiat;
 
 watch(visible, (visible) => {
   if (!visible) {

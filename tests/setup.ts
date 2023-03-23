@@ -4,14 +4,10 @@ import { server } from '~/tests/mocks/server';
 
 const { BACKEND_URL } = import.meta.env;
 
-mockNuxtImport('useRuntimeConfig', () => {
-  return () => {
-    return {
-      public: { baseUrl: BACKEND_URL, backendUrl: BACKEND_URL },
-      app: { baseURL: '/' },
-    };
-  };
-});
+mockNuxtImport('useRuntimeConfig', () => () => ({
+  public: { baseUrl: BACKEND_URL, backendUrl: BACKEND_URL },
+  app: { baseURL: '/' },
+}));
 
 beforeAll(() => server.listen({ onUnhandledRequest: `error` }));
 

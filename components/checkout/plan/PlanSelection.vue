@@ -27,9 +27,7 @@ const next = () => {
 
 const { account, authenticated } = storeToRefs(useMainStore());
 
-const vat = computed(() => {
-  return account.value?.vat;
-});
+const vat = computed(() => account.value?.vat);
 
 const css = useCssModule();
 </script>

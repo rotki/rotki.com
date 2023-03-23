@@ -7,9 +7,9 @@ onBeforeMount(() => {
   }
 });
 
-const subscriptionIdentifier = computed(() => {
-  return 'id' in route.query ? (route.query.id as string) : undefined;
-});
+const subscriptionIdentifier = computed(() =>
+  'id' in route.query ? (route.query.id as string) : undefined
+);
 </script>
 
 <template>

@@ -99,9 +99,7 @@ const proceed = async () => {
   }
 };
 
-const isSelected = (method: PaymentMethod) => {
-  return selected.value === method;
-};
+const isSelected = (method: PaymentMethod) => selected.value === method;
 
 const select = (method: PaymentMethod) => {
   selected.value = method;
