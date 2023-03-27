@@ -30,7 +30,7 @@ const { visible } = useOverflow();
   <PremiumFeatures />
   <AvailablePlans @download="visible = true" />
   <PageFooter landing />
-  <!--  <DownloadDialog v-if="visible" @dismiss="visible = false" />-->
+  <DownloadDialog v-if="visible" @dismiss="visible = false" />
 </template>
 
 <style lang="scss">
