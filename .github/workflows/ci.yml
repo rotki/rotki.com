@@ -6,13 +6,11 @@ on:
       - main
       - staging
       - develop
-      - next
   pull_request:
     branches:
       - main
       - staging
       - develop
-      - next
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
@@ -45,6 +43,7 @@ jobs:
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.cache/Cypress/
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -60,6 +59,30 @@ jobs:
 
       - name: Run tests ✅
         run: pnpm run test
+
+      - name: Run cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          start: pnpm run dev
+          browser: chrome
+          wait-on: 'http://localhost:3000'
+          install: false
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: e2e-screenshots
+          path: tests/e2e/screenshots
+          retention-days: 7
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-videos
+          path: tests/e2e/videos
+          retention-days: 7
 
   build-docker:
     runs-on: ubuntu-latest
