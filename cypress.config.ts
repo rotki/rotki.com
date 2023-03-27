@@ -9,6 +9,8 @@ export default defineConfig({
     specPattern: `tests/e2e/specs/**/*.spec.cy.ts`,
     screenshotsFolder: 'tests/e2e/screenshots',
     supportFile: 'tests/e2e/support/e2e.ts',
+    videosFolder: 'tests/e2e/videos',
+    downloadsFolder: 'tests/e2e/downloads',
     testIsolation: false,
     setupNodeEvents(on, config) {
       // implement node event listeners here

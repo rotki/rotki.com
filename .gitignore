@@ -67,7 +67,6 @@ typings/
 
 # nuxt.js build output
 .nuxt
-.output
 
 # nuxt.js nitro build output
 .output
@@ -92,3 +91,8 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# test files
+tests/e2e/videos
+tests/e2e/screenshots
+tests/**/coverage
