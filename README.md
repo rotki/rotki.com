@@ -12,8 +12,8 @@ $ pnpm run dev
 # build for production and launch server
 $ pnpm run build
 $ pnpm start
-
-## Run
+```
+## Setting up the environment
 
 Make sure the environment file exists
 
@@ -43,7 +43,21 @@ NUXT_PUBLIC_BASE_URL=https://localhost
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
-Run with
+### Backend proxy
+
+You can configure the frontend to proxy the `/webapi` to a server running somewhere:
+
+For the `production` system you could use:
+```dotenv
+PROXY_DOMAIN=rotki.com
+```
+or if `staging` is running you could set:
+
+```dotenv
+PROXY_DOMAIN=staging.rotki.com
+```
+## Run
+Run with the development server with the following command:
 
 ```bash
 $ pnpm run dev
