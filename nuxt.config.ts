@@ -15,7 +15,7 @@ const nonIndexed = [
   '/account-deleted',
 ];
 
-const domain = process.env.PROXY_DOMAIN || 'rotki.com';
+const domain = process.env.PROXY_DOMAIN || 'localhost';
 const baseUrl = `https://${domain}`;
 
 const proxy = {
