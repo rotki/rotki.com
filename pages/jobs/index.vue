@@ -18,7 +18,7 @@ definePageMeta({
 </script>
 
 <template>
-  <JobsContent>
+  <NuxtLayout name="jobs">
     <div />
-  </JobsContent>
+  </NuxtLayout>
 </template>

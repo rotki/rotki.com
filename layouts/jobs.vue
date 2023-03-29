@@ -4,7 +4,7 @@ const css = useCssModule();
 
 <template>
   <PageContainer>
-    <template #title> Jobs </template>
+    <template #title> Jobs</template>
     <div :class="css.container">
       <TextHeading>Available Roles</TextHeading>
       <ul :class="css.tabs">
@@ -27,7 +27,7 @@ const css = useCssModule();
           </NuxtLink>
         </li>
       </ul>
-      <NuxtPage />
+      <slot />
     </div>
   </PageContainer>
 </template>
