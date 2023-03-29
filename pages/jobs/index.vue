@@ -18,9 +18,7 @@ definePageMeta({
 </script>
 
 <template>
-  <JobsContent />
+  <JobsContent>
+    <div />
+  </JobsContent>
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>
