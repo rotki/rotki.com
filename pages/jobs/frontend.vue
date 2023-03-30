@@ -15,5 +15,7 @@ useHead({
 </script>
 
 <template>
-  <FrontendDeveloper />
+  <NuxtLayout name="jobs">
+    <FrontendDeveloper />
+  </NuxtLayout>
 </template>

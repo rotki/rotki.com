@@ -27,7 +27,7 @@ const css = useCssModule();
           </NuxtLink>
         </li>
       </ul>
-      <NuxtPage />
+      <slot />
     </div>
   </PageContainer>
 </template>

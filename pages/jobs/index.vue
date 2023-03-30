@@ -18,9 +18,7 @@ definePageMeta({
 </script>
 
 <template>
-  <JobsContent />
+  <NuxtLayout name="jobs">
+    <div />
+  </NuxtLayout>
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>
