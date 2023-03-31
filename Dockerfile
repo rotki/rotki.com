@@ -4,7 +4,7 @@ COPY ./ /build/
 
 WORKDIR /build
 
-RUN npm install -g pnpm && \
+RUN npm install -g pnpm@8 && \
     pnpm install && \
     pnpm run build
 

@@ -2,7 +2,7 @@
   "name": "rotki.com",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@7.29.3",
+  "packageManager": "pnpm@8.1.0",
   "scripts": {
     "dev": "nuxi dev",
     "build": "nuxi build",
@@ -84,6 +84,10 @@
     "vite": "4.2.0",
     "vitest": "0.29.7",
     "webpack": "5.76.2"
+  },
+  "engines": {
+    "node": ">=18 <19",
+    "pnpm": ">=8 <9"
   },
   "husky": {
     "hooks": {
