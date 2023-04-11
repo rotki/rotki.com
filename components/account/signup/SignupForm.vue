@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { email, minLength, required, sameAs } from '@vuelidate/validators';
+import {
+  email,
+  helpers,
+  minLength,
+  required,
+  sameAs,
+} from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { get } from '@vueuse/core';
 import { type Ref } from 'vue';
@@ -43,7 +49,13 @@ const rules = {
   address1: { required },
   address2: {},
   city: { required },
-  postcode: { required },
+  postcode: {
+    required,
+    validateCode: helpers.withMessage(
+      'Enter a valid postal code. Only alphabets, numbers, space and -',
+      helpers.regex(/^[\d\sA-Za-z-]+$/)
+    ),
+  },
   country: { required },
   captcha: { required },
 };
@@ -287,6 +299,7 @@ const css = useCssModule();
         </div>
 
         <Recaptcha
+          id="signup-captcha"
           :class="css.recaptcha"
           :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
           @error="onError"
@@ -297,6 +310,7 @@ const css = useCssModule();
 
         <label :class="css.termsCheck">
           <input
+            id="tos"
             :class="css.checkbox"
             :value="termsAccepted"
             type="checkbox"
