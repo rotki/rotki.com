@@ -4,7 +4,8 @@
     "get_premium": "Get Premium",
     "get_premium_plan": "Get Premium Plan",
     "get_advanced_plan": "Get Advanced Plan",
-    "get_in_touch": "Get In Touch Now"
+    "get_in_touch": "Get In Touch Now",
+    "go_back_home": "Go back home"
   },
   "supported_defi": {
     "title": "Dedicated DeFi support for",
