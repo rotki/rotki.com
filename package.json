@@ -18,7 +18,8 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --headless",
     "coverage": "vitest run --coverage",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "bumpp -r --no-push"
   },
   "dependencies": {
     "@metamask/detect-provider": "1.2.0",
@@ -33,6 +34,7 @@
     "autoprefixer": "10.4.14",
     "braintree-web": "3.92.0",
     "bufferutil": "4.0.7",
+    "bumpp": "9.1.0",
     "consola": "2.15.3",
     "encoding": "0.1.13",
     "ethers": "5.7.2",
