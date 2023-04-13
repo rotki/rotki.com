@@ -5,7 +5,7 @@ const { token, step, plan, submit } = useBraintree();
 <template>
   <PaymentFrame :loading="!token" :step="step">
     <PaypalPayment
-      v-if="token"
+      v-if="token && plan"
       :plan="plan"
       :token="token"
       @pay="submit($event)"

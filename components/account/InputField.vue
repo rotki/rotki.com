@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { type BaseErrorObject } from '~/types/common';
+
 const props = withDefaults(
   defineProps<{
     id: string;
@@ -7,7 +9,7 @@ const props = withDefaults(
     label?: string;
     hint?: string;
     placeholder?: string;
-    errorMessages?: { $message: string }[];
+    errorMessages?: BaseErrorObject[];
     autocomplete?: string;
     readonly?: boolean;
     disabled?: boolean;
@@ -33,7 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const inputField = ref<HTMLInputElement | null>(null);
-const input = (event: InputEvent) => {
+const input = (event: Event) => {
   const target = event.target;
   if (target) {
     emit('update:modelValue', (target as HTMLInputElement).value ?? '');

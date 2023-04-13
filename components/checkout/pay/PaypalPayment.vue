@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { get } from '@vueuse/core';
 import { client, paypalCheckout } from 'braintree-web';
 import { type Ref } from 'vue';
 import { type SelectedPlan } from '~/types';
+import { type PayEvent } from '~/types/common';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
 
@@ -10,7 +12,7 @@ const initializeBraintree = async (
   plan: Ref<SelectedPlan>,
   accepted: Ref<boolean>,
   mustAcceptRefund: Ref<boolean>,
-  pay: (plan: { months: number; nonce: string }) => void
+  pay: (plan: PayEvent) => void
 ) => {
   let paypalActions: any = null;
   watch(accepted, (accepted) => {
@@ -64,11 +66,11 @@ const initializeBraintree = async (
       onCancel: () => {
         logger.info('PayPal payment was cancelled by user');
       },
-      // @ts-expect-error
       onInit: (_, actions) => {
         paypalActions = actions;
-        const userAcceptedPolicy = unref(accepted);
+        const userAcceptedPolicy = get(accepted);
         if (!userAcceptedPolicy) {
+          assert('disable' in actions && typeof actions.disable === 'function');
           actions.disable();
         }
       },
@@ -88,7 +90,7 @@ const props = defineProps<{
   plan: SelectedPlan;
 }>();
 
-const emit = defineEmits<{ (e: 'pay', plan: {}): void }>();
+const emit = defineEmits<{ (e: 'pay', plan: PayEvent): void }>();
 
 const { token, plan } = toRefs(props);
 const error = ref('');

@@ -27,13 +27,24 @@ const date = computed(() => {
   return date.toLocaleDateString();
 });
 
+const vatOverview = computed(() => {
+  const cPlan = get(plan);
+  if (!(cPlan.vat && 'priceInEur' in cPlan)) {
+    return undefined;
+  }
+  return {
+    vat: cPlan.vat,
+    priceInEur: cPlan.priceInEur,
+  };
+});
+
 const select = () => {
   set(selection, true);
 };
 
 const switchTo = (months: number) => {
   set(selection, false);
-  const currentRoute = router.currentRoute;
+  const currentRoute = get(router.currentRoute);
 
   navigateTo({
     path: currentRoute.path,
@@ -59,13 +70,8 @@ const css = useCssModule();
         {{ plan.finalPriceInEur }}
       </template>
       <template #vat>
-        <span v-if="plan.vat && !crypto">
-          {{
-            t('selected_plan_overview.vat', {
-              vat: plan.vat,
-              priceInEur: plan.priceInEur,
-            })
-          }}
+        <span v-if="vatOverview && !crypto">
+          {{ t('selected_plan_overview.vat', vatOverview) }}
         </span>
         <span v-else-if="plan.vat">
           {{

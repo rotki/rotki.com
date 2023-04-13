@@ -143,7 +143,7 @@ export async function fetchWithCsrf<
       },
     });
 
-    const race = await Promise.race([aborter, fetch]);
+    const race = await Promise.race<any>([aborter, fetch]);
     if (race === null) {
       controller.abort();
     }
