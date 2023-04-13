@@ -4,7 +4,9 @@ import { commonAttrs, getMetadata } from '~/utils/metadata';
 const title = 'jobs | rotki';
 const description = 'Available roles and positions in the rotki team';
 
-const { baseUrl } = useRuntimeConfig();
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
 
 useHead({
   title,

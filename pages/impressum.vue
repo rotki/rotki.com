@@ -4,8 +4,10 @@ import { commonAttrs, getMetadata } from '@/utils/metadata';
 const title = 'impressum | rotki';
 const description = 'Impressum - DE';
 
-const config = useRuntimeConfig();
-const baseUrl = config.baseUrl;
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
+
 useHead({
   title,
   meta: getMetadata(title, description, `${baseUrl}/impressum/`, baseUrl),

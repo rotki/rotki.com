@@ -5,7 +5,9 @@ const title = 'vue/typescript frontend developer | rotki';
 const description =
   'We are looking for a passionate Vue.js developer with excellent knowledge of Typescript.';
 
-const { baseUrl } = useRuntimeConfig();
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
 
 useHead({
   title,
