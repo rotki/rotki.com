@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { debouncedWatch, get, set } from '@vueuse/core';
 import { type Country } from '~/composables/countries';
+import { type BaseErrorObject } from '~/types/common';
 
 const props = withDefaults(
   defineProps<{
@@ -10,7 +11,7 @@ const props = withDefaults(
     countries?: Country[];
     hint?: string;
     disabled?: boolean;
-    errorMessages?: { $message: string }[];
+    errorMessages?: BaseErrorObject[];
     autocomplete?: string;
   }>(),
   {

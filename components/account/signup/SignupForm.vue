@@ -89,7 +89,7 @@ const useSignup = (
     loading.value = true;
 
     try {
-      await fetchWithCsrf('/webapi/signup/', {
+      await fetchWithCsrf<void>('/webapi/signup/', {
         method: 'post',
         body: {
           captcha: captcha.value,

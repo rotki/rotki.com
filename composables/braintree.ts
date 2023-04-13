@@ -5,6 +5,7 @@ import {
   type PaymentStep,
   type SelectedPlan,
 } from '~/types';
+import { type PayEvent } from '~/types/common';
 
 export const useBraintree = () => {
   const store = useMainStore();
@@ -65,7 +66,7 @@ export const useBraintree = () => {
     return data;
   });
 
-  const token = computed(() => {
+  const token = computed<string>(() => {
     const payload = get(checkout);
     if (!payload) {
       return '';
@@ -73,13 +74,7 @@ export const useBraintree = () => {
     return payload.braintreeClientToken;
   });
 
-  const submit = async ({
-    months,
-    nonce,
-  }: {
-    months: number;
-    nonce: string;
-  }) => {
+  const submit = async ({ months, nonce }: PayEvent) => {
     set(pending, true);
     const result = await store.pay({
       months,

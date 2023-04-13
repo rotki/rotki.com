@@ -10,6 +10,7 @@ import { type ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-se
 import { get, set } from '@vueuse/core';
 import { type Ref } from 'vue';
 import { type SelectedPlan } from '~/types';
+import { type PayEvent } from '~/types/common';
 import { logger } from '~/utils/logger';
 import { assert } from '~/utils/assert';
 
@@ -168,7 +169,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'pay', payment: { months: number; nonce: string }): void;
+  (e: 'pay', payment: PayEvent): void;
   (e: 'update:pending', pending: boolean): void;
 }>();
 

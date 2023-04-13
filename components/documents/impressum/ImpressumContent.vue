@@ -8,7 +8,7 @@ const { data } = await useAsyncData('/documents/impressum', () =>
   <PageContainer>
     <template #title> {{ data?.title ?? '' }}</template>
 
-    <ContentRenderer :value="data">
+    <ContentRenderer v-if="data" :value="data">
       <ContentRendererMarkdown :value="data" />
     </ContentRenderer>
   </PageContainer>

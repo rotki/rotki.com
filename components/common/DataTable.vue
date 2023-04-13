@@ -3,7 +3,7 @@ import { type DataTableHeader } from '~/types/common';
 
 const props = defineProps<{
   headers: DataTableHeader[];
-  items: unknown[];
+  items: any[];
 }>();
 
 const { items } = toRefs(props);
@@ -30,10 +30,7 @@ const css = useCssModule();
             <th
               v-for="header in headers"
               :key="header.text"
-              :class="{
-                [header.className]: true,
-                [css.header]: true,
-              }"
+              :class="[header.className, css.header]"
               scope="col"
             >
               {{ header.text }}

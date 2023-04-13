@@ -7,6 +7,10 @@ const { t } = useI18n();
 const css = useCssModule();
 
 const pageTitle = computed(() => get(error)?.message);
+const statusCode = computed(() => {
+  const err = get(error);
+  return err && 'statusCode' in err ? err.statusCode : -1;
+});
 const title = computed(() => `${get(pageTitle)} | rotki`);
 
 const handleError = () => clearError({ redirect: '/' });
@@ -21,7 +25,7 @@ useHead(() => ({
 <template>
   <PageContainer>
     <div v-if="error" :class="css.wrapper">
-      <h1 :class="css.title">{{ error.statusCode }}</h1>
+      <h1 :class="css.title">{{ statusCode }}</h1>
       <p :class="css.subtitle">{{ pageTitle }}</p>
       <ActionButton
         :text="t('actions.go_back_home')"

@@ -33,7 +33,7 @@ const setCaptchaId = (v: number) => {
 const reset = async () => {
   loading.value = true;
   try {
-    await fetchWithCsrf('/webapi/password-reset/request/', {
+    await fetchWithCsrf<void>('/webapi/password-reset/request/', {
       method: 'post',
       body: {
         captcha: recaptcha.recaptchaToken.value,

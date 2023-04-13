@@ -10,7 +10,7 @@ const { data } = await useAsyncData('/documents/tos', () =>
   <PageContainer>
     <template #title> {{ data?.title ?? '' }}</template>
 
-    <ContentRenderer :value="data" :class="css.content">
+    <ContentRenderer v-if="data" :value="data" :class="css.content">
       <ContentRendererMarkdown :value="data" />
     </ContentRenderer>
   </PageContainer>

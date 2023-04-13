@@ -5,7 +5,7 @@ const { data } = await useAsyncData('/jobs/backend', () =>
 </script>
 
 <template>
-  <ContentRenderer :value="data">
+  <ContentRenderer v-if="data" :value="data">
     <ContentRendererMarkdown :value="data" />
   </ContentRenderer>
 </template>
