@@ -7,8 +7,10 @@ const description =
 const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`;
 
-const config = useRuntimeConfig();
-const baseUrl = config.baseUrl;
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
+
 useHead({
   title: 'rotki',
   meta: [

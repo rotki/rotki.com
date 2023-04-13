@@ -5,7 +5,9 @@ const title = 'python backend developer | rotki';
 const description =
   'We are looking for a backend developer to help us improve Rotki.';
 
-const { baseUrl } = useRuntimeConfig();
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
 
 useHead({
   title,
