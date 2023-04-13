@@ -3,6 +3,7 @@ const nonIndexed = [
   '/home',
   '/blank',
   '/maintenance',
+  '/health',
   '/password/changed',
   '/password/send',
   '/password/reset',
@@ -136,8 +137,10 @@ export default defineNuxtConfig({
   },
 
   robots: {
-    UserAgent: '*',
-    Disallow: () => nonIndexed,
+    rules: {
+      UserAgent: '*',
+      Disallow: nonIndexed,
+    },
   },
 
   content: {
