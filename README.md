@@ -56,6 +56,10 @@ or if `staging` is running you could set:
 ```dotenv
 PROXY_DOMAIN=staging.rotki.com
 ```
+If the server where you proxy doesn't run using `https` you can set so that the backend requests are proxied to `http`:
+```dotenv
+PROXY_INSECURE=true
+```
 ## Run
 Run with the development server with the following command:
 
