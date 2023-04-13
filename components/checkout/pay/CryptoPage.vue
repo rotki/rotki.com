@@ -20,8 +20,11 @@ onMounted(async () => {
   const selectedPlan = get(plan);
   const selectedCurrency = get(currency);
   if (selectedPlan > 0 && selectedCurrency) {
-    provider = (await detectEthereumProvider()) as Provider | null;
-    metamaskSupport.value = !!provider;
+    provider = await detectEthereumProvider();
+    logger.debug(
+      `provider: ${!!provider}, is metamask: ${provider?.isMetaMask}`
+    );
+    set(metamaskSupport, !!provider);
     set(loading, true);
     const subId = get(subscriptionId);
     const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);

@@ -22,7 +22,7 @@
     "release": "bumpp -r --no-push"
   },
   "dependencies": {
-    "@metamask/detect-provider": "1.2.0",
+    "@metamask/detect-provider": "2.0.0",
     "@nuxtjs/robots": "3.0.0",
     "@nuxtjs/tailwindcss": "6.6.6",
     "@pinia/nuxt": "0.4.8",
