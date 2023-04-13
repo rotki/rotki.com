@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ethers } from 'ethers';
+import { parseEther, parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import { get, set, useClipboard } from '@vueuse/core';
 import { type CryptoPayment } from '~/types';
@@ -14,10 +14,10 @@ const createPaymentQR = async (
   if (payment.cryptocurrency === 'BTC') {
     qrText = `bitcoin:${payment.cryptoAddress}?amount=${payment.finalPriceInCrypto}&label=Rotki`;
   } else if (payment.cryptocurrency === 'ETH') {
-    const ethPrice = ethers.utils.parseEther(payment.finalPriceInCrypto);
+    const ethPrice = parseEther(payment.finalPriceInCrypto);
     qrText = `ethereum:${payment.cryptoAddress}?value=${ethPrice.toString()}`;
   } else if (payment.cryptocurrency === 'DAI') {
-    const daiPrice = ethers.utils.parseUnits(payment.finalPriceInCrypto, 18);
+    const daiPrice = parseUnits(payment.finalPriceInCrypto, 18);
     qrText = `ethereum:${payment.cryptoAddress}/transfer?address=${dai}&uint256=${daiPrice}`;
   }
 

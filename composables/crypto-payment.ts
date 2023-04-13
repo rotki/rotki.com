@@ -1,4 +1,11 @@
-import { ethers } from 'ethers';
+import {
+  BrowserProvider,
+  Contract,
+  type JsonRpcSigner,
+  type Signer,
+  type TransactionResponse,
+  parseEther,
+} from 'ethers';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { type Ref } from 'vue';
 import { logger } from '~/utils/logger';
@@ -43,11 +50,11 @@ export const useWeb3Payment = (
     { immediate: false }
   );
 
-  async function payWithEth(signer: ethers.Signer) {
+  async function payWithEth(signer: JsonRpcSigner) {
     stop();
     const payment = get(data);
     assert(payment);
-    const value = ethers.utils.parseEther(payment.finalPriceInCrypto);
+    const value = parseEther(payment.finalPriceInCrypto);
     const to = payment.cryptoAddress;
     logger.info(
       `preparing to send ${payment.finalPriceInCrypto}(${value}) ETH to ${to}`
@@ -62,7 +69,7 @@ export const useWeb3Payment = (
     start();
   }
 
-  async function payWithDai(signer: ethers.Signer) {
+  async function payWithDai(signer: Signer): Promise<void> {
     stop();
     const payment = get(data);
     assert(payment);
@@ -72,15 +79,14 @@ export const useWeb3Payment = (
       tokenAddress: contractAddress,
     } = payment;
     assert(contractAddress);
-    const contract = new ethers.Contract(contractAddress, abi, signer.provider);
-    const contractWithSigner = contract.connect(signer);
-    const price = ethers.utils.parseEther(finalPriceInCrypto);
+    const contract = new Contract(contractAddress, abi, signer);
+    const price = parseEther(finalPriceInCrypto);
     logger.info(`preparing to send ${price} DAI to ${cryptoAddress}`);
     set(state, 'pending');
-    const tx = await (contractWithSigner.transfer(
+    const tx = await (contract.transfer(
       cryptoAddress,
       price
-    ) as Promise<ethers.providers.TransactionResponse>);
+    ) as Promise<TransactionResponse>);
     logger.info(`transaction is pending: ${tx.hash}`);
     await markTransactionStarted();
     start();
@@ -100,10 +106,10 @@ export const useWeb3Payment = (
         logger.info('missing permission');
         return;
       }
-      const web3Provider = new ethers.providers.Web3Provider(provider as any);
-      const network = await web3Provider.getNetwork();
+      const browserProvider = new BrowserProvider(provider);
+      const network = await browserProvider.getNetwork();
 
-      const expected = testing ? 11155111 : 1;
+      const expected = BigInt(testing ? 11155111 : 1);
       const name = testing ? 'Sepolia' : 'Mainnet';
       if (network.chainId !== expected) {
         set(
@@ -113,7 +119,7 @@ export const useWeb3Payment = (
         return;
       }
 
-      const signer = web3Provider.getSigner();
+      const signer = await browserProvider.getSigner();
 
       if (payment.cryptocurrency === 'ETH') {
         await payWithEth(signer);
