@@ -2,8 +2,8 @@ lockfileVersion: '6.0'
 
 dependencies:
   '@metamask/detect-provider':
-    specifier: 1.2.0
-    version: 1.2.0
+    specifier: 2.0.0
+    version: 2.0.0
   '@nuxtjs/robots':
     specifier: 3.0.0
     version: 3.0.0
@@ -1579,9 +1579,9 @@ packages:
       - encoding
       - supports-color
 
-  /@metamask/detect-provider@1.2.0:
-    resolution: {integrity: sha512-ocA76vt+8D0thgXZ7LxFPyqw3H7988qblgzddTDA6B8a/yU0uKV42QR/DhA+Jh11rJjxW0jKvwb5htA6krNZDQ==}
-    engines: {node: '>= 10'}
+  /@metamask/detect-provider@2.0.0:
+    resolution: {integrity: sha512-sFpN+TX13E9fdBDh9lvQeZdJn4qYoRb/6QF2oZZK/Pn559IhCFacPMU1rMuqyXoFQF3JSJfii2l98B87QDPeCQ==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /@mswjs/cookies@0.2.2:
