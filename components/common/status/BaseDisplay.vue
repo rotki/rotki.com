@@ -74,18 +74,12 @@ const css = useCssModule();
 }
 
 .title {
-  @apply font-sans font-bold flex flex-row justify-center;
+  @apply font-sans font-bold flex flex-row justify-center mb-4 text-2xl leading-7;
 
-  line-height: 29px;
-  font-size: 24px;
   letter-spacing: 0;
-  margin-bottom: 16px;
 }
 
 .message {
-  @apply font-sans break-words;
-
-  font-size: 14px;
-  line-height: 20px;
+  @apply font-sans break-words leading-5 text-lg font-medium;
 }
 </style>
