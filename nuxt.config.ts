@@ -17,7 +17,9 @@ const nonIndexed = [
 ];
 
 const domain = process.env.PROXY_DOMAIN || 'localhost';
-const baseUrl = `https://${domain}`;
+const insecureProxy = process.env.PROXY_INSECURE;
+const proxyProtocol = insecureProxy ? 'http' : 'https';
+const baseUrl = `${proxyProtocol}://${domain}`;
 
 const proxy = {
   host: domain,
