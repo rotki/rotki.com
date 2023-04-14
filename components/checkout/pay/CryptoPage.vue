@@ -70,8 +70,13 @@ const step = computed<PaymentStep>(() => {
 });
 
 const reset = () => {
-  set(currentState, 'idle');
-  set(error, '');
+  const { query } = useRoute();
+  navigateTo({
+    path: '/checkout/payment-method',
+    query: {
+      p: query.p,
+    },
+  });
 };
 
 const config = useRuntimeConfig();
