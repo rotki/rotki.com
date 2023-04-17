@@ -4,7 +4,9 @@ COPY ./ /build/
 
 WORKDIR /build
 
-RUN npm install -g pnpm@8 && \
+RUN --mount=type=cache,target=/root/.npm/_cacache/ \
+    --mount=type=cache,target=/root/.local/share/pnpm/store \
+    npm install -g pnpm@8 && \
     pnpm install && \
     pnpm run build
 
@@ -16,7 +18,8 @@ ENV GIT_SHA=${GIT_SHA}
 ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=4000
 
-RUN npm install -g pm2@5.2.2
+RUN --mount=type=cache,target=/root/.npm/_cacache/ \
+    npm install -g pm2@5.2.2
 
 COPY --from=builder /build/.output ./
 COPY --from=builder /build/ecosystem.config.js ./
