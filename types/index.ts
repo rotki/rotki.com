@@ -81,6 +81,7 @@ export const Account = z.object({
   subscriptions: z.array(Subscription),
   payments: z.array(Payment),
   dateNow: z.string(),
+  emailConfirmed: z.boolean(),
 });
 
 export type Account = z.infer<typeof Account>;

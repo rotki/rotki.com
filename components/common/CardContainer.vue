@@ -19,9 +19,7 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .card {
-  @apply p-4 pt-1 rounded-md;
-
-  box-shadow: 0 2px 12px rgba(74, 91, 120, 0.1) !important;
+  @apply p-4 pt-1 rounded border border-gray-300 shadow-md;
 }
 
 .warning {

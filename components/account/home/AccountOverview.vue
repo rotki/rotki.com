@@ -10,6 +10,8 @@ const premium = computed(() => get(account)?.canUsePremium ?? false);
 
 const username = computed(() => get(account)?.username);
 
+const emailConfirmed = computed(() => get(account)?.emailConfirmed ?? false);
+
 const logout = async () => {
   await store.logout(true);
   await navigateTo('/login');
@@ -27,7 +29,8 @@ const css = useCssModule();
       </LinkText>
     </template>
     <TextHeading :class="css.header"> Welcome {{ username }}</TextHeading>
-    <SubscriptionTable :class="css.category" />
+    <UnverifiedEmailWarning v-if="!emailConfirmed" />
+    <SubscriptionTable v-else :class="css.category" />
     <PaymentsTable :class="css.category" />
     <ApiKeys v-if="premium" :class="css.category" />
     <AccountDetails :class="css.category" />

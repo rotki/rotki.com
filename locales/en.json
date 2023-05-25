@@ -1,4 +1,9 @@
 {
+  "account": {
+    "unverified_email": {
+      "message": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail."
+    }
+  },
   "actions": {
     "download": "Start now for free",
     "get_premium": "Get Premium",
