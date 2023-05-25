@@ -52,7 +52,7 @@ const css = useCssModule();
       primary
       small
       :text="hasApiKeys ? 'Regenerate' : 'Generate'"
-      @click="regenerateKeys"
+      @click="regenerateKeys()"
     />
   </CardContainer>
 </template>

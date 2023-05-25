@@ -76,7 +76,7 @@ const css = useCssModule();
           small
           text="Confirm"
           warning
-          @click="deleteAccount"
+          @click="deleteAccount()"
         />
       </div>
     </ModalDialog>

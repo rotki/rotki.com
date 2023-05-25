@@ -23,7 +23,7 @@ const css = useCssModule();
 
 <template>
   <div :class="css.wrapper">
-    <span @mouseenter="on" @mouseleave="off">
+    <span @mouseenter="on()" @mouseleave="off()">
       <slot name="activator" />
     </span>
     <div

@@ -117,7 +117,7 @@ const css = useCssModule();
       <SelectionButton
         :selected="false"
         :disabled="!metamaskSupport"
-        @click="payWithMetamask"
+        @click="payWithMetamask()"
       >
         <div :class="css.row">
           <MetamaskIcon :class="css.icon" />

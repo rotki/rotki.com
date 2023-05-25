@@ -136,7 +136,7 @@ const css = useCssModule();
       </div>
     </div>
     <div :class="css.continue">
-      <SelectionButton :disabled="!selected" selected @click="proceed">
+      <SelectionButton :disabled="!selected" selected @click="proceed()">
         Continue to Checkout
       </SelectionButton>
     </div>

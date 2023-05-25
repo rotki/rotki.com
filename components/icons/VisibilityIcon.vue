@@ -3,6 +3,7 @@ defineProps<{
   visible?: boolean;
 }>();
 </script>
+
 <template>
   <svg v-if="visible" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
     <path

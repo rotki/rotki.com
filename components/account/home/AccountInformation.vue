@@ -89,6 +89,7 @@ const update = async () => {
 const { countries } = useCountries();
 const css = useCssModule();
 </script>
+
 <template>
   <CardContainer :class="css.info">
     <TextHeading subheading> Customer Information</TextHeading>
@@ -208,12 +209,13 @@ const css = useCssModule();
       primary
       small
       text="Update"
-      @click="update"
+      @click="update()"
     >
       <SpinnerIcon v-if="loading" class="animate-spin" />
     </ActionButton>
   </CardContainer>
 </template>
+
 <style lang="scss" module>
 .info {
   @apply mt-8;

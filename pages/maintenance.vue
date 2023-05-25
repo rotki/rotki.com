@@ -23,6 +23,7 @@ if (!config.maintenance) {
 
 const css = useCssModule();
 </script>
+
 <template>
   <div :class="css.wrapper">
     <img
@@ -43,6 +44,7 @@ const css = useCssModule();
     </div>
   </div>
 </template>
+
 <style lang="scss" module>
 .wrapper {
   @apply w-full min-h-full flex flex-col items-center justify-center text-center py-28 px-8;

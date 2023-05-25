@@ -61,7 +61,7 @@ const css = useCssModule();
       filled
       autocomplete="current-password"
       label="Password"
-      @enter="performLogin"
+      @enter="performLogin()"
       @focus="error = ''"
     >
       <template #prepend>
@@ -88,7 +88,7 @@ const css = useCssModule();
         primary
         small
         text="Sign in"
-        @click="performLogin"
+        @click="performLogin()"
       />
     </div>
 

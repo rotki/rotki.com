@@ -302,10 +302,10 @@ const css = useCssModule();
           id="signup-captcha"
           :class="css.recaptcha"
           :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
-          @error="onError"
-          @expired="onExpired"
-          @success="onSuccess"
-          @captcha-id="setCaptchaId"
+          @error="onError()"
+          @expired="onExpired()"
+          @success="onSuccess($event)"
+          @captcha-id="setCaptchaId($event)"
         />
 
         <label :class="css.termsCheck">

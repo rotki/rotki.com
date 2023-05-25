@@ -73,7 +73,7 @@ const css = useCssModule();
           :title="text.title"
         >
           <div v-if="text.closable" :class="css.close">
-            <SelectionButton :selected="false" @click="close">
+            <SelectionButton :selected="false" @click="close()">
               OK
             </SelectionButton>
           </div>

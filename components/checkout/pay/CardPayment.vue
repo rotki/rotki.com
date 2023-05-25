@@ -319,7 +319,7 @@ const css = useCssModule();
 <template>
   <ErrorDisplay v-if="error" :message="error.message" :title="error.title">
     <div :class="css.close">
-      <SelectionButton :selected="false" @click="close"> OK </SelectionButton>
+      <SelectionButton :selected="false" @click="close()"> OK </SelectionButton>
     </div>
   </ErrorDisplay>
   <div v-show="!error">
@@ -360,7 +360,7 @@ const css = useCssModule();
           :class="css.button"
           :disabled="!valid || paying"
           selected
-          @click="submit"
+          @click="submit()"
         >
           Start subscription
         </SelectionButton>

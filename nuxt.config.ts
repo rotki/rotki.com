@@ -28,10 +28,6 @@ const proxy = {
 };
 
 export default defineNuxtConfig({
-  // Target (https://go.nuxtjs.dev/config-target)
-  target: 'server',
-
-  // Global page headers (https://go.nuxtjs.dev/config-head)
   app: {
     head: {
       title: 'rotki.com',
@@ -100,9 +96,7 @@ export default defineNuxtConfig({
     strategy: 'no_prefix',
     langDir: 'locales',
     lazy: true,
-    vueI18n: {
-      fallbackLocale: 'en',
-    },
+    vueI18n: './i18n.config.ts',
   },
 
   nitro: {

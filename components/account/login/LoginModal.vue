@@ -11,7 +11,11 @@ const dismiss = () => {
 </script>
 
 <template>
-  <ModalDialog :model-value="modelValue" boxless @update:model-value="dismiss">
-    <LoginForm modal @complete="dismiss" />
+  <ModalDialog
+    :model-value="modelValue"
+    boxless
+    @update:model-value="dismiss()"
+  >
+    <LoginForm modal @complete="dismiss()" />
   </ModalDialog>
 </template>

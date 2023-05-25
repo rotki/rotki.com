@@ -15,11 +15,13 @@ const checkStyle = computed(() => ({
 
 const css = useCssModule();
 </script>
+
 <template>
   <div :class="css.mark">
     <CheckIcon v-if="selected" :class="css.check" :style="checkStyle" />
   </div>
 </template>
+
 <style lang="scss" module>
 .mark {
   @apply flex flex-row justify-end;

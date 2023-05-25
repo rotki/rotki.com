@@ -25,7 +25,7 @@ const css = useCssModule();
       [css.selected]: selected,
     }"
     :disabled="disabled"
-    @click="click"
+    @click="click()"
   >
     <span
       :class="{

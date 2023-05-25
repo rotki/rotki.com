@@ -77,10 +77,10 @@ const css = useCssModule();
         />
         <Recaptcha
           :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
-          @error="onError"
-          @expired="onExpired"
-          @success="onSuccess"
-          @captcha-id="setCaptchaId"
+          @error="onError()"
+          @expired="onExpired()"
+          @success="onSuccess($event)"
+          @captcha-id="setCaptchaId($event)"
         />
 
         <ActionButton
@@ -90,7 +90,7 @@ const css = useCssModule();
           primary
           small
           text="Submit"
-          @click="reset"
+          @click="reset()"
         >
           <SpinnerIcon v-if="loading" class="animate-spin" />
         </ActionButton>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const css = useCssModule();
 </script>
+
 <template>
   <div :class="css.container">
     <div :class="css.row">

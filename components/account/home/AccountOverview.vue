@@ -23,7 +23,7 @@ const css = useCssModule();
     <template #title> Account Management</template>
     <template #links>
       <LinkText class="cursor-pointer">
-        <span @click="logout">Logout</span>
+        <span @click="logout()">Logout</span>
       </LinkText>
     </template>
     <TextHeading :class="css.header"> Welcome {{ username }}</TextHeading>

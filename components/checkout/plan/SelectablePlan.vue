@@ -32,7 +32,7 @@ const css = useCssModule();
       [css.plan]: true,
       [css.selected]: selected,
     }"
-    @click="click"
+    @click="click()"
   >
     <CheckMark class="-mr-12" :selected="selected" mt="-18px" />
     <div

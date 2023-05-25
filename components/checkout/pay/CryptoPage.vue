@@ -112,7 +112,7 @@ const css = useCssModule();
 </script>
 
 <template>
-  <PaymentFrame :loading="loading" :step="step" @close="reset">
+  <PaymentFrame :loading="loading" :step="step" @close="reset()">
     <template #description>
       <div :class="css.description">
         Payments by crypto can have slower processing times.
@@ -125,7 +125,7 @@ const css = useCssModule();
           :data="data"
           :plan="plan"
           :metamask-support="metamaskSupport"
-          @pay="payWithMetamask"
+          @pay="payWithMetamask()"
         />
       </div>
     </div>

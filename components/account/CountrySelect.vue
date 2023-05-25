@@ -151,7 +151,7 @@ const css = useCssModule();
             :disabled="disabled"
             @focus="showOptions()"
             @blur="exit()"
-            @keyup="keyMonitor"
+            @keyup="keyMonitor($event)"
           />
           <label
             v-if="label"

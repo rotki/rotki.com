@@ -99,7 +99,7 @@ const css = useCssModule();
             <ActionButton v-else primary @click="goToAccount()">
               Manage Premium
             </ActionButton>
-            <ActionButton @click="goToProductsDetail">
+            <ActionButton @click="goToProductsDetail()">
               More Details
             </ActionButton>
           </div>

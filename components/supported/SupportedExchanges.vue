@@ -76,6 +76,7 @@ const exchanges = [
 
 const { t } = useI18n();
 </script>
+
 <template>
   <div class="py-12">
     <TextHeading>{{ t('supported_exchanges.title') }}</TextHeading>

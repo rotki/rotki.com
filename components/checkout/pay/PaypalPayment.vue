@@ -119,6 +119,7 @@ onUnmounted(async () => {
 
 const css = useCssModule();
 </script>
+
 <template>
   <ErrorDisplay v-if="error" :message="error" title="Initialization Error" />
   <div v-else>

@@ -12,6 +12,7 @@ useHead({
   ...commonAttrs(),
 });
 </script>
+
 <template>
   <PageContainer>
     <div class="mb-8">

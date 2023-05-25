@@ -53,7 +53,7 @@ const css = useCssModule();
           :class="css.button"
           :disabled="!acceptRefundPolicy"
           selected
-          @click="submit"
+          @click="submit()"
         >
           Submit Request
         </SelectionButton>

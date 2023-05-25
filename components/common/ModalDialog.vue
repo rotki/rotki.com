@@ -41,6 +41,10 @@ const dismiss = () => {
   emit('update:modelValue', false);
 };
 
+const prevent = (e: Event) => {
+  e.stopPropagation();
+};
+
 const style = computed(() => ({
   'max-width': width.value,
   height: height.value,
@@ -53,7 +57,7 @@ const css = useCssModule();
 
 <template>
   <div v-if="visible" :class="{ [css.container]: true, [css.out]: out }">
-    <div :class="css.overlay" @click="dismiss">
+    <div :class="css.overlay" @click="dismiss()">
       <div :class="css.wrapper">
         <div
           :class="{
@@ -61,7 +65,7 @@ const css = useCssModule();
             [css.boxless]: boxless,
           }"
           :style="style"
-          @click="($event) => $event.stopPropagation()"
+          @click="prevent($event)"
         >
           <slot />
         </div>

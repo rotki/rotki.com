@@ -9,7 +9,7 @@ const css = useCssModule();
 
 <template>
   <div :class="css.container">
-    <div :class="css.box" @click="dismiss">
+    <div :class="css.box" @click="dismiss()">
       <slot />
     </div>
   </div>

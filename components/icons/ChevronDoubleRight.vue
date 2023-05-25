@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defaultIconSize } from '~/utils/icon-size';
 </script>
+
 <template>
   <svg :style="defaultIconSize()" viewBox="0 0 24 24">
     <path

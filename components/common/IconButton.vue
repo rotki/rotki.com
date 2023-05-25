@@ -30,7 +30,7 @@ const css = useCssModule();
       [css.btn]: true,
       [css.disabled]: disabled,
     }"
-    @click="click"
+    @click="click()"
   >
     <slot />
   </div>

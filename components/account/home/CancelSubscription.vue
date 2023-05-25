@@ -17,6 +17,7 @@ const cancelSubscription = async () => {
 
 const css = useCssModule();
 </script>
+
 <template>
   <div>
     <button :class="css.actionButton" @click="confirm = true">Cancel</button>
@@ -78,7 +79,7 @@ const css = useCssModule();
           <ActionButton filled small @click="confirm = false">
             No don't cancel
           </ActionButton>
-          <ActionButton primary small warning @click="cancelSubscription">
+          <ActionButton primary small warning @click="cancelSubscription()">
             Yes, cancel my subscription
           </ActionButton>
         </div>
@@ -86,6 +87,7 @@ const css = useCssModule();
     </ModalDialog>
   </div>
 </template>
+
 <style lang="scss" module>
 @import '@/assets/css/media.scss';
 

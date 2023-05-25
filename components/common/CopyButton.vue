@@ -21,7 +21,7 @@ const css = useCssModule();
 <template>
   <InfoTooltip>
     <template #activator>
-      <button :class="css.button" @click="copyToClipboard">
+      <button :class="css.button" @click="copyToClipboard()">
         <CopyIcon />
       </button>
     </template>

@@ -32,7 +32,7 @@ const css = useCssModule();
 <template>
   <InfoTooltip :class="css.tooltip">
     <template #activator>
-      <button :class="css.button" :disabled="disabled" @click="toggle">
+      <button :class="css.button" :disabled="disabled" @click="toggle()">
         <VisibilityIcon :visible="modelValue" />
       </button>
     </template>

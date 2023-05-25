@@ -66,6 +66,7 @@ const changePassword = async () => {
 
 const css = useCssModule();
 </script>
+
 <template>
   <CardContainer>
     <TextHeading subheading>Account Details</TextHeading>
@@ -119,7 +120,7 @@ const css = useCssModule();
         primary
         small
         text="Change Password"
-        @click="changePassword"
+        @click="changePassword()"
       >
         <SpinnerIcon v-if="loading" class="animate-spin" />
       </ActionButton>

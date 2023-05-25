@@ -3,6 +3,7 @@ defineProps<{ visible: boolean }>();
 
 const css = useCssModule();
 </script>
+
 <template>
   <Transition name="fade">
     <NotificationMessage v-if="visible">
@@ -20,6 +21,7 @@ const css = useCssModule();
     </NotificationMessage>
   </Transition>
 </template>
+
 <style lang="scss" module>
 .icon {
   @apply flex items-center;

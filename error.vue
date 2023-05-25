@@ -31,7 +31,7 @@ useHead(() => ({
         :text="t('actions.go_back_home')"
         primary
         small
-        @click="handleError"
+        @click="handleError()"
       />
     </div>
   </PageContainer>

@@ -84,14 +84,18 @@ const css = useCssModule();
     </i18n-t>
     <span>
       {{
-        t('selected_plan_overview.renew_period', plan.months, {
-          months: plan.months,
-        })
+        t(
+          'selected_plan_overview.renew_period',
+          {
+            months: plan.months,
+          },
+          plan.months
+        )
       }}
     </span>
 
     <template #body>
-      <div :class="css.change" @click="select">Change</div>
+      <div :class="css.change" @click="select()">Change</div>
       <ChangePlanDialog
         :crypto="crypto"
         :warning="warning"

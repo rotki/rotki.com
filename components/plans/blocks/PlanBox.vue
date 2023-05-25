@@ -30,7 +30,7 @@ const css = useCssModule();
     <div :class="css.description">
       <slot />
       <div :class="css.button">
-        <ActionButton :text="action" @click="buttonClicked" />
+        <ActionButton :text="action" @click="buttonClicked()" />
       </div>
     </div>
   </div>

@@ -80,7 +80,7 @@ const css = useCssModule();
         </CustomCheckbox>
       </div>
       <div :class="css.buttons">
-        <ActionButton text="Cancel" primary small @click="cancel" />
+        <ActionButton text="Cancel" primary small @click="cancel()" />
       </div>
     </div>
   </ModalDialog>

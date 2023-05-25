@@ -4,6 +4,7 @@ defineProps<{
 }>();
 const css = useCssModule();
 </script>
+
 <template>
   <div :class="css.wrapper">
     <SupportedIconWrapper
@@ -14,6 +15,7 @@ const css = useCssModule();
     />
   </div>
 </template>
+
 <style lang="scss" module>
 .wrapper {
   @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-8;
