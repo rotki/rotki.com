@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
+
+const props = withDefaults(defineProps<{ disabled?: boolean }>(), {
+  disabled: false,
+});
+const disabled = toRef(props, 'disabled');
 
 const visible = ref(false);
 
@@ -11,7 +16,12 @@ const { start, stop } = useTimeoutFn(
   { immediate: false }
 );
 
-const on = () => start();
+const on = () => {
+  if (get(disabled)) {
+    return;
+  }
+  start();
+};
 
 const off = () => {
   set(visible, false);

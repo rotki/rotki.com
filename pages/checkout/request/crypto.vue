@@ -5,6 +5,7 @@ definePageMeta({
   middleware: [
     'maintenance',
     'authentication',
+    'unverified',
     'subscriber',
     'pending-payment',
   ],

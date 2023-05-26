@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
 import detectEthereumProvider from '@metamask/detect-provider';
-import { type CryptoPayment, type PaymentStep, type Provider } from '~/types';
+import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
+import { type CryptoPayment, type PaymentStep, type Provider } from '~/types';
+import { PaymentError } from '~/types/codes';
 import { assert } from '~/utils/assert';
+
+const { t } = useI18n();
 
 const loading = ref(false);
 const data = ref<CryptoPayment | null>(null);
@@ -29,7 +32,11 @@ onMounted(async () => {
     const subId = get(subscriptionId);
     const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
     if (result.isError) {
-      set(error, result.error.message);
+      if (result.code === PaymentError.UNVERIFIED) {
+        set(error, t('payment.error.unverified_email'));
+      } else {
+        set(error, result.error.message);
+      }
     } else if (result.result.transactionStarted) {
       await navigateTo('/home');
     } else {

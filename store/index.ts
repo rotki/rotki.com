@@ -1,13 +1,7 @@
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
-import { acceptHMRUpdate, defineStore } from 'pinia';
 import { FetchError } from 'ofetch';
-import {
-  type DeleteAccountPayload,
-  type PasswordChangePayload,
-  type ProfilePayload,
-} from '~/types/account';
-import { type ActionResult } from '~/types/common';
-import { type LoginCredentials } from '~/types/login';
+import { acceptHMRUpdate, defineStore } from 'pinia';
+import { type Currency } from '~/composables/plan';
 import {
   Account,
   ApiKeys,
@@ -31,10 +25,17 @@ import {
   type Subscription,
   UpdateProfileResponse,
 } from '~/types';
-import { logger } from '~/utils/logger';
-import { assert } from '~/utils/assert';
-import { type Currency } from '~/composables/plan';
+import {
+  type DeleteAccountPayload,
+  type PasswordChangePayload,
+  type ProfilePayload,
+} from '~/types/account';
+import { PaymentError } from '~/types/codes';
+import { type ActionResult } from '~/types/common';
+import { type LoginCredentials } from '~/types/login';
 import { fetchWithCsrf } from '~/utils/api';
+import { assert } from '~/utils/assert';
+import { logger } from '~/utils/logger';
 
 const SESSION_TIMEOUT = 3600000;
 
@@ -299,7 +300,9 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
-  const pay = async (request: CardPaymentRequest): Promise<Result<true>> => {
+  const pay = async (
+    request: CardPaymentRequest
+  ): Promise<Result<true, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<CardPaymentResponse>(
         '/webapi/payment/btr',
@@ -318,13 +321,20 @@ export const useMainStore = defineStore('main', () => {
       };
     } catch (e: any) {
       let error = e;
-      if (e instanceof FetchError && e.status === 400) {
-        error = new Error(CardPaymentResponse.parse(e.data).message);
+      let code: PaymentError | undefined = undefined;
+      if (e instanceof FetchError) {
+        if (e.status === 400) {
+          error = new Error(CardPaymentResponse.parse(e.data).message);
+        } else if (e.status === 403) {
+          error = '';
+          code = PaymentError.UNVERIFIED;
+        }
       }
       logger.error(e);
       return {
         isError: true,
         error,
+        code,
       };
     }
   };
@@ -333,7 +343,7 @@ export const useMainStore = defineStore('main', () => {
     plan: number,
     currency: Currency,
     subscriptionId?: string
-  ): Promise<Result<CryptoPayment>> => {
+  ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/payment/crypto',
@@ -359,13 +369,20 @@ export const useMainStore = defineStore('main', () => {
       };
     } catch (e: any) {
       let error = e;
-      if (e instanceof FetchError && e.status === 400) {
-        error = new Error(CardPaymentResponse.parse(e.data).message);
+      let code: PaymentError | undefined = undefined;
+      if (e instanceof FetchError) {
+        if (e.status === 400) {
+          error = new Error(CardPaymentResponse.parse(e.data).message);
+        } else if (e.status === 403) {
+          error = '';
+          code = PaymentError.UNVERIFIED;
+        }
       }
       logger.error(e);
       return {
         error,
         isError: true,
+        code,
       };
     }
   };
@@ -432,7 +449,7 @@ export const useMainStore = defineStore('main', () => {
     plan: number,
     currency: Currency,
     subscriptionId?: string
-  ): Promise<Result<CryptoPayment>> => {
+  ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
         'webapi/payment/pending',

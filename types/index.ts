@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
-type ResultError = {
+type ResultError<Code = undefined> = {
   isError: true;
   error: Error;
+  code?: Code;
 };
 
 type ResultSuccess<T> = {
@@ -10,7 +11,7 @@ type ResultSuccess<T> = {
   result: T;
 };
 
-export type Result<T> = ResultError | ResultSuccess<T>;
+export type Result<T, Code = undefined> = ResultError<Code> | ResultSuccess<T>;
 
 export interface ApiResponse<T> {
   readonly result: T | null;

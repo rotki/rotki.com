@@ -1,16 +1,6 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
-
-const store = useMainStore();
-const { account } = storeToRefs(store);
-const hasActiveSubscription = computed(
-  () => !!get(account)?.hasActiveSubscription
-);
-const goToCheckoutPlan = () => navigateTo('/checkout/plan');
 const goToProductsDetail = () => navigateTo('/products/details');
-const goToAccount = () => navigateTo('/home');
+
 const css = useCssModule();
 </script>
 
@@ -89,16 +79,7 @@ const css = useCssModule();
             made in uniswap, sushiswap, balancer and more.
           </ProductDescription>
           <div :class="css.actions">
-            <ActionButton
-              v-if="!hasActiveSubscription"
-              primary
-              @click="goToCheckoutPlan()"
-            >
-              Subscribe now
-            </ActionButton>
-            <ActionButton v-else primary @click="goToAccount()">
-              Manage Premium
-            </ActionButton>
+            <SubscribeNowButton />
             <ActionButton @click="goToProductsDetail()">
               More Details
             </ActionButton>

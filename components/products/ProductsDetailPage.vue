@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
-
-const store = useMainStore();
-const { account } = storeToRefs(store);
-const hasActiveSubscription = computed(
-  () => !!get(account)?.hasActiveSubscription
-);
-const goToCheckoutPlan = () => navigateTo('/checkout/plan');
-const goToAccount = () => navigateTo('/home');
 const css = useCssModule();
 </script>
 
@@ -231,16 +220,7 @@ const css = useCssModule();
           </ProductDetailDescription>
 
           <div :class="css.actions">
-            <ActionButton
-              v-if="!hasActiveSubscription"
-              primary
-              @click="goToCheckoutPlan()"
-            >
-              Subscribe now
-            </ActionButton>
-            <ActionButton v-else primary @click="goToAccount()">
-              Manage Premium
-            </ActionButton>
+            <SubscribeNowButton />
           </div>
         </div>
       </div>

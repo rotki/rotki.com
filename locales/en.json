@@ -144,6 +144,11 @@
       }
     }
   },
+  "subscription": {
+    "error": {
+      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
+    }
+  },
   "selected_plan_overview": {
     "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
     "vat": "({priceInEur}€ + {vat}% VAT)",
