@@ -12,16 +12,36 @@ const hasActiveSubscription = computed(
 );
 
 const emailConfirmed = computed(() => get(account)?.emailConfirmed ?? false);
+
+const showTooltip = computed(() => {
+  if (!isDefined(account)) {
+    return false;
+  }
+
+  const { emailConfirmed } = get(account);
+  return !emailConfirmed;
+});
+
+const allowNavigation = computed(() => {
+  if (!isDefined(account)) {
+    return true;
+  }
+
+  const { emailConfirmed } = get(account);
+  return emailConfirmed;
+});
+
 const goToCheckoutPlan = () => navigateTo('/checkout/plan');
+
 const goToAccount = () => navigateTo('/home');
 </script>
 
 <template>
-  <InfoTooltip v-if="!hasActiveSubscription" :disabled="emailConfirmed">
+  <InfoTooltip v-if="!hasActiveSubscription" :disabled="showTooltip">
     <template #activator>
       <ActionButton
         primary
-        :disabled="!emailConfirmed"
+        :disabled="!allowNavigation"
         @click="goToCheckoutPlan()"
       >
         Subscribe now
