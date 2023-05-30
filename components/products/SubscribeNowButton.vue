@@ -37,7 +37,7 @@ const goToAccount = () => navigateTo('/home');
 </script>
 
 <template>
-  <InfoTooltip v-if="!hasActiveSubscription" :disabled="showTooltip">
+  <InfoTooltip v-if="!hasActiveSubscription" :disabled="!showTooltip">
     <template #activator>
       <ActionButton
         primary
