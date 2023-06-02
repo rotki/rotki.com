@@ -26,6 +26,15 @@ const css = useCssModule();
             Vue.js/TypeScript Developer
           </NuxtLink>
         </li>
+        <li :class="css.tab">
+          <NuxtLink
+            :active-class="css.active"
+            :class="css.link"
+            to="/jobs/ui-ux"
+          >
+            UI/UX Designer
+          </NuxtLink>
+        </li>
       </ul>
       <slot />
     </div>

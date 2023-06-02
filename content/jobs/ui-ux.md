@@ -1,0 +1,44 @@
+## UI/UX designer
+
+## What is rotki?
+
+Rotki helps manage accounts and blockchain transactions. It’s local-first,
+privacy focused and all open source. We are long time contributors to the
+Ethereum ecosystem and general crypto space. In order to support more
+blockchains (Cosmos, Roll Ups, etc.), and to continue to ship new features
+we need the help of a backend Python developer.
+
+## What are we looking for
+
+We are looking for a UI/UX designer who wants to be part of our team and 
+aligns with the open-source local-first application ethos, to help us improve
+our application's user experience and design. Familiarity with blockschain is 
+important. The candidate should be a user of crypto to understand the content
+of the app that we are developing. They should also be able to use the app 
+and point out the direction of changes.
+The position is fully remote and it can be either part-time or full-time.
+
+## What will working with us look like?
+
+Your primary focus will be working with the team to improve the overall 
+application user experience. You will brainstorm, collect and evaluate 
+user feedback, iterate and translate it to user flows, wireframes, 
+prototypes and mockups that the frontend team can use for implementation. 
+Your secondary focus will be defining and building a brand identity around 
+our current logo (european red robin), the website ux improvement and the 
+creation of promotional material, such as twitter headers and other graphics.
+
+## Responsibilities
+
+* Create and define user centric design SOPs.
+* Define and create current and new Personas.
+* Study and define current user flows and new ones.
+* Collect, understand and prioritize feedback.
+* Help the team to brainstorm new ideas and improve existing ones in a user centric way.
+* Create user flows, wireframes, prototypes and mockups
+* Creating original designs (graphics/promotional material)
+
+## Requirements
+
+* 4 hours daily overlap with European working hours 0900 - 1800 CET for smoother teamwork
+* Understanding of blockchain in theory and practice

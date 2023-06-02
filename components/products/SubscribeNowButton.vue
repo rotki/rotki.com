@@ -11,8 +11,6 @@ const hasActiveSubscription = computed(
   () => !!get(account)?.hasActiveSubscription
 );
 
-const emailConfirmed = computed(() => get(account)?.emailConfirmed ?? false);
-
 const showTooltip = computed(() => {
   if (!isDefined(account)) {
     return false;
