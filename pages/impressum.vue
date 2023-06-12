@@ -1,22 +1,5 @@
-<script setup lang="ts">
-import { commonAttrs, getMetadata } from '@/utils/metadata';
-
-const title = 'impressum | rotki';
-const description = 'Impressum - DE';
-
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
-useHead({
-  title,
-  meta: getMetadata(title, description, `${baseUrl}/impressum/`, baseUrl),
-  ...commonAttrs(),
-});
-</script>
-
 <template>
-  <ImpressumContent />
+  <MarkdownContent path="/documents/impressum" />
 </template>
 
 <style lang="scss">
