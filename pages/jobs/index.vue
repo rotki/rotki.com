@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const title = 'jobs';
@@ -15,12 +15,14 @@ useHead({
 });
 
 definePageMeta({
-  redirect: '/jobs/backend',
+  middleware: 'redirects',
 });
 </script>
 
 <template>
   <NuxtLayout name="jobs">
-    <div />
+    <div>
+      <TextParagraph>There are no open roles.</TextParagraph>
+    </div>
   </NuxtLayout>
 </template>
