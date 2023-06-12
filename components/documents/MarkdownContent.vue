@@ -19,7 +19,12 @@ if (!data) {
   const { title, description } = data;
 
   useHead({
-    meta: getMetadata(title, description, `${baseUrl}${props.path}`, baseUrl),
+    meta: getMetadata(
+      title ?? '',
+      description ?? '',
+      `${baseUrl}${props.path}`,
+      baseUrl
+    ),
     ...commonAttrs(),
   });
 }
