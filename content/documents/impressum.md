@@ -1,5 +1,6 @@
 ---
 title: Impressum
+description: Impressum - DE
 ---
 
 ## Angaben gemäß § 5 TMG
