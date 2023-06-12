@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'select payment method | rotki',
+  title: 'select payment method',
   meta: [
     {
       key: 'description',

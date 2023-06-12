@@ -2,7 +2,7 @@
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 useHead({
-  title: 'maintenance | rotki',
+  title: 'maintenance',
   meta: [
     {
       key: 'description',

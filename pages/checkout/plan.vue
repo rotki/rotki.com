@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'select premium plan | rotki',
+  title: 'select premium plan',
   meta: [
     {
       key: 'description',

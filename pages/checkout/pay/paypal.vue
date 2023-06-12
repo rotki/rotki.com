@@ -12,7 +12,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'pay with paypal | rotki',
+  title: 'pay with paypal',
   meta: [
     {
       key: 'description',

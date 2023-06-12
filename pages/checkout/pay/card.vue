@@ -12,7 +12,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'pay with credit card | rotki',
+  title: 'pay with credit card',
   meta: [
     {
       key: 'description',

@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'pay with crypto | rotki',
+  title: 'pay with crypto',
   meta: [
     {
       key: 'description',

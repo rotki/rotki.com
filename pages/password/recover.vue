@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'password recovery | rotki',
+  title: 'password recovery',
   meta: [
     {
       key: 'description',

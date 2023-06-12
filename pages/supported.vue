@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
-const title = 'supported exchanges and DeFi | rotki';
+const title = 'supported exchanges and DeFi';
 const description = 'Supported Exchanges and DeFi by Rotki';
 const config = useRuntimeConfig();
 const baseUrl = config.public.baseUrl;

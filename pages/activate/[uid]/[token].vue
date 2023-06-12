@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'activate account | rotki',
+  title: 'activate account',
   meta: [
     {
       key: 'description',

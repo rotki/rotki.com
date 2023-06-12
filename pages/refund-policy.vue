@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
-const title = 'refund policy | rotki';
+const title = 'refund policy';
 const description = 'Rotki Refund and Cancellation Policy';
 
 const config = useRuntimeConfig();
