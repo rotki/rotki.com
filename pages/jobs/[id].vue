@@ -6,9 +6,9 @@ const {
   public: { baseUrl },
 } = useRuntimeConfig();
 const { path } = useRoute();
-const { loadContent } = useMarkdownContent();
+const { loadJob } = useMarkdownContent();
 
-const data = await loadContent(path);
+const data = await loadJob(path);
 
 if (!data?.open) {
   showError({ message: `Page not found: ${path}`, statusCode: 404 });

@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const { loadJobs, firstJob } = useMarkdownContent();
     await loadJobs();
     if (get(firstJob)) {
-      return navigateTo(get(firstJob)?._path);
+      return navigateTo(get(firstJob)?.link);
     }
   }
 });

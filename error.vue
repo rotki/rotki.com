@@ -6,12 +6,11 @@ const error = useError();
 const { t } = useI18n();
 const css = useCssModule();
 
-const pageTitle = computed(() => get(error)?.message);
+const title = computed(() => get(error)?.message ?? '');
 const statusCode = computed(() => {
   const err = get(error);
   return err && 'statusCode' in err ? err.statusCode : -1;
 });
-const title = computed(() => `${get(pageTitle)}`);
 
 const handleError = () => clearError({ redirect: '/' });
 
@@ -26,7 +25,7 @@ useHead(() => ({
   <PageContainer>
     <div v-if="error" :class="css.wrapper">
       <h1 :class="css.title">{{ statusCode }}</h1>
-      <p :class="css.subtitle">{{ pageTitle }}</p>
+      <p :class="css.subtitle">{{ title }}</p>
       <ActionButton
         :text="t('actions.go_back_home')"
         primary

@@ -14,11 +14,7 @@ await loadJobs();
       <TextHeading>Available Roles</TextHeading>
       <ul v-if="openJobs.length > 0" :class="css.tabs">
         <li v-for="tab in openJobs" :key="tab._id" :class="css.tab">
-          <NuxtLink
-            :active-class="css.active"
-            :class="css.link"
-            :to="tab._path"
-          >
+          <NuxtLink :active-class="css.active" :class="css.link" :to="tab.link">
             {{ tab.title }}
           </NuxtLink>
         </li>

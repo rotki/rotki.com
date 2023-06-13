@@ -1,3 +1,5 @@
+import { GITHUB_CONTENT_PREFIX } from './utils/constants';
+
 const nonIndexed = [
   '/activation',
   '/home',
@@ -150,6 +152,15 @@ export default defineNuxtConfig({
     },
     api: {
       baseURL: '/md/_content',
+    },
+    sources: {
+      github: {
+        prefix: GITHUB_CONTENT_PREFIX, // Prefix for routes used to query contents
+        driver: 'github', // Driver used to fetch contents
+        repo: 'rotki/rotki.com',
+        branch: 'main',
+        dir: 'content', // Directory where contents are located. It could be a subdirectory of the repository.
+      },
     },
   },
 });
