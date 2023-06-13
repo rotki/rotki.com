@@ -2,7 +2,7 @@
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 useHead({
-  title: 'account deleted | rotki',
+  title: 'account deleted',
   meta: [
     {
       key: 'description',

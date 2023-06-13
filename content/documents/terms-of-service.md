@@ -1,5 +1,6 @@
 ---
 title: Terms Of Service
+description: The terms and conditions outline the rules and regulations for the use of rotki.com Website and all services offered in the Premium Rotki subscription.
 ---
 These terms and conditions outline the rules and regulations for the use
 of rotki.com Website and all services offered in the Premium Rotki

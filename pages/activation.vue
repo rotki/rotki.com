@@ -2,7 +2,7 @@
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 useHead({
-  title: 'account activation | rotki',
+  title: 'account activation',
   meta: [
     {
       key: 'description',

@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'recovery e-mail send | rotki',
+  title: 'recovery e-mail send',
   meta: [
     {
       key: 'description',

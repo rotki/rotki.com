@@ -11,7 +11,7 @@ const statusCode = computed(() => {
   const err = get(error);
   return err && 'statusCode' in err ? err.statusCode : -1;
 });
-const title = computed(() => `${get(pageTitle)} | rotki`);
+const title = computed(() => `${get(pageTitle)}`);
 
 const handleError = () => clearError({ redirect: '/' });
 

@@ -6,7 +6,7 @@ definePageMeta({
 });
 
 useHead({
-  title: 'password changed | rotki',
+  title: 'password changed',
   meta: [
     {
       key: 'description',

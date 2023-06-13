@@ -1,5 +1,10 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import { useMarkdownContent } from '~/composables/markdown';
+
 const css = useCssModule();
+const { openJobs, loadJobs } = useMarkdownContent();
+
+await loadJobs();
 </script>
 
 <template>
@@ -7,32 +12,14 @@ const css = useCssModule();
     <template #title> Jobs </template>
     <div :class="css.container">
       <TextHeading>Available Roles</TextHeading>
-      <ul :class="css.tabs">
-        <li :class="css.tab">
+      <ul v-if="openJobs.length > 0" :class="css.tabs">
+        <li v-for="tab in openJobs" :key="tab._id" :class="css.tab">
           <NuxtLink
             :active-class="css.active"
             :class="css.link"
-            to="/jobs/backend"
+            :to="tab._path"
           >
-            Python Backend Developer
-          </NuxtLink>
-        </li>
-        <li :class="css.tab">
-          <NuxtLink
-            :active-class="css.active"
-            :class="css.link"
-            to="/jobs/frontend"
-          >
-            Vue.js/TypeScript Developer
-          </NuxtLink>
-        </li>
-        <li :class="css.tab">
-          <NuxtLink
-            :active-class="css.active"
-            :class="css.link"
-            to="/jobs/ui-ux"
-          >
-            UI/UX Designer
+            {{ tab.title }}
           </NuxtLink>
         </li>
       </ul>

@@ -31,6 +31,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'rotki.com',
+      titleTemplate: '%s | rotki',
       htmlAttrs: {
         lang: 'en',
       },
