@@ -7,7 +7,7 @@ WORKDIR /build
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
     npm install -g pnpm@8 && \
-    pnpm install && \
+    pnpm install --frozen-lockfile --no-optional && \
     pnpm run build
 
 FROM node:18-alpine as production
@@ -19,7 +19,7 @@ ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=4000
 
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
-    npm install -g pm2@5.2.2
+    npm install -g pm2@5.3.0
 
 COPY --from=builder /build/.output ./
 COPY --from=builder /build/ecosystem.config.js ./
