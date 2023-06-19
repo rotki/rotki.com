@@ -16,6 +16,10 @@ const nonIndexed = [
   '/checkout/pay/paypal',
   '/checkout/request/crypto',
   '/account-deleted',
+  '/api/',
+  '/md/',
+  '/documents/',
+  '/_nuxt/',
 ];
 
 const domain = process.env.PROXY_DOMAIN || 'localhost';
