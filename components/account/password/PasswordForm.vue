@@ -8,9 +8,15 @@ import { logger } from '~/utils/logger';
 
 const emailAddress = ref('');
 const loading = ref(false);
-const captchaId = ref<number>();
-const recaptcha = useRecaptcha();
-const { onError, onExpired, onSuccess, recaptchaToken } = recaptcha;
+
+const {
+  onError,
+  onExpired,
+  onSuccess,
+  resetCaptcha,
+  captchaId,
+  recaptchaToken,
+} = useRecaptcha();
 
 const rules = {
   email: { required, email },
@@ -26,10 +32,6 @@ const v$ = useVuelidate(
     $externalResults,
   },
 );
-
-const setCaptchaId = (v: number) => {
-  set(captchaId, v);
-};
 
 const reset = async () => {
   set(loading, true);
@@ -50,8 +52,7 @@ const reset = async () => {
       e.status === 400 &&
       e.data?.message?.captcha
     ) {
-      window.grecaptcha?.reset(get(captchaId));
-      onExpired();
+      resetCaptcha();
       set($externalResults, e.data.message);
     }
 
@@ -84,11 +85,11 @@ const { t } = useI18n();
           />
 
           <Recaptcha
+            v-model:captcha-id="captchaId"
             :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
             @error="onError()"
             @expired="onExpired()"
             @success="onSuccess($event)"
-            @captcha-id="setCaptchaId($event)"
           />
         </div>
         <RuiButton

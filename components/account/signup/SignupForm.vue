@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { type Ref } from 'vue';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import { type Ref } from 'vue';
 import {
   type SignupAccountPayload,
   type SignupAddressPayload,
@@ -11,6 +11,9 @@ import {
 import { fetchWithCsrf } from '~/utils/api';
 import { type ValidationErrors } from '~/types/common';
 import { type ApiResponse } from '~/types';
+
+const { t } = useI18n();
+const { captchaId, resetCaptcha } = useRecaptcha();
 
 const accountForm = ref<SignupAccountPayload>({
   username: '',
@@ -36,12 +39,10 @@ const addressForm = ref<SignupAddressPayload>({
 });
 
 const loading: Ref<boolean> = ref(false);
-const captchaId: Ref<number> = ref(0);
 const externalResults: Ref<ValidationErrors> = ref({});
 
 const signup = async ({
   recaptchaToken,
-  onExpired,
 }: {
   recaptchaToken: string;
   onExpired: () => void;
@@ -67,8 +68,7 @@ const signup = async ({
     if (result) {
       await navigateTo({ path: '/activation' });
     } else if (typeof message === 'object') {
-      window.grecaptcha?.reset(get(captchaId));
-      onExpired();
+      resetCaptcha();
       setErrors(message);
     }
   } catch (e: any) {
@@ -78,15 +78,12 @@ const signup = async ({
       e.data &&
       typeof e.data.message === 'object'
     ) {
-      window.grecaptcha?.reset(get(captchaId));
-      onExpired();
+      resetCaptcha();
       setErrors(e.data.message);
     }
   }
   set(loading, false);
 };
-
-const { t } = useI18n();
 
 const step: Ref<number> = ref(1);
 const steps = [

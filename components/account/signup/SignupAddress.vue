@@ -10,7 +10,7 @@ import { type ValidationErrors } from '~/types/common';
 const props = defineProps<{
   modelValue: SignupAddressPayload;
   externalResults: ValidationErrors;
-  captchaId: number;
+  captchaId: number | undefined;
   loading: boolean;
 }>();
 
@@ -193,7 +193,7 @@ const { t } = useI18n();
         @error="onError()"
         @expired="onExpired()"
         @success="onSuccess($event)"
-        @captcha-id="setCaptchaId($event)"
+        @update:captcha-id="setCaptchaId($event)"
       />
 
       <RuiCheckbox id="tos" v-model="terms" color="primary">
