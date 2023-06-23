@@ -7,7 +7,7 @@ WORKDIR /build
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
     npm install -g pnpm@8 && \
-    pnpm install --frozen-lockfile --no-optional && \
+    pnpm install --frozen-lockfile && \
     pnpm run build
 
 FROM node:18-alpine as production
