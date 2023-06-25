@@ -5,20 +5,24 @@ import { get, set, useClipboard } from '@vueuse/core';
 import { type CryptoPayment } from '~/types';
 import { logger } from '~/utils/logger';
 
+const config = useRuntimeConfig();
+
 const createPaymentQR = async (
   payment: CryptoPayment,
   canvas: HTMLCanvasElement
 ) => {
-  const dai = '0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844';
   let qrText = '';
+  const chainId = getChainId(!!config.public.testing);
   if (payment.cryptocurrency === 'BTC') {
     qrText = `bitcoin:${payment.cryptoAddress}?amount=${payment.finalPriceInCrypto}&label=Rotki`;
   } else if (payment.cryptocurrency === 'ETH') {
     const ethPrice = parseEther(payment.finalPriceInCrypto);
-    qrText = `ethereum:${payment.cryptoAddress}?value=${ethPrice.toString()}`;
+    qrText = `ethereum:${
+      payment.cryptoAddress
+    }@${chainId}?value=${ethPrice.toString()}`;
   } else if (payment.cryptocurrency === 'DAI') {
-    const daiPrice = parseUnits(payment.finalPriceInCrypto, 18);
-    qrText = `ethereum:${payment.cryptoAddress}/transfer?address=${dai}&uint256=${daiPrice}`;
+    const tokenPrice = parseUnits(payment.finalPriceInCrypto, 18);
+    qrText = `ethereum:${payment.tokenAddress}@${chainId}/transfer?address=${payment.cryptoAddress}&uint256=${tokenPrice}`;
   }
 
   logger.info(qrText);

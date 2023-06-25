@@ -33,6 +33,8 @@ const abi = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
 
+export const getChainId = (testing: boolean) => BigInt(testing ? 11155111 : 1);
+
 export const useWeb3Payment = (
   data: Ref<CryptoPayment | null>,
   getProvider: () => Provider,
@@ -109,7 +111,7 @@ export const useWeb3Payment = (
       const browserProvider = new BrowserProvider(provider);
       const network = await browserProvider.getNetwork();
 
-      const expected = BigInt(testing ? 11155111 : 1);
+      const expected = getChainId(testing);
       const name = testing ? 'Sepolia' : 'Mainnet';
       if (network.chainId !== expected) {
         set(

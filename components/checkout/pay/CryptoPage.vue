@@ -97,7 +97,7 @@ const {
     assert(provider);
     return provider;
   },
-  !!config.testing
+  !!config.public.testing
 );
 
 watch(plan, async (plan) => {
