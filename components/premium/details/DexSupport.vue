@@ -8,11 +8,11 @@ const { t } = useI18n();
       {{ t('home.premium_features.features.dex_support.title') }}
     </template>
 
-    <I18nT
+    <i18n-t
       keypath="home.premium_features.features.dex_support.detail"
       scope="global"
     >
       <br />
-    </I18nT>
+    </i18n-t>
   </PremiumFeature>
 </template>

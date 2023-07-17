@@ -62,7 +62,7 @@ const css = useCssModule();
 <template>
   <PlanOverview>
     <span :class="css.plan">{{ name }} Plan.</span>
-    <I18nT keypath="selected_plan_overview.plan" scope="global">
+    <i18n-t keypath="selected_plan_overview.plan" scope="global">
       <template #date>
         {{ date }}
       </template>
@@ -81,7 +81,7 @@ const css = useCssModule();
           }}
         </span>
       </template>
-    </I18nT>
+    </i18n-t>
     <span>
       {{
         t(
