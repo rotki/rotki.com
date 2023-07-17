@@ -16,9 +16,9 @@ const css = useCssModule();
     <div :class="css.column2">
       <div :class="css.row">
         <div :class="css.text">
-          <i18n-t keypath="home.use_app" scope="global">
+          <I18nT keypath="home.use_app" scope="global">
             <br />
-          </i18n-t>
+          </I18nT>
         </div>
       </div>
       <DownloadButton :class="css.button" @click="emit('download')" />

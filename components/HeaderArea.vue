@@ -7,7 +7,7 @@ withDefaults(
   {
     noMargin: false,
     landing: false,
-  }
+  },
 );
 
 const css = useCssModule();

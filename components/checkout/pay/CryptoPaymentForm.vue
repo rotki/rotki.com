@@ -5,11 +5,19 @@ import { get, set, useClipboard } from '@vueuse/core';
 import { type CryptoPayment } from '~/types';
 import { logger } from '~/utils/logger';
 
+const props = defineProps<{
+  data: CryptoPayment;
+  plan: number;
+  metamaskSupport: boolean;
+}>();
+
+const emit = defineEmits<{ (e: 'pay'): void }>();
+
 const config = useRuntimeConfig();
 
 const createPaymentQR = async (
   payment: CryptoPayment,
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement,
 ) => {
   let qrText = '';
   const chainId = getChainId(!!config.public.testing);
@@ -29,14 +37,6 @@ const createPaymentQR = async (
   await toCanvas(canvas, qrText);
   return qrText;
 };
-
-const props = defineProps<{
-  data: CryptoPayment;
-  plan: number;
-  metamaskSupport: boolean;
-}>();
-
-const emit = defineEmits<{ (e: 'pay'): void }>();
 
 const { data } = toRefs(props);
 const canvas = ref<HTMLCanvasElement>();

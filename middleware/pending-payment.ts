@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async () => {
   const { subscriptions } = get(account);
 
   const pending = subscriptions.filter(
-    ({ actions, status }) => actions.includes('renew') || status === 'Pending'
+    ({ actions, status }) => actions.includes('renew') || status === 'Pending',
   );
 
   if (pending.length > 0) {

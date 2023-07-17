@@ -38,7 +38,7 @@ function setupTokenValidation() {
 function setupFormValidation(
   password: Ref<string>,
   passwordConfirmation: Ref<string>,
-  $externalResults: Ref<{}>
+  $externalResults: Ref<NonNullable<unknown>>,
 ) {
   const rules = {
     password: { required, minLength: minLength(8) },
@@ -54,7 +54,7 @@ function setupFormValidation(
     {
       $autoDirty: true,
       $externalResults,
-    }
+    },
   );
 
   const valid = computed(() => !v$.value.$invalid);
@@ -100,7 +100,7 @@ const { validating, isValid } = setupTokenValidation();
 const { valid, v$ } = setupFormValidation(
   password,
   passwordConfirmation,
-  $externalResults
+  $externalResults,
 );
 
 const css = useCssModule();

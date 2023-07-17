@@ -25,7 +25,7 @@ const done = ref(false);
 const { account } = storeToRefs(store);
 
 const movedOffline = computed(
-  () => get(account)?.address.movedOffline ?? false
+  () => get(account)?.address.movedOffline ?? false,
 );
 
 onMounted(() => {

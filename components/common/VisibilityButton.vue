@@ -11,7 +11,7 @@ const props = withDefaults(
     modelValue: false,
     showTooltipText: 'Show',
     hideTooltipText: 'Hide',
-  }
+  },
 );
 
 const emit = defineEmits<{

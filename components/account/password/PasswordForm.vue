@@ -23,7 +23,7 @@ const v$ = useVuelidate(
   {
     $autoDirty: true,
     $externalResults,
-  }
+  },
 );
 
 const setCaptchaId = (v: number) => {

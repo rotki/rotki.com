@@ -25,7 +25,7 @@ const props = withDefaults(
     readonly: false,
     disabled: false,
     filled: false,
-  }
+  },
 );
 
 const emit = defineEmits<{

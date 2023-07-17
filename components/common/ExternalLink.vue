@@ -10,7 +10,7 @@ const props = withDefaults(
     text: '',
     sameTab: false,
     noRef: false,
-  }
+  },
 );
 
 const { text, url } = toRefs(props);

@@ -14,7 +14,7 @@ withDefaults(
     valid: false,
     number: false,
     empty: false,
-  }
+  },
 );
 
 const emit = defineEmits<{ (e: 'click'): void }>();

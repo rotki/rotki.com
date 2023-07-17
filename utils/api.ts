@@ -40,7 +40,7 @@ function getUpdatedKey(key: string, camelCase: boolean) {
 export const convertKeys = (
   data: any,
   camelCase: boolean,
-  skipKey: boolean
+  skipKey: boolean,
 ): any => {
   if (Array.isArray(data)) {
     return data.map((entry) => convertKeys(entry, camelCase, false));
@@ -63,6 +63,7 @@ export const convertKeys = (
 };
 
 const CSRF_COOKIE = 'csrftoken';
+
 export const SESSION_COOKIE = 'sessionid';
 const CSRF_HEADER = 'X-CSRFToken';
 
@@ -88,7 +89,7 @@ export const sleep = (ms = 0, signal: AbortSignal): Promise<void> =>
 
 export async function fetchWithCsrf<
   Resp,
-  Req extends NitroFetchRequest = NitroFetchRequest
+  Req extends NitroFetchRequest = NitroFetchRequest,
 >(request: Req, options?: NitroFetchOptions<Req>) {
   const { baseUrl } = useRuntimeConfig().public;
 
@@ -97,7 +98,7 @@ export async function fetchWithCsrf<
   if (
     process.client &&
     ['post', 'delete', 'put', 'patch'].includes(
-      options?.method?.toLowerCase() ?? ''
+      options?.method?.toLowerCase() ?? '',
     )
   ) {
     await initCsrf();
@@ -132,7 +133,7 @@ export async function fetchWithCsrf<
         context.options.body = convertKeys(context.options.body, false, false);
       },
       onResponse(
-        context: FetchContext & { response: FetchResponse<Req> }
+        context: FetchContext & { response: FetchResponse<Req> },
       ): Promise<void> | void {
         if ([200].includes(context.response.status) && isDefined(refresh)) {
           get(refresh)();

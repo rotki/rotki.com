@@ -16,10 +16,10 @@ interface JobMarkdownContent extends MarkdownParsedContent {
 export const useMarkdownContent = () => {
   const jobs: Ref<JobMarkdownContent[]> = ref([]);
   const openJobs: ComputedRef<JobMarkdownContent[]> = computed(() =>
-    get(jobs).filter((job) => job.open)
+    get(jobs).filter((job) => job.open),
   );
   const firstJob: ComputedRef<JobMarkdownContent | null> = computed(
-    () => get(openJobs)[0] ?? null
+    () => get(openJobs)[0] ?? null,
   );
 
   /**
@@ -45,7 +45,7 @@ export const useMarkdownContent = () => {
       foundJobs?.map((job) => {
         job.link = replacePathPrefix(GITHUB_CONTENT_PREFIX, job._path);
         return job;
-      }) ?? []
+      }) ?? [],
     );
   };
 

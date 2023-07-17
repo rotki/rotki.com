@@ -10,9 +10,9 @@ const css = useCssModule();
       <img :class="css.image" alt="Cryptocurrencies" src="/img/crypto.svg" />
     </template>
     <FeatureDetails>
-      <i18n-t keypath="home.profit_loss_report.detail" scope="global">
+      <I18nT keypath="home.profit_loss_report.detail" scope="global">
         <br />
-      </i18n-t>
+      </I18nT>
     </FeatureDetails>
   </FeatureContainer>
 </template>

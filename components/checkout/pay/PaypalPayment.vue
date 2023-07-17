@@ -7,12 +7,19 @@ import { type PayEvent } from '~/types/common';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
 
+const props = defineProps<{
+  token: string;
+  plan: SelectedPlan;
+}>();
+
+const emit = defineEmits<{ (e: 'pay', plan: PayEvent): void }>();
+
 const initializeBraintree = async (
   token: Ref<string>,
   plan: Ref<SelectedPlan>,
   accepted: Ref<boolean>,
   mustAcceptRefund: Ref<boolean>,
-  pay: (plan: PayEvent) => void
+  pay: (plan: PayEvent) => void,
 ) => {
   let paypalActions: any = null;
   watch(accepted, (accepted) => {
@@ -85,13 +92,6 @@ const initializeBraintree = async (
   return btClient;
 };
 
-const props = defineProps<{
-  token: string;
-  plan: SelectedPlan;
-}>();
-
-const emit = defineEmits<{ (e: 'pay', plan: PayEvent): void }>();
-
 const { token, plan } = toRefs(props);
 const error = ref('');
 const accepted = ref(false);
@@ -106,7 +106,7 @@ onMounted(async () => {
       plan,
       accepted,
       mustAcceptRefund,
-      (p) => emit('pay', p)
+      (p) => emit('pay', p),
     );
   } catch (e: any) {
     error.value = e.message;

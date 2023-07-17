@@ -1,13 +1,13 @@
 <script setup lang="ts">
-const statuses = ['success', 'error', 'neutral'] as const;
-
-type Status = (typeof statuses)[number];
-
 defineProps<{
   status: Status;
   message: string;
   title: string;
 }>();
+
+const statuses = ['success', 'error', 'neutral'] as const;
+
+type Status = (typeof statuses)[number];
 
 const css = useCssModule();
 </script>

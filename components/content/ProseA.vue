@@ -9,7 +9,7 @@ withDefaults(
     href: '#',
     target: '_self',
     rel: undefined,
-  }
+  },
 );
 
 const css = useCssModule();

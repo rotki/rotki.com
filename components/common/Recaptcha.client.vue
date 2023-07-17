@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const css = useCssModule();
-
 const props = withDefaults(
   defineProps<{
     theme?: 'light' | 'dark';
@@ -12,7 +10,7 @@ const props = withDefaults(
     theme: 'light',
     size: 'normal',
     useRecaptchaNet: false,
-  }
+  },
 );
 
 const emit = defineEmits<{
@@ -21,6 +19,8 @@ const emit = defineEmits<{
   (e: 'success', value: string): void;
   (e: 'captcha-id', value: number): void;
 }>();
+
+const css = useCssModule();
 
 const {
   public: {

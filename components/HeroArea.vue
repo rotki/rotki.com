@@ -8,9 +8,9 @@ const { t } = useI18n();
   <div :class="css.wrapper">
     <div :class="css.title">
       <div :class="css.column">
-        <i18n-t keypath="home.hero.title" scope="global">
+        <I18nT keypath="home.hero.title" scope="global">
           <br />
-        </i18n-t>
+        </I18nT>
       </div>
     </div>
     <div :class="css.subtitle">

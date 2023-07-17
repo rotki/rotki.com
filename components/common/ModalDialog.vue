@@ -14,7 +14,7 @@ const props = withDefaults(
     padding: '0px',
     boxless: false,
     height: undefined,
-  }
+  },
 );
 
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();

@@ -19,6 +19,7 @@ export interface ApiResponse<T> {
 }
 
 const StringArray = z.array(z.string());
+
 export const ApiError = z.union([z.string(), z.record(StringArray)]);
 
 export type ApiError = z.infer<typeof ApiError>;
@@ -44,6 +45,7 @@ const SubStatus = z.enum([
   'Pending',
   'Past Due',
 ] as const);
+
 export type SubStatus = z.infer<typeof SubStatus>;
 
 export const Subscription = z.object({
@@ -255,7 +257,9 @@ export interface Provider {
 }
 
 export type StepType = 'pending' | 'failure' | 'success';
+
 export type IdleStep = 'idle';
+
 export type PaymentStep =
   | {
       type: StepType;

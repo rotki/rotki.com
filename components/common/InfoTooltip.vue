@@ -13,7 +13,7 @@ const { start, stop } = useTimeoutFn(
     set(visible, true);
   },
   400,
-  { immediate: false }
+  { immediate: false },
 );
 
 const on = () => {

@@ -12,7 +12,7 @@ const props = withDefaults(
   {
     crypto: false,
     warning: false,
-  }
+  },
 );
 
 const { plan } = toRefs(props);
@@ -62,7 +62,7 @@ const css = useCssModule();
 <template>
   <PlanOverview>
     <span :class="css.plan">{{ name }} Plan.</span>
-    <i18n-t keypath="selected_plan_overview.plan" scope="global">
+    <I18nT keypath="selected_plan_overview.plan" scope="global">
       <template #date>
         {{ date }}
       </template>
@@ -81,7 +81,7 @@ const css = useCssModule();
           }}
         </span>
       </template>
-    </i18n-t>
+    </I18nT>
     <span>
       {{
         t(
@@ -89,7 +89,7 @@ const css = useCssModule();
           {
             months: plan.months,
           },
-          plan.months
+          plan.months,
         )
       }}
     </span>

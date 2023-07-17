@@ -5,7 +5,7 @@ withDefaults(
   }>(),
   {
     image: '',
-  }
+  },
 );
 
 const css = useCssModule();

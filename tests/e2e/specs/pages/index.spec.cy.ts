@@ -31,7 +31,7 @@ describe('Homepage test', () => {
       .get('div')
       .contains(
         'div',
-        'You can download Rotki in your computer and start using it for free right now. Binaries available for all major Operating Systems.'
+        'You can download Rotki in your computer and start using it for free right now. Binaries available for all major Operating Systems.',
       )
       .first();
     const linuxLink = cy.get('img[src="/img/dl/linux.svg"]').first();

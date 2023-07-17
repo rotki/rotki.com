@@ -21,9 +21,19 @@ type FieldStatus = {
 
 type EmptyState = { number: boolean; cvv: boolean; expirationDate: boolean };
 
+const props = defineProps<{
+  token: string;
+  plan: SelectedPlan;
+}>();
+
+const emit = defineEmits<{
+  (e: 'pay', payment: PayEvent): void;
+  (e: 'update:pending', pending: boolean): void;
+}>();
+
 const setupEmptyStateMonitoring = (
   hostedFields: HostedFields,
-  empty: Ref<EmptyState>
+  empty: Ref<EmptyState>,
 ) => {
   hostedFields.on('notEmpty', (event) => {
     const field = event.fields[event.emittedBy];
@@ -46,7 +56,7 @@ const setupValidityMonitoring = (
     numberStatus: Ref<FieldStatus>;
     expirationDateStatus: Ref<FieldStatus>;
     cvvStatus: Ref<FieldStatus>;
-  }
+  },
 ) => {
   hostedFields.on('validityChange', (event) => {
     const field = event.emittedBy;
@@ -72,7 +82,7 @@ const setupFocusManagement = (
     numberStatus: Ref<FieldStatus>;
     expirationDateStatus: Ref<FieldStatus>;
     cvvStatus: Ref<FieldStatus>;
-  }
+  },
 ) => {
   hostedFields.on('focus', (event) => {
     const field = event.emittedBy;
@@ -138,7 +148,7 @@ const setupHostedFields = () => {
       numberStatus: Ref<FieldStatus>;
       expirationDateStatus: Ref<FieldStatus>;
       cvvStatus: Ref<FieldStatus>;
-    }
+    },
   ) => {
     setupFocusManagement(get(), focused, status);
     setupEmptyStateMonitoring(get(), empty);
@@ -162,16 +172,6 @@ type ErrorMessage = {
   title: string;
   message: string;
 };
-
-const props = defineProps<{
-  token: string;
-  plan: SelectedPlan;
-}>();
-
-const emit = defineEmits<{
-  (e: 'pay', payment: PayEvent): void;
-  (e: 'update:pending', pending: boolean): void;
-}>();
 
 const { token, plan } = toRefs(props);
 const fields = setupHostedFields();
@@ -240,7 +240,7 @@ const valid = computed(
     get(accepted) &&
     get(numberStatus).valid &&
     get(expirationDateStatus).valid &&
-    get(cvvStatus).valid
+    get(cvvStatus).valid,
 );
 const paying = ref(false);
 
@@ -290,7 +290,7 @@ const submit = async () => {
         title: '3D Secure authentication failed',
         message: `The 3D Secure authentication of your card failed (${status?.replaceAll(
           '_',
-          ' '
+          ' ',
         )}). Please try a different payment method.`,
       });
       logger.error(`liability did not shift, due to status: ${status}`);

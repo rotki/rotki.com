@@ -1,8 +1,11 @@
 import { get } from '@vueuse/core';
 
 const availablePlans = [1, 3, 6, 12];
+
 export const supportedCurrencies = ['ETH', 'BTC', 'DAI'] as const;
+
 export type Currency = (typeof supportedCurrencies)[number];
+
 type CurrencyParam = Currency | null;
 
 export const usePlanParams = () => {

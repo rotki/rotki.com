@@ -21,7 +21,7 @@ if (!data?.open) {
       title ?? '',
       description ?? '',
       `${baseUrl}${path}`,
-      baseUrl
+      baseUrl,
     ),
     ...commonAttrs(),
   });

@@ -6,7 +6,7 @@ const props = withDefaults(
   }>(),
   {
     mt: '-18px',
-  }
+  },
 );
 const { mt } = toRefs(props);
 const checkStyle = computed(() => ({

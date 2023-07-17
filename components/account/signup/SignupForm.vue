@@ -53,7 +53,7 @@ const rules = {
     required,
     validateCode: helpers.withMessage(
       'Enter a valid postal code. Only alphabets, numbers, space and -',
-      helpers.regex(/^[\d\sA-Za-z-]+$/)
+      helpers.regex(/^[\d\sA-Za-z-]+$/),
     ),
   },
   country: { required },
@@ -77,7 +77,7 @@ const setCaptchaId = (v: number) => {
 
 const useSignup = (
   captcha: Ref<string>,
-  $externalResults: Ref<Record<string, string>>
+  $externalResults: Ref<Record<string, string>>,
 ) => {
   const signup = async (payload: SignupPayload) => {
     const isValid = await get(v$).$validate();

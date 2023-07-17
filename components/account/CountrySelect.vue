@@ -20,7 +20,7 @@ const props = withDefaults(
     disabled: false,
     errorMessages: () => [],
     autocomplete: undefined,
-  }
+  },
 );
 
 const emit = defineEmits<{
@@ -121,7 +121,7 @@ debouncedWatch(
       setCountryUsingCode(value);
     }
   },
-  { debounce: 800 }
+  { debounce: 800 },
 );
 
 emit('selected', get(selected));

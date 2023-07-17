@@ -15,7 +15,7 @@ const props = withDefaults(
   {
     crypto: false,
     warning: false,
-  }
+  },
 );
 
 const emit = defineEmits<{

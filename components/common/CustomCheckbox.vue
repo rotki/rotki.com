@@ -6,7 +6,7 @@ withDefaults(
   }>(),
   {
     id: '',
-  }
+  },
 );
 
 const emit = defineEmits<{

@@ -25,7 +25,7 @@ onMounted(async () => {
   if (selectedPlan > 0 && selectedCurrency) {
     provider = await detectEthereumProvider();
     logger.debug(
-      `provider: ${!!provider}, is metamask: ${provider?.isMetaMask}`
+      `provider: ${!!provider}, is metamask: ${provider?.isMetaMask}`,
     );
     set(metamaskSupport, !!provider);
     set(loading, true);
@@ -97,7 +97,7 @@ const {
     assert(provider);
     return provider;
   },
-  !!config.public.testing
+  !!config.public.testing,
 );
 
 watch(plan, async (plan) => {
@@ -106,7 +106,7 @@ watch(plan, async (plan) => {
   const response = await switchCryptoPlan(
     plan,
     selectedCurrency,
-    get(subscriptionId)
+    get(subscriptionId),
   );
   if (!response.isError) {
     set(data, response.result);

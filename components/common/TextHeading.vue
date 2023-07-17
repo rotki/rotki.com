@@ -9,7 +9,7 @@ withDefaults(
     subheading: false,
     noMargin: false,
     secondary: false,
-  }
+  },
 );
 
 const css = useCssModule();

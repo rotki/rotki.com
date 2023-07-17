@@ -1,3 +1,5 @@
+//TODO: split store functionality
+/* eslint-disable max-lines */
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
@@ -52,7 +54,7 @@ export const useMainStore = defineStore('main', () => {
         '/webapi/account/',
         {
           method: 'get',
-        }
+        },
       );
       set(authenticated, true);
       set(account, Account.parse(response.result));
@@ -96,7 +98,7 @@ export const useMainStore = defineStore('main', () => {
         '/webapi/regenerate-keys/',
         {
           method: 'patch',
-        }
+        },
       );
       const acc = get(account);
       assert(acc);
@@ -110,7 +112,7 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const changePassword = async (
-    payload: PasswordChangePayload
+    payload: PasswordChangePayload,
   ): Promise<ActionResult> => {
     try {
       const response = await fetchWithCsrf<ChangePasswordResponse>(
@@ -118,7 +120,7 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'patch',
           body: payload,
-        }
+        },
       );
       const data = ChangePasswordResponse.parse(response);
       return {
@@ -140,7 +142,7 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const updateProfile = async (
-    payload: ProfilePayload
+    payload: ProfilePayload,
   ): Promise<ActionResult> => {
     try {
       const response = await fetchWithCsrf<UpdateProfileResponse>(
@@ -148,7 +150,7 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'patch',
           body: payload,
-        }
+        },
       );
 
       const { result } = UpdateProfileResponse.parse(response);
@@ -179,7 +181,7 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const deleteAccount = async (
-    payload: DeleteAccountPayload
+    payload: DeleteAccountPayload,
   ): Promise<ActionResult> => {
     try {
       const response = await fetchWithCsrf<DeleteAccountResponse>(
@@ -187,7 +189,7 @@ export const useMainStore = defineStore('main', () => {
         {
           body: payload,
           method: 'delete',
-        }
+        },
       );
 
       const data = DeleteAccountResponse.parse(response);
@@ -215,7 +217,7 @@ export const useMainStore = defineStore('main', () => {
     assert(acc);
     const subscriptions = [...acc.subscriptions];
     const subIndex = subscriptions.findIndex(
-      (sub) => sub.identifier === subscription.identifier
+      (sub) => sub.identifier === subscription.identifier,
     );
     const sub = subscriptions[subIndex];
     const { actions, status, nextActionDate } = sub;
@@ -223,7 +225,7 @@ export const useMainStore = defineStore('main', () => {
     function updateSub(
       actions: string[],
       status: SubStatus,
-      nextActionDate: string
+      nextActionDate: string,
     ) {
       sub.actions = actions;
       sub.status = status;
@@ -241,7 +243,7 @@ export const useMainStore = defineStore('main', () => {
         `/webapi/subscription/${subscription.identifier}`,
         {
           method: 'delete',
-        }
+        },
       );
       const data = CancelSubscriptionResponse.parse(response);
       if (data.result) {
@@ -284,7 +286,7 @@ export const useMainStore = defineStore('main', () => {
         `/webapi/checkout/card/${plan}`,
         {
           method: 'get',
-        }
+        },
       );
       const data = CardCheckoutResponse.parse(response);
       return {
@@ -301,7 +303,7 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const pay = async (
-    request: CardPaymentRequest
+    request: CardPaymentRequest,
   ): Promise<Result<true, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<CardPaymentResponse>(
@@ -309,7 +311,7 @@ export const useMainStore = defineStore('main', () => {
         {
           method: 'post',
           body: request,
-        }
+        },
       );
       getAccount().then();
 
@@ -342,7 +344,7 @@ export const useMainStore = defineStore('main', () => {
   const cryptoPayment = async (
     plan: number,
     currency: Currency,
-    subscriptionId?: string
+    subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
@@ -356,9 +358,9 @@ export const useMainStore = defineStore('main', () => {
               subscriptionId,
             },
             false,
-            false
+            false,
           ),
-        }
+        },
       );
 
       const { result } = CryptoPaymentResponse.parse(response);
@@ -388,14 +390,14 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const checkPendingCryptoPayment = async (
-    subscriptionId?: string
+    subscriptionId?: string,
   ): Promise<Result<PendingCryptoPayment>> => {
     try {
       const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(
         '/webapi/payment/pending',
         {
           params: convertKeys({ subscriptionId }, false, false),
-        }
+        },
       );
       const data = PendingCryptoPaymentResponse.parse(response);
       if (data.result) {
@@ -423,7 +425,7 @@ export const useMainStore = defineStore('main', () => {
         'webapi/payment/pending',
         {
           method: 'patch',
-        }
+        },
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
       if (data.result) {
@@ -448,14 +450,14 @@ export const useMainStore = defineStore('main', () => {
   const switchCryptoPlan = async (
     plan: number,
     currency: Currency,
-    subscriptionId?: string
+    subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
         'webapi/payment/pending',
         {
           method: 'delete',
-        }
+        },
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
       if (data.result) {
@@ -486,7 +488,7 @@ export const useMainStore = defineStore('main', () => {
       logger.debug('session expired, logging out');
       await logout();
     },
-    SESSION_TIMEOUT
+    SESSION_TIMEOUT,
   );
 
   const logout = async (callApi = false): Promise<void> => {

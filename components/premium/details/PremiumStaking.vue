@@ -8,11 +8,11 @@ const { t } = useI18n();
       {{ t('home.premium_features.features.premium_staking.title') }}
     </template>
 
-    <i18n-t
+    <I18nT
       keypath="home.premium_features.features.premium_staking.detail"
       scope="global"
     >
       <br />
-    </i18n-t>
+    </I18nT>
   </PremiumFeature>
 </template>

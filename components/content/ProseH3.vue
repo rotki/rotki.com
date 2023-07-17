@@ -5,7 +5,7 @@ withDefaults(
   }>(),
   {
     id: undefined,
-  }
+  },
 );
 
 const { anchorLinks } = useRuntimeConfig().public.content;

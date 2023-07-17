@@ -9,7 +9,7 @@ withDefaults(
     height: '24px',
     width: '24px',
     color: undefined,
-  }
+  },
 );
 </script>
 

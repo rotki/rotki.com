@@ -5,7 +5,7 @@ withDefaults(
   }>(),
   {
     small: false,
-  }
+  },
 );
 
 const css = useCssModule();

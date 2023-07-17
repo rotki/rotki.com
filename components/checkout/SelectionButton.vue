@@ -6,7 +6,7 @@ withDefaults(
   }>(),
   {
     disabled: false,
-  }
+  },
 );
 
 const emit = defineEmits<{ (e: 'click'): void }>();

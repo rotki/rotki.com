@@ -20,7 +20,7 @@ const payments = computed(() => {
     return [];
   }
   return userAccount.payments.sort(
-    (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime()
+    (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
   );
 });
 

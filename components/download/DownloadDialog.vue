@@ -43,7 +43,7 @@ const windowsUrl = ref(LATEST);
 
 const fetchLatestRelease = async () => {
   const { data } = await useFetch<GithubRelease>(
-    'https://api.github.com/repos/rotki/rotki/releases/latest'
+    'https://api.github.com/repos/rotki/rotki/releases/latest',
   );
   const latestRelease = get(data);
   if (latestRelease) {

@@ -9,7 +9,7 @@ withDefaults(
     wide: false,
     centerHorizontally: true,
     centerVertically: true,
-  }
+  },
 );
 
 const css = useCssModule();

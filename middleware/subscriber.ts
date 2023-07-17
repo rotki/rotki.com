@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(() => {
   const { hasActiveSubscription, subscriptions } = get(account);
   if (hasActiveSubscription) {
     const renewableSubscriptions = subscriptions.filter(({ actions }) =>
-      actions.includes('renew')
+      actions.includes('renew'),
     );
 
     if (!renewableSubscriptions) {

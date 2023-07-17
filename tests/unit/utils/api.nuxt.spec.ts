@@ -15,7 +15,7 @@ describe('api utilities', () => {
 
   it('fetchWithCsrf: fetch countries runs correctly', async () => {
     const response = await fetchWithCsrf<ApiResponse<Country[]>>(
-      `/webapi/countries`
+      `/webapi/countries`,
     );
 
     assert.isArray(response.result);
@@ -43,7 +43,7 @@ describe('api utilities', () => {
           username: '',
           password: '',
         },
-      }
+      },
     );
 
     assert.isString(response.message);

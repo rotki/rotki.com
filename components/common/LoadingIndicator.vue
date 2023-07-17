@@ -5,7 +5,7 @@ withDefaults(
   }>(),
   {
     full: false,
-  }
+  },
 );
 const css = useCssModule();
 </script>
@@ -71,7 +71,9 @@ const css = useCssModule();
   stroke: #da4e24;
   stroke-dasharray: 1, 200;
   stroke-dashoffset: 0;
-  animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+  animation:
+    dash 1.5s ease-in-out infinite,
+    color 6s ease-in-out infinite;
   stroke-linecap: round;
 }
 

@@ -23,7 +23,7 @@ if (!data) {
       title ?? '',
       description ?? '',
       `${baseUrl}${props.path}`,
-      baseUrl
+      baseUrl,
     ),
     ...commonAttrs(),
   });

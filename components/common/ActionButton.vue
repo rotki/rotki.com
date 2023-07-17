@@ -19,7 +19,7 @@ withDefaults(
     loading: false,
     warning: false,
     href: '',
-  }
+  },
 );
 
 const emit = defineEmits<{

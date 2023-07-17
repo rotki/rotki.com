@@ -5,7 +5,7 @@ withDefaults(
   }>(),
   {
     landing: false,
-  }
+  },
 );
 
 const year = new Date().getFullYear().toString();

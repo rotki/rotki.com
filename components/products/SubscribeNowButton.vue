@@ -8,7 +8,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const { account } = storeToRefs(store);
 const hasActiveSubscription = computed(
-  () => !!get(account)?.hasActiveSubscription
+  () => !!get(account)?.hasActiveSubscription,
 );
 
 const showTooltip = computed(() => {

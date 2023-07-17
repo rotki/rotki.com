@@ -10,7 +10,7 @@ declare global {
           'error-callback'(): void;
           theme?: 'light' | 'dark';
           size?: 'compact' | 'normal';
-        }
+        },
       ): number;
       reset(id?: number): void;
     };

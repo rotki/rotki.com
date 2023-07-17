@@ -28,7 +28,7 @@ const subscriptions = computed(() => {
 const pending = computed(() => get(subscriptions).filter((sub) => sub.pending));
 
 const renewableSubscriptions = computed(() =>
-  get(subscriptions).filter(({ actions }) => actions.includes('renew'))
+  get(subscriptions).filter(({ actions }) => actions.includes('renew')),
 );
 
 const pendingPaymentCurrency = computedAsync(async () => {
@@ -70,12 +70,12 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(
     }
 
     return link;
-  }
+  },
 );
 
 const { pause, resume, isActive } = useIntervalFn(
   async () => await store.getAccount(),
-  60000
+  60000,
 );
 
 watch(pending, (pending) => {

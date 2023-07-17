@@ -38,7 +38,7 @@ export const getChainId = (testing: boolean) => BigInt(testing ? 11155111 : 1);
 export const useWeb3Payment = (
   data: Ref<CryptoPayment | null>,
   getProvider: () => Provider,
-  testing: boolean
+  testing: boolean,
 ) => {
   const { markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
@@ -49,7 +49,7 @@ export const useWeb3Payment = (
       set(state, 'success');
     },
     5000,
-    { immediate: false }
+    { immediate: false },
   );
 
   async function payWithEth(signer: JsonRpcSigner) {
@@ -59,7 +59,7 @@ export const useWeb3Payment = (
     const value = parseEther(payment.finalPriceInCrypto);
     const to = payment.cryptoAddress;
     logger.info(
-      `preparing to send ${payment.finalPriceInCrypto}(${value}) ETH to ${to}`
+      `preparing to send ${payment.finalPriceInCrypto}(${value}) ETH to ${to}`,
     );
     set(state, 'pending');
     const tx = await signer.sendTransaction({
@@ -87,7 +87,7 @@ export const useWeb3Payment = (
     set(state, 'pending');
     const tx = await (contract.transfer(
       cryptoAddress,
-      price
+      price,
     ) as Promise<TransactionResponse>);
     logger.info(`transaction is pending: ${tx.hash}`);
     await markTransactionStarted();
@@ -116,7 +116,7 @@ export const useWeb3Payment = (
       if (network.chainId !== expected) {
         set(
           error,
-          `We are expecting payments on ${name} but found ${network.name}`
+          `We are expecting payments on ${name} but found ${network.name}`,
         );
         return;
       }

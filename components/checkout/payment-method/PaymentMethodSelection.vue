@@ -12,6 +12,8 @@ import {
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
 
+const props = defineProps<{ identifier?: string }>();
+
 enum PaymentMethod {
   ETH = 1,
   BTC = 2,
@@ -57,8 +59,6 @@ const paymentMethods: PaymentMethodItem[] = [
     component: PaypalIcon,
   },
 ];
-
-const props = defineProps<{ identifier?: string }>();
 
 const { identifier } = toRefs(props);
 const selected: Ref<PaymentMethod | null> = ref(null);

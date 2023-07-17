@@ -12,7 +12,7 @@ const { account } = storeToRefs(store);
 
 const username = computed(() => account.value?.username);
 const isSubscriber = computed(
-  () => account.value?.hasActiveSubscription ?? false
+  () => account.value?.hasActiveSubscription ?? false,
 );
 
 const deleteAccount = async () => {
