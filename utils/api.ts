@@ -177,17 +177,19 @@ export async function fetchWithCsrf<
 }
 
 async function initCsrf(): Promise<void> {
-  const { backendUrl } = useRuntimeConfig().public;
+  const {
+    public: { baseUrl },
+  } = useRuntimeConfig();
 
   const controller = new AbortController();
-  try {
-    const aborter = sleep(30000, controller.signal);
-    const csrf = $fetch('/webapi/csrf/', {
-      baseURL: backendUrl,
-      credentials: 'include',
-      signal: controller.signal,
-    });
+  const aborter = sleep(30000, controller.signal);
+  const csrf = $fetch('/webapi/csrf/', {
+    baseURL: baseUrl,
+    credentials: 'include',
+    signal: controller.signal,
+  });
 
+  try {
     const race = await Promise.race([aborter, csrf]);
     if (race === null) {
       controller.abort();
