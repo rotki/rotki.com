@@ -1,4 +1,4 @@
-import { GITHUB_CONTENT_PREFIX } from './utils/constants';
+import { GITHUB_CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from './utils/constants';
 
 const nonIndexed = [
   '/activation',
@@ -159,6 +159,11 @@ export default defineNuxtConfig({
       baseURL: '/md/_content',
     },
     sources: {
+      content: {
+        driver: 'fs',
+        prefix: LOCAL_CONTENT_PREFIX,
+        base: 'content',
+      },
       github: {
         prefix: GITHUB_CONTENT_PREFIX, // Prefix for routes used to query contents
         driver: 'github', // Driver used to fetch contents

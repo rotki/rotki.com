@@ -112,7 +112,12 @@ const css = useCssModule();
       autocomplete="new-password"
     />
 
-    <div :class="css.row" class="mt-8">
+    <div class="my-5 border-t border-grey-50" />
+
+    <div class="flex justify-end mt-8">
+      <span v-if="success" :class="css.success">
+        <CheckMarkIcon /> Your password has been changed.
+      </span>
       <RuiButton
         :disabled="v$.$invalid"
         size="lg"
@@ -122,9 +127,6 @@ const css = useCssModule();
       >
         Change Password
       </RuiButton>
-      <span v-if="success" :class="css.success">
-        <CheckMarkIcon /> Your password has been changed.
-      </span>
     </div>
   </CardContainer>
 </template>
@@ -135,6 +137,6 @@ const css = useCssModule();
 }
 
 .success {
-  @apply flex flex-row ml-4 mt-6 text-rui-grey-800 transition duration-300 ease-in-out;
+  @apply flex flex-row mr-4 mt-6 text-rui-grey-800 transition duration-300 ease-in-out;
 }
 </style>

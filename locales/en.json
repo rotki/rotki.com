@@ -126,6 +126,7 @@
     }
   },
   "actions": {
+    "apply": "Apply",
     "back": "Back",
     "continue": "Continue",
     "download": "Start now for free",
@@ -318,6 +319,12 @@
   },
   "page_header": {
     "manage_premium": "Manage Premium"
+  },
+  "jobs": {
+    "title": "Careers at rotki",
+    "header": "We’re looking for talented people",
+    "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
+    "no_open_roles": "There are no open roles."
   },
   "country_select": {
     "no_data": "No matching countries found"

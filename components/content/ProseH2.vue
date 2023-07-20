@@ -28,7 +28,7 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .heading {
-  @apply text-rui-text font-bold mt-6;
+  @apply text-rui-text font-bold mt-8 mb-6;
   @apply text-[1.05rem] sm:text-[1.2rem] md:text-[1.35rem] 2xl:text-[1.5rem];
   @apply leading-[1.4rem] sm:leading-[1.6rem] md:leading-[1.8rem] 2xl:leading-[2.2rem];
 }

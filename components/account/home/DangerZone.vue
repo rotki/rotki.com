@@ -34,11 +34,11 @@ const css = useCssModule();
 
 <template>
   <CardContainer warning>
-    <TextHeading>
+    <TextHeading class="mt-4" no-margin>
       <div class="text-rui-error">Delete account</div>
     </TextHeading>
 
-    <p class="text-rui-text-secondary">
+    <p class="text-rui-text-secondary mt-1">
       Proceeding will completely delete your account data. If you proceed you
       will not be able to recover your account!
     </p>

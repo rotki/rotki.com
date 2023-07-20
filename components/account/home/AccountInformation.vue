@@ -203,7 +203,9 @@ const css = useCssModule();
       @blur="v$.country.$touch()"
     />
 
-    <div class="mt-8">
+    <div class="my-5 border-t border-grey-50" />
+
+    <div class="flex justify-end mt-8">
       <RuiButton size="lg" :loading="loading" color="primary" @click="update()">
         Update
       </RuiButton>

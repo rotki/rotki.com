@@ -1,13 +1,16 @@
 import { get, set } from '@vueuse/core';
+import { groupBy } from 'graphql/jsutils/groupBy';
 import type { MarkdownParsedContent } from '@nuxt/content/dist/runtime/types';
 import type { ComputedRef, Ref } from 'vue';
-import { logger } from '~/utils/logger';
 import { replacePathPrefix } from '~/utils/api';
-import { GITHUB_CONTENT_PREFIX } from '~/utils/constants';
+import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
+import { logger } from '~/utils/logger';
 
-interface JobMarkdownContent extends MarkdownParsedContent {
+export interface JobMarkdownContent extends MarkdownParsedContent {
   link?: string;
   open: boolean;
+  category: string;
+  tags: string[];
 }
 
 /**
@@ -18,6 +21,12 @@ export const useMarkdownContent = () => {
   const openJobs: ComputedRef<JobMarkdownContent[]> = computed(() =>
     get(jobs).filter((job) => job.open),
   );
+  const groupedOpenJobsByCategory: ComputedRef<
+    Record<string, readonly JobMarkdownContent[]>
+  > = computed(() =>
+    Object.fromEntries(groupBy(get(openJobs), (item) => item.category ?? '')),
+  );
+
   const firstJob: ComputedRef<JobMarkdownContent | null> = computed(
     () => get(openJobs)[0] ?? null,
   );
@@ -29,24 +38,41 @@ export const useMarkdownContent = () => {
     const path = `/jobs`;
 
     let foundJobs;
+    let prefix = CONTENT_PREFIX;
 
     try {
-      const remotePath = `${GITHUB_CONTENT_PREFIX}${path}`;
       // try to fetch from remote
-      foundJobs = await queryContent<JobMarkdownContent>(remotePath).find();
+      foundJobs = await queryContent<JobMarkdownContent>(
+        `${prefix}${path}`,
+      ).find();
     } catch (e: any) {
       logger.error(e);
+      prefix = LOCAL_CONTENT_PREFIX;
       // fallback to local if remote fails
-      foundJobs = await queryContent<JobMarkdownContent>(path).find();
+      foundJobs = await queryContent<JobMarkdownContent>(
+        `${prefix}${path}`,
+      ).find();
     }
 
     set(
       jobs,
       foundJobs?.map((job) => {
-        job.link = replacePathPrefix(GITHUB_CONTENT_PREFIX, job._path);
+        job.link = replacePathPrefix(prefix, job._path);
         return job;
       }) ?? [],
     );
+  };
+
+  const queryPrefixForJob = async (
+    prefix: typeof CONTENT_PREFIX,
+    path: string,
+  ): Promise<JobMarkdownContent> => {
+    const prefixedPath = `${prefix}${path}`;
+    const data = await queryContent<JobMarkdownContent>(prefixedPath).findOne();
+    return {
+      ...data,
+      link: replacePathPrefix(prefix, data?._path),
+    };
   };
 
   /**
@@ -54,22 +80,13 @@ export const useMarkdownContent = () => {
    */
   const loadJob = async (path: string): Promise<JobMarkdownContent> => {
     try {
-      const remotePath = `${GITHUB_CONTENT_PREFIX}${path}`;
-      // try to fetch from remote
-      const data = await queryContent<JobMarkdownContent>(remotePath).findOne();
-      return {
-        ...data,
-        link: replacePathPrefix(GITHUB_CONTENT_PREFIX, data?._path),
-      };
+      // try to fetch from prefix
+      return await queryPrefixForJob(CONTENT_PREFIX, path);
     } catch (e: any) {
       logger.error(e);
 
       // fallback to local if remote fails
-      const data = await queryContent<JobMarkdownContent>(path).findOne();
-      return {
-        ...data,
-        link: replacePathPrefix(GITHUB_CONTENT_PREFIX, data?._path),
-      };
+      return await queryPrefixForJob(LOCAL_CONTENT_PREFIX, path);
     }
   };
 
@@ -89,6 +106,7 @@ export const useMarkdownContent = () => {
   return {
     jobs,
     openJobs,
+    groupedOpenJobsByCategory,
     firstJob,
     loadJob,
     loadJobs,

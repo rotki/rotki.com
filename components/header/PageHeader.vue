@@ -23,7 +23,7 @@ const logout = async () => {
       <div>
         <NavigationMenu />
       </div>
-      <div class="flex items-center space-x-2 ml-6">
+      <div class="flex items-center space-x-2 ml-6 lg:ml-0">
         <NuxtLink to="/home">
           <RuiButton rounded color="primary">
             {{ t('page_header.manage_premium') }}

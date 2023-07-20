@@ -1,51 +1,33 @@
 <script lang="ts" setup>
-import { useMarkdownContent } from '~/composables/markdown';
+import Default from '~/layouts/default.vue';
 
-const css = useCssModule();
-const { openJobs, loadJobs } = useMarkdownContent();
+const slots = useSlots();
 
-await loadJobs();
+const { t } = useI18n();
 </script>
 
 <template>
-  <PageContainer>
-    <template #title> Jobs </template>
-    <div :class="css.container">
-      <TextHeading>Available Roles</TextHeading>
-      <ul v-if="openJobs.length > 0" :class="css.tabs">
-        <li v-for="tab in openJobs" :key="tab._id" :class="css.tab">
-          <NuxtLink :active-class="css.active" :class="css.link" :to="tab.link">
-            {{ tab.title }}
-          </NuxtLink>
-        </li>
-      </ul>
-      <slot />
+  <Default>
+    <div class="bg-rui-primary/[.04] py-10 lg:py-20">
+      <div class="container">
+        <div class="max-w-[768px]">
+          <div class="mb-3 text-h6 -ml-1">
+            <ButtonLink to="/jobs" color="primary" inline>
+              {{ t('jobs.title') }}
+            </ButtonLink>
+          </div>
+          <div class="text-h4">
+            <slot name="title" />
+          </div>
+          <div v-if="slots.description" class="mt-5 body-1">
+            <slot name="description" />
+          </div>
+        </div>
+      </div>
     </div>
-  </PageContainer>
+    <slot />
+    <template #footer>
+      <PageFooter landing />
+    </template>
+  </Default>
 </template>
-
-<style lang="scss" module>
-.container {
-  @apply py-16;
-}
-
-.tabs {
-  @apply flex mb-0 list-none flex-wrap pt-6 pb-6 flex-row;
-}
-
-.tab {
-  @apply -mb-px mr-2 flex-1 text-center font-sans;
-
-  &:last-child {
-    @apply mr-0;
-  }
-}
-
-.link {
-  @apply text-xs font-bold uppercase px-5 py-3 border-rui-primary border rounded block leading-normal text-rui-primary;
-}
-
-.active {
-  @apply text-white bg-rui-primary;
-}
-</style>

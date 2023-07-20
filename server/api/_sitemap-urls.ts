@@ -1,10 +1,10 @@
 import { type ParsedContent } from '@nuxt/content/dist/runtime/types';
 import { serverQueryContent } from '#content/server';
-import { GITHUB_CONTENT_PREFIX } from '~/utils/constants';
+import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
 
 const getLink = (path?: string) =>
-  path?.startsWith(GITHUB_CONTENT_PREFIX)
-    ? `${path}`.replace(GITHUB_CONTENT_PREFIX, '')
+  path?.startsWith(CONTENT_PREFIX)
+    ? `${path}`.replace(CONTENT_PREFIX, '')
     : path;
 
 export default cachedEventHandler(
@@ -15,7 +15,7 @@ export default cachedEventHandler(
       // try to fetch from remote
       jobs = await serverQueryContent(event)
         .where({
-          _path: { $contains: `${GITHUB_CONTENT_PREFIX}/${dir}` },
+          _path: { $contains: `${CONTENT_PREFIX}/${dir}` },
           open: { $eq: true },
         })
         .only('_path')
@@ -23,7 +23,10 @@ export default cachedEventHandler(
     } catch {
       // fallback to local if remote fails
       jobs = await serverQueryContent(event)
-        .where({ _dir: { $eq: dir }, open: { $eq: true } })
+        .where({
+          _dir: { $eq: `${LOCAL_CONTENT_PREFIX}/${dir}` },
+          open: { $eq: true },
+        })
         .only('_path')
         .find();
     }
