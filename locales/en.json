@@ -1,16 +1,142 @@
 {
+  "auth": {
+    "activation": {
+      "invalid": {
+        "title": "Invalid Link",
+        "message": "The activation link is not valid. This can happen if you have already confirmed your account."
+      },
+      "success": {
+        "title": "Welcome to rotki",
+        "message": "Your rotki account has been successfully activated. To see your dashboard click"
+      }
+    },
+    "common": {
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "confirm_hint": "Enter the same password as before, for verification.",
+      "password_hint": {
+        "line_1": "Your password can't be too similar to your other personal information.",
+        "line_2": "Your password must contain at least 8 characters.",
+        "line_3": "Your password can't be a commonly used password.",
+        "line_4": "Your password can't be entirely numeric."
+      },
+      "required": "Required."
+    },
+    "login": {
+      "title": "Sign in",
+      "message": " Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
+      "forgot_password": "Forgot password?",
+      "first_time_premium": "First time premium?",
+      "sign_up_now": "Sign up now",
+      "alert_error": "If you are writing your username and password from the app, we remind you that they are independent accounts."
+    },
+    "password_changed": {
+      "title": "Password changed",
+      "message": "Your password has been successfully reset. Click below to log in."
+    },
+    "password_link_send": {
+      "title": "Password recovery",
+      "message": "A recovery link has been send to your account's address. Please check your mailbox to proceed."
+    },
+    "password_reset": {
+      "invalid": {
+        "title": "Invalid password reset link",
+        "message": "The link you followed doesn't seem like a valid password reset link."
+      },
+      "form": {
+        "confirm": "Confirm new password",
+        "password": "New password"
+      },
+      "title": "Provide your new password"
+    },
+    "pending_activation": {
+      "title": "Please check your email",
+      "message": "A confirm registration link has been send to your account's address. Please check your mailbox to proceed."
+    },
+    "recover_password": {
+      "title": "Recover password"
+    },
+    "signup": {
+      "steps": {
+        "step_1": {
+          "title": "Introduction",
+          "description": "First step"
+        },
+        "step_2": {
+          "title": "Account",
+          "description": "Set your credentials"
+        },
+        "step_3": {
+          "title": "Customer Information",
+          "description": "Information for invoice of payments"
+        },
+        "step_4": {
+          "title": "Address",
+          "description": "Will only be used for invoice of payments"
+        }
+      },
+      "create_account": "Create Account",
+      "introduction": {
+        "title": "Important Note",
+        "message": {
+          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. Rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account don't work for the other. To use Rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
+          "premium_subscription": "premium subscription",
+          "download": "download"
+        }
+      },
+      "account": {
+        "title": "Account",
+        "form": {
+          "username_hint": "Required. Provide a unique username for your new account.",
+          "email_hint": "Required. Provide a valid email address.",
+          "confirm_password": "Repeat password",
+          "github_username": "Github username",
+          "github_username_hint": "Optional. Provide Github username for in-Github support."
+        }
+      },
+      "address": {
+        "form": {
+          "address_line_1": "Address line 1",
+          "address_line_2": "Address line 2",
+          "city": "City",
+          "postal_code": "Postal code",
+          "country": "Country",
+          "tos": "I have read and agreed to the {tos} and the {privacy_policy}"
+        }
+      },
+      "customer_information": {
+        "title": "Customer Information",
+        "form": {
+          "first_name": "First name",
+          "last_name": "Last name",
+          "name_hint": "Required. Will only be used for invoice of payments.",
+          "company": "Company name",
+          "company_hint": "Optional. If you want to be invoiced as a company the given company name will be added to the invoice.",
+          "vat_id": "VAT ID",
+          "vat_id_hint": "Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
+        }
+      }
+    }
+  },
   "account": {
     "unverified_email": {
       "message": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail."
     }
   },
   "actions": {
+    "back": "Back",
+    "continue": "Continue",
     "download": "Start now for free",
     "get_premium": "Get Premium",
     "get_premium_plan": "Get Premium Plan",
     "get_advanced_plan": "Get Advanced Plan",
     "get_in_touch": "Get In Touch Now",
-    "go_back_home": "Go back home"
+    "go_back_home": "Go back home",
+    "submit": "Submit"
+  },
+  "common": {
+    "here": "here"
   },
   "supported_defi": {
     "title": "Dedicated DeFi support for",

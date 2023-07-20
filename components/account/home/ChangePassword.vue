@@ -112,14 +112,11 @@ const css = useCssModule();
       autocomplete="new-password"
     />
 
-    <div :class="css.row">
+    <div :class="css.row" class="mt-8">
       <RuiButton
         :disabled="v$.$invalid"
-        variant="outlined"
         size="lg"
-        class="uppercase outline-2 mt-4"
         :loading="loading"
-        rounded
         color="primary"
         @click="changePassword()"
       >

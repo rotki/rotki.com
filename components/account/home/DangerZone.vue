@@ -34,28 +34,29 @@ const css = useCssModule();
 
 <template>
   <CardContainer warning>
-    <TextHeading>Danger Zone</TextHeading>
+    <TextHeading>
+      <div class="text-rui-error">Delete account</div>
+    </TextHeading>
 
-    <p :class="css.text">
+    <p class="text-rui-text-secondary">
       Proceeding will completely delete your account data. If you proceed you
       will not be able to recover your account!
     </p>
 
-    <p v-if="isSubscriber" :class="css.warning">
+    <p v-if="isSubscriber" class="text-rui-warning">
       You cannot delete your account while you have an active subscription.
     </p>
 
-    <RuiButton
-      :disabled="isSubscriber"
-      variant="outlined"
-      size="lg"
-      class="uppercase outline-2"
-      rounded
-      color="warning"
-      @click="confirm = true"
-    >
-      Delete My Account
-    </RuiButton>
+    <div class="mt-8">
+      <RuiButton
+        :disabled="isSubscriber"
+        size="lg"
+        color="error"
+        @click="confirm = true"
+      >
+        Delete My Account
+      </RuiButton>
+    </div>
 
     <ModalDialog v-model="confirm" padding="1rem">
       <div :class="css.title">Delete Account</div>

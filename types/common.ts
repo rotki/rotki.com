@@ -16,3 +16,5 @@ export type ActionResult = {
 export type BaseErrorObject = { $message: string | Ref<string> };
 
 export type PayEvent = { months: number; nonce: string };
+
+export type ValidationErrors = Record<string, string[] | string>;

@@ -1,420 +1,185 @@
-<script setup lang="ts">
-import {
-  email,
-  helpers,
-  minLength,
-  required,
-  sameAs,
-} from '@vuelidate/validators';
-import { useVuelidate } from '@vuelidate/core';
-import { get } from '@vueuse/core';
+<script lang="ts" setup>
 import { type Ref } from 'vue';
+import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
-import { type SignupPayload } from '~/types/signup';
+import {
+  type SignupAccountPayload,
+  type SignupAddressPayload,
+  type SignupCustomerInformationPayload,
+  type SignupPayload,
+} from '~/types/signup';
 import { fetchWithCsrf } from '~/utils/api';
+import { type ValidationErrors } from '~/types/common';
+import { type ApiResponse } from '~/types';
 
-const recaptcha = useRecaptcha();
-
-const state = reactive<SignupPayload & { captcha: Ref<string> }>({
+const accountForm = ref<SignupAccountPayload>({
   username: '',
   password: '',
   confirmPassword: '',
   email: '',
   githubUsername: '',
+});
+
+const customerInformationForm = ref<SignupCustomerInformationPayload>({
   firstName: '',
   lastName: '',
   companyName: '',
   vatId: '',
+});
+
+const addressForm = ref<SignupAddressPayload>({
   address1: '',
   address2: '',
   city: '',
   postcode: '',
   country: '',
-  captcha: recaptcha.recaptchaToken,
 });
 
-const rules = {
-  username: { required },
-  password: { required, minLength: minLength(8) },
-  confirmPassword: {
-    required,
-    sameAsPassword: sameAs(toRef(state, 'password'), 'password'),
-  },
-  email: { required, email },
-  githubUsername: {},
-  firstName: { required },
-  lastName: { required },
-  companyName: {},
-  vatId: {},
-  address1: { required },
-  address2: {},
-  city: { required },
-  postcode: {
-    required,
-    validateCode: helpers.withMessage(
-      'Enter a valid postal code. Only alphabets, numbers, space and -',
-      helpers.regex(/^[\d\sA-Za-z-]+$/),
-    ),
-  },
-  country: { required },
-  captcha: { required },
-};
+const loading: Ref<boolean> = ref(false);
+const captchaId: Ref<number> = ref(0);
+const externalResults: Ref<ValidationErrors> = ref({});
 
-const loading = ref(false);
-const captchaId = ref<number>();
-const $externalResults = ref({});
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-});
-const termsAccepted = ref(false);
+const signup = async ({
+  recaptchaToken,
+  onExpired,
+}: {
+  recaptchaToken: string;
+  onExpired: () => void;
+}) => {
+  set(loading, true);
 
-const { recaptchaPassed, onError, onSuccess, onExpired } = recaptcha;
+  const payload: SignupPayload = {
+    ...get(accountForm),
+    ...get(customerInformationForm),
+    ...get(addressForm),
+  };
 
-const setCaptchaId = (v: number) => {
-  captchaId.value = v;
-};
-
-const useSignup = (
-  captcha: Ref<string>,
-  $externalResults: Ref<Record<string, string>>,
-) => {
-  const signup = async (payload: SignupPayload) => {
-    const isValid = await get(v$).$validate();
-
-    if (!isValid) {
-      return;
-    }
-
-    loading.value = true;
-
-    try {
-      await fetchWithCsrf<void>('/webapi/signup/', {
-        method: 'post',
-        body: {
-          captcha: captcha.value,
-          ...payload,
-        },
-      });
+  try {
+    const { result, message } = await fetchWithCsrf<
+      ApiResponse<boolean, ValidationErrors>
+    >('/webapi/signup/', {
+      method: 'post',
+      body: {
+        captcha: recaptchaToken,
+        ...payload,
+      },
+    });
+    if (result) {
       await navigateTo({ path: '/activation' });
-    } catch (e: any) {
-      if (
-        e instanceof FetchError &&
-        e.status === 400 &&
-        e.data &&
-        typeof e.data.message === 'object'
-      ) {
-        window.grecaptcha?.reset(captchaId.value);
-        onExpired();
-        $externalResults.value = e.data.message;
-      }
+    } else if (typeof message === 'object') {
+      window.grecaptcha?.reset(get(captchaId));
+      onExpired();
+      setErrors(message);
     }
-    loading.value = false;
-  };
-  return {
-    signup,
-  };
+  } catch (e: any) {
+    if (
+      e instanceof FetchError &&
+      e.status === 400 &&
+      e.data &&
+      typeof e.data.message === 'object'
+    ) {
+      window.grecaptcha?.reset(get(captchaId));
+      onExpired();
+      setErrors(e.data.message);
+    }
+  }
+  set(loading, false);
 };
 
-const { countries } = useCountries();
-const { signup } = useSignup(recaptcha.recaptchaToken, $externalResults);
-const css = useCssModule();
+const { t } = useI18n();
+
+const step: Ref<number> = ref(1);
+const steps = [
+  {
+    title: t('auth.signup.steps.step_1.title'),
+    description: t('auth.signup.steps.step_1.description'),
+  },
+  {
+    title: t('auth.signup.steps.step_2.title'),
+    description: t('auth.signup.steps.step_2.description'),
+  },
+  {
+    title: t('auth.signup.steps.step_3.title'),
+    description: t('auth.signup.steps.step_3.description'),
+  },
+  {
+    title: t('auth.signup.steps.step_4.title'),
+    description: t('auth.signup.steps.step_4.description'),
+  },
+];
+
+const back = () => {
+  set(step, Math.max(get(step) - 1, 1));
+};
+const next = () => {
+  set(step, Math.min(get(step) + 1, 4));
+};
+
+const haveIntersectionKeys = (obj1: object, obj2: object) => {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  return keys1.some((key) => keys2.includes(key));
+};
+
+const setErrors = (errors: ValidationErrors) => {
+  set(externalResults, errors);
+
+  if (haveIntersectionKeys(errors, get(accountForm))) {
+    set(step, 2);
+    return;
+  } else if (haveIntersectionKeys(errors, get(customerInformationForm))) {
+    set(step, 3);
+    return;
+  } else if (haveIntersectionKeys(errors, get(addressForm))) {
+    set(step, 4);
+    return;
+  }
+};
 </script>
 
 <template>
-  <PageContainer>
-    <template #title> Create a rotki premium Account</template>
-
-    <div :class="css.row">
-      <div :class="css.column">
-        <div :class="css.hint">
-          <span :class="css.important">Important</span> Note: Creating an
-          account in rotki.com is only needed to purchase a
-          <ButtonLink to="/products" inline color="primary">
-            premium subscription
-          </ButtonLink>
-          Rotki is a local application and the account you create when you use
-          it is stored on your computer. This is not the same account as premium
-          and credentials for one account don't work for the other. To use Rotki
-          simply
-          <ButtonLink
-            inline
-            color="primary"
-            external
-            to="/https://github.com/rotki/rotki/releases/latest"
-          >
-            download
-          </ButtonLink>
-          and run it. Proceed only if you intend to purchase premium and unlock
-          the premium features of the application.
-        </div>
-
-        <TextHeading :class="css.heading">Account</TextHeading>
-
-        <div :class="css.inputs">
-          <InputField
-            id="username"
-            v-model="state.username"
-            :error-messages="v$.username.$errors"
-            hint="Required: Provide a unique username for your new account."
-            label="Username"
-            autocomplete="username"
-            @blur="v$.username.$touch()"
-          />
-          <InputField
-            id="email"
-            v-model="state.email"
-            :error-messages="v$.email.$errors"
-            hint="Required. Provide a valid email address."
-            label="Email"
-            type="email"
-            autocomplete="email"
-            @blur="v$.email.$touch()"
-          />
-          <InputField
-            id="github"
-            v-model="state.githubUsername"
-            :error-messages="v$.githubUsername.$errors"
-            hint="Optional. Provide Github username for in-Github support."
-            label="Github Username"
-            @blur="v$.githubUsername.$touch()"
-          />
-          <InputField
-            id="password"
-            v-model="state.password"
-            :error-messages="v$.password.$errors"
-            label="Password"
-            type="password"
-            autocomplete="new-password"
-            @blur="v$.password.$touch()"
-          >
-            <ul :class="css.list">
-              <li>
-                Your password can't be too similar to your other personal
-                information.
-              </li>
-              <li>Your password must contain at least 8 characters.</li>
-              <li>Your password can't be a commonly used password.</li>
-
-              <li>Your password can't be entirely numeric.</li>
-            </ul>
-          </InputField>
-
-          <InputField
-            id="password-confirmation"
-            v-model="state.confirmPassword"
-            :error-messages="v$.confirmPassword.$errors"
-            hint="Enter the same password as before, for verification."
-            label="Password Confirmation"
-            type="password"
-            autocomplete="new-password"
-            @blur="v$.confirmPassword.$touch()"
-          />
-        </div>
-
-        <TextHeading :class="css.heading">Customer Information</TextHeading>
-
-        <div :class="css.inputs">
-          <InputField
-            id="first-name"
-            v-model="state.firstName"
-            :error-messages="v$.firstName.$errors"
-            hint="Required. Will only be used for invoice of payments."
-            label="First Name"
-            autocomplete="given-name"
-            @blur="v$.firstName.$touch()"
-          />
-          <InputField
-            id="last-name"
-            v-model="state.lastName"
-            :error-messages="v$.lastName.$errors"
-            hint="Required. Will only be used for invoice of payments."
-            label="Last Name"
-            autocomplete="family-name"
-            @blur="v$.lastName.$touch()"
-          />
-          <InputField
-            id="company-name"
-            v-model="state.companyName"
-            hint="Optional. If you want to be invoiced as a company the given company name will be added to the invoice."
-            label="Company Name"
-            autocomplete="organization"
-            @blur="v$.companyName.$touch()"
-          />
-          <InputField
-            id="vat-id"
-            v-model="state.vatId"
-            :error-messages="v$.vatId.$errors"
-            hint="Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
-            label="VAT ID"
-            @blur="v$.vatId.$touch()"
-          />
-        </div>
-
-        <TextHeading :class="css.heading">Address</TextHeading>
-
-        <div :class="css.inputs">
-          <InputField
-            id="address-1"
-            v-model="state.address1"
-            :error-messages="v$.address1.$errors"
-            hint="Required. Will only be used for invoice of payments."
-            label="Address line 1"
-            autocomplete="address-line1"
-            @blur="v$.address1.$touch()"
-          />
-          <InputField
-            id="address-2"
-            v-model="state.address2"
-            :error-messages="v$.address2.$errors"
-            hint="Optional. Additional data for the address."
-            label="Address line 2"
-            autocomplete="address-line2"
-            @blur="v$.address2.$touch()"
-          />
-          <InputField
-            id="city"
-            v-model="state.city"
-            :error-messages="v$.city.$errors"
-            hint="Required. Will only be used for invoice of payments."
-            label="City"
-            autocomplete="address-level2"
-            @blur="v$.city.$touch()"
-          />
-          <InputField
-            id="postal"
-            v-model="state.postcode"
-            :error-messages="v$.postcode.$errors"
-            hint="Required. Will only be used for invoice of payments."
-            label="Postal code"
-            autocomplete="postal-code"
-            @blur="v$.postcode.$touch()"
-          />
-
-          <CountrySelect
-            id="country"
-            v-model="state.country"
-            :countries="countries"
-            :error-messages="v$.country.$errors"
-            hint="Required. Will only be used for invoice of payments."
-            label="Country"
-            autocomplete="country"
-            @blur="v$.country.$touch()"
-          />
-        </div>
-
-        <Recaptcha
-          id="signup-captcha"
-          :class="css.recaptcha"
-          :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
-          @error="onError()"
-          @expired="onExpired()"
-          @success="onSuccess($event)"
-          @captcha-id="setCaptchaId($event)"
-        />
-
-        <label :class="css.termsCheck">
-          <input
-            id="tos"
-            :class="css.checkbox"
-            :value="termsAccepted"
-            type="checkbox"
-            @click="termsAccepted = !termsAccepted"
-          />
-          <span :class="css.terms">
-            I have read and agreed to the
-            <ButtonLink inline color="primary" to="/tos">
-              Terms of Service
-            </ButtonLink>
-            and the
-            <ButtonLink inline color="primary" to="/privacy-policy">
-              Privacy Policy
-            </ButtonLink>
-          </span>
-        </label>
-
-        <RuiButton
-          :disabled="!termsAccepted || !recaptchaPassed || loading"
-          :loading="loading"
-          variant="default"
-          size="lg"
-          class="w-full mt-12"
-          color="primary"
-          @click="signup(state)"
-        >
-          Create Account
-        </RuiButton>
-      </div>
+  <div
+    class="container flex flex-col lg:flex-row pt-4 pb-8 lg:py-14 h-full grow"
+  >
+    <div class="lg:hidden mb-14 [&>div>div]:pt-4 [&>div>hr]:!mt-4">
+      <RuiStepper custom orientation="horizontal" :step="step" :steps="steps" />
     </div>
-  </PageContainer>
+
+    <div class="flex justify-center grow">
+      <form class="w-[440px] flex flex-col justify-between" @submit.prevent="">
+        <SignupIntroduction v-if="step === 1" @next="next()" />
+        <SignupAccount
+          v-if="step === 2"
+          v-model="accountForm"
+          :external-results="externalResults"
+          @back="back()"
+          @next="next()"
+        />
+        <SignupCustomerInformation
+          v-if="step === 3"
+          v-model="customerInformationForm"
+          :external-results="externalResults"
+          @back="back()"
+          @next="next()"
+        />
+        <SignupAddress
+          v-if="step === 4"
+          v-model="addressForm"
+          v-model:captcha-id="captchaId"
+          :loading="loading"
+          :external-results="externalResults"
+          @back="back()"
+          @finish="signup($event)"
+        />
+        <div class="mt-4 p-6">
+          <RuiFooterStepper v-model="step" :pages="4" variant="pill" />
+        </div>
+      </form>
+    </div>
+
+    <div class="hidden lg:block w-[332px] sticky top-0 self-start">
+      <RuiStepper custom orientation="vertical" :step="step" :steps="steps" />
+    </div>
+  </div>
 </template>
-
-<style lang="scss" module>
-@import '@/assets/css/media.scss';
-@import '@/assets/css/main.scss';
-
-.row {
-  @apply flex flex-row mx-auto;
-}
-
-.column {
-  @apply flex flex-col;
-}
-
-.hint {
-  @apply font-sans;
-
-  margin-top: 48px;
-  align-items: center;
-  text-align: justify;
-  color: #808080;
-
-  div {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 500px;
-  }
-
-  @include text-size(14px, 21px);
-  @include for-size(phone-only) {
-    bottom: calc($mobile-margin / 2);
-    padding: calc($mobile-margin / 2);
-  }
-}
-
-.inputs {
-  margin-top: 12px;
-
-  > * {
-    margin-top: 24px;
-  }
-}
-
-.heading {
-  margin-top: 40px;
-}
-
-.checkbox {
-  @apply h-5 w-5 text-rui-primary;
-}
-
-.termsCheck {
-  @apply inline-flex items-center mt-8;
-}
-
-.terms {
-  @apply ml-2 text-rui-text;
-}
-
-.list {
-  @apply text-xs;
-
-  list-style-type: circle;
-  padding-left: $mobile-margin * 2;
-  color: #808080;
-}
-
-.recaptcha {
-  @apply mt-12;
-}
-</style>

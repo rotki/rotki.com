@@ -16,6 +16,8 @@ const dismiss = () => {
     boxless
     @update:model-value="dismiss()"
   >
-    <LoginForm modal @complete="dismiss()" />
+    <div class="bg-white p-8 shadow-5 rounded">
+      <LoginForm modal @complete="dismiss()" />
+    </div>
   </ModalDialog>
 </template>

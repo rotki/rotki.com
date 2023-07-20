@@ -22,7 +22,3 @@ useHead({
 <template>
   <AccountActivate />
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>

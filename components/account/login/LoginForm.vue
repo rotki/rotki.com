@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { get, set } from '@vueuse/core';
+import { required } from '@vuelidate/validators';
+import { useVuelidate } from '@vuelidate/core';
 import { useMainStore } from '~/store';
 
 const props = withDefaults(defineProps<{ modal?: boolean }>(), {
@@ -8,165 +11,124 @@ const props = withDefaults(defineProps<{ modal?: boolean }>(), {
 const emit = defineEmits<{ (e: 'complete'): void }>();
 
 const { modal } = toRefs(props);
-const username = ref('');
-const password = ref('');
-const showPassword = ref(false);
-const error = ref('');
+const username: Ref<string> = ref('');
+const password: Ref<string> = ref('');
+const loading: Ref<boolean> = ref(false);
+const error: Ref<string> = ref('');
+const hadError: Ref<boolean> = ref(false);
 
-const valid = computed(() => !!unref(username) && !!unref(password));
+const rules = {
+  username: { required },
+  password: { required },
+};
+
+const v$ = useVuelidate(
+  rules,
+  {
+    username,
+    password,
+  },
+  {
+    $autoDirty: true,
+  },
+);
 
 const { login } = useMainStore();
 
 const performLogin = async () => {
-  error.value = await login({
-    username: username.value,
-    password: password.value,
-  });
+  set(loading, true);
+  set(
+    error,
+    await login({
+      username: username.value,
+      password: password.value,
+    }),
+  );
+  set(loading, false);
 
-  if (!error.value) {
-    if (modal.value) {
+  if (!get(error)) {
+    if (get(modal)) {
       emit('complete');
     } else {
       await navigateTo('/home');
     }
+  } else {
+    set(hadError, true);
   }
 };
 
-const css = useCssModule();
+const { t } = useI18n();
 </script>
 
 <template>
-  <BoxContainer>
-    <template #label>Sign in</template>
-    <InputField
-      id="username"
-      v-model="username"
-      filled
-      label="Username"
-      type="text"
-      autocomplete="username"
-      @focus="error = ''"
-    >
-      <template #prepend>
-        <span :class="css.prepend">
-          <UserIcon />
-        </span>
-      </template>
-    </InputField>
-    <InputField
-      id="password"
-      v-model="password"
-      :class="css.password"
-      :type="showPassword ? 'text' : 'password'"
-      filled
-      autocomplete="current-password"
-      label="Password"
-      @enter="performLogin()"
-      @focus="error = ''"
-    >
-      <template #prepend>
-        <span :class="css.prepend">
-          <PasswordIcon />
-        </span>
-      </template>
-      <template #append>
-        <button :class="css.show" @click="showPassword = !showPassword">
-          <span v-if="showPassword">HIDE</span>
-          <span v-else>SHOW</span>
-        </button>
-      </template>
-    </InputField>
-
-    <div :class="css.errorWrapper">
-      <div v-if="error" :class="css.error">{{ error }}</div>
+  <div class="w-[360px] space-y-8">
+    <div class="space-y-3">
+      <div class="text-h4">{{ t('auth.login.title') }}</div>
+      <div class="text-body-1 text-rui-text-secondary">
+        {{ t('auth.login.message') }}
+      </div>
     </div>
+    <form @submit.prevent="">
+      <div class="space-y-5">
+        <RuiTextField
+          id="username"
+          v-model="username"
+          dense
+          variant="outlined"
+          :label="t('auth.common.username')"
+          autocomplete="username"
+          hide-details
+          color="primary"
+          :error-messages="error ? [error] : []"
+          @focus="error = ''"
+        />
 
-    <div :class="css.buttonContainer">
+        <RuiRevealableTextField
+          id="password"
+          v-model="password"
+          variant="outlined"
+          dense
+          :label="t('auth.common.password')"
+          autocomplete="current-password"
+          hide-details
+          color="primary"
+          :error-messages="error ? [error] : []"
+          @enter="performLogin()"
+          @focus="error = ''"
+        />
+      </div>
+
+      <div class="flex justify-end mb-6 mt-2">
+        <ButtonLink to="/password/recover" inline>
+          {{ t('auth.login.forgot_password') }}
+        </ButtonLink>
+      </div>
+
+      <div v-if="error" class="text-body-1 text-center text-rui-error pb-6">
+        {{ error }}
+      </div>
+
       <RuiButton
-        :disabled="!valid"
-        variant="default"
-        size="lg"
-        class="w-full"
+        :disabled="v$.$invalid || loading"
         color="primary"
+        :loading="loading"
+        class="w-full"
+        size="lg"
         @click="performLogin()"
       >
-        Sign in
+        {{ t('actions.continue') }}
       </RuiButton>
-    </div>
-
-    <div :class="css.reset">
-      <ButtonLink to="/password/recover" color="primary">
-        Forgot password?
+    </form>
+    <div class="flex items-center justify-center">
+      <span class="text-rui-text-secondary">
+        {{ t('auth.login.first_time_premium') }}
+      </span>
+      <ButtonLink to="/signup" inline color="primary">
+        {{ t('auth.login.sign_up_now') }}
       </ButtonLink>
     </div>
-
-    <div :class="css.divider" />
-
-    <div :class="css.create">
-      First time premium?
-      <ButtonLink to="/signup" inline color="primary"> Sign up now </ButtonLink>
-    </div>
-  </BoxContainer>
+  </div>
+  <div v-if="hadError" class="mt-14 w-[660px]">
+    <RuiAlert type="error" :description="t('auth.login.alert_error')" />
+  </div>
 </template>
-
-<style lang="scss" module>
-@import '@/assets/css/media.scss';
-@import '@/assets/css/main.scss';
-
-.buttonContainer {
-  @apply flex flex-row align-middle justify-center mt-8;
-}
-
-.reset {
-  @apply flex flex-row justify-center text-rui-primary focus:text-yellow-800 my-6;
-
-  width: 100%;
-
-  @include for-size(phone-only) {
-    margin-top: calc($mobile-margin / 2);
-    margin-bottom: calc($mobile-margin / 2);
-  }
-}
-
-.prepend {
-  @apply p-3 flex items-center;
-}
-
-.password {
-  @apply mt-5;
-}
-
-.show {
-  @apply m-2 focus:outline-none;
-
-  width: 56px;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0;
-  color: #363f41;
-}
-
-.divider {
-  @apply border border-solid border-rui-text opacity-20;
-
-  width: 328px;
-}
-
-.create {
-  @apply flex flex-row align-middle justify-center mt-6 mb-2;
-}
-
-.signup {
-  @apply font-bold ml-2;
-}
-
-.error {
-  @apply text-rui-error text-xs tracking-tight;
-}
-
-.errorWrapper {
-  @apply flex flex-row justify-center -mt-1.5;
-
-  height: 18px;
-}
-</style>

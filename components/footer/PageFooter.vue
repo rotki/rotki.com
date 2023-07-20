@@ -1,13 +1,25 @@
 <script setup lang="ts">
+withDefaults(
+  defineProps<{
+    landing?: boolean;
+  }>(),
+  {
+    landing: false,
+  },
+);
+
 const { t } = useI18n();
 
 const year = new Date().getFullYear().toString();
 </script>
 
 <template>
-  <div class="py-8 lg:py-16">
+  <div>
     <div class="container">
-      <div class="space-y-4 lg:space-y-8">
+      <div
+        v-if="landing"
+        class="space-y-4 lg:space-y-8 mt-8 mb-4 lg:mt-16 lg:mb-10"
+      >
         <div class="flex flex-col lg:flex-row justify-between items-center">
           <div class="hidden lg:block">
             <RuiLogo text />
@@ -25,9 +37,9 @@ const year = new Date().getFullYear().toString();
           <FooterLegalese />
         </div>
       </div>
-      <div class="border-t border-grey-100 my-6 lg:my-10" />
+      <div class="border-t border-grey-100" />
       <div
-        class="flex flex-col-reverse lg:flex-row justify-between items-center"
+        class="flex flex-col-reverse lg:flex-row justify-between items-center pt-4 pb-6 lg:pt-8 lg:pb-12"
       >
         <div
           class="flex flex-wrap justify-center space-x-1 text-rui-text-secondary mt-2 lg:mt-0"

@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
-import { set } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import { type Ref } from 'vue';
 import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
+import { toMessages } from '~/utils/validation';
 
 function setupTokenValidation() {
   const route = useRoute();
   const { uid, token } = route.params;
-  const validating = ref(true);
-  const isValid = ref(true);
+  const validating: Ref<boolean> = ref(true);
+  const isValid: Ref<boolean> = ref(true);
 
   const validateToken = async () => {
     try {
@@ -57,7 +58,7 @@ function setupFormValidation(
     },
   );
 
-  const valid = computed(() => !v$.value.$invalid);
+  const valid = computed(() => !get(v$).$invalid);
   return { v$, valid };
 }
 
@@ -67,15 +68,18 @@ const $externalResults = ref({});
 
 const route = useRoute();
 const { uid, token } = route.params;
+const submitting: Ref<boolean> = ref(false);
+
 const submit = async () => {
+  set(submitting, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/confirm/', {
       method: 'post',
       body: {
         uid,
         token,
-        password: password.value,
-        password_confirmation: passwordConfirmation.value,
+        password: get(password),
+        password_confirmation: get(passwordConfirmation),
       },
     });
     await navigateTo({
@@ -85,14 +89,16 @@ const submit = async () => {
     if (e instanceof FetchError && e.status === 400) {
       const message = e.data.message;
       if (message && typeof message === 'object') {
-        $externalResults.value = {
+        set($externalResults, {
           password: message.password,
           passwordConfirmation: message.password_confirmation,
-        };
+        });
       }
     } else {
       logger.error(e);
     }
+  } finally {
+    set(submitting, false);
   }
 };
 
@@ -103,98 +109,80 @@ const { valid, v$ } = setupFormValidation(
   $externalResults,
 );
 
-const css = useCssModule();
+const { t } = useI18n();
 </script>
 
 <template>
-  <PageContainer>
-    <template #title> Reset your password </template>
-
-    <div :class="css.content">
-      <LoadingIndicator v-if="validating" />
-      <UserActionMessage v-else-if="!isValid">
-        <template #header>Invalid password reset link.</template>
-        <p>
-          The link you followed doesn't seem like a valid password reset link.
-        </p>
-      </UserActionMessage>
-      <BoxContainer v-else>
-        <template #label> Provide your new password </template>
-        <InputField
-          id="password"
-          v-model="password"
-          :error-messages="v$.password.$errors"
-          filled
-          label="Password"
-          autocomplete="new-password"
-          type="password"
-        >
-          <ul :class="css.list">
-            <li>
-              Your password can't be too similar to your other personal
-              information.
-            </li>
-            <li>Your password must contain at least 8 characters.</li>
-            <li>Your password can't be a commonly used password.</li>
-
-            <li>Your password can't be entirely numeric.</li>
-          </ul>
-        </InputField>
-
-        <InputField
-          id="password-confirmation"
-          v-model="passwordConfirmation"
-          :class="css.confirmation"
-          :error-messages="v$.passwordConfirmation.$errors"
-          filled
-          hint="Enter the same password as before, for verification."
-          label="Password Confirmation"
-          type="password"
-          autocomplete="new-password"
-        />
-        <div :class="css.buttonWrapper">
-          <RuiButton
-            :disabled="!valid"
-            variant="default"
-            size="lg"
-            class="w-full mt-16"
-            color="primary"
-            @click="submit()"
-          >
-            Submit
-          </RuiButton>
+  <div
+    class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
+  >
+    <div class="w-[360px]">
+      <div v-if="validating" class="flex justify-center">
+        <RuiProgress variant="indeterminate" circular color="primary" />
+      </div>
+      <div v-else-if="!isValid" class="space-y-3">
+        <div class="text-h4">{{ t('auth.password_reset.invalid.title') }}</div>
+        <div class="text-body-1 text-rui-text-secondary">
+          {{ t('auth.password_reset.invalid.message') }}
         </div>
-      </BoxContainer>
+      </div>
+      <div v-else class="space-y-8">
+        <div class="text-h4">{{ t('auth.password_reset.title') }}</div>
+        <form class="space-y-6" @submit.prevent="">
+          <div class="space-y-5">
+            <div class="space-y-1">
+              <RuiRevealableTextField
+                id="password"
+                v-model="password"
+                dense
+                variant="outlined"
+                :label="t('auth.password_reset.form.password')"
+                hide-details
+                color="primary"
+                :error-messages="toMessages(v$.password)"
+              />
+              <ul class="ml-4 list-disc text-rui-text-secondary text-caption">
+                <li>
+                  {{ t('auth.common.password_hint.line_1') }}
+                </li>
+                <li>
+                  {{ t('auth.common.password_hint.line_2') }}
+                </li>
+                <li>
+                  {{ t('auth.common.password_hint.line_3') }}
+                </li>
+                <li>
+                  {{ t('auth.common.password_hint.line_4') }}
+                </li>
+              </ul>
+            </div>
+            <div>
+              <RuiRevealableTextField
+                id="password-confirmation"
+                v-model="passwordConfirmation"
+                dense
+                variant="outlined"
+                :label="t('auth.password_reset.form.confirm')"
+                :hint="t('auth.common.confirm_hint')"
+                color="primary"
+                :error-messages="toMessages(v$.passwordConfirmation)"
+              />
+            </div>
+          </div>
+          <div>
+            <RuiButton
+              color="primary"
+              :disabled="!valid"
+              class="w-full"
+              size="lg"
+              :loading="submitting"
+              @click="submit()"
+            >
+              {{ t('actions.submit') }}
+            </RuiButton>
+          </div>
+        </form>
+      </div>
     </div>
-  </PageContainer>
+  </div>
 </template>
-
-<style lang="scss" module>
-.buttonWrapper {
-  @apply flex flex-row align-middle justify-center;
-}
-
-.subtitle {
-  @apply text-rui-text font-medium text-center uppercase text-xs;
-}
-
-.list {
-  @apply text-xs list-disc pl-6 text-rui-text-secondary;
-}
-
-.box {
-  @apply border p-6 rounded w-full lg:w-96;
-}
-
-.label {
-  @apply text-rui-grey-800 mb-4 text-lg;
-}
-
-.confirmation {
-  @apply mt-2;
-}
-
-.content {
-  @apply flex flex-row justify-center;
-}
-</style>

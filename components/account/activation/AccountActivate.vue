@@ -22,39 +22,34 @@ const validateToken = async () => {
 };
 
 onBeforeMount(async () => await validateToken());
-
-const css = useCssModule();
+const { t } = useI18n();
 </script>
 
 <template>
-  <PageContainer>
-    <template #title> Account Activation </template>
-    <div :class="css.content">
-      <div v-if="!validating">
-        <UserActionMessage v-if="isValid">
-          <template #header>Welcome to rotki</template>
-
-          <p>Your rotki account has been successfully activated.</p>
-          <div>
-            To see your dashboard click
-            <ButtonLink to="/home" inline color="primary">here</ButtonLink>
-          </div>
-        </UserActionMessage>
-        <UserActionMessage v-else>
-          <template #header>Invalid Link</template>
-          <p>The activation link is not valid.</p>
-          <p>This can happen if you have already confirmed your account.</p>
-        </UserActionMessage>
+  <div
+    class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
+  >
+    <div class="w-[380px]">
+      <div v-if="validating" class="flex justify-center">
+        <RuiProgress variant="indeterminate" circular color="primary" />
       </div>
-      <div v-else>
-        <LoadingIndicator />
+      <div v-else-if="!isValid" class="space-y-3">
+        <div class="text-h4">{{ t('auth.activation.invalid.title') }}</div>
+        <div class="text-body-1 text-rui-text-secondary">
+          {{ t('auth.activation.invalid.message') }}
+        </div>
+      </div>
+      <div v-else class="space-y-3">
+        <div class="text-h4">{{ t('auth.activation.success.title') }}</div>
+        <div class="text-body-1 text-rui-text-secondary">
+          <span>
+            {{ t('auth.activation.success.message') }}
+          </span>
+          <ButtonLink to="/home" inline color="primary">
+            {{ t('common.here') }}
+          </ButtonLink>
+        </div>
       </div>
     </div>
-  </PageContainer>
+  </div>
 </template>
-
-<style module lang="scss">
-.content {
-  @apply flex flex-row justify-center;
-}
-</style>

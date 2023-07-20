@@ -21,7 +21,3 @@ useHead({
 <template>
   <PasswordForm />
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>

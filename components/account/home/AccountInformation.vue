@@ -203,17 +203,11 @@ const css = useCssModule();
       @blur="v$.country.$touch()"
     />
 
-    <RuiButton
-      variant="outlined"
-      size="lg"
-      class="uppercase outline-2 mt-4"
-      :loading="loading"
-      rounded
-      color="primary"
-      @click="update()"
-    >
-      Update
-    </RuiButton>
+    <div class="mt-8">
+      <RuiButton size="lg" :loading="loading" color="primary" @click="update()">
+        Update
+      </RuiButton>
+    </div>
   </CardContainer>
 </template>
 

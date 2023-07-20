@@ -1,16 +1,27 @@
-export interface SignupPayload {
+export interface SignupAccountPayload {
   readonly username: string;
   readonly email: string;
   readonly password: string;
   readonly confirmPassword: string;
+  readonly githubUsername: string;
+}
+
+export interface SignupCustomerInformationPayload {
   readonly firstName: string;
   readonly lastName: string;
   readonly companyName: string;
+  readonly vatId: string;
+}
+
+export interface SignupAddressPayload {
   readonly address1: string;
   readonly address2: string;
   readonly city: string;
-  readonly country: string;
   readonly postcode: string;
-  readonly githubUsername: string;
-  readonly vatId: string;
+  readonly country: string;
 }
+
+export interface SignupPayload
+  extends SignupAccountPayload,
+    SignupCustomerInformationPayload,
+    SignupAddressPayload {}

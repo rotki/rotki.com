@@ -13,9 +13,9 @@ type ResultSuccess<T> = {
 
 export type Result<T, Code = undefined> = ResultError<Code> | ResultSuccess<T>;
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T, M = string> {
   readonly result: T | null;
-  readonly message: string;
+  readonly message: M;
 }
 
 const StringArray = z.array(z.string());

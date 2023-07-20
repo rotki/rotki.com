@@ -2,6 +2,7 @@
 import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
 import { FetchError } from 'ofetch';
+import { get, set } from '@vueuse/core';
 import { fetchWithCsrf } from '~/utils/api';
 import { logger } from '~/utils/logger';
 
@@ -9,7 +10,7 @@ const emailAddress = ref('');
 const loading = ref(false);
 const captchaId = ref<number>();
 const recaptcha = useRecaptcha();
-const { onError, onExpired, onSuccess } = recaptcha;
+const { onError, onExpired, onSuccess, recaptchaToken } = recaptcha;
 
 const rules = {
   email: { required, email },
@@ -19,7 +20,7 @@ const rules = {
 const $externalResults = ref({});
 const v$ = useVuelidate(
   rules,
-  { email: emailAddress, captcha: recaptcha.recaptchaToken },
+  { email: emailAddress, captcha: recaptchaToken },
   {
     $autoDirty: true,
     $externalResults,
@@ -27,17 +28,17 @@ const v$ = useVuelidate(
 );
 
 const setCaptchaId = (v: number) => {
-  captchaId.value = v;
+  set(captchaId, v);
 };
 
 const reset = async () => {
-  loading.value = true;
+  set(loading, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/request/', {
       method: 'post',
       body: {
-        captcha: recaptcha.recaptchaToken.value,
-        email: emailAddress.value,
+        captcha: get(recaptchaToken),
+        email: get(emailAddress),
       },
     });
     await navigateTo({
@@ -49,66 +50,58 @@ const reset = async () => {
       e.status === 400 &&
       e.data?.message?.captcha
     ) {
-      window.grecaptcha?.reset(captchaId.value);
+      window.grecaptcha?.reset(get(captchaId));
       onExpired();
-      $externalResults.value = e.data.message;
+      set($externalResults, e.data.message);
     }
 
     logger.error(e);
   }
-  loading.value = false;
+  set(loading, false);
 };
 
-const css = useCssModule();
+const { t } = useI18n();
 </script>
 
 <template>
-  <PageContainer>
-    <template #title> Reset your password</template>
-    <div :class="css.content">
-      <BoxContainer>
-        <template #label> Recover password</template>
-        <InputField
-          id="email"
-          v-model="emailAddress"
-          filled
-          label="Email"
-          autocomplete="email"
-        />
-        <Recaptcha
-          :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
-          @error="onError()"
-          @expired="onExpired()"
-          @success="onSuccess($event)"
-          @captcha-id="setCaptchaId($event)"
-        />
+  <div
+    class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
+  >
+    <div class="w-[360px] space-y-8">
+      <div class="text-h4">{{ t('auth.recover_password.title') }}</div>
 
+      <form class="space-y-6" @submit.prevent="">
+        <div class="space-y-5">
+          <RuiTextField
+            id="email"
+            v-model="emailAddress"
+            dense
+            variant="outlined"
+            :label="t('auth.common.email')"
+            autocomplete="email"
+            hide-details
+            color="primary"
+          />
+
+          <Recaptcha
+            :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
+            @error="onError()"
+            @expired="onExpired()"
+            @success="onSuccess($event)"
+            @captcha-id="setCaptchaId($event)"
+          />
+        </div>
         <RuiButton
-          :disabled="v$.$invalid || loading"
-          :loading="loading"
-          variant="default"
-          size="lg"
-          class="w-full"
           color="primary"
+          :disabled="v$.$invalid || loading"
+          class="w-full"
+          size="lg"
+          :loading="loading"
           @click="reset()"
         >
-          Submit
+          {{ t('actions.submit') }}
         </RuiButton>
-      </BoxContainer>
+      </form>
     </div>
-  </PageContainer>
+  </div>
 </template>
-
-<style lang="scss" module>
-.button {
-  @apply mt-12;
-}
-
-.recaptcha {
-  @apply mt-4 h-20;
-}
-
-.content {
-  @apply flex flex-row justify-center;
-}
-</style>

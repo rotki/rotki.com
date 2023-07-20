@@ -1,12 +1,11 @@
 @import "media";
 
 .page {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
+  @apply overflow-x-hidden scroll-smooth;
 }
 
 .body {
-  @apply overflow-x-hidden overflow-y-hidden text-rui-text;
+  @apply text-rui-text;
 }
 
 .container {
@@ -18,5 +17,5 @@
 }
 
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+  @apply opacity-0;
 }

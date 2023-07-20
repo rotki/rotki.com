@@ -21,7 +21,3 @@ useHead({
 <template>
   <LoginPage />
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>

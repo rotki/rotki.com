@@ -86,8 +86,8 @@ devDependencies:
     specifier: 1.1.0
     version: 1.1.0(eslint@8.45.0)(vue@3.3.4)
   '@rotki/ui-library':
-    specifier: 0.2.2
-    version: 0.2.2(@vueuse/core@10.2.1)(@vueuse/shared@10.2.1)(vue@3.3.4)
+    specifier: 0.2.3
+    version: 0.2.3(@vueuse/core@10.2.1)(@vueuse/shared@10.2.1)(vue@3.3.4)
   '@types/braintree-web':
     specifier: 3.75.23
     version: 3.75.23
@@ -2237,8 +2237,8 @@ packages:
       - vue
     dev: true
 
-  /@rotki/ui-library@0.2.2(@vueuse/core@10.2.1)(@vueuse/shared@10.2.1)(vue@3.3.4):
-    resolution: {integrity: sha512-LgOMSSYzhVQso8SM2DoPNiqXCosA82zvWtGYDGAjISOPQDdgQMjUGAMP7hBSkyxgpf9NDbeDWx7nMmz4u9fx2A==}
+  /@rotki/ui-library@0.2.3(@vueuse/core@10.2.1)(@vueuse/shared@10.2.1)(vue@3.3.4):
+    resolution: {integrity: sha512-3J8ZjEMt2JlkhGPtf4ZXJ+MMLyr7XsR/Tg+CytLsu+/mET1C5c4HIa8Zr01kb3PXAHO1Mx2Bcb9GCmrGCNBSSg==}
     engines: {pnpm: '>=8 <9'}
     peerDependencies:
       '@vueuse/core': '>10.0.0'

@@ -22,6 +22,10 @@ useHead({
   ],
   ...commonAttrs(),
 });
+
+definePageMeta({
+  layout: 'landing',
+});
 </script>
 
 <template>

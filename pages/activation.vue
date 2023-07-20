@@ -18,7 +18,3 @@ useHead({
 <template>
   <PendingActivation />
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>

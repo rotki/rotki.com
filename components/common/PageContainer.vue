@@ -46,7 +46,7 @@ const slots = useSlots();
 @import '@/assets/css/main.scss';
 
 .wrapper {
-  @apply container flex flex-col flex-grow min-h-screen px-4;
+  @apply container flex flex-col flex-grow min-h-screen py-12;
 }
 
 .subtitle {

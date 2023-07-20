@@ -22,7 +22,3 @@ useHead({
 <template>
   <PasswordChanged />
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>
