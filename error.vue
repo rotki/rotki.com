@@ -41,10 +41,10 @@ useHead(() => ({
   @apply text-center my-24;
 }
 .title {
-  @apply block font-serif text-red-500 font-bold text-6xl;
+  @apply block text-red-500 font-bold text-6xl;
 }
 
 .subtitle {
-  @apply block font-sans font-light text-primary2 my-8 text-3xl;
+  @apply block font-light text-rui-text my-8 text-3xl;
 }
 </style>

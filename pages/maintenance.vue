@@ -55,7 +55,7 @@ const css = useCssModule();
 }
 
 .link {
-  @apply text-primary hover:text-primary3 font-bold;
+  @apply text-rui-primary hover:text-rui-primary-darker font-bold;
 }
 
 .heading {
@@ -63,6 +63,6 @@ const css = useCssModule();
 }
 
 .description {
-  @apply font-sans text-typography text-base mt-8 text-center text-xl;
+  @apply text-rui-text text-base mt-8 text-center text-xl;
 }
 </style>

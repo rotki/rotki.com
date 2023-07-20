@@ -13,10 +13,10 @@ const css = useCssModule();
 
 <style module lang="scss">
 .body {
-  @apply font-sans text-shade11 text-xl;
+  @apply text-rui-grey-800 text-xl;
 }
 
 .header {
-  @apply font-serif font-bold text-shade11 pb-2 text-2xl mb-4;
+  @apply font-bold text-rui-grey-800 pb-2 text-2xl mb-4;
 }
 </style>

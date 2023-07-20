@@ -60,7 +60,7 @@ const css = useCssModule();
 }
 
 .heading {
-  @apply font-serif text-shade11 mb-4;
+  @apply text-rui-grey-800 mb-4;
 }
 
 .tableWrapper {

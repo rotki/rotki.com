@@ -14,7 +14,7 @@ const css = useCssModule();
 @import '@/assets/css/media.scss';
 
 .column {
-  @apply flex flex-col font-sans uppercase justify-center text-primary2;
+  @apply flex flex-col uppercase justify-center text-rui-text;
 
   margin-left: 16px;
   margin-right: 16px;
@@ -26,6 +26,6 @@ const css = useCssModule();
 }
 
 .link {
-  @apply hover:text-shade8;
+  @apply hover:text-rui-text-secondary;
 }
 </style>

@@ -1,61 +1,22 @@
 @import "media";
 
 .page {
-  @apply bg-background bg-rotki-pattern bg-local bg-right-top bg-no-repeat;
-
   scroll-behavior: smooth;
   overflow-x: hidden;
-
-  @include for-size(phone-only) {
-    background-size: 4.5rem;
-  }
-
-  @include for-size(tablet-portrait-up) {
-   background-size: 5rem;
-  }
-
-  @include for-size(desktop-up) {
-    background-size: 7.5rem;
-  }
-
-  @include for-size(big-desktop-up) {
-    background-size: 12rem;
-  }
-
 }
 
 .body {
-  @apply bg-rotki-logo bg-local bg-left-top bg-no-repeat overflow-x-hidden overflow-y-hidden;
-
-  @include for-size(phone-only) {
-    background-size: 4rem;
-  }
-
-  @include for-size(tablet-portrait-up) {
-    background-size: 5rem;
-  }
-
-  @include for-size(desktop-up) {
-    background-size: 6.5rem;
-  }
-
-  @include for-size(big-desktop-up) {
-    background-size: 11rem;
-  }
-
+  @apply overflow-x-hidden overflow-y-hidden text-rui-text;
 }
 
-$mobile-margin: 16px;
-
-$mobile-font-percentage: 0.7;
-$tablet-font-percentage: 0.8;
-
-$mobile-button-percentage: 0.8;
-$mobile-image-percentage: 0.4;
+.container {
+  @apply px-4;
+}
 
 .fade-enter-active, .fade-leave-active {
   transition: opacity .4s;
 }
+
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }

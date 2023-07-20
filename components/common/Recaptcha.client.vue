@@ -98,6 +98,6 @@ onMounted(() => {
 }
 
 .error {
-  @apply text-xs font-sans text-[#e53935] mt-2;
+  @apply text-xs text-[#e53935] mt-2;
 }
 </style>

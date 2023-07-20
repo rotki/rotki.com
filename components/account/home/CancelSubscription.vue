@@ -92,15 +92,15 @@ const css = useCssModule();
 @import '@/assets/css/media.scss';
 
 .actionButton {
-  @apply text-primary hover:text-yellow-500 focus:outline-none;
+  @apply text-rui-primary hover:text-yellow-500 focus:outline-none;
 }
 
 .title {
-  @apply font-sans text-primary2 font-bold text-xl;
+  @apply text-rui-text font-bold text-xl;
 }
 
 .text {
-  @apply font-sans text-primary2 whitespace-normal mt-4;
+  @apply text-rui-text whitespace-normal mt-4;
 
   @include text-size(16px, 24px);
 }

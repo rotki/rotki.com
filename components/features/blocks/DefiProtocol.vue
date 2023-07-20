@@ -65,7 +65,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply font-serif font-bold text-shade11 flex-col flex self-center;
+  @apply font-bold text-rui-grey-800 flex-col flex self-center;
 
   margin-left: 18px;
   letter-spacing: -0.03em;
@@ -74,7 +74,7 @@ const css = useCssModule();
 }
 
 .description {
-  @apply font-sans text-primary2;
+  @apply text-rui-text;
 
   margin-top: 27px;
   padding-right: 16px;

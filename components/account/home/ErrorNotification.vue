@@ -32,10 +32,10 @@ const css = useCssModule();
 }
 
 .errorTitle {
-  @apply font-sans font-bold;
+  @apply font-bold;
 }
 
 .errorDescription {
-  @apply font-sans text-shade11;
+  @apply text-rui-grey-800;
 }
 </style>

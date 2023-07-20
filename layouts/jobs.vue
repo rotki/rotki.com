@@ -42,10 +42,10 @@ await loadJobs();
 }
 
 .link {
-  @apply text-xs font-bold uppercase px-5 py-3 border-primary border rounded block leading-normal text-primary;
+  @apply text-xs font-bold uppercase px-5 py-3 border-rui-primary border rounded block leading-normal text-rui-primary;
 }
 
 .active {
-  @apply text-white bg-primary;
+  @apply text-white bg-rui-primary;
 }
 </style>

@@ -24,7 +24,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply text-typography;
+  @apply text-rui-text;
 
   font-size: 18px;
   line-height: 21px;
@@ -32,7 +32,7 @@ const css = useCssModule();
 }
 
 .description {
-  @apply text-typography;
+  @apply text-rui-text;
 
   padding-top: 8px;
   font-size: 15px;

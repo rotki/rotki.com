@@ -97,7 +97,7 @@ const css = useCssModule();
 }
 
 .emphasis {
-  @apply font-sans font-bold;
+  @apply font-bold;
 
   font-size: 28px;
   line-height: 33px;

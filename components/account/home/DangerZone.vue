@@ -109,10 +109,10 @@ const css = useCssModule();
 }
 
 .warning {
-  @apply mb-2 text-shade11 font-bold;
+  @apply mb-2 text-rui-grey-800 font-bold;
 }
 
 .title {
-  @apply font-sans text-primary2 font-bold text-xl;
+  @apply text-rui-text font-bold text-xl;
 }
 </style>

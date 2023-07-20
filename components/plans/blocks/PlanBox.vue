@@ -52,7 +52,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply font-bold text-primary2 font-serif text-center;
+  @apply font-bold text-rui-text text-center;
 
   letter-spacing: -0.01em;
 
@@ -60,7 +60,7 @@ const css = useCssModule();
 }
 
 .description {
-  @apply font-sans text-center text-primary2 flex flex-col self-center;
+  @apply text-center text-rui-text flex flex-col self-center;
 
   margin-top: 45px;
   max-width: 370px;

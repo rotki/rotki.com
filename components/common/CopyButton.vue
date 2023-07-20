@@ -33,7 +33,7 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .button {
-  @apply hover:bg-shade1 rounded-2xl focus:outline-none;
+  @apply hover:bg-rui-grey-100 rounded-2xl focus:outline-none;
 
   padding: 8px;
 }

@@ -26,7 +26,7 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .text {
-  @apply font-sans text-shade11 text-justify mt-4;
+  @apply text-rui-grey-800 text-justify mt-4;
   @apply text-[0.7875rem] sm:text-[0.9rem] md:text-[1.0125rem] 2xl:text-[1.2375rem];
   @apply leading-[1.1375rem] sm:leading-[1.3rem] md:leading-[1.4625rem] 2xl:leading-[1.7875rem];
 }

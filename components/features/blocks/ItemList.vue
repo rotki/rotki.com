@@ -21,7 +21,7 @@ const css = useCssModule();
 }
 
 .list {
-  @apply font-sans font-light text-black;
+  @apply font-light text-black;
 
   @include text-size(24px, 32px);
 }
@@ -32,7 +32,7 @@ const css = useCssModule();
 }
 
 .list li::before {
-  @apply text-primary;
+  @apply text-rui-primary;
 
   margin-top: 12px;
   margin-right: 8px;

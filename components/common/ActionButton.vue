@@ -57,7 +57,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .button {
-  @apply relative overflow-hidden transition transform hover:scale-110;
+  @apply relative overflow-hidden transition transform hover:scale-110 font-bold;
 
   &::after {
     content: '';
@@ -80,7 +80,7 @@ const css = useCssModule();
 }
 
 .small {
-  @apply font-sans rounded focus:outline-none px-4 bg-primary3 font-bold;
+  @apply rounded focus:outline-none px-4 bg-rui-primary-darker font-bold;
 
   $button-height: 48px;
 
@@ -94,7 +94,7 @@ const css = useCssModule();
 }
 
 .large {
-  @apply font-serif uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-shade12 focus:ring-opacity-75;
+  @apply uppercase rounded-full border-2 focus:outline-none focus:ring-1 focus:ring-rui-primary focus:ring-opacity-75;
 
   $button-height: 65px;
   $button-width: 275px;
@@ -111,12 +111,12 @@ const css = useCssModule();
 
 .large:disabled,
 .small:disabled {
-  @apply bg-shade5 hover:bg-shade5;
+  @apply bg-rui-grey-400 hover:bg-rui-grey-400;
 }
 
 .loading:disabled,
 .primary {
-  @apply text-white bg-primary font-bold;
+  @apply text-white bg-rui-primary;
 }
 
 .warning {
@@ -124,11 +124,11 @@ const css = useCssModule();
 }
 
 .secondary {
-  @apply text-primary border-primary hover:bg-shade1 font-bold;
+  @apply text-rui-primary border-rui-primary hover:bg-rui-grey-100;
 }
 
 .filled {
-  @apply text-primary border-transparent hover:bg-shade1 bg-white;
+  @apply text-rui-primary border-transparent hover:bg-rui-grey-100 bg-white;
 }
 
 .row {

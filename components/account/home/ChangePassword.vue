@@ -141,6 +141,6 @@ const css = useCssModule();
 }
 
 .success {
-  @apply flex flex-row ml-4 mt-6 text-shade11 transition duration-300 ease-in-out;
+  @apply flex flex-row ml-4 mt-6 text-rui-grey-800 transition duration-300 ease-in-out;
 }
 </style>

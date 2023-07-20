@@ -67,6 +67,9 @@ devDependencies:
   '@commitlint/config-conventional':
     specifier: 17.6.6
     version: 17.6.6
+  '@fontsource/roboto':
+    specifier: 5.0.5
+    version: 5.0.5
   '@nuxt/content':
     specifier: 2.7.0
     version: 2.7.0
@@ -79,6 +82,9 @@ devDependencies:
   '@rotki/eslint-config':
     specifier: 1.1.0
     version: 1.1.0(eslint@8.45.0)(vue@3.3.4)
+  '@rotki/ui-library':
+    specifier: 0.1.2
+    version: 0.1.2(vue@3.3.4)
   '@types/braintree-web':
     specifier: 3.75.23
     version: 3.75.23
@@ -1188,6 +1194,10 @@ packages:
     resolution: {integrity: sha512-Ag+9YM4ocKQx9AarydN0KY2j0ErMHNIocPDrVo8zAE44xLTjEtz81OdR68/cydGtk6m6jDb5Za3r2useMzYmSw==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
+  /@fontsource/roboto@5.0.5:
+    resolution: {integrity: sha512-IMXFq5AMgGx0sgNLfwWsmPuy3qa7lmDmQcXXihqwF4mT2UpD725cbxZj93ERY793OWon+6V1ANax02I3nt9+4w==}
+    dev: true
+
   /@hapi/hoek@9.3.0:
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
     dev: true
@@ -2222,6 +2232,15 @@ packages:
       - eslint-import-resolver-webpack
       - supports-color
       - vue
+    dev: true
+
+  /@rotki/ui-library@0.1.2(vue@3.3.4):
+    resolution: {integrity: sha512-2gzD/kjuw13Pxpsjcf/8BzQkN36Yhg1FltrkVJNFABcpimkGkZZLgyIeDWw4V6BnLkQUCRhAYUfj1Jb6Sxjviw==}
+    engines: {pnpm: '>=8 <9'}
+    peerDependencies:
+      vue: '>=3.3.4'
+    dependencies:
+      vue: 3.3.4
     dev: true
 
   /@sideway/address@4.1.4:

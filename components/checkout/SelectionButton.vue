@@ -42,7 +42,7 @@ const css = useCssModule();
 $color: #da4e24;
 
 .text {
-  @apply font-sans font-bold;
+  @apply font-bold;
 
   line-height: 19px;
   font-size: 16px;

@@ -30,7 +30,7 @@ const css = useCssModule();
 }
 
 .header {
-  @apply font-bold font-serif text-primary2;
+  @apply font-bold text-rui-text;
 
   text-align: center;
   letter-spacing: -0.03em;

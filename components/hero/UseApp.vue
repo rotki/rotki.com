@@ -95,7 +95,7 @@ const css = useCssModule();
 }
 
 .text {
-  @apply flex-col text-shade8 font-regular align-middle;
+  @apply flex-col text-rui-text-secondary align-middle;
 
   @include text-size(32px, 50px);
 }

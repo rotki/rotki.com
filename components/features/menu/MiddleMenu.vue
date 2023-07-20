@@ -136,13 +136,13 @@ const css = useCssModule();
 }
 
 .menu {
-  @apply flex flex-row font-sans justify-center font-light text-center;
+  @apply flex flex-row justify-center font-light text-center;
 
   @include text-size(24px, 32px);
 }
 
 .sticky {
-  @apply bg-background;
+  @apply bg-rui-grey-100;
 
   position: fixed;
   top: 0;
@@ -177,6 +177,6 @@ const css = useCssModule();
 }
 
 .active {
-  @apply text-primary font-medium;
+  @apply text-rui-primary font-medium;
 }
 </style>

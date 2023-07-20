@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
+
 const props = withDefaults(
   defineProps<{
     url: string;
@@ -15,24 +17,20 @@ const props = withDefaults(
 
 const { text, url } = toRefs(props);
 const display = computed(() => (text.value ? text.value : url.value));
-const css = useCssModule();
+
+const attrs = useAttrs();
 </script>
 
 <template>
   <NuxtLink
-    :class="css.link"
     :href="url"
     :target="sameTab ? '_self' : '_blank'"
     :rel="noRef ? 'noreferrer' : null"
   >
-    <slot>
-      {{ display }}
-    </slot>
+    <RuiButton v-bind="attrs" variant="text">
+      <slot>
+        {{ display }}
+      </slot>
+    </RuiButton>
   </NuxtLink>
 </template>
-
-<style module>
-.link {
-  @apply hover:text-shade8 text-primary;
-}
-</style>

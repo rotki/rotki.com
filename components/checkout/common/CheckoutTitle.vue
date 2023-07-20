@@ -10,6 +10,6 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .title {
-  @apply font-serif font-bold text-3xl text-typography;
+  @apply font-bold text-3xl text-rui-text;
 }
 </style>

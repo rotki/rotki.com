@@ -27,6 +27,6 @@ const css = useCssModule();
 }
 
 .label {
-  @apply text-typography font-serif mb-6 font-bold text-2xl;
+  @apply text-rui-text mb-6 font-bold text-2xl;
 }
 </style>
