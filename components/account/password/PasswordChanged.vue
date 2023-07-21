@@ -5,7 +5,7 @@
       <template #header>Password changed.</template>
       <div>
         Your password has been changed. Go to your
-        <ExternalLink same-tab text="account" url="/home" />.
+        <ButtonLink to="/home" inline color="primary">account</ButtonLink>.
       </div>
     </UserActionMessage>
   </PageContainer>

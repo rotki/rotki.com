@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
@@ -47,13 +48,16 @@ const css = useCssModule();
         <CopyButton :class="css.button" :model-value="apiSecret" />
       </div>
     </div>
-    <ActionButton
-      :class="css.actionButton"
-      primary
-      small
-      :text="hasApiKeys ? 'Regenerate' : 'Generate'"
+    <RuiButton
+      variant="outlined"
+      size="lg"
+      class="uppercase outline-2 mt-3"
+      rounded
+      color="primary"
       @click="regenerateKeys()"
-    />
+    >
+      {{ hasApiKeys ? 'Regenerate' : 'Generate' }}
+    </RuiButton>
   </CardContainer>
 </template>
 
@@ -80,10 +84,6 @@ const css = useCssModule();
 
 .toggle {
   @apply ml-3 mt-1 mr-0 mb-0;
-}
-
-.actionButton {
-  @apply mt-3;
 }
 
 .heading {

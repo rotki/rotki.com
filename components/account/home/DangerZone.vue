@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { type ActionResult } from '~/types/common';
@@ -45,14 +46,17 @@ const css = useCssModule();
       You cannot delete your account while you have an active subscription.
     </p>
 
-    <ActionButton
+    <RuiButton
       :disabled="isSubscriber"
-      primary
-      small
-      text="Delete My Account"
-      warning
+      variant="outlined"
+      size="lg"
+      class="uppercase outline-2"
+      rounded
+      color="warning"
       @click="confirm = true"
-    />
+    >
+      Delete My Account
+    </RuiButton>
 
     <ModalDialog v-model="confirm" padding="1rem">
       <div :class="css.title">Delete Account</div>
@@ -69,15 +73,26 @@ const css = useCssModule();
       <InputField id="user-confirm" v-model="usernameConfirmation" />
 
       <div :class="css.buttons">
-        <ActionButton filled small text="Cancel" @click="confirm = false" />
-        <ActionButton
-          :disabled="username !== usernameConfirmation"
-          primary
-          small
-          text="Confirm"
-          warning
+        <RuiButton
+          variant="default"
+          size="lg"
+          class="uppercase"
+          rounded
+          color="warning"
+          @click="confirm = false"
+        >
+          Cancel
+        </RuiButton>
+        <RuiButton
+          variant="outlined"
+          size="lg"
+          class="uppercase outline-2"
+          rounded
+          color="warning"
           @click="deleteAccount()"
-        />
+        >
+          Confirm
+        </RuiButton>
       </div>
     </ModalDialog>
     <ErrorNotification :visible="!!error">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { useMainStore } from '~/store';
 
 const props = withDefaults(defineProps<{ modal?: boolean }>(), {
@@ -82,30 +83,29 @@ const css = useCssModule();
     </div>
 
     <div :class="css.buttonContainer">
-      <ActionButton
-        :class="css.button"
+      <RuiButton
         :disabled="!valid"
-        primary
-        small
-        text="Sign in"
+        variant="default"
+        size="lg"
+        class="w-full"
+        color="primary"
         @click="performLogin()"
-      />
+      >
+        Sign in
+      </RuiButton>
     </div>
 
     <div :class="css.reset">
-      <ExternalLink same-tab text="Forgot password?" url="/password/recover" />
+      <ButtonLink to="/password/recover" color="primary">
+        Forgot password?
+      </ButtonLink>
     </div>
 
     <div :class="css.divider" />
 
     <div :class="css.create">
       First time premium?
-      <ExternalLink
-        :class="css.signup"
-        same-tab
-        text="Sign up now"
-        url="/signup"
-      />
+      <ButtonLink to="/signup" inline color="primary"> Sign up now </ButtonLink>
     </div>
   </BoxContainer>
 </template>
@@ -116,10 +116,6 @@ const css = useCssModule();
 
 .buttonContainer {
   @apply flex flex-row align-middle justify-center mt-8;
-}
-
-.button {
-  width: 288px;
 }
 
 .reset {

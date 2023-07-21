@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { type Subscription } from '~/types';
 import { useMainStore } from '~/store';
 
@@ -41,11 +42,14 @@ const css = useCssModule();
           <li>
             Did you know that as a premium user by providing your Github
             username you have priority for all issues reported in our
-            <ExternalLink
-              no-ref
-              text="bug tracker"
-              url="https://github.com/rotki/rotki/issues"
-            />
+            <ButtonLink
+              inline
+              color="primary"
+              external
+              to="https://github.com/rotki/rotki/issues"
+            >
+              bug tracker
+            </ButtonLink>
             ? The same applies to any feature requests.
           </li>
           <li>
@@ -76,12 +80,27 @@ const css = useCssModule();
         </p>
 
         <div :class="css.buttons">
-          <ActionButton filled small @click="confirm = false">
+          <RuiButton
+            variant="default"
+            size="lg"
+            class="uppercase"
+            rounded
+            color="primary"
+            @click="confirm = false"
+          >
             No don't cancel
-          </ActionButton>
-          <ActionButton primary small warning @click="cancelSubscription()">
+          </RuiButton>
+
+          <RuiButton
+            variant="outlined"
+            size="lg"
+            class="uppercase outline-2"
+            rounded
+            color="warning"
+            @click="cancelSubscription()"
+          >
             Yes, cancel my subscription
-          </ActionButton>
+          </RuiButton>
         </div>
       </div>
     </ModalDialog>
@@ -114,10 +133,6 @@ const css = useCssModule();
 }
 
 .buttons {
-  @apply flex flex-row mt-4 justify-end;
-
-  button:first-child {
-    @apply mr-2;
-  }
+  @apply flex flex-row mt-4 justify-end space-x-2;
 }
 </style>

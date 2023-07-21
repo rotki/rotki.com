@@ -25,12 +25,9 @@ const css = useCssModule();
     <div :class="css['list-container']">
       <ItemList :list="defi" />
     </div>
-    <ExternalLink
-      :class="css.link"
-      same-tab
-      :text="t('home.more_information')"
-      url="/supported#defi"
-    />
+    <ButtonLink :class="css.link" to="/supported#defi">
+      {{ t('home.more_information') }}
+    </ButtonLink>
   </FeatureContainer>
 </template>
 

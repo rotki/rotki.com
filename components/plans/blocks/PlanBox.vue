@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { get } from '@vueuse/core';
 
 const props = defineProps<{
@@ -29,8 +30,17 @@ const css = useCssModule();
     </div>
     <div :class="css.description">
       <slot />
-      <div :class="css.button">
-        <ActionButton :text="action" @click="buttonClicked()" />
+      <div :class="css.button" class="flex justify-center">
+        <RuiButton
+          variant="outlined"
+          size="lg"
+          class="!py-4 !px-10 !text-xl uppercase outline-2"
+          rounded
+          color="primary"
+          @click="buttonClicked()"
+        >
+          {{ action }}
+        </RuiButton>
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@ import {
   RiDiscordLine,
   RiExternalLinkLine,
   RiGithubLine,
+  RiLogoutBoxRLine,
   RiMailSendLine,
   RiTwitterLine,
   RuiPlugin,
@@ -12,11 +13,12 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(RuiPlugin, {
     mode: 'light',
     icons: [
+      RiDiscordLine,
       RiExternalLinkLine,
       RiGithubLine,
-      RiTwitterLine,
-      RiDiscordLine,
+      RiLogoutBoxRLine,
       RiMailSendLine,
+      RiTwitterLine,
     ],
   });
 });

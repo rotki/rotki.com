@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
@@ -113,17 +114,18 @@ const css = useCssModule();
     />
 
     <div :class="css.row">
-      <ActionButton
-        :class="css.confirm"
+      <RuiButton
         :disabled="v$.$invalid"
+        variant="outlined"
+        size="lg"
+        class="uppercase outline-2 mt-4"
         :loading="loading"
-        primary
-        small
-        text="Change Password"
+        rounded
+        color="primary"
         @click="changePassword()"
       >
-        <SpinnerIcon v-if="loading" class="animate-spin" />
-      </ActionButton>
+        Change Password
+      </RuiButton>
       <span v-if="success" :class="css.success">
         <CheckMarkIcon /> Your password has been changed.
       </span>
@@ -132,10 +134,6 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-.confirm {
-  @apply mt-4;
-}
-
 .row {
   @apply flex-row flex;
 }

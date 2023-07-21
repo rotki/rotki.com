@@ -1,6 +1,16 @@
 <script setup lang="ts">
-import { RuiButton, RuiLogo } from '@rotki/ui-library';
+import { RuiButton, RuiIcon, RuiLogo } from '@rotki/ui-library';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
 const { t } = useI18n();
+
+const store = useMainStore();
+const { authenticated } = storeToRefs(store);
+
+const logout = async () => {
+  await store.logout(true);
+  await navigateTo('/login');
+};
 </script>
 
 <template>
@@ -14,11 +24,24 @@ const { t } = useI18n();
       <div>
         <NavigationMenu />
       </div>
-      <NuxtLink to="/home">
-        <RuiButton rounded color="primary">
-          {{ t('page_header.manage_premium') }}
+      <div class="flex items-center space-x-2">
+        <NuxtLink to="/home">
+          <RuiButton rounded color="primary">
+            {{ t('page_header.manage_premium') }}
+          </RuiButton>
+        </NuxtLink>
+        <RuiButton
+          v-if="authenticated"
+          title="Logout"
+          color="primary"
+          variant="text"
+          icon
+          class="!p-2"
+          @click="logout()"
+        >
+          <RuiIcon name="logout-box-r-line" />
         </RuiButton>
-      </NuxtLink>
+      </div>
     </div>
   </div>
 </template>

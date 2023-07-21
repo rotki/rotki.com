@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { RuiButton } from '@rotki/ui-library';
 import { get } from '@vueuse/core';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
@@ -26,12 +27,18 @@ useHead(() => ({
     <div v-if="error" :class="css.wrapper">
       <h1 :class="css.title">{{ statusCode }}</h1>
       <p :class="css.subtitle">{{ title }}</p>
-      <ActionButton
-        :text="t('actions.go_back_home')"
-        primary
-        small
-        @click="handleError()"
-      />
+
+      <div class="flex justify-center">
+        <RuiButton
+          variant="default"
+          size="lg"
+          filled
+          color="primary"
+          @click="handleError()"
+        >
+          {{ t('actions.go_back_home') }}
+        </RuiButton>
+      </div>
     </div>
   </PageContainer>
 </template>
