@@ -68,7 +68,7 @@ const attrs = useAttrs();
 }
 
 .title {
-  @apply flex flex-row font-serif font-bold text-shade11;
+  @apply flex flex-row font-bold text-rui-grey-800;
 
   letter-spacing: -0.03em;
   margin-bottom: 27px;

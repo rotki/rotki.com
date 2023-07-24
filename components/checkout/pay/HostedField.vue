@@ -63,7 +63,7 @@ const css = useCssModule();
   }
 
   &.error ~ label {
-    @apply text-error;
+    @apply text-rui-error;
   }
 
   &.focused ~ label {
@@ -71,7 +71,7 @@ const css = useCssModule();
   }
 
   &.focused:not(.error) ~ label {
-    @apply text-primary3;
+    @apply text-rui-primary-darker;
   }
 
   &:not(.empty):not(.focused) ~ label {
@@ -79,7 +79,7 @@ const css = useCssModule();
   }
 
   &:not(.empty):not(.focused):not(.error) ~ label {
-    @apply text-label;
+    @apply text-rui-text-secondary;
   }
 }
 
@@ -92,13 +92,13 @@ const css = useCssModule();
   &.error {
     &::before,
     &::after {
-      @apply bg-error w-1/2;
+      @apply bg-rui-error w-1/2;
     }
   }
 
   &::before,
   &::after {
-    @apply absolute bottom-0 w-0 bg-primary3 transition-all ease-in-out;
+    @apply absolute bottom-0 w-0 bg-rui-primary-darker transition-all ease-in-out;
 
     content: '';
     height: 2px;
@@ -119,7 +119,7 @@ const css = useCssModule();
 }
 
 .label {
-  @apply font-sans absolute top-3.5 text-label;
+  @apply absolute top-3.5 text-rui-text-secondary;
 
   font-size: 16px;
   line-height: 24px;

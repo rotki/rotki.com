@@ -116,7 +116,7 @@ const css = useCssModule();
 }
 
 .action {
-  @apply text-primary3 text-center mt-3 mb-1;
+  @apply text-rui-primary-darker text-center mt-3 mb-1;
 }
 
 .action-wrapper {

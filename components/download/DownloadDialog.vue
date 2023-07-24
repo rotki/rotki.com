@@ -168,7 +168,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply font-serif font-bold text-shade11;
+  @apply font-bold text-rui-grey-800;
 
   letter-spacing: -0.03em;
 
@@ -176,7 +176,7 @@ const css = useCssModule();
 }
 
 .description {
-  @apply font-sans text-primary2;
+  @apply text-rui-text;
 
   margin-top: 30px;
   letter-spacing: -0.03em;
@@ -224,7 +224,7 @@ const css = useCssModule();
 }
 
 .row3 {
-  @apply flex flex-row flex-wrap justify-center font-sans items-center;
+  @apply flex flex-row flex-wrap justify-center items-center;
 
   margin-top: 22px;
   text-align: center;

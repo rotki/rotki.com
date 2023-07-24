@@ -49,6 +49,6 @@ const css = useCssModule();
 
 .button {
   @apply focus:outline-none flex items-center justify-center;
-  @apply w-10 h-10 rounded-full hover:bg-shade1 transition disabled:text-gray-400 disabled:cursor-not-allowed;
+  @apply w-10 h-10 rounded-full hover:bg-rui-grey-100 transition disabled:text-gray-400 disabled:cursor-not-allowed;
 }
 </style>

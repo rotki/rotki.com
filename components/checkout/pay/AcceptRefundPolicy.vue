@@ -22,6 +22,6 @@ const css = useCssModule();
 
 <style module lang="scss">
 .link {
-  @apply text-primary3;
+  @apply text-rui-primary-darker;
 }
 </style>

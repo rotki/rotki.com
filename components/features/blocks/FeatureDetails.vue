@@ -31,7 +31,7 @@ const slots = useSlots();
 }
 
 .subtitle {
-  @apply flex flex-row font-serif font-bold text-primary2;
+  @apply flex flex-row font-bold text-rui-text;
 
   letter-spacing: -0.01em;
   margin-top: 58px;
@@ -41,7 +41,7 @@ const slots = useSlots();
 }
 
 .description {
-  @apply flex flex-row font-sans text-primary2;
+  @apply flex flex-row text-rui-text;
 
   @include text-size(24px, 32px);
 }

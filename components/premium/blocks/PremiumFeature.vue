@@ -50,7 +50,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply font-bold font-serif text-white;
+  @apply font-bold text-white;
 
   margin-bottom: 38px;
   letter-spacing: -0.01em;
@@ -59,7 +59,7 @@ const css = useCssModule();
 }
 
 .description {
-  @apply font-sans font-light text-white;
+  @apply font-light text-white;
 
   @include text-size(24px, 30px);
 }

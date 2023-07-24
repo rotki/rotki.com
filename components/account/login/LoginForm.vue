@@ -123,7 +123,7 @@ const css = useCssModule();
 }
 
 .reset {
-  @apply flex flex-row justify-center text-primary focus:text-yellow-800 my-6;
+  @apply flex flex-row justify-center text-rui-primary focus:text-yellow-800 my-6;
 
   width: 100%;
 
@@ -152,7 +152,7 @@ const css = useCssModule();
 }
 
 .divider {
-  @apply border border-solid border-typography opacity-20;
+  @apply border border-solid border-rui-text opacity-20;
 
   width: 328px;
 }
@@ -166,7 +166,7 @@ const css = useCssModule();
 }
 
 .error {
-  @apply text-error text-xs tracking-tight;
+  @apply text-rui-error text-xs tracking-tight;
 }
 
 .errorWrapper {

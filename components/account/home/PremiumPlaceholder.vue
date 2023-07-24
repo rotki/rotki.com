@@ -37,6 +37,6 @@ const css = useCssModule();
 }
 
 .link {
-  @apply hover:text-shade8 text-primary;
+  @apply hover:text-rui-text-secondary text-rui-primary;
 }
 </style>

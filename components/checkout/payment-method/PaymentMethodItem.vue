@@ -54,7 +54,7 @@ const css = useCssModule();
 }
 
 .text {
-  @apply font-bold font-sans mt-2;
+  @apply font-bold mt-2;
 
   line-height: 28px;
   font-size: 24px;

@@ -10,7 +10,7 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .description {
-  @apply text-typography;
+  @apply text-rui-text;
 
   line-height: 18px;
   font-size: 15px;

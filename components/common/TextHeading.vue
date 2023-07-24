@@ -33,7 +33,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .heading {
-  @apply font-serif text-primary2 font-bold text-2xl;
+  @apply text-rui-text font-bold text-2xl;
 
   &:not(.no-margin) {
     @apply mt-6;
@@ -41,7 +41,7 @@ const css = useCssModule();
 }
 
 .secondary {
-  @apply font-serif text-primary2 font-bold text-xl;
+  @apply text-rui-text font-bold text-xl;
 
   &:not(.no-margin) {
     @apply mt-6;
@@ -51,7 +51,7 @@ const css = useCssModule();
 }
 
 .subheading {
-  @apply font-serif text-primary2 font-medium text-lg;
+  @apply text-rui-text font-medium text-lg;
 
   &:not(.no-margin) {
     @apply mt-4;

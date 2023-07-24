@@ -67,7 +67,7 @@ $subtitle-line-height: 42px;
 }
 
 .title {
-  @apply flex flex-row justify-center font-serif text-primary2 font-bold;
+  @apply flex flex-row justify-center text-rui-text font-bold;
 
   @include text-size(66px, 84px);
   @include for-size(phone-only) {
@@ -76,7 +76,7 @@ $subtitle-line-height: 42px;
 }
 
 .subtitle {
-  @apply flex flex-row justify-center font-sans font-light text-primary2;
+  @apply flex flex-row justify-center font-light text-rui-text;
 
   margin-top: 36px;
 

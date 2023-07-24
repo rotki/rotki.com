@@ -26,7 +26,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply flex-col font-serif text-primary2 text-4xl font-bold;
+  @apply flex-col text-rui-text text-4xl font-bold;
 
   letter-spacing: -0.01em;
 
@@ -34,7 +34,7 @@ const css = useCssModule();
 }
 
 .subtitle {
-  @apply flex-col font-sans text-primary2 text-center;
+  @apply flex-col text-rui-text text-center;
 
   @include text-size(24px, 30px);
 }

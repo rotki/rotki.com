@@ -26,7 +26,7 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .list {
-  @apply pl-8 list-disc font-sans mt-4;
+  @apply pl-8 list-disc mt-4;
   @apply text-[0.7875rem] sm:text-[0.9rem] md:text-[1.0125rem] 2xl:text-[1.2375rem];
   @apply leading-[1.1375rem] sm:leading-[1.3rem] md:leading-[1.4625rem] 2xl:leading-[1.7875rem];
 }

@@ -18,15 +18,6 @@ const slots = useSlots();
 
 <template>
   <div :class="css.wrapper">
-    <HeaderArea no-margin>
-      <template #subtitle>
-        <div :class="css.subtitle">
-          <slot name="title" />
-        </div>
-      </template>
-      <slot name="links" />
-    </HeaderArea>
-
     <div
       :class="{
         [css.content]: true,
@@ -47,8 +38,6 @@ const slots = useSlots();
     <div v-if="slots.hint" :class="css.hint">
       <slot name="hint" />
     </div>
-
-    <PageFooter />
   </div>
 </template>
 
@@ -61,7 +50,7 @@ const slots = useSlots();
 }
 
 .subtitle {
-  @apply font-sans text-primary2 font-medium text-center uppercase text-base;
+  @apply text-rui-text font-medium text-center uppercase text-base;
 }
 
 .content.center-vertically {
@@ -93,7 +82,7 @@ const slots = useSlots();
 }
 
 .hint {
-  @apply items-center text-justify w-full bottom-10 text-shade8 text-sm sm:p-2 sm:bottom-2;
+  @apply items-center text-justify w-full bottom-10 text-rui-text-secondary text-sm sm:p-2 sm:bottom-2;
 
   div {
     @apply ml-auto mr-auto max-w-lg;

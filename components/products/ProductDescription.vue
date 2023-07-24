@@ -59,10 +59,10 @@ const slots = useSlots();
 }
 
 .title {
-  @apply font-serif text-3xl text-typography font-medium mt-4 lg:mt-0;
+  @apply text-3xl text-rui-text font-medium mt-4 lg:mt-0;
 }
 
 .description {
-  @apply font-sans text-typography text-base mt-4 text-justify;
+  @apply text-rui-text text-base mt-4 text-justify;
 }
 </style>

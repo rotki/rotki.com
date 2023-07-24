@@ -43,7 +43,7 @@ const css = useCssModule();
   margin-top: 16px;
 
   input {
-    @apply text-primary3;
+    @apply text-rui-primary-darker;
   }
 }
 

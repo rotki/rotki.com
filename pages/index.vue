@@ -26,12 +26,10 @@ const { visible } = useOverflow();
 </script>
 
 <template>
-  <HeaderArea landing />
   <HeroArea @download="visible = true" />
   <FeatureList @download="visible = true" />
   <PremiumFeatures />
   <AvailablePlans @download="visible = true" />
-  <PageFooter landing />
   <DownloadDialog v-if="visible" @dismiss="visible = false" />
 </template>
 

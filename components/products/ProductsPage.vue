@@ -95,7 +95,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .title {
-  @apply font-serif font-bold text-3xl text-typography;
+  @apply font-bold text-3xl text-rui-text;
 }
 
 .details {

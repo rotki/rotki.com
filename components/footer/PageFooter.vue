@@ -1,79 +1,46 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    landing?: boolean;
-  }>(),
-  {
-    landing: false,
-  },
-);
+import { RuiButton, RuiLogo } from '@rotki/ui-library';
+
+const { t } = useI18n();
 
 const year = new Date().getFullYear().toString();
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.wrapper">
-    <div :class="css.row">
-      <div :class="css.logo">
-        <img alt="rotki" src="/img/logo-small.svg" />
+  <div class="py-8 lg:py-16">
+    <div class="container">
+      <div class="space-y-4 lg:space-y-8">
+        <div class="flex flex-col lg:flex-row justify-between items-center">
+          <div class="hidden lg:block">
+            <RuiLogo text />
+          </div>
+          <NuxtLink v-if="false" to="/download">
+            <RuiButton color="primary" variant="text" size="lg">
+              {{ t('page_footer.download') }}
+            </RuiButton>
+          </NuxtLink>
+        </div>
+        <div class="flex flex-col xl:flex-row justify-between items-center">
+          <div class="hidden lg:block">
+            <NavigationMenu />
+          </div>
+          <FooterLegalese />
+        </div>
       </div>
-      <div :class="css.menus">
-        <LinksArea landing />
+      <div class="border-t border-grey-100 my-6 lg:my-10" />
+      <div
+        class="flex flex-col-reverse lg:flex-row justify-between items-center"
+      >
+        <div
+          class="flex flex-wrap justify-center space-x-1 text-rui-text-secondary mt-2 lg:mt-0"
+        >
+          <div>&copy; Rotki Solutions GmbH 2018-{{ year }}.</div>
+          <div>All Rights Reserved.</div>
+        </div>
+        <div>
+          <FooterIconLinks />
+        </div>
       </div>
-      <div :class="css.links">
-        <FooterIconLinks />
-      </div>
-    </div>
-    <div :class="css.secondRow">
-      <div :class="css.copyright">
-        <div>© Rotki Solutions GmbH 2018-{{ year }}.</div>
-        <div>All Rights Reserved.</div>
-      </div>
-      <FooterLegalese />
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-@import '@/assets/css/main.scss';
-@import '@/assets/css/media.scss';
-
-.wrapper {
-  @apply container pb-0 pb-4;
-}
-
-.row {
-  @apply flex flex-wrap flex-col lg:flex-row items-center justify-center xl:justify-start md:px-8 px-4 space-y-8;
-}
-
-.logo {
-  @apply ml-4;
-}
-
-.menus {
-  @apply flex flex-1 mx-0 lg:mx-14;
-}
-
-.links {
-  > * {
-    @apply my-2;
-  }
-}
-
-.secondRow {
-  @apply flex flex-row justify-center lg:justify-between flex-wrap mt-6 2xl:mt-12 md:px-8 px-4;
-
-  > * {
-    @apply py-2;
-  }
-}
-
-.copyright {
-  @apply font-sans text-shade11 md:flex-row flex text-sm flex-col w-full md:w-max text-center md:text-left my-4 md:my-0;
-
-  > * {
-    @apply md:px-1 pt-0.5;
-  }
-}
-</style>

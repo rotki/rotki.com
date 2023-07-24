@@ -89,6 +89,6 @@ const css = useCssModule();
 }
 
 .actionButton {
-  @apply text-primary hover:text-yellow-600;
+  @apply text-rui-primary hover:text-yellow-600;
 }
 </style>

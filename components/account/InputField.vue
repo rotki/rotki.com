@@ -124,7 +124,7 @@ const slots = useSlots();
 }
 
 .input:not(.filled) {
-  @apply block border-shade10 box-border border-solid focus:outline-none focus:border-primary py-2 px-3 appearance-none w-full bg-white;
+  @apply block border-rui-grey-300 box-border border-solid focus:outline-none focus:border-rui-primary py-2 px-3 appearance-none w-full bg-white;
 
   margin-top: 8px;
   border-width: 1px;
@@ -139,11 +139,11 @@ const slots = useSlots();
   }
 
   &:focus-within ~ label {
-    @apply transform scale-75 -translate-y-4 text-primary3 duration-300;
+    @apply transform scale-75 -translate-y-4 text-rui-primary-darker duration-300;
   }
 
   &:not(.empty):not(:focus-within) ~ label {
-    @apply transform scale-75 -translate-y-4 text-label duration-300;
+    @apply transform scale-75 -translate-y-4 text-rui-text-secondary duration-300;
   }
 
   @include for-size(phone-only) {
@@ -161,11 +161,11 @@ const slots = useSlots();
   }
 
   &:focus-within ~ label {
-    @apply transform scale-75 -translate-y-4 text-primary3 duration-300;
+    @apply transform scale-75 -translate-y-4 text-rui-primary-darker duration-300;
   }
 
   &:not(.empty):not(:focus-within) ~ label {
-    @apply transform scale-75 -translate-y-4 text-label duration-300;
+    @apply transform scale-75 -translate-y-4 text-rui-text-secondary duration-300;
   }
 }
 
@@ -181,7 +181,7 @@ const slots = useSlots();
 
   &::before,
   &::after {
-    @apply absolute bottom-0 w-0 bg-primary3 transition-all ease-in-out;
+    @apply absolute bottom-0 w-0 bg-rui-primary-darker transition-all ease-in-out;
 
     content: '';
     height: 2px;
@@ -231,7 +231,7 @@ const slots = useSlots();
 }
 
 .label {
-  @apply font-sans absolute top-4 text-label text-sm;
+  @apply absolute top-4 text-rui-text-secondary text-sm;
 }
 
 .only-text label {

@@ -105,7 +105,7 @@ const css = useCssModule();
 }
 
 .hint {
-  @apply mt-4 text-base italic h-5 text-typography;
+  @apply mt-4 text-base italic h-5 text-rui-text;
 }
 
 .continue {

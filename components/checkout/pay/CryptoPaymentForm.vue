@@ -168,10 +168,10 @@ const css = useCssModule();
 }
 
 .hint {
-  @apply text-shade8 mt-4 mb-4;
+  @apply text-rui-text-secondary mt-4 mb-4;
 }
 
 .info {
-  @apply font-bold mt-3 text-shade12;
+  @apply font-bold mt-3 text-rui-primary;
 }
 </style>

@@ -177,11 +177,11 @@ const css = useCssModule();
 }
 
 .subtitle {
-  @apply font-sans text-primary2 font-medium text-center uppercase text-xs;
+  @apply text-rui-text font-medium text-center uppercase text-xs;
 }
 
 .list {
-  @apply text-xs list-disc pl-6 text-shade8;
+  @apply text-xs list-disc pl-6 text-rui-text-secondary;
 }
 
 .box {
@@ -189,7 +189,7 @@ const css = useCssModule();
 }
 
 .label {
-  @apply text-shade11 font-serif mb-4 text-lg;
+  @apply text-rui-grey-800 mb-4 text-lg;
 }
 
 .confirmation {

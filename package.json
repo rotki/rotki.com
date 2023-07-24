@@ -45,10 +45,12 @@
   "devDependencies": {
     "@commitlint/cli": "17.6.6",
     "@commitlint/config-conventional": "17.6.6",
+    "@fontsource/roboto": "5.0.5",
     "@nuxt/content": "2.7.0",
     "@nuxt/devtools": "0.6.7",
     "@nuxtjs/i18n": "8.0.0-beta.12",
     "@rotki/eslint-config": "1.1.0",
+    "@rotki/ui-library": "0.1.2",
     "@types/braintree-web": "3.75.23",
     "@types/paypal-checkout-components": "4.0.5",
     "@types/qrcode": "1.5.1",

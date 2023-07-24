@@ -74,12 +74,12 @@ const css = useCssModule();
 }
 
 .title {
-  @apply font-sans font-bold flex flex-row justify-center mb-4 text-2xl leading-7;
+  @apply font-bold flex flex-row justify-center mb-4 text-2xl leading-7;
 
   letter-spacing: 0;
 }
 
 .message {
-  @apply font-sans break-words leading-5 text-lg font-medium;
+  @apply break-words leading-5 text-lg font-medium;
 }
 </style>

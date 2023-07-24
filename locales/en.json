@@ -154,5 +154,26 @@
     "vat": "({priceInEur}€ + {vat}% VAT)",
     "includes_vat": "(includes {vat}% VAT)",
     "renew_period": "every {months} month | every {months} months"
+  },
+  "navigation_menu": {
+    "home": "Home",
+    "download": "Download",
+    "jobs": "Jobs",
+    "values": "Values",
+    "features": "Features",
+    "documentation": "Documentation",
+    "blog": "Blog"
+  },
+  "footer_legalese": {
+    "impressum": "Impressum",
+    "privacy_policy": "Privacy Policy",
+    "tos": "Terms of Service",
+    "faq": "FAQ"
+  },
+  "page_footer": {
+    "download": "Get the app"
+  },
+  "page_header": {
+    "manage_premium": "Manage Premium"
   }
 }

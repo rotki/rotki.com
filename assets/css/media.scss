@@ -18,6 +18,9 @@ $tablet-landscape-font-percentage: 0.9;
 $desktop-up-font-percentage: 0.9;
 $big-desktop-font-percentage: 1.1;
 
+$mobile-button-percentage: 0.8;
+$mobile-image-percentage: 0.4;
+
 @mixin text-size($font-size, $line-height) {
   font-size: $font-size;
   line-height: $line-height;
@@ -48,6 +51,7 @@ $big-desktop-font-percentage: 1.1;
   }
 }
 
+$mobile-margin: 16px;
 
 @mixin margin-x($margin) {
   margin-left: $margin;

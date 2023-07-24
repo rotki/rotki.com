@@ -233,7 +233,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .title {
-  @apply font-serif font-bold text-3xl text-typography;
+  @apply font-bold text-3xl text-rui-text;
 }
 
 .details {
@@ -245,7 +245,7 @@ const css = useCssModule();
 
   &::before {
     content: '';
-    @apply absolute w-16 h-1 bg-primary left-1/2 top-full transform -translate-x-1/2;
+    @apply absolute w-16 h-1 bg-rui-primary left-1/2 top-full transform -translate-x-1/2;
   }
 }
 

@@ -1,30 +1,32 @@
-<script setup lang="ts">
-const css = useCssModule();
+<script lang="ts" setup>
+const { t } = useI18n();
 </script>
 
 <template>
-  <div :class="css.links">
-    <ExternalLink same-tab text="Impressum" url="/impressum" />
-    <ExternalLink same-tab text="Privacy Policy" url="/privacy-policy" />
-    <ExternalLink same-tab text="Terms of Service" url="/tos" />
+  <div class="flex flex-wrap justify-center space-x-2">
     <ExternalLink
+      size="lg"
+      same-tab
+      :text="t('footer_legalese.impressum')"
+      url="/impressum"
+    />
+    <ExternalLink
+      size="lg"
+      same-tab
+      :text="t('footer_legalese.privacy_policy')"
+      url="/privacy-policy"
+    />
+    <ExternalLink
+      size="lg"
+      same-tab
+      :text="t('footer_legalese.tos')"
+      url="/tos"
+    />
+    <ExternalLink
+      size="lg"
       no-ref
-      text="FAQ"
+      :text="t('footer_legalese.faq')"
       url="https://rotki.readthedocs.io/en/latest/faq.html"
     />
   </div>
 </template>
-
-<style lang="scss" module>
-@import '@/assets/css/main.scss';
-@import '@/assets/css/media.scss';
-
-.links {
-  @apply flex flex-row flex-wrap justify-center md:justify-start;
-
-  > * {
-    margin-left: 8px;
-    margin-right: 8px;
-  }
-}
-</style>

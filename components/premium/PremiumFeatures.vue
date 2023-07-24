@@ -46,7 +46,7 @@ const css = useCssModule();
 }
 
 .wrapper {
-  @apply bg-primary2 bg-repeat;
+  @apply bg-rui-primary-darker;
 
   padding-bottom: 100px;
 
@@ -60,7 +60,7 @@ const css = useCssModule();
 }
 
 .title {
-  @apply text-primary font-serif font-bold;
+  @apply text-rui-primary-lighter font-bold;
 
   padding-top: 91px;
   margin-bottom: 10px;

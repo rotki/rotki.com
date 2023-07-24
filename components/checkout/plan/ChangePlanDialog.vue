@@ -93,7 +93,7 @@ const css = useCssModule();
 }
 
 .plan {
-  @apply font-sans rounded focus:outline-none px-4 py-2 my-2 border-primary3 border-2;
+  @apply rounded focus:outline-none px-4 py-2 my-2 border-rui-primary-darker border-2;
 
   background-position: center;
   transition: background 0.8s;
@@ -105,7 +105,7 @@ const css = useCssModule();
   }
 
   &:not(.disabled):active {
-    @apply bg-primary3;
+    @apply bg-rui-primary-darker;
 
     background-size: 100%;
     transition: background 0s;

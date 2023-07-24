@@ -385,7 +385,7 @@ const css = useCssModule();
 }
 
 .checkbox {
-  @apply h-5 w-5 text-primary;
+  @apply h-5 w-5 text-rui-primary;
 }
 
 .termsCheck {
@@ -393,7 +393,7 @@ const css = useCssModule();
 }
 
 .terms {
-  @apply ml-2 text-primary2;
+  @apply ml-2 text-rui-text;
 }
 
 .list {

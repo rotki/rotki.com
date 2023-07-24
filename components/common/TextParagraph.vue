@@ -27,7 +27,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .text {
-  @apply font-sans text-shade11 text-justify;
+  @apply text-rui-grey-800 text-justify;
 
   margin-top: 16px;
 
