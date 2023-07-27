@@ -14,6 +14,7 @@
     "lint:fix": "eslint . --fix",
     "lint:style": "stylelint **/*.{vue,css,scss} --ignore-path .gitignore",
     "lint:all": "pnpm lint && pnpm lint:style",
+    "typecheck": "npx nuxi typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "cypress:open": "cypress open",
@@ -38,6 +39,7 @@
     "loglevel": "1.8.1",
     "pinia": "2.1.4",
     "qrcode": "1.5.3",
+    "swiper": "10.0.4",
     "vue": "3.3.4",
     "vue-router": "4.2.4",
     "zod": "3.21.4"

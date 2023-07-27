@@ -22,15 +22,13 @@ useHead({
   ],
   ...commonAttrs(),
 });
-const { visible } = useOverflow();
 </script>
 
 <template>
-  <HeroArea @download="visible = true" />
-  <FeatureList @download="visible = true" />
+  <HeroArea />
+  <FeatureList />
   <PremiumFeatures />
-  <AvailablePlans @download="visible = true" />
-  <DownloadDialog v-if="visible" @dismiss="visible = false" />
+  <AvailablePlans />
 </template>
 
 <style lang="scss">

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>();
-
 const css = useCssModule();
 </script>
 
@@ -9,7 +7,7 @@ const css = useCssModule();
   <MiddleMenu />
   <div :class="css.wrapper">
     <div>
-      <AppDashboard @download="emit('download')" />
+      <AppDashboard />
       <SupportedExchangeDetails />
       <DefiProtocols />
       <DefiDetails />

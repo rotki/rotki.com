@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>();
-
 const { t } = useI18n();
 const css = useCssModule();
 </script>
@@ -12,7 +10,7 @@ const css = useCssModule();
     </div>
     <div :class="css.basic">
       <div :class="css.content">
-        <FreePlan @download="emit('download')" />
+        <FreePlan />
         <BasicPlan />
         <AdvancedPlan v-if="false" />
       </div>

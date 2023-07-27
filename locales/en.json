@@ -144,6 +144,22 @@
       }
     }
   },
+  "download": {
+    "heading": {
+      "download_rotki": "Download rotki",
+      "description": "You can download rotki in your computer and start using it for free right now. Binaries available for all major Operating Systems."
+    },
+    "documentation": {
+      "title": "Documentation",
+      "heading": "What are the first steps after installing rotki?",
+      "description": "On our documentation page you have a user guide that will help you introduce yourself and clarify any doubts that may arise during the process.",
+      "action": "View all documentation"
+    },
+    "preview": "Preview",
+    "action": "Download",
+    "download_for": "Download for",
+    "latest_release": "Latest Release"
+  },
   "subscription": {
     "error": {
       "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."

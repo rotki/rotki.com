@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>();
-
 const css = useCssModule();
 </script>
 
@@ -21,7 +19,7 @@ const css = useCssModule();
           </i18n-t>
         </div>
       </div>
-      <DownloadButton :class="css.button" @click="emit('download')" />
+      <DownloadButton :class="css.button" />
     </div>
   </div>
 </template>

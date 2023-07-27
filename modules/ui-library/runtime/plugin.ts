@@ -1,10 +1,15 @@
 import {
+  RiAppleLine,
+  RiArrowLeftLine,
+  RiArrowRightLine,
   RiDiscordLine,
+  RiDownloadCloud2Line,
   RiExternalLinkLine,
   RiGithubLine,
   RiLogoutBoxRLine,
   RiMailSendLine,
   RiTwitterLine,
+  RiWindowsLine,
   RuiPlugin,
 } from '@rotki/ui-library';
 import { defineNuxtPlugin } from '#app';
@@ -14,12 +19,17 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(RuiPlugin, {
     mode: 'light',
     icons: [
+      RiAppleLine,
+      RiArrowLeftLine,
+      RiArrowRightLine,
       RiDiscordLine,
+      RiDownloadCloud2Line,
       RiExternalLinkLine,
       RiGithubLine,
       RiLogoutBoxRLine,
       RiMailSendLine,
       RiTwitterLine,
+      RiWindowsLine,
     ],
   });
 });

@@ -1,12 +1,10 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>();
-
 const { t } = useI18n();
 const css = useCssModule();
 </script>
 
 <template>
-  <PlanBox :action="t('actions.download')" @click="emit('download')">
+  <PlanBox :action="t('actions.download')" url="/download">
     <template #title>{{ t('home.plans.details.free.title') }}</template>
     {{ t('home.plans.details.free.subtitle') }}
     <div :class="css.filler" />

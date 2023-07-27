@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>();
 const { t } = useI18n();
 const css = useCssModule();
 </script>
@@ -23,7 +22,7 @@ const css = useCssModule();
       {{ t('home.dashboard.details.net_worth_over_time.description') }}
     </FeatureDetails>
     <div class="flex flex-row">
-      <DownloadButton @click="emit('download')" />
+      <DownloadButton />
     </div>
   </FeatureContainer>
 </template>

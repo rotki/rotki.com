@@ -4,13 +4,15 @@ const { t } = useI18n();
 
 <template>
   <div class="flex flex-wrap justify-center space-x-2">
-    <ButtonLink size="lg" to="/impressum">
+    <ButtonLink size="lg" to="/impressum" highlight-active>
       {{ t('footer_legalese.impressum') }}
     </ButtonLink>
-    <ButtonLink size="lg" to="/privacy-policy">
+    <ButtonLink size="lg" to="/privacy-policy" highlight-active>
       {{ t('footer_legalese.privacy_policy') }}
     </ButtonLink>
-    <ButtonLink size="lg" to="/tos">{{ t('footer_legalese.tos') }}</ButtonLink>
+    <ButtonLink size="lg" to="/tos" highlight-active>
+      {{ t('footer_legalese.tos') }}
+    </ButtonLink>
     <ButtonLink
       size="lg"
       to="https://rotki.readthedocs.io/en/latest/faq.html"

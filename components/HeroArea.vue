@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'download'): void }>();
 const css = useCssModule();
 const { t } = useI18n();
 </script>
@@ -23,7 +22,7 @@ const { t } = useI18n();
       </div>
     </div>
     <div :class="css.buttons">
-      <DownloadButton @click="emit('download')" />
+      <DownloadButton />
 
       <ButtonLink
         variant="outlined"
@@ -57,7 +56,7 @@ const { t } = useI18n();
         <div>{{ t('home.advantages.own_your_data.description') }}</div>
       </InfoBox>
     </div>
-    <UseApp @download="emit('download')" />
+    <UseApp />
   </div>
 </template>
 

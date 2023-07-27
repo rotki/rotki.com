@@ -4,14 +4,16 @@ const { t } = useI18n();
 
 <template>
   <div class="flex space-x-4 flex-wrap justify-center">
-    <ButtonLink size="lg" to="/">{{ t('navigation_menu.home') }}</ButtonLink>
+    <ButtonLink size="lg" to="/" highlight-exact-active>{{
+      t('navigation_menu.home')
+    }}</ButtonLink>
     <ButtonLink size="lg" to="/#features">
       {{ t('navigation_menu.features') }}
     </ButtonLink>
-    <ButtonLink v-if="false" size="lg" to="/download">
+    <ButtonLink size="lg" to="/download" highlight-exact-active>
       {{ t('navigation_menu.download') }}
     </ButtonLink>
-    <ButtonLink size="lg" to="/jobs">
+    <ButtonLink size="lg" to="/jobs" highlight-active>
       {{ t('navigation_menu.jobs') }}
     </ButtonLink>
     <ButtonLink v-if="false" size="lg" to="/values">
