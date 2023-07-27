@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiIcon } from '@rotki/ui-library';
 const { t } = useI18n();
 </script>
 

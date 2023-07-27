@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';

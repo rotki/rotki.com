@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 const emit = defineEmits<{ (e: 'click'): void }>();
 
 const { t } = useI18n();

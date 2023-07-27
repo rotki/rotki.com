@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { type ActionResult } from '~/types/common';

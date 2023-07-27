@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 import { useMainStore } from '~/store';
 
 const props = withDefaults(defineProps<{ modal?: boolean }>(), {

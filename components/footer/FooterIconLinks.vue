@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { RuiIcon } from '@rotki/ui-library';
-
 const menus = [
   {
     title: 'Github',

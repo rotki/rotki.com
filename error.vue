@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { RuiButton } from '@rotki/ui-library';
 import { get } from '@vueuse/core';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 

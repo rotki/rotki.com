@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 import { get } from '@vueuse/core';
 
 const props = defineProps<{

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { RuiButton, RuiLogo } from '@rotki/ui-library';
-
 const { t } = useI18n();
 
 const year = new Date().getFullYear().toString();

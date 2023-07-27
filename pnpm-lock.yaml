@@ -83,8 +83,8 @@ devDependencies:
     specifier: 1.1.0
     version: 1.1.0(eslint@8.45.0)(vue@3.3.4)
   '@rotki/ui-library':
-    specifier: 0.1.2
-    version: 0.1.2(vue@3.3.4)
+    specifier: 0.2.2
+    version: 0.2.2(@vueuse/core@10.2.1)(@vueuse/shared@10.2.1)(vue@3.3.4)
   '@types/braintree-web':
     specifier: 3.75.23
     version: 3.75.23
@@ -2234,12 +2234,16 @@ packages:
       - vue
     dev: true
 
-  /@rotki/ui-library@0.1.2(vue@3.3.4):
-    resolution: {integrity: sha512-2gzD/kjuw13Pxpsjcf/8BzQkN36Yhg1FltrkVJNFABcpimkGkZZLgyIeDWw4V6BnLkQUCRhAYUfj1Jb6Sxjviw==}
+  /@rotki/ui-library@0.2.2(@vueuse/core@10.2.1)(@vueuse/shared@10.2.1)(vue@3.3.4):
+    resolution: {integrity: sha512-LgOMSSYzhVQso8SM2DoPNiqXCosA82zvWtGYDGAjISOPQDdgQMjUGAMP7hBSkyxgpf9NDbeDWx7nMmz4u9fx2A==}
     engines: {pnpm: '>=8 <9'}
     peerDependencies:
+      '@vueuse/core': '>10.0.0'
+      '@vueuse/shared': '>10.0.0'
       vue: '>=3.3.4'
     dependencies:
+      '@vueuse/core': 10.2.1(vue@3.3.4)
+      '@vueuse/shared': 10.2.1(vue@3.3.4)
       vue: 3.3.4
     dev: true
 
@@ -2454,7 +2458,6 @@ packages:
 
   /@types/web-bluetooth@0.0.17:
     resolution: {integrity: sha512-4p9vcSmxAayx72yn70joFoL44c9MO/0+iVEBIQXe3v2h2SiAsEIo/G5v6ObFWvNKRFjbrVadNf9LqEEZeQPzdA==}
-    dev: false
 
   /@types/yauzl@2.10.0:
     resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
@@ -2978,11 +2981,9 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: false
 
   /@vueuse/metadata@10.2.1:
     resolution: {integrity: sha512-3Gt68mY/i6bQvFqx7cuGBzrCCQu17OBaGWS5JdwISpMsHnMKKjC2FeB5OAfMcCQ0oINfADP3i9A4PPRo0peHdQ==}
-    dev: false
 
   /@vueuse/nuxt@10.2.1(nuxt@3.6.3)(vue@3.3.4):
     resolution: {integrity: sha512-01iDXnjZFDaGZnEL0nvlmSTNV0EG6WY+VSFyWnBji9lbxdQwOn4DHvLou3ePe8ipaoQVtY58WcL0OHIFa4+fBA==}
@@ -3009,7 +3010,6 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: false
 
   /@webassemblyjs/ast@1.11.6:
     resolution: {integrity: sha512-IN1xI7PwOvLPgjcf180gC1bqn3q/QaOCwYUahIOhbYUu8KA/3tw2RT/T0Gidi1l7Hhj5D/INhJxiICObqpMu4Q==}
@@ -12339,7 +12339,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.3.4
-    dev: false
 
   /vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}

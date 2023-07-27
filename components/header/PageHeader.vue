@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton, RuiIcon, RuiLogo } from '@rotki/ui-library';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 const { t } = useI18n();

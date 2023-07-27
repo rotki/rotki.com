@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 import { type Subscription } from '~/types';
 import { useMainStore } from '~/store';
 

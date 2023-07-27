@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
-
 const { t } = useI18n();
 const css = useCssModule();
 </script>

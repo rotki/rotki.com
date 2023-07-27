@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RuiButton } from '@rotki/ui-library';
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { type ComputedRef } from 'vue';
