@@ -28,26 +28,37 @@ const allowNavigation = computed(() => {
   const { emailConfirmed } = get(account);
   return emailConfirmed;
 });
-
-const goToCheckoutPlan = () => navigateTo('/checkout/plan');
-
-const goToAccount = () => navigateTo('/home');
 </script>
 
 <template>
   <InfoTooltip v-if="!hasActiveSubscription" :disabled="!showTooltip">
     <template #activator>
-      <ActionButton
-        primary
+      <ButtonLink
+        variant="default"
+        size="lg"
+        class="!py-4 !px-10 !text-xl uppercase"
+        rounded
+        filled
+        color="primary"
         :disabled="!allowNavigation"
-        @click="goToCheckoutPlan()"
+        to="/checkout/plan"
       >
         Subscribe now
-      </ActionButton>
+      </ButtonLink>
     </template>
     <span> {{ t('subscription.error.unverified_email') }}</span>
   </InfoTooltip>
-  <ActionButton v-else primary @click="goToAccount()">
+
+  <ButtonLink
+    v-else
+    variant="default"
+    size="lg"
+    class="!py-4 !px-10 !text-xl uppercase"
+    rounded
+    filled
+    color="primary"
+    to="/home"
+  >
     Manage Premium
-  </ActionButton>
+  </ButtonLink>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
+
 const { t } = useI18n();
 const css = useCssModule();
 </script>
@@ -19,7 +21,15 @@ const css = useCssModule();
               {{ t('home.plans.details.custom.subtitle') }}
             </div>
             <div :class="css.button">
-              <ActionButton :text="t('actions.get_in_touch')" />
+              <RuiButton
+                variant="outlined"
+                size="lg"
+                class="!py-4 !px-10 !text-xl uppercase outline-2"
+                rounded
+                color="primary"
+              >
+                {{ t('actions.get_in_touch') }}
+              </RuiButton>
             </div>
           </div>
         </div>

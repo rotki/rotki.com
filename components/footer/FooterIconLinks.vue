@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RuiButton, RuiIcon } from '@rotki/ui-library';
+import { RuiIcon } from '@rotki/ui-library';
 
 const menus = [
   {
@@ -32,14 +32,12 @@ const menus = [
 <template>
   <div class="flex flex-wrap items-center space-x-4">
     <div v-for="menu in menus" :key="menu.title">
-      <a :href="menu.href" rel="noreferrer" target="_blank" :title="menu.title">
-        <RuiButton size="lg" variant="text">
-          <span class="flex items-center">
-            <span v-if="menu.showText" class="mr-4">{{ menu.title }}</span>
-            <RuiIcon :name="menu.icon" />
-          </span>
-        </RuiButton>
-      </a>
+      <ButtonLink size="lg" :to="menu.href" :title="menu.title" external>
+        <span class="flex space-x-2 items-center">
+          <span v-if="menu.showText">{{ menu.title }}</span>
+          <RuiIcon :name="menu.icon" />
+        </span>
+      </ButtonLink>
     </div>
   </div>
 </template>

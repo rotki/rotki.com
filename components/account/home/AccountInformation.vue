@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
@@ -203,25 +204,22 @@ const css = useCssModule();
       @blur="v$.country.$touch()"
     />
 
-    <ActionButton
-      :class="css.confirm"
+    <RuiButton
+      variant="outlined"
+      size="lg"
+      class="uppercase outline-2 mt-4"
       :loading="loading"
-      primary
-      small
-      text="Update"
+      rounded
+      color="primary"
       @click="update()"
     >
-      <SpinnerIcon v-if="loading" class="animate-spin" />
-    </ActionButton>
+      Update
+    </RuiButton>
   </CardContainer>
 </template>
 
 <style lang="scss" module>
 .info {
   @apply mt-8;
-}
-
-.confirm {
-  @apply mt-4;
 }
 </style>

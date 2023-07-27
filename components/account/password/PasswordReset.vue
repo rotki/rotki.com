@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { set } from '@vueuse/core';
@@ -153,14 +154,16 @@ const css = useCssModule();
           autocomplete="new-password"
         />
         <div :class="css.buttonWrapper">
-          <ActionButton
-            :class="css.button"
+          <RuiButton
             :disabled="!valid"
-            primary
-            small
-            text="Submit"
+            variant="default"
+            size="lg"
+            class="w-full mt-16"
+            color="primary"
             @click="submit()"
-          />
+          >
+            Submit
+          </RuiButton>
         </div>
       </BoxContainer>
     </div>
@@ -168,10 +171,6 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-.button {
-  @apply mt-16;
-}
-
 .buttonWrapper {
   @apply flex flex-row align-middle justify-center;
 }

@@ -24,11 +24,17 @@ const { t } = useI18n();
     </div>
     <div :class="css.buttons">
       <DownloadButton @click="emit('download')" />
-      <ActionButton
-        :class="css.premium"
-        :text="t('actions.get_premium')"
-        @click="navigateTo('/products')"
-      />
+
+      <ButtonLink
+        variant="outlined"
+        size="lg"
+        class="!py-4 !px-10 !text-xl uppercase outline-2"
+        rounded
+        color="primary"
+        to="/products"
+      >
+        {{ t('actions.get_premium') }}
+      </ButtonLink>
     </div>
     <div :class="css.screenshot">
       <img alt="rotki screenshot" src="/img/screenshot.png" />

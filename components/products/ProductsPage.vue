@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const goToProductsDetail = () => navigateTo('/products/details');
-
 const css = useCssModule();
 </script>
 
@@ -80,9 +78,16 @@ const css = useCssModule();
           </ProductDescription>
           <div :class="css.actions">
             <SubscribeNowButton />
-            <ActionButton @click="goToProductsDetail()">
+            <ButtonLink
+              variant="outlined"
+              size="lg"
+              class="!py-4 !px-10 !text-xl uppercase outline-2"
+              rounded
+              color="primary"
+              to="/products/details"
+            >
               More Details
-            </ActionButton>
+            </ButtonLink>
           </div>
         </div>
       </div>

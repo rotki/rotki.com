@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library';
 import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
 import { FetchError } from 'ofetch';
@@ -83,17 +84,17 @@ const css = useCssModule();
           @captcha-id="setCaptchaId($event)"
         />
 
-        <ActionButton
-          :class="css.button"
+        <RuiButton
           :disabled="v$.$invalid || loading"
           :loading="loading"
-          primary
-          small
-          text="Submit"
+          variant="default"
+          size="lg"
+          class="w-full"
+          color="primary"
           @click="reset()"
         >
-          <SpinnerIcon v-if="loading" class="animate-spin" />
-        </ActionButton>
+          Submit
+        </RuiButton>
       </BoxContainer>
     </div>
   </PageContainer>

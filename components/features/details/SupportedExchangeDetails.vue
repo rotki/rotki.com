@@ -24,12 +24,9 @@ const { t } = useI18n();
       <ItemList :list="column1" />
       <ItemList :list="column2" />
     </div>
-    <ExternalLink
-      :class="css.link"
-      same-tab
-      :text="t('home.more_information')"
-      url="/supported"
-    />
+    <ButtonLink :class="css.link" to="/supported">
+      {{ t('home.more_information') }}
+    </ButtonLink>
   </FeatureContainer>
 </template>
 

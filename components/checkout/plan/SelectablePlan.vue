@@ -86,7 +86,7 @@ const css = useCssModule();
 
   &.selected {
     background-color: #fff;
-    border-color: #da4e24;
+    @apply border-rui-primary;
     box-shadow: 0 4px 8px #0003;
   }
 

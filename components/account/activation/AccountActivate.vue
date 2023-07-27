@@ -37,7 +37,7 @@ const css = useCssModule();
           <p>Your rotki account has been successfully activated.</p>
           <div>
             To see your dashboard click
-            <ExternalLink same-tab text="here" url="/home" />
+            <ButtonLink to="/home" inline color="primary">here</ButtonLink>
           </div>
         </UserActionMessage>
         <UserActionMessage v-else>

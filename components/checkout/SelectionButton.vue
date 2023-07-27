@@ -39,8 +39,6 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-$color: #da4e24;
-
 .text {
   @apply font-bold;
 
@@ -49,7 +47,7 @@ $color: #da4e24;
   letter-spacing: 0;
 
   &:not(.selected) {
-    color: $color;
+    @apply text-rui-primary;
   }
 
   &.selected {
@@ -59,8 +57,7 @@ $color: #da4e24;
 
 .button {
   background: 0 0 no-repeat padding-box;
-  border: 1px solid $color;
-  @apply relative overflow-hidden rounded-full py-1.5 px-4;
+  @apply relative overflow-hidden rounded-full py-1.5 px-4 border border-rui-primary;
 
   &::after {
     content: '';
@@ -89,9 +86,7 @@ $color: #da4e24;
   }
 
   &.selected {
-    background-color: $color;
-
-    @apply hover:scale-100;
+    @apply hover:scale-100 bg-rui-primary;
 
     &::after {
       content: unset;
@@ -99,9 +94,7 @@ $color: #da4e24;
   }
 
   &:focus {
-    @apply outline-none;
-
-    color: rgba($color, 0.7);
+    @apply outline-none text-rui-primary-lighter;
   }
 }
 </style>
