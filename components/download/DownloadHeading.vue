@@ -44,11 +44,12 @@ const css = useCssModule();
       @apply flex flex-col space-y-4 mb-16;
 
       .title {
-        @apply text-rui-light-primary text-h6;
+        @apply text-rui-light-primary text-h6 font-medium;
       }
 
       .description {
-        @apply text-rui-text text-h3;
+        @apply text-rui-text text-h4 md:text-h3;
+        @apply font-normal #{!important};
       }
     }
 

@@ -82,10 +82,10 @@ scanImages();
     }
 
     .controls {
-      @apply flex flex-col absolute -bottom-[2.8125rem] z-10 -left-2 -right-2 items-center justify-center;
+      @apply flex flex-col absolute -bottom-[1.75rem] md:-bottom-[3rem] z-10 left-5 right-5 items-center justify-center;
 
       .preview {
-        @apply px-8 py-6 rounded-xl border border-black/[.12] bg-white text-h4;
+        @apply px-4 py-3 md:px-8 md:py-6 rounded-xl border border-black/[.12] bg-white text-h5 md:text-h4 font-bold;
         box-shadow: 4px 32px 80px 0 rgba(191, 194, 203, 0.24);
       }
     }
