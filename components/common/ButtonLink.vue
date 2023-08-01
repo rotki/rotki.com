@@ -49,6 +49,7 @@ const getColor = (active: boolean, exact: boolean) => {
     <RuiButton
       v-bind="{
         variant: 'text',
+        type: 'button',
         color: getColor(link?.isActive, link?.isExactActive),
         ...attrs,
       }"

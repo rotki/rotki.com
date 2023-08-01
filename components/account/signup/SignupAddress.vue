@@ -137,7 +137,7 @@ const { t } = useI18n();
         autocomplete="address-line2"
         dense
         :label="t('auth.signup.address.form.address_line_2')"
-        :hint="t('auth.common.required')"
+        :hint="t('auth.common.optional')"
         :error-messages="toMessages(v$.address2)"
         @update:model-value="updateValue('address2', $event)"
         @blur="v$.address2.$touch()"
