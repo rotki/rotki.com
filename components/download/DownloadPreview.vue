@@ -55,15 +55,17 @@ scanImages();
           <img :src="image" alt=" " class="w-full" />
         </SwiperSlide>
       </Carousel>
-      <div :class="css.controls">
-        <CarouselControls
-          v-if="swiper"
-          v-model:swiper="swiper"
-          :active-index="activeIndex"
-          :pages="pages"
-        />
-        <div :class="css.preview">
-          {{ t('download.preview') }}
+      <div class="container relative">
+        <div :class="css.controls">
+          <CarouselControls
+            v-if="swiper"
+            v-model:swiper="swiper"
+            :active-index="activeIndex"
+            :pages="pages"
+          />
+          <div :class="css.preview">
+            {{ t('download.preview') }}
+          </div>
         </div>
       </div>
     </div>
@@ -82,7 +84,7 @@ scanImages();
     }
 
     .controls {
-      @apply flex flex-col absolute -bottom-[1.75rem] md:-bottom-[3rem] z-10 left-5 right-5 items-center justify-center;
+      @apply flex flex-col absolute -bottom-[1.75rem] md:-bottom-[3rem] z-10 left-0 right-0 md:-left-6 md:-right-6 items-center justify-center;
 
       .preview {
         @apply px-4 py-3 md:px-8 md:py-6 rounded-xl border border-black/[.12] bg-white text-h5 md:text-h4 font-bold;
