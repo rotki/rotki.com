@@ -3,7 +3,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div class="flex space-x-4 flex-wrap justify-center">
+  <div class="flex space-x-3 xl:space-x-4 flex-wrap justify-center">
     <ButtonLink size="lg" to="/" highlight-exact-active>{{
       t('navigation_menu.home')
     }}</ButtonLink>

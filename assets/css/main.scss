@@ -9,7 +9,7 @@
 }
 
 .container {
-  @apply px-4;
+  @apply px-4 md:px-12 xl:px-16;
 }
 
 .fade-enter-active, .fade-leave-active {
