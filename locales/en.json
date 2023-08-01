@@ -21,6 +21,7 @@
         "line_3": "Your password can't be a commonly used password.",
         "line_4": "Your password can't be entirely numeric."
       },
+      "optional": "Optional.",
       "required": "Required."
     },
     "login": {
