@@ -18,8 +18,8 @@ describe('api utilities', () => {
       `/webapi/countries`,
     );
 
-    assert.isArray(response.result);
-    assert.equal(response.result?.length, 249);
+    expect(response.result).toMatchObject([{ name: 'Country', code: 'CT' }]);
+    expect(response.result).toHaveLength(1);
     expect(refresh).toBeCalled();
     expect(refresh).toHaveBeenCalledOnce();
   }, 5000);
