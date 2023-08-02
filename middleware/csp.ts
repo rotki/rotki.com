@@ -6,6 +6,7 @@ import { isClient } from '@vueuse/core';
  */
 export default defineNuxtRouteMiddleware((to, from) => {
   if (isClient && from.path === '/checkout/payment-method') {
+    abortNavigation();
     window.location.href = to.fullPath;
   }
 });
