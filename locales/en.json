@@ -318,5 +318,8 @@
   },
   "page_header": {
     "manage_premium": "Manage Premium"
+  },
+  "country_select": {
+    "no_data": "No matching countries found"
   }
 }
