@@ -182,7 +182,11 @@ const { t } = useI18n();
         :hint="t('auth.common.required')"
         :error-messages="toMessages(v$.country)"
         @blur="v$.country.$touch()"
-      />
+      >
+        <template #no-data>
+          {{ t('country_select.no_data') }}
+        </template>
+      </RuiAutoComplete>
       <Recaptcha
         id="signup-captcha"
         :invalid="v$.captcha.$invalid && v$.captcha.$dirty"

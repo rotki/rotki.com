@@ -128,7 +128,7 @@ const { t } = useI18n();
       </ButtonLink>
     </div>
   </div>
-  <div v-if="hadError" class="mt-14 w-[660px]">
+  <div v-if="hadError" :class="modal ? 'w-[360px] mt-8' : 'w-[660px] mt-14'">
     <RuiAlert type="error" :description="t('auth.login.alert_error')" />
   </div>
 </template>
