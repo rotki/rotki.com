@@ -328,5 +328,6 @@
   },
   "country_select": {
     "no_data": "No matching countries found"
-  }
+  },
+  "logout": "Logout"
 }
