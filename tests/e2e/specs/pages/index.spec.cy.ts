@@ -34,7 +34,7 @@ describe('Homepage test', () => {
       .get('div')
       .contains(
         'h3',
-        'You can download rotki in your computer and start using it for free right now. Binaries available for all major Operating Systems.',
+        'Download now and start using across all major Operating Systems',
       )
       .first();
 
