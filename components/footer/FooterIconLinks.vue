@@ -15,7 +15,7 @@ const menus = [
   {
     title: 'Discord',
     showText: false,
-    href: 'https://discord.gg/aGCxHG7',
+    href: 'https://discord.rotki.com',
     icon: 'discord-line',
   },
   {
