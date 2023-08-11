@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import 'swiper/css';
 import { get } from '@vueuse/core';
-import { RuiFooterStepper } from '@rotki/ui-library';
 import type { Swiper } from 'swiper/types';
 
 const props = withDefaults(

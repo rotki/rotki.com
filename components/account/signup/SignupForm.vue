@@ -142,10 +142,6 @@ const setErrors = (errors: ValidationErrors) => {
   <div
     class="container flex flex-col lg:flex-row pt-4 pb-8 lg:py-14 h-full grow"
   >
-    <div class="lg:hidden mb-14 [&>div>div]:pt-4 [&>div>hr]:!mt-4">
-      <RuiStepper custom orientation="horizontal" :step="step" :steps="steps" />
-    </div>
-
     <div class="flex justify-center grow">
       <form class="w-[440px] flex flex-col justify-between" @submit.prevent="">
         <SignupIntroduction v-if="step === 1" @next="next()" />
@@ -172,8 +168,8 @@ const setErrors = (errors: ValidationErrors) => {
           @back="back()"
           @finish="signup($event)"
         />
-        <div class="mt-4 p-6">
-          <RuiFooterStepper v-model="step" :pages="4" variant="pill" />
+        <div class="py-10 lg:px-4">
+          <RuiFooterStepper :model-value="step" :pages="4" variant="pill" />
         </div>
       </form>
     </div>

@@ -216,7 +216,7 @@ const { t } = useI18n();
     <RuiButton
       data-cy="back-button"
       type="button"
-      class="w-full"
+      class="w-full row-start-2 md:row-start-auto"
       size="lg"
       @click="emit('back')"
     >
