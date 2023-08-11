@@ -4,9 +4,9 @@ const { t } = useI18n();
 
 <template>
   <div
-    class="container py-16 lg:pt-[250px] lg:pb-32 flex flex-col items-center justify-center"
+    class="container h-full flex flex-col pt-10 md:pt-0 md:flex-1 md:items-center md:justify-center"
   >
-    <div class="w-[500px] space-y-3">
+    <div class="max-w-[30.6rem] space-y-3">
       <div class="text-h4">{{ t('auth.pending_activation.title') }}</div>
       <div class="text-body-1 text-rui-text-secondary">
         {{ t('auth.pending_activation.message') }}

@@ -153,7 +153,7 @@ const { t } = useI18n();
   <div class="mt-16 grid md:grid-cols-2 gap-4">
     <RuiButton
       type="button"
-      class="w-full"
+      class="w-full row-start-2 md:row-start-auto"
       size="lg"
       data-cy="back-button"
       @click="emit('back')"
