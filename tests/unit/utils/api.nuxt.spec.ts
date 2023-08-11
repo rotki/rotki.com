@@ -1,4 +1,4 @@
-import { afterEach, assert, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Account, ApiResponse } from '~/types';
 import { fetchWithCsrf, setHooks, sleep } from '~/utils/api';
 import { type Country } from '~/composables/countries';
@@ -14,57 +14,49 @@ describe('api utilities', () => {
   });
 
   it('fetchWithCsrf: fetch countries runs correctly', async () => {
-    const response = await fetchWithCsrf<ApiResponse<Country[]>>(
-      `/webapi/countries`,
+    await expect(
+      fetchWithCsrf<ApiResponse<Country[]>>(`/webapi/countries`),
+    ).resolves.toMatchObject(
+      expect.objectContaining({
+        result: [{ name: 'Country', code: 'CT' }],
+      }),
     );
 
-    expect(response.result).toMatchObject([{ name: 'Country', code: 'CT' }]);
-    expect(response.result).toHaveLength(1);
     expect(refresh).toBeCalled();
     expect(refresh).toHaveBeenCalledOnce();
   }, 5000);
 
-  it('fetchWithCsrf: fetch account info with 401 error', () => {
-    const response = fetchWithCsrf<ApiResponse<Account>>(`/webapi/account`);
-
-    response.catch((e) => {
-      assert.equal(e.status, 401);
-      expect(logout).toBeCalled();
-      expect(logout).toHaveBeenCalledOnce();
-    });
+  it('fetchWithCsrf: fetch account info with 401 error', async () => {
+    await expect(
+      fetchWithCsrf<ApiResponse<Account>>(`/webapi/account`),
+    ).rejects.toMatch(/401/);
+    expect(logout).toBeCalled();
+    expect(logout).toHaveBeenCalledOnce();
   }, 2000);
 
-  it.skip('initCsrf: login and setup csrf successfully', async () => {
-    const response = await fetchWithCsrf<ApiResponse<undefined>>(
-      `/webapi/login/`,
-      {
+  it('initCsrf: login and setup csrf successfully', async () => {
+    await expect(
+      fetchWithCsrf<ApiResponse<undefined>>(`/webapi/login/`, {
         method: 'post',
         body: {
-          username: '',
-          password: '',
+          username: 'test',
+          password: '1234',
         },
-      },
-    );
-
-    assert.isString(response.message);
-    assert.isUndefined(response.result);
+      }),
+    ).resolves.toMatchObject({ message: 'success' });
   }, 2000);
 
   it('sleep: resolves with the exact timeout', async () => {
     const controller = new AbortController();
-    const res = await sleep(1000, controller.signal);
-
-    assert.equal(res, undefined);
+    await expect(sleep(1, controller.signal)).resolves.toBeUndefined();
   }, 1000);
 
-  it('sleep: early abort throws an error', () => {
+  it('sleep: early abort throws an error', async () => {
     const controller = new AbortController();
-    const aborter = sleep(2000, controller.signal);
 
-    controller.abort();
-
-    aborter.catch((e) => {
-      assert.equal(e.message, 'request aborted');
-    });
+    setTimeout(() => controller.abort(), 1);
+    await expect(sleep(2000, controller.signal)).rejects.toMatch(
+      /request aborted/,
+    );
   });
 });

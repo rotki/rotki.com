@@ -16,7 +16,7 @@
     "lint:all": "pnpm lint && pnpm lint:style",
     "typecheck": "npx nuxi typecheck",
     "test": "vitest run",
-    "test:watch": "vitest",
+    "test:watch": "vitest --ui",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --headless",
     "coverage": "vitest run --coverage",
