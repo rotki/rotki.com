@@ -1,38 +1,35 @@
 ---
 title: Impressum
+subtitle: Angaben gemäß § 5 TMG
 description: Impressum - DE
+address: "Rotki Solutions GmbH\n
+          Matthiasstr. 11\n
+          10249 Berlin\n
+          Handelsregister: HRB221065B\n
+          Registergericht: Amtsgericht Charlottenburg"
 ---
-
-## Angaben gemäß § 5 TMG
-
-<address>Rotki Solutions GmbH  
-Matthiasstr. 11  
-10249 Berlin  
-Handelsregister: HRB221065B  
-Registergericht: Amtsgericht Charlottenburg
-</address>
 
 ### Vertreten durch:
 
 Eleftherios Karapetsas
 
-## Kontakt
+##### Kontakt
 
 email: info@rotki.com
 
-## EU-Streitschlichtung
+##### EU-Streitschlichtung
 
 Die Europäische Kommission stellt eine Plattform zur
 Online-Streitbeilegung (OS) bereit:
 [https://ec.europa.eu/consumers/odr](https://ec.europa.eu/consumers/odr){target="_blank"}.
 Unsere E-Mail-Adresse finden Sie oben im Impressum
 
-## Verbraucherstreitbeilegung/Universalschlichtungsstelle
+##### Verbraucherstreitbeilegung/Universalschlichtungsstelle
 
 Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor
 einer Verbraucherschlichtungsstelle teilzunehmen.
 
-## Haftung für Inhalte
+##### Haftung für Inhalte
 
 Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf
 diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis
@@ -47,7 +44,7 @@ diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer
 konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden
 Rechtsverletzungen werden wir diese Inhalte umgehend entfernen
 
-## Haftung für Links
+##### Haftung für Links
 
 Unser Angebot enthält Links zu externen Websites Dritter, auf deren
 Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden
@@ -62,7 +59,7 @@ ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei
 Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend
 entfernen.
 
-## Urheberrecht
+##### Urheberrecht
 
 Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen
 Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung,

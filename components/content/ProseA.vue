@@ -23,6 +23,6 @@ const css = useCssModule();
 
 <style module lang="scss">
 .link {
-  @apply text-rui-primary hover:text-rui-primary-darker font-medium;
+  @apply text-rui-primary hover:text-rui-primary-darker font-medium underline;
 }
 </style>
