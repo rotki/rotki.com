@@ -6,7 +6,7 @@ import {
   hostedFields,
   threeDSecure,
 } from 'braintree-web';
-import { type ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure';
+import { type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import { get, set } from '@vueuse/core';
 import { type Ref } from 'vue';
 import { type SelectedPlan } from '~/types';
@@ -264,7 +264,7 @@ const submit = async () => {
         next();
       },
       removeFrame: () => updatePending(),
-      amount: parseFloat(selectedPlan.finalPriceInEur),
+      amount: selectedPlan.finalPriceInEur,
       nonce: token.nonce,
       bin: token.details.bin,
     };
