@@ -3,7 +3,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div class="flex flex-wrap justify-center space-x-2">
+  <div class="flex flex-wrap justify-center gap-x-4">
     <ButtonLink size="lg" to="/impressum" highlight-active>
       {{ t('footer_legalese.impressum') }}
     </ButtonLink>
