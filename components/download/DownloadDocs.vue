@@ -21,6 +21,7 @@ const css = useCssModule();
           <ButtonLink
             color="primary"
             variant="default"
+            size="lg"
             external
             to="https://rotki.readthedocs.io/en/latest/index.html"
           >
@@ -43,7 +44,7 @@ const css = useCssModule();
     @apply flex flex-col;
 
     .title {
-      @apply text-rui-light-primary text-h6 mb-3;
+      @apply text-rui-light-primary text-h6 mb-3 font-medium;
     }
 
     .heading {

@@ -16,16 +16,18 @@ const css = useCssModule();
     <div :class="css.icon">
       <RuiIcon :name="icon" color="primary" />
     </div>
-    <div>
-      <p :class="css.for">{{ t('download.download_for') }}</p>
-      <h6 :class="css.platform">{{ platform }}</h6>
-    </div>
-    <div :class="css.action">
-      <a :href="url" download>
-        <RuiButton color="primary" size="lg">
-          {{ t('download.action') }}
-        </RuiButton>
-      </a>
+    <div :class="css.body">
+      <div>
+        <p :class="css.for">{{ t('download.download_for') }}</p>
+        <h6 :class="css.platform">{{ platform }}</h6>
+      </div>
+      <div>
+        <a :href="url" download>
+          <RuiButton color="primary" size="lg">
+            {{ t('download.action') }}
+          </RuiButton>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -39,16 +41,16 @@ const css = useCssModule();
     @apply flex items-center justify-center p-3 w-12 h-12 bg-white rounded-[0.625rem] text-rui-primary;
   }
 
+  .body {
+    @apply flex items-end md:items-start justify-between md:flex-col space-x-4 md:space-x-0 md:space-y-4;
+  }
+
   .for {
-    @apply text-body-1 text-rui-light-secondary;
+    @apply text-body-1 text-rui-text-secondary;
   }
 
   .platform {
-    @apply text-h6;
-  }
-
-  .action {
-    @apply inline-flex grow items-end;
+    @apply text-h6 font-medium;
   }
 }
 </style>
