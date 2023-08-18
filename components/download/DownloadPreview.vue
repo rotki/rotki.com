@@ -84,7 +84,7 @@ scanImages();
     }
 
     .controls {
-      @apply flex flex-col absolute -bottom-[1.75rem] md:-bottom-[3rem] z-10 -left-2 -right-2 md:-left-6 md:-right-6 items-center justify-center;
+      @apply flex flex-col absolute -bottom-[1.75rem] md:-bottom-[3rem] -left-2 -right-2 md:-left-6 md:-right-6 items-center justify-center z-[1];
 
       .preview {
         @apply mt-2 md:mt-0 px-8 py-2 md:py-6 rounded-xl border border-black/[.12] bg-white text-h5 md:text-h4 font-medium;
