@@ -66,19 +66,25 @@ export const useMarkdownContent = () => {
   const queryPrefixForJob = async (
     prefix: typeof CONTENT_PREFIX,
     path: string,
-  ): Promise<JobMarkdownContent> => {
+  ): Promise<JobMarkdownContent | null> => {
     const prefixedPath = `${prefix}${path}`;
-    const data = await queryContent<JobMarkdownContent>(prefixedPath).findOne();
-    return {
-      ...data,
-      link: replacePathPrefix(prefix, data?._path),
-    };
+    try {
+      const data = await queryContent<JobMarkdownContent>(
+        prefixedPath,
+      ).findOne();
+      return {
+        ...data,
+        link: replacePathPrefix(prefix, data?._path),
+      };
+    } catch {
+      return null;
+    }
   };
 
   /**
    * fetches a single markdown files within the jobs directory
    */
-  const loadJob = async (path: string): Promise<JobMarkdownContent> => {
+  const loadJob = async (path: string): Promise<JobMarkdownContent | null> => {
     try {
       // try to fetch from prefix
       return await queryPrefixForJob(CONTENT_PREFIX, path);
