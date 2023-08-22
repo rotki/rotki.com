@@ -68,7 +68,7 @@ const { t } = useI18n();
   <div
     class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
   >
-    <div class="w-[360px] space-y-8">
+    <div class="w-[360px] max-w-full space-y-8">
       <div class="text-h4">{{ t('auth.recover_password.title') }}</div>
 
       <form class="space-y-6" @submit.prevent="">

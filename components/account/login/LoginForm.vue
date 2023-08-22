@@ -61,7 +61,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div class="w-[360px] space-y-8">
+  <div class="w-[360px] max-w-full space-y-8">
     <div class="space-y-3">
       <div class="text-h4">{{ t('auth.login.title') }}</div>
       <div class="text-body-1 text-rui-text-secondary">
@@ -128,7 +128,11 @@ const { t } = useI18n();
       </ButtonLink>
     </div>
   </div>
-  <div v-if="hadError" :class="modal ? 'w-[360px] mt-8' : 'w-[660px] mt-14'">
+  <div
+    v-if="hadError"
+    class="max-w-full"
+    :class="modal ? 'w-[360px] mt-8' : 'w-[660px] mt-14'"
+  >
     <RuiAlert type="error" :description="t('auth.login.alert_error')" />
   </div>
 </template>

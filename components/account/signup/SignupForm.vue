@@ -140,7 +140,10 @@ const setErrors = (errors: ValidationErrors) => {
     class="container flex flex-col lg:flex-row pt-4 pb-8 lg:py-14 h-full grow"
   >
     <div class="flex justify-center grow">
-      <form class="w-[440px] flex flex-col justify-between" @submit.prevent="">
+      <form
+        class="w-[440px] max-w-full flex flex-col justify-between"
+        @submit.prevent=""
+      >
         <SignupIntroduction v-if="step === 1" @next="next()" />
         <SignupAccount
           v-if="step === 2"

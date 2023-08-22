@@ -29,7 +29,7 @@ const { t } = useI18n();
   <div
     class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
   >
-    <div class="w-[380px]">
+    <div class="w-[380px] max-w-full">
       <div v-if="validating" class="flex justify-center">
         <RuiProgress variant="indeterminate" circular color="primary" />
       </div>
