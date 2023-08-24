@@ -10,7 +10,7 @@ const menus = [
     title: 'Twitter',
     showText: false,
     href: 'https://twitter.com/rotkiapp',
-    icon: 'twitter-line',
+    icon: 'twitter-x-line',
   },
   {
     title: 'Discord',
