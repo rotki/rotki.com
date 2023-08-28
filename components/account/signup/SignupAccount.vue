@@ -94,6 +94,7 @@ const { t } = useI18n();
           type="password"
           :model-value="modelValue.password"
           variant="outlined"
+          color="primary"
           dense
           autocomplete="new-password"
           :label="t('auth.common.password')"

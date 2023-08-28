@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware(() => {
     );
 
     if (!renewableSubscriptions) {
-      return navigateTo('/home');
+      return navigateTo('/home/subscription');
     }
   }
 });

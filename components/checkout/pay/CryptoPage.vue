@@ -38,7 +38,7 @@ onMounted(async () => {
         set(error, result.error.message);
       }
     } else if (result.result.transactionStarted) {
-      await navigateTo('/home');
+      await navigateTo('/home/subscription');
     } else {
       set(data, result.result);
     }

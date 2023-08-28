@@ -18,7 +18,7 @@ const { t } = useI18n();
         variant="default"
         class="w-full"
         size="lg"
-        to="/home"
+        to="/home/subscription"
       >
         {{ t('actions.continue') }}
       </ButtonLink>

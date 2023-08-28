@@ -57,7 +57,7 @@ const allowNavigation = computed(() => {
     rounded
     filled
     color="primary"
-    to="/home"
+    to="/home/subscription"
   >
     Manage Premium
   </ButtonLink>

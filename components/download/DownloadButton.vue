@@ -11,7 +11,7 @@ const { t } = useI18n();
       rounded
       color="primary"
     >
-      {{ t('actions.download') }}
+      {{ t('actions.start_now_for_free') }}
     </RuiButton>
   </NuxtLink>
 </template>

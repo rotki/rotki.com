@@ -37,7 +37,7 @@ const reset = async () => {
   set(loading, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/request/', {
-      method: 'post',
+      method: 'POST',
       body: {
         captcha: get(recaptchaToken),
         email: get(emailAddress),

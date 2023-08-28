@@ -53,7 +53,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<ApiResponse<Account>>(
         '/webapi/account/',
         {
-          method: 'get',
+          method: 'GET',
         },
       );
       set(authenticated, true);
@@ -69,7 +69,7 @@ export const useMainStore = defineStore('main', () => {
   }: LoginCredentials): Promise<string> => {
     try {
       await fetchWithCsrf<string>('/webapi/login/', {
-        method: 'post',
+        method: 'POST',
         credentials: 'include',
         body: {
           username,
@@ -97,7 +97,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<ApiResponse<ApiKeys>>(
         '/webapi/regenerate-keys/',
         {
-          method: 'patch',
+          method: 'PATCH',
         },
       );
       const acc = get(account);
@@ -118,7 +118,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<ChangePasswordResponse>(
         '/webapi/change-password/',
         {
-          method: 'patch',
+          method: 'PATCH',
           body: payload,
         },
       );
@@ -148,7 +148,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<UpdateProfileResponse>(
         '/webapi/account/',
         {
-          method: 'patch',
+          method: 'PATCH',
           body: payload,
         },
       );
@@ -188,7 +188,7 @@ export const useMainStore = defineStore('main', () => {
         '/webapi/account/',
         {
           body: payload,
-          method: 'delete',
+          method: 'DELETE',
         },
       );
 
@@ -211,6 +211,14 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const { stop, start } = useTimeoutFn(() => set(cancellationError, ''), 7000);
+
+  const subscriptions: ComputedRef<Subscription[]> = computed(() => {
+    const userAccount = get(account);
+    if (!userAccount) {
+      return [];
+    }
+    return userAccount.subscriptions;
+  });
 
   const cancelSubscription = async (subscription: Subscription) => {
     const acc = get(account);
@@ -242,7 +250,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<CancelSubscriptionResponse>(
         `/webapi/subscription/${subscription.identifier}`,
         {
-          method: 'delete',
+          method: 'DELETE',
         },
       );
       const data = CancelSubscriptionResponse.parse(response);
@@ -270,7 +278,7 @@ export const useMainStore = defineStore('main', () => {
 
     try {
       const response = await fetchWithCsrf<PremiumResponse>('/webapi/premium', {
-        method: 'get',
+        method: 'GET',
       });
       const data = PremiumResponse.parse(response);
       set(plans, data.result.plans);
@@ -285,7 +293,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<CardCheckoutResponse>(
         `/webapi/checkout/card/${plan}`,
         {
-          method: 'get',
+          method: 'GET',
         },
       );
       const data = CardCheckoutResponse.parse(response);
@@ -309,7 +317,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<CardPaymentResponse>(
         '/webapi/payment/btr',
         {
-          method: 'post',
+          method: 'POST',
           body: request,
         },
       );
@@ -350,7 +358,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/payment/crypto',
         {
-          method: 'post',
+          method: 'POST',
           body: convertKeys(
             {
               currency,
@@ -424,7 +432,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
         'webapi/payment/pending',
         {
-          method: 'patch',
+          method: 'PATCH',
         },
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
@@ -456,7 +464,7 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
         'webapi/payment/pending',
         {
-          method: 'delete',
+          method: 'DELETE',
         },
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
@@ -496,7 +504,7 @@ export const useMainStore = defineStore('main', () => {
     if (callApi) {
       try {
         await fetchWithCsrf<UpdateProfileResponse>('/webapi/logout/', {
-          method: 'post',
+          method: 'POST',
         });
       } catch (e) {
         logger.error(e);
@@ -519,6 +527,7 @@ export const useMainStore = defineStore('main', () => {
     account,
     plans,
     cancellationError,
+    subscriptions,
     login,
     getAccount,
     changePassword,

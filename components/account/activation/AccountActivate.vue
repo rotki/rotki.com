@@ -45,7 +45,7 @@ const { t } = useI18n();
           <span>
             {{ t('auth.activation.success.message') }}
           </span>
-          <ButtonLink to="/home" inline color="primary">
+          <ButtonLink to="/home/subscription" inline color="primary">
             {{ t('common.here') }}
           </ButtonLink>
         </div>

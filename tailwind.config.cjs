@@ -1,4 +1,6 @@
 module.exports = {
+  mode: 'jit',
+  darkMode: 'class',
   content: [
     './components/**/*.{vue,js,ts}',
     './layouts/**/*.vue',

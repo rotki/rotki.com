@@ -121,24 +121,127 @@
     }
   },
   "account": {
+    "account_deleted": {
+      "message": "Your rotki premium account has been successfully deleted.",
+      "title": "Your account was deleted"
+    },
+    "address": {
+      "country": {
+        "hint": "Required. Email us at {email} if you need to change your billing country."
+      }
+    },
+    "api_keys": {
+      "title": "API Credentials",
+      "api_key": "API Key",
+      "api_secret": "API Secret"
+    },
     "unverified_email": {
       "message": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail."
-    }
+    },
+    "moved_offline": "Moved offline. For editing please contact {email}.",
+    "no_premium": {
+      "title": "Rotki Premium",
+      "no_premium_found": "No premium subscription found. Select your {plan}.",
+      "plan": "premium subscription plan"
+    },
+    "change_password": {
+      "title": "Change Password",
+      "current_password": {
+        "label": "Current Password",
+        "hint": "Enter your current account password. Only needed if you want to change password"
+      },
+      "new_password": {
+        "label": "New password"
+      },
+      "message": {
+        "success": "Your password has been changed."
+      }
+    },
+    "delete_account": {
+      "title": "Delete account",
+      "description": "Proceeding will completely delete your account data. If you proceed you will not be able to recover your account!",
+      "unable_to_delete": "You cannot delete your account while you have an active subscription.",
+      "delete_my_account": "Delete my account",
+      "confirmation": {
+        "description": "By proceeding you will delete your account and all its accompanying data from our servers. This action is not reversible. Are you sure you want to perform the deletion?\n\nType your username to continue: {username}"
+      },
+      "notification": {
+        "title": "Account deletion failed"
+      }
+    },
+    "payments": {
+      "no_payments_found": "No payments found",
+      "paid": "Paid",
+      "headers": {
+        "paid_at": "Paid at",
+        "amount_in_symbol": "Amount in {symbol}"
+      },
+      "title": "Your latest payments"
+    },
+    "subscriptions": {
+      "cancellation": {
+        "actions": {
+          "no": "No, don't cancel",
+          "yes": "Yes, cancel my subsciption"
+        },
+        "title": "Canceling Your Rotki Subscription",
+        "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a Rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the Rotki community.",
+        "bug_tracker": "bug tracker",
+        "subscription_status": {
+          "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all Rotki premium features.",
+          "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."
+        },
+        "benefits": {
+          "1": "Rotki is open-source software, and your subscription helps support its development.",
+          "2": "As a premium user, you have priority for all issues reported in our {bug_tracker} when you provide your Github username. The same applies to any feature requests you may have.",
+          "3": "If you cancel your subscription, you will no longer be able to use any Rotki premium features until you subscribe again.",
+          "4": "We're constantly developing new premium features that will soon be available to our subscribers."
+        },
+        "notification": {
+          "title": "Cancellation Failure"
+        }
+      },
+      "headers": {
+        "created": "Created",
+        "next_billing": "Next Billing",
+        "cost_in_symbol_per_period": "Cost in {symbol} per period"
+      },
+      "no_subscriptions_found": "No subscriptions found",
+      "title": "Subscription History"
+    },
+    "tabs": {
+      "subscription": "Subscription",
+      "account_details": "Account Details",
+      "customer_information": "Customer Information",
+      "address": "Address"
+    },
+    "welcome": "Welcome"
   },
   "actions": {
     "apply": "Apply",
     "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
     "continue": "Continue",
-    "download": "Start now for free",
-    "get_premium": "Get Premium",
-    "get_premium_plan": "Get Premium Plan",
+    "download": "Download",
+    "generate": "Generate",
     "get_advanced_plan": "Get Advanced Plan",
     "get_in_touch": "Get In Touch Now",
+    "get_premium": "Get Premium",
+    "get_premium_plan": "Get Premium Plan",
     "go_back_home": "Go back home",
-    "submit": "Submit"
+    "regenerate": "Regenerate",
+    "renew": "Renew",
+    "start_now_for_free": "Start now for free",
+    "submit": "Submit",
+    "update": "Update"
   },
   "common": {
-    "here": "here"
+    "here": "here",
+    "actions": "actions",
+    "status": "status",
+    "none": "none",
+    "plan": "plan"
   },
   "supported_defi": {
     "title": "Dedicated DeFi support for",
@@ -380,5 +483,8 @@
         "description": "Contribute code/issues."
       }
     }
+  },
+  "notifications": {
+    "changes_saved": "Your changes have been successfully saved!"
   }
 }

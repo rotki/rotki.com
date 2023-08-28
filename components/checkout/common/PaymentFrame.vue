@@ -84,7 +84,9 @@ const css = useCssModule();
           :title="text.title"
         >
           <div :class="css['action-wrapper']">
-            <NuxtLink :class="css.action" to="/home"> Manage Premium </NuxtLink>
+            <NuxtLink :class="css.action" to="/home/subscription">
+              Manage Premium
+            </NuxtLink>
           </div>
         </SuccessDisplay>
       </div>

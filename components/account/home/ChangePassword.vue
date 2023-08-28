@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
-import { storeToRefs } from 'pinia';
+import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { type ActionResult } from '~/types/common';
 
@@ -9,12 +9,6 @@ const loading = ref(false);
 const success = ref(false);
 
 const store = useMainStore();
-const { account } = storeToRefs(store);
-
-const email = computed(() => {
-  const userAccount = account.value;
-  return !userAccount ? '' : userAccount.email;
-});
 
 const state = reactive({
   currentPassword: '',
@@ -41,102 +35,130 @@ const v$ = useVuelidate(rules, state, {
 let pendingTimeout: any;
 
 const changePassword = async () => {
-  loading.value = true;
+  set(loading, true);
   const result: ActionResult = await store.changePassword(state);
-  loading.value = false;
+  set(loading, false);
   if (result.message && typeof result.message !== 'string') {
-    $externalResults.value = result.message;
+    set($externalResults, result.message);
   }
 
   if (result.success) {
-    success.value = true;
+    set(success, true);
     if (pendingTimeout) {
       clearTimeout(pendingTimeout);
       pendingTimeout = undefined;
     }
     pendingTimeout = setTimeout(() => {
-      success.value = false;
+      set(success, false);
     }, 4000);
-    state.currentPassword = '';
-    state.newPassword = '';
-    state.passwordConfirmation = '';
-    v$.value.$reset();
+    reset();
   }
 };
 
-const css = useCssModule();
+const reset = () => {
+  state.currentPassword = '';
+  state.newPassword = '';
+  state.passwordConfirmation = '';
+  get(v$).$reset();
+};
+
+const { t } = useI18n();
 </script>
 
 <template>
-  <CardContainer>
-    <TextHeading subheading>Account Details</TextHeading>
-    <InputField
-      id="email"
-      :model-value="email"
-      disabled
-      hint="At the moment user email can't be changed. Email us support@rotki.com if you need to do so."
-      label="Email"
-      readonly
-      type="email"
-    />
+  <div>
+    <div class="text-h6 mb-6">{{ t('account.change_password.title') }}</div>
+    <div>
+      <div class="space-y-5">
+        <RuiRevealableTextField
+          id="current-password"
+          v-model="state.currentPassword"
+          variant="outlined"
+          color="primary"
+          :error-messages="toMessages(v$.currentPassword)"
+          :hint="t('account.change_password.current_password.hint')"
+          :label="t('account.change_password.current_password.label')"
+          autocomplete="current-password"
+        />
 
-    <TextHeading subheading>Change Password</TextHeading>
+        <div class="space-y-1">
+          <RuiRevealableTextField
+            id="new-password"
+            v-model="state.newPassword"
+            color="primary"
+            variant="outlined"
+            hide-details
+            :label="t('account.change_password.new_password.label')"
+            autocomplete="new-password"
+            :error-messages="toMessages(v$.newPassword).length > 0 ? [''] : []"
+          />
 
-    <InputField
-      id="current-password"
-      v-model="state.currentPassword"
-      :error-messages="v$.currentPassword.$errors"
-      hint="Enter your current account password. Only needed if you want to change password"
-      label="Current Password"
-      type="password"
-      autocomplete="current-password"
-    />
+          <ul
+            class="ml-4 list-disc text-caption"
+            :class="
+              toMessages(v$.newPassword).length > 0
+                ? 'text-rui-error'
+                : 'text-rui-text-secondary'
+            "
+          >
+            <li>
+              {{ t('auth.common.password_hint.line_1') }}
+            </li>
+            <li>
+              {{ t('auth.common.password_hint.line_2') }}
+            </li>
+            <li>
+              {{ t('auth.common.password_hint.line_3') }}
+            </li>
+            <li>
+              {{ t('auth.common.password_hint.line_4') }}
+            </li>
+          </ul>
+        </div>
 
-    <InputField
-      id="new-password"
-      v-model="state.newPassword"
-      :error-messages="v$.newPassword.$errors"
-      hint="Enter a new password for your account"
-      label="New Password"
-      type="password"
-      autocomplete="new-password"
-    />
+        <RuiRevealableTextField
+          id="password-confirmation"
+          v-model="state.passwordConfirmation"
+          color="primary"
+          :error-messages="toMessages(v$.passwordConfirmation)"
+          variant="outlined"
+          :label="t('auth.signup.account.form.confirm_password')"
+          :hint="t('auth.common.confirm_hint')"
+          autocomplete="new-password"
+        />
+      </div>
 
-    <InputField
-      id="password-confirmation"
-      v-model="state.passwordConfirmation"
-      :error-messages="v$.passwordConfirmation.$errors"
-      hint="Enter the same password as before, for verification."
-      label="Password Confirmation"
-      type="password"
-      autocomplete="new-password"
-    />
+      <div class="mt-10 mb-5 border-t border-grey-50" />
 
-    <div class="my-5 border-t border-grey-50" />
-
-    <div class="flex justify-end mt-8">
-      <span v-if="success" :class="css.success">
-        <CheckMarkIcon /> Your password has been changed.
-      </span>
-      <RuiButton
-        :disabled="v$.$invalid"
-        size="lg"
-        :loading="loading"
-        color="primary"
-        @click="changePassword()"
-      >
-        Change Password
-      </RuiButton>
+      <div class="flex justify-end gap-3">
+        <RuiButton
+          size="lg"
+          color="primary"
+          variant="outlined"
+          @click="reset()"
+        >
+          {{ t('actions.cancel') }}
+        </RuiButton>
+        <RuiButton
+          :disabled="v$.$invalid"
+          size="lg"
+          :loading="loading"
+          color="primary"
+          @click="changePassword()"
+        >
+          {{ t('actions.update') }}
+        </RuiButton>
+      </div>
     </div>
-  </CardContainer>
+  </div>
+
+  <FloatingNotification
+    type="success"
+    closeable
+    :visible="success"
+    :timeout="3000"
+    @dismiss="success = false"
+  >
+    {{ t('account.change_password.message.success') }}
+  </FloatingNotification>
 </template>
-
-<style lang="scss" module>
-.row {
-  @apply flex-row flex;
-}
-
-.success {
-  @apply flex flex-row mr-4 mt-6 text-rui-grey-800 transition duration-300 ease-in-out;
-}
-</style>

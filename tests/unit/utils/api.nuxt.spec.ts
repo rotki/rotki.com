@@ -37,7 +37,7 @@ describe('api utilities', () => {
   it('initCsrf: login and setup csrf successfully', async () => {
     await expect(
       fetchWithCsrf<ApiResponse<undefined>>(`/webapi/login/`, {
-        method: 'post',
+        method: 'POST',
         body: {
           username: 'test',
           password: '1234',

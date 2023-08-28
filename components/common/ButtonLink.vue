@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
+import { type RouteLocationRaw } from 'vue-router';
 
 defineOptions({
   inheritAttrs: false,
@@ -7,7 +8,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    to: string;
+    to: RouteLocationRaw;
     external?: boolean;
     inline?: boolean;
     highlightActive?: boolean;
@@ -56,7 +57,7 @@ const getColor = (active: boolean, exact: boolean) => {
       :class="{ ['inline-flex py-0 !px-1 !text-[1em]']: inline }"
     >
       <slot>
-        {{ to }}
+        {{ link?.href }}
       </slot>
       <template #append>
         <slot name="append" />

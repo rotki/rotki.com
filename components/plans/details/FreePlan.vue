@@ -4,7 +4,7 @@ const css = useCssModule();
 </script>
 
 <template>
-  <PlanBox :action="t('actions.download')" url="/download">
+  <PlanBox :action="t('actions.start_now_for_free')" url="/download">
     <template #title>{{ t('home.plans.details.free.title') }}</template>
     {{ t('home.plans.details.free.subtitle') }}
     <div :class="css.filler" />

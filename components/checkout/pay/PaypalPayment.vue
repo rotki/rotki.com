@@ -126,12 +126,10 @@ const css = useCssModule();
     <div id="paypal-button" :class="css.buttons" />
     <SelectedPlanOverview :plan="plan" />
     <AcceptRefundPolicy v-model="accepted" />
-    <ErrorNotification :visible="mustAcceptRefund">
+    <FloatingNotification :visible="mustAcceptRefund">
       <template #title> Refund policy </template>
-      <template #description>
-        You need to accept the refund policy before proceeding
-      </template>
-    </ErrorNotification>
+      You need to accept the refund policy before proceeding
+    </FloatingNotification>
   </div>
 </template>
 

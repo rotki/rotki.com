@@ -1,94 +1,89 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
+import { type Payment } from 'types';
+import { type Ref } from 'vue';
+import {
+  type DataTableColumn,
+  type DataTableSortColumn,
+  type TablePaginationData,
+} from '@rotki/ui-library';
 import { useMainStore } from '~/store';
-import { type DataTableHeader } from '~/types/common';
 
-const headers: DataTableHeader[] = [
-  { text: 'Plan', value: '' },
-  { text: 'Paid at', value: '', sortable: true },
-  { text: 'Amount in €', value: '', sortable: true },
-  { text: 'Status', value: '' },
-  { text: 'Receipt', value: '', className: 'text-right' },
+const { t } = useI18n();
+
+const headers: DataTableColumn<Payment>[] = [
+  {
+    label: t('common.plan'),
+    key: 'plan',
+    cellClass: 'font-bold',
+    class: 'capitalize',
+  },
+  {
+    label: t('account.payments.headers.paid_at'),
+    key: 'paidAt',
+    sortable: true,
+  },
+  {
+    label: t('account.payments.headers.amount_in_symbol', { symbol: '€' }),
+    key: 'eurAmount',
+    sortable: true,
+    align: 'end',
+  },
+  { label: t('common.status'), key: 'status', class: 'capitalize' },
+  {
+    label: t('common.actions'),
+    key: 'actions',
+    align: 'end',
+    class: 'capitalize',
+  },
 ];
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
+
+const pagination: Ref<TablePaginationData | undefined> = ref();
+const sort: Ref<DataTableSortColumn<Payment>[]> = ref([]);
+
 const payments = computed(() => {
   const userAccount = get(account);
   if (!userAccount) {
     return [];
   }
+
   return userAccount.payments.sort(
     (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
   );
 });
-
-const css = useCssModule();
 </script>
 
 <template>
-  <DataTable v-if="payments.length > 0" :headers="headers" :items="payments">
-    <template #title>Your latest payments</template>
-    <template #item="{ item }">
-      <td :class="css.td">
-        {{ item.plan }}
-      </td>
-      <td :class="css.td">
-        <div :class="css.text">
-          {{ item.paidAt }}
-        </div>
-      </td>
-      <td :class="css.td">
-        <div :class="css.text">
-          {{ item.eurAmount }}
-        </div>
-      </td>
+  <div>
+    <div class="text-h6 mb-6">{{ t('account.payments.title') }}</div>
+    <RuiDataTable
+      v-model:pagination="pagination"
+      v-model:sort="sort"
+      :cols="headers"
+      :empty="{ description: t('account.payments.no_payments_found') }"
+      :rows="payments"
+      outlined
+      row-attr="identifier"
+    >
+      <template #item.status>
+        <RuiChip size="sm" color="success">
+          {{ t('account.payments.paid') }}
+        </RuiChip>
+      </template>
 
-      <td :class="css.td">
-        <div :class="css.text">Paid</div>
-      </td>
-      <td :class="css.action">
-        <div :class="css.actionContainer">
-          <a
-            :class="css.actionButton"
-            :href="`/webapi/download/receipt/${item.identifier}`"
-            target="_blank"
-            download
-          >
-            <InfoTooltip>
-              <template #activator>
-                <ReceiptIcon />
-              </template>
-              Download Receipt
-            </InfoTooltip>
-          </a>
-        </div>
-      </td>
-    </template>
-  </DataTable>
+      <template #item.actions="{ row }">
+        <ButtonLink
+          :to="`/webapi/download/receipt/${row.identifier}`"
+          color="primary"
+          external
+        >
+          {{ t('actions.download') }}
+        </ButtonLink>
+      </template>
+    </RuiDataTable>
+  </div>
 </template>
-
-<style lang="scss" module>
-@import '@/assets/css/media.scss';
-
-.td {
-  @apply px-6 py-4 whitespace-nowrap;
-}
-
-.text {
-  @apply text-sm text-gray-500;
-}
-
-.action {
-  @apply px-6 py-4 whitespace-nowrap text-right text-sm font-medium;
-}
-
-.actionContainer {
-  @apply flex flex-row-reverse;
-}
-
-.actionButton {
-  @apply text-rui-primary hover:text-yellow-600;
-}
-</style>

@@ -16,7 +16,7 @@ function setupTokenValidation() {
   const validateToken = async () => {
     try {
       await fetchWithCsrf<void>('/webapi/password-reset/validate/', {
-        method: 'post',
+        method: 'POST',
         body: {
           uid,
           token,
@@ -74,7 +74,7 @@ const submit = async () => {
   set(submitting, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/confirm/', {
-      method: 'post',
+      method: 'POST',
       body: {
         uid,
         token,

@@ -50,7 +50,7 @@ const performLogin = async () => {
     if (get(modal)) {
       emit('complete');
     } else {
-      await navigateTo('/home');
+      await navigateTo('/home/subscription');
     }
   } else {
     set(hadError, true);

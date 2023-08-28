@@ -59,7 +59,7 @@ const signup = async ({
     const { result, message } = await fetchWithCsrf<
       ApiResponse<boolean, ValidationErrors>
     >('/webapi/signup/', {
-      method: 'post',
+      method: 'POST',
       body: {
         captcha: recaptchaToken,
         ...payload,
@@ -109,7 +109,7 @@ const back = () => {
   set(step, Math.max(get(step) - 1, 1));
 };
 const next = () => {
-  set(step, Math.min(get(step) + 1, 4));
+  set(step, Math.min(get(step) + 1, steps.length));
 };
 
 const haveIntersectionKeys = (obj1: object, obj2: object) => {

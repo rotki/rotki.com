@@ -11,6 +11,6 @@ export default defineNuxtRouteMiddleware(() => {
 
   const { emailConfirmed } = get(account);
   if (!emailConfirmed) {
-    return navigateTo('/home');
+    return navigateTo('/home/subscription');
   }
 });

@@ -7,10 +7,11 @@ import { useMainStore } from '~/store';
 
 const store = useMainStore();
 const state = reactive({
-  firstName: '',
-  lastName: '',
-  companyName: '',
-  vatId: '',
+  address1: '',
+  address2: '',
+  city: '',
+  postcode: '',
+  country: '',
 });
 
 const loading = ref(false);
@@ -27,10 +28,11 @@ onBeforeMount(() => {
 });
 
 const rules = {
-  firstName: { required },
-  lastName: { required },
-  companyName: {},
-  vatId: {},
+  address1: { required },
+  address2: {},
+  city: { required },
+  postcode: { required },
+  country: { required },
 };
 
 const $externalResults = ref<Record<string, string[]>>({});
@@ -56,10 +58,11 @@ const reset = () => {
   const offline = t('account.moved_offline', { email: supportEmail });
   const unavailable = get(movedOffline);
 
-  state.firstName = unavailable ? offline : userAccount.address.firstName;
-  state.lastName = unavailable ? offline : userAccount.address.lastName;
-  state.companyName = unavailable ? offline : userAccount.address.companyName;
-  state.vatId = unavailable ? offline : userAccount.address.vatId;
+  state.address1 = unavailable ? offline : userAccount.address.address1;
+  state.address2 = unavailable ? offline : userAccount.address.address2;
+  state.city = unavailable ? offline : userAccount.address.city;
+  state.postcode = unavailable ? offline : userAccount.address.postcode;
+  state.country = unavailable ? offline : userAccount.address.country;
 
   get(v$).$reset();
 };
@@ -78,8 +81,8 @@ const update = async () => {
 
   const payload = objectOmit(
     {
-      ...userAccount.address,
       githubUsername: userAccount.githubUsername,
+      ...userAccount.address,
       ...state,
     },
     ['movedOffline'],
@@ -100,54 +103,63 @@ const { t } = useI18n();
   <div class="pt-2">
     <div class="space-y-5">
       <RuiTextField
-        id="first-name"
-        v-model="state.firstName"
+        id="address-1"
+        v-model="state.address1"
         :disabled="movedOffline"
         variant="outlined"
         color="primary"
-        autocomplete="given-name"
-        :label="t('auth.signup.customer_information.form.first_name')"
-        :hint="t('auth.signup.customer_information.form.name_hint')"
-        :error-messages="toMessages(v$.firstName)"
-        @blur="v$.firstName.$touch()"
+        autocomplete="address-line1"
+        :label="t('auth.signup.address.form.address_line_1')"
+        :hint="t('auth.common.required')"
+        :error-messages="toMessages(v$.address1)"
+        @blur="v$.address1.$touch()"
       />
 
       <RuiTextField
-        id="last-name"
-        v-model="state.lastName"
+        id="address-2"
+        v-model="state.address2"
         :disabled="movedOffline"
         variant="outlined"
         color="primary"
-        autocomplete="family-name"
-        :label="t('auth.signup.customer_information.form.last_name')"
-        :hint="t('auth.signup.customer_information.form.name_hint')"
-        :error-messages="toMessages(v$.lastName)"
-        @blur="v$.lastName.$touch()"
+        autocomplete="address-line2"
+        :label="t('auth.signup.address.form.address_line_2')"
+        :hint="t('auth.common.optional')"
+        :error-messages="toMessages(v$.address2)"
+        @blur="v$.address2.$touch()"
       />
 
       <RuiTextField
-        id="company-name"
-        v-model="state.companyName"
+        id="city"
+        v-model="state.city"
         :disabled="movedOffline"
         variant="outlined"
         color="primary"
-        autocomplete="organization"
-        :label="t('auth.signup.customer_information.form.company')"
-        :hint="t('auth.signup.customer_information.form.company_hint')"
-        :error-messages="toMessages(v$.companyName)"
-        @blur="v$.companyName.$touch()"
+        autocomplete="address-level2"
+        :label="t('auth.signup.address.form.city')"
+        :hint="t('auth.common.required')"
+        :error-messages="toMessages(v$.city)"
+        @blur="v$.city.$touch()"
       />
 
       <RuiTextField
-        id="vat-id"
-        v-model="state.vatId"
+        id="postal"
+        v-model="state.postcode"
         :disabled="movedOffline"
         variant="outlined"
         color="primary"
-        :label="t('auth.signup.customer_information.form.vat_id')"
-        :hint="t('auth.signup.customer_information.form.vat_id_hint')"
-        :error-messages="toMessages(v$.vatId)"
-        @blur="v$.vatId.$touch()"
+        autocomplete="postal-code"
+        :label="t('auth.signup.address.form.postal_code')"
+        :hint="t('auth.common.required')"
+        :error-messages="toMessages(v$.postcode)"
+        @blur="v$.postcode.$touch()"
+      />
+
+      <CountrySelect
+        v-model="state.country"
+        disabled
+        :error-messages="toMessages(v$.country)"
+        :hint="t('account.address.country.hint', { email: supportEmail })"
+        @blur="v$.country.$touch()"
       />
     </div>
 

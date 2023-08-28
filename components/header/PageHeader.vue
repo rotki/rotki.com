@@ -60,7 +60,7 @@ const css = useCssModule();
         <NavigationMenu :class="css.navigation" />
 
         <div :class="css.auth">
-          <NuxtLink to="/home">
+          <NuxtLink to="/home/subscription">
             <RuiButton rounded color="primary" class="w-full py-2 md:py-1.5">
               {{ t('page_header.manage_premium') }}
             </RuiButton>

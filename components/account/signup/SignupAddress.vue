@@ -4,7 +4,6 @@ import { get, set } from '@vueuse/core';
 import { useVuelidate } from '@vuelidate/core';
 import { type SignupAddressPayload } from '~/types/signup';
 import { toMessages } from '~/utils/validation';
-import { type Country } from '~/composables/countries';
 import { type ValidationErrors } from '~/types/common';
 
 const props = defineProps<{
@@ -84,20 +83,6 @@ const updateValue = (field: string, value: any) => {
   });
 };
 
-const { countries } = useCountries();
-
-const country = computed({
-  get() {
-    return (
-      get(countries).find(({ code }) => code === get(modelValue).country) ||
-      null
-    );
-  },
-  set(item: Country | null) {
-    updateValue('country', item ? item.code : '');
-  },
-});
-
 const setCaptchaId = (captchaId: number) => {
   emit('update:captcha-id', captchaId);
 };
@@ -168,25 +153,15 @@ const { t } = useI18n();
         @update:model-value="updateValue('postcode', $event)"
         @blur="v$.postcode.$touch()"
       />
-      <RuiAutoComplete
-        id="country"
-        v-model="country"
-        variant="outlined"
-        color="primary"
-        autocomplete="country"
-        :data="countries"
-        key-prop="code"
-        text-prop="name"
-        dense
-        :label="t('auth.signup.address.form.country')"
-        :hint="t('auth.common.required')"
+
+      <CountrySelect
+        :model-value="modelValue.country"
         :error-messages="toMessages(v$.country)"
+        dense
+        :hint="t('auth.common.required')"
         @blur="v$.country.$touch()"
-      >
-        <template #no-data>
-          {{ t('country_select.no_data') }}
-        </template>
-      </RuiAutoComplete>
+        @update:model-value="updateValue('country', $event)"
+      />
       <Recaptcha
         id="signup-captcha"
         :invalid="v$.captcha.$invalid && v$.captcha.$dirty"

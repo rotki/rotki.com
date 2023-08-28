@@ -25,7 +25,7 @@ export default defineNuxtRouteMiddleware(async () => {
     }
 
     if (response.result?.transactionStarted) {
-      return navigateTo('/home');
+      return navigateTo('/home/subscription');
     } else if (response.result.pending) {
       const queryParams: { p: string; c: string; id?: string } = {
         p: durationInMonths.toString(),

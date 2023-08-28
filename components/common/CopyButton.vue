@@ -14,42 +14,26 @@ const copyToClipboard = () => {
   set(copied, true);
   start();
 };
-
-const css = useCssModule();
 </script>
 
 <template>
-  <InfoTooltip>
+  <RuiTooltip>
     <template #activator>
-      <button :class="css.button" @click="copyToClipboard()">
-        <CopyIcon />
-      </button>
+      <RuiButton
+        tabindex="-1"
+        variant="text"
+        type="button"
+        class="!p-2"
+        icon
+        @click="copyToClipboard()"
+      >
+        <RuiIcon
+          class="text-black/[.54] dark:text-white/[.56]"
+          size="20"
+          name="file-copy-line"
+        />
+      </RuiButton>
     </template>
-
-    <span v-if="copied">Copied to clipboard</span>
-    <span v-else> Copy to clipboard </span>
-  </InfoTooltip>
+    {{ copied ? 'Copied to clipboard' : 'Copy to clipboard' }}
+  </RuiTooltip>
 </template>
-
-<style lang="scss" module>
-.button {
-  @apply hover:bg-rui-grey-100 rounded-2xl focus:outline-none;
-
-  padding: 8px;
-}
-
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple 600ms linear;
-  background-color: rgba(255, 255, 255, 0.7);
-}
-
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-</style>
