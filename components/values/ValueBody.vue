@@ -17,69 +17,45 @@ const { t } = useI18n();
         </div>
       </div>
       <div class="border-t border-rui-grey-300 self-center" />
-      <div class="flex gap-5 items-start">
-        <div
-          class="border-r-[3px] border-rui-primary pb-2.5 pr-5 text-h5 text-rui-primary"
-        >
-          01
-        </div>
-        <div class="space-y-4">
-          <div class="text-h5">
-            {{ t('values.values_section.list.1.title') }}
-          </div>
-          <div
-            class="text-rui-text-secondary text-body-1 whitespace-break-spaces"
-          >
-            {{ t('values.values_section.list.1.value') }}
-          </div>
-        </div>
-      </div>
-      <div class="flex gap-5 items-start">
-        <div
-          class="border-r-[3px] border-rui-primary pb-2.5 pr-5 text-h5 text-rui-primary"
-        >
-          02
-        </div>
-        <div class="space-y-4">
-          <div class="text-h5">
-            {{ t('values.values_section.list.2.title') }}
-          </div>
-          <div
-            class="text-rui-text-secondary text-body-1 whitespace-break-spaces"
-          >
-            <i18n-t keypath="values.values_section.list.2.value" scope="global">
-              <template #open_source>
-                <strong>
-                  {{ t('values.values_section.list.2.open_source') }}
-                </strong>
-              </template>
-              <template #local_first>
-                <strong>
-                  {{ t('values.values_section.list.2.local_first') }}
-                </strong>
-              </template>
-            </i18n-t>
-          </div>
-        </div>
-      </div>
+      <ValueBodyItem>
+        <template #number>01</template>
+        <template #title>
+          {{ t('values.values_section.list.1.title') }}
+        </template>
+        <template #values>
+          {{ t('values.values_section.list.1.value') }}
+        </template>
+      </ValueBodyItem>
+      <ValueBodyItem>
+        <template #number>02</template>
+        <template #title>
+          {{ t('values.values_section.list.2.title') }}
+        </template>
+        <template #values>
+          <i18n-t keypath="values.values_section.list.2.value" scope="global">
+            <template #open_source>
+              <strong>
+                {{ t('values.values_section.list.2.open_source') }}
+              </strong>
+            </template>
+            <template #local_first>
+              <strong>
+                {{ t('values.values_section.list.2.local_first') }}
+              </strong>
+            </template>
+          </i18n-t>
+        </template>
+      </ValueBodyItem>
       <div class="hidden md:block border-t border-rui-grey-300 self-center" />
-      <div class="flex gap-5 items-start">
-        <div
-          class="border-r-[3px] border-rui-primary pb-2.5 pr-5 text-h5 text-rui-primary"
-        >
-          03
-        </div>
-        <div class="space-y-4">
-          <div class="text-h5">
-            {{ t('values.values_section.list.3.title') }}
-          </div>
-          <div
-            class="text-rui-text-secondary text-body-1 whitespace-break-spaces"
-          >
-            {{ t('values.values_section.list.3.value') }}
-          </div>
-        </div>
-      </div>
+      <ValueBodyItem>
+        <template #number>03</template>
+        <template #title>
+          {{ t('values.values_section.list.3.title') }}
+        </template>
+        <template #values>
+          {{ t('values.values_section.list.3.value') }}
+        </template>
+      </ValueBodyItem>
     </div>
   </div>
 </template>

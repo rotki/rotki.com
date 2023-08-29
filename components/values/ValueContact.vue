@@ -1,30 +1,37 @@
 <script setup lang="ts">
 const { t } = useI18n();
 
+const {
+  public: {
+    contact: { emailMailto, email, twitter, discord, github },
+  },
+} = useRuntimeConfig();
+
 const contacts = [
   {
     title: 'Email',
     description: t('values.contact_section.email.description'),
-    href: 'mailto:info@rotki.com',
+    href: emailMailto,
     icon: 'chat-smile-2-line',
+    linkLabel: email,
   },
   {
     title: 'Twitter',
     description: t('values.contact_section.twitter.description'),
-    href: 'https://twitter.com/rotkiapp',
+    href: twitter,
     icon: 'twitter-x-line',
     linkLabel: '@RotkiApp',
   },
   {
     title: 'Discord',
     description: t('values.contact_section.discord.description'),
-    href: 'https://discord.rotki.com',
+    href: discord,
     icon: 'discord-line',
   },
   {
     title: 'Github',
     description: t('values.contact_section.github.description'),
-    href: 'https://github.com/rotki',
+    href: github,
     icon: 'github-line',
     linkLabel: 'Rotki Solutions GmbH',
   },

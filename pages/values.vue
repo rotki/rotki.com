@@ -22,7 +22,7 @@ definePageMeta({
   <div>
     <ValueHeading />
     <ValueBody />
-    <ValueVission />
+    <ValueVision />
     <div>
       <div class="container">
         <div class="border-t border-rui-grey-200" />

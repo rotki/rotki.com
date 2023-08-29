@@ -1,27 +1,33 @@
 <script setup lang="ts">
+const {
+  public: {
+    contact: { emailMailto, twitter, discord, github },
+  },
+} = useRuntimeConfig();
+
 const menus = [
   {
     title: 'Github',
     showText: false,
-    href: 'https://github.com/rotki',
+    href: github,
     icon: 'github-line',
   },
   {
     title: 'Twitter',
     showText: false,
-    href: 'https://twitter.com/rotkiapp',
+    href: twitter,
     icon: 'twitter-x-line',
   },
   {
     title: 'Discord',
     showText: false,
-    href: 'https://discord.rotki.com',
+    href: discord,
     icon: 'discord-line',
   },
   {
     title: 'Contact',
     showText: true,
-    href: 'mailto:info@rotki.com',
+    href: emailMailto,
     icon: 'mail-send-line',
   },
 ];

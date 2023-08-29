@@ -15,9 +15,14 @@ useHead({
   ...commonAttrs(),
 });
 
-const config = useRuntimeConfig();
+const {
+  public: {
+    maintenance,
+    contact: { emailMailto, email },
+  },
+} = useRuntimeConfig();
 
-if (!config.maintenance) {
+if (!maintenance) {
   navigateTo('/');
 }
 
@@ -38,8 +43,8 @@ const css = useCssModule();
       Sorry for the inconvenience but we're performing some maintenance at the
       moment. <br />
       If you need anything, you can always contact us on
-      <a :class="css.link" href="mailto:info@rotki.com" target="_blank">
-        info@rotki.com
+      <a :class="css.link" :href="emailMailto" target="_blank">
+        {{ email }}
       </a>
     </div>
   </div>
