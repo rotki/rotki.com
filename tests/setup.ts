@@ -2,12 +2,23 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 import { mockNuxtImport } from 'nuxt-vitest/utils';
 import { server } from '~/tests/mocks/server';
 
-const { BACKEND_URL } = import.meta.env;
-
-mockNuxtImport('useRuntimeConfig', () => () => ({
-  public: { baseUrl: BACKEND_URL, backendUrl: BACKEND_URL },
-  app: { baseURL: '/' },
-}));
+mockNuxtImport('useRuntimeConfig', () => () => {
+  const { BACKEND_URL } = import.meta.env;
+  return {
+    public: {
+      baseUrl: BACKEND_URL,
+      backendUrl: BACKEND_URL,
+      contact: {
+        emailMailto: 'mailto:info@rotki.com',
+        email: 'info@rotki.com',
+        twitter: 'https://twitter.com/rotkiapp',
+        discord: 'https://discord.rotki.com',
+        github: 'https://github.com/rotki',
+      },
+    },
+    app: { baseURL: '/' },
+  };
+});
 
 beforeAll(() => server.listen({ onUnhandledRequest: `error` }));
 

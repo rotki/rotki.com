@@ -329,5 +329,56 @@
   "country_select": {
     "no_data": "No matching countries found"
   },
-  "logout": "Logout"
+  "logout": "Logout",
+  "values": {
+    "title": "Nice to meet you",
+    "subtitle": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
+    "values_section": {
+      "title": "Values",
+      "description": "We are driven by a set of core values that guide our every action and decision. Our commitment to these values is what sets us apart and ensures that our users receive the utmost quality and service.",
+      "list": {
+        "1": {
+          "title": "We are:",
+          "value": "a team of dedicated builders driven by our love for what we create. Our passion lies in developing applications that bring tangible value to our users. We believe in the power of open-source development, as it enables transparency, audibility, and the provision of user guarantees."
+        },
+        "2": {
+          "title": "We build:",
+          "value": "- {open_source}: Because that's the only way to create transparent applications that can be audited and provide users with guarantees.\n- {local_first}: Building local applications that store all data locally is the only way to guarantee data privacy and true ownership. Nobody can deny access to the app or the data to the user if it's a local application.",
+          "open_source": "Open-source",
+          "local_first": "Local-first"
+        },
+        "3": {
+          "title": "We welcome:",
+          "value": "external open-source contributors who understand our mission and utilise our product themselves, driven by the desire to help it reach its maximum potential.\n\nOur team can independently shoulder their responsibilities, taking ownership of their work. We value teamwork and collaboration, emphasising the importance of collective effort rather than individual stardom."
+        }
+      }
+    },
+    "vision_section": {
+      "title": "Vision",
+      "description": "rotki is the portfolio tracking, management and accounting tool for your finances. The one-stop app for viewing and managing your finances. rotki aspires to: ",
+      "list": {
+        "1": "Be the one place to track your entire portfolio across on-chain crypto, banks, stocks, trades and more.",
+        "2": "Allow you to manage your finances, perform trades across CEXes, on-chain swaps, and other brokers from one interface.",
+        "3": "Create monthly/quarterly/yearly reports covering assets across all mentioned locations.",
+        "4": "A modular system that many contributors outside our team can extend. For example, if someone wants to integrate tax accounting rules for a specific jurisdiction, they are experts on or integrate a chain they know of."
+      }
+    },
+    "contact_section": {
+      "title": "Contact us",
+      "header": "Get in touch",
+      "subtitle": "For media inquiries or additional information about Rotki, please reach out to:",
+      "email": {
+        "description": "We’re here to help."
+      },
+      "twitter": {
+        "description": "See our daily updates."
+      },
+      "discord": {
+        "description": "Chat with us."
+      },
+      "github": {
+        "description": "Contribute code/issues."
+      }
+    }
+  }
 }
