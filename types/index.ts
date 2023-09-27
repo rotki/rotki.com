@@ -74,7 +74,6 @@ export type Payment = z.infer<typeof Payment>;
 export const Account = z.object({
   username: z.string().nonempty(),
   email: z.string().nonempty(),
-  githubUsername: z.string(),
   apiKey: z.string(),
   apiSecret: z.string(),
   canUsePremium: z.boolean(),
@@ -105,7 +104,6 @@ export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>;
 
 const UpdateProfile = z.object({
   address: Address,
-  githubUsername: z.string(),
 });
 
 export const UpdateProfileResponse = z.object({

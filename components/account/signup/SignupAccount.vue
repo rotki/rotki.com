@@ -29,7 +29,6 @@ const rules = {
     sameAsPassword: sameAs(password, 'password'),
   },
   email: { required, email },
-  githubUsername: {},
 };
 
 const $externalResults: Ref<Record<string, string[]>> = ref({});
@@ -136,18 +135,6 @@ const { t } = useI18n();
         :hint="t('auth.common.confirm_hint')"
         :error-messages="toMessages(v$.confirmPassword)"
         @update:model-value="updateValue('confirmPassword', $event)"
-      />
-
-      <RuiTextField
-        id="github"
-        :model-value="modelValue.githubUsername"
-        variant="outlined"
-        color="primary"
-        dense
-        :label="t('auth.signup.account.form.github_username')"
-        :hint="t('auth.signup.account.form.github_username_hint')"
-        :error-messages="toMessages(v$.githubUsername)"
-        @update:model-value="updateValue('githubUsername', $event)"
       />
     </div>
   </div>

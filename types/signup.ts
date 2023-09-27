@@ -3,7 +3,6 @@ export interface SignupAccountPayload {
   readonly email: string;
   readonly password: string;
   readonly confirmPassword: string;
-  readonly githubUsername: string;
 }
 
 export interface SignupCustomerInformationPayload {

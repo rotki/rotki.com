@@ -11,7 +11,6 @@ describe('Signup test', () => {
   it('show account form', () => {
     cy.get('input#username').first().as('usernameInput');
     cy.get('input#email').first().as('emailInput');
-    cy.get('input#github').first().as('githubInput');
     cy.get('input#password').first().as('passwordInput');
     cy.get('input#password-confirmation').first().as('confirmPasswordInput');
     cy.get('button[data-cy=next-button]').first().as('nextButton');

@@ -81,7 +81,6 @@ const update = async () => {
 
   const payload = objectOmit(
     {
-      githubUsername: userAccount.githubUsername,
       ...userAccount.address,
       ...state,
     },

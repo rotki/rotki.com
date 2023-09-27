@@ -5,7 +5,6 @@ export interface PasswordChangePayload {
 }
 
 export interface ProfilePayload {
-  readonly githubUsername: string;
   readonly firstName?: string;
   readonly lastName?: string;
   readonly companyName?: string;

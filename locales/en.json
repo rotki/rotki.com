@@ -91,9 +91,7 @@
         "form": {
           "username_hint": "Required. Provide a unique username for your new account.",
           "email_hint": "Required. Provide a valid email address.",
-          "confirm_password": "Repeat password",
-          "github_username": "Github username",
-          "github_username_hint": "Optional. Provide Github username for in-Github support."
+          "confirm_password": "Repeat password"
         }
       },
       "address": {
@@ -193,9 +191,8 @@
         },
         "benefits": {
           "1": "Rotki is open-source software, and your subscription helps support its development.",
-          "2": "As a premium user, you have priority for all issues reported in our {bug_tracker} when you provide your Github username. The same applies to any feature requests you may have.",
-          "3": "If you cancel your subscription, you will no longer be able to use any Rotki premium features until you subscribe again.",
-          "4": "We're constantly developing new premium features that will soon be available to our subscribers."
+          "2": "If you cancel your subscription, you will no longer be able to use any Rotki premium features until you subscribe again.",
+          "3": "We're constantly developing new premium features that will soon be available to our subscribers."
         },
         "notification": {
           "title": "Cancellation Failure"

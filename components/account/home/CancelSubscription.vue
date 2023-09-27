@@ -65,7 +65,6 @@ const { t } = useI18n();
                 </i18n-t>
               </li>
               <li>{{ t('account.subscriptions.cancellation.benefits.3') }}</li>
-              <li>{{ t('account.subscriptions.cancellation.benefits.4') }}</li>
             </ul>
           </template>
 

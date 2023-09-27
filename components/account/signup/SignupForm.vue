@@ -20,7 +20,6 @@ const accountForm = ref<SignupAccountPayload>({
   password: '',
   confirmPassword: '',
   email: '',
-  githubUsername: '',
 });
 
 const customerInformationForm = ref<SignupCustomerInformationPayload>({

@@ -79,7 +79,6 @@ const update = async () => {
   const payload = objectOmit(
     {
       ...userAccount.address,
-      githubUsername: userAccount.githubUsername,
       ...state,
     },
     ['movedOffline'],
