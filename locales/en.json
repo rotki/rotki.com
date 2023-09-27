@@ -62,7 +62,7 @@
       "steps": {
         "step_1": {
           "title": "Introduction",
-          "description": "First step"
+          "description": "Important information"
         },
         "step_2": {
           "title": "Account",
@@ -70,18 +70,18 @@
         },
         "step_3": {
           "title": "Customer Information",
-          "description": "Information for invoice of payments"
+          "description": "Information for payment invoices"
         },
         "step_4": {
           "title": "Address",
-          "description": "Will only be used for invoice of payments"
+          "description": "Will only be used for payment invoices"
         }
       },
       "create_account": "Create Account",
       "introduction": {
         "title": "Important Note",
         "message": {
-          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. Rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account don't work for the other. To use Rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
+          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. Rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account do not work for the other. To use Rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
           "premium_subscription": "premium subscription",
           "download": "download"
         }
