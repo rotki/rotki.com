@@ -167,7 +167,7 @@ const { t } = useI18n();
 
     <div class="flex justify-end gap-3">
       <RuiButton size="lg" color="primary" variant="outlined" @click="reset()">
-        {{ t('actions.cancel') }}
+        {{ t('actions.reset') }}
       </RuiButton>
       <RuiButton
         :disabled="v$.$invalid"

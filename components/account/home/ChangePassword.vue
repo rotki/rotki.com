@@ -137,7 +137,7 @@ const { t } = useI18n();
           variant="outlined"
           @click="reset()"
         >
-          {{ t('actions.cancel') }}
+          {{ t('actions.reset') }}
         </RuiButton>
         <RuiButton
           :disabled="v$.$invalid"
