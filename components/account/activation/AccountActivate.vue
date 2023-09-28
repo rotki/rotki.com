@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import { useMainStore } from '~/store';
 import { fetchWithCsrf } from '~/utils/api';
 
 const route = useRoute();
 const { uid, token } = route.params;
 const validating = ref(true);
 const isValid = ref(false);
+
+const { getAccount } = useMainStore();
 
 const validateToken = async () => {
   try {
@@ -21,7 +24,12 @@ const validateToken = async () => {
   }
 };
 
-onBeforeMount(async () => await validateToken());
+onBeforeMount(async () => {
+  await validateToken();
+  if (get(isValid)) {
+    await getAccount();
+  }
+});
 const { t } = useI18n();
 </script>
 
