@@ -1,44 +1,59 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { storeToRefs } from 'pinia';
+import { get, set } from '@vueuse/core';
+import { type ComputedRef, type Ref } from 'vue';
 import { type Plan } from '~/types';
 import { useMainStore } from '~/store';
 
-defineProps<{ plans: Plan[] }>();
+const { t } = useI18n();
+const route = useRoute();
+const { plan: savedPlan } = usePlanParams();
 
-const selected = ref<Plan | null>(null);
-const isSelected = (plan: Plan) => plan === selected.value;
+const { account, authenticated, plans } = storeToRefs(useMainStore());
+
+const identifier: Ref<number> = ref(get(savedPlan));
+const processing: Ref<boolean> = ref(false);
+
+const selected: ComputedRef<Plan | undefined> = computed(
+  () => get(plans)?.find((plan) => plan.months === get(identifier)),
+);
 
 const cryptoPrice = computed(() => {
-  const plan = selected.value;
+  const plan = get(selected);
   if (!plan) {
     return 0;
   }
   return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2);
 });
 
-const next = () => {
-  navigateTo({
-    path: '/checkout/payment-method',
-    query: {
-      p: selected.value?.months.toString(),
-    },
-  });
+const vat = computed(() => get(account)?.vat);
+
+const isSelected = (plan: Plan) => plan === get(selected);
+
+const select = (plan: Plan) => {
+  set(identifier, plan.months);
 };
 
-const { account, authenticated } = storeToRefs(useMainStore());
-
-const vat = computed(() => account.value?.vat);
+const next = () => {
+  set(processing, true);
+  navigateTo({
+    name: 'checkout-pay-method',
+    query: { ...route.query, plan: get(identifier) },
+  });
+};
 
 const css = useCssModule();
 </script>
 
 <template>
   <div :class="css.container">
-    <CheckoutTitle> Premium Plans </CheckoutTitle>
+    <CheckoutTitle>
+      {{ t('home.plans.tiers.step_1.title') }}
+    </CheckoutTitle>
     <CheckoutDescription>
-      <span v-if="vat">The prices include a +{{ vat }}% VAT tax</span>
+      <span v-if="vat">{{ t('home.plans.tiers.step_1.vat', { vat }) }}</span>
       <span v-if="!authenticated">
-        VAT may apply depending on your jurisdiction
+        {{ t('home.plans.tiers.step_1.maybe_vat') }}
       </span>
     </CheckoutDescription>
 
@@ -48,75 +63,71 @@ const css = useCssModule();
           v-for="plan in plans"
           :key="plan.months"
           :plan="plan"
+          :popular="plan.months === 12"
           :selected="isSelected(plan)"
-          @click="selected = plan"
+          @click="select(plan)"
         />
+      </div>
+
+      <div v-if="selected" :class="css.hint">
+        {{ t('home.plans.tiers.step_1.crypto_hint', { cryptoPrice }) }}
       </div>
     </div>
 
-    <div :class="css.hint">
-      <span v-if="selected">
-        * When paying with crypto the monthly price is
-        {{ cryptoPrice }} €
-      </span>
-    </div>
+    <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
+      <div :class="css.notes">
+        <div v-for="i in 4" :key="i" :class="css.note">
+          <RuiIcon :class="css.note__icon" name="arrow-right-circle-line" />
+          <p>{{ t(`home.plans.tiers.step_1.notes.${i}`) }}</p>
+        </div>
+      </div>
 
-    <div :class="css.continue">
-      <SelectionButton :disabled="!selected" selected @click="next()">
-        Continue
-      </SelectionButton>
-    </div>
-
-    <div class="mt-8">
-      <TextHeading secondary class="mb-4">Notes</TextHeading>
-      <ul :class="css.notes">
-        <li>
-          The selected payment method will be billed the total amount for the
-          subscription immediately.
-        </li>
-        <li>
-          New billing cycle starts at UTC midnight after the subscription has
-          ran out.
-        </li>
-        <li>
-          An invoice is generated for each payment and you can access it from
-          your account page.
-        </li>
-        <li>
-          Subscriptions can be canceled from the account page at any point in
-          time.
-        </li>
-      </ul>
+      <div :class="css.continue">
+        <RuiButton
+          :disabled="!selected"
+          :loading="processing"
+          class="w-full"
+          color="primary"
+          size="lg"
+          @click="next()"
+        >
+          {{ t('actions.continue') }}
+        </RuiButton>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" module>
 .container {
-  @apply w-full;
+  @apply flex flex-col w-full grow;
 }
 
 .selection {
-  @apply flex flex-row w-full justify-center;
+  @apply flex flex-col w-full justify-center my-8;
 }
 
 .selectable {
-  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-8;
+  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-4;
 }
 
 .hint {
-  @apply mt-4 text-base italic h-5 text-rui-text;
+  @apply mt-3 text-base italic text-rui-text;
 }
 
 .continue {
-  @apply flex flex-row justify-center mt-9;
-
-  & > button {
-    width: 180px;
-  }
+  @apply mt-[2.63rem];
 }
 
 .notes {
-  @apply list-disc pl-6;
+  @apply flex flex-col gap-3;
+
+  .note {
+    @apply flex gap-3;
+
+    &__icon {
+      @apply text-black/[.54] shrink-0;
+    }
+  }
 }
 </style>

@@ -9,12 +9,14 @@ import { type Plan } from '~/types';
 const props = withDefaults(
   defineProps<{
     visible: boolean;
+    vat?: number;
     crypto?: boolean;
     warning?: boolean;
   }>(),
   {
     crypto: false,
     warning: false,
+    vat: undefined,
   },
 );
 
@@ -22,6 +24,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void;
   (e: 'select', months: number): void;
 }>();
+const { t } = useI18n();
 const store = useMainStore();
 const { plans } = storeToRefs(store);
 const { crypto, visible, warning } = toRefs(props);
@@ -54,7 +57,7 @@ const css = useCssModule();
 <template>
   <ModalDialog :model-value="visible">
     <div :class="css.body">
-      <TextHeading no-margin>Change Plan</TextHeading>
+      <TextHeading no-margin>{{ t('change_plan.title') }}</TextHeading>
       <div
         v-for="plan in availablePlans"
         :key="plan.months.toString()"
@@ -64,31 +67,40 @@ const css = useCssModule();
         }"
         @click="select(plan.months)"
       >
-        <div :class="css.name">{{ getPlanName(plan.months) }} Plan.</div>
-        {{ getPrice(plan) }}€ <span v-if="false">+ {{ plan }}% VAT</span> every
-        {{ plan.months }} months
+        <div :class="css.name">
+          {{ t('home.plans.names.plan', { name: getPlanName(plan.months) }) }}
+        </div>
+        {{ getPrice(plan) }}€
+        <span v-if="vat">+ {{ t('common.vat', { vat }) }}</span>
+        {{
+          t(
+            'selected_plan_overview.renew_period',
+            { months: plan.months },
+            plan.months,
+          )
+        }}
       </div>
       <div v-if="crypto && warning" :class="css.warning">
         <span>
-          Switching a plan after sending a payment can lead to problems with the
-          activation of your subscription. Please only switch a plan if no
-          payment has been send.
+          {{ t('change_plan.switch_warning') }}
         </span>
-        <CustomCheckbox v-model="confirmed">
-          I confirm that no payment has been send. <br />
-          Allow me to switch the plan
-        </CustomCheckbox>
+        <RuiCheckbox v-model="confirmed" class="mt-3" color="primary">
+          <i18n-t keypath="change_plan.switch_agree" scope="global">
+            <template #separator>
+              <br />
+            </template>
+          </i18n-t>
+        </RuiCheckbox>
       </div>
       <div :class="css.buttons">
         <RuiButton
           variant="outlined"
           size="lg"
-          class="uppercase outline-2"
-          rounded
+          class="w-full"
           color="primary"
           @click="cancel()"
         >
-          Cancel
+          {{ t('actions.cancel') }}
         </RuiButton>
       </div>
     </div>
@@ -97,31 +109,23 @@ const css = useCssModule();
 
 <style module lang="scss">
 .body {
-  max-width: 450px;
-  padding: 24px;
+  @apply p-6 max-w-[30rem] w-full;
 }
 
 .plan {
-  @apply rounded focus:outline-none px-4 py-2 my-2 border-rui-primary-darker border-2;
-
-  background-position: center;
-  transition: background 0.8s;
+  @apply focus:outline-none px-4 py-2 my-2 transition bg-white;
+  @apply border-black/[0.12] border border-solid rounded;
 
   &:not(.disabled):hover {
-    background: rgba(218, 78, 36, 0.3)
-      radial-gradient(circle, transparent 1%, rgba(218, 78, 36, 0.3) 1%)
-      center/15000%;
+    @apply bg-rui-primary/[0.09] cursor-pointer;
   }
 
   &:not(.disabled):active {
-    @apply bg-rui-primary-darker;
-
-    background-size: 100%;
-    transition: background 0s;
+    @apply bg-rui-primary/[0.15] border-rui-primary;
   }
 
   &.disabled {
-    @apply bg-gray-50 cursor-not-allowed;
+    @apply bg-gray-50 cursor-not-allowed opacity-60;
   }
 }
 

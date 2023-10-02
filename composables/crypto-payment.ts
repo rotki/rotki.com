@@ -130,6 +130,7 @@ export const useWeb3Payment = (
       }
     } catch (e: any) {
       logger.error(e);
+      set(state, 'idle');
 
       if ('reason' in e) {
         set(error, e.reason);

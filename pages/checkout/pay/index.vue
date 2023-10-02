@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
@@ -20,5 +20,5 @@ useHead({
 </script>
 
 <template>
-  <PlanSelectionPage />
+  <PlanSelection />
 </template>

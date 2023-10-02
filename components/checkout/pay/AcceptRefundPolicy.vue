@@ -1,27 +1,47 @@
 <script setup lang="ts">
-defineProps<{ modelValue: boolean }>();
+defineProps<{ modelValue: boolean; disabled?: boolean }>();
 
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
 const css = useCssModule();
+const { t } = useI18n();
 </script>
 
 <template>
-  <CustomCheckbox
+  <RuiCheckbox
     id="refund"
+    :disabled="disabled"
     :model-value="modelValue"
+    color="primary"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <span>
-      I have read and agreed to the
-      <NuxtLink :class="css.link" target="_blank" to="/refund-policy">
-        Refunds/Cancellation Policy
-      </NuxtLink>
-    </span>
-  </CustomCheckbox>
+    <i18n-t
+      keypath="policies.refund.accept_policy.text"
+      scope="global"
+      tag="span"
+    >
+      <template #action>
+        <ButtonLink
+          to="/refund-policy"
+          color="primary"
+          tag="span"
+          :class="css.link"
+          external
+        >
+          {{ t('policies.refund.accept_policy.action') }}
+        </ButtonLink>
+      </template>
+    </i18n-t>
+  </RuiCheckbox>
 </template>
 
 <style module lang="scss">
 .link {
-  @apply text-rui-primary-darker;
+  @apply p-0 #{!important};
+
+  display: unset;
+
+  :global(> span) {
+    display: unset !important;
+  }
 }
 </style>

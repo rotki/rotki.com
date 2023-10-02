@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { set } from '@vueuse/core';
 
-const props = defineProps<{ modelValue: string }>();
+const props = defineProps<{ modelValue: string; disabled?: boolean }>();
 
 const { modelValue } = toRefs(props);
 const copied = ref(false);
@@ -20,6 +20,7 @@ const copyToClipboard = () => {
   <RuiTooltip>
     <template #activator>
       <RuiButton
+        :disabled="disabled"
         tabindex="-1"
         variant="text"
         type="button"

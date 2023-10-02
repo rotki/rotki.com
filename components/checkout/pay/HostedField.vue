@@ -1,5 +1,7 @@
-<script setup lang="ts">
-withDefaults(
+<script lang="ts" setup>
+import { get } from '@vueuse/core';
+
+const props = withDefaults(
   defineProps<{
     id: string;
     label?: string;
@@ -7,131 +9,230 @@ withDefaults(
     valid?: boolean;
     number?: boolean;
     empty?: boolean;
+    hideDetails?: boolean;
+    disabled?: boolean;
+    dense?: boolean;
   }>(),
   {
     label: '',
-    focused: false,
-    valid: false,
-    number: false,
-    empty: false,
   },
 );
 
 const emit = defineEmits<{ (e: 'click'): void }>();
 const css = useCssModule();
+
+const { disabled, id, label } = toRefs(props);
+
+const quotedLabel = computed(() => `"  ${get(label)}  "`);
 </script>
 
 <template>
   <div
-    :class="{
-      [css.field]: true,
-      [css.focused]: focused,
-      [css.error]: !valid,
-    }"
-    @click="emit('click')"
+    :class="[
+      css.wrapper,
+      css.outlined,
+      {
+        [css.dense]: dense,
+        [css['with-error']]: !valid,
+        [css['no-label']]: !label,
+        [css.number]: number,
+        [css.disabled]: disabled,
+      },
+    ]"
+    @click.stop.prevent="!disabled ? emit('click') : null"
   >
-    <div
-      :id="id"
-      :class="{
-        [css.input]: true,
-        [css.focused]: focused,
-        [css.empty]: empty,
-        [css.error]: !valid,
-      }"
-    />
-    <label :class="css.label" :for="id">{{ label }}</label>
-    <span v-if="number" :class="css.append">
-      <CardIcon :class="css.icon" />
-    </span>
+    <div class="flex items-center shrink-0">
+      <div v-if="number" :class="[css.icon, css.prepend]">
+        <RuiIcon name="bank-card-line" />
+      </div>
+    </div>
+    <div class="flex flex-1 overflow-hidden">
+      <div :id="id" :class="[css.input, { [css.empty]: empty }]" />
+      <label :class="css.label" :for="id">
+        {{ label }}
+      </label>
+      <fieldset :class="css.fieldset">
+        <legend />
+      </fieldset>
+    </div>
   </div>
 </template>
 
 <style lang="scss" module>
-%floating {
-  @apply transform scale-75 -translate-y-3.5 duration-300;
-}
+:global(.dark) {
+  .wrapper {
+    .label {
+      @apply border-white/[0.42];
 
-.input {
-  @apply block w-full appearance-none focus:outline-none bg-transparent;
+      &:after {
+        @apply border-white;
+      }
+    }
 
-  padding: 0 16px;
-  height: 56px;
+    .icon {
+      @apply text-white/[0.56];
+    }
 
-  & ~ label {
-    left: 8px;
-    transform-origin: 0 0;
-  }
+    &.outlined {
+      .fieldset {
+        @apply border-white/[0.23];
+      }
 
-  &.error ~ label {
-    @apply text-rui-error;
-  }
-
-  &.focused ~ label {
-    @extend %floating;
-  }
-
-  &.focused:not(.error) ~ label {
-    @apply text-rui-primary-darker;
-  }
-
-  &:not(.empty):not(.focused) ~ label {
-    @extend %floating;
-  }
-
-  &:not(.empty):not(.focused):not(.error) ~ label {
-    @apply text-rui-text-secondary;
+      .input {
+        &:focus {
+          ~ .fieldset {
+            @apply border-white;
+          }
+        }
+      }
+    }
   }
 }
 
-.field {
-  @apply relative;
+.wrapper {
+  @apply relative w-full flex items-center pt-3;
 
-  background: #f0f0f0 0 0 no-repeat padding-box;
-  border-radius: 4px 4px 0 0;
+  .input {
+    @apply leading-6 text-rui-text w-full bg-transparent pr-3 outline-0 outline-none transition-all placeholder:opacity-0 focus:placeholder:opacity-100 h-[3.5rem];
 
-  &.error {
-    &::before,
-    &::after {
-      @apply bg-rui-error w-1/2;
+    &:global(.braintree-hosted-fields-focused),
+    &:not(.empty) {
+      @apply outline-0;
+
+      + .label {
+        @apply after:scale-x-100  text-xs leading-tight;
+        padding-left: var(--x-padding);
+        padding-right: var(--x-padding);
+      }
     }
   }
 
-  &::before,
-  &::after {
-    @apply absolute bottom-0 w-0 bg-rui-primary-darker transition-all ease-in-out;
+  .label {
+    @apply left-0 text-base leading-[3.75] text-rui-text-secondary pointer-events-none absolute top-0 flex h-full w-full select-none transition-all border-b border-black/[0.42];
 
-    content: '';
-    height: 2px;
+    padding-left: calc(var(--x-padding) + var(--prepend-width, 0px));
+
+    &:after {
+      content: '';
+      @apply absolute bottom-0 left-0 block w-full scale-x-0 border-b-2 mb-[-1px] transition-transform duration-300 border-black;
+    }
   }
 
-  &::before {
-    @apply left-1/2;
+  .icon {
+    @apply text-black/[0.54];
   }
 
-  &::after {
-    @apply right-1/2;
+  .prepend {
+    @apply mr-2;
   }
 
-  &.focused::after,
-  &.focused::before {
-    @apply w-1/2;
+  &.number {
+    --x-padding: 0px;
+    --prepend-width: 2.25rem;
   }
-}
 
-.label {
-  @apply absolute top-3.5 text-rui-text-secondary;
+  &.disabled {
+    .input {
+      @apply border-dotted;
+      pointer-events: none;
 
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-}
+      &,
+      + .label {
+        @apply text-rui-text-disabled;
+      }
 
-.icon {
-  width: 24px;
-  height: 24px;
-}
+      ~ .fieldset {
+        @apply border-dotted;
+      }
+    }
+  }
 
-.append {
-  @apply absolute right-3.5 top-3.5;
+  &.with-error {
+    .input {
+      @apply border-rui-error #{!important};
+    }
+
+    .label {
+      @apply text-rui-error after:border-rui-error #{!important};
+    }
+
+    .fieldset {
+      @apply border-rui-error #{!important};
+    }
+  }
+
+  &.dense {
+    .input {
+      @apply py-1;
+    }
+
+    .label {
+      @apply leading-[3.5];
+    }
+  }
+
+  &.outlined {
+    @apply pt-0;
+
+    .prepend {
+      @apply ml-3 mr-0;
+    }
+
+    .label {
+      @apply leading-[3.5] border-0 border-transparent;
+      --x-padding: 0.75rem;
+
+      &:after {
+        content: none !important;
+      }
+    }
+
+    .input {
+      @apply border-b-0 px-3;
+
+      &:global(.braintree-hosted-fields-focused),
+      &:not(.empty) {
+        @apply border-t-transparent;
+
+        + .label {
+          @apply leading-[0] pl-4;
+        }
+
+        ~ .fieldset {
+          @apply border-2 border-rui-primary;
+
+          legend {
+            &:after {
+              content: v-bind(quotedLabel);
+            }
+          }
+        }
+      }
+    }
+
+    .fieldset {
+      @apply absolute w-full top-0 left-0 pointer-events-none rounded border border-black/[0.23] px-2 transition-all -mt-2;
+      height: calc(100% + 0.5rem);
+
+      legend {
+        @apply opacity-0 text-xs;
+
+        &:after {
+          @apply whitespace-break-spaces;
+          content: '\200B';
+        }
+      }
+    }
+
+    &.dense {
+      .input {
+        @apply py-2;
+      }
+
+      .label {
+        @apply leading-[2.5];
+      }
+    }
+  }
 }
 </style>

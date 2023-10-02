@@ -27,9 +27,9 @@ export default defineNuxtRouteMiddleware(async () => {
     if (response.result?.transactionStarted) {
       return navigateTo('/home/subscription');
     } else if (response.result.pending) {
-      const queryParams: { p: string; c: string; id?: string } = {
-        p: durationInMonths.toString(),
-        c: response.result.currency ?? '',
+      const queryParams: { plan: string; currency: string; id?: string } = {
+        plan: durationInMonths.toString(),
+        currency: response.result.currency ?? '',
       };
       if (id) {
         queryParams.id = id;

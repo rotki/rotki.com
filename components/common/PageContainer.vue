@@ -31,6 +31,9 @@ const slots = useSlots();
           [css.wideBody]: wide,
         }"
       >
+        <h4 v-if="slots.title" class="text-h4 text-rui-text text-center mb-4">
+          <slot name="title" />
+        </h4>
         <slot />
       </div>
     </div>
@@ -46,7 +49,7 @@ const slots = useSlots();
 @import '@/assets/css/main.scss';
 
 .wrapper {
-  @apply container flex flex-col flex-grow min-h-screen py-12;
+  @apply container flex flex-col min-h-full flex-grow py-12;
 }
 
 .subtitle {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, useIntervalFn } from '@vueuse/core';
+import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { type ContextColorsType } from '@rotki/ui-library/dist/consts/colors';
 import { type Ref } from 'vue/dist/vue';
@@ -52,6 +52,9 @@ const { subscriptions } = storeToRefs(store);
 
 const pagination: Ref<TablePaginationData | undefined> = ref();
 const sort: Ref<DataTableSortColumn<Subscription>[]> = ref([]);
+const selectedSubscription: Ref<Subscription | undefined> = ref();
+const showCancelDialog: Ref<boolean> = ref(false);
+const cancelling: Ref<boolean> = ref(false);
 
 const pending = computed(() => get(subscriptions).filter((sub) => sub.pending));
 
@@ -76,7 +79,7 @@ const pendingPaymentCurrency = computedAsync(async () => {
 const renewLink = computed<{ path: string; query: Record<string, string> }>(
   () => {
     const link = {
-      path: '/checkout/payment-method',
+      path: '/checkout/pay/method',
       query: {},
     };
 
@@ -85,7 +88,7 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(
     if (subs.length > 0) {
       const sub = subs[0];
       link.query = {
-        p: sub.durationInMonths.toString(),
+        plan: sub.durationInMonths.toString(),
         id: sub.identifier,
       };
     }
@@ -93,7 +96,7 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(
     if (isDefined(pendingPaymentCurrency)) {
       link.query = {
         ...link.query,
-        c: get(pendingPaymentCurrency),
+        currency: get(pendingPaymentCurrency),
       };
     }
 
@@ -138,6 +141,19 @@ const getChipStatusColor = (status: string): ContextColorsType | undefined => {
 
   return map[status];
 };
+
+const confirmCancel = (sub: Subscription) => {
+  set(selectedSubscription, sub);
+  set(showCancelDialog, true);
+};
+
+const cancelSubscription = async (sub: Subscription) => {
+  set(showCancelDialog, false);
+  set(cancelling, true);
+  await store.cancelSubscription(sub);
+  set(cancelling, false);
+  set(selectedSubscription, undefined);
+};
 </script>
 
 <template>
@@ -164,12 +180,19 @@ const getChipStatusColor = (status: string): ContextColorsType | undefined => {
 
       <template #item.actions="{ row }">
         <div v-if="displayActions(row)" class="flex gap-2 justify-end">
-          <CancelSubscription
+          <RuiButton
             v-if="hasAction(row, 'cancel')"
-            :subscription="row"
-          />
+            :loading="cancelling"
+            variant="text"
+            type="button"
+            color="warning"
+            @click="confirmCancel(row)"
+          >
+            {{ t('actions.cancel') }}
+          </RuiButton>
           <ButtonLink
             v-if="hasAction(row, 'renew')"
+            :disabled="cancelling"
             :to="renewLink"
             color="primary"
           >
@@ -179,5 +202,11 @@ const getChipStatusColor = (status: string): ContextColorsType | undefined => {
         <div v-else class="capitalize">{{ t('common.none') }}</div>
       </template>
     </RuiDataTable>
+
+    <CancelSubscription
+      v-model="showCancelDialog"
+      :subscription="selectedSubscription"
+      @cancel="cancelSubscription($event)"
+    />
   </div>
 </template>

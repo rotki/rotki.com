@@ -1,18 +1,25 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { get } from '@vueuse/core';
 import { type Plan } from '~/types';
-import { getPlanName } from '~/utils/plans';
+import { getPlanSelectionName } from '~/utils/plans';
 
-const props = defineProps<{
-  plan: Plan;
-  selected: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    plan: Plan;
+    selected: boolean;
+    popular?: boolean;
+  }>(),
+  { popular: false },
+);
 
 const emit = defineEmits<{ (e: 'click'): void }>();
 
+const { t } = useI18n();
+const css = useCssModule();
+
 const { plan } = toRefs(props);
 
-const name = computed(() => getPlanName(get(plan).months));
+const name = computed(() => getPlanSelectionName(get(plan).months));
 const totalPrice = computed(() => get(plan).priceFiat);
 const price = computed(() => {
   const { months, priceFiat } = get(plan);
@@ -22,123 +29,66 @@ const price = computed(() => {
 const click = () => {
   emit('click');
 };
-
-const css = useCssModule();
 </script>
 
 <template>
-  <div
-    :class="{
-      [css.plan]: true,
-      [css.selected]: selected,
-    }"
-    @click="click()"
-  >
-    <CheckMark class="-mr-12" :selected="selected" mt="-18px" />
-    <div
-      :class="{
-        [css.emphasis]: true,
-        [css.name]: true,
-      }"
-    >
-      {{ name }}
+  <div :class="[css.plan, { [css.selected]: selected }]" @click="click()">
+    <div class="flex items-center h-0 justify-center relative w-full">
+      <RuiChip
+        v-if="popular"
+        :label="t('home.plans.most_popular')"
+        class="-top-[2.9rem] absolute"
+        color="primary"
+        size="sm"
+      />
     </div>
-    <div
-      :class="{
-        [css.filler]: true,
-        [css.for]: true,
-      }"
-    >
-      for *
-    </div>
+    <CheckMark :selected="selected" />
+    <div :class="css.name">{{ name }}</div>
     <div :class="css.emphasis">{{ price }}€</div>
-    <div
-      :class="{
-        [css.filler]: true,
-        [css.monthly]: true,
-      }"
-    >
-      per month
+    <div :class="css.monthly">{{ t('home.plans.per_month') }}</div>
+    <div :class="css.total">
+      {{ t('home.plans.total', { total: totalPrice }) }}
     </div>
-    <div :class="css.total">Total: {{ totalPrice }}€</div>
-    <SelectionButton :class="css.button" :selected="selected">
-      Choose Plan
-    </SelectionButton>
+    <RuiButton :color="selected ? 'primary' : undefined" class="w-full">
+      {{ t('home.plans.choose') }}
+    </RuiButton>
+
     <div v-if="plan.discount" :class="css.discount">
-      Save {{ plan.discount }}%
+      <RuiIcon class="text-black/60" name="hand-coin-line" />
+      <span>
+        {{ t('home.plans.save_discount', { discount: plan.discount }) }}
+      </span>
     </div>
   </div>
 </template>
 
 <style lang="scss" module>
-%small {
-  font-size: 16px;
-  line-height: 19px;
-  letter-spacing: 0;
-}
-
 .plan {
-  @apply border border-solid border flex flex-col items-center w-full h-full p-8 cursor-pointer;
-
-  background: 0 0 no-repeat padding-box;
-  border-radius: 4px;
-  border: 1px solid;
+  @apply flex flex-col items-center min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8;
+  @apply border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12];
 
   &.selected {
-    background-color: #fff;
     @apply border-rui-primary;
-    box-shadow: 0 4px 8px #0003;
   }
+}
 
-  &:not(.selected) {
-    background-color: #f0f0f0;
-    border-color: #d2d2d2;
-  }
+.name {
+  @apply text-h5 text-rui-text mb-4;
 }
 
 .emphasis {
-  @apply font-bold;
-
-  font-size: 28px;
-  line-height: 33px;
-  letter-spacing: 0;
-  color: #212529;
-}
-
-.for {
-  margin-top: 8px;
-  margin-bottom: 8px;
+  @apply font-black text-h3 text-rui-text;
 }
 
 .monthly {
-  margin-top: 8px;
-  margin-bottom: 24px;
-}
-
-.filler {
-  @apply font-sans;
-
-  color: #545454;
-  opacity: 1;
-
-  @extend %small;
+  @apply text-body-1 text-rui-secondary mt-4;
 }
 
 .total {
-  font-weight: bold;
-  color: #212529;
-
-  @extend %small;
+  @apply mb-4 sm:mb-8 text-body-1 text-rui-primary;
 }
 
 .discount {
-  color: #878787;
-
-  @extend %small;
-}
-
-.button {
-  margin-top: 16px;
-  margin-bottom: 8px;
+  @apply flex gap-[0.62rem] text-base mt-2;
 }
 </style>

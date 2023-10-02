@@ -11,7 +11,7 @@ type CurrencyParam = Currency | null;
 export const usePlanParams = () => {
   const route = useRoute();
   const plan = computed(() => {
-    const plan = route.query.p;
+    const { plan } = route.query;
     if (typeof plan !== 'string') {
       return -1;
     }
@@ -32,17 +32,17 @@ export const usePlanParams = () => {
 export const useCurrencyParams = () => {
   const route = useRoute();
   const currency = computed<CurrencyParam>(() => {
-    const currency = route.query.c;
-    if (
-      typeof currency !== 'string' ||
-      !supportedCurrencies.includes(currency as any)
-    ) {
+    const { currency } = route.query;
+    if (typeof currency !== 'string' || !isSupported(currency)) {
       return null;
     }
     return currency as Currency;
   });
 
-  return { currency };
+  const isSupported = (value: string) =>
+    supportedCurrencies.includes(value as Currency);
+
+  return { currency, isSupportedCrypto: isSupported };
 };
 
 export const useSubscriptionIdParam = () => {
@@ -52,4 +52,13 @@ export const useSubscriptionIdParam = () => {
     return typeof query.id === 'string' ? query.id : undefined;
   });
   return { subscriptionId };
+};
+
+export const usePaymentMethodParam = () => {
+  const route = useRoute();
+  const paymentMethodId = computed(() => {
+    const { method } = get(route).query;
+    return typeof method === 'string' ? Number(method) : -1;
+  });
+  return { paymentMethodId };
 };

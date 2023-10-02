@@ -23,7 +23,6 @@ import {
   type Plan,
   PremiumResponse,
   type Result,
-  type SubStatus,
   type Subscription,
   UpdateProfileResponse,
 } from '~/types';
@@ -210,8 +209,6 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
-  const { stop, start } = useTimeoutFn(() => set(cancellationError, ''), 7000);
-
   const subscriptions: ComputedRef<Subscription[]> = computed(() => {
     const userAccount = get(account);
     if (!userAccount) {
@@ -223,30 +220,8 @@ export const useMainStore = defineStore('main', () => {
   const cancelSubscription = async (subscription: Subscription) => {
     const acc = get(account);
     assert(acc);
-    const subscriptions = [...acc.subscriptions];
-    const subIndex = subscriptions.findIndex(
-      (sub) => sub.identifier === subscription.identifier,
-    );
-    const sub = subscriptions[subIndex];
-    const { actions, status, nextActionDate } = sub;
-
-    function updateSub(
-      actions: string[],
-      status: SubStatus,
-      nextActionDate: string,
-    ) {
-      sub.actions = actions;
-      sub.status = status;
-      sub.nextActionDate = nextActionDate;
-      assert(acc);
-      set(account, {
-        ...acc,
-        subscriptions,
-      });
-    }
 
     try {
-      updateSub([], 'Cancelled', 'Never');
       const response = await fetchWithCsrf<CancelSubscriptionResponse>(
         `/webapi/subscription/${subscription.identifier}`,
         {
@@ -262,11 +237,8 @@ export const useMainStore = defineStore('main', () => {
       if (e instanceof FetchError && e.status === 404) {
         message = CancelSubscriptionResponse.parse(e.data).message;
       }
-      updateSub(actions, status, nextActionDate);
       logger.error(e);
-      stop();
       set(cancellationError, message);
-      start();
     }
   };
 
@@ -277,9 +249,12 @@ export const useMainStore = defineStore('main', () => {
     }
 
     try {
-      const response = await fetchWithCsrf<PremiumResponse>('/webapi/premium', {
-        method: 'GET',
-      });
+      const response = await fetchWithCsrf<PremiumResponse>(
+        '/webapi/premium/',
+        {
+          method: 'GET',
+        },
+      );
       const data = PremiumResponse.parse(response);
       set(plans, data.result.plans);
       set(authenticatedOnPlansLoad, get(authenticated));
@@ -436,6 +411,7 @@ export const useMainStore = defineStore('main', () => {
         },
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
+      getAccount().then();
       if (data.result) {
         return {
           result: data.result,

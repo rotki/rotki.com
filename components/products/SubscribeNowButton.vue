@@ -41,7 +41,7 @@ const allowNavigation = computed(() => {
         filled
         color="primary"
         :disabled="!allowNavigation"
-        to="/checkout/plan"
+        to="/checkout/pay"
       >
         Subscribe now
       </ButtonLink>

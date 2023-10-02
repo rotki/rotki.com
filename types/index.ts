@@ -258,13 +258,9 @@ export type StepType = 'pending' | 'failure' | 'success';
 
 export type IdleStep = 'idle';
 
-export type PaymentStep =
-  | {
-      type: StepType;
-      title: string;
-      message: string;
-      closeable?: boolean;
-    }
-  | {
-      type: IdleStep;
-    };
+export type PaymentStep = {
+  type: StepType | IdleStep;
+  title?: string;
+  message?: string;
+  closeable?: boolean;
+};
