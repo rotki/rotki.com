@@ -136,7 +136,7 @@
     "unverified_email": {
       "message": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail."
     },
-    "moved_offline": "Moved offline. For editing please contact {email}.",
+    "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
       "title": "Rotki Premium",
       "no_premium_found": "No premium subscription found. Select your {plan}.",

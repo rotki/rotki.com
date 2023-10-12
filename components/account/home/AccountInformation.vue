@@ -42,7 +42,7 @@ const v$ = useVuelidate(rules, state, {
 
 const {
   public: {
-    contact: { supportEmail },
+    contact: { supportEmail, supportEmailMailto },
   },
 } = useRuntimeConfig();
 
@@ -53,13 +53,16 @@ const reset = () => {
     return;
   }
 
-  const offline = t('account.moved_offline', { email: supportEmail });
   const unavailable = get(movedOffline);
 
-  state.firstName = unavailable ? offline : userAccount.address.firstName;
-  state.lastName = unavailable ? offline : userAccount.address.lastName;
-  state.companyName = unavailable ? offline : userAccount.address.companyName;
-  state.vatId = unavailable ? offline : userAccount.address.vatId;
+  if (unavailable) {
+    return;
+  }
+
+  state.firstName = userAccount.address.firstName;
+  state.lastName = userAccount.address.lastName;
+  state.companyName = userAccount.address.companyName;
+  state.vatId = userAccount.address.vatId;
 
   get(v$).$reset();
 };
@@ -96,12 +99,11 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div class="pt-2">
+  <div v-if="!movedOffline" class="pt-2">
     <div class="space-y-5">
       <RuiTextField
         id="first-name"
         v-model="state.firstName"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="given-name"
@@ -114,7 +116,6 @@ const { t } = useI18n();
       <RuiTextField
         id="last-name"
         v-model="state.lastName"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="family-name"
@@ -127,7 +128,6 @@ const { t } = useI18n();
       <RuiTextField
         id="company-name"
         v-model="state.companyName"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="organization"
@@ -140,7 +140,6 @@ const { t } = useI18n();
       <RuiTextField
         id="vat-id"
         v-model="state.vatId"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         :label="t('auth.signup.customer_information.form.vat_id')"
@@ -167,6 +166,21 @@ const { t } = useI18n();
       </RuiButton>
     </div>
   </div>
+  <RuiAlert v-else type="info">
+    <i18n-t keypath="account.moved_offline" scope="global">
+      <template #email>
+        <ButtonLink
+          inline
+          color="primary"
+          :to="supportEmailMailto"
+          class="underline"
+          external
+        >
+          {{ supportEmail }}
+        </ButtonLink>
+      </template>
+    </i18n-t>
+  </RuiAlert>
 
   <FloatingNotification
     type="success"

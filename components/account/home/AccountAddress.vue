@@ -44,7 +44,7 @@ const v$ = useVuelidate(rules, state, {
 
 const {
   public: {
-    contact: { supportEmail },
+    contact: { supportEmail, supportEmailMailto },
   },
 } = useRuntimeConfig();
 
@@ -55,14 +55,17 @@ const reset = () => {
     return;
   }
 
-  const offline = t('account.moved_offline', { email: supportEmail });
   const unavailable = get(movedOffline);
 
-  state.address1 = unavailable ? offline : userAccount.address.address1;
-  state.address2 = unavailable ? offline : userAccount.address.address2;
-  state.city = unavailable ? offline : userAccount.address.city;
-  state.postcode = unavailable ? offline : userAccount.address.postcode;
-  state.country = unavailable ? offline : userAccount.address.country;
+  if (unavailable) {
+    return;
+  }
+
+  state.address1 = userAccount.address.address1;
+  state.address2 = userAccount.address.address2;
+  state.city = userAccount.address.city;
+  state.postcode = userAccount.address.postcode;
+  state.country = userAccount.address.country;
 
   get(v$).$reset();
 };
@@ -99,12 +102,11 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div class="pt-2">
+  <div v-if="!movedOffline" class="pt-2">
     <div class="space-y-5">
       <RuiTextField
         id="address-1"
         v-model="state.address1"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="address-line1"
@@ -117,7 +119,6 @@ const { t } = useI18n();
       <RuiTextField
         id="address-2"
         v-model="state.address2"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="address-line2"
@@ -130,7 +131,6 @@ const { t } = useI18n();
       <RuiTextField
         id="city"
         v-model="state.city"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="address-level2"
@@ -143,7 +143,6 @@ const { t } = useI18n();
       <RuiTextField
         id="postal"
         v-model="state.postcode"
-        :disabled="movedOffline"
         variant="outlined"
         color="primary"
         autocomplete="postal-code"
@@ -179,6 +178,21 @@ const { t } = useI18n();
       </RuiButton>
     </div>
   </div>
+  <RuiAlert v-else type="info">
+    <i18n-t keypath="account.moved_offline" scope="global">
+      <template #email>
+        <ButtonLink
+          inline
+          color="primary"
+          :to="supportEmailMailto"
+          class="underline"
+          external
+        >
+          {{ supportEmail }}
+        </ButtonLink>
+      </template>
+    </i18n-t>
+  </RuiAlert>
 
   <FloatingNotification
     type="success"
