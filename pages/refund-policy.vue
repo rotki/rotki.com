@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
+const { t } = useI18n();
+
 const title = 'refund policy';
 const description = 'Rotki Refund and Cancellation Policy';
 
@@ -15,14 +17,17 @@ useHead({
 </script>
 
 <template>
-  <PageContainer>
-    <template #title> Rotki Refund and Cancellation Policy </template>
-    Rotki has features that can be used in a daily basis to assist users with
-    assets, portfolio management and analytics. But one of the main features is
-    assistance with tax reporting, which is something that is used infrequently.
-    Due to this nature of Rotki subscription
-    <strong>refunds are not allowed</strong>. You can at any time cancel your
-    subscription and from that point on no more payments will be made.
+  <PageContainer :center-vertically="false">
+    <template #title> {{ t('policies.refund.title') }} </template>
+    <p>
+      <i18n-t keypath="policies.refund.policy">
+        <template #non_refundable>
+          <strong>
+            {{ t('policies.refund.non_refundable') }}
+          </strong>
+        </template>
+      </i18n-t>
+    </p>
   </PageContainer>
 </template>
 

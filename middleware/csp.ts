@@ -5,8 +5,10 @@ import { isClient } from '@vueuse/core';
  * and force the route to reload from the server.
  */
 export default defineNuxtRouteMiddleware((to, from) => {
-  if (isClient && from.path === '/checkout/payment-method') {
-    abortNavigation();
-    window.location.href = to.fullPath;
+  if (isClient && from.path === '/checkout/pay/method') {
+    setTimeout(() => {
+      window.location.href = to.fullPath;
+    }, 100);
+    return abortNavigation();
   }
 });

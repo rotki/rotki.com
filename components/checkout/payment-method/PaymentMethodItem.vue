@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 defineProps<{ selected: boolean }>();
 
 const emit = defineEmits<{ (e: 'click'): void }>();
@@ -8,57 +8,40 @@ const css = useCssModule();
 
 <template>
   <div
-    :class="{
-      [css.content]: true,
-      [css.selected]: selected,
-    }"
+    :class="[css.content, { [css.selected]: selected }]"
     @click="emit('click')"
   >
-    <CheckMark :selected="selected" />
-
     <div :class="css.icon">
       <slot />
     </div>
     <div :class="css.text">
       <slot name="label" />
     </div>
+    <RuiRadio
+      :model-value="selected ? 'checked' : undefined"
+      color="primary"
+      hide-details
+      value="checked"
+    />
   </div>
 </template>
 
 <style lang="scss" module>
 .content {
-  @apply flex flex-col justify-center text-center items-center cursor-pointer;
-
-  width: 200px;
-  min-width: 150px;
-  height: 130px;
-  background: 0 0 no-repeat padding-box;
-  border: 1px solid;
-  border-radius: 4px;
+  @apply flex gap-4 justify-center items-center cursor-pointer p-4;
+  @apply min-w-[16rem] xl:min-w-[20rem] 2xl:min-w-[26rem] w-full;
+  @apply bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] border border-solid rounded;
 
   &.selected {
-    background-color: #fff;
-    box-shadow: 0 4px 8px #0003;
-    border-color: #da4e24;
-  }
-
-  &:not(.selected) {
-    background-color: #f0f0f0;
-    border-color: #d2d2d2;
+    @apply border-rui-primary bg-rui-primary/[.1];
   }
 }
 
 .icon {
-  width: 48px;
-  height: 48px;
+  @apply w-10 h-10;
 }
 
 .text {
-  @apply font-bold mt-2;
-
-  line-height: 28px;
-  font-size: 24px;
-  letter-spacing: 0;
-  color: #212529;
+  @apply font-bold grow;
 }
 </style>

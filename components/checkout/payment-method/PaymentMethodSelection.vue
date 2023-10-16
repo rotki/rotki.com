@@ -1,6 +1,6 @@
-<script setup lang="ts">
-import { get } from '@vueuse/core';
-import { type Component, type Ref } from 'vue';
+<script lang="ts" setup>
+import { get, set } from '@vueuse/core';
+import { type Component, type ComputedRef, type Ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   BitcoinIcon,
@@ -14,6 +14,8 @@ import { assert } from '~/utils/assert';
 
 const props = defineProps<{ identifier?: string }>();
 
+const { t } = useI18n();
+
 enum PaymentMethod {
   ETH = 1,
   BTC = 2,
@@ -26,148 +28,162 @@ type PaymentMethodItem = {
   id: PaymentMethod;
   label: string;
   component: Component;
-  crypto?: true;
+  name: string;
 };
+
+const store = useMainStore();
+const css = useCssModule();
+const { plan } = usePlanParams();
+const { isSupportedCrypto } = useCurrencyParams();
+const { paymentMethodId } = usePaymentMethodParam();
+
+const { identifier } = toRefs(props);
+const { authenticated } = storeToRefs(store);
+
+const loginRequired = ref(false);
+const method: Ref<PaymentMethod | undefined> = ref(get(paymentMethodId));
+const processing: Ref<boolean> = ref(false);
+
+const availablePaymentMethods = computed(() => {
+  if (!get(identifier)) {
+    return paymentMethods;
+  }
+  return paymentMethods.filter((value) =>
+    isSupportedCrypto(PaymentMethod[value.id]),
+  );
+});
+
+const selected: ComputedRef<PaymentMethodItem | undefined> = computed(() =>
+  get(availablePaymentMethods).find((m) => get(method) === m.id),
+);
 
 const paymentMethods: PaymentMethodItem[] = [
   {
     id: PaymentMethod.ETH,
     label: 'Ethereum',
     component: EthereumIcon,
-    crypto: true,
+    name: 'checkout-pay-request-crypto',
   },
   {
     id: PaymentMethod.BTC,
     label: 'Bitcoin',
     component: BitcoinIcon,
-    crypto: true,
+    name: 'checkout-pay-request-crypto',
   },
   {
     id: PaymentMethod.DAI,
     label: 'DAI',
     component: DaiIcon,
-    crypto: true,
+    name: 'checkout-pay-request-crypto',
   },
   {
     id: PaymentMethod.CARD,
     label: 'Card',
     component: CardIcon,
+    name: 'checkout-pay-card',
   },
   {
     id: PaymentMethod.PAYPAL,
     label: 'Paypal',
     component: PaypalIcon,
+    name: 'checkout-pay-paypal',
   },
 ];
 
-const { identifier } = toRefs(props);
-const selected: Ref<PaymentMethod | null> = ref(null);
-const loginRequired = ref(false);
-const store = useMainStore();
-const route = useRoute();
+const back = async () => {
+  await navigateTo({
+    name: 'checkout-pay',
+    query: { plan: get(plan), method: get(selected) ? get(method) : undefined },
+  });
+};
 
-const { authenticated } = storeToRefs(store);
-
-const proceed = async () => {
-  if (authenticated.value) {
-    const query: { p: string; c?: string; id?: string } = {
-      p: route.query.p as string,
-    };
-    let path: string;
-    const value = selected.value;
-    assert(value);
-    if (value === PaymentMethod.CARD) {
-      path = '/checkout/pay/card';
-    } else if (value === PaymentMethod.PAYPAL) {
-      path = '/checkout/pay/paypal';
-    } else {
-      path = '/checkout/request/crypto';
-      query.c = PaymentMethod[value];
-    }
-
-    const id = get(identifier);
-    if (id) {
-      query.id = id;
-    }
+const next = async () => {
+  if (get(authenticated)) {
+    set(processing, true);
+    const selectedMethod = get(selected);
+    assert(selectedMethod);
+    const { name, id } = selectedMethod;
 
     await navigateTo({
-      path,
-      query,
+      name,
+      query: {
+        plan: get(plan),
+        currency: isSupportedCrypto(PaymentMethod[id])
+          ? PaymentMethod[id]
+          : null,
+        id: get(identifier),
+        method: id,
+      },
     });
   } else {
-    loginRequired.value = true;
+    set(loginRequired, true);
   }
 };
 
-const isSelected = (method: PaymentMethod) => selected.value === method;
+const isSelected = (m: PaymentMethod) => get(method) === m;
 
-const select = (method: PaymentMethod) => {
-  selected.value = method;
+const select = (m: PaymentMethod) => {
+  set(method, m);
 };
-
-const availablePaymentMethods = computed(() => {
-  if (!get(identifier)) {
-    return paymentMethods;
-  }
-  return paymentMethods.filter((value) => value.crypto);
-});
-
-const css = useCssModule();
 </script>
 
 <template>
   <div :class="css.content">
-    <CheckoutTitle>Payment Methods</CheckoutTitle>
+    <CheckoutTitle>{{ t('home.plans.tiers.step_2.title') }}</CheckoutTitle>
     <CheckoutDescription>
-      Please select one of the following payment methods.
+      {{ t('home.plans.tiers.step_2.subtitle') }}
     </CheckoutDescription>
     <div :class="css.wrapper">
       <div :class="css.methods">
         <PaymentMethodItem
           v-for="item in availablePaymentMethods"
           :key="item.id"
-          :class="css.method"
           :selected="isSelected(item.id)"
           @click="select(item.id)"
         >
           <Component :is="item.component" />
-          <template #label> {{ item.label }} </template>
+          <template #label> {{ item.label }}</template>
         </PaymentMethodItem>
       </div>
     </div>
-    <div :class="css.continue">
-      <SelectionButton :disabled="!selected" selected @click="proceed()">
-        Continue to Checkout
-      </SelectionButton>
+    <div :class="css.buttons">
+      <RuiButton
+        :disabled="processing"
+        class="w-full"
+        size="lg"
+        @click="back()"
+      >
+        {{ t('actions.back') }}
+      </RuiButton>
+      <RuiButton
+        :disabled="!selected"
+        :loading="processing"
+        class="w-full"
+        color="primary"
+        size="lg"
+        @click="next()"
+      >
+        {{ t('actions.continue') }}
+      </RuiButton>
     </div>
     <LoginModal v-model="loginRequired" />
   </div>
 </template>
 
 <style lang="scss" module>
-$text-color: #212529;
-
 .content {
-  @apply w-full;
+  @apply flex flex-col w-full grow;
 }
 
 .wrapper {
-  @apply flex flex-row w-full justify-center;
+  @apply w-full justify-center grow my-8;
 }
 
 .methods {
-  @apply flex flex-row max-w-full overflow-x-auto;
+  @apply w-full lg:w-auto grid grid-cols-1 sm:grid-cols-2 gap-4 grid-flow-col-dense grid-rows-5 sm:grid-rows-3;
 }
 
-.method {
-  @apply mx-4;
-}
-
-.continue {
-  @apply flex flex-row justify-center mt-9;
-
-  & > button {
-    width: 187px;
-  }
+.buttons {
+  @apply flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto;
 }
 </style>

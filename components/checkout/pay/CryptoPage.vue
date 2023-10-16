@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import detectEthereumProvider from '@metamask/detect-provider';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
@@ -16,6 +16,7 @@ const { cryptoPayment, switchCryptoPlan } = useMainStore();
 const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
+const route = useRoute();
 
 let provider: Provider | null = null;
 
@@ -33,7 +34,7 @@ onMounted(async () => {
     const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
     if (result.isError) {
       if (result.code === PaymentError.UNVERIFIED) {
-        set(error, t('payment.error.unverified_email'));
+        set(error, t('subscription.error.unverified_email'));
       } else {
         set(error, result.error.message);
       }
@@ -55,35 +56,40 @@ const step = computed<PaymentStep>(() => {
   if (errorMessage) {
     return {
       type: 'failure',
-      title: 'Payment Failure',
+      title: t('subscription.error.payment_failure'),
       message: errorMessage,
       closeable: true,
     };
   } else if (state === 'pending') {
     return {
       type: 'pending',
-      title: 'Payment in Progress',
-      message: 'Please confirm your transaction...',
+      title: t('subscription.error.payment_progress'),
+      message: t('subscription.error.payment_progress_message'),
     };
   } else if (state === 'success') {
     return {
       type: 'success',
-      title: 'Transaction Pending',
-      message:
-        'You should receive an e-mail confirming the activation of your subscription in the near future.',
+      title: t('subscription.error.transaction_pending'),
+      message: t('subscription.error.transaction_pending_message'),
     };
   }
   return { type: 'idle' };
 });
 
-const reset = () => {
-  const { query } = useRoute();
+const back = () => {
+  const { plan, method } = route.query;
   navigateTo({
-    path: '/checkout/payment-method',
+    name: 'checkout-pay-method',
     query: {
-      p: query.p,
+      plan,
+      method,
     },
   });
+};
+
+const clear = () => {
+  set(error, null);
+  set(currentState, 'idle');
 };
 
 const config = useRuntimeConfig();
@@ -103,6 +109,7 @@ const {
 watch(plan, async (plan) => {
   const selectedCurrency = get(currency);
   assert(selectedCurrency);
+  set(loading, true);
   const response = await switchCryptoPlan(
     plan,
     selectedCurrency,
@@ -113,38 +120,50 @@ watch(plan, async (plan) => {
   } else {
     set(error, response.error.message);
   }
+  set(loading, false);
 });
-
-const css = useCssModule();
 </script>
 
 <template>
-  <PaymentFrame :loading="loading" :step="step" @close="reset()">
+  <PaymentFrame :step="step">
     <template #description>
-      <div :class="css.description">
-        Payments by crypto can have slower processing times.
-      </div>
+      <CheckoutDescription>
+        {{ t('home.plans.tiers.step_3.subtitle') }}
+      </CheckoutDescription>
     </template>
-    <div :class="css.row">
-      <div>
-        <CryptoPaymentForm
-          v-if="data"
-          :data="data"
-          :plan="plan"
-          :metamask-support="metamaskSupport"
-          @pay="payWithMetamask()"
+    <template #default="{ pending, success, failure, status }">
+      <div v-if="loading" class="flex justify-center my-10">
+        <RuiProgress
+          variant="indeterminate"
+          size="48"
+          circular
+          color="primary"
         />
       </div>
-    </div>
+      <CryptoPaymentForm
+        v-else-if="data && plan"
+        :data="data"
+        :pending="pending || currentState === 'pending'"
+        v-bind="{ success, failure, status }"
+        :loading="loading"
+        :metamask-support="metamaskSupport"
+        :plan="plan"
+        @pay="payWithMetamask()"
+        @clear:errors="clear()"
+      />
+
+      <div v-else class="flex gap-4 justify-center w-full mt-auto">
+        <RuiButton class="w-1/2" size="lg" @click="back()">
+          {{ t('actions.back') }}
+        </RuiButton>
+      </div>
+    </template>
   </PaymentFrame>
+
+  <FloatingNotification :visible="!(data || loading) && !!step">
+    <template #title>
+      {{ step.title }}
+    </template>
+    {{ step.message }}
+  </FloatingNotification>
 </template>
-
-<style lang="scss" module>
-@import '@/assets/css/media.scss';
-
-.description {
-  max-width: 600px;
-
-  @include text-size(18px, 21px);
-}
-</style>

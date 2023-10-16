@@ -19,6 +19,8 @@ definePageMeta({
   layout: 'account',
   middleware: ['maintenance', 'authentication'],
 });
+
+onMounted(() => store.getAccount());
 </script>
 
 <template>

@@ -20,7 +20,7 @@ const { t } = useI18n();
               <ButtonLink
                 inline
                 color="primary"
-                to="/checkout/plan"
+                to="/checkout/pay"
                 class="underline"
               >
                 {{ t('account.no_premium.plan') }}

@@ -28,5 +28,5 @@ useAutoLogout();
 </script>
 
 <template>
-  <CryptoRequestPage />
+  <CryptoRequest />
 </template>

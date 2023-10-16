@@ -180,7 +180,7 @@
       "cancellation": {
         "actions": {
           "no": "No, don't cancel",
-          "yes": "Yes, cancel my subsciption"
+          "yes": "Yes, cancel my subscription"
         },
         "title": "Canceling Your Rotki Subscription",
         "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a Rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the Rotki community.",
@@ -232,14 +232,20 @@
     "reset": "Reset",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
-    "update": "Update"
+    "update": "Update",
+    "change": "Change",
+    "ok": "Ok"
   },
   "common": {
     "here": "here",
     "actions": "actions",
     "status": "status",
     "none": "none",
-    "plan": "plan"
+    "plan": "plan",
+    "for": "for",
+    "amount": "Amount",
+    "address": "Address",
+    "vat": "{vat}% VAT"
   },
   "supported_defi": {
     "title": "Dedicated DeFi support for",
@@ -353,6 +359,11 @@
     },
     "plans": {
       "title": "Start using rotki today!",
+      "most_popular": "Most popular",
+      "choose": "Choose Plan",
+      "save_discount": "Save {discount}%",
+      "per_month": "per month",
+      "total": "Total {total}€",
       "details": {
         "free": {
           "title": "Free",
@@ -369,6 +380,52 @@
         "custom": {
           "title": "Want a custom tailored plan?",
           "subtitle": "Get in touch with us to tailor the plan to your needs."
+        }
+      },
+      "names": {
+        "1": "Monthly",
+        "12": "Yearly",
+        "numeric": "{months} Months",
+        "for": "{name} for",
+        "plan": "{name} Plan."
+      },
+      "tiers": {
+        "step_1": {
+          "title": "Premium Plans",
+          "description": "Choose the different plans we offer",
+          "vat": "The prices include a +{vat}% VAT tax",
+          "maybe_vat": "VAT may apply depending on your jurisdiction",
+          "crypto_hint": "* When paying with crypto the monthly price is {cryptoPrice} €",
+          "notes": {
+            "1": "The selected payment method will be billed the total amount for the subscription immediately.",
+            "2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
+            "3": "An invoice is generated for each payment and you can access it from your account page.",
+            "4": "Subscriptions can be canceled from the account page at any point in time."
+          }
+        },
+        "step_2": {
+          "title": "Payment Methods",
+          "description": "Select one of the different methods",
+          "subtitle": "Please select one of the following payment methods."
+        },
+        "step_3": {
+          "title": "Payment Details",
+          "description": "Proceed to the payment",
+          "subtitle": "Payments by crypto can have slower processing times.",
+          "start": "Start Subscription",
+          "chose": "You chose:",
+          "payment_description": "Payments are safely processed with Braintree a PayPal Service",
+          "metamask": {
+            "action": "Pay with Metamask",
+            "notice": "You can pay with metamask, your mobile wallet or manually send the exact amount to the following address above. Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
+            "paid_notice_1": "If you already have a made a transaction you don't need to do anything more.",
+            "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed."
+          },
+          "notes": {
+            "1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
+            "2": "Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
+            "3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
+          }
         }
       }
     }
@@ -391,7 +448,21 @@
   },
   "subscription": {
     "error": {
-      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
+      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address.",
+      "payment_failure": "Payment Failure",
+      "payment_progress": "Payment in progress",
+      "payment_progress_message": "Please confirm your transaction...",
+      "payment_progress_wait": "Please wait while your payment is processed...",
+      "transaction_pending": "Transaction Pending",
+      "transaction_pending_message": "You should receive an e-mail confirming the activation of your subscription in the near future.",
+      "init_error": "Initialization Error",
+      "payment_error": "Payment Error",
+      "3d_auth_failed": "3D Secure authentication failed",
+      "3d_auth_failed_message": "The 3D Secure authentication of your card failed ({status}). Please try a different payment method."
+    },
+    "success": {
+      "title": "Payment Success",
+      "message": "Your payment was processed successfully. Visit the account management page to manage your account."
     }
   },
   "selected_plan_overview": {
@@ -399,6 +470,11 @@
     "vat": "({priceInEur}€ + {vat}% VAT)",
     "includes_vat": "(includes {vat}% VAT)",
     "renew_period": "every {months} month | every {months} months"
+  },
+  "change_plan": {
+    "title": "Change Plan",
+    "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been send.",
+    "switch_agree": "I confirm that no payment has been send. {separator}Allow me to switch the plan"
   },
   "navigation_menu": {
     "home": "Home",
@@ -484,5 +560,18 @@
   },
   "notifications": {
     "changes_saved": "Your changes have been successfully saved!"
+  },
+  "policies": {
+    "refund": {
+      "title": "Rotki Refund and Cancellation Policy",
+      "non_refundable": "refunds are not allowed",
+      "policy": "Rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of Rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
+      "accept_title": "Refund policy",
+      "accept_message": "You need to accept the refund policy before proceeding",
+      "accept_policy": {
+        "text": "I have read and agreed to the {action}",
+        "action": "Refunds/Cancellation Policy"
+      }
+    }
   }
 }

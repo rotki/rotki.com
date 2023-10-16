@@ -8,10 +8,12 @@ import {
 import { type PayEvent } from '~/types/common';
 
 export const useBraintree = () => {
+  const { t } = useI18n();
   const store = useMainStore();
   const route = useRoute();
   const router = useRouter();
   const checkout = ref<CardCheckout | null>(null);
+  const loadingPlan = ref(false);
   const pending = ref(false);
   const paymentSuccess = ref(false);
   const paymentError = ref('');
@@ -24,27 +26,34 @@ export const useBraintree = () => {
     if (isPending) {
       return {
         type: 'pending',
-        title: 'Payment in progress',
-        message: 'Please wait while your payment is processed...',
+        title: t('subscription.error.payment_progress'),
+        message: t('subscription.error.payment_progress_wait'),
       };
     } else if (isFailure) {
-      return { type: 'failure', title: 'Payment Failure', message: isFailure };
+      return {
+        type: 'failure',
+        title: t('subscription.error.payment_failure'),
+        message: isFailure,
+      };
     } else if (isSuccess) {
       return {
         type: 'success',
-        title: 'Payment Success',
-        message:
-          'Your payment was processed successfully. Visit the account management page to manage your account.',
+        title: t('subscription.success.title'),
+        message: t('subscription.success.message'),
       };
     }
     return { type: 'idle' };
   });
 
-  watch(route, async (route) => await loadPlan(route.query.p as string));
+  watchEffect(async () => {
+    await loadPlan(route.query.plan as string);
+  });
 
   async function loadPlan(months: string) {
+    set(loadingPlan, true);
     const plan = parseInt(months);
     const data = await store.checkout(plan);
+    set(loadingPlan, false);
     if (data.isError) {
       router.back();
     } else {
@@ -53,7 +62,7 @@ export const useBraintree = () => {
   }
 
   onBeforeMount(async () => {
-    await loadPlan(get(route).query.p as string);
+    await loadPlan(get(route).query.plan as string);
   });
 
   const plan = computed<SelectedPlan | null>(() => {
@@ -87,11 +96,20 @@ export const useBraintree = () => {
     }
     set(pending, false);
   };
+
+  const reset = () => {
+    set(pending, false);
+    set(paymentSuccess, false);
+    set(paymentError, '');
+  };
+
   return {
     plan,
     token,
     step,
     pending,
+    loading: loadingPlan,
     submit,
+    reset,
   };
 };

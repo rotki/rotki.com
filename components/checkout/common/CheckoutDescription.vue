@@ -10,11 +10,6 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .description {
-  @apply text-rui-text;
-
-  line-height: 18px;
-  font-size: 15px;
-  margin-bottom: 56px;
-  letter-spacing: 0;
+  @apply text-body-1 text-center text-rui-text-secondary;
 }
 </style>

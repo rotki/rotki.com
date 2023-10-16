@@ -41,7 +41,7 @@ const getColor = (active: boolean, exact: boolean) => {
 <template>
   <NuxtLink
     #default="link"
-    class="inline-flex"
+    :class="{ 'inline-flex': inline }"
     :href="external ? to : undefined"
     :to="external ? undefined : to"
     :target="external ? '_blank' : '_self'"

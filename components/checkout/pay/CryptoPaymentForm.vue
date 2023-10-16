@@ -2,16 +2,23 @@
 import { parseEther, parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import { get, set, useClipboard } from '@vueuse/core';
-import { type CryptoPayment } from '~/types';
+import { type CryptoPayment, type PaymentStep } from '~/types';
 import { logger } from '~/utils/logger';
 
 const props = defineProps<{
   data: CryptoPayment;
   plan: number;
+  pending: boolean;
+  success: boolean;
+  failure: boolean;
+  loading: boolean;
   metamaskSupport: boolean;
+  status: PaymentStep;
 }>();
 
-const emit = defineEmits<{ (e: 'pay'): void }>();
+const emit = defineEmits<{ (e: 'pay'): void; (e: 'clear:errors'): void }>();
+
+const { t } = useI18n();
 
 const config = useRuntimeConfig();
 
@@ -38,7 +45,7 @@ const createPaymentQR = async (
   return qrText;
 };
 
-const { data } = toRefs(props);
+const { data, pending, loading, success } = toRefs(props);
 const canvas = ref<HTMLCanvasElement>();
 const qrText = ref<string>('');
 
@@ -47,6 +54,8 @@ const paymentAmount = computed(() => {
   return `${finalPriceInCrypto} ${cryptocurrency}`;
 });
 
+const processing = computed(() => get(pending) || get(loading));
+
 watch(canvas, async (canvas) => {
   if (!canvas) {
     return;
@@ -54,117 +63,120 @@ watch(canvas, async (canvas) => {
   set(qrText, await createPaymentQR(get(data), canvas));
 });
 
+const redirect = () => {
+  navigateTo({ name: 'checkout-success' });
+  stopWatcher();
+};
+
+const stopWatcher = watchEffect(() => {
+  if (get(success)) {
+    redirect();
+  }
+});
+
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
 const isBtc = computed(() => get(data).cryptocurrency === 'BTC');
 
 const payWithMetamask = () => emit('pay');
+const clearErrors = () => emit('clear:errors');
 const css = useCssModule();
 </script>
 
 <template>
-  <div
-    :class="{
-      [css.wrapper]: true,
-      [css.body]: true,
-    }"
-  >
-    <div :class="css.row">
-      <div :class="css.qrcode">
-        <canvas ref="canvas" @click="copyToClipboard(qrText)" />
-      </div>
-      <div :class="css.inputs">
-        <InputField
-          id="price"
-          :class="css.fields"
-          :model-value="paymentAmount"
-          label="Amount"
-          readonly
-        >
-          <template #append>
-            <div :class="css.copy">
-              <CopyButton :model-value="data.finalPriceInCrypto" />
-            </div>
-          </template>
-        </InputField>
-        <InputField
-          id="address"
-          :class="css.fields"
-          :model-value="data.cryptoAddress"
-          label="Address"
-          readonly
-        >
-          <template #append>
-            <div :class="css.copy">
-              <CopyButton :model-value="data.cryptoAddress" />
-            </div>
-          </template>
-        </InputField>
-      </div>
+  <div :class="css.wrapper">
+    <div :class="css.qrcode">
+      <canvas ref="canvas" @click="copyToClipboard(qrText)" />
     </div>
-    <SelectedPlanOverview :plan="data" crypto warning />
+    <div :class="css.inputs">
+      <RuiTextField
+        id="price"
+        :disabled="processing"
+        :model-value="paymentAmount"
+        :label="t('common.amount')"
+        variant="outlined"
+        hide-details
+        readonly
+      >
+        <template #append>
+          <CopyButton
+            :disabled="processing"
+            :model-value="data.finalPriceInCrypto"
+          />
+        </template>
+      </RuiTextField>
+      <RuiTextField
+        id="address"
+        :disabled="processing"
+        :model-value="data.cryptoAddress"
+        :label="t('common.address')"
+        variant="outlined"
+        hide-details
+        readonly
+      >
+        <template #append>
+          <CopyButton
+            :disabled="processing"
+            :model-value="data.cryptoAddress"
+          />
+        </template>
+      </RuiTextField>
+    </div>
+    <SelectedPlanOverview :plan="data" :disabled="processing" crypto warning />
     <div :class="css.hint">
-      You can pay with metamask, your mobile wallet or manually send the exact
-      amount to the following address above. Once the whole amount is sent and
-      manually processed, then a receipt will be sent to your email and your
-      subscription will be activated.
+      {{ t('home.plans.tiers.step_3.metamask.notice') }}
 
       <div :class="css.info">
-        If you already have a made a transaction you don't need to do anything
-        more.
-        <div>
-          You will be notified about your subscription via e-mail as soon as
-          your transaction is confirmed.
-        </div>
+        <p>
+          {{ t('home.plans.tiers.step_3.metamask.paid_notice_1') }}
+        </p>
+        <p>
+          {{ t('home.plans.tiers.step_3.metamask.paid_notice_2') }}
+        </p>
       </div>
     </div>
     <div v-if="!isBtc" :class="css.button">
-      <SelectionButton
-        :selected="false"
-        :disabled="!metamaskSupport"
+      <RuiButton
+        :disabled="!metamaskSupport || processing"
+        :loading="processing"
+        colos="primary"
+        size="lg"
         @click="payWithMetamask()"
       >
-        <div :class="css.row">
-          <MetamaskIcon :class="css.icon" />
-          Pay with Metamask
-        </div>
-      </SelectionButton>
+        <template #prepend>
+          <MetamaskIcon class="h-6 w-6 mr-2" />
+        </template>
+        {{ t('home.plans.tiers.step_3.metamask.action') }}
+      </RuiButton>
     </div>
   </div>
+
+  <FloatingNotification
+    :timeout="10000"
+    :visible="failure"
+    @dismiss="clearErrors()"
+  >
+    <template #title>
+      {{ status?.title }}
+    </template>
+    {{ status?.message }}
+  </FloatingNotification>
 </template>
 
 <style lang="scss" module>
 .wrapper {
-  @apply flex flex-col mt-4;
-}
-
-.row {
-  @apply flex flex-row;
+  @apply flex flex-col mt-6 grow;
 }
 
 .qrcode {
-  @apply border m-4;
+  @apply border mx-auto mt-2 mb-10;
 }
 
 .inputs {
-  @apply flex flex-col justify-center ml-3;
-}
-
-.fields {
-  width: 450px;
-}
-
-.copy {
-  @apply flex flex-row items-center mt-2 ml-2;
+  @apply flex flex-col justify-center gap-6;
 }
 
 .button {
-  @apply mt-4;
-}
-
-.icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
+  @apply my-4;
 }
 
 .hint {

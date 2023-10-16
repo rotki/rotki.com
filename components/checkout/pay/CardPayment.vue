@@ -9,7 +9,8 @@ import {
 import { type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import { get, set } from '@vueuse/core';
 import { type Ref } from 'vue';
-import { type SelectedPlan } from '~/types';
+import { type HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields';
+import { type PaymentStep, type SelectedPlan } from '~/types';
 import { type PayEvent } from '~/types/common';
 import { logger } from '~/utils/logger';
 import { assert } from '~/utils/assert';
@@ -24,12 +25,21 @@ type EmptyState = { number: boolean; cvv: boolean; expirationDate: boolean };
 const props = defineProps<{
   token: string;
   plan: SelectedPlan;
+  success: boolean;
+  failure: boolean;
+  pending: boolean;
+  loading: boolean;
+  status: PaymentStep;
 }>();
 
 const emit = defineEmits<{
   (e: 'pay', payment: PayEvent): void;
   (e: 'update:pending', pending: boolean): void;
+  (e: 'clear:errors'): void;
 }>();
+
+const { t } = useI18n();
+const { paymentMethodId } = usePaymentMethodParam();
 
 const setupEmptyStateMonitoring = (
   hostedFields: HostedFields,
@@ -114,7 +124,7 @@ const hasError = (status: Ref<FieldStatus>) =>
 const setupHostedFields = () => {
   let _fields: HostedFields | null = null;
 
-  const get = () => {
+  const getFields = () => {
     assert(_fields);
     return _fields;
   };
@@ -122,7 +132,22 @@ const setupHostedFields = () => {
   const create = async (client: braintree.Client) => {
     _fields = await hostedFields.create({
       client,
-      styles: {},
+      styles: {
+        body: {
+          'font-size': '16px',
+        },
+        input: {
+          'font-size': '1rem',
+          'font-family': 'Roboto',
+          color: 'rgba(0, 0, 0, 0.87)',
+        },
+        ':disabled': {
+          color: 'rgba(0, 0, 0, 0.5)',
+        },
+        '.invalid': {
+          color: 'red',
+        },
+      },
       fields: {
         number: {
           container: '#card-number',
@@ -134,6 +159,29 @@ const setupHostedFields = () => {
           container: '#expiration',
         },
       },
+    });
+    watch(processing, (val) => {
+      const hostedFields: HostedFieldsHostedFieldsFieldName[] = [
+        'number',
+        'expirationDate',
+        'cvv',
+      ];
+      if (val) {
+        hostedFields.forEach((field) => {
+          _fields?.setAttribute({
+            field,
+            attribute: 'disabled',
+            value: true,
+          });
+        });
+      } else {
+        hostedFields.forEach((field) => {
+          _fields?.removeAttribute({
+            field,
+            attribute: 'disabled',
+          });
+        });
+      }
     });
   };
 
@@ -150,9 +198,9 @@ const setupHostedFields = () => {
       cvvStatus: Ref<FieldStatus>;
     },
   ) => {
-    setupFocusManagement(get(), focused, status);
-    setupEmptyStateMonitoring(get(), empty);
-    setupValidityMonitoring(get(), status);
+    setupFocusManagement(getFields(), focused, status);
+    setupEmptyStateMonitoring(getFields(), empty);
+    setupValidityMonitoring(getFields(), status);
   };
 
   const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
@@ -162,7 +210,7 @@ const setupHostedFields = () => {
   return {
     create,
     setup,
-    get,
+    get: getFields,
     focus,
     teardown,
   };
@@ -173,14 +221,13 @@ type ErrorMessage = {
   message: string;
 };
 
-const { token, plan } = toRefs(props);
+const { token, plan, success, pending, loading } = toRefs(props);
 const fields = setupHostedFields();
 const verify = ref(false);
 const challengeVisible = ref(false);
+const paying = ref(false);
+const initializing = ref(true);
 
-const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
-  fields.focus(field);
-};
 const accepted = ref(false);
 const defaultStatus: FieldStatus = {
   valid: false,
@@ -205,36 +252,6 @@ const error = ref<ErrorMessage | null>(null);
 
 let btThreeDSecure: ThreeDSecure;
 
-onMounted(async () => {
-  try {
-    const btClient = await client.create({
-      authorization: get(token),
-    });
-
-    await fields.create(btClient);
-    fields.setup(focused, empty, {
-      numberStatus,
-      expirationDateStatus,
-      cvvStatus,
-    });
-
-    btThreeDSecure = await threeDSecure.create({
-      version: '2',
-      client: btClient,
-    });
-  } catch (e: any) {
-    set(error, {
-      title: 'Initialization Error',
-      message: e.message,
-    });
-  }
-});
-
-onUnmounted(() => {
-  btThreeDSecure?.teardown();
-  fields.teardown();
-});
-
 const valid = computed(
   () =>
     get(accepted) &&
@@ -242,10 +259,25 @@ const valid = computed(
     get(expirationDateStatus).valid &&
     get(cvvStatus).valid,
 );
-const paying = ref(false);
+
+const processing = computed(() => get(paying) || get(loading) || get(pending));
+
+const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
+  fields.focus(field);
+};
 
 const updatePending = () => {
   emit('update:pending', true);
+};
+
+const back = async () => {
+  await navigateTo({
+    name: 'checkout-pay-method',
+    query: {
+      plan: get(plan).months,
+      method: get(paymentMethodId),
+    },
+  });
 };
 
 const submit = async () => {
@@ -287,17 +319,16 @@ const submit = async () => {
     } else {
       const status = (threeDSecureInfo as any)?.status as string | undefined;
       set(error, {
-        title: '3D Secure authentication failed',
-        message: `The 3D Secure authentication of your card failed (${status?.replaceAll(
-          '_',
-          ' ',
-        )}). Please try a different payment method.`,
+        title: t('subscription.error.3d_auth_failed'),
+        message: t('subscription.error.3d_auth_failed_message', {
+          status: status?.replaceAll('_', ' '),
+        }),
       });
       logger.error(`liability did not shift, due to status: ${status}`);
     }
   } catch (e: any) {
     set(error, {
-      title: 'Payment Error',
+      title: t('subscription.error.payment_error'),
       message: e.message,
     });
     logger.error(e);
@@ -309,88 +340,154 @@ const submit = async () => {
     btThreeDSecure.off('authentication-modal-render', onRender);
   }
 };
-const close = () => {
+const clearError = () => {
   set(error, null);
 };
+
+const redirect = () => {
+  navigateTo({ name: 'checkout-success' });
+  stopWatcher();
+};
+
+const stopWatcher = watchEffect(() => {
+  if (get(success)) {
+    redirect();
+  }
+});
+
+onMounted(async () => {
+  try {
+    set(initializing, true);
+    const btClient = await client.create({
+      authorization: get(token),
+    });
+
+    await fields.create(btClient);
+    fields.setup(focused, empty, {
+      numberStatus,
+      expirationDateStatus,
+      cvvStatus,
+    });
+
+    btThreeDSecure = await threeDSecure.create({
+      version: '2',
+      client: btClient,
+    });
+    set(initializing, false);
+  } catch (e: any) {
+    set(error, {
+      title: t('subscription.error.init_error'),
+      message: e.message,
+    });
+  }
+});
+
+onUnmounted(() => {
+  btThreeDSecure?.teardown();
+  fields.teardown();
+});
 
 const css = useCssModule();
 </script>
 
 <template>
-  <ErrorDisplay v-if="error" :message="error.message" :title="error.title">
-    <div :class="css.close">
-      <SelectionButton :selected="false" @click="close()"> OK </SelectionButton>
+  <div class="my-6 grow flex flex-col">
+    <div :class="css.inputs">
+      <HostedField
+        id="card-number"
+        :class="css.number"
+        :empty="empty.number"
+        :disabled="processing || initializing"
+        :focused="focused === 'number'"
+        :valid="!numberError"
+        label="Card Number"
+        number
+        @click="focus('number')"
+      />
+      <HostedField
+        id="expiration"
+        :class="css.expiration"
+        :empty="empty.expirationDate"
+        :disabled="processing || initializing"
+        :focused="focused === 'expirationDate'"
+        :valid="!expirationError"
+        label="Expiration"
+        @click="focus('expirationDate')"
+      />
+      <HostedField
+        id="cvv"
+        :class="css.cvv"
+        :empty="empty.cvv"
+        :disabled="processing || initializing"
+        :focused="focused === 'cvv'"
+        :valid="!cvvError"
+        label="CVV"
+        @click="focus('cvv')"
+      />
     </div>
-  </ErrorDisplay>
-  <div v-show="!error">
-    <div v-show="!verify">
-      <div :class="css.inputs">
-        <HostedField
-          id="card-number"
-          :class="css.number"
-          :empty="empty.number"
-          :focused="focused === 'number'"
-          :valid="!numberError"
-          label="Card Number"
-          number
-          @click="focus('number')"
-        />
-        <HostedField
-          id="expiration"
-          :class="css.expiration"
-          :empty="empty.expirationDate"
-          :focused="focused === 'expirationDate'"
-          :valid="!expirationError"
-          label="Expiration"
-          @click="focus('expirationDate')"
-        />
-        <HostedField
-          id="cvv"
-          :class="css.cvv"
-          :empty="empty.cvv"
-          :focused="focused === 'cvv'"
-          :valid="!cvvError"
-          label="CVV"
-          @click="focus('cvv')"
-        />
-      </div>
-      <SelectedPlanOverview :plan="plan" />
-      <div>
-        <SelectionButton
-          :class="css.button"
-          :disabled="!valid || paying"
-          selected
-          @click="submit()"
-        >
-          Start subscription
-        </SelectionButton>
-      </div>
-      <AcceptRefundPolicy v-model="accepted" />
+    <SelectedPlanOverview :plan="plan" :disabled="processing || initializing" />
+    <AcceptRefundPolicy
+      v-model="accepted"
+      :disabled="processing || initializing"
+      :class="css.policy"
+    />
+    <div v-if="pending" class="my-8">
+      <RuiAlert type="info">
+        <template #title>
+          {{ status?.title }}
+        </template>
+        <span>{{ status?.message }}</span>
+      </RuiAlert>
     </div>
-    <LoadingIndicator v-if="verify && !challengeVisible" :class="css.loader" />
+    <div :class="css.buttons">
+      <RuiButton
+        :disabled="processing"
+        class="w-full"
+        size="lg"
+        @click="back()"
+      >
+        {{ t('actions.back') }}
+      </RuiButton>
+      <RuiButton
+        :disabled="!valid"
+        :loading="processing || initializing"
+        class="w-full"
+        color="primary"
+        size="lg"
+        @click="submit()"
+      >
+        {{ t('home.plans.tiers.step_3.start') }}
+      </RuiButton>
+    </div>
   </div>
+
+  <FloatingNotification
+    :timeout="10000"
+    :visible="!!error"
+    closeable
+    @dismiss="clearError()"
+  >
+    <template #title>
+      {{ error?.title }}
+    </template>
+    {{ error?.message }}
+  </FloatingNotification>
+
+  <FloatingNotification :timeout="10000" :visible="failure">
+    <template #title>
+      {{ status?.title }}
+    </template>
+    {{ status?.message }}
+  </FloatingNotification>
 </template>
 
 <style lang="scss" module>
 .inputs {
-  @apply flex flex-row;
-
-  & > *:not(:first-child) {
-    margin-left: 32px;
-  }
+  @apply grid grid-rows-2 grid-cols-2 gap-x-4 gap-y-12;
 }
 
 .number {
-  width: 328px;
-}
-
-.cvv,
-.expiration {
-  width: 128px;
-}
-
-.button {
-  margin-top: 51px;
+  @apply col-span-2;
 }
 
 .close {
@@ -399,5 +496,13 @@ const css = useCssModule();
 
 .loader {
   min-height: 400px;
+}
+
+.policy {
+  @apply my-8;
+}
+
+.buttons {
+  @apply flex gap-4 justify-center w-full mt-auto;
 }
 </style>

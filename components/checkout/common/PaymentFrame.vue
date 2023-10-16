@@ -3,106 +3,50 @@ import { get, toRefs } from '@vueuse/core';
 import { type IdleStep, type PaymentStep, type StepType } from '~/types';
 
 const props = defineProps<{
-  loading: boolean;
   step: PaymentStep;
 }>();
 
-const emit = defineEmits<{ (e: 'close'): void }>();
+const { t } = useI18n();
 
 const { step } = toRefs(props);
 const useType = (type: StepType | IdleStep) =>
   computed(() => get(step).type === type);
-const text = computed(() => {
-  const currentStep = get(step);
-  if (currentStep.type === 'idle') {
-    return {
-      title: '',
-      message: '',
-      closable: false,
-    };
-  }
-  return {
-    title: currentStep.title,
-    message: currentStep.message,
-    closable: currentStep.closeable,
-  };
-});
-
-const close = () => {
-  emit('close');
-};
 
 const isPending = useType('pending');
 const isSuccess = useType('success');
 const isFailure = useType('failure');
-const userInteraction = useType('idle');
 
 const css = useCssModule();
 </script>
 
 <template>
-  <PageContainer :center-vertically="false">
-    <template #title>Subscription Payment</template>
-    <PageContent>
-      <div :class="css.content">
-        <CheckoutTitle>Payment Details</CheckoutTitle>
+  <div :class="css.content">
+    <CheckoutTitle>
+      {{ t('home.plans.tiers.step_3.title') }}
+    </CheckoutTitle>
 
-        <slot name="description">
-          <CheckoutDescription>
-            <div :class="css.description">
-              <span :class="css.text">
-                Payments are safely processed with
-              </span>
-              <BraintreeIcon :class="css.braintree" />
-            </div>
-          </CheckoutDescription>
-        </slot>
+    <slot name="description">
+      <CheckoutDescription>
+        {{ t('home.plans.tiers.step_3.payment_description') }}
+      </CheckoutDescription>
+    </slot>
 
-        <LoadingIndicator v-if="loading" :class="css.loader" />
-        <div v-if="userInteraction">
-          <slot />
-        </div>
-        <PendingDisplay
-          v-if="isPending"
-          :message="text.message"
-          :title="text.title"
-        />
-        <ErrorDisplay
-          v-else-if="isFailure"
-          :message="text.message"
-          :title="text.title"
-        >
-          <div v-if="text.closable" :class="css.close">
-            <SelectionButton :selected="false" @click="close()">
-              OK
-            </SelectionButton>
-          </div>
-        </ErrorDisplay>
-        <SuccessDisplay
-          v-else-if="isSuccess"
-          :message="text.message"
-          :title="text.title"
-        >
-          <div :class="css['action-wrapper']">
-            <NuxtLink :class="css.action" to="/home/subscription">
-              Manage Premium
-            </NuxtLink>
-          </div>
-        </SuccessDisplay>
-      </div>
-    </PageContent>
-  </PageContainer>
+    <slot
+      :failure="isFailure"
+      :pending="isPending"
+      :success="isSuccess"
+      :status="step"
+    />
+  </div>
 </template>
 
 <style lang="scss" module>
 .loader {
-  min-height: 400px;
+  @apply min-h-[25rem];
 }
 
 .braintree {
-  @apply ml-1;
-
-  width: 120px;
+  @apply ml-1 w-[7.5rem];
 }
 
 .text {
@@ -110,11 +54,11 @@ const css = useCssModule();
 }
 
 .description {
-  @apply flex flex-row;
+  @apply flex flex-row justify-center;
 }
 
 .content {
-  @apply p-0 w-full;
+  @apply flex flex-col w-full max-w-[29rem] mx-auto mt-8 lg:mt-0 grow;
 }
 
 .action {

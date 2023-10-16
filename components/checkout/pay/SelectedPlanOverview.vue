@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { type CryptoPayment, type SelectedPlan } from '~/types';
-import { getPlanName } from '~/utils/plans';
+import { getPlanNameFor } from '~/utils/plans';
 
 const props = withDefaults(
   defineProps<{
     plan: SelectedPlan | CryptoPayment;
     crypto?: boolean;
     warning?: boolean;
+    disabled?: boolean;
   }>(),
   {
     crypto: false,
@@ -20,7 +21,7 @@ const router = useRouter();
 
 const selection = ref(false);
 
-const name = computed(() => getPlanName(get(plan).months));
+const name = computed(() => getPlanNameFor(get(plan).months));
 const date = computed(() => {
   const currentPlan = get(plan);
   const date = new Date(currentPlan.startDate * 1000);
@@ -50,7 +51,7 @@ const switchTo = (months: number) => {
     path: currentRoute.path,
     query: {
       ...currentRoute.query,
-      p: months.toString(),
+      plan: months.toString(),
     },
   });
 };
@@ -61,7 +62,7 @@ const css = useCssModule();
 
 <template>
   <PlanOverview>
-    <span :class="css.plan">{{ name }} Plan.</span>
+    <span :class="css.plan">{{ name }}</span>
     <i18n-t keypath="selected_plan_overview.plan" scope="global">
       <template #date>
         {{ date }}
@@ -94,11 +95,20 @@ const css = useCssModule();
       }}
     </span>
 
-    <template #body>
-      <div :class="css.change" @click="select()">Change</div>
+    <template #action>
+      <RuiButton
+        :class="css.change"
+        :disabled="disabled"
+        color="primary"
+        variant="text"
+        @click="select()"
+      >
+        {{ t('actions.change') }}
+      </RuiButton>
       <ChangePlanDialog
         :crypto="crypto"
         :warning="warning"
+        :vat="vatOverview?.vat ?? plan.vat"
         :visible="selection"
         @cancel="selection = false"
         @select="switchTo($event)"
@@ -109,12 +119,6 @@ const css = useCssModule();
 
 <style lang="scss" module>
 .plan {
-  @apply font-bold;
-}
-
-.change {
-  @apply font-bold text-base cursor-pointer p-4;
-
-  color: #351404;
+  @apply text-body-1 font-bold mr-1;
 }
 </style>

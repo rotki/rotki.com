@@ -1,4 +1,5 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import { get } from '@vueuse/core';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
@@ -17,8 +18,17 @@ useHead({
   ],
   ...commonAttrs(),
 });
+
+const { plan } = usePlanParams();
+const { subscriptionId } = useSubscriptionIdParam();
+
+onBeforeMount(() => {
+  if (!get(plan)) {
+    navigateTo({ name: 'checkout-pay' });
+  }
+});
 </script>
 
 <template>
-  <PaymentMethodPage />
+  <PaymentMethodSelection :identifier="subscriptionId" />
 </template>
