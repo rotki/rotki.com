@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
-import { type Payment } from 'types';
 import { type Ref } from 'vue';
 import {
   type DataTableColumn,
@@ -9,6 +8,7 @@ import {
   type TablePaginationData,
 } from '@rotki/ui-library';
 import { useMainStore } from '~/store';
+import { type Payment } from '~/types';
 
 const { t } = useI18n();
 

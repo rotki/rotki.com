@@ -12,9 +12,8 @@ export const useCountries = () => {
 
   const loadCountries = async () => {
     try {
-      const response = await fetchWithCsrf<ApiResponse<Country[]>>(
-        '/webapi/countries/',
-      );
+      const response =
+        await fetchWithCsrf<ApiResponse<Country[]>>('/webapi/countries/');
       countries.value = response.result ?? [];
     } catch (e: any) {
       countriesLoadError.value = e.message;

@@ -69,9 +69,8 @@ export const useMarkdownContent = () => {
   ): Promise<JobMarkdownContent | null> => {
     const prefixedPath = `${prefix}${path}`;
     try {
-      const data = await queryContent<JobMarkdownContent>(
-        prefixedPath,
-      ).findOne();
+      const data =
+        await queryContent<JobMarkdownContent>(prefixedPath).findOne();
       return {
         ...data,
         link: replacePathPrefix(prefix, data?._path),

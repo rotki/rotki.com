@@ -1,5 +1,5 @@
 <script setup lang="ts">
-withDefaults(
+const props = withDefaults(
   defineProps<{
     id?: string;
   }>(),
@@ -8,18 +8,14 @@ withDefaults(
   },
 );
 
-const { anchorLinks } = useRuntimeConfig().public.content;
-const heading = 2;
-
-const generate =
-  anchorLinks?.depth >= heading && !anchorLinks?.exclude.includes(heading);
-
+const { headings } = useRuntimeConfig().public.mdc;
+const generate = computed(() => props.id && headings?.anchorLinks?.h2);
 const css = useCssModule();
 </script>
 
 <template>
   <h2 :id="id" :class="css.heading">
-    <a v-if="id && generate" :href="`#${id}`">
+    <a v-if="generate" :href="`#${id}`">
       <slot />
     </a>
     <slot v-else />

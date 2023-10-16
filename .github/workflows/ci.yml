@@ -111,9 +111,9 @@ jobs:
       - name: Run cypress tests
         uses: cypress-io/github-action@v5
         with:
-          start: pnpm run dev --dotenv .env.test
+          start: pnpm run dev --dotenv .env.test --host 127.0.0.1
           browser: chrome
-          wait-on: 'http://localhost:3000'
+          wait-on: 'http://127.0.0.1:3000'
           install: false
 
       - name: Upload screenshots
