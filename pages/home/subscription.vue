@@ -26,7 +26,7 @@ onMounted(() => store.getAccount());
 <template>
   <div class="space-y-10">
     <UnverifiedEmailWarning v-if="!emailConfirmed" />
-    <PremiumPlaceholder v-if="!canUsePremium" />
+    <PremiumPlaceholder v-else-if="!canUsePremium" />
     <ApiKeys v-if="premium" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable />
