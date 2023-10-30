@@ -345,7 +345,7 @@
         },
         "premium_defi": {
           "title": "DeFi historical accounting, profit and loss",
-          "detail": " See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocol to be informed via email when certain conditions are met."
+          "detail": " See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocols to be informed via email when certain conditions are met."
         },
         "dex_support": {
           "title": "Decentralized exchanges",
@@ -418,7 +418,7 @@
           "metamask": {
             "action": "Pay with Metamask",
             "notice": "You can pay with metamask, your mobile wallet or manually send the exact amount to the following address above. Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
-            "paid_notice_1": "If you already have a made a transaction you don't need to do anything more.",
+            "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed."
           },
           "notes": {
@@ -473,7 +473,7 @@
   },
   "change_plan": {
     "title": "Change Plan",
-    "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been send.",
+    "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
     "switch_agree": "I confirm that no payment has been send. {separator}Allow me to switch the plan"
   },
   "navigation_menu": {
