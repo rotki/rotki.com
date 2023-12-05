@@ -31,6 +31,7 @@ definePageMeta({
 <template>
   <HeroArea />
   <FeatureList />
+  <Testimonials />
   <PremiumFeatures />
   <AvailablePlans />
 </template>

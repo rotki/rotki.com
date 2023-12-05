@@ -10,6 +10,7 @@ import {
   RiBankCardLine,
   RiBankLine,
   RiCalendarTodoLine,
+  RiChat1Line,
   RiChatSmile2Line,
   RiCloseLine,
   RiDiscordLine,
@@ -72,6 +73,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       RiInformationLine,
       RiAccountCircleLine,
       RiMapPinLine,
+      RiChat1Line,
     ],
   });
 });

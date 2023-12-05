@@ -34,13 +34,11 @@ const css = useCssModule();
   }
 
   @include for-size(tablet-landscape-up) {
-    margin-left: 280px !important;
-    margin-bottom: -150px;
+    margin-left: 17.5rem !important;
   }
 
   @include for-size(desktop-up) {
-    margin-left: 280px;
-    margin-bottom: -150px;
+    margin-left: 17.5rem;
   }
 }
 </style>
