@@ -1,6 +1,9 @@
-import { get, set } from '@vueuse/core';
+import { get, objectPick, set } from '@vueuse/core';
 import { groupBy } from 'graphql/jsutils/groupBy';
-import type { MarkdownParsedContent } from '@nuxt/content/dist/runtime/types';
+import {
+  type MarkdownParsedContent,
+  type QueryBuilderWhere,
+} from '@nuxt/content/dist/runtime/types';
 import type { ComputedRef, Ref } from 'vue';
 import { replacePathPrefix } from '~/utils/api';
 import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
@@ -13,11 +16,19 @@ export interface JobMarkdownContent extends MarkdownParsedContent {
   tags: string[];
 }
 
+export interface TestimonialMarkdownContent extends MarkdownParsedContent {
+  avatar?: string;
+  visible: boolean;
+  username: string;
+  url: string;
+}
+
 /**
  * Loads jobs and markdown content based on given path
  */
 export const useMarkdownContent = () => {
   const jobs: Ref<JobMarkdownContent[]> = ref([]);
+  const testimonials: Ref<TestimonialMarkdownContent[]> = ref([]);
   const openJobs: ComputedRef<JobMarkdownContent[]> = computed(() =>
     get(jobs).filter((job) => job.open),
   );
@@ -34,32 +45,61 @@ export const useMarkdownContent = () => {
   /**
    * fetches all markdown files within the jobs directory
    */
-  const loadJobs = async () => {
-    const path = `/jobs`;
-
-    let foundJobs;
+  const loadAll = async <T>(path: string, where: QueryBuilderWhere = {}) => {
+    let found;
     let prefix = CONTENT_PREFIX;
 
     try {
       // try to fetch from remote
-      foundJobs = await queryContent<JobMarkdownContent>(
-        `${prefix}${path}`,
-      ).find();
+      found = await queryContent<T>(`${prefix}${path}`).where(where).find();
     } catch (e: any) {
       logger.error(e);
       prefix = LOCAL_CONTENT_PREFIX;
       // fallback to local if remote fails
-      foundJobs = await queryContent<JobMarkdownContent>(
-        `${prefix}${path}`,
-      ).find();
+      found = await queryContent<T>(`${prefix}${path}`).where(where).find();
     }
+
+    return { data: found ?? [], prefix };
+  };
+
+  /**
+   * fetches all markdown files within the jobs directory
+   */
+  const loadJobs = async () => {
+    const path = `/jobs`;
+
+    const { data, prefix } = await loadAll<JobMarkdownContent>(path);
 
     set(
       jobs,
-      foundJobs?.map((job) => {
+      data?.map((job) => {
         job.link = replacePathPrefix(prefix, job._path);
         return job;
       }) ?? [],
+    );
+  };
+
+  /**
+   * fetches all markdown files within the testimonials directory
+   */
+  const loadTestimonials = async () => {
+    const path = `/testimonials`;
+
+    const { data } = await loadAll<TestimonialMarkdownContent>(path, {
+      visible: true,
+    });
+
+    set(
+      testimonials,
+      data.map((testimonial) =>
+        objectPick(testimonial, [
+          'avatar',
+          'visible',
+          'body',
+          'username',
+          'url',
+        ]),
+      ),
     );
   };
 
@@ -113,8 +153,10 @@ export const useMarkdownContent = () => {
     openJobs,
     groupedOpenJobsByCategory,
     firstJob,
+    testimonials,
     loadJob,
     loadJobs,
+    loadTestimonials,
     loadContent,
   };
 };

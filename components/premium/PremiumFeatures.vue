@@ -34,14 +34,10 @@ const css = useCssModule();
 @import '@/assets/css/media.scss';
 
 .premium {
-  padding-top: 350px;
-  padding-bottom: 70px;
-  width: 100%;
-  overflow-x: hidden;
+  @apply w-full overflow-x-hidden pt-80 pb-[4.375rem];
 
   @include for-size(phone-only) {
-    padding-top: 200px;
-    overflow-y: hidden;
+    @apply overflow-y-hidden pt-0;
   }
 }
 

@@ -4,9 +4,15 @@ import { get } from '@vueuse/core';
 import type { Swiper } from 'swiper/types';
 
 const props = withDefaults(
-  defineProps<{ activeIndex: number; pages: number; swiper?: Swiper }>(),
+  defineProps<{
+    activeIndex: number;
+    pages: number;
+    swiper?: Swiper;
+    arrowButtons?: boolean;
+  }>(),
   {
     swiper: undefined,
+    arrowButtons: false,
   },
 );
 
@@ -33,7 +39,7 @@ const onNavigate = (index: number) => {
     :class="css.controls"
     :model-value="activeIndex"
     :pages="pages"
-    arrow-buttons
+    :arrow-buttons="arrowButtons"
     variant="bullet"
     @update:model-value="onNavigate($event)"
   />

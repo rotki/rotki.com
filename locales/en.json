@@ -331,6 +331,11 @@
       "title": "Profit/loss report",
       "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.{0}{0}Profit/loss report for free users has a transaction limit and does not take into account all possible protocols."
     },
+
+    "testimonials": {
+      "title": "Don’t just take our word for it",
+      "detail": "Hear from some of our amazing customers who are using rotki."
+    },
     "premium_features": {
       "title": "Premium features",
       "features": {

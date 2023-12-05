@@ -62,6 +62,7 @@ scanImages();
             v-model:swiper="swiper"
             :active-index="activeIndex"
             :pages="pages"
+            arrow-buttons
           />
           <div :class="css.preview">
             {{ t('download.preview') }}
