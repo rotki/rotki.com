@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { useMarkdownContent } from '~/composables/markdown';
+
 const { t } = useI18n();
 const css = useCssModule();
+
+const { loadTestimonials, testimonials } = useMarkdownContent();
+
+await loadTestimonials();
 </script>
 
 <template>
@@ -8,7 +14,7 @@ const css = useCssModule();
     <div :class="css.wrapper">
       <div :class="css.title">{{ t('home.testimonials.title') }}</div>
       <div :class="css.detail">{{ t('home.testimonials.detail') }}</div>
-      <TestimonialCarousel />
+      <TestimonialCarousel :testimonials="testimonials" />
     </div>
   </div>
 </template>

@@ -66,41 +66,49 @@ export const useMarkdownContent = () => {
    * fetches all markdown files within the jobs directory
    */
   const loadJobs = async () => {
-    const path = `/jobs`;
+    const path = '/jobs';
 
-    const { data, prefix } = await loadAll<JobMarkdownContent>(path);
+    try {
+      const { data, prefix } = await loadAll<JobMarkdownContent>(path);
 
-    set(
-      jobs,
-      data?.map((job) => {
-        job.link = replacePathPrefix(prefix, job._path);
-        return job;
-      }) ?? [],
-    );
+      set(
+        jobs,
+        data?.map((job) => {
+          job.link = replacePathPrefix(prefix, job._path);
+          return job;
+        }) ?? [],
+      );
+    } catch (e) {
+      logger.error(e);
+    }
   };
 
   /**
    * fetches all markdown files within the testimonials directory
    */
   const loadTestimonials = async () => {
-    const path = `/testimonials`;
+    const path = '/testimonials';
 
-    const { data } = await loadAll<TestimonialMarkdownContent>(path, {
-      visible: true,
-    });
+    try {
+      const { data } = await loadAll<TestimonialMarkdownContent>(path, {
+        visible: true,
+      });
 
-    set(
-      testimonials,
-      data.map((testimonial) =>
-        objectPick(testimonial, [
-          'avatar',
-          'visible',
-          'body',
-          'username',
-          'url',
-        ]),
-      ),
-    );
+      set(
+        testimonials,
+        data.map((testimonial) =>
+          objectPick(testimonial, [
+            'avatar',
+            'visible',
+            'body',
+            'username',
+            'url',
+          ]),
+        ),
+      );
+    } catch (e) {
+      logger.error(e);
+    }
   };
 
   const queryPrefixForJob = async (

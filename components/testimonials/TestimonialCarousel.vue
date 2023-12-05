@@ -3,14 +3,16 @@ import { Autoplay } from 'swiper/modules';
 import { SwiperSlide } from 'swiper/vue';
 import { type Swiper, type SwiperOptions } from 'swiper/types';
 import { get, set } from '@vueuse/core';
-import { useMarkdownContent } from '~/composables/markdown';
+import { type TestimonialMarkdownContent } from '~/composables/markdown';
 
-const { loadTestimonials, testimonials } = useMarkdownContent();
+defineProps<{
+  testimonials: TestimonialMarkdownContent[];
+}>();
 
 const css = useCssModule();
 const swiper = ref<Swiper>();
-const pages = ref(get(swiper)?.snapGrid.length ?? 1);
-const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
+const pages = computed(() => get(swiper)?.snapGrid.length ?? 1);
+const activeIndex = computed(() => (get(swiper)?.activeIndex ?? 0) + 1);
 const breakpoints: Record<number, SwiperOptions> = {
   // when window width is >= 320px
   320: {
@@ -41,13 +43,7 @@ const breakpoints: Record<number, SwiperOptions> = {
 
 const onSwiperUpdate = (s: Swiper) => {
   set(swiper, s);
-  set(activeIndex, s.activeIndex + 1);
-  set(pages, s.snapGrid.length);
 };
-
-onMounted(async () => {
-  await loadTestimonials();
-});
 </script>
 
 <template>
