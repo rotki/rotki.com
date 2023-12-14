@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
-import { type ContextColorsType } from '@rotki/ui-library/dist/consts/colors';
+import { type ContextColorsType } from '@rotki/ui-library';
 
 const props = withDefaults(
   defineProps<{

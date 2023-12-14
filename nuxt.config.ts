@@ -83,6 +83,9 @@ export default defineNuxtConfig({
 
   css: [],
   ssr: true,
+  site: {
+    url: 'https://rotki.com',
+  },
 
   components: [{ path: '~/components', pathPrefix: false }],
 
@@ -95,7 +98,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
     'nuxt-simple-sitemap',
-    'nuxt-vitest',
+    '@nuxt/test-utils/module',
     './modules/ui-library/module.ts',
   ],
 
@@ -146,7 +149,6 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
-    siteUrl: 'https://rotki.com',
     exclude: nonIndexed,
   },
 

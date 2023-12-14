@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { type ContextColorsType } from '@rotki/ui-library/dist/consts/colors';
-import { type Ref } from 'vue/dist/vue';
 import {
+  type ContextColorsType,
   type DataTableColumn,
   type DataTableSortColumn,
   type TablePaginationData,

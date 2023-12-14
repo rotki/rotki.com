@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { mockNuxtImport } from 'nuxt-vitest/utils';
+import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { server } from '~/tests/mocks/server';
 
 mockNuxtImport('useRuntimeConfig', () => () => {
