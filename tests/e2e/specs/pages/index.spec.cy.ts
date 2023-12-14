@@ -4,108 +4,102 @@ describe('Homepage test', () => {
   });
 
   it('checks our dashboard hero buttons!', () => {
-    const freeButton = cy
-      .get('button')
+    cy.get('button')
       .contains('button', 'Start now for free')
-      .first();
+      .first()
+      .should('be.visible');
 
-    const premiumButton = cy
-      .get('button')
+    cy.get('button')
       .contains('button', 'Get Premium')
-      .first();
-
-    expect(freeButton).to.exist;
-    expect(premiumButton).to.exist;
+      .first()
+      .should('be.visible');
   });
 
   it('checks our dashboard app download links!', () => {
-    const freeButton = cy.get('button').contains('Start now for free').first();
-
-    freeButton.click();
+    cy.get('button').contains('Start now for free').first().click();
 
     cy.url().should('include', '/download');
 
-    const downloadTitle = cy
-      .get('div')
-      .contains('h6', 'Download rotki')
-      .first();
+    cy.get('div').contains('h6', 'Download rotki').first().should('be.visible');
 
-    const downloadDesc = cy
-      .get('div')
+    cy.get('div')
       .contains(
         'h3',
         'Download now and start using across all major Operating Systems',
       )
-      .first();
+      .first()
+      .should('be.visible');
 
-    const linuxLink = cy.get('h6').contains('LINUX').first();
-    const macSiliconLink = cy.get('h6').contains('MAC apple silicon').first();
-    const macIntelLink = cy.get('h6').contains('MAC intel').first();
-    const windowsLink = cy.get('h6').contains('WINDOWS').first();
-    const version = cy.get('p').contains('Latest Release: v').first();
+    cy.get('h6').contains('LINUX').first().as('linuxLink');
+    cy.get('h6').contains('MAC apple silicon').first().as('appleSiliconLink');
+    cy.get('h6').contains('MAC intel').first().as('appleIntelLink');
+    cy.get('h6').contains('WINDOWS').first().as('windowsLink');
 
-    expect(downloadTitle).to.exist;
-    expect(downloadDesc).to.exist;
-    expect(linuxLink).to.exist;
-    expect(macSiliconLink).to.exist;
-    expect(macIntelLink).to.exist;
-    expect(windowsLink).to.exist;
-    expect(version).to.exist;
+    cy.get('@linuxLink').should('exist');
+    cy.get('@appleSiliconLink').should('exist');
+    cy.get('@appleIntelLink').should('exist');
+    cy.get('@windowsLink').should('exist');
+    cy.get('p').contains('Latest Release: v').first().should('exist');
 
-    const linuxButton = linuxLink
+    cy.get('@linuxLink')
       .parent()
       .parent()
       .find('div button')
       .contains('Download')
-      .parent('button');
+      .parent('button')
+      .as('linuxButton');
 
-    expect(linuxButton).to.exist;
-    linuxButton
+    cy.get('@linuxButton').should('exist');
+
+    cy.get('@linuxButton')
       .should('be.enabled')
       .parent('a')
       .should('have.attr', 'href')
       .and('include', 'rotki-linux')
       .and('include', '.AppImage');
 
-    const macSiliconButton = macSiliconLink
+    cy.get('@appleSiliconLink')
       .parent()
       .parent()
       .find('div button')
       .contains('Download')
-      .parent('button');
+      .parent('button')
+      .as('appleSiliconButton');
 
-    expect(macSiliconButton).to.exist;
-    macSiliconButton
+    cy.get('@appleSiliconButton').should('exist');
+    cy.get('@appleSiliconButton')
       .should('be.enabled')
       .parent('a')
       .should('have.attr', 'href')
       .and('include', 'rotki-darwin_arm')
       .and('include', '.dmg');
 
-    const macIntelButton = macIntelLink
+    cy.get('@appleIntelLink')
       .parent()
       .parent()
       .find('div button')
       .contains('Download')
-      .parent('button');
+      .parent('button')
+      .as('appleIntelButton');
 
-    expect(macIntelButton).to.exist;
-    macIntelButton
+    cy.get('@appleIntelButton');
+    cy.get('@appleIntelButton')
       .should('be.enabled')
       .parent('a')
       .should('have.attr', 'href')
       .and('include', 'rotki-darwin_x')
       .and('include', '.dmg');
 
-    const windowsButton = windowsLink
+    cy.get('@windowsLink')
       .parent()
       .parent()
       .find('div button')
       .contains('Download')
-      .parent('button');
+      .parent('button')
+      .as('windowsButton');
 
-    expect(windowsButton).to.exist;
-    windowsButton
+    cy.get('@windowsButton').should('exist');
+    cy.get('@windowsButton')
       .should('be.enabled')
       .parent('a')
       .should('have.attr', 'href')

@@ -142,6 +142,7 @@ const { t } = useI18n();
       />
       <RuiTextField
         id="postal"
+        data-cy="postal"
         :model-value="modelValue.postcode"
         variant="outlined"
         color="primary"

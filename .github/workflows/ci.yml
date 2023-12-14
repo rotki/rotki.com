@@ -108,10 +108,13 @@ jobs:
       - name: Run tests ✅
         run: pnpm run test
 
+      - name: Set .env
+        run: cp .env.test .env
+
       - name: Run cypress tests
         uses: cypress-io/github-action@v5
         with:
-          start: pnpm run dev --dotenv .env.test --host 127.0.0.1
+          start: pnpm run start
           browser: chrome
           wait-on: 'http://127.0.0.1:3000'
           install: false
