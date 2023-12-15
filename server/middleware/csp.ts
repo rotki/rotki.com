@@ -50,6 +50,7 @@ const policy: Record<ContentPolicy, string[]> = {
     UNSAFE_INLINE,
     'data:',
     'www.gstatic.com/recaptcha',
+    'https://pbs.twimg.com/profile_images/',
   ],
   [ContentPolicy.CONNECT_SRC]: [SELF, 'api.github.com'],
   [ContentPolicy.BASE_URI]: [SELF],
