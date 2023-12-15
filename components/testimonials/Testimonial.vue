@@ -20,7 +20,10 @@ const css = useCssModule();
         <RuiIcon name="chat-1-line" size="16" />
       </span>
       <span v-if="avatar" :class="css.avatar">
-        <img :src="avatar" :alt="username" class="object-cover" />
+        <a v-if="url" :href="url" target="_blank">
+          <img :src="avatar" :alt="username" class="object-cover" />
+        </a>
+        <img v-else :src="avatar" :alt="username" class="object-cover" />
       </span>
     </span>
     <ContentRenderer :value="body">
