@@ -32,7 +32,10 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .image {
+  @apply w-[980px] hidden;
+
   @media only screen and (min-width: 1190px) {
+    @apply block;
     right: -750px !important;
   }
 
@@ -42,16 +45,6 @@ const css = useCssModule();
 
   @media only screen and (min-width: 1500px) {
     right: -400px;
-  }
-
-  @include for-size(phone-only) {
-    position: relative;
-    margin-bottom: 60px;
-  }
-
-  @include for-size(tablet-portrait-up) {
-    position: relative;
-    margin-bottom: 60px;
   }
 
   @include for-size(desktop-up) {

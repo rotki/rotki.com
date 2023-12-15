@@ -36,7 +36,7 @@ const { t } = useI18n();
       </ButtonLink>
     </div>
     <div :class="css.screenshot">
-      <img alt="rotki screenshot" src="/img/screenshot.png" />
+      <img alt="rotki screenshot" src="/img/dashboard.png" />
     </div>
     <div :class="css.description">
       <InfoBox>
@@ -142,6 +142,10 @@ $subtitle-line-height: 42px;
   @include for-size(tablet-portrait-up) {
     padding-right: $mobile-margin;
     padding-left: $mobile-margin;
+  }
+
+  img {
+    @apply w-[980px];
   }
 }
 
