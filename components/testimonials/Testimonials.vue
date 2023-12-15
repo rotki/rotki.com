@@ -23,7 +23,7 @@ await loadTestimonials();
 @import '@/assets/css/main.scss';
 
 .testimonials {
-  @apply pt-20 pb-80 w-full overflow-x-hidden bg-rui-primary/[0.04] -mb-[20rem];
+  @apply pt-20 pb-80 w-full overflow-x-hidden bg-rui-primary/[0.04] -mb-[19rem];
 }
 
 .wrapper {

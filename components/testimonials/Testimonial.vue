@@ -53,7 +53,7 @@ const css = useCssModule();
   }
 
   .text {
-    @apply text-rui-text font-medium text-lg;
+    @apply text-rui-text font-medium text-lg min-h-[8rem];
 
     p {
       @apply mb-0;
