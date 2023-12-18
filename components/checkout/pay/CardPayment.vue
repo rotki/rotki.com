@@ -347,6 +347,9 @@ const clearError = () => {
 const redirect = () => {
   navigateTo({ name: 'checkout-success' });
   stopWatcher();
+  // redirect happens outside of router to force reload for csp.
+  const url = new URL(`${window.location.origin}/checkout/success`);
+  window.location.href = url.toString();
 };
 
 const stopWatcher = watchEffect(() => {

@@ -104,17 +104,31 @@ const next = async () => {
     assert(selectedMethod);
     const { name, id } = selectedMethod;
 
-    await navigateTo({
-      name,
-      query: {
-        plan: get(plan),
-        currency: isSupportedCrypto(PaymentMethod[id])
-          ? PaymentMethod[id]
-          : null,
-        id: get(identifier),
-        method: id,
-      },
-    });
+    if (selectedMethod.id === PaymentMethod.CARD) {
+      // For card payments we use href instead of router to trigger a server reload
+      // This need to happen due to the CSP policy required for 3DSecure v2
+      const queryString = new URLSearchParams({
+        plan: get(plan).toString(),
+        id: get(identifier) ?? '',
+        method: selectedMethod.id.toString(),
+      });
+      const url = new URL(
+        `${window.location.origin}/checkout/pay/card?${queryString}`,
+      );
+      window.location.href = url.toString();
+    } else {
+      await navigateTo({
+        name,
+        query: {
+          plan: get(plan),
+          currency: isSupportedCrypto(PaymentMethod[id])
+            ? PaymentMethod[id]
+            : null,
+          id: get(identifier),
+          method: id,
+        },
+      });
+    }
   } else {
     set(loginRequired, true);
   }

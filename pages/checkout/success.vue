@@ -2,13 +2,7 @@
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
-  middleware: [
-    'maintenance',
-    'authentication',
-    'unverified',
-    'subscriber',
-    'csp',
-  ],
+  middleware: ['maintenance', 'authentication', 'unverified', 'subscriber'],
 });
 
 useHead({
