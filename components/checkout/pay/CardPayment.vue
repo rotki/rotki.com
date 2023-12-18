@@ -260,7 +260,8 @@ const valid = computed(
     get(cvvStatus).valid,
 );
 
-const processing = computed(() => get(paying) || get(loading) || get(pending));
+const processing = logicOr(paying, loading, pending);
+const disabled = logicOr(processing, initializing, success);
 
 const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
   fields.focus(field);
@@ -345,7 +346,6 @@ const clearError = () => {
 };
 
 const redirect = () => {
-  navigateTo({ name: 'checkout-success' });
   stopWatcher();
   // redirect happens outside of router to force reload for csp.
   const url = new URL(`${window.location.origin}/checkout/success`);
@@ -400,7 +400,7 @@ const css = useCssModule();
         id="card-number"
         :class="css.number"
         :empty="empty.number"
-        :disabled="processing || initializing"
+        :disabled="disabled"
         :focused="focused === 'number'"
         :valid="!numberError"
         label="Card Number"
@@ -411,7 +411,7 @@ const css = useCssModule();
         id="expiration"
         :class="css.expiration"
         :empty="empty.expirationDate"
-        :disabled="processing || initializing"
+        :disabled="disabled"
         :focused="focused === 'expirationDate'"
         :valid="!expirationError"
         label="Expiration"
@@ -421,17 +421,17 @@ const css = useCssModule();
         id="cvv"
         :class="css.cvv"
         :empty="empty.cvv"
-        :disabled="processing || initializing"
+        :disabled="disabled"
         :focused="focused === 'cvv'"
         :valid="!cvvError"
         label="CVV"
         @click="focus('cvv')"
       />
     </div>
-    <SelectedPlanOverview :plan="plan" :disabled="processing || initializing" />
+    <SelectedPlanOverview :plan="plan" :disabled="disabled" />
     <AcceptRefundPolicy
       v-model="accepted"
-      :disabled="processing || initializing"
+      :disabled="disabled"
       :class="css.policy"
     />
     <div v-if="pending" class="my-8">
@@ -444,7 +444,7 @@ const css = useCssModule();
     </div>
     <div :class="css.buttons">
       <RuiButton
-        :disabled="processing"
+        :disabled="processing || success"
         class="w-full"
         size="lg"
         @click="back()"
@@ -453,7 +453,7 @@ const css = useCssModule();
       </RuiButton>
       <RuiButton
         :disabled="!valid"
-        :loading="processing || initializing"
+        :loading="disabled"
         class="w-full"
         color="primary"
         size="lg"
