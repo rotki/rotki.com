@@ -64,7 +64,7 @@ watch(canvas, async (canvas) => {
 });
 
 const redirect = () => {
-  navigateTo({ name: 'checkout-success' });
+  navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
   stopWatcher();
 };
 

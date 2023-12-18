@@ -26,8 +26,8 @@ export const useBraintree = () => {
     if (isPending) {
       return {
         type: 'pending',
-        title: t('subscription.error.payment_progress'),
-        message: t('subscription.error.payment_progress_wait'),
+        title: t('subscription.progress.payment_progress'),
+        message: t('subscription.progress.payment_progress_wait'),
       };
     } else if (isFailure) {
       return {
@@ -38,8 +38,6 @@ export const useBraintree = () => {
     } else if (isSuccess) {
       return {
         type: 'success',
-        title: t('subscription.success.title'),
-        message: t('subscription.success.message'),
       };
     }
     return { type: 'idle' };

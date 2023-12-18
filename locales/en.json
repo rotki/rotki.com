@@ -455,15 +455,19 @@
     "error": {
       "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address.",
       "payment_failure": "Payment Failure",
-      "payment_progress": "Payment in progress",
-      "payment_progress_message": "Please confirm your transaction...",
-      "payment_progress_wait": "Please wait while your payment is processed...",
-      "transaction_pending": "Transaction Pending",
-      "transaction_pending_message": "You should receive an e-mail confirming the activation of your subscription in the near future.",
       "init_error": "Initialization Error",
       "payment_error": "Payment Error",
       "3d_auth_failed": "3D Secure authentication failed",
       "3d_auth_failed_message": "The 3D Secure authentication of your card failed ({status}). Please try a different payment method."
+    },
+    "progress": {
+      "payment_progress": "Payment in progress",
+      "payment_progress_message": "Please confirm your transaction...",
+      "payment_progress_wait": "Please wait while your payment is processed..."
+    },
+    "crypto_success": {
+      "title": "Transaction Pending",
+      "message": "You should receive an e-mail confirming the activation of your subscription in the near future."
     },
     "success": {
       "title": "Payment Success",
