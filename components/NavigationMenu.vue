@@ -60,7 +60,7 @@ const menus: Menu[] = [
       :external="menu.external"
       :to="menu.to"
     >
-      <span> {{ menu.label }} </span>
+      {{ menu.label }}
       <template v-if="menu.external" #append>
         <RuiIcon size="18" name="external-link-line" />
       </template>
