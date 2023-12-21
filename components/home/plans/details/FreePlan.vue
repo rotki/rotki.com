@@ -9,6 +9,7 @@ const { t } = useI18n();
     button-variant="outlined"
   >
     <template #title>{{ t('home.plans.details.free.title') }}</template>
+    <template #price>{{ t('home.plans.details.free.price') }}</template>
     {{ t('home.plans.details.free.subtitle') }}
   </PlanBox>
 </template>

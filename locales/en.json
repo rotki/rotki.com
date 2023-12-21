@@ -334,7 +334,7 @@
     },
     "profit_loss_report": {
       "title": "Profit/loss report",
-      "subtitle": "Profit/loss report for all your histories data",
+      "subtitle": "Profit/loss report for all your historical data",
       "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols."
     },
 
@@ -379,7 +379,8 @@
       "details": {
         "recommended": "Recommended",
         "free": {
-          "title": "Starter Plan (Free)",
+          "price": "Free",
+          "title": "Starter Plan",
           "subtitle": "Anyone can download the application and start using it for free."
         },
         "premium": {

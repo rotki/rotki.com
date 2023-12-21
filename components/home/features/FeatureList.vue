@@ -3,7 +3,7 @@ const model = ref(0);
 
 const { t } = useI18n();
 
-const data = [
+const data = computed(() => [
   {
     title: t('home.dashboard.title'),
     subtitle: t('home.dashboard.subtitle'),
@@ -24,7 +24,7 @@ const data = [
     title: t('home.profit_loss_report.title'),
     subtitle: t('home.profit_loss_report.subtitle'),
   },
-];
+]);
 
 const [DefineTab, ReuseTab] = createReusableTemplate<{
   title: string;

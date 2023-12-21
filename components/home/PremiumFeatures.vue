@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n();
 
-const data = [
+const data = computed(() => [
   {
     icon: 'pie-chart-line',
     text: t('home.premium_features.features.graphs_and_statistics.title'),
@@ -30,7 +30,7 @@ const data = [
     text: t('home.premium_features.features.premium_defi.title'),
     description: t('home.premium_features.features.premium_defi.detail'),
   },
-];
+]);
 </script>
 
 <template>

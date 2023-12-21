@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n();
 
-const data = [
+const data = computed(() => [
   {
     image: '/img/defi/makerdao.png',
     name: t('home.eth_protocols.protocols.maker_dao.title'),
@@ -32,14 +32,14 @@ const data = [
     name: t('home.eth_protocols.protocols.balancer.title'),
     description: t('home.eth_protocols.protocols.balancer.description'),
   },
-];
+]);
 </script>
 
 <template>
   <div class="flex flex-1 flex-col gap-4">
-    <h5 class="text-h5 text-rui-primary">
+    <h6 class="text-h6 text-rui-primary">
       {{ t('home.eth_protocols.title') }}
-    </h5>
+    </h6>
     <h4 class="text-h4">{{ t('home.eth_protocols.subtitle') }}</h4>
     <div
       class="text-body-1 text-rui-text-secondary whitespace-break-spaces pt-2"

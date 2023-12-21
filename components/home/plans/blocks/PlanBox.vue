@@ -13,9 +13,15 @@ const { t } = useI18n();
   <div class="flex flex-col h-full rounded border">
     <div class="flex flex-col gap-6 flex-1 py-6 px-8">
       <div class="flex justify-between items-start flex-wrap gap-2">
-        <h4 class="text-h4">
-          <slot name="title" />
-        </h4>
+        <div>
+          <h6 class="text-h6 text-rui-primary">
+            <slot name="title" />
+          </h6>
+          <h4 class="text-h4">
+            <slot name="price" />
+          </h4>
+        </div>
+
         <RuiChip v-if="recommended">
           {{ t('home.plans.details.recommended') }}
         </RuiChip>
