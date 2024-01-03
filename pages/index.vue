@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata';
-import HomeBanner from '~/components/home/HomeBanner.vue';
 
 const description =
   'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.';

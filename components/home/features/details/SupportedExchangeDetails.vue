@@ -22,8 +22,8 @@ const exchanges = [
     img: '/img/exchanges/binance.svg',
   },
   {
-    name: 'Bittrex',
-    img: '/img/exchanges/bittrex.svg',
+    name: 'Bitmex',
+    img: '/img/exchanges/bitmex.svg',
   },
   {
     name: 'Bitfinex',
@@ -62,8 +62,16 @@ const exchanges = [
     img: '/img/exchanges/independentreserve.svg',
   },
   {
+    name: 'Okx',
+    img: '/img/exchanges/okx.svg',
+  },
+  {
     name: 'Woo',
     img: '/img/exchanges/woo.svg',
+  },
+  {
+    name: 'Bybit',
+    img: '/img/exchanges/bybit.svg',
   },
 ];
 </script>
