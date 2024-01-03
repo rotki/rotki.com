@@ -17,7 +17,7 @@ const slots = useSlots();
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div :class="css.wrapper" class="container">
     <div
       :class="{
         [css.content]: true,
@@ -49,7 +49,7 @@ const slots = useSlots();
 @import '@/assets/css/main.scss';
 
 .wrapper {
-  @apply container flex flex-col min-h-full flex-grow py-12;
+  @apply flex flex-col min-h-full flex-grow py-12;
 }
 
 .subtitle {

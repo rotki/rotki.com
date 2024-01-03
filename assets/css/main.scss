@@ -1,15 +1,7 @@
 @import "media";
 
-.page {
-  @apply overflow-x-hidden scroll-smooth;
-}
-
 .body {
   @apply text-rui-text;
-}
-
-.container {
-  @apply px-4 md:px-12 xl:px-16;
 }
 
 .fade-enter-active, .fade-leave-active {

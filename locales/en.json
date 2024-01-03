@@ -257,7 +257,7 @@
   "home": {
     "more_information": "More Information",
     "hero": {
-      "title": "The portfolio manager that{0}protects your privacy",
+      "title": "The portfolio manager that protects your privacy",
       "motto": "rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy."
     },
     "advantages": {
@@ -275,8 +275,10 @@
       }
     },
     "use_app": "rotki offers tracking of all your crypto assets no matter where they are. Be it on a blockchain,{0}a DeFi protocol or on one of the supported  exchanges.",
+    "rotki_offer": "What does {0} offer?",
     "dashboard": {
-      "title": "A 360° overview of your assets",
+      "title": "Dashboard",
+      "subtitle": "A 360° overview of your assets",
       "details": {
         "asset_and_liabilities": {
           "title": "Assets and Liabilities",
@@ -289,15 +291,18 @@
       }
     },
     "exchanges": {
-      "title": "Connect to a big number of centralized exchanges",
+      "title": "Exchanges",
+      "subtitle": "Connect to a big number of centralized exchanges",
       "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals."
     },
     "defi": {
       "title": "DeFi",
+      "subtitle": "Overview of all of your DeFi",
       "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation."
     },
     "eth_protocols": {
-      "title": "Ethereum DeFi protocol details",
+      "title": "Ethereum protocols",
+      "subtitle": "Ethereum DeFi protocol details",
       "detail": "Details per protocol for some of the supported protocols:",
       "protocols": {
         "maker_dao": {
@@ -318,7 +323,7 @@
         },
         "uniswap": {
           "title": "Uniswap",
-          "description": "Your current LP balances, and v2 trades"
+          "description": "Your current LP balances, v2 and v3 trades"
         },
         "balancer": {
           "title": "Balancer",
@@ -329,7 +334,8 @@
     },
     "profit_loss_report": {
       "title": "Profit/loss report",
-      "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.{0}{0}Profit/loss report for free users has a transaction limit and does not take into account all possible protocols."
+      "subtitle": "Profit/loss report for all your historical data",
+      "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols."
     },
 
     "testimonials": {
@@ -338,11 +344,12 @@
     },
     "premium_features": {
       "title": "Premium features",
+      "subtitle": "Enjoy all the potential that rotki offers.",
       "features": {
         "graphs_and_statistics": {
           "title": "Graphs and statistics",
           "subtitle": "Premium users can visit the graphs/statistics page and get graphs for:",
-          "detail": "Premium users can visit the graphs/statistics page and get graphs for:{0}{0}Net worth over time{0}Asset amount and total asset value over time{0}Breakdown of total net worth per location{0}Breakdown of total net worth per asset"
+          "detail": "Premium users can visit the graphs/statistics page and get graphs for:\nNet worth over time\nAsset amount and total asset value over time\nBreakdown of total net worth per location\nBreakdown of total net worth per asset"
         },
         "history": {
           "title": "Higher limits for trades, transactions, deposits and withdrawals",
@@ -354,11 +361,11 @@
         },
         "dex_support": {
           "title": "Decentralized exchanges",
-          "detail": "See how much you have in each liquidity pool. All your Uniswap and Balancer LP join/exit events are shown along with the total profit/loss per pool.{0}{0}Uniswap and Balancer trades are taken into account in the tax report for premium users."
+          "detail": "See how much you have in each liquidity pool. All your Uniswap and Balancer LP join/exit events are shown along with the total profit/loss per pool.\n\nUniswap and Balancer trades are taken into account in the tax report for premium users."
         },
         "premium_staking": {
           "title": "Advanced staking",
-          "detail": "See how much of the token is staked per account.{0}What is the expected APR.{0}How much of the token you have earned by staking across all accounts.{0}{0}See a list of all your staking events with links to the corresponding transactions."
+          "detail": "See how much of the token is staked per account.\nWhat is the expected APR.\nHow much of the token you have earned by staking across all accounts.\n\nSee a list of all your staking events with links to the corresponding transactions."
         }
       }
     },
@@ -370,12 +377,14 @@
       "per_month": "per month",
       "total": "Total {total}€",
       "details": {
+        "recommended": "Recommended",
         "free": {
-          "title": "Free",
+          "price": "Free",
+          "title": "Starter Plan",
           "subtitle": "Anyone can download the application and start using it for free."
         },
         "premium": {
-          "title": "Premium",
+          "title": "Premium Plan",
           "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features."
         },
         "advanced": {

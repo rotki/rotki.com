@@ -29,13 +29,9 @@ definePageMeta({
 </script>
 
 <template>
-  <HeroArea />
+  <HomeBanner />
   <FeatureList />
   <Testimonials />
   <PremiumFeatures />
   <AvailablePlans />
 </template>
-
-<style lang="scss">
-@import '@/assets/css/main.scss';
-</style>
