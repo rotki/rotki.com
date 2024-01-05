@@ -6,9 +6,9 @@ withDefaults(
     avatar?: string;
     body: TestimonialMarkdownContent['body'];
     username: string;
-    url: string;
+    url?: string;
   }>(),
-  { avatar: undefined },
+  { avatar: undefined, url: undefined },
 );
 const css = useCssModule();
 </script>
@@ -53,7 +53,7 @@ const css = useCssModule();
   }
 
   .text {
-    @apply text-rui-text font-medium text-lg min-h-[8rem];
+    @apply text-rui-text font-medium text-lg min-h-[8rem] text-justify;
 
     p {
       @apply mb-0;
