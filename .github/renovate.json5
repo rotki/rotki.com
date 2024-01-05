@@ -1,0 +1,15 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+    ':dependencyDashboard',
+    ':dependencyDashboardApproval',
+  ],
+  packageRules: [
+    {
+      allowedVersions: '/^(18)\\./',
+      groupName: 'Node.js',
+      matchPackageNames: ['@types/node', 'node'],
+    },
+  ],
+}
