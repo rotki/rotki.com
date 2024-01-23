@@ -19,6 +19,8 @@ useHead({
   ...commonAttrs(),
 });
 
+// NB: this param name is also used in backend email links,
+// if changed, kindly sync with backend team to update email links as well.
 const { plan } = usePlanParams();
 const { subscriptionId } = useSubscriptionIdParam();
 

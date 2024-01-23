@@ -11,6 +11,8 @@ type CurrencyParam = Currency | null;
 export const usePlanParams = () => {
   const route = useRoute();
   const plan = computed(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
     const { plan } = route.query;
     if (typeof plan !== 'string') {
       return -1;
@@ -32,6 +34,8 @@ export const usePlanParams = () => {
 export const useCurrencyParams = () => {
   const route = useRoute();
   const currency = computed<CurrencyParam>(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
     const { currency } = route.query;
     if (typeof currency !== 'string' || !isSupported(currency)) {
       return null;
@@ -48,6 +52,8 @@ export const useCurrencyParams = () => {
 export const useSubscriptionIdParam = () => {
   const route = useRoute();
   const subscriptionId = computed(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
     const query = get(route).query;
     return typeof query.id === 'string' ? query.id : undefined;
   });
@@ -57,6 +63,8 @@ export const useSubscriptionIdParam = () => {
 export const usePaymentMethodParam = () => {
   const route = useRoute();
   const paymentMethodId = computed(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
     const { method } = get(route).query;
     return typeof method === 'string' ? Number(method) : -1;
   });
