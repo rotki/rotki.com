@@ -85,3 +85,12 @@ pnpm test
 # run watch mode
 pnpm test:watch
 ```
+
+## Changes to activation, subscription and payment links
+
+For to the following urls, any change requires backend sync to avoid broken email links.
+
+/password/reset/[uid]/[token]
+/activate/[uid]/[token]/
+/checkout/pay/method?p=[number_of_months]&id=[subscription_id]
+/home
