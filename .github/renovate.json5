@@ -7,7 +7,7 @@
   ],
   packageRules: [
     {
-      allowedVersions: '/^(18)\\./',
+      allowedVersions: '/^(20)\\./',
       groupName: 'Node.js',
       matchPackageNames: ['@types/node', 'node'],
     },

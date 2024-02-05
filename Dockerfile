@@ -1,4 +1,4 @@
-FROM node:18 as builder
+FROM node:20 as builder
 
 COPY ./ /build/
 
@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/root/.npm/_cacache/ \
     pnpm install --frozen-lockfile && \
     pnpm run build
 
-FROM node:18-alpine as production
+FROM node:20-alpine as production
 
 WORKDIR /app
 ARG GIT_SHA
@@ -19,7 +19,7 @@ ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=4000
 
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
-    npm install -g pm2@5.3.0
+    npm install -g pm2@5.3.1
 
 COPY --from=builder /build/.output ./.output/
 COPY --from=builder /build/ecosystem.config.cjs ./
