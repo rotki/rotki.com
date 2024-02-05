@@ -28,7 +28,7 @@ const {
   },
 } = useRuntimeConfig();
 
-const recaptchaEl = ref<HTMLElement | null>(null);
+const recaptchaEl = ref<HTMLElement>();
 const rendered = ref(false);
 
 // this will be populated once the deferred captcha script is loaded

@@ -126,7 +126,7 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: !process.env.CI || process.env.TEST,
+    enabled: !!process.env.CI || !!process.env.TEST,
   },
 
   runtimeConfig: {
