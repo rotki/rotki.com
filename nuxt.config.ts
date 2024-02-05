@@ -133,7 +133,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
-    'nuxt-simple-sitemap',
+    '@nuxtjs/sitemap',
     '@nuxt/test-utils/module',
     './modules/ui-library/module.ts',
   ],
