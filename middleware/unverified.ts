@@ -5,12 +5,10 @@ import { useMainStore } from '~/store';
 export default defineNuxtRouteMiddleware(() => {
   const { account } = storeToRefs(useMainStore());
 
-  if (!isDefined(account)) {
+  if (!isDefined(account))
     return;
-  }
 
   const { emailConfirmed } = get(account);
-  if (!emailConfirmed) {
+  if (!emailConfirmed)
     return navigateTo('/home/subscription');
-  }
 });

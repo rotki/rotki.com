@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Autoplay } from 'swiper/modules';
 import { SwiperSlide } from 'swiper/vue';
-import { type Swiper, type SwiperOptions } from 'swiper/types';
 import { get, set } from '@vueuse/core';
-import { type TestimonialMarkdownContent } from '~/composables/markdown';
+import type { Swiper, SwiperOptions } from 'swiper/types';
+import type { TestimonialMarkdownContent } from '~/composables/markdown';
 
 defineProps<{
   testimonials: TestimonialMarkdownContent[];
@@ -41,9 +41,9 @@ const breakpoints: Record<number, SwiperOptions> = {
   },
 };
 
-const onSwiperUpdate = (s: Swiper) => {
+function onSwiperUpdate(s: Swiper) {
   set(swiper, s);
-};
+}
 </script>
 
 <template>
@@ -61,7 +61,10 @@ const onSwiperUpdate = (s: Swiper) => {
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
     >
-      <SwiperSlide v-for="(testimonial, i) in testimonials" :key="i">
+      <SwiperSlide
+        v-for="(testimonial, i) in testimonials"
+        :key="i"
+      >
         <Testimonial v-bind="testimonial" />
       </SwiperSlide>
     </Carousel>

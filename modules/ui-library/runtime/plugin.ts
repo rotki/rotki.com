@@ -47,7 +47,6 @@ import '@fontsource/roboto/latin.css';
 export default defineNuxtPlugin((nuxtApp) => {
   const RuiPlugin = createRui({
     theme: {
-      mode: 'light',
       icons: [
         RiAppleLine,
         RiArrowDropRightLine,
@@ -90,6 +89,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         RiCoinsLine,
         RiBarChart2Line,
       ],
+      mode: 'light',
     },
   });
 

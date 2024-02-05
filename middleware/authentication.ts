@@ -4,7 +4,6 @@ import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(() => {
   const { authenticated } = storeToRefs(useMainStore());
-  if (!get(authenticated)) {
+  if (!get(authenticated))
     return navigateTo('/login');
-  }
 });

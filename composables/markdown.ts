@@ -1,13 +1,13 @@
 import { get, objectPick, set } from '@vueuse/core';
 import { groupBy } from 'graphql/jsutils/groupBy';
-import {
-  type MarkdownParsedContent,
-  type QueryBuilderWhere,
-} from '@nuxt/content/dist/runtime/types';
-import type { ComputedRef, Ref } from 'vue';
 import { replacePathPrefix } from '~/utils/api';
 import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
 import { logger } from '~/utils/logger';
+import type {
+  MarkdownParsedContent,
+  QueryBuilderWhere,
+} from '@nuxt/content/dist/runtime/types';
+import type { ComputedRef, Ref } from 'vue';
 
 export interface JobMarkdownContent extends MarkdownParsedContent {
   link?: string;
@@ -26,16 +26,16 @@ export interface TestimonialMarkdownContent extends MarkdownParsedContent {
 /**
  * Loads jobs and markdown content based on given path
  */
-export const useMarkdownContent = () => {
+export function useMarkdownContent() {
   const jobs: Ref<JobMarkdownContent[]> = ref([]);
   const testimonials: Ref<TestimonialMarkdownContent[]> = ref([]);
   const openJobs: ComputedRef<JobMarkdownContent[]> = computed(() =>
-    get(jobs).filter((job) => job.open),
+    get(jobs).filter(job => job.open),
   );
   const groupedOpenJobsByCategory: ComputedRef<
     Record<string, readonly JobMarkdownContent[]>
   > = computed(() =>
-    Object.fromEntries(groupBy(get(openJobs), (item) => item.category ?? '')),
+    Object.fromEntries(groupBy(get(openJobs), item => item.category ?? '')),
   );
 
   const firstJob: ComputedRef<JobMarkdownContent | null> = computed(
@@ -52,8 +52,9 @@ export const useMarkdownContent = () => {
     try {
       // try to fetch from remote
       found = await queryContent<T>(`${prefix}${path}`).where(where).find();
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
       prefix = LOCAL_CONTENT_PREFIX;
       // fallback to local if remote fails
       found = await queryContent<T>(`${prefix}${path}`).where(where).find();
@@ -78,8 +79,9 @@ export const useMarkdownContent = () => {
           return job;
         }) ?? [],
       );
-    } catch (e) {
-      logger.error(e);
+    }
+    catch (error) {
+      logger.error(error);
     }
   };
 
@@ -96,7 +98,7 @@ export const useMarkdownContent = () => {
 
       set(
         testimonials,
-        data.map((testimonial) =>
+        data.map(testimonial =>
           objectPick(testimonial, [
             'avatar',
             'visible',
@@ -106,8 +108,9 @@ export const useMarkdownContent = () => {
           ]),
         ),
       );
-    } catch (e) {
-      logger.error(e);
+    }
+    catch (error) {
+      logger.error(error);
     }
   };
 
@@ -117,13 +120,14 @@ export const useMarkdownContent = () => {
   ): Promise<JobMarkdownContent | null> => {
     const prefixedPath = `${prefix}${path}`;
     try {
-      const data =
-        await queryContent<JobMarkdownContent>(prefixedPath).findOne();
+      const data
+        = await queryContent<JobMarkdownContent>(prefixedPath).findOne();
       return {
         ...data,
         link: replacePathPrefix(prefix, data?._path),
       };
-    } catch {
+    }
+    catch {
       return null;
     }
   };
@@ -135,8 +139,9 @@ export const useMarkdownContent = () => {
     try {
       // try to fetch from prefix
       return await queryPrefixForJob(CONTENT_PREFIX, path);
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
 
       // fallback to local if remote fails
       return await queryPrefixForJob(LOCAL_CONTENT_PREFIX, path);
@@ -151,20 +156,21 @@ export const useMarkdownContent = () => {
     try {
       const { data } = await useAsyncData(path, queryContent(path).findOne);
       return get(data);
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
     }
   };
 
   return {
-    jobs,
-    openJobs,
-    groupedOpenJobsByCategory,
     firstJob,
-    testimonials,
+    groupedOpenJobsByCategory,
+    jobs,
+    loadContent,
     loadJob,
     loadJobs,
     loadTestimonials,
-    loadContent,
+    openJobs,
+    testimonials,
   };
-};
+}

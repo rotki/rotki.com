@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { GITHUB_CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from './utils/constants';
 
 const nonIndexed = [
@@ -38,57 +39,91 @@ const proxy = {
 export default defineNuxtConfig({
   app: {
     head: {
-      title: 'rotki.com',
-      titleTemplate: '%s | rotki',
       htmlAttrs: {
         lang: 'en',
       },
-      meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'msapplication-TileColor', content: '#00aba9' },
-        { name: 'theme-color', content: '#ffffff' },
-      ],
       link: [
         {
-          rel: 'apple-touch-icon',
           href: '/apple-touch-icon.png',
+          rel: 'apple-touch-icon',
           sizes: '180x180',
         },
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { href: '/favicon.ico', rel: 'icon', type: 'image/x-icon' },
         {
-          rel: 'icon',
-          type: 'image/png',
           href: '/favicon-32x32.png',
-          sizes: '32x32',
-        },
-        {
           rel: 'icon',
+          sizes: '32x32',
           type: 'image/png',
+        },
+        {
           href: '/favicon-16x16.png',
+          rel: 'icon',
           sizes: '16x16',
+          type: 'image/png',
         },
         {
-          rel: 'manifest',
-          href: '/site.webmanifest',
           crossorigin: 'use-credentials',
+          href: '/site.webmanifest',
+          rel: 'manifest',
         },
         {
-          rel: 'mask-icon',
-          href: '/safari-pinned-tab.svg',
           color: '#5bbad5',
+          href: '/safari-pinned-tab.svg',
+          rel: 'mask-icon',
         },
       ],
+      meta: [
+        { charset: 'utf-8' },
+        { content: 'width=device-width, initial-scale=1', name: 'viewport' },
+        { content: '#00aba9', name: 'msapplication-TileColor' },
+        { content: '#ffffff', name: 'theme-color' },
+      ],
+      title: 'rotki.com',
+      titleTemplate: '%s | rotki',
     },
   },
 
+  components: [{ path: '~/components', pathPrefix: false }],
+  content: {
+    api: {
+      baseURL: '/md/_content',
+    },
+    // https://content.nuxtjs.org/api/configuration
+    markdown: {
+      // https://content.nuxtjs.org/api/configuration#tags
+      tags: {
+        address: 'ProseAddress',
+      },
+    },
+    sources: {
+      content: {
+        base: 'content',
+        driver: 'fs',
+        prefix: LOCAL_CONTENT_PREFIX,
+      },
+      github: {
+        branch: 'main',
+        dir: 'content', // Directory where contents are located. It could be a subdirectory of the repository.
+        driver: 'github', // Driver used to fetch contents
+        prefix: GITHUB_CONTENT_PREFIX, // Prefix for routes used to query contents
+        repo: 'rotki/rotki.com',
+      },
+    },
+  },
   css: [],
-  ssr: true,
-  site: {
-    url: 'https://rotki.com',
+
+  devtools: {
+    enabled: !!process.env.CI || !!process.env.TEST,
   },
 
-  components: [{ path: '~/components', pathPrefix: false }],
+  i18n: {
+    defaultLocale: 'en',
+    langDir: 'locales',
+    lazy: true,
+    locales: [{ code: 'en', file: 'en.json', iso: 'en-US' }],
+    strategy: 'no_prefix',
+    vueI18n: './i18n.config.ts',
+  },
 
   modules: [
     '@nuxt/devtools',
@@ -103,91 +138,57 @@ export default defineNuxtConfig({
     './modules/ui-library/module.ts',
   ],
 
-  i18n: {
-    locales: [{ code: 'en', iso: 'en-US', file: 'en.json' }],
-    defaultLocale: 'en',
-    strategy: 'no_prefix',
-    langDir: 'locales',
-    lazy: true,
-    vueI18n: './i18n.config.ts',
-  },
-
   nitro: {
     devProxy: {
       '/webapi': {
-        target: proxy.target,
         changeOrigin: true,
         headers: {
           host: proxy.host,
           referer: proxy.referrer,
         },
+        target: proxy.target,
       },
     },
   },
 
-  devtools: {
-    enabled: !!process.env.CI || !!process.env.TEST,
-  },
-
-  runtimeConfig: {
-    public: {
-      recaptcha: {
-        siteKey: '',
-      },
-      baseUrl: '',
-      maintenance: false,
-      testing: false,
-      contact: {
-        emailMailto: 'mailto:info@rotki.com',
-        email: 'info@rotki.com',
-        supportEmail: 'support@rotki.com',
-        supportEmailMailto: 'mailto:support@rotki.com',
-        twitter: 'https://twitter.com/rotkiapp',
-        discord: 'https://discord.rotki.com',
-        github: 'https://github.com/rotki',
-      },
+  robots: {
+    rules: {
+      Disallow: nonIndexed,
+      UserAgent: '*',
     },
-  },
-
-  sitemap: {
-    exclude: nonIndexed,
   },
 
   routeRules: {
     '/home/**': { index: false },
   },
 
-  robots: {
-    rules: {
-      UserAgent: '*',
-      Disallow: nonIndexed,
+  runtimeConfig: {
+    public: {
+      baseUrl: '',
+      contact: {
+        discord: 'https://discord.rotki.com',
+        email: 'info@rotki.com',
+        emailMailto: 'mailto:info@rotki.com',
+        github: 'https://github.com/rotki',
+        supportEmail: 'support@rotki.com',
+        supportEmailMailto: 'mailto:support@rotki.com',
+        twitter: 'https://twitter.com/rotkiapp',
+      },
+      maintenance: false,
+      recaptcha: {
+        siteKey: '',
+      },
+      testing: false,
     },
   },
 
-  content: {
-    // https://content.nuxtjs.org/api/configuration
-    markdown: {
-      // https://content.nuxtjs.org/api/configuration#tags
-      tags: {
-        address: 'ProseAddress',
-      },
-    },
-    api: {
-      baseURL: '/md/_content',
-    },
-    sources: {
-      content: {
-        driver: 'fs',
-        prefix: LOCAL_CONTENT_PREFIX,
-        base: 'content',
-      },
-      github: {
-        prefix: GITHUB_CONTENT_PREFIX, // Prefix for routes used to query contents
-        driver: 'github', // Driver used to fetch contents
-        repo: 'rotki/rotki.com',
-        branch: 'main',
-        dir: 'content', // Directory where contents are located. It could be a subdirectory of the repository.
-      },
-    },
+  site: {
+    url: 'https://rotki.com',
   },
+
+  sitemap: {
+    exclude: nonIndexed,
+  },
+
+  ssr: true,
 });

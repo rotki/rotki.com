@@ -4,7 +4,10 @@ const css = useCssModule();
 
 <template>
   <div :class="css.container">
-    <div v-if="$slots.left" :class="css.left">
+    <div
+      v-if="$slots.left"
+      :class="css.left"
+    >
       <slot name="left" />
     </div>
     <div :class="css.text">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
-import { type JobMarkdownContent } from '~/composables/markdown';
+import type { JobMarkdownContent } from '~/composables/markdown';
 
 const props = defineProps<{
   data: JobMarkdownContent;
@@ -18,11 +18,10 @@ const separatedData: ComputedRef<{
   const dataVal = get(data);
 
   for (const item of dataVal.body.children) {
-    if (item.tag !== 'blockquote') {
+    if (item.tag !== 'blockquote')
       regularItems.push(item);
-    } else {
+    else
       blockquoteItems.push(item);
-    }
   }
 
   return {

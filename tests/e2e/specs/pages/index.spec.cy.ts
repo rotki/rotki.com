@@ -1,4 +1,4 @@
-describe('Homepage test', () => {
+describe('homepage test', () => {
   it('successfully loads', () => {
     cy.visit('/').wait(3000);
   });

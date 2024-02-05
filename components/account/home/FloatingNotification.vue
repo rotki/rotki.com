@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
-import { type ContextColorsType } from '@rotki/ui-library';
+import type { ContextColorsType } from '@rotki/ui-library';
 
 const props = withDefaults(
   defineProps<{
@@ -29,10 +29,10 @@ const { stop, start, isPending } = useTimeoutFn(
   () => get(timeout) ?? 0,
 );
 
-const dismiss = () => {
+function dismiss() {
   emit('dismiss');
   get(isPending) && stop();
-};
+}
 
 watch(visible, (show) => {
   if (isDefined(get(timeout)) && show) {
@@ -48,8 +48,15 @@ watch(visible, (show) => {
       v-if="visible"
       class="fixed top-0 md:top-28 z-20 w-full md:bottom-auto right-0 md:right-2 md:w-[520px]"
     >
-      <RuiAlert :closeable="closeable" :type="type" @close="dismiss()">
-        <template v-if="slots.title" #title>
+      <RuiAlert
+        :closeable="closeable"
+        :type="type"
+        @close="dismiss()"
+      >
+        <template
+          v-if="slots.title"
+          #title
+        >
           <slot name="title" />
         </template>
         <slot />

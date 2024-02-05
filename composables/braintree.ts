@@ -1,13 +1,13 @@
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import {
-  type CardCheckout,
-  type PaymentStep,
-  type SelectedPlan,
+import type {
+  CardCheckout,
+  PaymentStep,
+  SelectedPlan,
 } from '~/types';
-import { type PayEvent } from '~/types/common';
+import type { PayEvent } from '~/types/common';
 
-export const useBraintree = () => {
+export function useBraintree() {
   const { t } = useI18n();
   const store = useMainStore();
   const route = useRoute();
@@ -25,17 +25,19 @@ export const useBraintree = () => {
 
     if (isPending) {
       return {
-        type: 'pending',
-        title: t('subscription.progress.payment_progress'),
         message: t('subscription.progress.payment_progress_wait'),
+        title: t('subscription.progress.payment_progress'),
+        type: 'pending',
       };
-    } else if (isFailure) {
+    }
+    else if (isFailure) {
       return {
-        type: 'failure',
-        title: t('subscription.error.payment_failure'),
         message: isFailure,
+        title: t('subscription.error.payment_failure'),
+        type: 'failure',
       };
-    } else if (isSuccess) {
+    }
+    else if (isSuccess) {
       return {
         type: 'success',
       };
@@ -52,11 +54,10 @@ export const useBraintree = () => {
     const plan = parseInt(months);
     const data = await store.checkout(plan);
     set(loadingPlan, false);
-    if (data.isError) {
+    if (data.isError)
       router.back();
-    } else {
+    else
       set(checkout, data.result);
-    }
   }
 
   onBeforeMount(async () => {
@@ -65,19 +66,18 @@ export const useBraintree = () => {
 
   const plan = computed<SelectedPlan | null>(() => {
     const payload = get(checkout);
-    if (!payload) {
+    if (!payload)
       return null;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { braintreeClientToken, ...data } = payload;
     return data;
   });
 
   const token = computed<string>(() => {
     const payload = get(checkout);
-    if (!payload) {
+    if (!payload)
       return '';
-    }
+
     return payload.braintreeClientToken;
   });
 
@@ -87,11 +87,11 @@ export const useBraintree = () => {
       months,
       paymentMethodNonce: nonce,
     });
-    if (result.isError) {
+    if (result.isError)
       set(paymentError, result.error.message);
-    } else {
+    else
       set(paymentSuccess, true);
-    }
+
     set(pending, false);
   };
 
@@ -102,12 +102,12 @@ export const useBraintree = () => {
   };
 
   return {
-    plan,
-    token,
-    step,
-    pending,
     loading: loadingPlan,
-    submit,
+    pending,
+    plan,
     reset,
+    step,
+    submit,
+    token,
   };
-};
+}

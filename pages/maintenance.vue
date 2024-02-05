@@ -22,9 +22,8 @@ const {
   },
 } = useRuntimeConfig();
 
-if (!maintenance) {
+if (!maintenance)
   navigateTo('/');
-}
 
 const css = useCssModule();
 </script>
@@ -37,13 +36,19 @@ const css = useCssModule();
       src="/img/maintenance.svg"
     />
 
-    <TextHeading :class="css.heading">We'll be back soon!</TextHeading>
+    <TextHeading :class="css.heading">
+      We'll be back soon!
+    </TextHeading>
 
     <div :class="css.description">
       Sorry for the inconvenience but we're performing some maintenance at the
       moment. <br />
       If you need anything, you can always contact us on
-      <a :class="css.link" :href="emailMailto" target="_blank">
+      <a
+        :class="css.link"
+        :href="emailMailto"
+        target="_blank"
+      >
         {{ email }}
       </a>
     </div>

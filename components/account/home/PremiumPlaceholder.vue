@@ -15,7 +15,10 @@ const { t } = useI18n();
           {{ t('account.no_premium.title') }}
         </div>
         <div class="text-rui-text-secondary">
-          <i18n-t keypath="account.no_premium.no_premium_found" scope="global">
+          <i18n-t
+            keypath="account.no_premium.no_premium_found"
+            scope="global"
+          >
             <template #plan>
               <ButtonLink
                 inline

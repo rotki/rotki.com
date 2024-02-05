@@ -40,7 +40,9 @@ const data = computed(() => [
     <h6 class="text-h6 text-rui-primary">
       {{ t('home.eth_protocols.title') }}
     </h6>
-    <h4 class="text-h4">{{ t('home.eth_protocols.subtitle') }}</h4>
+    <h4 class="text-h4">
+      {{ t('home.eth_protocols.subtitle') }}
+    </h4>
     <div
       class="text-body-1 text-rui-text-secondary whitespace-break-spaces pt-2"
     >
@@ -54,10 +56,16 @@ const data = computed(() => [
       class="bg-rui-primary/[0.04] rounded p-4 flex gap-4 items-center"
     >
       <div class="w-10 h-10 shrink-0 rounded-full overflow-hidden">
-        <img :src="item.image" :alt="item.name" class="w-full h-full" />
+        <img
+          :src="item.image"
+          :alt="item.name"
+          class="w-full h-full"
+        />
       </div>
       <div>
-        <div class="text-body-1">{{ item.name }}</div>
+        <div class="text-body-1">
+          {{ item.name }}
+        </div>
         <div class="text-body-2 text-rui-text-secondary">
           {{ item.description }}
         </div>

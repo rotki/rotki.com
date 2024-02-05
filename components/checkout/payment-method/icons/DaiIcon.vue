@@ -8,7 +8,10 @@
     viewBox="0 0 48 48"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g fill-rule="nonzero" stroke-width=".090001">
+    <g
+      fill-rule="nonzero"
+      stroke-width=".090001"
+    >
       <path
         d="m24 4c11.047 0 20 8.9551 20 20 0 11.047-8.9533 20-20 20-11.045 0-20-8.9542-20-20 0-11.045 8.9551-20 20-20z"
         fill="#f5ac37"

@@ -2,9 +2,9 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import { type CryptoPayment, type PaymentStep, type Provider } from '~/types';
 import { PaymentError } from '~/types/codes';
 import { assert } from '~/utils/assert';
+import type { CryptoPayment, PaymentStep, Provider } from '~/types';
 
 const { t } = useI18n();
 
@@ -33,19 +33,21 @@ onMounted(async () => {
     const subId = get(subscriptionId);
     const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
     if (result.isError) {
-      if (result.code === PaymentError.UNVERIFIED) {
+      if (result.code === PaymentError.UNVERIFIED)
         set(error, t('subscription.error.unverified_email'));
-      } else {
+      else
         set(error, result.error.message);
-      }
-    } else if (result.result.transactionStarted) {
+    }
+    else if (result.result.transactionStarted) {
       await navigateTo('/home/subscription');
-    } else {
+    }
+    else {
       set(data, result.result);
     }
 
     set(loading, false);
-  } else {
+  }
+  else {
     await navigateTo('/products');
   }
 });
@@ -60,13 +62,15 @@ const step = computed<PaymentStep>(() => {
       message: errorMessage,
       closeable: true,
     };
-  } else if (state === 'pending') {
+  }
+  else if (state === 'pending') {
     return {
       type: 'pending',
       title: t('subscription.error.payment_progress'),
       message: t('subscription.error.payment_progress_message'),
     };
-  } else if (state === 'success') {
+  }
+  else if (state === 'success') {
     return {
       type: 'success',
       title: t('subscription.error.transaction_pending'),
@@ -76,7 +80,7 @@ const step = computed<PaymentStep>(() => {
   return { type: 'idle' };
 });
 
-const back = () => {
+function back() {
   const { plan, method } = route.query;
   navigateTo({
     name: 'checkout-pay-method',
@@ -85,12 +89,12 @@ const back = () => {
       method,
     },
   });
-};
+}
 
-const clear = () => {
+function clear() {
   set(error, null);
   set(currentState, 'idle');
-};
+}
 
 const config = useRuntimeConfig();
 const {
@@ -115,11 +119,11 @@ watch(plan, async (plan) => {
     selectedCurrency,
     get(subscriptionId),
   );
-  if (!response.isError) {
+  if (!response.isError)
     set(data, response.result);
-  } else {
+  else
     set(error, response.error.message);
-  }
+
   set(loading, false);
 });
 </script>
@@ -132,7 +136,10 @@ watch(plan, async (plan) => {
       </CheckoutDescription>
     </template>
     <template #default="{ pending, success, failure, status }">
-      <div v-if="loading" class="flex justify-center my-10">
+      <div
+        v-if="loading"
+        class="flex justify-center my-10"
+      >
         <RuiProgress
           variant="indeterminate"
           size="48"
@@ -152,8 +159,15 @@ watch(plan, async (plan) => {
         @clear:errors="clear()"
       />
 
-      <div v-else class="flex gap-4 justify-center w-full mt-auto">
-        <RuiButton class="w-1/2" size="lg" @click="back()">
+      <div
+        v-else
+        class="flex gap-4 justify-center w-full mt-auto"
+      >
+        <RuiButton
+          class="w-1/2"
+          size="lg"
+          @click="back()"
+        >
           {{ t('actions.back') }}
         </RuiButton>
       </div>

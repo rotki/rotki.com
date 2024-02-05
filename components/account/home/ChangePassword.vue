@@ -3,7 +3,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import { type ActionResult } from '~/types/common';
+import type { ActionResult } from '~/types/common';
 
 const loading = ref(false);
 const success = ref(false);
@@ -34,13 +34,12 @@ const v$ = useVuelidate(rules, state, {
 
 let pendingTimeout: any;
 
-const changePassword = async () => {
+async function changePassword() {
   set(loading, true);
   const result: ActionResult = await store.changePassword(state);
   set(loading, false);
-  if (result.message && typeof result.message !== 'string') {
+  if (result.message && typeof result.message !== 'string')
     set($externalResults, result.message);
-  }
 
   if (result.success) {
     set(success, true);
@@ -53,21 +52,23 @@ const changePassword = async () => {
     }, 4000);
     reset();
   }
-};
+}
 
-const reset = () => {
+function reset() {
   state.currentPassword = '';
   state.newPassword = '';
   state.passwordConfirmation = '';
   get(v$).$reset();
-};
+}
 
 const { t } = useI18n();
 </script>
 
 <template>
   <div>
-    <div class="text-h6 mb-6">{{ t('account.change_password.title') }}</div>
+    <div class="text-h6 mb-6">
+      {{ t('account.change_password.title') }}
+    </div>
     <div>
       <div class="space-y-5">
         <RuiRevealableTextField

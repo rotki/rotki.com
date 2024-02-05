@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { get, set, useTimestamp } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { type Ref } from 'vue';
-import { type SelectedPlan } from '~/types';
 import { useMainStore } from '~/store';
+import type { Ref } from 'vue';
+import type { SelectedPlan } from '~/types';
 
 const { t } = useI18n();
 
@@ -20,7 +20,7 @@ const { subscriptionId } = useSubscriptionIdParam();
 const selectedPlan = computed<SelectedPlan>(() => {
   const availablePlans = get(plans);
   const months = get(plan);
-  const selectedPlan = availablePlans?.find((plan) => plan.months === months);
+  const selectedPlan = availablePlans?.find(plan => plan.months === months);
   const price = selectedPlan?.priceCrypto ?? '0';
   return {
     startDate: get(useTimestamp()) / 1000,
@@ -31,7 +31,7 @@ const selectedPlan = computed<SelectedPlan>(() => {
   };
 });
 
-const back = async () => {
+async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
@@ -39,9 +39,9 @@ const back = async () => {
       method: get(paymentMethodId),
     },
   });
-};
+}
 
-const submit = () => {
+function submit() {
   set(processing, true);
   navigateTo({
     name: 'checkout-pay-crypto',
@@ -52,7 +52,7 @@ const submit = () => {
       id: get(subscriptionId),
     },
   });
-};
+}
 
 onMounted(async () => await store.getPlans());
 const css = useCssModule();
@@ -65,7 +65,11 @@ const css = useCssModule();
       {{ t('home.plans.tiers.step_3.subtitle') }}
     </CheckoutDescription>
     <CryptoPaymentInfo />
-    <SelectedPlanOverview :plan="selectedPlan" :disabled="processing" crypto />
+    <SelectedPlanOverview
+      :plan="selectedPlan"
+      :disabled="processing"
+      crypto
+    />
     <AcceptRefundPolicy
       v-model="acceptRefundPolicy"
       :class="css.policy"

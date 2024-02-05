@@ -42,13 +42,22 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
     @click.stop.prevent="!disabled ? emit('click') : null"
   >
     <div class="flex items-center shrink-0">
-      <div v-if="number" :class="[css.icon, css.prepend]">
+      <div
+        v-if="number"
+        :class="[css.icon, css.prepend]"
+      >
         <RuiIcon name="bank-card-line" />
       </div>
     </div>
     <div class="flex flex-1 overflow-hidden">
-      <div :id="id" :class="[css.input, { [css.empty]: empty }]" />
-      <label :class="css.label" :for="id">
+      <div
+        :id="id"
+        :class="[css.input, { [css.empty]: empty }]"
+      />
+      <label
+        :class="css.label"
+        :for="id"
+      >
         {{ label }}
       </label>
       <fieldset :class="css.fieldset">

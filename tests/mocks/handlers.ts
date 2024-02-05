@@ -13,26 +13,21 @@ export const handlers = [
           'Set-Cookie': 'csrftoken=1234',
         },
       },
-    ),
-  ),
+    )),
   http.post(`${BACKEND_URL}/webapi/login`, () =>
-    HttpResponse.json({ message: 'success' }),
-  ),
+    HttpResponse.json({ message: 'success' })),
   http.get(`${BACKEND_URL}/webapi/countries`, () =>
     HttpResponse.json({
-      result: [{ name: 'Country', code: 'CT' }],
       message: 'it works!',
-    }),
-  ),
+      result: [{ code: 'CT', name: 'Country' }],
+    })),
   http.get(`${BACKEND_URL}/webapi/countries`, () =>
-    HttpResponse.json({ result: [], message: 'it works!!' }),
-  ),
+    HttpResponse.json({ message: 'it works!!', result: [] })),
   http.get(`${BACKEND_URL}/webapi/account`, () =>
     HttpResponse.json(
-      { result: [], message: 'fail' },
+      { message: 'fail', result: [] },
       {
         status: 401,
       },
-    ),
-  ),
+    )),
 ];

@@ -16,7 +16,9 @@ const values = [
   <div class="py-10 md:py-20">
     <div class="container space-y-10 md:space-y-16">
       <div class="space-y-5">
-        <div class="text-h4">{{ t('values.vision_section.title') }}</div>
+        <div class="text-h4">
+          {{ t('values.vision_section.title') }}
+        </div>
         <div class="text-body-1">
           {{ t('values.vision_section.description') }}
         </div>

@@ -13,7 +13,7 @@ const icon: ComputedRef<string> = computed(() => {
     {
       'full-time': 'timer-2-line',
       'part-time': 'timer-2-line',
-      remote: 'user-location-line',
+      'remote': 'user-location-line',
     }[value] ?? ''
   );
 });
@@ -25,8 +25,14 @@ const icon: ComputedRef<string> = computed(() => {
     :label="tag"
     variant="outlined"
   >
-    <template v-if="icon" #prepend>
-      <RuiIcon :name="icon" class="p-0.5" />
+    <template
+      v-if="icon"
+      #prepend
+    >
+      <RuiIcon
+        :name="icon"
+        class="p-0.5"
+      />
     </template>
   </RuiChip>
 </template>

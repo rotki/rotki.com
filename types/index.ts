@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
-type ResultError<Code = undefined> = {
+interface ResultError<Code = undefined> {
   isError: true;
   error: Error;
   code?: Code;
-};
+}
 
-type ResultSuccess<T> = {
+interface ResultSuccess<T> {
   isError: false;
   result: T;
-};
+}
 
 export type Result<T, Code = undefined> = ResultError<Code> | ResultSuccess<T>;
 
@@ -25,16 +25,16 @@ export const ApiError = z.union([z.string(), z.record(StringArray)]);
 export type ApiError = z.infer<typeof ApiError>;
 
 export const Address = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  companyName: z.string(),
   address1: z.string(),
   address2: z.string(),
   city: z.string(),
-  postcode: z.string(),
+  companyName: z.string(),
   country: z.string(),
-  vatId: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
   movedOffline: z.boolean(),
+  postcode: z.string(),
+  vatId: z.string(),
 });
 
 export type Address = z.infer<typeof Address>;
@@ -49,41 +49,41 @@ const SubStatus = z.enum([
 export type SubStatus = z.infer<typeof SubStatus>;
 
 export const Subscription = z.object({
-  identifier: z.string().nonempty(),
-  planName: z.string(),
-  durationInMonths: z.number().nonnegative(),
-  status: SubStatus,
-  pending: z.boolean().default(false),
+  actions: StringArray,
   createdDate: z.string(),
+  durationInMonths: z.number().nonnegative(),
+  identifier: z.string().nonempty(),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
-  actions: StringArray,
+  pending: z.boolean().default(false),
+  planName: z.string(),
+  status: SubStatus,
 });
 
 export type Subscription = z.infer<typeof Subscription>;
 
 export const Payment = z.object({
-  identifier: z.string().nonempty(),
-  plan: z.string(),
-  paidAt: z.string(),
   eurAmount: z.string(),
+  identifier: z.string().nonempty(),
+  paidAt: z.string(),
+  plan: z.string(),
 });
 
 export type Payment = z.infer<typeof Payment>;
 
 export const Account = z.object({
-  username: z.string().nonempty(),
-  email: z.string().nonempty(),
+  address: Address,
   apiKey: z.string(),
   apiSecret: z.string(),
   canUsePremium: z.boolean(),
-  address: Address,
-  vat: z.number(),
-  hasActiveSubscription: z.boolean(),
-  subscriptions: z.array(Subscription),
-  payments: z.array(Payment),
   dateNow: z.string(),
+  email: z.string().nonempty(),
   emailConfirmed: z.boolean(),
+  hasActiveSubscription: z.boolean(),
+  payments: z.array(Payment),
+  subscriptions: z.array(Subscription),
+  username: z.string().nonempty(),
+  vat: z.number(),
 });
 
 export type Account = z.infer<typeof Account>;
@@ -96,8 +96,8 @@ export const ApiKeys = z.object({
 export type ApiKeys = z.infer<typeof ApiKeys>;
 
 export const ChangePasswordResponse = z.object({
-  result: z.boolean().optional(),
   message: ApiError.optional(),
+  result: z.boolean().optional(),
 });
 
 export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>;
@@ -107,22 +107,22 @@ const UpdateProfile = z.object({
 });
 
 export const UpdateProfileResponse = z.object({
-  result: UpdateProfile.optional(),
   message: ApiError.optional(),
+  result: UpdateProfile.optional(),
 });
 
 export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponse>;
 
 export const DeleteAccountResponse = z.object({
-  result: z.boolean().optional(),
   message: z.string().optional(),
+  result: z.boolean().optional(),
 });
 
 export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>;
 
 export const CancelSubscriptionResponse = z.object({
-  result: z.boolean().optional(),
   message: z.string().optional(),
+  result: z.boolean().optional(),
 });
 
 export type CancelSubscriptionResponse = z.infer<
@@ -130,10 +130,10 @@ export type CancelSubscriptionResponse = z.infer<
 >;
 
 const Plan = z.object({
-  months: z.number(),
-  priceFiat: z.string(),
-  priceCrypto: z.string(),
   discount: z.number(),
+  months: z.number(),
+  priceCrypto: z.string(),
+  priceFiat: z.string(),
 });
 
 export type Plan = z.infer<typeof Plan>;
@@ -151,11 +151,11 @@ export const PremiumResponse = z.object({
 export type PremiumResponse = z.infer<typeof PremiumResponse>;
 
 const SelectedPlan = z.object({
+  finalPriceInEur: z.string(),
+  months: z.number(),
+  priceInEur: z.string(),
   startDate: z.number(),
   vat: z.number(),
-  priceInEur: z.string(),
-  months: z.number(),
-  finalPriceInEur: z.string(),
 });
 
 export type SelectedPlan = z.infer<typeof SelectedPlan>;
@@ -175,45 +175,45 @@ export const CardCheckoutResponse = z.object({
 export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>;
 
 export const CardPaymentResponse = z.object({
-  result: z.boolean().optional(),
   message: z.string().optional(),
+  result: z.boolean().optional(),
 });
 
 export type CardPaymentResponse = z.infer<typeof CardPaymentResponse>;
 
 const CryptoPayment = z.object({
-  vat: z.number(),
-  finalPriceInEur: z.string().nonempty(),
+  cryptoAddress: z.string(),
   cryptocurrency: z.enum(supportedCurrencies),
   finalPriceInCrypto: z.string().nonempty(),
-  cryptoAddress: z.string(),
-  tokenAddress: z.string().nullish(),
-  startDate: z.number(),
+  finalPriceInEur: z.string().nonempty(),
   hoursForPayment: z.number(),
   months: z.number(),
+  startDate: z.number(),
+  tokenAddress: z.string().nullish(),
   transactionStarted: z.boolean(),
+  vat: z.number(),
 });
 
 export type CryptoPayment = z.infer<typeof CryptoPayment>;
 
 export const CryptoPaymentResponse = z.object({
-  result: CryptoPayment.optional(),
   message: ApiError.optional(),
+  result: CryptoPayment.optional(),
 });
 
 export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>;
 
 const PendingCryptoPayment = z.object({
+  currency: z.enum(['ETH', 'BTC', 'DAI']).optional(),
   pending: z.boolean(),
   transactionStarted: z.boolean().optional(),
-  currency: z.enum(['ETH', 'BTC', 'DAI']).optional(),
 });
 
 export type PendingCryptoPayment = z.infer<typeof PendingCryptoPayment>;
 
 export const PendingCryptoPaymentResponse = z.object({
-  result: PendingCryptoPayment.optional(),
   message: z.string().optional(),
+  result: PendingCryptoPayment.optional(),
 });
 
 export type PendingCryptoPaymentResponse = z.infer<
@@ -221,18 +221,18 @@ export type PendingCryptoPaymentResponse = z.infer<
 >;
 
 export const PendingCryptoPaymentResultResponse = z.object({
-  result: z.boolean().optional(),
   message: z.string().optional(),
+  result: z.boolean().optional(),
 });
 
 export type PendingCryptoPaymentResultResponse = z.infer<
   typeof PendingCryptoPaymentResultResponse
 >;
 
-export type CardPaymentRequest = {
+export interface CardPaymentRequest {
   months: number;
   paymentMethodNonce: string;
-};
+}
 
 interface Request {
   readonly method: string;
@@ -258,9 +258,9 @@ export type StepType = 'pending' | 'failure' | 'success';
 
 export type IdleStep = 'idle';
 
-export type PaymentStep = {
+export interface PaymentStep {
   type: StepType | IdleStep;
   title?: string;
   message?: string;
   closeable?: boolean;
-};
+}

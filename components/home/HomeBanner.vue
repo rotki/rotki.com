@@ -43,9 +43,14 @@ const data = [
         class="flex items-center justify-center text-rui-text-secondary gap-2 py-5 md:py-0 sm:px-4 md:px-8 flex-1 cursor-pointer"
       >
         <RuiIcon :name="item.icon" />
-        <RuiTooltip tooltip-class="max-w-[10rem]" :open-delay="400">
+        <RuiTooltip
+          tooltip-class="max-w-[10rem]"
+          :open-delay="400"
+        >
           <template #activator>
-            <div class="whitespace-nowrap">{{ item.text }}</div>
+            <div class="whitespace-nowrap">
+              {{ item.text }}
+            </div>
           </template>
           {{ item.tooltip }}
         </RuiTooltip>

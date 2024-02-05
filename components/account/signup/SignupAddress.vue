@@ -2,9 +2,9 @@
 import { helpers, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { useVuelidate } from '@vuelidate/core';
-import { type SignupAddressPayload } from '~/types/signup';
 import { toMessages } from '~/utils/validation';
-import { type ValidationErrors } from '~/types/common';
+import type { SignupAddressPayload } from '~/types/signup';
+import type { ValidationErrors } from '~/types/common';
 
 const props = defineProps<{
   modelValue: SignupAddressPayload;
@@ -47,8 +47,8 @@ const rules = {
 const terms: Ref<boolean> = ref(false);
 
 const recaptcha = useRecaptcha();
-const { recaptchaPassed, onError, onSuccess, onExpired, recaptchaToken } =
-  recaptcha;
+const { recaptchaPassed, onError, onSuccess, onExpired, recaptchaToken }
+  = recaptcha;
 
 const $externalResults: Ref<Record<string, string[]>> = ref({});
 
@@ -69,37 +69,38 @@ watch(
   externalResults,
   (errors) => {
     set($externalResults, errors);
-    if (Object.values(errors).some((i) => !!i)) {
+    if (Object.values(errors).some(i => !!i))
       get(v$).$validate();
-    }
   },
   { immediate: true },
 );
 
-const updateValue = (field: string, value: any) => {
+function updateValue(field: string, value: any) {
   emit('update:model-value', {
     ...get(modelValue),
     [field]: value,
   });
-};
+}
 
-const setCaptchaId = (captchaId: number) => {
+function setCaptchaId(captchaId: number) {
   emit('update:captcha-id', captchaId);
-};
+}
 
-const finish = () => {
+function finish() {
   emit('finish', {
     recaptchaToken: get(recaptchaToken),
     onExpired,
   });
-};
+}
 
 const { t } = useI18n();
 </script>
 
 <template>
   <div class="space-y-8 grow">
-    <div class="text-h4 text-center">Address</div>
+    <div class="text-h4 text-center">
+      Address
+    </div>
     <div class="space-y-5">
       <RuiTextField
         id="address-1"
@@ -172,15 +173,32 @@ const { t } = useI18n();
         @update:captcha-id="setCaptchaId($event)"
       />
 
-      <RuiCheckbox id="tos" v-model="terms" color="primary">
-        <i18n-t keypath="auth.signup.address.form.tos" scope="global">
+      <RuiCheckbox
+        id="tos"
+        v-model="terms"
+        color="primary"
+      >
+        <i18n-t
+          keypath="auth.signup.address.form.tos"
+          scope="global"
+        >
           <template #tos>
-            <ButtonLink to="/tos" inline color="primary" external>
+            <ButtonLink
+              to="/tos"
+              inline
+              color="primary"
+              external
+            >
               {{ t('footer_legalese.tos') }}
             </ButtonLink>
           </template>
           <template #privacy_policy>
-            <ButtonLink to="/privacy-policy" inline color="primary" external>
+            <ButtonLink
+              to="/privacy-policy"
+              inline
+              color="primary"
+              external
+            >
               {{ t('footer_legalese.privacy_policy') }}
             </ButtonLink>
           </template>

@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
-import { type Ref } from 'vue';
-import {
-  type SignupAccountPayload,
-  type SignupAddressPayload,
-  type SignupCustomerInformationPayload,
-  type SignupPayload,
-} from '~/types/signup';
 import { fetchWithCsrf } from '~/utils/api';
-import { type ValidationErrors } from '~/types/common';
-import { type ApiResponse } from '~/types';
+import type { Ref } from 'vue';
+import type {
+  SignupAccountPayload,
+  SignupAddressPayload,
+  SignupCustomerInformationPayload,
+  SignupPayload,
+} from '~/types/signup';
+import type { ValidationErrors } from '~/types/common';
+import type { ApiResponse } from '~/types';
 
 const { t } = useI18n();
 const { captchaId, resetCaptcha } = useRecaptcha();
@@ -40,12 +40,12 @@ const addressForm = ref<SignupAddressPayload>({
 const loading: Ref<boolean> = ref(false);
 const externalResults: Ref<ValidationErrors> = ref({});
 
-const signup = async ({
+async function signup({
   recaptchaToken,
 }: {
   recaptchaToken: string;
   onExpired: () => void;
-}) => {
+}) {
   set(loading, true);
 
   const payload: SignupPayload = {
@@ -66,23 +66,25 @@ const signup = async ({
     });
     if (result) {
       await navigateTo({ path: '/activation' });
-    } else if (typeof message === 'object') {
+    }
+    else if (typeof message === 'object') {
       resetCaptcha();
       setErrors(message);
     }
-  } catch (e: any) {
+  }
+  catch (error: any) {
     if (
-      e instanceof FetchError &&
-      e.status === 400 &&
-      e.data &&
-      typeof e.data.message === 'object'
+      error instanceof FetchError
+      && error.status === 400
+      && error.data
+      && typeof error.data.message === 'object'
     ) {
       resetCaptcha();
-      setErrors(e.data.message);
+      setErrors(error.data.message);
     }
   }
   set(loading, false);
-};
+}
 
 const step: Ref<number> = ref(1);
 const steps = [
@@ -104,34 +106,33 @@ const steps = [
   },
 ];
 
-const back = () => {
+function back() {
   set(step, Math.max(get(step) - 1, 1));
-};
-const next = () => {
-  set(step, Math.min(get(step) + 1, steps.length));
-};
+}
 
-const haveIntersectionKeys = (obj1: object, obj2: object) => {
+function next() {
+  set(step, Math.min(get(step) + 1, steps.length));
+}
+
+function haveIntersectionKeys(obj1: object, obj2: object) {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);
 
-  return keys1.some((key) => keys2.includes(key));
-};
+  return keys1.some(key => keys2.includes(key));
+}
 
-const setErrors = (errors: ValidationErrors) => {
+function setErrors(errors: ValidationErrors) {
   set(externalResults, errors);
 
-  if (haveIntersectionKeys(errors, get(accountForm))) {
+  if (haveIntersectionKeys(errors, get(accountForm)))
     set(step, 2);
-    return;
-  } else if (haveIntersectionKeys(errors, get(customerInformationForm))) {
+
+  else if (haveIntersectionKeys(errors, get(customerInformationForm)))
     set(step, 3);
-    return;
-  } else if (haveIntersectionKeys(errors, get(addressForm))) {
+
+  else if (haveIntersectionKeys(errors, get(addressForm)))
     set(step, 4);
-    return;
-  }
-};
+}
 </script>
 
 <template>
@@ -143,7 +144,10 @@ const setErrors = (errors: ValidationErrors) => {
         class="w-[440px] max-w-full flex flex-col justify-between"
         @submit.prevent=""
       >
-        <SignupIntroduction v-if="step === 1" @next="next()" />
+        <SignupIntroduction
+          v-if="step === 1"
+          @next="next()"
+        />
         <SignupAccount
           v-if="step === 2"
           v-model="accountForm"
@@ -168,13 +172,22 @@ const setErrors = (errors: ValidationErrors) => {
           @finish="signup($event)"
         />
         <div class="py-10 lg:px-4">
-          <RuiFooterStepper :model-value="step" :pages="4" variant="pill" />
+          <RuiFooterStepper
+            :model-value="step"
+            :pages="4"
+            variant="pill"
+          />
         </div>
       </form>
     </div>
 
     <div class="hidden lg:block w-[332px] sticky top-0 self-start">
-      <RuiStepper custom orientation="vertical" :step="step" :steps="steps" />
+      <RuiStepper
+        custom
+        orientation="vertical"
+        :step="step"
+        :steps="steps"
+      />
     </div>
   </div>
 </template>

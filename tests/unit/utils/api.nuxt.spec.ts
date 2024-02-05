@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { Account, ApiResponse } from '~/types';
 import { fetchWithCsrf, setHooks, sleep } from '~/utils/api';
-import { type Country } from '~/composables/countries';
+import type { Country } from '~/composables/countries';
+import type { Account, ApiResponse } from '~/types';
 
 const logout = vi.fn();
 const refresh = vi.fn();
@@ -18,7 +18,7 @@ describe('api utilities', () => {
       fetchWithCsrf<ApiResponse<Country[]>>(`/webapi/countries`),
     ).resolves.toMatchObject(
       expect.objectContaining({
-        result: [{ name: 'Country', code: 'CT' }],
+        result: [{ code: 'CT', name: 'Country' }],
       }),
     );
 
@@ -37,11 +37,11 @@ describe('api utilities', () => {
   it('initCsrf: login and setup csrf successfully', async () => {
     await expect(
       fetchWithCsrf<ApiResponse<undefined>>(`/webapi/login/`, {
-        method: 'POST',
         body: {
-          username: 'test',
           password: '1234',
+          username: 'test',
         },
+        method: 'POST',
       }),
     ).resolves.toMatchObject({ message: 'success' });
   }, 2000);

@@ -18,13 +18,12 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
 }>();
 
-const toggle = () => {
-  if (props.disabled) {
+function toggle() {
+  if (props.disabled)
     return;
-  }
 
   emit('update:modelValue', !props.modelValue);
-};
+}
 
 const css = useCssModule();
 </script>
@@ -32,7 +31,11 @@ const css = useCssModule();
 <template>
   <InfoTooltip :class="css.tooltip">
     <template #activator>
-      <button :class="css.button" :disabled="disabled" @click="toggle()">
+      <button
+        :class="css.button"
+        :disabled="disabled"
+        @click="toggle()"
+      >
         <VisibilityIcon :visible="modelValue" />
       </button>
     </template>

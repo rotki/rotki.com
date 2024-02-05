@@ -1,11 +1,12 @@
-import { type ParsedContent } from '@nuxt/content/dist/runtime/types';
-import { serverQueryContent } from '#content/server';
 import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
+import type { ParsedContent } from '@nuxt/content/dist/runtime/types';
+import { serverQueryContent } from '#content/server';
 
-const getLink = (path?: string) =>
-  path?.startsWith(CONTENT_PREFIX)
+function getLink(path?: string) {
+  return path?.startsWith(CONTENT_PREFIX)
     ? `${path}`.replace(CONTENT_PREFIX, '')
     : path;
+}
 
 export default cachedEventHandler(
   async (event) => {
@@ -20,7 +21,8 @@ export default cachedEventHandler(
         })
         .only('_path')
         .find();
-    } catch {
+    }
+    catch {
       // fallback to local if remote fails
       jobs = await serverQueryContent(event)
         .where({
@@ -33,15 +35,15 @@ export default cachedEventHandler(
 
     const now = new Date().toDateString();
 
-    return jobs.map((job) => ({
-      loc: getLink(job._path),
-      lastmod: now,
+    return jobs.map(job => ({
       changefreq: 'daily',
+      lastmod: now,
+      loc: getLink(job._path),
       priority: 0.8,
     }));
   },
   {
-    name: 'sitemap-dynamic-urls',
     maxAge: 60 * 10, // 10 minutes
+    name: 'sitemap-dynamic-urls',
   },
 );

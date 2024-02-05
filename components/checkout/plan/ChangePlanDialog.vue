@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { type ComputedRef } from 'vue';
 import { useMainStore } from '~/store';
 import { getPlanName } from '~/utils/plans';
-import { type Plan } from '~/types';
+import type { ComputedRef } from 'vue';
+import type { Plan } from '~/types';
 
 const props = withDefaults(
   defineProps<{
@@ -33,20 +33,21 @@ const confirmed = ref(false);
 const availablePlans: ComputedRef<Plan[]> = computed(() => get(plans) ?? []);
 
 const cancel = () => emit('cancel');
-const select = (months: number) => {
-  if (get(warning) && !get(confirmed)) {
-    return;
-  }
-  return emit('select', months);
-};
 
-const getPrice = (plan: Plan) =>
-  get(crypto) ? plan.priceCrypto : plan.priceFiat;
+function select(months: number) {
+  if (get(warning) && !get(confirmed))
+    return;
+
+  return emit('select', months);
+}
+
+function getPrice(plan: Plan) {
+  return get(crypto) ? plan.priceCrypto : plan.priceFiat;
+}
 
 watch(visible, (visible) => {
-  if (!visible) {
+  if (!visible)
     set(confirmed, false);
-  }
 });
 
 onMounted(async () => await store.getPlans());
@@ -57,7 +58,9 @@ const css = useCssModule();
 <template>
   <ModalDialog :model-value="visible">
     <div :class="css.body">
-      <TextHeading no-margin>{{ t('change_plan.title') }}</TextHeading>
+      <TextHeading no-margin>
+        {{ t('change_plan.title') }}
+      </TextHeading>
       <div
         v-for="plan in availablePlans"
         :key="plan.months.toString()"
@@ -80,12 +83,22 @@ const css = useCssModule();
           )
         }}
       </div>
-      <div v-if="crypto && warning" :class="css.warning">
+      <div
+        v-if="crypto && warning"
+        :class="css.warning"
+      >
         <span>
           {{ t('change_plan.switch_warning') }}
         </span>
-        <RuiCheckbox v-model="confirmed" class="mt-3" color="primary">
-          <i18n-t keypath="change_plan.switch_agree" scope="global">
+        <RuiCheckbox
+          v-model="confirmed"
+          class="mt-3"
+          color="primary"
+        >
+          <i18n-t
+            keypath="change_plan.switch_agree"
+            scope="global"
+          >
             <template #separator>
               <br />
             </template>

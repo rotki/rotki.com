@@ -18,7 +18,9 @@ useHead({
 
 <template>
   <PageContainer :center-vertically="false">
-    <template #title> {{ t('policies.refund.title') }} </template>
+    <template #title>
+      {{ t('policies.refund.title') }}
+    </template>
     <p>
       <i18n-t keypath="policies.refund.policy">
         <template #non_refundable>

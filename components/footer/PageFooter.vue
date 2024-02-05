@@ -16,13 +16,23 @@ const year = new Date().getFullYear().toString();
 <template>
   <div>
     <div class="container">
-      <div v-if="landing" class="space-y-8 mt-8 lg:mt-16 mb-10">
+      <div
+        v-if="landing"
+        class="space-y-8 mt-8 lg:mt-16 mb-10"
+      >
         <div class="flex justify-between items-center">
           <div>
-            <RuiLogo class="!h-8 md:h-12" text />
+            <RuiLogo
+              class="!h-8 md:h-12"
+              text
+            />
           </div>
           <NuxtLink to="/download">
-            <RuiButton color="primary" variant="text" size="lg">
+            <RuiButton
+              color="primary"
+              variant="text"
+              size="lg"
+            >
               {{ t('page_footer.download') }}
             </RuiButton>
           </NuxtLink>

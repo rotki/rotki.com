@@ -5,18 +5,18 @@ import { server } from '~/tests/mocks/server';
 mockNuxtImport('useRuntimeConfig', () => () => {
   const { BACKEND_URL } = import.meta.env;
   return {
+    app: { baseURL: '/' },
     public: {
-      baseUrl: BACKEND_URL,
       backendUrl: BACKEND_URL,
+      baseUrl: BACKEND_URL,
       contact: {
-        emailMailto: 'mailto:info@rotki.com',
-        email: 'info@rotki.com',
-        twitter: 'https://twitter.com/rotkiapp',
         discord: 'https://discord.rotki.com',
+        email: 'info@rotki.com',
+        emailMailto: 'mailto:info@rotki.com',
         github: 'https://github.com/rotki',
+        twitter: 'https://twitter.com/rotkiapp',
       },
     },
-    app: { baseURL: '/' },
   };
 });
 

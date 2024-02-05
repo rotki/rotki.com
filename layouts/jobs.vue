@@ -12,14 +12,21 @@ const { t } = useI18n();
       <div class="container">
         <div class="max-w-[768px]">
           <div class="mb-3 text-h6 -ml-1">
-            <ButtonLink to="/jobs" color="primary" inline>
+            <ButtonLink
+              to="/jobs"
+              color="primary"
+              inline
+            >
               {{ t('jobs.title') }}
             </ButtonLink>
           </div>
           <div class="text-h4">
             <slot name="title" />
           </div>
-          <div v-if="slots.description" class="mt-5 body-1">
+          <div
+            v-if="slots.description"
+            class="mt-5 body-1"
+          >
             <slot name="description" />
           </div>
         </div>

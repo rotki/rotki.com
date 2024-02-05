@@ -5,9 +5,8 @@ import { useMainStore } from '~/store';
 export default defineNuxtRouteMiddleware(() => {
   const { account } = storeToRefs(useMainStore());
 
-  if (!isDefined(account)) {
+  if (!isDefined(account))
     return;
-  }
 
   const { hasActiveSubscription, subscriptions } = get(account);
   if (hasActiveSubscription) {
@@ -15,8 +14,7 @@ export default defineNuxtRouteMiddleware(() => {
       actions.includes('renew'),
     );
 
-    if (!renewableSubscriptions) {
+    if (!renewableSubscriptions)
       return navigateTo('/home/subscription');
-    }
   }
 });

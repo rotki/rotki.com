@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get, toRefs } from '@vueuse/core';
-import { type IdleStep, type PaymentStep, type StepType } from '~/types';
+import type { IdleStep, PaymentStep, StepType } from '~/types';
 
 const props = defineProps<{
   step: PaymentStep;
@@ -9,8 +9,10 @@ const props = defineProps<{
 const { t } = useI18n();
 
 const { step } = toRefs(props);
-const useType = (type: StepType | IdleStep) =>
-  computed(() => get(step).type === type);
+
+function useType(type: StepType | IdleStep) {
+  return computed(() => get(step).type === type);
+}
 
 const isPending = useType('pending');
 const isSuccess = useType('success');

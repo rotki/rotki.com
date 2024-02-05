@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/core';
-import { type Component, type ComputedRef, type Ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
   BitcoinIcon,
@@ -11,6 +10,7 @@ import {
 } from '#components';
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
+import type { Component, ComputedRef, Ref } from 'vue';
 
 const props = defineProps<{ identifier?: string }>();
 
@@ -24,12 +24,12 @@ enum PaymentMethod {
   PAYPAL = 5,
 }
 
-type PaymentMethodItem = {
+interface PaymentMethodItem {
   id: PaymentMethod;
   label: string;
   component: Component;
   name: string;
-};
+}
 
 const store = useMainStore();
 const css = useCssModule();
@@ -45,16 +45,16 @@ const method: Ref<PaymentMethod | undefined> = ref(get(paymentMethodId));
 const processing: Ref<boolean> = ref(false);
 
 const availablePaymentMethods = computed(() => {
-  if (!get(identifier)) {
+  if (!get(identifier))
     return paymentMethods;
-  }
-  return paymentMethods.filter((value) =>
+
+  return paymentMethods.filter(value =>
     isSupportedCrypto(PaymentMethod[value.id]),
   );
 });
 
 const selected: ComputedRef<PaymentMethodItem | undefined> = computed(() =>
-  get(availablePaymentMethods).find((m) => get(method) === m.id),
+  get(availablePaymentMethods).find(m => get(method) === m.id),
 );
 
 const paymentMethods: PaymentMethodItem[] = [
@@ -90,14 +90,14 @@ const paymentMethods: PaymentMethodItem[] = [
   },
 ];
 
-const back = async () => {
+async function back() {
   await navigateTo({
     name: 'checkout-pay',
     query: { plan: get(plan), method: get(selected) ? get(method) : undefined },
   });
-};
+}
 
-const next = async () => {
+async function next() {
   if (get(authenticated)) {
     set(processing, true);
     const selectedMethod = get(selected);
@@ -116,7 +116,8 @@ const next = async () => {
         `${window.location.origin}/checkout/pay/card?${queryString}`,
       );
       window.location.href = url.toString();
-    } else {
+    }
+    else {
       await navigateTo({
         name,
         query: {
@@ -129,16 +130,17 @@ const next = async () => {
         },
       });
     }
-  } else {
+  }
+  else {
     set(loginRequired, true);
   }
-};
+}
 
 const isSelected = (m: PaymentMethod) => get(method) === m;
 
-const select = (m: PaymentMethod) => {
+function select(m: PaymentMethod) {
   set(method, m);
-};
+}
 </script>
 
 <template>
@@ -156,7 +158,9 @@ const select = (m: PaymentMethod) => {
           @click="select(item.id)"
         >
           <Component :is="item.component" />
-          <template #label> {{ item.label }}</template>
+          <template #label>
+            {{ item.label }}
+          </template>
         </PaymentMethodItem>
       </div>
     </div>

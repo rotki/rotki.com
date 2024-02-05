@@ -33,7 +33,7 @@ const steps = computed(() => [
 ]);
 
 const step = computed(() => {
-  const index = get(steps).findIndex((step) =>
+  const index = get(steps).findIndex(step =>
     step.names.includes(String(route.name)),
   );
   return index + 1;

@@ -2,7 +2,7 @@
 import { get } from '@vueuse/core';
 import { commonAttrs } from '~/utils/metadata';
 import { useAppDownload } from '~/composables/download';
-import { type DownloadItemProps } from '~/components/download/DownloadItem.vue';
+import type { DownloadItemProps } from '~/components/download/DownloadItem.vue';
 
 useHead({
   title: 'download',
@@ -40,7 +40,10 @@ definePageMeta({
 </script>
 
 <template>
-  <DownloadHeading :links="links" :version="version" />
+  <DownloadHeading
+    :links="links"
+    :version="version"
+  />
   <DownloadDocs />
   <DownloadPreview />
 </template>

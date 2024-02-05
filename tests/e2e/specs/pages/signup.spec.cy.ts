@@ -1,4 +1,4 @@
-describe('Signup test', () => {
+describe('signup test', () => {
   before(() => {
     cy.visit('/signup').wait(3000);
   });
@@ -6,7 +6,7 @@ describe('Signup test', () => {
   beforeEach(() => {
     cy.intercept('/webapi/countries', {
       body: {
-        result: [{ name: 'Country', code: 'CT' }],
+        result: [{ code: 'CT', name: 'Country' }],
       },
     });
   });

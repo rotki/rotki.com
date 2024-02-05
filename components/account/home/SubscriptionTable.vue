@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import {
-  type ContextColorsType,
-  type DataTableColumn,
-  type DataTableSortColumn,
-  type TablePaginationData,
-} from '@rotki/ui-library';
 import { useMainStore } from '~/store';
-import { type Subscription } from '~/types';
+import type {
+  ContextColorsType,
+  DataTableColumn,
+  DataTableSortColumn,
+  TablePaginationData,
+} from '@rotki/ui-library';
+import type { Subscription } from '~/types';
 
 const { t } = useI18n();
 
@@ -55,7 +55,7 @@ const selectedSubscription: Ref<Subscription | undefined> = ref();
 const showCancelDialog: Ref<boolean> = ref(false);
 const cancelling: Ref<boolean> = ref(false);
 
-const pending = computed(() => get(subscriptions).filter((sub) => sub.pending));
+const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
 
 const renewableSubscriptions = computed(() =>
   get(subscriptions).filter(({ actions }) => actions.includes('renew')),
@@ -63,14 +63,13 @@ const renewableSubscriptions = computed(() =>
 
 const pendingPaymentCurrency = computedAsync(async () => {
   const subs = get(renewableSubscriptions);
-  if (subs.length === 0) {
+  if (subs.length === 0)
     return undefined;
-  }
+
   const response = await store.checkPendingCryptoPayment(subs[0].identifier);
 
-  if (response.isError || !response.result.pending) {
+  if (response.isError || !response.result.pending)
     return undefined;
-  }
 
   return response.result.currency;
 });
@@ -109,50 +108,50 @@ const { pause, resume, isActive } = useIntervalFn(
 );
 
 watch(pending, (pending) => {
-  if (pending.length === 0) {
+  if (pending.length === 0)
     pause();
-  } else if (!get(isActive)) {
+  else if (!get(isActive))
     resume();
-  }
 });
 
 onUnmounted(() => pause());
 
-const hasAction = (sub: Subscription, action: 'renew' | 'cancel') => {
-  if (action === 'cancel') {
+function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
+  if (action === 'cancel')
     return sub.status !== 'Pending' && sub.actions.includes('cancel');
-  } else if (action === 'renew') {
+  else if (action === 'renew')
     return sub.actions.includes('renew');
-  }
+
   return false;
-};
+}
 
-const displayActions = (sub: Subscription) =>
-  hasAction(sub, 'renew') || hasAction(sub, 'cancel');
+function displayActions(sub: Subscription) {
+  return hasAction(sub, 'renew') || hasAction(sub, 'cancel');
+}
 
-const getChipStatusColor = (status: string): ContextColorsType | undefined => {
+function getChipStatusColor(status: string): ContextColorsType | undefined {
   const map: Record<string, ContextColorsType> = {
-    Active: 'success',
-    Cancelled: 'error',
-    Pending: 'warning',
+    'Active': 'success',
+    'Cancelled': 'error',
+    'Pending': 'warning',
     'Past Due': 'warning',
   };
 
   return map[status];
-};
+}
 
-const confirmCancel = (sub: Subscription) => {
+function confirmCancel(sub: Subscription) {
   set(selectedSubscription, sub);
   set(showCancelDialog, true);
-};
+}
 
-const cancelSubscription = async (sub: Subscription) => {
+async function cancelSubscription(sub: Subscription) {
   set(showCancelDialog, false);
   set(cancelling, true);
   await store.cancelSubscription(sub);
   set(cancelling, false);
   set(selectedSubscription, undefined);
-};
+}
 </script>
 
 <template>
@@ -172,13 +171,19 @@ const cancelSubscription = async (sub: Subscription) => {
       outlined
     >
       <template #item.status="{ row }">
-        <RuiChip size="sm" :color="getChipStatusColor(row.status)">
+        <RuiChip
+          size="sm"
+          :color="getChipStatusColor(row.status)"
+        >
           {{ row.status }}
         </RuiChip>
       </template>
 
       <template #item.actions="{ row }">
-        <div v-if="displayActions(row)" class="flex gap-2 justify-end">
+        <div
+          v-if="displayActions(row)"
+          class="flex gap-2 justify-end"
+        >
           <RuiButton
             v-if="hasAction(row, 'cancel')"
             :loading="cancelling"
@@ -198,7 +203,12 @@ const cancelSubscription = async (sub: Subscription) => {
             {{ t('actions.renew') }}
           </ButtonLink>
         </div>
-        <div v-else class="capitalize">{{ t('common.none') }}</div>
+        <div
+          v-else
+          class="capitalize"
+        >
+          {{ t('common.none') }}
+        </div>
       </template>
     </RuiDataTable>
 

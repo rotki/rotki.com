@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
-import { type Plan } from '~/types';
 import { getPlanSelectionName } from '~/utils/plans';
+import type { Plan } from '~/types';
 
 const props = withDefaults(
   defineProps<{
@@ -26,13 +26,16 @@ const price = computed(() => {
   return (parseFloat(priceFiat) / months).toFixed(2);
 });
 
-const click = () => {
+function click() {
   emit('click');
-};
+}
 </script>
 
 <template>
-  <div :class="[css.plan, { [css.selected]: selected }]" @click="click()">
+  <div
+    :class="[css.plan, { [css.selected]: selected }]"
+    @click="click()"
+  >
     <div class="flex items-center h-0 justify-center relative w-full">
       <RuiChip
         v-if="popular"
@@ -43,18 +46,33 @@ const click = () => {
       />
     </div>
     <CheckMark :selected="selected" />
-    <div :class="css.name">{{ name }}</div>
-    <div :class="css.emphasis">{{ price }}€</div>
-    <div :class="css.monthly">{{ t('home.plans.per_month') }}</div>
+    <div :class="css.name">
+      {{ name }}
+    </div>
+    <div :class="css.emphasis">
+      {{ price }}€
+    </div>
+    <div :class="css.monthly">
+      {{ t('home.plans.per_month') }}
+    </div>
     <div :class="css.total">
       {{ t('home.plans.total', { total: totalPrice }) }}
     </div>
-    <RuiButton :color="selected ? 'primary' : undefined" class="w-full">
+    <RuiButton
+      :color="selected ? 'primary' : undefined"
+      class="w-full"
+    >
       {{ t('home.plans.choose') }}
     </RuiButton>
 
-    <div v-if="plan.discount" :class="css.discount">
-      <RuiIcon class="text-black/60" name="hand-coin-line" />
+    <div
+      v-if="plan.discount"
+      :class="css.discount"
+    >
+      <RuiIcon
+        class="text-black/60"
+        name="hand-coin-line"
+      />
       <span>
         {{ t('home.plans.save_discount', { discount: plan.discount }) }}
       </span>

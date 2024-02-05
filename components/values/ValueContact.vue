@@ -65,13 +65,20 @@ const contacts = [
           </div>
           <div class="space-y-5">
             <div class="space-y-2">
-              <div class="text-h6">{{ contact.title }}</div>
+              <div class="text-h6">
+                {{ contact.title }}
+              </div>
               <div class="text-body-1 text-rui-text-secondary">
                 {{ contact.description }}
               </div>
             </div>
             <div class="-ml-1">
-              <ButtonLink external :to="contact.href" inline color="primary">
+              <ButtonLink
+                external
+                :to="contact.href"
+                inline
+                color="primary"
+              >
                 {{ contact.linkLabel ?? contact.href }}
               </ButtonLink>
             </div>

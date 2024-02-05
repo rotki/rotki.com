@@ -2,10 +2,10 @@
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
-import { type Ref } from 'vue';
 import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
 import { toMessages } from '~/utils/validation';
+import type { Ref } from 'vue';
 
 function setupTokenValidation() {
   const route = useRoute();
@@ -22,12 +22,14 @@ function setupTokenValidation() {
           token,
         },
       });
-    } catch (e: any) {
-      if (!(e instanceof FetchError && e.status === 404)) {
-        logger.error(e);
-      }
+    }
+    catch (error: any) {
+      if (!(error instanceof FetchError && error.status === 404))
+        logger.error(error);
+
       set(isValid, false);
-    } finally {
+    }
+    finally {
       set(validating, false);
     }
   };
@@ -70,7 +72,7 @@ const route = useRoute();
 const { uid, token } = route.params;
 const submitting: Ref<boolean> = ref(false);
 
-const submit = async () => {
+async function submit() {
   set(submitting, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/confirm/', {
@@ -85,22 +87,25 @@ const submit = async () => {
     await navigateTo({
       path: '/password/changed',
     });
-  } catch (e: any) {
-    if (e instanceof FetchError && e.status === 400) {
-      const message = e.data.message;
+  }
+  catch (error: any) {
+    if (error instanceof FetchError && error.status === 400) {
+      const message = error.data.message;
       if (message && typeof message === 'object') {
         set($externalResults, {
           password: message.password,
           passwordConfirmation: message.password_confirmation,
         });
       }
-    } else {
-      logger.error(e);
     }
-  } finally {
+    else {
+      logger.error(error);
+    }
+  }
+  finally {
     set(submitting, false);
   }
-};
+}
 
 const { validating, isValid } = setupTokenValidation();
 const { valid, v$ } = setupFormValidation(
@@ -117,18 +122,38 @@ const { t } = useI18n();
     class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
   >
     <div class="w-[360px] max-w-full">
-      <div v-if="validating" class="flex justify-center">
-        <RuiProgress variant="indeterminate" circular color="primary" />
+      <div
+        v-if="validating"
+        class="flex justify-center"
+      >
+        <RuiProgress
+          variant="indeterminate"
+          circular
+          color="primary"
+        />
       </div>
-      <div v-else-if="!isValid" class="space-y-3">
-        <div class="text-h4">{{ t('auth.password_reset.invalid.title') }}</div>
+      <div
+        v-else-if="!isValid"
+        class="space-y-3"
+      >
+        <div class="text-h4">
+          {{ t('auth.password_reset.invalid.title') }}
+        </div>
         <div class="text-body-1 text-rui-text-secondary">
           {{ t('auth.password_reset.invalid.message') }}
         </div>
       </div>
-      <div v-else class="space-y-8">
-        <div class="text-h4">{{ t('auth.password_reset.title') }}</div>
-        <form class="space-y-6" @submit.prevent="">
+      <div
+        v-else
+        class="space-y-8"
+      >
+        <div class="text-h4">
+          {{ t('auth.password_reset.title') }}
+        </div>
+        <form
+          class="space-y-6"
+          @submit.prevent=""
+        >
           <div class="space-y-5">
             <div class="space-y-1">
               <RuiRevealableTextField

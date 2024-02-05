@@ -8,38 +8,38 @@ export type Currency = (typeof supportedCurrencies)[number];
 
 type CurrencyParam = Currency | null;
 
-export const usePlanParams = () => {
+export function usePlanParams() {
   const route = useRoute();
   const plan = computed(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
     const { plan } = route.query;
-    if (typeof plan !== 'string') {
+    if (typeof plan !== 'string')
       return -1;
-    }
+
     const selectedPlan = parseInt(plan);
     if (
-      isNaN(selectedPlan) ||
-      !isFinite(selectedPlan) ||
-      !availablePlans.includes(selectedPlan)
-    ) {
+      isNaN(selectedPlan)
+      || !isFinite(selectedPlan)
+      || !availablePlans.includes(selectedPlan)
+    )
       return -1;
-    }
+
     return selectedPlan;
   });
 
   return { plan };
-};
+}
 
-export const useCurrencyParams = () => {
+export function useCurrencyParams() {
   const route = useRoute();
   const currency = computed<CurrencyParam>(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
     const { currency } = route.query;
-    if (typeof currency !== 'string' || !isSupported(currency)) {
+    if (typeof currency !== 'string' || !isSupported(currency))
       return null;
-    }
+
     return currency as Currency;
   });
 
@@ -47,9 +47,9 @@ export const useCurrencyParams = () => {
     supportedCurrencies.includes(value as Currency);
 
   return { currency, isSupportedCrypto: isSupported };
-};
+}
 
-export const useSubscriptionIdParam = () => {
+export function useSubscriptionIdParam() {
   const route = useRoute();
   const subscriptionId = computed(() => {
     // NB: this param name is also used in backend email links,
@@ -58,9 +58,9 @@ export const useSubscriptionIdParam = () => {
     return typeof query.id === 'string' ? query.id : undefined;
   });
   return { subscriptionId };
-};
+}
 
-export const usePaymentMethodParam = () => {
+export function usePaymentMethodParam() {
   const route = useRoute();
   const paymentMethodId = computed(() => {
     // NB: this param name is also used in backend email links,
@@ -69,4 +69,4 @@ export const usePaymentMethodParam = () => {
     return typeof method === 'string' ? Number(method) : -1;
   });
   return { paymentMethodId };
-};
+}

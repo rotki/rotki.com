@@ -12,12 +12,12 @@ import * as composables from '@rotki/ui-library/composables';
 export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
-  meta: {
-    name: '@rotki/ui-library',
-    configKey: '@rotki/ui-library',
-  },
   // Default configuration options of the Nuxt module
   defaults: {},
+  meta: {
+    configKey: '@rotki/ui-library',
+    name: '@rotki/ui-library',
+  },
   async setup() {
     const resolver = createResolver(import.meta.url);
 
@@ -25,17 +25,17 @@ export default defineNuxtModule<ModuleOptions>({
 
     for (const component in components) {
       await addComponent({
-        name: component,
         export: component,
         filePath: '@rotki/ui-library/components',
+        name: component,
       });
     }
 
     for (const composable in composables) {
       addImports({
-        name: composable,
         as: composable,
         from: '@rotki/ui-library/composables',
+        name: composable,
       });
     }
   },

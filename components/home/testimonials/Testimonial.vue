@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type TestimonialMarkdownContent } from '~/composables/markdown';
+import type { TestimonialMarkdownContent } from '~/composables/markdown';
 
 withDefaults(
   defineProps<{
@@ -17,22 +17,55 @@ const css = useCssModule();
   <div :class="css.content">
     <span :class="css.thumbnails">
       <span :class="css.icon">
-        <RuiIcon name="chat-1-line" size="16" />
+        <RuiIcon
+          name="chat-1-line"
+          size="16"
+        />
       </span>
-      <span v-if="avatar" :class="css.avatar">
-        <a v-if="url" :href="url" target="_blank">
-          <img :src="avatar" :alt="username" class="object-cover" />
+      <span
+        v-if="avatar"
+        :class="css.avatar"
+      >
+        <a
+          v-if="url"
+          :href="url"
+          target="_blank"
+        >
+          <img
+            :src="avatar"
+            :alt="username"
+            class="object-cover"
+          />
         </a>
-        <img v-else :src="avatar" :alt="username" class="object-cover" />
+        <img
+          v-else
+          :src="avatar"
+          :alt="username"
+          class="object-cover"
+        />
       </span>
     </span>
     <ContentRenderer :value="body">
-      <ContentRendererMarkdown :class="css.text" :value="body" tag="span" />
+      <ContentRendererMarkdown
+        :class="css.text"
+        :value="body"
+        tag="span"
+      />
     </ContentRenderer>
-    <a v-if="url" :href="url" :class="css.username" target="_blank">
+    <a
+      v-if="url"
+      :href="url"
+      :class="css.username"
+      target="_blank"
+    >
       {{ username }}
     </a>
-    <span v-else :class="css.username">{{ username }}</span>
+    <span
+      v-else
+      :class="css.username"
+    >
+      {{ username }}
+    </span>
   </div>
 </template>
 

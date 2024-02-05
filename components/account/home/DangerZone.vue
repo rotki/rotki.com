@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import { type ActionResult } from '~/types/common';
+import type { ActionResult } from '~/types/common';
 
 const confirm = ref(false);
 const usernameConfirmation = ref('');
@@ -24,7 +24,7 @@ const { start, stop } = useTimeoutFn(
   { immediate: false },
 );
 
-const deleteAccount = async () => {
+async function deleteAccount() {
   dismissNotification();
   set(confirm, false);
   const result: ActionResult = await store.deleteAccount({
@@ -33,22 +33,26 @@ const deleteAccount = async () => {
   if (result.success) {
     await store.logout();
     await navigateTo('/account-deleted');
-  } else {
+  }
+  else {
     set(error, typeof result.message === 'string' ? result.message : '');
     start();
   }
-};
+}
 
-const dismissNotification = () => {
+function dismissNotification() {
   stop();
   set(error, '');
-};
+}
 
 const { t } = useI18n();
 </script>
 
 <template>
-  <RuiCard class="!border-2" :class="{ '!border-rui-error': !isSubscriber }">
+  <RuiCard
+    class="!border-2"
+    :class="{ '!border-rui-error': !isSubscriber }"
+  >
     <div>
       <div
         class="text-lg font-semibold"
@@ -78,7 +82,9 @@ const { t } = useI18n();
     </div>
   </RuiCard>
   <RuiDialog v-model="confirm">
-    <template #title>{{ t('account.delete_account.title') }}</template>
+    <template #title>
+      {{ t('account.delete_account.title') }}
+    </template>
 
     <div class="whitespace-break-spaces mb-4">
       <i18n-t
@@ -99,10 +105,17 @@ const { t } = useI18n();
     />
 
     <template #actions>
-      <RuiButton variant="text" color="primary" @click="confirm = false">
+      <RuiButton
+        variant="text"
+        color="primary"
+        @click="confirm = false"
+      >
         {{ t('actions.cancel') }}
       </RuiButton>
-      <RuiButton color="error" @click="deleteAccount()">
+      <RuiButton
+        color="error"
+        @click="deleteAccount()"
+      >
         {{ t('actions.confirm') }}
       </RuiButton>
     </template>

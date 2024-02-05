@@ -12,7 +12,8 @@ const data = await loadJob(path);
 
 if (!data?.open) {
   showError({ message: `Page not found: ${path}`, statusCode: 404 });
-} else {
+}
+else {
   useContentHead(data);
   const { title, description } = data;
 
@@ -33,8 +34,13 @@ definePageMeta({
 </script>
 
 <template>
-  <NuxtLayout v-if="data" name="jobs">
-    <template #title>{{ data.title }}</template>
+  <NuxtLayout
+    v-if="data"
+    name="jobs"
+  >
+    <template #title>
+      {{ data.title }}
+    </template>
     <JobDetail :data="data" />
   </NuxtLayout>
 </template>

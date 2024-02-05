@@ -30,7 +30,9 @@ definePageMeta({
 
 <template>
   <NuxtLayout name="jobs">
-    <template #title>{{ header }}</template>
+    <template #title>
+      {{ header }}
+    </template>
     <template #description>
       {{ subheader }}
     </template>
@@ -45,7 +47,10 @@ definePageMeta({
             :key="category"
             class="space-y-6"
           >
-            <div v-if="category" class="text-h6 font-medium">
+            <div
+              v-if="category"
+              class="text-h6 font-medium"
+            >
               {{ category }}
             </div>
             <div class="space-y-6">

@@ -12,18 +12,16 @@ const hasActiveSubscription = computed(
 );
 
 const showTooltip = computed(() => {
-  if (!isDefined(account)) {
+  if (!isDefined(account))
     return false;
-  }
 
   const { emailConfirmed } = get(account);
   return !emailConfirmed;
 });
 
 const allowNavigation = computed(() => {
-  if (!isDefined(account)) {
+  if (!isDefined(account))
     return true;
-  }
 
   const { emailConfirmed } = get(account);
   return emailConfirmed;
@@ -31,7 +29,10 @@ const allowNavigation = computed(() => {
 </script>
 
 <template>
-  <InfoTooltip v-if="!hasActiveSubscription" :disabled="!showTooltip">
+  <InfoTooltip
+    v-if="!hasActiveSubscription"
+    :disabled="!showTooltip"
+  >
     <template #activator>
       <ButtonLink
         variant="default"

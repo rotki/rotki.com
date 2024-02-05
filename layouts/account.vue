@@ -44,25 +44,37 @@ const tabModelValue = ref();
               align="start"
               color="primary"
             >
-              <RuiTab link to="/home/subscription">
+              <RuiTab
+                link
+                to="/home/subscription"
+              >
                 <template #prepend>
                   <RuiIcon name="vip-crown-line" />
                 </template>
                 {{ t('account.tabs.subscription') }}
               </RuiTab>
-              <RuiTab link to="/home/account-details">
+              <RuiTab
+                link
+                to="/home/account-details"
+              >
                 <template #prepend>
                   <RuiIcon name="account-circle-line" />
                 </template>
                 {{ t('account.tabs.account_details') }}
               </RuiTab>
-              <RuiTab link to="/home/customer-information">
+              <RuiTab
+                link
+                to="/home/customer-information"
+              >
                 <template #prepend>
                   <RuiIcon name="information-line" />
                 </template>
                 {{ t('account.tabs.customer_information') }}
               </RuiTab>
-              <RuiTab link to="/home/address">
+              <RuiTab
+                link
+                to="/home/address"
+              >
                 <template #prepend>
                   <RuiIcon name="map-pin-line" />
                 </template>
@@ -71,28 +83,56 @@ const tabModelValue = ref();
             </RuiTabs>
           </div>
           <div class="lg:hidden">
-            <RuiTabs v-model="tabModelValue" grow color="primary">
-              <RuiTab link to="/home/subscription">
+            <RuiTabs
+              v-model="tabModelValue"
+              grow
+              color="primary"
+            >
+              <RuiTab
+                link
+                to="/home/subscription"
+              >
                 <template #prepend>
-                  <RuiIcon class="shrink-0" name="vip-crown-line" />
+                  <RuiIcon
+                    class="shrink-0"
+                    name="vip-crown-line"
+                  />
                 </template>
                 {{ t('account.tabs.subscription') }}
               </RuiTab>
-              <RuiTab link to="/home/account-details">
+              <RuiTab
+                link
+                to="/home/account-details"
+              >
                 <template #prepend>
-                  <RuiIcon class="shrink-0" name="account-circle-line" />
+                  <RuiIcon
+                    class="shrink-0"
+                    name="account-circle-line"
+                  />
                 </template>
                 {{ t('account.tabs.account_details') }}
               </RuiTab>
-              <RuiTab link to="/home/customer-information">
+              <RuiTab
+                link
+                to="/home/customer-information"
+              >
                 <template #prepend>
-                  <RuiIcon class="shrink-0" name="information-line" />
+                  <RuiIcon
+                    class="shrink-0"
+                    name="information-line"
+                  />
                 </template>
                 {{ t('account.tabs.customer_information') }}
               </RuiTab>
-              <RuiTab link to="/home/address">
+              <RuiTab
+                link
+                to="/home/address"
+              >
                 <template #prepend>
-                  <RuiIcon class="shrink-0" name="map-pin-line" />
+                  <RuiIcon
+                    class="shrink-0"
+                    name="map-pin-line"
+                  />
                 </template>
                 {{ t('account.tabs.address') }}
               </RuiTab>

@@ -2,8 +2,8 @@
 import { parseEther, parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import { get, set, useClipboard } from '@vueuse/core';
-import { type CryptoPayment, type PaymentStep } from '~/types';
 import { logger } from '~/utils/logger';
+import type { CryptoPayment, PaymentStep } from '~/types';
 
 const props = defineProps<{
   data: CryptoPayment;
@@ -22,20 +22,19 @@ const { t } = useI18n();
 
 const config = useRuntimeConfig();
 
-const createPaymentQR = async (
-  payment: CryptoPayment,
-  canvas: HTMLCanvasElement,
-) => {
+async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement) {
   let qrText = '';
   const chainId = getChainId(!!config.public.testing);
   if (payment.cryptocurrency === 'BTC') {
     qrText = `bitcoin:${payment.cryptoAddress}?amount=${payment.finalPriceInCrypto}&label=Rotki`;
-  } else if (payment.cryptocurrency === 'ETH') {
+  }
+  else if (payment.cryptocurrency === 'ETH') {
     const ethPrice = parseEther(payment.finalPriceInCrypto);
     qrText = `ethereum:${
       payment.cryptoAddress
     }@${chainId}?value=${ethPrice.toString()}`;
-  } else if (payment.cryptocurrency === 'DAI') {
+  }
+  else if (payment.cryptocurrency === 'DAI') {
     const tokenPrice = parseUnits(payment.finalPriceInCrypto, 18);
     qrText = `ethereum:${payment.tokenAddress}@${chainId}/transfer?address=${payment.cryptoAddress}&uint256=${tokenPrice}`;
   }
@@ -43,7 +42,7 @@ const createPaymentQR = async (
   logger.info(qrText);
   await toCanvas(canvas, qrText);
   return qrText;
-};
+}
 
 const { data, pending, loading, success } = toRefs(props);
 const canvas = ref<HTMLCanvasElement>();
@@ -57,21 +56,20 @@ const paymentAmount = computed(() => {
 const processing = computed(() => get(pending) || get(loading));
 
 watch(canvas, async (canvas) => {
-  if (!canvas) {
+  if (!canvas)
     return;
-  }
+
   set(qrText, await createPaymentQR(get(data), canvas));
 });
 
-const redirect = () => {
+function redirect() {
   navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
   stopWatcher();
-};
+}
 
 const stopWatcher = watchEffect(() => {
-  if (get(success)) {
+  if (get(success))
     redirect();
-  }
 });
 
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
@@ -85,7 +83,10 @@ const css = useCssModule();
 <template>
   <div :class="css.wrapper">
     <div :class="css.qrcode">
-      <canvas ref="canvas" @click="copyToClipboard(qrText)" />
+      <canvas
+        ref="canvas"
+        @click="copyToClipboard(qrText)"
+      />
     </div>
     <div :class="css.inputs">
       <RuiTextField
@@ -121,7 +122,12 @@ const css = useCssModule();
         </template>
       </RuiTextField>
     </div>
-    <SelectedPlanOverview :plan="data" :disabled="processing" crypto warning />
+    <SelectedPlanOverview
+      :plan="data"
+      :disabled="processing"
+      crypto
+      warning
+    />
     <div :class="css.hint">
       {{ t('home.plans.tiers.step_3.metamask.notice') }}
 
@@ -134,7 +140,10 @@ const css = useCssModule();
         </p>
       </div>
     </div>
-    <div v-if="!isBtc" :class="css.button">
+    <div
+      v-if="!isBtc"
+      :class="css.button"
+    >
       <RuiButton
         :disabled="!metamaskSupport || processing"
         :loading="processing"

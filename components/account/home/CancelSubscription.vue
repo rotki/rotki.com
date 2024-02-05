@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { type Subscription } from '~/types';
 import { useMainStore } from '~/store';
+import type { Subscription } from '~/types';
 
 const props = defineProps<{
   subscription?: Subscription;
@@ -20,7 +20,7 @@ const isPending = computed(() => get(subscription)?.status === 'Pending');
 const store = useMainStore();
 const { cancellationError } = storeToRefs(store);
 
-const cancelSubscription = async () => {
+function cancelSubscription() {
   const sub = get(subscription);
   if (!sub) {
     emit('update:model-value', false);
@@ -28,7 +28,7 @@ const cancelSubscription = async () => {
   }
 
   emit('cancel', sub);
-};
+}
 
 const { t } = useI18n();
 </script>
@@ -107,7 +107,10 @@ const { t } = useI18n();
         {{ t('account.subscriptions.cancellation.actions.no') }}
       </RuiButton>
 
-      <RuiButton color="error" @click="cancelSubscription()">
+      <RuiButton
+        color="error"
+        @click="cancelSubscription()"
+      >
         {{ t('account.subscriptions.cancellation.actions.yes') }}
       </RuiButton>
     </template>

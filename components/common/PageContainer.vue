@@ -17,7 +17,10 @@ const slots = useSlots();
 </script>
 
 <template>
-  <div :class="css.wrapper" class="container">
+  <div
+    :class="css.wrapper"
+    class="container"
+  >
     <div
       :class="{
         [css.content]: true,
@@ -31,14 +34,20 @@ const slots = useSlots();
           [css.wideBody]: wide,
         }"
       >
-        <h4 v-if="slots.title" class="text-h4 text-rui-text text-center mb-4">
+        <h4
+          v-if="slots.title"
+          class="text-h4 text-rui-text text-center mb-4"
+        >
           <slot name="title" />
         </h4>
         <slot />
       </div>
     </div>
 
-    <div v-if="slots.hint" :class="css.hint">
+    <div
+      v-if="slots.hint"
+      :class="css.hint"
+    >
       <slot name="hint" />
     </div>
   </div>

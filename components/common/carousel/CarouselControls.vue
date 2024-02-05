@@ -22,16 +22,15 @@ const { swiper } = toRefs(props);
 
 const css = useCssModule();
 
-const onNavigate = (index: number) => {
+function onNavigate(index: number) {
   const s = get(swiper);
 
-  if (!s) {
+  if (!s)
     return;
-  }
 
   s.slideTo(index - 1);
   emit('update:swiper', s);
-};
+}
 </script>
 
 <template>

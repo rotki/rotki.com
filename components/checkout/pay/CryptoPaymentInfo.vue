@@ -5,9 +5,16 @@ const css = useCssModule();
 
 <template>
   <div :class="css.container">
-    <div v-for="i in 3" :key="i" :class="css.row">
+    <div
+      v-for="i in 3"
+      :key="i"
+      :class="css.row"
+    >
       <div>
-        <RuiChip color="primary" size="sm">
+        <RuiChip
+          color="primary"
+          size="sm"
+        >
           <span :class="css.point">{{ i }}</span>
         </RuiChip>
       </div>

@@ -5,9 +5,9 @@ const emit = defineEmits<{
   (e: 'update:modelValue', dismiss: boolean): void;
 }>();
 
-const dismiss = () => {
+function dismiss() {
   emit('update:modelValue', false);
-};
+}
 </script>
 
 <template>
@@ -17,7 +17,10 @@ const dismiss = () => {
     @update:model-value="dismiss()"
   >
     <div class="bg-white p-8 shadow-5 rounded">
-      <LoginForm modal @complete="dismiss()" />
+      <LoginForm
+        modal
+        @complete="dismiss()"
+      />
     </div>
   </ModalDialog>
 </template>

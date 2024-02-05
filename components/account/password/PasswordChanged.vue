@@ -8,7 +8,9 @@ const { t } = useI18n();
   >
     <div class="w-[360px] max-w-full space-y-8">
       <div class="space-y-3">
-        <div class="text-h4">{{ t('auth.password_changed.title') }}</div>
+        <div class="text-h4">
+          {{ t('auth.password_changed.title') }}
+        </div>
         <div class="text-body-1 text-rui-text-secondary">
           {{ t('auth.password_changed.message') }}
         </div>

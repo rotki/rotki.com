@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { type CryptoPayment, type SelectedPlan } from '~/types';
 import { getPlanNameFor } from '~/utils/plans';
+import type { CryptoPayment, SelectedPlan } from '~/types';
 
 const props = withDefaults(
   defineProps<{
@@ -30,20 +30,20 @@ const date = computed(() => {
 
 const vatOverview = computed(() => {
   const cPlan = get(plan);
-  if (!(cPlan.vat && 'priceInEur' in cPlan)) {
+  if (!(cPlan.vat && 'priceInEur' in cPlan))
     return undefined;
-  }
+
   return {
     vat: cPlan.vat,
     priceInEur: cPlan.priceInEur,
   };
 });
 
-const select = () => {
+function select() {
   set(selection, true);
-};
+}
 
-const switchTo = (months: number) => {
+function switchTo(months: number) {
   set(selection, false);
   const currentRoute = get(router.currentRoute);
 
@@ -54,7 +54,7 @@ const switchTo = (months: number) => {
       plan: months.toString(),
     },
   });
-};
+}
 
 const { t } = useI18n();
 const css = useCssModule();
@@ -63,7 +63,10 @@ const css = useCssModule();
 <template>
   <PlanOverview>
     <span :class="css.plan">{{ name }}</span>
-    <i18n-t keypath="selected_plan_overview.plan" scope="global">
+    <i18n-t
+      keypath="selected_plan_overview.plan"
+      scope="global"
+    >
       <template #date>
         {{ date }}
       </template>

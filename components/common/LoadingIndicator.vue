@@ -18,7 +18,10 @@ const css = useCssModule();
     }"
   >
     <div :class="css.loader">
-      <svg :class="css.circular" viewBox="25 25 50 50">
+      <svg
+        :class="css.circular"
+        viewBox="25 25 50 50"
+      >
         <circle
           :class="css.path"
           cx="50"

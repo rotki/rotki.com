@@ -7,16 +7,16 @@ import {
   parseEther,
 } from 'ethers';
 import { get, set, useTimeoutFn } from '@vueuse/core';
-import { type Ref } from 'vue';
 import { logger } from '~/utils/logger';
-import {
-  type CryptoPayment,
-  type IdleStep,
-  type Provider,
-  type StepType,
-} from '~/types';
 import { assert } from '~/utils/assert';
 import { useMainStore } from '~/store';
+import type {
+  CryptoPayment,
+  IdleStep,
+  Provider,
+  StepType,
+} from '~/types';
+import type { Ref } from 'vue';
 
 const abi = [
   // Some details about the token
@@ -35,11 +35,7 @@ const abi = [
 
 export const getChainId = (testing: boolean) => BigInt(testing ? 11155111 : 1);
 
-export const useWeb3Payment = (
-  data: Ref<CryptoPayment | null>,
-  getProvider: () => Provider,
-  testing: boolean,
-) => {
+export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () => Provider, testing: boolean) {
   const { markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
   const error = ref('');
@@ -123,26 +119,25 @@ export const useWeb3Payment = (
 
       const signer = await browserProvider.getSigner();
 
-      if (payment.cryptocurrency === 'ETH') {
+      if (payment.cryptocurrency === 'ETH')
         await payWithEth(signer);
-      } else if (payment.cryptocurrency === 'DAI') {
+      else if (payment.cryptocurrency === 'DAI')
         await payWithDai(signer);
-      }
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error_: any) {
+      logger.error(error_);
       set(state, 'idle');
 
-      if ('reason' in e) {
-        set(error, e.reason);
-      } else {
-        set(error, e.message);
-      }
+      if ('reason' in error_)
+        set(error, error_.reason);
+      else
+        set(error, error_.message);
     }
   };
 
   return {
+    error,
     payWithMetamask,
     state,
-    error,
   };
-};
+}

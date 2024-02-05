@@ -7,41 +7,45 @@ export function getMetadata(
   const imageUrl = `${baseUrl}/img/share.png`;
   return [
     {
+      content: description,
       key: 'description',
       name: 'description',
-      content: description,
     },
     // Open graph/FB sharing metadata
-    { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: url },
-    { property: 'og:title', content: title },
+    { content: 'website', property: 'og:type' },
+    { content: url, property: 'og:url' },
+    { content: title, property: 'og:title' },
     {
+      content: description,
       property: 'og:description',
-      content: description,
     },
-    { property: 'og:image', content: imageUrl },
+    { content: imageUrl, property: 'og:image' },
     // Twitter sharing metadata
-    { property: 'twitter:card', content: 'summary_large_image' },
-    { property: 'twitter:url', content: url },
-    { property: 'twitter:title', content: title },
+    { content: 'summary_large_image', property: 'twitter:card' },
+    { content: url, property: 'twitter:url' },
+    { content: title, property: 'twitter:title' },
     {
-      property: 'twitter:description',
       content: description,
+      property: 'twitter:description',
     },
-    { property: 'twitter:image', content: imageUrl },
+    { content: imageUrl, property: 'twitter:image' },
   ];
 }
 
-export const noIndex = () => ({
-  name: 'robots',
-  content: 'noindex',
-});
+export function noIndex() {
+  return {
+    content: 'noindex',
+    name: 'robots',
+  };
+}
 
-export const commonAttrs = () => ({
-  htmlAttrs: {
-    class: 'page',
-  },
-  bodyAttrs: {
-    class: 'body',
-  },
-});
+export function commonAttrs() {
+  return {
+    bodyAttrs: {
+      class: 'body',
+    },
+    htmlAttrs: {
+      class: 'page',
+    },
+  };
+}

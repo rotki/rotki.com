@@ -37,23 +37,22 @@ const grecaptcha = toRef(window, 'grecaptcha');
 /**
  * Renders the captcha if not rendered and required fields are available
  */
-const renderCaptcha = () => {
-  if (rendered.value || !(grecaptcha.value && recaptchaEl.value)) {
+function renderCaptcha() {
+  if (rendered.value || !(grecaptcha.value && recaptchaEl.value))
     return;
-  }
 
   const id = grecaptcha.value.render(recaptchaEl.value, {
-    sitekey: siteKey,
-    callback: (token: string) => emit('success', token),
+    'sitekey': siteKey,
+    'callback': (token: string) => emit('success', token),
     'expired-callback': () => emit('expired'),
     'error-callback': () => emit('error'),
-    theme: props.theme,
-    size: props.size,
+    'theme': props.theme,
+    'size': props.size,
   });
 
   emit('captcha-id', id);
   rendered.value = true;
-};
+}
 
 window.onRecaptchaLoaded = renderCaptcha;
 
@@ -72,7 +71,8 @@ onMounted(() => {
         },
       ],
     });
-  } else {
+  }
+  else {
     nextTick(renderCaptcha);
   }
 });
@@ -80,9 +80,15 @@ onMounted(() => {
 
 <template>
   <div :class="css.wrapper">
-    <div ref="recaptchaEl" :class="css.recaptcha" />
+    <div
+      ref="recaptchaEl"
+      :class="css.recaptcha"
+    />
 
-    <p v-if="invalid" :class="css.error">
+    <p
+      v-if="invalid"
+      :class="css.error"
+    >
       Invalid or expired captcha, please try again
     </p>
   </div>

@@ -16,7 +16,12 @@ const css = useCssModule();
 </script>
 
 <template>
-  <NuxtLink :class="css.link" :href="href" :target="target" :rel="rel">
+  <NuxtLink
+    :class="css.link"
+    :href="href"
+    :target="target"
+    :rel="rel"
+  >
     <slot />
   </NuxtLink>
 </template>

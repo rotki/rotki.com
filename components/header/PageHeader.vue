@@ -2,15 +2,16 @@
 import { storeToRefs } from 'pinia';
 import { set } from '@vueuse/core';
 import { useMainStore } from '~/store';
+
 const { t } = useI18n();
 
 const store = useMainStore();
 const { authenticated } = storeToRefs(store);
 
-const logout = async () => {
+async function logout() {
   await store.logout(true);
   await navigateTo('/login');
-};
+}
 
 const menuOpened: Ref<boolean> = ref(false);
 
@@ -49,11 +50,17 @@ const css = useCssModule();
         @click="menuOpened = false"
       >
         <RuiButton icon>
-          <RuiIcon name="close-line" color="primary" />
+          <RuiIcon
+            name="close-line"
+            color="primary"
+          />
         </RuiButton>
       </div>
       <div :class="[css.wrapper, { [css.wrapper__closed]: !menuOpened }]">
-        <NuxtLink to="/" :class="css.logo">
+        <NuxtLink
+          to="/"
+          :class="css.logo"
+        >
           <RuiLogo text />
         </NuxtLink>
 
@@ -61,7 +68,11 @@ const css = useCssModule();
 
         <div :class="css.auth">
           <NuxtLink to="/home/subscription">
-            <RuiButton rounded color="primary" class="w-full py-2 md:py-1.5">
+            <RuiButton
+              rounded
+              color="primary"
+              class="w-full py-2 md:py-1.5"
+            >
               {{ t('page_header.manage_premium') }}
             </RuiButton>
           </NuxtLink>

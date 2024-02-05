@@ -8,7 +8,7 @@ const { account, subscriptions } = storeToRefs(store);
 
 const premium = computed(() => get(account)?.canUsePremium ?? false);
 const emailConfirmed = computed(() => get(account)?.emailConfirmed ?? false);
-const pending = computed(() => get(subscriptions).filter((sub) => sub.pending));
+const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
 
 const canUsePremium = computed(() => {
   const arePending = get(pending);

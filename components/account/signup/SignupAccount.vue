@@ -2,9 +2,9 @@
 import { email, minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { useVuelidate } from '@vuelidate/core';
-import { type SignupAccountPayload } from '~/types/signup';
 import { toMessages } from '~/utils/validation';
-import { type ValidationErrors } from '~/types/common';
+import type { SignupAccountPayload } from '~/types/signup';
+import type { ValidationErrors } from '~/types/common';
 
 const props = defineProps<{
   modelValue: SignupAccountPayload;
@@ -42,26 +42,27 @@ watch(
   externalResults,
   (errors) => {
     set($externalResults, errors);
-    if (Object.values(errors).some((i) => !!i)) {
+    if (Object.values(errors).some(i => !!i))
       get(v$).$validate();
-    }
   },
   { immediate: true },
 );
 
-const updateValue = (field: string, value: any) => {
+function updateValue(field: string, value: any) {
   emit('update:model-value', {
     ...get(modelValue),
     [field]: value,
   });
-};
+}
 
 const { t } = useI18n();
 </script>
 
 <template>
   <div class="space-y-8 grow">
-    <div class="text-h4 text-center">{{ t('auth.signup.account.title') }}</div>
+    <div class="text-h4 text-center">
+      {{ t('auth.signup.account.title') }}
+    </div>
     <div class="space-y-5">
       <RuiTextField
         id="username"
