@@ -13,3 +13,18 @@ export function toTitleCase(string: string): string {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 }
+
+export function secondsToReadable(number: number): string {
+  const rounded = Math.floor(number);
+  const minutes = Math.floor(rounded / 60);
+  const seconds = rounded % 60;
+
+  const messages = [];
+  if (minutes > 0)
+    messages.push(`${minutes} minutes`);
+
+  if (seconds > 0)
+    messages.push(`${seconds} seconds`);
+
+  return messages.join(' ');
+}

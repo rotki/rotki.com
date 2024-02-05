@@ -5,22 +5,20 @@ import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import {
   Account,
+  ActionResultResponse,
   ApiKeys,
   type ApiResponse,
-  CancelSubscriptionResponse,
   type CardCheckout,
   CardCheckoutResponse,
   type CardPaymentRequest,
-  CardPaymentResponse,
   ChangePasswordResponse,
   type CryptoPayment,
   CryptoPaymentResponse,
-  DeleteAccountResponse,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
-  PendingCryptoPaymentResultResponse,
   type Plan,
   PremiumResponse,
+  ResendVerificationResponse,
   type Result,
   type Subscription,
   UpdateProfileResponse,
@@ -29,6 +27,7 @@ import { PaymentError } from '~/types/codes';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
+import { secondsToReadable } from '~/utils/text';
 import type { LoginCredentials } from '~/types/login';
 import type { ActionResult } from '~/types/common';
 import type {
@@ -36,6 +35,7 @@ import type {
   PasswordChangePayload,
   ProfilePayload,
 } from '~/types/account';
+import type { ComposerTranslation } from 'vue-i18n';
 
 const SESSION_TIMEOUT = 3600000;
 
@@ -59,6 +59,53 @@ export const useMainStore = defineStore('main', () => {
     }
     catch (error) {
       logger.error(error);
+    }
+  };
+
+  const resendVerificationCode = async (t: ComposerTranslation): Promise<ActionResult> => {
+    const onError = (data: ResendVerificationResponse) => {
+      let message = data.message;
+      if (isDefined(data.allowedIn)) {
+        message += `\n${t('account.unverified_email.message.try_again', {
+          text: secondsToReadable(data.allowedIn),
+        })}`;
+      }
+
+      return {
+        message,
+        success: false,
+      };
+    };
+    try {
+      const response = await fetchWithCsrf<ResendVerificationResponse>(
+        '/webapi/email-verification/',
+        {
+          method: 'GET',
+        },
+      );
+
+      const data = ResendVerificationResponse.parse(response);
+      if (data.result) {
+        return {
+          message: '',
+          success: true,
+        };
+      }
+      else {
+        return onError(data);
+      }
+    }
+    catch (error: any) {
+      logger.error(error);
+      if (error instanceof FetchError)
+        return onError(error.data);
+
+      const message = error.message;
+
+      return {
+        message,
+        success: false,
+      };
     }
   };
 
@@ -185,7 +232,7 @@ export const useMainStore = defineStore('main', () => {
     payload: DeleteAccountPayload,
   ): Promise<ActionResult> => {
     try {
-      const response = await fetchWithCsrf<DeleteAccountResponse>(
+      const response = await fetchWithCsrf<ActionResultResponse>(
         '/webapi/account/',
         {
           body: payload,
@@ -193,7 +240,7 @@ export const useMainStore = defineStore('main', () => {
         },
       );
 
-      const data = DeleteAccountResponse.parse(response);
+      const data = ActionResultResponse.parse(response);
       return {
         message: data.message,
         success: data.result ?? false,
@@ -202,7 +249,7 @@ export const useMainStore = defineStore('main', () => {
     catch (error: any) {
       let message = error.message;
       if (error instanceof FetchError && error.status === 400)
-        message = DeleteAccountResponse.parse(error.data).message;
+        message = ActionResultResponse.parse(error.data).message;
 
       logger.error(error);
       return {
@@ -225,20 +272,20 @@ export const useMainStore = defineStore('main', () => {
     assert(acc);
 
     try {
-      const response = await fetchWithCsrf<CancelSubscriptionResponse>(
+      const response = await fetchWithCsrf<ActionResultResponse>(
         `/webapi/subscription/${subscription.identifier}`,
         {
           method: 'DELETE',
         },
       );
-      const data = CancelSubscriptionResponse.parse(response);
+      const data = ActionResultResponse.parse(response);
       if (data.result)
         await getAccount();
     }
     catch (error: any) {
       let message = error.message;
       if (error instanceof FetchError && error.status === 404)
-        message = CancelSubscriptionResponse.parse(error.data).message;
+        message = ActionResultResponse.parse(error.data).message;
 
       logger.error(error);
       set(cancellationError, message);
@@ -294,7 +341,7 @@ export const useMainStore = defineStore('main', () => {
     request: CardPaymentRequest,
   ): Promise<Result<true, PaymentError>> => {
     try {
-      const response = await fetchWithCsrf<CardPaymentResponse>(
+      const response = await fetchWithCsrf<ActionResultResponse>(
         '/webapi/payment/btr',
         {
           body: request,
@@ -303,7 +350,7 @@ export const useMainStore = defineStore('main', () => {
       );
       getAccount().then().catch(error => logger.error(error));
 
-      const data = CardPaymentResponse.parse(response);
+      const data = ActionResultResponse.parse(response);
       assert(data.result);
       return {
         isError: false,
@@ -316,7 +363,7 @@ export const useMainStore = defineStore('main', () => {
       let code: PaymentError | undefined;
       if (error_ instanceof FetchError) {
         if (error_.status === 400) {
-          error = new Error(CardPaymentResponse.parse(error_.data).message);
+          error = new Error(ActionResultResponse.parse(error_.data).message);
         }
         else if (error_.status === 403) {
           error = '';
@@ -366,7 +413,7 @@ export const useMainStore = defineStore('main', () => {
       let code: PaymentError | undefined;
       if (error_ instanceof FetchError) {
         if (error_.status === 400) {
-          error = new Error(CardPaymentResponse.parse(error_.data).message);
+          error = new Error(ActionResultResponse.parse(error_.data).message);
         }
         else if (error_.status === 403) {
           error = '';
@@ -415,13 +462,13 @@ export const useMainStore = defineStore('main', () => {
 
   const markTransactionStarted = async (): Promise<Result<boolean>> => {
     try {
-      const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
+      const response = await fetchWithCsrf<ActionResultResponse>(
         'webapi/payment/pending',
         {
           method: 'PATCH',
         },
       );
-      const data = PendingCryptoPaymentResultResponse.parse(response);
+      const data = ActionResultResponse.parse(response);
       getAccount().then().catch(error => logger.error(error));
       if (data.result) {
         return {
@@ -446,13 +493,13 @@ export const useMainStore = defineStore('main', () => {
 
   const deletePendingPayment = async (): Promise<Result<boolean>> => {
     try {
-      const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
+      const response = await fetchWithCsrf<ActionResultResponse>(
         'webapi/payment/pending',
         {
           method: 'DELETE',
         },
       );
-      const data = PendingCryptoPaymentResultResponse.parse(response);
+      const data = ActionResultResponse.parse(response);
       if (data.result) {
         return {
           isError: false,
@@ -555,6 +602,7 @@ export const useMainStore = defineStore('main', () => {
     pay,
     plans,
     refreshSession,
+    resendVerificationCode,
     subscriptions,
     switchCryptoPlan,
     updateKeys,

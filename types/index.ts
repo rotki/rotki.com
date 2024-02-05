@@ -113,21 +113,12 @@ export const UpdateProfileResponse = z.object({
 
 export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponse>;
 
-export const DeleteAccountResponse = z.object({
+export const ActionResultResponse = z.object({
   message: z.string().optional(),
   result: z.boolean().optional(),
 });
 
-export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>;
-
-export const CancelSubscriptionResponse = z.object({
-  message: z.string().optional(),
-  result: z.boolean().optional(),
-});
-
-export type CancelSubscriptionResponse = z.infer<
-  typeof CancelSubscriptionResponse
->;
+export type ActionResultResponse = z.infer<typeof ActionResultResponse>;
 
 const Plan = z.object({
   discount: z.number(),
@@ -173,13 +164,6 @@ export const CardCheckoutResponse = z.object({
 });
 
 export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>;
-
-export const CardPaymentResponse = z.object({
-  message: z.string().optional(),
-  result: z.boolean().optional(),
-});
-
-export type CardPaymentResponse = z.infer<typeof CardPaymentResponse>;
 
 const CryptoPayment = z.object({
   chainId: z.number().optional(),
@@ -336,3 +320,11 @@ export const CreatePaypalNonceResponse = z.object({
 });
 
 export type CreatePaypalNonceResponse = z.infer<typeof CreatePaypalNonceResponse>;
+
+export const ResendVerificationResponse = z.object({
+  allowedIn: z.number().optional(),
+  message: z.string().optional(),
+  result: z.literal(true).optional(),
+});
+
+export type ResendVerificationResponse = z.infer<typeof ResendVerificationResponse>;
