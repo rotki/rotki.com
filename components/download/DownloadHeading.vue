@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type DownloadItemProps } from '~/components/download/DownloadItem.vue';
+import type { DownloadItemProps } from '~/components/download/DownloadItem.vue';
 
 defineProps<{ version: string; links: DownloadItemProps[] }>();
 
@@ -9,7 +9,10 @@ const css = useCssModule();
 
 <template>
   <div :class="css.wrapper">
-    <div :class="css.wrapper__container" class="container">
+    <div
+      :class="css.wrapper__container"
+      class="container"
+    >
       <div :class="css.titles">
         <h6 :class="css.title">
           {{ t('download.heading.download_rotki') }}

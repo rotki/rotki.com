@@ -10,7 +10,10 @@ const slots = useSlots();
       [css.reverse]: slots.right,
     }"
   >
-    <div v-if="slots.left" :class="css.left">
+    <div
+      v-if="slots.left"
+      :class="css.left"
+    >
       <slot name="left" />
     </div>
     <div
@@ -26,7 +29,10 @@ const slots = useSlots();
         <slot />
       </div>
     </div>
-    <div v-if="slots.right" :class="css.right">
+    <div
+      v-if="slots.right"
+      :class="css.right"
+    >
       <slot name="right" />
     </div>
   </div>

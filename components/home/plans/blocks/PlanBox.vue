@@ -30,7 +30,10 @@ const { t } = useI18n();
         <slot />
       </div>
     </div>
-    <div v-if="url" class="border-t py-6 px-8">
+    <div
+      v-if="url"
+      class="border-t py-6 px-8"
+    >
       <ButtonLink
         :variant="buttonVariant"
         class="w-full"

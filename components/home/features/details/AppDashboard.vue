@@ -12,8 +12,12 @@ const { t } = useI18n();
       />
     </div>
     <div class="flex flex-1 flex-col gap-4">
-      <h5 class="text-h5 text-rui-primary">{{ t('home.dashboard.title') }}</h5>
-      <h6 class="text-h6">{{ t('home.dashboard.subtitle') }}</h6>
+      <h5 class="text-h5 text-rui-primary">
+        {{ t('home.dashboard.title') }}
+      </h5>
+      <h6 class="text-h6">
+        {{ t('home.dashboard.subtitle') }}
+      </h6>
       <div class="flex flex-col gap-6 text-rui-text-secondary pt-2">
         <div>
           <div class="text-subtitle-1 font-bold">

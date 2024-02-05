@@ -6,9 +6,16 @@ defineProps<{
 </script>
 
 <template>
-  <BaseDisplay :message="message" :title="title" status="success">
+  <BaseDisplay
+    :message="message"
+    :title="title"
+    status="success"
+  >
     <template #icon>
-      <CheckCircle height="48px" width="48px" />
+      <CheckCircle
+        height="48px"
+        width="48px"
+      />
     </template>
     <slot />
   </BaseDisplay>

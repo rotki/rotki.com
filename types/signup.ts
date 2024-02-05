@@ -22,5 +22,5 @@ export interface SignupAddressPayload {
 
 export interface SignupPayload
   extends SignupAccountPayload,
-    SignupCustomerInformationPayload,
-    SignupAddressPayload {}
+  SignupCustomerInformationPayload,
+  SignupAddressPayload {}

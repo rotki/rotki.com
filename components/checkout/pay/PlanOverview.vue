@@ -8,7 +8,9 @@ const css = useCssModule();
     <RuiCard>
       <div class="flex gap-1">
         <div class="flex flex-col">
-          <div :class="css.title">{{ t('home.plans.tiers.step_3.chose') }}</div>
+          <div :class="css.title">
+            {{ t('home.plans.tiers.step_3.chose') }}
+          </div>
           <div :class="css.body">
             <div :class="css.description">
               <slot />

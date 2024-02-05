@@ -15,7 +15,9 @@ const { t } = useI18n();
       <h5 class="text-h5 text-rui-primary">
         {{ t('home.profit_loss_report.title') }}
       </h5>
-      <h6 class="text-h6">{{ t('home.profit_loss_report.subtitle') }}</h6>
+      <h6 class="text-h6">
+        {{ t('home.profit_loss_report.subtitle') }}
+      </h6>
       <div
         class="text-body-1 text-rui-text-secondary whitespace-break-spaces pt-2"
       >

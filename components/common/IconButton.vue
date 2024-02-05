@@ -13,13 +13,13 @@ const emit = defineEmits<{
 }>();
 
 const { disabled } = toRefs(props);
-const click = () => {
-  if (disabled.value) {
+
+function click() {
+  if (disabled.value)
     return;
-  }
 
   emit('click');
-};
+}
 
 const css = useCssModule();
 </script>

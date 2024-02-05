@@ -1,4 +1,6 @@
-export const defaultIconSize = () => ({
-  width: '24px',
-  height: '24px',
-});
+export function defaultIconSize() {
+  return {
+    height: '24px',
+    width: '24px',
+  };
+}

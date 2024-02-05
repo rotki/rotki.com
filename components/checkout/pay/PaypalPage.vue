@@ -5,7 +5,10 @@ const { token, step, plan, pending, loading, submit, reset } = useBraintree();
 <template>
   <PaymentFrame :step="step">
     <template #default="slotProps">
-      <div v-if="!(token && plan)" class="flex justify-center my-10">
+      <div
+        v-if="!(token && plan)"
+        class="flex justify-center my-10"
+      >
         <RuiProgress
           variant="indeterminate"
           size="48"

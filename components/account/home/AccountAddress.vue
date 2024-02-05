@@ -48,18 +48,16 @@ const {
   },
 } = useRuntimeConfig();
 
-const reset = () => {
+function reset() {
   const userAccount = get(account);
 
-  if (!userAccount) {
+  if (!userAccount)
     return;
-  }
 
   const unavailable = get(movedOffline);
 
-  if (unavailable) {
+  if (unavailable)
     return;
-  }
 
   state.address1 = userAccount.address.address1;
   state.address2 = userAccount.address.address2;
@@ -68,18 +66,17 @@ const reset = () => {
   state.country = userAccount.address.country;
 
   get(v$).$reset();
-};
+}
 
-const update = async () => {
+async function update() {
   const userAccount = get(account);
-  if (!userAccount) {
+  if (!userAccount)
     return;
-  }
 
   const isValid = await get(v$).$validate();
-  if (!isValid) {
+  if (!isValid)
     return;
-  }
+
   set(loading, true);
 
   const payload = objectOmit(
@@ -90,19 +87,22 @@ const update = async () => {
     ['movedOffline'],
   );
   const { success, message } = await store.updateProfile(payload);
-  if (success) {
+  if (success)
     set(done, true);
-  } else if (message && typeof message !== 'string') {
+  else if (message && typeof message !== 'string')
     set($externalResults, message);
-  }
+
   set(loading, false);
-};
+}
 
 const { t } = useI18n();
 </script>
 
 <template>
-  <div v-if="!movedOffline" class="pt-2">
+  <div
+    v-if="!movedOffline"
+    class="pt-2"
+  >
     <div class="space-y-5">
       <RuiTextField
         id="address-1"
@@ -164,7 +164,12 @@ const { t } = useI18n();
     <div class="mt-10 mb-5 border-t border-grey-50" />
 
     <div class="flex justify-end gap-3">
-      <RuiButton size="lg" color="primary" variant="outlined" @click="reset()">
+      <RuiButton
+        size="lg"
+        color="primary"
+        variant="outlined"
+        @click="reset()"
+      >
         {{ t('actions.reset') }}
       </RuiButton>
       <RuiButton
@@ -178,8 +183,14 @@ const { t } = useI18n();
       </RuiButton>
     </div>
   </div>
-  <RuiAlert v-else type="info">
-    <i18n-t keypath="account.moved_offline" scope="global">
+  <RuiAlert
+    v-else
+    type="info"
+  >
+    <i18n-t
+      keypath="account.moved_offline"
+      scope="global"
+    >
       <template #email>
         <ButtonLink
           inline

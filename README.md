@@ -13,6 +13,7 @@ $ pnpm run dev
 $ pnpm run build
 $ pnpm start
 ```
+
 ## Setting up the environment
 
 Make sure the environment file exists
@@ -48,19 +49,25 @@ NODE_TLS_REJECT_UNAUTHORIZED=0
 You can configure the frontend to proxy the `/webapi` to a server running somewhere:
 
 For the `production` system you could use:
+
 ```dotenv
 PROXY_DOMAIN=rotki.com
 ```
+
 or if `staging` is running you could set:
 
 ```dotenv
 PROXY_DOMAIN=staging.rotki.com
 ```
+
 If the server where you proxy doesn't run using `https` you can set so that the backend requests are proxied to `http`:
+
 ```dotenv
 PROXY_INSECURE=true
 ```
+
 ## Run
+
 Run with the development server with the following command:
 
 ```bash

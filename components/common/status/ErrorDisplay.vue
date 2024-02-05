@@ -6,9 +6,17 @@ defineProps<{
 </script>
 
 <template>
-  <BaseDisplay :message="message" :title="title" status="error">
+  <BaseDisplay
+    :message="message"
+    :title="title"
+    status="error"
+  >
     <template #icon>
-      <AlertIcon height="48px" width="48px" color="white" />
+      <AlertIcon
+        height="48px"
+        width="48px"
+        color="white"
+      />
     </template>
     <slot />
   </BaseDisplay>

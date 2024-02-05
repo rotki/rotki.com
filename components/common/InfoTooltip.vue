@@ -16,24 +16,27 @@ const { start, stop } = useTimeoutFn(
   { immediate: false },
 );
 
-const on = () => {
-  if (get(disabled)) {
+function on() {
+  if (get(disabled))
     return;
-  }
-  start();
-};
 
-const off = () => {
+  start();
+}
+
+function off() {
   set(visible, false);
   stop();
-};
+}
 
 const css = useCssModule();
 </script>
 
 <template>
   <div :class="css.wrapper">
-    <span @mouseenter="on()" @mouseleave="off()">
+    <span
+      @mouseenter="on()"
+      @mouseleave="off()"
+    >
       <slot name="activator" />
     </span>
     <div

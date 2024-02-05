@@ -28,7 +28,8 @@ watch(modelValue, (display) => {
   if (display) {
     out.value = false;
     visible.value = true;
-  } else {
+  }
+  else {
     out.value = true;
     nextTick(() => {
       setTimeout(() => {
@@ -37,27 +38,34 @@ watch(modelValue, (display) => {
     });
   }
 });
-const dismiss = () => {
-  emit('update:modelValue', false);
-};
 
-const prevent = (e: Event) => {
+function dismiss() {
+  emit('update:modelValue', false);
+}
+
+function prevent(e: Event) {
   e.stopPropagation();
-};
+}
 
 const style = computed(() => ({
   'max-width': width.value,
-  height: height.value,
-  padding: padding.value,
-  margin: '0.5rem',
+  'height': height.value,
+  'padding': padding.value,
+  'margin': '0.5rem',
 }));
 
 const css = useCssModule();
 </script>
 
 <template>
-  <div v-if="visible" :class="{ [css.container]: true, [css.out]: out }">
-    <div :class="css.overlay" @click="dismiss()">
+  <div
+    v-if="visible"
+    :class="{ [css.container]: true, [css.out]: out }"
+  >
+    <div
+      :class="css.overlay"
+      @click="dismiss()"
+    >
       <div :class="css.wrapper">
         <div
           :class="{

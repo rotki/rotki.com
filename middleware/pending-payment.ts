@@ -5,9 +5,8 @@ import { useMainStore } from '~/store';
 export default defineNuxtRouteMiddleware(async () => {
   const store = useMainStore();
   const { account } = storeToRefs(store);
-  if (!isDefined(account)) {
+  if (!isDefined(account))
     return;
-  }
 
   const { subscriptions } = get(account);
 
@@ -20,20 +19,20 @@ export default defineNuxtRouteMiddleware(async () => {
     const id = status === 'Pending' ? undefined : identifier;
     const response = await store.checkPendingCryptoPayment(id);
 
-    if (response.isError) {
+    if (response.isError)
       return;
-    }
 
     if (response.result?.transactionStarted) {
       return navigateTo('/home/subscription');
-    } else if (response.result.pending) {
+    }
+    else if (response.result.pending) {
       const queryParams: { plan: string; currency: string; id?: string } = {
-        plan: durationInMonths.toString(),
         currency: response.result.currency ?? '',
+        plan: durationInMonths.toString(),
       };
-      if (id) {
+      if (id)
         queryParams.id = id;
-      }
+
       return navigateTo({
         path: '/checkout/pay/crypto',
         query: queryParams,

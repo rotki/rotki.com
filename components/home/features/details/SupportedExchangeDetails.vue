@@ -82,7 +82,9 @@ const exchanges = [
       <h6 class="text-h6 text-rui-primary">
         {{ t('home.exchanges.title') }}
       </h6>
-      <h4 class="text-h4">{{ t('home.exchanges.subtitle') }}</h4>
+      <h4 class="text-h4">
+        {{ t('home.exchanges.subtitle') }}
+      </h4>
       <div class="text-body-1 text-rui-text-secondary pt-2">
         {{ t('home.exchanges.detail') }}
       </div>
@@ -96,7 +98,11 @@ const exchanges = [
             class="flex items-center gap-3 text-subtitle-1 font-bold"
           >
             <div class="w-8 h-8 rounded-full overflow-hidden">
-              <img :src="item.img" :alt="item.name" class="w-full h-full" />
+              <img
+                :src="item.img"
+                :alt="item.name"
+                class="w-full h-full"
+              />
             </div>
             {{ item.name }}
           </div>

@@ -4,12 +4,18 @@ const css = useCssModule();
 
 <template>
   <PageContainer :center-vertically="false">
-    <template #title> Premium Features </template>
+    <template #title>
+      Premium Features
+    </template>
     <PageContent>
       <div class="w-full">
-        <div :class="css.title">Premium Features Details</div>
+        <div :class="css.title">
+          Premium Features Details
+        </div>
         <div :class="css.details">
-          <TextHeading :class="css.subtitle">Data synchronization</TextHeading>
+          <TextHeading :class="css.subtitle">
+            Data synchronization
+          </TextHeading>
           <ProductDetailDescription>
             <template #left>
               <img
@@ -26,7 +32,9 @@ const css = useCssModule();
             expires
           </ProductDetailDescription>
 
-          <TextHeading :class="css.subtitle">Analytics</TextHeading>
+          <TextHeading :class="css.subtitle">
+            Analytics
+          </TextHeading>
           <ProductDetailDescription>
             <template #left>
               <img
@@ -35,7 +43,9 @@ const css = useCssModule();
                 src="/img/products/details/stats_asset_amount_value.jpg"
               />
             </template>
-            <template #title>Asset amount & value over time</template>
+            <template #title>
+              Asset amount & value over time
+            </template>
             As a premium user you can access the analytics section of the
             application and unlock analytics graphs such as analysis of net
             value and amount over time for each asset you own.
@@ -49,12 +59,16 @@ const css = useCssModule();
                 src="/img/products/details/stats_distribution_location.jpg"
               />
             </template>
-            <template #title>Value distribution</template>
+            <template #title>
+              Value distribution
+            </template>
             Or a distribution pie chart of your net value per location
             (exchanges, blockchain accounts, banks e.t.c.)
           </ProductDetailDescription>
 
-          <TextHeading :class="css.subtitle">Dark Mode</TextHeading>
+          <TextHeading :class="css.subtitle">
+            Dark Mode
+          </TextHeading>
           <ProductDetailDescription>
             <template #left>
               <img
@@ -67,9 +81,9 @@ const css = useCssModule();
             readability of text and prolong the battery life of your device.
           </ProductDetailDescription>
 
-          <TextHeading :class="css.subtitle"
-            >Increased event limits</TextHeading
-          >
+          <TextHeading :class="css.subtitle">
+            Increased event limits
+          </TextHeading>
           <ProductDetailDescription>
             <template #left>
               <img
@@ -78,7 +92,9 @@ const css = useCssModule();
                 src="/img/products/details/transactions.jpg"
               />
             </template>
-            <template #title>Ethereum transactions</template>
+            <template #title>
+              Ethereum transactions
+            </template>
             Free users have a limit of the 100 most recent ethereum transactions
             in the transactions viewer. As a premium user you have higher limits
             in the amount of transactions you can see.
@@ -92,7 +108,9 @@ const css = useCssModule();
                 src="/img/products/details/trades.jpg"
               />
             </template>
-            <template #title>Trades</template>
+            <template #title>
+              Trades
+            </template>
             Free users have a limit of the 250 most recent trades in the trades
             viewer. As a premium user you have higher limits in the amount of
             trades you can see.
@@ -106,14 +124,18 @@ const css = useCssModule();
                 src="/img/products/details/deposits_and_withdrawals.jpg"
               />
             </template>
-            <template #title>Deposit/withdrawals</template>
+            <template #title>
+              Deposit/withdrawals
+            </template>
             Free users have a limit of the 100 most recent exchange
             deposits/withdrawals in the deposits/withdrawals viewer. As a
             premium user there are higher limits in the amount of exchange
             deposits/withdrawals you can see
           </ProductDetailDescription>
 
-          <TextHeading :class="css.subtitle">DeFi</TextHeading>
+          <TextHeading :class="css.subtitle">
+            DeFi
+          </TextHeading>
           <ProductDetailDescription>
             <template #left>
               <img
@@ -122,7 +144,9 @@ const css = useCssModule();
                 src="/img/products/details/sc_compound1.jpg"
               />
             </template>
-            <template #title>Compound Finance Historical Analysis</template>
+            <template #title>
+              Compound Finance Historical Analysis
+            </template>
             As a premium user you can see how much you have earned/lost by using
             the Compound Finance protocol. For earning, how much you earned by
             lending and COMP rewards. For losses, how much you lost by borrowing
@@ -149,7 +173,9 @@ const css = useCssModule();
                 src="/img/products/details/sc_vaults_premium.jpg"
               />
             </template>
-            <template #title>MakerDAO Vaults</template>
+            <template #title>
+              MakerDAO Vaults
+            </template>
             By having a premium subscription all your MakerDAO vaults are
             auto-detected and you can see all of the information per vault,
             including the interest rate owed in DAI. You can also see all the
@@ -170,7 +196,9 @@ const css = useCssModule();
                 src="/img/products/details/sc_vaults_premium_watchers_email.jpg"
               />
             </template>
-            <template #title>MakerDAO Vault Watchers</template>
+            <template #title>
+              MakerDAO Vault Watchers
+            </template>
             Premium users can also set vault watchers that will reside on
             Rotki's servers. That means they can choose a target
             collateralization ratio and if the vault's ratio goes above or below
@@ -186,7 +214,9 @@ const css = useCssModule();
                 src="/img/products/details/sc_aave.jpg"
               />
             </template>
-            <template #title>Aave Historical Analysis</template>
+            <template #title>
+              Aave Historical Analysis
+            </template>
             All Aave historical accounting data for lending/borrowing along with
             how much interest you have earned by lending from the Aave protocol
             can be inspected when you are using a premium account.

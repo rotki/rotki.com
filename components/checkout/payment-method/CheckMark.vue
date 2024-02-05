@@ -7,7 +7,11 @@ const css = useCssModule();
 
 <template>
   <div :class="css.mark">
-    <RuiBadge :model-value="selected" color="primary" icon="check-line" />
+    <RuiBadge
+      :model-value="selected"
+      color="primary"
+      icon="check-line"
+    />
   </div>
 </template>
 

@@ -2,9 +2,9 @@
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { useVuelidate } from '@vuelidate/core';
-import { type SignupCustomerInformationPayload } from '~/types/signup';
 import { toMessages } from '~/utils/validation';
-import { type ValidationErrors } from '~/types/common';
+import type { SignupCustomerInformationPayload } from '~/types/signup';
+import type { ValidationErrors } from '~/types/common';
 
 const props = defineProps<{
   modelValue: SignupCustomerInformationPayload;
@@ -37,19 +37,18 @@ watch(
   externalResults,
   (errors) => {
     set($externalResults, errors);
-    if (Object.values(errors).some((i) => !!i)) {
+    if (Object.values(errors).some(i => !!i))
       get(v$).$validate();
-    }
   },
   { immediate: true },
 );
 
-const updateValue = (field: string, value: any) => {
+function updateValue(field: string, value: any) {
   emit('update:model-value', {
     ...get(modelValue),
     [field]: value,
   });
-};
+}
 
 const { t } = useI18n();
 </script>

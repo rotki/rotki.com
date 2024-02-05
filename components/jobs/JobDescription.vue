@@ -18,8 +18,15 @@ defineProps<{
     <div class="text-body-2 text-rui-text-secondary">
       {{ job.description }}
     </div>
-    <div v-if="job.tags && job.tags.length > 0" class="space-x-2.5">
-      <JobTag v-for="tag in job.tags" :key="tag" :tag="tag" />
+    <div
+      v-if="job.tags && job.tags.length > 0"
+      class="space-x-2.5"
+    >
+      <JobTag
+        v-for="tag in job.tags"
+        :key="tag"
+        :tag="tag"
+      />
     </div>
   </div>
 </template>

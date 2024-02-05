@@ -33,7 +33,7 @@ const v$ = useVuelidate(
   },
 );
 
-const reset = async () => {
+async function reset() {
   set(loading, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/request/', {
@@ -46,20 +46,21 @@ const reset = async () => {
     await navigateTo({
       path: '/password/send',
     });
-  } catch (e: any) {
+  }
+  catch (error: any) {
     if (
-      e instanceof FetchError &&
-      e.status === 400 &&
-      e.data?.message?.captcha
+      error instanceof FetchError
+      && error.status === 400
+      && error.data?.message?.captcha
     ) {
       resetCaptcha();
-      set($externalResults, e.data.message);
+      set($externalResults, error.data.message);
     }
 
-    logger.error(e);
+    logger.error(error);
   }
   set(loading, false);
-};
+}
 
 const { t } = useI18n();
 </script>
@@ -69,9 +70,14 @@ const { t } = useI18n();
     class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
   >
     <div class="w-[360px] max-w-full space-y-8">
-      <div class="text-h4">{{ t('auth.recover_password.title') }}</div>
+      <div class="text-h4">
+        {{ t('auth.recover_password.title') }}
+      </div>
 
-      <form class="space-y-6" @submit.prevent="">
+      <form
+        class="space-y-6"
+        @submit.prevent=""
+      >
         <div class="space-y-5">
           <RuiTextField
             id="email"

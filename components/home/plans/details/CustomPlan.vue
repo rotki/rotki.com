@@ -6,10 +6,17 @@ const css = useCssModule();
 <template>
   <div>
     <div :class="css.space">
-      <img :class="css.image" alt="rotki in Space" src="/img/space.svg" />
+      <img
+        :class="css.image"
+        alt="rotki in Space"
+        src="/img/space.svg"
+      />
     </div>
     <div :class="css.row">
-      <div :class="css.wrapper" class="container">
+      <div
+        :class="css.wrapper"
+        class="container"
+      >
         <div :class="css.row">
           <div :class="css.column2">
             <div :class="css.title">

@@ -3,8 +3,8 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Autoplay } from 'swiper/modules';
 import { SwiperSlide } from 'swiper/vue';
-import { type Swiper } from 'swiper/types';
 import { get, set } from '@vueuse/core';
+import type { Swiper } from 'swiper/types';
 
 const css = useCssModule();
 
@@ -14,29 +14,32 @@ const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
 
 const images = ref([]);
 
-const scanImages = () => {
+function scanImages() {
   const assetContext = import.meta.glob(
     '~/public/img/screenshots/*.(png|jpe?g|webp)',
   );
 
-  const assetPaths = Object.keys(assetContext).map((path) =>
+  const assetPaths = Object.keys(assetContext).map(path =>
     path.replace('/public/img', '/img'),
   );
 
   set(images, assetPaths);
-};
+}
 
-const onSwiperUpdate = (s: Swiper) => {
+function onSwiperUpdate(s: Swiper) {
   set(swiper, s);
   set(activeIndex, s.activeIndex + 1);
   set(pages, s.snapGrid.length);
-};
+}
 
 scanImages();
 </script>
 
 <template>
-  <div :class="css.container" class="container">
+  <div
+    :class="css.container"
+    class="container"
+  >
     <Carousel
       :autoplay="{
         delay: 5000,
@@ -49,8 +52,15 @@ scanImages();
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
     >
-      <SwiperSlide v-for="(image, i) in images" :key="i">
-        <img :src="image" alt=" " class="w-full" />
+      <SwiperSlide
+        v-for="(image, i) in images"
+        :key="i"
+      >
+        <img
+          :src="image"
+          alt=" "
+          class="w-full"
+        />
       </SwiperSlide>
     </Carousel>
     <div class="container relative !px-0">

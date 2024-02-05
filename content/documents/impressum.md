@@ -21,7 +21,7 @@ email: info@rotki.com
 
 Die Europäische Kommission stellt eine Plattform zur
 Online-Streitbeilegung (OS) bereit:
-[https://ec.europa.eu/consumers/odr](https://ec.europa.eu/consumers/odr){target="_blank"}.
+[https://ec.europa.eu/consumers/odr](https://ec.europa.eu/consumers/odr){target="\_blank"}.
 Unsere E-Mail-Adresse finden Sie oben im Impressum
 
 ##### Verbraucherstreitbeilegung/Universalschlichtungsstelle

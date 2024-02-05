@@ -8,12 +8,12 @@ const copied = ref(false);
 const { start, stop } = useTimeoutFn(() => set(copied, false), 4000);
 const { copy } = useClipboard({ source: modelValue });
 
-const copyToClipboard = () => {
+function copyToClipboard() {
   stop();
   copy();
   set(copied, true);
   start();
-};
+}
 </script>
 
 <template>

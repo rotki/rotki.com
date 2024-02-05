@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { client, paypalCheckout } from 'braintree-web';
-import { type Ref } from 'vue';
-import { type PaymentStep, type SelectedPlan } from '~/types';
-import { type PayEvent } from '~/types/common';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
+import type { Ref } from 'vue';
+import type { PaymentStep, SelectedPlan } from '~/types';
+import type { PayEvent } from '~/types/common';
 
-type ErrorMessage = {
+interface ErrorMessage {
   title: string;
   message: string;
-};
+}
 
 const props = defineProps<{
   token: string;
@@ -42,26 +42,21 @@ const processing = computed(() => get(paying) || get(loading) || get(pending));
 
 let btClient: braintree.Client | null = null;
 
-const initializeBraintree = async (
-  token: Ref<string>,
-  plan: Ref<SelectedPlan>,
-  pay: (plan: PayEvent) => void,
-) => {
+async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, pay: (plan: PayEvent) => void) {
   let paypalActions: any = null;
   watch(accepted, (val) => {
-    if (val) {
+    if (val)
       paypalActions?.enable();
-    } else {
+    else
       paypalActions?.disable();
-    }
+
     set(mustAcceptRefund, !val);
   });
   watch(processing, (val) => {
-    if (val) {
+    if (val)
       paypalActions?.disable();
-    } else {
+    else
       paypalActions?.enable();
-    }
   });
   const btClient = await client.create({
     authorization: get(token),
@@ -119,21 +114,20 @@ const initializeBraintree = async (
         }
       },
       onClick: () => {
-        if (!get(accepted)) {
+        if (!get(accepted))
           set(mustAcceptRefund, true);
-        }
       },
     })
     .render('#paypal-button');
 
   return btClient;
-};
+}
 
-const clearError = () => {
+function clearError() {
   set(error, null);
-};
+}
 
-const back = async () => {
+async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
@@ -141,28 +135,28 @@ const back = async () => {
       method: get(paymentMethodId),
     },
   });
-};
+}
 
-const redirect = () => {
+function redirect() {
   navigateTo({ name: 'checkout-success' });
   stopWatcher();
-};
+}
 
 const stopWatcher = watchEffect(() => {
-  if (get(success)) {
+  if (get(success))
     redirect();
-  }
 });
 
 onMounted(async () => {
   try {
     set(initializing, true);
-    btClient = await initializeBraintree(token, plan, (p) => emit('pay', p));
+    btClient = await initializeBraintree(token, plan, p => emit('pay', p));
     set(initializing, false);
-  } catch (e: any) {
+  }
+  catch (error_: any) {
     set(error, {
       title: t('subscription.error.init_error'),
-      message: e.message,
+      message: error_.message,
     });
   }
 });
@@ -183,13 +177,19 @@ const css = useCssModule();
         { [css.buttons__disabled]: mustAcceptRefund || processing },
       ]"
     />
-    <SelectedPlanOverview :plan="plan" :disabled="processing || initializing" />
+    <SelectedPlanOverview
+      :plan="plan"
+      :disabled="processing || initializing"
+    />
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"
       :class="css.policy"
     />
-    <div v-if="pending" class="my-8">
+    <div
+      v-if="pending"
+      class="my-8"
+    >
       <RuiAlert type="info">
         <template #title>
           {{ status?.title }}
@@ -211,7 +211,9 @@ const css = useCssModule();
   </div>
 
   <FloatingNotification :visible="mustAcceptRefund">
-    <template #title> {{ t('policies.refund.accept_title') }} </template>
+    <template #title>
+      {{ t('policies.refund.accept_title') }}
+    </template>
     {{ t('policies.refund.accept_message') }}
   </FloatingNotification>
   <FloatingNotification

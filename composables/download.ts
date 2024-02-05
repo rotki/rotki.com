@@ -1,20 +1,18 @@
 import { get, set } from '@vueuse/core';
 import { logger } from '~/utils/logger';
 
-type Asset = {
+interface Asset {
   readonly name: string;
 
   readonly browser_download_url: string;
-};
+}
 
-type GithubRelease = {
+interface GithubRelease {
   readonly tag_name: string;
   readonly assets: Asset[];
-};
+}
 
-export const useAppDownload = (
-  fallbackUrl = 'https://github.com/rotki/rotki/releases/latest',
-) => {
+export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/releases/latest') {
   const version = ref('');
   const linuxUrl = ref(fallbackUrl);
   const macOSUrl = ref(fallbackUrl);
@@ -35,8 +33,8 @@ export const useAppDownload = (
   }
 
   function isMacOsApp(name: string, arm64 = false): boolean {
-    const archMatch =
-      (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'));
+    const archMatch
+      = (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'));
     return archMatch && name.endsWith('.dmg');
   }
 
@@ -46,9 +44,8 @@ export const useAppDownload = (
         'https://api.github.com/repos/rotki/rotki/releases/latest',
       );
 
-      if (!get(data)) {
+      if (!get(data))
         await refresh();
-      }
 
       const latestRelease = get(data);
       if (latestRelease) {
@@ -72,17 +69,18 @@ export const useAppDownload = (
           getUrl(assets, ({ name }) => isWindowApp(name)),
         );
       }
-    } catch (e) {
-      logger.error(e);
+    }
+    catch (error) {
+      logger.error(error);
     }
   };
 
   return {
     fetchLatestRelease,
-    version,
     linuxUrl,
-    macOSUrl,
     macOSArmUrl,
+    macOSUrl,
+    version,
     windowsUrl,
   };
-};
+}

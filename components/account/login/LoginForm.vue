@@ -35,7 +35,7 @@ const v$ = useVuelidate(
 
 const { login } = useMainStore();
 
-const performLogin = async () => {
+async function performLogin() {
   set(loading, true);
   set(
     error,
@@ -47,15 +47,15 @@ const performLogin = async () => {
   set(loading, false);
 
   if (!get(error)) {
-    if (get(modal)) {
+    if (get(modal))
       emit('complete');
-    } else {
+    else
       await navigateTo('/home/subscription');
-    }
-  } else {
+  }
+  else {
     set(hadError, true);
   }
-};
+}
 
 const { t } = useI18n();
 </script>
@@ -63,7 +63,9 @@ const { t } = useI18n();
 <template>
   <div class="w-[360px] max-w-full space-y-8">
     <div class="space-y-3">
-      <div class="text-h4">{{ t('auth.login.title') }}</div>
+      <div class="text-h4">
+        {{ t('auth.login.title') }}
+      </div>
       <div class="text-body-1 text-rui-text-secondary">
         {{ t('auth.login.message') }}
       </div>
@@ -99,12 +101,18 @@ const { t } = useI18n();
       </div>
 
       <div class="flex justify-end mb-6 mt-2">
-        <ButtonLink to="/password/recover" inline>
+        <ButtonLink
+          to="/password/recover"
+          inline
+        >
           {{ t('auth.login.forgot_password') }}
         </ButtonLink>
       </div>
 
-      <div v-if="error" class="text-body-1 text-center text-rui-error pb-6">
+      <div
+        v-if="error"
+        class="text-body-1 text-center text-rui-error pb-6"
+      >
         {{ error }}
       </div>
 
@@ -123,7 +131,11 @@ const { t } = useI18n();
       <span class="text-rui-text-secondary">
         {{ t('auth.login.first_time_premium') }}
       </span>
-      <ButtonLink to="/signup" inline color="primary">
+      <ButtonLink
+        to="/signup"
+        inline
+        color="primary"
+      >
         {{ t('auth.login.sign_up_now') }}
       </ButtonLink>
     </div>
@@ -133,6 +145,9 @@ const { t } = useI18n();
     class="max-w-full"
     :class="modal ? 'w-[360px] mt-8' : 'w-[660px] mt-14'"
   >
-    <RuiAlert type="error" :description="t('auth.login.alert_error')" />
+    <RuiAlert
+      type="error"
+      :description="t('auth.login.alert_error')"
+    />
   </div>
 </template>

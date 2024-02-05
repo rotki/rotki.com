@@ -15,7 +15,9 @@ const { t } = useI18n();
 
 <template>
   <div>
-    <div class="text-h6 mb-6">Details</div>
+    <div class="text-h6 mb-6">
+      Details
+    </div>
     <div>
       <div class="space-y-5">
         <RuiTextField

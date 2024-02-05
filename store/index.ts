@@ -1,9 +1,8 @@
-//TODO: split store functionality
+// TODO: split store functionality
 /* eslint-disable max-lines */
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
-import { type Currency } from '~/composables/plan';
 import {
   Account,
   ApiKeys,
@@ -26,17 +25,18 @@ import {
   type Subscription,
   UpdateProfileResponse,
 } from '~/types';
-import {
-  type DeleteAccountPayload,
-  type PasswordChangePayload,
-  type ProfilePayload,
-} from '~/types/account';
 import { PaymentError } from '~/types/codes';
-import { type ActionResult } from '~/types/common';
-import { type LoginCredentials } from '~/types/login';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
+import type { LoginCredentials } from '~/types/login';
+import type { ActionResult } from '~/types/common';
+import type {
+  DeleteAccountPayload,
+  PasswordChangePayload,
+  ProfilePayload,
+} from '~/types/account';
+import type { Currency } from '~/composables/plan';
 
 const SESSION_TIMEOUT = 3600000;
 
@@ -57,34 +57,35 @@ export const useMainStore = defineStore('main', () => {
       );
       set(authenticated, true);
       set(account, Account.parse(response.result));
-    } catch (e) {
-      logger.error(e);
+    }
+    catch (error) {
+      logger.error(error);
     }
   };
 
   const login = async ({
-    username,
     password,
+    username,
   }: LoginCredentials): Promise<string> => {
     try {
       await fetchWithCsrf<string>('/webapi/login/', {
-        method: 'POST',
-        credentials: 'include',
         body: {
-          username,
           password,
+          username,
         },
+        credentials: 'include',
+        method: 'POST',
       });
       await getAccount();
       set(authenticated, true);
       return '';
-    } catch (e: any) {
-      let message = e.message;
-      if (e instanceof FetchError) {
-        const status = e?.status || -1;
-        if (status === 400 && e.response) {
-          message = e.data.message || '';
-        }
+    }
+    catch (error: any) {
+      let message = error.message;
+      if (error instanceof FetchError) {
+        const status = error?.status || -1;
+        if (status === 400 && error.response)
+          message = error.data.message || '';
       }
       set(authenticated, false);
       return message;
@@ -105,8 +106,9 @@ export const useMainStore = defineStore('main', () => {
         ...acc,
         ...ApiKeys.parse(response.result),
       });
-    } catch (e) {
-      logger.error(e);
+    }
+    catch (error) {
+      logger.error(error);
     }
   };
 
@@ -117,25 +119,26 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<ChangePasswordResponse>(
         '/webapi/change-password/',
         {
-          method: 'PATCH',
           body: payload,
+          method: 'PATCH',
         },
       );
       const data = ChangePasswordResponse.parse(response);
       return {
-        success: data.result ?? false,
         message: '',
+        success: data.result ?? false,
       };
-    } catch (e: any) {
-      logger.error(e);
-      let message = e.message;
-      if (e instanceof FetchError && e.status === 400) {
-        const data = ChangePasswordResponse.parse(e.data);
+    }
+    catch (error: any) {
+      logger.error(error);
+      let message = error.message;
+      if (error instanceof FetchError && error.status === 400) {
+        const data = ChangePasswordResponse.parse(error.data);
         message = data.message;
       }
       return {
-        success: false,
         message,
+        success: false,
       };
     }
   };
@@ -147,8 +150,8 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<UpdateProfileResponse>(
         '/webapi/account/',
         {
-          method: 'PATCH',
           body: payload,
+          method: 'PATCH',
         },
       );
 
@@ -162,19 +165,20 @@ export const useMainStore = defineStore('main', () => {
         ...result,
       });
 
-      if (payload.country !== country) {
+      if (payload.country !== country)
         await getAccount();
-      }
+
       return { success: true };
-    } catch (e: any) {
-      logger.error(e);
-      let message = e.message;
-      if (e instanceof FetchError && e.status === 400) {
-        message = UpdateProfileResponse.parse(e.data).message;
-      }
+    }
+    catch (error: any) {
+      logger.error(error);
+      let message = error.message;
+      if (error instanceof FetchError && error.status === 400)
+        message = UpdateProfileResponse.parse(error.data).message;
+
       return {
-        success: false,
         message,
+        success: false,
       };
     }
   };
@@ -193,27 +197,28 @@ export const useMainStore = defineStore('main', () => {
 
       const data = DeleteAccountResponse.parse(response);
       return {
-        success: data.result ?? false,
         message: data.message,
+        success: data.result ?? false,
       };
-    } catch (e: any) {
-      let message = e.message;
-      if (e instanceof FetchError && e.status === 400) {
-        message = DeleteAccountResponse.parse(e.data).message;
-      }
-      logger.error(e);
+    }
+    catch (error: any) {
+      let message = error.message;
+      if (error instanceof FetchError && error.status === 400)
+        message = DeleteAccountResponse.parse(error.data).message;
+
+      logger.error(error);
       return {
-        success: false,
         message,
+        success: false,
       };
     }
   };
 
   const subscriptions: ComputedRef<Subscription[]> = computed(() => {
     const userAccount = get(account);
-    if (!userAccount) {
+    if (!userAccount)
       return [];
-    }
+
     return userAccount.subscriptions;
   });
 
@@ -229,15 +234,15 @@ export const useMainStore = defineStore('main', () => {
         },
       );
       const data = CancelSubscriptionResponse.parse(response);
-      if (data.result) {
+      if (data.result)
         await getAccount();
-      }
-    } catch (e: any) {
-      let message = e.message;
-      if (e instanceof FetchError && e.status === 404) {
-        message = CancelSubscriptionResponse.parse(e.data).message;
-      }
-      logger.error(e);
+    }
+    catch (error: any) {
+      let message = error.message;
+      if (error instanceof FetchError && error.status === 404)
+        message = CancelSubscriptionResponse.parse(error.data).message;
+
+      logger.error(error);
       set(cancellationError, message);
     }
   };
@@ -258,8 +263,9 @@ export const useMainStore = defineStore('main', () => {
       const data = PremiumResponse.parse(response);
       set(plans, data.result.plans);
       set(authenticatedOnPlansLoad, get(authenticated));
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
     }
   };
 
@@ -276,11 +282,12 @@ export const useMainStore = defineStore('main', () => {
         isError: false,
         result: data.result,
       };
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
       return {
+        error,
         isError: true,
-        error: e,
       };
     }
   };
@@ -292,11 +299,11 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<CardPaymentResponse>(
         '/webapi/payment/btr',
         {
-          method: 'POST',
           body: request,
+          method: 'POST',
         },
       );
-      getAccount().then();
+      getAccount().then().catch(error => logger.error(error));
 
       const data = CardPaymentResponse.parse(response);
       assert(data.result);
@@ -304,22 +311,24 @@ export const useMainStore = defineStore('main', () => {
         isError: false,
         result: true,
       };
-    } catch (e: any) {
-      let error = e;
-      let code: PaymentError | undefined = undefined;
-      if (e instanceof FetchError) {
-        if (e.status === 400) {
-          error = new Error(CardPaymentResponse.parse(e.data).message);
-        } else if (e.status === 403) {
+    }
+    catch (error_: any) {
+      let error = error_;
+      let code: PaymentError | undefined;
+      if (error_ instanceof FetchError) {
+        if (error_.status === 400) {
+          error = new Error(CardPaymentResponse.parse(error_.data).message);
+        }
+        else if (error_.status === 403) {
           error = '';
           code = PaymentError.UNVERIFIED;
         }
       }
-      logger.error(e);
+      logger.error(error_);
       return {
-        isError: true,
-        error,
         code,
+        error,
+        isError: true,
       };
     }
   };
@@ -333,7 +342,6 @@ export const useMainStore = defineStore('main', () => {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/payment/crypto',
         {
-          method: 'POST',
           body: convertKeys(
             {
               currency,
@@ -343,31 +351,34 @@ export const useMainStore = defineStore('main', () => {
             false,
             false,
           ),
+          method: 'POST',
         },
       );
 
       const { result } = CryptoPaymentResponse.parse(response);
       assert(result);
       return {
-        result,
         isError: false,
+        result,
       };
-    } catch (e: any) {
-      let error = e;
-      let code: PaymentError | undefined = undefined;
-      if (e instanceof FetchError) {
-        if (e.status === 400) {
-          error = new Error(CardPaymentResponse.parse(e.data).message);
-        } else if (e.status === 403) {
+    }
+    catch (error_: any) {
+      let error = error_;
+      let code: PaymentError | undefined;
+      if (error_ instanceof FetchError) {
+        if (error_.status === 400) {
+          error = new Error(CardPaymentResponse.parse(error_.data).message);
+        }
+        else if (error_.status === 403) {
           error = '';
           code = PaymentError.UNVERIFIED;
         }
       }
-      logger.error(e);
+      logger.error(error_);
       return {
+        code,
         error,
         isError: true,
-        code,
       };
     }
   };
@@ -385,18 +396,19 @@ export const useMainStore = defineStore('main', () => {
       const data = PendingCryptoPaymentResponse.parse(response);
       if (data.result) {
         return {
-          result: data.result,
           isError: false,
+          result: data.result,
         };
       }
       return {
         error: new Error(data.message),
         isError: true,
       };
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
       return {
-        error: e,
+        error,
         isError: true,
       };
     }
@@ -411,21 +423,22 @@ export const useMainStore = defineStore('main', () => {
         },
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
-      getAccount().then();
+      getAccount().then().catch(error => logger.error(error));
       if (data.result) {
         return {
-          result: data.result,
           isError: false,
+          result: data.result,
         };
       }
       return {
         error: new Error(data.message),
         isError: true,
       };
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
       return {
-        error: e,
+        error,
         isError: true,
       };
     }
@@ -446,9 +459,9 @@ export const useMainStore = defineStore('main', () => {
       const data = PendingCryptoPaymentResultResponse.parse(response);
       if (data.result) {
         const payment = await cryptoPayment(plan, currency, subscriptionId);
-        if (payment.isError) {
+        if (payment.isError)
           return payment;
-        }
+
         return {
           isError: false,
           result: payment.result,
@@ -458,16 +471,17 @@ export const useMainStore = defineStore('main', () => {
         error: new Error(data.message),
         isError: true,
       };
-    } catch (e: any) {
-      logger.error(e);
+    }
+    catch (error: any) {
+      logger.error(error);
       return {
-        error: e,
+        error,
         isError: true,
       };
     }
   };
 
-  const { stop: stopCountdown, start: startCountdown } = useTimeoutFn(
+  const { start: startCountdown, stop: stopCountdown } = useTimeoutFn(
     async () => {
       logger.debug('session expired, logging out');
       await logout();
@@ -482,8 +496,9 @@ export const useMainStore = defineStore('main', () => {
         await fetchWithCsrf<UpdateProfileResponse>('/webapi/logout/', {
           method: 'POST',
         });
-      } catch (e) {
-        logger.error(e);
+      }
+      catch (error) {
+        logger.error(error);
       }
     }
     set(authenticated, false);
@@ -491,38 +506,37 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const refreshSession = () => {
-    if (!isClient) {
+    if (!isClient)
       return;
-    }
+
     stopCountdown();
     startCountdown();
   };
 
   return {
-    authenticated,
     account,
-    plans,
+    authenticated,
     cancellationError,
-    subscriptions,
-    login,
-    getAccount,
+    cancelSubscription,
     changePassword,
+    checkout,
+    checkPendingCryptoPayment,
+    cryptoPayment,
+    deleteAccount,
+    getAccount,
+    getPlans,
+    login,
+    logout,
+    markTransactionStarted,
+    pay,
+    plans,
+    refreshSession,
+    subscriptions,
+    switchCryptoPlan,
     updateKeys,
     updateProfile,
-    deleteAccount,
-    cancelSubscription,
-    getPlans,
-    checkout,
-    pay,
-    cryptoPayment,
-    checkPendingCryptoPayment,
-    switchCryptoPlan,
-    markTransactionStarted,
-    logout,
-    refreshSession,
   };
 });
 
-if (import.meta.hot) {
+if (import.meta.hot)
   import.meta.hot.accept(acceptHMRUpdate(useMainStore, import.meta.hot));
-}

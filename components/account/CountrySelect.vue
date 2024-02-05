@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
-import { type Country } from '~/composables/countries';
+import type { Country } from '~/composables/countries';
 
 const props = withDefaults(
   defineProps<{

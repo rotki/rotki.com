@@ -12,8 +12,12 @@ await loadTestimonials();
 <template>
   <div :class="css.testimonials">
     <div class="container">
-      <div :class="css.title">{{ t('home.testimonials.title') }}</div>
-      <div :class="css.detail">{{ t('home.testimonials.detail') }}</div>
+      <div :class="css.title">
+        {{ t('home.testimonials.title') }}
+      </div>
+      <div :class="css.detail">
+        {{ t('home.testimonials.detail') }}
+      </div>
       <TestimonialCarousel :testimonials="testimonials" />
     </div>
   </div>

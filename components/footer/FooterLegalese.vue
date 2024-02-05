@@ -4,13 +4,25 @@ const { t } = useI18n();
 
 <template>
   <div class="flex flex-wrap justify-center gap-x-4">
-    <ButtonLink size="lg" to="/impressum" highlight-active>
+    <ButtonLink
+      size="lg"
+      to="/impressum"
+      highlight-active
+    >
       {{ t('footer_legalese.impressum') }}
     </ButtonLink>
-    <ButtonLink size="lg" to="/privacy-policy" highlight-active>
+    <ButtonLink
+      size="lg"
+      to="/privacy-policy"
+      highlight-active
+    >
       {{ t('footer_legalese.privacy_policy') }}
     </ButtonLink>
-    <ButtonLink size="lg" to="/tos" highlight-active>
+    <ButtonLink
+      size="lg"
+      to="/tos"
+      highlight-active
+    >
       {{ t('footer_legalese.tos') }}
     </ButtonLink>
     <ButtonLink

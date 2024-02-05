@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
-import { type Ref } from 'vue';
-import {
-  type DataTableColumn,
-  type DataTableSortColumn,
-  type TablePaginationData,
-} from '@rotki/ui-library';
 import { useMainStore } from '~/store';
-import { type Payment } from '~/types';
+import type { Ref } from 'vue';
+import type {
+  DataTableColumn,
+  DataTableSortColumn,
+  TablePaginationData,
+} from '@rotki/ui-library';
+import type { Payment } from '~/types';
 
 const { t } = useI18n();
 
@@ -47,9 +47,8 @@ const sort: Ref<DataTableSortColumn<Payment>[]> = ref([]);
 
 const payments = computed(() => {
   const userAccount = get(account);
-  if (!userAccount) {
+  if (!userAccount)
     return [];
-  }
 
   return userAccount.payments.sort(
     (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
@@ -59,7 +58,9 @@ const payments = computed(() => {
 
 <template>
   <div>
-    <div class="text-h6 mb-6">{{ t('account.payments.title') }}</div>
+    <div class="text-h6 mb-6">
+      {{ t('account.payments.title') }}
+    </div>
     <RuiDataTable
       v-model:pagination="pagination"
       v-model:sort="sort"
@@ -70,7 +71,10 @@ const payments = computed(() => {
       row-attr="identifier"
     >
       <template #item.status>
-        <RuiChip size="sm" color="success">
+        <RuiChip
+          size="sm"
+          color="success"
+        >
           {{ t('account.payments.paid') }}
         </RuiChip>
       </template>

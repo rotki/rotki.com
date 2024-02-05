@@ -5,7 +5,10 @@ const css = useCssModule();
 
 <template>
   <div :class="css.wrapper">
-    <div :class="css.wrapper__container" class="container">
+    <div
+      :class="css.wrapper__container"
+      class="container"
+    >
       <h6 :class="css.title">
         {{ t('download.documentation.title') }}
       </h6>

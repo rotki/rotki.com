@@ -2,7 +2,7 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { logger } from '~/utils/logger';
 
-export const useAutoLogout = () => {
+export function useAutoLogout() {
   const store = useMainStore();
   const { authenticated } = storeToRefs(store);
   watch(authenticated, async (authenticated) => {
@@ -11,4 +11,4 @@ export const useAutoLogout = () => {
       await navigateTo('/login');
     }
   });
-};
+}

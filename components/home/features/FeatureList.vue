@@ -59,10 +59,17 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
       </div>
     </div>
   </DefineTab>
-  <div id="features" class="py-16 md:py-20 bg-[#f9f9f9]">
+  <div
+    id="features"
+    class="py-16 md:py-20 bg-[#f9f9f9]"
+  >
     <div class="container">
       <div class="pb-16 md:pb-20">
-        <i18n-t class="text-h4 mb-10" tag="h4" keypath="home.rotki_offer">
+        <i18n-t
+          class="text-h4 mb-10"
+          tag="h4"
+          keypath="home.rotki_offer"
+        >
           <span class="text-rui-primary">rotki</span>
         </i18n-t>
         <div
@@ -79,11 +86,21 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
         </div>
       </div>
       <RuiTabItems v-model="model">
-        <RuiTabItem eager><AppDashboard /></RuiTabItem>
-        <RuiTabItem eager><SupportedExchangeDetails /></RuiTabItem>
-        <RuiTabItem eager><DefiProtocols /></RuiTabItem>
-        <RuiTabItem eager><EthProtocols /></RuiTabItem>
-        <RuiTabItem eager><ProfitLossReport /></RuiTabItem>
+        <RuiTabItem eager>
+          <AppDashboard />
+        </RuiTabItem>
+        <RuiTabItem eager>
+          <SupportedExchangeDetails />
+        </RuiTabItem>
+        <RuiTabItem eager>
+          <DefiProtocols />
+        </RuiTabItem>
+        <RuiTabItem eager>
+          <EthProtocols />
+        </RuiTabItem>
+        <RuiTabItem eager>
+          <ProfitLossReport />
+        </RuiTabItem>
       </RuiTabItems>
     </div>
   </div>

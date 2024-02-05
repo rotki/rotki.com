@@ -12,11 +12,11 @@ const apiKey = computed(() => account.value?.apiKey ?? '');
 const apiSecret = computed(() => account.value?.apiSecret ?? '');
 const hasApiKeys = computed(() => apiKey.value && apiSecret.value);
 
-const regenerateKeys = async () => {
+async function regenerateKeys() {
   set(loading, true);
   await store.updateKeys();
   set(loading, false);
-};
+}
 
 const { t } = useI18n();
 </script>
@@ -24,9 +24,15 @@ const { t } = useI18n();
 <template>
   <div>
     <div class="mb-6 flex justify-between items-center">
-      <div class="text-h6">{{ t('account.api_keys.title') }}</div>
+      <div class="text-h6">
+        {{ t('account.api_keys.title') }}
+      </div>
       <div>
-        <RuiButton color="primary" :loading="loading" @click="regenerateKeys()">
+        <RuiButton
+          color="primary"
+          :loading="loading"
+          @click="regenerateKeys()"
+        >
           <template #prepend>
             <RuiIcon name="refresh-line" />
           </template>

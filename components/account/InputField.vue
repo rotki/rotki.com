@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type BaseErrorObject } from '~/types/common';
+import type { BaseErrorObject } from '~/types/common';
 
 const props = withDefaults(
   defineProps<{
@@ -35,12 +35,12 @@ const emit = defineEmits<{
 }>();
 
 const inputField = ref<HTMLInputElement | null>(null);
-const input = (event: Event) => {
+
+function input(event: Event) {
   const target = event.target;
-  if (target) {
+  if (target)
     emit('update:modelValue', (target as HTMLInputElement).value ?? '');
-  }
-};
+}
 const value = toRef(props, 'modelValue');
 const lastMessage = ref('');
 watch(toRef(props, 'errorMessages'), (value) => {
@@ -72,7 +72,10 @@ const slots = useSlots();
       }"
     >
       <div :class="css.slot">
-        <slot v-if="slots.prepend" name="prepend" />
+        <slot
+          v-if="slots.prepend"
+          name="prepend"
+        />
         <div :class="css.inputContainer">
           <input
             :id="id"
@@ -94,9 +97,18 @@ const slots = useSlots();
             @input="input($event)"
             @keypress.enter="enter()"
           />
-          <label v-if="label" :class="css.label" :for="id"> {{ label }}</label>
+          <label
+            v-if="label"
+            :class="css.label"
+            :for="id"
+          >
+            {{ label }}
+          </label>
         </div>
-        <slot v-if="$slots.append" name="append" />
+        <slot
+          v-if="$slots.append"
+          name="append"
+        />
       </div>
     </div>
 
@@ -108,7 +120,10 @@ const slots = useSlots();
       {{ errorMessages[0].$message }}
     </span>
 
-    <span v-else :class="css.caption">
+    <span
+      v-else
+      :class="css.caption"
+    >
       <slot name="hint">{{ hint }}</slot>
     </span>
     <slot />

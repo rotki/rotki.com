@@ -14,8 +14,14 @@ const css = useCssModule();
 </script>
 
 <template>
-  <h2 :id="id" :class="css.heading">
-    <a v-if="generate" :href="`#${id}`">
+  <h2
+    :id="id"
+    :class="css.heading"
+  >
+    <a
+      v-if="generate"
+      :href="`#${id}`"
+    >
       <slot />
     </a>
     <slot v-else />

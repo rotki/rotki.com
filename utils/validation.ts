@@ -1,5 +1,5 @@
-import { type BaseValidation } from '@vuelidate/core';
 import { get } from '@vueuse/core';
+import type { BaseValidation } from '@vuelidate/core';
 
 /**
  * Converts an object of vuelidate's BaseValidation to an array of
@@ -8,5 +8,6 @@ import { get } from '@vueuse/core';
  * @param validation BaseValidation
  * @return string[]
  */
-export const toMessages = (validation: BaseValidation): string[] =>
-  validation.$errors.map((e) => get(e.$message));
+export function toMessages(validation: BaseValidation): string[] {
+  return validation.$errors.map(e => get(e.$message));
+}

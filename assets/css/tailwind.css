@@ -5,5 +5,5 @@
 @tailwind utilities;
 
 .container {
-    @apply px-4 md:px-12 xl:px-16;
+  @apply px-4 md:px-12 xl:px-16;
 }

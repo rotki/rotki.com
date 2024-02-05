@@ -6,21 +6,21 @@ import {
   hostedFields,
   threeDSecure,
 } from 'braintree-web';
-import { type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import { get, set } from '@vueuse/core';
-import { type Ref } from 'vue';
-import { type HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields';
-import { type PaymentStep, type SelectedPlan } from '~/types';
-import { type PayEvent } from '~/types/common';
 import { logger } from '~/utils/logger';
 import { assert } from '~/utils/assert';
+import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
+import type { Ref } from 'vue';
+import type { HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields';
+import type { PaymentStep, SelectedPlan } from '~/types';
+import type { PayEvent } from '~/types/common';
 
-type FieldStatus = {
+interface FieldStatus {
   valid: boolean;
   touched: boolean;
-};
+}
 
-type EmptyState = { number: boolean; cvv: boolean; expirationDate: boolean };
+interface EmptyState { number: boolean; cvv: boolean; expirationDate: boolean }
 
 const props = defineProps<{
   token: string;
@@ -41,10 +41,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { paymentMethodId } = usePaymentMethodParam();
 
-const setupEmptyStateMonitoring = (
-  hostedFields: HostedFields,
-  empty: Ref<EmptyState>,
-) => {
+function setupEmptyStateMonitoring(hostedFields: HostedFields, empty: Ref<EmptyState>) {
   hostedFields.on('notEmpty', (event) => {
     const field = event.fields[event.emittedBy];
     set(empty, { ...get(empty), [event.emittedBy]: field.isEmpty });
@@ -54,74 +51,68 @@ const setupEmptyStateMonitoring = (
     const field = event.fields[event.emittedBy];
     set(empty, { ...get(empty), [event.emittedBy]: field.isEmpty });
   });
-};
+}
 
-const setupValidityMonitoring = (
-  hostedFields: HostedFields,
-  {
-    cvvStatus,
-    expirationDateStatus,
-    numberStatus,
-  }: {
-    numberStatus: Ref<FieldStatus>;
-    expirationDateStatus: Ref<FieldStatus>;
-    cvvStatus: Ref<FieldStatus>;
-  },
-) => {
+function setupValidityMonitoring(hostedFields: HostedFields, {
+  cvvStatus,
+  expirationDateStatus,
+  numberStatus,
+}: {
+  numberStatus: Ref<FieldStatus>;
+  expirationDateStatus: Ref<FieldStatus>;
+  cvvStatus: Ref<FieldStatus>;
+}) {
   hostedFields.on('validityChange', (event) => {
     const field = event.emittedBy;
     const valid = event.fields[field].isValid;
-    if (field === 'number') {
+    if (field === 'number')
       set(numberStatus, { ...get(numberStatus), valid });
-    } else if (field === 'expirationDate') {
+    else if (field === 'expirationDate')
       set(expirationDateStatus, { ...get(expirationDateStatus), valid });
-    } else if (field === 'cvv') {
+    else if (field === 'cvv')
       set(cvvStatus, { ...get(cvvStatus), valid });
-    }
   });
-};
+}
 
-const setupFocusManagement = (
-  hostedFields: HostedFields,
-  focused: Ref<string>,
-  {
-    cvvStatus,
-    expirationDateStatus,
-    numberStatus,
-  }: {
-    numberStatus: Ref<FieldStatus>;
-    expirationDateStatus: Ref<FieldStatus>;
-    cvvStatus: Ref<FieldStatus>;
-  },
-) => {
+function setupFocusManagement(hostedFields: HostedFields, focused: Ref<string>, {
+  cvvStatus,
+  expirationDateStatus,
+  numberStatus,
+}: {
+  numberStatus: Ref<FieldStatus>;
+  expirationDateStatus: Ref<FieldStatus>;
+  cvvStatus: Ref<FieldStatus>;
+}) {
   hostedFields.on('focus', (event) => {
     const field = event.emittedBy;
     set(focused, field);
     if (field === 'number') {
       set(numberStatus, { ...get(numberStatus), touched: true });
-    } else if (field === 'expirationDate') {
+    }
+    else if (field === 'expirationDate') {
       set(expirationDateStatus, {
         ...get(expirationDateStatus),
         touched: true,
       });
-    } else if (field === 'cvv') {
+    }
+    else if (field === 'cvv') {
       set(cvvStatus, { ...get(cvvStatus), touched: true });
     }
   });
   hostedFields.on('blur', (event) => {
-    if (get(focused) === event.emittedBy) {
+    if (get(focused) === event.emittedBy)
       set(focused, '');
-    }
   });
-};
+}
 
-const hasError = (status: Ref<FieldStatus>) =>
-  computed(() => {
+function hasError(status: Ref<FieldStatus>) {
+  return computed(() => {
     const { touched, valid } = get(status);
     return touched && !valid;
   });
+}
 
-const setupHostedFields = () => {
+function setupHostedFields() {
   let _fields: HostedFields | null = null;
 
   const getFields = () => {
@@ -133,13 +124,13 @@ const setupHostedFields = () => {
     _fields = await hostedFields.create({
       client,
       styles: {
-        body: {
+        'body': {
           'font-size': '16px',
         },
-        input: {
+        'input': {
           'font-size': '1rem',
           'font-family': 'Roboto',
-          color: 'rgba(0, 0, 0, 0.87)',
+          'color': 'rgba(0, 0, 0, 0.87)',
         },
         ':disabled': {
           color: 'rgba(0, 0, 0, 0.5)',
@@ -174,7 +165,8 @@ const setupHostedFields = () => {
             value: true,
           });
         });
-      } else {
+      }
+      else {
         hostedFields.forEach((field) => {
           _fields?.removeAttribute({
             field,
@@ -214,12 +206,12 @@ const setupHostedFields = () => {
     focus,
     teardown,
   };
-};
+}
 
-type ErrorMessage = {
+interface ErrorMessage {
   title: string;
   message: string;
-};
+}
 
 const { token, plan, success, pending, loading } = toRefs(props);
 const fields = setupHostedFields();
@@ -254,24 +246,24 @@ let btThreeDSecure: ThreeDSecure;
 
 const valid = computed(
   () =>
-    get(accepted) &&
-    get(numberStatus).valid &&
-    get(expirationDateStatus).valid &&
-    get(cvvStatus).valid,
+    get(accepted)
+    && get(numberStatus).valid
+    && get(expirationDateStatus).valid
+    && get(cvvStatus).valid,
 );
 
 const processing = logicOr(paying, loading, pending);
 const disabled = logicOr(processing, initializing, success);
 
-const focus = (field: 'cvv' | 'expirationDate' | 'number') => {
+function focus(field: 'cvv' | 'expirationDate' | 'number') {
   fields.focus(field);
-};
+}
 
-const updatePending = () => {
+function updatePending() {
   emit('update:pending', true);
-};
+}
 
-const back = async () => {
+async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
@@ -279,9 +271,9 @@ const back = async () => {
       method: get(paymentMethodId),
     },
   });
-};
+}
 
-const submit = async () => {
+async function submit() {
   set(paying, true);
 
   const onClose = () => set(challengeVisible, false);
@@ -292,7 +284,7 @@ const submit = async () => {
     const token = await fields.get().tokenize();
 
     const options: ThreeDSecureVerifyOptions = {
-      // @ts-ignore
+      // @ts-expect-error
       onLookupComplete(_: any, next: any) {
         next();
       },
@@ -317,7 +309,8 @@ const submit = async () => {
         months,
         nonce: payload.nonce,
       });
-    } else {
+    }
+    else {
       const status = (threeDSecureInfo as any)?.status as string | undefined;
       set(error, {
         title: t('subscription.error.3d_auth_failed'),
@@ -327,35 +320,37 @@ const submit = async () => {
       });
       logger.error(`liability did not shift, due to status: ${status}`);
     }
-  } catch (e: any) {
+  }
+  catch (error_: any) {
     set(error, {
       title: t('subscription.error.payment_error'),
-      message: e.message,
+      message: error_.message,
     });
-    logger.error(e);
-  } finally {
+    logger.error(error_);
+  }
+  finally {
     set(paying, false);
     set(verify, false);
     set(challengeVisible, false);
     btThreeDSecure.off('authentication-modal-close', onClose);
     btThreeDSecure.off('authentication-modal-render', onRender);
   }
-};
-const clearError = () => {
-  set(error, null);
-};
+}
 
-const redirect = () => {
+function clearError() {
+  set(error, null);
+}
+
+function redirect() {
   stopWatcher();
   // redirect happens outside of router to force reload for csp.
   const url = new URL(`${window.location.origin}/checkout/success`);
   window.location.href = url.toString();
-};
+}
 
 const stopWatcher = watchEffect(() => {
-  if (get(success)) {
+  if (get(success))
     redirect();
-  }
 });
 
 onMounted(async () => {
@@ -377,10 +372,11 @@ onMounted(async () => {
       client: btClient,
     });
     set(initializing, false);
-  } catch (e: any) {
+  }
+  catch (error_: any) {
     set(error, {
       title: t('subscription.error.init_error'),
-      message: e.message,
+      message: error_.message,
     });
   }
 });
@@ -428,13 +424,19 @@ const css = useCssModule();
         @click="focus('cvv')"
       />
     </div>
-    <SelectedPlanOverview :plan="plan" :disabled="disabled" />
+    <SelectedPlanOverview
+      :plan="plan"
+      :disabled="disabled"
+    />
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="disabled"
       :class="css.policy"
     />
-    <div v-if="pending" class="my-8">
+    <div
+      v-if="pending"
+      class="my-8"
+    >
       <RuiAlert type="info">
         <template #title>
           {{ status?.title }}
@@ -476,7 +478,10 @@ const css = useCssModule();
     {{ error?.message }}
   </FloatingNotification>
 
-  <FloatingNotification :timeout="10000" :visible="failure">
+  <FloatingNotification
+    :timeout="10000"
+    :visible="failure"
+  >
     <template #title>
       {{ status?.title }}
     </template>

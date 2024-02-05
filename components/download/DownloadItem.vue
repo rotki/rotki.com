@@ -14,16 +14,29 @@ const css = useCssModule();
 <template>
   <div :class="css.wrapper">
     <div :class="css.icon">
-      <RuiIcon :name="icon" color="primary" />
+      <RuiIcon
+        :name="icon"
+        color="primary"
+      />
     </div>
     <div :class="css.body">
       <div>
-        <p :class="css.for">{{ t('download.download_for') }}</p>
-        <h6 :class="css.platform">{{ platform }}</h6>
+        <p :class="css.for">
+          {{ t('download.download_for') }}
+        </p>
+        <h6 :class="css.platform">
+          {{ platform }}
+        </h6>
       </div>
       <div>
-        <a :href="url" download>
-          <RuiButton color="primary" size="lg">
+        <a
+          :href="url"
+          download
+        >
+          <RuiButton
+            color="primary"
+            size="lg"
+          >
             {{ t('download.action') }}
           </RuiButton>
         </a>

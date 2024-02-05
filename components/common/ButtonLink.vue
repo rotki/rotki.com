@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
-import { type RouteLocationRaw } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 defineOptions({
   inheritAttrs: false,
@@ -26,16 +26,15 @@ const attrs = useAttrs();
 
 const { highlightActive, highlightExactActive } = toRefs(props);
 
-const getColor = (active: boolean, exact: boolean) => {
+function getColor(active: boolean, exact: boolean) {
   if (
-    (get(highlightActive) && active) ||
-    (get(highlightExactActive) && exact)
-  ) {
+    (get(highlightActive) && active)
+    || (get(highlightExactActive) && exact)
+  )
     return 'primary';
-  }
 
   return undefined;
-};
+}
 </script>
 
 <template>

@@ -13,7 +13,8 @@ const data = await loadContent(props.path);
 
 if (!data) {
   showError({ message: `Page not found: ${props.path}`, statusCode: 404 });
-} else {
+}
+else {
   useContentHead(data);
   const { title, description } = data;
 
@@ -33,10 +34,16 @@ if (!data) {
   <div class="py-10 md:py-20 border-b border-rui-grey-300">
     <div class="container flex flex-col lg:flex-row gap-8 justify-between">
       <div v-if="data?.subtitle">
-        <div v-if="data?.title" class="text-h6 text-rui-primary mb-3">
+        <div
+          v-if="data?.title"
+          class="text-h6 text-rui-primary mb-3"
+        >
           {{ data.title }}
         </div>
-        <div v-if="data?.subtitle" class="text-h4">
+        <div
+          v-if="data?.subtitle"
+          class="text-h4"
+        >
           {{ data.subtitle }}
         </div>
       </div>
@@ -56,7 +63,10 @@ if (!data) {
 
   <div class="py-10 md:py-20">
     <div class="container lg:max-w-[720px]">
-      <ContentRenderer v-if="data" :value="data">
+      <ContentRenderer
+        v-if="data"
+        :value="data"
+      >
         <ContentRendererMarkdown :value="data" />
       </ContentRenderer>
     </div>

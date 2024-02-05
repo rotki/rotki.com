@@ -11,9 +11,9 @@ withDefaults(
 
 const emit = defineEmits<{ (e: 'click'): void }>();
 
-const click = () => {
+function click() {
   emit('click');
-};
+}
 
 const css = useCssModule();
 </script>

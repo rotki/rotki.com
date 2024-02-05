@@ -1,8 +1,17 @@
 <template>
-  <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    viewBox="0 0 48 48"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <g transform="matrix(.17188 0 0 .17188 -3.3797 -2.4172)">
-      <polygon class="st0" points="193 65.8 274.1 35.5 174.6 109.4" />
-      <polygon class="st1" points="125.6 65.8 44.4 35.5 143.1 110.1" />
+      <polygon
+        class="st0"
+        points="193 65.8 274.1 35.5 174.6 109.4"
+      />
+      <polygon
+        class="st1"
+        points="125.6 65.8 44.4 35.5 143.1 110.1"
+      />
       <polygon
         class="st1"
         points="238.3 206.8 211.8 247.4 268.5 263 284.8 207.7"
@@ -19,8 +28,14 @@
         class="st1"
         points="214.9 138.2 175.9 103.4 174.6 164.6 230.8 162.1"
       />
-      <polygon class="st1" points="111.4 208.1 106.8 247.4 140.6 230.9" />
-      <polygon class="st1" points="207.1 208.1 177.9 230.9 211.8 247.4" />
+      <polygon
+        class="st1"
+        points="111.4 208.1 106.8 247.4 140.6 230.9"
+      />
+      <polygon
+        class="st1"
+        points="207.1 208.1 177.9 230.9 211.8 247.4"
+      />
       <polygon
         class="st2"
         points="211.8 247.4 177.9 230.9 180.6 253 180.3 262.3"
@@ -29,10 +44,22 @@
         class="st2"
         points="106.8 247.4 138.3 262.3 138.1 253 140.6 230.9"
       />
-      <polygon class="st3" points="130.5 176.1 138.8 193.5 110.6 185.2" />
-      <polygon class="st3" points="208 185.2 179.7 193.5 188 176.1" />
-      <polygon class="st4" points="80.3 207.7 106.8 247.4 111.6 206.8" />
-      <polygon class="st4" points="238.3 207.7 207 206.8 211.8 247.4" />
+      <polygon
+        class="st3"
+        points="130.5 176.1 138.8 193.5 110.6 185.2"
+      />
+      <polygon
+        class="st3"
+        points="208 185.2 179.7 193.5 188 176.1"
+      />
+      <polygon
+        class="st4"
+        points="80.3 207.7 106.8 247.4 111.6 206.8"
+      />
+      <polygon
+        class="st4"
+        points="238.3 207.7 207 206.8 211.8 247.4"
+      />
       <polygon
         class="st4"
         points="188.1 176.1 208.1 185.2 230.8 162.1 174.6 164.6 179.8 193.5"
@@ -41,8 +68,14 @@
         class="st4"
         points="144.1 164.6 87.8 162.1 110.6 185.2 130.6 176.1 138.8 193.5"
       />
-      <polygon class="st5" points="110.6 185.2 87.8 162.1 111.4 208.1" />
-      <polygon class="st5" points="230.8 162.1 208.1 185.2 207.1 208.1" />
+      <polygon
+        class="st5"
+        points="110.6 185.2 87.8 162.1 111.4 208.1"
+      />
+      <polygon
+        class="st5"
+        points="230.8 162.1 208.1 185.2 207.1 208.1"
+      />
       <polygon
         class="st5"
         points="144.1 164.6 138.8 193.5 145.4 227.6 146.9 182.7"

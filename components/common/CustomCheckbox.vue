@@ -13,9 +13,9 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
 }>();
 
-const update = (checked: boolean) => {
+function update(checked: boolean) {
   emit('update:modelValue', checked);
-};
+}
 
 const css = useCssModule();
 </script>
@@ -28,7 +28,10 @@ const css = useCssModule();
       type="checkbox"
       @click="update(!modelValue)"
     />
-    <label :class="css.label" :for="id">
+    <label
+      :class="css.label"
+      :for="id"
+    >
       <slot />
     </label>
   </div>

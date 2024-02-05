@@ -1,31 +1,50 @@
-const SELF = "'self'";
-const UNSAFE_INLINE = "'unsafe-inline'";
-const UNSAFE_EVAL = "'unsafe-eval'";
-const NONE = "'none'";
+const SELF = '\'self\'';
+const UNSAFE_INLINE = '\'unsafe-inline\'';
+const UNSAFE_EVAL = '\'unsafe-eval\'';
+const NONE = '\'none\'';
 
 const ContentPolicy = {
-  FRAME_ANCESTORS: 'frame-ancestors',
+  BASE_URI: 'base-uri',
   BLOCK_ALL_MIXED_CONTENT: 'block-all-mixed-content',
+  CHILD_SRC: 'child-src',
+  CONNECT_SRC: 'connect-src',
   DEFAULT_SRC: 'default-src',
+  FONT_SRC: 'font-src',
+  FORM_ACTION: 'form-action',
+  FRAME_ANCESTORS: 'frame-ancestors',
+  FRAME_SRC: 'frame-src',
+  IMG_SRC: 'img-src',
+  OBJECT_SRC: 'object-src',
   SCRIPT_SRC: 'script-src',
   STYLE_SRC: 'style-src',
-  OBJECT_SRC: 'object-src',
-  FRAME_SRC: 'frame-src',
-  CHILD_SRC: 'child-src',
-  IMG_SRC: 'img-src',
-  CONNECT_SRC: 'connect-src',
-  BASE_URI: 'base-uri',
-  FORM_ACTION: 'form-action',
   WORKER_SRC: 'worker-src',
-  FONT_SRC: 'font-src',
 } as const;
 
 type ContentPolicy = (typeof ContentPolicy)[keyof typeof ContentPolicy];
 
 const policy: Record<ContentPolicy, string[]> = {
-  [ContentPolicy.FRAME_ANCESTORS]: [SELF],
+  [ContentPolicy.BASE_URI]: [SELF],
   [ContentPolicy.BLOCK_ALL_MIXED_CONTENT]: [],
+  [ContentPolicy.CHILD_SRC]: [NONE],
+  [ContentPolicy.CONNECT_SRC]: [SELF, 'api.github.com'],
   [ContentPolicy.DEFAULT_SRC]: [SELF],
+  [ContentPolicy.FONT_SRC]: [SELF, 'fonts.gstatic.com'],
+  [ContentPolicy.FORM_ACTION]: [SELF],
+  [ContentPolicy.FRAME_ANCESTORS]: [SELF],
+  [ContentPolicy.FRAME_SRC]: [
+    '*.recaptcha.net',
+    'recaptcha.net',
+    'https://www.google.com/recaptcha/',
+    'https://recaptcha.google.com',
+  ],
+  [ContentPolicy.IMG_SRC]: [
+    SELF,
+    UNSAFE_INLINE,
+    'data:',
+    'www.gstatic.com/recaptcha',
+    'https://pbs.twimg.com/profile_images/',
+  ],
+  [ContentPolicy.OBJECT_SRC]: [NONE],
   [ContentPolicy.SCRIPT_SRC]: [
     SELF,
     UNSAFE_INLINE,
@@ -37,26 +56,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'https://www.google.com/recaptcha/',
   ],
   [ContentPolicy.STYLE_SRC]: [SELF, UNSAFE_INLINE, 'fonts.googleapis.com'],
-  [ContentPolicy.OBJECT_SRC]: [NONE],
-  [ContentPolicy.FRAME_SRC]: [
-    '*.recaptcha.net',
-    'recaptcha.net',
-    'https://www.google.com/recaptcha/',
-    'https://recaptcha.google.com',
-  ],
-  [ContentPolicy.CHILD_SRC]: [NONE],
-  [ContentPolicy.IMG_SRC]: [
-    SELF,
-    UNSAFE_INLINE,
-    'data:',
-    'www.gstatic.com/recaptcha',
-    'https://pbs.twimg.com/profile_images/',
-  ],
-  [ContentPolicy.CONNECT_SRC]: [SELF, 'api.github.com'],
-  [ContentPolicy.BASE_URI]: [SELF],
-  [ContentPolicy.FORM_ACTION]: [SELF],
   [ContentPolicy.WORKER_SRC]: [SELF, 'www.recaptcha.net'],
-  [ContentPolicy.FONT_SRC]: [SELF, 'fonts.gstatic.com'],
 };
 
 function getCSP(page?: 'card' | 'paypal') {
@@ -72,7 +72,8 @@ function getCSP(page?: 'card' | 'paypal') {
     ];
     finalPolicy[ContentPolicy.CONNECT_SRC] = [SELF, '*'];
     finalPolicy[ContentPolicy.FORM_ACTION] = [SELF, '*'];
-  } else if (page === 'paypal') {
+  }
+  else if (page === 'paypal') {
     finalPolicy[ContentPolicy.SCRIPT_SRC] = [
       ...finalPolicy[ContentPolicy.SCRIPT_SRC],
       'js.braintreegateway.com',
@@ -103,9 +104,9 @@ function getCSP(page?: 'card' | 'paypal') {
       '*.paypal.com',
     ];
   }
-  for (const policyKey in finalPolicy) {
+  for (const policyKey in finalPolicy)
     csp += `${policyKey} ${finalPolicy[policyKey as ContentPolicy].join(' ')};`;
-  }
+
   return csp;
 }
 
@@ -113,14 +114,14 @@ const defaultCSP = getCSP();
 
 export default defineEventHandler((event) => {
   const url = event.node.req.url;
-  if (!url || import.meta.env.SKIP_CSP === 'true') {
+  if (!url || import.meta.env.SKIP_CSP === 'true')
     return;
-  }
+
   let csp = defaultCSP;
-  if (url.startsWith('/checkout/pay/card')) {
+  if (url.startsWith('/checkout/pay/card'))
     csp = getCSP('card');
-  } else if (url.startsWith('/checkout/pay/paypal')) {
+  else if (url.startsWith('/checkout/pay/paypal'))
     csp = getCSP('paypal');
-  }
+
   event.node.res.setHeader('content-security-policy', csp);
 });

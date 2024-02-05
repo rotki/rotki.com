@@ -45,7 +45,9 @@ const defi = [
     <h6 class="text-h6 text-rui-primary">
       {{ t('home.defi.title') }}
     </h6>
-    <h4 class="text-h4">{{ t('home.defi.detail') }}</h4>
+    <h4 class="text-h4">
+      {{ t('home.defi.detail') }}
+    </h4>
   </div>
   <div class="pt-8">
     <div class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -55,7 +57,11 @@ const defi = [
         class="flex items-center gap-3 text-subtitle-1 font-bold"
       >
         <div class="w-8 h-8 rounded-full overflow-hidden">
-          <img :src="item.img" :alt="item.name" class="w-full h-full" />
+          <img
+            :src="item.img"
+            :alt="item.name"
+            class="w-full h-full"
+          />
         </div>
         {{ item.name }}
       </div>

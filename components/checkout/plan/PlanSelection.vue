@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { get, set } from '@vueuse/core';
-import { type ComputedRef, type Ref } from 'vue';
-import { type Plan } from '~/types';
 import { useMainStore } from '~/store';
+import type { ComputedRef, Ref } from 'vue';
+import type { Plan } from '~/types';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -15,14 +15,14 @@ const identifier: Ref<number> = ref(get(savedPlan));
 const processing: Ref<boolean> = ref(false);
 
 const selected: ComputedRef<Plan | undefined> = computed(
-  () => get(plans)?.find((plan) => plan.months === get(identifier)),
+  () => get(plans)?.find(plan => plan.months === get(identifier)),
 );
 
 const cryptoPrice = computed(() => {
   const plan = get(selected);
-  if (!plan) {
+  if (!plan)
     return 0;
-  }
+
   return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2);
 });
 
@@ -30,17 +30,17 @@ const vat = computed(() => get(account)?.vat);
 
 const isSelected = (plan: Plan) => plan === get(selected);
 
-const select = (plan: Plan) => {
+function select(plan: Plan) {
   set(identifier, plan.months);
-};
+}
 
-const next = () => {
+function next() {
   set(processing, true);
   navigateTo({
     name: 'checkout-pay-method',
     query: { ...route.query, plan: get(identifier) },
   });
-};
+}
 
 const css = useCssModule();
 </script>
@@ -69,15 +69,25 @@ const css = useCssModule();
         />
       </div>
 
-      <div v-if="selected" :class="css.hint">
+      <div
+        v-if="selected"
+        :class="css.hint"
+      >
         {{ t('home.plans.tiers.step_1.crypto_hint', { cryptoPrice }) }}
       </div>
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
       <div :class="css.notes">
-        <div v-for="i in 4" :key="i" :class="css.note">
-          <RuiIcon :class="css.note__icon" name="arrow-right-circle-line" />
+        <div
+          v-for="i in 4"
+          :key="i"
+          :class="css.note"
+        >
+          <RuiIcon
+            :class="css.note__icon"
+            name="arrow-right-circle-line"
+          />
           <p>{{ t(`home.plans.tiers.step_1.notes.${i}`) }}</p>
         </div>
       </div>

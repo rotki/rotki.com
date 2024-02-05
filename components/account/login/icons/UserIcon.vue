@@ -6,8 +6,17 @@
     width="24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <rect id="Boundary" fill="none" height="24" width="24" />
-    <g id="Group_31" data-name="Group 31" transform="translate(2 2.204)">
+    <rect
+      id="Boundary"
+      fill="none"
+      height="24"
+      width="24"
+    />
+    <g
+      id="Group_31"
+      data-name="Group 31"
+      transform="translate(2 2.204)"
+    >
       <ellipse
         id="Ellipse_9"
         cx="5.19"

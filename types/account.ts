@@ -16,6 +16,6 @@ export interface ProfilePayload {
   readonly country?: string;
 }
 
-export type DeleteAccountPayload = {
+export interface DeleteAccountPayload {
   username: string;
-};
+}

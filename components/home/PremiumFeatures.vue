@@ -37,20 +37,33 @@ const data = computed(() => [
   <div class="py-20 container">
     <div class="lg:px-8 grid md:grid-cols-2 gap-x-16 gap-y-10">
       <div class="flex flex-col gap-4">
-        <h4 class="text-h4">{{ t('home.premium_features.title') }}</h4>
+        <h4 class="text-h4">
+          {{ t('home.premium_features.title') }}
+        </h4>
         <div class="text-body-1 text-rui-text-secondary">
           {{ t('home.premium_features.subtitle') }}
         </div>
-        <ButtonLink to="/products" variant="outlined" size="lg" class="mt-4">
+        <ButtonLink
+          to="/products"
+          variant="outlined"
+          size="lg"
+          class="mt-4"
+        >
           {{ t('actions.get_premium') }}
         </ButtonLink>
       </div>
-      <div v-for="item in data" :key="item.text" class="flex items-start gap-4">
+      <div
+        v-for="item in data"
+        :key="item.text"
+        class="flex items-start gap-4"
+      >
         <div class="p-3 rounded-lg bg-rui-primary text-white">
           <RuiIcon :name="item.icon" />
         </div>
         <div class="flex flex-col gap-2">
-          <h5 class="text-h5">{{ item.text }}</h5>
+          <h5 class="text-h5">
+            {{ item.text }}
+          </h5>
           <div
             class="text-body-1 text-rui-text-secondary whitespace-break-spaces"
           >

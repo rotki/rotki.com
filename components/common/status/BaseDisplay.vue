@@ -26,8 +26,12 @@ const css = useCssModule();
         <slot name="icon" />
       </div>
       <div :class="css.body">
-        <div :class="css.title">{{ title }}</div>
-        <div :class="css.message">{{ message }}</div>
+        <div :class="css.title">
+          {{ title }}
+        </div>
+        <div :class="css.message">
+          {{ message }}
+        </div>
         <slot />
       </div>
     </div>
