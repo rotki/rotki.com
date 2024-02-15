@@ -28,7 +28,7 @@ const policy: Record<ContentPolicy, string[]> = {
   [ContentPolicy.CHILD_SRC]: [NONE],
   [ContentPolicy.CONNECT_SRC]: [SELF, 'api.github.com'],
   [ContentPolicy.DEFAULT_SRC]: [SELF],
-  [ContentPolicy.FONT_SRC]: [SELF, 'fonts.gstatic.com'],
+  [ContentPolicy.FONT_SRC]: [SELF, 'data:', 'fonts.gstatic.com'],
   [ContentPolicy.FORM_ACTION]: [SELF],
   [ContentPolicy.FRAME_ANCESTORS]: [SELF],
   [ContentPolicy.FRAME_SRC]: [
@@ -85,6 +85,7 @@ function getCSP(page?: 'card' | 'paypal') {
       ...finalPolicy[ContentPolicy.IMG_SRC],
       'assets.braintreegateway.com',
       'checkout.paypal.com',
+      'www.paypalobjects.com',
     ];
     finalPolicy[ContentPolicy.CHILD_SRC] = [
       '*.paypal.com',
