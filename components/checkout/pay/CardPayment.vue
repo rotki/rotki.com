@@ -284,7 +284,7 @@ async function submit() {
     const token = await fields.get().tokenize();
 
     const options: ThreeDSecureVerifyOptions = {
-      // @ts-expect-error
+      // @ts-expect-error type is missing
       onLookupComplete(_: any, next: any) {
         next();
       },
@@ -292,6 +292,7 @@ async function submit() {
       amount: selectedPlan.finalPriceInEur,
       nonce: token.nonce,
       bin: token.details.bin,
+      challengeRequested: true,
     };
     set(verify, true);
 
