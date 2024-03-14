@@ -39,11 +39,12 @@ function click() {
     <div class="flex items-center h-0 justify-center relative w-full">
       <RuiChip
         v-if="popular"
-        :label="t('home.plans.most_popular')"
         class="-top-[2.9rem] absolute"
         color="primary"
         size="sm"
-      />
+      >
+        {{ t('home.plans.most_popular') }}
+      </RuiChip>
     </div>
     <CheckMark :selected="selected" />
     <div :class="css.name">

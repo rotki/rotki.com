@@ -43,6 +43,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'data:',
     'www.gstatic.com/recaptcha',
     'https://pbs.twimg.com/profile_images/',
+    'assets.braintreegateway.com',
   ],
   [ContentPolicy.OBJECT_SRC]: [NONE],
   [ContentPolicy.SCRIPT_SRC]: [
@@ -83,7 +84,6 @@ function getCSP(page?: 'card' | 'paypal') {
     ];
     finalPolicy[ContentPolicy.IMG_SRC] = [
       ...finalPolicy[ContentPolicy.IMG_SRC],
-      'assets.braintreegateway.com',
       'checkout.paypal.com',
       'www.paypalobjects.com',
     ];

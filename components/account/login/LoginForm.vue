@@ -122,6 +122,7 @@ const { t } = useI18n();
         :loading="loading"
         class="w-full"
         size="lg"
+        type="submit"
         @click="performLogin()"
       >
         {{ t('actions.continue') }}

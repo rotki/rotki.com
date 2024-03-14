@@ -1,12 +1,26 @@
 <script setup lang="ts">
-const { token, step, plan, pending, loading, submit, reset } = useBraintree();
+import { set } from '@vueuse/core';
+import { usePaymentCardsStore } from '~/store/payments/cards';
+
+const { token, step, plan, pending, loading, submit } = useBraintree();
+
+const store = usePaymentCardsStore();
+const { getCard } = store;
+const { card } = storeToRefs(store);
+const loadingCard = ref(false);
+
+onBeforeMount(async () => {
+  set(loadingCard, true);
+  await getCard();
+  set(loadingCard, false);
+});
 </script>
 
 <template>
   <PaymentFrame :step="step">
     <template #default="slotProps">
       <div
-        v-if="!(token && plan)"
+        v-if="!(token && plan) || loading || loadingCard"
         class="flex justify-center my-10"
       >
         <RuiProgress
@@ -18,13 +32,12 @@ const { token, step, plan, pending, loading, submit, reset } = useBraintree();
       </div>
       <CardPayment
         v-else
+        :card="card"
         v-bind="slotProps"
-        :loading="loading"
         :plan="plan"
         :token="token"
         @pay="submit($event)"
         @update:pending="pending = $event"
-        @clear:errors="reset()"
       />
     </template>
   </PaymentFrame>

@@ -26,6 +26,7 @@ const { t } = useI18n();
           tag="span"
           :class="css.link"
           external
+          target="_blank"
         >
           {{ t('policies.refund.accept_policy.action') }}
         </ButtonLink>

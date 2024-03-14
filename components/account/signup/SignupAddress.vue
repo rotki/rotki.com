@@ -104,6 +104,7 @@ const { t } = useI18n();
     <div class="space-y-5">
       <RuiTextField
         id="address-1"
+        maxlength="128"
         :model-value="modelValue.address1"
         variant="outlined"
         color="primary"
@@ -117,6 +118,7 @@ const { t } = useI18n();
       />
       <RuiTextField
         id="address-2"
+        maxlength="128"
         :model-value="modelValue.address2"
         variant="outlined"
         color="primary"

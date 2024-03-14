@@ -6,7 +6,7 @@ const css = useCssModule();
 <template>
   <div :class="css.content">
     <RuiCard>
-      <div class="flex gap-1">
+      <div class="flex gap-4">
         <div class="flex flex-col">
           <div :class="css.title">
             {{ t('home.plans.tiers.step_3.chose') }}

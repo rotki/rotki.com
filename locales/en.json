@@ -131,7 +131,8 @@
     "api_keys": {
       "title": "API Credentials",
       "api_key": "API Key",
-      "api_secret": "API Secret"
+      "api_secret": "API Secret",
+      "not_generated": "You haven't generated an API key"
     },
     "unverified_email": {
       "message": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail."
@@ -439,6 +440,15 @@
             "1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
             "2": "Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
             "3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
+          },
+          "saved_card": {
+            "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
+            "card_expired": "The card has expired. Please use a different card.",
+            "delete": {
+              "title": "Remove Saved Card",
+              "description": "Are you sure you want to remove this card?"
+            },
+            "expiry": "Expiry {expiresAt}"
           }
         }
       }

@@ -40,7 +40,10 @@ const { t } = useI18n();
         </RuiButton>
       </div>
     </div>
-    <div class="grid md:grid-cols-2 gap-4">
+    <div
+      v-if="hasApiKeys"
+      class="grid md:grid-cols-2 gap-4"
+    >
       <RuiRevealableTextField
         id="api-key"
         :model-value="apiKey"
@@ -72,6 +75,12 @@ const { t } = useI18n();
           <CopyButton :model-value="apiSecret" />
         </template>
       </RuiRevealableTextField>
+    </div>
+    <div
+      v-else
+      class="text-rui-text-secondary"
+    >
+      {{ t('account.api_keys.not_generated') }}
     </div>
   </div>
 </template>

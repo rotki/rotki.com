@@ -229,9 +229,12 @@ export type PendingCryptoPaymentResultResponse = z.infer<
   typeof PendingCryptoPaymentResultResponse
 >;
 
-export interface CardPaymentRequest {
-  months: number;
+export interface CreateCardRequest {
   paymentMethodNonce: string;
+}
+
+export interface CardPaymentRequest extends CreateCardRequest {
+  months: number;
 }
 
 interface Request {
@@ -264,3 +267,27 @@ export interface PaymentStep {
   message?: string;
   closeable?: boolean;
 }
+
+export const SavedCard = z.object({
+  expiresAt: z.string(),
+  imageUrl: z.string(),
+  last4: z.string(),
+  token: z.string(),
+});
+
+export type SavedCard = z.infer<typeof SavedCard>;
+
+export interface SavedCardResponse {
+  cardDetails?: SavedCard;
+  message?: string;
+}
+
+export interface CreateCardNonceRequest {
+  paymentToken: string;
+}
+
+export const CreateCardNonceResponse = z.object({
+  paymentNonce: z.string(),
+});
+
+export type CreateCardNonceResponse = z.infer<typeof CreateCardNonceResponse>;

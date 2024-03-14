@@ -208,7 +208,7 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
         }
 
         ~ .fieldset {
-          @apply border-2 border-rui-primary;
+          @apply border-2 border-rui-success;
 
           legend {
             &:after {

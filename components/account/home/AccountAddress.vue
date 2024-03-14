@@ -107,6 +107,7 @@ const { t } = useI18n();
       <RuiTextField
         id="address-1"
         v-model="state.address1"
+        maxlength="128"
         variant="outlined"
         color="primary"
         autocomplete="address-line1"
@@ -119,6 +120,7 @@ const { t } = useI18n();
       <RuiTextField
         id="address-2"
         v-model="state.address2"
+        maxlength="128"
         variant="outlined"
         color="primary"
         autocomplete="address-line2"
