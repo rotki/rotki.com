@@ -77,7 +77,6 @@ export const useMainStore = defineStore('main', () => {
         method: 'POST',
       });
       await getAccount();
-      set(authenticated, true);
       return '';
     }
     catch (error: any) {
@@ -313,6 +312,7 @@ export const useMainStore = defineStore('main', () => {
       };
     }
     catch (error_: any) {
+      getAccount().then().catch(error => logger.error(error));
       let error = error_;
       let code: PaymentError | undefined;
       if (error_ instanceof FetchError) {
@@ -436,6 +436,7 @@ export const useMainStore = defineStore('main', () => {
       };
     }
     catch (error: any) {
+      getAccount().then().catch(error => logger.error(error));
       logger.error(error);
       return {
         error,
