@@ -60,10 +60,6 @@ export function useBraintree() {
       set(checkout, data.result);
   }
 
-  onBeforeMount(async () => {
-    await loadPlan(get(route).query.plan as string);
-  });
-
   const plan = computed<SelectedPlan | null>(() => {
     const payload = get(checkout);
     if (!payload)
