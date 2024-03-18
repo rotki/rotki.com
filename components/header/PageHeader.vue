@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { set } from '@vueuse/core';
 import { useMainStore } from '~/store';
+import { EXTERNAL_LOGO } from '~/utils/external-links';
 
 const { t } = useI18n();
 
@@ -32,7 +33,10 @@ const css = useCssModule();
     <div class="container">
       <div :class="css['mobile-header']">
         <NuxtLink to="/">
-          <RuiLogo text />
+          <RuiLogo
+            text
+            :custom-src="EXTERNAL_LOGO"
+          />
         </NuxtLink>
         <div>
           <RuiButton
@@ -61,7 +65,10 @@ const css = useCssModule();
           to="/"
           :class="css.logo"
         >
-          <RuiLogo text />
+          <RuiLogo
+            text
+            :custom-src="EXTERNAL_LOGO"
+          />
         </NuxtLink>
 
         <NavigationMenu :class="css.navigation" />

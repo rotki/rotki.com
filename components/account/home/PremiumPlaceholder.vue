@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { EXTERNAL_LOGO } from '~/utils/external-links';
+
 const { t } = useI18n();
 </script>
 
@@ -8,7 +10,10 @@ const { t } = useI18n();
       <div
         class="rounded-full w-10 h-10 flex items-center justify-center bg-rui-primary/[0.04]"
       >
-        <RuiLogo class="w-6 h-6" />
+        <RuiLogo
+          class="w-6 h-6"
+          :custom-src="EXTERNAL_LOGO"
+        />
       </div>
       <div>
         <div class="text-body-1">
