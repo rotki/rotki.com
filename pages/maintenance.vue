@@ -26,42 +26,54 @@ if (!maintenance)
   navigateTo('/');
 
 const css = useCssModule();
+const otherHeight = inject('otherHeight', 0);
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div
+    class="container"
+    :class="[css.wrapper]"
+  >
     <img
       :class="css.image"
       alt="rotki maintenance"
       src="/img/maintenance.svg"
     />
 
-    <TextHeading :class="css.heading">
-      We'll be back soon!
-    </TextHeading>
+    <div class="flex flex-col gap-4">
+      <h6 class="text-h6 text-rui-primary">
+        Under maintenance
+      </h6>
 
-    <div :class="css.description">
-      Sorry for the inconvenience but we're performing some maintenance at the
-      moment. <br />
-      If you need anything, you can always contact us on
-      <a
-        :class="css.link"
-        :href="emailMailto"
-        target="_blank"
-      >
-        {{ email }}
-      </a>
+      <h3 :class="css.heading">
+        We'll be back soon!
+      </h3>
+
+      <p :class="css.description">
+        Sorry for the inconvenience, but we're performing some maintenance at the
+        moment. <br />
+        If you need anything, you can always contact us on
+        <a
+          :class="css.link"
+          :href="emailMailto"
+          target="_blank"
+        >
+          {{ email }}
+        </a>
+      </p>
     </div>
   </div>
 </template>
 
 <style lang="scss" module>
 .wrapper {
-  @apply w-full min-h-full flex flex-col items-center justify-center text-center py-28 px-8;
+  @apply w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center py-4;
+  @apply text-center lg:text-left;
+  min-height: calc(100vh - v-bind(otherHeight) * 1px);
 }
 
 .image {
-  width: 500px;
+  @apply w-1/3 lg:w-1/2 max-w-[40rem];
 }
 
 .link {
@@ -69,10 +81,10 @@ const css = useCssModule();
 }
 
 .heading {
-  @apply text-4xl;
+  @apply text-h3 font-black text-rui-text;
 }
 
 .description {
-  @apply text-rui-text text-base mt-8 text-center text-xl;
+  @apply text-black/60 text-body-1 pt-2 mb-0;
 }
 </style>
