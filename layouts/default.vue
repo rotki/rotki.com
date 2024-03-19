@@ -12,6 +12,8 @@ const { height: bottomHeight } = useElementBounding(footerRef);
 const otherHeight: ComputedRef<number> = computed(
   () => get(topHeight) + get(bottomHeight) || 219,
 );
+
+provide('otherHeight', otherHeight);
 </script>
 
 <template>
