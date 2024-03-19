@@ -20,7 +20,7 @@ const year = new Date().getFullYear().toString();
     <div class="container">
       <div
         v-if="landing"
-        class="space-y-8 mt-8 lg:mt-16 mb-10"
+        class="space-y-8 pt-8 lg:pt-16 mb-10"
       >
         <div class="flex justify-between items-center">
           <div>
