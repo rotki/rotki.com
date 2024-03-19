@@ -72,7 +72,7 @@ const otherHeight = inject('otherHeight', 0);
 <style lang="scss" module>
 .wrapper {
   @apply w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center;
-  @apply text-center lg:text-left;
+  @apply text-center lg:text-left py-4;
   min-height: calc(100vh - v-bind(otherHeight) * 1px);
 }
 
