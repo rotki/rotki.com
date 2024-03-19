@@ -44,6 +44,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'www.gstatic.com/recaptcha',
     'https://pbs.twimg.com/profile_images/',
     'assets.braintreegateway.com',
+    'https://raw.githubusercontent.com/rotki/data/',
   ],
   [ContentPolicy.OBJECT_SRC]: [NONE],
   [ContentPolicy.SCRIPT_SRC]: [
