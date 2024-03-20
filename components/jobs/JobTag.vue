@@ -22,7 +22,6 @@ const icon: ComputedRef<string> = computed(() => {
 <template>
   <RuiChip
     class="capitalize hover:!bg-transparent py-1 !min-h-0"
-    :label="tag"
     variant="outlined"
   >
     <template
@@ -34,5 +33,6 @@ const icon: ComputedRef<string> = computed(() => {
         class="p-0.5"
       />
     </template>
+    {{ tag }}
   </RuiChip>
 </template>

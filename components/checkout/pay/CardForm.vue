@@ -158,6 +158,9 @@ function setupHostedFields() {
         ':disabled': {
           color: 'rgba(0, 0, 0, 0.5)',
         },
+        'input:not(:focus)::placeholder': {
+          color: 'transparent',
+        },
         '.invalid': {
           color: 'red',
         },
@@ -171,6 +174,7 @@ function setupHostedFields() {
         },
         expirationDate: {
           container: '#expiration',
+          placeholder: 'MM / YY',
         },
       },
     });
