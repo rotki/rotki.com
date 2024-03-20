@@ -52,7 +52,7 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
     <div class="flex flex-1 overflow-hidden">
       <div
         :id="id"
-        :class="[css.input, { [css.empty]: empty }]"
+        :class="[css.input, { [css.empty]: empty, [css.focused]: focused }]"
       />
       <label
         :class="css.label"
@@ -104,7 +104,7 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
   .input {
     @apply leading-6 text-rui-text w-full bg-transparent pr-3 outline-0 outline-none transition-all placeholder:opacity-0 focus:placeholder:opacity-100 h-[3.5rem];
 
-    &:global(.braintree-hosted-fields-focused),
+    &.focused,
     &:not(.empty) {
       @apply outline-0;
 
@@ -199,7 +199,7 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
     .input {
       @apply border-b-0 px-3;
 
-      &:global(.braintree-hosted-fields-focused),
+      &.focused,
       &:not(.empty) {
         @apply border-t-transparent;
 
