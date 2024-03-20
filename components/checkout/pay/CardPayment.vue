@@ -54,6 +54,8 @@ const valid = logicAnd(accepted, formValid);
 const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
 
+const { addCard, createCardNonce } = usePaymentCardsStore();
+
 function updatePending() {
   emit('update:pending', true);
 }
@@ -79,22 +81,10 @@ async function submit() {
   try {
     const { nonce, bin } = await get(cardForm).submit();
 
-    const options: ThreeDSecureVerifyOptions = {
-      // @ts-expect-error type is missing
-      onLookupComplete(_: any, next: any) {
-        next();
-      },
-      removeFrame: () => updatePending(),
-      amount: get(plan).finalPriceInEur,
-      nonce,
-      bin,
-      challengeRequested: true,
-    };
+    const savedCard = get(card);
 
-    const cardVal = get(card);
-
-    const paymentToken = cardVal
-      ? cardVal.token
+    const paymentToken = savedCard
+      ? savedCard.token
       : await addCard({
         paymentMethodNonce: nonce,
       });
@@ -103,8 +93,17 @@ async function submit() {
       paymentToken,
     });
 
-    if (paymentNonce)
-      options.nonce = paymentNonce;
+    const options: ThreeDSecureVerifyOptions = {
+      // @ts-expect-error type is missing
+      onLookupComplete(_: any, next: any) {
+        next();
+      },
+      removeFrame: () => updatePending(),
+      amount: get(plan).finalPriceInEur,
+      nonce: paymentNonce,
+      bin,
+      challengeRequested: true,
+    };
 
     set(verify, true);
 
@@ -154,17 +153,17 @@ function clearError() {
   set(error, null);
 }
 
+const stopWatcher = watchEffect(() => {
+  if (get(success))
+    redirect();
+});
+
 function redirect() {
   stopWatcher();
   // redirect happens outside of router to force reload for csp.
   const url = new URL(`${window.location.origin}/checkout/success`);
   window.location.href = url.toString();
 }
-
-const stopWatcher = watchEffect(() => {
-  if (get(success))
-    redirect();
-});
 
 const btClient: Ref<Client | null> = ref(null);
 
@@ -197,8 +196,6 @@ onUnmounted(() => {
 });
 
 const css = useCssModule();
-
-const { addCard, createCardNonce } = usePaymentCardsStore();
 </script>
 
 <template>
@@ -207,11 +204,11 @@ const { addCard, createCardNonce } = usePaymentCardsStore();
       <SavedCardDisplay
         v-if="card"
         ref="cardForm"
-        v-model:form-valid="formValid"
-        v-model:initializing="formInitializing"
         :card="card"
         :disabled="disabled"
         :client="btClient"
+        @update:form-valid="formValid = $event"
+        @update:initializing="formInitializing = $event"
       />
       <CardForm
         v-else

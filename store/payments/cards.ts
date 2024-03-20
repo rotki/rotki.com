@@ -40,9 +40,9 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
       const parsed = SavedCard.parse(response);
       return parsed.token;
     }
-    catch (error) {
+    catch (error: any) {
       logger.error(error);
-      return '';
+      throw new Error(error.message);
     }
   };
 
@@ -73,9 +73,9 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
       );
       return response.paymentNonce;
     }
-    catch (error) {
+    catch (error: any) {
       logger.error(error);
-      return '';
+      throw new Error(error.message);
     }
   };
 
