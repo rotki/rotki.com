@@ -5,13 +5,13 @@ import {
   type CreateCardNonceResponse,
   type CreateCardRequest,
   SavedCard,
-  type SavedCardResponse,
+  SavedCardResponse,
 } from '~/types';
 import { fetchWithCsrf } from '~/utils/api';
 import { logger } from '~/utils/logger';
 
 export const usePaymentCardsStore = defineStore('payments/cards', () => {
-  const card = ref<SavedCard | null>(null);
+  const card = ref<SavedCard>();
 
   const getCard = async (): Promise<void> => {
     try {
@@ -21,7 +21,8 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
           method: 'GET',
         },
       );
-      set(card, SavedCard.parse(response.cardDetails));
+      const parsedResponse = SavedCardResponse.parse(response);
+      set(card, parsedResponse.cardDetails);
     }
     catch (error) {
       logger.error(error);

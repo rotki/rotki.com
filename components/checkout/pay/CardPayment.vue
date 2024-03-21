@@ -20,7 +20,7 @@ const props = defineProps<{
   failure: boolean;
   pending: boolean;
   status: PaymentStep;
-  card: SavedCard | null;
+  card: SavedCard | undefined;
 }>();
 
 const emit = defineEmits<{
