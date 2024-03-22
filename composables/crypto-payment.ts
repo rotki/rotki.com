@@ -1,10 +1,9 @@
 import {
   BrowserProvider,
   Contract,
-  type JsonRpcSigner,
   type Signer,
   type TransactionResponse,
-  parseEther,
+  parseUnits,
 } from 'ethers';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { logger } from '~/utils/logger';
@@ -26,6 +25,9 @@ const abi = [
   // Get the account balance
   'function balanceOf(address) view returns (uint)',
 
+  // Get the decimal number of a token
+  'function decimals() public view returns (uint8)',
+
   // Send some of your tokens to someone else
   'function transfer(address to, uint amount)',
 
@@ -33,7 +35,7 @@ const abi = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
 
-export const getChainId = (testing: boolean) => BigInt(testing ? 11155111 : 1);
+export const getChainId = (testing: boolean, chainId?: string | number) => BigInt(chainId ?? (testing ? 11155111 : 1));
 
 export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () => Provider, testing: boolean) {
   const { markTransactionStarted } = useMainStore();
@@ -48,43 +50,44 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
     { immediate: false },
   );
 
-  async function payWithEth(signer: JsonRpcSigner) {
+  async function executePayment(signer: Signer): Promise<void> {
     stop();
     const payment = get(data);
     assert(payment);
-    const value = parseEther(payment.finalPriceInCrypto);
-    const to = payment.cryptoAddress;
-    logger.info(
-      `preparing to send ${payment.finalPriceInCrypto}(${value}) ETH to ${to}`,
-    );
-    set(state, 'pending');
-    const tx = await signer.sendTransaction({
-      to,
-      value,
-    });
-    logger.info(`transaction is pending: ${tx.hash}`);
-    await markTransactionStarted();
-    start();
-  }
 
-  async function payWithDai(signer: Signer): Promise<void> {
-    stop();
-    const payment = get(data);
-    assert(payment);
     const {
-      cryptoAddress,
+      cryptoAddress: to,
+      cryptocurrency,
+      decimals,
       finalPriceInCrypto,
-      tokenAddress: contractAddress,
+      tokenAddress,
     } = payment;
-    assert(contractAddress);
-    const contract = new Contract(contractAddress, abi, signer);
-    const price = parseEther(finalPriceInCrypto);
-    logger.info(`preparing to send ${price} DAI to ${cryptoAddress}`);
+
+    const currency = cryptocurrency.split(':')[1];
+    const value = parseUnits(finalPriceInCrypto, decimals);
+
+    let tx: TransactionResponse;
+
+    logger.info(`preparing to send ${value} ${currency} to ${to}`);
     set(state, 'pending');
-    const tx = await (contract.transfer(
-      cryptoAddress,
-      price,
-    ) as Promise<TransactionResponse>);
+
+    // Pay with native token
+    if (!tokenAddress) {
+      tx = await signer.sendTransaction({
+        to,
+        value,
+      });
+    }
+    // Pay with non-native token
+    else {
+      const contract = new Contract(tokenAddress, abi, signer);
+
+      tx = await (contract.transfer(
+        to,
+        value,
+      ) as Promise<TransactionResponse>);
+    }
+
     logger.info(`transaction is pending: ${tx.hash}`);
     await markTransactionStarted();
     start();
@@ -107,35 +110,43 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
       const browserProvider = new BrowserProvider(provider);
       const network = await browserProvider.getNetwork();
 
-      const expected = getChainId(testing);
-      const name = testing ? 'Sepolia' : 'Mainnet';
-      if (network.chainId !== expected) {
+      const {
+        chainId,
+        chainName,
+      } = payment;
+
+      const expectedChainId = getChainId(testing, chainId);
+
+      if (network.chainId !== expectedChainId) {
         set(
           error,
-          `We are expecting payments on ${name} but found ${network.name}`,
+          `We are expecting payments on ${chainName} but found ${network.name}. Change the network and try again.`,
         );
         return;
       }
 
       const signer = await browserProvider.getSigner();
-
-      if (payment.cryptocurrency === 'ETH')
-        await payWithEth(signer);
-      else if (payment.cryptocurrency === 'DAI')
-        await payWithDai(signer);
+      await executePayment(signer);
     }
     catch (error_: any) {
       logger.error(error_);
       set(state, 'idle');
 
-      if ('reason' in error_)
+      if ('reason' in error_ && error_.reason)
         set(error, error_.reason);
+
       else
         set(error, error_.message);
     }
   };
 
+  function clearErrors() {
+    set(error, null);
+    set(state, 'idle');
+  }
+
   return {
+    clearErrors,
     error,
     payWithMetamask,
     state,

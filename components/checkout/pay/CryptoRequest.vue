@@ -1,35 +1,18 @@
 <script lang="ts" setup>
-import { get, set, useTimestamp } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
+import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
+import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import type { Ref } from 'vue';
-import type { SelectedPlan } from '~/types';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const { account, plans } = storeToRefs(store);
 const acceptRefundPolicy = ref(false);
 const processing: Ref<boolean> = ref(false);
 
 const { plan } = usePlanParams();
-const { currency } = useCurrencyParams();
 const { paymentMethodId } = usePaymentMethodParam();
 const { subscriptionId } = useSubscriptionIdParam();
-
-const selectedPlan = computed<SelectedPlan>(() => {
-  const availablePlans = get(plans);
-  const months = get(plan);
-  const selectedPlan = availablePlans?.find(plan => plan.months === months);
-  const price = selectedPlan?.priceCrypto ?? '0';
-  return {
-    startDate: get(useTimestamp()) / 1000,
-    finalPriceInEur: price,
-    priceInEur: price,
-    months,
-    vat: get(account)?.vat ?? 0,
-  };
-});
 
 async function back() {
   await navigateTo({
@@ -40,6 +23,8 @@ async function back() {
     },
   });
 }
+
+const currency = ref('');
 
 function submit() {
   set(processing, true);
@@ -54,22 +39,28 @@ function submit() {
   });
 }
 
-onMounted(async () => await store.getPlans());
+const cryptoStore = usePaymentCryptoStore();
+
+onBeforeMount(async () => {
+  await store.getPlans();
+  await cryptoStore.fetchPaymentAssets();
+});
 const css = useCssModule();
+
+const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
 </script>
 
 <template>
   <div :class="css.content">
-    <CheckoutTitle>{{ t('home.plans.tiers.step_3.title') }}</CheckoutTitle>
+    <CheckoutTitle>
+      {{ t('home.plans.tiers.step_3.title') }}
+    </CheckoutTitle>
     <CheckoutDescription>
       {{ t('home.plans.tiers.step_3.subtitle') }}
     </CheckoutDescription>
     <CryptoPaymentInfo />
-    <SelectedPlanOverview
-      :plan="selectedPlan"
-      :disabled="processing"
-      crypto
-    />
+    <RuiDivider class="my-8" />
+    <CryptoAssetSelector v-model="currency" />
     <AcceptRefundPolicy
       v-model="acceptRefundPolicy"
       :class="css.policy"
@@ -85,14 +76,14 @@ const css = useCssModule();
         {{ t('actions.back') }}
       </RuiButton>
       <RuiButton
-        :disabled="!acceptRefundPolicy"
+        :disabled="!valid"
         :loading="processing"
         class="w-full"
         color="primary"
         size="lg"
         @click="submit()"
       >
-        {{ t('home.plans.tiers.step_3.start') }}
+        {{ t('actions.continue') }}
       </RuiButton>
     </div>
   </div>

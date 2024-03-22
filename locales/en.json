@@ -38,7 +38,7 @@
     },
     "password_link_send": {
       "title": "Password recovery",
-      "message": "A recovery link has been send to your account's address. Please check your mailbox to proceed."
+      "message": "A recovery link has been sent to your account's address. Please check your mailbox to proceed."
     },
     "password_reset": {
       "invalid": {
@@ -53,7 +53,7 @@
     },
     "pending_activation": {
       "title": "Please check your email",
-      "message": "A confirm registration link has been send to your account's address. Please check your mailbox to proceed."
+      "message": "A confirm registration link has been sent to your account's address. Please check your mailbox to proceed."
     },
     "recover_password": {
       "title": "Recover password"
@@ -430,6 +430,17 @@
           "start": "Start Subscription",
           "chose": "You chose:",
           "payment_description": "Payments are safely processed with Braintree a PayPal Service",
+          "labels": {
+            "network": "Network",
+            "token": "Token",
+            "token_contract": "Token contract",
+            "to_address": "Send to address"
+          },
+          "change_payment": {
+            "title": "Change Payment",
+            "warning": "Change payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
+            "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to change the payment method."
+          },
           "metamask": {
             "action": "Pay with Metamask",
             "notice": "You can pay with metamask, your mobile wallet or manually send the exact amount to the following address above. Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
@@ -502,7 +513,7 @@
   "change_plan": {
     "title": "Change Plan",
     "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
-    "switch_agree": "I confirm that no payment has been send. {separator}Allow me to switch the plan"
+    "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to switch the plan"
   },
   "navigation_menu": {
     "home": "Home",

@@ -12,7 +12,7 @@ const loading = ref(false);
 const data = ref<CryptoPayment | null>(null);
 const metamaskSupport = ref(false);
 
-const { cryptoPayment, switchCryptoPlan } = useMainStore();
+const { cryptoPayment, switchCryptoPlan, deletePendingPayment } = useMainStore();
 const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
@@ -20,10 +20,25 @@ const route = useRoute();
 
 let provider: Provider | null = null;
 
+const config = useRuntimeConfig();
+const {
+  payWithMetamask,
+  state: currentState,
+  error,
+  clearErrors,
+} = useWeb3Payment(
+  data,
+  () => {
+    assert(provider);
+    return provider;
+  },
+  !!config.public.testing,
+);
+
 onMounted(async () => {
   const selectedPlan = get(plan);
   const selectedCurrency = get(currency);
-  if (selectedPlan > 0 && selectedCurrency) {
+  if (selectedPlan && selectedCurrency) {
     provider = await detectEthereumProvider();
     logger.debug(
       `provider: ${!!provider}, is metamask: ${provider?.isMetaMask}`,
@@ -91,25 +106,6 @@ function back() {
   });
 }
 
-function clear() {
-  set(error, null);
-  set(currentState, 'idle');
-}
-
-const config = useRuntimeConfig();
-const {
-  payWithMetamask,
-  state: currentState,
-  error,
-} = useWeb3Payment(
-  data,
-  () => {
-    assert(provider);
-    return provider;
-  },
-  !!config.public.testing,
-);
-
 watch(plan, async (plan) => {
   const selectedCurrency = get(currency);
   assert(selectedCurrency);
@@ -126,6 +122,19 @@ watch(plan, async (plan) => {
 
   set(loading, false);
 });
+
+async function changePaymentMethod() {
+  set(loading, true);
+  const response = await deletePendingPayment();
+
+  if (!response.isError) {
+    back();
+  }
+  else {
+    set(error, response.error.message);
+    set(loading, false);
+  }
+}
 </script>
 
 <template>
@@ -156,7 +165,8 @@ watch(plan, async (plan) => {
         :metamask-support="metamaskSupport"
         :plan="plan"
         @pay="payWithMetamask()"
-        @clear:errors="clear()"
+        @change="changePaymentMethod()"
+        @clear:errors="clearErrors()"
       />
 
       <div
