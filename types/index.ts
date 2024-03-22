@@ -277,10 +277,12 @@ export const SavedCard = z.object({
 
 export type SavedCard = z.infer<typeof SavedCard>;
 
-export interface SavedCardResponse {
-  cardDetails?: SavedCard;
-  message?: string;
-}
+export const SavedCardResponse = z.object({
+  cardDetails: SavedCard.optional(),
+  message: z.string().optional(),
+});
+
+export type SavedCardResponse = z.infer<typeof SavedCardResponse>;
 
 export interface CreateCardNonceRequest {
   paymentToken: string;
