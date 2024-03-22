@@ -438,7 +438,7 @@
           },
           "change_payment": {
             "title": "Change Payment",
-            "warning": "Change payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
+            "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
             "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to change the payment method."
           },
           "metamask": {
