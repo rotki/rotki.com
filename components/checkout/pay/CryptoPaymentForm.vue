@@ -206,6 +206,7 @@ const showChangePaymentDialog = ref(false);
 
   <FloatingNotification
     :timeout="10000"
+    closeable
     :visible="failure"
     @dismiss="clearErrors()"
   >
