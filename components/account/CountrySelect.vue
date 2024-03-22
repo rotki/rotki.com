@@ -48,5 +48,8 @@ const country = computed({
     <template #no-data>
       {{ t('country_select.no_data') }}
     </template>
+    <template #default="{ item }">
+      {{ item.name }}
+    </template>
   </RuiAutoComplete>
 </template>

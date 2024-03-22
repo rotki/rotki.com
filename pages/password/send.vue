@@ -11,7 +11,7 @@ useHead({
     {
       key: 'description',
       name: 'description',
-      content: 'The password recovery link has been send to your address',
+      content: 'The password recovery link has been sent to your address',
     },
     noIndex(),
   ],

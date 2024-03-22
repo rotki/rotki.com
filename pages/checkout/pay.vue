@@ -46,7 +46,7 @@ onMounted(async () => {
 
 <template>
   <div
-    class="container flex flex-col lg:flex-row pt-4 pb-8 lg:py-14 h-full grow"
+    class="container flex flex-col lg:flex-row py-8 lg:py-14 h-full grow"
   >
     <div class="flex justify-center grow">
       <RuiProgress

@@ -1,40 +1,31 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import {
-  BitcoinIcon,
-  CardIcon,
-  DaiIcon,
-  EthereumIcon,
-  PaypalIcon,
-} from '#components';
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
-import type { Component, ComputedRef, Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 
 const props = defineProps<{ identifier?: string }>();
 
 const { t } = useI18n();
 
 enum PaymentMethod {
-  ETH = 1,
-  BTC = 2,
-  DAI = 3,
-  CARD = 4,
-  PAYPAL = 5,
+  BLOCKCHAIN = 1,
+  CARD = 2,
+  PAYPAL = 3,
 }
 
 interface PaymentMethodItem {
   id: PaymentMethod;
   label: string;
-  component: Component;
+  icon: string;
   name: string;
+  class: string;
 }
 
 const store = useMainStore();
 const css = useCssModule();
 const { plan } = usePlanParams();
-const { isSupportedCrypto } = useCurrencyParams();
 const { paymentMethodId } = usePaymentMethodParam();
 
 const { identifier } = toRefs(props);
@@ -44,51 +35,33 @@ const loginRequired = ref(false);
 const method: Ref<PaymentMethod | undefined> = ref(get(paymentMethodId));
 const processing: Ref<boolean> = ref(false);
 
-const availablePaymentMethods = computed(() => {
-  if (!get(identifier))
-    return paymentMethods;
-
-  return paymentMethods.filter(value =>
-    isSupportedCrypto(PaymentMethod[value.id]),
-  );
-});
-
-const selected: ComputedRef<PaymentMethodItem | undefined> = computed(() =>
-  get(availablePaymentMethods).find(m => get(method) === m.id),
-);
-
 const paymentMethods: PaymentMethodItem[] = [
   {
-    id: PaymentMethod.ETH,
-    label: 'Ethereum',
-    component: EthereumIcon,
+    id: PaymentMethod.BLOCKCHAIN,
+    label: 'Blockchain',
+    icon: 'coin-line',
     name: 'checkout-pay-request-crypto',
-  },
-  {
-    id: PaymentMethod.BTC,
-    label: 'Bitcoin',
-    component: BitcoinIcon,
-    name: 'checkout-pay-request-crypto',
-  },
-  {
-    id: PaymentMethod.DAI,
-    label: 'DAI',
-    component: DaiIcon,
-    name: 'checkout-pay-request-crypto',
+    class: 'sm:col-start-1',
   },
   {
     id: PaymentMethod.CARD,
     label: 'Card',
-    component: CardIcon,
+    icon: 'bank-card-line',
     name: 'checkout-pay-card',
+    class: 'sm:col-start-2',
   },
   {
     id: PaymentMethod.PAYPAL,
     label: 'Paypal',
-    component: PaypalIcon,
+    icon: 'paypal-line',
     name: 'checkout-pay-paypal',
+    class: 'sm:col-start-2',
   },
 ];
+
+const selected: ComputedRef<PaymentMethodItem | undefined> = computed(() =>
+  get(paymentMethods).find(m => get(method) === m.id),
+);
 
 async function back() {
   await navigateTo({
@@ -102,15 +75,15 @@ async function next() {
     set(processing, true);
     const selectedMethod = get(selected);
     assert(selectedMethod);
-    const { name, id } = selectedMethod;
+    const { name, id: method } = selectedMethod;
 
-    if (selectedMethod.id === PaymentMethod.CARD) {
+    if (method === PaymentMethod.CARD) {
       // For card payments we use href instead of router to trigger a server reload
       // This need to happen due to the CSP policy required for 3DSecure v2
       const queryString = new URLSearchParams({
         plan: get(plan).toString(),
         id: get(identifier) ?? '',
-        method: selectedMethod.id.toString(),
+        method: method.toString(),
       });
       const url = new URL(
         `${window.location.origin}/checkout/pay/card?${queryString}`,
@@ -122,11 +95,8 @@ async function next() {
         name,
         query: {
           plan: get(plan),
-          currency: isSupportedCrypto(PaymentMethod[id])
-            ? PaymentMethod[id]
-            : null,
           id: get(identifier),
-          method: id,
+          method,
         },
       });
     }
@@ -152,12 +122,15 @@ function select(m: PaymentMethod) {
     <div :class="css.wrapper">
       <div :class="css.methods">
         <PaymentMethodItem
-          v-for="item in availablePaymentMethods"
+          v-for="item in paymentMethods"
           :key="item.id"
           :selected="isSelected(item.id)"
+          :class="item.class"
           @click="select(item.id)"
         >
-          <Component :is="item.component" />
+          <div class="w-10 h-10 rounded-full bg-rui-grey-400 text-white flex items-center justify-center">
+            <RuiIcon :name="item.icon" />
+          </div>
           <template #label>
             {{ item.label }}
           </template>
@@ -198,7 +171,7 @@ function select(m: PaymentMethod) {
 }
 
 .methods {
-  @apply w-full lg:w-auto grid grid-cols-1 sm:grid-cols-2 gap-4 grid-flow-col-dense grid-rows-5 sm:grid-rows-3;
+  @apply w-full grid grid-cols-1 sm:grid-cols-2 gap-4;
 }
 
 .buttons {

@@ -36,7 +36,6 @@ import type {
   PasswordChangePayload,
   ProfilePayload,
 } from '~/types/account';
-import type { Currency } from '~/composables/plan';
 
 const SESSION_TIMEOUT = 3600000;
 
@@ -335,7 +334,7 @@ export const useMainStore = defineStore('main', () => {
 
   const cryptoPayment = async (
     plan: number,
-    currency: Currency,
+    currencyId: string,
     subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
@@ -344,7 +343,7 @@ export const useMainStore = defineStore('main', () => {
         {
           body: convertKeys(
             {
-              currency,
+              currencyId,
               months: plan,
               subscriptionId,
             },
@@ -445,11 +444,7 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
-  const switchCryptoPlan = async (
-    plan: number,
-    currency: Currency,
-    subscriptionId?: string,
-  ): Promise<Result<CryptoPayment, PaymentError>> => {
+  const deletePendingPayment = async (): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<PendingCryptoPaymentResultResponse>(
         'webapi/payment/pending',
@@ -459,6 +454,33 @@ export const useMainStore = defineStore('main', () => {
       );
       const data = PendingCryptoPaymentResultResponse.parse(response);
       if (data.result) {
+        return {
+          isError: false,
+          result: data.result,
+        };
+      }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
+    }
+    catch (error: any) {
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+  };
+
+  const switchCryptoPlan = async (
+    plan: number,
+    currency: string,
+    subscriptionId?: string,
+  ): Promise<Result<CryptoPayment, PaymentError>> => {
+    try {
+      const data = await deletePendingPayment();
+      if (!data.isError) {
         const payment = await cryptoPayment(plan, currency, subscriptionId);
         if (payment.isError)
           return payment;
@@ -469,7 +491,7 @@ export const useMainStore = defineStore('main', () => {
         };
       }
       return {
-        error: new Error(data.message),
+        error: data.error,
         isError: true,
       };
     }
@@ -524,6 +546,7 @@ export const useMainStore = defineStore('main', () => {
     checkPendingCryptoPayment,
     cryptoPayment,
     deleteAccount,
+    deletePendingPayment,
     getAccount,
     getPlans,
     login,

@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { parseEther, parseUnits } from 'ethers';
+import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import { get, set, useClipboard } from '@vueuse/core';
 import { logger } from '~/utils/logger';
+import { getChainId } from '~/composables/crypto-payment';
+import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
+import { toTitleCase } from '~/utils/text';
 import type { CryptoPayment, PaymentStep } from '~/types';
 
 const props = defineProps<{
@@ -16,7 +19,11 @@ const props = defineProps<{
   status: PaymentStep;
 }>();
 
-const emit = defineEmits<{ (e: 'pay'): void; (e: 'clear:errors'): void }>();
+const emit = defineEmits<{
+  (e: 'change'): void;
+  (e: 'pay'): void;
+  (e: 'clear:errors'): void;
+}>();
 
 const { t } = useI18n();
 
@@ -24,19 +31,25 @@ const config = useRuntimeConfig();
 
 async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement) {
   let qrText = '';
-  const chainId = getChainId(!!config.public.testing);
-  if (payment.cryptocurrency === 'BTC') {
-    qrText = `bitcoin:${payment.cryptoAddress}?amount=${payment.finalPriceInCrypto}&label=Rotki`;
+  const {
+    cryptoAddress,
+    chainName,
+    finalPriceInCrypto,
+    tokenAddress,
+    decimals,
+  } = payment;
+
+  if (chainName === 'bitcoin') {
+    qrText = `bitcoin:${cryptoAddress}?amount=${finalPriceInCrypto}&label=Rotki`;
   }
-  else if (payment.cryptocurrency === 'ETH') {
-    const ethPrice = parseEther(payment.finalPriceInCrypto);
-    qrText = `ethereum:${
-      payment.cryptoAddress
-    }@${chainId}?value=${ethPrice.toString()}`;
-  }
-  else if (payment.cryptocurrency === 'DAI') {
-    const tokenPrice = parseUnits(payment.finalPriceInCrypto, 18);
-    qrText = `ethereum:${payment.tokenAddress}@${chainId}/transfer?address=${payment.cryptoAddress}&uint256=${tokenPrice}`;
+  else {
+    const chainId = getChainId(!!config.public.testing, payment.chainId);
+    const tokenAmount = parseUnits(finalPriceInCrypto, decimals);
+
+    if (!tokenAddress)
+      qrText = `ethereum:${cryptoAddress}@${chainId}?value=${tokenAmount}`;
+    else
+      qrText = `ethereum:${tokenAddress}@${chainId}/transfer?address=${cryptoAddress}&uint256=${tokenAmount}`;
   }
 
   logger.info(qrText);
@@ -50,7 +63,8 @@ const qrText = ref<string>('');
 
 const paymentAmount = computed(() => {
   const { cryptocurrency, finalPriceInCrypto } = get(data);
-  return `${finalPriceInCrypto} ${cryptocurrency}`;
+  const currencyName = cryptocurrency.split(':')[1];
+  return `${finalPriceInCrypto} ${currencyName}`;
 });
 
 const processing = computed(() => get(pending) || get(loading));
@@ -73,11 +87,14 @@ const stopWatcher = watchEffect(() => {
 });
 
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
-const isBtc = computed(() => get(data).cryptocurrency === 'BTC');
+const isBtc = computed(() => get(data).chainName === 'bitcoin');
 
 const payWithMetamask = () => emit('pay');
+const changePaymentMethod = () => emit('change');
 const clearErrors = () => emit('clear:errors');
 const css = useCssModule();
+
+const showChangePaymentDialog = ref(false);
 </script>
 
 <template>
@@ -85,11 +102,26 @@ const css = useCssModule();
     <div :class="css.qrcode">
       <canvas
         ref="canvas"
+        class="canvas"
         @click="copyToClipboard(qrText)"
       />
     </div>
     <div :class="css.inputs">
       <RuiTextField
+        id="chain"
+        color="primary"
+        :disabled="processing"
+        :model-value="toTitleCase(data.chainName)"
+        :label="t('home.plans.tiers.step_3.labels.network')"
+        variant="outlined"
+        hide-details
+        readonly
+      >
+        <template #prepend>
+          <CryptoChainIcon :chain="data.chainName" />
+        </template>
+      </RuiTextField>
+      <InputWithCopyButton
         id="price"
         :disabled="processing"
         :model-value="paymentAmount"
@@ -97,30 +129,29 @@ const css = useCssModule();
         variant="outlined"
         hide-details
         readonly
-      >
-        <template #append>
-          <CopyButton
-            :disabled="processing"
-            :model-value="data.finalPriceInCrypto"
-          />
-        </template>
-      </RuiTextField>
-      <RuiTextField
-        id="address"
+        :copy-value="data.finalPriceInCrypto"
+      />
+      <InputWithCopyButton
+        v-if="data.tokenAddress"
+        id="contract"
         :disabled="processing"
-        :model-value="data.cryptoAddress"
-        :label="t('common.address')"
+        :model-value="data.tokenAddress"
+        :label="t('home.plans.tiers.step_3.labels.token_contract')"
         variant="outlined"
         hide-details
         readonly
-      >
-        <template #append>
-          <CopyButton
-            :disabled="processing"
-            :model-value="data.cryptoAddress"
-          />
-        </template>
-      </RuiTextField>
+        :copy-value="data.tokenAddress"
+      />
+      <InputWithCopyButton
+        id="address"
+        :disabled="processing"
+        :model-value="data.cryptoAddress"
+        :label="t('home.plans.tiers.step_3.labels.to_address')"
+        variant="outlined"
+        hide-details
+        readonly
+        :copy-value="data.cryptoAddress"
+      />
     </div>
     <SelectedPlanOverview
       :plan="data"
@@ -140,22 +171,35 @@ const css = useCssModule();
         </p>
       </div>
     </div>
-    <div
-      v-if="!isBtc"
-      :class="css.button"
-    >
-      <RuiButton
-        :disabled="!metamaskSupport || processing"
-        :loading="processing"
-        colos="primary"
-        size="lg"
-        @click="payWithMetamask()"
+    <div class="my-4 flex gap-4">
+      <div class="grow">
+        <RuiButton
+          :disabled="processing"
+          size="lg"
+          class="w-full"
+          @click="showChangePaymentDialog = true"
+        >
+          {{ t('home.plans.tiers.step_3.change_payment.title') }}
+        </RuiButton>
+      </div>
+      <div
+        v-if="!isBtc"
+        class="grow"
       >
-        <template #prepend>
-          <MetamaskIcon class="h-6 w-6 mr-2" />
-        </template>
-        {{ t('home.plans.tiers.step_3.metamask.action') }}
-      </RuiButton>
+        <RuiButton
+          :disabled="!metamaskSupport || processing"
+          :loading="processing"
+          color="primary"
+          size="lg"
+          class="w-full"
+          @click="payWithMetamask()"
+        >
+          <template #prepend>
+            <MetamaskIcon class="h-6 w-6 mr-2" />
+          </template>
+          {{ t('home.plans.tiers.step_3.metamask.action') }}
+        </RuiButton>
+      </div>
     </div>
   </div>
 
@@ -169,6 +213,11 @@ const css = useCssModule();
     </template>
     {{ status?.message }}
   </FloatingNotification>
+
+  <ChangeCryptoPayment
+    v-model="showChangePaymentDialog"
+    @change="changePaymentMethod()"
+  />
 </template>
 
 <style lang="scss" module>
@@ -180,19 +229,19 @@ const css = useCssModule();
   @apply border mx-auto mt-2 mb-10;
 }
 
+.canvas {
+  @apply w-[228px] h-[228px];
+}
+
 .inputs {
   @apply flex flex-col justify-center gap-6;
 }
 
-.button {
-  @apply my-4;
-}
-
 .hint {
-  @apply text-rui-text-secondary mt-4 mb-4;
+  @apply text-rui-text mt-4 mb-4;
 }
 
 .info {
-  @apply font-bold mt-3 text-rui-primary;
+  @apply font-bold mt-3;
 }
 </style>
