@@ -20,20 +20,23 @@ const props = withDefaults(
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
 
 const { width, height, padding, modelValue } = toRefs(props);
-const out = ref(false);
+const out = ref(true);
 const visible = ref(false);
 
 onMounted(() => set(visible, get(modelValue)));
 watch(modelValue, (display) => {
   if (display) {
-    out.value = false;
-    visible.value = true;
+    set(visible, true);
+    set(out, true);
+    nextTick(() => {
+      set(out, false);
+    });
   }
   else {
-    out.value = true;
+    set(out, true);
     nextTick(() => {
       setTimeout(() => {
-        visible.value = false;
+        set(visible, false);
       }, 800);
     });
   }
@@ -87,9 +90,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .overlay {
-  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0;
-
-  background-color: #00000099;
+  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0 bg-black/[0.6];
 }
 
 .wrapper {
@@ -101,8 +102,7 @@ const css = useCssModule();
     @apply bg-white flex flex-col rounded-lg mb-2;
   }
 
-  @apply transition;
-  transform: translateY(0);
+  @apply transition transform translate-y-0;
 }
 
 .out .dialog {
