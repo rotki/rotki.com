@@ -184,7 +184,10 @@ async function changePaymentMethod() {
     </template>
   </PaymentFrame>
 
-  <FloatingNotification :visible="!(data || loading) && !!step">
+  <FloatingNotification
+    :visible="!(data || loading) && !!step"
+    closeable
+  >
     <template #title>
       {{ step.title }}
     </template>
