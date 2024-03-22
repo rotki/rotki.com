@@ -153,6 +153,7 @@ const showChangePaymentDialog = ref(false);
         :copy-value="data.cryptoAddress"
       />
     </div>
+    <RuiDivider class="mt-8" />
     <SelectedPlanOverview
       :plan="data"
       :disabled="processing"
@@ -171,7 +172,7 @@ const showChangePaymentDialog = ref(false);
         </p>
       </div>
     </div>
-    <div class="my-4 flex gap-4">
+    <div class="my-4 flex flex-col sm:flex-row gap-4">
       <div class="grow">
         <RuiButton
           :disabled="processing"
@@ -238,7 +239,7 @@ const showChangePaymentDialog = ref(false);
 }
 
 .hint {
-  @apply text-rui-text mt-4 mb-4;
+  @apply text-rui-text mt-6 mb-6 text-sm;
 }
 
 .info {
