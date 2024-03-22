@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { client, paypalCheckout } from 'braintree-web';
+import { usePaymentPaypalStore } from '~/store/payments/paypal';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
 import type { Ref } from 'vue';
@@ -30,6 +31,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const { paymentMethodId } = usePaymentMethodParam();
+const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
 const { token, plan, loading, pending, success } = toRefs(props);
 const error: Ref<ErrorMessage | null> = ref(null);
@@ -91,9 +93,11 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
         set(paying, true);
         logger.debug(`User approved PayPal payment`);
         const token = await btPayPalCheckout.tokenizePayment(data);
+        const vaultedToken = await addPaypal({ paymentMethodNonce: token.nonce });
+        const vaultedNonce = await createPaypalNonce({ paymentToken: vaultedToken });
         pay({
           months: get(plan).months,
-          nonce: token.nonce,
+          nonce: vaultedNonce,
         });
         return token;
       },

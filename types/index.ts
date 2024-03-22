@@ -293,3 +293,32 @@ export const CreateCardNonceResponse = z.object({
 });
 
 export type CreateCardNonceResponse = z.infer<typeof CreateCardNonceResponse>;
+
+export interface VaultPaypalRequest {
+  paymentMethodNonce: string;
+}
+
+export interface CreatePaypalNonceRequest {
+  paymentToken: string;
+}
+
+export const SavedPaypalAccount = z.object({
+  email: z.string(),
+  imageUrl: z.string(),
+  token: z.string(),
+});
+
+export type SavedPaypalAccount = z.infer<typeof SavedPaypalAccount>;
+
+export const SavedPaypalResponse = z.object({
+  message: z.string().optional(),
+  paypalDetails: SavedPaypalAccount.optional(),
+});
+
+export type SavedPaypalResponse = z.infer<typeof SavedPaypalResponse>;
+
+export const CreatePaypalNonceResponse = z.object({
+  paymentNonce: z.string(),
+});
+
+export type CreatePaypalNonceResponse = z.infer<typeof CreatePaypalNonceResponse>;
