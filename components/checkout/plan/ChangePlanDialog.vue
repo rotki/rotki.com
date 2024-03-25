@@ -58,7 +58,10 @@ const css = useCssModule();
 <template>
   <ModalDialog :model-value="visible">
     <div :class="css.body">
-      <TextHeading no-margin>
+      <TextHeading
+        no-margin
+        class="mb-4"
+      >
         {{ t('change_plan.title') }}
       </TextHeading>
       <div
@@ -87,7 +90,7 @@ const css = useCssModule();
         v-if="crypto && warning"
         :class="css.warning"
       >
-        <span>
+        <span class="text-rui-text-secondary">
           {{ t('change_plan.switch_warning') }}
         </span>
         <RuiCheckbox

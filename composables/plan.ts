@@ -2,11 +2,7 @@ import { get } from '@vueuse/core';
 
 const availablePlans = [1, 3, 6, 12];
 
-export const supportedCurrencies = ['ETH', 'BTC', 'DAI'] as const;
-
-export type Currency = (typeof supportedCurrencies)[number];
-
-type CurrencyParam = Currency | null;
+type CurrencyParam = string | null;
 
 export function usePlanParams() {
   const route = useRoute();
@@ -37,16 +33,13 @@ export function useCurrencyParams() {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
     const { currency } = route.query;
-    if (typeof currency !== 'string' || !isSupported(currency))
+    if (typeof currency !== 'string')
       return null;
 
-    return currency as Currency;
+    return currency;
   });
 
-  const isSupported = (value: string) =>
-    supportedCurrencies.includes(value as Currency);
-
-  return { currency, isSupportedCrypto: isSupported };
+  return { currency };
 }
 
 export function useSubscriptionIdParam() {

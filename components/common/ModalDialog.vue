@@ -20,20 +20,23 @@ const props = withDefaults(
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
 
 const { width, height, padding, modelValue } = toRefs(props);
-const out = ref(false);
+const out = ref(true);
 const visible = ref(false);
 
 onMounted(() => set(visible, get(modelValue)));
 watch(modelValue, (display) => {
   if (display) {
-    out.value = false;
-    visible.value = true;
+    set(visible, true);
+    set(out, true);
+    nextTick(() => {
+      set(out, false);
+    });
   }
   else {
-    out.value = true;
+    set(out, true);
     nextTick(() => {
       setTimeout(() => {
-        visible.value = false;
+        set(visible, false);
       }, 800);
     });
   }
@@ -87,9 +90,7 @@ const css = useCssModule();
 @import '@/assets/css/main.scss';
 
 .overlay {
-  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0;
-
-  background-color: #0000002e;
+  @apply w-screen h-screen overflow-y-hidden z-30 fixed top-0 right-0 bg-black/[0.6];
 }
 
 .wrapper {
@@ -101,66 +102,18 @@ const css = useCssModule();
     @apply bg-white flex flex-col rounded-lg mb-2;
   }
 
-  transform: scale(0);
-  animation: zoomIn 0.5s 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  @apply transition transform translate-y-0;
 }
 
 .out .dialog {
-  animation: zoomOut 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  transform: translateY(100vh);
 }
 
 .container {
-  @apply w-screen h-screen overflow-y-hidden fixed top-0 right-0;
-
-  z-index: 101;
-  transform: scaleY(0.01) scaleX(0);
-  animation: unfoldIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  @apply w-screen h-screen overflow-y-hidden fixed top-0 right-0 z-[101] transition opacity-100;
 }
 
 .out.container {
-  transform: scale(1);
-  animation: unfoldOut 1s 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-}
-
-@keyframes unfoldIn {
-  0% {
-    transform: scaleY(0.005) scaleX(0);
-  }
-  50% {
-    transform: scaleY(0.005) scaleX(1);
-  }
-  100% {
-    transform: scaleY(1) scaleX(1);
-  }
-}
-
-@keyframes unfoldOut {
-  0% {
-    transform: scaleY(1) scaleX(1);
-  }
-  50% {
-    transform: scaleY(0.005) scaleX(1);
-  }
-  100% {
-    transform: scaleY(0.005) scaleX(0);
-  }
-}
-
-@keyframes zoomIn {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes zoomOut {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0);
-  }
+  @apply opacity-0;
 }
 </style>

@@ -118,7 +118,7 @@ const css = useCssModule();
 }
 
 .selectable {
-  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-4;
+  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 xl:gap-4;
 }
 
 .hint {
