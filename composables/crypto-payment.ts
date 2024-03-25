@@ -25,9 +25,6 @@ const abi = [
   // Get the account balance
   'function balanceOf(address) view returns (uint)',
 
-  // Get the decimal number of a token
-  'function decimals() public view returns (uint8)',
-
   // Send some of your tokens to someone else
   'function transfer(address to, uint amount)',
 
@@ -69,7 +66,6 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
     let tx: TransactionResponse;
 
     logger.info(`preparing to send ${value} ${currency} to ${to}`);
-    set(state, 'pending');
 
     // Pay with native token
     if (!tokenAddress) {
@@ -94,6 +90,10 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
   }
 
   const payWithMetamask = async () => {
+    if (get(state) === 'pending')
+      return;
+
+    set(state, 'pending');
     try {
       const payment = get(data);
       assert(payment);
