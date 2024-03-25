@@ -232,7 +232,7 @@ const showChangePaymentDialog = ref(false);
 }
 
 .canvas {
-  @apply w-[228px] h-[228px];
+  @apply w-[14.25rem] h-[14.25rem];
 }
 
 .inputs {
