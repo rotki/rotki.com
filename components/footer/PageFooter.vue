@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { EXTERNAL_LOGO } from '~/utils/external-links';
-
 withDefaults(
   defineProps<{
     landing?: boolean;
@@ -24,10 +22,9 @@ const year = new Date().getFullYear().toString();
       >
         <div class="flex justify-between items-center">
           <div>
-            <RuiLogo
-              class="!h-8 md:h-12"
+            <AppLogo
               text
-              :custom-src="EXTERNAL_LOGO"
+              class="!h-8 md:h-12"
             />
           </div>
           <NuxtLink to="/download">
