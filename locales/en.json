@@ -443,13 +443,13 @@
           },
           "metamask": {
             "action": "Pay with Metamask",
-            "notice": "You can pay with metamask, your mobile wallet or manually send the exact amount to the following address above. Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
+            "notice": "You can pay with metamask, your mobile wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed."
           },
           "notes": {
             "1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
-            "2": "Once the whole amount is sent and manually processed, then a receipt will be sent to your email and your subscription will be activated.",
+            "2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
           },
           "saved_card": {
