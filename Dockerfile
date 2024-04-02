@@ -29,4 +29,4 @@ EXPOSE ${NITRO_PORT}
 
 CMD ["pm2-runtime", "ecosystem.config.cjs"]
 HEALTHCHECK --start-period=30s --retries=2 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${NITRO_PORT}/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:${NITRO_PORT}/health || exit 1
