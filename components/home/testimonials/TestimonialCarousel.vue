@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Autoplay } from 'swiper/modules';
 import { SwiperSlide } from 'swiper/vue';
 import { get, set } from '@vueuse/core';
 import type { Swiper, SwiperOptions } from 'swiper/types';
@@ -11,8 +10,8 @@ defineProps<{
 
 const css = useCssModule();
 const swiper = ref<Swiper>();
-const pages = computed(() => get(swiper)?.snapGrid.length ?? 1);
-const activeIndex = computed(() => (get(swiper)?.activeIndex ?? 0) + 1);
+const pages = ref(get(swiper)?.snapGrid.length ?? 1);
+const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
 const breakpoints: Record<number, SwiperOptions> = {
   // when window width is >= 320px
   320: {
@@ -43,6 +42,8 @@ const breakpoints: Record<number, SwiperOptions> = {
 
 function onSwiperUpdate(s: Swiper) {
   set(swiper, s);
+  set(activeIndex, s.activeIndex + 1);
+  set(pages, s.snapGrid.length);
 }
 </script>
 
@@ -55,7 +56,6 @@ function onSwiperUpdate(s: Swiper) {
         pauseOnMouseEnter: true,
       }"
       :breakpoints="breakpoints"
-      :modules="[Autoplay]"
       :class="css.slider"
       auto-height
       @swiper="onSwiperUpdate($event)"

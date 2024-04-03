@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { Autoplay } from 'swiper/modules';
 import { SwiperSlide } from 'swiper/vue';
 import { get, set } from '@vueuse/core';
 import type { Swiper } from 'swiper/types';
@@ -46,7 +45,6 @@ scanImages();
         disableOnInteraction: false,
         pauseOnMouseEnter: true,
       }"
-      :modules="[Autoplay]"
       auto-height
       :class="css.slider"
       @swiper="onSwiperUpdate($event)"

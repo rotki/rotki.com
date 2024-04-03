@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import 'swiper/css';
 import { Swiper } from 'swiper/vue';
+import { Autoplay, Keyboard } from 'swiper/modules';
 import type { SwiperOptions } from 'swiper/types';
 
 withDefaults(defineProps<SwiperOptions>(), {
@@ -11,6 +12,7 @@ withDefaults(defineProps<SwiperOptions>(), {
   slidesPerView: 1,
   spaceBetween: 30,
   centeredSlides: false,
+  modules: () => [],
 });
 
 const css = useCssModule();
@@ -28,12 +30,13 @@ const css = useCssModule();
     :effect="effect"
     :enabled="enabled"
     :loop="loop"
-    :modules="modules"
+    :modules="[Autoplay, Keyboard, ...modules]"
     :navigation="navigation"
     :pagination="pagination"
     :slides-per-view="slidesPerView"
     :space-between="spaceBetween"
     :zoom="zoom"
+    :keyboard="true"
   >
     <slot />
   </Swiper>
