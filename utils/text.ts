@@ -14,17 +14,16 @@ export function toTitleCase(string: string): string {
     .join(' ');
 }
 
-export function secondsToReadable(number: number): string {
+export function formatSeconds(number: number): { minutes?: number; seconds?: number } {
   const rounded = Math.floor(number);
   const minutes = Math.floor(rounded / 60);
   const seconds = rounded % 60;
 
-  const messages = [];
+  const result: { minutes?: number; seconds?: number } = {};
   if (minutes > 0)
-    messages.push(`${minutes} minutes`);
-
+    result.minutes = minutes;
   if (seconds > 0)
-    messages.push(`${seconds} seconds`);
+    result.seconds = seconds;
 
-  return messages.join(' ');
+  return result;
 }

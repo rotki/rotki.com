@@ -27,7 +27,7 @@ import { PaymentError } from '~/types/codes';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { logger } from '~/utils/logger';
-import { secondsToReadable } from '~/utils/text';
+import { formatSeconds } from '~/utils/text';
 import type { LoginCredentials } from '~/types/login';
 import type { ActionResult } from '~/types/common';
 import type {
@@ -66,8 +66,16 @@ export const useMainStore = defineStore('main', () => {
     const onError = (data: ResendVerificationResponse) => {
       let message = data.message;
       if (isDefined(data.allowedIn)) {
+        const formatted = formatSeconds(data.allowedIn);
+        const formattedMessage = [];
+        if (formatted.minutes)
+          formattedMessage.push(t('account.unverified_email.message.time.minutes', { number: formatted.minutes }));
+
+        if (formatted.seconds)
+          formattedMessage.push(t('account.unverified_email.message.time.seconds', { number: formatted.seconds }));
+
         message += `\n${t('account.unverified_email.message.try_again', {
-          text: secondsToReadable(data.allowedIn),
+          time: formattedMessage.join(' '),
         })}`;
       }
 

@@ -77,6 +77,7 @@ const { t } = useI18n();
           v-model="username"
           dense
           variant="outlined"
+          :disabled="loading"
           :label="t('auth.common.username')"
           autocomplete="username"
           hide-details
@@ -89,6 +90,7 @@ const { t } = useI18n();
           id="password"
           v-model="password"
           variant="outlined"
+          :disabled="loading"
           dense
           :label="t('auth.common.password')"
           autocomplete="current-password"
@@ -103,6 +105,7 @@ const { t } = useI18n();
       <div class="flex justify-end mb-6 mt-2">
         <ButtonLink
           to="/password/recover"
+          :disabled="loading"
           inline
         >
           {{ t('auth.login.forgot_password') }}
