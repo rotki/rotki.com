@@ -21,7 +21,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Data Synchronization"
-                src="/img/products/details/data_sync.jpg"
+                src="/img/products/details/data_sync.webp"
               />
             </template>
             By being a premium user you have the option to upload your account's
@@ -40,7 +40,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Asset amount value"
-                src="/img/products/details/stats_asset_amount_value.jpg"
+                src="/img/products/details/stats_asset_amount_value.webp"
               />
             </template>
             <template #title>
@@ -56,7 +56,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Asset distribution"
-                src="/img/products/details/stats_distribution_location.jpg"
+                src="/img/products/details/stats_distribution_location.webp"
               />
             </template>
             <template #title>
@@ -74,7 +74,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Dark Mode"
-                src="/img/products/details/dark_mode.jpg"
+                src="/img/products/details/dark_mode.webp"
               />
             </template>
             Dark mode can lessen the strain on your eyes, improve the
@@ -89,7 +89,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="ETH Transactions"
-                src="/img/products/details/transactions.jpg"
+                src="/img/products/details/transactions.webp"
               />
             </template>
             <template #title>
@@ -105,7 +105,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Unlimited Trades"
-                src="/img/products/details/trades.jpg"
+                src="/img/products/details/trades.webp"
               />
             </template>
             <template #title>
@@ -121,7 +121,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Unlimited Deposits and Withdrawals"
-                src="/img/products/details/deposits_and_withdrawals.jpg"
+                src="/img/products/details/deposits_and_withdrawals.webp"
               />
             </template>
             <template #title>
@@ -141,7 +141,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Compound Details"
-                src="/img/products/details/sc_compound1.jpg"
+                src="/img/products/details/sc_compound1.webp"
               />
             </template>
             <template #title>
@@ -158,7 +158,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Compound History"
-                src="/img/products/details/sc_compound2.jpg"
+                src="/img/products/details/sc_compound2.webp"
               />
             </template>
             As a premium user you can also see a history of all your
@@ -170,7 +170,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Vaults Premium"
-                src="/img/products/details/sc_vaults_premium.jpg"
+                src="/img/products/details/sc_vaults_premium.webp"
               />
             </template>
             <template #title>
@@ -188,12 +188,12 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Vaults Premium Watchers"
-                src="/img/products/details/sc_vaults_premium_watchers.jpg"
+                src="/img/products/details/sc_vaults_premium_watchers.webp"
               />
               <img
                 :class="css.image"
                 alt="Vaults Premium Watchers Email"
-                src="/img/products/details/sc_vaults_premium_watchers_email.jpg"
+                src="/img/products/details/sc_vaults_premium_watchers_email.webp"
               />
             </template>
             <template #title>
@@ -211,7 +211,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="AAVE Historical Accounting"
-                src="/img/products/details/sc_aave.jpg"
+                src="/img/products/details/sc_aave.webp"
               />
             </template>
             <template #title>
@@ -227,7 +227,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Yearn Vaults"
-                src="/img/products/details/sc_yearn_vaults1.jpg"
+                src="/img/products/details/sc_yearn_vaults1.webp"
               />
             </template>
             <template #title>
@@ -242,7 +242,7 @@ const css = useCssModule();
               <img
                 :class="css.image"
                 alt="Yearn History"
-                src="/img/products/details/sc_yearn_vaults2.jpg"
+                src="/img/products/details/sc_yearn_vaults2.webp"
               />
             </template>
             You can also see a history of all your vault actions

@@ -8,7 +8,7 @@ const { t } = useI18n();
       <img
         class="rounded-xl overflow-hidden"
         :alt="t('home.profit_loss_report.title')"
-        src="/img/dashboard-2.jpg"
+        src="/img/dashboard-2.webp"
       />
     </div>
     <div class="flex flex-1 flex-col gap-4">

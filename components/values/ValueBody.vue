@@ -5,7 +5,7 @@ const { t } = useI18n();
 <template>
   <div class="flex flex-col items-center justify-center">
     <img
-      src="/img/scenery.jpg"
+      src="/img/scenery.webp"
       alt="Rotki values"
     />
   </div>

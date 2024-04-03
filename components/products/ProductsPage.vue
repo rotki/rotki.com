@@ -93,7 +93,7 @@ const css = useCssModule();
             <template #right>
               <img
                 alt="DeFi protocols"
-                src="/img/products/eth@2x.png"
+                src="/img/products/eth.png"
               />
             </template>
             <template #title>

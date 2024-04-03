@@ -46,7 +46,7 @@ const values = [
           class="shrink-0 w-[240px] h-[240px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
         >
           <img
-            src="/img/rotki-values.png"
+            src="/img/rotki-values.webp"
             alt="Rotki values"
             class="rounded-full w-full h-full border-[12px] border-rui-grey-200"
           />
