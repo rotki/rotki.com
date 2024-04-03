@@ -215,6 +215,7 @@
         "cost_in_symbol_per_period": "Cost in {symbol} per period"
       },
       "no_subscriptions_found": "No subscriptions found",
+      "payment_detail": "Payment Details",
       "title": "Subscription History"
     },
     "tabs": {

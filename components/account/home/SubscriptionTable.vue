@@ -116,6 +116,10 @@ watch(pending, (pending) => {
 
 onUnmounted(() => pause());
 
+function isPending(sub: Subscription) {
+  return sub.status === 'Pending';
+}
+
 function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
   if (action === 'cancel')
     return sub.status !== 'Pending' && sub.actions.includes('cancel');
@@ -126,7 +130,7 @@ function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
 }
 
 function displayActions(sub: Subscription) {
-  return hasAction(sub, 'renew') || hasAction(sub, 'cancel');
+  return hasAction(sub, 'renew') || hasAction(sub, 'cancel') || isPending(sub);
 }
 
 function getChipStatusColor(status: string): ContextColorsType | undefined {
@@ -201,6 +205,14 @@ async function cancelSubscription(sub: Subscription) {
             color="primary"
           >
             {{ t('actions.renew') }}
+          </ButtonLink>
+          <ButtonLink
+            v-if="isPending(row)"
+            :disabled="cancelling"
+            :to="{ path: '/checkout/pay/method' }"
+            color="primary"
+          >
+            {{ t('account.subscriptions.payment_detail') }}
           </ButtonLink>
         </div>
         <div
