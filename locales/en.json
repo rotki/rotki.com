@@ -135,7 +135,17 @@
       "not_generated": "You haven't generated an API key"
     },
     "unverified_email": {
-      "message": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail."
+      "message": {
+        "description": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail.",
+        "error": "Failed to send activation e-mail",
+        "success": "New activation e-mail has been sent",
+        "try_again": "Try again in {time}",
+        "time": {
+          "minutes": "{number} minutes",
+          "seconds": "{number} seconds"
+        }
+      },
+      "resend": "Re-send activation e-mail"
     },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
