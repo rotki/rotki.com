@@ -29,7 +29,7 @@ describe('api utilities', () => {
   it('fetchWithCsrf: fetch account info with 401 error', async () => {
     await expect(
       fetchWithCsrf<ApiResponse<Account>>(`/webapi/account`),
-    ).rejects.toMatch(/401/);
+    ).rejects.toThrowError(/401/);
     expect(logout).toBeCalled();
     expect(logout).toHaveBeenCalledOnce();
   }, 2000);
@@ -55,7 +55,7 @@ describe('api utilities', () => {
     const controller = new AbortController();
 
     setTimeout(() => controller.abort(), 1);
-    await expect(sleep(2000, controller.signal)).rejects.toMatch(
+    await expect(sleep(2000, controller.signal)).rejects.toThrowError(
       /request aborted/,
     );
   });
