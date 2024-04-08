@@ -130,7 +130,7 @@ watch(plan, async (plan) => {
   const response = await switchCryptoPlan(
     plan,
     selectedCurrency,
-    get(subscriptionId),
+    get(subscriptionId) ?? get(currentCryptoSubscriptionId),
   );
   if (!response.isError)
     set(data, response.result);
