@@ -20,6 +20,7 @@ async function back() {
     query: {
       plan: get(plan),
       method: get(paymentMethodId),
+      id: get(subscriptionId),
     },
   });
 }
@@ -68,6 +69,7 @@ const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
     />
     <div :class="css.buttons">
       <RuiButton
+        v-if="!subscriptionId"
         :disabled="processing"
         class="w-full"
         size="lg"

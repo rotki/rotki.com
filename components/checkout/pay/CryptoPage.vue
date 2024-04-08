@@ -3,6 +3,7 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
+import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
 import type { CryptoPayment, PaymentStep, Provider } from '~/types';
 
@@ -12,7 +13,7 @@ const loading = ref(false);
 const data = ref<CryptoPayment | null>(null);
 const metamaskSupport = ref(false);
 
-const { cryptoPayment, switchCryptoPlan, deletePendingPayment } = useMainStore();
+const { cryptoPayment, switchCryptoPlan, deletePendingPayment, subscriptions } = useMainStore();
 const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
@@ -95,13 +96,29 @@ const step = computed<PaymentStep>(() => {
   return { type: 'idle' };
 });
 
+const currentCryptoSubscriptionId = computed(() => {
+  const subs = get(subscriptions).filter(sub => sub.pending);
+
+  if (subs.length > 1)
+    return subs.find(sub => sub.status === 'Active')?.identifier;
+
+  return undefined;
+});
+
 function back() {
-  const { plan, method } = route.query;
+  const { plan, id } = route.query;
+  const subId = id ?? get(currentCryptoSubscriptionId);
+
+  const name = subId
+    ? 'checkout-pay-request-crypto'
+    : 'checkout-pay-method';
+
   navigateTo({
-    name: 'checkout-pay-method',
+    name,
     query: {
       plan,
-      method,
+      method: PaymentMethod.BLOCKCHAIN,
+      id: subId,
     },
   });
 }

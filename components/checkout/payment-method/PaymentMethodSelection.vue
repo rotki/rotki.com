@@ -2,18 +2,13 @@
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
 import type { ComputedRef, Ref } from 'vue';
 
 const props = defineProps<{ identifier?: string }>();
 
 const { t } = useI18n();
-
-enum PaymentMethod {
-  BLOCKCHAIN = 1,
-  CARD = 2,
-  PAYPAL = 3,
-}
 
 interface PaymentMethodItem {
   id: PaymentMethod;

@@ -2,6 +2,7 @@
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { PaymentMethod } from '~/types/payment';
 import type {
   ContextColorsType,
   DataTableColumn,
@@ -74,32 +75,33 @@ const pendingPaymentCurrency = computedAsync(async () => {
   return response.result.currency;
 });
 
-const renewLink = computed<{ path: string; query: Record<string, string> }>(
-  () => {
-    const link = {
-      path: '/checkout/pay/method',
-      query: {},
+const renewLink = computed<{ path: string; query: Record<string, string> }>(() => {
+  const link = {
+    path: '/checkout/pay/request-crypto',
+    query: {},
+  };
+
+  const subs = get(renewableSubscriptions);
+
+  if (subs.length > 0) {
+    const sub = subs[0];
+    link.query = {
+      plan: sub.durationInMonths.toString(),
+      id: sub.identifier,
+      method: PaymentMethod.BLOCKCHAIN,
     };
+  }
 
-    const subs = get(renewableSubscriptions);
+  if (isDefined(pendingPaymentCurrency)) {
+    link.query = {
+      ...link.query,
+      method: PaymentMethod.BLOCKCHAIN,
+      currency: get(pendingPaymentCurrency),
+    };
+  }
 
-    if (subs.length > 0) {
-      const sub = subs[0];
-      link.query = {
-        plan: sub.durationInMonths.toString(),
-        id: sub.identifier,
-      };
-    }
-
-    if (isDefined(pendingPaymentCurrency)) {
-      link.query = {
-        ...link.query,
-        currency: get(pendingPaymentCurrency),
-      };
-    }
-
-    return link;
-  },
+  return link;
+},
 );
 
 const { pause, resume, isActive } = useIntervalFn(
