@@ -444,7 +444,7 @@
           "labels": {
             "network": "Network",
             "token": "Token",
-            "token_contract": "Token contract",
+            "token_contract": "Token contract: ",
             "to_address": "Send to address"
           },
           "change_payment": {

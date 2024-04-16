@@ -63,6 +63,23 @@ const selectedToken = computed({
     emit('update:modelValue', item ? item.id : '');
   },
 });
+
+const hint = computed(() => {
+  const chain = get(selectedChain);
+  if (!chain)
+    return '';
+
+  const items = get(paymentAssets)[chain.id];
+
+  if (!items)
+    return '';
+
+  const address = items[get(modelValue)]?.address;
+  if (!address)
+    return '';
+
+  return `${t('home.plans.tiers.step_3.labels.token_contract')} ${address}`;
+});
 </script>
 
 <template>
@@ -93,6 +110,7 @@ const selectedToken = computed({
       :disabled="paymentAssetsLoading || !selectedChain"
       key-prop="id"
       text-prop="label"
+      :hint="hint"
       :label="t('home.plans.tiers.step_3.labels.token')"
     >
       <template #default="{ item }">
