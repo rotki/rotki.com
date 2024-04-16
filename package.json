@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "nuxi dev",
     "build": "vue-tsc --noEmit --project tsconfig.build.json && nuxi build",
+    "clean": "rimraf node_modules .output .nuxt dist && pnpm store prune && pnpm i",
     "start": "nuxi start",
     "generate": "nuxi generate",
     "postinstall": "nuxi prepare",
@@ -57,7 +58,7 @@
     "@nuxtjs/i18n": "8.3.0",
     "@nuxtjs/sitemap": "5.1.4",
     "@rotki/eslint-config": "2.7.0",
-    "@rotki/ui-library": "0.14.0",
+    "@rotki/ui-library": "0.15.0",
     "@types/braintree-web": "3.96.11",
     "@types/paypal-checkout-components": "4.0.8",
     "@types/qrcode": "1.5.5",
