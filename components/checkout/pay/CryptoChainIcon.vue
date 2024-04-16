@@ -11,7 +11,7 @@ const error = ref(false);
   <div class="w-6 h-6">
     <div
       v-if="pending || error"
-      class="w-full h-full bg-rui-grey-300 text-rui-grey-500 uppercase rounded-md flex items-center justify-center"
+      class="w-full h-full bg-rui-grey-300 text-rui-grey-700 uppercase rounded-md flex items-center justify-center"
     >
       {{ chain[0] }}
     </div>

@@ -5,7 +5,7 @@ import { get, set, useClipboard } from '@vueuse/core';
 import { logger } from '~/utils/logger';
 import { getChainId } from '~/composables/crypto-payment';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
-import { toTitleCase } from '~/utils/text';
+import { toTitleCase, truncateAddress } from '~/utils/text';
 import type { CryptoPayment, PaymentStep } from '~/types';
 
 const props = defineProps<{
@@ -107,20 +107,6 @@ const showChangePaymentDialog = ref(false);
       />
     </div>
     <div :class="css.inputs">
-      <RuiTextField
-        id="chain"
-        color="primary"
-        :disabled="processing"
-        :model-value="toTitleCase(data.chainName)"
-        :label="t('home.plans.tiers.step_3.labels.network')"
-        variant="outlined"
-        hide-details
-        readonly
-      >
-        <template #prepend>
-          <CryptoChainIcon :chain="data.chainName" />
-        </template>
-      </RuiTextField>
       <InputWithCopyButton
         id="price"
         :disabled="processing"
@@ -132,17 +118,6 @@ const showChangePaymentDialog = ref(false);
         :copy-value="data.finalPriceInCrypto"
       />
       <InputWithCopyButton
-        v-if="data.tokenAddress"
-        id="contract"
-        :disabled="processing"
-        :model-value="data.tokenAddress"
-        :label="t('home.plans.tiers.step_3.labels.token_contract')"
-        variant="outlined"
-        hide-details
-        readonly
-        :copy-value="data.tokenAddress"
-      />
-      <InputWithCopyButton
         id="address"
         :disabled="processing"
         :model-value="data.cryptoAddress"
@@ -152,6 +127,29 @@ const showChangePaymentDialog = ref(false);
         readonly
         :copy-value="data.cryptoAddress"
       />
+
+      <RuiAlert type="info">
+        <div class="flex items-center gap-2">
+          <b>{{ t('home.plans.tiers.step_3.labels.network') }}:</b>
+
+          <div class="flex items-center gap-2">
+            <CryptoChainIcon :chain="data.chainName" />
+            {{ toTitleCase(data.chainName) }}
+          </div>
+        </div>
+        <div
+          v-if="data.tokenAddress"
+          class="flex gap-2 mt-1"
+        >
+          <b>{{ t('home.plans.tiers.step_3.labels.token_contract') }}</b>
+          <RuiTooltip :open-delay="400">
+            <template #activator>
+              {{ truncateAddress(data.tokenAddress, 8) }}
+            </template>
+            {{ data.tokenAddress }}
+          </RuiTooltip>
+        </div>
+      </RuiAlert>
     </div>
     <RuiDivider class="mt-8" />
     <SelectedPlanOverview
