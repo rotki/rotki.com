@@ -97,8 +97,8 @@ devDependencies:
     specifier: 2.7.0
     version: 2.7.0(@vue/compiler-sfc@3.4.21)(eslint@8.57.0)(typescript@5.3.3)(vitest@1.5.0)
   '@rotki/ui-library':
-    specifier: 0.14.0
-    version: 0.14.0(@vueuse/core@10.9.0)(@vueuse/shared@10.9.0)(vue@3.4.21)
+    specifier: 0.15.0
+    version: 0.15.0(@vueuse/core@10.9.0)(@vueuse/shared@10.9.0)(vue@3.4.21)
   '@types/braintree-web':
     specifier: 3.96.11
     version: 3.96.11
@@ -2721,8 +2721,8 @@ packages:
       - vitest
     dev: true
 
-  /@rotki/ui-library@0.14.0(@vueuse/core@10.9.0)(@vueuse/shared@10.9.0)(vue@3.4.21):
-    resolution: {integrity: sha512-8FTExRKnNPyqXPOo9b2bqB/oxNBbjRgoGcK9MP5zRyyhof6YgiWiWeg2Ok8aTOoluJyeT27sUkp9jTgGCL45yg==}
+  /@rotki/ui-library@0.15.0(@vueuse/core@10.9.0)(@vueuse/shared@10.9.0)(vue@3.4.21):
+    resolution: {integrity: sha512-QYckezC3HCB74V4/OFppHuDhJ1rDWe5DgVz/t4CWlkOzNi0iN9+x45SsBdL4LVS0HSU6HdbNZwEuWBDf5lnFLA==}
     engines: {pnpm: '>=8 <9'}
     peerDependencies:
       '@vueuse/core': '>10.0.0'
@@ -4378,6 +4378,7 @@ packages:
   /astral-regex@2.0.0:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
+    requiresBuild: true
 
   /async-sema@3.1.1:
     resolution: {integrity: sha512-tLRNUXati5MFePdAk8dw7Qt7DpxPB60ofAgn8WRhW6a2rcimZnYBP9oxHiv0OHy+Wz7kPMG+t4LGdt31+4EmGg==}
@@ -11864,6 +11865,7 @@ packages:
   /type-fest@0.21.3:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
+    requiresBuild: true
 
   /type-fest@0.6.0:
     resolution: {integrity: sha512-q+MB8nYR1KDLrgr4G5yemftpMC7/QLqVndBmEEdqzmNj5dcFOO4Oo8qlwZE3ULT3+Zim1F8Kq4cBnikNhlCMlg==}

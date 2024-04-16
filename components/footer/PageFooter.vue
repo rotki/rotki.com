@@ -21,12 +21,10 @@ const year = new Date().getFullYear().toString();
         class="space-y-8 pt-8 lg:pt-16 mb-10"
       >
         <div class="flex justify-between items-center">
-          <div>
-            <AppLogo
-              text
-              class="!h-8 md:h-12"
-            />
-          </div>
+          <AppLogo
+            text
+            size="2"
+          />
           <NuxtLink to="/download">
             <RuiButton
               color="primary"

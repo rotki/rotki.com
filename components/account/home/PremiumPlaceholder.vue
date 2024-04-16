@@ -8,7 +8,7 @@ const { t } = useI18n();
       <div
         class="rounded-full w-10 h-10 flex items-center justify-center bg-rui-primary/[0.04]"
       >
-        <AppLogo class="w-6 h-6" />
+        <AppLogo size="1.5" />
       </div>
       <div>
         <div class="text-body-1">

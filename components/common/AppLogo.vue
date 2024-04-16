@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import { EXTERNAL_LOGO } from '~/utils/external-links';
-
-withDefaults(
-  defineProps<{
-    src?: string;
-    text?: boolean;
-  }>(),
-  {
-    src: EXTERNAL_LOGO,
-    text: false,
-  },
-);
+withDefaults(defineProps<{ text?: boolean }>(), { text: false });
 
 const attrs = useAttrs();
+const branch = useRuntimeConfig().public.testing ? 'develop' : 'main';
 </script>
 
 <template>
   <ClientOnly>
     <RuiLogo
       :text="text"
-      :custom-src="src"
+      :branch="branch"
+      logo="website"
       v-bind="attrs"
-      class="transition delay-1000"
     />
     <template #fallback>
       <RuiLogo
