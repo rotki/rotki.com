@@ -31,7 +31,7 @@ const year = new Date().getFullYear().toString();
               variant="text"
               size="lg"
             >
-              {{ t("page_footer.download") }}
+              {{ t('page_footer.download') }}
             </RuiButton>
           </NuxtLink>
         </div>

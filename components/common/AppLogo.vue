@@ -2,7 +2,7 @@
 withDefaults(defineProps<{ text?: boolean }>(), { text: false });
 
 const attrs = useAttrs();
-const branch = process.env.NODE_ENV === 'development' ? 'develop' : 'main';
+const branch = useRuntimeConfig().public.testing ? 'develop' : 'main';
 </script>
 
 <template>
