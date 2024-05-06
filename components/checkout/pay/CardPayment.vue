@@ -6,7 +6,7 @@ import {
   threeDSecure,
 } from 'braintree-web';
 import { get, set } from '@vueuse/core';
-import { logger } from '~/utils/logger';
+import { useLogger } from '~/utils/use-logger';
 import { assert } from '~/utils/assert';
 import { usePaymentCardsStore } from '~/store/payments/cards';
 import type { PaymentStep, SavedCard, SelectedPlan } from '~/types';
@@ -55,6 +55,8 @@ const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
 
 const { addCard, createCardNonce } = usePaymentCardsStore();
+
+const logger = useLogger('card-payment');
 
 function updatePending() {
   emit('update:pending', true);

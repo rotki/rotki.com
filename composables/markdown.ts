@@ -1,8 +1,8 @@
 import { get, objectPick, set } from '@vueuse/core';
 import { groupBy } from 'graphql/jsutils/groupBy';
+import { useLogger } from '~/utils/use-logger';
 import { replacePathPrefix } from '~/utils/api';
 import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
-import { logger } from '~/utils/logger';
 import type {
   MarkdownParsedContent,
   QueryBuilderWhere,
@@ -41,6 +41,8 @@ export function useMarkdownContent() {
   const firstJob: ComputedRef<JobMarkdownContent | null> = computed(
     () => get(openJobs)[0] ?? null,
   );
+
+  const logger = useLogger('markdown-content');
 
   /**
    * fetches all markdown files within the jobs directory

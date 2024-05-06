@@ -2,7 +2,7 @@
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import { get, set, useClipboard } from '@vueuse/core';
-import { logger } from '~/utils/logger';
+import { useLogger } from '~/utils/use-logger';
 import { getChainId } from '~/composables/crypto-payment';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import { toTitleCase, truncateAddress } from '~/utils/text';
@@ -28,6 +28,8 @@ const emit = defineEmits<{
 const { t } = useI18n();
 
 const config = useRuntimeConfig();
+
+const logger = useLogger('card-payment-form');
 
 async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement) {
   let qrText = '';

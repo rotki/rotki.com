@@ -3,6 +3,7 @@ import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useMainStore } from '~/store';
 import { fetchWithCsrf } from '~/utils/api';
+import { useLogger } from '~/utils/use-logger';
 
 const route = useRoute();
 const { uid, token } = route.params;
@@ -10,6 +11,7 @@ const validating = ref(true);
 const isValid = ref(false);
 
 const { getAccount } = useMainStore();
+const logger = useLogger();
 
 async function validateToken() {
   try {

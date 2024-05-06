@@ -40,7 +40,6 @@
     "@vueuse/shared": "10.9.0",
     "braintree-web": "3.102.0",
     "ethers": "6.12.1",
-    "loglevel": "1.9.1",
     "pinia": "2.1.7",
     "qrcode": "1.5.3",
     "swiper": "11.1.1",

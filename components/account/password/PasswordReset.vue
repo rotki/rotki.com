@@ -4,8 +4,11 @@ import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
+import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 import type { Ref } from 'vue';
+
+const logger = useLogger();
 
 function setupTokenValidation() {
   const route = useRoute();

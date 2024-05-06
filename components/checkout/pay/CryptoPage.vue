@@ -5,6 +5,7 @@ import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
+import { useLogger } from '~/utils/use-logger';
 import type { CryptoPayment, PaymentStep, Provider } from '~/types';
 
 const { t } = useI18n();
@@ -35,6 +36,8 @@ const {
   },
   !!config.public.testing,
 );
+
+const logger = useLogger();
 
 onMounted(async () => {
   const selectedPlan = get(plan);

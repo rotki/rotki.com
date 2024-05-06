@@ -1,11 +1,13 @@
 import { set } from '@vueuse/core';
+import { useLogger } from '~/utils/use-logger';
 import { fetchWithCsrf } from '~/utils/api';
-import { logger } from '~/utils/logger';
 import { PaymentAssetResponse } from '~/types';
 
 export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
   const paymentAssetsLoading = ref(false);
   const paymentAssets = ref<PaymentAssetResponse>({});
+
+  const logger = useLogger('crypto-payment');
 
   const fetchPaymentAssets = async (): Promise<void> => {
     set(paymentAssetsLoading, true);

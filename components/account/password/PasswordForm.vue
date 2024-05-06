@@ -3,8 +3,8 @@ import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
 import { FetchError } from 'ofetch';
 import { get, set } from '@vueuse/core';
+import { useLogger } from '~/utils/use-logger';
 import { fetchWithCsrf } from '~/utils/api';
-import { logger } from '~/utils/logger';
 
 const emailAddress = ref('');
 const loading = ref(false);
@@ -32,6 +32,8 @@ const v$ = useVuelidate(
     $externalResults,
   },
 );
+
+const logger = useLogger('password-form');
 
 async function reset() {
   set(loading, true);

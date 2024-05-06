@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { client, paypalCheckout } from 'braintree-web';
+import { useLogger } from '~/utils/use-logger';
 import { usePaymentPaypalStore } from '~/store/payments/paypal';
 import { assert } from '~/utils/assert';
-import { logger } from '~/utils/logger';
 import type { Ref } from 'vue';
 import type { PaymentStep, SelectedPlan } from '~/types';
 import type { PayEvent } from '~/types/common';
@@ -43,6 +43,8 @@ const initializing = ref(false);
 const processing = computed(() => get(paying) || get(loading) || get(pending));
 
 let btClient: braintree.Client | null = null;
+
+const logger = useLogger('paypal-payment');
 
 async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, pay: (plan: PayEvent) => void) {
   let paypalActions: any = null;

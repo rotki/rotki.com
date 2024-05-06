@@ -1,5 +1,5 @@
 import { get, set } from '@vueuse/core';
-import { logger } from '~/utils/logger';
+import { useLogger } from '~/utils/use-logger';
 
 interface Asset {
   readonly name: string;
@@ -18,6 +18,8 @@ export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/rel
   const macOSUrl = ref(fallbackUrl);
   const macOSArmUrl = ref(fallbackUrl);
   const windowsUrl = ref(fallbackUrl);
+
+  const logger = useLogger('download');
 
   function getUrl(assets: Asset[], filter: (asset: Asset) => boolean): string {
     const matched = assets.filter(filter);

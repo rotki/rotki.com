@@ -6,7 +6,7 @@ import {
   parseUnits,
 } from 'ethers';
 import { get, set, useTimeoutFn } from '@vueuse/core';
-import { logger } from '~/utils/logger';
+import { useLogger } from '~/utils/use-logger';
 import { assert } from '~/utils/assert';
 import { useMainStore } from '~/store';
 import type {
@@ -38,6 +38,9 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
   const { markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
   const error = ref('');
+
+  const logger = useLogger('web3-payment');
+
   const { start, stop } = useTimeoutFn(
     () => {
       logger.info('change to done');

@@ -3,6 +3,7 @@
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
+import { useLogger } from '~/utils/use-logger';
 import {
   Account,
   ActionResultResponse,
@@ -26,7 +27,6 @@ import {
 import { PaymentError } from '~/types/codes';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
-import { logger } from '~/utils/logger';
 import { formatSeconds } from '~/utils/text';
 import type { LoginCredentials } from '~/types/login';
 import type { ActionResult } from '~/types/common';
@@ -45,6 +45,8 @@ export const useMainStore = defineStore('main', () => {
   const plans = ref<Plan[] | null>(null);
   const authenticatedOnPlansLoad = ref(false);
   const cancellationError = ref('');
+
+  const logger = useLogger('store');
 
   const getAccount = async (): Promise<void> => {
     try {

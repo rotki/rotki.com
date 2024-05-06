@@ -1,4 +1,5 @@
 import { get, set } from '@vueuse/core';
+import { useLogger } from '~/utils/use-logger';
 
 function isObject(data: any): boolean {
   return typeof data === 'object'
@@ -63,6 +64,8 @@ const CSRF_HEADER = 'X-CSRFToken';
 
 const logout = ref<() => Promise<void>>();
 const refresh = ref<() => void>();
+
+const logger = useLogger('fetch');
 
 export function setHooks(hooks: {
   logout: () => Promise<void>;
@@ -130,6 +133,8 @@ export const fetchWithCsrf = $fetch.create({
   parseResponse(responseText: string) {
     return convertKeys(JSON.parse(responseText), true, false);
   },
+  retry: 1,
+  retryDelay: 500,
   timeout: TIMEOUT,
 });
 

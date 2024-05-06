@@ -1,4 +1,5 @@
 import { set } from '@vueuse/core';
+import { useLogger } from '~/utils/use-logger';
 import {
   type ApiResponse,
   type CreateCardNonceRequest,
@@ -8,10 +9,11 @@ import {
   SavedCardResponse,
 } from '~/types';
 import { fetchWithCsrf } from '~/utils/api';
-import { logger } from '~/utils/logger';
 
 export const usePaymentCardsStore = defineStore('payments/cards', () => {
   const card = ref<SavedCard>();
+
+  const logger = useLogger('card-payment');
 
   const getCard = async (): Promise<void> => {
     try {

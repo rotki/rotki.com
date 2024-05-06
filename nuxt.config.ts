@@ -174,6 +174,7 @@ export default defineNuxtConfig({
         supportEmailMailto: 'mailto:support@rotki.com',
         twitter: 'https://twitter.com/rotkiapp',
       },
+      loglevel: 3, // Setting info loglevel as the default.
       maintenance: false,
       recaptcha: {
         siteKey: '',
