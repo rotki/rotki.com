@@ -1,6 +1,4 @@
-import { type FetchContext, FetchError, type FetchResponse } from 'ofetch';
 import { get, set } from '@vueuse/core';
-import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack';
 
 function isObject(data: any): boolean {
   return typeof data === 'object'
@@ -57,6 +55,7 @@ export function convertKeys(data: any, camelCase: boolean, skipKey: boolean): an
   return converted;
 }
 
+const TIMEOUT = 30000;
 const CSRF_COOKIE = 'csrftoken';
 
 export const SESSION_COOKIE = 'sessionid';
@@ -73,86 +72,51 @@ export function setHooks(hooks: {
   set(refresh, hooks.refresh);
 }
 
-export function sleep(ms = 0, signal: AbortSignal): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const id = setTimeout(() => resolve(), ms);
-    signal?.addEventListener('abort', () => {
-      clearTimeout(id);
-      reject(new Error('request aborted'));
-    });
-  });
-}
+export const fetchWithCsrf = $fetch.create({
+  credentials: 'include',
+  async onRequest({ options }) {
+    const { baseUrl } = useRuntimeConfig().public;
+    const event = typeof useEvent === 'function' ? useEvent() : null;
 
-export async function fetchWithCsrf<
-  Resp,
-  Req extends NitroFetchRequest = NitroFetchRequest,
->(request: Req, options?: NitroFetchOptions<Req>) {
-  const { baseUrl } = useRuntimeConfig().public;
+    let token = event
+      ? parseCookies(event)[CSRF_COOKIE]
+      : useCookie(CSRF_COOKIE).value;
 
-  let token = useCookie(CSRF_COOKIE).value;
+    if (process.client && ['post', 'delete', 'put', 'patch'].includes(options?.method?.toLowerCase() ?? ''))
+      token = await initCsrf();
 
-  if (
-    process.client
-    && ['post', 'delete', 'put', 'patch'].includes(
-      options?.method?.toLowerCase() ?? '',
-    )
-  ) {
-    await initCsrf();
-    token = getCookie(CSRF_COOKIE);
-  }
-
-  let headers: any = {
-    ...options?.headers,
-    ...(token && { [CSRF_HEADER]: token }),
-    'accept': 'application/json',
-    'content-type': 'application/json',
-  };
-
-  if (process.server || process.env.NODE_ENV === 'test') {
-    headers = {
-      ...headers,
-      ...useRequestHeaders(['cookie']),
-      referer: baseUrl,
+    let headers: any = {
+      'accept': 'application/json',
+      'content-type': 'application/json',
+      ...(token && { [CSRF_HEADER]: token }),
+      ...options?.headers,
     };
-  }
 
-  const controller = new AbortController();
-  try {
-    const aborter = sleep(30000, controller.signal);
-    const fetch = $fetch<Resp>(request, {
-      baseURL: baseUrl,
-      ...options,
-      credentials: 'include',
-      headers,
-      onRequest(context: FetchContext): void {
-        context.options.body = convertKeys(context.options.body, false, false);
-      },
-      onResponse(
-        context: FetchContext & { response: FetchResponse<Req> },
-      ): Promise<void> | void {
-        if ([200].includes(context.response.status) && isDefined(refresh))
-          get(refresh)();
-      },
-      parseResponse(responseText: string): Req {
-        return convertKeys(JSON.parse(responseText), true, false);
-      },
-      signal: controller.signal,
-    });
+    if (process.server || process.env.NODE_ENV === 'test') {
+      const cookieString = event
+        ? event.headers.get('cookie')
+        : useRequestHeaders(['cookie']).cookie;
 
-    const race = await Promise.race<any>([aborter, fetch]);
-    if (race === null)
-      controller.abort();
+      headers = {
+        ...headers,
+        ...(cookieString && { cookie: cookieString }),
+        referer: baseUrl,
+      };
+    }
 
-    return fetch;
-  }
-  catch (error) {
-    if (!(error instanceof FetchError))
-      throw error;
-
+    options.headers = headers;
+    options.baseURL = baseUrl;
+    options.body = convertKeys(options.body, false, false);
+  },
+  onResponse({ response }): Promise<void> | void {
+    const status = response.status;
+    if ([200].includes(status) && isDefined(refresh))
+      get(refresh)();
+  },
+  async onResponseError({ response }) {
     // when any of the following redirects occur and the final throw is not caught then nuxt SSR will log the following error:
     // [unhandledRejection] Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
-
-    const status = error.response?.status ?? -1;
+    const status = response.status;
 
     if ([401].includes(status)) {
       await navigateTo('/login');
@@ -161,44 +125,31 @@ export async function fetchWithCsrf<
     }
 
     if ([500].includes(status))
-      logger.error('[Error]', error.data?.message, error.data);
+      logger.error('[Error]', response.body);
+  },
+  parseResponse(responseText: string) {
+    return convertKeys(JSON.parse(responseText), true, false);
+  },
+  timeout: TIMEOUT,
+});
 
-    throw error;
-  }
-  finally {
-    controller.abort();
-  }
-}
+async function initCsrf(): Promise<string | undefined | null> {
+  const { baseUrl } = useRuntimeConfig().public;
+  const existingToken = useCookie(CSRF_COOKIE).value;
 
-async function initCsrf(): Promise<void> {
-  const {
-    public: { baseUrl },
-  } = useRuntimeConfig();
+  if (existingToken)
+    return existingToken;
 
-  const controller = new AbortController();
-  const aborter = sleep(30000, controller.signal);
-  const csrf = $fetch('/webapi/csrf/', {
+  await $fetch('/webapi/csrf/', {
     baseURL: baseUrl,
     credentials: 'include',
-    signal: controller.signal,
+    timeout: TIMEOUT,
   });
 
-  try {
-    const race = await Promise.race([aborter, csrf]);
-    if (race === null)
-      controller.abort();
-  }
-  finally {
-    controller.abort();
-  }
+  return useCookie(CSRF_COOKIE).value;
 }
 
 // https://github.com/axios/axios/blob/bdf493cf8b84eb3e3440e72d5725ba0f138e0451/lib/helpers/cookies.js
-function getCookie(name: string) {
-  const match = document.cookie.match(new RegExp(`(^|;\\s*)(${name})=([^;]*)`));
-  return match ? decodeURIComponent(match[3]) : null;
-}
-
 export function replacePathPrefix(prefix: string, path?: string) {
   return path?.startsWith(prefix) ? `${path}`.replace(prefix, '') : path;
 }

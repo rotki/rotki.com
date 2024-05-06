@@ -16,6 +16,10 @@ mockNuxtImport('useRuntimeConfig', () => () => {
         github: 'https://github.com/rotki',
         twitter: 'https://twitter.com/rotkiapp',
       },
+      i18n: {
+        defaultLocale: 'en',
+        detectBrowserLanguage: false,
+      },
     },
   };
 });
