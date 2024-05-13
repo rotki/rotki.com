@@ -138,6 +138,7 @@ function displayActions(sub: Subscription) {
 function getChipStatusColor(status: string): ContextColorsType | undefined {
   const map: Record<string, ContextColorsType> = {
     'Active': 'success',
+    'Cancelled but still active': 'success',
     'Cancelled': 'error',
     'Pending': 'warning',
     'Past Due': 'warning',
@@ -181,7 +182,22 @@ async function cancelSubscription(sub: Subscription) {
           size="sm"
           :color="getChipStatusColor(row.status)"
         >
-          {{ row.status }}
+          <RuiTooltip v-if="row.status === 'Cancelled but still active'">
+            <template #activator>
+              <div class="flex py-0.5 items-center gap-1">
+                <RuiIcon
+                  size="16"
+                  class="text-white"
+                  name="information-line"
+                />
+                {{ t('account.subscriptions.cancelled_but_still_active.status', { date: row.nextActionDate }) }}
+              </div>
+            </template>
+            {{ t('account.subscriptions.cancelled_but_still_active.description', { date: row.nextActionDate }) }}
+          </RuiTooltip>
+          <template v-else>
+            {{ row.status }}
+          </template>
         </RuiChip>
       </template>
 

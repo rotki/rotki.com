@@ -42,6 +42,7 @@ export type Address = z.infer<typeof Address>;
 const SubStatus = z.enum([
   'Active',
   'Cancelled',
+  'Cancelled but still active',
   'Pending',
   'Past Due',
 ] as const);
