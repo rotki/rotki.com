@@ -188,6 +188,10 @@
       "title": "Your latest payments"
     },
     "subscriptions": {
+      "cancelled_but_still_active": {
+        "status": "Active until {date}",
+        "description": "You canceled this subscription, but it will remain active until {date}"
+      },
       "cancellation": {
         "actions": {
           "no": "No, don't cancel",

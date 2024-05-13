@@ -4,6 +4,7 @@ COPY ./ /build/
 
 WORKDIR /build
 
+ENV COREPACK_ENABLE_STRICT=0
 ENV CYPRESS_INSTALL_BINARY=0
 
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
