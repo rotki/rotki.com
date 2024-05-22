@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+
 const { t } = useI18n();
 
-const data = [
+const data: { icon: RuiIcons; text: string; tooltip: string }[] = [
   {
     icon: 'open-source-line',
     text: t('home.advantages.open_source.title'),

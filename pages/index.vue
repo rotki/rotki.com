@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { useDynamicMessages } from '~/composables/dynamic-message';
 
 const description
   = 'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.';
@@ -23,12 +24,22 @@ useHead({
   ...commonAttrs(),
 });
 
+const { fetchMessages, activeDashboardMessages } = useDynamicMessages();
+
+onBeforeMount(() => {
+  fetchMessages();
+});
+
 definePageMeta({
   layout: 'landing',
 });
 </script>
 
 <template>
+  <DynamicMessageDisplay
+    v-if="activeDashboardMessages.length > 0"
+    :messages="activeDashboardMessages"
+  />
   <HomeBanner />
   <FeatureList />
   <Testimonials />

@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+
 const { t } = useI18n();
 
-const values = [
+const values: { icon: RuiIcons; label: string }[] = [
   { icon: 'bank-line', label: t('values.vision_section.list.1') },
   {
     icon: 'money-dollar-circle-line',

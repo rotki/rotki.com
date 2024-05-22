@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+
 const { t } = useI18n();
 
 const {
@@ -7,7 +9,7 @@ const {
   },
 } = useRuntimeConfig();
 
-const contacts = [
+const contacts: { title: string; description: string; href: string; icon: RuiIcons; linkLabel?: string }[] = [
   {
     title: 'Email',
     description: t('values.contact_section.email.description'),

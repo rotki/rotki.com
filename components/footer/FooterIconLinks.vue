@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+
 const {
   public: {
     contact: { emailMailto, twitter, discord, github },
   },
 } = useRuntimeConfig();
 
-const menus = [
+const menus: { title: string; showText: boolean; href: string; icon: RuiIcons }[] = [
   {
     title: 'Github',
     showText: false,

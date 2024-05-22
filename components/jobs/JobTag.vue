@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
+import type { RuiIcons } from '@rotki/ui-library';
 
 const props = defineProps<{
   tag: string;
@@ -7,15 +8,15 @@ const props = defineProps<{
 
 const { tag } = toRefs(props);
 
-const icon: ComputedRef<string> = computed(() => {
+const icon: ComputedRef<RuiIcons | undefined> = computed(() => {
   const value = get(tag);
-  return (
-    {
-      'full-time': 'timer-2-line',
-      'part-time': 'timer-2-line',
-      'remote': 'user-location-line',
-    }[value] ?? ''
-  );
+  const map: Record<string, RuiIcons> = {
+    'full-time': 'timer-2-line',
+    'part-time': 'timer-2-line',
+    'remote': 'user-location-line',
+  };
+
+  return map[value] ?? undefined;
 });
 </script>
 

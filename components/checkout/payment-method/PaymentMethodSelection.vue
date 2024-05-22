@@ -5,6 +5,7 @@ import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
 import type { ComputedRef, Ref } from 'vue';
+import type { RuiIcons } from '@rotki/ui-library';
 
 const props = defineProps<{ identifier?: string }>();
 
@@ -13,7 +14,7 @@ const { t } = useI18n();
 interface PaymentMethodItem {
   id: PaymentMethod;
   label: string;
-  icon: string;
+  icon: RuiIcons;
   name: string;
   class: string;
 }

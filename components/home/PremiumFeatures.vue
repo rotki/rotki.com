@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+
 const { t } = useI18n();
 
-const data = computed(() => [
+const data = computed<{ icon: RuiIcons; text: string; description: string }[]>(() => [
   {
     icon: 'pie-chart-line',
     text: t('home.premium_features.features.graphs_and_statistics.title'),
