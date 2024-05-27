@@ -242,6 +242,7 @@
     "get_in_touch": "Get In Touch Now",
     "get_premium": "Get Premium",
     "get_premium_plan": "Get Premium Plan",
+    "get_started_for_free": "Get started for free",
     "go_back_home": "Go back home",
     "regenerate": "Regenerate",
     "renew": "Renew",
@@ -262,6 +263,100 @@
     "amount": "Amount",
     "address": "Address",
     "vat": "{vat}% VAT"
+  },
+  "products": {
+    "heading": "Premium Features",
+    "title": "Upgrade rotki today",
+    "description": "Take your financial management to the next level with rotki premium, our subscription offering. Gain access to exclusive features and advanced tools designed to enhance your investment experience.",
+    "unlock": {
+      "title": "Unlock Premium Features",
+      "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape."
+    },
+    "details": "Premium details",
+    "footer": {
+      "title": "Financial tracking made easy",
+      "description": "Join the users who are already revolutionizing their financial tracking with us"
+    },
+    "features": {
+      "data_sync": {
+        "title": "Sync DB with rotki Server",
+        "description": "By enabling this option, you can effortlessly back up your data to the Server, ensuring the ability to restore it on any account or device using the same API Key/secret and account password. Seamlessly synchronize your data across multiple accounts and devices, ensuring that the most recent information is always available."
+      },
+      "liquity": {
+        "title": "Liquity",
+        "description": "Easily track your stability pool deposits, staked amount, and stake events at a glance. Plus, visualize your staking gains effortlessly, with clear breakdowns of your rewards in ETH and LUSD that are ready to claim. Dive into the nitty-gritty with statistics like Total Gains from the Stability Pool, Total Deposited and Withdrawn amounts, and even an Estimated Profit and Loss analysis."
+      },
+      "staking": {
+        "title": "Staking",
+        "description": "See information about your staking activity for multiple chains and locations (ETH, LQTY, Kraken and more). Information like total gained in a period and individual staking deposit/withdrawal/income events."
+      },
+      "higher_limits": {
+        "title": "Higher Limits",
+        "description": "rotki has limits for multiple things that the free version can process. Number of trades, number of transactions, deposits/withdrawals, historic events and more. With premium these limits are increasing depending on the tier you have bought."
+      },
+      "a_lot_of_perks": {
+        "title": "A lot of perks",
+        "description": "Premium gives you access to various perks such as dark mode and customizable color layout in the app. Some other perks include watchers for your makerdao CDP position that can warn you when by email when it goes over or below a certain collateralization ratio."
+      },
+      "graphs": {
+        "title": "Graphs",
+        "description": "rotki premium gives you access to an array of analytics in the form of graphs. You can see, among others, the analysis of total net value over time, amount and value per asset over time, distribution of your total worth per asset or per location."
+      },
+      "synchronization": {
+        "title": "Synchronization",
+        "description": "You have the option to upload your account's encrypted database to our server. It can then be synchronized between different devices. It also serves as a backup. The data is encrypted with your password and we can not read it."
+      },
+      "defi_protocol": {
+        "title": "Information per DeFi protocol",
+        "description": "You can see extra information per supported DeFi protocols. For example analysis of your liquity, aave, compound, makerdao positions. Analysis of your yearn vaults. Breakdown of the swaps made in uniswap, sushiswap, balancer and more."
+      },
+      "data_synchronization": {
+        "title": "Data synchronization",
+        "description": "By being a premium user you have the option to upload your account's encrypted database to our server. It can then be synchronized between different devices. It also serves as a backup. The data is encrypted with your password and we can not read it. Synced databases are automatically deleted a month after your subscription expires."
+      },
+      "dark_mode": {
+        "title": "Dark Mode",
+        "description": "Dark mode can lessen the strain on your eyes, improve the readability of text and prolong the battery life of your device."
+      },
+      "monerium_api_keys": {
+        "title": "Monerium API Keys",
+        "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on the mainnet, Polygon, and Gnosis chain will be enriched with bank data or chain bridging information. You can also view this data in the Monerium app and have SEPA data overlaid on your transactions."
+      },
+      "theme_customization": {
+        "title": "Theme customization",
+        "description": "Premium users have the option to personalize the color scheme for both light and dark modes. Users can access and customize specific color palettes for the app theme within the settings."
+      },
+      "timeframe": {
+        "title": "Customization of timeframe selector on the dashboard",
+        "description": "Set the default time frame for the dashboard graph. This timeframe will be pre-selected upon login. By default, it will remember the previous session’s selection. Premium users will have access to all options, while free users can only choose from \"Remember\", \"2 Weeks\", and \"1 Week\" in the settings."
+      },
+      "limits": {
+        "title": "Increased event limits",
+        "transactions": {
+          "title": "Ethereum transactions",
+          "description": "Free users have a limit of the 100 most recent ethereum transactions in the transactions viewer. As a premium user you have higher limits in the amount of transactions you can see."
+        },
+        "trades": {
+          "title": "Trades",
+          "description": "Free users have a limit of the 250 most recent trades in the trades viewer. As a premium user you have higher limits in the amount of trades you can see."
+        },
+        "deposits_and_withdrawals": {
+          "title": "Deposit/withdrawals",
+          "description": "Free users have a limit of the 100 most recent exchange deposits/withdrawals in the deposits/withdrawals viewer. As a premium user there are higher limits in the amount of exchange deposits/withdrawals you can see."
+        }
+      },
+      "analytics": {
+        "title": "Analytics",
+        "asset_amount_and_value": {
+          "title": "Asset amount & value over time",
+          "description": "As a premium user you can access the analytics section of the application and unlock analytics graphs such as analysis of net value and amount over time for each asset you own."
+        },
+        "distribution_locations": {
+          "title": "Value distribution",
+          "description": "Or a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks e.t.c.)"
+        }
+      }
+    }
   },
   "supported_defi": {
     "title": "Dedicated DeFi support for",
