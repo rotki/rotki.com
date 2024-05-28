@@ -267,7 +267,7 @@
   "products": {
     "heading": "Premium Features",
     "title": "Upgrade rotki today",
-    "description": "Take your financial management to the next level with rotki premium, our subscription offering. Gain access to exclusive features and advanced tools designed to enhance your investment experience.",
+    "description": "Take your financial management to the next level with rotki premium, our subscription offering. Gain access to exclusive features and advanced tools designed to enhance managing your portfolio and investments.",
     "unlock": {
       "title": "Unlock Premium Features",
       "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape."
@@ -280,11 +280,11 @@
     "features": {
       "data_sync": {
         "title": "Sync DB with rotki Server",
-        "description": "By enabling this option, you can effortlessly back up your data to the Server, ensuring the ability to restore it on any account or device using the same API Key/secret and account password. Seamlessly synchronize your data across multiple accounts and devices, ensuring that the most recent information is always available."
+        "description": "By enabling this option, you can effortlessly back up your data  to our cloud and effortlessly sync or restore them to any number of devices. The data is encrypted and we have no access to them. They can only be decrypted with your password."
       },
       "staking": {
         "title": "Staking",
-        "description": "See information about your staking activity for multiple chains and locations (ETH, LQTY, Kraken and more). Information like total gained in a period and individual staking deposit/withdrawal/income events."
+        "description": "See information about your staking activity for multiple chains and locations (ETH, Liquity, Kraken and more). Information like total gained in a given time period, performance, breakdown of rewards and individual staking deposit/withdrawal/income events."
       },
       "higher_limits": {
         "title": "Higher Limits",
@@ -292,11 +292,11 @@
       },
       "a_lot_of_perks": {
         "title": "A lot of perks",
-        "description": "Premium gives you access to various perks such as dark mode and customizable color layout in the app. Some other perks include watchers for your makerdao CDP position that can warn you when by email when it goes over or below a certain collateralization ratio."
+        "description": "Premium gives you access to various perks such as dark mode and customizable color layout in the app. Some other perks include watchers for your makerdao CDP position that can warn you by email when it goes over or below a certain collateralization ratio."
       },
       "graphs": {
         "title": "Graphs",
-        "description": "rotki premium gives you access to an array of analytics in the form of graphs. You can see, among others, the analysis of total net value over time, amount and value per asset over time, distribution of your total worth per asset or per location."
+        "description": "rotki premium gives you access to an array of analytics and graphs. You can see, among others, the analysis of total net value over time, amount and value per asset over time, distribution of your total worth per asset or per location."
       },
       "defi_protocol": {
         "title": "Information per DeFi protocol",
