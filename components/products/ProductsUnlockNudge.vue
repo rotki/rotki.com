@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+
 const { t } = useI18n();
 
-const data = [
+const data: { icon: RuiIcons; title: string; description: string }[] = [
   {
     icon: 'database-2-line',
     title: t('products.features.data_synchronization.title'),

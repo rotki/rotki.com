@@ -3,10 +3,6 @@ const { t } = useI18n();
 
 const data = [
   {
-    title: t('products.features.staking.title'),
-    description: t('products.features.staking.description'),
-  },
-  {
     title: t('products.features.higher_limits.title'),
     description: t('products.features.higher_limits.description'),
   },
@@ -19,10 +15,6 @@ const data = [
     description: t('products.features.graphs.description'),
   },
   {
-    title: t('products.features.synchronization.title'),
-    description: t('products.features.synchronization.description'),
-  },
-  {
     title: t('products.features.defi_protocol.title'),
     description: t('products.features.defi_protocol.description'),
   },
@@ -32,7 +24,7 @@ const data = [
 <template>
   <div class="py-10 lg:py-20">
     <div class="container">
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-4 md:gap-y-8">
+      <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-y-8">
         <div
           v-for="item in data"
           :key="item.title"

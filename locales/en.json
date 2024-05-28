@@ -282,10 +282,6 @@
         "title": "Sync DB with rotki Server",
         "description": "By enabling this option, you can effortlessly back up your data to the Server, ensuring the ability to restore it on any account or device using the same API Key/secret and account password. Seamlessly synchronize your data across multiple accounts and devices, ensuring that the most recent information is always available."
       },
-      "liquity": {
-        "title": "Liquity",
-        "description": "Easily track your stability pool deposits, staked amount, and stake events at a glance. Plus, visualize your staking gains effortlessly, with clear breakdowns of your rewards in ETH and LUSD that are ready to claim. Dive into the nitty-gritty with statistics like Total Gains from the Stability Pool, Total Deposited and Withdrawn amounts, and even an Estimated Profit and Loss analysis."
-      },
       "staking": {
         "title": "Staking",
         "description": "See information about your staking activity for multiple chains and locations (ETH, LQTY, Kraken and more). Information like total gained in a period and individual staking deposit/withdrawal/income events."
@@ -301,10 +297,6 @@
       "graphs": {
         "title": "Graphs",
         "description": "rotki premium gives you access to an array of analytics in the form of graphs. You can see, among others, the analysis of total net value over time, amount and value per asset over time, distribution of your total worth per asset or per location."
-      },
-      "synchronization": {
-        "title": "Synchronization",
-        "description": "You have the option to upload your account's encrypted database to our server. It can then be synchronized between different devices. It also serves as a backup. The data is encrypted with your password and we can not read it."
       },
       "defi_protocol": {
         "title": "Information per DeFi protocol",

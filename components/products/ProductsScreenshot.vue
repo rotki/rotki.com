@@ -3,9 +3,9 @@ const { t } = useI18n();
 
 const data = [
   {
-    img: '/img/products/liquity.webp',
-    title: t('products.features.liquity.title'),
-    description: t('products.features.liquity.description'),
+    img: '/img/products/staking.webp',
+    title: t('products.features.staking.title'),
+    description: t('products.features.staking.description'),
   },
   {
     img: '/img/products/data_sync.webp',
@@ -18,12 +18,7 @@ const data = [
 <template>
   <div class="pb-10 lg:pb-20">
     <div class="container">
-      <img
-        src="/img/products/staking.webp"
-        :alt="t('products.features.staking.title')"
-        class="rounded-xl w-full"
-      />
-      <div class="pt-12 lg:pt-24 grid md:grid-cols-2 gap-12">
+      <div class="grid md:grid-cols-2 gap-12">
         <div
           v-for="item in data"
           :key="item.title"
