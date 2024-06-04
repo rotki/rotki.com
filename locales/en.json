@@ -623,8 +623,16 @@
     "jobs": "Jobs",
     "values": "Values",
     "features": "Features",
-    "documentation": "Documentation",
-    "blog": "Blog"
+    "premium_features": "Premium Features",
+    "documentation": {
+      "title": "Documentation",
+      "description": "Everything you need to know about the app"
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Latest news and updates on rotki"
+    },
+    "resources": "Resources"
   },
   "footer_legalese": {
     "impressum": "Impressum",

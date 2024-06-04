@@ -21,10 +21,10 @@ definePageMeta({
 
 <template>
   <ProductsHeading />
-  <ProductsScreenshot />
   <ProductsBlocks />
-  <ProductsUnlockNudge />
   <ProductsLimits />
+  <ProductsScreenshot />
+  <ProductsUnlockNudge />
   <ProductsAnalytics />
   <ProductsTimeframe />
   <ProductsFooter />

@@ -22,7 +22,7 @@ const data = [
 </script>
 
 <template>
-  <div class="py-10 lg:py-20">
+  <div>
     <div class="container">
       <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-y-8">
         <div
