@@ -22,8 +22,8 @@ definePageMeta({
 <template>
   <ProductsHeading />
   <ProductsBlocks />
-  <ProductsLimits />
   <ProductsScreenshot />
+  <ProductsLimits />
   <ProductsUnlockNudge />
   <ProductsAnalytics />
   <ProductsTimeframe />

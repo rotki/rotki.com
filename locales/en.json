@@ -280,7 +280,7 @@
     "features": {
       "data_sync": {
         "title": "Sync DB with rotki Server",
-        "description": "By enabling this option, you can effortlessly back up your data  to our cloud and effortlessly sync or restore them to any number of devices. The data is encrypted and we have no access to them. They can only be decrypted with your password."
+        "description": "By enabling this option, you can back up your data  to our cloud and effortlessly sync or restore them to any number of devices. The data is encrypted and we have no access to them. They can only be decrypted with your password."
       },
       "staking": {
         "title": "Staking",
@@ -295,7 +295,7 @@
         "description": "Premium gives you access to various perks such as dark mode and customizable color layout in the app. Some other perks include watchers for your makerdao CDP position that can warn you by email when it goes over or below a certain collateralization ratio."
       },
       "graphs": {
-        "title": "Graphs",
+        "title": "Graphs & Analytics",
         "description": "rotki premium gives you access to an array of analytics and graphs. You can see, among others, the analysis of total net value over time, amount and value per asset over time, distribution of your total worth per asset or per location."
       },
       "defi_protocol": {
@@ -312,7 +312,7 @@
       },
       "monerium_api_keys": {
         "title": "Monerium API Keys",
-        "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on the mainnet, Polygon, and Gnosis chain will be enriched with bank data or chain bridging information. You can also view this data in the Monerium app and have SEPA data overlaid on your transactions."
+        "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on the mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information."
       },
       "theme_customization": {
         "title": "Theme customization",
@@ -324,17 +324,13 @@
       },
       "limits": {
         "title": "Increased event limits",
-        "transactions": {
-          "title": "Ethereum transactions",
-          "description": "Free users have a limit of the 100 most recent ethereum transactions in the transactions viewer. As a premium user you have higher limits in the amount of transactions you can see."
+        "history_view": {
+          "title": "History view",
+          "description": "Free users have a limit on the most recent events in the history view. As a premium user, you have higher limits on the number of events you can see."
         },
-        "trades": {
-          "title": "Trades",
-          "description": "Free users have a limit of the 250 most recent trades in the trades viewer. As a premium user you have higher limits in the amount of trades you can see."
-        },
-        "deposits_and_withdrawals": {
-          "title": "Deposit/withdrawals",
-          "description": "Free users have a limit of the 100 most recent exchange deposits/withdrawals in the deposits/withdrawals viewer. As a premium user there are higher limits in the amount of exchange deposits/withdrawals you can see."
+        "user_notes": {
+          "title": "User notes",
+          "description": "Free users can add up to 10 notes. As a premium user, you have higher limits on the number of notes you can add."
         }
       },
       "analytics": {

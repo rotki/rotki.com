@@ -16,7 +16,7 @@ const data = [
 </script>
 
 <template>
-  <div class="pb-10 lg:pb-20">
+  <div class="py-16 lg:py-32">
     <div class="container">
       <div class="grid md:grid-cols-2 gap-12">
         <div
