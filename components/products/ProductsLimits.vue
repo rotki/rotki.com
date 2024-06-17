@@ -8,6 +8,16 @@ const data = [
     description: t('products.features.limits.history_view.description'),
   },
   {
+    img: '/img/products/trades_limits.webp',
+    title: t('products.features.limits.trades.title'),
+    description: t('products.features.limits.trades.description'),
+  },
+  {
+    img: '/img/products/deposits_withdrawals_limits.webp',
+    title: t('products.features.limits.deposits_withdrawals.title'),
+    description: t('products.features.limits.deposits_withdrawals.description'),
+  },
+  {
     img: '/img/products/user_notes_limits.webp',
     title: t('products.features.limits.user_notes.title'),
     description: t('products.features.limits.user_notes.description'),
@@ -16,11 +26,11 @@ const data = [
 </script>
 
 <template>
-  <div class="pb-16 lg:pb-32">
+  <div class="py-14 lg:py-28">
     <div class="container">
       <div class="flex flex-col gap-4 pb-10 lg:pb-20">
         <div class="text-rui-light-primary text-h6 font-medium">
-          {{ t('products.details') }}
+          {{ t('products.features.limits.heading') }}
         </div>
         <h3 class="text-h5 lg:text-h3 font-black">
           {{ t('products.features.limits.title') }}
@@ -35,6 +45,7 @@ const data = [
           <img
             :src="item.img"
             :alt="item.title"
+            class="rounded-xl border border border-rui-grey-400"
           />
           <div class="flex flex-col gap-6">
             <h4 class="text-h5 xl:text-h4 font-bold">

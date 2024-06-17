@@ -3,20 +3,28 @@ const { t } = useI18n();
 
 const data = [
   {
+    title: t('products.features.sync_db_with_server.title'),
+    description: t('products.features.sync_db_with_server.description'),
+  },
+  {
+    title: t('products.features.staking.title'),
+    description: t('products.features.staking.description'),
+  },
+  {
     title: t('products.features.higher_limits.title'),
     description: t('products.features.higher_limits.description'),
   },
   {
-    title: t('products.features.a_lot_of_perks.title'),
-    description: t('products.features.a_lot_of_perks.description'),
+    title: t('products.features.detailed_graphs.title'),
+    description: t('products.features.detailed_graphs.description'),
   },
   {
-    title: t('products.features.graphs.title'),
-    description: t('products.features.graphs.description'),
+    title: t('products.features.defi.title'),
+    description: t('products.features.defi.description'),
   },
   {
-    title: t('products.features.defi_protocol.title'),
-    description: t('products.features.defi_protocol.description'),
+    title: t('products.features.exclusive_perks.title'),
+    description: t('products.features.exclusive_perks.description'),
   },
 ];
 </script>
@@ -24,7 +32,7 @@ const data = [
 <template>
   <div>
     <div class="container">
-      <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-y-8">
+      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-4 md:gap-y-8">
         <div
           v-for="item in data"
           :key="item.title"

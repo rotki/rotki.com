@@ -265,68 +265,64 @@
     "vat": "{vat}% VAT"
   },
   "products": {
-    "heading": "Premium Features",
+    "heading": "Unlock the Full Potential of rotki with Premium Features",
     "title": "Upgrade rotki today",
-    "description": "Take your financial management to the next level with rotki premium, our subscription offering. Gain access to exclusive features and advanced tools designed to enhance managing your portfolio and investments.",
+    "description": "Elevate your financial management with rotki premium, our exclusive subscription offering. Gain access to advanced tools and features designed to enhance your portfolio and investment management.",
     "unlock": {
       "title": "Unlock Premium Features",
       "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape."
     },
-    "details": "Premium details",
     "footer": {
-      "title": "Financial tracking made easy",
-      "description": "Join the users who are already revolutionizing their financial tracking with us"
+      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor."
     },
     "features": {
-      "data_sync": {
-        "title": "Sync DB with rotki Server",
-        "description": "By enabling this option, you can back up your data  to our cloud and effortlessly sync or restore them to any number of devices. The data is encrypted and we have no access to them. They can only be decrypted with your password."
+      "sync_db_with_server": {
+        "title": "Sync data across multiple machines",
+        "description": "Effortlessly back up your data to our cloud and sync or restore it across multiple devices. Your data is encrypted and can only be decrypted with your password, ensuring complete privacy."
       },
       "staking": {
         "title": "Staking",
-        "description": "See information about your staking activity for multiple chains and locations (ETH, Liquity, Kraken and more). Information like total gained in a given time period, performance, breakdown of rewards and individual staking deposit/withdrawal/income events."
+        "description": "Track your staking activities across various chains and platforms like ETH, Liquity, Kraken, and more. Get detailed insights on total gains, performance, rewards breakdown, and individual staking events."
       },
       "higher_limits": {
         "title": "Higher Limits",
-        "description": "rotki has limits for multiple things that the free version can process. Number of trades, number of transactions, deposits/withdrawals, historic events and more. With premium these limits are increasing depending on the tier you have bought."
+        "description": "Say goodbye to limits. With rotki Premium, you can process more trades, transactions, deposits/withdrawals, and historic events. The limits increase with each premium tier, providing greater flexibility and control."
       },
-      "a_lot_of_perks": {
-        "title": "A lot of perks",
-        "description": "Premium gives you access to various perks such as dark mode and customizable color layout in the app. Some other perks include watchers for your makerdao CDP position that can warn you by email when it goes over or below a certain collateralization ratio."
+      "detailed_graphs": {
+        "title": "Detailed Graphs",
+        "description": "Access a wide array of analytics and graphs. Analyze your total net value over time, asset value distributions, and the worth distribution per asset or location."
       },
-      "graphs": {
-        "title": "Graphs & Analytics",
-        "description": "rotki premium gives you access to an array of analytics and graphs. You can see, among others, the analysis of total net value over time, amount and value per asset over time, distribution of your total worth per asset or per location."
+      "defi": {
+        "title": "DeFi",
+        "description": "Gain detailed insights into supported DeFi protocols. Analyze your Liquity, Aave, Compound, MakerDAO positions, and more. Understand your Yearn vaults and track your swaps on platforms like Uniswap and Sushiswap."
       },
-      "defi_protocol": {
-        "title": "Information per DeFi protocol",
-        "description": "You can see extra information per supported DeFi protocols. For example analysis of your liquity, aave, compound, makerdao positions. Analysis of your yearn vaults. Breakdown of the swaps made in uniswap, sushiswap, balancer and more."
-      },
-      "data_synchronization": {
-        "title": "Data synchronization",
-        "description": "By being a premium user you have the option to upload your account's encrypted database to our server. It can then be synchronized between different devices. It also serves as a backup. The data is encrypted with your password and we can not read it. Synced databases are automatically deleted a month after your subscription expires."
-      },
-      "dark_mode": {
-        "title": "Dark Mode",
-        "description": "Dark mode can lessen the strain on your eyes, improve the readability of text and prolong the battery life of your device."
-      },
-      "monerium_api_keys": {
-        "title": "Monerium API Keys",
-        "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on the mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information."
-      },
-      "theme_customization": {
-        "title": "Theme customization",
-        "description": "Premium users have the option to personalize the color scheme for both light and dark modes. Users can access and customize specific color palettes for the app theme within the settings."
+      "exclusive_perks": {
+        "title": "Exclusive perks",
+        "description": "Enjoy various perks like dark mode, customizable color layouts, and alerts for your MakerDAO CDP position, notifying you by email when it crosses certain thresholds."
       },
       "timeframe": {
-        "title": "Customization of timeframe selector on the dashboard",
-        "description": "Set the default time frame for the dashboard graph. This timeframe will be pre-selected upon login. By default, it will remember the previous session’s selection. Premium users will have access to all options, while free users can only choose from \"Remember\", \"2 Weeks\", and \"1 Week\" in the settings."
+        "heading": "Enhanced Customization Options",
+        "title": "Timeframe Customization on Dashboard",
+        "description": "Set the default timeframe for the dashboard graph. Premium users have access to all options, while free users can choose from \"Remember\", \"2 Weeks\", and \"1 Week\"."
+      },
+      "theme_customization": {
+        "title": "Dark mode & theme customization",
+        "description": "Reduce eye strain, improve text readability, and prolong your device's battery life with dark mode. Personalize the color scheme for both light and dark modes, and customize specific color palettes for the app theme within the settings"
       },
       "limits": {
         "title": "Increased event limits",
+        "heading": "Expanded Capabilities for Premium Users",
         "history_view": {
           "title": "History view",
-          "description": "Free users have a limit on the most recent events in the history view. As a premium user, you have higher limits on the number of events you can see."
+          "description": "Free users have a limit of the 100 most recent events in the history event viewer. As a premium user you have higher limits in the amount of events you can see."
+        },
+        "trades": {
+          "title": "Trades",
+          "description": "Free users are limited to the 250 most recent trades. Premium users enjoy higher limits on the number of trades visible."
+        },
+        "deposits_withdrawals": {
+          "title": "Deposit/withdrawals",
+          "description": "Free users are limited to the 100 most recent exchange deposits/withdrawals. Premium users benefit from higher limits for viewing deposits and withdrawals."
         },
         "user_notes": {
           "title": "User notes",
@@ -334,14 +330,27 @@
         }
       },
       "analytics": {
-        "title": "Analytics",
+        "heading": "Enhanced Data Insights",
+        "title": "Graphs & Analytics",
         "asset_amount_and_value": {
-          "title": "Asset amount & value over time",
-          "description": "As a premium user you can access the analytics section of the application and unlock analytics graphs such as analysis of net value and amount over time for each asset you own."
+          "title": "Asset tracking",
+          "description": "Access comprehensive analytics, including net value and asset amount over time for each owned asset."
         },
         "distribution_locations": {
           "title": "Value distribution",
-          "description": "Or a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks e.t.c.)"
+          "description": "View a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks, etc.)."
+        }
+      },
+      "monerium_and_backup": {
+        "heading": "Enrich Transactions and Synchronize Data",
+        "title": "Monerium API Integration and Premium Data Backup",
+        "monerium_api_keys": {
+          "title": "Monerium API Keys",
+          "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on the mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information."
+        },
+        "data_synchronization": {
+          "title": "Data synchronization",
+          "description": "As a premium user, you can upload your encrypted database to our server, synchronize it across devices, and use it as a backup. Your data remains encrypted with your password, ensuring privacy. Synced databases are automatically deleted one month after your subscription expires."
         }
       }
     }
