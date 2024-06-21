@@ -50,14 +50,16 @@ scanImages();
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
     >
+      <!-- Retain the height, so it's not jumping when the image first loaded -->
       <SwiperSlide
         v-for="(image, i) in images"
         :key="i"
+        class="relative pt-[56.2%]"
       >
         <img
           :src="image"
           alt=" "
-          class="w-full"
+          class="w-full absolute h-full top-0 left-0"
         />
       </SwiperSlide>
     </Carousel>

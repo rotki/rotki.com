@@ -13,8 +13,19 @@ useHead({
   meta: getMetadata(title, description, `${baseUrl}/products/`, baseUrl),
   ...commonAttrs(),
 });
+
+definePageMeta({
+  layout: 'landing',
+});
 </script>
 
 <template>
-  <ProductsPage />
+  <ProductsHeading />
+  <ProductsBlocks />
+  <ProductsLimits />
+  <ProductsUnlockNudge />
+  <ProductsAnalytics />
+  <ProductsTimeframe />
+  <ProductsMoneriumAndSync />
+  <ProductsFooter />
 </template>

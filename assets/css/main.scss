@@ -1,5 +1,9 @@
 @import 'media';
 
+html {
+  @apply antialiased;
+}
+
 .body {
   @apply text-rui-text;
 }

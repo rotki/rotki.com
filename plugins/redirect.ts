@@ -1,8 +1,8 @@
 export default defineNuxtPlugin(() => {
   addRouteMiddleware((to) => {
-    if (to.path === '/products/detail') {
+    if (to.path.startsWith('/products/detail')) {
       return navigateTo(
-        { name: 'products-details' },
+        { name: 'products' },
         { redirectCode: 301, replace: true },
       );
     }
