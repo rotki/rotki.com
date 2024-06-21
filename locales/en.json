@@ -267,7 +267,7 @@
   "products": {
     "heading": "Unlock the Full Potential of rotki with Premium Features",
     "title": "Upgrade rotki today",
-    "description": "Elevate your financial management with rotki premium, our exclusive subscription offering. Gain access to advanced tools and features designed to enhance your portfolio and investment management.",
+    "description": "Elevate your financial management with rotki premium, our exclusive subscription offering. Gain access to advanced tools and features designed to enhance the management of your portfolio and investments.",
     "unlock": {
       "title": "Unlock Premium Features",
       "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape."
@@ -294,7 +294,7 @@
       },
       "defi": {
         "title": "DeFi",
-        "description": "Gain detailed insights into supported DeFi protocols. Analyze your Liquity, Aave, Compound, MakerDAO positions, and more. Understand your Yearn vaults and track your swaps on platforms like Uniswap and Sushiswap."
+        "description": "Gain detailed insights into supported DeFi protocols. Analyze your Liquity, Aave, Compound, MakerDAO positions. Understand your Yearn vaults and track your swaps on platforms like Uniswap, Paraswap and more."
       },
       "exclusive_perks": {
         "title": "Exclusive perks",
@@ -303,7 +303,7 @@
       "timeframe": {
         "heading": "Enhanced Customization Options",
         "title": "Timeframe Customization on Dashboard",
-        "description": "Set the default timeframe for the dashboard graph. Premium users have access to all options, while free users can choose from \"Remember\", \"2 Weeks\", and \"1 Week\"."
+        "description": "Set the timeframe for the dashboard graph. Premium users have access to all options, while free users can choose between only \"2 Weeks\", and \"1 Week\"."
       },
       "theme_customization": {
         "title": "Dark mode & theme customization",

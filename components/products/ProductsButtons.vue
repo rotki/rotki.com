@@ -4,9 +4,15 @@ import { get } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import type { ContextColorsType } from '@rotki/ui-library';
 
-defineProps<{
-  color?: ContextColorsType;
-}>();
+withDefaults(
+  defineProps<{
+    color?: ContextColorsType;
+    onlyPremium?: boolean;
+  }>(),
+  {
+    onlyPremium: false,
+  },
+);
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
@@ -28,6 +34,7 @@ const { t } = useI18n();
 <template>
   <div class="flex flex-wrap gap-3">
     <ButtonLink
+      v-if="!onlyPremium"
       variant="outlined"
       to="/download"
       size="lg"
