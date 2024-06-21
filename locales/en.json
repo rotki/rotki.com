@@ -346,7 +346,7 @@
         "title": "Monerium API Integration and Premium Data Backup",
         "monerium_api_keys": {
           "title": "Monerium API Keys",
-          "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on the mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information."
+          "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information."
         },
         "data_synchronization": {
           "title": "Data synchronization",
