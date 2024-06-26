@@ -81,44 +81,50 @@ const { t } = useI18n();
       </RuiButton>
     </div>
   </RuiCard>
-  <RuiDialog v-model="confirm">
-    <template #title>
-      {{ t('account.delete_account.title') }}
-    </template>
+  <RuiDialog
+    v-model="confirm"
+    max-width="900"
+  >
+    <RuiCard>
+      <template #header>
+        {{ t('account.delete_account.title') }}
+      </template>
 
-    <div class="whitespace-break-spaces mb-4">
-      <i18n-t
-        keypath="account.delete_account.confirmation.description"
-        scope="global"
-      >
-        <template #username>
-          <strong>{{ username }}</strong>
-        </template>
-      </i18n-t>
-    </div>
+      <div class="whitespace-break-spaces mb-4">
+        <i18n-t
+          keypath="account.delete_account.confirmation.description"
+          scope="global"
+        >
+          <template #username>
+            <strong>{{ username }}</strong>
+          </template>
+        </i18n-t>
+      </div>
 
-    <RuiTextField
-      v-model="usernameConfirmation"
-      color="primary"
-      variant="outlined"
-      :label="t('auth.common.username')"
-    />
-
-    <template #actions>
-      <RuiButton
-        variant="text"
+      <RuiTextField
+        v-model="usernameConfirmation"
         color="primary"
-        @click="confirm = false"
-      >
-        {{ t('actions.cancel') }}
-      </RuiButton>
-      <RuiButton
-        color="error"
-        @click="deleteAccount()"
-      >
-        {{ t('actions.confirm') }}
-      </RuiButton>
-    </template>
+        variant="outlined"
+        :label="t('auth.common.username')"
+      />
+
+      <div class="flex justify-end gap-4 pt-4">
+        <RuiButton
+          variant="text"
+          color="primary"
+          @click="confirm = false"
+        >
+          {{ t('actions.cancel') }}
+        </RuiButton>
+        <RuiButton
+          :disabled="usernameConfirmation !== username"
+          color="error"
+          @click="deleteAccount()"
+        >
+          {{ t('actions.confirm') }}
+        </RuiButton>
+      </div>
+    </RuiCard>
   </RuiDialog>
 
   <FloatingNotification

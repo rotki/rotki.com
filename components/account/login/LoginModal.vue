@@ -1,26 +1,17 @@
 <script setup lang="ts">
-defineProps<{ modelValue: boolean }>();
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', dismiss: boolean): void;
-}>();
-
-function dismiss() {
-  emit('update:modelValue', false);
-}
+const modelValue = defineModel<boolean>({ required: true });
 </script>
 
 <template>
-  <ModalDialog
-    :model-value="modelValue"
-    boxless
-    @update:model-value="dismiss()"
+  <RuiDialog
+    v-model="modelValue"
+    max-width="430"
   >
-    <div class="bg-white p-8 shadow-5 rounded">
+    <RuiCard class="p-4">
       <LoginForm
         modal
-        @complete="dismiss()"
+        @complete="modelValue = false"
       />
-    </div>
-  </ModalDialog>
+    </RuiCard>
+  </RuiDialog>
 </template>

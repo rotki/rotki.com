@@ -56,14 +56,14 @@ const css = useCssModule();
 </script>
 
 <template>
-  <ModalDialog :model-value="visible">
-    <div :class="css.body">
-      <TextHeading
-        no-margin
-        class="mb-4"
-      >
+  <RuiDialog
+    max-width="500"
+    :model-value="visible"
+  >
+    <RuiCard>
+      <template #header>
         {{ t('change_plan.title') }}
-      </TextHeading>
+      </template>
       <div
         v-for="plan in availablePlans"
         :key="plan.months.toString()"
@@ -108,7 +108,7 @@ const css = useCssModule();
           </i18n-t>
         </RuiCheckbox>
       </div>
-      <div :class="css.buttons">
+      <div class="flex justify-end gap-4 pt-4">
         <RuiButton
           variant="outlined"
           size="lg"
@@ -119,15 +119,11 @@ const css = useCssModule();
           {{ t('actions.cancel') }}
         </RuiButton>
       </div>
-    </div>
-  </ModalDialog>
+    </RuiCard>
+  </RuiDialog>
 </template>
 
 <style module lang="scss">
-.body {
-  @apply p-6 max-w-[30rem] w-full;
-}
-
 .plan {
   @apply focus:outline-none px-4 py-2 my-2 transition bg-white;
   @apply border-black/[0.12] border border-solid rounded;
@@ -147,10 +143,6 @@ const css = useCssModule();
 
 .name {
   @apply font-bold;
-}
-
-.buttons {
-  @apply flex flex-row justify-end mt-2;
 }
 
 .warning {
