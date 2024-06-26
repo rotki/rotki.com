@@ -21,48 +21,49 @@ function change() {
 <template>
   <RuiDialog
     :model-value="modelValue"
-    size="sm"
+    max-width="500"
     @update:model-value="emit('update:model-value', $event)"
   >
-    <template #title>
-      {{ t('home.plans.tiers.step_3.change_payment.title') }}
-    </template>
-    <div class="text-rui-text-secondary">
-      {{ t('home.plans.tiers.step_3.change_payment.warning') }}
-    </div>
-
-    <div>
-      <RuiCheckbox
-        v-model="confirmed"
-        class="mt-3"
-        color="primary"
-      >
-        <i18n-t
-          keypath="home.plans.tiers.step_3.change_payment.switch_agree"
-          scope="global"
-        >
-          <template #separator>
-            <br />
-          </template>
-        </i18n-t>
-      </RuiCheckbox>
-    </div>
-
-    <template #actions>
-      <RuiButton
-        color="primary"
-        variant="text"
-        @click="emit('update:model-value', false)"
-      >
-        {{ t('actions.cancel') }}
-      </RuiButton>
-      <RuiButton
-        color="error"
-        :disabled="!confirmed"
-        @click="change()"
-      >
+    <RuiCard>
+      <template #header>
         {{ t('home.plans.tiers.step_3.change_payment.title') }}
-      </RuiButton>
-    </template>
+      </template>
+      <template #subheader>
+        {{ t('home.plans.tiers.step_3.change_payment.warning') }}
+      </template>
+
+      <div>
+        <RuiCheckbox
+          v-model="confirmed"
+          color="primary"
+        >
+          <i18n-t
+            keypath="home.plans.tiers.step_3.change_payment.switch_agree"
+            scope="global"
+          >
+            <template #separator>
+              <br />
+            </template>
+          </i18n-t>
+        </RuiCheckbox>
+      </div>
+
+      <div class="flex justify-end gap-4 pt-4">
+        <RuiButton
+          color="primary"
+          variant="text"
+          @click="emit('update:model-value', false)"
+        >
+          {{ t('actions.cancel') }}
+        </RuiButton>
+        <RuiButton
+          color="error"
+          :disabled="!confirmed"
+          @click="change()"
+        >
+          {{ t('home.plans.tiers.step_3.change_payment.title') }}
+        </RuiButton>
+      </div>
+    </RuiCard>
   </RuiDialog>
 </template>

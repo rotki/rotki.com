@@ -36,84 +36,87 @@ const { t } = useI18n();
 <template>
   <RuiDialog
     :model-value="modelValue"
+    max-width="900"
     @update:model-value="emit('update:model-value', $event)"
   >
-    <template #title>
-      {{ t('account.subscriptions.cancellation.title') }}
-    </template>
+    <RuiCard>
+      <template #header>
+        {{ t('account.subscriptions.cancellation.title') }}
+      </template>
 
-    <div class="whitespace-break-spaces mb-4">
-      <i18n-t
-        keypath="account.subscriptions.cancellation.description"
-        scope="global"
-      >
-        <template #benefits>
-          <ul class="list-disc ml-5">
-            <li>{{ t('account.subscriptions.cancellation.benefits.1') }}</li>
-            <li>
-              <i18n-t
-                keypath="account.subscriptions.cancellation.benefits.2"
-                scope="global"
-              >
-                <template #bug_tracker>
-                  <ButtonLink
-                    class="underline"
-                    color="primary"
-                    external
-                    inline
-                    to="https://github.com/rotki/rotki/issues"
-                  >
-                    {{ t('account.subscriptions.cancellation.bug_tracker') }}
-                  </ButtonLink>
-                </template>
-              </i18n-t>
-            </li>
-            <li>{{ t('account.subscriptions.cancellation.benefits.3') }}</li>
-          </ul>
-        </template>
+      <div class="whitespace-break-spaces mb-4">
+        <i18n-t
+          keypath="account.subscriptions.cancellation.description"
+          scope="global"
+        >
+          <template #benefits>
+            <ul class="list-disc ml-5">
+              <li>{{ t('account.subscriptions.cancellation.benefits.1') }}</li>
+              <li>
+                <i18n-t
+                  keypath="account.subscriptions.cancellation.benefits.2"
+                  scope="global"
+                >
+                  <template #bug_tracker>
+                    <ButtonLink
+                      class="underline"
+                      color="primary"
+                      external
+                      inline
+                      to="https://github.com/rotki/rotki/issues"
+                    >
+                      {{ t('account.subscriptions.cancellation.bug_tracker') }}
+                    </ButtonLink>
+                  </template>
+                </i18n-t>
+              </li>
+              <li>{{ t('account.subscriptions.cancellation.benefits.3') }}</li>
+            </ul>
+          </template>
 
-        <template #subscription_status>
-          <span v-if="!isPending">
-            {{
-              t(
-                'account.subscriptions.cancellation.subscription_status.normal',
-                {
-                  start_date: subscription?.createdDate ?? '',
-                  end_date: subscription?.nextActionDate ?? '',
-                },
-              )
-            }}
-          </span>
-          <span v-else>
-            {{
-              t(
-                'account.subscriptions.cancellation.subscription_status.pending',
-                {
-                  start_date: subscription?.createdDate ?? '',
-                },
-              )
-            }}
-          </span>
-        </template>
-      </i18n-t>
-    </div>
+          <template #subscription_status>
+            <span v-if="!isPending">
+              {{
+                t(
+                  'account.subscriptions.cancellation.subscription_status.normal',
+                  {
+                    start_date: subscription?.createdDate ?? '',
+                    end_date: subscription?.nextActionDate ?? '',
+                  },
+                )
+              }}
+            </span>
+            <span v-else>
+              {{
+                t(
+                  'account.subscriptions.cancellation.subscription_status.pending',
+                  {
+                    start_date: subscription?.createdDate ?? '',
+                  },
+                )
+              }}
+            </span>
+          </template>
+        </i18n-t>
+      </div>
 
-    <template #actions>
-      <RuiButton
-        color="primary"
-        variant="text"
-        @click="emit('update:model-value', false)"
-      >
-        {{ t('account.subscriptions.cancellation.actions.no') }}
-      </RuiButton>
+      <div class="flex justify-end gap-4 pt-4">
+        <RuiButton
+          color="primary"
+          variant="text"
+          @click="emit('update:model-value', false)"
+        >
+          {{ t('account.subscriptions.cancellation.actions.no') }}
+        </RuiButton>
 
-      <RuiButton
-        color="error"
-        @click="cancelSubscription()"
-      >
-        {{ t('account.subscriptions.cancellation.actions.yes') }}
-      </RuiButton>
-    </template>
+        <RuiButton
+          color="error"
+          @click="cancelSubscription()"
+        >
+          {{ t('account.subscriptions.cancellation.actions.yes') }}
+        </RuiButton>
+      </div>
+    </RuiCard>
   </RuiDialog>
 
   <FloatingNotification
