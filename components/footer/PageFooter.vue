@@ -20,30 +20,27 @@ const year = new Date().getFullYear().toString();
         v-if="landing"
         class="space-y-8 pt-8 lg:pt-16 mb-10"
       >
-        <div class="flex justify-between items-center">
+        <div class="flex flex-wrap gap-12">
           <AppLogo
             text
             size="2"
           />
-          <NuxtLink to="/download">
-            <RuiButton
+          <div class="flex-1 min-w-full xl:min-w-0 flex justify-center order-2 xl:order-1">
+            <FooterNavigation class="w-full xl:max-w-[800px]" />
+          </div>
+          <div
+            class="order-1 xl:order-2 flex justify-end"
+          >
+            <ButtonLink
               color="primary"
-              variant="text"
               size="lg"
+              to="/download"
+              rounded
+              variant="filled"
             >
               {{ t('page_footer.download') }}
-            </RuiButton>
-          </NuxtLink>
-        </div>
-        <div
-          class="flex md:flex-col xl:flex-row justify-between items-start md:items-center"
-        >
-          <NavigationMenu
-            class="grow xl:grow-0 flex-col md:flex-row gap-y-3 !gap-x-4"
-          />
-          <FooterLegalese
-            class="grow xl:grow-0 mt-0 md:mt-4 xl:mt-0 flex-col md:flex-row gap-y-3"
-          />
+            </ButtonLink>
+          </div>
         </div>
       </div>
       <div class="border-t border-rui-grey-100" />
