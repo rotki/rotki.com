@@ -26,7 +26,7 @@ const policy: Record<ContentPolicy, string[]> = {
   [ContentPolicy.BASE_URI]: [SELF],
   [ContentPolicy.BLOCK_ALL_MIXED_CONTENT]: [],
   [ContentPolicy.CHILD_SRC]: [NONE],
-  [ContentPolicy.CONNECT_SRC]: [SELF, 'api.github.com', 'raw.githubusercontent.com/rotki/data/'],
+  [ContentPolicy.CONNECT_SRC]: [SELF, 'api.github.com', 'raw.githubusercontent.com/rotki/data/', 'raw.githubusercontent.com/rotki/rotki/'],
   [ContentPolicy.DEFAULT_SRC]: [SELF],
   [ContentPolicy.FONT_SRC]: [SELF, 'data:', 'fonts.gstatic.com'],
   [ContentPolicy.FORM_ACTION]: [SELF],
@@ -45,6 +45,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'https://pbs.twimg.com/profile_images/',
     'assets.braintreegateway.com',
     'https://raw.githubusercontent.com/rotki/data/',
+    'https://raw.githubusercontent.com/rotki/rotki/',
   ],
   [ContentPolicy.OBJECT_SRC]: [NONE],
   [ContentPolicy.SCRIPT_SRC]: [

@@ -31,21 +31,15 @@ const menus: (Menu | MenuParent)[] = [
     highlightActive: true,
   },
   {
+    label: t('navigation_menu.integration.title'),
+    description: t('navigation_menu.integration.description'),
+    to: '/integrations',
+  },
+  {
     label: t('navigation_menu.download'),
     to: '/download',
     highlightExactActive: true,
   },
-  {
-    label: t('navigation_menu.jobs'),
-    to: '/jobs',
-    highlightActive: true,
-  },
-  {
-    label: t('navigation_menu.values'),
-    to: '/values',
-    highlightActive: true,
-  },
-
   {
     label: t('navigation_menu.resources'),
     children: [
@@ -99,11 +93,11 @@ const { isMdAndDown } = useBreakpoint();
           close-on-content-click
           wrapper-class="w-full"
         >
-          <template #activator="{ on }">
+          <template #activator="{ attrs }">
             <RuiButton
               variant="text"
               class="w-full justify-start"
-              v-on="on"
+              v-bind="attrs"
             >
               <div class="flex items-center gap-2">
                 {{ menu.label }}

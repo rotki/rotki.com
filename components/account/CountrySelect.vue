@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
-import type { Country } from '~/composables/countries';
-
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    modelValue: string;
     disabled?: boolean;
   }>(),
   {
@@ -12,44 +8,33 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void;
-}>();
-
-const { modelValue } = toRefs(props);
-
 const { t } = useI18n();
 
 const { countries } = useCountries();
 
-const country = computed({
-  get() {
-    return get(countries).find(({ code }) => code === get(modelValue)) || null;
-  },
-  set(item: Country | null) {
-    emit('update:modelValue', item ? item.code : '');
-  },
-});
+const modelValue = defineModel<string>({ required: true });
 </script>
 
 <template>
   <RuiAutoComplete
     id="country"
-    v-model="country"
+    v-model="modelValue"
     variant="outlined"
     color="primary"
     autocomplete="country"
-    :data="countries"
+    :options="countries"
     :disabled="disabled"
-    key-prop="code"
-    text-prop="name"
+    key-attr="code"
+    text-attr="name"
+    auto-select-first
     :label="t('auth.signup.address.form.country')"
+    :item-height="46"
+    :no-data-text="t('country_select.no_data')"
   >
-    <template #no-data>
-      {{ t('country_select.no_data') }}
-    </template>
-    <template #default="{ item }">
-      {{ item.name }}
+    <template #item="{ item }">
+      <div class="py-2">
+        {{ item.name }}
+      </div>
     </template>
   </RuiAutoComplete>
 </template>

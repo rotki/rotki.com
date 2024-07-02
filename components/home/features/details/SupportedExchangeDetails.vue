@@ -112,7 +112,7 @@ const exchanges = [
 
     <div class="flex-1">
       <img
-        class="rounded-xl overflow-hidden"
+        class="overflow-hidden"
         :alt="t('home.exchanges.title')"
         src="/img/exchanges.png"
       />

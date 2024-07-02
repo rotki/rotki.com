@@ -62,7 +62,7 @@ describe('signup test', () => {
     cy.get('input#address-2').first().as('address2Input');
     cy.get('input#city').first().as('cityInput');
     cy.get('input#postal').first().as('postalInput');
-    cy.get('input#country').first().as('countryInput');
+    cy.get('#country input').first().as('countryInput');
     cy.get('div#signup-captcha').first().as('captcha');
     cy.get('input#tos').first().as('tosInput');
     cy.get('button')

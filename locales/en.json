@@ -637,6 +637,10 @@
       "title": "Blog",
       "description": "Latest news and updates on rotki"
     },
+    "integration": {
+      "title": "Integration",
+      "description": "Supported blockchains, exchanges, and protocols"
+    },
     "resources": "Resources"
   },
   "footer_legalese": {
@@ -727,5 +731,27 @@
         "action": "Refunds/Cancellation Policy"
       }
     }
+  },
+  "integration": {
+    "header": "Integrations",
+    "title": "Connect your blockchains, connect your exchanges",
+    "description": "We support different blockchains, exchanges, and protocols to help you track, account for, and analyze your finances while protecting your privacy.",
+    "tabs": {
+      "all": "All"
+    },
+    "search": "Search",
+    "blockchains": {
+      "title": "Blockchains",
+      "description": "Connect your blockchain addresses."
+    },
+    "exchanges": {
+      "title": "Exchanges",
+      "description": "Connect to a big number of centralized exchanges."
+    },
+    "protocols": {
+      "title": "Protocols",
+      "description": "More than {number}+ DeFi protocols are supported."
+    },
+    "no_data_found": "No data found with keyword \"{keyword}\""
   }
 }
