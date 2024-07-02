@@ -638,12 +638,13 @@
       "description": "Latest news and updates on rotki"
     },
     "integration": {
-      "title": "Integration",
+      "title": "Integrations",
       "description": "Supported blockchains, exchanges, and protocols"
     },
-    "resources": "Resources"
-  },
-  "footer_legalese": {
+    "resources": "Resources",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
     "impressum": "Impressum",
     "privacy_policy": "Privacy Policy",
     "tos": "Terms of Service",
