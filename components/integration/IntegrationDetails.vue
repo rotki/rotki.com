@@ -8,9 +8,9 @@ enum TabCategory {
   EXCHANGES = 'exchanges',
   PROTOCOLS = 'protocols',
 }
-const search: Ref<string> = ref('');
+const search = ref<string>('');
 const searchDebounced = refDebounced(search, 200);
-const tab: Ref<TabCategory> = ref(TabCategory.ALL);
+const tab = ref<TabCategory>(TabCategory.ALL);
 
 const { t } = useI18n();
 
@@ -53,8 +53,8 @@ const data = computed(() => {
   };
 });
 
-const isAllSelected: ComputedRef<boolean> = computed(() => get(tab) === 'all');
-const total: ComputedRef<number> = computed(() => Object.values(get(data)).reduce((accumulator, item) => accumulator + item.data.length, 0));
+const isAllSelected = computed<boolean>(() => get(tab) === 'all');
+const total = computed<number>(() => Object.values(get(data)).reduce((accumulator, item) => accumulator + item.data.length, 0));
 
 const [DefineNotFound, ReuseNotFound] = createReusableTemplate<{
   keyword: string;

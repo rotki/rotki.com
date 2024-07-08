@@ -7,8 +7,8 @@ const { t } = useI18n();
 
 const store = useMainStore();
 
-const success: Ref<boolean> = ref(false);
-const error: Ref<string> = ref('');
+const success = ref<boolean>(false);
+const error = ref<string>('');
 
 let pendingTimeout: any;
 

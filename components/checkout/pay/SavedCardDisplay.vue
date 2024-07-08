@@ -71,11 +71,11 @@ const vaults = setupVaults();
 
 const { t } = useI18n();
 
-const submitPayload: Ref<{ nonce: string; bin: string }> = ref({
+const submitPayload = ref<{ nonce: string; bin: string }>({
   nonce: '',
   bin: '',
 });
-const payloadError: Ref<string> = ref('');
+const payloadError = ref<string>('');
 
 onMounted(async () => {
   try {

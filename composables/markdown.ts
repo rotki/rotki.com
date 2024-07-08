@@ -7,7 +7,6 @@ import type {
   MarkdownParsedContent,
   QueryBuilderWhere,
 } from '@nuxt/content/dist/runtime/types';
-import type { ComputedRef, Ref } from 'vue';
 
 export interface JobMarkdownContent extends MarkdownParsedContent {
   link?: string;
@@ -27,18 +26,18 @@ export interface TestimonialMarkdownContent extends MarkdownParsedContent {
  * Loads jobs and markdown content based on given path
  */
 export function useMarkdownContent() {
-  const jobs: Ref<JobMarkdownContent[]> = ref([]);
-  const testimonials: Ref<TestimonialMarkdownContent[]> = ref([]);
-  const openJobs: ComputedRef<JobMarkdownContent[]> = computed(() =>
+  const jobs = ref<JobMarkdownContent[]>([]);
+  const testimonials = ref<TestimonialMarkdownContent[]>([]);
+  const openJobs = computed<JobMarkdownContent[]>(() =>
     get(jobs).filter(job => job.open),
   );
-  const groupedOpenJobsByCategory: ComputedRef<
+  const groupedOpenJobsByCategory = computed<
     Record<string, readonly JobMarkdownContent[]>
-  > = computed(() =>
+  >(() =>
     Object.fromEntries(groupBy(get(openJobs), item => item.category ?? '')),
   );
 
-  const firstJob: ComputedRef<JobMarkdownContent | null> = computed(
+  const firstJob = computed<JobMarkdownContent | null>(
     () => get(openJobs)[0] ?? null,
   );
 

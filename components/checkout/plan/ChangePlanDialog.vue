@@ -3,7 +3,6 @@ import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { getPlanName } from '~/utils/plans';
-import type { ComputedRef } from 'vue';
 import type { Plan } from '~/types';
 
 const props = withDefaults(
@@ -30,7 +29,7 @@ const { plans } = storeToRefs(store);
 const { crypto, visible, warning } = toRefs(props);
 const confirmed = ref(false);
 
-const availablePlans: ComputedRef<Plan[]> = computed(() => get(plans) ?? []);
+const availablePlans = computed<Plan[]>(() => get(plans) ?? []);
 
 const cancel = () => emit('cancel');
 

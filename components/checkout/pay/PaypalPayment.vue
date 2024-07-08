@@ -34,7 +34,7 @@ const { paymentMethodId } = usePaymentMethodParam();
 const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
 const { token, plan, loading, pending, success } = toRefs(props);
-const error: Ref<ErrorMessage | null> = ref(null);
+const error = ref<ErrorMessage | null>(null);
 const accepted = ref(false);
 const mustAcceptRefund = ref(false);
 const paying = ref(false);

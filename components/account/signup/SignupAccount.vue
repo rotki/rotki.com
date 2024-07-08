@@ -31,7 +31,7 @@ const rules = {
   email: { required, email },
 };
 
-const $externalResults: Ref<Record<string, string[]>> = ref({});
+const $externalResults = ref<Record<string, string[]>>({});
 
 const v$ = useVuelidate(rules, modelValue, {
   $autoDirty: true,

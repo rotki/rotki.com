@@ -269,7 +269,7 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
-  const subscriptions: ComputedRef<Subscription[]> = computed(() => {
+  const subscriptions = computed<Subscription[]>(() => {
     const userAccount = get(account);
     if (!userAccount)
       return [];

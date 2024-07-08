@@ -15,14 +15,14 @@ interface Item {
   label: string;
 }
 
-const blockchainItems: ComputedRef<Item[]> = computed(() => Object.keys(get(paymentAssets)).map(item => ({
+const blockchainItems = computed<Item[]>(() => Object.keys(get(paymentAssets)).map(item => ({
   id: item,
   label: toTitleCase(item),
 })));
 
-const selectedChain: Ref<string> = ref('');
+const selectedChain = ref<string>('');
 
-const tokenItems: ComputedRef<Item[]> = computed(() => {
+const tokenItems = computed<Item[]>(() => {
   const chain = get(selectedChain);
   if (!chain)
     return [];

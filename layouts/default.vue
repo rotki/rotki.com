@@ -9,7 +9,7 @@ const footerRef = ref<HTMLDivElement>();
 const { height: topHeight } = useElementBounding(headerRef);
 const { height: bottomHeight } = useElementBounding(footerRef);
 
-const otherHeight: ComputedRef<number> = computed(
+const otherHeight = computed<number>(
   () => get(topHeight) + get(bottomHeight) || 219,
 );
 

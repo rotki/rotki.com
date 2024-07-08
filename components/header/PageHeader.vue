@@ -13,7 +13,7 @@ async function logout() {
   await navigateTo('/login');
 }
 
-const menuOpened: Ref<boolean> = ref(false);
+const menuOpened = ref<boolean>(false);
 
 const route = useRoute();
 

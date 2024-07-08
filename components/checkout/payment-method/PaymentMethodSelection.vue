@@ -4,7 +4,6 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
-import type { ComputedRef, Ref } from 'vue';
 import type { RuiIcons } from '@rotki/ui-library';
 
 const props = defineProps<{ identifier?: string }>();
@@ -28,8 +27,8 @@ const { identifier } = toRefs(props);
 const { authenticated } = storeToRefs(store);
 
 const loginRequired = ref(false);
-const method: Ref<PaymentMethod | undefined> = ref(get(paymentMethodId));
-const processing: Ref<boolean> = ref(false);
+const method = ref<PaymentMethod>(get(paymentMethodId));
+const processing = ref<boolean>(false);
 
 const paymentMethods: PaymentMethodItem[] = [
   {
@@ -55,7 +54,7 @@ const paymentMethods: PaymentMethodItem[] = [
   },
 ];
 
-const selected: ComputedRef<PaymentMethodItem | undefined> = computed(() =>
+const selected = computed<PaymentMethodItem | undefined>(() =>
   get(paymentMethods).find(m => get(method) === m.id),
 );
 

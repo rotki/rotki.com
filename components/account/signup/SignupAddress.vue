@@ -44,13 +44,13 @@ const rules = {
   terms: { checked: (value: boolean) => value },
 };
 
-const terms: Ref<boolean> = ref(false);
+const terms = ref<boolean>(false);
 
 const recaptcha = useRecaptcha();
 const { recaptchaPassed, onError, onSuccess, onExpired, recaptchaToken }
   = recaptcha;
 
-const $externalResults: Ref<Record<string, string[]>> = ref({});
+const $externalResults = ref<Record<string, string[]>>({});
 
 const v$ = useVuelidate(
   rules,

@@ -2,7 +2,6 @@
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
-import type { Ref } from 'vue';
 import type {
   SignupAccountPayload,
   SignupAddressPayload,
@@ -37,8 +36,8 @@ const addressForm = ref<SignupAddressPayload>({
   country: '',
 });
 
-const loading: Ref<boolean> = ref(false);
-const externalResults: Ref<ValidationErrors> = ref({});
+const loading = ref<boolean>(false);
+const externalResults = ref<ValidationErrors>({});
 
 async function signup({
   recaptchaToken,
@@ -86,7 +85,7 @@ async function signup({
   set(loading, false);
 }
 
-const step: Ref<number> = ref(1);
+const step = ref<number>(1);
 const steps = [
   {
     title: t('auth.signup.steps.step_1.title'),

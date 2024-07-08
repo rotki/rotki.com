@@ -2,7 +2,6 @@
 import { storeToRefs } from 'pinia';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import type { ComputedRef, Ref } from 'vue';
 import type { Plan } from '~/types';
 
 const { t } = useI18n();
@@ -11,10 +10,10 @@ const { plan: savedPlan } = usePlanParams();
 
 const { account, authenticated, plans } = storeToRefs(useMainStore());
 
-const identifier: Ref<number> = ref(get(savedPlan));
-const processing: Ref<boolean> = ref(false);
+const identifier = ref<number>(get(savedPlan));
+const processing = ref<boolean>(false);
 
-const selected: ComputedRef<Plan | undefined> = computed(
+const selected = computed<Plan | undefined>(
   () => get(plans)?.find(plan => plan.months === get(identifier)),
 );
 

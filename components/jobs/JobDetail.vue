@@ -8,10 +8,10 @@ const props = defineProps<{
 
 const { data } = toRefs(props);
 
-const separatedData: ComputedRef<{
+const separatedData = computed<{
   default: JobMarkdownContent;
   blockquote: JobMarkdownContent;
-}> = computed(() => {
+}>(() => {
   const regularItems = [];
   const blockquoteItems = [];
 

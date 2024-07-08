@@ -13,8 +13,8 @@ const logger = useLogger();
 function setupTokenValidation() {
   const route = useRoute();
   const { uid, token } = route.params;
-  const validating: Ref<boolean> = ref(true);
-  const isValid: Ref<boolean> = ref(true);
+  const validating = ref<boolean>(true);
+  const isValid = ref<boolean>(true);
 
   const validateToken = async () => {
     try {
@@ -73,7 +73,7 @@ const $externalResults = ref({});
 
 const route = useRoute();
 const { uid, token } = route.params;
-const submitting: Ref<boolean> = ref(false);
+const submitting = ref<boolean>(false);
 
 async function submit() {
   set(submitting, true);

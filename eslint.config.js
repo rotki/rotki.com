@@ -8,6 +8,11 @@ export default rotki({
   },
   stylistic: true,
   formatters: true,
+  rotki: {
+    overrides: {
+      '@rotki/consistent-ref-type-annotation': ['warn', { allowInference: true }],
+    },
+  },
 }, {
   files: ['**/*.ts'],
   rules: {

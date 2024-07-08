@@ -167,7 +167,7 @@ function redirect() {
   window.location.href = url.toString();
 }
 
-const btClient: Ref<Client | null> = ref(null);
+const btClient = ref<Client | null>(null);
 
 onBeforeMount(async () => {
   try {

@@ -11,11 +11,11 @@ const props = withDefaults(defineProps<{ modal?: boolean }>(), {
 const emit = defineEmits<{ (e: 'complete'): void }>();
 
 const { modal } = toRefs(props);
-const username: Ref<string> = ref('');
-const password: Ref<string> = ref('');
-const loading: Ref<boolean> = ref(false);
-const error: Ref<string> = ref('');
-const hadError: Ref<boolean> = ref(false);
+const username = ref<string>('');
+const password = ref<string>('');
+const loading = ref<boolean>(false);
+const error = ref<string>('');
+const hadError = ref<boolean>(false);
 
 const rules = {
   username: { required },

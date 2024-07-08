@@ -2,7 +2,6 @@
 import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import type { Ref } from 'vue';
 import type {
   DataTableColumn,
   DataTableSortColumn,
@@ -42,8 +41,8 @@ const headers: DataTableColumn<Payment>[] = [
 const store = useMainStore();
 const { account } = storeToRefs(store);
 
-const pagination: Ref<TablePaginationData | undefined> = ref();
-const sort: Ref<DataTableSortColumn<Payment>[]> = ref([]);
+const pagination = ref<TablePaginationData>();
+const sort = ref<DataTableSortColumn<Payment>[]>([]);
 
 const payments = computed(() => {
   const userAccount = get(account);

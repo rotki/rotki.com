@@ -50,11 +50,11 @@ const headers: DataTableColumn<Subscription>[] = [
 const store = useMainStore();
 const { subscriptions } = storeToRefs(store);
 
-const pagination: Ref<TablePaginationData | undefined> = ref();
-const sort: Ref<DataTableSortColumn<Subscription>[]> = ref([]);
-const selectedSubscription: Ref<Subscription | undefined> = ref();
-const showCancelDialog: Ref<boolean> = ref(false);
-const cancelling: Ref<boolean> = ref(false);
+const pagination = ref<TablePaginationData>();
+const sort = ref<DataTableSortColumn<Subscription>[]>([]);
+const selectedSubscription = ref<Subscription>();
+const showCancelDialog = ref<boolean>(false);
+const cancelling = ref<boolean>(false);
 
 const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
 

@@ -2,13 +2,12 @@
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
-import type { Ref } from 'vue';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const acceptRefundPolicy = ref(false);
-const processing: Ref<boolean> = ref(false);
+const processing = ref<boolean>(false);
 
 const { plan } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();

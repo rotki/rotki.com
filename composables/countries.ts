@@ -1,4 +1,3 @@
-import type { Ref } from 'vue';
 import type { ApiResponse } from '~/types';
 
 export interface Country {
@@ -7,8 +6,8 @@ export interface Country {
 }
 
 export function useCountries() {
-  const countries: Ref<Country[]> = ref([]);
-  const countriesLoadError: Ref<string> = ref('');
+  const countries = ref<Country[]>([]);
+  const countriesLoadError = ref<string>('');
 
   const loadCountries = async () => {
     try {

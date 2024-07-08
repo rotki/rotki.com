@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const { tag } = toRefs(props);
 
-const icon: ComputedRef<RuiIcons | undefined> = computed(() => {
+const icon = computed<RuiIcons | undefined>(() => {
   const value = get(tag);
   const map: Record<string, RuiIcons> = {
     'full-time': 'timer-2-line',
