@@ -45,7 +45,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'https://pbs.twimg.com/profile_images/',
     'assets.braintreegateway.com',
     'https://raw.githubusercontent.com/rotki/data/',
-    'https://raw.githubusercontent.com/rotki/rotki/',
+    'https://raw.githubusercontent.com/rotki/rotki.com/',
   ],
   [ContentPolicy.OBJECT_SRC]: [NONE],
   [ContentPolicy.SCRIPT_SRC]: [
