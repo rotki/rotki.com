@@ -175,6 +175,7 @@ const CryptoPayment = z.object({
   finalPriceInCrypto: z.string().nonempty(),
   finalPriceInEur: z.string().nonempty(),
   hoursForPayment: z.number(),
+  iconUrl: z.string().optional(),
   months: z.number(),
   startDate: z.number(),
   tokenAddress: z.string().nullish(),
@@ -284,6 +285,7 @@ export type CreateCardNonceResponse = z.infer<typeof CreateCardNonceResponse>;
 
 export const PaymentAsset = z.object({
   address: z.string().optional(),
+  iconUrl: z.string().optional(),
   isNativeCurrency: z.literal(true).optional(),
   name: z.string(),
   symbol: z.string(),

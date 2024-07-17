@@ -13,6 +13,7 @@ const { paymentAssets, paymentAssetsLoading } = storeToRefs(cryptoStore);
 interface Item {
   id: string;
   label: string;
+  iconUrl?: string;
 }
 
 const blockchainItems = computed<Item[]>(() => Object.keys(get(paymentAssets)).map(item => ({
@@ -41,6 +42,7 @@ const tokenItems = computed<Item[]>(() => {
     return {
       id,
       label,
+      iconUrl: item.iconUrl,
     };
   });
 });
@@ -113,6 +115,25 @@ const hint = computed(() => {
       :hint="hint"
       return-object
       :label="t('home.plans.tiers.step_3.labels.token')"
-    />
+    >
+      <template #item="{ item }">
+        <div class="flex items-center gap-3">
+          <CryptoAssetIcon
+            :name="item.label"
+            :icon-url="item.iconUrl"
+          />
+          {{ item.label }}
+        </div>
+      </template>
+      <template #selection="{ item }">
+        <div class="flex items-center gap-3">
+          <CryptoAssetIcon
+            :name="item.label"
+            :icon-url="item.iconUrl"
+          />
+          {{ item.label }}
+        </div>
+      </template>
+    </RuiAutoComplete>
   </div>
 </template>

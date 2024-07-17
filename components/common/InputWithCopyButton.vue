@@ -7,6 +7,12 @@ defineProps<{
 
 <template>
   <RuiTextField color="primary">
+    <template
+      v-if="$slots.prepend"
+      #prepend
+    >
+      <slot name="prepend" />
+    </template>
     <template #append>
       <CopyButton
         :disabled="disabled"
