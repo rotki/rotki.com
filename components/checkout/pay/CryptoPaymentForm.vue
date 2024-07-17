@@ -63,10 +63,15 @@ const { data, pending, loading, success } = toRefs(props);
 const canvas = ref<HTMLCanvasElement>();
 const qrText = ref<string>('');
 
+const currencyName = computed(() => {
+  const { cryptocurrency } = get(data);
+  return cryptocurrency.split(':')[1];
+});
+
 const paymentAmount = computed(() => {
-  const { cryptocurrency, finalPriceInCrypto } = get(data);
-  const currencyName = cryptocurrency.split(':')[1];
-  return `${finalPriceInCrypto} ${currencyName}`;
+  const { finalPriceInCrypto } = get(data);
+  const currency = get(currencyName);
+  return `${finalPriceInCrypto} ${currency}`;
 });
 
 const processing = computed(() => get(pending) || get(loading));
@@ -118,7 +123,14 @@ const showChangePaymentDialog = ref(false);
         hide-details
         readonly
         :copy-value="data.finalPriceInCrypto"
-      />
+      >
+        <template #prepend>
+          <CryptoAssetIcon
+            :icon-url="data.iconUrl"
+            :name="currencyName"
+          />
+        </template>
+      </InputWithCopyButton>
       <InputWithCopyButton
         id="address"
         :disabled="processing"
