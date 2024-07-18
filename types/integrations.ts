@@ -5,6 +5,8 @@ export const IntegrationItem = z.object({
   label: z.string(),
 });
 
+export type IntegrationItem = z.infer<typeof IntegrationItem>;
+
 export const IntegrationData = z.object({
   blockchains: z.array(IntegrationItem),
   exchanges: z.array(IntegrationItem),
