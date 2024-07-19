@@ -3,6 +3,31 @@ import { HttpResponse, http } from 'msw';
 const { BACKEND_URL } = import.meta.env;
 
 export const handlers = [
+  http.options(`${BACKEND_URL}/webapi/csrf`, () => HttpResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+    },
+  })),
+  http.options(`${BACKEND_URL}/webapi/countries`, () => HttpResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+    },
+  })),
+  http.options(`${BACKEND_URL}/webapi/login`, () => HttpResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+
+    },
+  })),
+  http.options(`${BACKEND_URL}/webapi/account`, () => HttpResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+    },
+  })),
   http.get(`${BACKEND_URL}/webapi/csrf`, () =>
     HttpResponse.json(
       {

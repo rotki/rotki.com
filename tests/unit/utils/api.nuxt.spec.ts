@@ -1,3 +1,4 @@
+import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fetchWithCsrf, setHooks } from '~/utils/api';
 import type { Country } from '~/composables/countries';
@@ -27,11 +28,13 @@ describe('api utilities', () => {
   }, 5000);
 
   it('fetchWithCsrf: fetch account info with 401 error', async () => {
+    mockNuxtImport('navigateTo', () => vi.fn());
     await expect(
       fetchWithCsrf<ApiResponse<Account>>(`/webapi/account`),
     ).rejects.toThrowError(/401/);
     expect(logout).toBeCalled();
     expect(logout).toHaveBeenCalledOnce();
+    expect(navigateTo).toHaveBeenCalledOnce();
   }, 2000);
 
   it('initCsrf: login and setup csrf successfully', async () => {
