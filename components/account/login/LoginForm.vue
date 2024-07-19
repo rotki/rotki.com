@@ -4,13 +4,6 @@ import { required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { useMainStore } from '~/store';
 
-const props = withDefaults(defineProps<{ modal?: boolean }>(), {
-  modal: false,
-});
-
-const emit = defineEmits<{ (e: 'complete'): void }>();
-
-const { modal } = toRefs(props);
 const username = ref<string>('');
 const password = ref<string>('');
 const loading = ref<boolean>(false);
@@ -34,6 +27,7 @@ const v$ = useVuelidate(
 );
 
 const { login } = useMainStore();
+const route = useRoute();
 
 async function performLogin() {
   set(loading, true);
@@ -47,14 +41,14 @@ async function performLogin() {
   set(loading, false);
 
   if (!get(error)) {
-    if (get(modal))
-      emit('complete');
+    const { redirectUrl } = route.query;
+    if (redirectUrl)
+      window.location.href = decodeURIComponent(redirectUrl as string);
     else
       await navigateTo('/home/subscription');
   }
-  else {
-    set(hadError, true);
-  }
+
+  else { set(hadError, true); }
 }
 
 const { t } = useI18n();
@@ -136,7 +130,10 @@ const { t } = useI18n();
         {{ t('auth.login.first_time_premium') }}
       </span>
       <ButtonLink
-        to="/signup"
+        :to="{
+          path: '/signup',
+          query: route.query,
+        }"
         inline
         color="primary"
       >
@@ -146,8 +143,7 @@ const { t } = useI18n();
   </div>
   <div
     v-if="hadError"
-    class="max-w-full"
-    :class="modal ? 'w-[360px] mt-8' : 'w-[660px] mt-14'"
+    class="max-w-full w-[660px] mt-14"
   >
     <RuiAlert
       type="error"

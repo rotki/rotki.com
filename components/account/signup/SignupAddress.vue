@@ -109,6 +109,7 @@ const { t } = useI18n();
         variant="outlined"
         color="primary"
         autocomplete="address-line1"
+        autofocus
         dense
         :label="t('auth.signup.address.form.address_line_1')"
         :hint="t('auth.common.required')"
@@ -191,7 +192,7 @@ const { t } = useI18n();
               color="primary"
               external
             >
-              {{ t('footer_legalese.tos') }}
+              {{ t('navigation_menu.tos') }}
             </ButtonLink>
           </template>
           <template #privacy_policy>
@@ -201,7 +202,7 @@ const { t } = useI18n();
               color="primary"
               external
             >
-              {{ t('footer_legalese.privacy_policy') }}
+              {{ t('navigation_menu.privacy_policy') }}
             </ButtonLink>
           </template>
         </i18n-t>
@@ -224,6 +225,7 @@ const { t } = useI18n();
       color="primary"
       class="w-full"
       size="lg"
+      type="submit"
       :loading="loading"
       @click="finish()"
     >

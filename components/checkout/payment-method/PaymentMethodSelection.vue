@@ -26,7 +26,6 @@ const { paymentMethodId } = usePaymentMethodParam();
 const { identifier } = toRefs(props);
 const { authenticated } = storeToRefs(store);
 
-const loginRequired = ref(false);
 const method = ref<PaymentMethod>(get(paymentMethodId));
 const processing = ref<boolean>(false);
 
@@ -65,39 +64,42 @@ async function back() {
   });
 }
 
-async function next() {
-  if (get(authenticated)) {
-    set(processing, true);
-    const selectedMethod = get(selected);
-    assert(selectedMethod);
-    const { name, id: method } = selectedMethod;
+const router = useRouter();
 
+async function next() {
+  set(processing, true);
+  const selectedMethod = get(selected);
+  assert(selectedMethod);
+  const { name, id: method } = selectedMethod;
+
+  const { href } = router.resolve({
+    name,
+    query: {
+      plan: get(plan),
+      id: get(identifier),
+      method,
+    },
+  });
+
+  if (get(authenticated)) {
     if (method === PaymentMethod.CARD) {
       // For card payments we use href instead of router to trigger a server reload
       // This need to happen due to the CSP policy required for 3DSecure v2
-      const queryString = new URLSearchParams({
-        plan: get(plan).toString(),
-        id: get(identifier) ?? '',
-        method: method.toString(),
-      });
-      const url = new URL(
-        `${window.location.origin}/checkout/pay/card?${queryString}`,
-      );
-      window.location.href = url.toString();
+      window.location.href = new URL(
+        `${window.location.origin}${href}`,
+      ).toString();
     }
     else {
-      await navigateTo({
-        name,
-        query: {
-          plan: get(plan),
-          id: get(identifier),
-          method,
-        },
-      });
+      await navigateTo(href);
     }
   }
   else {
-    set(loginRequired, true);
+    await navigateTo({
+      path: '/login',
+      query: {
+        redirectUrl: encodeURIComponent(href),
+      },
+    });
   }
 }
 
@@ -152,7 +154,6 @@ function select(m: PaymentMethod) {
         {{ t('actions.continue') }}
       </RuiButton>
     </div>
-    <LoginModal v-model="loginRequired" />
   </div>
 </template>
 

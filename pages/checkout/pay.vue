@@ -39,6 +39,12 @@ const step = computed(() => {
   return index + 1;
 });
 
+const { removeStoredRedirectUrl } = useRedirectUrl();
+
+onBeforeMount(() => {
+  removeStoredRedirectUrl();
+});
+
 onMounted(async () => {
   await store.getPlans();
 });

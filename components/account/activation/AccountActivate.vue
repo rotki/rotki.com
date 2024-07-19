@@ -10,7 +10,9 @@ const { uid, token } = route.params;
 const validating = ref(true);
 const isValid = ref(false);
 
-const { getAccount } = useMainStore();
+const mainStore = useMainStore();
+const { getAccount } = mainStore;
+const { account } = storeToRefs(mainStore);
 const logger = useLogger();
 
 async function validateToken() {
@@ -33,6 +35,22 @@ onBeforeMount(async () => {
     await getAccount();
 });
 const { t } = useI18n();
+
+const { getLastRedirectUrl } = useRedirectUrl();
+
+const lastPaymentLink = computed(() => {
+  const accountVal = get(account);
+  if (accountVal && accountVal.username)
+    return getLastRedirectUrl(accountVal.username);
+
+  return undefined;
+});
+
+function redirectToPaymentLink() {
+  const paymentLink = get(lastPaymentLink);
+  if (paymentLink)
+    window.location.href = paymentLink;
+}
 </script>
 
 <template>
@@ -79,6 +97,23 @@ const { t } = useI18n();
           >
             {{ t('common.here') }}
           </ButtonLink>
+        </div>
+        <div
+          v-if="lastPaymentLink"
+          class="text-body-1 text-rui-text-secondary border-t pt-3"
+        >
+          <span>
+            {{ t('auth.activation.success.continue_payment') }}
+          </span>
+          <RuiButton
+            :to="lastPaymentLink"
+            color="primary"
+            class="inline-flex py-0 !px-1 !text-[1em]"
+            variant="text"
+            @click="redirectToPaymentLink()"
+          >
+            {{ t('common.here') }}
+          </RuiButton>
         </div>
       </div>
     </div>
