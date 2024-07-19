@@ -2,6 +2,7 @@
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
+import { useRedirectUrl } from '~/composables/redirect-url';
 import type {
   SignupAccountPayload,
   SignupAddressPayload,
@@ -39,6 +40,10 @@ const addressForm = ref<SignupAddressPayload>({
 const loading = ref<boolean>(false);
 const externalResults = ref<ValidationErrors>({});
 
+const route = useRoute();
+
+const { saveRedirectUrl } = useRedirectUrl();
+
 async function signup({
   recaptchaToken,
 }: {
@@ -64,6 +69,10 @@ async function signup({
       },
     });
     if (result) {
+      const { redirectUrl } = route.query;
+      if (redirectUrl)
+        saveRedirectUrl(payload.username, decodeURIComponent(redirectUrl as string));
+
       await navigateTo({ path: '/activation' });
     }
     else if (typeof message === 'object') {

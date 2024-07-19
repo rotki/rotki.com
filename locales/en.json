@@ -7,7 +7,8 @@
       },
       "success": {
         "title": "Welcome to rotki",
-        "message": "Your rotki account has been successfully activated. To see your dashboard click"
+        "message": "Your rotki account has been successfully activated. To see your dashboard click",
+        "continue_payment": "Or continue your payment"
       }
     },
     "common": {
