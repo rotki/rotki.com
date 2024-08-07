@@ -144,6 +144,7 @@ export default defineNuxtConfig({
         changeOrigin: true,
         headers: {
           host: proxy.host,
+          origin: proxy.referrer,
           referer: proxy.referrer,
         },
         target: proxy.target,
