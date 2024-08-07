@@ -46,7 +46,7 @@ const menus: (Menu | MenuParent)[] = [
       {
         label: t('navigation_menu.documentation.title'),
         description: t('navigation_menu.documentation.description'),
-        to: 'https://rotki.readthedocs.io/en/latest/index.html',
+        to: 'https://docs.rotki.com',
         external: true,
       },
       {

@@ -26,7 +26,7 @@ const css = useCssModule();
             variant="default"
             size="lg"
             external
-            to="https://rotki.readthedocs.io/en/latest/index.html"
+            to="https://docs.rotki.com"
           >
             {{ t('download.documentation.action') }}
             <template #append>
