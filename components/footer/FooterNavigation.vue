@@ -55,7 +55,7 @@ const menus: MenuGroup[] = [
     items: [
       {
         label: t('navigation_menu.documentation.title'),
-        to: 'https://rotki.readthedocs.io/en/latest/index.html',
+        to: 'https://docs.rotki.com',
         external: true,
       },
       {
@@ -85,7 +85,7 @@ const menus: MenuGroup[] = [
       },
       {
         label: t('navigation_menu.faq'),
-        to: 'https://rotki.readthedocs.io/en/latest/faq.html',
+        to: 'https://docs.rotki.com/faq',
         external: true,
       },
     ],
