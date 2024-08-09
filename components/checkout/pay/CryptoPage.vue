@@ -1,18 +1,15 @@
 <script lang="ts" setup>
-import detectEthereumProvider from '@metamask/detect-provider';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
-import { useLogger } from '~/utils/use-logger';
-import type { CryptoPayment, PaymentStep, Provider } from '~/types';
+import type { CryptoPayment, PaymentStep } from '~/types';
 
 const { t } = useI18n();
 
 const loading = ref(false);
 const data = ref<CryptoPayment | null>(null);
-const metamaskSupport = ref(false);
 
 const { cryptoPayment, switchCryptoPlan, deletePendingPayment, subscriptions } = useMainStore();
 const { plan } = usePlanParams();
@@ -20,34 +17,23 @@ const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
 const route = useRoute();
 
-let provider: Provider | null = null;
-
 const config = useRuntimeConfig();
 const {
-  payWithMetamask,
+  web3Modal,
+  connected,
+  pay,
   state: currentState,
   error,
   clearErrors,
 } = useWeb3Payment(
   data,
-  () => {
-    assert(provider);
-    return provider;
-  },
   !!config.public.testing,
 );
-
-const logger = useLogger();
 
 onMounted(async () => {
   const selectedPlan = get(plan);
   const selectedCurrency = get(currency);
   if (selectedPlan && selectedCurrency) {
-    provider = await detectEthereumProvider();
-    logger.debug(
-      `provider: ${!!provider}, is metamask: ${provider?.isMetaMask}`,
-    );
-    set(metamaskSupport, !!provider);
     set(loading, true);
     const subId = get(subscriptionId);
     const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
@@ -182,9 +168,10 @@ async function changePaymentMethod() {
         :pending="pending || currentState === 'pending'"
         v-bind="{ success, failure, status }"
         :loading="loading"
-        :metamask-support="metamaskSupport"
         :plan="plan"
-        @pay="payWithMetamask()"
+        :connected="connected"
+        @pay="pay()"
+        @connect="web3Modal?.open()"
         @change="changePaymentMethod()"
         @clear:errors="clearErrors()"
       />

@@ -182,6 +182,9 @@ export default defineNuxtConfig({
         siteKey: '',
       },
       testing: false,
+      walletConnect: {
+        projectId: '',
+      },
     },
   },
 

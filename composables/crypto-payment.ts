@@ -6,13 +6,14 @@ import {
   parseUnits,
 } from 'ethers';
 import { get, set, useTimeoutFn } from '@vueuse/core';
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers/vue';
 import { useLogger } from '~/utils/use-logger';
 import { assert } from '~/utils/assert';
 import { useMainStore } from '~/store';
+import type { Web3Modal } from '@web3modal/ethers';
 import type {
   CryptoPayment,
   IdleStep,
-  Provider,
   StepType,
 } from '~/types';
 import type { Ref } from 'vue';
@@ -32,9 +33,11 @@ const abi = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
 
-export const getChainId = (testing: boolean, chainId?: string | number) => BigInt(chainId ?? (testing ? 11155111 : 1));
+export const getChainId = (testing: boolean, chainId?: string | number) => Number(chainId ?? (testing ? 11155111 : 1));
 
-export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () => Provider, testing: boolean) {
+export function useWeb3Payment(data: Ref<CryptoPayment | null>, testing: boolean) {
+  const web3Modal = ref<Web3Modal>();
+  const connected = ref(false);
   const { markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
   const error = ref('');
@@ -92,25 +95,89 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
     start();
   }
 
-  const payWithMetamask = async () => {
+  function handleChange({ isConnected }: { isConnected: boolean }) {
+    clearErrors();
+    set(connected, isConnected);
+  }
+
+  const {
+    public: {
+      baseUrl,
+      walletConnect: {
+        projectId,
+      },
+    },
+  } = useRuntimeConfig();
+
+  watchImmediate(data, (payment) => {
+    if (!payment)
+      return;
+
+    const {
+      chainId,
+      chainName,
+    } = payment;
+
+    // 2. Set chains
+    const expectedChainId = getChainId(testing, chainId);
+    const network = {
+      chainId: expectedChainId,
+      currency: '',
+      explorerUrl: '',
+      name: toTitleCase(chainName),
+      rpcUrl: '',
+    };
+
+    // 3. Create your application's metadata object
+    const metadata = {
+      description: 'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.',
+      icons: ['https://raw.githubusercontent.com/rotki/data/main/assets/icons/app_logo.png'],
+      name: 'Rotki',
+      url: baseUrl,
+    };
+
+    // 4. Create Ethers config
+    const ethersConfig = defaultConfig({
+      defaultChainId: 1,
+      enableEIP6963: true,
+      enableInjected: true,
+      metadata,
+    });
+
+    // 5. Create a AppKit instance
+    const modal = createWeb3Modal({
+      chains: [network],
+      enableAnalytics: true,
+      ethersConfig,
+      projectId,
+    });
+
+    modal.subscribeProvider(handleChange);
+
+    set(web3Modal, modal);
+  });
+
+  const pay = async () => {
     if (get(state) === 'pending')
       return;
 
     set(state, 'pending');
-    try {
-      const payment = get(data);
-      assert(payment);
-      const provider = getProvider();
-      const accounts = await provider.request({
-        method: 'eth_requestAccounts',
-        params: [],
-      });
 
-      if (!accounts || accounts.length === 0) {
-        logger.info('missing permission');
+    try {
+      const modal = get(web3Modal);
+      assert(modal);
+
+      if (!modal.getIsConnected()) {
+        set(error, 'User is disconnected');
         return;
       }
-      const browserProvider = new BrowserProvider(provider);
+
+      const payment = get(data);
+      assert(payment);
+      const walletProvider = modal.getWalletProvider();
+      assert(walletProvider);
+
+      const browserProvider = new BrowserProvider(walletProvider);
       const network = await browserProvider.getNetwork();
 
       const {
@@ -120,15 +187,15 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
 
       const expectedChainId = getChainId(testing, chainId);
 
-      if (network.chainId !== expectedChainId) {
+      if (network.chainId !== BigInt(expectedChainId)) {
         set(
           error,
           `We are expecting payments on ${chainName} but found ${network.name}. Change the network and try again.`,
         );
         return;
       }
-
       const signer = await browserProvider.getSigner();
+
       await executePayment(signer);
     }
     catch (error_: any) {
@@ -150,8 +217,10 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
 
   return {
     clearErrors,
+    connected,
     error,
-    payWithMetamask,
+    pay,
     state,
+    web3Modal,
   };
 }
