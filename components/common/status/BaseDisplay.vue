@@ -5,9 +5,9 @@ defineProps<{
   title: string;
 }>();
 
-const statuses = ['success', 'error', 'neutral'] as const;
+const _statuses = ['success', 'error', 'neutral'] as const;
 
-type Status = (typeof statuses)[number];
+type Status = (typeof _statuses)[number];
 
 const css = useCssModule();
 </script>

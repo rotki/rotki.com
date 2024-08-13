@@ -2,7 +2,7 @@ import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
 import { useMainStore } from '~/store';
 
-export default defineNuxtRouteMiddleware(() => {
+export default defineNuxtRouteMiddleware(async () => {
   const { account } = storeToRefs(useMainStore());
 
   if (!isDefined(account))

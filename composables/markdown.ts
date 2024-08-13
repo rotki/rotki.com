@@ -145,7 +145,7 @@ export function useMarkdownContent() {
       logger.error(error);
 
       // fallback to local if remote fails
-      return await queryPrefixForJob(LOCAL_CONTENT_PREFIX, path);
+      return queryPrefixForJob(LOCAL_CONTENT_PREFIX, path);
     }
   };
 

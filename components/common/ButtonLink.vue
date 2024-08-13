@@ -30,8 +30,9 @@ function getColor(active: boolean, exact: boolean) {
   if (
     (get(highlightActive) && active)
     || (get(highlightExactActive) && exact)
-  )
+  ) {
     return 'primary';
+  }
 
   return undefined;
 }

@@ -11,6 +11,6 @@ export default defineNuxtPlugin(async () => {
   if (sessionId) {
     const { getAccount } = useMainStore();
 
-    return await getAccount();
+    return getAccount();
   }
 });

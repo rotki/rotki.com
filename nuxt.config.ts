@@ -83,7 +83,10 @@ export default defineNuxtConfig({
     },
   },
 
+  compatibilityDate: '2024-08-13',
+
   components: [{ path: '~/components', pathPrefix: false }],
+
   content: {
     api: {
       baseURL: '/md/_content',
@@ -110,6 +113,7 @@ export default defineNuxtConfig({
       },
     },
   },
+
   css: [],
 
   devtools: {
@@ -153,10 +157,10 @@ export default defineNuxtConfig({
   },
 
   robots: {
-    rules: {
-      Disallow: nonIndexed,
-      UserAgent: '*',
-    },
+    groups: [{
+      disallow: nonIndexed,
+      userAgent: '*',
+    }],
   },
 
   routeRules: {
@@ -192,6 +196,5 @@ export default defineNuxtConfig({
   sitemap: {
     exclude: nonIndexed,
   },
-
   ssr: true,
 });

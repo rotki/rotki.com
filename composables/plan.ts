@@ -18,8 +18,9 @@ export function usePlanParams() {
       isNaN(selectedPlan)
       || !isFinite(selectedPlan)
       || !availablePlans.includes(selectedPlan)
-    )
+    ) {
       return -1;
+    }
 
     return selectedPlan;
   });

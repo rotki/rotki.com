@@ -21,16 +21,17 @@ function getUpdatedKey(key: string, camelCase: boolean) {
       const nextCharOffset = offset + 1;
       if (
         (nextCharOffset < string.length
-        && /([A-Z])/.test(string[nextCharOffset]))
+        && /[A-Z]/.test(string[nextCharOffset]))
         || nextCharOffset === string.length
-      )
+      ) {
         return p1;
+      }
 
       return `_${p1.toLowerCase()}`;
     })
-    .replace(/([0-9])/gu, (_, p1, offset, string) => {
+    .replace(/(\d)/gu, (_, p1, offset, string) => {
       const previousOffset = offset - 1;
-      if (previousOffset >= 0 && /(\d)/.test(string[previousOffset]))
+      if (previousOffset >= 0 && /\d/.test(string[previousOffset]))
         return p1;
 
       return `_${p1.toLowerCase()}`;
@@ -85,7 +86,7 @@ export const fetchWithCsrf = $fetch.create({
       ? parseCookies(event)[CSRF_COOKIE]
       : useCookie(CSRF_COOKIE).value;
 
-    if (process.client && ['post', 'delete', 'put', 'patch'].includes(options?.method?.toLowerCase() ?? ''))
+    if (import.meta.client && ['post', 'delete', 'put', 'patch'].includes(options?.method?.toLowerCase() ?? ''))
       token = await initCsrf();
 
     let headers: any = {
@@ -95,7 +96,7 @@ export const fetchWithCsrf = $fetch.create({
       ...options?.headers,
     };
 
-    if (process.server || process.env.NODE_ENV === 'test') {
+    if (import.meta.server || process.env.NODE_ENV === 'test') {
       const cookieString = event
         ? event.headers.get('cookie')
         : useRequestHeaders(['cookie']).cookie;

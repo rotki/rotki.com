@@ -1,5 +1,5 @@
 export default defineNuxtPlugin(() => {
-  addRouteMiddleware((to) => {
+  addRouteMiddleware(async (to) => {
     if (to.path.startsWith('/products/detail')) {
       return navigateTo(
         { name: 'products' },

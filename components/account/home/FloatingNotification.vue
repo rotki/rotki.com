@@ -31,12 +31,16 @@ const { stop, start, isPending } = useTimeoutFn(
 
 function dismiss() {
   emit('dismiss');
-  get(isPending) && stop();
+  if (get(isPending)) {
+    stop();
+  }
 }
 
 watch(visible, (show) => {
   if (isDefined(get(timeout)) && show) {
-    get(isPending) && stop();
+    if (get(isPending)) {
+      stop();
+    }
     start();
   }
 });

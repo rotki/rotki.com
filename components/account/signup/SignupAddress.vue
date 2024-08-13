@@ -36,7 +36,7 @@ const rules = {
     required,
     validateCode: helpers.withMessage(
       'Enter a valid postal code. Only alphabets, numbers, space and -',
-      helpers.regex(/^[\d\sA-Za-z-]+$/),
+      helpers.regex(/^[\d\sa-z-]+$/i),
     ),
   },
   country: { required },
