@@ -12,7 +12,7 @@ export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
   const fetchPaymentAssets = async (): Promise<void> => {
     set(paymentAssetsLoading, true);
     try {
-      const response = await fetchWithCsrf<PaymentAssetResponse>('/webapi/payment/crypto/options', {
+      const response = await fetchWithCsrf<PaymentAssetResponse>('/webapi/payment/crypto/options/', {
         method: 'GET',
       });
       set(paymentAssets, PaymentAssetResponse.parse(response));
