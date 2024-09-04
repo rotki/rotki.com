@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
+import { canBuyNewSubscription } from '~/utils/subscription';
 import type { Plan } from '~/types';
 
 const { t } = useI18n();
@@ -40,6 +41,8 @@ function next() {
     query: { ...route.query, plan: get(identifier) },
   });
 }
+
+const canBuy = reactive(canBuyNewSubscription)(account);
 
 const css = useCssModule();
 </script>
@@ -93,7 +96,7 @@ const css = useCssModule();
 
       <div :class="css.continue">
         <RuiButton
-          :disabled="!selected"
+          :disabled="!selected || !canBuy"
           :loading="processing"
           class="w-full"
           color="primary"
@@ -102,6 +105,22 @@ const css = useCssModule();
         >
           {{ t('actions.continue') }}
         </RuiButton>
+      </div>
+
+      <div
+        v-if="!canBuy"
+        class="inline text-sm text-rui-text-secondary mt-2"
+      >
+        <span>* {{ t('home.plans.cannot_continue') }}</span>
+        <ButtonLink
+          to="/home/subscription"
+          variant="text"
+          color="primary"
+          inline
+          class="leading-[0] hover:underline"
+        >
+          {{ t('page_header.manage_premium') }}
+        </ButtonLink>
       </div>
     </div>
   </div>

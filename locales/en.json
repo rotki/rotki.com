@@ -479,6 +479,7 @@
       }
     },
     "plans": {
+      "cannot_continue": "You cannot continue because you have an active subscription. Click here to",
       "title": "Start using rotki today!",
       "most_popular": "Most popular",
       "choose": "Choose Plan",

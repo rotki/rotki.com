@@ -54,7 +54,7 @@ scanImages();
       <SwiperSlide
         v-for="(image, i) in images"
         :key="i"
-        class="relative pt-[56.2%]"
+        class="relative pt-[56.2%] bg-rui-grey-100"
       >
         <img
           :src="image"
