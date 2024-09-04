@@ -18,7 +18,7 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
   const getCard = async (): Promise<void> => {
     try {
       const response = await fetchWithCsrf<SavedCardResponse>(
-        '/webapi/payment/btr/cards',
+        '/webapi/payment/btr/cards/',
         {
           method: 'GET',
         },
@@ -34,7 +34,7 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
   const addCard = async (request: CreateCardRequest): Promise<string> => {
     try {
       const response = await fetchWithCsrf<SavedCard>(
-        '/webapi/payment/btr/cards',
+        '/webapi/payment/btr/cards/',
         {
           body: request,
           method: 'POST',
@@ -52,7 +52,7 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
   const deleteCard = async (token: string): Promise<void> => {
     try {
       await fetchWithCsrf<ApiResponse<boolean>>(
-        '/webapi/payment/btr/cards',
+        '/webapi/payment/btr/cards/',
         {
           body: { paymentToken: token },
           method: 'DELETE',
@@ -68,7 +68,7 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
   const createCardNonce = async (request: CreateCardNonceRequest): Promise<string> => {
     try {
       const response = await fetchWithCsrf<CreateCardNonceResponse>(
-        '/webapi/payment/btr/cards/nonce',
+        '/webapi/payment/btr/cards/nonce/',
         {
           body: request,
           method: 'POST',

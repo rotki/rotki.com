@@ -4,7 +4,7 @@ describe('signup test', () => {
   });
 
   beforeEach(() => {
-    cy.intercept('/webapi/countries', {
+    cy.intercept('/webapi/countries/', {
       body: {
         result: [{ code: 'CT', name: 'Country' }],
       },

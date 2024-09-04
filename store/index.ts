@@ -283,7 +283,7 @@ export const useMainStore = defineStore('main', () => {
 
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        `/webapi/subscription/${subscription.identifier}`,
+        `/webapi/subscription/${subscription.identifier}/`,
         {
           method: 'DELETE',
         },
@@ -327,7 +327,7 @@ export const useMainStore = defineStore('main', () => {
   const checkout = async (plan: number): Promise<Result<CardCheckout>> => {
     try {
       const response = await fetchWithCsrf<CardCheckoutResponse>(
-        `/webapi/checkout/card/${plan}`,
+        `/webapi/checkout/card/${plan}/`,
         {
           method: 'GET',
         },
@@ -352,7 +352,7 @@ export const useMainStore = defineStore('main', () => {
   ): Promise<Result<true, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        '/webapi/payment/btr',
+        '/webapi/payment/btr/',
         {
           body: request,
           method: 'POST',
@@ -396,7 +396,7 @@ export const useMainStore = defineStore('main', () => {
   ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
-        '/webapi/payment/crypto',
+        '/webapi/payment/crypto/',
         {
           body: convertKeys(
             {
@@ -444,7 +444,7 @@ export const useMainStore = defineStore('main', () => {
   ): Promise<Result<PendingCryptoPayment>> => {
     try {
       const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(
-        '/webapi/payment/pending',
+        '/webapi/payment/pending/',
         {
           params: convertKeys({ subscriptionId }, false, false),
         },
