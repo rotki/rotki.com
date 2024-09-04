@@ -18,7 +18,7 @@ export const usePaymentPaypalStore = defineStore('payments/paypal', () => {
   const getPaypal = async (): Promise<void> => {
     try {
       const response = await fetchWithCsrf<SavedPaypalResponse>(
-        '/webapi/payment/btr/paypal',
+        '/webapi/payment/btr/paypal/',
         {
           method: 'GET',
         },
@@ -34,7 +34,7 @@ export const usePaymentPaypalStore = defineStore('payments/paypal', () => {
   const addPaypal = async (request: VaultPaypalRequest): Promise<string> => {
     try {
       const response = await fetchWithCsrf<SavedPaypalAccount>(
-        '/webapi/payment/btr/paypal',
+        '/webapi/payment/btr/paypal/',
         {
           body: request,
           method: 'POST',
@@ -52,7 +52,7 @@ export const usePaymentPaypalStore = defineStore('payments/paypal', () => {
   const deletePaypal = async (token: string): Promise<void> => {
     try {
       await fetchWithCsrf<ApiResponse<boolean>>(
-        '/webapi/payment/btr/paypal',
+        '/webapi/payment/btr/paypal/',
         {
           body: { paymentToken: token },
           method: 'DELETE',
@@ -68,7 +68,7 @@ export const usePaymentPaypalStore = defineStore('payments/paypal', () => {
   const createPaypalNonce = async (request: CreatePaypalNonceRequest): Promise<string> => {
     try {
       const response = await fetchWithCsrf<CreatePaypalNonceResponse>(
-        '/webapi/payment/btr/paypal/nonce',
+        '/webapi/payment/btr/paypal/nonce/',
         {
           body: request,
           method: 'POST',

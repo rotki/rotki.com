@@ -80,7 +80,7 @@ const payments = computed(() => {
 
       <template #item.actions="{ row }">
         <ButtonLink
-          :to="`/webapi/download/receipt/${row.identifier}`"
+          :to="`/webapi/download/receipt/${row.identifier}/`"
           color="primary"
           external
         >

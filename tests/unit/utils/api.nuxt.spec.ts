@@ -16,7 +16,7 @@ describe('api utilities', () => {
 
   it('fetchWithCsrf: fetch countries runs correctly', async () => {
     await expect(
-      fetchWithCsrf<ApiResponse<Country[]>>(`/webapi/countries`),
+      fetchWithCsrf<ApiResponse<Country[]>>(`/webapi/countries/`),
     ).resolves.toMatchObject(
       expect.objectContaining({
         result: [{ code: 'CT', name: 'Country' }],
@@ -30,7 +30,7 @@ describe('api utilities', () => {
   it('fetchWithCsrf: fetch account info with 401 error', async () => {
     mockNuxtImport('navigateTo', () => vi.fn());
     await expect(
-      fetchWithCsrf<ApiResponse<Account>>(`/webapi/account`),
+      fetchWithCsrf<ApiResponse<Account>>(`/webapi/account/`),
     ).rejects.toThrowError(/401/);
     expect(logout).toBeCalled();
     expect(logout).toHaveBeenCalledOnce();
