@@ -16,9 +16,6 @@ withDefaults(
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
-const hasActiveSubscription = computed(
-  () => !!get(account)?.hasActiveSubscription,
-);
 
 const allowNavigation = computed(() => {
   if (!isDefined(account))
@@ -45,7 +42,6 @@ const { t } = useI18n();
     </ButtonLink>
 
     <RuiTooltip
-      v-if="!hasActiveSubscription"
       :disabled="allowNavigation"
       tooltip-class="max-w-[20rem]"
     >
@@ -62,14 +58,5 @@ const { t } = useI18n();
       </template>
       {{ t('subscription.error.unverified_email') }}
     </RuiTooltip>
-    <ButtonLink
-      v-else
-      to="/home/subscription"
-      size="lg"
-      variant="filled"
-      :color="color"
-    >
-      {{ t('page_header.manage_premium') }}
-    </ButtonLink>
   </div>
 </template>
