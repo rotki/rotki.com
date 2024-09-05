@@ -28,7 +28,6 @@
     "cypress": "13.13.2"
   },
   "dependencies": {
-    "@metamask/detect-provider": "2.0.0",
     "@nuxtjs/robots": "4.0.2",
     "@nuxtjs/tailwindcss": "6.11.4",
     "@pinia/nuxt": "0.5.3",
@@ -38,6 +37,7 @@
     "@vueuse/math": "10.11.1",
     "@vueuse/nuxt": "10.11.1",
     "@vueuse/shared": "10.11.1",
+    "@web3modal/ethers": "5.1.0",
     "braintree-web": "3.106.0",
     "ethers": "6.13.2",
     "pinia": "2.2.1",
