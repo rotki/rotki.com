@@ -11,7 +11,7 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '@/assets/css/media.scss';
+@import '@/assets/css/media';
 
 .column {
   @apply flex flex-col uppercase justify-center text-rui-text;

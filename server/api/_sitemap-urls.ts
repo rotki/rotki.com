@@ -1,5 +1,5 @@
 import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
-import type { ParsedContent } from '@nuxt/content/dist/runtime/types';
+import type { ParsedContent } from '@nuxt/content';
 import { serverQueryContent } from '#content/server';
 
 function getLink(path?: string) {

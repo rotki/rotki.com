@@ -124,7 +124,7 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
     langDir: 'locales',
     lazy: true,
-    locales: [{ code: 'en', file: 'en.json', iso: 'en-US' }],
+    locales: [{ code: 'en', file: 'en.json', language: 'en-US' }],
     strategy: 'no_prefix',
     vueI18n: './i18n.config.ts',
   },
@@ -140,6 +140,7 @@ export default defineNuxtConfig({
     '@nuxtjs/sitemap',
     '@nuxt/test-utils/module',
     './modules/ui-library/module.ts',
+    '@nuxt/image',
   ],
 
   nitro: {
@@ -197,4 +198,13 @@ export default defineNuxtConfig({
     exclude: nonIndexed,
   },
   ssr: true,
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern',
+        },
+      },
+    },
+  },
 });

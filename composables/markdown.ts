@@ -6,7 +6,7 @@ import { CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from '~/utils/constants';
 import type {
   MarkdownParsedContent,
   QueryBuilderWhere,
-} from '@nuxt/content/dist/runtime/types';
+} from '@nuxt/content';
 
 export interface JobMarkdownContent extends MarkdownParsedContent {
   link?: string;

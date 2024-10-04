@@ -131,8 +131,8 @@ const slots = useSlots();
 </template>
 
 <style lang="scss" module>
-@import '@/assets/css/media.scss';
-@import '@/assets/css/main.scss';
+@import '@/assets/css/media';
+@import '@/assets/css/main';
 
 .wrapper {
   @apply flex flex-col pt-2.5;

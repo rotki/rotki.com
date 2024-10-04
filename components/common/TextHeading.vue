@@ -29,8 +29,8 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '@/assets/css/media.scss';
-@import '@/assets/css/main.scss';
+@import '@/assets/css/media';
+@import '@/assets/css/main';
 
 .heading {
   @apply text-rui-text font-bold text-2xl;

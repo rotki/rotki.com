@@ -8,8 +8,9 @@ const props = withDefaults(
   },
 );
 
-const { headings } = useRuntimeConfig().public.mdc;
-const generate = computed(() => props.id && headings?.anchorLinks?.h3);
+const { id } = toRefs(props);
+
+const { generate } = useHeadings(id, 'h3');
 
 const css = useCssModule();
 </script>
