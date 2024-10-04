@@ -92,7 +92,7 @@
     "vitest": "2.0.5",
     "vitest-environment-nuxt": "1.0.0",
     "vue-tsc": "2.0.29",
-    "webpack": "5.93.0"
+    "webpack": "5.94.0"
   },
   "engines": {
     "node": ">=20 <21",
