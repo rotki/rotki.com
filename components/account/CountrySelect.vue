@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const modelValue = defineModel<string>({ required: true });
+
 withDefaults(
   defineProps<{
     disabled?: boolean;
@@ -11,8 +13,6 @@ withDefaults(
 const { t } = useI18n();
 
 const { countries } = useCountries();
-
-const modelValue = defineModel<string>({ required: true });
 </script>
 
 <template>

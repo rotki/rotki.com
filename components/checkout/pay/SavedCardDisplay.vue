@@ -137,8 +137,6 @@ function submit() {
   return get(submitPayload);
 }
 
-defineExpose({ submit });
-
 const { deleteCard } = usePaymentCardsStore();
 
 const deleteLoading = ref(false);
@@ -155,6 +153,8 @@ async function handleDeleteCard() {
   await deleteCard(get(card).token);
   set(deleteLoading, false);
 }
+
+defineExpose({ submit });
 </script>
 
 <template>

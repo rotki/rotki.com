@@ -21,8 +21,8 @@ function getUpdatedKey(key: string, camelCase: boolean) {
       const nextCharOffset = offset + 1;
       if (
         (nextCharOffset < string.length
-        && /[A-Z]/.test(string[nextCharOffset]))
-        || nextCharOffset === string.length
+          && /[A-Z]/.test(string[nextCharOffset]))
+          || nextCharOffset === string.length
       ) {
         return p1;
       }
