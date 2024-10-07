@@ -22,6 +22,11 @@ const ContentPolicy = {
 
 type ContentPolicy = (typeof ContentPolicy)[keyof typeof ContentPolicy];
 
+function developOnlyRules(...rules: string[]): string[] {
+  // eslint-disable-next-line node/prefer-global/process
+  return process.env.NODE_ENV === 'development' ? rules : [];
+}
+
 const policy: Record<ContentPolicy, string[]> = {
   [ContentPolicy.BASE_URI]: [SELF],
   [ContentPolicy.BLOCK_ALL_MIXED_CONTENT]: [],
@@ -31,6 +36,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'api.github.com',
     'raw.githubusercontent.com/rotki/data/',
     'raw.githubusercontent.com/rotki/rotki.com/',
+    ...developOnlyRules('ws://localhost:4000/ws'),
   ],
   [ContentPolicy.DEFAULT_SRC]: [SELF],
   [ContentPolicy.FONT_SRC]: [SELF, 'data:', 'fonts.gstatic.com'],
@@ -41,6 +47,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'recaptcha.net',
     'https://www.google.com/recaptcha/',
     'https://recaptcha.google.com',
+    ...developOnlyRules('http://localhost:3000/__nuxt_devtools__/client/'),
   ],
   [ContentPolicy.IMG_SRC]: [
     SELF,
