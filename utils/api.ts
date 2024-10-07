@@ -93,8 +93,11 @@ export const fetchWithCsrf = $fetch.create({
       'accept': 'application/json',
       'content-type': 'application/json',
       ...(token && { [CSRF_HEADER]: token }),
-      ...options?.headers,
     };
+
+    for (const [key, value] of options.headers) {
+      headers[key] = value;
+    }
 
     if (import.meta.server || process.env.NODE_ENV === 'test') {
       const cookieString = event
