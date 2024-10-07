@@ -117,7 +117,7 @@ export default defineNuxtConfig({
   css: [],
 
   devtools: {
-    enabled: !!process.env.CI || !!process.env.TEST,
+    enabled: process.env.NODE_ENV === 'development' && !(!!process.env.CI || !!process.env.TEST),
   },
 
   i18n: {
