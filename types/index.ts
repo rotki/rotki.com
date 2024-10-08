@@ -37,8 +37,6 @@ export const Address = z.object({
   vatId: z.string(),
 });
 
-export type Address = z.infer<typeof Address>;
-
 const SubStatus = z.enum([
   'Active',
   'Cancelled',
@@ -47,13 +45,11 @@ const SubStatus = z.enum([
   'Past Due',
 ] as const);
 
-export type SubStatus = z.infer<typeof SubStatus>;
-
 export const Subscription = z.object({
   actions: StringArray,
   createdDate: z.string(),
   durationInMonths: z.number().nonnegative(),
-  identifier: z.string().nonempty(),
+  identifier: z.string().min(1),
   isSoftCanceled: z.boolean().default(false),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
@@ -66,7 +62,7 @@ export type Subscription = z.infer<typeof Subscription>;
 
 export const Payment = z.object({
   eurAmount: z.string(),
-  identifier: z.string().nonempty(),
+  identifier: z.string().min(1),
   paidAt: z.string(),
   plan: z.string(),
 });
@@ -79,20 +75,20 @@ export const Account = z.object({
   apiSecret: z.string(),
   canUsePremium: z.boolean(),
   dateNow: z.string(),
-  email: z.string().nonempty(),
+  email: z.string().min(1),
   emailConfirmed: z.boolean(),
   hasActiveSubscription: z.boolean(),
   payments: z.array(Payment),
   subscriptions: z.array(Subscription),
-  username: z.string().nonempty(),
+  username: z.string().min(1),
   vat: z.number(),
 });
 
 export type Account = z.infer<typeof Account>;
 
 export const ApiKeys = z.object({
-  apiKey: z.string().nonempty(),
-  apiSecret: z.string().nonempty(),
+  apiKey: z.string().min(1),
+  apiSecret: z.string().min(1),
 });
 
 export type ApiKeys = z.infer<typeof ApiKeys>;
@@ -135,8 +131,6 @@ const PremiumData = z.object({
   plans: z.array(Plan),
 });
 
-export type PremiumData = z.infer<typeof PremiumData>;
-
 export const PremiumResponse = z.object({
   result: PremiumData,
 });
@@ -173,8 +167,8 @@ const CryptoPayment = z.object({
   cryptoAddress: z.string(),
   cryptocurrency: z.string(),
   decimals: z.number().optional(),
-  finalPriceInCrypto: z.string().nonempty(),
-  finalPriceInEur: z.string().nonempty(),
+  finalPriceInCrypto: z.string().min(1),
+  finalPriceInEur: z.string().min(1),
   hoursForPayment: z.number(),
   iconUrl: z.string().optional(),
   months: z.number(),
@@ -206,18 +200,12 @@ export const PendingCryptoPaymentResponse = z.object({
   result: PendingCryptoPayment.optional(),
 });
 
-export type PendingCryptoPaymentResponse = z.infer<
-  typeof PendingCryptoPaymentResponse
->;
+export type PendingCryptoPaymentResponse = z.infer<typeof PendingCryptoPaymentResponse>;
 
-export const PendingCryptoPaymentResultResponse = z.object({
+z.object({
   message: z.string().optional(),
   result: z.boolean().optional(),
 });
-
-export type PendingCryptoPaymentResultResponse = z.infer<
-  typeof PendingCryptoPaymentResultResponse
->;
 
 export interface CreateCardRequest {
   paymentMethodNonce: string;
