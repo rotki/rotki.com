@@ -11,7 +11,24 @@ import type {
 } from '@rotki/ui-library';
 import type { Subscription } from '~/types';
 
+const pagination = ref<TablePaginationData>();
+const sort = ref<DataTableSortColumn<Subscription>[]>([]);
+const selectedSubscription = ref<Subscription>();
+const showCancelDialog = ref<boolean>(false);
+const cancelling = ref<boolean>(false);
+const resuming = ref<boolean>(false);
+const resumingSubscription = ref<Subscription>();
+
 const { t } = useI18n();
+
+const store = useMainStore();
+const { subscriptions } = storeToRefs(store);
+
+const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
+const { pause, resume, isActive } = useIntervalFn(
+  async () => await store.getAccount(),
+  60000,
+);
 
 const headers: DataTableColumn<Subscription>[] = [
   {
@@ -46,15 +63,6 @@ const headers: DataTableColumn<Subscription>[] = [
     class: 'capitalize',
   },
 ];
-
-const store = useMainStore();
-const { subscriptions } = storeToRefs(store);
-
-const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<Subscription>[]>([]);
-const selectedSubscription = ref<Subscription>();
-const showCancelDialog = ref<boolean>(false);
-const cancelling = ref<boolean>(false);
 
 const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
 
@@ -101,25 +109,16 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
   }
 
   return link;
-},
-);
-
-const { pause, resume, isActive } = useIntervalFn(
-  async () => await store.getAccount(),
-  60000,
-);
-
-watch(pending, (pending) => {
-  if (pending.length === 0)
-    pause();
-  else if (!get(isActive))
-    resume();
 });
-
-onUnmounted(() => pause());
 
 function isPending(sub: Subscription) {
   return sub.status === 'Pending';
+}
+
+async function resumeSubscription(sub: Subscription): Promise<void> {
+  set(resuming, true);
+  await resumeUserSubscription(sub.identifier);
+  set(resuming, false);
 }
 
 function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
@@ -132,7 +131,10 @@ function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
 }
 
 function displayActions(sub: Subscription) {
-  return hasAction(sub, 'renew') || hasAction(sub, 'cancel') || isPending(sub);
+  return hasAction(sub, 'renew')
+    || hasAction(sub, 'cancel')
+    || isPending(sub)
+    || sub.isSoftCanceled;
 }
 
 function getChipStatusColor(status: string): ContextColorsType | undefined {
@@ -155,10 +157,19 @@ function confirmCancel(sub: Subscription) {
 async function cancelSubscription(sub: Subscription) {
   set(showCancelDialog, false);
   set(cancelling, true);
-  await store.cancelSubscription(sub);
+  await cancelUserSubscription(sub);
   set(cancelling, false);
   set(selectedSubscription, undefined);
 }
+
+watch(pending, (pending) => {
+  if (pending.length === 0)
+    pause();
+  else if (!get(isActive))
+    resume();
+});
+
+onUnmounted(() => pause());
 </script>
 
 <template>
@@ -232,10 +243,24 @@ async function cancelSubscription(sub: Subscription) {
           >
             {{ t('account.subscriptions.payment_detail') }}
           </ButtonLink>
+          <RuiTooltip v-if="row.isSoftCanceled">
+            <template #activator>
+              <RuiButton
+                :loading="resuming"
+                variant="text"
+                type="button"
+                color="info"
+                @click="resumingSubscription = row"
+              >
+                {{ t('actions.resume') }}
+              </RuiButton>
+            </template>
+            {{ t('account.subscriptions.resume_hint', { date: row.nextActionDate }) }}
+          </RuiTooltip>
         </div>
         <div
           v-else
-          class="capitalize"
+          class="capitalize mx-4 my-2"
         >
           {{ t('common.none') }}
         </div>
@@ -246,6 +271,11 @@ async function cancelSubscription(sub: Subscription) {
       v-model="showCancelDialog"
       :subscription="selectedSubscription"
       @cancel="cancelSubscription($event)"
+    />
+
+    <ResumeSubscriptionDialog
+      v-model="resumingSubscription"
+      @confirm="resumeSubscription($event)"
     />
   </div>
 </template>

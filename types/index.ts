@@ -54,6 +54,7 @@ export const Subscription = z.object({
   createdDate: z.string(),
   durationInMonths: z.number().nonnegative(),
   identifier: z.string().nonempty(),
+  isSoftCanceled: z.boolean().default(false),
   nextActionDate: z.string(),
   nextBillingAmount: z.string(),
   pending: z.boolean().default(false),

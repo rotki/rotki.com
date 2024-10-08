@@ -221,7 +221,24 @@
       },
       "no_subscriptions_found": "No subscriptions found",
       "payment_detail": "Payment Details",
-      "title": "Subscription History"
+      "title": "Subscription History",
+      "resume": {
+        "title": "Resume your rotki subscription",
+        "actions": {
+          "yes": "Yes, resume my subscription",
+          "no": "No, don't resume"
+        },
+        "description": "By confirming, your subscription's billing cycle will resume, and you will be charged according to your selected plan starting from the next billing date. Are you sure you want to resume your subscription?",
+        "details": {
+          "plan_name": "Subscription Plan: {plan}",
+          "billing_cycle": "Billing Cycle: {duration}",
+          "billing_amount": "Billing Amount: {amount}",
+          "amount_in_eur": "{amount} €",
+          "duration_in_months": "every {duration} month|every {duration} months",
+          "next_billing_date": "Next billing date: {date}"
+        }
+      },
+      "resume_hint": "Resume the active billing of your subscription from {date}"
     },
     "tabs": {
       "subscription": "Subscription",
@@ -248,6 +265,7 @@
     "regenerate": "Regenerate",
     "renew": "Renew",
     "reset": "Reset",
+    "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
     "update": "Update",

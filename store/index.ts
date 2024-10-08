@@ -45,6 +45,7 @@ export const useMainStore = defineStore('main', () => {
   const plans = ref<Plan[] | null>(null);
   const authenticatedOnPlansLoad = ref(false);
   const cancellationError = ref('');
+  const resumeError = ref('');
 
   const logger = useLogger('store');
 
@@ -276,31 +277,6 @@ export const useMainStore = defineStore('main', () => {
 
     return userAccount.subscriptions;
   });
-
-  const cancelSubscription = async (subscription: Subscription) => {
-    const acc = get(account);
-    assert(acc);
-
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        `/webapi/subscription/${subscription.identifier}/`,
-        {
-          method: 'DELETE',
-        },
-      );
-      const data = ActionResultResponse.parse(response);
-      if (data.result)
-        await getAccount();
-    }
-    catch (error: any) {
-      let message = error.message;
-      if (error instanceof FetchError && error.status === 404)
-        message = ActionResultResponse.parse(error.data).message;
-
-      logger.error(error);
-      set(cancellationError, message);
-    }
-  };
 
   const getPlans = async (): Promise<void> => {
     if (get(plans) && get(authenticated) === get(authenticatedOnPlansLoad)) {
@@ -569,7 +545,7 @@ export const useMainStore = defineStore('main', () => {
     SESSION_TIMEOUT,
   );
 
-  const logout = async (callApi = false): Promise<void> => {
+  async function logout(callApi = false): Promise<void> {
     stopCountdown();
     if (callApi) {
       try {
@@ -583,7 +559,7 @@ export const useMainStore = defineStore('main', () => {
     }
     set(authenticated, false);
     set(account, null);
-  };
+  }
 
   const refreshSession = () => {
     if (!isClient)
@@ -597,7 +573,6 @@ export const useMainStore = defineStore('main', () => {
     account,
     authenticated,
     cancellationError,
-    cancelSubscription,
     changePassword,
     checkout,
     checkPendingCryptoPayment,
@@ -613,6 +588,7 @@ export const useMainStore = defineStore('main', () => {
     plans,
     refreshSession,
     resendVerificationCode,
+    resumeError,
     subscriptions,
     switchCryptoPlan,
     updateKeys,
