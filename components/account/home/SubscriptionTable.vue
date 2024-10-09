@@ -260,7 +260,7 @@ onUnmounted(() => pause());
         </div>
         <div
           v-else
-          class="capitalize mx-4 my-2"
+          class="capitalize m-2"
         >
           {{ t('common.none') }}
         </div>

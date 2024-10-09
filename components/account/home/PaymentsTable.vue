@@ -79,13 +79,15 @@ const payments = computed(() => {
       </template>
 
       <template #item.actions="{ row }">
-        <ButtonLink
-          :to="`/webapi/download/receipt/${row.identifier}/`"
-          color="primary"
-          external
-        >
-          {{ t('actions.download') }}
-        </ButtonLink>
+        <div class="flex gap-2 justify-end">
+          <ButtonLink
+            :to="`/webapi/download/receipt/${row.identifier}/`"
+            color="primary"
+            external
+          >
+            {{ t('actions.download') }}
+          </ButtonLink>
+        </div>
       </template>
     </RuiDataTable>
   </div>
