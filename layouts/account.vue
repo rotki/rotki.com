@@ -10,7 +10,15 @@ const { t } = useI18n();
 const store = useMainStore();
 const { account } = storeToRefs(store);
 
-const username = computed(() => get(account)?.username);
+const name = computed(() => {
+  const accountVal = get(account);
+  if (!accountVal)
+    return '';
+
+  const { firstName, lastName } = accountVal.address;
+
+  return `${firstName} ${lastName}`;
+});
 
 useHead({
   title: 'account',
@@ -34,7 +42,7 @@ const tabModelValue = ref();
     <div class="py-10 lg:py-16">
       <div class="container">
         <div class="text-h4 mb-6">
-          {{ t('account.welcome') }} {{ username }}
+          {{ t('account.welcome') }} {{ name }}
         </div>
         <div class="flex flex-col lg:flex-row gap-6">
           <div class="hidden lg:block w-[270px] shrink-0">
