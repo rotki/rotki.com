@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { get } from '@vueuse/core';
 import { useMainStore } from '~/store';
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
 
+const {
+  public: {
+    contact: { emailMailto, email: rotkiEmail },
+  },
+} = useRuntimeConfig();
+
 const email = computed(() => {
-  const userAccount = account.value;
+  const userAccount = get(account);
   return !userAccount ? '' : userAccount.email;
+});
+
+const username = computed(() => {
+  const userAccount = get(account);
+  return !userAccount ? '' : userAccount.username;
 });
 
 const { t } = useI18n();
@@ -22,13 +34,41 @@ const { t } = useI18n();
       <div class="space-y-5">
         <RuiTextField
           id="email"
-          v-model="email"
+          v-model="username"
           disabled
+          class="[&_input]:!text-rui-text"
           variant="outlined"
-          :label="t('auth.common.email')"
+          :label="t('auth.common.username')"
           hide-details
           color="primary"
+          append-icon="lock-line"
         />
+        <div>
+          <RuiTextField
+            id="email"
+            v-model="email"
+            disabled
+            class="[&_input]:!text-rui-text"
+            variant="outlined"
+            :label="t('auth.common.email')"
+            hide-details
+            color="primary"
+            append-icon="lock-line"
+          />
+          <div class="text-rui-text-secondary pt-2 px-3 text-xs flex">
+            To change your email, please contact our support tem via
+            <ButtonLink
+              :to="emailMailto"
+              external
+              color="primary"
+              variant="text"
+              class="leading-[0]"
+              inline
+            >
+              {{ rotkiEmail }}
+            </ButtonLink>
+          </div>
+        </div>
       </div>
 
       <div class="mt-10 mb-5 border-t border-grey-50" />
