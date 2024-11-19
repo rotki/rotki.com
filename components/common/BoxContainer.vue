@@ -23,8 +23,8 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '@/assets/css/media';
-@import '@/assets/css/main';
+@use '@/assets/css/media';
+@use '@/assets/css/main';
 
 .box {
   @apply border p-4 md:p-7 rounded-sm bg-white w-full md:w-96;

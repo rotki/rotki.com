@@ -20,6 +20,6 @@ useHead({
 </template>
 
 <style lang="scss">
-@import '@/assets/css/media';
-@import '@/assets/css/main';
+@use '@/assets/css/media';
+@use '@/assets/css/main';
 </style>

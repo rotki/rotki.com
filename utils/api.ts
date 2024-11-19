@@ -22,7 +22,7 @@ function getUpdatedKey(key: string, camelCase: boolean) {
       if (
         (nextCharOffset < string.length
           && /[A-Z]/.test(string[nextCharOffset]))
-          || nextCharOffset === string.length
+        || nextCharOffset === string.length
       ) {
         return p1;
       }

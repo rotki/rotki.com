@@ -54,8 +54,8 @@ const slots = useSlots();
 </template>
 
 <style lang="scss" module>
-@import '@/assets/css/media';
-@import '@/assets/css/main';
+@use '@/assets/css/media' as media;
+@use '@/assets/css/main';
 
 .wrapper {
   @apply flex flex-col min-h-full flex-grow py-12;
@@ -80,7 +80,7 @@ const slots = useSlots();
 .details.wideBody {
   max-width: 85%;
 
-  @include for-size(phone-only) {
+  @include media.for-size(phone-only) {
     max-width: 90%;
   }
 }
@@ -88,7 +88,7 @@ const slots = useSlots();
 .details {
   @apply w-full 2xl:max-w-5xl xl:max-w-3xl;
 
-  @include for-size(phone-only) {
+  @include media.for-size(phone-only) {
     width: 90%;
   }
 }

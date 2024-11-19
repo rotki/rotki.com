@@ -44,8 +44,8 @@ const css = useCssModule();
 </template>
 
 <style lang="scss" module>
-@import '@/assets/css/main';
-@import '@/assets/css/media';
+@use '@/assets/css/main';
+@use '@/assets/css/media';
 
 .wrapper {
   margin-top: 247px;

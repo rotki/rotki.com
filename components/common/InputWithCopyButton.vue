@@ -1,12 +1,25 @@
 <script setup lang="ts">
-defineProps<{
-  disabled?: boolean;
+import type { TextFieldProps } from '@rotki/ui-library/components';
+
+type Props = TextFieldProps & {
   copyValue: string;
-}>();
+};
+
+defineOptions({
+  inheritAttrs: false,
+});
+
+const modelValue = defineModel<string>({ required: true });
+
+defineProps<Props>();
 </script>
 
 <template>
-  <RuiTextField color="primary">
+  <RuiTextField
+    v-model="modelValue"
+    color="primary"
+    v-bind="$attrs"
+  >
     <template
       v-if="$slots.prepend"
       #prepend

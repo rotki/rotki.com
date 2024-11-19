@@ -121,12 +121,10 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    defaultLocale: 'en',
-    langDir: 'locales',
+    defaultLocale: 'en-US',
     lazy: true,
-    locales: [{ code: 'en', file: 'en.json', language: 'en-US' }],
+    locales: [{ code: 'en-US', file: 'en.json', language: 'en-US' }],
     strategy: 'no_prefix',
-    vueI18n: './i18n.config.ts',
   },
 
   modules: [

@@ -32,6 +32,9 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     for (const composable in composables) {
+      if (composable === 'default') {
+        continue;
+      }
       addImports({
         as: composable,
         from: '@rotki/ui-library/composables',
