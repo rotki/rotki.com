@@ -4,6 +4,7 @@ import { required } from '@vuelidate/validators';
 import { get, objectOmit, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { toMessages } from '~/utils/validation';
 
 const store = useMainStore();
 const state = reactive({

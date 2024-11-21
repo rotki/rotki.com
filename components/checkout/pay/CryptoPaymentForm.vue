@@ -15,13 +15,14 @@ const props = defineProps<{
   success: boolean;
   failure: boolean;
   loading: boolean;
-  metamaskSupport: boolean;
+  connected: boolean;
   status: PaymentStep;
 }>();
 
 const emit = defineEmits<{
   (e: 'change'): void;
   (e: 'pay'): void;
+  (e: 'connect'): void;
   (e: 'clear:errors'): void;
 }>();
 
@@ -96,7 +97,8 @@ const stopWatcher = watchEffect(() => {
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
 const isBtc = computed(() => get(data).chainName === 'bitcoin');
 
-const payWithMetamask = () => emit('pay');
+const pay = () => emit('pay');
+const connect = () => emit('connect');
 const changePaymentMethod = () => emit('change');
 const clearErrors = () => emit('clear:errors');
 const css = useCssModule();
@@ -173,14 +175,14 @@ const showChangePaymentDialog = ref(false);
       warning
     />
     <div :class="css.hint">
-      {{ t('home.plans.tiers.step_3.metamask.notice') }}
+      {{ t('home.plans.tiers.step_3.wallet.notice') }}
 
       <div :class="css.info">
         <p>
-          {{ t('home.plans.tiers.step_3.metamask.paid_notice_1') }}
+          {{ t('home.plans.tiers.step_3.wallet.paid_notice_1') }}
         </p>
         <p>
-          {{ t('home.plans.tiers.step_3.metamask.paid_notice_2') }}
+          {{ t('home.plans.tiers.step_3.wallet.paid_notice_2') }}
         </p>
       </div>
     </div>
@@ -197,21 +199,43 @@ const showChangePaymentDialog = ref(false);
       </div>
       <div
         v-if="!isBtc"
-        class="grow"
+        class="grow flex gap-1"
       >
         <RuiButton
-          :disabled="!metamaskSupport || processing"
-          :loading="processing"
+          v-if="!connected"
           color="primary"
+          :loading="processing"
+          :disabled="processing"
           size="lg"
           class="w-full"
-          @click="payWithMetamask()"
+          @click="connect()"
         >
-          <template #prepend>
-            <MetamaskIcon class="h-6 w-6 mr-2" />
-          </template>
-          {{ t('home.plans.tiers.step_3.metamask.action') }}
+          {{ t('home.plans.tiers.step_3.wallet.connect_wallet') }}
         </RuiButton>
+        <template v-else>
+          <RuiButton
+            :loading="processing"
+            :disabled="processing"
+            color="primary"
+            size="lg"
+            class="w-full"
+            @click="pay()"
+          >
+            {{ t('home.plans.tiers.step_3.wallet.pay_with_wallet') }}
+          </RuiButton>
+
+          <RuiButton
+            size="lg"
+            color="secondary"
+            class="!px-3"
+            @click="connect()"
+          >
+            <RuiIcon
+              name="link"
+              size="20"
+            />
+          </RuiButton>
+        </template>
       </div>
     </div>
   </div>
