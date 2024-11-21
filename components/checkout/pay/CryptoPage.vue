@@ -1,75 +1,26 @@
 <script lang="ts" setup>
-import detectEthereumProvider from '@metamask/detect-provider';
+import { useAppKit, useAppKitAccount } from '@reown/appkit/vue';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
-import { useLogger } from '~/utils/use-logger';
-import type { CryptoPayment, PaymentStep, Provider } from '~/types';
+import type { CryptoPayment, PaymentStep } from '~/types';
 
 const { t } = useI18n();
 
 const loading = ref(false);
 const data = ref<CryptoPayment | null>(null);
-const metamaskSupport = ref(false);
 
 const { cryptoPayment, switchCryptoPlan, deletePendingPayment, subscriptions } = useMainStore();
+
 const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
 const route = useRoute();
-
-let provider: Provider | null = null;
-
-const config = useRuntimeConfig();
-const {
-  payWithMetamask,
-  state: currentState,
-  error,
-  clearErrors,
-} = useWeb3Payment(
-  data,
-  () => {
-    assert(provider);
-    return provider;
-  },
-  !!config.public.testing,
-);
-
-const logger = useLogger();
-
-onMounted(async () => {
-  const selectedPlan = get(plan);
-  const selectedCurrency = get(currency);
-  if (selectedPlan && selectedCurrency) {
-    provider = await detectEthereumProvider();
-    logger.debug(
-      `provider: ${!!provider}, is metamask: ${provider?.isMetaMask}`,
-    );
-    set(metamaskSupport, !!provider);
-    set(loading, true);
-    const subId = get(subscriptionId);
-    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
-    if (result.isError) {
-      if (result.code === PaymentError.UNVERIFIED)
-        set(error, t('subscription.error.unverified_email'));
-      else
-        set(error, result.error.message);
-    }
-    else if (result.result.transactionStarted) {
-      await navigateTo('/home/subscription');
-    }
-    else {
-      set(data, result.result);
-    }
-
-    set(loading, false);
-  }
-  else {
-    await navigateTo('/products');
-  }
-});
+const { pay, state: currentState, error, clearErrors } = useWeb3Payment(data);
+const account = useAppKitAccount();
+const { open } = useAppKit();
 
 const step = computed<PaymentStep>(() => {
   const errorMessage = get(error);
@@ -126,6 +77,19 @@ function back() {
   });
 }
 
+async function changePaymentMethod() {
+  set(loading, true);
+  const response = await deletePendingPayment();
+
+  if (!response.isError) {
+    back();
+  }
+  else {
+    set(error, response.error.message);
+    set(loading, false);
+  }
+}
+
 watch(plan, async (plan) => {
   const selectedCurrency = get(currency);
   assert(selectedCurrency);
@@ -143,18 +107,32 @@ watch(plan, async (plan) => {
   set(loading, false);
 });
 
-async function changePaymentMethod() {
-  set(loading, true);
-  const response = await deletePendingPayment();
+onMounted(async () => {
+  const selectedPlan = get(plan);
+  const selectedCurrency = get(currency);
+  if (selectedPlan && selectedCurrency) {
+    set(loading, true);
+    const subId = get(subscriptionId);
+    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
+    if (result.isError) {
+      if (result.code === PaymentError.UNVERIFIED)
+        set(error, t('subscription.error.unverified_email'));
+      else
+        set(error, result.error.message);
+    }
+    else if (result.result.transactionStarted) {
+      await navigateTo('/home/subscription');
+    }
+    else {
+      set(data, result.result);
+    }
 
-  if (!response.isError) {
-    back();
-  }
-  else {
-    set(error, response.error.message);
     set(loading, false);
   }
-}
+  else {
+    await navigateTo('/products');
+  }
+});
 </script>
 
 <template>
@@ -182,9 +160,10 @@ async function changePaymentMethod() {
         :pending="pending || currentState === 'pending'"
         v-bind="{ success, failure, status }"
         :loading="loading"
-        :metamask-support="metamaskSupport"
         :plan="plan"
-        @pay="payWithMetamask()"
+        :connected="account.isConnected"
+        @pay="pay()"
+        @connect="open()"
         @change="changePaymentMethod()"
         @clear:errors="clearErrors()"
       />

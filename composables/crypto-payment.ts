@@ -1,60 +1,83 @@
+import { EthersAdapter } from '@reown/appkit-adapter-ethers';
 import {
-  BrowserProvider,
-  Contract,
-  type Signer,
-  type TransactionResponse,
-  parseUnits,
-} from 'ethers';
+  type AppKitNetwork,
+  arbitrum,
+  arbitrumSepolia,
+  base,
+  baseSepolia,
+  mainnet,
+  sepolia,
+} from '@reown/appkit/networks';
+import { createAppKit, useAppKitAccount, useAppKitProvider } from '@reown/appkit/vue';
 import { get, set, useTimeoutFn } from '@vueuse/core';
-import { useLogger } from '~/utils/use-logger';
-import { assert } from '~/utils/assert';
+import { BrowserProvider, Contract, type Signer, type TransactionResponse, parseUnits } from 'ethers';
 import { useMainStore } from '~/store';
-import type {
-  CryptoPayment,
-  IdleStep,
-  Provider,
-  StepType,
-} from '~/types';
+import { assert } from '~/utils/assert';
+import { useLogger } from '~/utils/use-logger';
+import type { CryptoPayment, IdleStep, StepType } from '~/types';
 import type { Ref } from 'vue';
 
 const abi = [
   // Some details about the token
   'function name() view returns (string)',
   'function symbol() view returns (string)',
-
   // Get the account balance
   'function balanceOf(address) view returns (uint)',
-
   // Send some of your tokens to someone else
   'function transfer(address to, uint amount)',
-
   // An event triggered whenever anyone transfers to someone else
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
 
-export const getChainId = (testing: boolean, chainId?: string | number) => BigInt(chainId ?? (testing ? 11155111 : 1));
+export const getChainId = (testing: boolean, chainId?: string | number) => Number(chainId ?? (testing ? 11155111 : 1));
 
-export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () => Provider, testing: boolean) {
+const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
+const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base];
+
+export function useWeb3Payment(data: Ref<CryptoPayment | null>) {
   const { markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
   const error = ref('');
 
   const logger = useLogger('web3-payment');
+  const { t } = useI18n();
+  const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
+  const { start, stop } = useTimeoutFn(() => {
+    logger.info('change to done');
+    set(state, 'success');
+  }, 5000, { immediate: false });
 
-  const { start, stop } = useTimeoutFn(
-    () => {
-      logger.info('change to done');
-      set(state, 'success');
+  const account = useAppKitAccount();
+  const defaultNetwork = getNetwork(get(data)?.chainId);
+
+  const appKit = createAppKit({
+    adapters: [new EthersAdapter()],
+    allowUnsupportedChain: false,
+    defaultNetwork,
+    features: {
+      analytics: true,
+      email: false,
+      onramp: false,
+      socials: false,
+      swaps: false,
     },
-    5000,
-    { immediate: false },
-  );
+    metadata: {
+      description: 'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.',
+      icons: ['https://raw.githubusercontent.com/rotki/data/main/assets/icons/app_logo.png'],
+      name: 'Rotki',
+      url: baseUrl,
+    },
+    networks: testing ? testNetworks : productionNetworks,
+    projectId,
+    themeMode: 'light',
+  });
 
-  async function executePayment(signer: Signer): Promise<void> {
+  appKit.subscribeAccount(() => {
+    clearErrors();
+  });
+
+  async function executePayment(signer: Signer, payment: CryptoPayment): Promise<void> {
     stop();
-    const payment = get(data);
-    assert(payment);
-
     const {
       cryptoAddress: to,
       cryptocurrency,
@@ -72,19 +95,12 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
 
     // Pay with native token
     if (!tokenAddress) {
-      tx = await signer.sendTransaction({
-        to,
-        value,
-      });
+      tx = await signer.sendTransaction({ to, value });
     }
     // Pay with non-native token
     else {
       const contract = new Contract(tokenAddress, abi, signer);
-
-      tx = await (contract.transfer(
-        to,
-        value,
-      ) as Promise<TransactionResponse>);
+      tx = await (contract.transfer(to, value) as Promise<TransactionResponse>);
     }
 
     logger.info(`transaction is pending: ${tx.hash}`);
@@ -92,44 +108,34 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
     start();
   }
 
-  const payWithMetamask = async () => {
+  const pay = async (): Promise<void> => {
     if (get(state) === 'pending')
       return;
 
     set(state, 'pending');
+
     try {
+      if (!get(account, 'isConnected')) {
+        set(error, t('subscription.crypto_payment.not_connected'));
+        return;
+      }
+
       const payment = get(data);
       assert(payment);
-      const provider = getProvider();
-      const accounts = await provider.request({
-        method: 'eth_requestAccounts',
-        params: [],
-      });
 
-      if (!accounts || accounts.length === 0) {
-        logger.info('missing permission');
-        return;
-      }
-      const browserProvider = new BrowserProvider(provider);
+      const { walletProvider } = useAppKitProvider('eip155');
+      const browserProvider = new BrowserProvider(walletProvider as any);
       const network = await browserProvider.getNetwork();
 
-      const {
-        chainId,
-        chainName,
-      } = payment;
-
+      const { chainId, chainName } = payment;
       const expectedChainId = getChainId(testing, chainId);
 
-      if (network.chainId !== expectedChainId) {
-        set(
-          error,
-          `We are expecting payments on ${chainName} but found ${network.name}. Change the network and try again.`,
-        );
+      if (network.chainId !== BigInt(expectedChainId)) {
+        set(error, t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName }));
         return;
       }
 
-      const signer = await browserProvider.getSigner();
-      await executePayment(signer);
+      await executePayment(await browserProvider.getSigner(), payment);
     }
     catch (error_: any) {
       logger.error(error_);
@@ -148,10 +154,23 @@ export function useWeb3Payment(data: Ref<CryptoPayment | null>, getProvider: () 
     set(state, 'idle');
   }
 
+  function getNetwork(chainId?: number): AppKitNetwork {
+    const networks = testing ? testNetworks : productionNetworks;
+    const network = networks.find(network => network.id === chainId);
+    if (!network) {
+      return testing ? testNetworks[0] : productionNetworks[0];
+    }
+    return network;
+  }
+
+  onUnmounted(async () => {
+    await appKit.disconnect();
+  });
+
   return {
     clearErrors,
     error,
-    payWithMetamask,
+    pay,
     state,
   };
 }

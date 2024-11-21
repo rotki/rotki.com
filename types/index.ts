@@ -215,26 +215,6 @@ export interface CardPaymentRequest extends CreateCardRequest {
   months: number;
 }
 
-interface Request {
-  readonly method: string;
-  readonly params: { [key: string]: any }[];
-}
-
-interface Caveat {
-  readonly name: string;
-  readonly value: string[];
-}
-
-interface Permission {
-  readonly parentCapability: string;
-  readonly caveats: Caveat[];
-}
-
-export interface Provider {
-  readonly isMetaMask?: boolean;
-  readonly request: (request: Request) => Promise<Permission[]>;
-}
-
 export type StepType = 'pending' | 'failure' | 'success';
 
 export type IdleStep = 'idle';

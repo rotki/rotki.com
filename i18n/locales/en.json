@@ -568,9 +568,10 @@
             "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
             "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to change the payment method."
           },
-          "metamask": {
-            "action": "Pay with Metamask",
-            "notice": "You can pay with metamask, your mobile wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
+          "wallet": {
+            "connect_wallet": "Connect wallet",
+            "pay_with_wallet": "Pay with wallet",
+            "notice": "You can pay your wallet wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed."
           },
@@ -587,6 +588,9 @@
               "description": "Are you sure you want to remove this card?"
             },
             "expiry": "Expiry {expiresAt}"
+          },
+          "wallets": {
+            "pay": "Pay with browser wallet"
           }
         }
       }
@@ -629,6 +633,10 @@
     "success": {
       "title": "Payment Success",
       "message": "Your payment was processed successfully. Visit the account management page to manage your account."
+    },
+    "crypto_payment": {
+      "invalid_chain": "We are expecting payments on {chainName} but found ${actualName}. Change the network and try again.",
+      "not_connected": "No account is connected"
     }
   },
   "selected_plan_overview": {
