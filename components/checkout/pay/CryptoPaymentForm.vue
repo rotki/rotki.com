@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useAppKitState } from '@reown/appkit/vue';
+import { get, set, useClipboard } from '@vueuse/core';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
-import { get, set, useClipboard } from '@vueuse/core';
-import { useLogger } from '~/utils/use-logger';
-import { getChainId } from '~/composables/crypto-payment';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
+import { getChainId } from '~/composables/crypto-payment';
 import { toTitleCase, truncateAddress } from '~/utils/text';
+import { useLogger } from '~/utils/use-logger';
+import type { WatchHandle } from 'vue';
 import type { CryptoPayment, PaymentStep } from '~/types';
 
 const props = defineProps<{
@@ -27,15 +28,42 @@ const emit = defineEmits<{
   (e: 'clear:errors'): void;
 }>();
 
+const { data, pending, loading, success } = toRefs(props);
+
+const canvas = useTemplateRef('canvas');
+const qrText = ref<string>('');
+const showChangePaymentDialog = ref(false);
+
+let stopWatcher: WatchHandle;
+
 const { t } = useI18n();
-
 const config = useRuntimeConfig();
-
 const logger = useLogger('card-payment-form');
 const appkitState = useAppKitState();
+const { copy: copyToClipboard } = useClipboard({ source: qrText });
+
+const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
+
+const currencyName = computed<string>(() => {
+  const { cryptocurrency } = get(data);
+  return cryptocurrency.split(':')[1];
+});
+
+const paymentAmount = computed<string>(() => {
+  const { finalPriceInCrypto } = get(data);
+  const currency = get(currencyName);
+  return `${finalPriceInCrypto} ${currency}`;
+});
+
+const processing = logicOr(pending, loading);
+
+function redirect() {
+  navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
+  stopWatcher?.();
+}
 
 async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement) {
-  let qrText = '';
+  let qrText: string;
   const {
     cryptoAddress,
     chainName,
@@ -48,7 +76,7 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
     qrText = `bitcoin:${cryptoAddress}?amount=${finalPriceInCrypto}&label=Rotki`;
   }
   else {
-    const chainId = getChainId(!!config.public.testing, payment.chainId);
+    const chainId = getChainId(config.public.testing, payment.chainId);
     const tokenAmount = parseUnits(finalPriceInCrypto, decimals);
 
     if (!tokenAddress)
@@ -62,22 +90,10 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
   return qrText;
 }
 
-const { data, pending, loading, success } = toRefs(props);
-const canvas = ref<HTMLCanvasElement>();
-const qrText = ref<string>('');
-
-const currencyName = computed(() => {
-  const { cryptocurrency } = get(data);
-  return cryptocurrency.split(':')[1];
+stopWatcher = watchEffect(() => {
+  if (get(success))
+    redirect();
 });
-
-const paymentAmount = computed(() => {
-  const { finalPriceInCrypto } = get(data);
-  const currency = get(currencyName);
-  return `${finalPriceInCrypto} ${currency}`;
-});
-
-const processing = computed(() => get(pending) || get(loading));
 
 watch(canvas, async (canvas) => {
   if (!canvas)
@@ -85,32 +101,11 @@ watch(canvas, async (canvas) => {
 
   set(qrText, await createPaymentQR(get(data), canvas));
 });
-
-function redirect() {
-  navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
-  stopWatcher();
-}
-
-const stopWatcher = watchEffect(() => {
-  if (get(success))
-    redirect();
-});
-
-const { copy: copyToClipboard } = useClipboard({ source: qrText });
-const isBtc = computed(() => get(data).chainName === 'bitcoin');
-
-const pay = () => emit('pay');
-const connect = () => emit('connect');
-const changePaymentMethod = () => emit('change');
-const clearErrors = () => emit('clear:errors');
-const css = useCssModule();
-
-const showChangePaymentDialog = ref(false);
 </script>
 
 <template>
-  <div :class="css.wrapper">
-    <div :class="css.qrcode">
+  <div :class="$style.wrapper">
+    <div :class="$style.qrcode">
       <canvas
         v-if="!appkitState.open"
         ref="canvas"
@@ -118,10 +113,10 @@ const showChangePaymentDialog = ref(false);
       />
       <div
         v-else
-        :class="css.canvas"
+        :class="$style.canvas"
       />
     </div>
-    <div :class="css.inputs">
+    <div :class="$style.inputs">
       <InputWithCopyButton
         id="price"
         :disabled="processing"
@@ -180,10 +175,10 @@ const showChangePaymentDialog = ref(false);
       crypto
       warning
     />
-    <div :class="css.hint">
+    <div :class="$style.hint">
       {{ t('home.plans.tiers.step_3.wallet.notice') }}
 
-      <div :class="css.info">
+      <div :class="$style.info">
         <p>
           {{ t('home.plans.tiers.step_3.wallet.paid_notice_1') }}
         </p>
@@ -214,7 +209,7 @@ const showChangePaymentDialog = ref(false);
           :disabled="processing"
           size="lg"
           class="w-full"
-          @click="connect()"
+          @click="emit('connect')"
         >
           {{ t('home.plans.tiers.step_3.wallet.connect_wallet') }}
         </RuiButton>
@@ -225,7 +220,7 @@ const showChangePaymentDialog = ref(false);
             color="primary"
             size="lg"
             class="w-full"
-            @click="pay()"
+            @click="emit('pay')"
           >
             {{ t('home.plans.tiers.step_3.wallet.pay_with_wallet') }}
           </RuiButton>
@@ -234,7 +229,7 @@ const showChangePaymentDialog = ref(false);
             size="lg"
             color="secondary"
             class="!px-3"
-            @click="connect()"
+            @click="emit('connect')"
           >
             <RuiIcon
               name="link"
@@ -250,7 +245,7 @@ const showChangePaymentDialog = ref(false);
     :timeout="10000"
     closeable
     :visible="failure"
-    @dismiss="clearErrors()"
+    @dismiss="emit('clear:errors')"
   >
     <template #title>
       {{ status?.title }}
@@ -260,7 +255,7 @@ const showChangePaymentDialog = ref(false);
 
   <ChangeCryptoPayment
     v-model="showChangePaymentDialog"
-    @change="changePaymentMethod()"
+    @change="emit('change')"
   />
 </template>
 
