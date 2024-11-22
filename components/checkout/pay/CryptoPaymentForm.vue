@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppKitState } from '@reown/appkit/vue';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import { get, set, useClipboard } from '@vueuse/core';
@@ -31,6 +32,7 @@ const { t } = useI18n();
 const config = useRuntimeConfig();
 
 const logger = useLogger('card-payment-form');
+const appkitState = useAppKitState();
 
 async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement) {
   let qrText = '';
@@ -110,9 +112,13 @@ const showChangePaymentDialog = ref(false);
   <div :class="css.wrapper">
     <div :class="css.qrcode">
       <canvas
+        v-if="!appkitState.open"
         ref="canvas"
-        class="canvas"
         @click="copyToClipboard(qrText)"
+      />
+      <div
+        v-else
+        :class="css.canvas"
       />
     </div>
     <div :class="css.inputs">
@@ -268,7 +274,7 @@ const showChangePaymentDialog = ref(false);
 }
 
 .canvas {
-  @apply w-[14.25rem] h-[14.25rem];
+  @apply w-[11.25rem] h-[11.25rem];
 }
 
 .inputs {
