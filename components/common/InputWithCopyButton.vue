@@ -18,7 +18,9 @@ defineProps<Props>();
   <RuiTextField
     v-model="modelValue"
     color="primary"
+    variant="outlined"
     v-bind="$attrs"
+    hide-details
   >
     <template
       v-if="$slots.prepend"
