@@ -49,7 +49,7 @@ function next() {
   });
 }
 
-const canBuy = reactive(canBuyNewSubscription)(account);
+const canBuy = reactify(canBuyNewSubscription)(account);
 </script>
 
 <template>

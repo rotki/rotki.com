@@ -1,11 +1,10 @@
-import { get } from '@vueuse/core';
 import type { Account } from '~/types';
 
-export function canBuyNewSubscription(account: Ref<Account | null>): boolean {
-  if (!isDefined(account))
+export function canBuyNewSubscription(account: Account | null): boolean {
+  if (!account)
     return true;
 
-  const { hasActiveSubscription, subscriptions } = get(account);
+  const { hasActiveSubscription, subscriptions } = account;
 
   if (!hasActiveSubscription)
     return true;
