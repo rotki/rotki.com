@@ -33,6 +33,7 @@ const rendered = ref(false);
 
 // this will be populated once the deferred captcha script is loaded
 const grecaptcha = toRef(window, 'grecaptcha');
+const { t } = useI18n();
 
 /**
  * Renders the captcha if not rendered and required fields are available
@@ -89,7 +90,7 @@ onMounted(() => {
       v-if="invalid"
       :class="css.error"
     >
-      Invalid or expired captcha, please try again
+      {{ t('recaptcha.expired_captcha') }}
     </p>
   </div>
 </template>

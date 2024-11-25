@@ -99,7 +99,7 @@ const { t } = useI18n();
 <template>
   <div class="space-y-8 grow">
     <div class="text-h4 text-center">
-      Address
+      {{ t('signup_address.title') }}
     </div>
     <div class="space-y-5">
       <RuiTextField

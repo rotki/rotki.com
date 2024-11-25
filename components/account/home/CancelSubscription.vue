@@ -51,10 +51,10 @@ const { t } = useI18n();
         >
           <template #benefits>
             <ul class="list-disc ml-5">
-              <li>{{ t('account.subscriptions.cancellation.benefits.1') }}</li>
+              <li>{{ t('account.subscriptions.cancellation.benefits.line_1') }}</li>
               <li>
                 <i18n-t
-                  keypath="account.subscriptions.cancellation.benefits.2"
+                  keypath="account.subscriptions.cancellation.benefits.line_2"
                   scope="global"
                 >
                   <template #bug_tracker>
@@ -70,7 +70,7 @@ const { t } = useI18n();
                   </template>
                 </i18n-t>
               </li>
-              <li>{{ t('account.subscriptions.cancellation.benefits.3') }}</li>
+              <li>{{ t('account.subscriptions.cancellation.benefits.line_3') }}</li>
             </ul>
           </template>
 

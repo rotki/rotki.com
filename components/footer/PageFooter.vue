@@ -11,6 +11,7 @@ withDefaults(
 const { t } = useI18n();
 
 const year = new Date().getFullYear().toString();
+const copyright = computed<string>(() => `© Rotki Solutions GmbH 2018-${year}.`);
 </script>
 
 <template>
@@ -50,8 +51,8 @@ const year = new Date().getFullYear().toString();
         <div
           class="flex flex-wrap space-x-1 text-rui-text-secondary mt-6 lg:mt-0"
         >
-          <div>&copy; Rotki Solutions GmbH 2018-{{ year }}.</div>
-          <div>All Rights Reserved.</div>
+          <div> {{ copyright }} </div>
+          <div> {{ t('page_footer.all_rights_reseved') }}</div>
         </div>
         <div>
           <FooterIconLinks />

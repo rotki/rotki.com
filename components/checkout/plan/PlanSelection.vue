@@ -28,6 +28,13 @@ const cryptoPrice = computed(() => {
 
 const vat = computed(() => get(account)?.vat);
 
+const notes = computed(() => [
+  t('home.plans.tiers.step_1.notes.line_1'),
+  t('home.plans.tiers.step_1.notes.line_2'),
+  t('home.plans.tiers.step_1.notes.line_3'),
+  t('home.plans.tiers.step_1.notes.line_4'),
+]);
+
 const isSelected = (plan: Plan) => plan === get(selected);
 
 function select(plan: Plan) {
@@ -82,7 +89,7 @@ const css = useCssModule();
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
       <div :class="css.notes">
         <div
-          v-for="i in 4"
+          v-for="(line, i) in notes"
           :key="i"
           :class="css.note"
         >
@@ -90,7 +97,7 @@ const css = useCssModule();
             :class="css.note__icon"
             name="arrow-right-circle-line"
           />
-          <p>{{ t(`home.plans.tiers.step_1.notes.${i}`) }}</p>
+          <p>{{ line }}</p>
         </div>
       </div>
 

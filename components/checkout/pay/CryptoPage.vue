@@ -10,7 +10,7 @@ import type { CryptoPayment, PaymentStep } from '~/types';
 const { t } = useI18n();
 
 const loading = ref(false);
-const data = ref<CryptoPayment | null>(null);
+const data = ref<CryptoPayment>();
 
 const { cryptoPayment, switchCryptoPlan, deletePendingPayment, subscriptions } = useMainStore();
 
@@ -36,16 +36,12 @@ const step = computed<PaymentStep>(() => {
   else if (state === 'pending') {
     return {
       type: 'pending',
-      title: t('subscription.error.payment_progress'),
-      message: t('subscription.error.payment_progress_message'),
+      title: t('subscription.progress.payment_progress'),
+      message: t('subscription.progress.payment_progress_message'),
     };
   }
   else if (state === 'success') {
-    return {
-      type: 'success',
-      title: t('subscription.error.transaction_pending'),
-      message: t('subscription.error.transaction_pending_message'),
-    };
+    return { type: 'success' };
   }
   return { type: 'idle' };
 });

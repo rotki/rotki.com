@@ -28,7 +28,7 @@ const { t } = useI18n();
 <template>
   <div>
     <div class="text-h6 mb-6">
-      Details
+      {{ t('account_details.title') }}
     </div>
     <div>
       <div class="space-y-5">
@@ -56,7 +56,7 @@ const { t } = useI18n();
             append-icon="lock-line"
           />
           <div class="text-rui-text-secondary pt-2 px-3 text-xs flex">
-            To change your email, please contact our support tem via
+            {{ t('account_details.check_email') }}
             <ButtonLink
               :to="emailMailto"
               external

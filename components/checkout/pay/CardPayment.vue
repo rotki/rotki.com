@@ -127,8 +127,8 @@ async function submit() {
     else {
       const status = (threeDSecureInfo as any)?.status as string | undefined;
       set(error, {
-        title: t('subscription.error.3d_auth_failed'),
-        message: t('subscription.error.3d_auth_failed_message', {
+        title: t('subscription.error.auth_failed_3d_secure'),
+        message: t('subscription.error.auth_failed_3d_secure_message', {
           status: status?.replaceAll('_', ' '),
         }),
       });

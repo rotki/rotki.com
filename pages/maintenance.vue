@@ -7,8 +7,7 @@ useHead({
     {
       key: 'description',
       name: 'description',
-      content:
-        'rotki is currently undergoing maintenance please come back later',
+      content: 'rotki is currently undergoing maintenance please come back later',
     },
     noIndex(),
   ],
@@ -19,12 +18,8 @@ definePageMeta({
   layout: 'landing',
 });
 
-const {
-  public: {
-    maintenance,
-    contact: { emailMailto, email },
-  },
-} = useRuntimeConfig();
+const { public: { maintenance, contact: { emailMailto, email } } } = useRuntimeConfig();
+const { t } = useI18n();
 
 if (!maintenance)
   navigateTo('/');
@@ -46,17 +41,17 @@ const otherHeight = inject('otherHeight', 0);
 
     <div class="flex flex-col gap-4">
       <h6 class="text-h6 text-rui-primary">
-        Under maintenance
+        {{ t('maintenance.title') }}
       </h6>
 
       <h3 :class="css.heading">
-        We'll be back soon!
+        {{ t('maintenance.heading') }}
       </h3>
 
       <p :class="css.description">
-        Sorry for the inconvenience, but we're performing some maintenance at the
-        moment. <br />
-        If you need anything, you can always contact us on
+        {{ t('maintenance.description.line_one') }}
+        <br />
+        {{ t('maintenance.description.line_two') }}
         <a
           :class="css.link"
           :href="emailMailto"

@@ -19,12 +19,12 @@ const otherHeight = inject('otherHeight', 0);
       </h6>
 
       <h3 :class="css.heading">
-        Page not found
+        {{ t('not_found.title') }}
       </h3>
 
       <p :class="css.description">
-        You may have mis-typed the URL or the page has been removed. <br />
-        Actually, there is nothing to see here...
+        {{ t('not_found.description.line_one') }} <br />
+        {{ t('not_found.description.line_two') }}
       </p>
 
       <RuiButton

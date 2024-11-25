@@ -1,7 +1,9 @@
 export function getPlanName(months: number) {
   const { t } = useI18n();
-  if (months === 1 || months === 12)
-    return t(`home.plans.names.${months}`);
+  if (months === 1)
+    return t(`home.plans.names.monthly`);
+  else if (months === 12)
+    return t(`home.plans.names.yearly`);
 
   return t(`home.plans.names.numeric`, { months });
 }

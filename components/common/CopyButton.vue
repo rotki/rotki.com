@@ -5,8 +5,10 @@ const props = defineProps<{ modelValue: string; disabled?: boolean }>();
 
 const { modelValue } = toRefs(props);
 const copied = ref(false);
+
 const { start, stop } = useTimeoutFn(() => set(copied, false), 4000);
 const { copy } = useClipboard({ source: modelValue });
+const { t } = useI18n();
 
 function copyToClipboard() {
   stop();
@@ -35,6 +37,6 @@ function copyToClipboard() {
         />
       </RuiButton>
     </template>
-    {{ copied ? 'Copied to clipboard' : 'Copy to clipboard' }}
+    {{ copied ? t('copy_button.copied') : t('copy_button.copy') }}
   </RuiTooltip>
 </template>

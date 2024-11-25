@@ -26,6 +26,16 @@ const emit = defineEmits<{
   (e: 'update:initializing', initializing: boolean): void;
 }>();
 
+const { client, card } = toRefs(props);
+
+const deleteLoading = ref(false);
+const showDeleteConfirmation = ref(false);
+const submitPayload = ref<{ nonce: string; bin: string }>({
+  nonce: '',
+  bin: '',
+});
+const payloadError = ref<string>('');
+
 function updateError(error: ErrorMessage) {
   emit('update:error', error);
 }
@@ -37,9 +47,6 @@ function updateFormValid(valid: boolean) {
 function updateInitializing(valid: boolean) {
   emit('update:initializing', valid);
 }
-
-const { client, card } = toRefs(props);
-const css = useCssModule();
 
 function setupVaults() {
   let _vaults: VaultManager | null = null;
@@ -66,41 +73,12 @@ function setupVaults() {
     teardown,
   };
 }
-
+const { deleteCard } = usePaymentCardsStore();
 const vaults = setupVaults();
-
+const css = useCssModule();
 const { t } = useI18n();
 
-const submitPayload = ref<{ nonce: string; bin: string }>({
-  nonce: '',
-  bin: '',
-});
-const payloadError = ref<string>('');
-
-onMounted(async () => {
-  try {
-    updateInitializing(true);
-    await vaults.create(get(client));
-    await checkPaymentMethods();
-  }
-  catch (error_: any) {
-    updateError({
-      title: t('subscription.error.init_error'),
-      message: error_.message,
-    });
-  }
-  finally {
-    updateInitializing(false);
-  }
-});
-
-watchImmediate(payloadError, (payloadError) => {
-  updateFormValid(!payloadError);
-});
-
-onUnmounted(() => {
-  vaults.teardown();
-});
+const last4Digits = computed<string>(() => `**** **** **** ${props.card.last4}`);
 
 async function checkPaymentMethods() {
   const methods = await vaults.get().fetchPaymentMethods();
@@ -137,12 +115,6 @@ function submit() {
   return get(submitPayload);
 }
 
-const { deleteCard } = usePaymentCardsStore();
-
-const deleteLoading = ref(false);
-
-const showDeleteConfirmation = ref(false);
-
 function deleteCardClick() {
   set(showDeleteConfirmation, true);
 }
@@ -153,6 +125,31 @@ async function handleDeleteCard() {
   await deleteCard(get(card).token);
   set(deleteLoading, false);
 }
+
+watchImmediate(payloadError, (payloadError) => {
+  updateFormValid(!payloadError);
+});
+
+onMounted(async () => {
+  try {
+    updateInitializing(true);
+    await vaults.create(get(client));
+    await checkPaymentMethods();
+  }
+  catch (error_: any) {
+    updateError({
+      title: t('subscription.error.init_error'),
+      message: error_.message,
+    });
+  }
+  finally {
+    updateInitializing(false);
+  }
+});
+
+onUnmounted(() => {
+  vaults.teardown();
+});
 
 defineExpose({ submit });
 </script>
@@ -168,14 +165,10 @@ defineExpose({ submit });
     </div>
     <div class="grow">
       <div>
-        **** **** **** {{ card.last4 }}
+        {{ last4Digits }}
       </div>
       <div class="text-rui-text-secondary">
-        {{
-          t('home.plans.tiers.step_3.saved_card.expiry', {
-            expiresAt: card.expiresAt,
-          })
-        }}
+        {{ t('home.plans.tiers.step_3.saved_card.expiry', { expiresAt: card.expiresAt }) }}
       </div>
     </div>
     <RuiButton

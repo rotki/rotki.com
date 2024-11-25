@@ -1,124 +1,4 @@
 {
-  "auth": {
-    "activation": {
-      "invalid": {
-        "title": "Invalid Link",
-        "message": "The activation link is not valid. This can happen if you have already confirmed your account."
-      },
-      "success": {
-        "title": "Welcome to rotki",
-        "message": "Your rotki account has been successfully activated. To see your dashboard click",
-        "continue_payment": "Or continue your payment"
-      }
-    },
-    "common": {
-      "email": "Email",
-      "username": "Username",
-      "password": "Password",
-      "confirm_hint": "Enter the same password as before, for verification.",
-      "password_hint": {
-        "line_1": "Your password can't be too similar to your other personal information.",
-        "line_2": "Your password must contain at least 8 characters.",
-        "line_3": "Your password can't be a commonly used password.",
-        "line_4": "Your password can't be entirely numeric."
-      },
-      "optional": "Optional.",
-      "required": "Required."
-    },
-    "login": {
-      "title": "Sign in",
-      "message": " Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
-      "forgot_password": "Forgot password?",
-      "first_time_premium": "First time premium?",
-      "sign_up_now": "Sign up now",
-      "alert_error": "If you are writing your username and password from the app, we remind you that they are independent accounts."
-    },
-    "password_changed": {
-      "title": "Password changed",
-      "message": "Your password has been successfully reset. Click below to log in."
-    },
-    "password_link_send": {
-      "title": "Password recovery",
-      "message": "A recovery link has been sent to your account's address. Please check your mailbox to proceed."
-    },
-    "password_reset": {
-      "invalid": {
-        "title": "Invalid password reset link",
-        "message": "The link you followed doesn't seem like a valid password reset link."
-      },
-      "form": {
-        "confirm": "Confirm new password",
-        "password": "New password"
-      },
-      "title": "Provide your new password"
-    },
-    "pending_activation": {
-      "title": "Please check your email",
-      "message": "A confirm registration link has been sent to your account's address. Please check your mailbox to proceed."
-    },
-    "recover_password": {
-      "title": "Recover password"
-    },
-    "signup": {
-      "steps": {
-        "step_1": {
-          "title": "Introduction",
-          "description": "Important information"
-        },
-        "step_2": {
-          "title": "Account",
-          "description": "Set your credentials"
-        },
-        "step_3": {
-          "title": "Customer Information",
-          "description": "Information for payment invoices"
-        },
-        "step_4": {
-          "title": "Address",
-          "description": "Will only be used for payment invoices"
-        }
-      },
-      "create_account": "Create Account",
-      "introduction": {
-        "title": "Important Note",
-        "message": {
-          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. Rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account do not work for the other. To use Rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
-          "premium_subscription": "premium subscription",
-          "download": "download"
-        }
-      },
-      "account": {
-        "title": "Account",
-        "form": {
-          "username_hint": "Required. Provide a unique username for your new account.",
-          "email_hint": "Required. Provide a valid email address.",
-          "confirm_password": "Repeat password"
-        }
-      },
-      "address": {
-        "form": {
-          "address_line_1": "Address line 1",
-          "address_line_2": "Address line 2",
-          "city": "City",
-          "postal_code": "Postal code",
-          "country": "Country",
-          "tos": "I have read and agreed to the {tos} and the {privacy_policy}"
-        }
-      },
-      "customer_information": {
-        "title": "Customer Information",
-        "form": {
-          "first_name": "First name",
-          "last_name": "Last name",
-          "name_hint": "Required. Will only be used for invoice of payments.",
-          "company": "Company name",
-          "company_hint": "Optional. If you want to be invoiced as a company the given company name will be added to the invoice.",
-          "vat_id": "VAT ID",
-          "vat_id_hint": "Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
-        }
-      }
-    }
-  },
   "account": {
     "account_deleted": {
       "message": "Your rotki premium account has been successfully deleted.",
@@ -130,128 +10,136 @@
       }
     },
     "api_keys": {
-      "title": "API Credentials",
       "api_key": "API Key",
       "api_secret": "API Secret",
-      "not_generated": "You haven't generated an API key"
+      "not_generated": "You haven't generated an API key",
+      "title": "API Credentials"
+    },
+    "change_password": {
+      "current_password": {
+        "hint": "Enter your current account password. Only needed if you want to change password",
+        "label": "Current Password"
+      },
+      "message": {
+        "success": "Your password has been changed."
+      },
+      "new_password": {
+        "label": "New password"
+      },
+      "title": "Change Password"
+    },
+    "delete_account": {
+      "confirmation": {
+        "description": "By proceeding you will delete your account and all its accompanying data from our servers. This action is not reversible. Are you sure you want to perform the deletion?\n\nType your username to continue: {username}"
+      },
+      "delete_my_account": "Delete my account",
+      "description": "Proceeding will completely delete your account data. If you proceed you will not be able to recover your account!",
+      "notification": {
+        "title": "Account deletion failed"
+      },
+      "title": "Delete account",
+      "unable_to_delete": "You cannot delete your account while you have an active subscription."
+    },
+    "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
+    "no_premium": {
+      "no_premium_found": "No premium subscription found. Select your {plan}.",
+      "plan": "premium subscription plan",
+      "title": "Rotki Premium"
+    },
+    "payments": {
+      "headers": {
+        "amount_in_symbol": "Amount in {symbol}",
+        "paid_at": "Paid at"
+      },
+      "no_payments_found": "No payments found",
+      "paid": "Paid",
+      "title": "Your latest payments"
+    },
+    "subscriptions": {
+      "cancellation": {
+        "actions": {
+          "no": "No, don't cancel",
+          "yes": "Yes, cancel my subscription"
+        },
+        "benefits": {
+          "line_1": "Rotki is open-source software, and your subscription helps support its development.",
+          "line_2": "If you cancel your subscription, you will no longer be able to use any Rotki premium features until you subscribe again.",
+          "line_3": "We're constantly developing new premium features that will soon be available to our subscribers."
+        },
+        "bug_tracker": "bug tracker",
+        "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a Rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the Rotki community.",
+        "notification": {
+          "title": "Cancellation Failure"
+        },
+        "subscription_status": {
+          "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all Rotki premium features.",
+          "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."
+        },
+        "title": "Canceling Your Rotki Subscription"
+      },
+      "cancelled_but_still_active": {
+        "description": "You canceled this subscription, but it will remain active until {date}",
+        "status": "Active until {date}"
+      },
+      "headers": {
+        "cost_in_symbol_per_period": "Cost in {symbol} per period",
+        "created": "Created",
+        "next_billing": "Next Billing"
+      },
+      "no_subscriptions_found": "No subscriptions found",
+      "payment_detail": "Payment Details",
+      "resume": {
+        "actions": {
+          "no": "No, don't resume",
+          "yes": "Yes, resume my subscription"
+        },
+        "description": "By confirming, your subscription's billing cycle will resume, and you will be charged according to your selected plan starting from the next billing date. Are you sure you want to resume your subscription?",
+        "details": {
+          "amount_in_eur": "{amount} €",
+          "billing_amount": "Billing Amount: {amount}",
+          "billing_cycle": "Billing Cycle: {duration}",
+          "duration_in_months": "every {duration} month|every {duration} months",
+          "next_billing_date": "Next billing date: {date}",
+          "plan_name": "Subscription Plan: {plan}"
+        },
+        "notification": {
+          "title": "Your subscription was successfully resumed."
+        },
+        "title": "Resume your rotki subscription"
+      },
+      "resume_hint": "Resume the active billing of your subscription from {date}",
+      "title": "Subscription History"
+    },
+    "tabs": {
+      "account_details": "Account Details",
+      "address": "Address",
+      "customer_information": "Customer Information",
+      "subscription": "Subscription"
     },
     "unverified_email": {
       "message": {
         "description": "Your e-mail address has not been verified. Check your mailbox for the activation e-mail.",
         "error": "Failed to send activation e-mail",
         "success": "New activation e-mail has been sent",
-        "try_again": "Try again in {time}",
         "time": {
           "minutes": "{number} minutes",
           "seconds": "{number} seconds"
-        }
+        },
+        "try_again": "Try again in {time}"
       },
       "resend": "Re-send activation e-mail"
     },
-    "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
-    "no_premium": {
-      "title": "Rotki Premium",
-      "no_premium_found": "No premium subscription found. Select your {plan}.",
-      "plan": "premium subscription plan"
-    },
-    "change_password": {
-      "title": "Change Password",
-      "current_password": {
-        "label": "Current Password",
-        "hint": "Enter your current account password. Only needed if you want to change password"
-      },
-      "new_password": {
-        "label": "New password"
-      },
-      "message": {
-        "success": "Your password has been changed."
-      }
-    },
-    "delete_account": {
-      "title": "Delete account",
-      "description": "Proceeding will completely delete your account data. If you proceed you will not be able to recover your account!",
-      "unable_to_delete": "You cannot delete your account while you have an active subscription.",
-      "delete_my_account": "Delete my account",
-      "confirmation": {
-        "description": "By proceeding you will delete your account and all its accompanying data from our servers. This action is not reversible. Are you sure you want to perform the deletion?\n\nType your username to continue: {username}"
-      },
-      "notification": {
-        "title": "Account deletion failed"
-      }
-    },
-    "payments": {
-      "no_payments_found": "No payments found",
-      "paid": "Paid",
-      "headers": {
-        "paid_at": "Paid at",
-        "amount_in_symbol": "Amount in {symbol}"
-      },
-      "title": "Your latest payments"
-    },
-    "subscriptions": {
-      "cancelled_but_still_active": {
-        "status": "Active until {date}",
-        "description": "You canceled this subscription, but it will remain active until {date}"
-      },
-      "cancellation": {
-        "actions": {
-          "no": "No, don't cancel",
-          "yes": "Yes, cancel my subscription"
-        },
-        "title": "Canceling Your Rotki Subscription",
-        "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a Rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the Rotki community.",
-        "bug_tracker": "bug tracker",
-        "subscription_status": {
-          "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all Rotki premium features.",
-          "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."
-        },
-        "benefits": {
-          "1": "Rotki is open-source software, and your subscription helps support its development.",
-          "2": "If you cancel your subscription, you will no longer be able to use any Rotki premium features until you subscribe again.",
-          "3": "We're constantly developing new premium features that will soon be available to our subscribers."
-        },
-        "notification": {
-          "title": "Cancellation Failure"
-        }
-      },
-      "headers": {
-        "created": "Created",
-        "next_billing": "Next Billing",
-        "cost_in_symbol_per_period": "Cost in {symbol} per period"
-      },
-      "no_subscriptions_found": "No subscriptions found",
-      "payment_detail": "Payment Details",
-      "title": "Subscription History",
-      "resume": {
-        "title": "Resume your rotki subscription",
-        "actions": {
-          "yes": "Yes, resume my subscription",
-          "no": "No, don't resume"
-        },
-        "description": "By confirming, your subscription's billing cycle will resume, and you will be charged according to your selected plan starting from the next billing date. Are you sure you want to resume your subscription?",
-        "details": {
-          "plan_name": "Subscription Plan: {plan}",
-          "billing_cycle": "Billing Cycle: {duration}",
-          "billing_amount": "Billing Amount: {amount}",
-          "amount_in_eur": "{amount} €",
-          "duration_in_months": "every {duration} month|every {duration} months",
-          "next_billing_date": "Next billing date: {date}"
-        }
-      },
-      "resume_hint": "Resume the active billing of your subscription from {date}"
-    },
-    "tabs": {
-      "subscription": "Subscription",
-      "account_details": "Account Details",
-      "customer_information": "Customer Information",
-      "address": "Address"
-    },
     "welcome": "Welcome"
+  },
+  "account_details": {
+    "check_email": "To change your email, please contact our support tem via",
+    "title": "Details"
   },
   "actions": {
     "apply": "Apply",
     "back": "Back",
     "cancel": "Cancel",
+    "change": "Change",
     "confirm": "Confirm",
     "continue": "Continue",
     "download": "Download",
@@ -268,519 +156,645 @@
     "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
-    "update": "Update",
-    "change": "Change",
-    "ok": "Ok"
+    "update": "Update"
   },
-  "common": {
-    "here": "here",
-    "actions": "actions",
-    "status": "status",
-    "none": "none",
-    "plan": "plan",
-    "for": "for",
-    "amount": "Amount",
-    "address": "Address",
-    "vat": "{vat}% VAT"
-  },
-  "products": {
-    "heading": "Unlock the Full Potential of rotki with Premium Features",
-    "title": "Upgrade rotki today",
-    "description": "Elevate your financial management with rotki premium, our exclusive subscription offering. Gain access to advanced tools and features designed to enhance the management of your portfolio and investments.",
-    "unlock": {
-      "title": "Unlock Premium Features",
-      "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape."
+  "auth": {
+    "activation": {
+      "invalid": {
+        "message": "The activation link is not valid. This can happen if you have already confirmed your account.",
+        "title": "Invalid Link"
+      },
+      "success": {
+        "continue_payment": "Or continue your payment",
+        "message": "Your rotki account has been successfully activated. To see your dashboard click",
+        "title": "Welcome to rotki"
+      }
     },
-    "footer": {
-      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor."
+    "common": {
+      "confirm_hint": "Enter the same password as before, for verification.",
+      "email": "Email",
+      "optional": "Optional.",
+      "password": "Password",
+      "password_hint": {
+        "line_1": "Your password can't be too similar to your other personal information.",
+        "line_2": "Your password must contain at least 8 characters.",
+        "line_3": "Your password can't be a commonly used password.",
+        "line_4": "Your password can't be entirely numeric."
+      },
+      "required": "Required.",
+      "username": "Username"
     },
-    "features": {
-      "sync_db_with_server": {
-        "title": "Sync data across multiple machines",
-        "description": "Effortlessly back up your data to our cloud and sync or restore it across multiple devices. Your data is encrypted and can only be decrypted with your password, ensuring complete privacy."
+    "login": {
+      "alert_error": "If you are writing your username and password from the app, we remind you that they are independent accounts.",
+      "first_time_premium": "First time premium?",
+      "forgot_password": "Forgot password?",
+      "message": " Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
+      "sign_up_now": "Sign up now",
+      "title": "Sign in"
+    },
+    "password_changed": {
+      "message": "Your password has been successfully reset. Click below to log in.",
+      "title": "Password changed"
+    },
+    "password_link_send": {
+      "message": "A recovery link has been sent to your account's address. Please check your mailbox to proceed.",
+      "title": "Password recovery"
+    },
+    "password_reset": {
+      "form": {
+        "confirm": "Confirm new password",
+        "password": "New password"
       },
-      "staking": {
-        "title": "Staking",
-        "description": "Track your staking activities across various chains and platforms like ETH, Liquity, Kraken, and more. Get detailed insights on total gains, performance, rewards breakdown, and individual staking events."
+      "invalid": {
+        "message": "The link you followed doesn't seem like a valid password reset link.",
+        "title": "Invalid password reset link"
       },
-      "higher_limits": {
-        "title": "Higher Limits",
-        "description": "Say goodbye to limits. With rotki Premium, you can process more trades, transactions, deposits/withdrawals, and historic events. The limits increase with each premium tier, providing greater flexibility and control."
-      },
-      "detailed_graphs": {
-        "title": "Detailed Graphs",
-        "description": "Access a wide array of analytics and graphs. Analyze your total net value over time, asset value distributions, and the worth distribution per asset or location."
-      },
-      "defi": {
-        "title": "DeFi",
-        "description": "Gain detailed insights into supported DeFi protocols. Analyze your Liquity, Aave, Compound, MakerDAO positions. Understand your Yearn vaults and track your swaps on platforms like Uniswap, Paraswap and more."
-      },
-      "exclusive_perks": {
-        "title": "Exclusive perks",
-        "description": "Enjoy various perks like dark mode, customizable color layouts, and alerts for your MakerDAO CDP position, notifying you by email when it crosses certain thresholds."
-      },
-      "timeframe": {
-        "heading": "Enhanced Customization Options",
-        "title": "Timeframe Customization on Dashboard",
-        "description": "Set the timeframe for the dashboard graph. Premium users have access to all options, while free users can choose between only \"2 Weeks\", and \"1 Week\"."
-      },
-      "theme_customization": {
-        "title": "Dark mode & theme customization",
-        "description": "Reduce eye strain, improve text readability, and prolong your device's battery life with dark mode. Personalize the color scheme for both light and dark modes, and customize specific color palettes for the app theme within the settings"
-      },
-      "limits": {
-        "title": "Increased event limits",
-        "heading": "Expanded Capabilities for Premium Users",
-        "history_view": {
-          "title": "History view",
-          "description": "Free users have a limit of the 100 most recent events in the history event viewer. As a premium user you have higher limits in the amount of events you can see."
+      "title": "Provide your new password"
+    },
+    "pending_activation": {
+      "message": "A confirm registration link has been sent to your account's address. Please check your mailbox to proceed.",
+      "title": "Please check your email"
+    },
+    "recover_password": {
+      "title": "Recover password"
+    },
+    "signup": {
+      "account": {
+        "form": {
+          "confirm_password": "Repeat password",
+          "email_hint": "Required. Provide a valid email address.",
+          "username_hint": "Required. Provide a unique username for your new account."
         },
-        "trades": {
-          "title": "Trades",
-          "description": "Free users are limited to the 250 most recent trades. Premium users enjoy higher limits on the number of trades visible."
-        },
-        "deposits_withdrawals": {
-          "title": "Deposit/withdrawals",
-          "description": "Free users are limited to the 100 most recent exchange deposits/withdrawals. Premium users benefit from higher limits for viewing deposits and withdrawals."
-        },
-        "user_notes": {
-          "title": "User notes",
-          "description": "Free users can add up to 10 notes. As a premium user, you have higher limits on the number of notes you can add."
+        "title": "Account"
+      },
+      "address": {
+        "form": {
+          "address_line_1": "Address line 1",
+          "address_line_2": "Address line 2",
+          "city": "City",
+          "country": "Country",
+          "postal_code": "Postal code",
+          "tos": "I have read and agreed to the {tos} and the {privacy_policy}"
         }
       },
-      "analytics": {
-        "heading": "Enhanced Data Insights",
-        "title": "Graphs & Analytics",
-        "asset_amount_and_value": {
-          "title": "Asset tracking",
-          "description": "Access comprehensive analytics, including net value and asset amount over time for each owned asset."
+      "create_account": "Create Account",
+      "customer_information": {
+        "form": {
+          "company": "Company name",
+          "company_hint": "Optional. If you want to be invoiced as a company the given company name will be added to the invoice.",
+          "first_name": "First name",
+          "last_name": "Last name",
+          "name_hint": "Required. Will only be used for invoice of payments.",
+          "vat_id": "VAT ID",
+          "vat_id_hint": "Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
         },
-        "distribution_locations": {
-          "title": "Value distribution",
-          "description": "View a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks, etc.)."
-        }
+        "title": "Customer Information"
       },
-      "monerium_and_backup": {
-        "heading": "Enrich Transactions and Synchronize Data",
-        "title": "Monerium API Integration and Premium Data Backup",
-        "monerium_api_keys": {
-          "title": "Monerium API Keys",
-          "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information."
+      "introduction": {
+        "message": {
+          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. Rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account do not work for the other. To use Rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
+          "download": "download",
+          "premium_subscription": "premium subscription"
         },
-        "data_synchronization": {
-          "title": "Data synchronization",
-          "description": "As a premium user, you can upload your encrypted database to our server, synchronize it across devices, and use it as a backup. Your data remains encrypted with your password, ensuring privacy. Synced databases are automatically deleted one month after your subscription expires."
+        "title": "Important Note"
+      },
+      "steps": {
+        "step_1": {
+          "description": "Important information",
+          "title": "Introduction"
+        },
+        "step_2": {
+          "description": "Set your credentials",
+          "title": "Account"
+        },
+        "step_3": {
+          "description": "Information for payment invoices",
+          "title": "Customer Information"
+        },
+        "step_4": {
+          "description": "Will only be used for payment invoices",
+          "title": "Address"
         }
       }
     }
   },
-  "supported_defi": {
-    "title": "Dedicated DeFi support for",
-    "caption": "* All DeFi protocols are supported, these are just the ones we have dedicated views for."
+  "change_plan": {
+    "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to switch the plan",
+    "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
+    "title": "Change Plan"
   },
-  "supported_exchanges": {
-    "title": "Supported Exchanges"
+  "common": {
+    "actions": "actions",
+    "amount": "Amount",
+    "here": "here",
+    "none": "none",
+    "plan": "plan",
+    "status": "status",
+    "vat": "{vat}% VAT"
+  },
+  "copy_button": {
+    "copied": "Copied to clipboard",
+    "copy": "Copy to clipboard"
+  },
+  "country_select": {
+    "no_data": "No matching countries found"
+  },
+  "download": {
+    "action": "Download",
+    "documentation": {
+      "action": "View all documentation",
+      "description": "On our documentation page you have a user guide that will help you introduce yourself and clarify any doubts that may arise during the process.",
+      "heading": "What are the first steps after installing rotki?",
+      "title": "Documentation"
+    },
+    "download_for": "Download for",
+    "heading": {
+      "description": "Download now and start using across all major Operating Systems",
+      "download_rotki": "Download rotki"
+    },
+    "latest_release": "Latest Release",
+    "preview": "Preview"
   },
   "home": {
-    "more_information": "More Information",
-    "hero": {
-      "title": "The portfolio manager that protects your privacy",
-      "motto": "rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy."
-    },
     "advantages": {
-      "open_source": {
-        "title": "Open source",
-        "description": "rotki's source code is available to inspect, modify and enhance."
-      },
       "local_app": {
-        "title": "Local app",
-        "description": "rotki is a local-first application with a strong focus on user privacy."
+        "description": "rotki is a local-first application with a strong focus on user privacy.",
+        "title": "Local app"
+      },
+      "open_source": {
+        "description": "rotki's source code is available to inspect, modify and enhance.",
+        "title": "Open source"
       },
       "own_your_data": {
-        "title": "Own your data",
-        "description": "Your financial data is kept encrypted in your system and not shared with third parties."
+        "description": "Your financial data is kept encrypted in your system and not shared with third parties.",
+        "title": "Own your data"
       }
     },
-    "use_app": "rotki offers tracking of all your crypto assets no matter where they are. Be it on a blockchain,{0}a DeFi protocol or on one of the supported  exchanges.",
-    "rotki_offer": "What does {0} offer?",
     "dashboard": {
-      "title": "Dashboard",
-      "subtitle": "A 360° overview of your assets",
       "details": {
         "asset_and_liabilities": {
-          "title": "Assets and Liabilities",
-          "description": "View all of your assets and liabilities and your exposure to each as a percentage of your net worth."
+          "description": "View all of your assets and liabilities and your exposure to each as a percentage of your net worth.",
+          "title": "Assets and Liabilities"
         },
         "net_worth_over_time": {
-          "title": "Net worth over time",
-          "description": "Users can also see a graph of how their total net worth is evolving over time. Free users are limited to the last 2 weeks."
-        }
-      }
-    },
-    "exchanges": {
-      "title": "Exchanges",
-      "subtitle": "Connect to a big number of centralized exchanges",
-      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals."
-    },
-    "defi": {
-      "title": "DeFi",
-      "subtitle": "Overview of all of your DeFi",
-      "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation."
-    },
-    "eth_protocols": {
-      "title": "Ethereum protocols",
-      "subtitle": "Ethereum DeFi protocol details",
-      "detail": "Details per protocol for some of the supported protocols:",
-      "protocols": {
-        "maker_dao": {
-          "title": "Maker DAO",
-          "description": "Which vaults you have open, how much you have in DSR"
-        },
-        "aave": {
-          "title": "AAVE",
-          "description": "Your current balances and liabilities"
-        },
-        "compound": {
-          "title": "Compound",
-          "description": "Your current balances and liabilities"
-        },
-        "yearn_vaults": {
-          "title": "Yearn vaults",
-          "description": "Your current balances"
-        },
-        "uniswap": {
-          "title": "Uniswap",
-          "description": "Your current LP balances, v2 and v3 trades"
-        },
-        "balancer": {
-          "title": "Balancer",
-          "description": "Your current LP balances, and trades"
+          "description": "Users can also see a graph of how their total net worth is evolving over time. Free users are limited to the last 2 weeks.",
+          "title": "Net worth over time"
         }
       },
+      "subtitle": "A 360° overview of your assets",
+      "title": "Dashboard"
+    },
+    "defi": {
+      "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation.",
+      "subtitle": "Overview of all of your DeFi",
+      "title": "DeFi"
+    },
+    "eth_protocols": {
+      "detail": "Details per protocol for some of the supported protocols:",
+      "protocols": {
+        "aave": {
+          "description": "Your current balances and liabilities",
+          "title": "AAVE"
+        },
+        "balancer": {
+          "description": "Your current LP balances, and trades",
+          "title": "Balancer"
+        },
+        "compound": {
+          "description": "Your current balances and liabilities",
+          "title": "Compound"
+        },
+        "maker_dao": {
+          "description": "Which vaults you have open, how much you have in DSR",
+          "title": "Maker DAO"
+        },
+        "uniswap": {
+          "description": "Your current LP balances, v2 and v3 trades",
+          "title": "Uniswap"
+        },
+        "yearn_vaults": {
+          "description": "Your current balances",
+          "title": "Yearn vaults"
+        }
+      },
+      "subtitle": "Ethereum DeFi protocol details",
+      "title": "Ethereum protocols",
       "watcher_note": "Premium users can set watchers for various protocols so that they can be informed via email when certain conditions are met."
     },
-    "profit_loss_report": {
-      "title": "Profit/loss report",
-      "subtitle": "Profit/loss report for all your historical data",
-      "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols."
+    "exchanges": {
+      "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals.",
+      "subtitle": "Connect to a big number of centralized exchanges",
+      "title": "Exchanges"
     },
-
-    "testimonials": {
-      "title": "Don’t just take our word for it",
-      "detail": "Hear from some of our amazing customers who are using rotki."
-    },
-    "premium_features": {
-      "title": "Premium features",
-      "subtitle": "Enjoy all the potential that rotki offers.",
-      "features": {
-        "graphs_and_statistics": {
-          "title": "Graphs and statistics",
-          "subtitle": "Premium users can visit the graphs/statistics page and get graphs for:",
-          "detail": "Premium users can visit the graphs/statistics page and get graphs for:\nNet worth over time\nAsset amount and total asset value over time\nBreakdown of total net worth per location\nBreakdown of total net worth per asset"
-        },
-        "history": {
-          "title": "Higher limits for trades, transactions, deposits and withdrawals",
-          "detail": "Free users have a limit on the number of transactions, deposits, withdrawals and other events they can see and process. Premium users have higher limits."
-        },
-        "premium_defi": {
-          "title": "DeFi historical accounting, profit and loss",
-          "detail": " See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocols to be informed via email when certain conditions are met."
-        },
-        "dex_support": {
-          "title": "Decentralized exchanges",
-          "detail": "See how much you have in each liquidity pool. All your Uniswap and Balancer LP join/exit events are shown along with the total profit/loss per pool.\n\nUniswap and Balancer trades are taken into account in the tax report for premium users."
-        },
-        "premium_staking": {
-          "title": "Advanced staking",
-          "detail": "See how much of the token is staked per account.\nWhat is the expected APR.\nHow much of the token you have earned by staking across all accounts.\n\nSee a list of all your staking events with links to the corresponding transactions."
-        }
-      }
+    "hero": {
+      "motto": "rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.",
+      "title": "The portfolio manager that protects your privacy"
     },
     "plans": {
       "cannot_continue": "You cannot continue because you have an active subscription. Click here to",
-      "title": "Start using rotki today!",
-      "most_popular": "Most popular",
       "choose": "Choose Plan",
-      "save_discount": "Save {discount}%",
-      "per_month": "per month",
-      "total": "Total {total}€",
       "details": {
-        "recommended": "Recommended",
-        "free": {
-          "price": "Free",
-          "title": "Starter Plan",
-          "subtitle": "Anyone can download the application and start using it for free."
-        },
-        "premium": {
-          "title": "Premium Plan",
-          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features."
-        },
         "advanced": {
-          "title": "Advanced",
-          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features."
+          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
+          "title": "Advanced"
         },
         "custom": {
-          "title": "Want a custom tailored plan?",
-          "subtitle": "Get in touch with us to tailor the plan to your needs."
-        }
+          "subtitle": "Get in touch with us to tailor the plan to your needs.",
+          "title": "Want a custom tailored plan?"
+        },
+        "free": {
+          "price": "Free",
+          "subtitle": "Anyone can download the application and start using it for free.",
+          "title": "Starter Plan"
+        },
+        "premium": {
+          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
+          "title": "Premium Plan"
+        },
+        "recommended": "Recommended"
       },
+      "most_popular": "Most popular",
       "names": {
-        "1": "Monthly",
-        "12": "Yearly",
-        "numeric": "{months} Months",
         "for": "{name} for",
-        "plan": "{name} Plan."
+        "numeric": "{months} Months",
+        "plan": "{name} Plan.",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
       },
+      "per_month": "per month",
+      "save_discount": "Save {discount}%",
       "tiers": {
         "step_1": {
-          "title": "Premium Plans",
-          "description": "Choose the different plans we offer",
-          "vat": "The prices include a +{vat}% VAT tax",
-          "maybe_vat": "VAT may apply depending on your jurisdiction",
           "crypto_hint": "* When paying with crypto the monthly price is {cryptoPrice} €",
+          "description": "Choose the different plans we offer",
+          "maybe_vat": "VAT may apply depending on your jurisdiction",
+          "title": "Premium Plans",
+          "vat": "The prices include a +{vat}% VAT tax",
           "notes": {
-            "1": "The selected payment method will be billed the total amount for the subscription immediately.",
-            "2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
-            "3": "An invoice is generated for each payment and you can access it from your account page.",
-            "4": "Subscriptions can be canceled from the account page at any point in time."
+            "line_1": "The selected payment method will be billed the total amount for the subscription immediately.",
+            "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
+            "line_3": "An invoice is generated for each payment and you can access it from your account page.",
+            "line_4": "Subscriptions can be canceled from the account page at any point in time."
           }
         },
         "step_2": {
-          "title": "Payment Methods",
           "description": "Select one of the different methods",
-          "subtitle": "Please select one of the following payment methods."
+          "subtitle": "Please select one of the following payment methods.",
+          "title": "Payment Methods"
         },
         "step_3": {
-          "title": "Payment Details",
-          "description": "Proceed to the payment",
-          "subtitle": "Payments by crypto can have slower processing times.",
-          "start": "Start Subscription",
+          "change_payment": {
+            "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to change the payment method.",
+            "title": "Change Payment",
+            "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent."
+          },
           "chose": "You chose:",
-          "payment_description": "Payments are safely processed with Braintree a PayPal Service",
+          "description": "Proceed to the payment",
           "labels": {
             "network": "Network",
+            "to_address": "Send to address",
             "token": "Token",
-            "token_contract": "Token contract: ",
-            "to_address": "Send to address"
+            "token_contract": "Token contract: "
           },
-          "change_payment": {
-            "title": "Change Payment",
-            "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
-            "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to change the payment method."
-          },
-          "wallet": {
-            "connect_wallet": "Connect wallet",
-            "pay_with_wallet": "Pay with wallet",
-            "notice": "You can pay your wallet wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
-            "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
-            "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed."
-          },
-          "notes": {
-            "1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
-            "2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
-            "3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
-          },
+          "payment_description": "Payments are safely processed with Braintree a PayPal Service",
           "saved_card": {
             "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
             "card_expired": "The card has expired. Please use a different card.",
             "delete": {
-              "title": "Remove Saved Card",
-              "description": "Are you sure you want to remove this card?"
+              "description": "Are you sure you want to remove this card?",
+              "title": "Remove Saved Card"
             },
             "expiry": "Expiry {expiresAt}"
           },
-          "wallets": {
-            "pay": "Pay with browser wallet"
+          "start": "Start Subscription",
+          "subtitle": "Payments by crypto can have slower processing times.",
+          "title": "Payment Details",
+          "wallet": {
+            "connect_wallet": "Connect wallet",
+            "notice": "You can pay your wallet wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
+            "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
+            "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed.",
+            "pay_with_wallet": "Pay with wallet"
+          },
+          "notes": {
+            "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
+            "line_2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
+            "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
           }
         }
-      }
+      },
+      "total": "Total {total}€"
+    },
+    "premium_features": {
+      "features": {
+        "dex_support": {
+          "detail": "See how much you have in each liquidity pool. All your Uniswap and Balancer LP join/exit events are shown along with the total profit/loss per pool.\n\nUniswap and Balancer trades are taken into account in the tax report for premium users.",
+          "title": "Decentralized exchanges"
+        },
+        "graphs_and_statistics": {
+          "detail": "Premium users can visit the graphs/statistics page and get graphs for:\nNet worth over time\nAsset amount and total asset value over time\nBreakdown of total net worth per location\nBreakdown of total net worth per asset",
+          "title": "Graphs and statistics"
+        },
+        "history": {
+          "detail": "Free users have a limit on the number of transactions, deposits, withdrawals and other events they can see and process. Premium users have higher limits.",
+          "title": "Higher limits for trades, transactions, deposits and withdrawals"
+        },
+        "premium_defi": {
+          "detail": " See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocols to be informed via email when certain conditions are met.",
+          "title": "DeFi historical accounting, profit and loss"
+        },
+        "premium_staking": {
+          "detail": "See how much of the token is staked per account.\nWhat is the expected APR.\nHow much of the token you have earned by staking across all accounts.\n\nSee a list of all your staking events with links to the corresponding transactions.",
+          "title": "Advanced staking"
+        }
+      },
+      "subtitle": "Enjoy all the potential that rotki offers.",
+      "title": "Premium features"
+    },
+    "profit_loss_report": {
+      "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols.",
+      "subtitle": "Profit/loss report for all your historical data",
+      "title": "Profit/loss report"
+    },
+    "rotki_offer": "What does {0} offer?",
+    "testimonials": {
+      "detail": "Hear from some of our amazing customers who are using rotki.",
+      "title": "Don’t just take our word for it"
     }
   },
-  "download": {
-    "heading": {
-      "download_rotki": "Download rotki",
-      "description": "Download now and start using across all major Operating Systems"
+  "integration": {
+    "blockchains": {
+      "description": "Connect your blockchain addresses.",
+      "title": "Blockchains"
     },
+    "description": "We support different blockchains, exchanges, and protocols to help you track, account for, and analyze your finances while protecting your privacy.",
+    "exchanges": {
+      "description": "Connect to a big number of centralized exchanges.",
+      "title": "Exchanges"
+    },
+    "header": "Integrations",
+    "no_data_found": "No data found with keyword \"{keyword}\"",
+    "protocols": {
+      "description": "More than {number}+ DeFi protocols are supported.",
+      "title": "Protocols"
+    },
+    "search": "Search",
+    "tabs": {
+      "all": "All"
+    },
+    "title": "Connect your blockchains, connect your exchanges"
+  },
+  "jobs": {
+    "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
+    "header": "We’re looking for talented people",
+    "no_open_roles": "There are no open roles.",
+    "title": "Careers at rotki"
+  },
+  "logout": "Logout",
+  "maintenance": {
+    "description": {
+      "line_one": "Sorry for the inconvenience, but we're performing some maintenance at the moment.",
+      "line_two": "If you need anything, you can always contact us on"
+    },
+    "heading": "We'll be back soon!",
+    "title": "Under maintenance"
+  },
+  "navigation_menu": {
+    "blog": {
+      "description": "Latest news and updates on rotki",
+      "title": "Blog"
+    },
+    "company": "Company",
     "documentation": {
-      "title": "Documentation",
-      "heading": "What are the first steps after installing rotki?",
-      "description": "On our documentation page you have a user guide that will help you introduce yourself and clarify any doubts that may arise during the process.",
-      "action": "View all documentation"
+      "description": "Everything you need to know about the app",
+      "title": "Documentation"
     },
-    "preview": "Preview",
-    "action": "Download",
-    "download_for": "Download for",
-    "latest_release": "Latest Release"
+    "download": "Download",
+    "faq": "FAQ",
+    "home": "Home",
+    "impressum": "Impressum",
+    "integration": {
+      "description": "Supported blockchains, exchanges, and protocols",
+      "title": "Integrations"
+    },
+    "jobs": "Jobs",
+    "legal": "Legal",
+    "premium_features": "Premium Features",
+    "privacy_policy": "Privacy Policy",
+    "product": "Product",
+    "resources": "Resources",
+    "tos": "Terms of Service",
+    "values": "Values"
+  },
+  "not_found": {
+    "description": {
+      "line_one": "You may have mis-typed the URL or the page has been removed.",
+      "line_two": "Actually, there is nothing to see here..."
+    },
+    "title": "Page not found"
+  },
+  "notifications": {
+    "changes_saved": "Your changes have been successfully saved!"
+  },
+  "page_footer": {
+    "all_rights_reseved": "All Rights Reserved.",
+    "download": "Get the app"
+  },
+  "page_header": {
+    "manage_premium": "Manage Premium"
+  },
+  "policies": {
+    "refund": {
+      "accept_message": "You need to accept the refund policy before proceeding",
+      "accept_policy": {
+        "action": "Refunds/Cancellation Policy",
+        "text": "I have read and agreed to the {action}"
+      },
+      "accept_title": "Refund policy",
+      "non_refundable": "refunds are not allowed",
+      "policy": "Rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of Rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
+      "title": "Rotki Refund and Cancellation Policy"
+    }
+  },
+  "products": {
+    "description": "Elevate your financial management with rotki premium, our exclusive subscription offering. Gain access to advanced tools and features designed to enhance the management of your portfolio and investments.",
+    "features": {
+      "analytics": {
+        "asset_amount_and_value": {
+          "description": "Access comprehensive analytics, including net value and asset amount over time for each owned asset.",
+          "title": "Asset tracking"
+        },
+        "distribution_locations": {
+          "description": "View a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks, etc.).",
+          "title": "Value distribution"
+        },
+        "heading": "Enhanced Data Insights",
+        "title": "Graphs & Analytics"
+      },
+      "defi": {
+        "description": "Gain detailed insights into supported DeFi protocols. Analyze your Liquity, Aave, Compound, MakerDAO positions. Understand your Yearn vaults and track your swaps on platforms like Uniswap, Paraswap and more.",
+        "title": "DeFi"
+      },
+      "detailed_graphs": {
+        "description": "Access a wide array of analytics and graphs. Analyze your total net value over time, asset value distributions, and the worth distribution per asset or location.",
+        "title": "Detailed Graphs"
+      },
+      "exclusive_perks": {
+        "description": "Enjoy various perks like dark mode, customizable color layouts, and alerts for your MakerDAO CDP position, notifying you by email when it crosses certain thresholds.",
+        "title": "Exclusive perks"
+      },
+      "higher_limits": {
+        "description": "Say goodbye to limits. With rotki Premium, you can process more trades, transactions, deposits/withdrawals, and historic events. The limits increase with each premium tier, providing greater flexibility and control.",
+        "title": "Higher Limits"
+      },
+      "limits": {
+        "deposits_withdrawals": {
+          "description": "Free users are limited to the 100 most recent exchange deposits/withdrawals. Premium users benefit from higher limits for viewing deposits and withdrawals.",
+          "title": "Deposit/withdrawals"
+        },
+        "heading": "Expanded Capabilities for Premium Users",
+        "history_view": {
+          "description": "Free users have a limit of the 100 most recent events in the history event viewer. As a premium user you have higher limits in the amount of events you can see.",
+          "title": "History view"
+        },
+        "title": "Increased event limits",
+        "trades": {
+          "description": "Free users are limited to the 250 most recent trades. Premium users enjoy higher limits on the number of trades visible.",
+          "title": "Trades"
+        },
+        "user_notes": {
+          "description": "Free users can add up to 10 notes. As a premium user, you have higher limits on the number of notes you can add.",
+          "title": "User notes"
+        }
+      },
+      "monerium_and_backup": {
+        "data_synchronization": {
+          "description": "As a premium user, you can upload your encrypted database to our server, synchronize it across devices, and use it as a backup. Your data remains encrypted with your password, ensuring privacy. Synced databases are automatically deleted one month after your subscription expires.",
+          "title": "Data synchronization"
+        },
+        "heading": "Enrich Transactions and Synchronize Data",
+        "monerium_api_keys": {
+          "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information.",
+          "title": "Monerium API Keys"
+        },
+        "title": "Monerium API Integration and Premium Data Backup"
+      },
+      "staking": {
+        "description": "Track your staking activities across various chains and platforms like ETH, Liquity, Kraken, and more. Get detailed insights on total gains, performance, rewards breakdown, and individual staking events.",
+        "title": "Staking"
+      },
+      "sync_db_with_server": {
+        "description": "Effortlessly back up your data to our cloud and sync or restore it across multiple devices. Your data is encrypted and can only be decrypted with your password, ensuring complete privacy.",
+        "title": "Sync data across multiple machines"
+      },
+      "theme_customization": {
+        "description": "Reduce eye strain, improve text readability, and prolong your device's battery life with dark mode. Personalize the color scheme for both light and dark modes, and customize specific color palettes for the app theme within the settings",
+        "title": "Dark mode & theme customization"
+      },
+      "timeframe": {
+        "description": "Set the timeframe for the dashboard graph. Premium users have access to all options, while free users can choose between only \"2 Weeks\", and \"1 Week\".",
+        "heading": "Enhanced Customization Options",
+        "title": "Timeframe Customization on Dashboard"
+      }
+    },
+    "footer": {
+      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor."
+    },
+    "heading": "Unlock the Full Potential of rotki with Premium Features",
+    "title": "Upgrade rotki today",
+    "unlock": {
+      "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape.",
+      "title": "Unlock Premium Features"
+    }
+  },
+  "recaptcha": {
+    "expired_captcha": "Invalid or expired captcha, please try again"
+  },
+  "selected_plan_overview": {
+    "includes_vat": "(includes {vat}% VAT)",
+    "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
+    "renew_period": "every {months} month | every {months} months",
+    "vat": "({priceInEur}€ + {vat}% VAT)"
+  },
+  "signup_address": {
+    "title": "Address"
   },
   "subscription": {
+    "crypto_payment": {
+      "invalid_chain": "We are expecting payments on {chainName} but found ${actualName}. Change the network and try again.",
+      "not_connected": "No account is connected"
+    },
+    "crypto_success": {
+      "message": "You should receive an e-mail confirming the activation of your subscription in the near future.",
+      "title": "Transaction Pending"
+    },
     "error": {
-      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address.",
-      "payment_failure": "Payment Failure",
+      "auth_failed_3d_secure": "3D Secure authentication failed",
+      "auth_failed_3d_secure_message": "The 3D Secure authentication of your card failed ({status}). Please try a different payment method.",
       "init_error": "Initialization Error",
       "payment_error": "Payment Error",
-      "3d_auth_failed": "3D Secure authentication failed",
-      "3d_auth_failed_message": "The 3D Secure authentication of your card failed ({status}). Please try a different payment method."
+      "payment_failure": "Payment Failure",
+      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
     },
     "progress": {
       "payment_progress": "Payment in progress",
       "payment_progress_message": "Please confirm your transaction...",
       "payment_progress_wait": "Please wait while your payment is processed..."
     },
-    "crypto_success": {
-      "title": "Transaction Pending",
-      "message": "You should receive an e-mail confirming the activation of your subscription in the near future."
-    },
     "success": {
-      "title": "Payment Success",
-      "message": "Your payment was processed successfully. Visit the account management page to manage your account."
-    },
-    "crypto_payment": {
-      "invalid_chain": "We are expecting payments on {chainName} but found ${actualName}. Change the network and try again.",
-      "not_connected": "No account is connected"
+      "message": "Your payment was processed successfully. Visit the account management page to manage your account.",
+      "title": "Payment Success"
     }
   },
-  "selected_plan_overview": {
-    "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
-    "vat": "({priceInEur}€ + {vat}% VAT)",
-    "includes_vat": "(includes {vat}% VAT)",
-    "renew_period": "every {months} month | every {months} months"
-  },
-  "change_plan": {
-    "title": "Change Plan",
-    "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
-    "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to switch the plan"
-  },
-  "navigation_menu": {
-    "home": "Home",
-    "download": "Download",
-    "jobs": "Jobs",
-    "values": "Values",
-    "features": "Features",
-    "premium_features": "Premium Features",
-    "documentation": {
-      "title": "Documentation",
-      "description": "Everything you need to know about the app"
-    },
-    "blog": {
-      "title": "Blog",
-      "description": "Latest news and updates on rotki"
-    },
-    "integration": {
-      "title": "Integrations",
-      "description": "Supported blockchains, exchanges, and protocols"
-    },
-    "resources": "Resources",
-    "product": "Product",
-    "company": "Company",
-    "legal": "Legal",
-    "impressum": "Impressum",
-    "privacy_policy": "Privacy Policy",
-    "tos": "Terms of Service",
-    "faq": "FAQ"
-  },
-  "page_footer": {
-    "download": "Get the app"
-  },
-  "page_header": {
-    "manage_premium": "Manage Premium"
-  },
-  "jobs": {
-    "title": "Careers at rotki",
-    "header": "We’re looking for talented people",
-    "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
-    "no_open_roles": "There are no open roles."
-  },
-  "country_select": {
-    "no_data": "No matching countries found"
-  },
-  "logout": "Logout",
   "values": {
-    "title": "Nice to meet you",
-    "subtitle": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
-    "values_section": {
-      "title": "Values",
-      "description": "We are driven by a set of core values that guide our every action and decision. Our commitment to these values is what sets us apart and ensures that our users receive the utmost quality and service.",
-      "list": {
-        "1": {
-          "title": "We are:",
-          "value": "a team of dedicated builders driven by our love for what we create. Our passion lies in developing applications that bring tangible value to our users. We believe in the power of open-source development, as it enables transparency, audibility, and the provision of user guarantees."
-        },
-        "2": {
-          "title": "We build:",
-          "value": "- {open_source}: Because that's the only way to create transparent applications that can be audited and provide users with guarantees.\n- {local_first}: Building local applications that store all data locally is the only way to guarantee data privacy and true ownership. Nobody can deny access to the app or the data to the user if it's a local application.",
-          "open_source": "Open-source",
-          "local_first": "Local-first"
-        },
-        "3": {
-          "title": "We welcome:",
-          "value": "external open-source contributors who understand our mission and utilise our product themselves, driven by the desire to help it reach its maximum potential.\n\nOur team can independently shoulder their responsibilities, taking ownership of their work. We value teamwork and collaboration, emphasising the importance of collective effort rather than individual stardom."
-        }
-      }
-    },
-    "vision_section": {
-      "title": "Vision",
-      "description": "rotki is the portfolio tracking, management and accounting tool for your finances. The one-stop app for viewing and managing your finances. rotki aspires to: ",
-      "list": {
-        "1": "Be the one place to track your entire portfolio across on-chain crypto, banks, stocks, trades and more.",
-        "2": "Allow you to manage your finances, perform trades across CEXes, on-chain swaps, and other brokers from one interface.",
-        "3": "Create monthly/quarterly/yearly reports covering assets across all mentioned locations.",
-        "4": "A modular system that many contributors outside our team can extend. For example, if someone wants to integrate tax accounting rules for a specific jurisdiction, they are experts on or integrate a chain they know of."
-      }
-    },
     "contact_section": {
-      "title": "Contact us",
-      "header": "Get in touch",
-      "subtitle": "For media inquiries or additional information about Rotki, please reach out to:",
-      "email": {
-        "description": "We’re here to help."
-      },
-      "twitter": {
-        "description": "See our daily updates."
-      },
       "discord": {
         "description": "Chat with us."
       },
+      "email": {
+        "description": "We’re here to help."
+      },
       "github": {
         "description": "Contribute code/issues."
+      },
+      "header": "Get in touch",
+      "subtitle": "For media inquiries or additional information about Rotki, please reach out to:",
+      "title": "Contact us",
+      "twitter": {
+        "description": "See our daily updates."
       }
+    },
+    "subtitle": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
+    "title": "Nice to meet you",
+    "values_section": {
+      "description": "We are driven by a set of core values that guide our every action and decision. Our commitment to these values is what sets us apart and ensures that our users receive the utmost quality and service.",
+      "list": {
+        "line_1": {
+          "title": "We are:",
+          "value": "a team of dedicated builders driven by our love for what we create. Our passion lies in developing applications that bring tangible value to our users. We believe in the power of open-source development, as it enables transparency, audibility, and the provision of user guarantees."
+        },
+        "line_2": {
+          "local_first": "Local-first",
+          "open_source": "Open-source",
+          "title": "We build:",
+          "value": "- {open_source}: Because that's the only way to create transparent applications that can be audited and provide users with guarantees.\n- {local_first}: Building local applications that store all data locally is the only way to guarantee data privacy and true ownership. Nobody can deny access to the app or the data to the user if it's a local application."
+        },
+        "line_3": {
+          "title": "We welcome:",
+          "value": "external open-source contributors who understand our mission and utilise our product themselves, driven by the desire to help it reach its maximum potential.\n\nOur team can independently shoulder their responsibilities, taking ownership of their work. We value teamwork and collaboration, emphasising the importance of collective effort rather than individual stardom."
+        }
+      },
+      "title": "Values"
+    },
+    "vision_section": {
+      "description": "rotki is the portfolio tracking, management and accounting tool for your finances. The one-stop app for viewing and managing your finances. rotki aspires to: ",
+      "list": {
+        "line_1": "Be the one place to track your entire portfolio across on-chain crypto, banks, stocks, trades and more.",
+        "line_2": "Allow you to manage your finances, perform trades across CEXes, on-chain swaps, and other brokers from one interface.",
+        "line_3": "Create monthly/quarterly/yearly reports covering assets across all mentioned locations.",
+        "line_4": "A modular system that many contributors outside our team can extend. For example, if someone wants to integrate tax accounting rules for a specific jurisdiction, they are experts on or integrate a chain they know of."
+      },
+      "title": "Vision"
     }
-  },
-  "notifications": {
-    "changes_saved": "Your changes have been successfully saved!"
-  },
-  "policies": {
-    "refund": {
-      "title": "Rotki Refund and Cancellation Policy",
-      "non_refundable": "refunds are not allowed",
-      "policy": "Rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of Rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
-      "accept_title": "Refund policy",
-      "accept_message": "You need to accept the refund policy before proceeding",
-      "accept_policy": {
-        "text": "I have read and agreed to the {action}",
-        "action": "Refunds/Cancellation Policy"
-      }
-    }
-  },
-  "integration": {
-    "header": "Integrations",
-    "title": "Connect your blockchains, connect your exchanges",
-    "description": "We support different blockchains, exchanges, and protocols to help you track, account for, and analyze your finances while protecting your privacy.",
-    "tabs": {
-      "all": "All"
-    },
-    "search": "Search",
-    "blockchains": {
-      "title": "Blockchains",
-      "description": "Connect your blockchain addresses."
-    },
-    "exchanges": {
-      "title": "Exchanges",
-      "description": "Connect to a big number of centralized exchanges."
-    },
-    "protocols": {
-      "title": "Protocols",
-      "description": "More than {number}+ DeFi protocols are supported."
-    },
-    "no_data_found": "No data found with keyword \"{keyword}\""
   }
 }

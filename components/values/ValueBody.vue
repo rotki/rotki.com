@@ -22,52 +22,43 @@ const { t } = useI18n();
         </div>
       </div>
       <div class="border-t border-rui-grey-300 self-center" />
-      <ValueBodyItem>
-        <template #number>
-          01
-        </template>
+      <ValueBodyItem number="01">
         <template #title>
-          {{ t('values.values_section.list.1.title') }}
+          {{ t('values.values_section.list.line_1.title') }}
         </template>
         <template #values>
-          {{ t('values.values_section.list.1.value') }}
+          {{ t('values.values_section.list.line_1.value') }}
         </template>
       </ValueBodyItem>
-      <ValueBodyItem>
-        <template #number>
-          02
-        </template>
+      <ValueBodyItem number="02">
         <template #title>
-          {{ t('values.values_section.list.2.title') }}
+          {{ t('values.values_section.list.line_2.title') }}
         </template>
         <template #values>
           <i18n-t
-            keypath="values.values_section.list.2.value"
+            keypath="values.values_section.list.line_2.value"
             scope="global"
           >
             <template #open_source>
               <strong>
-                {{ t('values.values_section.list.2.open_source') }}
+                {{ t('values.values_section.list.line_2.open_source') }}
               </strong>
             </template>
             <template #local_first>
               <strong>
-                {{ t('values.values_section.list.2.local_first') }}
+                {{ t('values.values_section.list.line_2.local_first') }}
               </strong>
             </template>
           </i18n-t>
         </template>
       </ValueBodyItem>
       <div class="hidden md:block border-t border-rui-grey-300 self-center" />
-      <ValueBodyItem>
-        <template #number>
-          03
-        </template>
+      <ValueBodyItem number="03">
         <template #title>
-          {{ t('values.values_section.list.3.title') }}
+          {{ t('values.values_section.list.line_3.title') }}
         </template>
         <template #values>
-          {{ t('values.values_section.list.3.value') }}
+          {{ t('values.values_section.list.line_3.value') }}
         </template>
       </ValueBodyItem>
     </div>

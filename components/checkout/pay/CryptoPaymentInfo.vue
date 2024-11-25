@@ -1,12 +1,17 @@
 <script setup lang="ts">
 const { t } = useI18n();
+const notes = [
+  t(`home.plans.tiers.step_3.notes.line_1`),
+  t(`home.plans.tiers.step_3.notes.line_2`),
+  t(`home.plans.tiers.step_3.notes.line_3`),
+];
 const css = useCssModule();
 </script>
 
 <template>
   <div :class="css.container">
     <div
-      v-for="i in 3"
+      v-for="(note, i) in notes"
       :key="i"
       :class="css.row"
     >
@@ -19,7 +24,7 @@ const css = useCssModule();
         </RuiChip>
       </div>
       <div :class="css.description">
-        {{ t(`home.plans.tiers.step_3.notes.${i}`) }}
+        {{ note }}
       </div>
     </div>
   </div>

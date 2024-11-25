@@ -34,7 +34,7 @@ export const getChainId = (testing: boolean, chainId?: string | number) => Numbe
 const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
 const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base];
 
-export function useWeb3Payment(data: Ref<CryptoPayment | null>) {
+export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
   const { markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
   const error = ref('');

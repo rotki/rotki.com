@@ -1,3 +1,7 @@
+<script lang="ts" setup>
+const message = 'OK';
+</script>
+
 <template>
-  <div>OK</div>
+  <div> {{ message }} </div>
 </template>
