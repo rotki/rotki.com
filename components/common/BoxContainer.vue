@@ -2,7 +2,6 @@
 function stop(event: any) {
   event.stopPropagation();
 }
-const slots = useSlots();
 </script>
 
 <template>
@@ -11,7 +10,7 @@ const slots = useSlots();
     @click="stop($event)"
   >
     <div
-      v-if="slots.label"
+      v-if="$slots.label"
       :class="$style.label"
     >
       <slot name="label" />

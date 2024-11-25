@@ -1,18 +1,13 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    wide?: boolean;
-    centerVertically?: boolean;
-    centerHorizontally?: boolean;
-  }>(),
-  {
-    wide: false,
-    centerHorizontally: true,
-    centerVertically: true,
-  },
-);
-
-const slots = useSlots();
+withDefaults(defineProps<{
+  wide?: boolean;
+  centerVertically?: boolean;
+  centerHorizontally?: boolean;
+}>(), {
+  wide: false,
+  centerHorizontally: true,
+  centerVertically: true,
+});
 </script>
 
 <template>
@@ -34,7 +29,7 @@ const slots = useSlots();
         }"
       >
         <h4
-          v-if="slots.title"
+          v-if="$slots.title"
           class="text-h4 text-rui-text text-center mb-4"
         >
           <slot name="title" />
@@ -44,7 +39,7 @@ const slots = useSlots();
     </div>
 
     <div
-      v-if="slots.hint"
+      v-if="$slots.hint"
       :class="$style.hint"
     >
       <slot name="hint" />

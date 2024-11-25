@@ -20,8 +20,6 @@ const emit = defineEmits<{
   (e: 'dismiss'): void;
 }>();
 
-const slots = useSlots();
-
 const { timeout, visible } = toRefs(props);
 
 const { stop, start, isPending } = useTimeoutFn(
@@ -58,7 +56,7 @@ watch(visible, (show) => {
         @close="dismiss()"
       >
         <template
-          v-if="slots.title"
+          v-if="$slots.title"
           #title
         >
           <slot name="title" />

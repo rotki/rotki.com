@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import Default from '~/layouts/default.vue';
 
-const slots = useSlots();
-
 const { t } = useI18n();
 </script>
 
@@ -24,7 +22,7 @@ const { t } = useI18n();
             <slot name="title" />
           </div>
           <div
-            v-if="slots.description"
+            v-if="$slots.description"
             class="mt-5 body-1"
           >
             <slot name="description" />

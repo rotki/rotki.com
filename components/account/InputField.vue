@@ -57,8 +57,6 @@ const isEmpty = computed(() => {
 
 const blur = () => emit('blur');
 const enter = () => emit('enter');
-
-const slots = useSlots();
 </script>
 
 <template>
@@ -67,12 +65,12 @@ const slots = useSlots();
       :class="{
         [$style.field]: true,
         [$style.filled]: filled,
-        [$style['only-text']]: !slots.prepend,
+        [$style['only-text']]: !$slots.prepend,
       }"
     >
       <div :class="$style.slot">
         <slot
-          v-if="slots.prepend"
+          v-if="$slots.prepend"
           name="prepend"
         />
         <div :class="$style.inputContainer">
