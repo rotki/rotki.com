@@ -3,17 +3,16 @@ function stop(event: any) {
   event.stopPropagation();
 }
 const slots = useSlots();
-const css = useCssModule();
 </script>
 
 <template>
   <div
-    :class="css.box"
+    :class="$style.box"
     @click="stop($event)"
   >
     <div
       v-if="slots.label"
-      :class="css.label"
+      :class="$style.label"
     >
       <slot name="label" />
     </div>

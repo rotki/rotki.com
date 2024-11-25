@@ -14,23 +14,21 @@ const emit = defineEmits<{ (e: 'click'): void }>();
 function click() {
   emit('click');
 }
-
-const css = useCssModule();
 </script>
 
 <template>
   <button
     :class="{
-      [css.button]: true,
-      [css.selected]: selected,
+      [$style.button]: true,
+      [$style.selected]: selected,
     }"
     :disabled="disabled"
     @click="click()"
   >
     <span
       :class="{
-        [css.text]: true,
-        [css.selected]: selected,
+        [$style.text]: true,
+        [$style.selected]: selected,
       }"
     >
       <slot />

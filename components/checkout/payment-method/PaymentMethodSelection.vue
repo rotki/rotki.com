@@ -19,7 +19,7 @@ interface PaymentMethodItem {
 }
 
 const store = useMainStore();
-const css = useCssModule();
+
 const { plan } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
 
@@ -111,13 +111,13 @@ function select(m: PaymentMethod) {
 </script>
 
 <template>
-  <div :class="css.content">
+  <div :class="$style.content">
     <CheckoutTitle>{{ t('home.plans.tiers.step_2.title') }}</CheckoutTitle>
     <CheckoutDescription>
       {{ t('home.plans.tiers.step_2.subtitle') }}
     </CheckoutDescription>
-    <div :class="css.wrapper">
-      <div :class="css.methods">
+    <div :class="$style.wrapper">
+      <div :class="$style.methods">
         <PaymentMethodItem
           v-for="item in paymentMethods"
           :key="item.id"
@@ -134,7 +134,7 @@ function select(m: PaymentMethod) {
         </PaymentMethodItem>
       </div>
     </div>
-    <div :class="css.buttons">
+    <div :class="$style.buttons">
       <RuiButton
         :disabled="processing"
         class="w-full"

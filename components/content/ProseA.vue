@@ -11,13 +11,11 @@ withDefaults(
     rel: undefined,
   },
 );
-
-const css = useCssModule();
 </script>
 
 <template>
   <NuxtLink
-    :class="css.link"
+    :class="$style.link"
     :href="href"
     :target="target"
     :rel="rel"

@@ -2,11 +2,10 @@
 defineProps<{
   selected: boolean;
 }>();
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.mark">
+  <div :class="$style.mark">
     <RuiBadge
       :model-value="selected"
       color="primary"

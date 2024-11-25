@@ -5,25 +5,24 @@ const notes = [
   t(`home.plans.tiers.step_3.notes.line_2`),
   t(`home.plans.tiers.step_3.notes.line_3`),
 ];
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.container">
+  <div :class="$style.container">
     <div
       v-for="(note, i) in notes"
       :key="i"
-      :class="css.row"
+      :class="$style.row"
     >
       <div>
         <RuiChip
           color="primary"
           size="sm"
         >
-          <span :class="css.point">{{ i }}</span>
+          <span :class="$style.point">{{ i }}</span>
         </RuiChip>
       </div>
-      <div :class="css.description">
+      <div :class="$style.description">
         {{ note }}
       </div>
     </div>

@@ -50,12 +50,10 @@ function next() {
 }
 
 const canBuy = reactive(canBuyNewSubscription)(account);
-
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.container">
+  <div :class="$style.container">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
@@ -66,8 +64,8 @@ const css = useCssModule();
       </span>
     </CheckoutDescription>
 
-    <div :class="css.selection">
-      <div :class="css.selectable">
+    <div :class="$style.selection">
+      <div :class="$style.selectable">
         <SelectablePlan
           v-for="plan in plans"
           :key="plan.months"
@@ -80,28 +78,28 @@ const css = useCssModule();
 
       <div
         v-if="selected"
-        :class="css.hint"
+        :class="$style.hint"
       >
         {{ t('home.plans.tiers.step_1.crypto_hint', { cryptoPrice }) }}
       </div>
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
-      <div :class="css.notes">
+      <div :class="$style.notes">
         <div
           v-for="(line, i) in notes"
           :key="i"
-          :class="css.note"
+          :class="$style.note"
         >
           <RuiIcon
-            :class="css.note__icon"
+            :class="$style.note__icon"
             name="arrow-right-circle-line"
           />
           <p>{{ line }}</p>
         </div>
       </div>
 
-      <div :class="css.continue">
+      <div :class="$style.continue">
         <RuiButton
           :disabled="!selected || !canBuy"
           :loading="processing"

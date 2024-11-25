@@ -2,19 +2,17 @@
 defineProps<{ selected: boolean }>();
 
 const emit = defineEmits<{ (e: 'click'): void }>();
-
-const css = useCssModule();
 </script>
 
 <template>
   <div
-    :class="[css.content, { [css.selected]: selected }]"
+    :class="[$style.content, { [$style.selected]: selected }]"
     @click="emit('click')"
   >
-    <div :class="css.icon">
+    <div :class="$style.icon">
       <slot />
     </div>
-    <div :class="css.text">
+    <div :class="$style.text">
       <slot name="label" />
     </div>
     <RuiRadio

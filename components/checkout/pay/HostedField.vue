@@ -19,7 +19,6 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{ (e: 'click'): void }>();
-const css = useCssModule();
 
 const { disabled, id, label } = toRefs(props);
 
@@ -29,14 +28,14 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
 <template>
   <div
     :class="[
-      css.wrapper,
-      css.outlined,
+      $style.wrapper,
+      $style.outlined,
       {
-        [css.dense]: dense,
-        [css['with-error']]: !valid,
-        [css['no-label']]: !label,
-        [css.number]: number,
-        [css.disabled]: disabled,
+        [$style.dense]: dense,
+        [$style['with-error']]: !valid,
+        [$style['no-label']]: !label,
+        [$style.number]: number,
+        [$style.disabled]: disabled,
       },
     ]"
     @click.stop.prevent="!disabled ? emit('click') : null"
@@ -44,7 +43,7 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
     <div class="flex items-center shrink-0">
       <div
         v-if="number"
-        :class="[css.icon, css.prepend]"
+        :class="[$style.icon, $style.prepend]"
       >
         <RuiIcon name="bank-card-line" />
       </div>
@@ -52,15 +51,15 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
     <div class="flex flex-1 overflow-hidden">
       <div
         :id="id"
-        :class="[css.input, { [css.empty]: empty, [css.focused]: focused }]"
+        :class="[$style.input, { [$style.empty]: empty, [$style.focused]: focused }]"
       />
       <label
-        :class="css.label"
+        :class="$style.label"
         :for="id"
       >
         {{ label }}
       </label>
-      <fieldset :class="css.fieldset">
+      <fieldset :class="$style.fieldset">
         <legend />
       </fieldset>
     </div>

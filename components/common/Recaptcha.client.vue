@@ -20,8 +20,6 @@ const emit = defineEmits<{
   (e: 'captcha-id', value: number): void;
 }>();
 
-const css = useCssModule();
-
 const {
   public: {
     recaptcha: { siteKey },
@@ -80,15 +78,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div :class="$style.wrapper">
     <div
       ref="recaptchaEl"
-      :class="css.recaptcha"
+      :class="$style.recaptcha"
     />
 
     <p
       v-if="invalid"
-      :class="css.error"
+      :class="$style.error"
     >
       {{ t('recaptcha.expired_captcha') }}
     </p>

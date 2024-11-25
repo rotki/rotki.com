@@ -2,7 +2,7 @@
 defineProps<{ modelValue: boolean; disabled?: boolean }>();
 
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
-const css = useCssModule();
+
 const { t } = useI18n();
 </script>
 
@@ -24,7 +24,7 @@ const { t } = useI18n();
           to="/refund-policy"
           color="primary"
           tag="span"
-          :class="css.link"
+          :class="$style.link"
           external
           target="_blank"
         >

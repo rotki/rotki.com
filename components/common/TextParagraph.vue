@@ -7,15 +7,13 @@ withDefaults(
     small: false,
   },
 );
-
-const css = useCssModule();
 </script>
 
 <template>
   <div
     :class="{
-      [css.text]: true,
-      [css.small]: small,
+      [$style.text]: true,
+      [$style.small]: small,
     }"
   >
     <slot />

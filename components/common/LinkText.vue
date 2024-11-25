@@ -1,10 +1,6 @@
-<script setup lang="ts">
-const css = useCssModule();
-</script>
-
 <template>
-  <div :class="css.column">
-    <div :class="css.link">
+  <div :class="$style.column">
+    <div :class="$style.link">
       <slot />
     </div>
   </div>

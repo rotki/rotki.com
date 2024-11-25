@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
 
-const css = useCssModule();
-
 const headerRef = ref<HTMLDivElement>();
 const footerRef = ref<HTMLDivElement>();
 
@@ -20,7 +18,7 @@ provide('otherHeight', otherHeight);
   <div ref="headerRef">
     <PageHeader />
   </div>
-  <div :class="css.body">
+  <div :class="$style.body">
     <slot />
   </div>
   <div ref="footerRef">

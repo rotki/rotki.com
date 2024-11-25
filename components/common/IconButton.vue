@@ -20,15 +20,13 @@ function click() {
 
   emit('click');
 }
-
-const css = useCssModule();
 </script>
 
 <template>
   <div
     :class="{
-      [css.btn]: true,
-      [css.disabled]: disabled,
+      [$style.btn]: true,
+      [$style.disabled]: disabled,
     }"
     @click="click()"
   >

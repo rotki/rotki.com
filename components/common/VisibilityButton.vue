@@ -24,15 +24,13 @@ function toggle() {
 
   emit('update:modelValue', !props.modelValue);
 }
-
-const css = useCssModule();
 </script>
 
 <template>
-  <InfoTooltip :class="css.tooltip">
+  <InfoTooltip :class="$style.tooltip">
     <template #activator>
       <button
-        :class="css.button"
+        :class="$style.button"
         :disabled="disabled"
         @click="toggle()"
       >

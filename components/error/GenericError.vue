@@ -4,14 +4,13 @@ defineProps<{ statusCode: number; title: string }>();
 const emit = defineEmits<{ (e: 'handle-error'): void }>();
 
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
-  <h1 :class="css.title">
+  <h1 :class="$style.title">
     {{ statusCode }}
   </h1>
-  <p :class="css.subtitle">
+  <p :class="$style.subtitle">
     {{ title }}
   </p>
 

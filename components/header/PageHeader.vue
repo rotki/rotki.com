@@ -23,14 +23,12 @@ watch(
     set(menuOpened, false);
   },
 );
-
-const css = useCssModule();
 </script>
 
 <template>
   <div class="py-4 md:py-6 border-b border-rui-grey-200">
     <div class="container">
-      <div :class="css['mobile-header']">
+      <div :class="$style['mobile-header']">
         <NuxtLink to="/">
           <AppLogo text />
         </NuxtLink>
@@ -46,7 +44,7 @@ const css = useCssModule();
         </div>
       </div>
       <div
-        :class="[css.overlay, { [css.overlay__closed]: !menuOpened }]"
+        :class="[$style.overlay, { [$style.overlay__closed]: !menuOpened }]"
         @click="menuOpened = false"
       >
         <RuiButton icon>
@@ -56,17 +54,17 @@ const css = useCssModule();
           />
         </RuiButton>
       </div>
-      <div :class="[css.wrapper, { [css.wrapper__closed]: !menuOpened }]">
+      <div :class="[$style.wrapper, { [$style.wrapper__closed]: !menuOpened }]">
         <NuxtLink
           to="/"
-          :class="css.logo"
+          :class="$style.logo"
         >
           <AppLogo text />
         </NuxtLink>
 
-        <NavigationMenu :class="css.navigation" />
+        <NavigationMenu :class="$style.navigation" />
 
-        <div :class="css.auth">
+        <div :class="$style.auth">
           <NuxtLink to="/home/subscription">
             <RuiButton
               rounded

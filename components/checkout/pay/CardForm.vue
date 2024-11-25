@@ -42,7 +42,6 @@ function updateInitializing(valid: boolean) {
 }
 
 const { client, processing } = toRefs(props);
-const css = useCssModule();
 
 const defaultStatus: FieldStatus = {
   valid: false,
@@ -286,10 +285,10 @@ defineExpose({ submit });
 </script>
 
 <template>
-  <div :class="css.inputs">
+  <div :class="$style.inputs">
     <HostedField
       id="card-number"
-      :class="css.number"
+      :class="$style.number"
       :empty="empty.number"
       :disabled="disabled"
       :focused="focused === 'number'"
@@ -300,7 +299,7 @@ defineExpose({ submit });
     />
     <HostedField
       id="expiration"
-      :class="css.expiration"
+      :class="$style.expiration"
       :empty="empty.expirationDate"
       :disabled="disabled"
       :focused="focused === 'expirationDate'"
@@ -310,7 +309,7 @@ defineExpose({ submit });
     />
     <HostedField
       id="cvv"
-      :class="css.cvv"
+      :class="$style.cvv"
       :empty="empty.cvv"
       :disabled="disabled"
       :focused="focused === 'cvv'"

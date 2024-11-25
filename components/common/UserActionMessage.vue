@@ -1,10 +1,6 @@
-<script setup lang="ts">
-const css = useCssModule();
-</script>
-
 <template>
-  <div :class="css.body">
-    <p :class="css.header">
+  <div :class="$style.body">
+    <p :class="$style.header">
       <slot name="header" />
     </p>
     <slot />

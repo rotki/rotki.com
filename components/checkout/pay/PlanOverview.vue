@@ -1,18 +1,17 @@
 <script setup lang="ts">
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.content">
+  <div :class="$style.content">
     <RuiCard>
       <div class="flex gap-4">
         <div class="flex flex-col">
-          <div :class="css.title">
+          <div :class="$style.title">
             {{ t('home.plans.tiers.step_3.chose') }}
           </div>
-          <div :class="css.body">
-            <div :class="css.description">
+          <div :class="$style.body">
+            <div :class="$style.description">
               <slot />
             </div>
             <slot name="body" />

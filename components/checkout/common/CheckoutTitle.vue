@@ -1,9 +1,5 @@
-<script setup lang="ts">
-const css = useCssModule();
-</script>
-
 <template>
-  <h4 :class="css.title">
+  <h4 :class="$style.title">
     <slot />
   </h4>
 </template>

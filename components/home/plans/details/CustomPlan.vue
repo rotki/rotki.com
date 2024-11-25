@@ -1,31 +1,30 @@
 <script setup lang="ts">
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
   <div>
-    <div :class="css.space">
+    <div :class="$style.space">
       <img
-        :class="css.image"
+        :class="$style.image"
         alt="rotki in Space"
         src="/img/space.svg"
       />
     </div>
-    <div :class="css.row">
+    <div :class="$style.row">
       <div
-        :class="css.wrapper"
+        :class="$style.wrapper"
         class="container"
       >
-        <div :class="css.row">
-          <div :class="css.column2">
-            <div :class="css.title">
+        <div :class="$style.row">
+          <div :class="$style.column2">
+            <div :class="$style.title">
               {{ t('home.plans.details.custom.title') }}
             </div>
-            <div :class="css.description">
+            <div :class="$style.description">
               {{ t('home.plans.details.custom.subtitle') }}
             </div>
-            <div :class="css.button">
+            <div :class="$style.button">
               <RuiButton
                 variant="outlined"
                 size="lg"

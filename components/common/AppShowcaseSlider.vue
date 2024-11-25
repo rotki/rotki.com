@@ -5,8 +5,6 @@ import { SwiperSlide } from 'swiper/vue';
 import { get, set } from '@vueuse/core';
 import type { Swiper } from 'swiper/types';
 
-const css = useCssModule();
-
 const swiper = ref<Swiper>();
 const pages = ref(get(swiper)?.snapGrid.length ?? 1);
 const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
@@ -36,7 +34,7 @@ scanImages();
 
 <template>
   <div
-    :class="css.container"
+    :class="$style.container"
     class="container"
   >
     <Carousel
@@ -46,7 +44,7 @@ scanImages();
         pauseOnMouseEnter: true,
       }"
       auto-height
-      :class="css.slider"
+      :class="$style.slider"
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
     >
@@ -64,7 +62,7 @@ scanImages();
       </SwiperSlide>
     </Carousel>
     <div class="container relative !px-0">
-      <div :class="css.controls">
+      <div :class="$style.controls">
         <CarouselControls
           v-if="swiper"
           v-model:swiper="swiper"
@@ -72,7 +70,7 @@ scanImages();
           :pages="pages"
           arrow-buttons
         />
-        <div :class="css.thumbnail">
+        <div :class="$style.thumbnail">
           <slot />
         </div>
       </div>

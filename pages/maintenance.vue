@@ -24,17 +24,16 @@ const { t } = useI18n();
 if (!maintenance)
   navigateTo('/');
 
-const css = useCssModule();
 const otherHeight = inject('otherHeight', 0);
 </script>
 
 <template>
   <div
     class="container"
-    :class="[css.wrapper]"
+    :class="[$style.wrapper]"
   >
     <img
-      :class="css.image"
+      :class="$style.image"
       alt="rotki maintenance"
       src="/img/maintenance.svg"
     />
@@ -44,16 +43,16 @@ const otherHeight = inject('otherHeight', 0);
         {{ t('maintenance.title') }}
       </h6>
 
-      <h3 :class="css.heading">
+      <h3 :class="$style.heading">
         {{ t('maintenance.heading') }}
       </h3>
 
-      <p :class="css.description">
+      <p :class="$style.description">
         {{ t('maintenance.description.line_one') }}
         <br />
         {{ t('maintenance.description.line_two') }}
         <a
-          :class="css.link"
+          :class="$style.link"
           :href="emailMailto"
           target="_blank"
         >

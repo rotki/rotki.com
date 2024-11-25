@@ -20,8 +20,6 @@ const emit = defineEmits<{ (e: 'update:swiper', value: Swiper): void }>();
 
 const { swiper } = toRefs(props);
 
-const css = useCssModule();
-
 function onNavigate(index: number) {
   const s = get(swiper);
 
@@ -35,7 +33,7 @@ function onNavigate(index: number) {
 
 <template>
   <RuiFooterStepper
-    :class="css.controls"
+    :class="$style.controls"
     :model-value="activeIndex"
     :pages="pages"
     :arrow-buttons="arrowButtons"

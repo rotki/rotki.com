@@ -1,9 +1,5 @@
-<script setup lang="ts">
-const css = useCssModule();
-</script>
-
 <template>
-  <div :class="css.description">
+  <div :class="$style.description">
     <slot />
   </div>
 </template>

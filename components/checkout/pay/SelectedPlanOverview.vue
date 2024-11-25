@@ -57,12 +57,11 @@ function switchTo(months: number) {
 }
 
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
   <PlanOverview>
-    <span :class="css.plan">{{ name }}</span>
+    <span :class="$style.plan">{{ name }}</span>
     <i18n-t
       keypath="selected_plan_overview.plan"
       scope="global"
@@ -100,7 +99,7 @@ const css = useCssModule();
 
     <template #action>
       <RuiButton
-        :class="css.change"
+        :class="$style.change"
         :disabled="disabled"
         color="primary"
         variant="text"

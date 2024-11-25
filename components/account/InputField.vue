@@ -58,34 +58,33 @@ const isEmpty = computed(() => {
 const blur = () => emit('blur');
 const enter = () => emit('enter');
 
-const css = useCssModule();
 const slots = useSlots();
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div :class="$style.wrapper">
     <div
       :class="{
-        [css.field]: true,
-        [css.filled]: filled,
-        [css['only-text']]: !slots.prepend,
+        [$style.field]: true,
+        [$style.filled]: filled,
+        [$style['only-text']]: !slots.prepend,
       }"
     >
-      <div :class="css.slot">
+      <div :class="$style.slot">
         <slot
           v-if="slots.prepend"
           name="prepend"
         />
-        <div :class="css.inputContainer">
+        <div :class="$style.inputContainer">
           <input
             :id="id"
             ref="inputField"
             :aria-describedby="`${id}-error`"
             :class="{
-              [css.input]: true,
-              [css.inputText]: true,
-              [css.filled]: filled,
-              [css.empty]: isEmpty,
+              [$style.input]: true,
+              [$style.inputText]: true,
+              [$style.filled]: filled,
+              [$style.empty]: isEmpty,
             }"
             :disabled="disabled"
             :placeholder="placeholder"
@@ -99,7 +98,7 @@ const slots = useSlots();
           />
           <label
             v-if="label"
-            :class="css.label"
+            :class="$style.label"
             :for="id"
           >
             {{ label }}
@@ -115,14 +114,14 @@ const slots = useSlots();
     <span
       v-if="errorMessages && errorMessages.length > 0"
       :id="`${id}-error`"
-      :class="css.error"
+      :class="$style.error"
     >
       {{ errorMessages[0].$message }}
     </span>
 
     <span
       v-else
-      :class="css.caption"
+      :class="$style.caption"
     >
       <slot name="hint">{{ hint }}</slot>
     </span>

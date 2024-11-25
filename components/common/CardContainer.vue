@@ -2,15 +2,13 @@
 withDefaults(defineProps<{ warning?: boolean }>(), {
   warning: false,
 });
-
-const css = useCssModule();
 </script>
 
 <template>
   <div
     :class="{
-      [css.card]: true,
-      [css.warning]: warning,
+      [$style.card]: true,
+      [$style.warning]: warning,
     }"
   >
     <slot />

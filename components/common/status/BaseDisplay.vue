@@ -8,28 +8,26 @@ defineProps<{
 const _statuses = ['success', 'error', 'neutral'] as const;
 
 type Status = (typeof _statuses)[number];
-
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.container">
-    <div :class="css.wrapper">
+  <div :class="$style.container">
+    <div :class="$style.wrapper">
       <div
         :class="{
-          [css.header]: true,
-          [css.error]: status === 'error',
-          [css.success]: status === 'success',
-          [css.neutral]: status === 'neutral',
+          [$style.header]: true,
+          [$style.error]: status === 'error',
+          [$style.success]: status === 'success',
+          [$style.neutral]: status === 'neutral',
         }"
       >
         <slot name="icon" />
       </div>
-      <div :class="css.body">
-        <div :class="css.title">
+      <div :class="$style.body">
+        <div :class="$style.title">
           {{ title }}
         </div>
-        <div :class="css.message">
+        <div :class="$style.message">
           {{ message }}
         </div>
         <slot />

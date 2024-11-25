@@ -45,13 +45,12 @@ onBeforeMount(async () => {
   await store.getPlans();
   await cryptoStore.fetchPaymentAssets();
 });
-const css = useCssModule();
 
 const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
 </script>
 
 <template>
-  <div :class="css.content">
+  <div :class="$style.content">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_3.title') }}
     </CheckoutTitle>
@@ -63,10 +62,10 @@ const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
     <CryptoAssetSelector v-model="currency" />
     <AcceptRefundPolicy
       v-model="acceptRefundPolicy"
-      :class="css.policy"
+      :class="$style.policy"
       :disabled="processing"
     />
-    <div :class="css.buttons">
+    <div :class="$style.buttons">
       <RuiButton
         v-if="!subscriptionId"
         :disabled="processing"

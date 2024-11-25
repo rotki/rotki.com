@@ -8,7 +8,6 @@ defineProps<{
   testimonials: TestimonialMarkdownContent[];
 }>();
 
-const css = useCssModule();
 const swiper = ref<Swiper>();
 const pages = ref(get(swiper)?.snapGrid.length ?? 1);
 const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
@@ -48,7 +47,7 @@ function onSwiperUpdate(s: Swiper) {
 </script>
 
 <template>
-  <div :class="css.content">
+  <div :class="$style.content">
     <Carousel
       :autoplay="{
         delay: 10000,
@@ -56,7 +55,7 @@ function onSwiperUpdate(s: Swiper) {
         pauseOnMouseEnter: true,
       }"
       :breakpoints="breakpoints"
-      :class="css.slider"
+      :class="$style.slider"
       auto-height
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
@@ -71,7 +70,7 @@ function onSwiperUpdate(s: Swiper) {
     <CarouselControls
       v-if="swiper"
       v-model:swiper="swiper"
-      :class="css.stepper"
+      :class="$style.stepper"
       :active-index="activeIndex"
       :pages="pages"
     />

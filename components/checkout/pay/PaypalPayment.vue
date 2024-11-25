@@ -170,8 +170,6 @@ onMounted(async () => {
 onUnmounted(async () => {
   await btClient?.teardown(() => {});
 });
-
-const css = useCssModule();
 </script>
 
 <template>
@@ -179,8 +177,8 @@ const css = useCssModule();
     <div
       id="paypal-button"
       :class="[
-        css.buttons,
-        { [css.buttons__disabled]: mustAcceptRefund || processing },
+        $style.buttons,
+        { [$style.buttons__disabled]: mustAcceptRefund || processing },
       ]"
     />
     <SelectedPlanOverview
@@ -190,7 +188,7 @@ const css = useCssModule();
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"
-      :class="css.policy"
+      :class="$style.policy"
     />
     <div
       v-if="pending"
@@ -203,7 +201,7 @@ const css = useCssModule();
         <span>{{ status?.message }}</span>
       </RuiAlert>
     </div>
-    <div :class="css.button">
+    <div :class="$style.button">
       <RuiButton
         :disabled="processing"
         :loading="pending || initializing"

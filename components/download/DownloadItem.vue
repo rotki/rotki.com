@@ -8,23 +8,22 @@ export interface DownloadItemProps {
 defineProps<DownloadItemProps>();
 
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.wrapper">
-    <div :class="css.icon">
+  <div :class="$style.wrapper">
+    <div :class="$style.icon">
       <RuiIcon
         :name="icon"
         color="primary"
       />
     </div>
-    <div :class="css.body">
+    <div :class="$style.body">
       <div>
-        <p :class="css.for">
+        <p :class="$style.for">
           {{ t('download.download_for') }}
         </p>
-        <h6 :class="css.platform">
+        <h6 :class="$style.platform">
           {{ platform }}
         </h6>
       </div>

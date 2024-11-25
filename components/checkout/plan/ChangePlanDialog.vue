@@ -50,8 +50,6 @@ watch(visible, (visible) => {
 });
 
 onMounted(async () => await store.getPlans());
-
-const css = useCssModule();
 </script>
 
 <template>
@@ -67,12 +65,12 @@ const css = useCssModule();
         v-for="plan in availablePlans"
         :key="plan.months.toString()"
         :class="{
-          [css.plan]: true,
-          [css.disabled]: warning && !confirmed,
+          [$style.plan]: true,
+          [$style.disabled]: warning && !confirmed,
         }"
         @click="select(plan.months)"
       >
-        <div :class="css.name">
+        <div :class="$style.name">
           {{ t('home.plans.names.plan', { name: getPlanName(plan.months) }) }}
         </div>
         {{ getPrice(plan) }}€
@@ -87,7 +85,7 @@ const css = useCssModule();
       </div>
       <div
         v-if="crypto && warning"
-        :class="css.warning"
+        :class="$style.warning"
       >
         <span class="text-rui-text-secondary">
           {{ t('change_plan.switch_warning') }}

@@ -4,25 +4,24 @@ defineProps<{ statusCode: number }>();
 const emit = defineEmits<{ (e: 'handle-error'): void }>();
 
 const { t } = useI18n();
-const css = useCssModule();
 
 const otherHeight = inject('otherHeight', 0);
 </script>
 
 <template>
   <div
-    :class="[css.wrapper]"
+    :class="[$style.wrapper]"
   >
     <div class="flex flex-col gap-4">
       <h6 class="text-h6 text-rui-primary">
         {{ statusCode }}
       </h6>
 
-      <h3 :class="css.heading">
+      <h3 :class="$style.heading">
         {{ t('not_found.title') }}
       </h3>
 
-      <p :class="css.description">
+      <p :class="$style.description">
         {{ t('not_found.description.line_one') }} <br />
         {{ t('not_found.description.line_two') }}
       </p>
@@ -40,7 +39,7 @@ const otherHeight = inject('otherHeight', 0);
     </div>
 
     <img
-      :class="css.image"
+      :class="$style.image"
       alt="rotki maintenance"
       src="/img/not-found.svg"
     />

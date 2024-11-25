@@ -12,26 +12,25 @@ withDefaults(
   },
 );
 
-const css = useCssModule();
 const slots = useSlots();
 </script>
 
 <template>
   <div
-    :class="css.wrapper"
+    :class="$style.wrapper"
     class="container"
   >
     <div
       :class="{
-        [css.content]: true,
-        [css['center-vertically']]: centerVertically,
-        [css['center-horizontally']]: centerHorizontally,
+        [$style.content]: true,
+        [$style['center-vertically']]: centerVertically,
+        [$style['center-horizontally']]: centerHorizontally,
       }"
     >
       <div
         :class="{
-          [css.details]: true,
-          [css.wideBody]: wide,
+          [$style.details]: true,
+          [$style.wideBody]: wide,
         }"
       >
         <h4
@@ -46,7 +45,7 @@ const slots = useSlots();
 
     <div
       v-if="slots.hint"
-      :class="css.hint"
+      :class="$style.hint"
     >
       <slot name="hint" />
     </div>

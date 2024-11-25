@@ -1,11 +1,10 @@
 <script setup lang="ts">
-const css = useCssModule();
 const attrs = useAttrs();
 </script>
 
 <template>
   <svg
-    :class="css.icon"
+    :class="$style.icon"
     aria-hidden="true"
     height="1em"
     preserveAspectRatio="xMidYMid meet"

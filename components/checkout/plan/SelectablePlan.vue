@@ -15,7 +15,6 @@ const props = withDefaults(
 const emit = defineEmits<{ (e: 'click'): void }>();
 
 const { t } = useI18n();
-const css = useCssModule();
 
 const { plan } = toRefs(props);
 
@@ -33,7 +32,7 @@ function click() {
 
 <template>
   <div
-    :class="[css.plan, { [css.selected]: selected }]"
+    :class="[$style.plan, { [$style.selected]: selected }]"
     @click="click()"
   >
     <div class="flex items-center h-0 justify-center relative w-full">
@@ -47,16 +46,16 @@ function click() {
       </RuiChip>
     </div>
     <CheckMark :selected="selected" />
-    <div :class="css.name">
+    <div :class="$style.name">
       {{ name }}
     </div>
-    <div :class="css.emphasis">
+    <div :class="$style.emphasis">
       {{ price }}€
     </div>
-    <div :class="css.monthly">
+    <div :class="$style.monthly">
       {{ t('home.plans.per_month') }}
     </div>
-    <div :class="css.total">
+    <div :class="$style.total">
       {{ t('home.plans.total', { total: totalPrice }) }}
     </div>
     <RuiButton
@@ -68,7 +67,7 @@ function click() {
 
     <div
       v-if="plan.discount"
-      :class="css.discount"
+      :class="$style.discount"
     >
       <RuiIcon
         class="text-black/60"

@@ -196,8 +196,6 @@ onBeforeMount(async () => {
 onUnmounted(() => {
   btThreeDSecure?.teardown();
 });
-
-const css = useCssModule();
 </script>
 
 <template>
@@ -242,7 +240,7 @@ const css = useCssModule();
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="disabled"
-      :class="css.policy"
+      :class="$style.policy"
     />
     <div
       v-if="pending"
@@ -255,7 +253,7 @@ const css = useCssModule();
         <span>{{ status?.message }}</span>
       </RuiAlert>
     </div>
-    <div :class="css.buttons">
+    <div :class="$style.buttons">
       <RuiButton
         :disabled="processing || success"
         class="w-full"

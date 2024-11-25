@@ -1,9 +1,5 @@
-<script setup lang="ts">
-const css = useCssModule();
-</script>
-
 <template>
-  <div :class="css.ripple">
+  <div :class="$style.ripple">
     <div />
     <div />
   </div>

@@ -7,23 +7,22 @@ withDefaults(
     full: false,
   },
 );
-const css = useCssModule();
 </script>
 
 <template>
   <div
     :class="{
-      [css.container]: true,
-      [css.full]: full,
+      [$style.container]: true,
+      [$style.full]: full,
     }"
   >
-    <div :class="css.loader">
+    <div :class="$style.loader">
       <svg
-        :class="css.circular"
+        :class="$style.circular"
         viewBox="25 25 50 50"
       >
         <circle
-          :class="css.path"
+          :class="$style.path"
           cx="50"
           cy="50"
           fill="none"

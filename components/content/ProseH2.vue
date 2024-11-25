@@ -11,13 +11,12 @@ const props = withDefaults(
 const { id } = toRefs(props);
 
 const { generate } = useHeadings(id, 'h2');
-const css = useCssModule();
 </script>
 
 <template>
   <h2
     :id="id"
-    :class="css.heading"
+    :class="$style.heading"
   >
     <a
       v-if="generate"

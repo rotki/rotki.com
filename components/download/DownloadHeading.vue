@@ -4,32 +4,31 @@ import type { DownloadItemProps } from '~/components/download/DownloadItem.vue';
 defineProps<{ version: string; links: DownloadItemProps[] }>();
 
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div :class="$style.wrapper">
     <div
-      :class="css.wrapper__container"
+      :class="$style.wrapper__container"
       class="container"
     >
-      <div :class="css.titles">
-        <h6 :class="css.title">
+      <div :class="$style.titles">
+        <h6 :class="$style.title">
           {{ t('download.heading.download_rotki') }}
         </h6>
-        <h3 :class="css.description">
+        <h3 :class="$style.description">
           {{ t('download.heading.description') }}
         </h3>
       </div>
-      <div :class="css.links">
+      <div :class="$style.links">
         <DownloadItem
           v-for="(link, i) in links"
           v-bind="link"
           :key="i"
-          :class="css.link"
+          :class="$style.link"
         />
       </div>
-      <p :class="css.version">
+      <p :class="$style.version">
         {{ t('download.latest_release') }}: {{ version }}
       </p>
     </div>

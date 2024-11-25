@@ -1,22 +1,21 @@
 <script lang="ts" setup>
 const { t } = useI18n();
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div :class="$style.wrapper">
     <div
-      :class="css.wrapper__container"
+      :class="$style.wrapper__container"
       class="container"
     >
-      <h6 :class="css.title">
+      <h6 :class="$style.title">
         {{ t('download.documentation.title') }}
       </h6>
-      <h4 :class="css.heading">
+      <h4 :class="$style.heading">
         {{ t('download.documentation.heading') }}
       </h4>
-      <div :class="css.desc__wrapper">
-        <p :class="css.description">
+      <div :class="$style.desc__wrapper">
+        <p :class="$style.description">
           {{ t('download.documentation.description') }}
         </p>
 

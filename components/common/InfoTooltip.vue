@@ -27,12 +27,10 @@ function off() {
   set(visible, false);
   stop();
 }
-
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.wrapper">
+  <div :class="$style.wrapper">
     <span
       @mouseenter="on()"
       @mouseleave="off()"
@@ -41,8 +39,8 @@ const css = useCssModule();
     </span>
     <div
       :class="{
-        [css.tooltip]: true,
-        [css.active]: visible,
+        [$style.tooltip]: true,
+        [$style.active]: visible,
       }"
     >
       <slot />

@@ -17,12 +17,10 @@ function useType(type: StepType | IdleStep) {
 const isPending = useType('pending');
 const isSuccess = useType('success');
 const isFailure = useType('failure');
-
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.content">
+  <div :class="$style.content">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_3.title') }}
     </CheckoutTitle>

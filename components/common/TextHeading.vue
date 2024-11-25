@@ -11,17 +11,15 @@ withDefaults(
     secondary: false,
   },
 );
-
-const css = useCssModule();
 </script>
 
 <template>
   <div
     :class="{
-      [css.heading]: !subheading,
-      [css.subheading]: subheading,
-      [css.secondary]: secondary,
-      [css['no-margin']]: noMargin,
+      [$style.heading]: !subheading,
+      [$style.subheading]: subheading,
+      [$style.secondary]: secondary,
+      [$style['no-margin']]: noMargin,
     }"
   >
     <slot />

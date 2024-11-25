@@ -10,13 +10,12 @@ withDefaults(
   }>(),
   { avatar: undefined, url: undefined },
 );
-const css = useCssModule();
 </script>
 
 <template>
-  <div :class="css.content">
-    <span :class="css.thumbnails">
-      <span :class="css.icon">
+  <div :class="$style.content">
+    <span :class="$style.thumbnails">
+      <span :class="$style.icon">
         <RuiIcon
           name="chat-1-line"
           size="16"
@@ -24,7 +23,7 @@ const css = useCssModule();
       </span>
       <span
         v-if="avatar"
-        :class="css.avatar"
+        :class="$style.avatar"
       >
         <a
           v-if="url"
@@ -47,7 +46,7 @@ const css = useCssModule();
     </span>
     <ContentRenderer :value="body">
       <ContentRendererMarkdown
-        :class="css.text"
+        :class="$style.text"
         :value="body"
         tag="span"
       />
@@ -55,14 +54,14 @@ const css = useCssModule();
     <a
       v-if="url"
       :href="url"
-      :class="css.username"
+      :class="$style.username"
       target="_blank"
     >
       {{ username }}
     </a>
     <span
       v-else
-      :class="css.username"
+      :class="$style.username"
     >
       {{ username }}
     </span>

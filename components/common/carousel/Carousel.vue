@@ -14,8 +14,6 @@ withDefaults(defineProps<SwiperOptions>(), {
   centeredSlides: false,
   modules: () => [],
 });
-
-const css = useCssModule();
 </script>
 
 <template>
@@ -24,7 +22,7 @@ const css = useCssModule();
     :autoplay="autoplay"
     :breakpoints="breakpoints"
     :centered-slides="centeredSlides"
-    :class="css.swiper"
+    :class="$style.swiper"
     :coverflow-effect="coverflowEffect"
     :direction="direction"
     :effect="effect"

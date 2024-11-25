@@ -75,7 +75,7 @@ function setupVaults() {
 }
 const { deleteCard } = usePaymentCardsStore();
 const vaults = setupVaults();
-const css = useCssModule();
+
 const { t } = useI18n();
 
 const last4Digits = computed<string>(() => `**** **** **** ${props.card.last4}`);
@@ -155,7 +155,7 @@ defineExpose({ submit });
 </script>
 
 <template>
-  <div :class="css.card">
+  <div :class="$style.card">
     <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center">
       <img
         :src="card.imageUrl"
