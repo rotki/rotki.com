@@ -22,8 +22,6 @@ const props = withDefaults(
   },
 );
 
-const attrs = useAttrs();
-
 const { highlightActive, highlightExactActive } = toRefs(props);
 
 function getColor(active: boolean, exact: boolean) {
@@ -52,7 +50,7 @@ function getColor(active: boolean, exact: boolean) {
         variant: 'text',
         type: 'button',
         color: getColor(link?.isActive, link?.isExactActive),
-        ...attrs,
+        ...$attrs,
       }"
       :class="{ ['inline-flex py-0 !px-1 !text-[1em]']: inline }"
     >
