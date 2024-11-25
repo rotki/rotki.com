@@ -6,29 +6,23 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const props = withDefaults(
-  defineProps<{
-    to: RouteLocationRaw;
-    external?: boolean;
-    inline?: boolean;
-    highlightActive?: boolean;
-    highlightExactActive?: boolean;
-  }>(),
-  {
-    external: false,
-    inline: false,
-    highlightActive: false,
-    highlightExactActive: false,
-  },
-);
+const props = withDefaults(defineProps<{
+  to: RouteLocationRaw;
+  external?: boolean;
+  inline?: boolean;
+  highlightActive?: boolean;
+  highlightExactActive?: boolean;
+}>(), {
+  external: false,
+  inline: false,
+  highlightActive: false,
+  highlightExactActive: false,
+});
 
 const { highlightActive, highlightExactActive } = toRefs(props);
 
 function getColor(active: boolean, exact: boolean) {
-  if (
-    (get(highlightActive) && active)
-    || (get(highlightExactActive) && exact)
-  ) {
+  if ((get(highlightActive) && active) || (get(highlightExactActive) && exact)) {
     return 'primary';
   }
 
@@ -40,10 +34,9 @@ function getColor(active: boolean, exact: boolean) {
   <NuxtLink
     #default="link"
     :class="{ 'inline-flex': inline }"
-    :href="external ? to : undefined"
-    :to="external ? undefined : to"
+    :to="to"
+    :external="external"
     :target="external ? '_blank' : '_self'"
-    :rel="external ? 'noreferrer' : null"
   >
     <RuiButton
       v-bind="{
