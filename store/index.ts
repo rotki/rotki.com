@@ -3,7 +3,6 @@
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
-import { useLogger } from '~/utils/use-logger';
 import {
   Account,
   ActionResultResponse,
@@ -28,13 +27,10 @@ import { PaymentError } from '~/types/codes';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { formatSeconds } from '~/utils/text';
+import { useLogger } from '~/utils/use-logger';
 import type { LoginCredentials } from '~/types/login';
 import type { ActionResult } from '~/types/common';
-import type {
-  DeleteAccountPayload,
-  PasswordChangePayload,
-  ProfilePayload,
-} from '~/types/account';
+import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
 import type { ComposerTranslation } from 'vue-i18n';
 
 const SESSION_TIMEOUT = 3600000;
@@ -446,10 +442,26 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  function getPendingSubscription({ amount, date, duration }: {
+    amount: string;
+    duration: number;
+    date: number;
+  }): Subscription | undefined {
+    const subDate = new Date(date * 1000);
+    return get(subscriptions).find((subscription) => {
+      const [day, month, year] = subscription.createdDate.split('/').map(Number);
+      const createdDate = new Date(year, month - 1, day);
+      return subscription.status === 'Pending'
+        && subscription.durationInMonths === duration
+        && subscription.nextBillingAmount === amount
+        && createdDate.toDateString() === subDate.toDateString();
+    });
+  }
+
   const markTransactionStarted = async (): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/payment/pending',
+        'webapi/payment/pending/',
         {
           method: 'PATCH',
         },
@@ -480,7 +492,7 @@ export const useMainStore = defineStore('main', () => {
   const deletePendingPayment = async (): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/payment/pending',
+        'webapi/payment/pending/',
         {
           method: 'DELETE',
         },
@@ -580,6 +592,7 @@ export const useMainStore = defineStore('main', () => {
     deleteAccount,
     deletePendingPayment,
     getAccount,
+    getPendingSubscription,
     getPlans,
     login,
     logout,

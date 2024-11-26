@@ -12,7 +12,13 @@ const { t } = useI18n();
 const loading = ref(false);
 const data = ref<CryptoPayment>();
 
-const { cryptoPayment, switchCryptoPlan, deletePendingPayment, subscriptions } = useMainStore();
+const {
+  cryptoPayment,
+  switchCryptoPlan,
+  deletePendingPayment,
+  subscriptions,
+  getAccount,
+} = useMainStore();
 
 const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
@@ -110,6 +116,7 @@ onMounted(async () => {
     set(loading, true);
     const subId = get(subscriptionId);
     const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
+    await getAccount();
     if (result.isError) {
       if (result.code === PaymentError.UNVERIFIED)
         set(error, t('subscription.error.unverified_email'));

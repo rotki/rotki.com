@@ -14,7 +14,7 @@ import { BrowserProvider, Contract, type Signer, type TransactionResponse, parse
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
-import type { CryptoPayment, IdleStep, StepType } from '~/types';
+import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
 import type { Ref } from 'vue';
 
 const abi = [
@@ -29,19 +29,31 @@ const abi = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
 
-export const getChainId = (testing: boolean, chainId?: string | number) => Number(chainId ?? (testing ? 11155111 : 1));
-
 const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
 const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base];
 
+export const usePendingTx = createSharedComposable(() => useLocalStorage<PendingTx>('rotki.pending_tx', null, {
+  serializer: {
+    read: (v: any): any => (v ? JSON.parse(v) : null),
+    write: (v: any): string => JSON.stringify(v),
+  },
+}));
+
+interface ExecutePaymentParams {
+  signer: Signer;
+  payment: CryptoPayment;
+  blockExplorerUrl: string;
+}
+
 export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
-  const { markTransactionStarted } = useMainStore();
+  const { getPendingSubscription, markTransactionStarted } = useMainStore();
   const state = ref<StepType | IdleStep>('idle');
   const error = ref('');
 
   const logger = useLogger('web3-payment');
   const { t } = useI18n();
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
+  const pendingTx = usePendingTx();
   const { start, stop } = useTimeoutFn(() => {
     logger.info('change to done');
     set(state, 'success');
@@ -76,7 +88,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
     clearErrors();
   });
 
-  async function executePayment(signer: Signer, payment: CryptoPayment): Promise<void> {
+  async function executePayment({ blockExplorerUrl, payment, signer }: ExecutePaymentParams): Promise<void> {
     stop();
     const {
       cryptoAddress: to,
@@ -104,6 +116,19 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
     }
 
     logger.info(`transaction is pending: ${tx.hash}`);
+
+    const subscription = getPendingSubscription({
+      amount: payment.finalPriceInEur,
+      date: payment.startDate,
+      duration: payment.months,
+    });
+
+    set(pendingTx, {
+      blockExplorerUrl,
+      chainId: payment.chainId,
+      hash: tx.hash,
+      subscriptionId: subscription?.identifier,
+    });
     await markTransactionStarted();
     start();
   }
@@ -128,14 +153,21 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
       const network = await browserProvider.getNetwork();
 
       const { chainId, chainName } = payment;
-      const expectedChainId = getChainId(testing, chainId);
+      assert(chainId);
 
-      if (network.chainId !== BigInt(expectedChainId)) {
+      if (network.chainId !== BigInt(chainId)) {
         set(error, t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName }));
         return;
       }
 
-      await executePayment(await browserProvider.getSigner(), payment);
+      const appKitNetwork = getNetwork(chainId);
+
+      const url = appKitNetwork.blockExplorers?.default.url;
+      await executePayment({
+        blockExplorerUrl: url ? `${url}/tx/` : '',
+        payment,
+        signer: await browserProvider.getSigner(),
+      });
     }
     catch (error_: any) {
       logger.error(error_);

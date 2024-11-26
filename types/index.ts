@@ -300,3 +300,10 @@ export const ResendVerificationResponse = z.object({
 });
 
 export type ResendVerificationResponse = z.infer<typeof ResendVerificationResponse>;
+
+export interface PendingTx {
+  hash: string;
+  subscriptionId: string;
+  chainId: number;
+  blockExplorerUrl: string;
+}

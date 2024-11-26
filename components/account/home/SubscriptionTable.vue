@@ -3,13 +3,14 @@ import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
+import type { RouteLocationRaw } from 'vue-router';
 import type {
   ContextColorsType,
   DataTableColumn,
   DataTableSortColumn,
   TablePaginationData,
 } from '@rotki/ui-library';
-import type { Subscription } from '~/types';
+import type { PendingTx, Subscription } from '~/types';
 
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<Subscription>[]>([]);
@@ -25,6 +26,7 @@ const store = useMainStore();
 const { subscriptions } = storeToRefs(store);
 
 const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
+const pendingTx = usePendingTx();
 const { pause, resume, isActive } = useIntervalFn(
   async () => await store.getAccount(),
   60000,
@@ -111,6 +113,8 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
   return link;
 });
 
+const pendingPaymentLink: RouteLocationRaw = { path: '/checkout/pay/method' };
+
 function isPending(sub: Subscription) {
   return sub.status === 'Pending';
 }
@@ -162,6 +166,12 @@ async function cancelSubscription(sub: Subscription) {
   set(selectedSubscription, undefined);
 }
 
+function getBlockExplorerLink(pending: PendingTx): RouteLocationRaw {
+  return {
+    path: `${pending.blockExplorerUrl}/${pending.hash}`,
+  };
+}
+
 watch(pending, (pending) => {
   if (pending.length === 0)
     pause();
@@ -208,6 +218,11 @@ onUnmounted(() => pause());
           </RuiTooltip>
           <template v-else>
             {{ row.status }}
+            <RuiProgress
+              v-if="row.pending && pendingTx && row.identifier === pendingTx.subscriptionId"
+              thickness="2"
+              variant="indeterminate"
+            />
           </template>
         </RuiChip>
       </template>
@@ -235,10 +250,27 @@ onUnmounted(() => pause());
           >
             {{ t('actions.renew') }}
           </ButtonLink>
+          <RuiTooltip v-if="pendingTx && row.identifier === pendingTx.subscriptionId">
+            <template #activator>
+              <ButtonLink
+                external
+                icon
+                color="primary"
+                :to="getBlockExplorerLink(pendingTx)"
+              >
+                <RuiIcon
+                  name="links-line"
+                  :size="18"
+                />
+              </ButtonLink>
+            </template>
+            {{ t('account.subscriptions.pending_tx') }}
+          </RuiTooltip>
+          <!-- link will not work due to middleware if there is a transaction started -->
           <ButtonLink
-            v-if="isPending(row)"
+            v-else-if="isPending(row)"
             :disabled="cancelling"
-            :to="{ path: '/checkout/pay/method' }"
+            :to="pendingPaymentLink"
             color="primary"
           >
             {{ t('account.subscriptions.payment_detail') }}

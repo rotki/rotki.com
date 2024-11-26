@@ -4,7 +4,6 @@ import { get, set, useClipboard } from '@vueuse/core';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
-import { getChainId } from '~/composables/crypto-payment';
 import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 import type { WatchHandle } from 'vue';
@@ -37,7 +36,6 @@ const showChangePaymentDialog = ref(false);
 let stopWatcher: WatchHandle;
 
 const { t } = useI18n();
-const config = useRuntimeConfig();
 const logger = useLogger('card-payment-form');
 const appkitState = useAppKitState();
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
@@ -76,7 +74,7 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
     qrText = `bitcoin:${cryptoAddress}?amount=${finalPriceInCrypto}&label=Rotki`;
   }
   else {
-    const chainId = getChainId(config.public.testing, payment.chainId);
+    const chainId = payment.chainId;
     const tokenAmount = parseUnits(finalPriceInCrypto, decimals);
 
     if (!tokenAddress)

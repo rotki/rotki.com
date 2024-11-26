@@ -88,6 +88,7 @@
       },
       "no_subscriptions_found": "No subscriptions found",
       "payment_detail": "Payment Details",
+      "pending_tx": "A transaction already exists for this subscription, please wait up to 7 minutes for our system to process the payment.",
       "resume": {
         "actions": {
           "no": "No, don't resume",
