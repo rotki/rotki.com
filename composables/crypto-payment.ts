@@ -5,7 +5,9 @@ import {
   arbitrumSepolia,
   base,
   baseSepolia,
+  gnosis,
   mainnet,
+  optimism,
   sepolia,
 } from '@reown/appkit/networks';
 import { createAppKit, useAppKitAccount, useAppKitProvider } from '@reown/appkit/vue';
@@ -30,7 +32,7 @@ const abi = [
 ];
 
 const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
-const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base];
+const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis];
 
 export const usePendingTx = createSharedComposable(() => useLocalStorage<PendingTx>('rotki.pending_tx', null, {
   serializer: {
