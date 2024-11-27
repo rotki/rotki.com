@@ -10,7 +10,8 @@ import {
   optimism,
   sepolia,
 } from '@reown/appkit/networks';
-import { createAppKit, useAppKitAccount, useAppKitProvider } from '@reown/appkit/vue';
+import { createAppKit, useAppKitProvider } from '@reown/appkit/vue';
+import { ChainController } from '@reown/appkit-core';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { BrowserProvider, Contract, type Signer, type TransactionResponse, parseUnits } from 'ethers';
 import { useMainStore } from '~/store';
@@ -18,6 +19,11 @@ import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
 import type { Ref } from 'vue';
+
+// Patch the showUnsupportedChainUI method to no-op
+ChainController.showUnsupportedChainUI = function () {
+  // No operation
+};
 
 const abi = [
   // Some details about the token
@@ -47,10 +53,11 @@ interface ExecutePaymentParams {
   blockExplorerUrl: string;
 }
 
-export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
+export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
   const { getPendingSubscription, markTransactionStarted } = useMainStore();
-  const state = ref<StepType | IdleStep>('idle');
-  const error = ref('');
+  const connected = ref<boolean>(false);
+  const isOpen = ref<boolean>(false);
+  const connectedChainId = ref<bigint>();
 
   const logger = useLogger('web3-payment');
   const { t } = useI18n();
@@ -61,13 +68,11 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
     set(state, 'success');
   }, 5000, { immediate: false });
 
-  const account = useAppKitAccount();
-  const defaultNetwork = getNetwork(get(data)?.chainId);
+  const defaultNetwork = getNetwork(get(data).chainId);
 
   const appKit = createAppKit({
     adapters: [new EthersAdapter()],
-    allowUnsupportedChain: false,
-    defaultNetwork,
+    allowUnsupportedChain: true,
     features: {
       analytics: true,
       email: false,
@@ -81,13 +86,36 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
       name: 'Rotki',
       url: baseUrl,
     },
-    networks: testing ? testNetworks : productionNetworks,
+    networks: [defaultNetwork],
     projectId,
     themeMode: 'light',
   });
 
-  appKit.subscribeAccount(() => {
-    clearErrors();
+  appKit.subscribeAccount((account) => {
+    set(state, 'idle');
+    set(connected, account.isConnected);
+
+    if (account.isConnected) {
+      const { walletProvider } = useAppKitProvider('eip155');
+      const browserProvider = new BrowserProvider(walletProvider as any);
+      browserProvider.getNetwork()
+        .then(network => set(connectedChainId, network.chainId))
+        .catch(logger.error);
+    }
+    else {
+      set(connectedChainId, undefined);
+    }
+  });
+
+  appKit.subscribeState((state) => {
+    set(isOpen, state.open);
+  });
+
+  const isExpectedChain = computed<boolean>(() => {
+    const paymentChainId = get(data).chainId;
+    if (!isDefined(connectedChainId) || !paymentChainId)
+      return false;
+    return get(connectedChainId) === BigInt(paymentChainId);
   });
 
   async function executePayment({ blockExplorerUrl, payment, signer }: ExecutePaymentParams): Promise<void> {
@@ -142,8 +170,8 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
     set(state, 'pending');
 
     try {
-      if (!get(account, 'isConnected')) {
-        set(error, t('subscription.crypto_payment.not_connected'));
+      if (!get(connected)) {
+        set(errorMessage, t('subscription.crypto_payment.not_connected'));
         return;
       }
 
@@ -158,7 +186,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
       assert(chainId);
 
       if (network.chainId !== BigInt(chainId)) {
-        set(error, t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName }));
+        set(errorMessage, t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName }));
         return;
       }
 
@@ -176,17 +204,12 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
       set(state, 'idle');
 
       if ('reason' in error_ && error_.reason)
-        set(error, error_.reason);
+        set(errorMessage, error_.reason);
 
       else
-        set(error, error_.message);
+        set(errorMessage, error_.message);
     }
   };
-
-  function clearErrors() {
-    set(error, null);
-    set(state, 'idle');
-  }
 
   function getNetwork(chainId?: number): AppKitNetwork {
     const networks = testing ? testNetworks : productionNetworks;
@@ -197,14 +220,27 @@ export function useWeb3Payment(data: Ref<CryptoPayment | undefined>) {
     return network;
   }
 
+  function switchNetwork(): void {
+    const network = getNetwork(get(data).chainId);
+    appKit.switchNetwork(network);
+  }
+
+  watch(state, (state) => {
+    if (state === 'idle') {
+      set(errorMessage, '');
+    }
+  });
+
   onUnmounted(async () => {
     await appKit.disconnect();
   });
 
   return {
-    clearErrors,
-    error,
+    connected: readonly(connected),
+    isExpectedChain,
+    isOpen: readonly(isOpen),
+    open: async () => appKit.open(),
     pay,
-    state,
+    switchNetwork,
   };
 }

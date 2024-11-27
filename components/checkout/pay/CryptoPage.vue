@@ -1,16 +1,17 @@
 <script lang="ts" setup>
-import { useAppKit, useAppKitAccount } from '@reown/appkit/vue';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
-import type { CryptoPayment, PaymentStep } from '~/types';
+import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 
 const { t } = useI18n();
 
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const data = ref<CryptoPayment>();
+const error = ref<string>('');
+const paymentState = ref<StepType | IdleStep>('idle');
 
 const {
   cryptoPayment,
@@ -24,18 +25,15 @@ const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
 const route = useRoute();
-const { pay, state: currentState, error, clearErrors } = useWeb3Payment(data);
-const account = useAppKitAccount();
-const { open } = useAppKit();
 
 const step = computed<PaymentStep>(() => {
-  const errorMessage = get(error);
-  const state = get(currentState);
-  if (errorMessage) {
+  const message = get(error);
+  const state = get(paymentState);
+  if (message) {
     return {
       type: 'failure',
       title: t('subscription.error.payment_failure'),
-      message: errorMessage,
+      message,
       closeable: true,
     };
   }
@@ -159,16 +157,13 @@ onMounted(async () => {
       </div>
       <CryptoPaymentForm
         v-else-if="data && plan"
+        v-bind="{ success, failure, status, pending }"
+        v-model:error="error"
+        v-model:state="paymentState"
         :data="data"
-        :pending="pending || currentState === 'pending'"
-        v-bind="{ success, failure, status }"
         :loading="loading"
         :plan="plan"
-        :connected="account.isConnected"
-        @pay="pay()"
-        @connect="open()"
         @change="changePaymentMethod()"
-        @clear:errors="clearErrors()"
       />
 
       <div

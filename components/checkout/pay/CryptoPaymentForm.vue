@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAppKitState } from '@reown/appkit/vue';
 import { get, set, useClipboard } from '@vueuse/core';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
@@ -7,7 +6,11 @@ import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 import type { WatchHandle } from 'vue';
-import type { CryptoPayment, PaymentStep } from '~/types';
+import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
+
+const error = defineModel<string>('error', { required: true });
+
+const state = defineModel<StepType | IdleStep>('state', { required: true });
 
 const props = defineProps<{
   data: CryptoPayment;
@@ -16,15 +19,11 @@ const props = defineProps<{
   success: boolean;
   failure: boolean;
   loading: boolean;
-  connected: boolean;
   status: PaymentStep;
 }>();
 
 const emit = defineEmits<{
   (e: 'change'): void;
-  (e: 'pay'): void;
-  (e: 'connect'): void;
-  (e: 'clear:errors'): void;
 }>();
 
 const { data, pending, loading, success } = toRefs(props);
@@ -37,8 +36,8 @@ let stopWatcher: WatchHandle;
 
 const { t } = useI18n();
 const logger = useLogger('card-payment-form');
-const appkitState = useAppKitState();
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
+const { connected, pay, isOpen, open, isExpectedChain, switchNetwork } = useWeb3Payment(data, state, error);
 
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
 
@@ -105,7 +104,7 @@ watch(canvas, async (canvas) => {
   <div :class="$style.wrapper">
     <div :class="$style.qrcode">
       <canvas
-        v-if="!appkitState.open"
+        v-if="!isOpen"
         ref="canvas"
         @click="copyToClipboard(qrText)"
       />
@@ -207,27 +206,37 @@ watch(canvas, async (canvas) => {
           :disabled="processing"
           size="lg"
           class="w-full"
-          @click="emit('connect')"
+          @click="open()"
         >
           {{ t('home.plans.tiers.step_3.wallet.connect_wallet') }}
         </RuiButton>
         <template v-else>
           <RuiButton
+            v-if="isExpectedChain"
             :loading="processing"
             :disabled="processing"
             color="primary"
             size="lg"
             class="w-full"
-            @click="emit('pay')"
+            @click="pay()"
           >
             {{ t('home.plans.tiers.step_3.wallet.pay_with_wallet') }}
+          </RuiButton>
+          <RuiButton
+            v-else
+            color="primary"
+            size="lg"
+            class="w-full"
+            @click="switchNetwork()"
+          >
+            {{ t('home.plans.tiers.step_3.wallet.switch_network') }}
           </RuiButton>
 
           <RuiButton
             size="lg"
             color="secondary"
             class="!px-3"
-            @click="emit('connect')"
+            @click="open()"
           >
             <RuiIcon
               name="link"
@@ -243,7 +252,7 @@ watch(canvas, async (canvas) => {
     :timeout="10000"
     closeable
     :visible="failure"
-    @dismiss="emit('clear:errors')"
+    @dismiss="state = 'idle'"
   >
     <template #title>
       {{ status?.title }}

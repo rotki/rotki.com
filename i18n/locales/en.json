@@ -417,9 +417,9 @@
       "most_popular": "Most popular",
       "names": {
         "for": "{name} for",
+        "monthly": "Monthly",
         "numeric": "{months} Months",
         "plan": "{name} Plan.",
-        "monthly": "Monthly",
         "yearly": "Yearly"
       },
       "per_month": "per month",
@@ -429,14 +429,14 @@
           "crypto_hint": "* When paying with crypto the monthly price is {cryptoPrice} €",
           "description": "Choose the different plans we offer",
           "maybe_vat": "VAT may apply depending on your jurisdiction",
-          "title": "Premium Plans",
-          "vat": "The prices include a +{vat}% VAT tax",
           "notes": {
             "line_1": "The selected payment method will be billed the total amount for the subscription immediately.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
-          }
+          },
+          "title": "Premium Plans",
+          "vat": "The prices include a +{vat}% VAT tax"
         },
         "step_2": {
           "description": "Select one of the different methods",
@@ -457,6 +457,11 @@
             "token": "Token",
             "token_contract": "Token contract: "
           },
+          "notes": {
+            "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
+            "line_2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
+            "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
+          },
           "payment_description": "Payments are safely processed with Braintree a PayPal Service",
           "saved_card": {
             "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
@@ -475,12 +480,8 @@
             "notice": "You can pay your wallet wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed.",
-            "pay_with_wallet": "Pay with wallet"
-          },
-          "notes": {
-            "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
-            "line_2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
-            "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
+            "pay_with_wallet": "Pay with wallet",
+            "switch_network": "Switch Network"
           }
         }
       },
