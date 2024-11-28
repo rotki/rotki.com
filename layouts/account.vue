@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
 import { commonAttrs, noIndex } from '~/utils/metadata';
-import Default from '~/layouts/default.vue';
 
 const { t } = useI18n();
 
-const store = useMainStore();
-const { account } = storeToRefs(store);
+const { account } = storeToRefs(useMainStore());
 
-const name = computed(() => {
+const name = computed<string>(() => {
   const accountVal = get(account);
   if (!accountVal)
     return '';
 
-  const { firstName, lastName } = accountVal.address;
+  const { firstName, lastName, movedOffline } = accountVal.address;
+
+  if (movedOffline) {
+    return accountVal.username;
+  }
 
   return `${firstName} ${lastName}`;
 });
