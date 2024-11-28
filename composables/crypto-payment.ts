@@ -93,6 +93,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
 
   appKit.subscribeAccount((account) => {
     set(state, 'idle');
+    set(errorMessage, '');
     set(connected, account.isConnected);
 
     if (account.isConnected) {
@@ -199,15 +200,14 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
         signer: await browserProvider.getSigner(),
       });
     }
-    catch (error_: any) {
-      logger.error(error_);
+    catch (error: any) {
+      logger.error(error);
       set(state, 'idle');
 
-      if ('reason' in error_ && error_.reason)
-        set(errorMessage, error_.reason);
-
+      if ('shortMessage' in error)
+        set(errorMessage, error.shortMessage);
       else
-        set(errorMessage, error_.message);
+        set(errorMessage, error.message);
     }
   };
 
@@ -224,12 +224,6 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     const network = getNetwork(get(data).chainId);
     appKit.switchNetwork(network);
   }
-
-  watch(state, (state) => {
-    if (state === 'idle') {
-      set(errorMessage, '');
-    }
-  });
 
   onUnmounted(async () => {
     await appKit.disconnect();

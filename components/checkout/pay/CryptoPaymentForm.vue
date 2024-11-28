@@ -92,6 +92,11 @@ stopWatcher = watchEffect(() => {
     redirect();
 });
 
+function dismissNotification() {
+  set(state, 'idle');
+  set(error, '');
+}
+
 watch(canvas, async (canvas) => {
   if (!canvas)
     return;
@@ -252,7 +257,7 @@ watch(canvas, async (canvas) => {
     :timeout="10000"
     closeable
     :visible="failure"
-    @dismiss="state = 'idle'"
+    @dismiss="dismissNotification()"
   >
     <template #title>
       {{ status?.title }}
