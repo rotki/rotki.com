@@ -74,6 +74,12 @@ const hint = computed(() => {
 
   return `${t('home.plans.tiers.step_3.labels.token_contract')} ${address}`;
 });
+
+watch(tokenItems, (tokens) => {
+  if (tokens.length === 1) {
+    set(modelValue, tokens[0].id);
+  }
+});
 </script>
 
 <template>
