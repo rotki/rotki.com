@@ -219,7 +219,7 @@ onUnmounted(() => pause());
           <template v-else>
             {{ row.status }}
             <RuiProgress
-              v-if="row.pending && pendingTx && row.identifier === pendingTx.subscriptionId"
+              v-if="isPending(row) && pendingTx && row.identifier === pendingTx.subscriptionId"
               thickness="2"
               variant="indeterminate"
             />
