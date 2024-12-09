@@ -276,6 +276,13 @@
           "description": "Will only be used for payment invoices",
           "title": "Address"
         }
+      },
+      "vat": {
+        "cooldown": "VAT ID Verification Cooldown",
+        "timer": "Please wait {waitTime} seconds before trying again",
+        "unverified": "VAT ID Haven't Verified",
+        "verify_now": "Verify Now",
+        "verified": "VAT ID Verified"
       }
     }
   },
