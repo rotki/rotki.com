@@ -82,6 +82,7 @@ export const Account = z.object({
   subscriptions: z.array(Subscription),
   username: z.string().min(1),
   vat: z.number(),
+  vatIdStatus: z.string(),
 });
 
 export type Account = z.infer<typeof Account>;
