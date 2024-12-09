@@ -6,6 +6,8 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { toMessages } from '~/utils/validation';
 
+const { t } = useI18n();
+
 const store = useMainStore();
 const state = reactive({
   firstName: '',
@@ -21,6 +23,10 @@ const { account } = storeToRefs(store);
 
 const movedOffline = computed(
   () => get(account)?.address.movedOffline ?? false,
+);
+
+const isVatIdValid = computed(
+  () => get(account)?.vatIdStatus === 'Valid' || false,
 );
 
 onBeforeMount(() => {
@@ -55,13 +61,14 @@ function reset() {
 
   const unavailable = get(movedOffline);
 
+  state.vatId = userAccount.address.vatId;
+
   if (unavailable)
     return;
 
   state.firstName = userAccount.address.firstName;
   state.lastName = userAccount.address.lastName;
   state.companyName = userAccount.address.companyName;
-  state.vatId = userAccount.address.vatId;
 
   get(v$).$reset();
 }
@@ -93,10 +100,94 @@ async function update() {
   set(loading, false);
 }
 
-const { t } = useI18n();
+const waitTime = ref<number>(0);
+const loadingCheck = ref<boolean>(false);
+
+const { pause: pauseTimer, resume } = useIntervalFn(() => {
+  const wait = get(waitTime);
+  if (wait > 0) {
+    set(waitTime, wait - 1);
+  }
+  else {
+    pauseTimer();
+  }
+}, 1000, { immediate: false });
+
+async function handleCheckVATClick() {
+  set(loadingCheck, true);
+  const result = await store.checkVAT();
+  await store.refreshVATCheckStatus();
+
+  if (typeof result === 'number') {
+    set(waitTime, result);
+    pauseTimer();
+    if (result > 0) {
+      resume();
+    }
+  }
+  set(loadingCheck, false);
+}
+
+const [DefineVAT, ReuseVAT] = createReusableTemplate();
 </script>
 
 <template>
+  <DefineVAT>
+    <div class="flex gap-4 items-start">
+      <RuiTextField
+        id="vat-id"
+        v-model="state.vatId"
+        variant="outlined"
+        color="primary"
+        class="flex-1"
+        :label="t('auth.signup.customer_information.form.vat_id')"
+        :hint="t('auth.signup.customer_information.form.vat_id_hint')"
+        :error-messages="toMessages(v$.vatId)"
+        @blur="v$.vatId.$touch()"
+      />
+      <RuiTooltip persist-on-tooltip-hover>
+        <template #activator>
+          <RuiIcon
+            class="mt-4"
+            :name="isVatIdValid ? 'lu-circle-check' : 'lu-circle-x'"
+            :color="isVatIdValid ? 'success' : 'error'"
+          />
+        </template>
+        <div v-if="!isVatIdValid">
+          <div
+            v-if="waitTime > 0"
+            class="flex flex-col gap-1.5 items-center py-1.5"
+          >
+            {{ t('auth.signup.vat.cooldown') }}
+            <div class="text-grey-500">
+              {{ t('auth.signup.vat.timer', { waitTime }) }}
+            </div>
+          </div>
+          <div
+            v-else
+            class="flex flex-col gap-1.5 items-center py-1.5"
+          >
+            {{ t('auth.signup.vat.unverified') }}
+            <RuiButton
+              color="primary"
+              size="sm"
+              :disabled="waitTime > 0"
+              :loading="loadingCheck"
+              @click="handleCheckVATClick()"
+            >
+              {{ t('auth.signup.vat.verify_now') }}
+            </RuiButton>
+          </div>
+        </div>
+        <div
+          v-else
+          class="flex flex-col gap-1.5 items-center py-1.5"
+        >
+          {{ t('auth.signup.vat.verified') }}
+        </div>
+      </RuiTooltip>
+    </div>
+  </DefineVAT>
   <div
     v-if="!movedOffline"
     class="pt-2"
@@ -138,16 +229,7 @@ const { t } = useI18n();
         @blur="v$.companyName.$touch()"
       />
 
-      <RuiTextField
-        id="vat-id"
-        v-model="state.vatId"
-        variant="outlined"
-        color="primary"
-        :label="t('auth.signup.customer_information.form.vat_id')"
-        :hint="t('auth.signup.customer_information.form.vat_id_hint')"
-        :error-messages="toMessages(v$.vatId)"
-        @blur="v$.vatId.$touch()"
-      />
+      <ReuseVAT />
     </div>
 
     <div class="mt-10 mb-5 border-t border-grey-50" />
@@ -193,6 +275,13 @@ const { t } = useI18n();
       </template>
     </i18n-t>
   </RuiAlert>
+
+  <div
+    v-if="movedOffline"
+    class="mt-4"
+  >
+    <ReuseVAT />
+  </div>
 
   <FloatingNotification
     type="success"

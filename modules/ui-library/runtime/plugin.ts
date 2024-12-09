@@ -1,4 +1,6 @@
 import {
+  LuCircleCheck,
+  LuCircleX,
   RiAccountCircleLine,
   RiAppleLine,
   RiArrowDownSLine,
@@ -102,6 +104,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         RiLink,
         RiLockLine,
         RiLinksLine,
+        LuCircleX,
+        LuCircleCheck,
       ],
       mode: 'light',
     },
