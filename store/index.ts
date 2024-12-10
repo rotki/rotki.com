@@ -61,6 +61,53 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  const refreshVATCheckStatus = async (): Promise<void> => {
+    try {
+      const response = await fetchWithCsrf<ApiResponse<string>>(
+        'webapi/account/vat',
+        {
+          method: 'GET',
+        },
+      );
+      const { result } = response;
+      if (result) {
+        set(account, {
+          ...get(account),
+          vatIdStatus: result,
+        });
+      }
+    }
+    catch (error) {
+      logger.error(error);
+    }
+  };
+
+  const checkVAT = async (): Promise<number | boolean> => {
+    try {
+      const response = await fetchWithCsrf<ApiResponse<boolean>>(
+        'webapi/account/vat',
+        {
+          method: 'POST',
+        },
+      );
+      if (response.result) {
+        return response.result;
+      }
+
+      return false;
+    }
+    catch (error) {
+      logger.error(error);
+      if (error instanceof FetchError) {
+        const status = error?.status || -1;
+        const result = error.data.result;
+        if (status === 400 && typeof result === 'number')
+          return result;
+      }
+      return false;
+    }
+  };
+
   const resendVerificationCode = async (t: ComposerTranslation): Promise<ActionResult> => {
     const onError = (data: ResendVerificationResponse) => {
       let message = data.message;
@@ -588,6 +635,7 @@ export const useMainStore = defineStore('main', () => {
     changePassword,
     checkout,
     checkPendingCryptoPayment,
+    checkVAT,
     cryptoPayment,
     deleteAccount,
     deletePendingPayment,
@@ -600,6 +648,7 @@ export const useMainStore = defineStore('main', () => {
     pay,
     plans,
     refreshSession,
+    refreshVATCheckStatus,
     resendVerificationCode,
     resumeError,
     subscriptions,
