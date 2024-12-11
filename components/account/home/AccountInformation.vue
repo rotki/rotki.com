@@ -3,6 +3,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, objectOmit, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import { useVatCheck } from '~/composables/use-vat-check';
 import { useMainStore } from '~/store';
 import { toMessages } from '~/utils/validation';
 import { VatIdStatus } from '~/types/account';
@@ -18,9 +19,10 @@ const state = reactive({
   vatId: '',
 });
 
-const loading = ref(false);
-const done = ref(false);
-const vatSuccessMessage = ref('');
+const loading = ref<boolean>(false);
+const done = ref<boolean>(false);
+const vatSuccessMessage = ref<string>('');
+const vatErrorMessage = ref<string>('');
 const loadingCheck = ref<boolean>(false);
 const $externalResults = ref<Record<string, string[]>>({});
 const remainingTime = ref<number>(0);
@@ -37,6 +39,7 @@ const rules = {
 const waitUntilTime = useLocalStorage<number>('rotki.vat_check.wait_until_time', 0);
 
 const [DefineVAT, ReuseVAT] = createReusableTemplate();
+const { refreshVATCheckStatus, checkVAT } = useVatCheck();
 
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
@@ -75,8 +78,8 @@ const hideVATVerifyButton = computed<boolean>(() => {
   return status === VatIdStatus.NON_EU_ID;
 });
 
-const vatErrorMessage = computed<string>(() => {
-  if (get(remainingTime) > 0)
+const vatStatusErrorMessage = computed<string>(() => {
+  if (get(remainingTime) > 0 || state.vatId === '')
     return '';
   const status = get(account)?.vatIdStatus;
   if (status === VatIdStatus.NOT_VALID) {
@@ -137,22 +140,31 @@ async function update() {
 
 async function handleCheckVATClick() {
   set(loadingCheck, true);
-  const result = await store.checkVAT();
-  await store.refreshVATCheckStatus();
+  const checkResult = await checkVAT();
+  await refreshVATCheckStatus();
 
-  if (typeof result === 'number') {
+  if ('seconds' in checkResult) {
     const now = Math.round(Date.now() / 1000);
-    set(waitUntilTime, now + result);
-    set(remainingTime, result);
+    set(waitUntilTime, now + checkResult.seconds);
+    set(remainingTime, checkResult.seconds);
     pauseTimer();
-    if (result > 0) {
+    if (checkResult.seconds > 0) {
       resume();
     }
   }
-  else if (result) {
-    set(vatSuccessMessage, t('auth.signup.vat.verified'));
+  else if (checkResult.success) {
+    const status = get(account)?.vatIdStatus;
+    if (status === VatIdStatus.VALID) {
+      set(vatSuccessMessage, t('auth.signup.vat.verified'));
+      setTimeout(() => {
+        set(vatSuccessMessage, '');
+      }, 3000);
+    }
+  }
+  else {
+    set(vatErrorMessage, checkResult.message);
     setTimeout(() => {
-      set(vatSuccessMessage, '');
+      set(vatErrorMessage, '');
     }, 3000);
   }
   set(loadingCheck, false);
@@ -169,7 +181,7 @@ function updateRemainingTime(): boolean {
   return false;
 }
 
-onBeforeMount(() => {
+onMounted(() => {
   reset();
   resume();
   updateRemainingTime();
@@ -188,13 +200,13 @@ onBeforeMount(() => {
         class="flex-1"
         :label="t('auth.signup.customer_information.form.vat_id')"
         :hint="vatHint"
-        :error-messages="[...toMessages(v$.vatId), vatErrorMessage]"
+        :error-messages="[...toMessages(v$.vatId), vatStatusErrorMessage, vatErrorMessage]"
         :success-messages="vatSuccessMessage"
         @blur="v$.vatId.$touch()"
       >
         <template #append>
           <RuiIcon
-            v-if="!hideVATVerifyButton"
+            v-if="!hideVATVerifyButton && state.vatId"
             size="16"
             :name="isVatIdValid ? 'lu-circle-check' : 'lu-circle-x'"
             :color="isVatIdValid ? 'success' : 'error'"
