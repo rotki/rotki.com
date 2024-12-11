@@ -111,6 +111,7 @@ const { t } = useI18n();
         maxlength="128"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="address-line1"
         :label="t('auth.signup.address.form.address_line_1')"
         :hint="t('auth.common.required')"
@@ -124,6 +125,7 @@ const { t } = useI18n();
         maxlength="128"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="address-line2"
         :label="t('auth.signup.address.form.address_line_2')"
         :hint="t('auth.common.optional')"
@@ -136,6 +138,7 @@ const { t } = useI18n();
         v-model="state.city"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="address-level2"
         :label="t('auth.signup.address.form.city')"
         :hint="t('auth.common.required')"
@@ -148,6 +151,7 @@ const { t } = useI18n();
         v-model="state.postcode"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="postal-code"
         :label="t('auth.signup.address.form.postal_code')"
         :hint="t('auth.common.required')"
@@ -158,6 +162,7 @@ const { t } = useI18n();
       <CountrySelect
         v-model="state.country"
         disabled
+        dense
         :error-messages="toMessages(v$.country)"
         :hint="t('account.address.country.hint', { email: supportEmail })"
         @blur="v$.country.$touch()"

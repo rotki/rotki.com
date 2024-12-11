@@ -77,6 +77,7 @@ const { t } = useI18n();
           v-model="state.currentPassword"
           variant="outlined"
           color="primary"
+          dense
           :error-messages="toMessages(v$.currentPassword)"
           :hint="t('account.change_password.current_password.hint')"
           :label="t('account.change_password.current_password.label')"
@@ -89,6 +90,7 @@ const { t } = useI18n();
             v-model="state.newPassword"
             color="primary"
             variant="outlined"
+            dense
             hide-details
             :label="t('account.change_password.new_password.label')"
             autocomplete="new-password"
@@ -124,6 +126,7 @@ const { t } = useI18n();
           color="primary"
           :error-messages="toMessages(v$.passwordConfirmation)"
           variant="outlined"
+          dense
           :label="t('auth.signup.account.form.confirm_password')"
           :hint="t('auth.common.confirm_hint')"
           autocomplete="new-password"

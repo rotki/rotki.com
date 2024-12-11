@@ -36,6 +36,7 @@ const { t } = useI18n();
           id="email"
           v-model="username"
           disabled
+          dense
           class="[&_input]:!text-rui-text"
           variant="outlined"
           :label="t('auth.common.username')"
@@ -48,6 +49,7 @@ const { t } = useI18n();
             id="email"
             v-model="email"
             disabled
+            dense
             class="[&_input]:!text-rui-text"
             variant="outlined"
             :label="t('auth.common.email')"
