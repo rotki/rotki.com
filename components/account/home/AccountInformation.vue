@@ -21,20 +21,11 @@ const state = reactive({
 const loading = ref(false);
 const done = ref(false);
 const vatSuccessMessage = ref('');
+const loadingCheck = ref<boolean>(false);
+const $externalResults = ref<Record<string, string[]>>({});
+const remainingTime = ref<number>(0);
 
 const { account } = storeToRefs(store);
-
-const movedOffline = computed(
-  () => get(account)?.address.movedOffline ?? false,
-);
-
-const isVatIdValid = computed(
-  () => get(account)?.vatIdStatus === VatIdStatus.VALID || false,
-);
-
-onBeforeMount(() => {
-  reset();
-});
 
 const rules = {
   firstName: { required },
@@ -43,18 +34,59 @@ const rules = {
   vatId: {},
 };
 
-const $externalResults = ref<Record<string, string[]>>({});
+const waitUntilTime = useLocalStorage<number>('rotki.vat_check.wait_until_time', 0);
+
+const [DefineVAT, ReuseVAT] = createReusableTemplate();
 
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
   $externalResults,
 });
 
+const { pause: pauseTimer, resume } = useIntervalFn(() => {
+  if (!updateRemainingTime()) {
+    set(remainingTime, 0);
+    pauseTimer();
+  }
+}, 1000, { immediate: false });
+
 const {
   public: {
     contact: { supportEmail, supportEmailMailto },
   },
 } = useRuntimeConfig();
+
+const movedOffline = computed<boolean>(() => get(account)?.address.movedOffline ?? false);
+const isVatIdValid = computed<boolean>(() => get(account)?.vatIdStatus === VatIdStatus.VALID || false);
+
+const vatHint = computed<string>(() => {
+  const wait = get(remainingTime);
+  if (wait > 0) {
+    const formatted = formatSeconds(wait);
+    const time = `${(formatted.minutes || '00').toString().padStart(2, '0')}:${(formatted.seconds || '00').toString().padStart(2, '0')}`;
+    return t('auth.signup.vat.timer', { time });
+  }
+
+  return t('auth.signup.customer_information.form.vat_id_hint');
+});
+
+const hideVATVerifyButton = computed<boolean>(() => {
+  const status = get(account)?.vatIdStatus;
+  return status === VatIdStatus.NON_EU_ID;
+});
+
+const vatErrorMessage = computed<string>(() => {
+  if (get(remainingTime) > 0)
+    return '';
+  const status = get(account)?.vatIdStatus;
+  if (status === VatIdStatus.NOT_VALID) {
+    return t('auth.signup.vat.invalid');
+  }
+  else if (status === VatIdStatus.NOT_CHECKED) {
+    return t('auth.signup.vat.not_verified');
+  }
+  return '';
+});
 
 function reset() {
   const userAccount = get(account);
@@ -103,26 +135,15 @@ async function update() {
   set(loading, false);
 }
 
-const waitTime = ref<number>(0);
-const loadingCheck = ref<boolean>(false);
-
-const { pause: pauseTimer, resume } = useIntervalFn(() => {
-  const wait = get(waitTime);
-  if (wait > 0) {
-    set(waitTime, wait - 1);
-  }
-  else {
-    pauseTimer();
-  }
-}, 1000, { immediate: false });
-
 async function handleCheckVATClick() {
   set(loadingCheck, true);
   const result = await store.checkVAT();
   await store.refreshVATCheckStatus();
 
   if (typeof result === 'number') {
-    set(waitTime, result);
+    const now = Math.round(Date.now() / 1000);
+    set(waitUntilTime, now + result);
+    set(remainingTime, result);
     pauseTimer();
     if (result > 0) {
       resume();
@@ -137,35 +158,21 @@ async function handleCheckVATClick() {
   set(loadingCheck, false);
 }
 
-const [DefineVAT, ReuseVAT] = createReusableTemplate();
+function updateRemainingTime(): boolean {
+  const now = Math.round(Date.now() / 1000);
+  const endTime = get(waitUntilTime);
 
-const vatHint = computed(() => {
-  const wait = get(waitTime);
-  if (wait > 0) {
-    const formatted = formatSeconds(wait);
-    const time = `${(formatted.minutes || '00').toString().padStart(2, '0')}:${(formatted.seconds || '00').toString().padStart(2, '0')}`;
-    return t('auth.signup.vat.timer', { time });
+  if (endTime > now) {
+    set(remainingTime, endTime - now);
+    return true;
   }
+  return false;
+}
 
-  return t('auth.signup.customer_information.form.vat_id_hint');
-});
-
-const hideVATVerifyButton = computed(() => {
-  const status = get(account)?.vatIdStatus;
-  return status === VatIdStatus.NON_EU_ID;
-});
-
-const vatErrorMessage = computed(() => {
-  if (get(waitTime) > 0)
-    return '';
-  const status = get(account)?.vatIdStatus;
-  if (status === VatIdStatus.NOT_VALID) {
-    return t('auth.signup.vat.invalid');
-  }
-  else if (status === VatIdStatus.NOT_CHECKED) {
-    return t('auth.signup.vat.not_verified');
-  }
-  return '';
+onBeforeMount(() => {
+  reset();
+  resume();
+  updateRemainingTime();
 });
 </script>
 
@@ -198,7 +205,7 @@ const vatErrorMessage = computed(() => {
         v-if="!hideVATVerifyButton"
         color="primary"
         class="h-10"
-        :disabled="waitTime > 0"
+        :disabled="remainingTime > 0 || !state.vatId"
         :loading="loadingCheck"
         @click="handleCheckVATClick()"
       >
