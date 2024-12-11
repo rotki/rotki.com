@@ -5,6 +5,8 @@ import { get, objectOmit, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { toMessages } from '~/utils/validation';
+import { VatIdStatus } from '~/types/account';
+import { formatSeconds } from '~/utils/text';
 
 const { t } = useI18n();
 
@@ -18,6 +20,7 @@ const state = reactive({
 
 const loading = ref(false);
 const done = ref(false);
+const vatSuccessMessage = ref('');
 
 const { account } = storeToRefs(store);
 
@@ -26,7 +29,7 @@ const movedOffline = computed(
 );
 
 const isVatIdValid = computed(
-  () => get(account)?.vatIdStatus === 'Valid' || false,
+  () => get(account)?.vatIdStatus === VatIdStatus.VALID || false,
 );
 
 onBeforeMount(() => {
@@ -125,10 +128,45 @@ async function handleCheckVATClick() {
       resume();
     }
   }
+  else if (result) {
+    set(vatSuccessMessage, t('auth.signup.vat.verified'));
+    setTimeout(() => {
+      set(vatSuccessMessage, '');
+    }, 3000);
+  }
   set(loadingCheck, false);
 }
 
 const [DefineVAT, ReuseVAT] = createReusableTemplate();
+
+const vatHint = computed(() => {
+  const wait = get(waitTime);
+  if (wait > 0) {
+    const formatted = formatSeconds(wait);
+    const time = `${(formatted.minutes || '00').toString().padStart(2, '0')}:${(formatted.seconds || '00').toString().padStart(2, '0')}`;
+    return t('auth.signup.vat.timer', { time });
+  }
+
+  return t('auth.signup.customer_information.form.vat_id_hint');
+});
+
+const hideVATVerifyButton = computed(() => {
+  const status = get(account)?.vatIdStatus;
+  return status === VatIdStatus.NON_EU_ID;
+});
+
+const vatErrorMessage = computed(() => {
+  if (get(waitTime) > 0)
+    return '';
+  const status = get(account)?.vatIdStatus;
+  if (status === VatIdStatus.NOT_VALID) {
+    return t('auth.signup.vat.invalid');
+  }
+  else if (status === VatIdStatus.NOT_CHECKED) {
+    return t('auth.signup.vat.not_verified');
+  }
+  return '';
+});
 </script>
 
 <template>
@@ -139,53 +177,33 @@ const [DefineVAT, ReuseVAT] = createReusableTemplate();
         v-model="state.vatId"
         variant="outlined"
         color="primary"
+        dense
         class="flex-1"
         :label="t('auth.signup.customer_information.form.vat_id')"
-        :hint="t('auth.signup.customer_information.form.vat_id_hint')"
-        :error-messages="toMessages(v$.vatId)"
+        :hint="vatHint"
+        :error-messages="[...toMessages(v$.vatId), vatErrorMessage]"
+        :success-messages="vatSuccessMessage"
         @blur="v$.vatId.$touch()"
-      />
-      <RuiTooltip persist-on-tooltip-hover>
-        <template #activator>
+      >
+        <template #append>
           <RuiIcon
-            class="mt-4"
+            v-if="!hideVATVerifyButton"
+            size="16"
             :name="isVatIdValid ? 'lu-circle-check' : 'lu-circle-x'"
             :color="isVatIdValid ? 'success' : 'error'"
           />
         </template>
-        <div v-if="!isVatIdValid">
-          <div
-            v-if="waitTime > 0"
-            class="flex flex-col gap-1.5 items-center py-1.5"
-          >
-            {{ t('auth.signup.vat.cooldown') }}
-            <div class="text-grey-500">
-              {{ t('auth.signup.vat.timer', { waitTime }) }}
-            </div>
-          </div>
-          <div
-            v-else
-            class="flex flex-col gap-1.5 items-center py-1.5"
-          >
-            {{ t('auth.signup.vat.unverified') }}
-            <RuiButton
-              color="primary"
-              size="sm"
-              :disabled="waitTime > 0"
-              :loading="loadingCheck"
-              @click="handleCheckVATClick()"
-            >
-              {{ t('auth.signup.vat.verify_now') }}
-            </RuiButton>
-          </div>
-        </div>
-        <div
-          v-else
-          class="flex flex-col gap-1.5 items-center py-1.5"
-        >
-          {{ t('auth.signup.vat.verified') }}
-        </div>
-      </RuiTooltip>
+      </RuiTextField>
+      <RuiButton
+        v-if="!hideVATVerifyButton"
+        color="primary"
+        class="h-10"
+        :disabled="waitTime > 0"
+        :loading="loadingCheck"
+        @click="handleCheckVATClick()"
+      >
+        {{ t('auth.signup.vat.verify') }}
+      </RuiButton>
     </div>
   </DefineVAT>
   <div
@@ -198,6 +216,7 @@ const [DefineVAT, ReuseVAT] = createReusableTemplate();
         v-model="state.firstName"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="given-name"
         :label="t('auth.signup.customer_information.form.first_name')"
         :hint="t('auth.signup.customer_information.form.name_hint')"
@@ -210,6 +229,7 @@ const [DefineVAT, ReuseVAT] = createReusableTemplate();
         v-model="state.lastName"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="family-name"
         :label="t('auth.signup.customer_information.form.last_name')"
         :hint="t('auth.signup.customer_information.form.name_hint')"
@@ -222,6 +242,7 @@ const [DefineVAT, ReuseVAT] = createReusableTemplate();
         v-model="state.companyName"
         variant="outlined"
         color="primary"
+        dense
         autocomplete="organization"
         :label="t('auth.signup.customer_information.form.company')"
         :hint="t('auth.signup.customer_information.form.company_hint')"

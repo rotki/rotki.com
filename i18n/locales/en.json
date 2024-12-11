@@ -278,11 +278,11 @@
         }
       },
       "vat": {
-        "cooldown": "VAT ID Verification Cooldown",
-        "timer": "Please wait {waitTime} seconds before trying again",
-        "unverified": "VAT ID Haven't Verified",
-        "verify_now": "Verify Now",
-        "verified": "VAT ID Verified"
+        "invalid": "VAT ID is invalid. Please enter your correct VAT ID.",
+        "not_verified": "VAT ID not verified. Please verify your VAT ID before updating your customer information",
+        "timer": "VAT ID verification cooldown in progress. Please try again in {time}",
+        "verified": "Your VAT ID is successfully verified!",
+        "verify": "Verify"
       }
     }
   },

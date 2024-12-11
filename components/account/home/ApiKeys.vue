@@ -51,6 +51,7 @@ const { t } = useI18n();
         variant="outlined"
         :label="t('account.api_keys.api_key')"
         readonly
+        dense
         hide-details
         color="primary"
       >
@@ -67,6 +68,7 @@ const { t } = useI18n();
         variant="outlined"
         :label="t('account.api_keys.api_secret')"
         readonly
+        dense
         hide-details
         color="primary"
       >
