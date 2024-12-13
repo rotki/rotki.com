@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { requiredUnless } from '@vuelidate/validators';
 import { get, objectOmit, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useVatCheck } from '~/composables/use-vat-check';
@@ -29,9 +29,11 @@ const remainingTime = ref<number>(0);
 
 const { account } = storeToRefs(store);
 
+const movedOffline = computed<boolean>(() => get(account)?.address.movedOffline ?? false);
+
 const rules = {
-  firstName: { required },
-  lastName: { required },
+  firstName: { required: requiredUnless(movedOffline) },
+  lastName: { required: requiredUnless(movedOffline) },
   companyName: {},
   vatId: {},
 };
@@ -59,7 +61,6 @@ const {
   },
 } = useRuntimeConfig();
 
-const movedOffline = computed<boolean>(() => get(account)?.address.movedOffline ?? false);
 const isVatIdValid = computed<boolean>(() => get(account)?.vatIdStatus === VatIdStatus.VALID || false);
 
 const vatHint = computed<string>(() => {
@@ -140,6 +141,7 @@ async function update() {
 
 async function handleCheckVATClick() {
   set(loadingCheck, true);
+  await update();
   const checkResult = await checkVAT();
   await refreshVATCheckStatus();
 
