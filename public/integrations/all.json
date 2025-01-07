@@ -1,468 +1,512 @@
 {
   "blockchains": [
     {
-      "label": "Ethereum",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ethereum.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ethereum.svg",
+      "label": "Ethereum"
     },
     {
-      "label": "Bitcoin",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitcoin.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitcoin.svg",
+      "label": "Bitcoin"
     },
     {
-      "label": "Bitcoin Cash",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitcoin-cash.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitcoin-cash.svg",
+      "label": "Bitcoin Cash"
     },
     {
-      "label": "Kusama",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kusama.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kusama.svg",
+      "label": "Kusama"
     },
     {
-      "label": "Avalanche",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/avalanche.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/avalanche.svg",
+      "label": "Avalanche"
     },
     {
-      "label": "Polkadot",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/polkadot.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/polkadot.svg",
+      "label": "Polkadot"
     },
     {
-      "label": "Optimism",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/optimism.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/optimism.svg",
+      "label": "Optimism"
     },
     {
-      "label": "Polygon PoS",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/polygon_pos.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/polygon_pos.svg",
+      "label": "Polygon PoS"
     },
     {
-      "label": "Arbitrum One",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/arbitrum_one.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/arbitrum_one.svg",
+      "label": "Arbitrum One"
     },
     {
-      "label": "Base",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/base.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/base.svg",
+      "label": "Base"
     },
     {
-      "label": "Gnosis",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis.svg",
+      "label": "Gnosis"
     },
     {
-      "label": "Scroll",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/scroll.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/scroll.svg",
+      "label": "Scroll"
     },
     {
-      "label": "ZKSync Lite",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/zksync_lite.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/zksync_lite.svg",
+      "label": "ZKSync Lite"
     }
   ],
   "exchanges": [
     {
-      "label": "Kraken",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kraken.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kraken.svg",
+      "label": "Kraken"
     },
     {
-      "label": "Poloniex",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/poloniex.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/poloniex.svg",
+      "label": "Poloniex"
     },
     {
-      "label": "Bittrex",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bittrex.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bittrex.svg",
+      "label": "Bittrex"
     },
     {
-      "label": "Binance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/binance.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/binance.svg",
+      "label": "Binance"
     },
     {
-      "label": "Bitmex",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitmex.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitmex.svg",
+      "label": "Bitmex"
     },
     {
-      "label": "Coinbase",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/coinbase.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/coinbase.svg",
+      "label": "Coinbase"
     },
     {
-      "label": "Coinbase Pro",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/coinbasepro.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/coinbaseprime.svg",
+      "label": "Coinbase Prime"
     },
     {
-      "label": "Gemini",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gemini.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/coinbasepro.svg",
+      "label": "Coinbase Pro"
     },
     {
-      "label": "Cryptocom",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/crypto_com.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gemini.svg",
+      "label": "Gemini"
     },
     {
-      "label": "Bitstamp",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitstamp.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/crypto_com.svg",
+      "label": "Cryptocom"
     },
     {
-      "label": "Binance US",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/binance.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitstamp.svg",
+      "label": "Bitstamp"
     },
     {
-      "label": "Bitfinex",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitfinex.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/binance.svg",
+      "label": "Binance US"
     },
     {
-      "label": "Bitcoin.de",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/btcde.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitfinex.svg",
+      "label": "Bitfinex"
     },
     {
-      "label": "Iconomi",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/iconomi.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/btcde.svg",
+      "label": "Bitcoin.de"
     },
     {
-      "label": "Kucoin",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kucoin.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/iconomi.svg",
+      "label": "Iconomi"
     },
     {
-      "label": "FTX",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ftx.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kucoin.svg",
+      "label": "Kucoin"
     },
     {
-      "label": "Nexo",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/nexo.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ftx.svg",
+      "label": "FTX"
     },
     {
-      "label": "Blockfi",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/blockfi.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/nexo.svg",
+      "label": "Nexo"
     },
     {
-      "label": "Independent Reserve",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/independentreserve.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/blockfi.svg",
+      "label": "Blockfi"
     },
     {
-      "label": "Shapeshift",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shapeshift.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/independentreserve.svg",
+      "label": "Independent Reserve"
     },
     {
-      "label": "Uphold",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/uphold.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shapeshift.svg",
+      "label": "Shapeshift"
     },
     {
-      "label": "Bitpanda",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitpanda.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/uphold.svg",
+      "label": "Uphold"
     },
     {
-      "label": "Bisq",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bisq.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitpanda.svg",
+      "label": "Bitpanda"
     },
     {
-      "label": "FTX US",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ftxus.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bisq.svg",
+      "label": "Bisq"
     },
     {
-      "label": "OKX",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/okx.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ftxus.svg",
+      "label": "FTX US"
     },
     {
-      "label": "Woo",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/woo.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/okx.svg",
+      "label": "OKX"
     },
     {
-      "label": "Bybit",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bybit.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/woo.svg",
+      "label": "Woo"
     },
     {
-      "label": "HTX",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/htx.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bybit.svg",
+      "label": "Bybit"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/htx.svg",
+      "label": "HTX"
     }
   ],
   "protocols": [
     {
-      "label": "Hop Protocol",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/hop_protocol.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis.svg",
+      "label": "Locked GNO"
     },
     {
-      "label": "Makerdao vault",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/matic.svg",
+      "label": "WMatic"
     },
     {
-      "label": "Shutter",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shutter.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/votium.png",
+      "label": "Votium"
     },
     {
-      "label": "The Graph",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/thegraph.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shutter.png",
+      "label": "Shutter"
     },
     {
-      "label": "Paraswap",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/paraswap.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/juicebox.svg",
+      "label": "Juicebox"
     },
     {
-      "label": "Compound",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/compound.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/liquity.svg",
+      "label": "Liquity"
     },
     {
-      "label": "Makerdao SAI",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg",
+      "label": "Makerdao vault"
     },
     {
-      "label": "Cirle CCTP",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/cctp.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/omni.svg",
+      "label": "Omni"
     },
     {
-      "label": "Safe",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/safemultisig.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/convex.jpeg",
+      "label": "Convex"
     },
     {
-      "label": "EigenLayer",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/eigenlayer.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/polygon_pos.svg",
+      "label": "Polygon"
     },
     {
-      "label": "SDAI contract",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/sdai.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/badger.png",
+      "label": "Badger"
     },
     {
-      "label": "ETH2",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ethereum.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/cowswap.jpg",
+      "label": "Cowswap"
     },
     {
-      "label": "Convex",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/convex.jpeg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg",
+      "label": "Makerdao migration"
     },
     {
-      "label": "Juicebox",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/juicebox.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/metamask.svg",
+      "label": "Metamask swaps"
     },
     {
-      "label": "Monerium",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/monerium.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gitcoin.svg",
+      "label": "Gitcoin"
     },
     {
-      "label": "Safe Multisig",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/safemultisig.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/paraswap.svg",
+      "label": "Paraswap"
     },
     {
-      "label": "Diva",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/diva.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/dxdao.svg",
+      "label": "Dxdao"
     },
     {
-      "label": "Degen",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/degen.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/walletconnect.svg",
+      "label": "WalletConnect"
     },
     {
-      "label": "Pickle Finance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/pickle.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/openocean.png",
+      "label": "OpenOcean"
     },
     {
-      "label": "Element Finance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/element_finance.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/drips.png",
+      "label": "Drips"
     },
     {
-      "label": "1inch",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/1inch.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/thegraph.svg",
+      "label": "The Graph"
     },
     {
-      "label": "Paladin",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/paladin.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/base.svg",
+      "label": "Basenames"
     },
     {
-      "label": "Kyber",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kyber.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/monerium.svg",
+      "label": "Monerium"
     },
     {
-      "label": "Gnosis Pay",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis_pay.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/optimism.svg",
+      "label": "Optimism"
     },
     {
-      "label": "Ethereum Attestation Service",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/eas.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/aura-finance.png",
+      "label": "Aura Finance"
     },
     {
-      "label": "Yearn Governance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/yearn_vaults.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/defisaver.jpeg",
+      "label": "Defisaver"
     },
     {
-      "label": "Golem",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/golem.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kyber.svg",
+      "label": "Kyber"
     },
     {
-      "label": "Metamask swaps",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/metamask.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/0x.svg",
+      "label": "0x"
     },
     {
-      "label": "Gnosis Chain",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/puffer.svg",
+      "label": "Puffer"
     },
     {
-      "label": "Gearbox",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gearbox.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/llamazip.png",
+      "label": "LlamaZip"
     },
     {
-      "label": "Ens",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ens.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/extrafi.svg",
+      "label": "Extrafi"
     },
     {
-      "label": "Kyber",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kyber.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis_pay.png",
+      "label": "Gnosis Pay"
     },
     {
-      "label": "Scroll",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/scroll.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/wxdai.png",
+      "label": "WXDAI"
     },
     {
-      "label": "Lido eth",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/lido.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/curve.png",
+      "label": "Curve.fi"
     },
     {
-      "label": "Polygon",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/polygon_pos.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/fluence.png",
+      "label": "Fluence"
     },
     {
-      "label": "Shapeshift",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shapeshift.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/harvest.gif",
+      "label": "Harve Finance"
     },
     {
-      "label": "WXDAI",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/wxdai.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ens.svg",
+      "label": "Ens"
     },
     {
-      "label": "Cowswap",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/cowswap.jpg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/compound.svg",
+      "label": "Compound"
     },
     {
-      "label": "WETH",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/weth.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/aerodrome.svg",
+      "label": "Aerodrome Finance"
     },
     {
-      "label": "Aave",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/aave.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kraken.svg",
+      "label": "Kraken"
     },
     {
-      "label": "Gitcoin",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gitcoin.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg",
+      "label": "Makerdao SAI"
     },
     {
-      "label": "Omni",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/omni.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/firebird-finance.png",
+      "label": "Firebird Finance"
     },
     {
-      "label": "Defisaver",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/defisaver.jpeg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/pickle.svg",
+      "label": "Pickle Finance"
     },
     {
-      "label": "0x",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/0x.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/degen.svg",
+      "label": "Degen"
     },
     {
-      "label": "Velodrome finance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/velodrome.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/aave.svg",
+      "label": "Aave"
     },
     {
-      "label": "LlamaZip",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/llamazip.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/morpho.svg",
+      "label": "Morpho"
     },
     {
-      "label": "Clrfund",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/clrfund.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shapeshift.svg",
+      "label": "Shapeshift"
     },
     {
-      "label": "Badger",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/badger.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/giveth.jpg",
+      "label": "Giveth"
     },
     {
-      "label": "Makerdao DSR",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/velodrome.svg",
+      "label": "Velodrome finance"
     },
     {
-      "label": "Socket",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/socket.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/clrfund.png",
+      "label": "Clrfund"
     },
     {
-      "label": "Makerdao migration",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis.svg",
+      "label": "Gnosis Chain"
     },
     {
-      "label": "GMX",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gmx.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/blur.png",
+      "label": "Blur"
     },
     {
-      "label": "Votium",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/votium.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/safemultisig.svg",
+      "label": "Safe"
     },
     {
-      "label": "Aerodrome Finance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/aerodrome.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/yearn_vaults.svg",
+      "label": "Yearn Governance"
     },
     {
-      "label": "Locked GNO",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gnosis.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/zksync.jpg",
+      "label": "ZkSync"
     },
     {
-      "label": "Sky",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/sky_money.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/diva.svg",
+      "label": "Diva"
     },
     {
-      "label": "Drips",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/drips.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/scroll.svg",
+      "label": "Scroll"
     },
     {
-      "label": "Base",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/base.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/safemultisig.svg",
+      "label": "Safe Multisig"
     },
     {
-      "label": "Octant",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/octant.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/base.svg",
+      "label": "Base"
     },
     {
-      "label": "Blur",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/blur.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/stakedao.png",
+      "label": "Stakedao"
     },
     {
-      "label": "Kraken",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kraken.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/socket.png",
+      "label": "Socket"
     },
     {
-      "label": "Harve Finance",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/harvest.gif"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/umami.svg",
+      "label": "Umami"
     },
     {
-      "label": "WMatic",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/matic.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gmx.svg",
+      "label": "GMX"
     },
     {
-      "label": "Dxdao",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/dxdao.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/frax.png",
+      "label": "FRAX"
     },
     {
-      "label": "Extrafi",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/extrafi.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/efp.svg",
+      "label": "EFP"
     },
     {
-      "label": "Liquity",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/liquity.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/golem.svg",
+      "label": "Golem"
     },
     {
-      "label": "Arbitrum One",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/arbitrum_one.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/paladin.png",
+      "label": "Paladin"
     },
     {
-      "label": "Fluence",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/fluence.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/ethereum.svg",
+      "label": "ETH2"
     },
     {
-      "label": "Uniswap",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/uniswap.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/element_finance.png",
+      "label": "Element Finance"
     },
     {
-      "label": "Curve.fi",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/curve.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/gearbox.svg",
+      "label": "Gearbox"
     },
     {
-      "label": "Stakedao",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/stakedao.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/sky_money.svg",
+      "label": "Sky"
     },
     {
-      "label": "FRAX",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/frax.png"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/weth.svg",
+      "label": "WETH"
     },
     {
-      "label": "Optimism",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/optimism.svg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/lido.svg",
+      "label": "Lido eth"
     },
     {
-      "label": "ZkSync",
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/zksync.jpg"
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg",
+      "label": "Makerdao DSR"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/1inch.svg",
+      "label": "1inch"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/hop_protocol.png",
+      "label": "Hop Protocol"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/arbitrum_one.svg",
+      "label": "Arbitrum One"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/cctp.svg",
+      "label": "Circle CCTP"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/octant.svg",
+      "label": "Octant"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/eigenlayer.png",
+      "label": "EigenLayer"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/sdai.svg",
+      "label": "SDAI contract"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/uniswap.svg",
+      "label": "Uniswap"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kyber.svg",
+      "label": "Kyber"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/eas.png",
+      "label": "Ethereum Attestation Service"
     }
   ]
 }
