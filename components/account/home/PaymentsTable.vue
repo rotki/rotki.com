@@ -29,7 +29,7 @@ const headers: DataTableColumn<Payment>[] = [
     sortable: true,
     align: 'end',
   },
-  { label: t('common.status'), key: 'status', class: 'capitalize' },
+  { label: t('common.status'), key: 'isRefund', class: 'capitalize' },
   {
     label: t('common.actions'),
     key: 'actions',
@@ -69,12 +69,12 @@ const payments = computed(() => {
       outlined
       row-attr="identifier"
     >
-      <template #item.status>
+      <template #item.isRefund="{ row }">
         <RuiChip
           size="sm"
-          color="success"
+          :color="row.isRefund ? 'info' : 'success'"
         >
-          {{ t('account.payments.paid') }}
+          {{ row.isRefund ? t("account.payments.refunded") : t("account.payments.paid") }}
         </RuiChip>
       </template>
 

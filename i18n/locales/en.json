@@ -53,6 +53,7 @@
       },
       "no_payments_found": "No payments found",
       "paid": "Paid",
+      "refunded": "Refunded",
       "title": "Your latest payments"
     },
     "subscriptions": {
