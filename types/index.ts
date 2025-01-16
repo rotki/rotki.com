@@ -63,6 +63,7 @@ export type Subscription = z.infer<typeof Subscription>;
 export const Payment = z.object({
   eurAmount: z.string(),
   identifier: z.string().min(1),
+  isRefund: z.boolean().optional().default(false),
   paidAt: z.string(),
   plan: z.string(),
 });
