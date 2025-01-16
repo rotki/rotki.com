@@ -11,7 +11,9 @@ import type { Payment } from '~/types';
 
 const { t } = useI18n();
 
-const headers: DataTableColumn<Payment>[] = [
+type PaymentInfo = Payment & { status: 'Paid' | 'Refunded' };
+
+const headers: DataTableColumn<PaymentInfo>[] = [
   {
     label: t('common.plan'),
     key: 'plan',
@@ -42,14 +44,17 @@ const store = useMainStore();
 const { account } = storeToRefs(store);
 
 const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<Payment>[]>([]);
+const sort = ref<DataTableSortColumn<PaymentInfo>[]>([]);
 
 const payments = computed(() => {
   const userAccount = get(account);
   if (!userAccount)
     return [];
 
-  return userAccount.payments.sort(
+  return userAccount.payments.map(item => ({
+    ...item,
+    status: item.plan.includes('refund') ? 'Refunded' : 'Paid',
+  })).sort(
     (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
   );
 });
@@ -69,12 +74,12 @@ const payments = computed(() => {
       outlined
       row-attr="identifier"
     >
-      <template #item.status>
+      <template #item.status="{ row }">
         <RuiChip
           size="sm"
-          color="success"
+          :color="row.status === 'Paid' ? 'success' : 'info'"
         >
-          {{ t('account.payments.paid') }}
+          {{ row.status === 'Paid' ? t('account.payments.paid') : t('account.payments.refunded') }}
         </RuiChip>
       </template>
 
