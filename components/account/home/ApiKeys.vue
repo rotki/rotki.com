@@ -34,7 +34,7 @@ const { t } = useI18n();
           @click="regenerateKeys()"
         >
           <template #prepend>
-            <RuiIcon name="refresh-line" />
+            <RuiIcon name="lu-refresh-cw" />
           </template>
           {{ hasApiKeys ? t('actions.regenerate') : t('actions.generate') }}
         </RuiButton>

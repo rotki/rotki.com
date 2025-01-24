@@ -48,7 +48,7 @@ async function resend() {
     >
       <template #prepend>
         <RuiIcon
-          name="mail-send-line"
+          name="lu-mail"
           size="20"
         />
       </template>

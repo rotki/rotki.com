@@ -180,7 +180,7 @@ defineExpose({ submit });
       :loading="deleteLoading"
       @click="deleteCardClick()"
     >
-      <RuiIcon name="delete-bin-5-line" />
+      <RuiIcon name="lu-trash-2" />
     </RuiButton>
   </div>
   <RuiAlert

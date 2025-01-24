@@ -71,7 +71,7 @@ function click() {
     >
       <RuiIcon
         class="text-black/60"
-        name="hand-coin-line"
+        name="lu-donate-fill"
       />
       <span>
         {{ t('home.plans.save_discount', { discount: plan.discount }) }}

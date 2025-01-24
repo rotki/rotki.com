@@ -2,7 +2,7 @@
 export interface DownloadItemProps {
   platform: string;
   url: string;
-  icon: 'download-cloud-2-line' | 'apple-line' | 'windows-line';
+  icon: 'lu-cloud-download-2-fill' | 'lu-os-apple' | 'lu-os-windows';
 }
 
 defineProps<DownloadItemProps>();

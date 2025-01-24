@@ -209,7 +209,7 @@ onUnmounted(() => pause());
                 <RuiIcon
                   size="16"
                   class="text-white"
-                  name="information-line"
+                  name="lu-info"
                 />
                 {{ t('account.subscriptions.cancelled_but_still_active.status', { date: row.nextActionDate }) }}
               </div>
@@ -259,7 +259,7 @@ onUnmounted(() => pause());
                 :to="getBlockExplorerLink(pendingTx)"
               >
                 <RuiIcon
-                  name="links-line"
+                  name="lu-link"
                   :size="18"
                 />
               </ButtonLink>

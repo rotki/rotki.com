@@ -42,7 +42,7 @@ const { t } = useI18n();
           :label="t('auth.common.username')"
           hide-details
           color="primary"
-          append-icon="lock-line"
+          append-icon="lu-lock-keyhole"
         />
         <div>
           <RuiTextField
@@ -55,7 +55,7 @@ const { t } = useI18n();
             :label="t('auth.common.email')"
             hide-details
             color="primary"
-            append-icon="lock-line"
+            append-icon="lu-lock-keyhole"
           />
           <div class="text-rui-text-secondary pt-2 px-3 text-xs flex">
             {{ t('account_details.check_email') }}

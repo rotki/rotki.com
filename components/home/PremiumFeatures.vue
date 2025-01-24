@@ -5,30 +5,30 @@ const { t } = useI18n();
 
 const data = computed<{ icon: RuiIcons; text: string; description: string }[]>(() => [
   {
-    icon: 'pie-chart-line',
+    icon: 'lu-chart-pie',
     text: t('home.premium_features.features.graphs_and_statistics.title'),
     description: t(
       'home.premium_features.features.graphs_and_statistics.detail',
     ),
   },
   {
-    icon: 'bit-coin-line',
+    icon: 'lu-layers',
     text: t('home.premium_features.features.premium_staking.title'),
     description: t('home.premium_features.features.premium_staking.detail'),
   },
   {
-    icon: 'coins-line',
+    icon: 'lu-history',
     text: t('home.premium_features.features.history.title'),
     description: t('home.premium_features.features.history.detail'),
   },
   {
-    icon: 'bank-line',
+    icon: 'lu-landmark',
     text: t('home.premium_features.features.dex_support.title'),
     description: t('home.premium_features.features.dex_support.detail'),
   },
 
   {
-    icon: 'bar-chart-2-line',
+    icon: 'lu-chart-no-axes-column',
     text: t('home.premium_features.features.premium_defi.title'),
     description: t('home.premium_features.features.premium_defi.detail'),
   },

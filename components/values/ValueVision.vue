@@ -4,10 +4,10 @@ import type { RuiIcons } from '@rotki/ui-library';
 const { t } = useI18n();
 
 const values: { icon: RuiIcons; label: string }[] = [
-  { icon: 'bank-line', label: t('values.vision_section.list.line_1') },
-  { icon: 'money-dollar-circle-line', label: t('values.vision_section.list.line_2') },
-  { icon: 'calendar-todo-line', label: t('values.vision_section.list.line_3') },
-  { icon: 'hand-coin-line', label: t('values.vision_section.list.line_4') },
+  { icon: 'lu-landmark', label: t('values.vision_section.list.line_1') },
+  { icon: 'lu-badge-dollar-sign', label: t('values.vision_section.list.line_2') },
+  { icon: 'lu-calendar', label: t('values.vision_section.list.line_3') },
+  { icon: 'lu-donate-fill', label: t('values.vision_section.list.line_4') },
 ];
 </script>
 
