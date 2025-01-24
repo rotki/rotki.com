@@ -77,7 +77,7 @@ const { isMdAndUp } = useBreakpoint();
           v-model="search"
           variant="outlined"
           :label="t('integration.search')"
-          prepend-icon="search-line"
+          prepend-icon="lu-search"
           color="primary"
           clearable
         />

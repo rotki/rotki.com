@@ -83,7 +83,7 @@ const { isMdAndDown } = useBreakpoint();
         >
           <RuiIcon
             size="18"
-            name="external-link-line"
+            name="lu-external-link"
           />
         </template>
       </ButtonLink>
@@ -102,7 +102,7 @@ const { isMdAndDown } = useBreakpoint();
               <div class="flex items-center gap-2">
                 {{ menu.label }}
                 <RuiIcon
-                  name="arrow-down-s-line"
+                  name="lu-chevron-down"
                   size="16"
                 />
               </div>
@@ -128,7 +128,7 @@ const { isMdAndDown } = useBreakpoint();
               >
                 <RuiIcon
                   class="ml-8"
-                  name="external-link-line"
+                  name="lu-external-link"
                 />
               </template>
             </ButtonLink>
@@ -150,7 +150,7 @@ const { isMdAndDown } = useBreakpoint();
           >
             <RuiIcon
               size="18"
-              name="external-link-line"
+              name="lu-external-link"
             />
           </template>
         </ButtonLink>

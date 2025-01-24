@@ -5,17 +5,17 @@ const { t } = useI18n();
 
 const data: { icon: RuiIcons; text: string; tooltip: string }[] = [
   {
-    icon: 'open-source-line',
+    icon: 'lu-code-xml',
     text: t('home.advantages.open_source.title'),
     tooltip: t('home.advantages.open_source.description'),
   },
   {
-    icon: 'computer-line',
+    icon: 'lu-laptop-minimal',
     text: t('home.advantages.local_app.title'),
     tooltip: t('home.advantages.local_app.description'),
   },
   {
-    icon: 'database-line',
+    icon: 'lu-database',
     text: t('home.advantages.own_your_data.title'),
     tooltip: t('home.advantages.own_your_data.description'),
   },

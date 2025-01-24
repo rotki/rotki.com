@@ -12,25 +12,25 @@ const menus: { title: string; showText: boolean; href: string; icon: RuiIcons }[
     title: 'Github',
     showText: false,
     href: github,
-    icon: 'github-line',
+    icon: 'lu-github',
   },
   {
     title: 'Twitter',
     showText: false,
     href: twitter,
-    icon: 'twitter-x-line',
+    icon: 'lu-x-twitter',
   },
   {
     title: 'Discord',
     showText: false,
     href: discord,
-    icon: 'discord-line',
+    icon: 'lu-discord',
   },
   {
     title: 'Contact',
     showText: true,
     href: emailMailto,
-    icon: 'mail-send-line',
+    icon: 'lu-mail',
   },
 ];
 </script>

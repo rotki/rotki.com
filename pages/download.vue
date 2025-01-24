@@ -26,10 +26,10 @@ const {
 } = useAppDownload();
 
 const links = computed<DownloadItemProps[]>(() => [
-  { platform: 'LINUX', icon: 'download-cloud-2-line', url: get(linuxUrl) },
-  { platform: 'MAC apple silicon', icon: 'apple-line', url: get(macOSArmUrl) },
-  { platform: 'MAC intel', icon: 'apple-line', url: get(macOSUrl) },
-  { platform: 'WINDOWS', icon: 'windows-line', url: get(windowsUrl) },
+  { platform: 'LINUX', icon: 'lu-cloud-download-2-fill', url: get(linuxUrl) },
+  { platform: 'MAC apple silicon', icon: 'lu-os-apple', url: get(macOSArmUrl) },
+  { platform: 'MAC intel', icon: 'lu-os-apple', url: get(macOSUrl) },
+  { platform: 'WINDOWS', icon: 'lu-os-windows', url: get(windowsUrl) },
 ]);
 
 onBeforeMount(async () => await fetchLatestRelease());

@@ -244,7 +244,7 @@ watch(canvas, async (canvas) => {
             @click="open()"
           >
             <RuiIcon
-              name="link"
+              name="lu-link-2"
               size="20"
             />
           </RuiButton>

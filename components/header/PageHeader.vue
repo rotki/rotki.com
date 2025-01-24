@@ -39,7 +39,7 @@ watch(
             color="primary"
             @click="menuOpened = true"
           >
-            <RuiIcon name="menu-line" />
+            <RuiIcon name="lu-menu" />
           </RuiButton>
         </div>
       </div>
@@ -49,7 +49,7 @@ watch(
       >
         <RuiButton icon>
           <RuiIcon
-            name="close-line"
+            name="lu-x"
             color="primary"
           />
         </RuiButton>
@@ -84,7 +84,7 @@ watch(
             @click="logout()"
           >
             <span class="flex items-center">
-              <RuiIcon name="logout-box-r-line" />
+              <RuiIcon name="lu-log-out" />
               <span class="md:hidden ml-3">{{ t('logout') }}</span>
             </span>
           </RuiButton>

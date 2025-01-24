@@ -33,7 +33,7 @@ function copyToClipboard() {
         <RuiIcon
           class="text-black/[.54] dark:text-white/[.56]"
           size="20"
-          name="file-copy-line"
+          name="lu-copy"
         />
       </RuiButton>
     </template>

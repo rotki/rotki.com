@@ -63,7 +63,7 @@ const { t } = useI18n();
         <div class="bg-rui-primary/[.04] p-6 lg:w-[384px]">
           <div class="flex">
             <div class="bg-white rounded-lg p-3 text-rui-primary">
-              <RuiIcon name="lightbulb-line" />
+              <RuiIcon name="lu-lightbulb" />
             </div>
           </div>
           <ContentRenderer

@@ -45,7 +45,7 @@ const quotedLabel = computed(() => `"  ${get(label)}  "`);
         v-if="number"
         :class="[$style.icon, $style.prepend]"
       >
-        <RuiIcon name="bank-card-line" />
+        <RuiIcon name="lu-credit-card" />
       </div>
     </div>
     <div class="flex flex-1 overflow-hidden">

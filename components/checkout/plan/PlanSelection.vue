@@ -93,7 +93,7 @@ const canBuy = reactify(canBuyNewSubscription)(account);
         >
           <RuiIcon
             :class="$style.note__icon"
-            name="arrow-right-circle-line"
+            name="lu-circle-arrow-right"
           />
           <p>{{ line }}</p>
         </div>

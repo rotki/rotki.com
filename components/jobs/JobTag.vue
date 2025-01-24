@@ -11,9 +11,9 @@ const { tag } = toRefs(props);
 const icon = computed<RuiIcons | undefined>(() => {
   const value = get(tag);
   const map: Record<string, RuiIcons> = {
-    'full-time': 'timer-2-line',
-    'part-time': 'timer-2-line',
-    'remote': 'user-location-line',
+    'full-time': 'lu-timer',
+    'part-time': 'lu-timer',
+    'remote': 'lu-map-pin',
   };
 
   return map[value] ?? undefined;
@@ -32,6 +32,7 @@ const icon = computed<RuiIcons | undefined>(() => {
       <RuiIcon
         :name="icon"
         class="p-0.5"
+        size="20"
       />
     </template>
     {{ tag }}

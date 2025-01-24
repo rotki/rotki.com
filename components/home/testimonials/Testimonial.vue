@@ -17,7 +17,7 @@ withDefaults(
     <span :class="$style.thumbnails">
       <span :class="$style.icon">
         <RuiIcon
-          name="chat-1-line"
+          name="lu-message-circle"
           size="16"
         />
       </span>

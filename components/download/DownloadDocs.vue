@@ -29,7 +29,7 @@ const { t } = useI18n();
           >
             {{ t('download.documentation.action') }}
             <template #append>
-              <RuiIcon name="external-link-line" />
+              <RuiIcon name="lu-external-link" />
             </template>
           </ButtonLink>
         </div>

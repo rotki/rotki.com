@@ -60,7 +60,7 @@ const tabModelValue = ref();
                 to="/home/subscription"
               >
                 <template #prepend>
-                  <RuiIcon name="vip-crown-line" />
+                  <RuiIcon name="lu-crown" />
                 </template>
                 {{ t('account.tabs.subscription') }}
               </RuiTab>
@@ -69,7 +69,7 @@ const tabModelValue = ref();
                 to="/home/account-details"
               >
                 <template #prepend>
-                  <RuiIcon name="account-circle-line" />
+                  <RuiIcon name="lu-circle-user-round" />
                 </template>
                 {{ t('account.tabs.account_details') }}
               </RuiTab>
@@ -78,7 +78,7 @@ const tabModelValue = ref();
                 to="/home/customer-information"
               >
                 <template #prepend>
-                  <RuiIcon name="information-line" />
+                  <RuiIcon name="lu-info" />
                 </template>
                 {{ t('account.tabs.customer_information') }}
               </RuiTab>
@@ -87,7 +87,7 @@ const tabModelValue = ref();
                 to="/home/address"
               >
                 <template #prepend>
-                  <RuiIcon name="map-pin-line" />
+                  <RuiIcon name="lu-map-pin" />
                 </template>
                 {{ t('account.tabs.address') }}
               </RuiTab>
@@ -106,7 +106,7 @@ const tabModelValue = ref();
                 <template #prepend>
                   <RuiIcon
                     class="shrink-0"
-                    name="vip-crown-line"
+                    name="lu-crown"
                   />
                 </template>
                 {{ t('account.tabs.subscription') }}
@@ -118,7 +118,7 @@ const tabModelValue = ref();
                 <template #prepend>
                   <RuiIcon
                     class="shrink-0"
-                    name="account-circle-line"
+                    name="lu-circle-user-round"
                   />
                 </template>
                 {{ t('account.tabs.account_details') }}
@@ -130,7 +130,7 @@ const tabModelValue = ref();
                 <template #prepend>
                   <RuiIcon
                     class="shrink-0"
-                    name="information-line"
+                    name="lu-info"
                   />
                 </template>
                 {{ t('account.tabs.customer_information') }}
@@ -142,7 +142,7 @@ const tabModelValue = ref();
                 <template #prepend>
                   <RuiIcon
                     class="shrink-0"
-                    name="map-pin-line"
+                    name="lu-map-pin"
                   />
                 </template>
                 {{ t('account.tabs.address') }}
