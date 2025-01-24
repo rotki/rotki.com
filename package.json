@@ -111,6 +111,6 @@
     "*.{css,vue}": "stylelint"
   },
   "resolutions": {
-    "vite": "6.0.1"
+    "vite": "6.0.9"
   }
 }
