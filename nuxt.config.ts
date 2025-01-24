@@ -18,10 +18,8 @@ const nonIndexed = [
   '/checkout/pay/request-crypto',
   '/checkout/success',
   '/account-deleted',
-  '/api/',
   '/md/',
   '/documents/',
-  '/_nuxt/',
 ];
 
 const domain = process.env.PROXY_DOMAIN || 'localhost';
@@ -129,13 +127,13 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/devtools',
-    '@nuxt/content',
     '@nuxtjs/robots',
+    '@nuxtjs/sitemap',
+    '@nuxt/content',
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
-    '@nuxtjs/sitemap',
     '@nuxt/test-utils/module',
     './modules/ui-library/module.ts',
     '@nuxt/image',
