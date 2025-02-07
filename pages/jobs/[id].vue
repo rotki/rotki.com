@@ -1,26 +1,24 @@
 <script lang="ts" setup>
+import { get } from '@vueuse/core';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
-import { useMarkdownContent } from '~/composables/markdown';
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
+const { public: { baseUrl } } = useRuntimeConfig();
 const { path } = useRoute();
-const { loadJob } = useMarkdownContent();
+const { fallbackToLocalOnError } = useRemoteOrLocal();
 
-const data = await loadJob(path);
+const { data: job } = await useAsyncData(path, () => fallbackToLocalOnError(
+  async () => await queryCollection('jobsRemote').path(path).first(),
+  async () => await queryCollection('jobsLocal').path(path).first(),
+));
 
-if (!data?.open) {
+if (!get(job)?.open) {
   showError({ message: `Page not found: ${path}`, statusCode: 404 });
 }
 else {
-  useContentHead(data);
-  const { title, description } = data;
-
   useHead({
     meta: getMetadata(
-      title ?? '',
-      description ?? '',
+      get(job)?.title ?? '',
+      get(job)?.description ?? '',
       `${baseUrl}${path}`,
       baseUrl,
     ),
@@ -35,12 +33,12 @@ definePageMeta({
 
 <template>
   <NuxtLayout
-    v-if="data"
+    v-if="job"
     name="jobs"
   >
     <template #title>
-      {{ data.title }}
+      {{ job.title }}
     </template>
-    <JobDetail :data="data" />
+    <JobDetail :data="job" />
   </NuxtLayout>
 </template>

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import type { TestimonialMarkdownContent } from '~/composables/markdown';
+import type { TestimonialsLocalCollectionItem, TestimonialsRemoteCollectionItem } from '@nuxt/content';
 
-withDefaults(
-  defineProps<{
-    avatar?: string;
-    body: TestimonialMarkdownContent['body'];
-    username: string;
-    url?: string;
-  }>(),
-  { avatar: undefined, url: undefined },
-);
+type TestimonialBody = TestimonialsLocalCollectionItem['body'] | TestimonialsRemoteCollectionItem['body'];
+
+interface TestimonialProps {
+  avatar?: string;
+  body: TestimonialBody;
+  username: string;
+  url?: string;
+}
+
+withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefined });
 </script>
 
 <template>
@@ -45,7 +46,7 @@ withDefaults(
       </span>
     </span>
     <ContentRenderer :value="body">
-      <ContentRendererMarkdown
+      <ContentRenderer
         :class="$style.text"
         :value="body"
         tag="span"

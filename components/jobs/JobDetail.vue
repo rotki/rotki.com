@@ -1,46 +1,34 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
-import type { JobMarkdownContent } from '~/composables/markdown';
+import type { JobsLocalCollectionItem, JobsRemoteCollectionItem, MinimalTree } from '@nuxt/content';
 
 const props = defineProps<{
-  data: JobMarkdownContent;
+  data: JobsLocalCollectionItem | JobsRemoteCollectionItem;
 }>();
 
-const { data } = toRefs(props);
+function filterBy(filterMethod: (tag: string) => boolean) {
+  return computed(() => {
+    const data = props.data;
+    const body = data.body as any as MinimalTree;
+    assert(body.type === 'minimal');
 
-const separatedData = computed<{
-  default: JobMarkdownContent;
-  blockquote: JobMarkdownContent;
-}>(() => {
-  const regularItems = [];
-  const blockquoteItems = [];
+    const elements = body.value.filter(node => filterMethod(node[0]));
 
-  const dataVal = get(data);
+    if (elements.length === 0) {
+      return undefined;
+    }
 
-  for (const item of dataVal.body.children) {
-    if (item.tag !== 'blockquote')
-      regularItems.push(item);
-    else
-      blockquoteItems.push(item);
-  }
-
-  return {
-    default: {
-      ...dataVal,
+    return {
+      ...data,
       body: {
-        ...dataVal.body,
-        children: regularItems,
+        ...body,
+        value: elements,
       },
-    },
-    blockquote: {
-      ...dataVal,
-      body: {
-        ...dataVal.body,
-        children: blockquoteItems,
-      },
-    },
-  };
-});
+    };
+  });
+}
+
+const mainColumn = filterBy(tag => tag !== 'blockquote');
+const sideColumn = filterBy(tag => tag === 'blockquote');
 
 const { t } = useI18n();
 </script>
@@ -50,14 +38,12 @@ const { t } = useI18n();
     <div class="container flex flex-col lg:flex-row">
       <div class="grow">
         <ContentRenderer
-          v-if="separatedData.default"
-          :value="separatedData.default"
-        >
-          <ContentRendererMarkdown :value="separatedData.default" />
-        </ContentRenderer>
+          v-if="mainColumn"
+          :value="mainColumn"
+        />
       </div>
       <div
-        v-if="separatedData.blockquote.body.children.length > 0"
+        v-if="sideColumn"
         class="mt-8 lg:mt-0 lg:pl-16 xl:pl-24"
       >
         <div class="bg-rui-primary/[.04] p-6 lg:w-[384px]">
@@ -67,11 +53,9 @@ const { t } = useI18n();
             </div>
           </div>
           <ContentRenderer
-            v-if="separatedData.blockquote"
-            :value="separatedData.blockquote"
-          >
-            <ContentRendererMarkdown :value="separatedData.blockquote" />
-          </ContentRenderer>
+            v-if="sideColumn"
+            :value="sideColumn"
+          />
           <ButtonLink
             to="mailto:careers@rotki.com"
             external

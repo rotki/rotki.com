@@ -46,6 +46,7 @@ export function commonAttrs() {
     },
     htmlAttrs: {
       class: 'page',
+      lang: 'en',
     },
   };
 }
