@@ -328,7 +328,7 @@
     "advantages": {
       "local_app": {
         "description": "rotki is a local-first application with a strong focus on user privacy.",
-        "title": "Local app"
+        "title": "Self-hosted app"
       },
       "open_source": {
         "description": "rotki's source code is available to inspect, modify and enhance.",
@@ -396,8 +396,8 @@
       "title": "Exchanges"
     },
     "hero": {
-      "motto": "rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.",
-      "title": "The portfolio manager that protects your privacy"
+      "motto": "rotki is an open source, self-hosted portfolio manager, accounting and analytics tool that protects your privacy.",
+      "title": "Take control of your portfolio with unmatched privacy"
     },
     "plans": {
       "cannot_continue": "You cannot continue because you have an active subscription. Click here to",
@@ -498,7 +498,7 @@
     "premium_features": {
       "features": {
         "dex_support": {
-          "detail": "See how much you have in each liquidity pool. All your Uniswap and Balancer LP join/exit events are shown along with the total profit/loss per pool.\n\nUniswap and Balancer trades are taken into account in the tax report for premium users.",
+          "detail": "See how much you have in each liquidity pool. All your LP join/exit events are shown along with the total profit/loss per pool.\n\nDEX trades are taken into account in the tax report for premium users.",
           "title": "Decentralized exchanges"
         },
         "graphs_and_statistics": {
@@ -510,7 +510,7 @@
           "title": "Higher limits for trades, transactions, deposits and withdrawals"
         },
         "premium_defi": {
-          "detail": " See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocols to be informed via email when certain conditions are met.",
+          "detail": "See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocols to be informed via email when certain conditions are met.",
           "title": "DeFi historical accounting, profit and loss"
         },
         "premium_staking": {
@@ -522,9 +522,18 @@
       "title": "Premium features"
     },
     "profit_loss_report": {
-      "detail": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols.",
-      "subtitle": "Profit/loss report for all your historical data",
-      "title": "Profit/loss report"
+      "details": {
+        "pnl_explanation": {
+          "title": "Profit/loss report for your historical data",
+          "description": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols."
+        },
+        "free_vs_premium": {
+          "title": "Free vs. Premium:",
+          "description": "Free users can generate reports with a transaction limit and partial protocol coverage. Upgrade to Premium for unlimited reporting and full protocol support."
+        }
+      },
+      "title": "Profit/loss report",
+      "subtitle": "A profit/loss report for all your historical data"
     },
     "rotki_offer": "What does {0} offer?",
     "testimonials": {

@@ -15,13 +15,23 @@ const { t } = useI18n();
       <h5 class="text-h5 text-rui-primary">
         {{ t('home.profit_loss_report.title') }}
       </h5>
-      <h6 class="text-h6">
-        {{ t('home.profit_loss_report.subtitle') }}
-      </h6>
-      <div
-        class="text-body-1 text-rui-text-secondary whitespace-break-spaces pt-2"
-      >
-        {{ t('home.profit_loss_report.detail') }}
+      <div class="flex flex-col gap-6 text-rui-text-secondary pt-2">
+        <div>
+          <div class="text-subtitle-1 font-bold">
+            {{ t('home.profit_loss_report.details.pnl_explanation.title') }}
+          </div>
+          <div class="text-body-1">
+            {{ t('home.profit_loss_report.details.pnl_explanation.description') }}
+          </div>
+        </div>
+        <div>
+          <div class="text-subtitle-1 font-bold">
+            {{ t('home.profit_loss_report.details.free_vs_premium.title') }}
+          </div>
+          <div class="text-body-1">
+            {{ t('home.profit_loss_report.details.free_vs_premium.description') }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
