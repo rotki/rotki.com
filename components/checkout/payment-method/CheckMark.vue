@@ -9,7 +9,7 @@ defineProps<{
     <RuiBadge
       :model-value="selected"
       color="primary"
-      icon="check-line"
+      icon="lu-check"
     />
   </div>
 </template>
