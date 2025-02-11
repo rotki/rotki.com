@@ -3,12 +3,6 @@ import { IntegrationData, type IntegrationItem } from '~/types/integrations';
 import LocalIntegrationData from '~/public/integrations/all.json';
 
 export const useIntegrationsData = createSharedComposable(() => {
-  const defaultData = () => ({
-    blockchains: [],
-    exchanges: [],
-    protocols: [],
-  });
-
   const { public: { isDev, testing } } = useRuntimeConfig();
 
   const getRemoteIntegrationData = async (): Promise<IntegrationData | null> => {
@@ -57,16 +51,15 @@ export const useIntegrationsData = createSharedComposable(() => {
   };
 
   const data = asyncComputed<IntegrationData>(async () => {
-    if (isDev)
-      return filterDuplicateData(LocalIntegrationData);
-
-    const remoteData = await getRemoteIntegrationData();
-
-    if (remoteData)
-      return filterDuplicateData(remoteData);
-
-    return defaultData();
-  }, defaultData());
+    let data: IntegrationData;
+    if (isDev) {
+      data = LocalIntegrationData;
+    }
+    else {
+      data = await getRemoteIntegrationData() ?? LocalIntegrationData;
+    }
+    return filterDuplicateData(data);
+  }, filterDuplicateData(LocalIntegrationData));
 
   return {
     data,
