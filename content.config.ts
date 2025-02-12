@@ -1,4 +1,5 @@
 import { type CollectionSource, type DefinedCollection, defineCollection, defineContentConfig, z } from '@nuxt/content';
+import { asSitemapCollection } from '@nuxtjs/sitemap/content';
 
 const DOCUMENTS = 'content/documents/*.md';
 const JOBS = 'content/jobs/*.md';
@@ -52,11 +53,11 @@ function getDocumentsCollection(dataOrigin: 'remote' | 'local'): DefinedCollecti
 }
 
 function getJobsCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
-  return defineCollection({
+  return defineCollection(asSitemapCollection({
     schema: jobSchema,
     source: getSource(JOBS, dataOrigin),
     type: 'page',
-  });
+  }));
 }
 
 function getTestimonialsCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
