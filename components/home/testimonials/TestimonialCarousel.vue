@@ -2,10 +2,10 @@
 import { SwiperSlide } from 'swiper/vue';
 import { get, set } from '@vueuse/core';
 import type { Swiper, SwiperOptions } from 'swiper/types';
-import type { TestimonialMarkdownContent } from '~/composables/markdown';
+import type { TestimonialsLocalCollectionItem, TestimonialsRemoteCollectionItem } from '@nuxt/content';
 
 defineProps<{
-  testimonials: TestimonialMarkdownContent[];
+  testimonials: TestimonialsLocalCollectionItem[] | TestimonialsRemoteCollectionItem[];
 }>();
 
 const swiper = ref<Swiper>();

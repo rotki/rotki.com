@@ -1,27 +1,27 @@
 <script lang="ts" setup>
-import { useMarkdownContent } from '~/composables/markdown';
+import { get } from '@vueuse/core';
+import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const props = defineProps<{ path: string }>();
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-const { loadContent } = useMarkdownContent();
+const { public: { baseUrl } } = useRuntimeConfig();
 
-const data = await loadContent(props.path);
+const { fallbackToLocalOnError } = useRemoteOrLocal();
 
-if (!data) {
+const { data: document } = await useAsyncData(props.path, async () => fallbackToLocalOnError(
+  async () => queryCollection('documentsRemote').path(props.path).first(),
+  async () => await queryCollection('documentsLocal').path(props.path).first(),
+));
+
+if (!document) {
   showError({ message: `Page not found: ${props.path}`, statusCode: 404 });
 }
 else {
-  useContentHead(data);
-  const { title, description } = data;
-
   useHead({
     meta: getMetadata(
-      title ?? '',
-      description ?? '',
+      get(document)?.title ?? '',
+      get(document)?.description ?? '',
       `${baseUrl}${props.path}`,
       baseUrl,
     ),
@@ -33,30 +33,30 @@ else {
 <template>
   <div class="py-10 md:py-20 border-b border-rui-grey-300">
     <div class="container flex flex-col lg:flex-row gap-8 justify-between">
-      <div v-if="data?.subtitle">
+      <div v-if="document?.subtitle">
         <div
-          v-if="data?.title"
+          v-if="document?.title"
           class="text-h6 text-rui-primary mb-3"
         >
-          {{ data.title }}
+          {{ document.title }}
         </div>
         <div
-          v-if="data?.subtitle"
+          v-if="document?.subtitle"
           class="text-h4"
         >
-          {{ data.subtitle }}
+          {{ document.subtitle }}
         </div>
       </div>
-      <div v-else-if="data?.title">
+      <div v-else-if="document?.title">
         <div class="text-h4">
-          {{ data.title }}
+          {{ document.title }}
         </div>
       </div>
       <div
-        v-if="data?.address"
+        v-if="document?.address"
         class="whitespace-pre-line text-body-1 text-rui-grey-600"
       >
-        {{ data.address }}
+        {{ document.address.split('\\n').join('\n') }}
       </div>
     </div>
   </div>
@@ -64,11 +64,9 @@ else {
   <div class="py-10 md:py-20">
     <div class="container lg:max-w-[720px]">
       <ContentRenderer
-        v-if="data"
-        :value="data"
-      >
-        <ContentRendererMarkdown :value="data" />
-      </ContentRenderer>
+        v-if="document"
+        :value="document"
+      />
     </div>
   </div>
 </template>

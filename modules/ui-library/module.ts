@@ -24,7 +24,7 @@ export default defineNuxtModule<ModuleOptions>({
     addPlugin(resolver.resolve('./runtime/plugin'));
 
     for (const component in components) {
-      await addComponent({
+      addComponent({
         export: component,
         filePath: '@rotki/ui-library/components',
         name: component,

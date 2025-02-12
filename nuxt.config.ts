@@ -1,5 +1,4 @@
 import process from 'node:process';
-import { GITHUB_CONTENT_PREFIX, LOCAL_CONTENT_PREFIX } from './utils/constants';
 
 const nonIndexed = [
   '/activation',
@@ -84,33 +83,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-08-13',
 
   components: [{ path: '~/components', pathPrefix: false }],
-
-  content: {
-    api: {
-      baseURL: '/md/_content',
-    },
-    // https://content.nuxtjs.org/api/configuration
-    markdown: {
-      // https://content.nuxtjs.org/api/configuration#tags
-      tags: {
-        address: 'ProseAddress',
-      },
-    },
-    sources: {
-      content: {
-        base: 'content',
-        driver: 'fs',
-        prefix: LOCAL_CONTENT_PREFIX,
-      },
-      github: {
-        branch: 'main',
-        dir: 'content', // Directory where contents are located. It could be a subdirectory of the repository.
-        driver: 'github', // Driver used to fetch contents
-        prefix: GITHUB_CONTENT_PREFIX, // Prefix for routes used to query contents
-        repo: 'rotki/rotki.com',
-      },
-    },
-  },
 
   css: [],
 

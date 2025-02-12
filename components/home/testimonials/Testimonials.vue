@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useMarkdownContent } from '~/composables/markdown';
+const { fallbackToLocalOnError } = useRemoteOrLocal();
+const { data: testimonials } = await useAsyncData('testimonials', () => fallbackToLocalOnError(
+  async () => await queryCollection('testimonialsRemote').all(),
+  async () => await queryCollection('testimonialsLocal').all(),
+));
 
 const { t } = useI18n();
-
-const { loadTestimonials, testimonials } = useMarkdownContent();
-
-await loadTestimonials();
 </script>
 
 <template>
@@ -17,7 +17,10 @@ await loadTestimonials();
       <div :class="$style.detail">
         {{ t('home.testimonials.detail') }}
       </div>
-      <TestimonialCarousel :testimonials="testimonials" />
+      <TestimonialCarousel
+        v-if="testimonials"
+        :testimonials="testimonials"
+      />
     </div>
   </div>
 </template>
