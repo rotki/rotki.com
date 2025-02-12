@@ -27,9 +27,12 @@ RUN --mount=type=cache,target=/root/.npm/_cacache/ \
 COPY --from=builder /build/.output ./.output/
 COPY --from=builder /build/ecosystem.config.cjs ./
 COPY --from=builder /build/package.json ./
+COPY health.sh ./
+
+RUN chmod +x health.sh
 
 EXPOSE ${NITRO_PORT}
 
 CMD ["pm2-runtime", "ecosystem.config.cjs"]
 HEALTHCHECK --start-period=30s --retries=2 \
-    CMD ["wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:${NITRO_PORT}/health"]
+    CMD ["/app/health.sh"]
