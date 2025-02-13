@@ -485,7 +485,7 @@
           "title": "Payment Details",
           "wallet": {
             "connect_wallet": "Connect wallet",
-            "notice": "You can pay your wallet wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
+            "notice": "You can pay directly via your wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed.",
             "pay_with_wallet": "Pay with wallet",
