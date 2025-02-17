@@ -64,7 +64,12 @@ function onSwiperUpdate(s: Swiper) {
         v-for="(testimonial, i) in testimonials"
         :key="i"
       >
-        <Testimonial v-bind="testimonial" />
+        <Testimonial
+          :avatar="testimonial.avatar"
+          :body="testimonial.body"
+          :url="testimonial.url"
+          :username="testimonial.username"
+        />
       </SwiperSlide>
     </Carousel>
     <CarouselControls
