@@ -19,6 +19,9 @@ const nonIndexed = [
   '/account-deleted',
   '/md/',
   '/documents/',
+  '/api/content/**',
+  '/_nuxt/**',
+  '/testimonials/**',
 ];
 
 const domain = process.env.PROXY_DOMAIN ?? 'localhost';
