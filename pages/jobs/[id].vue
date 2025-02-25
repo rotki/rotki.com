@@ -51,7 +51,10 @@ definePageMeta({
       v-if="job.open"
       :data="job"
     />
-    <div class="py-8 lg:py-20">
+    <div
+      v-else
+      class="py-8 lg:py-20"
+    >
       <div class="container flex flex-col lg:flex-row">
         <div>
           <div class="text-h5 font-medium mb-4">
