@@ -9,7 +9,7 @@ ENV CYPRESS_INSTALL_BINARY=0
 
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
-    npm install -g pnpm@9 && \
+    npm install -g pnpm@10 && \
     pnpm install --frozen-lockfile && \
     pnpm run build
 

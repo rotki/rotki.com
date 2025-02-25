@@ -2,7 +2,7 @@
   "name": "rotki.com",
   "version": "1.29.0",
   "private": true,
-  "packageManager": "pnpm@9.15.5",
+  "packageManager": "pnpm@10.5.0",
   "type": "module",
   "scripts": {
     "dev": "nuxi dev",
@@ -99,7 +99,20 @@
   },
   "engines": {
     "node": ">=20 <21",
-    "pnpm": ">=9 <10"
+    "pnpm": ">=10 <11"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@parcel/watcher",
+      "cypress",
+      "esbuild",
+      "msw",
+      "sharp",
+      "vue-demi"
+    ],
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   },
   "husky": {
     "hooks": {

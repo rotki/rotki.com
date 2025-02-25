@@ -97,7 +97,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies 👨🏻‍💻
-        run: pnpm install
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm cypress install
 
       - name: Run linter 👀
         run: pnpm run lint:all
