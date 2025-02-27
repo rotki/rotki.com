@@ -220,9 +220,9 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     return network;
   }
 
-  function switchNetwork(): void {
+  async function switchNetwork(): Promise<void> {
     const network = getNetwork(get(data).chainId);
-    appKit.switchNetwork(network);
+    await appKit.switchNetwork(network);
   }
 
   onUnmounted(async () => {
