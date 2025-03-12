@@ -30,7 +30,7 @@
   "dependencies": {
     "@metamask/detect-provider": "2.0.0",
     "@nuxtjs/robots": "5.2.6",
-    "@nuxtjs/tailwindcss": "6.11.4",
+    "@nuxtjs/tailwindcss": "6.13.2",
     "@pinia/nuxt": "0.10.1",
     "@reown/appkit": "1.6.9",
     "@reown/appkit-adapter-ethers": "1.6.9",
