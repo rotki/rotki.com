@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia';
-import { get } from '@vueuse/core';
-import { useMainStore } from '~/store';
 import type {
   DataTableColumn,
   DataTableSortColumn,
   TablePaginationData,
 } from '@rotki/ui-library';
 import type { Payment } from '~/types';
+import { get } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
 
 const { t } = useI18n();
 

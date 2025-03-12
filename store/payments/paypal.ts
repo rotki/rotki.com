@@ -1,5 +1,4 @@
 import { set } from '@vueuse/core';
-import { useLogger } from '~/utils/use-logger';
 import {
   type ApiResponse,
   type CreatePaypalNonceRequest,
@@ -9,6 +8,7 @@ import {
   type VaultPaypalRequest,
 } from '~/types';
 import { fetchWithCsrf } from '~/utils/api';
+import { useLogger } from '~/utils/use-logger';
 
 export const usePaymentPaypalStore = defineStore('payments/paypal', () => {
   const paypal = ref<SavedPaypalAccount>();

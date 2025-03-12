@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type { Plan } from '~/types';
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { getPlanName } from '~/utils/plans';
-import type { Plan } from '~/types';
 
 const props = withDefaults(
   defineProps<{

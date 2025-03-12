@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import type { RuiIcons } from '@rotki/ui-library';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
-import type { RuiIcons } from '@rotki/ui-library';
 
 const props = defineProps<{ identifier?: string }>();
 

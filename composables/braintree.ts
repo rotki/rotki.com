@@ -1,11 +1,11 @@
-import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store';
 import type {
   CardCheckout,
   PaymentStep,
   SelectedPlan,
 } from '~/types';
 import type { PayEvent } from '~/types/common';
+import { get, set } from '@vueuse/core';
+import { useMainStore } from '~/store';
 
 export function useBraintree() {
   const { t } = useI18n();

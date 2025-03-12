@@ -1,4 +1,4 @@
-import { type CollectionSource, type DefinedCollection, defineCollection, defineContentConfig, z } from '@nuxt/content';
+import { type CollectionSource, defineCollection, defineContentConfig, type DefinedCollection, z } from '@nuxt/content';
 import { asRobotsCollection } from '@nuxtjs/robots/content';
 import { asSitemapCollection } from '@nuxtjs/sitemap/content';
 

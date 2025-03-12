@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import type { WatchHandle } from 'vue';
+import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set, useClipboard } from '@vueuse/core';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
-import type { WatchHandle } from 'vue';
-import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 
 const error = defineModel<string>('error', { required: true });
 

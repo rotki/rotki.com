@@ -1,5 +1,9 @@
 // TODO: split store functionality
 /* eslint-disable max-lines */
+import type { ComposerTranslation } from 'vue-i18n';
+import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
+import type { ActionResult } from '~/types/common';
+import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
@@ -28,10 +32,6 @@ import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { formatSeconds } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
-import type { LoginCredentials } from '~/types/login';
-import type { ActionResult } from '~/types/common';
-import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
-import type { ComposerTranslation } from 'vue-i18n';
 
 const SESSION_TIMEOUT = 3600000;
 

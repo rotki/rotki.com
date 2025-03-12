@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { type Client, type HostedFields, hostedFields } from 'braintree-web';
-import { get, set } from '@vueuse/core';
-import { assert } from '~/utils/assert';
-import type { Ref } from 'vue';
 import type { HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields';
+import type { Ref } from 'vue';
+import { get, set } from '@vueuse/core';
+import { type Client, type HostedFields, hostedFields } from 'braintree-web';
+import { assert } from '~/utils/assert';
 
 interface FieldStatus {
   valid: boolean;

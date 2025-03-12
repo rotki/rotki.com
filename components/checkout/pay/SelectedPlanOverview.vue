@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { CryptoPayment, SelectedPlan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { getPlanNameFor } from '~/utils/plans';
-import type { CryptoPayment, SelectedPlan } from '~/types';
 
 const props = withDefaults(
   defineProps<{

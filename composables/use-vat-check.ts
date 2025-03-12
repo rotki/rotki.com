@@ -1,8 +1,8 @@
+import type { ApiResponse } from '~/types';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useMainStore } from '~/store';
 import { fetchWithCsrf } from '~/utils/api';
-import type { ApiResponse } from '~/types';
 
 interface VATCheckSuccess {
   readonly success: true;

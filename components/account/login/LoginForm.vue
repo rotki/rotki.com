@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
-import { required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 
 const username = ref<string>('');

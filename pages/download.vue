@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { get } from '@vueuse/core';
-import { commonAttrs } from '~/utils/metadata';
-import { useAppDownload } from '~/composables/download';
 import type { DownloadItemProps } from '~/components/download/DownloadItem.vue';
+import { get } from '@vueuse/core';
+import { useAppDownload } from '~/composables/download';
+import { commonAttrs } from '~/utils/metadata';
 
 useHead({
   title: 'download',

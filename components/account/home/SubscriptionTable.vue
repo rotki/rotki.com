@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { get, set, useIntervalFn } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
-import { PaymentMethod } from '~/types/payment';
-import type { RouteLocationRaw } from 'vue-router';
 import type {
   ContextColorsType,
   DataTableColumn,
   DataTableSortColumn,
   TablePaginationData,
 } from '@rotki/ui-library';
+import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx, Subscription } from '~/types';
+import { get, set, useIntervalFn } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
+import { PaymentMethod } from '~/types/payment';
 
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<Subscription>[]>([]);

@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { get, set } from '@vueuse/core';
-import { FetchError } from 'ofetch';
-import { fetchWithCsrf } from '~/utils/api';
-import { useRedirectUrl } from '~/composables/redirect-url';
+import type { ApiResponse } from '~/types';
+import type { ValidationErrors } from '~/types/common';
 import type {
   SignupAccountPayload,
   SignupAddressPayload,
   SignupCustomerInformationPayload,
   SignupPayload,
 } from '~/types/signup';
-import type { ValidationErrors } from '~/types/common';
-import type { ApiResponse } from '~/types';
+import { get, set } from '@vueuse/core';
+import { FetchError } from 'ofetch';
+import { useRedirectUrl } from '~/composables/redirect-url';
+import { fetchWithCsrf } from '~/utils/api';
 
 const { t } = useI18n();
 const { captchaId, resetCaptcha } = useRecaptcha();

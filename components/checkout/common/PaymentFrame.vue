@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { get, toRefs } from '@vueuse/core';
 import type { IdleStep, PaymentStep, StepType } from '~/types';
+import { get, toRefs } from '@vueuse/core';
 
 const props = defineProps<{
   step: PaymentStep;

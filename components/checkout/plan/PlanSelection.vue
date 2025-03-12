@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia';
+import type { Plan } from '~/types';
 import { get, set } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { canBuyNewSubscription } from '~/utils/subscription';
-import type { Plan } from '~/types';
 
 const { t } = useI18n();
 const route = useRoute();

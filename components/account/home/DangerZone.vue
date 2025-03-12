@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store';
 import type { ActionResult } from '~/types/common';
+import { get, set } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
 
 const confirm = ref(false);
 const usernameConfirmation = ref('');

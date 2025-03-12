@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { Subscription } from '~/types';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
-import type { Subscription } from '~/types';
 
 const props = defineProps<{
   subscription?: Subscription;

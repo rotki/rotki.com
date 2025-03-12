@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { set } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
 const { t } = useI18n();

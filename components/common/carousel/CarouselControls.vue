@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import 'swiper/css';
-import { get } from '@vueuse/core';
 import type { Swiper } from 'swiper/types';
+import { get } from '@vueuse/core';
+import 'swiper/css';
 
 const props = withDefaults(
   defineProps<{
