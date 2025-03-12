@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import type { SavedCard } from '~/types';
+import { get, set } from '@vueuse/core';
 import {
   type Client,
   type VaultManager,
   vaultManager,
 } from 'braintree-web';
-import { get, set } from '@vueuse/core';
-import { assert } from '~/utils/assert';
 import { usePaymentCardsStore } from '~/store/payments/cards';
-import type { SavedCard } from '~/types';
+import { assert } from '~/utils/assert';
 
 interface ErrorMessage {
   title: string;

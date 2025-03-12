@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
-import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 
 const { t } = useI18n();
 

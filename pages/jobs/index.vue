@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/core';
 import JobDescription from '~/components/jobs/JobDescription.vue';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
-import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
 
 type JobsCollectionItem = JobsLocalCollectionItem | JobsRemoteCollectionItem;
 

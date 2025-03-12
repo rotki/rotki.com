@@ -1,8 +1,8 @@
+import type { Country } from '~/composables/countries';
+import type { Account, ApiResponse } from '~/types';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fetchWithCsrf, setHooks } from '~/utils/api';
-import type { Country } from '~/composables/countries';
-import type { Account, ApiResponse } from '~/types';
 
 const logout = vi.fn();
 const refresh = vi.fn();

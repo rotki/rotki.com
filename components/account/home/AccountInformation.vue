@@ -5,9 +5,9 @@ import { get, objectOmit, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useVatCheck } from '~/composables/use-vat-check';
 import { useMainStore } from '~/store';
-import { toMessages } from '~/utils/validation';
 import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
+import { toMessages } from '~/utils/validation';
 
 const { t } = useI18n();
 

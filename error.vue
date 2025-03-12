@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 import GenericError from '~/components/error/GenericError.vue';
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 defineOptions({
   inheritAttrs: false,

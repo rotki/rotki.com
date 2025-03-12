@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia';
 import { get, set } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import CryptoChainIcon from '~/components/checkout/pay/CryptoChainIcon.vue';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { toTitleCase } from '~/utils/text';
-import CryptoChainIcon from '~/components/checkout/pay/CryptoChainIcon.vue';
 
 const modelValue = defineModel<string>({ required: true });
 

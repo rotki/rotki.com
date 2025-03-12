@@ -1,17 +1,17 @@
 <script setup lang="ts">
+import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
+import type { PaymentStep, SavedCard, SelectedPlan } from '~/types';
+import type { PayEvent } from '~/types/common';
+import { get, set } from '@vueuse/core';
 import {
   type Client,
-  type ThreeDSecure,
   client,
+  type ThreeDSecure,
   threeDSecure,
 } from 'braintree-web';
-import { get, set } from '@vueuse/core';
-import { useLogger } from '~/utils/use-logger';
-import { assert } from '~/utils/assert';
 import { usePaymentCardsStore } from '~/store/payments/cards';
-import type { PaymentStep, SavedCard, SelectedPlan } from '~/types';
-import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import type { PayEvent } from '~/types/common';
+import { assert } from '~/utils/assert';
+import { useLogger } from '~/utils/use-logger';
 
 const props = defineProps<{
   token: string;

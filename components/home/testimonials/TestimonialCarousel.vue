@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { SwiperSlide } from 'swiper/vue';
-import { get, set } from '@vueuse/core';
-import type { Swiper, SwiperOptions } from 'swiper/types';
 import type { TestimonialsLocalCollectionItem, TestimonialsRemoteCollectionItem } from '@nuxt/content';
+import type { Swiper, SwiperOptions } from 'swiper/types';
+import { get, set } from '@vueuse/core';
+import { SwiperSlide } from 'swiper/vue';
 
 defineProps<{
   testimonials: TestimonialsLocalCollectionItem[] | TestimonialsRemoteCollectionItem[];

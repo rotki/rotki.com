@@ -1,4 +1,6 @@
+import { defineNuxtPlugin } from '#app';
 import {
+  createRui,
   LuBadgeDollarSign,
   LuBlockchain,
   LuCalendar,
@@ -44,9 +46,7 @@ import {
   LuTrash2,
   LuX,
   LuXTwitter,
-  createRui,
 } from '@rotki/ui-library';
-import { defineNuxtPlugin } from '#app';
 import '@fontsource/roboto/latin.css';
 
 export default defineNuxtPlugin((nuxtApp) => {

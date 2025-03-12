@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type { Swiper } from 'swiper/types';
+import { get, set } from '@vueuse/core';
+import { SwiperSlide } from 'swiper/vue';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { SwiperSlide } from 'swiper/vue';
-import { get, set } from '@vueuse/core';
-import type { Swiper } from 'swiper/types';
 
 const swiper = ref<Swiper>();
 const pages = ref(get(swiper)?.snapGrid.length ?? 1);

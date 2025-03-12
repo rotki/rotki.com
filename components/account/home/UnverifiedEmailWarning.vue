@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { ActionResult } from '~/types/common';
 import { set } from '@vueuse/core';
 import { useMainStore } from '~/store';
-import type { ActionResult } from '~/types/common';
 
 const { t } = useI18n();
 

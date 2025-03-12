@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { get } from '@vueuse/core';
-import { useMainStore } from '~/store';
 import type { ContextColorsType } from '@rotki/ui-library';
+import { get } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { useMainStore } from '~/store';
 
 withDefaults(
   defineProps<{

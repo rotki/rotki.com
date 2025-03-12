@@ -1,6 +1,6 @@
 import { storeToRefs } from 'pinia';
-import { useLogger } from '~/utils/use-logger';
 import { useMainStore } from '~/store';
+import { useLogger } from '~/utils/use-logger';
 
 export function useAutoLogout() {
   const store = useMainStore();

@@ -1,6 +1,6 @@
-import { convertKeys } from '~/utils/api';
-import { IntegrationData, type IntegrationItem } from '~/types/integrations';
 import LocalIntegrationData from '~/public/integrations/all.json';
+import { IntegrationData, type IntegrationItem } from '~/types/integrations';
+import { convertKeys } from '~/utils/api';
 
 export const useIntegrationsData = createSharedComposable(() => {
   const { public: { isDev, testing } } = useRuntimeConfig();

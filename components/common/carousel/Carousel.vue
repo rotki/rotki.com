@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import 'swiper/css';
-import { Swiper } from 'swiper/vue';
-import { Autoplay, Keyboard } from 'swiper/modules';
 import type { SwiperOptions } from 'swiper/types';
+import { Autoplay, Keyboard } from 'swiper/modules';
+import { Swiper } from 'swiper/vue';
+import 'swiper/css';
 
 withDefaults(defineProps<SwiperOptions>(), {
   effect: 'slide',

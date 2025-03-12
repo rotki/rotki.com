@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { useDynamicMessages } from '~/composables/dynamic-message';
+import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const description
   = 'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.';

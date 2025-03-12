@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
-import { FetchError } from 'ofetch';
 import { get, set } from '@vueuse/core';
-import { useLogger } from '~/utils/use-logger';
+import { FetchError } from 'ofetch';
 import { fetchWithCsrf } from '~/utils/api';
+import { useLogger } from '~/utils/use-logger';
 
 const emailAddress = ref('');
 const loading = ref(false);

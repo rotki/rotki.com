@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import type { ValidationErrors } from '~/types/common';
+import type { SignupCustomerInformationPayload } from '~/types/signup';
+import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
-import { useVuelidate } from '@vuelidate/core';
 import { toMessages } from '~/utils/validation';
-import type { SignupCustomerInformationPayload } from '~/types/signup';
-import type { ValidationErrors } from '~/types/common';
 
 const props = defineProps<{
   modelValue: SignupCustomerInformationPayload;

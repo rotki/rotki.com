@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
 import type { ContextColorsType } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
+import { get } from '@vueuse/core';
 
 defineOptions({
   inheritAttrs: false,

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { ActionResult } from '~/types/common';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { toMessages } from '~/utils/validation';
-import type { ActionResult } from '~/types/common';
 
 const loading = ref(false);
 const success = ref(false);

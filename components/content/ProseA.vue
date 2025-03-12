@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    href: string;
+    href?: string;
     target?: string;
     rel?: string;
   }>(),

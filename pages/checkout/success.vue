@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { commonAttrs, noIndex } from '~/utils/metadata';
 import { navigateTo } from '#app';
+import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['maintenance', 'authentication', 'unverified', 'subscriber'],

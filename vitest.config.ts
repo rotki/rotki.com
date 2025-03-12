@@ -1,5 +1,6 @@
 import process from 'node:process';
 import { defineVitestConfig } from '@nuxt/test-utils/config';
+import { configDefaults } from 'vitest/config';
 
 export default defineVitestConfig({
   plugins: [],
@@ -10,6 +11,10 @@ export default defineVitestConfig({
       NODE_ENV: 'test',
     },
     environment: 'nuxt',
+    exclude: [
+      ...configDefaults.exclude,
+      '.data/**',
+    ],
     globals: true,
     setupFiles: ['./tests/setup.ts'],
   },

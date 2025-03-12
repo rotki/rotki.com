@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
-import { client, paypalCheckout } from 'braintree-web';
-import { useLogger } from '~/utils/use-logger';
-import { usePaymentPaypalStore } from '~/store/payments/paypal';
-import { assert } from '~/utils/assert';
 import type { Ref } from 'vue';
 import type { PaymentStep, SelectedPlan } from '~/types';
 import type { PayEvent } from '~/types/common';
+import { get, set } from '@vueuse/core';
+import { client, paypalCheckout } from 'braintree-web';
+import { usePaymentPaypalStore } from '~/store/payments/paypal';
+import { assert } from '~/utils/assert';
+import { useLogger } from '~/utils/use-logger';
 
 interface ErrorMessage {
   title: string;

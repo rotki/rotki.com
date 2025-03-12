@@ -1,4 +1,4 @@
-import { type ConsolaOptions, consola } from 'consola';
+import { consola, type ConsolaOptions } from 'consola';
 
 export const logger = consola;
 

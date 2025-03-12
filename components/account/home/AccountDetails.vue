@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { get } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
 const store = useMainStore();

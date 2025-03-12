@@ -1,5 +1,5 @@
-import { get } from '@vueuse/core';
 import type { BaseValidation } from '@vuelidate/core';
+import { get } from '@vueuse/core';
 
 /**
  * Converts an object of vuelidate's BaseValidation to an array of

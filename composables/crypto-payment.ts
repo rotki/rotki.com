@@ -1,4 +1,7 @@
+import type { Ref } from 'vue';
+import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
+import { ChainController } from '@reown/appkit-core';
 import {
   type AppKitNetwork,
   arbitrum,
@@ -11,14 +14,11 @@ import {
   sepolia,
 } from '@reown/appkit/networks';
 import { createAppKit, useAppKitProvider } from '@reown/appkit/vue';
-import { ChainController } from '@reown/appkit-core';
 import { get, set, useTimeoutFn } from '@vueuse/core';
-import { BrowserProvider, Contract, type Signer, type TransactionResponse, parseUnits } from 'ethers';
+import { BrowserProvider, Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
-import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
-import type { Ref } from 'vue';
 
 // Patch the showUnsupportedChainUI method to no-op
 ChainController.showUnsupportedChainUI = function () {
@@ -220,9 +220,9 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     return network;
   }
 
-  function switchNetwork(): void {
+  async function switchNetwork(): Promise<void> {
     const network = getNetwork(get(data).chainId);
-    appKit.switchNetwork(network);
+    await appKit.switchNetwork(network);
   }
 
   onUnmounted(async () => {

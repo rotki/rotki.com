@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import type { Plan } from '~/types';
 import { get } from '@vueuse/core';
 import { getPlanSelectionName } from '~/utils/plans';
-import type { Plan } from '~/types';
 
 const props = withDefaults(
   defineProps<{
