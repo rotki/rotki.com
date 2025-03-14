@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-export interface DownloadItemProps {
-  platform: string;
-  url: string;
-  icon: 'lu-cloud-download-2-fill' | 'lu-os-apple' | 'lu-os-windows';
-}
+import type { DownloadItem } from '~/types/download';
 
-defineProps<DownloadItemProps>();
+defineProps<{
+  data: DownloadItem;
+}>();
 
 const { t } = useI18n();
 </script>
@@ -14,8 +12,13 @@ const { t } = useI18n();
   <div :class="$style.wrapper">
     <div :class="$style.icon">
       <RuiIcon
-        :name="icon"
+        v-if="data.icon"
+        :name="data.icon"
         color="primary"
+      />
+      <img
+        v-if="data.image"
+        :src="data.image"
       />
     </div>
     <div :class="$style.body">
@@ -24,21 +27,79 @@ const { t } = useI18n();
           {{ t('download.download_for') }}
         </p>
         <h6 :class="$style.platform">
-          {{ platform }}
+          {{ data.platform }}
         </h6>
+
+        <div
+          v-if="data.command"
+          class="pt-4"
+        >
+          <InputWithCopyButton
+            v-if="data.command"
+            :model-value="data.command"
+            :copy-value="data.command"
+            hide-details
+            dense
+            readonly
+          />
+        </div>
       </div>
       <div>
-        <a
-          :href="url"
-          download
-        >
-          <RuiButton
+        <template v-if="data.url">
+          <ButtonLink
+            v-if="data.command"
+            :to="data.url"
+            external
+            size="sm"
             color="primary"
-            size="lg"
           >
-            {{ t('download.action') }}
-          </RuiButton>
-        </a>
+            {{ t('download.read_the_doc') }}
+            <template #append>
+              <RuiIcon
+                name="lu-external-link"
+                size="16"
+              />
+            </template>
+          </ButtonLink>
+          <a
+            v-else
+            :href="data.url"
+            download
+          >
+            <RuiButton
+              color="primary"
+            >
+              {{ t('download.action') }}
+            </RuiButton>
+          </a>
+        </template>
+        <RuiMenu v-else-if="'group' in data">
+          <template #activator="{ attrs }">
+            <RuiButton
+              v-bind="attrs"
+              color="primary"
+            >
+              {{ t('download.action') }}
+              <template #append>
+                <RuiIcon
+                  name="lu-chevron-down"
+                  size="18"
+                />
+              </template>
+            </RuiButton>
+          </template>
+          <div class="py-2">
+            <a
+              v-for="item in data.items"
+              :key="item.url"
+              :href="item.url"
+            >
+              <RuiButton variant="list">
+                {{ item.name }}
+              </RuiButton>
+            </a>
+          </div>
+        </RuiMenu>
       </div>
     </div>
   </div>
@@ -47,14 +108,14 @@ const { t } = useI18n();
 <style lang="scss" module>
 .wrapper {
   @apply p-4 lg:p-6 bg-rui-primary/[0.04];
-  @apply flex flex-col space-y-4;
+  @apply flex flex-col gap-y-4;
 
   .icon {
     @apply flex items-center justify-center p-3 w-12 h-12 bg-white rounded-[0.625rem] text-rui-primary;
   }
 
   .body {
-    @apply flex items-end md:items-start justify-between md:flex-col space-x-4 md:space-x-0 md:space-y-4;
+    @apply flex items-end md:items-start justify-between md:flex-col gap-x-4 gap-y-4 flex-wrap;
   }
 
   .for {

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { DownloadItemProps } from '~/components/download/DownloadItem.vue';
+import type { DownloadItem } from '~/types/download';
 
-defineProps<{ version: string; links: DownloadItemProps[] }>();
+defineProps<{ version: string; links: DownloadItem[] }>();
 
 const { t } = useI18n();
 </script>
@@ -23,8 +23,8 @@ const { t } = useI18n();
       <div :class="$style.links">
         <DownloadItem
           v-for="(link, i) in links"
-          v-bind="link"
           :key="i"
+          :data="link"
           :class="$style.link"
         />
       </div>
