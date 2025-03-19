@@ -16,6 +16,7 @@ const ContentPolicy = {
   IMG_SRC: 'img-src',
   OBJECT_SRC: 'object-src',
   SCRIPT_SRC: 'script-src',
+  SCRIPT_SRC_ELEM: 'script-src-elem',
   STYLE_SRC: 'style-src',
   WORKER_SRC: 'worker-src',
 } as const;
@@ -104,6 +105,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'https://www.gstatic.cn/recaptcha/',
     'https://www.google.com/recaptcha/',
   ],
+  [ContentPolicy.SCRIPT_SRC_ELEM]: [SELF, UNSAFE_INLINE],
   [ContentPolicy.STYLE_SRC]: [SELF, UNSAFE_INLINE, 'fonts.googleapis.com'],
   [ContentPolicy.WORKER_SRC]: [SELF, 'www.recaptcha.net'],
 };
