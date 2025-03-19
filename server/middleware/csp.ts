@@ -58,6 +58,7 @@ const policy: Record<ContentPolicy, string[]> = {
     'https://push.walletconnect.com',
     'https://push.walletconnect.org',
     'wss://www.walletlink.org',
+    'www.google.com/recaptcha/',
   ],
   [ContentPolicy.DEFAULT_SRC]: [SELF],
   [ContentPolicy.FONT_SRC]: [SELF, 'data:', 'fonts.gstatic.com'],
@@ -105,7 +106,12 @@ const policy: Record<ContentPolicy, string[]> = {
     'https://www.gstatic.cn/recaptcha/',
     'https://www.google.com/recaptcha/',
   ],
-  [ContentPolicy.SCRIPT_SRC_ELEM]: [SELF, UNSAFE_INLINE],
+  [ContentPolicy.SCRIPT_SRC_ELEM]: [
+    SELF,
+    UNSAFE_INLINE,
+    'www.google.com/recaptcha/',
+    'www.gstatic.com/recaptcha/',
+  ],
   [ContentPolicy.STYLE_SRC]: [SELF, UNSAFE_INLINE, 'fonts.googleapis.com'],
   [ContentPolicy.WORKER_SRC]: [SELF, 'www.recaptcha.net'],
 };
