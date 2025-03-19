@@ -111,9 +111,7 @@ const { isMdAndUp } = useBreakpoint();
         class="flex-1 flex flex-col gap-10"
       >
         <div v-if="isAllSelected && total === 0">
-          <ReuseNotFound
-            :keyword="searchDebounced"
-          />
+          <ReuseNotFound :keyword="searchDebounced" />
         </div>
         <template
           v-for="(datum, key) in data"

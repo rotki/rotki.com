@@ -34,6 +34,7 @@ const menus: (Menu | MenuParent)[] = [
     label: t('navigation_menu.integration.title'),
     description: t('navigation_menu.integration.description'),
     to: '/integrations',
+    highlightActive: true,
   },
   {
     label: t('navigation_menu.download'),

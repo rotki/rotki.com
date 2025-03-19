@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { DownloadItemProps } from '~/components/download/DownloadItem.vue';
+import type { DownloadItem } from '~/types/download';
 import { get } from '@vueuse/core';
 import { useAppDownload } from '~/composables/download';
 import { commonAttrs } from '~/utils/metadata';
@@ -25,11 +25,17 @@ const {
   fetchLatestRelease,
 } = useAppDownload();
 
-const links = computed<DownloadItemProps[]>(() => [
-  { platform: 'LINUX', icon: 'lu-cloud-download-2-fill', url: get(linuxUrl) },
-  { platform: 'MAC apple silicon', icon: 'lu-os-apple', url: get(macOSArmUrl) },
-  { platform: 'MAC intel', icon: 'lu-os-apple', url: get(macOSUrl) },
+const links = computed<DownloadItem[]>(() => [
+  { platform: 'LINUX', image: '/img/linux.svg', url: get(linuxUrl) },
+  { platform: 'MAC', icon: 'lu-os-apple', group: true, items: [{
+    name: 'MAC Apple Silicon',
+    url: get(macOSArmUrl),
+  }, {
+    name: 'MAC Intel',
+    url: get(macOSUrl),
+  }] },
   { platform: 'WINDOWS', icon: 'lu-os-windows', url: get(windowsUrl) },
+  { platform: 'DOCKER', image: '/img/docker.svg', url: 'https://docs.rotki.com/requirement-and-installation/packaged-binaries.html#docker', command: 'docker pull rotki/rotki' },
 ]);
 
 onBeforeMount(async () => await fetchLatestRelease());

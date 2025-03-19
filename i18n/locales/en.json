@@ -322,7 +322,8 @@
       "download_rotki": "Download rotki"
     },
     "latest_release": "Latest Release",
-    "preview": "Preview"
+    "preview": "Preview",
+    "read_the_doc": "Read the documentation"
   },
   "home": {
     "advantages": {
@@ -353,42 +354,79 @@
       "subtitle": "A 360° overview of your assets",
       "title": "Dashboard"
     },
-    "defi": {
-      "detail": "Overview of all of your DeFi holdings in various protocols, historical activity details and profit loss calculation.",
-      "subtitle": "Overview of all of your DeFi",
-      "title": "DeFi"
+    "history_events": {
+      "subtitle": "View all historical events including, transactions, trades, deposits, withdrawals and more.",
+      "title": "History events",
+      "key_features": "Key Features",
+      "features": {
+        "comprehensive": {
+          "title": "Comprehensive Transaction History",
+          "description": "View all historical transactions, including trades, transfers, and fees."
+        },
+        "categorization": {
+          "title": "Event Categorization",
+          "description": "Automatically classify transactions into deposits, withdrawals, trades, staking, and more."
+        },
+        "customizable": {
+          "title": "Customizable history",
+          "description": "Manually adjust or add missing transactions to ensure accuracy."
+        },
+        "filter": {
+          "title": "Filter & Search",
+          "description": "Easily find specific events using filters by date, asset, protocol, event type and more."
+        },
+        "csv_export": {
+          "title": "CSV Export",
+          "description": "Export historical event data for external analysis or tax reporting."
+        }
+      }
     },
-    "eth_protocols": {
-      "detail": "Details per protocol for some of the supported protocols:",
+    "evm_protocols": {
       "protocols": {
         "aave": {
-          "description": "Your current balances and liabilities",
           "title": "AAVE"
         },
         "balancer": {
-          "description": "Your current LP balances, and trades",
           "title": "Balancer"
         },
         "compound": {
-          "description": "Your current balances and liabilities",
           "title": "Compound"
         },
         "maker_dao": {
-          "description": "Which vaults you have open, how much you have in DSR",
           "title": "Maker DAO"
         },
         "uniswap": {
-          "description": "Your current LP balances, v2 and v3 trades",
           "title": "Uniswap"
         },
         "yearn_vaults": {
-          "description": "Your current balances",
           "title": "Yearn vaults"
         }
       },
-      "subtitle": "Ethereum DeFi protocol details",
-      "title": "Ethereum protocols",
-      "watcher_note": "Premium users can set watchers for various protocols so that they can be informed via email when certain conditions are met."
+      "subtitle": "Manage assets across multiple protocols across EVM networks.",
+      "title": "EVM protocols",
+      "key_features": "Key Features",
+      "features": {
+        "multi_chain_support": {
+          "title": "Multi-Chain Support",
+          "description": "Track assets across Ethereum and EVM-compatible chains like Polygon, BSC, and Arbitrum."
+        },
+        "automatic_activity_importing": {
+          "title": "Automatic Activity Importing",
+          "description": "Sync wallet activity directly from the blockchain."
+        },
+        "defi_balances": {
+          "title": "DeFi Balances Monitoring",
+          "description": "View balances and positions in lending, borrowing, and liquidity pools."
+        },
+        "staking_yield": {
+          "title": "Staking & Yield Farming",
+          "description": "Keep tabs on rewards from staking and yield-generating protocols."
+        },
+        "historical_data": {
+          "title": "Historical Data & PnL",
+          "description": "Analyze past transactions and profit/loss from DeFi interactions."
+        }
+      }
     },
     "exchanges": {
       "detail": "Connect to a big number of centralized exchanges and inspect current balances, historical trades, deposits and withdrawals.",

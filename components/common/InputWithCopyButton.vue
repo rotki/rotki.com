@@ -11,15 +11,15 @@ defineOptions({
 
 const modelValue = defineModel<string>({ required: true });
 
-defineProps<Props>();
+const props = defineProps<Props>();
 </script>
 
 <template>
   <RuiTextField
+    v-bind="props"
     v-model="modelValue"
     color="primary"
     variant="outlined"
-    v-bind="$attrs"
     hide-details
   >
     <template

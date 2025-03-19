@@ -13,12 +13,12 @@ const data = computed(() => [
     subtitle: t('home.exchanges.subtitle'),
   },
   {
-    title: t('home.defi.title'),
-    subtitle: t('home.defi.subtitle'),
+    title: t('home.history_events.title'),
+    subtitle: t('home.history_events.subtitle'),
   },
   {
-    title: t('home.eth_protocols.title'),
-    subtitle: t('home.eth_protocols.subtitle'),
+    title: t('home.evm_protocols.title'),
+    subtitle: t('home.evm_protocols.subtitle'),
   },
   {
     title: t('home.profit_loss_report.title'),
@@ -93,10 +93,10 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
           <SupportedExchangeDetails />
         </RuiTabItem>
         <RuiTabItem eager>
-          <DefiProtocols />
+          <HistoryEvents />
         </RuiTabItem>
         <RuiTabItem eager>
-          <EthProtocols />
+          <EvmProtocols />
         </RuiTabItem>
         <RuiTabItem eager>
           <ProfitLossReport />

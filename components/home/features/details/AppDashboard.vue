@@ -11,14 +11,14 @@ const { t } = useI18n();
         src="/img/dashboard.webp"
       />
     </div>
-    <div class="flex flex-1 flex-col gap-4">
-      <h5 class="text-h5 text-rui-primary">
+    <div class="flex flex-1 flex-col gap-2">
+      <h6 class="text-h6 text-rui-primary">
         {{ t('home.dashboard.title') }}
-      </h5>
+      </h6>
       <h6 class="text-h6">
         {{ t('home.dashboard.subtitle') }}
       </h6>
-      <div class="flex flex-col gap-6 text-rui-text-secondary pt-2">
+      <div class="flex flex-col gap-6 text-rui-text-secondary pt-4">
         <div>
           <div class="text-subtitle-1 font-bold">
             {{ t('home.dashboard.details.asset_and_liabilities.title') }}

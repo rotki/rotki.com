@@ -7,9 +7,13 @@ export const IntegrationItem = z.object({
 
 export type IntegrationItem = z.infer<typeof IntegrationItem>;
 
+export const ExchangeIntegrationData = IntegrationItem.extend({
+  isExchangeWithKey: z.boolean().optional(),
+});
+
 export const IntegrationData = z.object({
   blockchains: z.array(IntegrationItem),
-  exchanges: z.array(IntegrationItem),
+  exchanges: z.array(ExchangeIntegrationData),
   protocols: z.array(IntegrationItem),
 });
 
