@@ -100,17 +100,21 @@ const policy: Record<ContentPolicy, string[]> = {
     SELF,
     UNSAFE_INLINE,
     UNSAFE_EVAL,
-    'https://www.recaptcha.net',
-    'https://recaptcha.net',
-    'https://www.gstatic.com/recaptcha/',
-    'https://www.gstatic.cn/recaptcha/',
-    'https://www.google.com/recaptcha/',
+    'www.recaptcha.net',
+    'recaptcha.net',
+    'www.gstatic.com/recaptcha/',
+    'www.gstatic.cn/recaptcha/',
+    'www.google.com/recaptcha/',
   ],
   [ContentPolicy.SCRIPT_SRC_ELEM]: [
     SELF,
     UNSAFE_INLINE,
-    'www.google.com/recaptcha/',
+    UNSAFE_EVAL,
+    'www.recaptcha.net',
+    'recaptcha.net',
     'www.gstatic.com/recaptcha/',
+    'www.gstatic.cn/recaptcha/',
+    'www.google.com/recaptcha/',
   ],
   [ContentPolicy.STYLE_SRC]: [SELF, UNSAFE_INLINE, 'fonts.googleapis.com'],
   [ContentPolicy.WORKER_SRC]: [SELF, 'www.recaptcha.net'],
@@ -118,7 +122,36 @@ const policy: Record<ContentPolicy, string[]> = {
 
 function getCSP(page?: 'card' | 'paypal') {
   let csp = '';
-  const finalPolicy = { ...policy };
+  const finalPolicy = {
+    ...policy,
+    [ContentPolicy.CHILD_SRC]: [
+      'assets.braintreegateway.com',
+    ],
+    [ContentPolicy.CONNECT_SRC]: [
+      ...policy[ContentPolicy.CONNECT_SRC],
+      'api.sandbox.braintreegateway.com',
+      'api.braintreegateway.com',
+      'client-analytics.sandbox.braintreegateway.com',
+      'client-analytics.braintreegateway.com',
+      '*.braintree-api.com',
+      '*.paypal.com',
+    ],
+    [ContentPolicy.FRAME_SRC]: [
+      ...policy[ContentPolicy.FRAME_SRC],
+      'assets.braintreegateway.com',
+    ],
+    [ContentPolicy.SCRIPT_SRC]: [
+      ...policy[ContentPolicy.SCRIPT_SRC],
+      'js.braintreegateway.com',
+      'assets.braintreegateway.com',
+    ],
+    [ContentPolicy.SCRIPT_SRC_ELEM]: [
+      ...policy[ContentPolicy.SCRIPT_SRC_ELEM],
+      'js.braintreegateway.com',
+      'assets.braintreegateway.com',
+    ],
+  };
+
   if (page === 'card') {
     finalPolicy[ContentPolicy.FRAME_SRC] = ['*'];
     finalPolicy[ContentPolicy.SCRIPT_SRC] = [
@@ -126,15 +159,31 @@ function getCSP(page?: 'card' | 'paypal') {
       UNSAFE_INLINE,
       UNSAFE_EVAL,
       '*',
+      // 3D Secure directives
+      'songbird.cardinalcommerce.com',
+      'songbirdstag.cardinalcommerce.com',
     ];
-    finalPolicy[ContentPolicy.CONNECT_SRC] = [SELF, '*'];
+    finalPolicy[ContentPolicy.SCRIPT_SRC_ELEM] = [
+      ...finalPolicy[ContentPolicy.SCRIPT_SRC_ELEM],
+      // 3D Secure directives
+      'songbird.cardinalcommerce.com',
+      'songbirdstag.cardinalcommerce.com',
+    ];
     finalPolicy[ContentPolicy.FORM_ACTION] = [SELF, '*'];
+    finalPolicy[ContentPolicy.CONNECT_SRC] = [
+      ...finalPolicy[ContentPolicy.CONNECT_SRC],
+      // 3D Secure directives
+      '*.cardinalcommerce.com',
+    ];
   }
   else if (page === 'paypal') {
     finalPolicy[ContentPolicy.SCRIPT_SRC] = [
       ...finalPolicy[ContentPolicy.SCRIPT_SRC],
-      'js.braintreegateway.com',
-      'assets.braintreegateway.com',
+      '*.paypal.com',
+      'www.paypalobjects.com',
+    ];
+    finalPolicy[ContentPolicy.SCRIPT_SRC_ELEM] = [
+      ...finalPolicy[ContentPolicy.SCRIPT_SRC_ELEM],
       '*.paypal.com',
       'www.paypalobjects.com',
     ];
@@ -144,20 +193,11 @@ function getCSP(page?: 'card' | 'paypal') {
       'www.paypalobjects.com',
     ];
     finalPolicy[ContentPolicy.CHILD_SRC] = [
+      ...finalPolicy[ContentPolicy.CHILD_SRC],
       '*.paypal.com',
-      'assets.braintreegateway.com',
     ];
     finalPolicy[ContentPolicy.FRAME_SRC] = [
-      '*.paypal.com',
-      'assets.braintreegateway.com',
-    ];
-    finalPolicy[ContentPolicy.CONNECT_SRC] = [
-      SELF,
-      'api.sandbox.braintreegateway.com',
-      'api.braintreegateway.com',
-      'client-analytics.sandbox.braintreegateway.com',
-      'client-analytics.braintreegateway.com',
-      '*.braintree-api.com',
+      ...finalPolicy[ContentPolicy.FRAME_SRC],
       '*.paypal.com',
     ];
   }
