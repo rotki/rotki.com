@@ -71,7 +71,7 @@
     "bumpp": "10.1.0",
     "eslint": "9.22.0",
     "eslint-plugin-nuxt": "4.0.0",
-    "happy-dom": "16.8.1",
+    "happy-dom": "17.4.4",
     "husky": "9.1.7",
     "lint-staged": "15.5.0",
     "msw": "2.7.3",
