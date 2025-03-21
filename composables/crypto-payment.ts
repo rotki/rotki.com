@@ -1,7 +1,7 @@
 import type { Ref } from 'vue';
 import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-import { ChainController } from '@reown/appkit-core';
+import { ChainController } from '@reown/appkit-controllers';
 import {
   type AppKitNetwork,
   arbitrum,
