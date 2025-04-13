@@ -8,14 +8,14 @@ const data = [
     description: t('products.features.limits.history_view.description'),
   },
   {
-    img: '/img/products/trades_limits.webp',
-    title: t('products.features.limits.trades.title'),
-    description: t('products.features.limits.trades.description'),
+    img: '/img/products/ethereum_validators_limits.webp',
+    title: t('products.features.limits.validators.title'),
+    description: t('products.features.limits.validators.description'),
   },
   {
-    img: '/img/products/deposits_withdrawals_limits.webp',
-    title: t('products.features.limits.deposits_withdrawals.title'),
-    description: t('products.features.limits.deposits_withdrawals.description'),
+    img: '/img/products/pnl_report_events_limits.webp',
+    title: t('products.features.limits.profit_loss_report.title'),
+    description: t('products.features.limits.profit_loss_report.description'),
   },
   {
     img: '/img/products/user_notes_limits.webp',
