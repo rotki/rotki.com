@@ -709,23 +709,23 @@
         "title": "Higher Limits"
       },
       "limits": {
-        "deposits_withdrawals": {
-          "description": "Free users are limited to the 100 most recent exchange deposits/withdrawals. Premium users benefit from higher limits for viewing deposits and withdrawals.",
-          "title": "Deposit/withdrawals"
-        },
         "heading": "Expanded Capabilities for Premium Users",
         "history_view": {
           "description": "Free users have a limit of the 100 most recent events in the history event viewer. As a premium user you have higher limits in the amount of events you can see.",
           "title": "History view"
         },
-        "title": "Increased event limits",
-        "trades": {
-          "description": "Free users are limited to the 250 most recent trades. Premium users enjoy higher limits on the number of trades visible.",
-          "title": "Trades"
+        "profit_loss_report": {
+          "description": "Free users are limited to the 100 most recent events in profit & loss report. Premium users benefit from higher limits for viewing events in profit & loss report.",
+          "title": "Profit & loss report events"
         },
+        "title": "Increased limits",
         "user_notes": {
           "description": "Free users can add up to 10 notes. As a premium user, you have higher limits on the number of notes you can add.",
           "title": "User notes"
+        },
+        "validators": {
+          "description": "Free users can only see 4 Ethereum validators. Premium users enjoy higher limits on the number of Ethereum validators visible.",
+          "title": "Ethererum Validators"
         }
       },
       "monerium_and_backup": {
