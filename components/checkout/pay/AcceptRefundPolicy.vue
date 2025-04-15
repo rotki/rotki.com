@@ -24,6 +24,7 @@ const { t } = useI18n();
           to="/refund-policy"
           color="primary"
           tag="span"
+          class="underline"
           :class="$style.link"
           external
           target="_blank"
