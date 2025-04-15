@@ -6,6 +6,6 @@
 
 <style lang="scss" module>
 .title {
-  @apply font-bold text-h4 text-rui-text text-center mb-3;
+  @apply font-bold text-h4 text-rui-text mb-3;
 }
 </style>
