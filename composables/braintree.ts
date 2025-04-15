@@ -1,22 +1,27 @@
-import type {
-  CardCheckout,
-  PaymentStep,
-  SelectedPlan,
-} from '~/types';
 import type { PayEvent } from '~/types/common';
 import { get, set } from '@vueuse/core';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
+import {
+  type CardCheckout,
+  CardCheckoutResponse,
+  type PaymentStep,
+  type Result,
+  type SelectedPlan,
+} from '~/types';
 
 export function useBraintree() {
-  const { t } = useI18n({ useScope: 'global' });
-  const store = useMainStore();
-  const route = useRoute();
-  const router = useRouter();
-  const checkout = ref<CardCheckout | null>(null);
+  const checkoutData = ref<CardCheckout | null>(null);
   const loadingPlan = ref(false);
   const pending = ref(false);
   const paymentSuccess = ref(false);
   const paymentError = ref('');
+
+  const { t } = useI18n();
+  const store = useMainStore();
+  const route = useRoute();
+  const router = useRouter();
+  const { fetchWithCsrf } = useFetchWithCsrf();
 
   const step = computed<PaymentStep>(() => {
     const isPending = get(pending);
@@ -45,23 +50,42 @@ export function useBraintree() {
     return { type: 'idle' };
   });
 
-  watchEffect(async () => {
-    await loadPlan(route.query.plan as string);
-  });
+  async function cardCheckout(plan: number): Promise<Result<CardCheckout>> {
+    try {
+      const response = await fetchWithCsrf<CardCheckoutResponse>(
+        `/webapi/checkout/card/${plan}/`,
+        {
+          method: 'GET',
+        },
+      );
+      const data = CardCheckoutResponse.parse(response);
+      return {
+        isError: false,
+        result: data.result,
+      };
+    }
+    catch (error: any) {
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+  };
 
   async function loadPlan(months: string) {
     set(loadingPlan, true);
     const plan = parseInt(months);
-    const data = await store.checkout(plan);
+    const data = await cardCheckout(plan);
     set(loadingPlan, false);
     if (data.isError)
       router.back();
     else
-      set(checkout, data.result);
+      set(checkoutData, data.result);
   }
 
   const plan = computed<SelectedPlan | null>(() => {
-    const payload = get(checkout);
+    const payload = get(checkoutData);
     if (!payload)
       return null;
 
@@ -69,8 +93,12 @@ export function useBraintree() {
     return data;
   });
 
+  watchEffect(async () => {
+    await loadPlan(route.query.plan as string);
+  });
+
   const token = computed<string>(() => {
-    const payload = get(checkout);
+    const payload = get(checkoutData);
     if (!payload)
       return '';
 
