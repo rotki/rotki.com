@@ -31,6 +31,11 @@ const menus: (Menu | MenuParent)[] = [
     highlightActive: true,
   },
   {
+    label: t('navigation_menu.pricing'),
+    to: '/pricing',
+    highlightActive: true,
+  },
+  {
     label: t('navigation_menu.integration.title'),
     description: t('navigation_menu.integration.description'),
     to: '/integrations',
