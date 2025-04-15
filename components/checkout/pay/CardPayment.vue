@@ -42,14 +42,14 @@ const challengeVisible = ref(false);
 const paying = ref(false);
 const initializing = ref(true);
 const formInitializing = ref(true);
+const discountCode = ref('');
 
 const accepted = ref(false);
 const error = ref<ErrorMessage | null>(null);
-
-let btThreeDSecure: ThreeDSecure;
-
 const formValid = ref(false);
 const valid = logicAnd(accepted, formValid);
+
+let btThreeDSecure: ThreeDSecure;
 
 const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
@@ -236,6 +236,10 @@ onUnmounted(() => {
     <SelectedPlanOverview
       :plan="plan"
       :disabled="disabled"
+    />
+    <DiscountCodeInput
+      v-model="discountCode"
+      class="mt-6"
     />
     <AcceptRefundPolicy
       v-model="accepted"

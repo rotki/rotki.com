@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
+import { useTiersStore } from '~/store/tiers';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const route = useRoute();
-const store = useMainStore();
-const { plans } = storeToRefs(store);
+const store = useTiersStore();
+const { availablePlans } = storeToRefs(store);
 
 const steps = computed(() => [
   {
@@ -45,8 +45,8 @@ onBeforeMount(() => {
   removeStoredRedirectUrl();
 });
 
-onMounted(async () => {
-  await store.getPlans();
+onBeforeMount(async () => {
+  await store.getAvailablePlans();
 });
 </script>
 
@@ -56,7 +56,7 @@ onMounted(async () => {
   >
     <div class="flex justify-center grow">
       <RuiProgress
-        v-if="!plans"
+        v-if="!availablePlans"
         circular
         class="mt-20"
         color="primary"

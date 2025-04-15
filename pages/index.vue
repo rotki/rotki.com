@@ -44,5 +44,5 @@ definePageMeta({
   <FeatureList />
   <Testimonials />
   <PremiumFeatures />
-  <AvailablePlans />
+  <PricingSection compact />
 </template>

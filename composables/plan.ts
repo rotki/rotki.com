@@ -1,28 +1,28 @@
+import type { PricingPeriod } from '~/types/tiers';
 import { get } from '@vueuse/core';
-
-const availablePlans = [1, 3, 6, 12];
 
 type CurrencyParam = string | null;
 
-export function usePlanParams() {
+export interface PlanParams {
+  period: PricingPeriod;
+  planId: number;
+  plan: string;
+}
+
+export function usePlanParams(): { plan: ComputedRef<PlanParams | undefined> } {
   const route = useRoute();
   const plan = computed(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
-    const { plan } = route.query;
-    if (typeof plan !== 'string')
-      return -1;
+    const { period, plan, planId } = route.query;
+    if (!period || !plan)
+      return undefined;
 
-    const selectedPlan = parseInt(plan);
-    if (
-      isNaN(selectedPlan)
-      || !isFinite(selectedPlan)
-      || !availablePlans.includes(selectedPlan)
-    ) {
-      return -1;
-    }
-
-    return selectedPlan;
+    return {
+      period: period as PricingPeriod,
+      plan: plan as string,
+      planId: parseInt(planId as string),
+    };
   });
 
   return { plan };
