@@ -20,7 +20,7 @@ interface PaymentMethodItem {
 
 const store = useMainStore();
 
-const { plan } = usePlanParams();
+const { plan: planParams } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
 
 const { identifier } = toRefs(props);
@@ -60,7 +60,10 @@ const selected = computed<PaymentMethodItem | undefined>(() =>
 async function back() {
   await navigateTo({
     name: 'checkout-pay',
-    query: { plan: get(plan), method: get(selected) ? get(method) : undefined },
+    query: {
+      ...get(planParams),
+      method: get(selected) ? get(method) : undefined,
+    },
   });
 }
 
@@ -75,7 +78,7 @@ async function next() {
   const { href } = router.resolve({
     name,
     query: {
-      plan: get(plan),
+      ...get(planParams),
       id: get(identifier),
       method,
     },

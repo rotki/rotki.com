@@ -7,3 +7,61 @@
 .container {
   @apply px-4 md:px-12 xl:px-16;
 }
+
+.text-body-1 {
+  @apply text-base;
+}
+
+.text-body-2 {
+  @apply text-sm;
+}
+
+.text-caption {
+  @apply text-xs;
+  line-height: 1.25rem;
+}
+
+.text-h1 {
+  @apply text-8xl font-light;
+  line-height: 7rem;
+}
+
+.text-h2 {
+  @apply text-6xl font-light;
+  line-height: 4.5rem;
+}
+
+.text-h3 {
+  @apply text-5xl;
+  line-height: 3.5rem;
+}
+
+.text-h4 {
+  @apply text-4xl font-semibold;
+  line-height: 2.625rem;
+}
+
+.text-h5 {
+  @apply text-2xl;
+  line-height: 2rem;
+}
+
+.text-h6 {
+  @apply text-xl font-medium;
+  line-height: 2rem;
+}
+
+.text-overline {
+  @apply text-xs uppercase;
+  line-height: 2rem;
+}
+
+.text-subtitle-1 {
+  @apply text-base;
+  line-height: 1.75rem;
+}
+
+.text-subtitle-2 {
+  @apply text-sm font-medium;
+  line-height: 1.25rem;
+}

@@ -1,32 +1,59 @@
 <script lang="ts" setup>
-import type { Plan } from '~/types';
+import type { AvailablePlan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { useMainStore } from '~/store';
+import { useTiersStore } from '~/store/tiers';
+import { PricingPeriod } from '~/types/tiers';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
-const { t } = useI18n({ useScope: 'global' });
+const {
+  public: {
+    contact: { emailMailto },
+  },
+} = useRuntimeConfig();
+
+const { t } = useI18n();
 const route = useRoute();
-const { plan: savedPlan } = usePlanParams();
+const { plan: planParams } = usePlanParams();
 
-const { account, authenticated, plans } = storeToRefs(useMainStore());
+const selectedPlanName = ref<string | undefined>(get(planParams)?.plan);
+const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || PricingPeriod.MONTHLY);
 
-const identifier = ref<number>(get(savedPlan));
 const processing = ref<boolean>(false);
 
-const selected = computed<Plan | undefined>(
-  () => get(plans)?.find(plan => plan.months === get(identifier)),
+const { account, authenticated } = storeToRefs(useMainStore());
+const { availablePlans } = storeToRefs(useTiersStore());
+
+function isSelected(plan: AvailablePlan) {
+  return plan.name === get(selectedPlanName);
+}
+
+const selectedPlan = computed<AvailablePlan | undefined>(
+  () => get(availablePlans)?.find(plan => isSelected(plan)),
 );
 
-const cryptoPrice = computed(() => {
-  const plan = get(selected);
-  if (!plan)
-    return 0;
-
-  return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2);
-});
-
 const vat = computed(() => get(account)?.vat);
+
+function select(plan: AvailablePlan) {
+  set(selectedPlanName, plan.name);
+}
+
+function next() {
+  set(processing, true);
+  navigateTo({
+    name: 'checkout-pay-method',
+    query: {
+      ...route.query,
+      plan: get(selectedPlanName),
+      period: get(selectedPlanPeriod),
+      planId: get(selectedPlan)?.subscriptionTierId,
+    },
+  });
+}
+
+const canBuy = reactify(canBuyNewSubscription)(account);
 
 const notes = computed(() => [
   t('home.plans.tiers.step_1.notes.line_1'),
@@ -34,74 +61,84 @@ const notes = computed(() => [
   t('home.plans.tiers.step_1.notes.line_3'),
   t('home.plans.tiers.step_1.notes.line_4'),
 ]);
-
-const isSelected = (plan: Plan) => plan === get(selected);
-
-function select(plan: Plan) {
-  set(identifier, plan.months);
-}
-
-function next() {
-  set(processing, true);
-  navigateTo({
-    name: 'checkout-pay-method',
-    query: { ...route.query, plan: get(identifier) },
-  });
-}
-
-const canBuy = reactify(canBuyNewSubscription)(account);
 </script>
 
 <template>
-  <div :class="$style.container">
+  <div class="flex flex-col w-full grow">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
     <CheckoutDescription>
-      <span v-if="vat">{{ t('home.plans.tiers.step_1.vat', { vat }) }}</span>
-      <span v-if="!authenticated">
+      <template v-if="vat">
+        {{ t('home.plans.tiers.step_1.vat', { vat }) }}
+      </template>
+      <template v-if="!authenticated">
         {{ t('home.plans.tiers.step_1.maybe_vat') }}
-      </span>
+      </template>
     </CheckoutDescription>
 
-    <div :class="$style.selection">
-      <div :class="$style.selectable">
+    <div class="pt-12">
+      <PricingPeriodTab
+        v-model="selectedPlanPeriod"
+        :data="availablePlans"
+      />
+
+      <div class="flex flex-col gap-4 pt-8 pb-12">
+        <template v-if="availablePlans.length === 0">
+          <div
+            v-for="i in 2"
+            :key="i"
+            class="rounded-xl border border-default p-4 flex flex-col gap-2"
+          >
+            <RuiSkeletonLoader class="w-20 h-7" />
+            <RuiSkeletonLoader class="w-28 h-7" />
+          </div>
+        </template>
         <SelectablePlan
-          v-for="plan in plans"
-          :key="plan.months"
+          v-for="plan in availablePlans"
+          :key="plan.subscriptionTierId"
           :plan="plan"
-          :popular="plan.months === 12"
+          :period="selectedPlanPeriod"
           :selected="isSelected(plan)"
           @click="select(plan)"
         />
-      </div>
-
-      <div
-        v-if="selected"
-        :class="$style.hint"
-      >
-        {{ t('home.plans.tiers.step_1.crypto_hint', { cryptoPrice }) }}
+        <div class="border border-default rounded-xl p-4 flex items-center justify-between">
+          <div class="text-h6 text-rui-primary">
+            {{ t('pricing.plans.custom_plan') }}
+          </div>
+          <ButtonLink
+            size="lg"
+            color="primary"
+            variant="outlined"
+            :to="emailMailto"
+          >
+            {{ t('values.contact_section.title') }}
+          </ButtonLink>
+        </div>
       </div>
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
-      <div :class="$style.notes">
+      <div class="flex flex-col gap-3">
         <div
           v-for="(line, i) in notes"
           :key="i"
-          :class="$style.note"
+          class="flex gap-2"
         >
           <RuiIcon
-            :class="$style.note__icon"
+            class="text-rui-text-secondary shrink-0"
             name="lu-circle-arrow-right"
+            size="20"
           />
-          <p>{{ line }}</p>
+          <p class="text-sm">
+            {{ line }}
+          </p>
         </div>
       </div>
 
-      <div :class="$style.continue">
+      <div class="mt-8">
         <RuiButton
-          :disabled="!selected || !canBuy"
+          :disabled="!selectedPlan || !canBuy"
           :loading="processing"
           class="w-full"
           color="primary"
@@ -130,37 +167,3 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.container {
-  @apply flex flex-col w-full grow;
-}
-
-.selection {
-  @apply flex flex-col w-full justify-center my-8;
-}
-
-.selectable {
-  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 xl:gap-4;
-}
-
-.hint {
-  @apply mt-3 text-base italic text-rui-text;
-}
-
-.continue {
-  @apply mt-[2.63rem];
-}
-
-.notes {
-  @apply flex flex-col gap-3;
-
-  .note {
-    @apply flex gap-3;
-
-    &__icon {
-      @apply text-black/[.54] shrink-0;
-    }
-  }
-}
-</style>

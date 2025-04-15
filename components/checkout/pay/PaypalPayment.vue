@@ -143,15 +143,15 @@ async function back() {
   });
 }
 
-function redirect() {
-  navigateTo({ name: 'checkout-success' });
-  stopWatcher();
-}
-
 const stopWatcher = watchEffect(() => {
   if (get(success))
     redirect();
 });
+
+function redirect() {
+  navigateTo({ name: 'checkout-success' });
+  stopWatcher();
+}
 
 onMounted(async () => {
   try {

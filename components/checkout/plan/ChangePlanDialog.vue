@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { Plan } from '~/types';
+import type { PlanParams } from '~/composables/plan';
+import type { AvailablePlan } from '~/types';
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
-import { getPlanName } from '~/utils/plans';
+import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { useTiersStore } from '~/store/tiers';
+import { PricingPeriod } from '~/types/tiers';
 
 const props = withDefaults(
   defineProps<{
@@ -21,27 +23,30 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
-  (e: 'select', months: number): void;
+  (e: 'select', data: PlanParams): void;
 }>();
-const { t } = useI18n({ useScope: 'global' });
-const store = useMainStore();
-const { plans } = storeToRefs(store);
+
 const { crypto, visible, warning } = toRefs(props);
+
+const { t } = useI18n();
+const { plan: planParams } = usePlanParams();
+
 const confirmed = ref(false);
 
-const availablePlans = computed<Plan[]>(() => get(plans) ?? []);
+const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || PricingPeriod.MONTHLY);
 
-const cancel = () => emit('cancel');
+const store = useTiersStore();
+const { availablePlans } = storeToRefs(store);
 
-function select(months: number) {
+function select(plan: AvailablePlan) {
   if (get(warning) && !get(confirmed))
     return;
 
-  return emit('select', months);
-}
-
-function getPrice(plan: Plan) {
-  return get(crypto) ? plan.priceCrypto : plan.priceFiat;
+  return emit('select', {
+    period: get(selectedPlanPeriod),
+    planId: plan.subscriptionTierId,
+    plan: plan.name,
+  });
 }
 
 watch(visible, (visible) => {
@@ -49,7 +54,9 @@ watch(visible, (visible) => {
     set(confirmed, false);
 });
 
-onMounted(async () => await store.getPlans());
+onMounted(async () => {
+  await store.getAvailablePlans();
+});
 </script>
 
 <template>
@@ -61,27 +68,22 @@ onMounted(async () => await store.getPlans());
       <template #header>
         {{ t('change_plan.title') }}
       </template>
-      <div
-        v-for="plan in availablePlans"
-        :key="plan.months.toString()"
-        :class="{
-          [$style.plan]: true,
-          [$style.disabled]: warning && !confirmed,
-        }"
-        @click="select(plan.months)"
-      >
-        <div :class="$style.name">
-          {{ t('home.plans.names.plan', { name: getPlanName(plan.months) }) }}
-        </div>
-        {{ getPrice(plan) }}€
-        <span v-if="vat">+ {{ t('common.vat', { vat }) }}</span>
-        {{
-          t(
-            'selected_plan_overview.renew_period',
-            { months: plan.months },
-            plan.months,
-          )
-        }}
+      <div class="pt-4">
+        <PricingPeriodTab
+          v-model="selectedPlanPeriod"
+          :data="availablePlans"
+        />
+      </div>
+      <div class="flex flex-col gap-4 py-4">
+        <SelectablePlan
+          v-for="plan in availablePlans"
+          :key="plan.subscriptionTierId"
+          :plan="plan"
+          readonly
+          :disabled="warning && !confirmed"
+          :period="selectedPlanPeriod"
+          @click="select(plan)"
+        />
       </div>
       <div
         v-if="crypto && warning"
@@ -111,7 +113,7 @@ onMounted(async () => await store.getPlans());
           size="lg"
           class="w-full"
           color="primary"
-          @click="cancel()"
+          @click="emit('cancel')"
         >
           {{ t('actions.cancel') }}
         </RuiButton>
