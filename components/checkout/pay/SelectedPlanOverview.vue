@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PlanParams } from '~/composables/plan';
 import type { CryptoPayment, SelectedPlan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { getPlanNameFor } from '~/utils/plans';
@@ -43,7 +44,7 @@ function select() {
   set(selection, true);
 }
 
-function switchTo(months: number) {
+function switchTo(data: PlanParams) {
   set(selection, false);
   const currentRoute = get(router.currentRoute);
 
@@ -51,7 +52,7 @@ function switchTo(months: number) {
     path: currentRoute.path,
     query: {
       ...currentRoute.query,
-      plan: months.toString(),
+      ...data,
     },
   });
 }

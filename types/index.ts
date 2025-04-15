@@ -129,6 +129,23 @@ const Plan = z.object({
 
 export type Plan = z.infer<typeof Plan>;
 
+export const AvailablePlan = z.object({
+  name: z.string(),
+  oneMonthTierConfig: z.object({
+    basePrice: z.string(),
+  }),
+  oneYearTierConfig: z.object({
+    basePrice: z.string(),
+  }),
+  subscriptionTierId: z.number(),
+});
+
+export type AvailablePlan = z.infer<typeof AvailablePlan>;
+
+export const AvailablePlans = z.array(AvailablePlan);
+
+export type AvailablePlans = z.infer<typeof AvailablePlans>;
+
 const PremiumData = z.object({
   plans: z.array(Plan),
 });
