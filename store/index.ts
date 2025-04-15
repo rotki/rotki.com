@@ -13,8 +13,6 @@ import {
   ActionResultResponse,
   ApiKeys,
   type ApiResponse,
-  type CardCheckout,
-  CardCheckoutResponse,
   type CardPaymentRequest,
   ChangePasswordResponse,
   type CryptoPayment,
@@ -39,7 +37,6 @@ export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false);
   const account = ref<Account | null>(null);
   const plans = ref<Plan[] | null>(null);
-  const authenticatedOnPlansLoad = ref(false);
   const cancellationError = ref('');
   const resumeError = ref('');
 
@@ -276,7 +273,7 @@ export const useMainStore = defineStore('main', () => {
   });
 
   const getPlans = async (): Promise<void> => {
-    if (get(plans) && get(authenticated) === get(authenticatedOnPlansLoad)) {
+    if (get(plans)) {
       logger.debug('plans already loaded');
       return;
     }
@@ -290,33 +287,9 @@ export const useMainStore = defineStore('main', () => {
       );
       const data = PremiumResponse.parse(response);
       set(plans, data.result.plans);
-      set(authenticatedOnPlansLoad, get(authenticated));
     }
     catch (error: any) {
       logger.error(error);
-    }
-  };
-
-  const checkout = async (plan: number): Promise<Result<CardCheckout>> => {
-    try {
-      const response = await fetchWithCsrf<CardCheckoutResponse>(
-        `/webapi/checkout/card/${plan}/`,
-        {
-          method: 'GET',
-        },
-      );
-      const data = CardCheckoutResponse.parse(response);
-      return {
-        isError: false,
-        result: data.result,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
     }
   };
 
@@ -592,7 +565,6 @@ export const useMainStore = defineStore('main', () => {
     authenticated,
     cancellationError,
     changePassword,
-    checkout,
     checkPendingCryptoPayment,
     cryptoPayment,
     deleteAccount,

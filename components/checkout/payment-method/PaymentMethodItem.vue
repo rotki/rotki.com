@@ -28,7 +28,7 @@ const emit = defineEmits<{ (e: 'click'): void }>();
 .content {
   @apply flex gap-4 justify-center items-center cursor-pointer p-4;
   @apply min-w-[16rem] xl:min-w-[20rem] 2xl:min-w-[26rem] w-full;
-  @apply bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] border border-solid rounded;
+  @apply bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] border border-solid rounded-lg;
 
   &.selected {
     @apply border-rui-primary bg-rui-primary/[.1];

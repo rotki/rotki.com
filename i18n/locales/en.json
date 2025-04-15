@@ -204,6 +204,7 @@
     "get_in_touch": "Get In Touch Now",
     "get_premium": "Get Premium",
     "get_premium_plan": "Get Premium Plan",
+    "get_started": "Get started",
     "get_started_for_free": "Get started for free",
     "go_back_home": "Go back home",
     "regenerate": "Regenerate",
@@ -536,7 +537,7 @@
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
-          "title": "Premium Plans",
+          "title": "Subscription Plans",
           "vat": "The prices include a +{vat}% VAT tax"
         },
         "step_2": {
@@ -552,6 +553,10 @@
           },
           "chose": "You chose:",
           "description": "Proceed to the payment",
+          "discount": {
+            "label": "Discount code",
+            "hint": "Optional. Enter a discount code to apply savings to your purchase."
+          },
           "labels": {
             "network": "Network",
             "to_address": "Send to address",
@@ -697,6 +702,7 @@
     "jobs": "Jobs",
     "legal": "Legal",
     "privacy_policy": "Privacy Policy",
+    "pricing": "Pricing",
     "product": "Product",
     "resources": "Resources",
     "rotki_premium": "rotki Premium",
@@ -732,6 +738,28 @@
       "non_refundable": "refunds are not allowed",
       "policy": "rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
       "title": "rotki Refund and Cancellation Policy"
+    }
+  },
+  "pricing": {
+    "billed_annually": "Billed annually in € {price}",
+    "billed_monthly": "Billed monthly in EUR",
+    "header": {
+      "title": "Compare our plans and find yours",
+      "heading": "Pricing",
+      "description": "Simple, transparent pricing that grows with you. Try any plan free for 30 days."
+    },
+    "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
+    "per_month": "/month",
+    "per_year": "/year",
+    "most_popular_plan": "Most popular plan",
+    "max_saved_annually": "Save {percent}% Annually",
+    "see_all_features": "See all features",
+    "see_less_features": "See less features",
+    "free": "Free",
+    "plans": {
+      "custom_plan": "Custom plan",
+      "starter_plan": "Starter plan",
+      "plan": "{plan} plan"
     }
   },
   "products": {
