@@ -1,15 +1,13 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useMainStore();
 const acceptRefundPolicy = ref(false);
 const processing = ref<boolean>(false);
 
-const { plan } = usePlanParams();
+const { plan: planParams } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
 const { subscriptionId } = useSubscriptionIdParam();
 
@@ -17,7 +15,7 @@ async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
-      plan: get(plan),
+      ...get(planParams),
       method: get(paymentMethodId),
       id: get(subscriptionId),
     },
@@ -31,7 +29,7 @@ function submit() {
   navigateTo({
     name: 'checkout-pay-crypto',
     query: {
-      plan: get(plan),
+      ...get(planParams),
       currency: get(currency),
       method: get(paymentMethodId),
       id: get(subscriptionId),
@@ -42,7 +40,6 @@ function submit() {
 const cryptoStore = usePaymentCryptoStore();
 
 onBeforeMount(async () => {
-  await store.getPlans();
   await cryptoStore.fetchPaymentAssets();
 });
 
