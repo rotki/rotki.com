@@ -25,7 +25,8 @@ const { plan } = usePlanParams();
 const { subscriptionId } = useSubscriptionIdParam();
 
 onBeforeMount(() => {
-  if (!get(plan))
+  const planVal = get(plan);
+  if (!planVal || !planVal.planId)
     navigateTo({ name: 'checkout-pay' });
 });
 </script>

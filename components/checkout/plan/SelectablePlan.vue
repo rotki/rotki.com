@@ -1,112 +1,84 @@
 <script lang="ts" setup>
-import type { Plan } from '~/types';
+import type { AvailablePlan } from '~/types';
 import { get } from '@vueuse/core';
-import { getPlanSelectionName } from '~/utils/plans';
+import { PricingPeriod } from '~/types/tiers';
 
 const props = withDefaults(
   defineProps<{
-    plan: Plan;
-    selected: boolean;
-    popular?: boolean;
+    plan: AvailablePlan;
+    selected?: boolean;
+    period: PricingPeriod;
+    readonly?: boolean;
+    disabled?: boolean;
   }>(),
-  { popular: false },
+  {
+    selected: false,
+  },
 );
 
 const emit = defineEmits<{ (e: 'click'): void }>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { plan } = toRefs(props);
+const { plan, period } = toRefs(props);
 
-const name = computed(() => getPlanSelectionName(get(plan).months));
-const totalPrice = computed(() => get(plan).priceFiat);
+const isMostPopular = computed(() => get(plan).name === 'next');
+
 const price = computed(() => {
-  const { months, priceFiat } = get(plan);
-  return (parseFloat(priceFiat) / months).toFixed(2);
-});
+  const { oneMonthTierConfig, oneYearTierConfig } = get(plan);
+  const periodVal = get(period);
 
-function click() {
-  emit('click');
-}
+  return parseFloat(periodVal === PricingPeriod.YEARLY ? oneYearTierConfig.basePrice : oneMonthTierConfig.basePrice).toFixed(2);
+});
 </script>
 
 <template>
   <div
-    :class="[$style.plan, { [$style.selected]: selected }]"
-    @click="click()"
+    class="rounded-xl border border-default p-4 cursor-pointer"
+    :class="{
+      '!border-rui-primary': selected,
+      '!bg-rui-grey-100': disabled,
+    }"
+    @click="emit('click')"
   >
-    <div class="flex items-center h-0 justify-center relative w-full">
-      <RuiChip
-        v-if="popular"
-        class="-top-[2.9rem] absolute"
-        color="primary"
-        size="sm"
-      >
-        {{ t('home.plans.most_popular') }}
-      </RuiChip>
-    </div>
-    <CheckMark :selected="selected" />
-    <div :class="$style.name">
-      {{ name }}
-    </div>
-    <div :class="$style.emphasis">
-      {{ price }}€
-    </div>
-    <div :class="$style.monthly">
-      {{ t('home.plans.per_month') }}
-    </div>
-    <div :class="$style.total">
-      {{ t('home.plans.total', { total: totalPrice }) }}
-    </div>
-    <RuiButton
-      :color="selected ? 'primary' : undefined"
-      class="w-full"
+    <RuiChip
+      v-if="isMostPopular"
+      color="primary"
+      class="mb-2 !min-h-4"
+      :class="{
+        'opacity-50': disabled,
+      }"
     >
-      {{ t('home.plans.choose') }}
-    </RuiButton>
-
-    <div
-      v-if="plan.discount"
-      :class="$style.discount"
-    >
-      <RuiIcon
-        class="text-black/60"
-        name="lu-donate-fill"
+      {{ t('pricing.most_popular_plan') }}
+    </RuiChip>
+    <div class="flex items-center">
+      <div class="flex-1">
+        <div
+          class="text-h6 text-rui-primary"
+          :class="{
+            'text-rui-text-secondary': disabled,
+          }"
+        >
+          {{ t('pricing.plans.plan', { plan: toTitleCase(plan.name) }) }}
+        </div>
+        <div
+          class="flex flex-wrap items-end gap-x-1"
+          :class="{
+            'text-black/[0.3]': disabled,
+          }"
+        >
+          <div class="text-h5 font-bold">
+            € {{ price }}
+          </div>
+          <div class="text-lg font-medium">
+            {{ period === PricingPeriod.YEARLY ? t('pricing.per_year') : t('pricing.per_month') }}
+          </div>
+        </div>
+      </div>
+      <CheckMark
+        v-if="!readonly"
+        :selected="selected"
       />
-      <span>
-        {{ t('home.plans.save_discount', { discount: plan.discount }) }}
-      </span>
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.plan {
-  @apply flex flex-col items-center min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8;
-  @apply border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12];
-
-  &.selected {
-    @apply border-rui-primary;
-  }
-}
-
-.name {
-  @apply text-h5 text-rui-text mb-4;
-}
-
-.emphasis {
-  @apply font-black text-h3 text-rui-text;
-}
-
-.monthly {
-  @apply text-body-1 text-rui-secondary mt-4;
-}
-
-.total {
-  @apply mb-4 sm:mb-8 text-body-1 text-rui-primary;
-}
-
-.discount {
-  @apply flex gap-[0.62rem] text-base mt-2;
-}
-</style>
