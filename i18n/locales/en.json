@@ -516,29 +516,24 @@
         },
         "recommended": "Recommended"
       },
-      "most_popular": "Most popular",
       "names": {
         "for": "{name} for",
         "monthly": "Monthly",
         "numeric": "{months} Months",
-        "plan": "{name} Plan.",
+        "plan": "{name} Plan ({period}) - € {price}",
         "yearly": "Yearly"
       },
-      "per_month": "per month",
-      "save_discount": "Save {discount}%",
       "tiers": {
         "step_1": {
           "crypto_hint": "* When paying with crypto the monthly price is {cryptoPrice} €",
           "description": "Choose the different plans we offer",
-          "maybe_vat": "VAT may apply depending on your jurisdiction",
           "notes": {
             "line_1": "The selected payment method will be billed the total amount for the subscription immediately.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
-          "title": "Subscription Plans",
-          "vat": "The prices include a +{vat}% VAT tax"
+          "title": "Subscription Plans"
         },
         "step_2": {
           "description": "Select one of the different methods",
@@ -554,9 +549,14 @@
           "chose": "You chose:",
           "description": "Proceed to the payment",
           "discount": {
-            "label": "Discount code",
-            "hint": "Optional. Enter a discount code to apply savings to your purchase."
+            "applied": "Discount code applied:",
+            "apply_code": "Apply code",
+            "hint": "Optional. Enter a discount code to apply savings to your purchase.",
+            "you_save": "You save €{amount}",
+            "percent_off": "({percentage}% off)",
+            "label": "Discount code"
           },
+          "grand_total": "Grand Total",
           "labels": {
             "network": "Network",
             "to_address": "Send to address",
@@ -573,7 +573,7 @@
             "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
             "card_expired": "The card has expired. Please use a different card.",
             "delete": {
-              "description": "Are you sure you want to remove this card?",
+              "description": "Are you sure you want to ree this card?",
               "title": "Remove Saved Card"
             },
             "expiry": "Expiry {expiresAt}"
@@ -865,10 +865,7 @@
     "expired_captcha": "Invalid or expired captcha, please try again"
   },
   "selected_plan_overview": {
-    "includes_vat": "(includes {vat}% VAT)",
-    "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
-    "renew_period": "every {months} month | every {months} months",
-    "vat": "({priceInEur}€ + {vat}% VAT)"
+    "next_payment": "Next payment: {date}"
   },
   "signup_address": {
     "title": "Address"

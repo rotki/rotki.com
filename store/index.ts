@@ -12,16 +12,14 @@ import {
   ActionResultResponse,
   ApiKeys,
   type ApiResponse,
-  type CardPaymentRequest,
   ChangePasswordResponse,
   type CryptoPayment,
   CryptoPaymentResponse,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
-  type Plan,
-  PremiumResponse,
   ResendVerificationResponse,
   type Result,
+  type SelectedPlan,
   type Subscription,
   UpdateProfileResponse,
 } from '~/types';
@@ -36,7 +34,6 @@ const SESSION_TIMEOUT = 3600000;
 export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false);
   const account = ref<Account | null>(null);
-  const plans = ref<Plan[] | null>(null);
   const cancellationError = ref('');
   const resumeError = ref('');
 
@@ -271,71 +268,12 @@ export const useMainStore = defineStore('main', () => {
     return userAccount.subscriptions;
   });
 
-  const getPlans = async (): Promise<void> => {
-    if (get(plans)) {
-      logger.debug('plans already loaded');
-      return;
-    }
-
-    try {
-      const response = await fetchWithCsrf<PremiumResponse>(
-        '/webapi/premium/',
-        {
-          method: 'GET',
-        },
-      );
-      const data = PremiumResponse.parse(response);
-      set(plans, data.result.plans);
-    }
-    catch (error: any) {
-      logger.error(error);
-    }
-  };
-
-  const pay = async (
-    request: CardPaymentRequest,
-  ): Promise<Result<true, PaymentError>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        '/webapi/payment/btr/',
-        {
-          body: request,
-          method: 'POST',
-        },
-      );
-      getAccount().then().catch(error => logger.error(error));
-
-      const data = ActionResultResponse.parse(response);
-      assert(data.result);
-      return {
-        isError: false,
-        result: true,
-      };
-    }
-    catch (error_: any) {
-      getAccount().then().catch(error => logger.error(error));
-      let error = error_;
-      let code: PaymentError | undefined;
-      if (error_ instanceof FetchError) {
-        if (error_.status === 400) {
-          error = new Error(ActionResultResponse.parse(error_.data).message);
-        }
-        else if (error_.status === 403) {
-          error = '';
-          code = PaymentError.UNVERIFIED;
-        }
-      }
-      logger.error(error_);
-      return {
-        code,
-        error,
-        isError: true,
-      };
-    }
+  const checkGetAccount = () => {
+    getAccount().then().catch(error => logger.error(error));
   };
 
   const cryptoPayment = async (
-    plan: number,
+    plan: SelectedPlan,
     currencyId: string,
     subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
@@ -346,7 +284,7 @@ export const useMainStore = defineStore('main', () => {
           body: convertKeys(
             {
               currencyId,
-              months: plan,
+              months: plan.durationInMonths,
               subscriptionId,
             },
             false,
@@ -492,7 +430,7 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const switchCryptoPlan = async (
-    plan: number,
+    plan: SelectedPlan,
     currency: string,
     subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
@@ -559,18 +497,16 @@ export const useMainStore = defineStore('main', () => {
     authenticated,
     cancellationError,
     changePassword,
+    checkGetAccount,
     checkPendingCryptoPayment,
     cryptoPayment,
     deleteAccount,
     deletePendingPayment,
     getAccount,
     getPendingSubscription,
-    getPlans,
     login,
     logout,
     markTransactionStarted,
-    pay,
-    plans,
     refreshSession,
     resendVerificationCode,
     resumeError,

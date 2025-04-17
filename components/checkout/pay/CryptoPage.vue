@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set } from '@vueuse/core';
+import { useSelectedPlan } from '~/composables/use-selected-plan';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
@@ -21,10 +22,11 @@ const {
   getAccount,
 } = useMainStore();
 
-const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
 const route = useRoute();
+
+const { selectedPlan } = useSelectedPlan();
 
 const step = computed<PaymentStep>(() => {
   const message = get(error);
@@ -90,7 +92,11 @@ async function changePaymentMethod() {
   }
 }
 
-watch(plan, async (plan) => {
+watch(selectedPlan, async (plan) => {
+  if (!plan) {
+    return;
+  }
+
   const selectedCurrency = get(currency);
   assert(selectedCurrency);
   set(loading, true);
@@ -108,12 +114,13 @@ watch(plan, async (plan) => {
 });
 
 onMounted(async () => {
-  const selectedPlan = get(plan);
+  const selectedPlanVal = get(selectedPlan);
   const selectedCurrency = get(currency);
-  if (selectedPlan && selectedCurrency) {
+
+  if (selectedPlanVal && selectedCurrency) {
     set(loading, true);
     const subId = get(subscriptionId);
-    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
+    const result = await cryptoPayment(selectedPlanVal, selectedCurrency, subId);
     await getAccount();
     if (result.isError) {
       if (result.code === PaymentError.UNVERIFIED)
@@ -156,13 +163,13 @@ onMounted(async () => {
         />
       </div>
       <CryptoPaymentForm
-        v-else-if="data && plan"
+        v-else-if="data && selectedPlan"
         v-bind="{ success, failure, status, pending }"
         v-model:error="error"
         v-model:state="paymentState"
         :data="data"
         :loading="loading"
-        :plan="plan"
+        :plan="selectedPlan"
         @change="changePaymentMethod()"
       />
 

@@ -5,7 +5,6 @@ type CurrencyParam = string | null;
 
 export interface PlanParams {
   period: PricingPeriod;
-  planId: number;
   plan: string;
 }
 
@@ -26,6 +25,21 @@ export function usePlanParams(): { plan: ComputedRef<PlanParams | undefined> } {
   });
 
   return { plan };
+}
+
+export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
+  const route = useRoute();
+  const planId = computed(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
+    const { planId } = route.query;
+    if (!planId)
+      return undefined;
+
+    return typeof planId === 'string' ? parseInt(planId) : undefined;
+  });
+
+  return { planId };
 }
 
 export function useCurrencyParams() {
