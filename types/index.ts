@@ -156,21 +156,18 @@ export const PremiumResponse = z.object({
 
 export type PremiumResponse = z.infer<typeof PremiumResponse>;
 
-const SelectedPlan = z.object({
-  finalPriceInEur: z.string(),
-  months: z.number(),
-  priceInEur: z.string(),
-  startDate: z.number(),
-  vat: z.number(),
-});
-
-export type SelectedPlan = z.infer<typeof SelectedPlan>;
+export interface SelectedPlan {
+  subscriptionTierId: number;
+  name: string;
+  price: number;
+  durationInMonths: number;
+}
 
 const CardCheckout = z
   .object({
     braintreeClientToken: z.string(),
-  })
-  .merge(SelectedPlan);
+    nextPayment: z.number(),
+  });
 
 export type CardCheckout = z.infer<typeof CardCheckout>;
 
@@ -231,7 +228,9 @@ export interface CreateCardRequest {
 }
 
 export interface CardPaymentRequest extends CreateCardRequest {
-  months: number;
+  durationInMonths: number;
+  subscriptionTierId: number;
+  discountCode?: string;
 }
 
 export type StepType = 'pending' | 'failure' | 'success';
