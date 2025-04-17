@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WatchHandle } from 'vue';
-import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
+import type { CryptoPayment, IdleStep, PaymentStep, SelectedPlan, StepType } from '~/types';
 import { get, set, useClipboard } from '@vueuse/core';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
@@ -14,7 +14,7 @@ const state = defineModel<StepType | IdleStep>('state', { required: true });
 
 const props = defineProps<{
   data: CryptoPayment;
-  plan: number;
+  plan: SelectedPlan;
   pending: boolean;
   success: boolean;
   failure: boolean;
@@ -37,7 +37,15 @@ let stopWatcher: WatchHandle;
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('card-payment-form');
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
-const { connected, pay, isOpen, open, isExpectedChain, switchNetwork } = useWeb3Payment(data, state, error);
+
+const {
+  connected,
+  pay,
+  isOpen,
+  open,
+  isExpectedChain,
+  switchNetwork,
+} = useWeb3Payment(data, state, error);
 
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
 
@@ -172,7 +180,8 @@ watch(canvas, async (canvas) => {
     </div>
     <RuiDivider class="mt-8" />
     <SelectedPlanOverview
-      :plan="data"
+      :plan="plan"
+      :next-payment="0"
       :disabled="processing"
       crypto
       warning

@@ -10,20 +10,18 @@ import { PricingPeriod } from '~/types/tiers';
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    vat?: number;
     crypto?: boolean;
     warning?: boolean;
   }>(),
   {
     crypto: false,
     warning: false,
-    vat: undefined,
   },
 );
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
-  (e: 'select', data: PlanParams): void;
+  (e: 'select', data: PlanParams & { planId: number }): void;
 }>();
 
 const { crypto, visible, warning } = toRefs(props);
@@ -54,7 +52,7 @@ watch(visible, (visible) => {
     set(confirmed, false);
 });
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await store.getAvailablePlans();
 });
 </script>

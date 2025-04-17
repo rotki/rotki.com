@@ -8,12 +8,6 @@ import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
-const {
-  public: {
-    contact: { emailMailto },
-  },
-} = useRuntimeConfig();
-
 const { t } = useI18n();
 const route = useRoute();
 const { plan: planParams } = usePlanParams();
@@ -23,7 +17,7 @@ const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || Pricing
 
 const processing = ref<boolean>(false);
 
-const { account, authenticated } = storeToRefs(useMainStore());
+const { account } = storeToRefs(useMainStore());
 const { availablePlans } = storeToRefs(useTiersStore());
 
 function isSelected(plan: AvailablePlan) {
@@ -33,8 +27,6 @@ function isSelected(plan: AvailablePlan) {
 const selectedPlan = computed<AvailablePlan | undefined>(
   () => get(availablePlans)?.find(plan => isSelected(plan)),
 );
-
-const vat = computed(() => get(account)?.vat);
 
 function select(plan: AvailablePlan) {
   set(selectedPlanName, plan.name);
@@ -68,14 +60,6 @@ const notes = computed(() => [
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
-    <CheckoutDescription>
-      <template v-if="vat">
-        {{ t('home.plans.tiers.step_1.vat', { vat }) }}
-      </template>
-      <template v-if="!authenticated">
-        {{ t('home.plans.tiers.step_1.maybe_vat') }}
-      </template>
-    </CheckoutDescription>
 
     <div class="pt-12">
       <PricingPeriodTab
@@ -83,7 +67,7 @@ const notes = computed(() => [
         :data="availablePlans"
       />
 
-      <div class="flex flex-col gap-4 pt-8 pb-12">
+      <div class="flex flex-col gap-4 py-8">
         <template v-if="availablePlans.length === 0">
           <div
             v-for="i in 2"
@@ -102,19 +86,6 @@ const notes = computed(() => [
           :selected="isSelected(plan)"
           @click="select(plan)"
         />
-        <div class="border border-default rounded-xl p-4 flex items-center justify-between">
-          <div class="text-h6 text-rui-primary">
-            {{ t('pricing.plans.custom_plan') }}
-          </div>
-          <ButtonLink
-            size="lg"
-            color="primary"
-            variant="outlined"
-            :to="emailMailto"
-          >
-            {{ t('values.contact_section.title') }}
-          </ButtonLink>
-        </div>
       </div>
     </div>
 
