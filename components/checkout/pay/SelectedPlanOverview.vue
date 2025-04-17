@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { PlanParams } from '~/composables/plan';
-import type { CryptoPayment, SelectedPlan } from '~/types';
+import type { SelectedPlan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { getPlanNameFor } from '~/utils/plans';
 
 const props = withDefaults(
   defineProps<{
-    plan: SelectedPlan | CryptoPayment;
+    plan: SelectedPlan;
     crypto?: boolean;
     warning?: boolean;
     disabled?: boolean;
+    nextPayment: number;
   }>(),
   {
     crypto: false,
@@ -17,34 +18,26 @@ const props = withDefaults(
   },
 );
 
-const { plan } = toRefs(props);
+const { plan, nextPayment } = toRefs(props);
 const router = useRouter();
 
 const selection = ref(false);
 
-const name = computed(() => getPlanNameFor(get(plan).months));
-const date = computed(() => {
-  const currentPlan = get(plan);
-  const date = new Date(currentPlan.startDate * 1000);
-  return date.toLocaleDateString();
+const name = computed(() => {
+  const selectedPlan = get(plan);
+  return getPlanNameFor(selectedPlan);
 });
 
-const vatOverview = computed(() => {
-  const cPlan = get(plan);
-  if (!(cPlan.vat && 'priceInEur' in cPlan))
-    return undefined;
-
-  return {
-    vat: cPlan.vat,
-    priceInEur: cPlan.priceInEur,
-  };
+const nextPaymentDate = computed(() => {
+  const date = new Date(get(nextPayment) * 1000);
+  return date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
 });
 
 function select() {
   set(selection, true);
 }
 
-function switchTo(data: PlanParams) {
+function switchTo(data: PlanParams & { planId: number }) {
   set(selection, false);
   const currentRoute = get(router.currentRoute);
 
@@ -61,67 +54,41 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <PlanOverview>
-    <span :class="$style.plan">{{ name }}</span>
-    <i18n-t
-      keypath="selected_plan_overview.plan"
-      scope="global"
-    >
-      <template #date>
-        {{ date }}
-      </template>
-      <template #finalPriceInEur>
-        {{ plan.finalPriceInEur }}
-      </template>
-      <template #vat>
-        <span v-if="vatOverview && !crypto">
-          {{ t('selected_plan_overview.vat', vatOverview) }}
-        </span>
-        <span v-else-if="plan.vat">
+  <RuiCard class="h-auto mt-6">
+    <div class="text-rui-text text-h6">
+      {{ t('home.plans.tiers.step_3.chose') }}
+    </div>
+    <div class="pt-1 flex items-center justify-between gap-4">
+      <div>
+        <div class="text-body-1 font-bold mr-1 text-rui-text-secondary">
+          {{ name }}
+        </div>
+        <div class="text-xs text-rui-text-secondary italic">
           {{
-            t('selected_plan_overview.includes_vat', {
-              vat: plan.vat,
+            t('selected_plan_overview.next_payment', {
+              date: nextPaymentDate,
             })
           }}
-        </span>
-      </template>
-    </i18n-t>
-    <span>
-      {{
-        t(
-          'selected_plan_overview.renew_period',
-          {
-            months: plan.months,
-          },
-          plan.months,
-        )
-      }}
-    </span>
+        </div>
+      </div>
 
-    <template #action>
-      <RuiButton
-        :class="$style.change"
-        :disabled="disabled"
-        color="primary"
-        variant="text"
-        @click="select()"
-      >
-        {{ t('actions.change') }}
-      </RuiButton>
-      <ChangePlanDialog
-        :crypto="crypto"
-        :warning="warning"
-        :vat="vatOverview?.vat ?? plan.vat"
-        :visible="selection"
-        @cancel="selection = false"
-        @select="switchTo($event)"
-      />
-    </template>
-  </PlanOverview>
+      <div>
+        <RuiButton
+          :disabled="disabled"
+          color="primary"
+          variant="text"
+          @click="select()"
+        >
+          {{ t('actions.change') }}
+        </RuiButton>
+        <ChangePlanDialog
+          :crypto="crypto"
+          :warning="warning"
+          :visible="selection"
+          @cancel="selection = false"
+          @select="switchTo($event)"
+        />
+      </div>
+    </div>
+  </RuiCard>
 </template>
-
-<style lang="scss" module>
-.plan {
-  @apply text-body-1 font-bold mr-1;
-}
-</style>
