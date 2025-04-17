@@ -1,19 +1,14 @@
 import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store/index';
 import { type AvailablePlan, AvailablePlans } from '~/types';
 import { PremiumTiersInfo } from '~/types/tiers';
 import { fetchWithCsrf } from '~/utils/api';
 
 export const useTiersStore = defineStore('tiers', () => {
-  const authenticatedOnPlansLoad = ref(false);
-
-  const { authenticated } = storeToRefs(useMainStore());
-
   const tiersInformation = ref<PremiumTiersInfo>([]);
   const availablePlans = ref<AvailablePlan[]>([]);
 
   const getAvailablePlans = async (): Promise<void> => {
-    if (get(availablePlans).length > 0 && get(authenticated) === get(authenticatedOnPlansLoad)) {
+    if (get(availablePlans).length > 0) {
       logger.debug('plans already loaded');
       return;
     }
@@ -27,7 +22,6 @@ export const useTiersStore = defineStore('tiers', () => {
       );
       const data = AvailablePlans.parse(response);
       set(availablePlans, data);
-      set(authenticatedOnPlansLoad, get(authenticated));
     }
     catch (error: any) {
       logger.error(error);
@@ -35,7 +29,7 @@ export const useTiersStore = defineStore('tiers', () => {
   };
 
   const getPremiumTiersInfo = async (): Promise<void> => {
-    if (get(tiersInformation).length > 0 && get(authenticated) === get(authenticatedOnPlansLoad)) {
+    if (get(tiersInformation).length > 0) {
       logger.debug('plans already loaded');
       return;
     }
