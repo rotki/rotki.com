@@ -106,6 +106,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         LuCircleCheck,
         LuDownload,
         LuMinus,
+        LuTrash2,
+        LuDownload,
         LuUserCog,
         LuScrollText,
         LuHandshake,
