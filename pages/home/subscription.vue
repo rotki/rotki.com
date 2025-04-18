@@ -20,7 +20,9 @@ definePageMeta({
   middleware: ['maintenance', 'authentication'],
 });
 
-onMounted(() => store.getAccount());
+onBeforeMount(() => {
+  store.getAccount();
+});
 </script>
 
 <template>
@@ -30,5 +32,6 @@ onMounted(() => store.getAccount());
     <ApiKeys v-if="premium" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable />
+    <UserDevicesTable />
   </div>
 </template>
