@@ -113,6 +113,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         LuDownload,
         LuHandshake,
         LuMinus,
+        LuTrash2,
+        LuDownload,
         LuUserCog,
         LuScrollText,
         LuHandshake,
