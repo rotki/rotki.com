@@ -2,6 +2,7 @@
 import type { PlanParams } from '~/composables/plan';
 import type { SelectedPlan } from '~/types';
 import { get, set } from '@vueuse/core';
+import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
 
 const props = withDefaults(
@@ -30,7 +31,7 @@ const name = computed(() => {
 
 const nextPaymentDate = computed(() => {
   const date = new Date(get(nextPayment) * 1000);
-  return date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+  return formatDate(date);
 });
 
 function select() {

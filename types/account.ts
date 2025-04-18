@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface PasswordChangePayload {
   readonly currentPassword: string;
   readonly newPassword: string;
@@ -26,3 +28,17 @@ export enum VatIdStatus {
   NOT_VALID = 'Not valid',
   NON_EU_ID = 'ID outside the EU',
 }
+
+export const UserDevice = z.object({
+  createdAt: z.string().datetime(),
+  id: z.number(),
+  label: z.string(),
+  uniqueId: z.string(),
+  user: z.string(),
+});
+
+export type UserDevice = z.infer<typeof UserDevice>;
+
+export const UserDevices = z.array(UserDevice);
+
+export type UserDevices = z.infer<typeof UserDevices>;

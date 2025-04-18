@@ -40,6 +40,14 @@
       "title": "Delete account",
       "unable_to_delete": "You cannot delete your account while you have an active subscription."
     },
+    "devices": {
+      "title": "Devices List",
+      "no_devices_found": "No devices found",
+      "headers": {
+        "label": "Label",
+        "date": "First logged in"
+      }
+    },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
       "no_premium_found": "No premium subscription found. Select your {plan}.",
@@ -197,6 +205,7 @@
     "change": "Change",
     "confirm": "Confirm",
     "continue": "Continue",
+    "delete": "Delete",
     "download": "Download",
     "download_for_free": "Download rotki for free",
     "edit": "Edit",
