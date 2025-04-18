@@ -6,6 +6,6 @@
 
 <style lang="scss" module>
 .description {
-  @apply text-body-1 text-center text-rui-text-secondary;
+  @apply text-body-1 text-rui-text-secondary;
 }
 </style>

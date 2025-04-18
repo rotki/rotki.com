@@ -40,6 +40,14 @@
       "title": "Delete account",
       "unable_to_delete": "You cannot delete your account while you have an active subscription."
     },
+    "devices": {
+      "title": "Devices List",
+      "no_devices_found": "No devices found",
+      "headers": {
+        "label": "Label",
+        "date": "First logged in"
+      }
+    },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
       "no_premium_found": "No premium subscription found. Select your {plan}.",
@@ -144,12 +152,14 @@
     "change": "Change",
     "confirm": "Confirm",
     "continue": "Continue",
+    "delete": "Delete",
     "download": "Download",
     "generate": "Generate",
     "get_advanced_plan": "Get Advanced Plan",
     "get_in_touch": "Get In Touch Now",
     "get_premium": "Get Premium",
     "get_premium_plan": "Get Premium Plan",
+    "get_started": "Get started",
     "get_started_for_free": "Get started for free",
     "go_back_home": "Go back home",
     "regenerate": "Regenerate",
@@ -460,29 +470,24 @@
         },
         "recommended": "Recommended"
       },
-      "most_popular": "Most popular",
       "names": {
         "for": "{name} for",
         "monthly": "Monthly",
         "numeric": "{months} Months",
-        "plan": "{name} Plan.",
+        "plan": "{name} Plan ({period}) - € {price}",
         "yearly": "Yearly"
       },
-      "per_month": "per month",
-      "save_discount": "Save {discount}%",
       "tiers": {
         "step_1": {
           "crypto_hint": "* When paying with crypto the monthly price is {cryptoPrice} €",
           "description": "Choose the different plans we offer",
-          "maybe_vat": "VAT may apply depending on your jurisdiction",
           "notes": {
             "line_1": "The selected payment method will be billed the total amount for the subscription immediately.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
-          "title": "Premium Plans",
-          "vat": "The prices include a +{vat}% VAT tax"
+          "title": "Subscription Plans"
         },
         "step_2": {
           "description": "Select one of the different methods",
@@ -497,6 +502,15 @@
           },
           "chose": "You chose:",
           "description": "Proceed to the payment",
+          "discount": {
+            "applied": "Discount code applied:",
+            "apply_code": "Apply code",
+            "hint": "Optional. Enter a discount code to apply savings to your purchase.",
+            "you_save": "You save €{amount}",
+            "percent_off": "({percentage}% off)",
+            "label": "Discount code"
+          },
+          "grand_total": "Grand Total",
           "labels": {
             "network": "Network",
             "to_address": "Send to address",
@@ -513,7 +527,7 @@
             "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
             "card_expired": "The card has expired. Please use a different card.",
             "delete": {
-              "description": "Are you sure you want to remove this card?",
+              "description": "Are you sure you want to ree this card?",
               "title": "Remove Saved Card"
             },
             "expiry": "Expiry {expiresAt}"
@@ -642,6 +656,7 @@
     "legal": "Legal",
     "premium_features": "Premium Features",
     "privacy_policy": "Privacy Policy",
+    "pricing": "Pricing",
     "product": "Product",
     "resources": "Resources",
     "tos": "Terms of Service",
@@ -675,6 +690,28 @@
       "non_refundable": "refunds are not allowed",
       "policy": "Rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of Rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
       "title": "Rotki Refund and Cancellation Policy"
+    }
+  },
+  "pricing": {
+    "billed_annually": "Billed annually in € {price}",
+    "billed_monthly": "Billed monthly in EUR",
+    "header": {
+      "title": "Compare our plans and find yours",
+      "heading": "Pricing",
+      "description": "Simple, transparent pricing that grows with you. Try any plan free for 30 days."
+    },
+    "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
+    "per_month": "/month",
+    "per_year": "/year",
+    "most_popular_plan": "Most popular plan",
+    "max_saved_annually": "Save {percent}% Annually",
+    "see_all_features": "See all features",
+    "see_less_features": "See less features",
+    "free": "Free",
+    "plans": {
+      "custom_plan": "Custom plan",
+      "starter_plan": "Starter plan",
+      "plan": "{plan} plan"
     }
   },
   "products": {
@@ -772,10 +809,7 @@
     "expired_captcha": "Invalid or expired captcha, please try again"
   },
   "selected_plan_overview": {
-    "includes_vat": "(includes {vat}% VAT)",
-    "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
-    "renew_period": "every {months} month | every {months} months",
-    "vat": "({priceInEur}€ + {vat}% VAT)"
+    "next_payment": "Next payment: {date}"
   },
   "signup_address": {
     "title": "Address"

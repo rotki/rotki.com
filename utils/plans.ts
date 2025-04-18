@@ -1,3 +1,5 @@
+import type { SelectedPlan } from '~/types';
+
 export function getPlanName(months: number) {
   const { t } = useI18n();
   if (months === 1)
@@ -8,14 +10,12 @@ export function getPlanName(months: number) {
   return t(`home.plans.names.numeric`, { months });
 }
 
-export function getPlanSelectionName(months: number) {
+export function getPlanNameFor({ durationInMonths, name, price }: SelectedPlan) {
   const { t } = useI18n();
 
-  return t(`home.plans.names.for`, { name: getPlanName(months) });
-}
-
-export function getPlanNameFor(months: number) {
-  const { t } = useI18n();
-
-  return t(`home.plans.names.plan`, { name: getPlanName(months) });
+  return t(`home.plans.names.plan`, {
+    name: toTitleCase(name),
+    period: getPlanName(durationInMonths),
+    price: price.toFixed(2),
+  });
 }

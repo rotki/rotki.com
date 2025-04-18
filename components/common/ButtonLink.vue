@@ -56,6 +56,9 @@ function getColor(active: boolean, exact: boolean) {
       }"
       :class="{ ['inline-flex py-0 !px-1 !text-[1em]']: inline }"
     >
+      <template #prepend>
+        <slot name="prepend" />
+      </template>
       <slot>
         {{ link?.href }}
       </slot>

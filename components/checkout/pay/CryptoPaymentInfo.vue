@@ -19,7 +19,7 @@ const notes = [
           color="primary"
           size="sm"
         >
-          <span :class="$style.point">{{ i }}</span>
+          <span :class="$style.point">{{ i + 1 }}</span>
         </RuiChip>
       </div>
       <div :class="$style.description">
