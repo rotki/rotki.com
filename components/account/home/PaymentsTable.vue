@@ -85,6 +85,12 @@ const payments = computed(() => {
             color="primary"
             external
           >
+            <template #prepend>
+              <RuiIcon
+                name="lu-download"
+                size="20"
+              />
+            </template>
             {{ t('actions.download') }}
           </ButtonLink>
         </div>
