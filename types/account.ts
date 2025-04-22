@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { Address, Subscription } from '~/types/index';
+import { DiscountType } from '~/types/payment';
 
 export interface PasswordChangePayload {
   readonly currentPassword: string;
@@ -42,3 +44,53 @@ export type UserDevice = z.infer<typeof UserDevice>;
 export const UserDevices = z.array(UserDevice);
 
 export type UserDevices = z.infer<typeof UserDevices>;
+
+export const UserPayment = z.object({
+  createdAt: z.string().datetime(),
+  discount: z.object({
+    amount: z.number().positive(),
+    discountType: z.nativeEnum(DiscountType),
+  }).nullable(),
+  durationInMonths: z.number().int().positive(),
+  finalPrice: z.number().positive(),
+  identifier: z.string().min(1),
+  isRefund: z.boolean().optional().default(false),
+  paidUsing: z.string(),
+  plan: z.string(),
+  priceBeforeDiscount: z.number().positive(),
+});
+
+export type UserPayment = z.infer<typeof UserPayment>;
+
+export const UserPayments = z.array(UserPayment);
+
+export type UserPayments = z.infer<typeof UserPayments>;
+
+export const PreTierPayment = z.object({
+  eurAmount: z.string(),
+  identifier: z.string().min(1),
+  isRefund: z.boolean().optional().default(false),
+  paidAt: z.string().datetime(),
+  paidUsing: z.string(),
+  plan: z.string(),
+});
+
+export type PreTierPayment = z.infer<typeof PreTierPayment>;
+
+export const Account = z.object({
+  address: Address,
+  apiKey: z.string(),
+  apiSecret: z.string(),
+  canUsePremium: z.boolean(),
+  dateNow: z.string(),
+  email: z.string().min(1),
+  emailConfirmed: z.boolean(),
+  hasActiveSubscription: z.boolean(),
+  payments: z.array(PreTierPayment),
+  subscriptions: z.array(Subscription),
+  username: z.string().min(1),
+  vat: z.number(),
+  vatIdStatus: z.string(),
+});
+
+export type Account = z.infer<typeof Account>;

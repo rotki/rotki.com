@@ -1,5 +1,6 @@
 import type { Country } from '~/composables/countries';
-import type { Account, ApiResponse } from '~/types';
+import type { ApiResponse } from '~/types';
+import type { Account } from '~/types/account';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';

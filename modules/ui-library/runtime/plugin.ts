@@ -2,6 +2,7 @@ import { defineNuxtPlugin } from '#app';
 import {
   createRui,
   LuBadgeDollarSign,
+  LuBadgePercent,
   LuBlockchain,
   LuCalendar,
   LuChartNoAxesColumn,
@@ -115,6 +116,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         LuMinus,
         LuTrash2,
         LuDownload,
+        LuBadgePercent,
         LuUserCog,
         LuScrollText,
         LuHandshake,
