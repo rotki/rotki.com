@@ -1,7 +1,7 @@
-import type { SelectedPlan } from '~/types';
-
 export function getPlanName(months: number) {
-  const { t } = useI18n();
+  const { $i18n } = useNuxtApp();
+  const t = $i18n.t;
+
   if (months === 1)
     return t(`home.plans.names.monthly`);
   else if (months === 12)
@@ -10,12 +10,15 @@ export function getPlanName(months: number) {
   return t(`home.plans.names.numeric`, { months });
 }
 
-export function getPlanNameFor({ durationInMonths, name, price }: SelectedPlan) {
-  const { t } = useI18n();
+export function getPlanNameFor({ durationInMonths, name }: {
+  durationInMonths: number;
+  name: string;
+}) {
+  const { $i18n } = useNuxtApp();
+  const t = $i18n.t;
 
   return t(`home.plans.names.plan`, {
     name: toTitleCase(name),
     period: getPlanName(durationInMonths),
-    price: price.toFixed(2),
   });
 }

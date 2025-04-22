@@ -16,7 +16,7 @@ const props = withDefaults(
 
 const { t } = useI18n();
 
-const popularPlan = 'next';
+const popularPlan = 'advanced';
 
 const plans = computed<MappedPlan[]>(() => {
   const isYearly = props.selectedPeriod === PricingPeriod.YEARLY;

@@ -26,7 +26,7 @@ const selection = ref(false);
 
 const name = computed(() => {
   const selectedPlan = get(plan);
-  return getPlanNameFor(selectedPlan);
+  return `${getPlanNameFor(selectedPlan)} - € ${selectedPlan.price.toFixed(2)}`;
 });
 
 const nextPaymentDate = computed(() => {
