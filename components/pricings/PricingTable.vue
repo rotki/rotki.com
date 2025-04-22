@@ -124,7 +124,7 @@ const { t } = useI18n();
       <div
         v-for="plan in plans"
         :key="plan.name"
-        class="flex flex-col p-6"
+        class="flex flex-col p-4 xl:p-6"
         :class="{ 'border-x-2 border-rui-primary rounded-b-xl border-b-2': isMostPopularPlan(plan) }"
       >
         <PricingTableButton

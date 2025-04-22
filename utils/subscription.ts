@@ -1,4 +1,4 @@
-import type { Account } from '~/types';
+import type { Account } from '~/types/account';
 
 export function canBuyNewSubscription(account: Account | null): boolean {
   if (!account)
