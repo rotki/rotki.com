@@ -1,14 +1,12 @@
 // TODO: split store functionality
 /* eslint-disable max-lines */
 import type { ComposerTranslation } from 'vue-i18n';
-import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
 import type { ActionResult } from '~/types/common';
 import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import {
-  Account,
   ActionResultResponse,
   ApiKeys,
   type ApiResponse,
@@ -23,6 +21,7 @@ import {
   type Subscription,
   UpdateProfileResponse,
 } from '~/types';
+import { Account, type DeleteAccountPayload, type PasswordChangePayload, type ProfilePayload } from '~/types/account';
 import { PaymentError } from '~/types/codes';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';

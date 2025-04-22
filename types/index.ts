@@ -60,34 +60,6 @@ export const Subscription = z.object({
 
 export type Subscription = z.infer<typeof Subscription>;
 
-export const Payment = z.object({
-  eurAmount: z.string(),
-  identifier: z.string().min(1),
-  isRefund: z.boolean().optional().default(false),
-  paidAt: z.string(),
-  plan: z.string(),
-});
-
-export type Payment = z.infer<typeof Payment>;
-
-export const Account = z.object({
-  address: Address,
-  apiKey: z.string(),
-  apiSecret: z.string(),
-  canUsePremium: z.boolean(),
-  dateNow: z.string(),
-  email: z.string().min(1),
-  emailConfirmed: z.boolean(),
-  hasActiveSubscription: z.boolean(),
-  payments: z.array(Payment),
-  subscriptions: z.array(Subscription),
-  username: z.string().min(1),
-  vat: z.number(),
-  vatIdStatus: z.string(),
-});
-
-export type Account = z.infer<typeof Account>;
-
 export const ApiKeys = z.object({
   apiKey: z.string().min(1),
   apiSecret: z.string().min(1),
