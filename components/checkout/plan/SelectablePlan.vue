@@ -22,7 +22,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { plan, period } = toRefs(props);
 
-const isMostPopular = computed(() => get(plan).name === 'next');
+const isMostPopular = computed(() => get(plan).name === 'advanced');
 
 const price = computed(() => {
   const { oneMonthTierConfig, oneYearTierConfig } = get(plan);

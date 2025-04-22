@@ -12,6 +12,7 @@ const { t } = useI18n({ useScope: 'global' });
     :disabled="disabled"
     :model-value="modelValue"
     color="primary"
+    hide-details
     @update:model-value="emit('update:modelValue', $event)"
   >
     <i18n-t
