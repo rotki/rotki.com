@@ -62,7 +62,7 @@ async function deleteDevice(id: number) {
       row-attr="id"
     >
       <template #item.createdAt="{ row }">
-        {{ formatDate(row.createdAt) }}
+        {{ formatDate(row.createdAt, 'MMMM DD, YYYY - HH:mm:ss') }}
       </template>
       <template #item.actions="{ row }">
         <RuiButton
