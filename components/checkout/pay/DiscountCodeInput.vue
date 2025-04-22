@@ -91,7 +91,8 @@ function reset() {
     <template #append>
       <RuiButton
         color="primary"
-        :disabled="!value || loading"
+        :loading="loading"
+        :disabled="!value"
         @click="fetchDiscountInfo(value)"
       >
         {{ t('home.plans.tiers.step_3.discount.apply_code') }}

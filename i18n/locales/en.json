@@ -56,11 +56,13 @@
     },
     "payments": {
       "headers": {
-        "amount_in_symbol": "Amount in {symbol}",
+        "method": "Method",
+        "paid_amount": "Paid Amount",
         "paid_at": "Paid at"
       },
       "no_payments_found": "No payments found",
       "paid": "Paid",
+      "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
       "title": "Your latest payments"
     },
@@ -476,7 +478,7 @@
         "for": "{name} for",
         "monthly": "Monthly",
         "numeric": "{months} Months",
-        "plan": "{name} Plan ({period}) - € {price}",
+        "plan": "{name} Plan ({period})",
         "yearly": "Yearly"
       },
       "tiers": {
@@ -502,7 +504,7 @@
             "title": "Change Payment",
             "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent."
           },
-          "chose": "You chose:",
+          "chose": "Your choice:",
           "description": "Proceed to the payment",
           "discount": {
             "applied": "Discount code applied:",
@@ -534,7 +536,7 @@
             },
             "expiry": "Expiry {expiresAt}"
           },
-          "start": "Start Subscription",
+          "start": "Pay Now",
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
           "wallet": {
@@ -819,7 +821,7 @@
     "expired_captcha": "Invalid or expired captcha, please try again"
   },
   "selected_plan_overview": {
-    "next_payment": "Next payment: {date}"
+    "next_payment": "Renews on: {date}"
   },
   "signup_address": {
     "title": "Address"
