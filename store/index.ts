@@ -1,32 +1,27 @@
 // TODO: split store functionality
 /* eslint-disable max-lines */
 import type { ComposerTranslation } from 'vue-i18n';
-import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
 import type { ActionResult } from '~/types/common';
 import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import {
-  Account,
   ActionResultResponse,
   ApiKeys,
   type ApiResponse,
-  type CardCheckout,
-  CardCheckoutResponse,
-  type CardPaymentRequest,
   ChangePasswordResponse,
   type CryptoPayment,
   CryptoPaymentResponse,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
-  type Plan,
-  PremiumResponse,
   ResendVerificationResponse,
   type Result,
+  type SelectedPlan,
   type Subscription,
   UpdateProfileResponse,
 } from '~/types';
+import { Account, type DeleteAccountPayload, type PasswordChangePayload, type ProfilePayload } from '~/types/account';
 import { PaymentError } from '~/types/codes';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
@@ -38,8 +33,6 @@ const SESSION_TIMEOUT = 3600000;
 export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false);
   const account = ref<Account | null>(null);
-  const plans = ref<Plan[] | null>(null);
-  const authenticatedOnPlansLoad = ref(false);
   const cancellationError = ref('');
   const resumeError = ref('');
 
@@ -274,95 +267,12 @@ export const useMainStore = defineStore('main', () => {
     return userAccount.subscriptions;
   });
 
-  const getPlans = async (): Promise<void> => {
-    if (get(plans) && get(authenticated) === get(authenticatedOnPlansLoad)) {
-      logger.debug('plans already loaded');
-      return;
-    }
-
-    try {
-      const response = await fetchWithCsrf<PremiumResponse>(
-        '/webapi/premium/',
-        {
-          method: 'GET',
-        },
-      );
-      const data = PremiumResponse.parse(response);
-      set(plans, data.result.plans);
-      set(authenticatedOnPlansLoad, get(authenticated));
-    }
-    catch (error: any) {
-      logger.error(error);
-    }
-  };
-
-  const checkout = async (plan: number): Promise<Result<CardCheckout>> => {
-    try {
-      const response = await fetchWithCsrf<CardCheckoutResponse>(
-        `/webapi/checkout/card/${plan}/`,
-        {
-          method: 'GET',
-        },
-      );
-      const data = CardCheckoutResponse.parse(response);
-      return {
-        isError: false,
-        result: data.result,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
-
-  const pay = async (
-    request: CardPaymentRequest,
-  ): Promise<Result<true, PaymentError>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        '/webapi/payment/btr/',
-        {
-          body: request,
-          method: 'POST',
-        },
-      );
-      getAccount().then().catch(error => logger.error(error));
-
-      const data = ActionResultResponse.parse(response);
-      assert(data.result);
-      return {
-        isError: false,
-        result: true,
-      };
-    }
-    catch (error_: any) {
-      getAccount().then().catch(error => logger.error(error));
-      let error = error_;
-      let code: PaymentError | undefined;
-      if (error_ instanceof FetchError) {
-        if (error_.status === 400) {
-          error = new Error(ActionResultResponse.parse(error_.data).message);
-        }
-        else if (error_.status === 403) {
-          error = '';
-          code = PaymentError.UNVERIFIED;
-        }
-      }
-      logger.error(error_);
-      return {
-        code,
-        error,
-        isError: true,
-      };
-    }
+  const checkGetAccount = () => {
+    getAccount().then().catch(error => logger.error(error));
   };
 
   const cryptoPayment = async (
-    plan: number,
+    plan: SelectedPlan,
     currencyId: string,
     subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
@@ -373,7 +283,7 @@ export const useMainStore = defineStore('main', () => {
           body: convertKeys(
             {
               currencyId,
-              months: plan,
+              months: plan.durationInMonths,
               subscriptionId,
             },
             false,
@@ -519,7 +429,7 @@ export const useMainStore = defineStore('main', () => {
   };
 
   const switchCryptoPlan = async (
-    plan: number,
+    plan: SelectedPlan,
     currency: string,
     subscriptionId?: string,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
@@ -586,19 +496,16 @@ export const useMainStore = defineStore('main', () => {
     authenticated,
     cancellationError,
     changePassword,
-    checkout,
+    checkGetAccount,
     checkPendingCryptoPayment,
     cryptoPayment,
     deleteAccount,
     deletePendingPayment,
     getAccount,
     getPendingSubscription,
-    getPlans,
     login,
     logout,
     markTransactionStarted,
-    pay,
-    plans,
     refreshSession,
     resendVerificationCode,
     resumeError,

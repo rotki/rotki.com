@@ -60,34 +60,6 @@ export const Subscription = z.object({
 
 export type Subscription = z.infer<typeof Subscription>;
 
-export const Payment = z.object({
-  eurAmount: z.string(),
-  identifier: z.string().min(1),
-  isRefund: z.boolean().optional().default(false),
-  paidAt: z.string(),
-  plan: z.string(),
-});
-
-export type Payment = z.infer<typeof Payment>;
-
-export const Account = z.object({
-  address: Address,
-  apiKey: z.string(),
-  apiSecret: z.string(),
-  canUsePremium: z.boolean(),
-  dateNow: z.string(),
-  email: z.string().min(1),
-  emailConfirmed: z.boolean(),
-  hasActiveSubscription: z.boolean(),
-  payments: z.array(Payment),
-  subscriptions: z.array(Subscription),
-  username: z.string().min(1),
-  vat: z.number(),
-  vatIdStatus: z.string(),
-});
-
-export type Account = z.infer<typeof Account>;
-
 export const ApiKeys = z.object({
   apiKey: z.string().min(1),
   apiSecret: z.string().min(1),
@@ -129,6 +101,23 @@ const Plan = z.object({
 
 export type Plan = z.infer<typeof Plan>;
 
+export const AvailablePlan = z.object({
+  name: z.string(),
+  oneMonthTierConfig: z.object({
+    basePrice: z.string(),
+  }),
+  oneYearTierConfig: z.object({
+    basePrice: z.string(),
+  }),
+  subscriptionTierId: z.number(),
+});
+
+export type AvailablePlan = z.infer<typeof AvailablePlan>;
+
+export const AvailablePlans = z.array(AvailablePlan);
+
+export type AvailablePlans = z.infer<typeof AvailablePlans>;
+
 const PremiumData = z.object({
   plans: z.array(Plan),
 });
@@ -139,21 +128,18 @@ export const PremiumResponse = z.object({
 
 export type PremiumResponse = z.infer<typeof PremiumResponse>;
 
-const SelectedPlan = z.object({
-  finalPriceInEur: z.string(),
-  months: z.number(),
-  priceInEur: z.string(),
-  startDate: z.number(),
-  vat: z.number(),
-});
-
-export type SelectedPlan = z.infer<typeof SelectedPlan>;
+export interface SelectedPlan {
+  subscriptionTierId: number;
+  name: string;
+  price: number;
+  durationInMonths: number;
+}
 
 const CardCheckout = z
   .object({
     braintreeClientToken: z.string(),
-  })
-  .merge(SelectedPlan);
+    nextPayment: z.number(),
+  });
 
 export type CardCheckout = z.infer<typeof CardCheckout>;
 
@@ -214,7 +200,9 @@ export interface CreateCardRequest {
 }
 
 export interface CardPaymentRequest extends CreateCardRequest {
-  months: number;
+  durationInMonths: number;
+  subscriptionTierId: number;
+  discountCode?: string;
 }
 
 export type StepType = 'pending' | 'failure' | 'success';

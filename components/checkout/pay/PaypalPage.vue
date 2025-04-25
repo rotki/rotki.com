@@ -1,12 +1,21 @@
 <script setup lang="ts">
-const { token, step, plan, pending, loading, submit, reset } = useBraintree();
+const {
+  loading,
+  nextPayment,
+  pending,
+  reset,
+  selectedPlan,
+  step,
+  submit,
+  token,
+} = useBraintree();
 </script>
 
 <template>
   <PaymentFrame :step="step">
     <template #default="slotProps">
       <div
-        v-if="!(token && plan)"
+        v-if="!(token && selectedPlan)"
         class="flex justify-center my-10"
       >
         <RuiProgress
@@ -20,9 +29,10 @@ const { token, step, plan, pending, loading, submit, reset } = useBraintree();
         v-else
         v-bind="slotProps"
         :loading="loading"
-        :plan="plan"
+        :plan="selectedPlan"
         :token="token"
-        @pay="submit($event)"
+        :next-payment="nextPayment"
+        @submit="submit($event)"
         @update:pending="pending = $event"
         @clear:errors="reset()"
       />

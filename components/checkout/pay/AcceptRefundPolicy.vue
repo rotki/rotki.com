@@ -12,6 +12,7 @@ const { t } = useI18n();
     :disabled="disabled"
     :model-value="modelValue"
     color="primary"
+    hide-details
     @update:model-value="emit('update:modelValue', $event)"
   >
     <i18n-t
@@ -24,6 +25,7 @@ const { t } = useI18n();
           to="/refund-policy"
           color="primary"
           tag="span"
+          class="underline"
           :class="$style.link"
           external
           target="_blank"
