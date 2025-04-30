@@ -33,18 +33,21 @@ const data: { icon: RuiIcons; text: string; tooltip: string }[] = [
       >
         {{ t('home.hero.motto') }}
       </h5>
-      <div>
-        <RuiButton
-          size="lg"
-          color="primary"
-          rounded
-        >
-          <template #prepend>
-            <RuiIcon name="lu-download" />
-          </template>
-          {{ t('actions.download_for_free') }}
-        </RuiButton>
-      </div>
+      <ButtonLink
+        to="/download"
+        size="lg"
+        color="primary"
+        rounded
+        variant="default"
+      >
+        <template #prepend>
+          <RuiIcon
+            size="20"
+            name="lu-download"
+          />
+        </template>
+        {{ t('actions.download_for_free') }}
+      </ButtonLink>
     </div>
   </div>
   <AppShowcaseSlider class="mt-16 mb-16 md:mb-48">
