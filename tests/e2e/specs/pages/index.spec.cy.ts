@@ -1,9 +1,14 @@
-describe('homepage test', () => {
+describe('homepage', () => {
   it('successfully loads', () => {
     cy.visit('/').wait(3000);
   });
 
-  it('checks our dashboard hero buttons!', () => {
+  it('checks our homepage hero buttons!', () => {
+    cy.get('button')
+      .contains('button', 'Download rotki for free')
+      .first()
+      .should('be.visible');
+
     cy.get('button')
       .contains('button', 'Start now for free')
       .first()
@@ -14,8 +19,10 @@ describe('homepage test', () => {
       .first()
       .should('be.visible');
   });
+});
 
-  it('checks our dashboard app download links!', () => {
+describe('download page', () => {
+  it('download page loads properly', () => {
     cy.get('button').contains('Start now for free').first().click();
 
     cy.url().should('include', '/download');
@@ -29,6 +36,46 @@ describe('homepage test', () => {
       )
       .first()
       .should('be.visible');
+  });
+
+  it('show links for mac', () => {
+    cy.visit('/download', {
+      onBeforeLoad(win) {
+        Object.defineProperty(win.navigator, 'userAgent', {
+          value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        });
+      },
+    });
+
+    cy.get('[data-cy="main-download-button"]').contains('Download for MAC').should('exist');
+  });
+
+  it('show links for linux', () => {
+    cy.visit('/download', {
+      onBeforeLoad(win) {
+        Object.defineProperty(win.navigator, 'userAgent', {
+          value: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        });
+      },
+    });
+
+    cy.get('[data-cy="main-download-button"]').contains('Download for LINUX').should('exist');
+  });
+
+  it('show links for windows', () => {
+    cy.visit('/download', {
+      onBeforeLoad(win) {
+        Object.defineProperty(win.navigator, 'userAgent', {
+          value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        });
+      },
+    });
+
+    cy.get('[data-cy="main-download-button"]').contains('Download for WINDOWS').should('exist');
+  });
+
+  it('checks all download links!', () => {
+    cy.get('[data-cy="show-all-download"]').click();
 
     cy.get('h6').contains('LINUX').first().as('linuxLink');
     cy.get('h6').contains('MAC').first().as('apple');

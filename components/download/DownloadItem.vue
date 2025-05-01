@@ -17,8 +17,9 @@ const { t } = useI18n();
         color="primary"
       />
       <img
-        v-if="data.image"
+        v-else-if="data.image"
         :src="data.image"
+        :alt="data.platform"
       />
     </div>
     <div :class="$style.body">
@@ -45,7 +46,34 @@ const { t } = useI18n();
         </div>
       </div>
       <div>
-        <template v-if="data.url">
+        <RuiMenu v-if="'group' in data">
+          <template #activator="{ attrs }">
+            <RuiButton
+              v-bind="attrs"
+              color="primary"
+            >
+              {{ t('download.action') }}
+              <template #append>
+                <RuiIcon
+                  name="lu-chevron-down"
+                  size="18"
+                />
+              </template>
+            </RuiButton>
+          </template>
+          <div class="py-2">
+            <a
+              v-for="item in data.items"
+              :key="item.url"
+              :href="item.url"
+            >
+              <RuiButton variant="list">
+                {{ item.name }}
+              </RuiButton>
+            </a>
+          </div>
+        </RuiMenu>
+        <template v-else>
           <ButtonLink
             v-if="data.command"
             :to="data.url"
@@ -73,33 +101,6 @@ const { t } = useI18n();
             </RuiButton>
           </a>
         </template>
-        <RuiMenu v-else-if="'group' in data">
-          <template #activator="{ attrs }">
-            <RuiButton
-              v-bind="attrs"
-              color="primary"
-            >
-              {{ t('download.action') }}
-              <template #append>
-                <RuiIcon
-                  name="lu-chevron-down"
-                  size="18"
-                />
-              </template>
-            </RuiButton>
-          </template>
-          <div class="py-2">
-            <a
-              v-for="item in data.items"
-              :key="item.url"
-              :href="item.url"
-            >
-              <RuiButton variant="list">
-                {{ item.name }}
-              </RuiButton>
-            </a>
-          </div>
-        </RuiMenu>
       </div>
     </div>
   </div>
