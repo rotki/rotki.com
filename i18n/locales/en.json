@@ -687,9 +687,17 @@
           "description": "Access comprehensive analytics, including net value and asset amount over time for each owned asset.",
           "title": "Asset tracking"
         },
+        "distribution_assets": {
+          "description": "View a distribution pie chart of your net value per assets.",
+          "title": "Value distribution (assets)"
+        },
         "distribution_locations": {
           "description": "View a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks, etc.).",
-          "title": "Value distribution"
+          "title": "Value distribution (locations)"
+        },
+        "events_analysis": {
+          "description": "View a summary of your activities, including ETH spent, exchanges/protocols used, and Gnosis Pay usage.",
+          "title": "Events analysis"
         },
         "heading": "Enhanced Data Insights",
         "title": "Graphs & Analytics"
