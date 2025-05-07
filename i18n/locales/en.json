@@ -318,7 +318,7 @@
       "title": "Documentation"
     },
     "download_for": "Download for {platform}",
-    "download_for_other_os": "@:download.download_for other OS or Docker",
+    "download_for_other_os": "@:download.download_for other OSes or Docker",
     "heading": {
       "description": "Download now and start using across all major Operating Systems",
       "download_rotki": "Download rotki"
