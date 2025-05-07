@@ -8,9 +8,19 @@ const data = [
     description: t('products.features.analytics.asset_amount_and_value.description'),
   },
   {
+    img: '/img/products/stats_distribution_asset.webp',
+    title: t('products.features.analytics.distribution_assets.title'),
+    description: t('products.features.analytics.distribution_assets.description'),
+  },
+  {
     img: '/img/products/stats_distribution_location.webp',
     title: t('products.features.analytics.distribution_locations.title'),
     description: t('products.features.analytics.distribution_locations.description'),
+  },
+  {
+    img: '/img/products/stats_events_analysis.webp',
+    title: t('products.features.analytics.events_analysis.title'),
+    description: t('products.features.analytics.events_analysis.description'),
   },
 ];
 </script>
