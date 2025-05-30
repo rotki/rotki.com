@@ -42,7 +42,6 @@ const biggestProtocols: string[] = [
   'Pickle Finance',
   '1inch',
   'Kyber',
-  'Paladin',
 ];
 
 const { data: integrationData } = useIntegrationsData();
@@ -106,7 +105,7 @@ const features = [
       >
         <template #activator>
           <div
-            class="bg-white rounded-lg p-1 min-[400px]:p-2 flex items-center justify-center border border-rui-grey-300 aspect-square"
+            class="w-full h-full bg-white rounded-lg p-1 min-[400px]:p-2 flex items-center justify-center border border-rui-grey-300 aspect-square"
           >
             <img
               :src="item.image"

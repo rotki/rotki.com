@@ -34,7 +34,7 @@ export const useIntegrationsData = createSharedComposable(() => {
       // Check if we already have an entry with this first word and same image
       if (!(firstWord in uniqueProtocols) || uniqueProtocols[firstWord].image !== protocol.image) {
         // If not, add it to uniqueProtocols
-        uniqueProtocols[firstWord] = protocol;
+        uniqueProtocols[firstWord] = { ...protocol };
       }
       else {
         // If there's a duplicate, modify the label of the existing one
@@ -58,10 +58,11 @@ export const useIntegrationsData = createSharedComposable(() => {
     else {
       data = await getRemoteIntegrationData() ?? LocalIntegrationData;
     }
-    return filterDuplicateData(data);
-  }, filterDuplicateData(LocalIntegrationData));
+    return data;
+  }, LocalIntegrationData);
 
   return {
     data,
+    filterDuplicateData,
   };
 });
