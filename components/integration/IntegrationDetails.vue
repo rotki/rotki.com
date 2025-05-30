@@ -25,14 +25,14 @@ function cleanString(text: string) {
   return text.toLocaleLowerCase().trim();
 }
 
-const { data: integrationData } = useIntegrationsData();
+const { data: integrationData, filterDuplicateData } = useIntegrationsData();
 
 const data = computed(() => {
   const searchVal = get(searchDebounced);
 
   const filter = (data: { label: string; image: string }[]) => data.filter(item => cleanString(item.label).includes(cleanString(searchVal)));
 
-  const integrationDataVal = get(integrationData);
+  const integrationDataVal = filterDuplicateData({ ...get(integrationData) });
 
   return {
     [TabCategory.BLOCKCHAINS]: {
