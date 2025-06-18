@@ -11,7 +11,7 @@ const validating = ref(true);
 const isValid = ref(false);
 
 const mainStore = useMainStore();
-const { getAccount } = mainStore;
+const { refreshUserData } = mainStore;
 const { account } = storeToRefs(mainStore);
 const logger = useLogger();
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -33,7 +33,7 @@ async function validateToken() {
 onBeforeMount(async () => {
   await validateToken();
   if (get(isValid))
-    await getAccount();
+    await refreshUserData();
 });
 const { t } = useI18n({ useScope: 'global' });
 

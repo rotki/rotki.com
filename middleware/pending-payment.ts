@@ -1,37 +1,51 @@
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { usePaymentCryptoStore } from '~/store/payments/crypto';
+import { PricingPeriod } from '~/types/tiers';
 
 export default defineNuxtRouteMiddleware(async () => {
   const store = useMainStore();
-  const { account } = storeToRefs(store);
-  if (!isDefined(account))
-    return;
+  const { refreshUserData } = store;
+  const { account, userSubscriptions } = storeToRefs(store);
+  const { checkPendingCryptoPayment } = usePaymentCryptoStore();
 
-  const { subscriptions } = get(account);
+  if (!get(account)) {
+    await refreshUserData();
+  }
 
-  const pending = subscriptions.filter(
+  const pendingSub = get(userSubscriptions).filter(
     ({ actions, status }) => actions.includes('renew') || status === 'Pending',
   );
 
-  if (pending.length > 0) {
-    const { durationInMonths, identifier, status } = pending[0];
-    const id = status === 'Pending' ? undefined : identifier;
-    const response = await store.checkPendingCryptoPayment(id);
+  if (pendingSub.length > 0) {
+    const { durationInMonths, id, status, tierName } = pendingSub[0];
+    const identifier = status === 'Pending' ? undefined : id;
+    const response = await checkPendingCryptoPayment(identifier);
 
     if (response.isError)
       return;
 
-    if (response.result?.transactionStarted) {
+    const { currency, discount, pending, transactionStarted } = response.result;
+
+    if (transactionStarted) {
       return navigateTo('/home/subscription');
     }
-    else if (response.result.pending) {
-      const queryParams: { plan: string; currency: string; id?: string } = {
-        currency: response.result.currency ?? '',
-        plan: durationInMonths.toString(),
+    else if (pending) {
+      const queryParams: {
+        plan: string;
+        currency: string;
+        period: string;
+        discountCode: string;
+        id?: string;
+      } = {
+        currency: currency ?? '',
+        discountCode: discount?.codeName ?? '',
+        period: durationInMonths === 1 ? PricingPeriod.MONTHLY : PricingPeriod.YEARLY,
+        plan: tierName,
       };
-      if (id)
-        queryParams.id = id;
+      if (identifier)
+        queryParams.id = identifier.toString();
 
       return navigateTo({
         path: '/checkout/pay/crypto',

@@ -572,7 +572,8 @@
             "network": "Network",
             "to_address": "Send to address",
             "token": "Token",
-            "token_contract": "Token contract: "
+            "token_contract": "Token contract: ",
+            "select_network_and_token": "Select network and token to pay"
           },
           "notes": {
             "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
