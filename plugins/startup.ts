@@ -9,8 +9,8 @@ export default defineNuxtPlugin(async () => {
   const sessionId = useCookie(SESSION_COOKIE).value;
 
   if (sessionId) {
-    const { getAccount } = useMainStore();
+    const { refreshUserData } = useMainStore();
 
-    return getAccount();
+    return refreshUserData();
   }
 });

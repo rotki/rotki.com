@@ -1,5 +1,3 @@
-// TODO: split store functionality
-/* eslint-disable max-lines */
 import type { ComposerTranslation } from 'vue-i18n';
 import type { ActionResult } from '~/types/common';
 import type { LoginCredentials } from '~/types/login';
@@ -11,28 +9,30 @@ import {
   ApiKeys,
   type ApiResponse,
   ChangePasswordResponse,
-  type CryptoPayment,
-  CryptoPaymentResponse,
-  type PendingCryptoPayment,
-  PendingCryptoPaymentResponse,
+  type PreTierSubscription,
   ResendVerificationResponse,
-  type Result,
-  type SelectedPlan,
-  type Subscription,
   UpdateProfileResponse,
+  UserSubscriptions,
 } from '~/types';
-import { Account, type DeleteAccountPayload, type PasswordChangePayload, type ProfilePayload } from '~/types/account';
-import { PaymentError } from '~/types/codes';
+import {
+  Account,
+  type DeleteAccountPayload,
+  type PasswordChangePayload,
+  type ProfilePayload,
+  UserPayments,
+} from '~/types/account';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { formatSeconds } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
-const SESSION_TIMEOUT = 3600000;
+const SESSION_TIMEOUT = 3_600_000;
 
 export const useMainStore = defineStore('main', () => {
   const authenticated = ref(false);
   const account = ref<Account | null>(null);
+  const userSubscriptions = ref<UserSubscriptions>([]);
+  const userPayments = ref<UserPayments>([]);
   const cancellationError = ref('');
   const resumeError = ref('');
 
@@ -48,6 +48,38 @@ export const useMainStore = defineStore('main', () => {
       );
       set(authenticated, true);
       set(account, Account.parse(response.result));
+    }
+    catch (error) {
+      logger.error(error);
+    }
+  };
+
+  const getSubscriptions = async (): Promise<void> => {
+    try {
+      const response = await fetchWithCsrf<ApiResponse<Account>>(
+        '/webapi/2/user/subscriptions',
+        {
+          method: 'GET',
+        },
+      );
+      set(userSubscriptions, UserSubscriptions.parse(response.result));
+    }
+    catch (error) {
+      logger.error(error);
+    }
+  };
+
+  const getPayments = async (): Promise<void> => {
+    try {
+      const response = await fetchWithCsrf<UserPayments>(
+        '/webapi/2/payments',
+        {
+          method: 'GET',
+        },
+      );
+
+      const parsed = UserPayments.parse(response);
+      set(userPayments, parsed);
     }
     catch (error) {
       logger.error(error);
@@ -109,6 +141,19 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  const refreshUserData = async () => {
+    await getAccount();
+    await getSubscriptions();
+    await getPayments();
+  };
+
+  const refreshSubscriptionsAndPayments = () => {
+    Promise.allSettled([
+      getSubscriptions(),
+      getPayments(),
+    ]).then().catch(error => logger.error(error));
+  };
+
   const login = async ({
     password,
     username,
@@ -122,7 +167,7 @@ export const useMainStore = defineStore('main', () => {
         credentials: 'include',
         method: 'POST',
       });
-      await getAccount();
+      await refreshUserData();
       return '';
     }
     catch (error: any) {
@@ -259,205 +304,13 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
-  const subscriptions = computed<Subscription[]>(() => {
+  const subscriptions = computed<PreTierSubscription[]>(() => {
     const userAccount = get(account);
     if (!userAccount)
       return [];
 
     return userAccount.subscriptions;
   });
-
-  const checkGetAccount = () => {
-    getAccount().then().catch(error => logger.error(error));
-  };
-
-  const cryptoPayment = async (
-    plan: SelectedPlan,
-    currencyId: string,
-    subscriptionId?: string,
-  ): Promise<Result<CryptoPayment, PaymentError>> => {
-    try {
-      const response = await fetchWithCsrf<CryptoPaymentResponse>(
-        '/webapi/payment/crypto/',
-        {
-          body: convertKeys(
-            {
-              currencyId,
-              months: plan.durationInMonths,
-              subscriptionId,
-            },
-            false,
-            false,
-          ),
-          method: 'POST',
-        },
-      );
-
-      const { result } = CryptoPaymentResponse.parse(response);
-      assert(result);
-      return {
-        isError: false,
-        result,
-      };
-    }
-    catch (error_: any) {
-      let error = error_;
-      let code: PaymentError | undefined;
-      if (error_ instanceof FetchError) {
-        if (error_.status === 400) {
-          error = new Error(ActionResultResponse.parse(error_.data).message);
-        }
-        else if (error_.status === 403) {
-          error = '';
-          code = PaymentError.UNVERIFIED;
-        }
-      }
-      logger.error(error_);
-      return {
-        code,
-        error,
-        isError: true,
-      };
-    }
-  };
-
-  const checkPendingCryptoPayment = async (
-    subscriptionId?: string,
-  ): Promise<Result<PendingCryptoPayment>> => {
-    try {
-      const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(
-        '/webapi/payment/pending/',
-        {
-          params: convertKeys({ subscriptionId }, false, false),
-        },
-      );
-      const data = PendingCryptoPaymentResponse.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
-
-  function getPendingSubscription({ amount, date, duration }: {
-    amount: string;
-    duration: number;
-    date: number;
-  }): Subscription | undefined {
-    const subDate = new Date(date * 1000);
-    return get(subscriptions).find((subscription) => {
-      const [day, month, year] = subscription.createdDate.split('/').map(Number);
-      const createdDate = new Date(year, month - 1, day);
-      return subscription.status === 'Pending'
-        && subscription.durationInMonths === duration
-        && subscription.nextBillingAmount === amount
-        && createdDate.toDateString() === subDate.toDateString();
-    });
-  }
-
-  const markTransactionStarted = async (): Promise<Result<boolean>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/payment/pending/',
-        {
-          method: 'PATCH',
-        },
-      );
-      const data = ActionResultResponse.parse(response);
-      getAccount().then().catch(error => logger.error(error));
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      getAccount().then().catch(error => logger.error(error));
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
-
-  const deletePendingPayment = async (): Promise<Result<boolean>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/payment/pending/',
-        {
-          method: 'DELETE',
-        },
-      );
-      const data = ActionResultResponse.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
-
-  const switchCryptoPlan = async (
-    plan: SelectedPlan,
-    currency: string,
-    subscriptionId?: string,
-  ): Promise<Result<CryptoPayment, PaymentError>> => {
-    try {
-      const data = await deletePendingPayment();
-      if (!data.isError) {
-        const payment = await cryptoPayment(plan, currency, subscriptionId);
-        if (payment.isError)
-          return payment;
-
-        return {
-          isError: false,
-          result: payment.result,
-        };
-      }
-      return {
-        error: data.error,
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
 
   const { start: startCountdown, stop: stopCountdown } = useTimeoutFn(
     async () => {
@@ -496,23 +349,22 @@ export const useMainStore = defineStore('main', () => {
     authenticated,
     cancellationError,
     changePassword,
-    checkGetAccount,
-    checkPendingCryptoPayment,
-    cryptoPayment,
     deleteAccount,
-    deletePendingPayment,
     getAccount,
-    getPendingSubscription,
+    getPayments,
+    getSubscriptions,
     login,
     logout,
-    markTransactionStarted,
     refreshSession,
+    refreshSubscriptionsAndPayments,
+    refreshUserData,
     resendVerificationCode,
     resumeError,
     subscriptions,
-    switchCryptoPlan,
     updateKeys,
     updateProfile,
+    userPayments,
+    userSubscriptions,
   };
 });
 

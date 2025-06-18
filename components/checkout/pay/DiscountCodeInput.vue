@@ -50,8 +50,9 @@ async function fetchDiscountInfo(value: string) {
 }
 
 watch(discountInfo, (info) => {
-  if (info && info.isValid) {
-    set(model, get(value));
+  const internalValue = get(value);
+  if (info && info.isValid && internalValue) {
+    set(model, internalValue);
   }
 });
 
@@ -59,9 +60,16 @@ watch(model, (model) => {
   set(value, model);
 });
 
-watch([model, discountInfo], async ([model, discountInfo]) => {
+watchImmediate([model, discountInfo, plan], async ([model, discountInfo]) => {
   if (model && !discountInfo) {
     await fetchDiscountInfo(model);
+  }
+});
+
+watch(plan, async () => {
+  const modelVal = get(model);
+  if (modelVal && get(discountInfo)) {
+    await fetchDiscountInfo(modelVal);
   }
 });
 
@@ -79,26 +87,32 @@ function reset() {
 </script>
 
 <template>
-  <RuiTextField
+  <form
     v-if="!discountInfo || !discountInfo.isValid"
-    v-model="value"
-    color="primary"
-    variant="outlined"
-    :label="t('home.plans.tiers.step_3.discount.label')"
-    :error-messages="discountInfo?.error"
-    :hint="t('home.plans.tiers.step_3.discount.hint')"
+    @submit.prevent="fetchDiscountInfo(value)"
   >
-    <template #append>
-      <RuiButton
-        color="primary"
-        :loading="loading"
-        :disabled="!value"
-        @click="fetchDiscountInfo(value)"
-      >
-        {{ t('home.plans.tiers.step_3.discount.apply_code') }}
-      </RuiButton>
-    </template>
-  </RuiTextField>
+    <RuiTextField
+      v-model="value"
+      color="primary"
+      variant="outlined"
+      :label="t('home.plans.tiers.step_3.discount.label')"
+      :error-messages="discountInfo?.error"
+      :hint="t('home.plans.tiers.step_3.discount.hint')"
+    >
+      <template #append>
+        <RuiButton
+          type="button"
+          color="primary"
+          :loading="loading"
+          :disabled="!value"
+          @click="fetchDiscountInfo(value)"
+        >
+          {{ t('home.plans.tiers.step_3.discount.apply_code') }}
+        </RuiButton>
+      </template>
+    </RuiTextField>
+  </form>
+
   <div
     v-else
     class="rounded-md px-3 h-14 flex items-center justify-between border border-rui-success"

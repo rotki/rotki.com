@@ -6,33 +6,37 @@ import type {
   TablePaginationData,
 } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
-import type { PendingTx, Subscription } from '~/types';
+import type { PendingTx, PreTierSubscription } from '~/types';
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { PaymentMethod } from '~/types/payment';
 
 const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<Subscription>[]>([]);
-const selectedSubscription = ref<Subscription>();
+const sort = ref<DataTableSortColumn<PreTierSubscription>[]>([]);
+const selectedSubscription = ref<PreTierSubscription>();
 const showCancelDialog = ref<boolean>(false);
 const cancelling = ref<boolean>(false);
 const resuming = ref<boolean>(false);
-const resumingSubscription = ref<Subscription>();
+const resumingSubscription = ref<PreTierSubscription>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
+const { getSubscriptions } = store;
 const { subscriptions } = storeToRefs(store);
+
+const { checkPendingCryptoPayment } = usePaymentCryptoStore();
 
 const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
 const pendingTx = usePendingTx();
 const { pause, resume, isActive } = useIntervalFn(
-  async () => await store.getAccount(),
+  async () => await getSubscriptions(),
   60000,
 );
 
-const headers: DataTableColumn<Subscription>[] = [
+const headers: DataTableColumn<PreTierSubscription>[] = [
   {
     label: t('common.plan'),
     key: 'planName',
@@ -77,7 +81,7 @@ const pendingPaymentCurrency = computedAsync(async () => {
   if (subs.length === 0)
     return undefined;
 
-  const response = await store.checkPendingCryptoPayment(subs[0].identifier);
+  const response = await checkPendingCryptoPayment(subs[0].identifier);
 
   if (response.isError || !response.result.pending)
     return undefined;
@@ -115,17 +119,17 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
 
 const pendingPaymentLink: RouteLocationRaw = { path: '/checkout/pay/method' };
 
-function isPending(sub: Subscription) {
+function isPending(sub: PreTierSubscription) {
   return sub.status === 'Pending';
 }
 
-async function resumeSubscription(sub: Subscription): Promise<void> {
+async function resumeSubscription(sub: PreTierSubscription): Promise<void> {
   set(resuming, true);
   await resumeUserSubscription(sub.identifier);
   set(resuming, false);
 }
 
-function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
+function hasAction(sub: PreTierSubscription, action: 'renew' | 'cancel') {
   if (action === 'cancel')
     return sub.status !== 'Pending' && sub.actions.includes('cancel');
   else if (action === 'renew')
@@ -134,7 +138,7 @@ function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
   return false;
 }
 
-function displayActions(sub: Subscription) {
+function displayActions(sub: PreTierSubscription) {
   return hasAction(sub, 'renew')
     || hasAction(sub, 'cancel')
     || isPending(sub)
@@ -153,12 +157,12 @@ function getChipStatusColor(status: string): ContextColorsType | undefined {
   return map[status];
 }
 
-function confirmCancel(sub: Subscription) {
+function confirmCancel(sub: PreTierSubscription) {
   set(selectedSubscription, sub);
   set(showCancelDialog, true);
 }
 
-async function cancelSubscription(sub: Subscription) {
+async function cancelSubscription(sub: PreTierSubscription) {
   set(showCancelDialog, false);
   set(cancelling, true);
   await cancelUserSubscription(sub);
