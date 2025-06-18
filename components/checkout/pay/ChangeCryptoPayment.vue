@@ -24,7 +24,7 @@ function change() {
     max-width="500"
     @update:model-value="emit('update:model-value', $event)"
   >
-    <RuiCard>
+    <RuiCard content-class="!pt-0">
       <template #header>
         {{ t('home.plans.tiers.step_3.change_payment.title') }}
       </template>
