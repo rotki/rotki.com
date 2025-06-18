@@ -45,7 +45,7 @@ const discountInfo = ref<DiscountInfo>();
 const { paymentMethodId } = usePaymentMethodParam();
 const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
-const { plan: planParams } = usePlanParams();
+const { planParams } = usePlanParams();
 const { planId } = usePlanIdParam();
 
 const processing = computed(() => get(paying) || get(loading) || get(pending));
@@ -58,7 +58,7 @@ const grandTotal = computed<number>(() => {
   const selectedPlan = get(plan);
   const discountVal = get(discountInfo);
   if (!discountVal || !discountVal.isValid) {
-    return get(selectedPlan).price;
+    return selectedPlan.price;
   }
 
   return discountVal.finalPrice;
@@ -106,10 +106,11 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
     .Buttons({
       createBillingAgreement: async () => {
         set(paying, true);
-        logger.debug(`Creating payment for ${get(grandTotal)} EUR`);
+        const grandTotalVal = get(grandTotal);
+        logger.debug(`Creating payment for ${grandTotalVal} EUR`);
         return await btPayPalCheckout.createPayment({
           flow: 'vault' as any,
-          amount: get(grandTotal),
+          amount: grandTotalVal,
           currency: 'EUR',
         });
       },

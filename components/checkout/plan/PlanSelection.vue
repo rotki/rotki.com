@@ -10,7 +10,7 @@ import { canBuyNewSubscription } from '~/utils/subscription';
 
 const { t } = useI18n();
 const route = useRoute();
-const { plan: planParams } = usePlanParams();
+const { planParams } = usePlanParams();
 
 const selectedPlanName = ref<string | undefined>(get(planParams)?.plan);
 const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || PricingPeriod.MONTHLY);

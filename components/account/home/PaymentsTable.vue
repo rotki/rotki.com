@@ -4,8 +4,7 @@ import type {
   DataTableSortColumn,
   TablePaginationData,
 } from '@rotki/ui-library';
-import { get, set } from '@vueuse/core';
-import { useUserPayments } from '~/composables/use-user-payments';
+import { get } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { DiscountType } from '~/types/payment';
 import { getPlanNameFor } from '~/utils/plans';
@@ -66,9 +65,8 @@ const headers: DataTableColumn<CombinedPayment>[] = [
   },
 ];
 
-const loading = ref(false);
 const store = useMainStore();
-const { account } = storeToRefs(store);
+const { account, userPayments } = storeToRefs(store);
 
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<CombinedPayment>[]>([
@@ -78,16 +76,8 @@ const sort = ref<DataTableSortColumn<CombinedPayment>[]>([
   },
 ]);
 
-const { payments, fetchPayments } = useUserPayments();
-
-async function refresh() {
-  set(loading, true);
-  await fetchPayments();
-  set(loading, false);
-}
-
 const combinedPayments = computed<CombinedPayment[]>(() => {
-  const newPayments = get(payments);
+  const newPayments = get(userPayments);
   const oldPayments = get(account)?.payments || [];
 
   return [
@@ -124,8 +114,6 @@ const combinedPayments = computed<CombinedPayment[]>(() => {
     }),
   ];
 });
-
-onMounted(refresh);
 </script>
 
 <template>
@@ -137,7 +125,6 @@ onMounted(refresh);
       v-model:pagination="pagination"
       v-model:sort="sort"
       :cols="headers"
-      :loading="loading"
       :empty="{ description: t('account.payments.no_payments_found') }"
       row-attr="identifier"
       :rows="combinedPayments"
