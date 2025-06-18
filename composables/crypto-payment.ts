@@ -13,10 +13,10 @@ import {
   optimism,
   sepolia,
 } from '@reown/appkit/networks';
-import { createAppKit, useAppKitProvider } from '@reown/appkit/vue';
+import { createAppKit } from '@reown/appkit/vue';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { BrowserProvider, Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
-import { useMainStore } from '~/store';
+import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
@@ -38,7 +38,7 @@ const abi = [
 ];
 
 const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
-const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis];
+const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis, sepolia];
 
 export const usePendingTx = createSharedComposable(() => useLocalStorage<PendingTx>('rotki.pending_tx', null, {
   serializer: {
@@ -54,7 +54,7 @@ interface ExecutePaymentParams {
 }
 
 export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
-  const { getPendingSubscription, markTransactionStarted } = useMainStore();
+  const { markTransactionStarted } = usePaymentCryptoStore();
   const connected = ref<boolean>(false);
   const isOpen = ref<boolean>(false);
   const connectedChainId = ref<bigint>();
@@ -91,14 +91,19 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     themeMode: 'light',
   });
 
+  const getBrowserProvider = (): BrowserProvider => {
+    assert(appKit);
+    const walletProvider = appKit.getProvider('eip155');
+    return new BrowserProvider(walletProvider as any);
+  };
+
   appKit.subscribeAccount((account) => {
     set(state, 'idle');
     set(errorMessage, '');
     set(connected, account.isConnected);
 
     if (account.isConnected) {
-      const { walletProvider } = useAppKitProvider('eip155');
-      const browserProvider = new BrowserProvider(walletProvider as any);
+      const browserProvider = getBrowserProvider();
       browserProvider.getNetwork()
         .then(network => set(connectedChainId, network.chainId))
         .catch(logger.error);
@@ -130,7 +135,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     } = payment;
 
     const currency = cryptocurrency.split(':')[1];
-    const value = parseUnits(finalPriceInCrypto, decimals);
+    const value = parseUnits(finalPriceInCrypto.toString(), decimals);
 
     let tx: TransactionResponse;
 
@@ -148,17 +153,11 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
 
     logger.info(`transaction is pending: ${tx.hash}`);
 
-    const subscription = getPendingSubscription({
-      amount: payment.finalPriceInEur,
-      date: payment.startDate,
-      duration: payment.months,
-    });
-
     set(pendingTx, {
       blockExplorerUrl,
       chainId: payment.chainId,
       hash: tx.hash,
-      subscriptionId: subscription?.identifier,
+      subscriptionId: payment.subscriptionId,
     });
     await markTransactionStarted();
     start();
@@ -179,8 +178,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       const payment = get(data);
       assert(payment);
 
-      const { walletProvider } = useAppKitProvider('eip155');
-      const browserProvider = new BrowserProvider(walletProvider as any);
+      const browserProvider = getBrowserProvider();
       const network = await browserProvider.getNetwork();
 
       const { chainId, chainName } = payment;

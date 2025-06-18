@@ -20,7 +20,7 @@ interface PaymentMethodItem {
 
 const store = useMainStore();
 
-const { plan: planParams } = usePlanParams();
+const { planParams } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
 
 const { identifier } = toRefs(props);

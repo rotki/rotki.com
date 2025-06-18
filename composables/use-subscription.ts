@@ -1,12 +1,12 @@
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useMainStore } from '~/store';
-import { ActionResultResponse, type Subscription } from '~/types';
+import { ActionResultResponse, type PreTierSubscription } from '~/types';
 import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 
 interface UseSubscriptionReturn {
-  cancelUserSubscription: (subscription: Subscription) => Promise<void>;
+  cancelUserSubscription: (subscription: PreTierSubscription) => Promise<void>;
   resumeUserSubscription: (identifier: string) => Promise<void>;
 }
 
@@ -40,7 +40,7 @@ export function useSubscription(): UseSubscriptionReturn {
     }
   };
 
-  const cancelUserSubscription = async (subscription: Subscription): Promise<void> => {
+  const cancelUserSubscription = async (subscription: PreTierSubscription): Promise<void> => {
     const acc = get(account);
     assert(acc);
 

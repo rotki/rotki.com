@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { WatchHandle } from 'vue';
 import type { CryptoPayment, IdleStep, PaymentStep, SelectedPlan, StepType } from '~/types';
+import type { DiscountInfo } from '~/types/payment';
 import { get, set, useClipboard } from '@vueuse/core';
 import { parseUnits } from 'ethers';
 import { toCanvas } from 'qrcode';
+import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
@@ -20,17 +22,21 @@ const props = defineProps<{
   failure: boolean;
   loading: boolean;
   status: PaymentStep;
+  discountCode?: string;
 }>();
 
 const emit = defineEmits<{
   (e: 'change'): void;
 }>();
 
-const { data, pending, loading, success } = toRefs(props);
+const { data, pending, loading, success, discountCode, plan } = toRefs(props);
 
 const canvas = useTemplateRef('canvas');
 const qrText = ref<string>('');
 const showChangePaymentDialog = ref(false);
+
+const discountCodeModel = ref('');
+const discountInfo = ref<DiscountInfo>();
 
 let stopWatcher: WatchHandle;
 
@@ -46,6 +52,8 @@ const {
   isExpectedChain,
   switchNetwork,
 } = useWeb3Payment(data, state, error);
+
+const router = useRouter();
 
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
 
@@ -82,7 +90,7 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
   }
   else {
     const chainId = payment.chainId;
-    const tokenAmount = parseUnits(finalPriceInCrypto, decimals);
+    const tokenAmount = parseUnits(finalPriceInCrypto.toString(), decimals);
 
     if (!tokenAddress)
       qrText = `ethereum:${cryptoAddress}@${chainId}?value=${tokenAmount}`;
@@ -111,10 +119,67 @@ watch(canvas, async (canvas) => {
 
   set(qrText, await createPaymentQR(get(data), canvas));
 });
+
+const grandTotal = computed<number>(() => {
+  const selectedPlan = get(plan);
+
+  if (!selectedPlan)
+    return 0;
+
+  const discountVal = get(discountInfo);
+
+  if (!discountVal || !discountVal.isValid) {
+    return selectedPlan.price;
+  }
+
+  return discountVal.finalPrice;
+});
+
+watchImmediate(discountCode, (discountCode) => {
+  if (discountCode) {
+    set(discountCodeModel, discountCode);
+  }
+});
+
+watch(discountCodeModel, (curr, prev) => {
+  if (curr === prev || curr === get(discountCode)) {
+    return;
+  }
+
+  const currentRoute = get(router.currentRoute);
+
+  navigateTo({
+    path: currentRoute.path,
+    query: {
+      ...currentRoute.query,
+      discountCode: curr,
+    },
+  });
+});
 </script>
 
 <template>
   <div :class="$style.wrapper">
+    <div class="mb-4">
+      <SelectedPlanOverview
+        :plan="plan"
+        :next-payment="0"
+        :disabled="processing"
+        warning
+      />
+
+      <DiscountCodeInput
+        v-model="discountCodeModel"
+        v-model:discount-info="discountInfo"
+        :plan="plan"
+        class="mt-6"
+      />
+
+      <PaymentGrandTotal
+        :grand-total="grandTotal"
+        class="mt-6"
+      />
+    </div>
     <div :class="$style.qrcode">
       <canvas
         v-if="!isOpen"
@@ -135,7 +200,7 @@ watch(canvas, async (canvas) => {
         variant="outlined"
         hide-details
         readonly
-        :copy-value="data.finalPriceInCrypto"
+        :copy-value="data.finalPriceInCrypto.toString()"
       >
         <template #prepend>
           <CryptoAssetIcon
@@ -179,13 +244,6 @@ watch(canvas, async (canvas) => {
       </RuiAlert>
     </div>
     <RuiDivider class="mt-8" />
-    <SelectedPlanOverview
-      :plan="plan"
-      :next-payment="0"
-      :disabled="processing"
-      crypto
-      warning
-    />
     <div :class="$style.hint">
       {{ t('home.plans.tiers.step_3.wallet.notice') }}
 
@@ -282,7 +340,7 @@ watch(canvas, async (canvas) => {
 
 <style lang="scss" module>
 .wrapper {
-  @apply flex flex-col mt-6 grow;
+  @apply flex flex-col grow;
 }
 
 .qrcode {

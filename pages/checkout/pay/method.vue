@@ -21,14 +21,14 @@ useHead({
 
 // NB: this param name is also used in backend email links,
 // if changed, kindly sync with backend team to update email links as well.
-const { plan } = usePlanParams();
+const { planParams } = usePlanParams();
 const { planId } = usePlanIdParam();
 const { subscriptionId } = useSubscriptionIdParam();
 
 onBeforeMount(() => {
-  const planVal = get(plan);
+  const planParamsVal = get(planParams);
   const planIdVal = get(planId);
-  if (!planVal || !planIdVal)
+  if (!planParamsVal || !planIdVal)
     navigateTo({ name: 'checkout-pay' });
 });
 </script>
