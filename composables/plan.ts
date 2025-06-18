@@ -3,14 +3,16 @@ import { get } from '@vueuse/core';
 
 type CurrencyParam = string | null;
 
+type DiscountCodeParam = string | undefined;
+
 export interface PlanParams {
   period: PricingPeriod;
   plan: string;
 }
 
-export function usePlanParams(): { plan: ComputedRef<PlanParams | undefined> } {
+export function usePlanParams(): { planParams: ComputedRef<PlanParams | undefined> } {
   const route = useRoute();
-  const plan = computed(() => {
+  const planParams = computed(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
     const { period, plan, planId } = route.query;
@@ -24,7 +26,7 @@ export function usePlanParams(): { plan: ComputedRef<PlanParams | undefined> } {
     };
   });
 
-  return { plan };
+  return { planParams };
 }
 
 export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
@@ -55,6 +57,21 @@ export function useCurrencyParams() {
   });
 
   return { currency };
+}
+
+export function useDiscountCodeParams() {
+  const route = useRoute();
+  const discountCode = computed<DiscountCodeParam>(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
+    const { discountCode } = route.query;
+    if (typeof discountCode !== 'string' || !discountCode)
+      return undefined;
+
+    return discountCode;
+  });
+
+  return { discountCode };
 }
 
 export function useSubscriptionIdParam() {

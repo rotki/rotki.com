@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Address, Subscription } from '~/types/index';
+import { Address, PreTierSubscription } from '~/types/index';
 import { DiscountType } from '~/types/payment';
 
 export interface PasswordChangePayload {
@@ -87,7 +87,7 @@ export const Account = z.object({
   emailConfirmed: z.boolean(),
   hasActiveSubscription: z.boolean(),
   payments: z.array(PreTierPayment),
-  subscriptions: z.array(Subscription),
+  subscriptions: z.array(PreTierSubscription),
   username: z.string().min(1),
   vat: z.number(),
   vatIdStatus: z.string(),
