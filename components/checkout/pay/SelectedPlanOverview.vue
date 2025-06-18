@@ -8,13 +8,11 @@ import { getPlanNameFor } from '~/utils/plans';
 const props = withDefaults(
   defineProps<{
     plan: SelectedPlan;
-    crypto?: boolean;
     warning?: boolean;
     disabled?: boolean;
-    nextPayment: number;
+    nextPayment?: number;
   }>(),
   {
-    crypto: false,
     warning: false,
   },
 );
@@ -30,7 +28,11 @@ const name = computed(() => {
 });
 
 const nextPaymentDate = computed(() => {
-  const date = new Date(get(nextPayment) * 1000);
+  const next = get(nextPayment);
+  if (!next) {
+    return undefined;
+  }
+  const date = new Date(next * 1000);
   return formatDate(date);
 });
 
@@ -64,7 +66,10 @@ const { t } = useI18n({ useScope: 'global' });
         <div class="text-body-1 font-bold mr-1 text-rui-text-secondary">
           {{ name }}
         </div>
-        <div class="text-xs text-rui-text-secondary italic">
+        <div
+          v-if="nextPaymentDate"
+          class="text-xs text-rui-text-secondary italic"
+        >
           {{
             t('selected_plan_overview.next_payment', {
               date: nextPaymentDate,
@@ -83,7 +88,6 @@ const { t } = useI18n({ useScope: 'global' });
           {{ t('actions.change') }}
         </RuiButton>
         <ChangePlanDialog
-          :crypto="crypto"
           :warning="warning"
           :visible="selection"
           @cancel="selection = false"

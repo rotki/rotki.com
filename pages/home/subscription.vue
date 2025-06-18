@@ -5,6 +5,7 @@ import { useMainStore } from '~/store';
 
 const store = useMainStore();
 const { account, subscriptions } = storeToRefs(store);
+const { refreshUserData } = store;
 
 const premium = computed(() => get(account)?.canUsePremium ?? false);
 const emailConfirmed = computed(() => get(account)?.emailConfirmed ?? false);
@@ -21,7 +22,7 @@ definePageMeta({
 });
 
 onBeforeMount(() => {
-  store.getAccount();
+  refreshUserData();
 });
 </script>
 

@@ -4,7 +4,7 @@ import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 
 export function useSelectedPlan() {
-  const { plan: planParam } = usePlanParams();
+  const { planParams } = usePlanParams();
   const { planId } = usePlanIdParam();
 
   const tiersStore = useTiersStore();
@@ -13,13 +13,15 @@ export function useSelectedPlan() {
 
   const selectedPlan = computed<SelectedPlan | undefined>(() => {
     const planIdVal = get(planId);
-    const planParamVal = get(planParam);
+    const planParamVal = get(planParams);
 
-    if (!planIdVal || !planParamVal) {
+    if (!planParamVal) {
       return undefined;
     }
 
-    const item = get(availablePlans).find(item => item.subscriptionTierId === planIdVal);
+    const item = planIdVal
+      ? get(availablePlans).find(item => item.subscriptionTierId === planIdVal)
+      : get(availablePlans).find(item => item.name === planParamVal.plan);
 
     if (!item)
       return undefined;

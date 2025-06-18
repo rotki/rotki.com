@@ -21,10 +21,10 @@ export function useBraintree() {
   const paymentError = ref('');
 
   const { t } = useI18n();
-  const { checkGetAccount } = useMainStore();
+  const { refreshSubscriptionsAndPayments } = useMainStore();
   const router = useRouter();
 
-  const { plan: planParam } = usePlanParams();
+  const { planParams } = usePlanParams();
   const { planId } = usePlanIdParam();
 
   async function getCardCheckoutData(plan: PlanParams, planId: number): Promise<Result<CardCheckout>> {
@@ -76,7 +76,7 @@ export function useBraintree() {
           method: 'POST',
         },
       );
-      checkGetAccount();
+      refreshSubscriptionsAndPayments();
       set(paymentSuccess, true);
     }
     catch (error_: any) {
@@ -147,7 +147,7 @@ export function useBraintree() {
   });
 
   watchEffect(async () => {
-    const planVal = get(planParam);
+    const planVal = get(planParams);
     const planIdVal = get(planId);
     if (!planVal || !planIdVal) {
       await router.push({ name: 'checkout-pay' });
