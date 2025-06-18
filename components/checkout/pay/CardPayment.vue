@@ -58,7 +58,7 @@ const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
 
 const { addCard, createCardNonce } = usePaymentCardsStore();
-const { plan: planParams } = usePlanParams();
+const { planParams } = usePlanParams();
 const { planId } = usePlanIdParam();
 
 const logger = useLogger('card-payment');
@@ -84,7 +84,7 @@ const grandTotal = computed<number>(() => {
   const selectedPlan = get(plan);
   const discountVal = get(discountInfo);
   if (!discountVal || !discountVal.isValid) {
-    return get(selectedPlan).price;
+    return selectedPlan.price;
   }
 
   return discountVal.finalPrice;

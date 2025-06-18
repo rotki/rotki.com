@@ -13,7 +13,7 @@ export default defineNuxtPlugin(async () => {
 
   if (session) {
     logger.debug(`fetching account for session id: ${session}`);
-    const { getAccount } = useMainStore();
-    return getAccount();
+    const { refreshUserData } = useMainStore();
+    return refreshUserData();
   }
 });

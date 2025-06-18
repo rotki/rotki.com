@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Address, Subscription } from '~/types/index';
+import { Address, PreTierSubscription } from '~/types/index';
 import { DiscountType } from '~/types/payment';
 
 export interface PasswordChangePayload {
@@ -46,7 +46,6 @@ export const UserDevices = z.array(UserDevice);
 export type UserDevices = z.infer<typeof UserDevices>;
 
 export const UserPayment = z.object({
-  createdAt: z.string().datetime(),
   discount: z.object({
     amount: z.number().positive(),
     discountType: z.nativeEnum(DiscountType),
@@ -55,6 +54,8 @@ export const UserPayment = z.object({
   finalPrice: z.number().positive(),
   identifier: z.string().min(1),
   isRefund: z.boolean().optional().default(false),
+  legacy: z.boolean(),
+  paidAt: z.string(),
   paidUsing: z.string(),
   plan: z.string(),
   priceBeforeDiscount: z.number().positive(),
@@ -70,7 +71,7 @@ export const PreTierPayment = z.object({
   eurAmount: z.string(),
   identifier: z.string().min(1),
   isRefund: z.boolean().optional().default(false),
-  paidAt: z.string().datetime(),
+  paidAt: z.string(),
   paidUsing: z.string(),
   plan: z.string(),
 });
@@ -87,7 +88,7 @@ export const Account = z.object({
   emailConfirmed: z.boolean(),
   hasActiveSubscription: z.boolean(),
   payments: z.array(PreTierPayment),
-  subscriptions: z.array(Subscription),
+  subscriptions: z.array(PreTierSubscription),
   username: z.string().min(1),
   vat: z.number(),
   vatIdStatus: z.string(),
