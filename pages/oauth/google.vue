@@ -6,17 +6,21 @@ interface GoogleTokenResponse {
   refresh_token?: string;
 }
 
+type OAuthMode = 'app' | 'docker';
+
 const { t } = useI18n();
 const route = useRoute();
 const config = useRuntimeConfig();
 
-// Get callback URL from query parameters
-const callbackUrl = computed(() => route.query.callbackUrl as string);
+// Get mode from query parameters
+const mode = computed(() => route.query.mode as OAuthMode);
 
 // State management
 const loading = ref(false);
 const error = ref<string | null>(null);
 const completed = ref(false);
+const accessToken = ref<string>('');
+const currentMode = ref<OAuthMode | null>(null);
 
 // Check if required environment variables are available
 const googleClientId = config.public.googleClientId;
@@ -35,8 +39,9 @@ function handleGoogleAuth() {
     return;
   }
 
-  if (!get(callbackUrl)) {
-    set(error, t('oauth.errors.no_callback_url'));
+  const currentMode = get(mode);
+  if (!currentMode || !['app', 'docker'].includes(currentMode)) {
+    set(error, t('oauth.errors.invalid_mode'));
     return;
   }
 
@@ -46,7 +51,7 @@ function handleGoogleAuth() {
 
     // Generate state parameter for security
     const state = btoa(JSON.stringify({
-      callbackUrl: get(callbackUrl),
+      mode: get(mode),
       timestamp: Date.now(),
     }));
 
@@ -92,7 +97,10 @@ onMounted(async () => {
 
       // Parse state parameter
       const stateData = JSON.parse(atob(state));
-      const originalCallbackUrl = stateData.callbackUrl;
+      const originalMode = stateData.mode as OAuthMode;
+
+      // Set the current mode from the state
+      set(currentMode, originalMode);
 
       // Get redirect URI
       const redirectUri = `${window.location.origin}/oauth/google`;
@@ -109,23 +117,32 @@ onMounted(async () => {
       });
 
       if (tokenResponse.access_token) {
-        // Redirect to callback URL with access token
-        const callbackUrlWithToken = new URL(originalCallbackUrl);
-        callbackUrlWithToken.searchParams.set('access_token', tokenResponse.access_token);
-        callbackUrlWithToken.searchParams.set('token_type', 'Bearer');
+        set(accessToken, tokenResponse.access_token);
 
-        if (tokenResponse.refresh_token) {
-          callbackUrlWithToken.searchParams.set('refresh_token', tokenResponse.refresh_token);
+        if (originalMode === 'app') {
+          // Redirect to rotki://oauth with access token
+          const callbackUrl = new URL('rotki://oauth');
+          callbackUrl.searchParams.set('access_token', tokenResponse.access_token);
+          callbackUrl.searchParams.set('token_type', 'Bearer');
+
+          if (tokenResponse.refresh_token) {
+            callbackUrl.searchParams.set('refresh_token', tokenResponse.refresh_token);
+          }
+
+          // Set completed state and show message before redirecting
+          set(completed, true);
+          set(loading, false);
+
+          // Delay redirect to allow user to see completion message
+          setTimeout(() => {
+            window.location.href = callbackUrl.toString();
+          }, 2000);
         }
-
-        // Set completed state and show message before redirecting
-        set(completed, true);
-        set(loading, false);
-
-        // Delay redirect to allow user to see completion message
-        setTimeout(() => {
-          window.location.href = callbackUrlWithToken.toString();
-        }, 2000);
+        else if (originalMode === 'docker') {
+          // For docker mode, just set completed and show tokens
+          set(completed, true);
+          set(loading, false);
+        }
       }
       else {
         throw new Error(t('oauth.errors.no_access_token'));
@@ -173,11 +190,34 @@ const otherHeight = inject('otherHeight', 0);
         </RuiAlert>
 
         <RuiAlert
-          v-if="completed"
+          v-if="completed && (mode === 'app' || currentMode === 'app')"
           type="success"
         >
           {{ t('oauth.completion.description') }}
         </RuiAlert>
+
+        <div
+          v-if="completed && (mode === 'docker' || currentMode === 'docker')"
+          class="space-y-6"
+        >
+          <RuiAlert type="success">
+            {{ t('oauth.completion.docker_description') }}
+          </RuiAlert>
+
+          <RuiTextArea
+            v-model="accessToken"
+            :label="t('oauth.access_token_label')"
+            readonly
+            variant="outlined"
+            color="primary"
+            rows="4"
+            @click="($event.target as HTMLTextAreaElement).select()"
+          >
+            <template #append>
+              <CopyButton :model-value="accessToken" />
+            </template>
+          </RuiTextArea>
+        </div>
 
         <RuiButton
           v-if="!completed"
