@@ -817,6 +817,23 @@
       "title": "Payment Success"
     }
   },
+  "oauth": {
+    "title": "OAuth Integration",
+    "description": "Click the button below to authenticate with Google",
+    "button": "Continue with Google",
+    "completion": {
+      "title": "Authentication Complete",
+      "description": "Your authentication was successful. You can now close this page."
+    },
+    "errors": {
+      "client_id_not_configured": "Google Client ID is not configured",
+      "no_callback_url": "No callback URL provided",
+      "initiate_flow_failed": "Failed to initiate OAuth flow",
+      "token_exchange_failed": "Failed to exchange authorization code for access token",
+      "no_access_token": "No access token received",
+      "oauth_error": "OAuth error: {error}"
+    }
+  },
   "values": {
     "contact_section": {
       "discord": {
