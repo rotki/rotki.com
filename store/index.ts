@@ -71,14 +71,14 @@ export const useMainStore = defineStore('main', () => {
 
   const getPayments = async (): Promise<void> => {
     try {
-      const response = await fetchWithCsrf<UserPayments>(
-        '/webapi/2/payments',
+      const response = await fetchWithCsrf<ApiResponse<UserPayments>>(
+        '/webapi/2/history/payments',
         {
           method: 'GET',
         },
       );
 
-      const parsed = UserPayments.parse(response);
+      const parsed = UserPayments.parse(response.result);
       set(userPayments, parsed);
     }
     catch (error) {
