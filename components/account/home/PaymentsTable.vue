@@ -4,33 +4,17 @@ import type {
   DataTableSortColumn,
   TablePaginationData,
 } from '@rotki/ui-library';
-import { get } from '@vueuse/core';
+import type { UserPayment } from '~/types/account';
 import { useMainStore } from '~/store';
 import { DiscountType } from '~/types/payment';
-import { getPlanNameFor } from '~/utils/plans';
 import { toTitleCase } from '~/utils/text';
 
 const { t } = useI18n({ useScope: 'global' });
 
-interface CombinedPayment {
-  identifier: string;
-  name: string;
-  createdAt: string;
-  priceBeforeDiscount: number;
-  finalPrice: number;
-  discount?: {
-    amount: number;
-    discountType: DiscountType;
-  };
-  isRefund: boolean;
-  paidUsing: string;
-  invoiceUrl: string;
-}
-
-const headers: DataTableColumn<CombinedPayment>[] = [
+const headers: DataTableColumn<UserPayment>[] = [
   {
     label: t('account.payments.headers.paid_at'),
-    key: 'createdAt',
+    key: 'paidAt',
     sortable: true,
   },
   {
@@ -66,54 +50,15 @@ const headers: DataTableColumn<CombinedPayment>[] = [
 ];
 
 const store = useMainStore();
-const { account, userPayments } = storeToRefs(store);
+const { userPayments } = storeToRefs(store);
 
 const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<CombinedPayment>[]>([
+const sort = ref<DataTableSortColumn<UserPayment>[]>([
   {
-    column: 'createdAt',
+    column: 'paidAt',
     direction: 'desc',
   },
 ]);
-
-const combinedPayments = computed<CombinedPayment[]>(() => {
-  const newPayments = get(userPayments);
-  const oldPayments = get(account)?.payments || [];
-
-  return [
-    ...newPayments.map((item) => {
-      const name = `${getPlanNameFor({
-        durationInMonths: item.durationInMonths,
-        name: item.plan,
-      })}`;
-
-      return {
-        ...item,
-        name,
-        invoiceUrl: `/webapi/2/invoices/${item.identifier}/`,
-      };
-    }),
-    ...oldPayments.map((item) => {
-      const name = `${getPlanNameFor({
-        durationInMonths: 1,
-        name: 'basic',
-      })}`;
-
-      const amount = parseFloat(item.eurAmount);
-
-      return {
-        name,
-        identifier: item.identifier,
-        createdAt: item.paidAt,
-        priceBeforeDiscount: amount,
-        finalPrice: amount,
-        paidUsing: item.paidUsing,
-        isRefund: item.isRefund,
-        invoiceUrl: `/webapi/download/receipt/${item.identifier}/`,
-      };
-    }),
-  ];
-});
 </script>
 
 <template>
@@ -127,11 +72,11 @@ const combinedPayments = computed<CombinedPayment[]>(() => {
       :cols="headers"
       :empty="{ description: t('account.payments.no_payments_found') }"
       row-attr="identifier"
-      :rows="combinedPayments"
+      :rows="userPayments"
       outlined
     >
-      <template #item.createdAt="{ row }">
-        {{ formatDate(row.createdAt, 'MMMM DD, YYYY - HH:mm:ss') }}
+      <template #item.paidAt="{ row }">
+        {{ row.paidAt }}
       </template>
       <template #item.finalPrice="{ row }">
         <div class="flex items-center justify-end gap-2">
@@ -192,7 +137,7 @@ const combinedPayments = computed<CombinedPayment[]>(() => {
       <template #item.actions="{ row }">
         <div class="flex gap-2 justify-end">
           <ButtonLink
-            :to="row.invoiceUrl"
+            :to="row.legacy ? `/webapi/download/receipt/${row.identifier}/` : `/webapi/2/invoices/${row.identifier}/`"
             color="primary"
             external
           >
