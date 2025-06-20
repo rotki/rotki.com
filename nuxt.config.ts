@@ -22,6 +22,8 @@ const nonIndexed = [
   '/api/content/**',
   '/_nuxt/**',
   '/testimonials/**',
+  '/oauth/**',
+  '/api/oauth/**',
 ];
 
 const domain = process.env.PROXY_DOMAIN ?? 'localhost';
