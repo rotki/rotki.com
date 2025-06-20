@@ -11,20 +11,20 @@ type OAuthMode = 'app' | 'docker';
 const { t } = useI18n();
 const route = useRoute();
 const config = useRuntimeConfig();
+const logger = useLogger();
 
 // Get mode from query parameters
 const mode = computed(() => route.query.mode as OAuthMode);
 
 // State management
 const loading = ref(false);
-const error = ref<string | null>(null);
+const error = ref<string>();
 const completed = ref(false);
 const accessToken = ref<string>('');
-const currentMode = ref<OAuthMode | null>(null);
+const currentMode = ref<OAuthMode>();
 
 // Check if required environment variables are available
 const googleClientId = config.public.googleClientId;
-const googleClientSecret = config.public.googleClientSecret;
 
 if (!googleClientId) {
   set(error, t('oauth.errors.client_id_not_configured'));
@@ -47,7 +47,7 @@ function handleGoogleAuth() {
 
   try {
     set(loading, true);
-    set(error, null);
+    set(error, undefined);
 
     // Generate state parameter for security
     const state = btoa(JSON.stringify({
@@ -73,90 +73,173 @@ function handleGoogleAuth() {
     window.location.href = `${googleAuthUrl}?${params.toString()}`;
   }
   catch (error_) {
-    console.error('OAuth error:', error_);
-    set(error, t('oauth.errors.initiate_flow_failed'));
+    logger.error('OAuth error:', error_);
+    const errorMessage = t('oauth.errors.initiate_flow_failed');
+    set(error, errorMessage);
     set(loading, false);
+
+    // If in app mode, notify the application about the failure
+    if (currentMode === 'app') {
+      handleAppModeFailure(errorMessage);
+    }
   }
 }
 
-// Handle OAuth callback
-onMounted(async () => {
+// Extract URL parameters and validate them
+function extractAndValidateParams() {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   const state = urlParams.get('state');
   const errorParam = urlParams.get('error');
 
   if (errorParam) {
-    set(error, t('oauth.errors.oauth_error', { error: errorParam }));
+    const errorMessage = t('oauth.errors.oauth_error', { error: errorParam });
+    set(error, errorMessage);
+
+    // If in app mode, notify the application about the failure
+    if (state) {
+      try {
+        const stateData = JSON.parse(atob(state));
+        if (stateData.mode === 'app') {
+          handleAppModeFailure(errorMessage);
+        }
+      }
+      catch (error_) {
+        logger.error('Failed to parse state:', error_);
+      }
+    }
+
+    return null;
+  }
+
+  if (!code || !state) {
+    return null;
+  }
+
+  return { code, state };
+}
+
+// Parse state and set current mode
+function parseStateAndSetMode(stateString: string) {
+  const stateData = JSON.parse(atob(stateString));
+  const originalMode = stateData.mode as OAuthMode;
+
+  // Set the current mode from the state
+  set(currentMode, originalMode);
+
+  return originalMode;
+}
+
+// Exchange code for access token
+async function exchangeCodeForToken(code: string, redirectUri: string) {
+  return await $fetch<GoogleTokenResponse>('/api/oauth/google/token', {
+    method: 'POST',
+    body: {
+      code,
+      redirect_uri: redirectUri,
+      client_id: googleClientId,
+    },
+  });
+}
+
+// Handle app mode completion
+function handleAppModeCompletion(accessTokenValue: string, refreshToken?: string) {
+  // Redirect to rotki://oauth with access token
+  const callbackUrl = new URL('rotki://oauth/success');
+  callbackUrl.searchParams.set('access_token', accessTokenValue);
+  callbackUrl.searchParams.set('token_type', 'Bearer');
+
+  if (refreshToken) {
+    callbackUrl.searchParams.set('refresh_token', refreshToken);
+  }
+
+  // Set completed state and show message before redirecting
+  set(completed, true);
+  set(loading, false);
+
+  // Delay redirect to allow user to see the completion message
+  setTimeout(() => {
+    logger.info(`Redirecting to: ${callbackUrl}`);
+    window.location.href = callbackUrl.toString();
+  }, 2000);
+}
+
+// Handle app mode failure
+function handleAppModeFailure(errorMessage?: string) {
+  // Redirect to rotki://oauth/failure to notify the application
+  const callbackUrl = new URL('rotki://oauth/failure');
+
+  // Add error message to the URL if provided
+  if (errorMessage) {
+    callbackUrl.searchParams.set('error', errorMessage);
+  }
+
+  // Delay redirect to allow user to see the error message
+  setTimeout(() => {
+    logger.info(`Redirecting to failure: ${callbackUrl}`);
+    window.location.href = callbackUrl.toString();
+  }, 2000);
+}
+
+// Handle docker mode completion
+function handleDockerModeCompletion() {
+  // For docker mode, just set completed and show tokens
+  set(completed, true);
+  set(loading, false);
+}
+
+// Main function to handle OAuth callback
+async function handleOAuthCallback() {
+  const params = extractAndValidateParams();
+  if (!params) {
     return;
   }
 
-  if (code && state) {
-    try {
-      set(loading, true);
+  const { code, state } = params;
 
-      // Parse state parameter
-      const stateData = JSON.parse(atob(state));
-      const originalMode = stateData.mode as OAuthMode;
+  // Parse state parameter and set mode
+  const originalMode = parseStateAndSetMode(state);
 
-      // Set the current mode from the state
-      set(currentMode, originalMode);
+  try {
+    set(loading, true);
 
-      // Get redirect URI
-      const redirectUri = `${window.location.origin}/oauth/google`;
+    // Get redirect URI
+    const redirectUri = `${window.location.origin}/oauth/google`;
 
-      // Exchange code for access token
-      const tokenResponse = await $fetch<GoogleTokenResponse>('/api/oauth/google/token', {
-        method: 'POST',
-        body: {
-          code,
-          redirect_uri: redirectUri,
-          client_id: googleClientId,
-          client_secret: googleClientSecret,
-        },
-      });
+    // Exchange code for access token
+    const tokenResponse = await exchangeCodeForToken(code, redirectUri);
 
-      if (tokenResponse.access_token) {
-        set(accessToken, tokenResponse.access_token);
+    if (tokenResponse.access_token) {
+      set(accessToken, tokenResponse.access_token);
 
-        if (originalMode === 'app') {
-          // Redirect to rotki://oauth with access token
-          const callbackUrl = new URL('rotki://oauth');
-          callbackUrl.searchParams.set('access_token', tokenResponse.access_token);
-          callbackUrl.searchParams.set('token_type', 'Bearer');
-
-          if (tokenResponse.refresh_token) {
-            callbackUrl.searchParams.set('refresh_token', tokenResponse.refresh_token);
-          }
-
-          // Set completed state and show message before redirecting
-          set(completed, true);
-          set(loading, false);
-
-          // Delay redirect to allow user to see completion message
-          setTimeout(() => {
-            window.location.href = callbackUrl.toString();
-          }, 2000);
-        }
-        else if (originalMode === 'docker') {
-          // For docker mode, just set completed and show tokens
-          set(completed, true);
-          set(loading, false);
-        }
+      if (originalMode === 'app') {
+        handleAppModeCompletion(tokenResponse.access_token, tokenResponse.refresh_token);
       }
-      else {
-        throw new Error(t('oauth.errors.no_access_token'));
+      else if (originalMode === 'docker') {
+        handleDockerModeCompletion();
       }
     }
-    catch (error_) {
-      console.error('Token exchange error:', error_);
-      set(error, t('oauth.errors.token_exchange_failed'));
-    }
-    finally {
-      set(loading, false);
+    else {
+      throw new Error(t('oauth.errors.no_access_token'));
     }
   }
-});
+  catch (error_) {
+    logger.error('Token exchange error:', error_);
+    const errorMessage = t('oauth.errors.token_exchange_failed');
+    set(error, errorMessage);
+
+    // If in app mode, notify the application about the failure
+    if (originalMode === 'app') {
+      handleAppModeFailure(errorMessage);
+    }
+  }
+  finally {
+    set(loading, false);
+  }
+}
+
+// Handle OAuth callback
+onMounted(handleOAuthCallback);
 
 // Set page metadata
 useHead({
@@ -225,6 +308,7 @@ const otherHeight = inject('otherHeight', 0);
           class="w-full"
           size="lg"
           :loading="loading"
+          :disabled="!mode || !['app', 'docker'].includes(mode)"
           @click="handleGoogleAuth()"
         >
           <template #prepend>
