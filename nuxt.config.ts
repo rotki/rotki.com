@@ -140,6 +140,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    googleClientSecret: '',
     public: {
       baseUrl: '',
       contact: {
@@ -151,8 +152,7 @@ export default defineNuxtConfig({
         supportEmailMailto: 'mailto:support@rotki.com',
         twitter: 'https://twitter.com/rotkiapp',
       },
-      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || '',
-      googleClientSecret: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_SECRET || '',
+      googleClientId: '',
       isDev: process.env.NODE_ENV === 'development',
       loglevel: 3, // Setting info loglevel as the default.
       maintenance: false,
