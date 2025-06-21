@@ -95,7 +95,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       blockExplorerUrl,
       chainId: payment.chainId,
       hash: tx.hash,
-      subscriptionId: payment.subscriptionId,
+      subscriptionId: payment.subscriptionId.toString(),
     });
     await markTransactionStarted();
     start();

@@ -39,7 +39,7 @@ async function resend() {
 
 <template>
   <RuiAlert type="warning">
-    {{ t('waccount.unverified_email.message.description') }}
+    {{ t('account.unverified_email.message.description') }}
     <RuiButton
       color="secondary"
       size="sm"
