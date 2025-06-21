@@ -48,7 +48,7 @@ const SubscriptionStatus = z.enum([
 
 export const PreTierSubscription = z.object({
   actions: StringArray,
-  createdDate: z.string(),
+  createdDate: z.string().datetime({ offset: true }),
   durationInMonths: z.number().nonnegative(),
   identifier: z.string().min(1),
   isSoftCanceled: z.boolean().default(false),
@@ -65,15 +65,16 @@ export const UserSubscription = z.object({
   actions: StringArray,
   createdDate: z.string(),
   durationInMonths: z.number().nonnegative(),
-  id: z.number(),
+  id: z.number().or(z.string()).transform(String),
   isActive: z.boolean(),
+  isLegacy: z.boolean(),
   isSoftCanceled: z.boolean().default(false),
   nextActionDate: z.string(),
-  nextBillingAmount: z.string(),
+  nextBillingAmount: z.number(),
   paymentProvider: z.string(),
   pending: z.boolean().default(false),
+  planName: z.string(),
   status: SubscriptionStatus,
-  tierName: z.string(),
 });
 
 export type UserSubscription = z.infer<typeof UserSubscription>;
@@ -323,7 +324,7 @@ export type ResendVerificationResponse = z.infer<typeof ResendVerificationRespon
 
 export interface PendingTx {
   hash: string;
-  subscriptionId: number;
+  subscriptionId: string;
   chainId: number;
   blockExplorerUrl: string;
 }

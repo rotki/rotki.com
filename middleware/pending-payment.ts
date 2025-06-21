@@ -19,7 +19,7 @@ export default defineNuxtRouteMiddleware(async () => {
   );
 
   if (pendingSub.length > 0) {
-    const { durationInMonths, id, status, tierName } = pendingSub[0];
+    const { durationInMonths, id, planName, status } = pendingSub[0];
     const identifier = status === 'Pending' ? undefined : id;
     const response = await checkPendingCryptoPayment(identifier);
 
@@ -42,7 +42,7 @@ export default defineNuxtRouteMiddleware(async () => {
         currency: currency ?? '',
         discountCode: discount?.codeName ?? '',
         period: durationInMonths === 1 ? PricingPeriod.MONTHLY : PricingPeriod.YEARLY,
-        plan: tierName,
+        plan: planName,
       };
       if (identifier)
         queryParams.id = identifier.toString();

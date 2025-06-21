@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { PreTierSubscription } from '~/types';
+import type { UserSubscription } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
-const modelValue = defineModel<PreTierSubscription | undefined>({ required: true });
+const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 
 const emit = defineEmits<{
-  confirm: [val: PreTierSubscription];
+  confirm: [val: UserSubscription];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });

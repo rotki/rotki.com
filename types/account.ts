@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Address, PreTierSubscription } from '~/types/index';
+import { Address } from '~/types/index';
 import { DiscountType } from '~/types/payment';
 
 export interface PasswordChangePayload {
@@ -48,17 +48,17 @@ export type UserDevices = z.infer<typeof UserDevices>;
 export const UserPayment = z.object({
   discount: z.object({
     amount: z.number().positive(),
-    discountType: z.nativeEnum(DiscountType),
-  }).nullable(),
+    type: z.nativeEnum(DiscountType),
+  }).optional(),
   durationInMonths: z.number().int().positive(),
-  finalPrice: z.number().positive(),
+  eurAmount: z.number().positive(),
   identifier: z.string().min(1),
   isRefund: z.boolean().optional().default(false),
   legacy: z.boolean(),
-  paidAt: z.string(),
+  paidAt: z.string().datetime({ offset: true }),
   paidUsing: z.string(),
   plan: z.string(),
-  priceBeforeDiscount: z.number().positive(),
+  priceBeforeDiscount: z.number().positive().optional(),
 });
 
 export type UserPayment = z.infer<typeof UserPayment>;
@@ -66,17 +66,6 @@ export type UserPayment = z.infer<typeof UserPayment>;
 export const UserPayments = z.array(UserPayment);
 
 export type UserPayments = z.infer<typeof UserPayments>;
-
-export const PreTierPayment = z.object({
-  eurAmount: z.string(),
-  identifier: z.string().min(1),
-  isRefund: z.boolean().optional().default(false),
-  paidAt: z.string(),
-  paidUsing: z.string(),
-  plan: z.string(),
-});
-
-export type PreTierPayment = z.infer<typeof PreTierPayment>;
 
 export const Account = z.object({
   address: Address,
@@ -87,8 +76,6 @@ export const Account = z.object({
   email: z.string().min(1),
   emailConfirmed: z.boolean(),
   hasActiveSubscription: z.boolean(),
-  payments: z.array(PreTierPayment),
-  subscriptions: z.array(PreTierSubscription),
   username: z.string().min(1),
   vat: z.number(),
   vatIdStatus: z.string(),
