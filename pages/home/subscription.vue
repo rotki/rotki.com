@@ -4,11 +4,12 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
 const store = useMainStore();
-const { account, subscriptions } = storeToRefs(store);
+const { account, userSubscriptions } = storeToRefs(store);
+const { refreshUserData } = store;
 
 const premium = computed(() => get(account)?.canUsePremium ?? false);
 const emailConfirmed = computed(() => get(account)?.emailConfirmed ?? false);
-const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
+const pending = computed(() => get(userSubscriptions).filter(sub => sub.pending));
 
 const canUsePremium = computed(() => {
   const arePending = get(pending);
@@ -20,7 +21,9 @@ definePageMeta({
   middleware: ['maintenance', 'authentication'],
 });
 
-onMounted(() => store.getAccount());
+onBeforeMount(() => {
+  refreshUserData();
+});
 </script>
 
 <template>
@@ -30,5 +33,6 @@ onMounted(() => store.getAccount());
     <ApiKeys v-if="premium" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable />
+    <UserDevicesTable />
   </div>
 </template>

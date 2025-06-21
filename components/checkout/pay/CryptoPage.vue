@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set } from '@vueuse/core';
+import { useSelectedPlan } from '~/composables/use-selected-plan';
 import { useMainStore } from '~/store';
+import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
@@ -13,18 +15,18 @@ const data = ref<CryptoPayment>();
 const error = ref<string>('');
 const paymentState = ref<StepType | IdleStep>('idle');
 
-const {
-  cryptoPayment,
-  switchCryptoPlan,
-  deletePendingPayment,
-  subscriptions,
-  getAccount,
-} = useMainStore();
+const store = useMainStore();
+const { refreshUserData } = store;
+const { userSubscriptions } = storeToRefs(store);
 
-const { plan } = usePlanParams();
+const { cryptoPayment, switchCryptoPlan, deletePendingCryptoPayment } = usePaymentCryptoStore();
+
 const { currency } = useCurrencyParams();
 const { subscriptionId } = useSubscriptionIdParam();
-const route = useRoute();
+const { discountCode } = useDiscountCodeParams();
+
+const { selectedPlan } = useSelectedPlan();
+const { planParams } = usePlanParams();
 
 const step = computed<PaymentStep>(() => {
   const message = get(error);
@@ -51,35 +53,36 @@ const step = computed<PaymentStep>(() => {
 });
 
 const currentCryptoSubscriptionId = computed(() => {
-  const subs = get(subscriptions).filter(sub => sub.pending);
+  const subs = get(userSubscriptions).filter(sub => sub.pending);
 
   if (subs.length > 1)
-    return subs.find(sub => sub.status === 'Active')?.identifier;
+    return subs.find(sub => sub.status === 'Active')?.id;
 
   return undefined;
 });
 
-function back() {
-  const { plan, id } = route.query;
-  const subId = id ?? get(currentCryptoSubscriptionId);
+const usedSubscriptionId = computed(() => get(subscriptionId) ?? get(currentCryptoSubscriptionId));
 
-  const name = subId
+function back() {
+  const id = get(usedSubscriptionId);
+
+  const name = id
     ? 'checkout-pay-request-crypto'
     : 'checkout-pay-method';
 
   navigateTo({
     name,
     query: {
-      plan,
+      ...get(planParams),
       method: PaymentMethod.BLOCKCHAIN,
-      id: subId,
+      id,
     },
   });
 }
 
 async function changePaymentMethod() {
   set(loading, true);
-  const response = await deletePendingPayment();
+  const response = await deletePendingCryptoPayment();
 
   if (!response.isError) {
     back();
@@ -90,14 +93,20 @@ async function changePaymentMethod() {
   }
 }
 
-watch(plan, async (plan) => {
+watch([selectedPlan, discountCode], async ([plan, discountCode]) => {
+  if (!plan) {
+    return;
+  }
+
   const selectedCurrency = get(currency);
   assert(selectedCurrency);
   set(loading, true);
+
   const response = await switchCryptoPlan(
     plan,
     selectedCurrency,
-    get(subscriptionId) ?? get(currentCryptoSubscriptionId),
+    get(usedSubscriptionId),
+    discountCode,
   );
   if (!response.isError)
     set(data, response.result);
@@ -108,13 +117,19 @@ watch(plan, async (plan) => {
 });
 
 onMounted(async () => {
-  const selectedPlan = get(plan);
+  const selectedPlanVal = get(selectedPlan);
   const selectedCurrency = get(currency);
-  if (selectedPlan && selectedCurrency) {
+
+  if (selectedPlanVal && selectedCurrency) {
     set(loading, true);
-    const subId = get(subscriptionId);
-    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
-    await getAccount();
+    const result = await cryptoPayment(
+      selectedPlanVal,
+      selectedCurrency,
+      get(usedSubscriptionId),
+      get(discountCode),
+    );
+
+    await refreshUserData();
     if (result.isError) {
       if (result.code === PaymentError.UNVERIFIED)
         set(error, t('subscription.error.unverified_email'));
@@ -156,13 +171,14 @@ onMounted(async () => {
         />
       </div>
       <CryptoPaymentForm
-        v-else-if="data && plan"
+        v-else-if="data && selectedPlan"
         v-bind="{ success, failure, status, pending }"
         v-model:error="error"
         v-model:state="paymentState"
         :data="data"
         :loading="loading"
-        :plan="plan"
+        :plan="selectedPlan"
+        :discount-code="discountCode"
         @change="changePaymentMethod()"
       />
 
