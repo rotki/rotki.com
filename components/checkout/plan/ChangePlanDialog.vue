@@ -93,9 +93,9 @@ onBeforeMount(async () => {
         />
         <div class="flex flex-col gap-4 py-4">
           <SelectablePlan
-            class="hover:bg-rui-grey-100 transition-all"
             v-for="plan in availablePlans"
             :key="plan.subscriptionTierId"
+            class="hover:bg-rui-grey-100 transition-all"
             :plan="plan"
             readonly
             :disabled="warning && !confirmed"
