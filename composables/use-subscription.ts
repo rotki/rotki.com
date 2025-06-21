@@ -1,35 +1,31 @@
-import { get, set } from '@vueuse/core';
+import { set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
-import { ActionResultResponse, type PreTierSubscription } from '~/types';
-import { assert } from '~/utils/assert';
+import { ActionResultResponse, type UserSubscription } from '~/types';
 
 interface UseSubscriptionReturn {
-  cancelUserSubscription: (subscription: PreTierSubscription) => Promise<void>;
-  resumeUserSubscription: (identifier: string) => Promise<void>;
+  cancelUserSubscription: (sub: UserSubscription) => Promise<void>;
+  resumeUserSubscription: (sub: UserSubscription) => Promise<void>;
 }
 
 export function useSubscription(): UseSubscriptionReturn {
   const store = useMainStore();
-  const { account, cancellationError, resumeError } = storeToRefs(store);
-  const { getAccount } = store;
+  const { cancellationError, resumeError } = storeToRefs(store);
+  const { getSubscriptions } = store;
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  const resumeUserSubscription = async (identifier: string) => {
-    const acc = get(account);
-    assert(acc);
-
+  const resumeUserSubscription = async (sub: UserSubscription) => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        `/webapi/subscription/${identifier}/resume/`,
+        `/webapi/subscription/${sub.id}/resume/`,
         {
           method: 'PATCH',
         },
       );
       const data = ActionResultResponse.parse(response);
       if (data.result)
-        await getAccount();
+        await getSubscriptions();
     }
     catch (error: any) {
       let message = error.message;
@@ -41,20 +37,17 @@ export function useSubscription(): UseSubscriptionReturn {
     }
   };
 
-  const cancelUserSubscription = async (subscription: PreTierSubscription): Promise<void> => {
-    const acc = get(account);
-    assert(acc);
-
+  const cancelUserSubscription = async (sub: UserSubscription): Promise<void> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        `/webapi/subscription/${subscription.identifier}/`,
+        `/webapi/subscription/${sub.id}/`,
         {
           method: 'DELETE',
         },
       );
       const data = ActionResultResponse.parse(response);
       if (data.result)
-        await getAccount();
+        await getSubscriptions();
     }
     catch (error: any) {
       let message = error.message;

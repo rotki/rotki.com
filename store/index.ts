@@ -10,7 +10,6 @@ import {
   ApiKeys,
   type ApiResponse,
   ChangePasswordResponse,
-  type PreTierSubscription,
   ResendVerificationResponse,
   UpdateProfileResponse,
   UserSubscriptions,
@@ -58,7 +57,7 @@ export const useMainStore = defineStore('main', () => {
   const getSubscriptions = async (): Promise<void> => {
     try {
       const response = await fetchWithCsrf<ApiResponse<Account>>(
-        '/webapi/2/user/subscriptions',
+        '/webapi/2/history/subscriptions',
         {
           method: 'GET',
         },
@@ -305,14 +304,6 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
-  const subscriptions = computed<PreTierSubscription[]>(() => {
-    const userAccount = get(account);
-    if (!userAccount)
-      return [];
-
-    return userAccount.subscriptions;
-  });
-
   const { start: startCountdown, stop: stopCountdown } = useTimeoutFn(
     async () => {
       logger.debug('session expired, logging out');
@@ -366,7 +357,6 @@ export const useMainStore = defineStore('main', () => {
     refreshUserData,
     resendVerificationCode,
     resumeError,
-    subscriptions,
     updateKeys,
     updateProfile,
     userPayments,
