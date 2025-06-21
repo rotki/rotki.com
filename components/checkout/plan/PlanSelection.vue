@@ -17,7 +17,7 @@ const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || Pricing
 
 const processing = ref<boolean>(false);
 
-const { account } = storeToRefs(useMainStore());
+const { account, userSubscriptions } = storeToRefs(useMainStore());
 const { availablePlans } = storeToRefs(useTiersStore());
 
 function isSelected(plan: AvailablePlan) {
@@ -45,7 +45,7 @@ function next() {
   });
 }
 
-const canBuy = reactify(canBuyNewSubscription)(account);
+const canBuy = reactify(canBuyNewSubscription)(account, userSubscriptions);
 
 const notes = computed(() => [
   t('home.plans.tiers.step_1.notes.line_1'),

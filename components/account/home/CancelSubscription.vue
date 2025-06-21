@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { PreTierSubscription } from '~/types';
+import type { UserSubscription } from '~/types';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
 const props = defineProps<{
-  subscription?: PreTierSubscription;
+  subscription?: UserSubscription;
   modelValue: boolean;
 }>();
 
 const emit = defineEmits<{
   (event: 'update:model-value', value: boolean): void;
   (event: 'clear:errors'): void;
-  (event: 'cancel', val: PreTierSubscription): void;
+  (event: 'cancel', val: UserSubscription): void;
 }>();
 
 const { subscription } = toRefs(props);
