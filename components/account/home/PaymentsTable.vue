@@ -7,6 +7,7 @@ import type {
 import type { UserPayment } from '~/types/account';
 import { useMainStore } from '~/store';
 import { DiscountType } from '~/types/payment';
+import { formatDate } from '~/utils/date';
 import { toTitleCase } from '~/utils/text';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -19,8 +20,8 @@ const headers: DataTableColumn<UserPayment>[] = [
   },
   {
     label: t('common.plan'),
-    key: 'name',
-    cellClass: 'font-bold',
+    key: 'plan',
+    cellClass: 'font-bold uppercase',
     class: '[&_button]:capitalize',
     sortable: true,
   },
@@ -75,13 +76,16 @@ const sort = ref<DataTableSortColumn<UserPayment>[]>([
       :rows="userPayments"
       outlined
     >
+      <template #item.plan="{ row }">
+        {{ row.legacy ? '-' : row.plan }}
+      </template>
       <template #item.paidAt="{ row }">
-        {{ row.paidAt }}
+        {{ formatDate(row.paidAt) }}
       </template>
       <template #item.finalPrice="{ row }">
         <div class="flex items-center justify-end gap-2">
           <RuiTooltip
-            v-if="row.discount"
+            v-if="row.discount && row.priceBeforeDiscount"
             :open-delay="200"
           >
             <template #activator>
@@ -107,8 +111,8 @@ const sort = ref<DataTableSortColumn<UserPayment>[]>([
             >
               <template #amount>
                 <div class="inline-flex gap-1">
-                  <b>{{ row.priceBeforeDiscount - row.finalPrice }}</b>
-                  <template v-if="row.discount.discountType === DiscountType.PERCENTAGE">
+                  <b>{{ row.priceBeforeDiscount - row.eurAmount }}</b>
+                  <template v-if="row.discount.type === DiscountType.PERCENTAGE">
                     {{
                       t('home.plans.tiers.step_3.discount.percent_off', {
                         percentage: row.discount.amount,
@@ -119,7 +123,7 @@ const sort = ref<DataTableSortColumn<UserPayment>[]>([
               </template>
             </i18n-t>
           </RuiTooltip>
-          € {{ row.finalPrice }}
+          € {{ row.eurAmount }}
         </div>
       </template>
       <template #item.paidUsing="{ row }">

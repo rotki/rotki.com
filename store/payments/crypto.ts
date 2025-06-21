@@ -157,7 +157,7 @@ export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
   };
 
   const checkPendingCryptoPayment = async (
-    subscriptionId?: number,
+    subscriptionId?: string,
   ): Promise<Result<PendingCryptoPayment>> => {
     try {
       const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(

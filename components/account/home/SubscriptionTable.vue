@@ -6,26 +6,28 @@ import type {
   TablePaginationData,
 } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
-import type { PendingTx, PreTierSubscription } from '~/types';
+import type { PendingTx, UserSubscription } from '~/types';
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { PaymentMethod } from '~/types/payment';
+import { formatDate } from '~/utils/date';
+import { getPlanNameFor } from '~/utils/plans';
 
 const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<PreTierSubscription>[]>([]);
-const selectedSubscription = ref<PreTierSubscription>();
+const sort = ref<DataTableSortColumn<UserSubscription>[]>([]);
+const selectedSubscription = ref<UserSubscription>();
 const showCancelDialog = ref<boolean>(false);
 const cancelling = ref<boolean>(false);
 const resuming = ref<boolean>(false);
-const resumingSubscription = ref<PreTierSubscription>();
+const resumingSubscription = ref<UserSubscription>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { getSubscriptions } = store;
-const { subscriptions } = storeToRefs(store);
+const { userSubscriptions } = storeToRefs(store);
 
 const { checkPendingCryptoPayment } = usePaymentCryptoStore();
 
@@ -36,7 +38,7 @@ const { pause, resume, isActive } = useIntervalFn(
   60000,
 );
 
-const headers: DataTableColumn<PreTierSubscription>[] = [
+const headers: DataTableColumn<UserSubscription>[] = [
   {
     label: t('common.plan'),
     key: 'planName',
@@ -70,10 +72,10 @@ const headers: DataTableColumn<PreTierSubscription>[] = [
   },
 ];
 
-const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
+const pending = computed(() => get(userSubscriptions).filter(sub => sub.pending));
 
 const renewableSubscriptions = computed(() =>
-  get(subscriptions).filter(({ actions }) => actions.includes('renew')),
+  get(userSubscriptions).filter(({ actions }) => actions.includes('renew')),
 );
 
 const pendingPaymentCurrency = computedAsync(async () => {
@@ -81,7 +83,7 @@ const pendingPaymentCurrency = computedAsync(async () => {
   if (subs.length === 0)
     return undefined;
 
-  const response = await checkPendingCryptoPayment(subs[0].identifier);
+  const response = await checkPendingCryptoPayment(subs[0].id);
 
   if (response.isError || !response.result.pending)
     return undefined;
@@ -101,7 +103,7 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
     const sub = subs[0];
     link.query = {
       plan: sub.durationInMonths.toString(),
-      id: sub.identifier,
+      id: sub.id,
       method: PaymentMethod.BLOCKCHAIN,
     };
   }
@@ -119,17 +121,17 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
 
 const pendingPaymentLink: RouteLocationRaw = { path: '/checkout/pay/method' };
 
-function isPending(sub: PreTierSubscription) {
+function isPending(sub: UserSubscription) {
   return sub.status === 'Pending';
 }
 
-async function resumeSubscription(sub: PreTierSubscription): Promise<void> {
+async function resumeSubscription(sub: UserSubscription): Promise<void> {
   set(resuming, true);
-  await resumeUserSubscription(sub.identifier);
+  await resumeUserSubscription(sub);
   set(resuming, false);
 }
 
-function hasAction(sub: PreTierSubscription, action: 'renew' | 'cancel') {
+function hasAction(sub: UserSubscription, action: 'renew' | 'cancel') {
   if (action === 'cancel')
     return sub.status !== 'Pending' && sub.actions.includes('cancel');
   else if (action === 'renew')
@@ -138,7 +140,7 @@ function hasAction(sub: PreTierSubscription, action: 'renew' | 'cancel') {
   return false;
 }
 
-function displayActions(sub: PreTierSubscription) {
+function displayActions(sub: UserSubscription) {
   return hasAction(sub, 'renew')
     || hasAction(sub, 'cancel')
     || isPending(sub)
@@ -157,12 +159,12 @@ function getChipStatusColor(status: string): ContextColorsType | undefined {
   return map[status];
 }
 
-function confirmCancel(sub: PreTierSubscription) {
+function confirmCancel(sub: UserSubscription) {
   set(selectedSubscription, sub);
   set(showCancelDialog, true);
 }
 
-async function cancelSubscription(sub: PreTierSubscription) {
+async function cancelSubscription(sub: UserSubscription) {
   set(showCancelDialog, false);
   set(cancelling, true);
   await cancelUserSubscription(sub);
@@ -195,13 +197,19 @@ onUnmounted(() => pause());
       v-model:pagination="pagination"
       v-model:sort="sort"
       :cols="headers"
-      :rows="subscriptions"
+      :rows="userSubscriptions"
       :empty="{
         description: t('account.subscriptions.no_subscriptions_found'),
       }"
-      row-attr="identifier"
+      row-attr="id"
       outlined
     >
+      <template #item.planName="{ row }">
+        {{ row.isLegacy ? row.planName : getPlanNameFor({ name: row.planName, durationInMonths: row.durationInMonths }) }}
+      </template>
+      <template #item.createdDate="{ row }">
+        {{ formatDate(row.createdDate) }}
+      </template>
       <template #item.status="{ row }">
         <RuiChip
           size="sm"
@@ -223,7 +231,7 @@ onUnmounted(() => pause());
           <template v-else>
             {{ row.status }}
             <RuiProgress
-              v-if="isPending(row) && pendingTx && row.identifier === pendingTx.subscriptionId"
+              v-if="isPending(row) && pendingTx && row.id === pendingTx.subscriptionId"
               thickness="2"
               variant="indeterminate"
             />
@@ -254,7 +262,7 @@ onUnmounted(() => pause());
           >
             {{ t('actions.renew') }}
           </ButtonLink>
-          <RuiTooltip v-if="pendingTx && row.identifier === pendingTx.subscriptionId">
+          <RuiTooltip v-if="pendingTx && row.id === pendingTx.subscriptionId">
             <template #activator>
               <ButtonLink
                 external
