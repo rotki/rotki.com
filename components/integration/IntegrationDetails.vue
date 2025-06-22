@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import { useIntegrationsData } from '~/composables/integrations';
 
 enum TabCategory {
@@ -13,6 +13,18 @@ const searchDebounced = refDebounced(search, 200);
 const tab = ref<TabCategory>(TabCategory.ALL);
 
 const { t } = useI18n();
+
+const router = useRouter();
+const route = useRoute();
+
+// Set initial tab based on URL hash
+onMounted(() => {
+  const hash = get(route).hash?.replace('#', '') as TabCategory;
+  if (hash && Object.values(TabCategory).includes(hash)) {
+    set(tab, hash);
+    router.replace({ hash: '' });
+  }
+});
 
 const tabCategoriesLabel = computed(() => ({
   [TabCategory.ALL]: t('integration.tabs.all'),
