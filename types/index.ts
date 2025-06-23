@@ -46,24 +46,9 @@ const SubscriptionStatus = z.enum([
   'Past Due',
 ] as const);
 
-export const PreTierSubscription = z.object({
-  actions: StringArray,
-  createdDate: z.string().datetime({ offset: true }),
-  durationInMonths: z.number().nonnegative(),
-  identifier: z.string().min(1),
-  isSoftCanceled: z.boolean().default(false),
-  nextActionDate: z.string(),
-  nextBillingAmount: z.string(),
-  pending: z.boolean().default(false),
-  planName: z.string(),
-  status: SubscriptionStatus,
-});
-
-export type PreTierSubscription = z.infer<typeof PreTierSubscription>;
-
 export const UserSubscription = z.object({
   actions: StringArray,
-  createdDate: z.string(),
+  createdDate: z.string().datetime({ offset: true }),
   durationInMonths: z.number().nonnegative(),
   id: z.number().or(z.string()).transform(String),
   isActive: z.boolean(),
