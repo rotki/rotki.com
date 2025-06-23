@@ -201,14 +201,7 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <div class="my-6 grow flex flex-col">
-    <div
-      id="paypal-button"
-      :class="[
-        $style.buttons,
-        { [$style.buttons__disabled]: !accepted || processing },
-      ]"
-    />
+  <div class="mb-6 grow flex flex-col">
     <SelectedPlanOverview
       :plan="plan"
       :next-payment="nextPayment"
@@ -227,7 +220,14 @@ onUnmounted(async () => {
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"
-      :class="$style.policy"
+      class="my-8"
+    />
+    <div
+      id="paypal-button"
+      class="mb-8"
+      :class="[
+        { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
+      ]"
     />
     <div
       v-if="pending"
@@ -240,7 +240,7 @@ onUnmounted(async () => {
         <span>{{ status?.message }}</span>
       </RuiAlert>
     </div>
-    <div :class="$style.button">
+    <div class="flex gap-4 justify-center w-full mt-auto">
       <RuiButton
         :disabled="processing"
         :loading="pending || initializing"
@@ -248,6 +248,12 @@ onUnmounted(async () => {
         size="lg"
         @click="back()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
     </div>
@@ -271,19 +277,3 @@ onUnmounted(async () => {
     {{ error?.message }}
   </FloatingNotification>
 </template>
-
-<style lang="scss" module>
-.policy {
-  @apply my-8;
-}
-
-.buttons {
-  &__disabled {
-    @apply opacity-50 cursor-not-allowed pointer-events-none;
-  }
-}
-
-.button {
-  @apply flex gap-4 justify-center w-full mt-auto;
-}
-</style>
