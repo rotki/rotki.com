@@ -3,6 +3,7 @@ import type { UserSubscription } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { formatDate } from '~/utils/date';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 
@@ -87,7 +88,7 @@ async function resumeSubscription() {
                 class="font-medium"
               >
                 <template #date>
-                  <span class="font-normal">{{ modelValue.nextActionDate }}</span>
+                  <span class="font-normal">{{ formatDate(modelValue.nextActionDate) }}</span>
                 </template>
               </i18n-t>
             </li>
@@ -108,7 +109,7 @@ async function resumeSubscription() {
         </RuiButton>
 
         <RuiButton
-          color="info"
+          color="primary"
           @click="resumeSubscription()"
         >
           {{ t('account.subscriptions.resume.actions.yes') }}
