@@ -191,6 +191,12 @@ onMounted(async () => {
           size="lg"
           @click="back()"
         >
+          <template #prepend>
+            <RuiIcon
+              name="lu-arrow-left"
+              size="16"
+            />
+          </template>
           {{ t('actions.back') }}
         </RuiButton>
       </div>

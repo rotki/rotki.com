@@ -210,6 +210,9 @@ onUnmounted(() => pause());
       <template #item.createdDate="{ row }">
         {{ formatDate(row.createdDate) }}
       </template>
+      <template #item.nextActionDate="{ row }">
+        {{ formatDate(row.nextActionDate) }}
+      </template>
       <template #item.status="{ row }">
         <RuiChip
           size="sm"
@@ -223,10 +226,10 @@ onUnmounted(() => pause());
                   class="text-white"
                   name="lu-info"
                 />
-                {{ t('account.subscriptions.cancelled_but_still_active.status', { date: row.nextActionDate }) }}
+                {{ t('account.subscriptions.cancelled_but_still_active.status', { date: formatDate(row.nextActionDate) }) }}
               </div>
             </template>
-            {{ t('account.subscriptions.cancelled_but_still_active.description', { date: row.nextActionDate }) }}
+            {{ t('account.subscriptions.cancelled_but_still_active.description', { date: formatDate(row.nextActionDate) }) }}
           </RuiTooltip>
           <template v-else>
             {{ row.status }}
@@ -262,7 +265,10 @@ onUnmounted(() => pause());
           >
             {{ t('actions.renew') }}
           </ButtonLink>
-          <RuiTooltip v-if="pendingTx && row.id === pendingTx.subscriptionId">
+          <RuiTooltip
+            v-if="pendingTx && row.id === pendingTx.subscriptionId"
+            tooltip-class="w-48"
+          >
             <template #activator>
               <ButtonLink
                 external
