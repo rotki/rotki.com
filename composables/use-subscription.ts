@@ -17,7 +17,7 @@ export function useSubscription(): UseSubscriptionReturn {
   const resumeUserSubscription = async (sub: UserSubscription) => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        `/webapi/subscription/${sub.id}/resume/`,
+        `/webapi/2/subscriptions/${sub.id}/resume/`,
         {
           method: 'PATCH',
         },
@@ -39,7 +39,7 @@ export function useSubscription(): UseSubscriptionReturn {
   const cancelUserSubscription = async (sub: UserSubscription): Promise<void> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        `/webapi/subscription/${sub.id}/`,
+        `/webapi/2/subscriptions/${sub.id}/`,
         {
           method: 'DELETE',
         },

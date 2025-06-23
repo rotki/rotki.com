@@ -3,6 +3,7 @@ import type { UserSubscription } from '~/types';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { formatDate } from '~/utils/date';
 
 const props = defineProps<{
   subscription?: UserSubscription;
@@ -75,27 +76,31 @@ const { t } = useI18n({ useScope: 'global' });
           </template>
 
           <template #subscription_status>
-            <span v-if="!isPending">
-              {{
-                t(
-                  'account.subscriptions.cancellation.subscription_status.normal',
-                  {
-                    start_date: subscription?.createdDate ?? '',
-                    end_date: subscription?.nextActionDate ?? '',
-                  },
-                )
-              }}
-            </span>
-            <span v-else>
-              {{
-                t(
-                  'account.subscriptions.cancellation.subscription_status.pending',
-                  {
-                    start_date: subscription?.createdDate ?? '',
-                  },
-                )
-              }}
-            </span>
+            <i18n-t
+              v-if="!isPending"
+              keypath="account.subscriptions.cancellation.subscription_status.normal"
+            >
+              <template #start_date>
+                <strong>
+                  {{ formatDate(subscription?.createdDate) }}
+                </strong>
+              </template>
+              <template #end_date>
+                <strong>
+                  {{ formatDate(subscription?.nextActionDate) }}
+                </strong>
+              </template>
+            </i18n-t>
+            <i18n-t
+              v-else
+              keypath="account.subscriptions.cancellation.subscription_status.pending"
+            >
+              <template #start_date>
+                <strong>
+                  {{ formatDate(subscription?.createdDate) }}
+                </strong>
+              </template>
+            </i18n-t>
           </template>
         </i18n-t>
       </div>
