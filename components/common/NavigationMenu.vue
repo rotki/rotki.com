@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ButtonProps } from '@rotki/ui-library';
+
 const { t } = useI18n({ useScope: 'global' });
 
 interface Menu {
@@ -8,6 +10,7 @@ interface Menu {
   highlightExactActive?: true;
   highlightActive?: true;
   external?: true;
+  buttonProps?: ButtonProps;
 }
 
 interface MenuParent {
@@ -52,11 +55,6 @@ const menus: (Menu | MenuParent)[] = [
     highlightExactActive: true,
   },
   {
-    label: t('navigation_menu.sponsor'),
-    to: '/sponsor/sponsor',
-    highlightExactActive: true,
-  },
-  {
     label: t('navigation_menu.resources'),
     children: [
       {
@@ -73,7 +71,15 @@ const menus: (Menu | MenuParent)[] = [
       },
     ],
   },
-
+  {
+    label: t('navigation_menu.sponsor'),
+    to: '/sponsor/sponsor',
+    highlightExactActive: true,
+    buttonProps: {
+      color: 'primary',
+      variant: 'outlined',
+    },
+  },
 ];
 
 const { isMdAndDown } = useBreakpoint();
@@ -92,6 +98,7 @@ const { isMdAndDown } = useBreakpoint();
         :highlight-exact-active="menu.highlightExactActive"
         :external="menu.external"
         :to="menu.to"
+        v-bind="menu.buttonProps"
       >
         {{ menu.label }}
         <template

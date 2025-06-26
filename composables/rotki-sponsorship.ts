@@ -4,9 +4,13 @@ import { Contract, ethers, type TransactionResponse } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
 const CONTRACT_ADDRESS = '0x281986c18a5680C149b95Fc15aa266b633B60e96';
+const USDC_CONTRACT_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';
 const CHAIN_ID = 11155111; // Sepolia testnet
 const RPC_URL = 'https://sepolia.gateway.tenderly.co';
 const IPFS_URL = 'https://gateway.pinata.cloud/ipfs/';
+
+// Currency symbols (keccak256 hashes)
+const USDC_SYMBOL = '0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa';
 
 const ROTKI_SPONSORSHIP_ABI = [
   'function tokenURI(uint256 tokenId) external view returns (string memory)',
@@ -15,6 +19,13 @@ const ROTKI_SPONSORSHIP_ABI = [
   'function currentReleaseId() external view returns (uint256)',
   'function ETH() external view returns (bytes32)',
   'function mint(uint256 tierId, bytes32 currencySymbol) external payable',
+];
+
+const ERC20_ABI = [
+  'function decimals() view returns (uint8)',
+  'function balanceOf(address) view returns (uint256)',
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function approve(address spender, uint256 amount) returns (bool)',
 ];
 
 export interface SponsorshipTier {
@@ -40,6 +51,19 @@ export interface TierBenefits {
   benefits: string;
 }
 
+export interface CurrencyOption {
+  key: string;
+  label: string;
+  symbol: string;
+  decimals: number;
+  contractAddress?: string;
+}
+
+export const CURRENCY_OPTIONS: CurrencyOption[] = [
+  { decimals: 18, key: 'ETH', label: 'ETH', symbol: 'ETH' },
+  { contractAddress: USDC_CONTRACT_ADDRESS, decimals: 6, key: 'USDC', label: 'USDC', symbol: 'USDC' },
+];
+
 export interface SponsorshipState {
   status: 'idle' | 'pending' | 'success' | 'error';
   txHash?: string;
@@ -48,7 +72,8 @@ export interface SponsorshipState {
 
 export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
   const sponsorshipState = ref<SponsorshipState>({ status: 'idle' });
-  const tierPrices = ref<Record<string, string>>({});
+  const selectedCurrency = ref<string>('ETH');
+  const tierPrices = ref<Record<string, Record<string, string>>>({});
   const tierSupply = ref<Record<string, TierSupply>>({});
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});
@@ -111,16 +136,19 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
 
   async function fetchTierPrices() {
     try {
-      const prices: Record<string, string> = {};
+      const prices: Record<string, Record<string, string>> = {};
       const provider = new ethers.JsonRpcProvider(RPC_URL);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
       const ethSymbol = await contract.ETH();
 
       for (const tier of SPONSORSHIP_TIERS) {
-        const price = await contract.getPrice(tier.tierId, ethSymbol);
-        prices[tier.key] = ethers.formatEther(price);
+        const ethPrice = await contract.getPrice(tier.tierId, ethSymbol);
+        const usdcPrice = await contract.getPrice(tier.tierId, USDC_SYMBOL);
+        prices[tier.key] = {
+          ETH: ethers.formatEther(ethPrice),
+          USDC: ethers.formatUnits(usdcPrice, 6),
+        };
       }
-
       set(tierPrices, prices);
     }
     catch (error_) {
@@ -182,28 +210,18 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
   async function loadNFTImages() {
     set(isLoading, true);
     set(error, null);
-
     try {
       const images: Record<string, string> = {};
       const supplies: Record<string, TierSupply> = {};
       const benefits: Record<string, TierBenefits> = {};
-
       for (const tier of SPONSORSHIP_TIERS) {
         const tierInfo = await fetchTierInfo(tier.tierId, tier.key);
         if (tierInfo) {
           images[tier.key] = tierInfo.imageUrl;
-          supplies[tier.key] = {
-            currentSupply: tierInfo.currentSupply,
-            maxSupply: tierInfo.maxSupply,
-            metadataURI: tierInfo.metadataURI,
-          };
-          benefits[tier.key] = {
-            benefits: tierInfo.benefits,
-            description: tierInfo.description,
-          };
+          supplies[tier.key] = { currentSupply: tierInfo.currentSupply, maxSupply: tierInfo.maxSupply, metadataURI: tierInfo.metadataURI };
+          benefits[tier.key] = { benefits: tierInfo.benefits, description: tierInfo.description };
         }
       }
-
       set(nftImages, images);
       set(tierSupply, supplies);
       set(tierBenefits, benefits);
@@ -217,7 +235,24 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     }
   }
 
-  async function mintSponsorshipNFT(tierId: number): Promise<void> {
+  async function approveUSDC(amount: string): Promise<TransactionResponse> {
+    const signer = await getSigner();
+    const usdcContract = new Contract(USDC_CONTRACT_ADDRESS, ERC20_ABI, signer);
+
+    const amountBN = ethers.parseUnits(amount, 6); // USDC has 6 decimals
+    return usdcContract.approve(CONTRACT_ADDRESS, amountBN);
+  }
+
+  async function checkUSDCAllowance(): Promise<string> {
+    const signer = await getSigner();
+    const userAddress = await signer.getAddress();
+    const usdcContract = new Contract(USDC_CONTRACT_ADDRESS, ERC20_ABI, signer);
+
+    const allowance = await usdcContract.allowance(userAddress, CONTRACT_ADDRESS);
+    return ethers.formatUnits(allowance, 6);
+  }
+
+  async function mintSponsorshipNFT(tierId: number, currency = 'ETH'): Promise<void> {
     if (get(sponsorshipState).status === 'pending') {
       throw new Error('Minting already in progress');
     }
@@ -232,11 +267,12 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
       const prices = get(tierPrices);
       const supplies = get(tierSupply);
       const tierKey = tierId === 0 ? 'bronze' : tierId === 1 ? 'silver' : 'gold';
-      const price = prices[tierKey];
+      const tierPricesForTier = prices[tierKey];
+      const price = tierPricesForTier?.[currency];
       const supply = supplies[tierKey];
 
       if (!price) {
-        throw new Error('Price not available for this tier');
+        throw new Error(`Price not available for this tier in ${currency}`);
       }
 
       if (!supply) {
@@ -251,12 +287,29 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
       const signer = await getSigner();
       const contract = new Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, signer);
 
-      // Get the ETH symbol from the contract
-      const ethSymbol = await contract.ETH();
+      let tx: TransactionResponse;
 
-      const tx: TransactionResponse = await contract.mint(tierId, ethSymbol, {
-        value: ethers.parseEther(price),
-      });
+      if (currency === 'ETH') {
+        // ETH payment
+        const ethSymbol = await contract.ETH();
+        tx = await contract.mint(tierId, ethSymbol, {
+          value: ethers.parseEther(price),
+        });
+      }
+      else if (currency === 'USDC') {
+        // USDC payment - check approval first
+        const allowance = await checkUSDCAllowance();
+        if (parseFloat(allowance) < parseFloat(price)) {
+          throw new Error(`Insufficient USDC allowance. Please approve ${price} USDC first.`);
+        }
+
+        tx = await contract.mint(tierId, USDC_SYMBOL, {
+          value: 0, // No ETH for token payments
+        });
+      }
+      else {
+        throw new Error(`Unsupported currency: ${currency}`);
+      }
 
       set(sponsorshipState, {
         status: 'pending',
@@ -297,20 +350,16 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
       const supplies: Record<string, TierSupply> = {};
       const provider = new ethers.JsonRpcProvider(RPC_URL);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
-
-      // Get current release ID from contract
       const releaseId = await contract.currentReleaseId();
 
       for (const tier of SPONSORSHIP_TIERS) {
         const [maxSupply, currentSupply, metadataURI] = await contract.getTierInfo(releaseId, tier.tierId);
-
         supplies[tier.key] = {
           currentSupply: Number(currentSupply),
           maxSupply: Number(maxSupply),
           metadataURI,
         };
       }
-
       set(tierSupply, supplies);
     }
     catch (error_) {
@@ -318,18 +367,14 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     }
   }
 
-  function resetSponsorshipState(): void {
-    set(sponsorshipState, { status: 'idle' });
-  }
-
   return {
     // Connection state and methods
     ...connectionMethods,
+    approveUSDC,
     blockExplorerUrl,
+    checkUSDCAllowance,
     connected,
-
     error: readonly(error),
-    // Methods
     fetchTierPrices,
     isExpectedChain,
     isLoading: readonly(isLoading),
@@ -337,9 +382,7 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     loadNFTImages,
     mintSponsorshipNFT,
     nftImages: readonly(nftImages),
-
-    resetSponsorshipState,
-    // Sponsorship specific state
+    selectedCurrency,
     sponsorshipState: readonly(sponsorshipState),
     tierBenefits: readonly(tierBenefits),
     tierPrices: readonly(tierPrices),
