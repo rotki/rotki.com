@@ -19,7 +19,7 @@ const value = ref<string>('');
 const loading = ref(false);
 
 async function fetchDiscountInfo(value: string) {
-  const selectedPlan = get(plan);
+  const { planId } = get(plan);
   set(loading, true);
   try {
     const response = await fetchWithCsrf<ApiResponse<boolean>>(
@@ -27,8 +27,7 @@ async function fetchDiscountInfo(value: string) {
       {
         body: {
           discountCode: value,
-          durationInMonths: selectedPlan.durationInMonths,
-          subscriptionTierId: selectedPlan.subscriptionTierId,
+          planId,
         },
         method: 'POST',
       },

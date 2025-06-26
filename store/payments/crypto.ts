@@ -47,7 +47,7 @@ export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
     discountCode: string | undefined,
   ): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
-      const { durationInMonths, subscriptionTierId } = plan;
+      const { planId } = plan;
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/2/crypto/payments',
         {
@@ -55,9 +55,8 @@ export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
             {
               cryptocurrencyIdentifier,
               discountCode,
-              durationInMonths,
+              planId,
               subscriptionId,
-              subscriptionTierId,
             },
             false,
             false,

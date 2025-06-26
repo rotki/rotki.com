@@ -4,7 +4,7 @@ import { PricingPeriod } from '~/types/tiers';
 const model = defineModel<PricingPeriod>({ required: true });
 
 const props = defineProps<{
-  data: { oneMonthTierConfig: { basePrice: string }; oneYearTierConfig: { basePrice: string } }[];
+  data: { monthlyPlan: { price: string }; yearlyPlan: { price: string } }[];
 }>();
 
 const maxSavedAnnually = computed(() => {
@@ -13,8 +13,8 @@ const maxSavedAnnually = computed(() => {
 
   return Math.max(
     ...props.data.map((item) => {
-      const monthlyPrice = parseFloat(item.oneMonthTierConfig.basePrice);
-      const yearlyPrice = parseFloat(item.oneYearTierConfig.basePrice);
+      const monthlyPrice = parseFloat(item.monthlyPlan.price);
+      const yearlyPrice = parseFloat(item.yearlyPlan.price);
 
       if (!monthlyPrice || !yearlyPrice)
         return 0;
