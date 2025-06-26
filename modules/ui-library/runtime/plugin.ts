@@ -47,6 +47,7 @@ import {
   LuStar,
   LuTimer,
   LuTrash2,
+  LuWallet,
   LuX,
   LuXTwitter,
 } from '@rotki/ui-library';
@@ -104,6 +105,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         LuDownload,
         LuHandshake,
         LuStar,
+        LuWallet,
       ],
       mode: 'light',
     },
