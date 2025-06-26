@@ -21,7 +21,7 @@ const { account, userSubscriptions } = storeToRefs(useMainStore());
 const { availablePlans } = storeToRefs(useTiersStore());
 
 function isSelected(plan: AvailablePlan) {
-  return plan.name === get(selectedPlanName);
+  return plan.tierName === get(selectedPlanName);
 }
 
 const selectedPlan = computed<AvailablePlan | undefined>(
@@ -29,18 +29,19 @@ const selectedPlan = computed<AvailablePlan | undefined>(
 );
 
 function select(plan: AvailablePlan) {
-  set(selectedPlanName, plan.name);
+  set(selectedPlanName, plan.tierName);
 }
 
 function next() {
   set(processing, true);
+  const planId = get(selectedPlan)?.[get(selectedPlanPeriod) === PricingPeriod.MONTHLY ? 'monthlyPlan' : 'yearlyPlan']?.planId;
   navigateTo({
     name: 'checkout-pay-method',
     query: {
       ...route.query,
       plan: get(selectedPlanName),
       period: get(selectedPlanPeriod),
-      planId: get(selectedPlan)?.subscriptionTierId,
+      planId,
     },
   });
 }
@@ -79,8 +80,8 @@ const notes = computed(() => [
           </div>
         </template>
         <SelectablePlan
-          v-for="plan in availablePlans"
-          :key="plan.subscriptionTierId"
+          v-for="(plan) in availablePlans"
+          :key="plan.tierName"
           :plan="plan"
           :period="selectedPlanPeriod"
           :selected="isSelected(plan)"

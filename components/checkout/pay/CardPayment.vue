@@ -11,7 +11,6 @@ import {
 } from 'braintree-web';
 import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import { usePaymentCardsStore } from '~/store/payments/cards';
-import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
 const props = defineProps<{
@@ -133,13 +132,11 @@ async function submit() {
 
     const threeDSecureInfo = payload.threeDSecureInfo;
     if (threeDSecureInfo.liabilityShifted) {
-      const { durationInMonths, subscriptionTierId } = get(plan);
-      assert(durationInMonths);
+      const { planId } = get(plan);
       emit('submit', {
-        durationInMonths,
         discountCode: get(discountCode) || undefined,
         paymentMethodNonce: payload.nonce,
-        subscriptionTierId,
+        planId,
       });
     }
     else {
