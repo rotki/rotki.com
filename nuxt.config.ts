@@ -160,6 +160,7 @@ export default defineNuxtConfig({
       isDev: process.env.NODE_ENV === 'development',
       loglevel: 3, // Setting info loglevel as the default.
       maintenance: false,
+      openseaApiKey: '',
       recaptcha: {
         siteKey: '',
       },

@@ -701,6 +701,7 @@
     "resources": "Resources",
     "rotki_premium": "rotki Premium",
     "product_and_services": "Product & Services",
+    "sponsor": "Sponsor rotki next release",
     "tos": "Terms of Service",
     "values": "Values"
   },
@@ -844,6 +845,12 @@
   },
   "signup_address": {
     "title": "Address"
+  },
+  "sponsor": {
+    "tabs": {
+      "sponsor": "Sponsor",
+      "leaderboard": "Leaderboard"
+    }
   },
   "subscription": {
     "crypto_payment": {
