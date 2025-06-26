@@ -2,14 +2,14 @@
 import Default from '~/layouts/default.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 useHead({
   title: 'sponsor',
   meta: [
     {
       name: 'sponsor',
-      content: 'Sponsor rotki next release',
+      content: 'Sponsor rotki\'s next release',
     },
     noIndex(),
   ],

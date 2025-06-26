@@ -3,7 +3,7 @@ import { get, set } from '@vueuse/core';
 import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
-const description = 'Sponsor rotki next release';
+const description = 'Sponsor rotki\'s next release';
 
 const {
   public: { baseUrl },
@@ -119,7 +119,7 @@ const buttonText = computed(() => {
     return `Approve ${currency}`;
   if (get(sponsorshipState).status === 'pending')
     return 'Minting...';
-  return `Mint ${tier?.label} NFT`;
+  return `Mint ${tier?.label} sponsorship NFT`;
 });
 
 const buttonAction = computed(() => {
@@ -248,10 +248,17 @@ onMounted(() => {
                 v-for="currency in CURRENCY_OPTIONS"
                 :key="currency.key"
                 :variant="selectedCurrency === currency.key ? 'default' : 'outlined'"
-                :color="selectedCurrency === currency.key ? 'primary' : 'secondary'"
+                color="primary"
                 size="sm"
                 @click="selectedCurrency = currency.key"
               >
+                <template #prepend>
+                  <CryptoAssetIcon
+                    class="bg-white rounded-full"
+                    :icon-url="currency.iconUrl"
+                    :name="currency.symbol"
+                  />
+                </template>
                 {{ currency.label }}
               </RuiButton>
             </div>
