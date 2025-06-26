@@ -3,7 +3,7 @@ import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
 import PricingTableButton from '~/components/pricings/PricingTableButton.vue';
 import PricingTableCell from '~/components/pricings/PricingTableCell.vue';
-import { isCustomPlan, isMostPopularPlan, isStarterPlan } from '~/components/pricings/utils';
+import { isCustomPlan, isFreePlan, isMostPopularPlan } from '~/components/pricings/utils';
 
 const props = defineProps<{
   plans: MappedPlan[];
@@ -12,7 +12,7 @@ const props = defineProps<{
   featuresLabel: { title: string; children: string[] }[];
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const tab = ref(props.plans[0].name);
 </script>
@@ -59,14 +59,14 @@ const tab = ref(props.plans[0].name);
                     {{ plan.mainPriceDisplay }}
                   </div>
                   <div
-                    v-if="!isStarterPlan(plan)"
+                    v-if="!isFreePlan(plan)"
                     class="text-lg font-medium"
                   >
                     {{ t('pricing.per_month') }}
                   </div>
                 </div>
                 <div
-                  v-if="!isStarterPlan(plan)"
+                  v-if="!isFreePlan(plan)"
                   class="text-rui-text-secondary"
                 >
                   {{ plan.secondaryPriceDisplay }}

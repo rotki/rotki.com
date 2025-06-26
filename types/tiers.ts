@@ -1,16 +1,17 @@
 import { z } from 'zod';
 
+export const PremiumTierPlan = z.object({
+  id: z.number(),
+  price: z.string(),
+}).nullable();
+
 export const PremiumTierInfo = z.object({
   limits: z.object({
     maxBackupSizeMb: z.number(),
   }),
+  monthlyPlan: PremiumTierPlan,
   name: z.string(),
-  oneMonthTierConfig: z.object({
-    basePrice: z.string(),
-  }),
-  oneYearTierConfig: z.object({
-    basePrice: z.string(),
-  }),
+  yearlyPlan: PremiumTierPlan,
 });
 
 export type PremiumTierInfo = z.infer<typeof PremiumTierInfo>;

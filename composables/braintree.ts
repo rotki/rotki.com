@@ -11,7 +11,6 @@ import {
   type PaymentStep,
   type Result,
 } from '~/types';
-import { PricingPeriod } from '~/types/tiers';
 
 export function useBraintree() {
   const checkoutData = ref<CardCheckout | null>(null);
@@ -20,23 +19,21 @@ export function useBraintree() {
   const paymentSuccess = ref(false);
   const paymentError = ref('');
 
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const { refreshSubscriptionsAndPayments } = useMainStore();
   const router = useRouter();
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  const { planParams } = usePlanParams();
   const { planId } = usePlanIdParam();
 
-  async function getCardCheckoutData(plan: PlanParams, planId: number): Promise<Result<CardCheckout>> {
+  async function getCardCheckoutData(planId: number): Promise<Result<CardCheckout>> {
     set(loadingPlan, true);
     try {
       const response = await fetchWithCsrf<CardCheckoutResponse>(
         `/webapi/2/braintree/payments`,
         {
           body: {
-            durationInMonths: plan.period === PricingPeriod.YEARLY ? 12 : 1,
-            subscriptionTierId: planId,
+            planId,
           },
           method: 'PUT',
         },
@@ -59,8 +56,8 @@ export function useBraintree() {
     }
   }
 
-  async function loadPlan(plan: PlanParams, planId: number) {
-    const data = await getCardCheckoutData(plan, planId);
+  async function loadPlan(planId: number) {
+    const data = await getCardCheckoutData(planId);
     if (data.isError)
       router.back();
     else
@@ -147,15 +144,16 @@ export function useBraintree() {
     return { type: 'idle' };
   });
 
-  watchEffect(async () => {
-    const planVal = get(planParams);
-    const planIdVal = get(planId);
-    if (!planVal || !planIdVal) {
-      await router.push({ name: 'checkout-pay' });
-      return;
-    }
+  watchEffect(() => {
+    (async () => {
+      const planIdVal = get(planId);
+      if (!planIdVal) {
+        await router.push({ name: 'checkout-pay' });
+        return;
+      }
 
-    await loadPlan(planVal, planIdVal);
+      await loadPlan(planIdVal);
+    })();
   });
 
   const { selectedPlan } = useSelectedPlan();

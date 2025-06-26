@@ -4,7 +4,7 @@ import type { UserDevice } from '~/types/account';
 import { set } from '@vueuse/core';
 import { formatDate } from '~/utils/date';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const headers: DataTableColumn<UserDevice>[] = [
   {

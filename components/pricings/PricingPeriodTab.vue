@@ -4,7 +4,7 @@ import { PricingPeriod } from '~/types/tiers';
 const model = defineModel<PricingPeriod>({ required: true });
 
 const props = defineProps<{
-  data: { oneMonthTierConfig: { basePrice: string }; oneYearTierConfig: { basePrice: string } }[];
+  data: { monthlyPlan: { price: string } | null; yearlyPlan: { price: string } | null }[];
 }>();
 
 const maxSavedAnnually = computed(() => {
@@ -13,8 +13,11 @@ const maxSavedAnnually = computed(() => {
 
   return Math.max(
     ...props.data.map((item) => {
-      const monthlyPrice = parseFloat(item.oneMonthTierConfig.basePrice);
-      const yearlyPrice = parseFloat(item.oneYearTierConfig.basePrice);
+      if (!item.monthlyPlan || !item.yearlyPlan) {
+        return 0;
+      }
+      const monthlyPrice = parseFloat(item.monthlyPlan.price);
+      const yearlyPrice = parseFloat(item.yearlyPlan.price);
 
       if (!monthlyPrice || !yearlyPrice)
         return 0;
@@ -28,11 +31,11 @@ const maxSavedAnnually = computed(() => {
   );
 });
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const tabs = [
-  { value: PricingPeriod.MONTHLY, label: 'Monthly billing' },
-  { value: PricingPeriod.YEARLY, label: 'Yearly billing' },
+  { value: PricingPeriod.MONTHLY, label: t('home.plans.names.monthly_billing') },
+  { value: PricingPeriod.YEARLY, label: t('home.plans.names.yearly_billing') },
 ];
 </script>
 
