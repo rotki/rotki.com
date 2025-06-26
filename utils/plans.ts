@@ -1,7 +1,6 @@
-export function getPlanName(months: number) {
-  const { $i18n } = useNuxtApp();
-  const t = $i18n.t;
+import type { ComposerTranslation } from 'vue-i18n';
 
+export function getPlanName(t: ComposerTranslation, months: number) {
   if (months === 1)
     return t(`home.plans.names.monthly`);
   else if (months === 12)
@@ -10,15 +9,12 @@ export function getPlanName(months: number) {
   return t(`home.plans.names.numeric`, { months });
 }
 
-export function getPlanNameFor({ durationInMonths, name }: {
+export function getPlanNameFor(t: ComposerTranslation, { durationInMonths, name }: {
   durationInMonths: number;
   name: string;
 }) {
-  const { $i18n } = useNuxtApp();
-  const t = $i18n.t;
-
   return t(`home.plans.names.plan`, {
     name: toTitleCase(name),
-    period: getPlanName(durationInMonths),
+    period: getPlanName(t, durationInMonths),
   });
 }

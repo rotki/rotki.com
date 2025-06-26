@@ -24,7 +24,7 @@ const emit = defineEmits<{
 
 const { visible, warning } = toRefs(props);
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { planParams } = usePlanParams();
 
 const confirmed = ref(false);
@@ -38,10 +38,17 @@ function select(plan: AvailablePlan) {
   if (get(warning) && !get(confirmed))
     return;
 
+  const planId = plan[get(selectedPlanPeriod) === PricingPeriod.MONTHLY ? 'monthlyPlan' : 'yearlyPlan']?.planId;
+
+  if (!planId) {
+    logger.error('Plan ID not found for selected period');
+    return;
+  }
+
   return emit('select', {
     period: get(selectedPlanPeriod),
-    planId: plan.subscriptionTierId,
-    plan: plan.name,
+    planId,
+    plan: plan.tierName,
   });
 }
 
@@ -59,6 +66,7 @@ onBeforeMount(async () => {
   <RuiDialog
     max-width="500"
     :model-value="visible"
+    @closed="emit('cancel')"
   >
     <RuiCard content-class="!pt-0">
       <template #header>
@@ -94,7 +102,7 @@ onBeforeMount(async () => {
         <div class="flex flex-col gap-4 py-4">
           <SelectablePlan
             v-for="plan in availablePlans"
-            :key="plan.subscriptionTierId"
+            :key="plan.tierName"
             class="hover:bg-rui-grey-100 transition-all"
             :plan="plan"
             readonly

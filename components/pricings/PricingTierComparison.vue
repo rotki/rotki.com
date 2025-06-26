@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CustomPlan, MappedPlan, RegularPlan, StarterPlan } from '~/components/pricings/type';
+import type { MappedPlan } from '~/components/pricings/type';
 import { get } from '@vueuse/core';
 import { type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 
@@ -14,41 +14,66 @@ const props = withDefaults(
   },
 );
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
-const popularPlan = 'advanced';
+const mostPopularPlan = 'next'; // TODO: get this information from backend
 
 const plans = computed<MappedPlan[]>(() => {
   const isYearly = props.selectedPeriod === PricingPeriod.YEARLY;
 
-  const regularPlan: Omit<RegularPlan, 'features'>[] = props.tiersData.map((item) => {
-    const yearlyPrice = parseFloat(item.oneYearTierConfig.basePrice);
-    const monthlyPrice = !isYearly ? parseFloat(item.oneMonthTierConfig.basePrice) : (yearlyPrice / 12);
+  const regularPlan: Omit<MappedPlan, 'features'>[] = [];
 
-    // Format prices to remove trailing zeros
-    const formattedMonthlyPrice = monthlyPrice.toFixed(2);
-    const formattedYearlyPrice = yearlyPrice.toFixed(2);
+  props.tiersData
+    .forEach((item) => {
+      // Skip if yearly plan is needed but doesn't exist
+      if (isYearly && !item.yearlyPlan)
+        return;
+      // Skip if monthly plan is needed but doesn't exist
+      if (!isYearly && !item.monthlyPlan)
+        return;
 
-    return {
-      name: item.name,
-      displayedName: t('pricing.plans.plan', { plan: toTitleCase(item.name) }),
-      mainPriceDisplay: `€ ${formattedMonthlyPrice}`,
-      secondaryPriceDisplay: isYearly ? t('pricing.billed_annually', { price: formattedYearlyPrice }) : t('pricing.billed_monthly'),
-      isMostPopular: item.name === popularPlan,
-    };
-  });
+      let yearlyPrice = 0;
+      let monthlyPrice = 0;
 
-  const freeTier: Omit<StarterPlan, 'features'> = {
+      if (item.yearlyPlan && item.monthlyPlan) {
+        yearlyPrice = parseFloat(item.yearlyPlan.price);
+        monthlyPrice = !isYearly ? parseFloat(item.monthlyPlan.price) : (yearlyPrice / 12);
+      }
+      else if (item.yearlyPlan && !item.monthlyPlan) {
+        yearlyPrice = parseFloat(item.yearlyPlan.price);
+        monthlyPrice = yearlyPrice / 12;
+      }
+      else if (item.monthlyPlan && !item.yearlyPlan) {
+        monthlyPrice = parseFloat(item.monthlyPlan.price);
+        yearlyPrice = monthlyPrice * 12;
+      }
+
+      // Format prices to remove trailing zeros
+      const formattedMonthlyPrice = monthlyPrice.toFixed(2);
+      const formattedYearlyPrice = yearlyPrice.toFixed(2);
+
+      regularPlan.push({
+        name: item.name,
+        displayedName: t('pricing.plans.plan', { plan: toTitleCase(item.name) }),
+        mainPriceDisplay: `€ ${formattedMonthlyPrice}`,
+        secondaryPriceDisplay: isYearly ? t('pricing.billed_annually', { price: formattedYearlyPrice }) : t('pricing.billed_monthly'),
+        type: 'regular',
+        isMostPopular: item.name === mostPopularPlan,
+      });
+    });
+
+  const freeTier: Omit<MappedPlan, 'features'> = {
     name: 'starter',
     displayedName: t('pricing.plans.starter_plan'),
     mainPriceDisplay: t('pricing.free'),
-    isStarter: true,
+    type: 'free',
   };
 
-  const customTier: Omit<CustomPlan, 'features'> = {
+  const customTier: Omit<MappedPlan, 'features'> = {
     name: 'custom',
     displayedName: t('pricing.plans.custom_plan'),
-    isCustom: true,
+    mainPriceDisplay: t('pricing.contact_us'),
+    type: 'custom',
   };
 
   return [
@@ -78,6 +103,7 @@ const plans = computed<MappedPlan[]>(() => {
   }));
 });
 
+// TODO: get this information from backend
 const featuresLabel = [
   {
     title: 'Overview',

@@ -22,13 +22,14 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { plan, period } = toRefs(props);
 
-const isMostPopular = computed(() => get(plan).name === 'advanced');
+const isMostPopular = computed(() => get(plan).tierName === 'next'); // TODO: get this data from backend
 
 const price = computed(() => {
-  const { oneMonthTierConfig, oneYearTierConfig } = get(plan);
+  const { monthlyPlan, yearlyPlan } = get(plan);
   const periodVal = get(period);
 
-  return parseFloat(periodVal === PricingPeriod.YEARLY ? oneYearTierConfig.basePrice : oneMonthTierConfig.basePrice).toFixed(2);
+  const targetPlan = periodVal === PricingPeriod.YEARLY ? yearlyPlan : monthlyPlan;
+  return targetPlan ? parseFloat(targetPlan.price).toFixed(2) : '0.00';
 });
 </script>
 
@@ -59,7 +60,7 @@ const price = computed(() => {
             'text-rui-text-secondary': disabled,
           }"
         >
-          {{ t('pricing.plans.plan', { plan: toTitleCase(plan.name) }) }}
+          {{ t('pricing.plans.plan', { plan: toTitleCase(plan.tierName) }) }}
         </div>
         <div
           class="flex flex-wrap items-end gap-x-1"
