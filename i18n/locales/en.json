@@ -530,9 +530,11 @@
       "names": {
         "for": "{name} for",
         "monthly": "Monthly",
+        "monthly_billing": "Monthly Billing",
         "numeric": "{months} Months",
         "plan": "{name} Plan ({period})",
-        "yearly": "Yearly"
+        "yearly": "Yearly",
+        "yearly_billing": "Yearly billing"
       },
       "tiers": {
         "step_1": {

@@ -1,25 +1,11 @@
-export interface RegularPlan {
+export type PlanType = 'regular' | 'free' | 'custom';
+
+export interface MappedPlan {
   name: string;
   displayedName: string;
   mainPriceDisplay: string;
-  secondaryPriceDisplay: string;
-  isMostPopular: boolean;
   features: any[][];
+  type: PlanType;
+  isMostPopular?: boolean;
+  secondaryPriceDisplay?: string;
 }
-
-export interface StarterPlan {
-  name: string;
-  displayedName: string;
-  mainPriceDisplay: string;
-  isStarter: true;
-  features: any[][];
-}
-
-export interface CustomPlan {
-  name: string;
-  displayedName: string;
-  isCustom: true;
-  features: any[][];
-}
-
-export type MappedPlan = StarterPlan | RegularPlan | CustomPlan;

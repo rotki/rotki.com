@@ -2,7 +2,6 @@
 import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
 import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
-import { useSelectedPlan } from '~/composables/use-selected-plan';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 
 const { t } = useI18n({ useScope: 'global' });

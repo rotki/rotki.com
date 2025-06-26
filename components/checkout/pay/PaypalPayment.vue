@@ -31,7 +31,7 @@ const emit = defineEmits<{
   (e: 'clear:errors'): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { token, plan, loading, pending, success, nextPayment } = toRefs(props);
 const error = ref<ErrorMessage | null>(null);
@@ -120,13 +120,12 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
         const token = await btPayPalCheckout.tokenizePayment(data);
         const vaultedToken = await addPaypal({ paymentMethodNonce: token.nonce });
         const vaultedNonce = await createPaypalNonce({ paymentToken: vaultedToken });
-        const { durationInMonths, subscriptionTierId } = get(plan);
+        const { planId } = get(plan);
 
         submit({
-          durationInMonths,
           paymentMethodNonce: vaultedNonce,
           discountCode: get(discountCode) || undefined,
-          subscriptionTierId,
+          planId,
         });
         return token;
       },
