@@ -52,6 +52,11 @@ const menus: (Menu | MenuParent)[] = [
     highlightExactActive: true,
   },
   {
+    label: t('navigation_menu.sponsor'),
+    to: '/sponsor/sponsor',
+    highlightExactActive: true,
+  },
+  {
     label: t('navigation_menu.resources'),
     children: [
       {
@@ -68,6 +73,7 @@ const menus: (Menu | MenuParent)[] = [
       },
     ],
   },
+
 ];
 
 const { isMdAndDown } = useBreakpoint();
