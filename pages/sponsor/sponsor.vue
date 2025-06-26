@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
-import { SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship';
+import { get, set } from '@vueuse/core';
+import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const description = 'Sponsor rotki next release';
@@ -22,6 +22,8 @@ definePageMeta({
 });
 
 const selectedTier = ref('bronze');
+const isApproving = ref(false);
+const usdcAllowance = ref('0');
 
 const sponsorship = useRotkiSponsorship();
 
@@ -36,13 +38,43 @@ const {
   isLoading,
   error,
   transactionUrl,
+  selectedCurrency,
   open: openWallet,
   switchNetwork,
   fetchTierPrices,
   loadNFTImages,
   mintSponsorshipNFT,
   isTierAvailable,
+  approveUSDC,
+  checkUSDCAllowance,
 } = sponsorship;
+
+async function handleApprove() {
+  try {
+    set(isApproving, true);
+    const tier = SPONSORSHIP_TIERS.find(t => t.key === get(selectedTier));
+    if (!tier)
+      return;
+
+    const prices = get(tierPrices);
+    const price = prices[tier.key]?.USDC;
+    if (!price)
+      return;
+
+    const tx = await approveUSDC(price);
+    await tx.wait();
+
+    // Refresh allowance after approval
+    const newAllowance = await checkUSDCAllowance();
+    set(usdcAllowance, newAllowance);
+  }
+  catch (error) {
+    console.error('Approval failed:', error);
+  }
+  finally {
+    set(isApproving, false);
+  }
+}
 
 async function handleMint() {
   try {
@@ -50,16 +82,30 @@ async function handleMint() {
     if (!tier)
       return;
 
-    await mintSponsorshipNFT(tier.tierId);
+    await mintSponsorshipNFT(tier.tierId, get(selectedCurrency));
   }
   catch (error) {
     console.error('Minting failed:', error);
   }
 }
 
+const needsApproval = computed(() => {
+  const currency = get(selectedCurrency);
+  if (currency !== 'USDC')
+    return false;
+
+  const selectedTierKey = get(selectedTier);
+  const prices = get(tierPrices);
+  const price = prices[selectedTierKey]?.USDC;
+  const allowance = get(usdcAllowance);
+
+  return price && parseFloat(allowance) < parseFloat(price);
+});
+
 const buttonText = computed(() => {
   const selectedTierKey = get(selectedTier);
   const tier = SPONSORSHIP_TIERS.find(t => t.key === selectedTierKey);
+  const currency = get(selectedCurrency);
 
   if (!get(connected))
     return 'Connect Wallet';
@@ -67,6 +113,10 @@ const buttonText = computed(() => {
     return 'Switch Network';
   if (!isTierAvailable(selectedTierKey))
     return `${tier?.label} Sold Out`;
+  if (get(isApproving))
+    return 'Approving USDC...';
+  if (get(needsApproval))
+    return `Approve ${currency}`;
   if (get(sponsorshipState).status === 'pending')
     return 'Minting...';
   return `Mint ${tier?.label} NFT`;
@@ -81,27 +131,46 @@ const buttonAction = computed(() => {
     return () => switchNetwork();
   if (!isTierAvailable(selectedTierKey))
     return () => {};
+  if (get(needsApproval))
+    return handleApprove;
   return handleMint;
 });
 
 const isButtonDisabled = computed(() => {
   const selectedTierKey = get(selectedTier);
-  return get(sponsorshipState).status === 'pending' || !isTierAvailable(selectedTierKey);
+  return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey);
 });
+
+async function checkAllowanceIfNeeded() {
+  const currency = get(selectedCurrency);
+  if (currency === 'USDC' && get(connected)) {
+    try {
+      const allowance = await checkUSDCAllowance();
+      set(usdcAllowance, allowance);
+    }
+    catch (error) {
+      console.error('Failed to check USDC allowance:', error);
+    }
+  }
+}
+
+watch(selectedCurrency, checkAllowanceIfNeeded);
+watch(connected, checkAllowanceIfNeeded);
 
 onMounted(() => {
   fetchTierPrices();
   loadNFTImages();
+  checkAllowanceIfNeeded();
 });
 </script>
 
 <template>
   <div class="marketplace-container">
-    <div class="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+    <div class="flex flex-col lg:flex-row gap-10 max-w-6xl mx-auto">
       <!-- NFT Image Section -->
       <div class="lg:w-1/2 flex justify-center">
         <div class="nft-image-container w-full flex justify-center lg:block">
-          <div class="aspect-square w-full max-w-md bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
+          <div class="aspect-square w-full max-w-md md:max-w-full bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
             <RuiSkeletonLoader
               v-if="isLoading"
               class="w-full h-full"
@@ -153,7 +222,7 @@ onMounted(() => {
       <div class="lg:w-1/2">
         <div class="space-y-6">
           <div>
-            <h5 class="text-h5 font-bold mb-2">
+            <h5 class="text-h4 font-bold mb-2">
               Sponsor next rotki release
             </h5>
             <p class="text-rui-text-secondary mb-6">
@@ -169,6 +238,25 @@ onMounted(() => {
             </p>
           </div>
 
+          <!-- Currency Selection -->
+          <div class="space-y-4">
+            <h6 class="font-bold">
+              Payment Currency
+            </h6>
+            <div class="flex gap-2">
+              <RuiButton
+                v-for="currency in CURRENCY_OPTIONS"
+                :key="currency.key"
+                :variant="selectedCurrency === currency.key ? 'default' : 'outlined'"
+                :color="selectedCurrency === currency.key ? 'primary' : 'secondary'"
+                size="sm"
+                @click="selectedCurrency = currency.key"
+              >
+                {{ currency.label }}
+              </RuiButton>
+            </div>
+          </div>
+
           <!-- Tier Selection -->
           <div class="space-y-4">
             <h6 class="font-bold">
@@ -179,7 +267,7 @@ onMounted(() => {
                 v-for="tier in SPONSORSHIP_TIERS"
                 :key="tier.key"
                 class="tier-option"
-                content-class="flex items-center justify-between !py-2 transition-all cursor-pointer"
+                content-class="flex items-center justify-between h-16 !py-2 transition-all cursor-pointer"
                 :class="{
                   '!border-rui-primary': selectedTier === tier.key,
                   'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key),
@@ -198,7 +286,7 @@ onMounted(() => {
                 />
                 <div class="flex flex-col items-end">
                   <div class="text-lg font-bold text-rui-primary">
-                    {{ tierPrices[tier.key] ? `${tierPrices[tier.key]} ETH` : 'Loading...' }}
+                    {{ tierPrices[tier.key]?.[selectedCurrency] ? `${tierPrices[tier.key][selectedCurrency]} ${selectedCurrency}` : 'Loading...' }}
                   </div>
                   <div
                     v-if="tierSupply[tier.key]"
@@ -228,7 +316,7 @@ onMounted(() => {
               color="primary"
               size="lg"
               class="w-full"
-              :loading="sponsorshipState.status === 'pending'"
+              :loading="sponsorshipState.status === 'pending' || isApproving"
               :disabled="isButtonDisabled"
               @click="buttonAction()"
             >
@@ -247,7 +335,7 @@ onMounted(() => {
           </div>
 
           <!-- Benefits Info -->
-          <div class="bg-rui-grey-50 p-4 rounded-lg">
+          <div class="bg-rui-grey-100 p-4 rounded-lg">
             <h6 class="font-bold mb-2">
               What you get:
             </h6>
@@ -262,15 +350,14 @@ onMounted(() => {
                 Benefits: {{ tierBenefits[selectedTier].benefits }}
               </p>
             </div>
-            <ul
+            <div
               v-else
-              class="text-sm text-rui-text-secondary space-y-1"
+              class="space-y-2"
             >
-              <li>• Exclusive NFT artwork</li>
-              <li>• Supporting rotki development</li>
-              <li>• Special community recognition</li>
-              <li>• Dedicated discord channel</li>
-            </ul>
+              <RuiSkeletonLoader />
+              <RuiSkeletonLoader />
+              <RuiSkeletonLoader />
+            </div>
           </div>
 
           <!-- Transaction Status -->
