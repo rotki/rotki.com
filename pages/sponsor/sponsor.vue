@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
-import { ethers } from 'ethers';
+import { get } from '@vueuse/core';
+import { SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const description = 'Sponsor rotki next release';
@@ -21,114 +21,73 @@ definePageMeta({
   layout: 'sponsor',
 });
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co';
-
-const CONTRACT_ADDRESS = '0x281986c18a5680C149b95Fc15aa266b633B60e96';
-
-const ROTKI_SPONSORSHIP_ABI = [
-  'function tokenURI(uint256 tokenId) external view returns (string memory)',
-  'function getPrice(uint256 tierId, bytes32 currencySymbol) external view returns (uint256)',
-  'function getTierInfo(uint256 releaseId, uint256 tierId) external view returns (uint256 maxSupply, uint256 currentSupply, string memory metadataURI)',
-  'function currentReleaseId() external view returns (uint256)',
-  'function ETH() external view returns (bytes32)',
-];
-
-const provider = new ethers.JsonRpcProvider(RPC_URL);
-
-const tiers = [
-  { key: 'bronze', label: 'Bronze', tierId: 0, price: '0' },
-  { key: 'silver', label: 'Silver', tierId: 1, price: '0' },
-  { key: 'gold', label: 'Gold', tierId: 2, price: '0' },
-];
-
 const selectedTier = ref('bronze');
-const nftImages = ref<Record<string, string>>({});
-const isLoading = ref(true);
-const error = ref<string | null>(null);
-const tierPrices = ref<Record<string, string>>({});
 
-async function fetchTierPrices() {
+const sponsorship = useRotkiSponsorship();
+
+const {
+  connected,
+  isExpectedChain,
+  sponsorshipState,
+  tierPrices,
+  tierSupply,
+  tierBenefits,
+  nftImages,
+  isLoading,
+  error,
+  transactionUrl,
+  open: openWallet,
+  switchNetwork,
+  fetchTierPrices,
+  loadNFTImages,
+  mintSponsorshipNFT,
+  isTierAvailable,
+} = sponsorship;
+
+async function handleMint() {
   try {
-    const prices: Record<string, string> = {};
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
-    const ethSymbol = await contract.ETH();
+    const tier = SPONSORSHIP_TIERS.find(t => t.key === get(selectedTier));
+    if (!tier)
+      return;
 
-    for (const tier of tiers) {
-      const price = await contract.getPrice(tier.tierId, ethSymbol);
-      prices[tier.key] = ethers.formatEther(price);
-    }
-
-    set(tierPrices, prices);
-    console.warn('Tier prices loaded:', prices);
+    await mintSponsorshipNFT(tier.tierId);
   }
-  catch (error_) {
-    console.error('Error fetching tier prices:', error_);
+  catch (error) {
+    console.error('Minting failed:', error);
   }
 }
 
-async function fetchNFTMetadata(tokenId: number, tierKey: string) {
-  try {
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
+const buttonText = computed(() => {
+  const selectedTierKey = get(selectedTier);
+  const tier = SPONSORSHIP_TIERS.find(t => t.key === selectedTierKey);
 
-    const tokenURI = await contract.tokenURI(tokenId);
-    console.warn(`Token URI for ${tierKey} token ${tokenId}:`, tokenURI);
+  if (!get(connected))
+    return 'Connect Wallet';
+  if (!get(isExpectedChain))
+    return 'Switch Network';
+  if (!isTierAvailable(selectedTierKey))
+    return `${tier?.label} Sold Out`;
+  if (get(sponsorshipState).status === 'pending')
+    return 'Minting...';
+  return `Mint ${tier?.label} NFT`;
+});
 
-    if (!tokenURI) {
-      return null;
-    }
+const buttonAction = computed(() => {
+  const selectedTierKey = get(selectedTier);
 
-    let metadataUrl = tokenURI;
-    if (tokenURI.startsWith('ipfs://')) {
-      metadataUrl = `https://gateway.pinata.cloud/ipfs/${tokenURI.slice(7)}`;
-    }
+  if (!get(connected))
+    return openWallet;
+  if (!get(isExpectedChain))
+    return () => switchNetwork();
+  if (!isTierAvailable(selectedTierKey))
+    return () => {};
+  return handleMint;
+});
 
-    const response = await fetch(metadataUrl);
-    if (!response.ok) {
-      throw new Error(`Metadata fetch error: ${response.status}`);
-    }
-
-    const metadata = await response.json();
-    console.warn(`NFT metadata for ${tierKey} token ${tokenId}:`, metadata);
-
-    let imageUrl = metadata.image;
-    if (imageUrl && imageUrl.startsWith('ipfs://')) {
-      imageUrl = `https://gateway.pinata.cloud/ipfs/${imageUrl.slice(7)}`;
-    }
-
-    console.warn(`Extracted image URL for ${tierKey} token ${tokenId}:`, imageUrl);
-    return imageUrl;
-  }
-  catch (error_) {
-    console.error(`Error fetching NFT metadata for ${tierKey} token ${tokenId}:`, error_);
-    return null;
-  }
-}
-
-async function loadNFTImages() {
-  set(isLoading, true);
-  set(error, null);
-
-  try {
-    const images: Record<string, string> = {};
-
-    for (const tier of tiers) {
-      const imageUrl = await fetchNFTMetadata(0, tier.key);
-      if (imageUrl) {
-        images[tier.key] = imageUrl;
-      }
-    }
-
-    console.warn('Final images object:', images);
-    set(nftImages, images);
-  }
-  catch (error_) {
-    set(error, 'Failed to load NFT images');
-    console.error('Error loading NFT images:', error_);
-  }
-  finally {
-    set(isLoading, false);
-  }
-}
+const isButtonDisabled = computed(() => {
+  const selectedTierKey = get(selectedTier);
+  return get(sponsorshipState).status === 'pending' || !isTierAvailable(selectedTierKey);
+});
 
 onMounted(() => {
   fetchTierPrices();
@@ -141,7 +100,7 @@ onMounted(() => {
     <div class="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
       <!-- NFT Image Section -->
       <div class="lg:w-1/2 flex justify-center">
-        <div class="nft-image-container w-full">
+        <div class="nft-image-container w-full flex justify-center lg:block">
           <div class="aspect-square w-full max-w-md bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
             <RuiSkeletonLoader
               v-if="isLoading"
@@ -151,9 +110,6 @@ onMounted(() => {
               v-else-if="error"
               class="text-red-500 text-center"
             >
-              <div class="text-4xl mb-2">
-                ❌
-              </div>
               <div class="text-lg font-medium">
                 Failed to load
               </div>
@@ -170,7 +126,7 @@ onMounted(() => {
             >
               <img
                 :src="nftImages[selectedTier]"
-                :alt="`${tiers.find(tier => tier.key === selectedTier)?.label} NFT`"
+                :alt="`${SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label} NFT`"
                 class="w-full h-full object-cover rounded-lg"
                 @error="console.warn('Image failed to load')"
               />
@@ -183,7 +139,7 @@ onMounted(() => {
                 🎨
               </div>
               <div class="text-lg font-medium">
-                {{ tiers.find(tier => tier.key === selectedTier)?.label }} NFT
+                {{ SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }} NFT
               </div>
               <div class="text-sm text-rui-text-secondary mt-1">
                 Image not available
@@ -219,29 +175,50 @@ onMounted(() => {
               Select Tier
             </h6>
             <div class="space-y-3">
-              <div
-                v-for="tier in tiers"
+              <RuiCard
+                v-for="tier in SPONSORSHIP_TIERS"
                 :key="tier.key"
                 class="tier-option"
-                :class="{ selected: selectedTier === tier.key }"
+                content-class="flex items-center justify-between !py-2 transition-all cursor-pointer"
+                :class="{
+                  '!border-rui-primary': selectedTier === tier.key,
+                  'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key),
+                }"
                 @click="selectedTier = tier.key"
               >
-                <div class="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
-                  <RuiRadio
-                    :id="tier.key"
-                    v-model="selectedTier"
-                    :value="tier.key"
-                    name="tier"
-                    hide-details
-                    class="font-bold"
-                    color="primary"
-                    :label="tier.label"
-                  />
-                  <div class="text-lg font-bold text-primary-600">
+                <RuiRadio
+                  :id="tier.key"
+                  v-model="selectedTier"
+                  :value="tier.key"
+                  name="tier"
+                  :hide-details="true"
+                  class="font-bold"
+                  color="primary"
+                  :label="tier.label"
+                />
+                <div class="flex flex-col items-end">
+                  <div class="text-lg font-bold text-rui-primary">
                     {{ tierPrices[tier.key] ? `${tierPrices[tier.key]} ETH` : 'Loading...' }}
                   </div>
+                  <div
+                    v-if="tierSupply[tier.key]"
+                    class="text-sm text-rui-text-secondary"
+                  >
+                    <template v-if="tierSupply[tier.key].maxSupply === 0">
+                      {{ tierSupply[tier.key].currentSupply }} minted
+                    </template>
+                    <template v-else>
+                      {{ tierSupply[tier.key].currentSupply }}/{{ tierSupply[tier.key].maxSupply }} minted
+                    </template>
+                  </div>
+                  <div
+                    v-if="tierSupply[tier.key] && !isTierAvailable(tier.key)"
+                    class="text-sm text-red-500 font-medium"
+                  >
+                    Sold Out
+                  </div>
                 </div>
-              </div>
+              </RuiCard>
             </div>
           </div>
 
@@ -251,27 +228,82 @@ onMounted(() => {
               color="primary"
               size="lg"
               class="w-full"
-              disabled
+              :loading="sponsorshipState.status === 'pending'"
+              :disabled="isButtonDisabled"
+              @click="buttonAction()"
             >
               <template #prepend>
-                <RuiIcon name="lu-external-link" />
+                <RuiIcon
+                  v-if="connected"
+                  name="lu-external-link"
+                />
+                <RuiIcon
+                  v-else
+                  name="lu-wallet"
+                />
               </template>
-              Mint {{ tiers.find(tier => tier.key === selectedTier)?.label }} NFT
+              {{ buttonText }}
             </RuiButton>
           </div>
 
-          <!-- Additional Info -->
+          <!-- Benefits Info -->
           <div class="bg-rui-grey-50 p-4 rounded-lg">
             <h6 class="font-bold mb-2">
               What you get:
             </h6>
-            <ul class="text-sm text-rui-text-secondary space-y-1">
+            <div
+              v-if="tierBenefits[selectedTier]"
+              class="text-sm text-rui-text-secondary"
+            >
+              <p class="mb-2">
+                {{ tierBenefits[selectedTier].description }}
+              </p>
+              <p class="font-medium">
+                Benefits: {{ tierBenefits[selectedTier].benefits }}
+              </p>
+            </div>
+            <ul
+              v-else
+              class="text-sm text-rui-text-secondary space-y-1"
+            >
               <li>• Exclusive NFT artwork</li>
               <li>• Supporting rotki development</li>
               <li>• Special community recognition</li>
               <li>• Dedicated discord channel</li>
             </ul>
           </div>
+
+          <!-- Transaction Status -->
+          <RuiAlert
+            v-if="sponsorshipState.status === 'success' && transactionUrl"
+            type="success"
+            class="mt-4"
+          >
+            <template #title>
+              NFT Minted Successfully!
+            </template>
+            <ButtonLink
+              :to="transactionUrl"
+              variant="text"
+              color="primary"
+              class="underline"
+              inline
+              external
+            >
+              View transaction on Etherscan
+            </ButtonLink>
+          </RuiAlert>
+
+          <RuiAlert
+            v-else-if="sponsorshipState.status === 'error'"
+            type="error"
+            class="mt-4"
+          >
+            <template #title>
+              Minting Failed
+            </template>
+            {{ sponsorshipState.error }}
+          </RuiAlert>
         </div>
       </div>
     </div>

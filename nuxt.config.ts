@@ -164,7 +164,7 @@ export default defineNuxtConfig({
       recaptcha: {
         siteKey: '',
       },
-      testing: false,
+      testing: true,
       walletConnect: {
         projectId: '',
       },
