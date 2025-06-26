@@ -64,7 +64,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     themeMode: 'light',
   });
 
-  const getProvider = (): BrowserProvider => {
+  const getBrowserProvider = (): BrowserProvider => {
     assert(appKit);
     const walletProvider = appKit.getProvider('eip155');
     return new BrowserProvider(walletProvider as any);
@@ -76,7 +76,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     onAccountChange?.(account.isConnected);
 
     if (account.isConnected) {
-      const browserProvider = getProvider();
+      const browserProvider = getBrowserProvider();
       browserProvider.getNetwork()
         .then(network => set(connectedChainId, network.chainId))
         .catch(logger.error);
@@ -120,12 +120,12 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
       throw new Error('Wallet not connected');
     }
 
-    const browserProvider = getProvider();
+    const browserProvider = getBrowserProvider();
     return browserProvider.getSigner();
   }
 
   async function validateNetwork(expectedChainId?: number): Promise<void> {
-    const provider = getProvider();
+    const provider = getBrowserProvider();
     const network = await provider.getNetwork();
     const targetChainId = expectedChainId || chainId;
 
@@ -151,9 +151,9 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     connected: readonly(connected),
     connectedChainId: readonly(connectedChainId),
     errorMessage: readonly(errorMessage),
-    getNetwork,
+    getBrowserProvider,
 
-    getProvider,
+    getNetwork,
     getSigner,
     isExpectedChain,
     isOpen: readonly(isOpen),

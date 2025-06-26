@@ -1,10 +1,9 @@
-import type { Web3ConnectionConfig } from './web3-connection';
+/* eslint-disable max-lines */
 import { get, set } from '@vueuse/core';
 import { Contract, ethers, type TransactionResponse } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
 const CONTRACT_ADDRESS = '0x281986c18a5680C149b95Fc15aa266b633B60e96';
-const USDC_CONTRACT_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';
 const CHAIN_ID = 11155111; // Sepolia testnet
 const RPC_URL = 'https://sepolia.gateway.tenderly.co';
 const IPFS_URL = 'https://gateway.pinata.cloud/ipfs/';
@@ -19,6 +18,7 @@ const ROTKI_SPONSORSHIP_ABI = [
   'function currentReleaseId() external view returns (uint256)',
   'function ETH() external view returns (bytes32)',
   'function mint(uint256 tierId, bytes32 currencySymbol) external payable',
+  'function paymentTokens(bytes32 symbol) external view returns (address)',
 ];
 
 const ERC20_ABI = [
@@ -57,11 +57,24 @@ export interface CurrencyOption {
   symbol: string;
   decimals: number;
   contractAddress?: string;
+  iconUrl?: string;
 }
 
 export const CURRENCY_OPTIONS: CurrencyOption[] = [
-  { decimals: 18, key: 'ETH', label: 'ETH', symbol: 'ETH' },
-  { contractAddress: USDC_CONTRACT_ADDRESS, decimals: 6, key: 'USDC', label: 'USDC', symbol: 'USDC' },
+  {
+    decimals: 18,
+    iconUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+    key: 'ETH',
+    label: 'ETH',
+    symbol: 'ETH',
+  },
+  {
+    decimals: 6,
+    iconUrl: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
+    key: 'USDC',
+    label: 'USDC',
+    symbol: 'USDC',
+  },
 ];
 
 export interface SponsorshipState {
@@ -70,7 +83,7 @@ export interface SponsorshipState {
   error?: string;
 }
 
-export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
+export function useRotkiSponsorship() {
   const sponsorshipState = ref<SponsorshipState>({ status: 'idle' });
   const selectedCurrency = ref<string>('ETH');
   const tierPrices = ref<Record<string, Record<string, string>>>({});
@@ -79,9 +92,10 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
   const nftImages = ref<Record<string, string>>({});
   const isLoading = ref(true);
   const error = ref<string | null>(null);
+  const usdcContractAddress = ref<string | null>(null);
 
   const logger = useLogger('rotki-sponsorship');
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
 
   const connection = useWeb3Connection({
     chainId: CHAIN_ID,
@@ -93,7 +107,6 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     onError: (error) => {
       set(sponsorshipState, { error, status: 'error' });
     },
-    ...config,
   });
 
   const {
@@ -133,6 +146,49 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
 
     return supply.currentSupply < supply.maxSupply;
   };
+
+  async function getPaymentTokenAddress(symbol: string): Promise<string | null> {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_URL);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
+
+      const symbolHash = ethers.keccak256(ethers.toUtf8Bytes(symbol));
+      const tokenAddress = await contract.paymentTokens(symbolHash);
+
+      // address(0) means ETH, but for other tokens we need a valid address
+      if (tokenAddress === ethers.ZeroAddress) {
+        return symbol === 'ETH' ? null : null; // null indicates not supported
+      }
+
+      return tokenAddress;
+    }
+    catch (error_) {
+      logger.error(`Error fetching payment token address for ${symbol}:`, error_);
+      return null;
+    }
+  }
+
+  async function loadUSDCAddress() {
+    try {
+      const provider = new ethers.JsonRpcProvider(RPC_URL);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
+
+      const tokenAddress = await contract.paymentTokens(USDC_SYMBOL);
+
+      if (tokenAddress !== ethers.ZeroAddress) {
+        set(usdcContractAddress, tokenAddress);
+
+        // Update CURRENCY_OPTIONS with the fetched address
+        const usdcOption = CURRENCY_OPTIONS.find(option => option.key === 'USDC');
+        if (usdcOption) {
+          usdcOption.contractAddress = tokenAddress;
+        }
+      }
+    }
+    catch (error_) {
+      logger.error('Error loading USDC contract address:', error_);
+    }
+  }
 
   async function fetchTierPrices() {
     try {
@@ -211,6 +267,9 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     set(isLoading, true);
     set(error, null);
     try {
+      // Load USDC address first
+      await loadUSDCAddress();
+
       const images: Record<string, string> = {};
       const supplies: Record<string, TierSupply> = {};
       const benefits: Record<string, TierBenefits> = {};
@@ -236,17 +295,27 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
   }
 
   async function approveUSDC(amount: string): Promise<TransactionResponse> {
+    const contractAddress = get(usdcContractAddress);
+    if (!contractAddress) {
+      throw new Error('USDC contract address not available');
+    }
+
     const signer = await getSigner();
-    const usdcContract = new Contract(USDC_CONTRACT_ADDRESS, ERC20_ABI, signer);
+    const usdcContract = new Contract(contractAddress, ERC20_ABI, signer);
 
     const amountBN = ethers.parseUnits(amount, 6); // USDC has 6 decimals
     return usdcContract.approve(CONTRACT_ADDRESS, amountBN);
   }
 
   async function checkUSDCAllowance(): Promise<string> {
+    const contractAddress = get(usdcContractAddress);
+    if (!contractAddress) {
+      throw new Error('USDC contract address not available');
+    }
+
     const signer = await getSigner();
     const userAddress = await signer.getAddress();
-    const usdcContract = new Contract(USDC_CONTRACT_ADDRESS, ERC20_ABI, signer);
+    const usdcContract = new Contract(contractAddress, ERC20_ABI, signer);
 
     const allowance = await usdcContract.allowance(userAddress, CONTRACT_ADDRESS);
     return ethers.formatUnits(allowance, 6);
@@ -376,10 +445,12 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     connected,
     error: readonly(error),
     fetchTierPrices,
+    getPaymentTokenAddress,
     isExpectedChain,
     isLoading: readonly(isLoading),
     isTierAvailable,
     loadNFTImages,
+    loadUSDCAddress,
     mintSponsorshipNFT,
     nftImages: readonly(nftImages),
     selectedCurrency,
@@ -388,5 +459,6 @@ export function useRotkiSponsorship(config: Web3ConnectionConfig = {}) {
     tierPrices: readonly(tierPrices),
     tierSupply: readonly(tierSupply),
     transactionUrl,
+    usdcContractAddress: readonly(usdcContractAddress),
   };
 }

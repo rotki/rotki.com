@@ -34,7 +34,7 @@ interface ExecutePaymentParams {
 export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
   const { getPendingSubscription, markTransactionStarted } = useMainStore();
   const logger = useLogger('web3-payment');
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const pendingTx = usePendingTx();
   const { start, stop } = useTimeoutFn(() => {
     logger.info('change to done');
@@ -54,8 +54,8 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
 
   const {
     connected,
+    getBrowserProvider,
     getNetwork,
-    getProvider,
     getSigner,
     isExpectedChain,
     isOpen,
@@ -125,7 +125,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       const { chainId, chainName } = payment;
       assert(chainId);
 
-      const provider = await getProvider();
+      const provider = await getBrowserProvider();
       const network = await provider.getNetwork();
 
       if (network.chainId !== BigInt(chainId)) {
