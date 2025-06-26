@@ -19,18 +19,25 @@ export function useSelectedPlan() {
       return undefined;
     }
 
-    const item = planIdVal
-      ? get(availablePlans).find(item => item.subscriptionTierId === planIdVal)
-      : get(availablePlans).find(item => item.name === planParamVal.plan);
+    const tierPlan = get(availablePlans).find(item => item.tierName === planParamVal.plan);
 
-    if (!item)
+    if (!tierPlan) {
       return undefined;
+    }
+
+    const period = planParamVal.period;
+    const isMonthly = period === PricingPeriod.MONTHLY;
+    const foundPlan = isMonthly ? tierPlan?.monthlyPlan : tierPlan?.yearlyPlan;
+
+    if (!foundPlan || (typeof planIdVal !== 'undefined' && foundPlan.planId !== planIdVal)) {
+      return undefined;
+    }
 
     return {
-      durationInMonths: planParamVal.period === PricingPeriod.MONTHLY ? 1 : 12,
-      name: item.name,
-      price: parseFloat(planParamVal.period === PricingPeriod.MONTHLY ? item.oneMonthTierConfig.basePrice : item.oneYearTierConfig.basePrice),
-      subscriptionTierId: item.subscriptionTierId,
+      durationInMonths: isMonthly ? 1 : 12,
+      name: tierPlan.tierName,
+      planId: foundPlan.planId,
+      price: parseFloat(foundPlan.price),
     };
   });
 

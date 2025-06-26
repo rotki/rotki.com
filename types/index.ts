@@ -110,14 +110,15 @@ const Plan = z.object({
 export type Plan = z.infer<typeof Plan>;
 
 export const AvailablePlan = z.object({
-  name: z.string(),
-  oneMonthTierConfig: z.object({
-    basePrice: z.string(),
+  monthlyPlan: z.object({
+    planId: z.number(),
+    price: z.string(),
   }),
-  oneYearTierConfig: z.object({
-    basePrice: z.string(),
+  tierName: z.string(),
+  yearlyPlan: z.object({
+    planId: z.number(),
+    price: z.string(),
   }),
-  subscriptionTierId: z.number(),
 });
 
 export type AvailablePlan = z.infer<typeof AvailablePlan>;
@@ -137,10 +138,9 @@ export const PremiumResponse = z.object({
 export type PremiumResponse = z.infer<typeof PremiumResponse>;
 
 export interface SelectedPlan {
-  subscriptionTierId: number;
+  planId: number;
   name: string;
   price: number;
-  durationInMonths: number;
 }
 
 const CardCheckout = z
@@ -216,8 +216,7 @@ export interface CreateCardRequest {
 }
 
 export interface CardPaymentRequest extends CreateCardRequest {
-  durationInMonths: number;
-  subscriptionTierId: number;
+  planId: number;
   discountCode?: string;
 }
 
