@@ -21,6 +21,7 @@ const loading = ref(false);
 const error = ref<string>();
 const completed = ref(false);
 const accessToken = ref<string>('');
+const refreshToken = ref<string>('');
 const currentMode = ref<OAuthMode>();
 
 // Check if required environment variables are available
@@ -63,7 +64,7 @@ function handleGoogleAuth() {
       client_id: googleClientId,
       redirect_uri: redirectUri,
       response_type: 'code',
-      scope: 'openid email profile https://www.googleapis.com/auth/calendar',
+      scope: 'openid email profile https://www.googleapis.com/auth/calendar.app.created',
       state,
       access_type: 'offline',
       prompt: 'consent',
@@ -211,6 +212,7 @@ async function handleOAuthCallback() {
 
     if (tokenResponse.access_token) {
       set(accessToken, tokenResponse.access_token);
+      set(refreshToken, tokenResponse.refresh_token);
 
       if (originalMode === 'app') {
         handleAppModeCompletion(tokenResponse.access_token, tokenResponse.refresh_token);
@@ -298,6 +300,20 @@ const otherHeight = inject('otherHeight', 0);
           >
             <template #append>
               <CopyButton :model-value="accessToken" />
+            </template>
+          </RuiTextArea>
+
+          <RuiTextArea
+            v-model="refreshToken"
+            :label="t('oauth.refresh_token_label')"
+            readonly
+            variant="outlined"
+            color="primary"
+            rows="4"
+            @click="($event.target as HTMLTextAreaElement).select()"
+          >
+            <template #append>
+              <CopyButton :model-value="refreshToken" />
             </template>
           </RuiTextArea>
         </div>
