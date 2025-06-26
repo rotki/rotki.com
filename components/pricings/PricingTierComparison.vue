@@ -22,8 +22,8 @@ const plans = computed<MappedPlan[]>(() => {
   const isYearly = props.selectedPeriod === PricingPeriod.YEARLY;
 
   const regularPlan: Omit<RegularPlan, 'features'>[] = props.tiersData.map((item) => {
-    const yearlyPrice = parseFloat(item.oneYearTierConfig.basePrice);
-    const monthlyPrice = !isYearly ? parseFloat(item.oneMonthTierConfig.basePrice) : (yearlyPrice / 12);
+    const yearlyPrice = parseFloat(item.yearlyPlan.price);
+    const monthlyPrice = !isYearly ? parseFloat(item.monthlyPlan.price) : (yearlyPrice / 12);
 
     // Format prices to remove trailing zeros
     const formattedMonthlyPrice = monthlyPrice.toFixed(2);
