@@ -1,102 +1,98 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { get, set } from '@vueuse/core';
+import { computed, onMounted, ref } from 'vue';
+import { z } from 'zod';
+import { fetchWithCsrf } from '~/utils/api';
+import { formatDate } from '~/utils/date';
 
 definePageMeta({
   layout: 'sponsor',
 });
 
-const activeTab = ref('gold');
+const loading = ref(false);
+const leaderboardData = ref<LeaderboardResponse | null>(null);
 
-type LeaderboardTier = 'gold' | 'silver' | 'bronze';
+const LeaderboardEntry = z.object({
+  rank: z.number(),
+  address: z.string(),
+  bronzeCount: z.number(),
+  silverCount: z.number(),
+  goldCount: z.number(),
+  points: z.number(),
+});
 
-const leaderboardData: Record<LeaderboardTier, Array<{ rank: number; address: string; nftCount: number }>> = {
-  gold: [
-    { rank: 1, address: '0x742d35Cc6635Bb6C4e0C4DE4aE4E4dF9A3c45A9B', nftCount: 127 },
-    { rank: 2, address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', nftCount: 98 },
-    { rank: 3, address: '0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe5', nftCount: 85 },
-    { rank: 4, address: '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD', nftCount: 73 },
-    { rank: 5, address: '0x8ba1f109551bD432803012645Hac136c18ceC6FE', nftCount: 61 },
-  ],
-  silver: [
-    { rank: 1, address: '0x1234567890123456789012345678901234567890', nftCount: 45 },
-    { rank: 2, address: '0xABCDEF1234567890ABCDEF1234567890ABCDEF12', nftCount: 38 },
-    { rank: 3, address: '0x9876543210987654321098765432109876543210', nftCount: 32 },
-    { rank: 4, address: '0x5555666677778888999900001111222233334444', nftCount: 27 },
-    { rank: 5, address: '0xAABBCCDDEEFF00112233445566778899AABBCCDD', nftCount: 23 },
-  ],
-  bronze: [
-    { rank: 1, address: '0x1111222233334444555566667777888899990000', nftCount: 18 },
-    { rank: 2, address: '0xFFEEDDCCBBAA99887766554433221100FFEEDDCC', nftCount: 15 },
-    { rank: 3, address: '0x0000111122223333444455556666777788889999', nftCount: 12 },
-    { rank: 4, address: '0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d', nftCount: 9 },
-    { rank: 5, address: '0x9f8e7d6c5b4a39281f0e9d8c7b6a59483f2e1d0c', nftCount: 6 },
-  ],
-};
+const LeaderboardResponse = z.object({
+  total: z.number(),
+  lastUpdated: z.string().datetime(),
+  data: z.array(LeaderboardEntry),
+});
 
-function shortenAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+type LeaderboardResponse = z.infer<typeof LeaderboardResponse>;
+
+const currentLeaderboard = computed(() => {
+  const data = get(leaderboardData);
+  if (!data || !data.data)
+    return [];
+
+  return data.data;
+});
+
+async function fetchLeaderboard() {
+  try {
+    set(loading, true);
+    const response = await fetchWithCsrf('/webapi/leaderboard/');
+    const validatedResponse = LeaderboardResponse.parse(response);
+    set(leaderboardData, validatedResponse);
+  }
+  catch (error_) {
+    console.error('Error fetching leaderboard:', error_);
+  }
+  finally {
+    set(loading, false);
+  }
 }
+
+onMounted(async () => {
+  await fetchLeaderboard();
+});
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-12 rounded-lg">
+  <div>
     <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold text-white mb-4">
+      <div class="text-center py-6 mb-6 bg-gradient-to-b from-transparent to-rui-primary/[0.05] rounded-xl">
+        <h4 class="text-h4 font-bold mb-2">
           Sponsor Leaderboard
-        </h1>
-        <p class="text-xl text-gray-300">
+        </h4>
+        <p class="text-rui-text-secondary">
           Our top supporters making a difference
         </p>
       </div>
 
-      <!-- Tab Navigation -->
-      <div class="flex justify-center mb-8">
-        <div class="bg-white/10 backdrop-blur-md rounded-lg p-1 flex space-x-1">
-          <button
-            class="px-6 py-3 rounded-md font-semibold transition-all duration-200"
-            :class="[
-              activeTab === 'gold'
-                ? 'bg-yellow-500 text-black shadow-lg'
-                : 'text-white hover:bg-white/10',
-            ]"
-            @click="activeTab = 'gold'"
-          >
-            🥇 Gold Tier
-          </button>
-          <button
-            class="px-6 py-3 rounded-md font-semibold transition-all duration-200"
-            :class="[
-              activeTab === 'silver'
-                ? 'bg-gray-300 text-black shadow-lg'
-                : 'text-white hover:bg-white/10',
-            ]"
-            @click="activeTab = 'silver'"
-          >
-            🥈 Silver Tier
-          </button>
-          <button
-            class="px-6 py-3 rounded-md font-semibold transition-all duration-200"
-            :class="[
-              activeTab === 'bronze'
-                ? 'bg-amber-600 text-white shadow-lg'
-                : 'text-white hover:bg-white/10',
-            ]"
-            @click="activeTab = 'bronze'"
-          >
-            🥉 Bronze Tier
-          </button>
-        </div>
-      </div>
-
-      <!-- Leaderboard Content -->
       <div class="max-w-2xl mx-auto">
-        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
-          <div class="space-y-4">
+        <RuiCard>
+          <div
+            v-if="loading"
+            class="text-center py-12"
+          >
+            <RuiProgress
+              circular
+              color="primary"
+              variant="indeterminate"
+            />
+            <p class="text-rui-text-secondary">
+              Loading leaderboard...
+            </p>
+          </div>
+
+          <div
+            v-else-if="currentLeaderboard.length > 0"
+            class="space-y-1"
+          >
             <div
-              v-for="(user, index) in leaderboardData[activeTab as LeaderboardTier]"
+              v-for="(user, index) in currentLeaderboard"
               :key="user.rank"
-              class="flex items-center p-4 rounded-xl transition-all duration-200 hover:transform hover:scale-[1.02]"
+              class="flex items-center p-3 rounded-xl"
               :class="[
                 index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30'
                 : 'bg-white/5 border border-white/10',
@@ -104,15 +100,33 @@ function shortenAddress(address: string): string {
             >
               <div class="flex items-center space-x-4 flex-1">
                 <div class="flex-1">
-                  <h3 class="text-white font-bold text-lg font-mono">
-                    {{ shortenAddress(user.address) }}
-                  </h3>
-                  <p class="text-gray-400 text-sm font-mono">
+                  <h5 class="text-sm font-bold font-mono">
                     {{ user.address }}
-                  </p>
-                  <p class="text-gray-300">
-                    NFTs Owned: {{ user.nftCount }}
-                  </p>
+                  </h5>
+                  <div class="text-rui-text-secondary text-sm space-y-1">
+                    <div class="flex gap-4">
+                      <span>🥉 {{ user.bronzeCount }} NFTs</span>
+                      <span>🥈 {{ user.silverCount }} NFTs</span>
+                      <span>🥇 {{ user.goldCount }} NFTs</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <RuiTooltip :open-delay="400">
+                        <template #activator>
+                          <RuiChip
+                            color="primary"
+                            size="sm"
+                          >
+                            {{ user.points }} points
+                          </RuiChip>
+                        </template>
+                        <div>
+                          <div>Gold = 10 pts</div>
+                          <div>Silver = 5 pts</div>
+                          <div>Bronze = 1 pts</div>
+                        </div>
+                      </RuiTooltip>
+                    </div>
+                  </div>
                 </div>
                 <div class="text-right">
                   <div
@@ -121,7 +135,7 @@ function shortenAddress(address: string): string {
                       index === 0 ? 'text-yellow-400'
                       : index === 1 ? 'text-gray-300'
                         : index === 2 ? 'text-amber-500'
-                          : 'text-white',
+                          : 'text-rui-text-secondary',
                     ]"
                   >
                     #{{ user.rank }}
@@ -130,22 +144,45 @@ function shortenAddress(address: string): string {
               </div>
             </div>
           </div>
-        </div>
+
+          <!-- Empty State -->
+          <div
+            v-else
+            class="text-center py-12"
+          >
+            <img
+              alt="No leaderboard data available"
+              class="w-24 mx-auto"
+              src="/img/not-found.svg"
+            />
+            <p class="text-rui-text-secondary text-lg">
+              No leaderboard data available
+            </p>
+          </div>
+        </RuiCard>
+
+        <p
+          v-if="leaderboardData?.lastUpdated"
+          class="text-xs text-rui-text-secondary mt-2 italic"
+        >
+          Last Updated: {{ formatDate(leaderboardData.lastUpdated, 'MMMM DD, YYYY hh:mm') }}
+        </p>
       </div>
 
       <!-- Call to Action -->
-      <div class="text-center mt-12">
+      <div class="text-center mt-6">
         <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 max-w-md mx-auto">
-          <h3 class="text-2xl font-bold text-white mb-4">
+          <h3 class="text-2xl font-bold mb-1">
             Join Our Sponsors
           </h3>
-          <p class="text-gray-300 mb-6">
+          <p class="text-rui-text-secondary text-sm mb-4">
             Support our project and see your name on this leaderboard!
           </p>
           <ButtonLink
-            variant="default"
+            variant="outlined"
             to="/sponsor/sponsor"
             size="lg"
+            color="primary"
             class="mx-auto"
           >
             Become a Sponsor
