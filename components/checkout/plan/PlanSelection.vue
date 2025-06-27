@@ -86,6 +86,7 @@ const notes = computed(() => [
           :period="selectedPlanPeriod"
           :selected="isSelected(plan)"
           @click="select(plan)"
+          @clear="selectedPlanName = undefined"
         />
       </div>
     </div>
