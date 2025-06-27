@@ -1,13 +1,13 @@
-import type { CustomPlan, MappedPlan, StarterPlan } from '~/components/pricings/type';
+import type { MappedPlan } from '~/components/pricings/type';
 
 export function isMostPopularPlan(plan: MappedPlan) {
-  return 'isMostPopular' in plan && plan.isMostPopular;
+  return plan.isMostPopular;
 }
 
-export function isStarterPlan(plan: MappedPlan): plan is StarterPlan {
-  return 'isStarter' in plan;
+export function isFreePlan(plan: MappedPlan) {
+  return plan.type === 'free';
 }
 
-export function isCustomPlan(plan: MappedPlan): plan is CustomPlan {
-  return 'isCustom' in plan;
+export function isCustomPlan(plan: MappedPlan) {
+  return plan.type === 'custom';
 }
