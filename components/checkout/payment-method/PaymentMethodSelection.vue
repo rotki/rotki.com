@@ -20,7 +20,7 @@ interface PaymentMethodItem {
 
 const store = useMainStore();
 
-const { plan } = usePlanParams();
+const { planParams } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
 
 const { identifier } = toRefs(props);
@@ -60,7 +60,10 @@ const selected = computed<PaymentMethodItem | undefined>(() =>
 async function back() {
   await navigateTo({
     name: 'checkout-pay',
-    query: { plan: get(plan), method: get(selected) ? get(method) : undefined },
+    query: {
+      ...get(planParams),
+      method: get(selected) ? get(method) : undefined,
+    },
   });
 }
 
@@ -75,7 +78,7 @@ async function next() {
   const { href } = router.resolve({
     name,
     query: {
-      plan: get(plan),
+      ...get(planParams),
       id: get(identifier),
       method,
     },
@@ -141,6 +144,12 @@ function select(m: PaymentMethod) {
         size="lg"
         @click="back()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
       <RuiButton

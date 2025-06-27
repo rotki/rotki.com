@@ -1,47 +1,55 @@
 <script setup lang="ts">
-import type { Plan } from '~/types';
+import type { PlanParams } from '~/composables/plan';
+import type { AvailablePlan } from '~/types';
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
-import { getPlanName } from '~/utils/plans';
+import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { useTiersStore } from '~/store/tiers';
+import { PricingPeriod } from '~/types/tiers';
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    vat?: number;
-    crypto?: boolean;
     warning?: boolean;
   }>(),
   {
-    crypto: false,
     warning: false,
-    vat: undefined,
   },
 );
 
 const emit = defineEmits<{
   (e: 'cancel'): void;
-  (e: 'select', months: number): void;
+  (e: 'select', data: PlanParams & { planId: number }): void;
 }>();
+
+const { visible, warning } = toRefs(props);
+
 const { t } = useI18n({ useScope: 'global' });
-const store = useMainStore();
-const { plans } = storeToRefs(store);
-const { crypto, visible, warning } = toRefs(props);
+const { planParams } = usePlanParams();
+
 const confirmed = ref(false);
 
-const availablePlans = computed<Plan[]>(() => get(plans) ?? []);
+const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || PricingPeriod.MONTHLY);
 
-const cancel = () => emit('cancel');
+const store = useTiersStore();
+const { availablePlans } = storeToRefs(store);
 
-function select(months: number) {
+function select(plan: AvailablePlan) {
   if (get(warning) && !get(confirmed))
     return;
 
-  return emit('select', months);
-}
+  const planId = plan[get(selectedPlanPeriod) === PricingPeriod.MONTHLY ? 'monthlyPlan' : 'yearlyPlan']?.planId;
 
-function getPrice(plan: Plan) {
-  return get(crypto) ? plan.priceCrypto : plan.priceFiat;
+  if (!planId) {
+    logger.error('Plan ID not found for selected period');
+    return;
+  }
+
+  return emit('select', {
+    period: get(selectedPlanPeriod),
+    planId,
+    plan: plan.tierName,
+  });
 }
 
 watch(visible, (visible) => {
@@ -49,43 +57,24 @@ watch(visible, (visible) => {
     set(confirmed, false);
 });
 
-onMounted(async () => await store.getPlans());
+onBeforeMount(async () => {
+  await store.getAvailablePlans();
+});
 </script>
 
 <template>
   <RuiDialog
     max-width="500"
     :model-value="visible"
+    @closed="emit('cancel')"
   >
-    <RuiCard>
+    <RuiCard content-class="!pt-0">
       <template #header>
         {{ t('change_plan.title') }}
       </template>
       <div
-        v-for="plan in availablePlans"
-        :key="plan.months.toString()"
-        :class="{
-          [$style.plan]: true,
-          [$style.disabled]: warning && !confirmed,
-        }"
-        @click="select(plan.months)"
-      >
-        <div :class="$style.name">
-          {{ t('home.plans.names.plan', { name: getPlanName(plan.months) }) }}
-        </div>
-        {{ getPrice(plan) }}€
-        <span v-if="vat">+ {{ t('common.vat', { vat }) }}</span>
-        {{
-          t(
-            'selected_plan_overview.renew_period',
-            { months: plan.months },
-            plan.months,
-          )
-        }}
-      </div>
-      <div
-        v-if="crypto && warning"
-        :class="$style.warning"
+        v-if="warning"
+        class="text-justify -mb-4"
       >
         <span class="text-rui-text-secondary">
           {{ t('change_plan.switch_warning') }}
@@ -105,44 +94,39 @@ onMounted(async () => await store.getPlans());
           </i18n-t>
         </RuiCheckbox>
       </div>
-      <div class="flex justify-end gap-4 pt-4">
-        <RuiButton
-          variant="outlined"
-          size="lg"
-          class="w-full"
-          color="primary"
-          @click="cancel()"
-        >
-          {{ t('actions.cancel') }}
-        </RuiButton>
+      <div class="relative pt-8">
+        <PricingPeriodTab
+          v-model="selectedPlanPeriod"
+          :data="availablePlans"
+        />
+        <div class="flex flex-col gap-4 py-4">
+          <SelectablePlan
+            v-for="plan in availablePlans"
+            :key="plan.tierName"
+            class="hover:bg-rui-grey-100 transition-all"
+            :plan="plan"
+            readonly
+            :disabled="warning && !confirmed"
+            :period="selectedPlanPeriod"
+            @click="select(plan)"
+          />
+        </div>
+        <div class="flex justify-end gap-4 pt-4">
+          <RuiButton
+            variant="outlined"
+            size="lg"
+            class="w-full"
+            color="primary"
+            @click="emit('cancel')"
+          >
+            {{ t('actions.cancel') }}
+          </RuiButton>
+        </div>
+        <div
+          v-if="warning && !confirmed"
+          class="absolute w-full h-full top-0 left-0 bg-white/[0.7]"
+        />
       </div>
     </RuiCard>
   </RuiDialog>
 </template>
-
-<style module lang="scss">
-.plan {
-  @apply focus:outline-none px-4 py-2 my-2 transition bg-white;
-  @apply border-black/[0.12] border border-solid rounded;
-
-  &:not(.disabled):hover {
-    @apply bg-rui-primary/[0.09] cursor-pointer;
-  }
-
-  &:not(.disabled):active {
-    @apply bg-rui-primary/[0.15] border-rui-primary;
-  }
-
-  &.disabled {
-    @apply bg-gray-50 cursor-not-allowed opacity-60;
-  }
-}
-
-.name {
-  @apply font-bold;
-}
-
-.warning {
-  @apply mt-4 text-justify;
-}
-</style>

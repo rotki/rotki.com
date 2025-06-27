@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import type { Subscription } from '~/types';
+import type { UserSubscription } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { formatDate } from '~/utils/date';
 
-const modelValue = defineModel<Subscription | undefined>({ required: true });
+const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 
 const emit = defineEmits<{
-  confirm: [val: Subscription];
+  confirm: [val: UserSubscription];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -87,7 +88,7 @@ async function resumeSubscription() {
                 class="font-medium"
               >
                 <template #date>
-                  <span class="font-normal">{{ modelValue.nextActionDate }}</span>
+                  <span class="font-normal">{{ formatDate(modelValue.nextActionDate) }}</span>
                 </template>
               </i18n-t>
             </li>
@@ -108,7 +109,7 @@ async function resumeSubscription() {
         </RuiButton>
 
         <RuiButton
-          color="info"
+          color="primary"
           @click="resumeSubscription()"
         >
           {{ t('account.subscriptions.resume.actions.yes') }}

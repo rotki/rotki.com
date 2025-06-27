@@ -1,52 +1,71 @@
 <script lang="ts" setup>
+import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store';
+import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useMainStore();
 const acceptRefundPolicy = ref(false);
 const processing = ref<boolean>(false);
 
-const { plan } = usePlanParams();
+const currency = ref('');
+
+const discountCode = ref('');
+const discountInfo = ref<DiscountInfo>();
+
+const { planParams } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
 const { subscriptionId } = useSubscriptionIdParam();
+
+const { selectedPlan } = useSelectedPlan();
+const cryptoStore = usePaymentCryptoStore();
 
 async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
-      plan: get(plan),
+      ...get(planParams),
       method: get(paymentMethodId),
       id: get(subscriptionId),
     },
   });
 }
-
-const currency = ref('');
 
 function submit() {
   set(processing, true);
   navigateTo({
     name: 'checkout-pay-crypto',
     query: {
-      plan: get(plan),
+      ...get(planParams),
       currency: get(currency),
       method: get(paymentMethodId),
       id: get(subscriptionId),
+      discountCode: get(discountCode),
     },
   });
 }
 
-const cryptoStore = usePaymentCryptoStore();
-
 onBeforeMount(async () => {
-  await store.getPlans();
   await cryptoStore.fetchPaymentAssets();
 });
 
 const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
+
+const grandTotal = computed<number>(() => {
+  const plan = get(selectedPlan);
+
+  if (!plan)
+    return 0;
+
+  const discountVal = get(discountInfo);
+
+  if (!discountVal || !discountVal.isValid) {
+    return plan.price;
+  }
+
+  return discountVal.finalPrice;
+});
 </script>
 
 <template>
@@ -58,7 +77,25 @@ const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
       {{ t('home.plans.tiers.step_3.subtitle') }}
     </CheckoutDescription>
     <CryptoPaymentInfo />
-    <RuiDivider class="my-8" />
+    <template v-if="selectedPlan">
+      <RuiDivider class="mt-8 mb-4" />
+      <SelectedPlanOverview
+        :plan="selectedPlan"
+        :next-payment="0"
+      />
+
+      <DiscountCodeInput
+        v-model="discountCode"
+        v-model:discount-info="discountInfo"
+        :plan="selectedPlan"
+        class="mt-6"
+      />
+
+      <PaymentGrandTotal
+        :grand-total="grandTotal"
+        class="mt-6"
+      />
+    </template>
     <CryptoAssetSelector v-model="currency" />
     <AcceptRefundPolicy
       v-model="acceptRefundPolicy"
@@ -73,6 +110,12 @@ const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
         size="lg"
         @click="back()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
       <RuiButton

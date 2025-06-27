@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import type { PaymentStep, SelectedPlan } from '~/types';
-import type { PayEvent } from '~/types/common';
+import type { CardPaymentRequest, PaymentStep, SelectedPlan } from '~/types';
+import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
 import { client, paypalCheckout } from 'braintree-web';
+import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import { usePaymentPaypalStore } from '~/store/payments/paypal';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -21,24 +22,31 @@ const props = defineProps<{
   pending: boolean;
   loading: boolean;
   status: PaymentStep;
+  nextPayment: number;
 }>();
 
 const emit = defineEmits<{
-  (e: 'pay', plan: PayEvent): void;
+  (e: 'submit', payment: CardPaymentRequest): void;
   (e: 'update:pending', pending: boolean): void;
   (e: 'clear:errors'): void;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-const { paymentMethodId } = usePaymentMethodParam();
-const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
-const { token, plan, loading, pending, success } = toRefs(props);
+const { token, plan, loading, pending, success, nextPayment } = toRefs(props);
 const error = ref<ErrorMessage | null>(null);
 const accepted = ref(false);
 const mustAcceptRefund = ref(false);
 const paying = ref(false);
 const initializing = ref(false);
+const discountCode = ref('');
+const discountInfo = ref<DiscountInfo>();
+
+const { paymentMethodId } = usePaymentMethodParam();
+const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
+
+const { planParams } = usePlanParams();
+const { planId } = usePlanIdParam();
 
 const processing = computed(() => get(paying) || get(loading) || get(pending));
 
@@ -46,8 +54,19 @@ let btClient: braintree.Client | null = null;
 
 const logger = useLogger('paypal-payment');
 
-async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, pay: (plan: PayEvent) => void) {
+const grandTotal = computed<number>(() => {
+  const selectedPlan = get(plan);
+  const discountVal = get(discountInfo);
+  if (!discountVal || !discountVal.isValid) {
+    return selectedPlan.price;
+  }
+
+  return discountVal.finalPrice;
+});
+
+async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, grandTotal: Ref<number>, submit: (plan: CardPaymentRequest) => void) {
   let paypalActions: any = null;
+
   watch(accepted, (val) => {
     if (val)
       paypalActions?.enable();
@@ -56,12 +75,14 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
 
     set(mustAcceptRefund, !val);
   });
+
   watch(processing, (val) => {
     if (val)
       paypalActions?.disable();
     else
       paypalActions?.enable();
   });
+
   const btClient = await client.create({
     authorization: get(token),
   });
@@ -69,6 +90,7 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
   const btPayPalCheckout = await paypalCheckout.create({
     client: btClient,
   });
+
   await btPayPalCheckout.loadPayPalSDK({
     currency: 'EUR',
     vault: true,
@@ -84,10 +106,11 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
     .Buttons({
       createBillingAgreement: async () => {
         set(paying, true);
-        logger.debug(`Creating payment for ${get(plan).finalPriceInEur} EUR`);
+        const grandTotalVal = get(grandTotal);
+        logger.debug(`Creating payment for ${grandTotalVal} EUR`);
         return await btPayPalCheckout.createPayment({
           flow: 'vault' as any,
-          amount: get(plan).finalPriceInEur,
+          amount: grandTotalVal,
           currency: 'EUR',
         });
       },
@@ -97,9 +120,12 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
         const token = await btPayPalCheckout.tokenizePayment(data);
         const vaultedToken = await addPaypal({ paymentMethodNonce: token.nonce });
         const vaultedNonce = await createPaypalNonce({ paymentToken: vaultedToken });
-        pay({
-          months: get(plan).months,
-          nonce: vaultedNonce,
+        const { planId } = get(plan);
+
+        submit({
+          paymentMethodNonce: vaultedNonce,
+          discountCode: get(discountCode) || undefined,
+          planId,
         });
         return token;
       },
@@ -137,15 +163,11 @@ async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
-      plan: get(plan).months,
+      ...get(planParams),
+      planId: get(planId),
       method: get(paymentMethodId),
     },
   });
-}
-
-function redirect() {
-  navigateTo({ name: 'checkout-success' });
-  stopWatcher();
 }
 
 const stopWatcher = watchEffect(() => {
@@ -153,10 +175,15 @@ const stopWatcher = watchEffect(() => {
     redirect();
 });
 
+function redirect() {
+  navigateTo({ name: 'checkout-success' });
+  stopWatcher();
+}
+
 onMounted(async () => {
   try {
     set(initializing, true);
-    btClient = await initializeBraintree(token, plan, p => emit('pay', p));
+    btClient = await initializeBraintree(token, plan, grandTotal, payment => emit('submit', payment));
     set(initializing, false);
   }
   catch (error_: any) {
@@ -173,22 +200,33 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <div class="my-6 grow flex flex-col">
-    <div
-      id="paypal-button"
-      :class="[
-        $style.buttons,
-        { [$style.buttons__disabled]: mustAcceptRefund || processing },
-      ]"
-    />
+  <div class="mb-6 grow flex flex-col">
     <SelectedPlanOverview
       :plan="plan"
+      :next-payment="nextPayment"
       :disabled="processing || initializing"
+    />
+    <DiscountCodeInput
+      v-model="discountCode"
+      v-model:discount-info="discountInfo"
+      :plan="plan"
+      class="mt-6"
+    />
+    <PaymentGrandTotal
+      :grand-total="grandTotal"
+      class="mt-6"
     />
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"
-      :class="$style.policy"
+      class="my-8"
+    />
+    <div
+      id="paypal-button"
+      class="mb-8"
+      :class="[
+        { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
+      ]"
     />
     <div
       v-if="pending"
@@ -201,7 +239,7 @@ onUnmounted(async () => {
         <span>{{ status?.message }}</span>
       </RuiAlert>
     </div>
-    <div :class="$style.button">
+    <div class="flex gap-4 justify-center w-full mt-auto">
       <RuiButton
         :disabled="processing"
         :loading="pending || initializing"
@@ -209,6 +247,12 @@ onUnmounted(async () => {
         size="lg"
         @click="back()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
     </div>
@@ -232,19 +276,3 @@ onUnmounted(async () => {
     {{ error?.message }}
   </FloatingNotification>
 </template>
-
-<style lang="scss" module>
-.policy {
-  @apply my-8;
-}
-
-.buttons {
-  &__disabled {
-    @apply opacity-50 cursor-not-allowed pointer-events-none;
-  }
-}
-
-.button {
-  @apply flex gap-4 justify-center w-full mt-auto;
-}
-</style>

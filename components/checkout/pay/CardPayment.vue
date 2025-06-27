@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import type { PaymentStep, SavedCard, SelectedPlan } from '~/types';
-import type { PayEvent } from '~/types/common';
+import type { CardPaymentRequest, PaymentStep, SavedCard, SelectedPlan } from '~/types';
+import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
 import {
   type Client,
@@ -9,8 +9,8 @@ import {
   type ThreeDSecure,
   threeDSecure,
 } from 'braintree-web';
+import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import { usePaymentCardsStore } from '~/store/payments/cards';
-import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
 const props = defineProps<{
@@ -20,11 +20,12 @@ const props = defineProps<{
   failure: boolean;
   pending: boolean;
   status: PaymentStep;
+  nextPayment: number;
   card: SavedCard | undefined;
 }>();
 
 const emit = defineEmits<{
-  (e: 'pay', payment: PayEvent): void;
+  (e: 'submit', payment: CardPaymentRequest): void;
   (e: 'update:pending', pending: boolean): void;
 }>();
 
@@ -42,19 +43,22 @@ const challengeVisible = ref(false);
 const paying = ref(false);
 const initializing = ref(true);
 const formInitializing = ref(true);
+const discountCode = ref('');
+const discountInfo = ref<DiscountInfo>();
 
 const accepted = ref(false);
 const error = ref<ErrorMessage | null>(null);
-
-let btThreeDSecure: ThreeDSecure;
-
 const formValid = ref(false);
 const valid = logicAnd(accepted, formValid);
+
+let btThreeDSecure: ThreeDSecure;
 
 const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
 
 const { addCard, createCardNonce } = usePaymentCardsStore();
+const { planParams } = usePlanParams();
+const { planId } = usePlanIdParam();
 
 const logger = useLogger('card-payment');
 
@@ -66,13 +70,24 @@ async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
-      plan: get(plan).months,
+      ...get(planParams),
+      planId: get(planId),
       method: get(paymentMethodId),
     },
   });
 }
 
 const cardForm = ref();
+
+const grandTotal = computed<number>(() => {
+  const selectedPlan = get(plan);
+  const discountVal = get(discountInfo);
+  if (!discountVal || !discountVal.isValid) {
+    return selectedPlan.price;
+  }
+
+  return discountVal.finalPrice;
+});
 
 async function submit() {
   set(paying, true);
@@ -101,7 +116,7 @@ async function submit() {
         next();
       },
       removeFrame: () => updatePending(),
-      amount: get(plan).finalPriceInEur,
+      amount: get(grandTotal).toFixed(2),
       nonce: paymentNonce,
       bin,
       challengeRequested: true,
@@ -117,11 +132,11 @@ async function submit() {
 
     const threeDSecureInfo = payload.threeDSecureInfo;
     if (threeDSecureInfo.liabilityShifted) {
-      const months = get(plan).months;
-      assert(months);
-      emit('pay', {
-        months,
-        nonce: payload.nonce,
+      const { planId } = get(plan);
+      emit('submit', {
+        discountCode: get(discountCode) || undefined,
+        paymentMethodNonce: payload.nonce,
+        planId,
       });
     }
     else {
@@ -232,10 +247,21 @@ onUnmounted(() => {
         color="primary"
       />
     </div>
-    <RuiDivider class="mt-8" />
+    <RuiDivider class="mt-6" />
     <SelectedPlanOverview
       :plan="plan"
+      :next-payment="nextPayment"
       :disabled="disabled"
+    />
+    <DiscountCodeInput
+      v-model="discountCode"
+      v-model:discount-info="discountInfo"
+      :plan="plan"
+      class="mt-6"
+    />
+    <PaymentGrandTotal
+      :grand-total="grandTotal"
+      class="mt-6"
     />
     <AcceptRefundPolicy
       v-model="accepted"
@@ -260,6 +286,12 @@ onUnmounted(() => {
         size="lg"
         @click="back()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
       <RuiButton
