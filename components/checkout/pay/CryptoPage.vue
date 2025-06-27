@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set } from '@vueuse/core';
-import { useSelectedPlan } from '~/composables/use-selected-plan';
 import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { PaymentError } from '~/types/codes';
