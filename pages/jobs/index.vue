@@ -13,7 +13,7 @@ const { data: jobs } = await useAsyncData('jobs', () => fallbackToLocalOnError(
   async () => await queryCollection('jobsLocal').all(),
 ));
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const title = t('jobs.title');
 const header = t('jobs.header');

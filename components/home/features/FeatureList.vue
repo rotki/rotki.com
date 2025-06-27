@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const model = ref(0);
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const data = computed(() => [
   {

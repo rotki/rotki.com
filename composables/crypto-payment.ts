@@ -13,7 +13,7 @@ import {
   optimism,
   sepolia,
 } from '@reown/appkit/networks';
-import { createAppKit, useAppKitProvider } from '@reown/appkit/vue';
+import { createAppKit } from '@reown/appkit/vue';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { BrowserProvider, Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
 import { useMainStore } from '~/store';
@@ -60,7 +60,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
   const connectedChainId = ref<bigint>();
 
   const logger = useLogger('web3-payment');
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
   const pendingTx = usePendingTx();
   const { start, stop } = useTimeoutFn(() => {
@@ -91,14 +91,19 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     themeMode: 'light',
   });
 
+  const getBrowserProvider = (): BrowserProvider => {
+    assert(appKit);
+    const walletProvider = appKit.getProvider('eip155');
+    return new BrowserProvider(walletProvider as any);
+  };
+
   appKit.subscribeAccount((account) => {
     set(state, 'idle');
     set(errorMessage, '');
     set(connected, account.isConnected);
 
     if (account.isConnected) {
-      const { walletProvider } = useAppKitProvider('eip155');
-      const browserProvider = new BrowserProvider(walletProvider as any);
+      const browserProvider = getBrowserProvider();
       browserProvider.getNetwork()
         .then(network => set(connectedChainId, network.chainId))
         .catch(logger.error);
@@ -179,8 +184,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       const payment = get(data);
       assert(payment);
 
-      const { walletProvider } = useAppKitProvider('eip155');
-      const browserProvider = new BrowserProvider(walletProvider as any);
+      const browserProvider = getBrowserProvider();
       const network = await browserProvider.getNetwork();
 
       const { chainId, chainName } = payment;

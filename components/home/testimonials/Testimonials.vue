@@ -5,7 +5,7 @@ const { data: testimonials } = await useAsyncData('testimonials', () => fallback
   async () => await queryCollection('testimonialsLocal').all(),
 ));
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

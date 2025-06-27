@@ -3,7 +3,7 @@ defineProps<{ statusCode: number; title: string }>();
 
 const emit = defineEmits<{ (e: 'handle-error'): void }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

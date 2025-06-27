@@ -12,7 +12,7 @@ import { FetchError } from 'ofetch';
 import { useRedirectUrl } from '~/composables/redirect-url';
 import { fetchWithCsrf } from '~/utils/api';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { captchaId, resetCaptcha } = useRecaptcha();
 
 const accountForm = ref<SignupAccountPayload>({

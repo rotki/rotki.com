@@ -6,7 +6,7 @@ const props = defineProps<{
   step: PaymentStep;
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { step } = toRefs(props);
 

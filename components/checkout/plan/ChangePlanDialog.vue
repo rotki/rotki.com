@@ -23,7 +23,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void;
   (e: 'select', months: number): void;
 }>();
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const store = useMainStore();
 const { plans } = storeToRefs(store);
 const { crypto, visible, warning } = toRefs(props);

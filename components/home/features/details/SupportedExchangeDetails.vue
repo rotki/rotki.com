@@ -2,7 +2,7 @@
 import { get } from '@vueuse/core';
 import { useIntegrationsData } from '~/composables/integrations';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { data: integrationData } = useIntegrationsData();
 
 const exchangesWithKeys = computed(() => get(integrationData).exchanges.filter(item => item.isExchangeWithKey));

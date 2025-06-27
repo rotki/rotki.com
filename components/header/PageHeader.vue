@@ -3,7 +3,7 @@ import { set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { authenticated } = storeToRefs(store);

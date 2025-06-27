@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const values: { icon: RuiIcons; label: string }[] = [
   { icon: 'lu-landmark', label: t('values.vision_section.list.line_1') },

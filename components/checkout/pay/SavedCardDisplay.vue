@@ -76,7 +76,7 @@ function setupVaults() {
 const { deleteCard } = usePaymentCardsStore();
 const vaults = setupVaults();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const last4Digits = computed<string>(() => `**** **** **** ${props.card.last4}`);
 

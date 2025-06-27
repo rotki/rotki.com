@@ -34,7 +34,7 @@ const showChangePaymentDialog = ref(false);
 
 let stopWatcher: WatchHandle;
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('card-payment-form');
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
 const { connected, pay, isOpen, open, isExpectedChain, switchNetwork } = useWeb3Payment(data, state, error);

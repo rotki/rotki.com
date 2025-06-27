@@ -20,7 +20,7 @@ const cancelling = ref<boolean>(false);
 const resuming = ref<boolean>(false);
 const resumingSubscription = ref<Subscription>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { subscriptions } = storeToRefs(store);

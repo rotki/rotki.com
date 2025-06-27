@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
 const { plan: savedPlan } = usePlanParams();
 

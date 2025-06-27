@@ -3,7 +3,7 @@ defineProps<{ statusCode: number }>();
 
 const emit = defineEmits<{ (e: 'handle-error'): void }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const otherHeight = inject('otherHeight', 0);
 </script>

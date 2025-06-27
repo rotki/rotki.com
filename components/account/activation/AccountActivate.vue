@@ -34,7 +34,7 @@ onBeforeMount(async () => {
   if (get(isValid))
     await getAccount();
 });
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { getLastRedirectUrl } = useRedirectUrl();
 

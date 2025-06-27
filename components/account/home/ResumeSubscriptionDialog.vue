@@ -10,7 +10,7 @@ const emit = defineEmits<{
   confirm: [val: Subscription];
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { resumeError } = storeToRefs(useMainStore());
 

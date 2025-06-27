@@ -10,7 +10,7 @@ const emit = defineEmits<{
 
 const confirmed = ref(false);
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 function change() {
   emit('change');

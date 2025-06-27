@@ -22,7 +22,7 @@ const username = computed(() => {
   return !userAccount ? '' : userAccount.username;
 });
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
