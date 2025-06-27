@@ -113,12 +113,12 @@ export const AvailablePlan = z.object({
   monthlyPlan: z.object({
     planId: z.number(),
     price: z.string(),
-  }),
+  }).nullable(),
   tierName: z.string(),
   yearlyPlan: z.object({
     planId: z.number(),
     price: z.string(),
-  }),
+  }).nullable(),
 });
 
 export type AvailablePlan = z.infer<typeof AvailablePlan>;
@@ -141,6 +141,7 @@ export interface SelectedPlan {
   planId: number;
   name: string;
   price: number;
+  durationInMonths: number;
 }
 
 const CardCheckout = z

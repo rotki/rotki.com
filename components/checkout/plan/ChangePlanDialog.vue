@@ -24,7 +24,7 @@ const emit = defineEmits<{
 
 const { visible, warning } = toRefs(props);
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { planParams } = usePlanParams();
 
 const confirmed = ref(false);
@@ -39,6 +39,11 @@ function select(plan: AvailablePlan) {
     return;
 
   const planId = plan[get(selectedPlanPeriod) === PricingPeriod.MONTHLY ? 'monthlyPlan' : 'yearlyPlan']?.planId;
+
+  if (!planId) {
+    logger.error('Plan ID not found for selected period');
+    return;
+  }
 
   return emit('select', {
     period: get(selectedPlanPeriod),

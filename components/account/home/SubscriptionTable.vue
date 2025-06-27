@@ -205,7 +205,7 @@ onUnmounted(() => pause());
       outlined
     >
       <template #item.planName="{ row }">
-        {{ row.isLegacy ? row.planName : getPlanNameFor({ name: row.planName, durationInMonths: row.durationInMonths }) }}
+        {{ row.isLegacy ? row.planName : getPlanNameFor(t, { name: row.planName, durationInMonths: row.durationInMonths }) }}
       </template>
       <template #item.createdDate="{ row }">
         {{ formatDate(row.createdDate) }}
