@@ -107,9 +107,8 @@ const Plan = z.object({
   priceFiat: z.string(),
 });
 
-export type Plan = z.infer<typeof Plan>;
-
 export const AvailablePlan = z.object({
+  isMostPopular: z.boolean().default(false),
   monthlyPlan: z.object({
     planId: z.number(),
     price: z.string(),
@@ -119,7 +118,10 @@ export const AvailablePlan = z.object({
     planId: z.number(),
     price: z.string(),
   }).nullable(),
-});
+}).transform(data => ({
+  ...data,
+  isMostPopular: data.tierName === 'pelican', // TODO: get this from backend
+}));
 
 export type AvailablePlan = z.infer<typeof AvailablePlan>;
 
