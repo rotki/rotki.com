@@ -16,8 +16,6 @@ const props = withDefaults(
 
 const { t } = useI18n({ useScope: 'global' });
 
-const mostPopularPlan = 'next'; // TODO: get this information from backend
-
 const plans = computed<MappedPlan[]>(() => {
   const isYearly = props.selectedPeriod === PricingPeriod.YEARLY;
 
@@ -49,8 +47,8 @@ const plans = computed<MappedPlan[]>(() => {
       }
 
       // Format prices to remove trailing zeros
-      const formattedMonthlyPrice = monthlyPrice.toFixed(2);
-      const formattedYearlyPrice = yearlyPrice.toFixed(2);
+      const formattedMonthlyPrice = formatCurrency(monthlyPrice);
+      const formattedYearlyPrice = formatCurrency(yearlyPrice);
 
       regularPlan.push({
         name: item.name,
@@ -58,7 +56,7 @@ const plans = computed<MappedPlan[]>(() => {
         mainPriceDisplay: `€ ${formattedMonthlyPrice}`,
         secondaryPriceDisplay: isYearly ? t('pricing.billed_annually', { price: formattedYearlyPrice }) : t('pricing.billed_monthly'),
         type: 'regular',
-        isMostPopular: item.name === mostPopularPlan,
+        isMostPopular: item.isMostPopular,
       });
     });
 
