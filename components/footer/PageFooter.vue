@@ -8,7 +8,7 @@ withDefaults(
   },
 );
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const year = new Date().getFullYear().toString();
 const copyright = computed<string>(() => `© Rotki Solutions GmbH 2018-${year}.`);

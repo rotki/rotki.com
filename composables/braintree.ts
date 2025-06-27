@@ -8,7 +8,7 @@ import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 
 export function useBraintree() {
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const store = useMainStore();
   const route = useRoute();
   const router = useRouter();

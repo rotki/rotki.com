@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const title = 'refund policy';
 const description = 'Rotki Refund and Cancellation Policy';

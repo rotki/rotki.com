@@ -47,7 +47,7 @@ const tokenItems = computed<Item[]>(() => {
   });
 });
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const selectedToken = computed({
   get() {

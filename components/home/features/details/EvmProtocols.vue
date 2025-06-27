@@ -3,7 +3,7 @@ import type { IntegrationItem } from '~/types/integrations';
 import { get } from '@vueuse/core';
 import { useIntegrationsData } from '~/composables/integrations';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 // Sorted by TVL, source: Defillama
 const biggestProtocols: string[] = [

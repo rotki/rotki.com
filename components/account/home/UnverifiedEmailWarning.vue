@@ -3,7 +3,7 @@ import type { ActionResult } from '~/types/common';
 import { set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 

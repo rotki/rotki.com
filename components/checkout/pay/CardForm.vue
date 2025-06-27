@@ -236,7 +236,7 @@ function setupHostedFields() {
 
 const fields = setupHostedFields();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 onMounted(async () => {
   try {

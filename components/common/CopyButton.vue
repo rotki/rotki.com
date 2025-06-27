@@ -8,7 +8,7 @@ const copied = ref(false);
 
 const { start, stop } = useTimeoutFn(() => set(copied, false), 4000);
 const { copy } = useClipboard({ source: modelValue });
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 function copyToClipboard() {
   stop();

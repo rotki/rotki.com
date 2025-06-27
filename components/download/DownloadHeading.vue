@@ -2,7 +2,7 @@
 import type { DownloadItem, DownloadItemSingle } from '~/types/download';
 
 const props = defineProps<{ version: string; links: DownloadItem[] }>();
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const showAll = ref(false);
 

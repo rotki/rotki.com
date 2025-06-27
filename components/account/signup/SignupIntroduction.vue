@@ -3,7 +3,7 @@ const emit = defineEmits<{
   (e: 'next'): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

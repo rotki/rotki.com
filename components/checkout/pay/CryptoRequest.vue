@@ -3,7 +3,7 @@ import { get, set } from '@vueuse/core';
 import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const acceptRefundPolicy = ref(false);

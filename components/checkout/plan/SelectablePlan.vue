@@ -14,7 +14,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{ (e: 'click'): void }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { plan } = toRefs(props);
 

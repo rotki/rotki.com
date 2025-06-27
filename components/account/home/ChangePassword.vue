@@ -62,7 +62,7 @@ function reset() {
   get(v$).$reset();
 }
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

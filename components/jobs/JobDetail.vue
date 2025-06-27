@@ -30,7 +30,7 @@ function filterBy(filterMethod: (tag: string) => boolean) {
 const mainColumn = filterBy(tag => tag !== 'blockquote');
 const sideColumn = filterBy(tag => tag === 'blockquote');
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

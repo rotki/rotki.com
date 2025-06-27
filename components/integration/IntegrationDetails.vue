@@ -12,7 +12,7 @@ const search = ref<string>('');
 const searchDebounced = refDebounced(search, 200);
 const tab = ref<TabCategory>(TabCategory.ALL);
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const router = useRouter();
 const route = useRoute();

@@ -5,7 +5,7 @@ import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { account } = storeToRefs(useMainStore());
 

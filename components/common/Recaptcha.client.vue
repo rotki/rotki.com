@@ -31,7 +31,7 @@ const rendered = ref(false);
 
 // this will be populated once the deferred captcha script is loaded
 const grecaptcha = toRef(window, 'grecaptcha');
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 /**
  * Renders the captcha if not rendered and required fields are available

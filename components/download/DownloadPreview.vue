@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import AppShowcaseSlider from '~/components/common/AppShowcaseSlider.vue';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

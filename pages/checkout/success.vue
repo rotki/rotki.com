@@ -19,7 +19,7 @@ useHead({
   ...commonAttrs(),
 });
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 useAutoLogout();
 

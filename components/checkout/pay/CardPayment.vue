@@ -28,7 +28,7 @@ const emit = defineEmits<{
   (e: 'update:pending', pending: boolean): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { paymentMethodId } = usePaymentMethodParam();
 
 interface ErrorMessage {

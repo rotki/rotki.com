@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const notes = [
   t(`home.plans.tiers.step_3.notes.line_1`),
   t(`home.plans.tiers.step_3.notes.line_2`),

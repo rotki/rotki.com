@@ -9,7 +9,7 @@ import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
 import { toMessages } from '~/utils/validation';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const state = reactive({

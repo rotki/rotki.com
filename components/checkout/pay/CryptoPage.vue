@@ -6,7 +6,7 @@ import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const loading = ref<boolean>(false);
 const data = ref<CryptoPayment>();

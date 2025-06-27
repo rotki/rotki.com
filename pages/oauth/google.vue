@@ -8,7 +8,7 @@ interface GoogleTokenResponse {
 
 type OAuthMode = 'app' | 'docker';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
 const config = useRuntimeConfig();
 const logger = useLogger();

@@ -5,7 +5,7 @@ import { commonAttrs, getMetadata } from '~/utils/metadata';
 const { public: { baseUrl } } = useRuntimeConfig();
 const { path } = useRoute();
 const { fallbackToLocalOnError } = useRemoteOrLocal();
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { data: job } = await useAsyncData(path, () => fallbackToLocalOnError(
   async () => await queryCollection('jobsRemote').path(path).first(),

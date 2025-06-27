@@ -19,7 +19,7 @@ definePageMeta({
 });
 
 const { public: { maintenance, contact: { emailMailto, email } } } = useRuntimeConfig();
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 if (!maintenance)
   navigateTo('/');

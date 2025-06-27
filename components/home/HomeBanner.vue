@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const data: { icon: RuiIcons; text: string; tooltip: string }[] = [
   {

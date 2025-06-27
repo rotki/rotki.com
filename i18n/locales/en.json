@@ -44,7 +44,7 @@
     "no_premium": {
       "no_premium_found": "No premium subscription found. Select your {plan}.",
       "plan": "premium subscription plan",
-      "title": "Rotki Premium"
+      "title": "rotki Premium"
     },
     "payments": {
       "headers": {
@@ -63,20 +63,20 @@
           "yes": "Yes, cancel my subscription"
         },
         "benefits": {
-          "line_1": "Rotki is open-source software, and your subscription helps support its development.",
-          "line_2": "If you cancel your subscription, you will no longer be able to use any Rotki premium features until you subscribe again.",
+          "line_1": "rotki is open-source software, and your subscription helps support its development.",
+          "line_2": "If you cancel your subscription, you will no longer be able to use any rotki premium features until you subscribe again.",
           "line_3": "We're constantly developing new premium features that will soon be available to our subscribers."
         },
         "bug_tracker": "bug tracker",
-        "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a Rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the Rotki community.",
+        "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the rotki community.",
         "notification": {
           "title": "Cancellation Failure"
         },
         "subscription_status": {
-          "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all Rotki premium features.",
+          "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all rotki premium features.",
           "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."
         },
-        "title": "Canceling Your Rotki Subscription"
+        "title": "Canceling Your rotki Subscription"
       },
       "cancelled_but_still_active": {
         "description": "You canceled this subscription, but it will remain active until {date}",
@@ -255,7 +255,7 @@
       },
       "introduction": {
         "message": {
-          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. Rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account do not work for the other. To use Rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
+          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account do not work for the other. To use rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
           "download": "download",
           "premium_subscription": "premium subscription"
         },
@@ -675,8 +675,8 @@
       },
       "accept_title": "Refund policy",
       "non_refundable": "refunds are not allowed",
-      "policy": "Rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of Rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
-      "title": "Rotki Refund and Cancellation Policy"
+      "policy": "rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
+      "title": "rotki Refund and Cancellation Policy"
     }
   },
   "products": {
@@ -849,7 +849,7 @@
         "description": "Contribute code/issues."
       },
       "header": "Get in touch",
-      "subtitle": "For media inquiries or additional information about Rotki, please reach out to:",
+      "subtitle": "For media inquiries or additional information about rotki, please reach out to:",
       "title": "Contact us",
       "twitter": {
         "description": "See our daily updates."
