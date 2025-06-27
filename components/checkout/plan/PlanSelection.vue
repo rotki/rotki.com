@@ -8,7 +8,7 @@ import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
 const { planParams } = usePlanParams();
 

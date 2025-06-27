@@ -31,7 +31,7 @@ const emit = defineEmits<{
   (e: 'clear:errors'): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 const { token, plan, loading, pending, success, nextPayment } = toRefs(props);
 const error = ref<ErrorMessage | null>(null);

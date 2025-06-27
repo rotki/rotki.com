@@ -1,6 +1,5 @@
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
-import { useSelectedPlan } from '~/composables/use-selected-plan';
 import { useMainStore } from '~/store';
 import {
   ActionResultResponse,
@@ -19,7 +18,7 @@ export function useBraintree() {
   const paymentSuccess = ref(false);
   const paymentError = ref('');
 
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: 'global' });
   const { refreshSubscriptionsAndPayments } = useMainStore();
   const router = useRouter();
 
@@ -143,14 +142,16 @@ export function useBraintree() {
     return { type: 'idle' };
   });
 
-  watchEffect(async () => {
-    const planIdVal = get(planId);
-    if (!planIdVal) {
-      await router.push({ name: 'checkout-pay' });
-      return;
-    }
+  watchEffect(() => {
+    (async () => {
+      const planIdVal = get(planId);
+      if (!planIdVal) {
+        await router.push({ name: 'checkout-pay' });
+        return;
+      }
 
-    await loadPlan(planIdVal);
+      await loadPlan(planIdVal);
+    })();
   });
 
   const { selectedPlan } = useSelectedPlan();

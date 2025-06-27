@@ -22,9 +22,11 @@ const router = useRouter();
 
 const selection = ref(false);
 
-const name = computed(() => {
+const { t } = useI18n({ useScope: 'global' });
+
+const name = computed<string>(() => {
   const selectedPlan = get(plan);
-  return `${getPlanNameFor(selectedPlan)} - € ${selectedPlan.price.toFixed(2)}`;
+  return `${getPlanNameFor(t, selectedPlan)} - € ${selectedPlan.price.toFixed(2)}`;
 });
 
 const nextPaymentDate = computed(() => {
@@ -52,8 +54,6 @@ function switchTo(data: PlanParams & { planId: number }) {
     },
   });
 }
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const PremiumTierPlan = z.object({
   id: z.number(),
   price: z.string(),
-});
+}).nullable();
 
 export const PremiumTierInfo = z.object({
   limits: z.object({

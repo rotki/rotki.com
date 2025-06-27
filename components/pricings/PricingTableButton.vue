@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
-import { isCustomPlan, isStarterPlan } from '~/components/pricings/utils';
+import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
 
 defineProps<{
   plan: MappedPlan;
@@ -14,12 +14,12 @@ const {
   },
 } = useRuntimeConfig();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
   <ButtonLink
-    v-if="isStarterPlan(plan)"
+    v-if="isFreePlan(plan)"
     class="w-full"
     to="/download"
     size="lg"
