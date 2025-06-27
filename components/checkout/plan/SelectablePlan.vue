@@ -28,7 +28,8 @@ const price = computed(() => {
   const { monthlyPlan, yearlyPlan } = get(plan);
   const periodVal = get(period);
 
-  return parseFloat(periodVal === PricingPeriod.YEARLY ? yearlyPlan.price : monthlyPlan.price).toFixed(2);
+  const targetPlan = periodVal === PricingPeriod.YEARLY ? yearlyPlan : monthlyPlan;
+  return targetPlan ? parseFloat(targetPlan.price).toFixed(2) : '0.00';
 });
 </script>
 
