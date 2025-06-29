@@ -12,6 +12,10 @@ definePageMeta({
 const loading = ref(false);
 const leaderboardData = ref<LeaderboardResponse | null>(null);
 
+// Clipboard functionality
+const clipboardSource = ref('');
+const { copy } = useClipboard({ source: clipboardSource });
+
 const LeaderboardEntry = z.object({
   rank: z.number(),
   address: z.string(),
@@ -19,6 +23,7 @@ const LeaderboardEntry = z.object({
   silverCount: z.number(),
   goldCount: z.number(),
   points: z.number(),
+  ensName: z.string().nullable().optional(),
 });
 
 const LeaderboardResponse = z.object({
@@ -50,6 +55,32 @@ async function fetchLeaderboard() {
   finally {
     set(loading, false);
   }
+}
+
+function formatAddressDisplay(holder: z.infer<typeof LeaderboardEntry>) {
+  if (holder.ensName) {
+    return {
+      primary: `${holder.ensName} - ${shortenAddress(holder.address)}`,
+      secondary: null,
+      showTooltip: true,
+      isEns: true,
+    };
+  }
+  return {
+    primary: holder.address,
+    secondary: null,
+    showTooltip: false,
+    isEns: false,
+  };
+}
+
+function shortenAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+function copyToClipboard(text: string) {
+  set(clipboardSource, text);
+  copy();
 }
 
 onMounted(async () => {
@@ -87,22 +118,48 @@ onMounted(async () => {
 
           <div
             v-else-if="currentLeaderboard.length > 0"
-            class="space-y-1"
+            class="flex flex-col"
           >
-            <div
+            <template
               v-for="(user, index) in currentLeaderboard"
               :key="user.rank"
-              class="flex items-center p-3 rounded-xl"
-              :class="[
-                index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30'
-                : 'bg-white/5 border border-white/10',
-              ]"
             >
+              <RuiDivider
+                v-if="index > 0"
+                class="mt-4 pt-2 w-full"
+              />
               <div class="flex items-center space-x-4 flex-1">
                 <div class="flex-1">
-                  <h5 class="text-sm font-bold font-mono">
-                    {{ user.address }}
-                  </h5>
+                  <div class="space-y-1">
+                    <RuiTooltip
+                      v-if="formatAddressDisplay(user).showTooltip"
+                      :open-delay="400"
+                    >
+                      <template #activator>
+                        <h5
+                          class="text-sm font-bold cursor-pointer hover:opacity-75 transition-opacity text-primary"
+                          @click="copyToClipboard(user.address)"
+                        >
+                          {{ formatAddressDisplay(user).primary }}
+                        </h5>
+                      </template>
+                      <div class="text-center">
+                        <div class="font-mono text-xs">
+                          {{ user.address }}
+                        </div>
+                        <div class="text-xs text-rui-dark-text-secondary mt-1">
+                          Click to copy full address
+                        </div>
+                      </div>
+                    </RuiTooltip>
+                    <h5
+                      v-else
+                      class="text-sm font-bold font-mono cursor-pointer hover:opacity-75 transition-opacity"
+                      @click="copyToClipboard(user.address)"
+                    >
+                      {{ formatAddressDisplay(user).primary }}
+                    </h5>
+                  </div>
                   <div class="text-rui-text-secondary text-sm space-y-1">
                     <div class="flex gap-4">
                       <span>🥉 {{ user.bronzeCount }} NFTs</span>
@@ -142,7 +199,7 @@ onMounted(async () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
 
           <!-- Empty State -->
