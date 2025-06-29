@@ -26,7 +26,7 @@ const tabs = [
   },
   {
     label: t('sponsor.tabs.leaderboard'),
-    icon: 'lu-star',
+    icon: 'lu-trophy',
     to: '/sponsor/leaderboard',
   },
 ];
