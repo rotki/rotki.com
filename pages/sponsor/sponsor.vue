@@ -26,6 +26,9 @@ const isApproving = ref(false);
 const usdcAllowance = ref('0');
 const showSuccessDialog = ref(false);
 
+// i18n
+const { t } = useI18n({ useScope: 'global' });
+
 const sponsorship = useRotkiSponsorship();
 
 const {
@@ -41,10 +44,12 @@ const {
   error,
   transactionUrl,
   selectedCurrency,
+  enabledCurrencies,
   open: openWallet,
   switchNetwork,
   fetchTierPrices,
   loadNFTImages,
+  loadEnabledCurrencies,
   mintSponsorshipNFT,
   isTierAvailable,
   approveUSDC,
@@ -110,18 +115,18 @@ const buttonText = computed(() => {
   const currency = get(selectedCurrency);
 
   if (!get(connected))
-    return 'Connect Wallet';
+    return t('sponsor.sponsor_page.buttons.connect_wallet');
   if (!get(isExpectedChain))
-    return 'Switch Network';
+    return t('sponsor.sponsor_page.buttons.switch_network');
   if (!isTierAvailable(selectedTierKey))
-    return `${tier?.label} Sold Out`;
+    return t('sponsor.sponsor_page.buttons.sold_out', { tier: tier?.label });
   if (get(isApproving))
-    return 'Approving USDC...';
+    return t('sponsor.sponsor_page.buttons.approving');
   if (get(needsApproval))
-    return `Approve ${currency}`;
+    return t('sponsor.sponsor_page.buttons.approve', { currency });
   if (get(sponsorshipState).status === 'pending')
-    return 'Minting...';
-  return `Mint ${tier?.label} sponsorship NFT`;
+    return t('sponsor.sponsor_page.buttons.minting');
+  return t('sponsor.sponsor_page.buttons.mint', { tier: tier?.label });
 });
 
 const buttonAction = computed(() => {
@@ -142,6 +147,8 @@ const isButtonDisabled = computed(() => {
   const selectedTierKey = get(selectedTier);
   return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey);
 });
+
+const availableCurrencies = computed(() => CURRENCY_OPTIONS.filter(c => get(enabledCurrencies).includes(c.key)));
 
 async function checkAllowanceIfNeeded() {
   const currency = get(selectedCurrency);
@@ -166,7 +173,8 @@ watch(() => sponsorshipState.value.status, (newStatus) => {
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
+  await loadEnabledCurrencies();
   fetchTierPrices();
   loadNFTImages();
   checkAllowanceIfNeeded();
@@ -189,13 +197,13 @@ onMounted(() => {
               class="text-red-500 text-center"
             >
               <div class="text-lg font-medium">
-                Failed to load
+                {{ t('sponsor.sponsor_page.nft_image.failed_to_load') }}
               </div>
               <button
                 class="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
                 @click="loadNFTImages()"
               >
-                Retry
+                {{ t('sponsor.sponsor_page.nft_image.retry') }}
               </button>
             </div>
             <div
@@ -204,7 +212,7 @@ onMounted(() => {
             >
               <img
                 :src="nftImages[selectedTier]"
-                :alt="`${SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label} NFT`"
+                :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label })"
                 class="w-full h-full object-cover rounded-lg"
                 @error="console.warn('Image failed to load')"
               />
@@ -217,10 +225,10 @@ onMounted(() => {
                 🎨
               </div>
               <div class="text-lg font-medium">
-                {{ SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }} NFT
+                {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }) }}
               </div>
               <div class="text-sm text-rui-text-secondary mt-1">
-                Image not available
+                {{ t('sponsor.sponsor_page.nft_image.image_not_available') }}
               </div>
             </div>
           </div>
@@ -232,17 +240,17 @@ onMounted(() => {
         <div class="space-y-6">
           <div>
             <h5 class="text-h4 font-bold mb-2">
-              Sponsor next rotki release
+              {{ t('sponsor.sponsor_page.title') }}
             </h5>
             <p class="text-rui-text-secondary mb-6">
-              Support rotki development by minting exclusive NFTs. Each tier unlocks special benefits and shows your commitment to the project. The more NFTs you hold, the higher you'll appear on the <ButtonLink
+              {{ t('sponsor.sponsor_page.description').replace('{leaderboard_link}', '') }}<ButtonLink
                 to="/sponsor/leaderboard"
                 color="primary"
                 inline
                 class="underline"
                 variant="text"
               >
-                leaderboard
+                {{ t('sponsor.sponsor_page.leaderboard_link_text') }}
               </ButtonLink>
             </p>
           </div>
@@ -250,11 +258,11 @@ onMounted(() => {
           <!-- Currency Selection -->
           <div class="space-y-4">
             <h6 class="font-bold">
-              Payment Currency
+              {{ t('sponsor.sponsor_page.payment_currency') }}
             </h6>
             <div class="flex gap-2">
               <RuiButton
-                v-for="currency in CURRENCY_OPTIONS"
+                v-for="currency in availableCurrencies"
                 :key="currency.key"
                 :variant="selectedCurrency === currency.key ? 'default' : 'outlined'"
                 color="primary"
@@ -276,7 +284,7 @@ onMounted(() => {
           <!-- Tier Selection -->
           <div class="space-y-4">
             <h6 class="font-bold">
-              Select Tier
+              {{ t('sponsor.sponsor_page.select_tier') }}
             </h6>
             <div class="space-y-3">
               <RuiCard
@@ -302,24 +310,24 @@ onMounted(() => {
                 />
                 <div class="flex flex-col items-end">
                   <div class="text-lg font-bold text-rui-primary">
-                    {{ tierPrices[tier.key]?.[selectedCurrency] ? `${tierPrices[tier.key][selectedCurrency]} ${selectedCurrency}` : 'Loading...' }}
+                    {{ tierPrices[tier.key]?.[selectedCurrency] ? `${tierPrices[tier.key][selectedCurrency]} ${selectedCurrency}` : t('sponsor.sponsor_page.pricing.loading') }}
                   </div>
                   <div
                     v-if="tierSupply[tier.key]"
                     class="text-sm text-rui-text-secondary"
                   >
                     <template v-if="tierSupply[tier.key].maxSupply === 0">
-                      {{ tierSupply[tier.key].currentSupply }} minted
+                      {{ t('sponsor.sponsor_page.pricing.minted', { current: tierSupply[tier.key].currentSupply }) }}
                     </template>
                     <template v-else>
-                      {{ tierSupply[tier.key].currentSupply }}/{{ tierSupply[tier.key].maxSupply }} minted
+                      {{ t('sponsor.sponsor_page.pricing.minted_with_max', { current: tierSupply[tier.key].currentSupply, max: tierSupply[tier.key].maxSupply }) }}
                     </template>
                   </div>
                   <div
                     v-if="tierSupply[tier.key] && !isTierAvailable(tier.key)"
                     class="text-sm text-red-500 font-medium"
                   >
-                    Sold Out
+                    {{ t('sponsor.sponsor_page.pricing.sold_out') }}
                   </div>
                 </div>
               </RuiCard>
@@ -353,7 +361,7 @@ onMounted(() => {
           <!-- Benefits Info -->
           <div class="bg-rui-grey-100 p-4 rounded-lg">
             <h6 class="font-bold mb-2">
-              What you get:
+              {{ t('sponsor.sponsor_page.benefits.title') }}
             </h6>
             <div
               v-if="tierBenefits[selectedTier]"
@@ -363,7 +371,7 @@ onMounted(() => {
                 {{ tierBenefits[selectedTier].description }}
               </p>
               <p class="font-medium">
-                Benefits: {{ tierBenefits[selectedTier].benefits }}
+                {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: tierBenefits[selectedTier].benefits }) }}
               </p>
             </div>
             <div
@@ -384,7 +392,7 @@ onMounted(() => {
             class="mt-4"
           >
             <template #title>
-              Minting Failed
+              {{ t('sponsor.sponsor_page.error.minting_failed') }}
             </template>
             {{ sponsorshipState.error }}
           </RuiAlert>
@@ -405,22 +413,15 @@ onMounted(() => {
               class="text-rui-success"
               size="24"
             />
-            <span class="text-h6 font-bold">NFT Minted Successfully!</span>
+            <span class="text-h6 font-bold">{{ t('sponsor.sponsor_page.success_dialog.title') }}</span>
           </div>
         </template>
 
         <div class="space-y-4">
           <p class="text-rui-text-secondary">
-            Your <span
-              class="font-bold"
-              :class="{
-                'text-amber-600': selectedTier === 'bronze',
-                'text-gray-500': selectedTier === 'silver',
-                'text-yellow-500': selectedTier === 'gold',
-              }"
-            >
-              {{ SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }}
-            </span> sponsorship NFT has been minted successfully!
+            {{ t('sponsor.sponsor_page.success_dialog.success_message', {
+              tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label,
+            }) }}
           </p>
           <p
             class="font-medium px-4 py-3 rounded-lg"
@@ -430,7 +431,10 @@ onMounted(() => {
               'bg-yellow-100 text-yellow-800': selectedTier === 'gold',
             }"
           >
-            Thank you for sponsoring the {{ releaseName ? `"${releaseName}"` : 'upcoming' }} rotki release! 🚀
+            {{ releaseName
+              ? t('sponsor.sponsor_page.success_dialog.thank_you_with_release', { release: releaseName })
+              : t('sponsor.sponsor_page.success_dialog.thank_you_upcoming')
+            }}
           </p>
 
           <div class="flex flex-col gap-3 pt-2">
@@ -445,7 +449,7 @@ onMounted(() => {
               <template #prepend>
                 <RuiIcon name="lu-external-link" />
               </template>
-              View on Etherscan
+              {{ t('sponsor.sponsor_page.success_dialog.view_etherscan') }}
             </ButtonLink>
 
             <ButtonLink
@@ -457,7 +461,7 @@ onMounted(() => {
               <template #prepend>
                 <RuiIcon name="lu-trophy" />
               </template>
-              View Leaderboard
+              {{ t('sponsor.sponsor_page.success_dialog.view_leaderboard') }}
             </ButtonLink>
           </div>
         </div>
@@ -469,7 +473,7 @@ onMounted(() => {
               color="primary"
               @click="showSuccessDialog = false"
             >
-              Close
+              {{ t('sponsor.sponsor_page.success_dialog.close') }}
             </RuiButton>
           </div>
         </template>

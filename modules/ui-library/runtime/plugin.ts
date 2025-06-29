@@ -49,8 +49,8 @@ import {
   LuTimer,
   LuTrash2,
   LuTrophy,
-  LuWallet,
   LuUserCog,
+  LuWallet,
   LuX,
   LuXTwitter,
 } from '@rotki/ui-library';
@@ -107,7 +107,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         LuCircleCheck,
         LuDownload,
         LuHandshake,
-        LuStar,
         LuUserCog,
         LuScrollText,
         LuHandshake,

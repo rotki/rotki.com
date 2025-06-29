@@ -3,22 +3,22 @@ import { get, set } from '@vueuse/core';
 import { Contract, ethers, type TransactionResponse } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
-const CONTRACT_ADDRESS = '0x281986c18a5680C149b95Fc15aa266b633B60e96';
+const CONTRACT_ADDRESS = '0x3b2854f9501Af54d3352AA30F78f92B7668041C7';
 const CHAIN_ID = 11155111; // Sepolia testnet
 const RPC_URL = 'https://sepolia.gateway.tenderly.co';
 const IPFS_URL = 'https://gateway.pinata.cloud/ipfs/';
 
-// Currency symbols (keccak256 hashes)
-const USDC_SYMBOL = '0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa';
+// Payment token addresses
+const ETH_ADDRESS = '0x0000000000000000000000000000000000000000';
+const USDC_ADDRESS = '0x1c7d4b196cb0c7b01d743fbc6116a902379c7238';
 
 const ROTKI_SPONSORSHIP_ABI = [
   'function tokenURI(uint256 tokenId) external view returns (string memory)',
-  'function getPrice(uint256 tierId, bytes32 currencySymbol) external view returns (uint256)',
+  'function getPrice(uint256 tierId, address paymentToken) external view returns (uint256)',
   'function getTierInfo(uint256 releaseId, uint256 tierId) external view returns (uint256 maxSupply, uint256 currentSupply, string memory metadataURI)',
   'function currentReleaseId() external view returns (uint256)',
-  'function ETH() external view returns (bytes32)',
-  'function mint(uint256 tierId, bytes32 currencySymbol) external payable',
-  'function paymentTokens(bytes32 symbol) external view returns (address)',
+  'function mint(uint256 tierId, address paymentToken) external payable',
+  'function paymentTokensEnabled(address token) external view returns (bool)',
 ];
 
 const ERC20_ABI = [
@@ -94,6 +94,7 @@ export function useRotkiSponsorship() {
   const isLoading = ref(true);
   const error = ref<string | null>(null);
   const usdcContractAddress = ref<string | null>(null);
+  const enabledCurrencies = ref<string[]>(['ETH']); // ETH is always enabled
 
   const logger = useLogger('rotki-sponsorship');
   const { t } = useI18n({ useScope: 'global' });
@@ -148,46 +149,56 @@ export function useRotkiSponsorship() {
     return supply.currentSupply < supply.maxSupply;
   };
 
-  async function getPaymentTokenAddress(symbol: string): Promise<string | null> {
+  async function checkPaymentTokenEnabled(tokenAddress: string): Promise<boolean> {
     try {
       const provider = new ethers.JsonRpcProvider(RPC_URL);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
 
-      const symbolHash = ethers.keccak256(ethers.toUtf8Bytes(symbol));
-      const tokenAddress = await contract.paymentTokens(symbolHash);
-
-      // address(0) means ETH, but for other tokens we need a valid address
-      if (tokenAddress === ethers.ZeroAddress) {
-        return symbol === 'ETH' ? null : null; // null indicates not supported
-      }
-
-      return tokenAddress;
+      const isEnabled = await contract.paymentTokensEnabled(tokenAddress);
+      logger.info(`Payment token ${tokenAddress} enabled: ${isEnabled}`);
+      return isEnabled;
     }
     catch (error_) {
-      logger.error(`Error fetching payment token address for ${symbol}:`, error_);
-      return null;
+      logger.error(`Error checking if payment token is enabled for ${tokenAddress}:`, error_);
+      return false;
     }
   }
 
-  async function loadUSDCAddress() {
+  async function loadEnabledCurrencies() {
     try {
-      const provider = new ethers.JsonRpcProvider(RPC_URL);
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
+      logger.info('Loading enabled currencies...');
+      // ETH is always enabled
+      const currencies = ['ETH'];
 
-      const tokenAddress = await contract.paymentTokens(USDC_SYMBOL);
+      // Check if USDC is enabled as a payment token
+      logger.info(`Checking if USDC (${USDC_ADDRESS}) is enabled...`);
+      const isUsdcEnabled = await checkPaymentTokenEnabled(USDC_ADDRESS);
 
-      if (tokenAddress !== ethers.ZeroAddress) {
-        set(usdcContractAddress, tokenAddress);
+      if (isUsdcEnabled) {
+        currencies.push('USDC');
+        set(usdcContractAddress, USDC_ADDRESS);
 
-        // Update CURRENCY_OPTIONS with the fetched address
+        // Update CURRENCY_OPTIONS with the address
         const usdcOption = CURRENCY_OPTIONS.find(option => option.key === 'USDC');
         if (usdcOption) {
-          usdcOption.contractAddress = tokenAddress;
+          usdcOption.contractAddress = USDC_ADDRESS;
         }
+        logger.info('USDC payment option enabled');
+      }
+      else {
+        logger.info('USDC payment option disabled');
+      }
+
+      set(enabledCurrencies, currencies);
+      logger.info(`Enabled currencies: ${currencies.join(', ')}`);
+
+      // If selected currency is not enabled, switch to ETH
+      if (!currencies.includes(get(selectedCurrency))) {
+        set(selectedCurrency, 'ETH');
       }
     }
     catch (error_) {
-      logger.error('Error loading USDC contract address:', error_);
+      logger.error('Error loading enabled currencies:', error_);
     }
   }
 
@@ -196,11 +207,10 @@ export function useRotkiSponsorship() {
       const prices: Record<string, Record<string, string>> = {};
       const provider = new ethers.JsonRpcProvider(RPC_URL);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
-      const ethSymbol = await contract.ETH();
 
       for (const tier of SPONSORSHIP_TIERS) {
-        const ethPrice = await contract.getPrice(tier.tierId, ethSymbol);
-        const usdcPrice = await contract.getPrice(tier.tierId, USDC_SYMBOL);
+        const ethPrice = await contract.getPrice(tier.tierId, ETH_ADDRESS);
+        const usdcPrice = await contract.getPrice(tier.tierId, USDC_ADDRESS);
         prices[tier.key] = {
           ETH: ethers.formatEther(ethPrice),
           USDC: ethers.formatUnits(usdcPrice, 6),
@@ -278,8 +288,8 @@ export function useRotkiSponsorship() {
     set(isLoading, true);
     set(error, null);
     try {
-      // Load USDC address first
-      await loadUSDCAddress();
+      // Load enabled currencies first
+      await loadEnabledCurrencies();
 
       const images: Record<string, string> = {};
       const supplies: Record<string, TierSupply> = {};
@@ -371,8 +381,7 @@ export function useRotkiSponsorship() {
 
       if (currency === 'ETH') {
         // ETH payment
-        const ethSymbol = await contract.ETH();
-        tx = await contract.mint(tierId, ethSymbol, {
+        tx = await contract.mint(tierId, ETH_ADDRESS, {
           value: ethers.parseEther(price),
         });
       }
@@ -383,7 +392,7 @@ export function useRotkiSponsorship() {
           throw new Error(`Insufficient USDC allowance. Please approve ${price} USDC first.`);
         }
 
-        tx = await contract.mint(tierId, USDC_SYMBOL, {
+        tx = await contract.mint(tierId, USDC_ADDRESS, {
           value: 0, // No ETH for token payments
         });
       }
@@ -452,16 +461,17 @@ export function useRotkiSponsorship() {
     ...connectionMethods,
     approveUSDC,
     blockExplorerUrl,
+    checkPaymentTokenEnabled,
     checkUSDCAllowance,
     connected,
+    enabledCurrencies: readonly(enabledCurrencies),
     error: readonly(error),
     fetchTierPrices,
-    getPaymentTokenAddress,
     isExpectedChain,
     isLoading: readonly(isLoading),
     isTierAvailable,
+    loadEnabledCurrencies,
     loadNFTImages,
-    loadUSDCAddress,
     mintSponsorshipNFT,
     nftImages: readonly(nftImages),
     releaseName: readonly(releaseName),

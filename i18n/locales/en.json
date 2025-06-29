@@ -850,6 +850,81 @@
     "tabs": {
       "sponsor": "Sponsor",
       "leaderboard": "Leaderboard"
+    },
+    "leaderboard": {
+      "title": "Sponsor Leaderboard",
+      "subtitle": "Our top supporters making a difference",
+      "loading": "Loading leaderboard...",
+      "empty_state": {
+        "title": "No leaderboard data available",
+        "alt": "No leaderboard data available"
+      },
+      "nft_counts": {
+        "bronze": "🥉 {count} NFTs",
+        "silver": "🥈 {count} NFTs",
+        "gold": "🥇 {count} NFTs"
+      },
+      "points": "{points} points",
+      "tooltip": {
+        "copy_address": "Click to copy full address",
+        "points_breakdown": {
+          "gold": "Gold = 10 pts",
+          "silver": "Silver = 5 pts",
+          "bronze": "Bronze = 1 pts"
+        }
+      },
+      "last_updated": "Last Updated: {date}",
+      "call_to_action": {
+        "title": "Join Our Sponsors",
+        "description": "Support our project and see your name on this leaderboard!",
+        "button": "Become a Sponsor"
+      },
+      "updated_every_hour": "Updated every hour"
+    },
+    "sponsor_page": {
+      "title": "Sponsor next rotki release",
+      "description": "Support rotki development by minting exclusive NFTs. Each tier unlocks special benefits and shows your commitment to the project. The more NFTs you hold, the higher you'll appear on the {leaderboard_link}",
+      "leaderboard_link_text": "leaderboard",
+      "nft_image": {
+        "failed_to_load": "Failed to load",
+        "retry": "Retry",
+        "alt": "{tier} NFT",
+        "not_available": "{tier} NFT",
+        "image_not_available": "Image not available"
+      },
+      "payment_currency": "Payment Currency",
+      "select_tier": "Select Tier",
+      "pricing": {
+        "loading": "Loading...",
+        "minted": "{current} minted",
+        "minted_with_max": "{current}/{max} minted",
+        "sold_out": "Sold Out"
+      },
+      "buttons": {
+        "connect_wallet": "Connect Wallet",
+        "switch_network": "Switch Network",
+        "sold_out": "{tier} Sold Out",
+        "approving": "Approving USDC...",
+        "approve": "Approve {currency}",
+        "minting": "Minting...",
+        "mint": "Mint {tier} sponsorship NFT"
+      },
+      "benefits": {
+        "title": "What you get:",
+        "benefits_label": "Benefits: {benefits}"
+      },
+      "error": {
+        "minting_failed": "Minting Failed"
+      },
+      "success_dialog": {
+        "title": "NFT Minted Successfully!",
+        "success_message": "Your {tier} sponsorship NFT has been minted successfully!",
+        "thank_you_with_release": "Thank you for sponsoring the \"{release}\" rotki release! 🚀",
+        "thank_you_upcoming": "Thank you for sponsoring the upcoming rotki release! 🚀",
+        "view_etherscan": "View on Etherscan",
+        "view_leaderboard": "View Leaderboard",
+        "close": "Close"
+      }
     }
   },
   "subscription": {

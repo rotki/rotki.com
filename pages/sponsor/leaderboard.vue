@@ -16,6 +16,9 @@ const leaderboardData = ref<LeaderboardResponse | null>(null);
 const clipboardSource = ref('');
 const { copy } = useClipboard({ source: clipboardSource });
 
+// i18n
+const { t } = useI18n({ useScope: 'global' });
+
 const LeaderboardEntry = z.object({
   rank: z.number(),
   address: z.string(),
@@ -93,10 +96,10 @@ onMounted(async () => {
     <div class="container mx-auto px-4">
       <div class="text-center py-6 mb-6 bg-gradient-to-b from-transparent to-rui-primary/[0.05] rounded-xl">
         <h4 class="text-h4 font-bold mb-2">
-          Sponsor Leaderboard
+          {{ t('sponsor.leaderboard.title') }}
         </h4>
         <p class="text-rui-text-secondary">
-          Our top supporters making a difference
+          {{ t('sponsor.leaderboard.subtitle') }}
         </p>
       </div>
 
@@ -112,7 +115,7 @@ onMounted(async () => {
               variant="indeterminate"
             />
             <p class="text-rui-text-secondary">
-              Loading leaderboard...
+              {{ t('sponsor.leaderboard.loading') }}
             </p>
           </div>
 
@@ -148,7 +151,7 @@ onMounted(async () => {
                           {{ user.address }}
                         </div>
                         <div class="text-xs text-rui-dark-text-secondary mt-1">
-                          Click to copy full address
+                          {{ t('sponsor.leaderboard.tooltip.copy_address') }}
                         </div>
                       </div>
                     </RuiTooltip>
@@ -162,9 +165,9 @@ onMounted(async () => {
                   </div>
                   <div class="text-rui-text-secondary text-sm space-y-1">
                     <div class="flex gap-4">
-                      <span>🥉 {{ user.bronzeCount }} NFTs</span>
-                      <span>🥈 {{ user.silverCount }} NFTs</span>
-                      <span>🥇 {{ user.goldCount }} NFTs</span>
+                      <span>{{ t('sponsor.leaderboard.nft_counts.bronze', { count: user.bronzeCount }) }}</span>
+                      <span>{{ t('sponsor.leaderboard.nft_counts.silver', { count: user.silverCount }) }}</span>
+                      <span>{{ t('sponsor.leaderboard.nft_counts.gold', { count: user.goldCount }) }}</span>
                     </div>
                     <div class="flex items-center gap-2">
                       <RuiTooltip :open-delay="400">
@@ -173,13 +176,13 @@ onMounted(async () => {
                             color="primary"
                             size="sm"
                           >
-                            {{ user.points }} points
+                            {{ t('sponsor.leaderboard.points', { points: user.points }) }}
                           </RuiChip>
                         </template>
                         <div>
-                          <div>Gold = 10 pts</div>
-                          <div>Silver = 5 pts</div>
-                          <div>Bronze = 1 pts</div>
+                          <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.gold') }}</div>
+                          <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.silver') }}</div>
+                          <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.bronze') }}</div>
                         </div>
                       </RuiTooltip>
                     </div>
@@ -208,21 +211,18 @@ onMounted(async () => {
             class="text-center py-12"
           >
             <img
-              alt="No leaderboard data available"
+              :alt="t('sponsor.leaderboard.empty_state.alt')"
               class="w-24 mx-auto"
               src="/img/not-found.svg"
             />
             <p class="text-rui-text-secondary text-lg">
-              No leaderboard data available
+              {{ t('sponsor.leaderboard.empty_state.title') }}
             </p>
           </div>
         </RuiCard>
 
-        <p
-          v-if="leaderboardData?.lastUpdated"
-          class="text-xs text-rui-text-secondary mt-2 italic"
-        >
-          Last Updated: {{ formatDate(leaderboardData.lastUpdated, 'MMMM DD, YYYY hh:mm') }}
+        <p class="text-xs text-rui-text-secondary mt-2 italic">
+          {{ leaderboardData?.lastUpdated ? t('sponsor.leaderboard.last_updated', { date: formatDate(leaderboardData.lastUpdated, 'MMMM DD, YYYY hh:mm') }) : t('sponsor.leaderboard.updated_every_hour') }}
         </p>
       </div>
 
@@ -230,10 +230,10 @@ onMounted(async () => {
       <div class="text-center mt-6">
         <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 max-w-md mx-auto">
           <h3 class="text-2xl font-bold mb-1">
-            Join Our Sponsors
+            {{ t('sponsor.leaderboard.call_to_action.title') }}
           </h3>
           <p class="text-rui-text-secondary text-sm mb-4">
-            Support our project and see your name on this leaderboard!
+            {{ t('sponsor.leaderboard.call_to_action.description') }}
           </p>
           <ButtonLink
             variant="outlined"
@@ -242,7 +242,7 @@ onMounted(async () => {
             color="primary"
             class="mx-auto"
           >
-            Become a Sponsor
+            {{ t('sponsor.leaderboard.call_to_action.button') }}
           </ButtonLink>
         </div>
       </div>
