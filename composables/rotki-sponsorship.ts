@@ -63,14 +63,14 @@ export interface CurrencyOption {
 export const CURRENCY_OPTIONS: CurrencyOption[] = [
   {
     decimals: 18,
-    iconUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+    iconUrl: '/img/chains/ethereum.svg',
     key: 'ETH',
     label: 'ETH',
     symbol: 'ETH',
   },
   {
     decimals: 6,
-    iconUrl: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png',
+    iconUrl: '/img/usdc.svg',
     key: 'USDC',
     label: 'USDC',
     symbol: 'USDC',
@@ -90,6 +90,7 @@ export function useRotkiSponsorship() {
   const tierSupply = ref<Record<string, TierSupply>>({});
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});
+  const releaseName = ref<string>('');
   const isLoading = ref(true);
   const error = ref<string | null>(null);
   const usdcContractAddress = ref<string | null>(null);
@@ -248,6 +249,15 @@ export function useRotkiSponsorship() {
       const benefitsAttribute = metadata.attributes?.find((attr: any) => attr.trait_type === 'Benefits');
       const benefits = benefitsAttribute?.value || '';
 
+      // Extract release name from metadata attributes or name
+      const releaseAttribute = metadata.attributes?.find((attr: any) => attr.trait_type === 'Release' || attr.trait_type === 'Release Name');
+      const releaseNameFromMetadata = releaseAttribute?.value || metadata.name || '';
+
+      // Set release name if we haven't set it yet or if it's different
+      if (releaseNameFromMetadata && get(releaseName) !== releaseNameFromMetadata) {
+        set(releaseName, releaseNameFromMetadata);
+      }
+
       return {
         benefits,
         currentSupply: Number(currentSupply),
@@ -255,6 +265,7 @@ export function useRotkiSponsorship() {
         imageUrl,
         maxSupply: Number(maxSupply),
         metadataURI,
+        releaseName: releaseNameFromMetadata,
       };
     }
     catch (error_) {
@@ -453,6 +464,7 @@ export function useRotkiSponsorship() {
     loadUSDCAddress,
     mintSponsorshipNFT,
     nftImages: readonly(nftImages),
+    releaseName: readonly(releaseName),
     selectedCurrency,
     sponsorshipState: readonly(sponsorshipState),
     tierBenefits: readonly(tierBenefits),
