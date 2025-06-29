@@ -24,6 +24,7 @@ definePageMeta({
 const selectedTier = ref('bronze');
 const isApproving = ref(false);
 const usdcAllowance = ref('0');
+const showSuccessDialog = ref(false);
 
 const sponsorship = useRotkiSponsorship();
 
@@ -35,6 +36,7 @@ const {
   tierSupply,
   tierBenefits,
   nftImages,
+  releaseName,
   isLoading,
   error,
   transactionUrl,
@@ -156,6 +158,13 @@ async function checkAllowanceIfNeeded() {
 
 watch(selectedCurrency, checkAllowanceIfNeeded);
 watch(connected, checkAllowanceIfNeeded);
+
+// Show success dialog when minting is successful
+watch(() => sponsorshipState.value.status, (newStatus) => {
+  if (newStatus === 'success' && get(transactionUrl)) {
+    set(showSuccessDialog, true);
+  }
+});
 
 onMounted(() => {
   fetchTierPrices();
@@ -368,28 +377,9 @@ onMounted(() => {
           </div>
 
           <!-- Transaction Status -->
-          <RuiAlert
-            v-if="sponsorshipState.status === 'success' && transactionUrl"
-            type="success"
-            class="mt-4"
-          >
-            <template #title>
-              NFT Minted Successfully!
-            </template>
-            <ButtonLink
-              :to="transactionUrl"
-              variant="text"
-              color="primary"
-              class="underline"
-              inline
-              external
-            >
-              View transaction on Etherscan
-            </ButtonLink>
-          </RuiAlert>
 
           <RuiAlert
-            v-else-if="sponsorshipState.status === 'error'"
+            v-if="sponsorshipState.status === 'error'"
             type="error"
             class="mt-4"
           >
@@ -401,5 +391,94 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Success Dialog -->
+    <RuiDialog
+      v-model="showSuccessDialog"
+      max-width="400px"
+    >
+      <RuiCard content-class="!pt-0">
+        <template #header>
+          <div class="flex items-center gap-3">
+            <RuiIcon
+              name="lu-circle-check"
+              class="text-rui-success"
+              size="24"
+            />
+            <span class="text-h6 font-bold">NFT Minted Successfully!</span>
+          </div>
+        </template>
+
+        <div class="space-y-4">
+          <p class="text-rui-text-secondary">
+            Your <span
+              class="font-bold"
+              :class="{
+                'text-amber-600': selectedTier === 'bronze',
+                'text-gray-500': selectedTier === 'silver',
+                'text-yellow-500': selectedTier === 'gold',
+              }"
+            >
+              {{ SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }}
+            </span> sponsorship NFT has been minted successfully!
+          </p>
+          <p
+            class="font-medium px-4 py-3 rounded-lg"
+            :class="{
+              'bg-amber-100 text-amber-800': selectedTier === 'bronze',
+              'bg-gray-100 text-gray-800': selectedTier === 'silver',
+              'bg-yellow-100 text-yellow-800': selectedTier === 'gold',
+            }"
+          >
+            Thank you for sponsoring the {{ releaseName ? `"${releaseName}"` : 'upcoming' }} rotki release! 🚀
+          </p>
+
+          <div class="flex flex-col gap-3 pt-2">
+            <ButtonLink
+              v-if="transactionUrl"
+              :to="transactionUrl"
+              variant="outlined"
+              color="primary"
+              class="w-full"
+              external
+            >
+              <template #prepend>
+                <RuiIcon name="lu-external-link" />
+              </template>
+              View on Etherscan
+            </ButtonLink>
+
+            <ButtonLink
+              to="/sponsor/leaderboard"
+              variant="default"
+              color="primary"
+              class="w-full"
+            >
+              <template #prepend>
+                <RuiIcon name="lu-trophy" />
+              </template>
+              View Leaderboard
+            </ButtonLink>
+          </div>
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end w-full">
+            <RuiButton
+              variant="text"
+              color="primary"
+              @click="showSuccessDialog = false"
+            >
+              Close
+            </RuiButton>
+          </div>
+        </template>
+      </RuiCard>
+    </RuiDialog>
+
+    <Confetti
+      v-if="showSuccessDialog"
+      class="absolute top-0 left-0 w-full h-full z-[10000]"
+    />
   </div>
 </template>
