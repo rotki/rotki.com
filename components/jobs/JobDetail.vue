@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { JobsLocalCollectionItem, JobsRemoteCollectionItem, MinimalTree } from '@nuxt/content';
+import type { JobsLocalCollectionItem, JobsRemoteCollectionItem, MinimarkTree } from '@nuxt/content';
 
 const props = defineProps<{
   data: JobsLocalCollectionItem | JobsRemoteCollectionItem;
@@ -8,8 +8,8 @@ const props = defineProps<{
 function filterBy(filterMethod: (tag: string) => boolean) {
   return computed(() => {
     const data = props.data;
-    const body = data.body as any as MinimalTree;
-    assert(body.type === 'minimal');
+    const body = data.body as any as MinimarkTree;
+    assert(body.type === 'minimark');
 
     const elements = body.value.filter(node => filterMethod(node[0]));
 
