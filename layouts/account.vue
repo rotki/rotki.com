@@ -66,6 +66,15 @@ const tabModelValue = ref();
               </RuiTab>
               <RuiTab
                 link
+                to="/home/devices"
+              >
+                <template #prepend>
+                  <RuiIcon name="lu-laptop-minimal" />
+                </template>
+                {{ t('account.tabs.devices') }}
+              </RuiTab>
+              <RuiTab
+                link
                 to="/home/account-details"
               >
                 <template #prepend>
@@ -110,6 +119,18 @@ const tabModelValue = ref();
                   />
                 </template>
                 {{ t('account.tabs.subscription') }}
+              </RuiTab>
+              <RuiTab
+                link
+                to="/home/devices"
+              >
+                <template #prepend>
+                  <RuiIcon
+                    class="shrink-0"
+                    name="lu-laptop-minimal"
+                  />
+                </template>
+                {{ t('account.tabs.devices') }}
               </RuiTab>
               <RuiTab
                 link
