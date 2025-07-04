@@ -146,6 +146,8 @@ export default defineNuxtConfig({
     public: {
       baseUrl: '',
       contact: {
+        bespokeEmail: 'bespoke-accounting@rotki.com',
+        bespokeEmailMailTo: 'mailto:bespoke-accounting@rotki.com',
         discord: 'https://discord.rotki.com',
         email: 'info@rotki.com',
         emailMailto: 'mailto:info@rotki.com',

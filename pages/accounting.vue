@@ -3,7 +3,7 @@ import { commonAttrs } from '~/utils/metadata';
 
 const {
   public: {
-    contact: { emailMailto, twitter, email },
+    contact: { bespokeEmail, bespokeEmailMailTo, twitter },
   },
 } = useRuntimeConfig();
 
@@ -27,112 +27,169 @@ const { t } = useI18n({ useScope: 'global' });
 
 const services = computed(() => [
   {
-    icon: 'lu-clock',
-    title: t('accounting.services.historical_balances.title'),
-    description: t('accounting.services.historical_balances.description'),
+    icon: 'lu-user-cog',
+    title: t('accounting.services.tailored.title'),
+    description: t('accounting.services.tailored.description'),
   },
   {
-    icon: 'lu-binary',
-    title: t('accounting.services.transaction_decoding.title'),
-    description: t('accounting.services.transaction_decoding.description'),
+    icon: 'lu-scroll-text',
+    title: t('accounting.services.scripts.title'),
+    description: t('accounting.services.scripts.description'),
   },
   {
-    icon: 'lu-calculator',
-    title: t('accounting.services.cost_basis_pnl.title'),
-    description: t('accounting.services.cost_basis_pnl.description'),
+    icon: 'lu-handshake',
+    title: t('accounting.services.hands_on.title'),
+    description: t('accounting.services.hands_on.description'),
   },
   {
-    icon: 'lu-puzzle',
-    title: t('accounting.services.complex_situations.title'),
-    description: t('accounting.services.complex_situations.description'),
+    icon: 'lu-eye-off',
+    title: t('accounting.services.privacy.title'),
+    description: t('accounting.services.privacy.description'),
   },
 ]);
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-16 max-w-6xl">
-    <div class="text-center mb-10 md:mb-16">
-      <h1 class="text-h4 mb-5">
-        {{ t('accounting.title') }}
-      </h1>
-      <i18n-t
-        tag="div"
-        class="text-xl md:text-xl mx-auto text-rui-text-secondary"
-        keypath="accounting.intro"
-      >
-        <template #twitter>
-          <ButtonLink
-            color="primary"
-            inline
-            external
-            :to="twitter"
-          >
-            @RotkiApp
-          </ButtonLink>
-        </template>
-      </i18n-t>
-    </div>
+  <div class="py-12 md:py-20">
+    <div class="container mx-auto max-w-5xl">
+      <div class="text-center mb-10 md:mb-16">
+        <h1 class="text-h4 mb-5">
+          {{ t('accounting.title') }}
+        </h1>
+        <i18n-t
+          tag="div"
+          class="text-xl md:text-xl mx-auto text-rui-text-secondary text-justify"
+          keypath="accounting.intro"
+        >
+          <template #twitter>
+            <ButtonLink
+              color="primary"
+              inline
+              external
+              :to="twitter"
+            >
+              @RotkiApp
+            </ButtonLink>
+          </template>
+        </i18n-t>
+      </div>
 
-    <div class="grid md:grid-cols-2 gap-3 md:gap-6 mb-16">
-      <div
-        v-for="service in services"
-        :key="service.title"
-        class="flex gap-4 p-6 rounded-xl bg-gradient-to-b from-transparent to-rui-primary/[0.05]"
-      >
-        <div class="p-3 rounded-lg bg-rui-primary text-white h-fit">
-          <RuiIcon
-            :name="service.icon"
-            size="24"
-          />
-        </div>
-        <div class="flex flex-col gap-1">
-          <h5 class="font-semibold">
-            {{ service.title }}
-          </h5>
-          <p class="text-rui-text-secondary text-sm">
-            {{ service.description }}
-          </p>
+      <div class="grid md:grid-cols-2 gap-3 md:gap-6 mb-16">
+        <div
+          v-for="service in services"
+          :key="service.title"
+          class="flex gap-4 p-4 md:p-6 rounded-xl bg-rui-grey-100"
+        >
+          <div class="p-3 rounded-lg bg-rui-primary text-white h-fit">
+            <RuiIcon
+              :name="service.icon"
+              size="24"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <h5 class="font-semibold">
+              {{ service.title }}
+            </h5>
+            <p class="text-rui-text-secondary text-sm text-justify">
+              {{ service.description }}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="rounded-xl overflow-hidden shadow-xl">
-      <img
-        src="/img/accounting.webp"
-        :alt="t('accounting.title')"
-        class="w-full h-auto"
-      />
+      <div class="rounded-xl overflow-hidden shadow-xl">
+        <img
+          src="/img/accounting.webp"
+          :alt="t('accounting.title')"
+          class="w-full h-auto"
+        />
+      </div>
     </div>
-
-    <div class="bg-rui-primary/5 dark:bg-rui-primary/10 rounded-2xl p-6 md:p-8 text-center mt-12">
-      <div class="mb-6">
+  </div>
+  <div class="bg-rui-primary text-rui-dark-text py-12 md:py-20">
+    <div class="container text-left max-w-5xl">
+      <div class="mb-8">
         <h4 class="text-h4 font-bold mb-4">
           {{ t('accounting.formalization.title') }}
         </h4>
 
-        <p class="font-bold">
+        <p class="text-sm text-white/[0.8] text-justify">
           {{ t('accounting.formalization.description') }}
         </p>
       </div>
 
-      <div class="max-w-sm mx-auto">
-        <p class="mb-4 text-rui-text-secondary text-sm">
-          {{ t('accounting.contact.message') }}
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <i18n-t
+        tag="div"
+        class="font-bold dark"
+        keypath="accounting.contact.message"
+      >
+        <template #email>
           <ButtonLink
-            :to="emailMailto"
-            size="sm"
-            variant="default"
-            color="primary"
+            class="underline !text-white"
+            inline
+            external
+            :to="bespokeEmailMailTo"
           >
-            <template #prepend>
-              <RuiIcon name="lu-mail" />
-            </template>
-            {{ t('accounting.contact.email_button', { email }) }}
+            {{ bespokeEmail }}
           </ButtonLink>
+        </template>
+      </i18n-t>
+    </div>
+  </div>
+
+  <div class="py-12 md:py-20 bg-rui-grey-50">
+    <div class="container mx-auto max-w-5xl">
+      <div class="text-center mb-10 md:mb-16">
+        <h2 class="text-h4 font-bold mb-6">
+          {{ t('accounting.pricing.title') }}
+        </h2>
+        <p class="text-lg text-rui-text-secondary max-w-3xl mx-auto">
+          {{ t('accounting.pricing.intro') }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-xl p-8 md:p-10 shadow-xl border-2 border-rui-primary mb-10">
+        <div class="text-center">
+          <h3 class="text-2xl font-bold mb-2">
+            {{ t('accounting.pricing.initial_consultation.title') }}
+          </h3>
+          <div class="mb-6">
+            <span class="text-2xl font-bold text-rui-primary">{{ t('accounting.pricing.initial_consultation.price') }}</span>
+            <span class="text-xl text-rui-text-secondary">{{ t('accounting.pricing.initial_consultation.per_hour') }}</span>
+          </div>
+          <p class="text-rui-text-secondary max-w-2xl mx-auto">
+            {{ t('accounting.pricing.initial_consultation.description') }}
+          </p>
         </div>
       </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-rui-grey-100 rounded-xl p-6">
+          <h4 class="text-lg font-semibold mb-3">
+            {{ t('accounting.pricing.custom_quote.title') }}
+          </h4>
+          <p class="text-rui-text-secondary text-sm text-justify">
+            {{ t('accounting.pricing.custom_quote.description') }}
+          </p>
+        </div>
+
+        <div class="bg-rui-grey-100 rounded-xl p-6">
+          <h4 class="text-lg font-semibold mb-3">
+            {{ t('accounting.pricing.transparent_fair.title') }}
+          </h4>
+          <p class="text-rui-text-secondary text-sm text-justify">
+            {{ t('accounting.pricing.transparent_fair.description') }}
+          </p>
+        </div>
+      </div>
+      <RuiAlert
+        class="mt-8 text-justify"
+        type="warning"
+        :title="t('accounting.important_note.title')"
+      >
+        {{ t('accounting.important_note.paragraph1') }}
+        {{ t('accounting.important_note.paragraph2') }}
+      </RuiAlert>
     </div>
   </div>
 </template>
