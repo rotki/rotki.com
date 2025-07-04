@@ -35,7 +35,7 @@ const menus: (Menu | MenuParent)[] = [
       },
       {
         label: t('navigation_menu.accounting_service'),
-        to: '/accounting',
+        to: '/bespoke',
         highlightActive: true,
       },
     ],
