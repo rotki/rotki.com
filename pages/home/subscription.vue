@@ -33,6 +33,5 @@ onBeforeMount(() => {
     <ApiKeys v-if="premium" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable />
-    <UserDevicesTable />
   </div>
 </template>
