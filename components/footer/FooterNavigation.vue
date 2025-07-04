@@ -24,7 +24,7 @@ const menus: MenuGroup[] = [
         highlightExactActive: true,
       },
       {
-        label: t('navigation_menu.premium_features'),
+        label: t('navigation_menu.rotki_premium'),
         to: '/products',
         highlightActive: true,
       },

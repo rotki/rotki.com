@@ -165,10 +165,11 @@
       "title": "Pricing",
       "intro": "Crypto accounting is complicated. We make it simple, by doing it right. This is a premium, hands-on service where we take your data, analyze it in depth, and deliver clear, accurate results you can trust.",
       "initial_consultation": {
+        "excluding_vat": "(excl. VAT)",
         "title": "Initial Consultation",
         "price": "€300",
         "per_hour": "/hour",
-        "description": "In the first 1–2 hours, we'll dig into your portfolio: review your rotki data, check your wallets, exchanges, and DeFi activity, and map out what needs to be done. You'll get a clear plan and an honest assessment of the work involved."
+        "description": "In the first 1–2 hours, we'll dig into your portfolio: review your rotki data, check your wallets, exchanges, and DeFi activity, and map out what needs to be done. \n\n You'll get a clear plan and an honest assessment of the work involved. \n The consultation usually takes from 1-3 hours on average"
       },
       "custom_quote": {
         "title": "Custom Quote for the Full Job",
@@ -675,7 +676,7 @@
     "title": "Under maintenance"
   },
   "navigation_menu": {
-    "accounting_service": "Bespoke Accounting Service",
+    "accounting_service": "Bespoke Accounting",
     "blog": {
       "description": "Latest news and updates on rotki",
       "title": "Blog"
@@ -695,11 +696,11 @@
     },
     "jobs": "Jobs",
     "legal": "Legal",
-    "premium_features": "Premium Features",
     "privacy_policy": "Privacy Policy",
     "product": "Product",
     "resources": "Resources",
     "rotki_premium": "rotki Premium",
+    "product_and_services": "Product & Services",
     "tos": "Terms of Service",
     "values": "Values"
   },

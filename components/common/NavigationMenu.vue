@@ -26,7 +26,7 @@ const menus: (Menu | MenuParent)[] = [
     highlightExactActive: true,
   },
   {
-    label: t('navigation_menu.premium_features'),
+    label: t('navigation_menu.product_and_services'),
     children: [
       {
         label: t('navigation_menu.rotki_premium'),
