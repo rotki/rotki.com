@@ -150,14 +150,15 @@ const services = computed(() => [
 
       <div class="bg-white rounded-xl p-8 md:p-10 shadow-xl border-2 border-rui-primary mb-10">
         <div class="text-center">
-          <h3 class="text-2xl font-bold mb-2">
+          <h3 class="text-2xl font-bold mb-0.5">
             {{ t('accounting.pricing.initial_consultation.title') }}
           </h3>
           <div class="mb-6">
             <span class="text-2xl font-bold text-rui-primary">{{ t('accounting.pricing.initial_consultation.price') }}</span>
             <span class="text-xl text-rui-text-secondary">{{ t('accounting.pricing.initial_consultation.per_hour') }}</span>
+            <span class="text-xs text-rui-text-secondary ml-2">{{ t('accounting.pricing.initial_consultation.excluding_vat') }}</span>
           </div>
-          <p class="text-rui-text-secondary max-w-2xl mx-auto">
+          <p class="text-rui-text-secondary max-w-2xl mx-auto whitespace-break-spaces">
             {{ t('accounting.pricing.initial_consultation.description') }}
           </p>
         </div>
