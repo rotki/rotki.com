@@ -139,7 +139,7 @@ const services = computed(() => [
 
   <div class="py-12 md:py-20 bg-rui-grey-50">
     <div class="container mx-auto max-w-5xl">
-      <div class="text-center mb-10 md:mb-16">
+      <div class="text-center mb-6 md:mb-10">
         <h2 class="text-h4 font-bold mb-6">
           {{ t('accounting.pricing.title') }}
         </h2>
@@ -148,7 +148,7 @@ const services = computed(() => [
         </p>
       </div>
 
-      <div class="bg-white rounded-xl p-8 md:p-10 shadow-xl border-2 border-rui-primary mb-10">
+      <div class="bg-white rounded-xl p-4 md:p-6 shadow-xl border-2 border-rui-primary mb-10 max-w-2xl mx-auto">
         <div class="text-center">
           <h3 class="text-2xl font-bold mb-0.5">
             {{ t('accounting.pricing.initial_consultation.title') }}
@@ -158,7 +158,7 @@ const services = computed(() => [
             <span class="text-xl text-rui-text-secondary">{{ t('accounting.pricing.initial_consultation.per_hour') }}</span>
             <span class="text-xs text-rui-text-secondary ml-2">{{ t('accounting.pricing.initial_consultation.excluding_vat') }}</span>
           </div>
-          <p class="text-rui-text-secondary max-w-2xl mx-auto whitespace-break-spaces">
+          <p class="text-rui-text-secondary mx-auto whitespace-break-spaces text-justify">
             {{ t('accounting.pricing.initial_consultation.description') }}
           </p>
         </div>
