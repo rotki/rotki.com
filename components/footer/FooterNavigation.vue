@@ -29,6 +29,11 @@ const menus: MenuGroup[] = [
         highlightActive: true,
       },
       {
+        label: t('navigation_menu.accounting_service'),
+        to: '/accounting',
+        highlightActive: true,
+      },
+      {
         label: t('navigation_menu.integration.title'),
         to: '/integrations',
         highlightActive: true,
@@ -114,6 +119,7 @@ const menus: MenuGroup[] = [
             :highlight-active="menu.highlightActive"
             :highlight-exact-active="menu.highlightExactActive"
             :external="menu.external"
+            class="[&_span]:!text-wrap [&_span]:text-left"
           >
             {{ menu.label }}
           </ButtonLink>

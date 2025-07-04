@@ -27,8 +27,18 @@ const menus: (Menu | MenuParent)[] = [
   },
   {
     label: t('navigation_menu.premium_features'),
-    to: '/products',
-    highlightActive: true,
+    children: [
+      {
+        label: t('navigation_menu.rotki_premium'),
+        to: '/products',
+        highlightActive: true,
+      },
+      {
+        label: t('navigation_menu.accounting_service'),
+        to: '/accounting',
+        highlightActive: true,
+      },
+    ],
   },
   {
     label: t('navigation_menu.integration.title'),

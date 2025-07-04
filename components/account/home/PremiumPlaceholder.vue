@@ -12,7 +12,7 @@ const { t } = useI18n({ useScope: 'global' });
       </div>
       <div>
         <div class="text-body-1">
-          {{ t('account.no_premium.title') }}
+          {{ t('navigation_menu.rotki_premium') }}
         </div>
         <div class="text-rui-text-secondary">
           <i18n-t
