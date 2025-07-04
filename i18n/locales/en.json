@@ -133,6 +133,36 @@
     },
     "welcome": "Welcome"
   },
+  "accounting": {
+    "title": "Bespoke Accounting Service",
+    "intro": "rotki isn't just a plug-and-play app. Since 2017, we {twitter} have built deep expertise in crypto accounting helping users who needed more:",
+    "services": {
+      "historical_balances": {
+        "title": "Historical Balances",
+        "description": "Balances at specific historical times"
+      },
+      "transaction_decoding": {
+        "title": "Transaction Decoding",
+        "description": "Decoding complex transactions"
+      },
+      "cost_basis_pnl": {
+        "title": "Cost Basis & PnL",
+        "description": "Accurate cost basis and profit/loss calculations"
+      },
+      "complex_situations": {
+        "title": "Complex Situations",
+        "description": "Any complex accounting situations you may need"
+      }
+    },
+    "formalization": {
+      "title": "From Private to Professional",
+      "description": "We're formalizing it as a bespoke service, with limited availability. Until now, this was private and ad hoc."
+    },
+    "contact": {
+      "message": "Need help and precision in your crypto accounting with someone who will treat your private data as their own?",
+      "email_button": "Email {email}"
+    }
+  },
   "account_details": {
     "check_email": "To change your email, please contact our support tem via",
     "title": "Details"
@@ -623,6 +653,7 @@
     "title": "Under maintenance"
   },
   "navigation_menu": {
+    "accounting_service": "Bespoke Accounting Service",
     "blog": {
       "description": "Latest news and updates on rotki",
       "title": "Blog"
@@ -646,6 +677,7 @@
     "privacy_policy": "Privacy Policy",
     "product": "Product",
     "resources": "Resources",
+    "rotki_premium": "rotki Premium",
     "tos": "Terms of Service",
     "values": "Values"
   },
