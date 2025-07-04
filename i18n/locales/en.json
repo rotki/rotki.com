@@ -41,11 +41,14 @@
       "unable_to_delete": "You cannot delete your account while you have an active subscription."
     },
     "devices": {
-      "title": "Devices List",
       "no_devices_found": "No devices found",
       "headers": {
         "label": "Label",
-        "date": "First logged in"
+        "last_seen": "Last Seen at"
+      },
+      "delete": {
+        "title": "Delete Device",
+        "description": "Are you sure you want to delete the device \"{label}\"? This action cannot be undone."
       }
     },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
@@ -126,6 +129,7 @@
       "account_details": "Account Details",
       "address": "Address",
       "customer_information": "Customer Information",
+      "devices": "Devices List",
       "subscription": "Subscription"
     },
     "unverified_email": {

@@ -46,6 +46,11 @@ const tabs = [
     to: '/home/subscription',
   },
   {
+    label: t('account.tabs.devices'),
+    icon: 'lu-laptop-minimal',
+    to: '/home/devices',
+  },
+  {
     label: t('account.tabs.account_details'),
     icon: 'lu-circle-user-round',
     to: '/home/account-details',
