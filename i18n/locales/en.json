@@ -143,6 +143,59 @@
     },
     "welcome": "Welcome"
   },
+  "accounting": {
+    "title": "Your Crypto Accounting, Done Right, By the People Who Built rotki",
+    "intro": "Crypto accounting isn’t plug-and-play. Every portfolio is unique, and getting it right means going deep: cleaning messy data, classifying complex events and ensuring your numbers actually make sense. Since 2017, rotki has helped users take control of their crypto finances. Now, for those who need hands-on help, we offer bespoke accounting services using rotki itself and tailored scripts to deliver complete, accurate results.",
+    "services": {
+      "tailored": {
+        "title": "Tailored To Your Needs",
+        "description": "No two portfolios are the same. We work with your exact data, wallets, CSVs, DeFi positions, NFTs and customize every step to match your accounting requirements."
+      },
+      "scripts": {
+        "title": "Built on rotki + Scripts",
+        "description": "We use rotki as the accounting engine, enhanced with custom scripts and tooling tailored to your case. The result: accurate, explainable data that you can use for your specific use case. You get both the data back and the scripts we made for you for reproducability."
+      },
+      "hands_on": {
+        "title": "Hands-On Service",
+        "description": "This isn’t SaaS. It's a service. We work directly with you: identify edge cases, fix data problems, label transactions, track missing histories, and explain every number."
+      },
+      "privacy": {
+        "title": "Privacy First, Always",
+        "description": "Your data stays with us. No uploads to third-party cloud tools. Everything is processed locally or on secure infrastructure we control. Your data is all deleted once we complete the job for you. Your privacy and peace of mind is our top priority."
+      }
+    },
+    "formalization": {
+      "title": "Our Approach",
+      "description": "rotki has always been about empowering users with accurate, private, local-first accounting tools. But not everyone has the time or expertise to dig into every transaction, match LP positions, or chase down lost CSVs. If you want your crypto accounting done with you or for you, using the same tools we’ve built and trusted for years, we’re here to help. We’ve worked with individuals, teams, and DAOs to get their books in order, clean, audit-ready, and future-proof. Not by using generic tax software but just with a deep understanding of the crypto landscape and a commitment to doing it right."
+    },
+    "contact": {
+      "message": "Or, you can email us at {email} with a short summary of your situation."
+    },
+    "pricing": {
+      "title": "Pricing",
+      "intro": "Crypto accounting is complicated. We make it simple, by doing it right. This is a premium, hands-on service where we take your data, analyze it in depth, and deliver clear, accurate results you can trust.",
+      "initial_consultation": {
+        "excluding_vat": "(excl. VAT)",
+        "title": "Initial Consultation",
+        "price": "€300",
+        "per_hour": "/hour",
+        "description": "The initial consultation takes from 1-3 hours on average. We'll dig into your portfolio: review your rotki data, check your wallets, exchanges, and DeFi activity, and map out what needs to be done. You'll get a clear plan and an honest assessment of the work involved."
+      },
+      "custom_quote": {
+        "title": "Custom Quote for the Full Job",
+        "description": "After the consultation, we'll give you a tailored offer based on your situation. Not vague promises but just a fair price for the actual time and complexity. Whether it's a cleanup, a full accounting year, or ongoing help, we'll scope it together."
+      },
+      "transparent_fair": {
+        "title": "Transparent and Fair",
+        "description": "If you decide not to proceed after the initial consultation, that's perfectly fine. You'll still leave with a clearer understanding of your accounting situation."
+      }
+    },
+    "important_note": {
+      "title": "Important note",
+      "paragraph1": "This is a crypto accounting and data preparation service. We help you organize, clean, and analyze your financial history so you (or your tax advisor) have a clear and complete picture.",
+      "paragraph2": "We do not provide tax advice or file tax returns. For filing taxes, we recommend working with a qualified tax professional in your jurisdiction who can use the data we prepare for you. We can also work directly with your tax advisor if you need us to."
+    }
+  },
   "account_details": {
     "check_email": "To change your email, please contact our support tem via",
     "title": "Details"
@@ -642,6 +695,7 @@
     "title": "Under maintenance"
   },
   "navigation_menu": {
+    "accounting_service": "Bespoke Accounting",
     "blog": {
       "description": "Latest news and updates on rotki",
       "title": "Blog"
@@ -661,11 +715,13 @@
     },
     "jobs": "Jobs",
     "legal": "Legal",
-    "premium_features": "Premium Features",
     "privacy_policy": "Privacy Policy",
     "pricing": "Pricing",
     "product": "Product",
     "resources": "Resources",
+    "rotki_premium": "rotki Premium",
+    "product_and_services": "Product & Services",
+    "sponsor": "Sponsor rotki's next release",
     "tos": "Terms of Service",
     "values": "Values"
   },
@@ -828,6 +884,87 @@
   },
   "signup_address": {
     "title": "Address"
+  },
+  "sponsor": {
+    "tabs": {
+      "sponsor": "Sponsor",
+      "leaderboard": "Leaderboard"
+    },
+    "leaderboard": {
+      "title": "Sponsor Leaderboard",
+      "subtitle": "Our top supporters making a difference",
+      "loading": "Loading leaderboard...",
+      "empty_state": {
+        "title": "No leaderboard data available",
+        "alt": "No leaderboard data available"
+      },
+      "nft_counts": {
+        "bronze": "🥉 {count} NFTs",
+        "silver": "🥈 {count} NFTs",
+        "gold": "🥇 {count} NFTs"
+      },
+      "points": "{points} points",
+      "tooltip": {
+        "copy_address": "Click to copy full address",
+        "points_breakdown": {
+          "gold": "Gold = 10 pts",
+          "silver": "Silver = 5 pts",
+          "bronze": "Bronze = 1 pts"
+        }
+      },
+      "last_updated": "Last Updated: {date}",
+      "call_to_action": {
+        "title": "Join Our Sponsors",
+        "description": "Support our project and see your name on this leaderboard!",
+        "button": "Become a Sponsor"
+      },
+      "updated_every_hour": "Updated every hour"
+    },
+    "sponsor_page": {
+      "title": "Sponsor next rotki release",
+      "description": "Support rotki development by minting exclusive NFTs. Each tier unlocks special benefits and shows your commitment to the project. The more NFTs you hold, the higher you'll appear on the {leaderboard_link}",
+      "leaderboard_link_text": "leaderboard",
+      "nft_image": {
+        "failed_to_load": "Failed to load",
+        "retry": "Retry",
+        "alt": "{tier} NFT",
+        "not_available": "{tier} NFT",
+        "image_not_available": "Image not available"
+      },
+      "payment_currency": "Payment Currency",
+      "select_tier": "Select Tier",
+      "pricing": {
+        "loading": "Loading...",
+        "minted": "{current} minted",
+        "minted_with_max": "{current}/{max} minted",
+        "sold_out": "Sold Out"
+      },
+      "buttons": {
+        "connect_wallet": "Connect Wallet",
+        "switch_network": "Switch Network",
+        "sold_out": "{tier} Sold Out",
+        "approving": "Approving USDC...",
+        "approve": "Approve {currency}",
+        "minting": "Minting...",
+        "mint": "Mint {tier} sponsorship NFT"
+      },
+      "benefits": {
+        "title": "What you get:",
+        "benefits_label": "Benefits: {benefits}"
+      },
+      "error": {
+        "minting_failed": "Minting Failed"
+      },
+      "success_dialog": {
+        "title": "NFT Minted Successfully!",
+        "success_message": "Your {tier} sponsorship NFT has been minted successfully!",
+        "thank_you_with_release": "Thank you for sponsoring the \"{release}\" rotki release! 🚀",
+        "thank_you_upcoming": "Thank you for sponsoring the upcoming rotki release! 🚀",
+        "view_etherscan": "View on Etherscan",
+        "view_leaderboard": "View Leaderboard",
+        "close": "Close"
+      }
+    }
   },
   "subscription": {
     "crypto_payment": {

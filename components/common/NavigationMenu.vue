@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ButtonProps } from '@rotki/ui-library';
+
 const { t } = useI18n({ useScope: 'global' });
 
 interface Menu {
@@ -8,6 +10,7 @@ interface Menu {
   highlightExactActive?: true;
   highlightActive?: true;
   external?: true;
+  buttonProps?: ButtonProps;
 }
 
 interface MenuParent {
@@ -26,9 +29,19 @@ const menus: (Menu | MenuParent)[] = [
     highlightExactActive: true,
   },
   {
-    label: t('navigation_menu.premium_features'),
-    to: '/products',
-    highlightActive: true,
+    label: t('navigation_menu.product_and_services'),
+    children: [
+      {
+        label: t('navigation_menu.rotki_premium'),
+        to: '/products',
+        highlightActive: true,
+      },
+      {
+        label: t('navigation_menu.accounting_service'),
+        to: '/bespoke',
+        highlightActive: true,
+      },
+    ],
   },
   {
     label: t('navigation_menu.pricing'),
@@ -63,6 +76,15 @@ const menus: (Menu | MenuParent)[] = [
       },
     ],
   },
+  {
+    label: t('navigation_menu.sponsor'),
+    to: '/sponsor/sponsor',
+    highlightExactActive: true,
+    buttonProps: {
+      color: 'primary',
+      variant: 'outlined',
+    },
+  },
 ];
 
 const { isMdAndDown } = useBreakpoint();
@@ -70,7 +92,7 @@ const { isMdAndDown } = useBreakpoint();
 
 <template>
   <div
-    class="flex flex-wrap md:justify-center md:gap-x-1 lg:gap-x-2 xl:gap-x-4"
+    class="flex flex-wrap md:justify-center md:gap-x-1"
   >
     <template v-for="menu in menus">
       <ButtonLink
@@ -81,6 +103,7 @@ const { isMdAndDown } = useBreakpoint();
         :highlight-exact-active="menu.highlightExactActive"
         :external="menu.external"
         :to="menu.to"
+        v-bind="menu.buttonProps"
       >
         {{ menu.label }}
         <template

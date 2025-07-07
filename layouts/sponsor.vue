@@ -1,64 +1,33 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
 import Default from '~/layouts/default.vue';
-import { useMainStore } from '~/store';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { account } = storeToRefs(useMainStore());
-
-const name = computed<string>(() => {
-  const accountVal = get(account);
-  if (!accountVal)
-    return '';
-
-  const { firstName, lastName, movedOffline } = accountVal.address;
-
-  if (movedOffline) {
-    return accountVal.username;
-  }
-
-  return `${firstName} ${lastName}`;
-});
-
 useHead({
-  title: 'account',
+  title: 'sponsor',
   meta: [
     {
-      key: 'description',
-      name: 'description',
-      content: 'Manage your rotki premium account',
+      name: 'sponsor',
+      content: 'Sponsor rotki\'s next release',
     },
     noIndex(),
   ],
   ...commonAttrs(),
 });
 
-useAutoLogout();
 const tabModelValue = ref();
 
 const tabs = [
   {
-    label: t('account.tabs.subscription'),
-    icon: 'lu-crown',
-    to: '/home/subscription',
+    label: t('sponsor.tabs.sponsor'),
+    icon: 'lu-handshake',
+    to: '/sponsor/sponsor',
   },
   {
-    label: t('account.tabs.account_details'),
-    icon: 'lu-circle-user-round',
-    to: '/home/account-details',
-  },
-  {
-    label: t('account.tabs.customer_information'),
-    icon: 'lu-info',
-    to: '/home/customer-information',
-  },
-  {
-    label: t('account.tabs.address'),
-    icon: 'lu-map-pin',
-    to: '/home/address',
+    label: t('sponsor.tabs.leaderboard'),
+    icon: 'lu-trophy',
+    to: '/sponsor/leaderboard',
   },
 ];
 </script>
@@ -67,9 +36,6 @@ const tabs = [
   <Default>
     <div class="py-10 lg:py-16">
       <div class="container">
-        <div class="text-h4 mb-6">
-          {{ t('account.welcome') }} {{ name }}
-        </div>
         <div class="flex flex-col lg:flex-row gap-6">
           <div class="hidden lg:block w-[270px] shrink-0">
             <RuiTabs

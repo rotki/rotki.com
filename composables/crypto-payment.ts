@@ -1,29 +1,10 @@
 import type { Ref } from 'vue';
 import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
-import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-import { ChainController } from '@reown/appkit-controllers';
-import {
-  type AppKitNetwork,
-  arbitrum,
-  arbitrumSepolia,
-  base,
-  baseSepolia,
-  gnosis,
-  mainnet,
-  optimism,
-  sepolia,
-} from '@reown/appkit/networks';
-import { createAppKit } from '@reown/appkit/vue';
 import { get, set, useTimeoutFn } from '@vueuse/core';
-import { BrowserProvider, Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
+import { Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
-
-// Patch the showUnsupportedChainUI method to no-op
-ChainController.showUnsupportedChainUI = function () {
-  // No operation
-};
 
 const abi = [
   // Some details about the token
@@ -36,9 +17,6 @@ const abi = [
   // An event triggered whenever anyone transfers to someone else
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
-
-const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
-const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis];
 
 export const usePendingTx = createSharedComposable(() => useLocalStorage<PendingTx>('rotki.pending_tx', null, {
   serializer: {
@@ -55,74 +33,34 @@ interface ExecutePaymentParams {
 
 export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
   const { markTransactionStarted } = usePaymentCryptoStore();
-  const connected = ref<boolean>(false);
-  const isOpen = ref<boolean>(false);
-  const connectedChainId = ref<bigint>();
-
   const logger = useLogger('web3-payment');
   const { t } = useI18n({ useScope: 'global' });
-  const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
   const pendingTx = usePendingTx();
   const { start, stop } = useTimeoutFn(() => {
     logger.info('change to done');
     set(state, 'success');
   }, 5000, { immediate: false });
 
-  const defaultNetwork = getNetwork(get(data).chainId);
-
-  const appKit = createAppKit({
-    adapters: [new EthersAdapter()],
-    allowUnsupportedChain: true,
-    features: {
-      analytics: true,
-      email: false,
-      onramp: false,
-      socials: false,
-      swaps: false,
+  const connection = useWeb3Connection({
+    chainId: get(data).chainId,
+    onAccountChange: () => {
+      set(state, 'idle');
+      set(errorMessage, '');
     },
-    metadata: {
-      description: 'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.',
-      icons: ['https://raw.githubusercontent.com/rotki/data/main/assets/icons/app_logo.png'],
-      name: 'Rotki',
-      url: baseUrl,
+    onError: (error) => {
+      set(errorMessage, error);
     },
-    networks: [defaultNetwork],
-    projectId,
-    themeMode: 'light',
   });
 
-  const getBrowserProvider = (): BrowserProvider => {
-    assert(appKit);
-    const walletProvider = appKit.getProvider('eip155');
-    return new BrowserProvider(walletProvider as any);
-  };
-
-  appKit.subscribeAccount((account) => {
-    set(state, 'idle');
-    set(errorMessage, '');
-    set(connected, account.isConnected);
-
-    if (account.isConnected) {
-      const browserProvider = getBrowserProvider();
-      browserProvider.getNetwork()
-        .then(network => set(connectedChainId, network.chainId))
-        .catch(logger.error);
-    }
-    else {
-      set(connectedChainId, undefined);
-    }
-  });
-
-  appKit.subscribeState((state) => {
-    set(isOpen, state.open);
-  });
-
-  const isExpectedChain = computed<boolean>(() => {
-    const paymentChainId = get(data).chainId;
-    if (!isDefined(connectedChainId) || !paymentChainId)
-      return false;
-    return get(connectedChainId) === BigInt(paymentChainId);
-  });
+  const {
+    connected,
+    getBrowserProvider,
+    getNetwork,
+    getSigner,
+    isExpectedChain,
+    isOpen,
+    ...connectionMethods
+  } = connection;
 
   async function executePayment({ blockExplorerUrl, payment, signer }: ExecutePaymentParams): Promise<void> {
     stop();
@@ -178,11 +116,11 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       const payment = get(data);
       assert(payment);
 
-      const browserProvider = getBrowserProvider();
-      const network = await browserProvider.getNetwork();
-
       const { chainId, chainName } = payment;
       assert(chainId);
+
+      const provider = await getBrowserProvider();
+      const network = await provider.getNetwork();
 
       if (network.chainId !== BigInt(chainId)) {
         set(errorMessage, t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName }));
@@ -190,12 +128,13 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       }
 
       const appKitNetwork = getNetwork(chainId);
+      const signer = await getSigner();
 
       const url = appKitNetwork.blockExplorers?.default.url;
       await executePayment({
         blockExplorerUrl: url ? `${url}/tx/` : '',
         payment,
-        signer: await browserProvider.getSigner(),
+        signer,
       });
     }
     catch (error: any) {
@@ -209,29 +148,15 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     }
   };
 
-  function getNetwork(chainId?: number): AppKitNetwork {
-    const networks = testing ? testNetworks : productionNetworks;
-    const network = networks.find(network => network.id === chainId);
-    if (!network) {
-      return testing ? testNetworks[0] : productionNetworks[0];
-    }
-    return network;
-  }
-
   async function switchNetwork(): Promise<void> {
-    const network = getNetwork(get(data).chainId);
-    await appKit.switchNetwork(network);
+    await connection.switchNetwork(get(data).chainId);
   }
-
-  onUnmounted(async () => {
-    await appKit.disconnect();
-  });
 
   return {
-    connected: readonly(connected),
+    connected,
     isExpectedChain,
-    isOpen: readonly(isOpen),
-    open: async () => appKit.open(),
+    isOpen,
+    open: connectionMethods.open,
     pay,
     switchNetwork,
   };

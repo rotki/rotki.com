@@ -24,8 +24,13 @@ const menus: MenuGroup[] = [
         highlightExactActive: true,
       },
       {
-        label: t('navigation_menu.premium_features'),
+        label: t('navigation_menu.rotki_premium'),
         to: '/products',
+        highlightActive: true,
+      },
+      {
+        label: t('navigation_menu.accounting_service'),
+        to: '/bespoke',
         highlightActive: true,
       },
       {
@@ -114,6 +119,7 @@ const menus: MenuGroup[] = [
             :highlight-active="menu.highlightActive"
             :highlight-exact-active="menu.highlightExactActive"
             :external="menu.external"
+            class="[&_span]:!text-wrap [&_span]:text-left"
           >
             {{ menu.label }}
           </ButtonLink>

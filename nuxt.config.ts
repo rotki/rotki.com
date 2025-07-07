@@ -146,6 +146,8 @@ export default defineNuxtConfig({
     public: {
       baseUrl: '',
       contact: {
+        bespokeEmail: 'bespoke-accounting@rotki.com',
+        bespokeEmailMailTo: 'mailto:bespoke-accounting@rotki.com',
         discord: 'https://discord.rotki.com',
         email: 'info@rotki.com',
         emailMailto: 'mailto:info@rotki.com',
@@ -158,10 +160,11 @@ export default defineNuxtConfig({
       isDev: process.env.NODE_ENV === 'development',
       loglevel: 3, // Setting info loglevel as the default.
       maintenance: false,
+      openseaApiKey: '',
       recaptcha: {
         siteKey: '',
       },
-      testing: false,
+      testing: true,
       walletConnect: {
         projectId: '',
       },
