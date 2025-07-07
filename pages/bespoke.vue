@@ -107,33 +107,51 @@ const services = computed(() => [
     </div>
   </div>
   <div class="bg-rui-primary text-rui-dark-text py-12 md:py-20">
-    <div class="container text-left max-w-5xl">
-      <div class="mb-8">
+    <div class="container max-w-5xl">
+      <div class="mb-8 text-center">
         <h4 class="text-h4 font-bold mb-4">
           {{ t('accounting.formalization.title') }}
         </h4>
 
-        <p class="text-sm text-white/[0.8] text-justify">
+        <p class="text-sm text-white/[0.8]">
           {{ t('accounting.formalization.description') }}
         </p>
       </div>
 
-      <i18n-t
-        tag="div"
-        class="font-bold dark"
-        keypath="accounting.contact.message"
-      >
-        <template #email>
-          <ButtonLink
-            class="underline !text-white"
-            inline
-            external
-            :to="bespokeEmailMailTo"
-          >
-            {{ bespokeEmail }}
-          </ButtonLink>
-        </template>
-      </i18n-t>
+      <div class="flex flex-col items-center space-y-4 dark">
+        <ButtonLink
+          external
+          to="https://calendly.com/rotki-lefteris/accounting-with-rotki"
+          size="lg"
+          variant="filled"
+          rounded
+        >
+          <template #prepend>
+            <RuiIcon
+              name="lu-calendar"
+              size="20"
+            />
+          </template>
+          Book a Free 15-Min Intro call
+        </ButtonLink>
+
+        <i18n-t
+          tag="div"
+          class="font-bold dark text-sm"
+          keypath="accounting.contact.message"
+        >
+          <template #email>
+            <ButtonLink
+              class="underline !text-white"
+              inline
+              external
+              :to="bespokeEmailMailTo"
+            >
+              {{ bespokeEmail }}
+            </ButtonLink>
+          </template>
+        </i18n-t>
+      </div>
     </div>
   </div>
 

@@ -159,7 +159,7 @@
       "description": "rotki has always been about empowering users with accurate, private, local-first accounting tools. But not everyone has the time or expertise to dig into every transaction, match LP positions, or chase down lost CSVs. If you want your crypto accounting done with you or for you, using the same tools we’ve built and trusted for years, we’re here to help. We’ve worked with individuals, teams, and DAOs to get their books in order, clean, audit-ready, and future-proof. Not by using generic tax software but just with a deep understanding of the crypto landscape and a commitment to doing it right."
     },
     "contact": {
-      "message": "Interested? Email us at {email}. Include a short summary of your situation, and we’ll follow up to schedule a consultation."
+      "message": "Or, you can email us at {email} with a short summary of your situation."
     },
     "pricing": {
       "title": "Pricing",
