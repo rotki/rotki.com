@@ -222,7 +222,7 @@ onMounted(async () => {
         </RuiCard>
 
         <p class="text-xs text-rui-text-secondary mt-2 italic">
-          {{ leaderboardData?.lastUpdated ? t('sponsor.leaderboard.last_updated', { date: formatDate(leaderboardData.lastUpdated, 'MMMM DD, YYYY hh:mm') }) : t('sponsor.leaderboard.updated_every_hour') }}
+          {{ leaderboardData?.lastUpdated ? t('sponsor.leaderboard.last_updated', { date: formatDate(leaderboardData.lastUpdated, 'MMMM DD, YYYY hh:mm z') }) : t('sponsor.leaderboard.updated_every_hour') }}
         </p>
       </div>
 

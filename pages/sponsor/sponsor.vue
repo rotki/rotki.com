@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship';
+import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS, useRotkiSponsorship } from '~/composables/rotki-sponsorship';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const description = 'Sponsor rotki\'s next release';
