@@ -8,6 +8,7 @@ definePageMeta({
     'unverified',
     'subscriber',
     'csp',
+    'valid-plan-id',
   ],
 });
 

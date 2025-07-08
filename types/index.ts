@@ -129,6 +129,16 @@ export const AvailablePlans = z.array(AvailablePlan);
 
 export type AvailablePlans = z.infer<typeof AvailablePlans>;
 
+export const AvailablePlansResponse = z.object({
+  settings: z.object({
+    country: z.string().nullish(),
+    isAuthenticated: z.boolean().default(false),
+  }),
+  tiers: AvailablePlans,
+});
+
+export type AvailablePlansResponse = z.infer<typeof AvailablePlansResponse>;
+
 const PremiumData = z.object({
   plans: z.array(Plan),
 });
