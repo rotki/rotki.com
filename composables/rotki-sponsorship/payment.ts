@@ -81,7 +81,9 @@ export function useRotkiSponsorshipPayment() {
   });
 
   const {
+    address,
     connected,
+    getBrowserProvider,
     getNetwork,
     getSigner,
     isExpectedChain,
@@ -155,8 +157,9 @@ export function useRotkiSponsorshipPayment() {
         throw new Error(`Price not available for ${tierKey} tier in ${currency}`);
       }
 
-      // Get supply info
-      const supplies = await refreshSupplyData();
+      // Get supply info using user's provider if connected
+      const provider = get(connected) ? getBrowserProvider() : undefined;
+      const supplies = await refreshSupplyData(provider);
       const supply = supplies[tierKey];
       if (!supply) {
         throw new Error('Supply information not available for this tier');
@@ -226,6 +229,7 @@ export function useRotkiSponsorshipPayment() {
   return {
     // Connection state and methods
     ...connectionMethods,
+    address,
     approveToken,
     checkTokenAllowance,
     connected,

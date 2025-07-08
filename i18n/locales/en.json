@@ -909,6 +909,7 @@
         "minting": "Minting...",
         "mint": "Mint {tier} sponsorship NFT"
       },
+      "connected_to": "Connected to: {address}",
       "benefits": {
         "title": "What you get:",
         "benefits_label": "Benefits: {benefits}"
