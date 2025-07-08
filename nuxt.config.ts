@@ -128,6 +128,16 @@ export default defineNuxtConfig({
         target: proxy.target,
       },
     },
+    storage: {
+      cache: {
+        base: 'cache:',
+        driver: 'redis',
+        host: process.env.REDIS_HOST || 'localhost',
+        password: process.env.REDIS_PASSWORD,
+        port: process.env.REDIS_PORT || 6379,
+        ttl: 600, // default TTL in seconds
+      },
+    },
   },
 
   robots: {

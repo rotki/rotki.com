@@ -1,5 +1,7 @@
+export type TierKey = 'bronze' | 'silver' | 'gold';
+
 export interface SponsorshipTier {
-  key: string;
+  key: TierKey;
   label: string;
   tierId: number;
 }
@@ -21,34 +23,24 @@ export interface TierBenefits {
   benefits: string;
 }
 
-export interface CurrencyOption {
-  key: string;
-  label: string;
+export interface PaymentToken {
   symbol: string;
+  address: string;
   decimals: number;
-  contractAddress?: string;
-  iconUrl?: string;
+  icon: string;
+  prices: Record<TierKey, string>;
+  icon_url: string;
 }
-
-export const CURRENCY_OPTIONS: CurrencyOption[] = [
-  {
-    decimals: 18,
-    iconUrl: '/img/chains/ethereum.svg',
-    key: 'ETH',
-    label: 'ETH',
-    symbol: 'ETH',
-  },
-  {
-    decimals: 6,
-    iconUrl: '/img/usdc.svg',
-    key: 'USDC',
-    label: 'USDC',
-    symbol: 'USDC',
-  },
-];
 
 export interface SponsorshipState {
   status: 'idle' | 'pending' | 'success' | 'error';
   txHash?: string;
   error?: string;
+}
+
+export interface NftConfig {
+  CHAIN_ID: number;
+  CONTRACT_ADDRESS: string;
+  RPC_URL: string;
+  hasContractChanged: boolean;
 }

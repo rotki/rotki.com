@@ -15,8 +15,8 @@ interface ConfettiParticle {
 // Composable: Use this to manage confetti animation
 function useConfetti() {
   // Refs
-  const confettiCanvas = ref<HTMLCanvasElement | null>(null);
-  const ctx = ref<CanvasRenderingContext2D | null>(null);
+  const confettiCanvas = ref<HTMLCanvasElement>();
+  const ctx = ref<CanvasRenderingContext2D>();
   const confettiParticles = ref<ConfettiParticle[]>([]);
   let animationFrameId: number;
 
