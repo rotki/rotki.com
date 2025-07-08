@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS, useRotkiSponsorship } from '~/composables/rotki-sponsorship';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
+import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
+import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
+import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useLeaderboardMetadata } from '~/composables/use-leaderboard-metadata';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { useLogger } from '~/utils/use-logger';
 
 const description = 'Sponsor rotki\'s next release';
 
@@ -12,7 +19,7 @@ const {
 useHead({
   title: 'Sponsor | rotki',
   meta: [
-    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor`),
+    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor/sponsor`),
   ],
   ...commonAttrs(),
 });
@@ -21,62 +28,69 @@ definePageMeta({
   layout: 'sponsor',
 });
 
+const logger = useLogger();
+
 const selectedTier = ref('bronze');
-const isApproving = ref(false);
-const usdcAllowance = ref('0');
+const isApproving = ref<boolean>(false);
+const tokenAllowance = ref<string>('0');
 const showSuccessDialog = ref(false);
 
-// i18n
 const { t } = useI18n({ useScope: 'global' });
+const { fetchWithCsrf } = useFetchWithCsrf();
 
-const sponsorship = useRotkiSponsorship();
+// Fetch leaderboard metadata on mount to ensure config is available
+const { fetchMetadata } = useLeaderboardMetadata();
 
 const {
   connected,
   isExpectedChain,
   sponsorshipState,
-  tierPrices,
-  tierSupply,
-  tierBenefits,
-  nftImages,
-  releaseName,
-  isLoading,
-  error,
   transactionUrl,
   selectedCurrency,
-  enabledCurrencies,
+  paymentTokens,
+  getPriceForTier,
   open: openWallet,
   switchNetwork,
-  fetchTierPrices,
-  loadNFTImages,
-  loadEnabledCurrencies,
+  loadPaymentTokens,
   mintSponsorshipNFT,
-  isTierAvailable,
-  approveUSDC,
-  checkUSDCAllowance,
-} = sponsorship;
+  approveToken,
+  checkTokenAllowance,
+  isLoadingPaymentTokens,
+} = useRotkiSponsorshipPayment();
+
+const { data: sponsorshipData, pending: isLoading } = await useSponsorshipData();
+
+const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
+const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
+const tierBenefits = computed(() => get(sponsorshipData)?.tierBenefits || {});
+const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
+const error = computed(() => get(sponsorshipData)?.error);
 
 async function handleApprove() {
   try {
     set(isApproving, true);
-    const tier = SPONSORSHIP_TIERS.find(t => t.key === get(selectedTier));
+    const tier = findTierByKey(get(selectedTier));
     if (!tier)
       return;
 
-    const prices = get(tierPrices);
-    const price = prices[tier.key]?.USDC;
+    const currency = get(selectedCurrency);
+    const token = get(paymentTokens).find(t => t.symbol === currency);
+    if (!token || !token.prices)
+      return;
+
+    const price = token.prices[tier.key];
     if (!price)
       return;
 
-    const tx = await approveUSDC(price);
+    const tx = await approveToken(currency, price);
     await tx.wait();
 
     // Refresh allowance after approval
-    const newAllowance = await checkUSDCAllowance();
-    set(usdcAllowance, newAllowance);
+    const newAllowance = await checkTokenAllowance(currency);
+    set(tokenAllowance, newAllowance);
   }
   catch (error) {
-    console.error('Approval failed:', error);
+    logger.error('Approval failed:', error);
   }
   finally {
     set(isApproving, false);
@@ -85,40 +99,41 @@ async function handleApprove() {
 
 async function handleMint() {
   try {
-    const tier = SPONSORSHIP_TIERS.find(t => t.key === get(selectedTier));
+    const tier = findTierByKey(get(selectedTier));
     if (!tier)
       return;
 
     await mintSponsorshipNFT(tier.tierId, get(selectedCurrency));
   }
   catch (error) {
-    console.error('Minting failed:', error);
+    logger.error('Minting failed:', error);
   }
 }
 
-const needsApproval = computed(() => {
+const needsApproval = computed<boolean>(() => {
   const currency = get(selectedCurrency);
-  if (currency !== 'USDC')
+  const token = get(paymentTokens).find(t => t.symbol === currency);
+
+  if (!token || token.address === ETH_ADDRESS)
     return false;
 
-  const selectedTierKey = get(selectedTier);
-  const prices = get(tierPrices);
-  const price = prices[selectedTierKey]?.USDC;
-  const allowance = get(usdcAllowance);
+  const selectedTierKey = get(selectedTier) as TierKey;
+  const price = token.prices[selectedTierKey];
+  const allowance = get(tokenAllowance);
 
-  return price && parseFloat(allowance) < parseFloat(price);
+  return !!(price && parseFloat(allowance) < parseFloat(price));
 });
 
 const buttonText = computed(() => {
   const selectedTierKey = get(selectedTier);
-  const tier = SPONSORSHIP_TIERS.find(t => t.key === selectedTierKey);
+  const tier = findTierByKey(selectedTierKey);
   const currency = get(selectedCurrency);
 
   if (!get(connected))
     return t('sponsor.sponsor_page.buttons.connect_wallet');
   if (!get(isExpectedChain))
     return t('sponsor.sponsor_page.buttons.switch_network');
-  if (!isTierAvailable(selectedTierKey))
+  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
     return t('sponsor.sponsor_page.buttons.sold_out', { tier: tier?.label });
   if (get(isApproving))
     return t('sponsor.sponsor_page.buttons.approving');
@@ -136,7 +151,7 @@ const buttonAction = computed(() => {
     return openWallet;
   if (!get(isExpectedChain))
     return () => switchNetwork();
-  if (!isTierAvailable(selectedTierKey))
+  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
     return () => {};
   if (get(needsApproval))
     return handleApprove;
@@ -145,20 +160,42 @@ const buttonAction = computed(() => {
 
 const isButtonDisabled = computed(() => {
   const selectedTierKey = get(selectedTier);
-  return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey);
+  return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
 });
 
-const availableCurrencies = computed(() => CURRENCY_OPTIONS.filter(c => get(enabledCurrencies).includes(c.key)));
+const availableTokens = computed(() => get(paymentTokens));
+
+const tierPriceDisplay = computed<Record<string, string>>(() => {
+  const result: Record<string, string> = {};
+  const currency = get(selectedCurrency);
+
+  if (get(isLoadingPaymentTokens)) {
+    SPONSORSHIP_TIERS.forEach((tier) => {
+      result[tier.key] = t('sponsor.sponsor_page.pricing.loading');
+    });
+    return result;
+  }
+
+  const priceGetter = get(getPriceForTier);
+  SPONSORSHIP_TIERS.forEach((tier) => {
+    const price = priceGetter(currency, tier.key);
+    result[tier.key] = price ? `${price} ${currency}` : t('sponsor.sponsor_page.pricing.loading');
+  });
+
+  return result;
+});
 
 async function checkAllowanceIfNeeded() {
   const currency = get(selectedCurrency);
-  if (currency === 'USDC' && get(connected)) {
+  const token = get(paymentTokens).find(t => t.symbol === currency);
+
+  if (token && token.address !== ETH_ADDRESS && get(connected)) {
     try {
-      const allowance = await checkUSDCAllowance();
-      set(usdcAllowance, allowance);
+      const allowance = await checkTokenAllowance(currency);
+      set(tokenAllowance, allowance);
     }
     catch (error) {
-      console.error('Failed to check USDC allowance:', error);
+      logger.error('Failed to check token allowance:', error);
     }
   }
 }
@@ -166,18 +203,43 @@ async function checkAllowanceIfNeeded() {
 watch(selectedCurrency, checkAllowanceIfNeeded);
 watch(connected, checkAllowanceIfNeeded);
 
+// Function to call after successful minting
+async function onMintingSuccess(txHash: string) {
+  try {
+    // Call the endpoint to monitor the transaction
+    await fetchWithCsrf('/webapi/nfts/monitor-tx/', {
+      method: 'POST',
+      body: {
+        txHash,
+      },
+    });
+
+    logger.info(`Transaction monitoring started for: ${txHash}`);
+  }
+  catch (error) {
+    logger.error('Failed to start transaction monitoring:', error);
+  }
+}
+
 // Show success dialog when minting is successful
-watch(() => sponsorshipState.value.status, (newStatus) => {
+watch(() => get(sponsorshipState).status, async (newStatus) => {
   if (newStatus === 'success' && get(transactionUrl)) {
     set(showSuccessDialog, true);
+
+    // Call the success callback function
+    const state = get(sponsorshipState);
+    if (state.txHash) {
+      await onMintingSuccess(state.txHash);
+    }
   }
 });
 
 onMounted(async () => {
-  await loadEnabledCurrencies();
-  fetchTierPrices();
-  loadNFTImages();
-  checkAllowanceIfNeeded();
+  // Fetch metadata to ensure config is available
+  await fetchMetadata();
+  // Only load currencies and check allowance on client-side
+  await loadPaymentTokens();
+  await checkAllowanceIfNeeded();
 });
 </script>
 
@@ -194,14 +256,14 @@ onMounted(async () => {
             />
             <div
               v-else-if="error"
-              class="text-red-500 text-center"
+              class="text-rui-error text-center"
             >
               <div class="text-lg font-medium">
                 {{ t('sponsor.sponsor_page.nft_image.failed_to_load') }}
               </div>
               <button
                 class="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
-                @click="loadNFTImages()"
+                @click="$router.go(0)"
               >
                 {{ t('sponsor.sponsor_page.nft_image.retry') }}
               </button>
@@ -212,9 +274,8 @@ onMounted(async () => {
             >
               <img
                 :src="nftImages[selectedTier]"
-                :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label })"
+                :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: findTierByKey(selectedTier)?.label })"
                 class="w-full h-full object-cover rounded-lg"
-                @error="console.warn('Image failed to load')"
               />
             </div>
             <div
@@ -225,7 +286,7 @@ onMounted(async () => {
                 🎨
               </div>
               <div class="text-lg font-medium">
-                {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }) }}
+                {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: findTierByKey(selectedTier)?.label }) }}
               </div>
               <div class="text-sm text-rui-text-secondary mt-1">
                 {{ t('sponsor.sponsor_page.nft_image.image_not_available') }}
@@ -260,23 +321,36 @@ onMounted(async () => {
             <h6 class="font-bold">
               {{ t('sponsor.sponsor_page.payment_currency') }}
             </h6>
-            <div class="flex gap-2">
+            <div
+              v-if="isLoadingPaymentTokens"
+              class="flex gap-2"
+            >
+              <RuiSkeletonLoader
+                v-for="i in 2"
+                :key="i"
+                class="w-20 h-8"
+              />
+            </div>
+            <div
+              v-else
+              class="flex gap-2"
+            >
               <RuiButton
-                v-for="currency in availableCurrencies"
-                :key="currency.key"
-                :variant="selectedCurrency === currency.key ? 'default' : 'outlined'"
+                v-for="token in availableTokens"
+                :key="token.symbol"
+                :variant="selectedCurrency === token.symbol ? 'default' : 'outlined'"
                 color="primary"
                 size="sm"
-                @click="selectedCurrency = currency.key"
+                @click="selectedCurrency = token.symbol"
               >
                 <template #prepend>
                   <CryptoAssetIcon
                     class="bg-white rounded-full"
-                    :icon-url="currency.iconUrl"
-                    :name="currency.symbol"
+                    :icon-url="token.icon_url"
+                    :name="token.symbol"
                   />
                 </template>
-                {{ currency.label }}
+                {{ token.symbol }}
               </RuiButton>
             </div>
           </div>
@@ -294,7 +368,7 @@ onMounted(async () => {
                 content-class="flex items-center justify-between h-16 !py-2 transition-all cursor-pointer"
                 :class="{
                   '!border-rui-primary': selectedTier === tier.key,
-                  'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key),
+                  'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply),
                 }"
                 @click="selectedTier = tier.key"
               >
@@ -310,7 +384,7 @@ onMounted(async () => {
                 />
                 <div class="flex flex-col items-end">
                   <div class="text-lg font-bold text-rui-primary">
-                    {{ tierPrices[tier.key]?.[selectedCurrency] ? `${tierPrices[tier.key][selectedCurrency]} ${selectedCurrency}` : t('sponsor.sponsor_page.pricing.loading') }}
+                    {{ tierPriceDisplay[tier.key] }}
                   </div>
                   <div
                     v-if="tierSupply[tier.key]"
@@ -324,8 +398,8 @@ onMounted(async () => {
                     </template>
                   </div>
                   <div
-                    v-if="tierSupply[tier.key] && !isTierAvailable(tier.key)"
-                    class="text-sm text-red-500 font-medium"
+                    v-if="tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply)"
+                    class="text-sm text-rui-error font-medium"
                   >
                     {{ t('sponsor.sponsor_page.pricing.sold_out') }}
                   </div>
@@ -420,7 +494,7 @@ onMounted(async () => {
         <div class="space-y-4">
           <p class="text-rui-text-secondary">
             {{ t('sponsor.sponsor_page.success_dialog.success_message', {
-              tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label,
+              tier: findTierByKey(selectedTier)?.label,
             }) }}
           </p>
           <p
