@@ -1,7 +1,9 @@
 import type { TierBenefits, TierSupply } from './types';
+import { get } from '@vueuse/shared';
 import { ethers } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
-import { CONTRACT_ADDRESS, IPFS_URL, ROTKI_SPONSORSHIP_ABI, RPC_URL } from './constants';
+import { useNftConfig } from './config';
+import { IPFS_URL, ROTKI_SPONSORSHIP_ABI } from './constants';
 
 const logger = useLogger('rotki-sponsorship-metadata');
 
@@ -15,16 +17,17 @@ export interface TierInfoResult {
   releaseName: string;
 }
 
-export async function fetchTierInfo(tierId: number, tierKey: string): Promise<TierInfoResult | null> {
+export async function fetchTierInfo(tierId: number, tierKey: string): Promise<TierInfoResult | undefined> {
   try {
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
+    const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
+    const provider = new ethers.JsonRpcProvider(get(RPC_URL));
+    const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, provider);
 
     const releaseId = await contract.currentReleaseId();
     const [maxSupply, currentSupply, metadataURI] = await contract.getTierInfo(releaseId, tierId);
 
     if (!metadataURI) {
-      return null;
+      return undefined;
     }
 
     // Convert metadataURI (IPFS CID) to HTTP URL to fetch the JSON metadata
@@ -67,7 +70,7 @@ export async function fetchTierInfo(tierId: number, tierKey: string): Promise<Ti
   }
   catch (error_) {
     logger.error(`Error fetching tier info for ${tierKey}:`, error_);
-    return null;
+    return undefined;
   }
 }
 
