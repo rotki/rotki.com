@@ -1,12 +1,12 @@
 import { Buffer } from 'node:buffer';
 import { z } from 'zod';
 import { IPFS_URL } from '~/composables/rotki-sponsorship/constants';
-import { CACHE_TTL, getCacheKey, getCacheStorage } from '~/server/utils/cache';
+import { CACHE_TTL } from '~/server/utils/cache';
 import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('nft-image-proxy');
 
-// In-memory cache entry interface for storing image data
+// Cache entry interface for storing image data
 interface ImageCacheEntry {
   data: string; // Base64 encoded image data
   contentType: string;
@@ -32,8 +32,8 @@ function normalizeIpfsUrl(url: string): string {
   return url;
 }
 
-// Fetch image with proper error handling
-async function fetchImage(url: string): Promise<{ data: Buffer; contentType: string }> {
+// Cached function for fetching images
+const fetchImageCached = defineCachedFunction(async (url: string): Promise<ImageCacheEntry> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
@@ -66,13 +66,20 @@ async function fetchImage(url: string): Promise<{ data: Buffer; contentType: str
       throw new Error('Image too large');
     }
 
-    return { contentType, data };
+    return {
+      contentType,
+      data: data.toString('base64'),
+    };
   }
   catch (error) {
     clearTimeout(timeoutId);
     throw error;
   }
-}
+}, {
+  getKey: (url: string) => `image:${url}`,
+  maxAge: CACHE_TTL.IMAGE,
+  name: 'fetchImage',
+});
 
 export default defineEventHandler(async (event) => {
   try {
@@ -82,49 +89,22 @@ export default defineEventHandler(async (event) => {
 
     // Normalize IPFS URL
     const normalizedUrl = normalizeIpfsUrl(url);
-    const storage = getCacheStorage();
-    const cacheKey = getCacheKey('image', normalizedUrl);
 
-    // Check cache first
-    const cached = await storage.getItem<ImageCacheEntry>(cacheKey);
-    if (cached) {
-      logger.debug(`Cache hit for ${normalizedUrl}`);
+    logger.debug(`Fetching image: ${normalizedUrl}`);
 
-      // Set cache headers
-      setResponseHeaders(event, {
-        'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=172800',
-        'Content-Type': cached.contentType,
-        'X-Cache': 'HIT',
-      });
-
-      // Convert base64 back to Buffer
-      return Buffer.from(cached.data, 'base64');
-    }
-
-    logger.debug(`Cache miss for ${normalizedUrl}, fetching...`);
-
-    // Fetch image
-    const { contentType, data } = await fetchImage(normalizedUrl);
-
-    // Cache the image as base64 encoded string
-    const cacheEntry: ImageCacheEntry = {
-      contentType,
-      data: data.toString('base64'),
-    };
-
-    await storage.setItem(cacheKey, cacheEntry, {
-      ttl: CACHE_TTL.IMAGE,
-    });
+    // Fetch image using cached function
+    const cached = await fetchImageCached(normalizedUrl);
 
     // Set response headers
     setResponseHeaders(event, {
       'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=172800',
-      'Content-Type': contentType,
-      'X-Cache': 'MISS',
+      'Content-Type': cached.contentType,
     });
 
-    logger.debug(`Successfully fetched and cached ${normalizedUrl}`);
-    return data;
+    logger.debug(`Successfully served image: ${normalizedUrl}`);
+
+    // Convert base64 back to Buffer
+    return Buffer.from(cached.data, 'base64');
   }
   catch (error) {
     logger.error('Error in image proxy:', error);
