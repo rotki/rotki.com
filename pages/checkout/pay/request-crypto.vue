@@ -8,6 +8,7 @@ definePageMeta({
     'unverified',
     'subscriber',
     'pending-payment',
+    'valid-plan-id',
   ],
 });
 

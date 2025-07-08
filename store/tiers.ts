@@ -1,29 +1,32 @@
 import { get, set } from '@vueuse/core';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { type AvailablePlan, AvailablePlans } from '~/types';
+import { AvailablePlansResponse } from '~/types';
 import { PremiumTiersInfo } from '~/types/tiers';
 
 export const useTiersStore = defineStore('tiers', () => {
   const tiersInformation = ref<PremiumTiersInfo>([]);
-  const availablePlans = ref<AvailablePlan[]>([]);
+  const availablePlansData = ref<AvailablePlansResponse>({
+    settings: {
+      isAuthenticated: false,
+    },
+    tiers: [],
+  });
+
+  const availablePlans = computed(() => get(availablePlansData).tiers);
+  const country = computed(() => get(availablePlansData).settings?.country);
 
   const { fetchWithCsrf } = useFetchWithCsrf();
 
   const getAvailablePlans = async (): Promise<void> => {
-    if (get(availablePlans).length > 0) {
-      logger.debug('plans already loaded');
-      return;
-    }
-
     try {
-      const response = await fetchWithCsrf<AvailablePlans>(
+      const response = await fetchWithCsrf<AvailablePlansResponse>(
         '/webapi/2/available-tiers',
         {
           method: 'GET',
         },
       );
-      const data = AvailablePlans.parse(response);
-      set(availablePlans, data);
+      const data = AvailablePlansResponse.parse(response);
+      set(availablePlansData, data);
     }
     catch (error: any) {
       logger.error(error);
@@ -50,6 +53,8 @@ export const useTiersStore = defineStore('tiers', () => {
 
   return {
     availablePlans,
+    availablePlansData,
+    country,
     getAvailablePlans,
     getPremiumTiersInfo,
     tiersInformation,

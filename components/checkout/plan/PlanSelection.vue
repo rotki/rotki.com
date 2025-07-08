@@ -3,9 +3,11 @@ import type { AvailablePlan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { useCountries } from '~/composables/countries';
 import { useMainStore } from '~/store';
 import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
+import { getCountryName } from '~/utils/countries';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -18,7 +20,10 @@ const selectedPlanPeriod = ref<PricingPeriod>(get(planParams)?.period || Pricing
 const processing = ref<boolean>(false);
 
 const { account, userSubscriptions } = storeToRefs(useMainStore());
-const { availablePlans } = storeToRefs(useTiersStore());
+const tiersStore = useTiersStore();
+const { country, availablePlans } = storeToRefs(tiersStore);
+
+const { countries } = useCountries();
 
 function isSelected(plan: AvailablePlan) {
   return plan.tierName === get(selectedPlanName);
@@ -47,6 +52,8 @@ function next() {
 }
 
 const canBuy = reactify(canBuyNewSubscription)(account, userSubscriptions);
+
+const countryName = computed<string>(() => getCountryName(get(country), get(countries)));
 
 const notes = computed(() => [
   t('home.plans.tiers.step_1.notes.line_1'),
@@ -106,6 +113,47 @@ const notes = computed(() => [
           <p class="text-sm">
             {{ line }}
           </p>
+        </div>
+      </div>
+
+      <div
+        v-if="!account"
+        class="flex flex-col gap-2 mt-8 -mb-6"
+      >
+        <div class="text-sm text-rui-text-secondary">
+          <i18n-t
+            v-if="country"
+            keypath="home.plans.country_prices"
+            tag="div"
+          >
+            <template #country>
+              {{ countryName }}
+            </template>
+            <template #login>
+              <ButtonLink
+                to="/login"
+                inline
+                color="primary"
+              >
+                {{ t('auth.login.title') }}
+              </ButtonLink>
+            </template>
+          </i18n-t>
+          <i18n-t
+            v-else
+            keypath="home.plans.login_to_show_prices"
+            tag="div"
+          >
+            <template #login>
+              <ButtonLink
+                to="/login"
+                inline
+                color="primary"
+              >
+                {{ t('auth.login.title') }}
+              </ButtonLink>
+            </template>
+          </i18n-t>
         </div>
       </div>
 
