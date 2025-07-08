@@ -37,6 +37,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   const isOpen = ref<boolean>(false);
   const connectedChainId = ref<bigint>();
   const errorMessage = ref<string>('');
+  const address = ref<string>();
 
   const logger = useLogger('web3-connection');
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
@@ -73,6 +74,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   appKit.subscribeAccount((account) => {
     set(errorMessage, '');
     set(connected, account.isConnected);
+    set(address, account.address);
     onAccountChange?.(account.isConnected);
 
     if (account.isConnected) {
@@ -83,6 +85,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     }
     else {
       set(connectedChainId, undefined);
+      set(address, undefined);
     }
   });
 
@@ -145,9 +148,10 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   });
 
   return {
+    // State
+    address: readonly(address),
     // Internal appKit instance (for advanced usage)
     appKit,
-    // State
     connected: readonly(connected),
     connectedChainId: readonly(connectedChainId),
     errorMessage: readonly(errorMessage),

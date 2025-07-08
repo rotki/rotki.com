@@ -128,22 +128,18 @@ function formatAddressDisplay(holder: LeaderboardEntry): {
 
   if (holder.ensName) {
     return {
-      primary: `${holder.ensName} - ${shortenAddress(holder.address)}`,
+      primary: `${holder.ensName} - ${truncateAddress(holder.address)}`,
       secondary: undefined,
       showTooltip: true,
       isEns: true,
     };
   }
   return {
-    primary: shouldShorten ? shortenAddress(holder.address) : holder.address,
+    primary: shouldShorten ? truncateAddress(holder.address) : holder.address,
     secondary: undefined,
     showTooltip: shouldShorten,
     isEns: false,
   };
-}
-
-function shortenAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 function copyToClipboard(text: string) {

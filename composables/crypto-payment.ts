@@ -53,6 +53,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
   });
 
   const {
+    address,
     connected,
     getBrowserProvider,
     getNetwork,
@@ -125,7 +126,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       const { chainId, chainName } = payment;
       assert(chainId);
 
-      const provider = await getBrowserProvider();
+      const provider = getBrowserProvider();
       const network = await provider.getNetwork();
 
       if (network.chainId !== BigInt(chainId)) {
@@ -159,6 +160,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
   }
 
   return {
+    address,
     connected,
     isExpectedChain,
     isOpen,

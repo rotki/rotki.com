@@ -37,7 +37,7 @@ let stopWatcher: WatchHandle;
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('card-payment-form');
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
-const { connected, pay, isOpen, open, isExpectedChain, switchNetwork } = useWeb3Payment(data, state, error);
+const { connected, address, pay, isOpen, open, isExpectedChain, switchNetwork } = useWeb3Payment(data, state, error);
 
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
 
@@ -244,12 +244,18 @@ watch(canvas, async (canvas) => {
             @click="open()"
           >
             <RuiIcon
-              name="lu-link-2"
+              name="lu-wallet"
               size="20"
             />
           </RuiButton>
         </template>
       </div>
+    </div>
+    <div
+      v-if="connected && address"
+      class="text-sm text-rui-text-secondary mt-2"
+    >
+      {{ t('sponsor.sponsor_page.connected_to', { address: truncateAddress(address) }) }}
     </div>
   </div>
 

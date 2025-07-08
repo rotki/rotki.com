@@ -8,6 +8,7 @@ import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/
 import { useLeaderboardMetadata } from '~/composables/use-leaderboard-metadata';
 import { fetchWithCsrf } from '~/utils/api';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
 const description = 'Sponsor rotki\'s next release';
@@ -42,13 +43,14 @@ const { fetchMetadata } = useLeaderboardMetadata();
 
 const {
   connected,
+  address,
   isExpectedChain,
   sponsorshipState,
   transactionUrl,
   selectedCurrency,
   paymentTokens,
   getPriceForTier,
-  open: openWallet,
+  open,
   switchNetwork,
   loadPaymentTokens,
   mintSponsorshipNFT,
@@ -147,7 +149,7 @@ const buttonAction = computed(() => {
   const selectedTierKey = get(selectedTier);
 
   if (!get(connected))
-    return openWallet;
+    return open;
   if (!get(isExpectedChain))
     return () => switchNetwork();
   if (!isTierAvailable(selectedTierKey, get(tierSupply)))
@@ -409,26 +411,43 @@ onMounted(async () => {
 
           <!-- Mint Button -->
           <div class="pt-4">
-            <RuiButton
-              color="primary"
-              size="lg"
-              class="w-full"
-              :loading="sponsorshipState.status === 'pending' || isApproving"
-              :disabled="isButtonDisabled"
-              @click="buttonAction()"
+            <div class="flex gap-1 overflow-hidden">
+              <RuiButton
+                color="primary"
+                size="lg"
+                class="w-full flex-1 [&_span]:!text-wrap"
+                :loading="sponsorshipState.status === 'pending' || isApproving"
+                :disabled="isButtonDisabled"
+                @click="buttonAction()"
+              >
+                <template #prepend>
+                  <RuiIcon
+                    v-if="connected"
+                    name="lu-external-link"
+                  />
+                  <RuiIcon
+                    v-else
+                    name="lu-wallet"
+                  />
+                </template>
+                {{ buttonText }}
+              </RuiButton>
+              <RuiButton
+                v-if="connected"
+                size="lg"
+                color="secondary"
+                class="!px-3"
+                @click="open()"
+              >
+                <RuiIcon name="lu-wallet" />
+              </RuiButton>
+            </div>
+            <div
+              v-if="connected && address"
+              class="text-sm text-rui-text-secondary mt-2"
             >
-              <template #prepend>
-                <RuiIcon
-                  v-if="connected"
-                  name="lu-external-link"
-                />
-                <RuiIcon
-                  v-else
-                  name="lu-wallet"
-                />
-              </template>
-              {{ buttonText }}
-            </RuiButton>
+              {{ t('sponsor.sponsor_page.connected_to', { address: truncateAddress(address) }) }}
+            </div>
           </div>
 
           <!-- Benefits Info -->
