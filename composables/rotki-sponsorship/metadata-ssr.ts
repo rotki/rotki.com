@@ -1,0 +1,104 @@
+import type { TierInfoResult } from './metadata';
+import type { TierBenefits, TierSupply } from './types';
+import { useLogger } from '~/utils/use-logger';
+
+const logger = useLogger('rotki-sponsorship-metadata-ssr');
+
+interface TierInfoResponse {
+  tiers: Record<number, TierInfoResult | null>;
+  releaseId: number | null;
+  cached: boolean;
+}
+
+/**
+ * SSR-compatible version of fetchTierInfo that uses the server API
+ */
+export async function fetchTierInfoSSR(tierId: number, tierKey: string): Promise<TierInfoResult | null> {
+  try {
+    const response = await $fetch<TierInfoResponse>('/api/nft/tier-info', {
+      params: {
+        tierIds: tierId.toString(),
+      },
+    });
+
+    return response.tiers[tierId] || null;
+  }
+  catch (error) {
+    logger.error(`Error fetching tier info for ${tierKey}:`, error);
+    return null;
+  }
+}
+
+/**
+ * SSR-compatible version of loadNFTImagesAndSupply that uses the server API
+ */
+export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: number }[]): Promise<{
+  images: Record<string, string>;
+  supplies: Record<string, TierSupply>;
+  benefits: Record<string, TierBenefits>;
+  releaseName: string;
+}> {
+  const images: Record<string, string> = {};
+  const supplies: Record<string, TierSupply> = {};
+  const benefits: Record<string, TierBenefits> = {};
+  let releaseName = '';
+
+  if (tiers.length === 0) {
+    return { benefits, images, releaseName, supplies };
+  }
+
+  try {
+    // Batch fetch all tiers at once
+    const tierIds = tiers.map(t => t.tierId).join(',');
+    const response = await $fetch<TierInfoResponse>('/api/nft/tier-info', {
+      params: {
+        tierIds,
+      },
+    });
+
+    // Process the results
+    for (const tier of tiers) {
+      const tierInfo = response.tiers[tier.tierId];
+      if (tierInfo) {
+        images[tier.key] = tierInfo.imageUrl;
+        supplies[tier.key] = {
+          currentSupply: tierInfo.currentSupply,
+          maxSupply: tierInfo.maxSupply,
+          metadataURI: tierInfo.metadataURI,
+        };
+        benefits[tier.key] = {
+          benefits: tierInfo.benefits,
+          description: tierInfo.description,
+        };
+        if (tierInfo.releaseName && !releaseName) {
+          releaseName = tierInfo.releaseName;
+        }
+      }
+    }
+  }
+  catch (error) {
+    logger.error('Error batch fetching tier info:', error);
+
+    // Fallback to individual fetches if batch fails
+    for (const tier of tiers) {
+      const tierInfo = await fetchTierInfoSSR(tier.tierId, tier.key);
+      if (tierInfo) {
+        images[tier.key] = tierInfo.imageUrl;
+        supplies[tier.key] = {
+          currentSupply: tierInfo.currentSupply,
+          maxSupply: tierInfo.maxSupply,
+          metadataURI: tierInfo.metadataURI,
+        };
+        benefits[tier.key] = {
+          benefits: tierInfo.benefits,
+          description: tierInfo.description,
+        };
+        if (tierInfo.releaseName && !releaseName) {
+          releaseName = tierInfo.releaseName;
+        }
+      }
+    }
+  }
+
+  return { benefits, images, releaseName, supplies };
+}

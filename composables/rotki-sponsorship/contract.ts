@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
-import { CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, RPC_URL, USDC_ADDRESS } from './constants';
+import { CONTRACT_ADDRESS, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI, RPC_URL, USDC_ADDRESS } from './constants';
 import { SPONSORSHIP_TIERS, type TierSupply } from './types';
 
 const logger = useLogger('rotki-sponsorship-contract');
@@ -27,7 +27,7 @@ export async function fetchTierPrices(): Promise<Record<string, Record<string, s
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, provider);
 
     for (const tier of SPONSORSHIP_TIERS) {
-      const ethPrice = await contract.getPrice(tier.tierId, '0x0000000000000000000000000000000000000000');
+      const ethPrice = await contract.getPrice(tier.tierId, ETH_ADDRESS);
       const usdcPrice = await contract.getPrice(tier.tierId, USDC_ADDRESS);
       prices[tier.key] = {
         ETH: ethers.formatEther(ethPrice),

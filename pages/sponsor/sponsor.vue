@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS, useRotkiSponsorship } from '~/composables/rotki-sponsorship';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
+import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship/types';
+import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const description = 'Sponsor rotki\'s next release';
@@ -26,40 +29,36 @@ const isApproving = ref(false);
 const usdcAllowance = ref('0');
 const showSuccessDialog = ref(false);
 
-// i18n
 const { t } = useI18n({ useScope: 'global' });
-
-const sponsorship = useRotkiSponsorship();
 
 const {
   connected,
   isExpectedChain,
   sponsorshipState,
-  tierPrices,
-  tierSupply,
-  tierBenefits,
-  nftImages,
-  releaseName,
-  isLoading,
-  error,
   transactionUrl,
   selectedCurrency,
   enabledCurrencies,
   open: openWallet,
   switchNetwork,
-  fetchTierPrices,
-  loadNFTImages,
   loadEnabledCurrencies,
   mintSponsorshipNFT,
-  isTierAvailable,
   approveUSDC,
   checkUSDCAllowance,
-} = sponsorship;
+} = useRotkiSponsorshipPayment();
+
+const { data: sponsorshipData, pending: isLoading } = await useSponsorshipData();
+
+const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
+const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
+const tierBenefits = computed(() => get(sponsorshipData)?.tierBenefits || {});
+const tierPrices = computed(() => get(sponsorshipData)?.tierPrices || {});
+const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
+const error = computed(() => get(sponsorshipData)?.error || null);
 
 async function handleApprove() {
   try {
     set(isApproving, true);
-    const tier = SPONSORSHIP_TIERS.find(t => t.key === get(selectedTier));
+    const tier = findTierByKey(get(selectedTier));
     if (!tier)
       return;
 
@@ -85,7 +84,7 @@ async function handleApprove() {
 
 async function handleMint() {
   try {
-    const tier = SPONSORSHIP_TIERS.find(t => t.key === get(selectedTier));
+    const tier = findTierByKey(get(selectedTier));
     if (!tier)
       return;
 
@@ -111,14 +110,14 @@ const needsApproval = computed(() => {
 
 const buttonText = computed(() => {
   const selectedTierKey = get(selectedTier);
-  const tier = SPONSORSHIP_TIERS.find(t => t.key === selectedTierKey);
+  const tier = findTierByKey(selectedTierKey);
   const currency = get(selectedCurrency);
 
   if (!get(connected))
     return t('sponsor.sponsor_page.buttons.connect_wallet');
   if (!get(isExpectedChain))
     return t('sponsor.sponsor_page.buttons.switch_network');
-  if (!isTierAvailable(selectedTierKey))
+  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
     return t('sponsor.sponsor_page.buttons.sold_out', { tier: tier?.label });
   if (get(isApproving))
     return t('sponsor.sponsor_page.buttons.approving');
@@ -136,7 +135,7 @@ const buttonAction = computed(() => {
     return openWallet;
   if (!get(isExpectedChain))
     return () => switchNetwork();
-  if (!isTierAvailable(selectedTierKey))
+  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
     return () => {};
   if (get(needsApproval))
     return handleApprove;
@@ -145,7 +144,7 @@ const buttonAction = computed(() => {
 
 const isButtonDisabled = computed(() => {
   const selectedTierKey = get(selectedTier);
-  return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey);
+  return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
 });
 
 const availableCurrencies = computed(() => CURRENCY_OPTIONS.filter(c => get(enabledCurrencies).includes(c.key)));
@@ -167,17 +166,16 @@ watch(selectedCurrency, checkAllowanceIfNeeded);
 watch(connected, checkAllowanceIfNeeded);
 
 // Show success dialog when minting is successful
-watch(() => sponsorshipState.value.status, (newStatus) => {
+watch(() => get(sponsorshipState).status, (newStatus) => {
   if (newStatus === 'success' && get(transactionUrl)) {
     set(showSuccessDialog, true);
   }
 });
 
 onMounted(async () => {
+  // Only load currencies and check allowance on client-side
   await loadEnabledCurrencies();
-  fetchTierPrices();
-  loadNFTImages();
-  checkAllowanceIfNeeded();
+  await checkAllowanceIfNeeded();
 });
 </script>
 
@@ -194,14 +192,14 @@ onMounted(async () => {
             />
             <div
               v-else-if="error"
-              class="text-red-500 text-center"
+              class="text-rui-error text-center"
             >
               <div class="text-lg font-medium">
                 {{ t('sponsor.sponsor_page.nft_image.failed_to_load') }}
               </div>
               <button
                 class="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
-                @click="loadNFTImages()"
+                @click="$router.go(0)"
               >
                 {{ t('sponsor.sponsor_page.nft_image.retry') }}
               </button>
@@ -212,7 +210,7 @@ onMounted(async () => {
             >
               <img
                 :src="nftImages[selectedTier]"
-                :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label })"
+                :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: findTierByKey(selectedTier)?.label })"
                 class="w-full h-full object-cover rounded-lg"
                 @error="console.warn('Image failed to load')"
               />
@@ -225,7 +223,7 @@ onMounted(async () => {
                 🎨
               </div>
               <div class="text-lg font-medium">
-                {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label }) }}
+                {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: findTierByKey(selectedTier)?.label }) }}
               </div>
               <div class="text-sm text-rui-text-secondary mt-1">
                 {{ t('sponsor.sponsor_page.nft_image.image_not_available') }}
@@ -294,7 +292,7 @@ onMounted(async () => {
                 content-class="flex items-center justify-between h-16 !py-2 transition-all cursor-pointer"
                 :class="{
                   '!border-rui-primary': selectedTier === tier.key,
-                  'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key),
+                  'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply),
                 }"
                 @click="selectedTier = tier.key"
               >
@@ -324,8 +322,8 @@ onMounted(async () => {
                     </template>
                   </div>
                   <div
-                    v-if="tierSupply[tier.key] && !isTierAvailable(tier.key)"
-                    class="text-sm text-red-500 font-medium"
+                    v-if="tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply)"
+                    class="text-sm text-rui-error font-medium"
                   >
                     {{ t('sponsor.sponsor_page.pricing.sold_out') }}
                   </div>
@@ -420,7 +418,7 @@ onMounted(async () => {
         <div class="space-y-4">
           <p class="text-rui-text-secondary">
             {{ t('sponsor.sponsor_page.success_dialog.success_message', {
-              tier: SPONSORSHIP_TIERS.find(tier => tier.key === selectedTier)?.label,
+              tier: findTierByKey(selectedTier)?.label,
             }) }}
           </p>
           <p
