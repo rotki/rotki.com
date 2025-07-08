@@ -5,6 +5,7 @@ import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useTiersStore } from '~/store/tiers';
 import {
   ActionResultResponse,
   ApiKeys,
@@ -37,6 +38,7 @@ export const useMainStore = defineStore('main', () => {
 
   const logger = useLogger('store');
   const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
+  const store = useTiersStore();
 
   const getAccount = async (): Promise<void> => {
     try {
@@ -143,8 +145,10 @@ export const useMainStore = defineStore('main', () => {
 
   const refreshUserData = async () => {
     await getAccount();
-    await getSubscriptions();
-    await getPayments();
+    if (get(account)) {
+      await getSubscriptions();
+      await getPayments();
+    }
   };
 
   const refreshSubscriptionsAndPayments = () => {
@@ -339,6 +343,10 @@ export const useMainStore = defineStore('main', () => {
   setHooks({
     logout,
     refresh: refreshSession,
+  });
+
+  watch(account, async () => {
+    await store.getAvailablePlans();
   });
 
   return {
