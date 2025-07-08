@@ -3,7 +3,13 @@ import { get } from '@vueuse/core';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
-  middleware: ['maintenance', 'unverified', 'pending-payment', 'subscriber'],
+  middleware: [
+    'maintenance',
+    'unverified',
+    'pending-payment',
+    'subscriber',
+    'valid-plan-id',
+  ],
 });
 
 useHead({
@@ -19,16 +25,12 @@ useHead({
   ...commonAttrs(),
 });
 
-// NB: this param name is also used in backend email links,
-// if changed, kindly sync with backend team to update email links as well.
 const { planParams } = usePlanParams();
-const { planId } = usePlanIdParam();
 const { subscriptionId } = useSubscriptionIdParam();
 
 onBeforeMount(() => {
   const planParamsVal = get(planParams);
-  const planIdVal = get(planId);
-  if (!planParamsVal || !planIdVal)
+  if (!planParamsVal)
     navigateTo({ name: 'checkout-pay' });
 });
 </script>

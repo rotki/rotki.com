@@ -8,6 +8,7 @@ type DiscountCodeParam = string | undefined;
 export interface PlanParams {
   period: PricingPeriod;
   plan: string;
+  planId: number;
 }
 
 export function usePlanParams(): { planParams: ComputedRef<PlanParams | undefined> } {
