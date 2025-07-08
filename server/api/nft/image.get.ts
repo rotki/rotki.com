@@ -1,70 +1,16 @@
 import { Buffer } from 'node:buffer';
 import { z } from 'zod';
 import { IPFS_URL } from '~/composables/rotki-sponsorship/constants';
+import { CACHE_TTL, getCacheKey, getCacheStorage } from '~/server/utils/cache';
 import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('nft-image-proxy');
 
-// Cache configuration
-const IMAGE_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
-const MAX_CACHE_SIZE = 100; // Maximum number of images to cache
-
-// In-memory cache for images
+// In-memory cache entry interface for storing image data
 interface ImageCacheEntry {
-  data: Buffer;
+  data: string; // Base64 encoded image data
   contentType: string;
-  timestamp: number;
 }
-
-class ImageCache {
-  private cache = new Map<string, ImageCacheEntry>();
-  private accessOrder: string[] = [];
-
-  get(key: string): ImageCacheEntry | null {
-    const entry = this.cache.get(key);
-    if (!entry) {
-      return null;
-    }
-
-    // Check if expired
-    if (Date.now() - entry.timestamp > IMAGE_CACHE_TTL) {
-      this.cache.delete(key);
-      this.accessOrder = this.accessOrder.filter(k => k !== key);
-      return null;
-    }
-
-    // Update access order (move to end)
-    this.accessOrder = this.accessOrder.filter(k => k !== key);
-    this.accessOrder.push(key);
-
-    return entry;
-  }
-
-  set(key: string, data: Buffer, contentType: string): void {
-    // Remove oldest entries if cache is full
-    while (this.cache.size >= MAX_CACHE_SIZE && this.accessOrder.length > 0) {
-      const oldestKey = this.accessOrder.shift()!;
-      this.cache.delete(oldestKey);
-    }
-
-    this.cache.set(key, {
-      contentType,
-      data,
-      timestamp: Date.now(),
-    });
-
-    // Add to access order
-    this.accessOrder.push(key);
-  }
-
-  clear(): void {
-    this.cache.clear();
-    this.accessOrder = [];
-  }
-}
-
-// Initialize cache
-const imageCache = new ImageCache();
 
 // Request validation schema
 const querySchema = z.object({
@@ -136,10 +82,11 @@ export default defineEventHandler(async (event) => {
 
     // Normalize IPFS URL
     const normalizedUrl = normalizeIpfsUrl(url);
-    const cacheKey = `image:${normalizedUrl}`;
+    const storage = getCacheStorage();
+    const cacheKey = getCacheKey('image', normalizedUrl);
 
     // Check cache first
-    const cached = imageCache.get(cacheKey);
+    const cached = await storage.getItem<ImageCacheEntry>(cacheKey);
     if (cached) {
       logger.debug(`Cache hit for ${normalizedUrl}`);
 
@@ -150,7 +97,8 @@ export default defineEventHandler(async (event) => {
         'X-Cache': 'HIT',
       });
 
-      return cached.data;
+      // Convert base64 back to Buffer
+      return Buffer.from(cached.data, 'base64');
     }
 
     logger.debug(`Cache miss for ${normalizedUrl}, fetching...`);
@@ -158,8 +106,15 @@ export default defineEventHandler(async (event) => {
     // Fetch image
     const { contentType, data } = await fetchImage(normalizedUrl);
 
-    // Cache the image
-    imageCache.set(cacheKey, data, contentType);
+    // Cache the image as base64 encoded string
+    const cacheEntry: ImageCacheEntry = {
+      contentType,
+      data: data.toString('base64'),
+    };
+
+    await storage.setItem(cacheKey, cacheEntry, {
+      ttl: CACHE_TTL.IMAGE,
+    });
 
     // Set response headers
     setResponseHeaders(event, {

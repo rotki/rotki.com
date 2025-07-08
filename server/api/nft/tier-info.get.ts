@@ -2,54 +2,11 @@ import type { TierInfoResult } from '~/composables/rotki-sponsorship/metadata';
 import { ethers } from 'ethers';
 import { z } from 'zod';
 import { CONTRACT_ADDRESS, IPFS_URL, ROTKI_SPONSORSHIP_ABI, RPC_URL } from '~/composables/rotki-sponsorship/constants';
+import { CACHE_TTL, getCacheKey, getCacheStorage } from '~/server/utils/cache';
 import { Multicall } from '~/server/utils/multicall';
 import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('nft-tier-info-api');
-
-// Cache configuration
-const TIER_DATA_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const METADATA_CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const RELEASE_ID_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-
-// In-memory cache implementation
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-  ttl: number;
-}
-
-class Cache {
-  private cache = new Map<string, CacheEntry<any>>();
-
-  get<T>(key: string): T | null {
-    const entry = this.cache.get(key);
-    if (!entry)
-      return null;
-
-    if (Date.now() - entry.timestamp > entry.ttl) {
-      this.cache.delete(key);
-      return null;
-    }
-
-    return entry.data;
-  }
-
-  set<T>(key: string, data: T, ttl: number): void {
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      ttl,
-    });
-  }
-
-  clear(): void {
-    this.cache.clear();
-  }
-}
-
-// Initialize cache
-const cache = new Cache();
 
 // Singleton provider instance
 let provider: ethers.JsonRpcProvider | null = null;
@@ -96,8 +53,11 @@ const querySchema = z.object({
 
 // Fetch metadata with caching
 async function fetchMetadata(metadataURI: string): Promise<any> {
-  const cacheKey = `metadata:${metadataURI}`;
-  const cached = cache.get<any>(cacheKey);
+  const storage = getCacheStorage();
+  const cacheKey = getCacheKey('metadata', metadataURI);
+
+  // Try to get from cache
+  const cached = await storage.getItem<any>(cacheKey);
   if (cached)
     return cached;
 
@@ -112,14 +72,22 @@ async function fetchMetadata(metadataURI: string): Promise<any> {
   }
 
   const metadata = await response.json();
-  cache.set(cacheKey, metadata, METADATA_CACHE_TTL);
+
+  // Store in cache with TTL
+  await storage.setItem(cacheKey, metadata, {
+    ttl: CACHE_TTL.METADATA,
+  });
+
   return metadata;
 }
 
 // Get current release ID with caching
 async function getCurrentReleaseId(): Promise<number> {
-  const cacheKey = 'releaseId:current';
-  const cached = cache.get<number>(cacheKey);
+  const storage = getCacheStorage();
+  const cacheKey = getCacheKey('releaseId', 'current');
+
+  // Try to get from cache
+  const cached = await storage.getItem<number>(cacheKey);
   if (cached !== null)
     return cached;
 
@@ -127,19 +95,24 @@ async function getCurrentReleaseId(): Promise<number> {
   const releaseId = await contract.currentReleaseId();
   const releaseIdNumber = Number(releaseId);
 
-  cache.set(cacheKey, releaseIdNumber, RELEASE_ID_CACHE_TTL);
+  // Store in cache with TTL
+  await storage.setItem(cacheKey, releaseIdNumber, {
+    ttl: CACHE_TTL.RELEASE_ID,
+  });
+
   return releaseIdNumber;
 }
 
 // Batch fetch tier info using multicall
 async function fetchTierInfoBatch(tierIds: number[], releaseId: number): Promise<Record<number, TierInfoResult | null>> {
   const results: Record<number, TierInfoResult | null> = {};
+  const storage = getCacheStorage();
 
   // Check cache first
   const uncachedTierIds: number[] = [];
   for (const tierId of tierIds) {
-    const cacheKey = `tier:${releaseId}:${tierId}`;
-    const cached = cache.get<TierInfoResult>(cacheKey);
+    const cacheKey = getCacheKey('tier', String(releaseId), String(tierId));
+    const cached = await storage.getItem<TierInfoResult>(cacheKey);
     if (cached) {
       results[tierId] = cached;
     }
@@ -192,7 +165,7 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number): Promise
 
         // Fetch metadata in parallel
         metadataPromises.push(
-          fetchMetadata(metadataURI).then((metadata) => {
+          fetchMetadata(metadataURI).then(async (metadata) => {
             // Extract image URL and convert to proxied URL
             let imageUrl = metadata.image;
             if (imageUrl) {
@@ -220,8 +193,10 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number): Promise
               releaseName,
             };
 
-            const cacheKey = `tier:${releaseId}:${tierId}`;
-            cache.set(cacheKey, tierInfo, TIER_DATA_CACHE_TTL);
+            const cacheKey = getCacheKey('tier', String(releaseId), String(tierId));
+            await storage.setItem(cacheKey, tierInfo, {
+              ttl: CACHE_TTL.TIER_DATA,
+            });
             results[tierId] = tierInfo;
           }).catch((error) => {
             logger.error(`Error fetching metadata for tier ${tierId}:`, error);
@@ -252,8 +227,9 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number): Promise
 
 // Fetch single tier info with caching
 async function fetchSingleTierInfo(tierId: number, releaseId: number): Promise<TierInfoResult | null> {
-  const cacheKey = `tier:${releaseId}:${tierId}`;
-  const cached = cache.get<TierInfoResult>(cacheKey);
+  const storage = getCacheStorage();
+  const cacheKey = getCacheKey('tier', String(releaseId), String(tierId));
+  const cached = await storage.getItem<TierInfoResult>(cacheKey);
   if (cached)
     return cached;
 
@@ -295,7 +271,9 @@ async function fetchSingleTierInfo(tierId: number, releaseId: number): Promise<T
       releaseName,
     };
 
-    cache.set(cacheKey, result, TIER_DATA_CACHE_TTL);
+    await storage.setItem(cacheKey, result, {
+      ttl: CACHE_TTL.TIER_DATA,
+    });
     return result;
   }
   catch (error) {
