@@ -4,6 +4,7 @@ import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
+import { useTiersStore } from '~/store/tiers';
 import {
   ActionResultResponse,
   ApiKeys,
@@ -36,6 +37,8 @@ export const useMainStore = defineStore('main', () => {
   const resumeError = ref('');
 
   const logger = useLogger('store');
+
+  const store = useTiersStore();
 
   const getAccount = async (): Promise<void> => {
     try {
@@ -142,8 +145,10 @@ export const useMainStore = defineStore('main', () => {
 
   const refreshUserData = async () => {
     await getAccount();
-    await getSubscriptions();
-    await getPayments();
+    if (get(account)) {
+      await getSubscriptions();
+      await getPayments();
+    }
   };
 
   const refreshSubscriptionsAndPayments = () => {
@@ -334,6 +339,10 @@ export const useMainStore = defineStore('main', () => {
     stopCountdown();
     startCountdown();
   };
+
+  watch(account, async () => {
+    await store.getAvailablePlans();
+  });
 
   return {
     account,
