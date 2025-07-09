@@ -38,6 +38,29 @@ useHead({
 
 useAutoLogout();
 const tabModelValue = ref();
+
+const tabs = [
+  {
+    label: t('account.tabs.subscription'),
+    icon: 'lu-crown',
+    to: '/home/subscription',
+  },
+  {
+    label: t('account.tabs.account_details'),
+    icon: 'lu-circle-user-round',
+    to: '/home/account-details',
+  },
+  {
+    label: t('account.tabs.customer_information'),
+    icon: 'lu-info',
+    to: '/home/customer-information',
+  },
+  {
+    label: t('account.tabs.address'),
+    icon: 'lu-map-pin',
+    to: '/home/address',
+  },
+];
 </script>
 
 <template>
@@ -56,40 +79,15 @@ const tabModelValue = ref();
               color="primary"
             >
               <RuiTab
+                v-for="tab in tabs"
+                :key="tab.to"
                 link
-                to="/home/subscription"
+                :to="tab.to"
               >
                 <template #prepend>
-                  <RuiIcon name="lu-crown" />
+                  <RuiIcon :name="tab.icon" />
                 </template>
-                {{ t('account.tabs.subscription') }}
-              </RuiTab>
-              <RuiTab
-                link
-                to="/home/account-details"
-              >
-                <template #prepend>
-                  <RuiIcon name="lu-circle-user-round" />
-                </template>
-                {{ t('account.tabs.account_details') }}
-              </RuiTab>
-              <RuiTab
-                link
-                to="/home/customer-information"
-              >
-                <template #prepend>
-                  <RuiIcon name="lu-info" />
-                </template>
-                {{ t('account.tabs.customer_information') }}
-              </RuiTab>
-              <RuiTab
-                link
-                to="/home/address"
-              >
-                <template #prepend>
-                  <RuiIcon name="lu-map-pin" />
-                </template>
-                {{ t('account.tabs.address') }}
+                {{ tab.label }}
               </RuiTab>
             </RuiTabs>
           </div>
@@ -100,52 +98,18 @@ const tabModelValue = ref();
               color="primary"
             >
               <RuiTab
+                v-for="tab in tabs"
+                :key="tab.to"
                 link
-                to="/home/subscription"
+                :to="tab.to"
               >
                 <template #prepend>
                   <RuiIcon
                     class="shrink-0"
-                    name="lu-crown"
+                    :name="tab.icon"
                   />
                 </template>
-                {{ t('account.tabs.subscription') }}
-              </RuiTab>
-              <RuiTab
-                link
-                to="/home/account-details"
-              >
-                <template #prepend>
-                  <RuiIcon
-                    class="shrink-0"
-                    name="lu-circle-user-round"
-                  />
-                </template>
-                {{ t('account.tabs.account_details') }}
-              </RuiTab>
-              <RuiTab
-                link
-                to="/home/customer-information"
-              >
-                <template #prepend>
-                  <RuiIcon
-                    class="shrink-0"
-                    name="lu-info"
-                  />
-                </template>
-                {{ t('account.tabs.customer_information') }}
-              </RuiTab>
-              <RuiTab
-                link
-                to="/home/address"
-              >
-                <template #prepend>
-                  <RuiIcon
-                    class="shrink-0"
-                    name="lu-map-pin"
-                  />
-                </template>
-                {{ t('account.tabs.address') }}
+                {{ tab.label }}
               </RuiTab>
             </RuiTabs>
           </div>
