@@ -61,7 +61,7 @@
     "@nuxtjs/sitemap": "7.4.1",
     "@rotki/eslint-config": "4.1.0",
     "@rotki/eslint-plugin": "1.0.0",
-    "@rotki/ui-library": "2.4.3",
+    "@rotki/ui-library": "2.4.4",
     "@types/braintree-web": "3.96.17",
     "@types/paypal-checkout-components": "4.0.8",
     "@types/qrcode": "1.5.5",
