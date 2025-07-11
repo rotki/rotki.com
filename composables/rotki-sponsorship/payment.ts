@@ -1,54 +1,53 @@
+import type { SponsorshipState } from '~/composables/rotki-sponsorship/types';
 import { get, set } from '@vueuse/core';
 import { Contract, ethers, type Signer, type TransactionResponse } from 'ethers';
-import { checkPaymentTokenEnabled, fetchTierPrices, refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
-import { CURRENCY_OPTIONS, type SponsorshipState } from '~/composables/rotki-sponsorship/types';
+import { refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
+import { usePaymentTokens } from '~/composables/rotki-sponsorship/use-payment-tokens';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { useLogger } from '~/utils/use-logger';
-import { CHAIN_ID, CONTRACT_ADDRESS, ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI, USDC_ADDRESS } from './constants';
+import { CHAIN_ID, CONTRACT_ADDRESS, ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI } from './constants';
 
-async function approveUSDC(amount: string, signer: Signer): Promise<TransactionResponse> {
-  const usdcContract = new Contract(USDC_ADDRESS, ERC20_ABI, signer);
-  const amountBN = ethers.parseUnits(amount, 6); // USDC has 6 decimals
-  return usdcContract.approve(CONTRACT_ADDRESS, amountBN);
+async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
+  const tokenContract = new Contract(tokenAddress, ERC20_ABI, signer);
+  const amountBN = ethers.parseUnits(amount, decimals);
+  return tokenContract.approve(CONTRACT_ADDRESS, amountBN);
 }
 
-async function checkUSDCAllowance(signer: Signer): Promise<string> {
+async function checkTokenAllowanceContract(tokenAddress: string, decimals: number, signer: Signer): Promise<string> {
   const userAddress = await signer.getAddress();
-  const usdcContract = new Contract(USDC_ADDRESS, ERC20_ABI, signer);
+  const tokenContract = new Contract(tokenAddress, ERC20_ABI, signer);
 
-  const allowance = await usdcContract.allowance(userAddress, CONTRACT_ADDRESS);
-  return ethers.formatUnits(allowance, 6);
+  const allowance = await tokenContract.allowance(userAddress, CONTRACT_ADDRESS);
+  return ethers.formatUnits(allowance, decimals);
 }
 
 async function mintNFT(
   tierId: number,
-  currency: string,
+  tokenAddress: string,
   price: string,
+  decimals: number,
   signer: Signer,
 ): Promise<TransactionResponse> {
   const contract = new Contract(CONTRACT_ADDRESS, ROTKI_SPONSORSHIP_ABI, signer);
 
   let tx: TransactionResponse;
 
-  if (currency === 'ETH') {
+  if (tokenAddress === ETH_ADDRESS) {
     // ETH payment
     tx = await contract.mint(tierId, ETH_ADDRESS, {
       value: ethers.parseEther(price),
     });
   }
-  else if (currency === 'USDC') {
-    // USDC payment - check approval first
-    const allowance = await checkUSDCAllowance(signer);
+  else {
+    // Token payment - check approval first
+    const allowance = await checkTokenAllowanceContract(tokenAddress, decimals, signer);
     if (parseFloat(allowance) < parseFloat(price)) {
-      throw new Error(`Insufficient USDC allowance. Please approve ${price} USDC first.`);
+      throw new Error(`Insufficient token allowance. Please approve ${price} tokens first.`);
     }
 
-    tx = await contract.mint(tierId, USDC_ADDRESS, {
+    tx = await contract.mint(tierId, tokenAddress, {
       value: 0, // No ETH for token payments
     });
-  }
-  else {
-    throw new Error(`Unsupported currency: ${currency}`);
   }
 
   return tx;
@@ -57,12 +56,12 @@ async function mintNFT(
 export function useRotkiSponsorshipPayment() {
   const sponsorshipState = ref<SponsorshipState>({ status: 'idle' });
   const selectedCurrency = ref<string>('ETH');
-  const isLoading = ref(true);
+  const isLoading = ref<boolean>(true);
   const error = ref<string | null>(null);
-  const enabledCurrencies = ref<string[]>(['ETH']); // ETH is always enabled
 
   const logger = useLogger('rotki-sponsorship');
   const { t } = useI18n({ useScope: 'global' });
+  const { fetchPaymentTokens, getPriceForTier, getTokenBySymbol, paymentTokens } = usePaymentTokens();
 
   const connection = useWeb3Connection({
     chainId: CHAIN_ID,
@@ -96,40 +95,23 @@ export function useRotkiSponsorshipPayment() {
     return null;
   });
 
-  async function loadEnabledCurrencies() {
+  async function loadPaymentTokens() {
     try {
-      logger.info('Loading enabled currencies...');
-      // ETH is always enabled
-      const currencies = ['ETH'];
+      logger.info('Loading payment tokens...');
+      await fetchPaymentTokens();
 
-      // Check if USDC is enabled as a payment token
-      logger.info(`Checking if USDC (${USDC_ADDRESS}) is enabled...`);
-      const isUsdcEnabled = await checkPaymentTokenEnabled(USDC_ADDRESS);
+      const tokens = get(paymentTokens);
+      logger.info(`Loaded ${tokens.length} payment tokens`);
 
-      if (isUsdcEnabled) {
-        currencies.push('USDC');
-
-        // Update CURRENCY_OPTIONS with the address
-        const usdcOption = CURRENCY_OPTIONS.find(option => option.key === 'USDC');
-        if (usdcOption) {
-          usdcOption.contractAddress = USDC_ADDRESS;
-        }
-        logger.info('USDC payment option enabled');
-      }
-      else {
-        logger.info('USDC payment option disabled');
-      }
-
-      set(enabledCurrencies, currencies);
-      logger.info(`Enabled currencies: ${currencies.join(', ')}`);
-
-      // If selected currency is not enabled, switch to ETH
-      if (!currencies.includes(get(selectedCurrency))) {
-        set(selectedCurrency, 'ETH');
+      // If selected currency is not available, switch to ETH
+      const selectedToken = get(getTokenBySymbol)(get(selectedCurrency));
+      if (!selectedToken && tokens.length > 0) {
+        set(selectedCurrency, tokens[0].symbol);
       }
     }
     catch (error_) {
-      logger.error('Error loading enabled currencies:', error_);
+      logger.error('Error loading payment tokens:', error_);
+      set(error, 'Failed to load payment options');
     }
   }
 
@@ -145,22 +127,28 @@ export function useRotkiSponsorshipPayment() {
         throw new Error(t('subscription.crypto_payment.not_connected'));
       }
 
-      // Fetch tier prices dynamically
-      const prices = await fetchTierPrices();
-      const supplies = await refreshSupplyData();
+      // Get payment token info
+      const token = get(getTokenBySymbol)(currency);
+      if (!token) {
+        throw new Error(`Payment token ${currency} not available`);
+      }
+
+      // Get tier info
       const tier = findTierById(tierId);
       if (!tier) {
         throw new Error(`Invalid tier ID: ${tierId}`);
       }
-      const tierKey = tier.key;
-      const tierPricesForTier = prices[tierKey];
-      const price = tierPricesForTier?.[currency];
-      const supply = supplies[tierKey];
+      const tierKey = tier.key as 'bronze' | 'silver' | 'gold';
 
+      // Get price from payment token
+      const price = token.prices[tierKey];
       if (!price) {
-        throw new Error(`Price not available for this tier in ${currency}`);
+        throw new Error(`Price not available for ${tierKey} tier in ${currency}`);
       }
 
+      // Get supply info
+      const supplies = await refreshSupplyData();
+      const supply = supplies[tierKey];
       if (!supply) {
         throw new Error('Supply information not available for this tier');
       }
@@ -171,7 +159,7 @@ export function useRotkiSponsorshipPayment() {
       }
 
       const signer = await getSigner();
-      const tx = await mintNFT(tierId, currency, price, signer);
+      const tx = await mintNFT(tierId, token.address, price, token.decimals, signer);
 
       set(sponsorshipState, {
         status: 'pending',
@@ -206,28 +194,39 @@ export function useRotkiSponsorshipPayment() {
     }
   }
 
-  async function approveUSDCWrapper(amount: string) {
+  async function approveToken(currency: string, amount: string) {
+    const token = get(getTokenBySymbol)(currency);
+    if (!token || token.address === ETH_ADDRESS) {
+      throw new Error('Cannot approve ETH or invalid token');
+    }
+
     const signer = await getSigner();
-    return approveUSDC(amount, signer);
+    return approveTokenContract(token.address, amount, token.decimals, signer);
   }
 
-  async function checkUSDCAllowanceWrapper() {
+  async function checkTokenAllowance(currency: string) {
+    const token = get(getTokenBySymbol)(currency);
+    if (!token || token.address === ETH_ADDRESS) {
+      return '0';
+    }
+
     const signer = await getSigner();
-    return checkUSDCAllowance(signer);
+    return checkTokenAllowanceContract(token.address, token.decimals, signer);
   }
 
   return {
     // Connection state and methods
     ...connectionMethods,
-    approveUSDC: approveUSDCWrapper,
-    checkUSDCAllowance: checkUSDCAllowanceWrapper,
+    approveToken,
+    checkTokenAllowance,
     connected,
-    enabledCurrencies: readonly(enabledCurrencies),
     error: readonly(error),
+    getPriceForTier,
     isExpectedChain,
     isLoading: readonly(isLoading),
-    loadEnabledCurrencies,
+    loadPaymentTokens,
     mintSponsorshipNFT,
+    paymentTokens,
     selectedCurrency,
     sponsorshipState: readonly(sponsorshipState),
     transactionUrl,

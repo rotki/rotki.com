@@ -1,6 +1,5 @@
 import { get, set } from '@vueuse/shared';
 import { useLogger } from '~/utils/use-logger';
-import { fetchTierPrices } from './contract';
 import { loadNFTImagesAndSupplySSR } from './metadata-ssr';
 import { SPONSORSHIP_TIERS, type TierBenefits, type TierSupply } from './types';
 import { isTierAvailable as isTierAvailableUtil } from './utils';
@@ -10,7 +9,6 @@ import { isTierAvailable as isTierAvailableUtil } from './utils';
  * This is the main composable that should be used for data fetching
  */
 export function useRotkiSponsorshipSSR() {
-  const tierPrices = ref<Record<string, Record<string, string>>>({});
   const tierSupply = ref<Record<string, TierSupply>>({});
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});
@@ -35,10 +33,6 @@ export function useRotkiSponsorshipSSR() {
       set(tierBenefits, benefits);
       set(releaseName, fetchedReleaseName);
 
-      // Load tier prices
-      const prices = await fetchTierPrices();
-      set(tierPrices, prices);
-
       logger.info('Successfully loaded all tier data via SSR');
     }
     catch (error_) {
@@ -62,8 +56,6 @@ export function useRotkiSponsorshipSSR() {
     nftImages: readonly(nftImages),
     releaseName: readonly(releaseName),
     tierBenefits: readonly(tierBenefits),
-
-    tierPrices: readonly(tierPrices),
     tierSupply: readonly(tierSupply),
   };
 }
@@ -82,7 +74,6 @@ export async function useSponsorshipData() {
       nftImages: get(ssr.nftImages),
       releaseName: get(ssr.releaseName),
       tierBenefits: get(ssr.tierBenefits),
-      tierPrices: get(ssr.tierPrices),
       tierSupply: get(ssr.tierSupply),
     };
   });

@@ -4,6 +4,21 @@ import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import { fetchWithCsrf } from '~/utils/api';
 import { formatDate } from '~/utils/date';
+import { commonAttrs, getMetadata } from '~/utils/metadata';
+
+const description = 'Rotki\'s sponsor leaderboard';
+
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
+
+useHead({
+  title: 'Leaderboard | rotki',
+  meta: [
+    ...getMetadata('Leaderboard | rotki', description, baseUrl, `${baseUrl}/sponsor/leaderboard`),
+  ],
+  ...commonAttrs(),
+});
 
 definePageMeta({
   layout: 'sponsor',

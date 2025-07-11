@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
-import { CURRENCY_OPTIONS, SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship/types';
+import { SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship/types';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
@@ -15,7 +16,7 @@ const {
 useHead({
   title: 'Sponsor | rotki',
   meta: [
-    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor`),
+    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor/sponsor`),
   ],
   ...commonAttrs(),
 });
@@ -25,8 +26,8 @@ definePageMeta({
 });
 
 const selectedTier = ref('bronze');
-const isApproving = ref(false);
-const usdcAllowance = ref('0');
+const isApproving = ref<boolean>(false);
+const tokenAllowance = ref<string>('0');
 const showSuccessDialog = ref(false);
 
 const { t } = useI18n({ useScope: 'global' });
@@ -37,13 +38,14 @@ const {
   sponsorshipState,
   transactionUrl,
   selectedCurrency,
-  enabledCurrencies,
+  paymentTokens,
+  getPriceForTier,
   open: openWallet,
   switchNetwork,
-  loadEnabledCurrencies,
+  loadPaymentTokens,
   mintSponsorshipNFT,
-  approveUSDC,
-  checkUSDCAllowance,
+  approveToken,
+  checkTokenAllowance,
 } = useRotkiSponsorshipPayment();
 
 const { data: sponsorshipData, pending: isLoading } = await useSponsorshipData();
@@ -51,7 +53,6 @@ const { data: sponsorshipData, pending: isLoading } = await useSponsorshipData()
 const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
 const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
 const tierBenefits = computed(() => get(sponsorshipData)?.tierBenefits || {});
-const tierPrices = computed(() => get(sponsorshipData)?.tierPrices || {});
 const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
 const error = computed(() => get(sponsorshipData)?.error || null);
 
@@ -62,17 +63,21 @@ async function handleApprove() {
     if (!tier)
       return;
 
-    const prices = get(tierPrices);
-    const price = prices[tier.key]?.USDC;
+    const currency = get(selectedCurrency);
+    const token = get(paymentTokens).find(t => t.symbol === currency);
+    if (!token || !token.prices)
+      return;
+
+    const price = token.prices[tier.key as 'bronze' | 'silver' | 'gold'];
     if (!price)
       return;
 
-    const tx = await approveUSDC(price);
+    const tx = await approveToken(currency, price);
     await tx.wait();
 
     // Refresh allowance after approval
-    const newAllowance = await checkUSDCAllowance();
-    set(usdcAllowance, newAllowance);
+    const newAllowance = await checkTokenAllowance(currency);
+    set(tokenAllowance, newAllowance);
   }
   catch (error) {
     console.error('Approval failed:', error);
@@ -95,17 +100,18 @@ async function handleMint() {
   }
 }
 
-const needsApproval = computed(() => {
+const needsApproval = computed<boolean>(() => {
   const currency = get(selectedCurrency);
-  if (currency !== 'USDC')
+  const token = get(paymentTokens).find(t => t.symbol === currency);
+
+  if (!token || token.address === ETH_ADDRESS)
     return false;
 
-  const selectedTierKey = get(selectedTier);
-  const prices = get(tierPrices);
-  const price = prices[selectedTierKey]?.USDC;
-  const allowance = get(usdcAllowance);
+  const selectedTierKey = get(selectedTier) as 'bronze' | 'silver' | 'gold';
+  const price = token.prices[selectedTierKey];
+  const allowance = get(tokenAllowance);
 
-  return price && parseFloat(allowance) < parseFloat(price);
+  return !!(price && parseFloat(allowance) < parseFloat(price));
 });
 
 const buttonText = computed(() => {
@@ -147,17 +153,19 @@ const isButtonDisabled = computed(() => {
   return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
 });
 
-const availableCurrencies = computed(() => CURRENCY_OPTIONS.filter(c => get(enabledCurrencies).includes(c.key)));
+const availableTokens = computed(() => get(paymentTokens));
 
 async function checkAllowanceIfNeeded() {
   const currency = get(selectedCurrency);
-  if (currency === 'USDC' && get(connected)) {
+  const token = get(paymentTokens).find(t => t.symbol === currency);
+
+  if (token && token.address !== ETH_ADDRESS && get(connected)) {
     try {
-      const allowance = await checkUSDCAllowance();
-      set(usdcAllowance, allowance);
+      const allowance = await checkTokenAllowance(currency);
+      set(tokenAllowance, allowance);
     }
     catch (error) {
-      console.error('Failed to check USDC allowance:', error);
+      console.error('Failed to check token allowance:', error);
     }
   }
 }
@@ -174,7 +182,7 @@ watch(() => get(sponsorshipState).status, (newStatus) => {
 
 onMounted(async () => {
   // Only load currencies and check allowance on client-side
-  await loadEnabledCurrencies();
+  await loadPaymentTokens();
   await checkAllowanceIfNeeded();
 });
 </script>
@@ -260,21 +268,21 @@ onMounted(async () => {
             </h6>
             <div class="flex gap-2">
               <RuiButton
-                v-for="currency in availableCurrencies"
-                :key="currency.key"
-                :variant="selectedCurrency === currency.key ? 'default' : 'outlined'"
+                v-for="token in availableTokens"
+                :key="token.symbol"
+                :variant="selectedCurrency === token.symbol ? 'default' : 'outlined'"
                 color="primary"
                 size="sm"
-                @click="selectedCurrency = currency.key"
+                @click="selectedCurrency = token.symbol"
               >
                 <template #prepend>
                   <CryptoAssetIcon
                     class="bg-white rounded-full"
-                    :icon-url="currency.iconUrl"
-                    :name="currency.symbol"
+                    :icon-url="token.icon_url"
+                    :name="token.symbol"
                   />
                 </template>
-                {{ currency.label }}
+                {{ token.symbol }}
               </RuiButton>
             </div>
           </div>
@@ -308,7 +316,10 @@ onMounted(async () => {
                 />
                 <div class="flex flex-col items-end">
                   <div class="text-lg font-bold text-rui-primary">
-                    {{ tierPrices[tier.key]?.[selectedCurrency] ? `${tierPrices[tier.key][selectedCurrency]} ${selectedCurrency}` : t('sponsor.sponsor_page.pricing.loading') }}
+                    {{ (() => {
+                      const price = get(getPriceForTier)(selectedCurrency, tier.key as 'bronze' | 'silver' | 'gold');
+                      return price ? `${price} ${selectedCurrency}` : t('sponsor.sponsor_page.pricing.loading');
+                    })() }}
                   </div>
                   <div
                     v-if="tierSupply[tier.key]"

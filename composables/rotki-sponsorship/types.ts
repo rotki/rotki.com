@@ -21,31 +21,18 @@ export interface TierBenefits {
   benefits: string;
 }
 
-export interface CurrencyOption {
-  key: string;
-  label: string;
+export interface PaymentToken {
   symbol: string;
+  address: string;
   decimals: number;
-  contractAddress?: string;
-  iconUrl?: string;
+  icon: string;
+  prices: {
+    bronze: string;
+    silver: string;
+    gold: string;
+  };
+  icon_url: string;
 }
-
-export const CURRENCY_OPTIONS: CurrencyOption[] = [
-  {
-    decimals: 18,
-    iconUrl: '/img/chains/ethereum.svg',
-    key: 'ETH',
-    label: 'ETH',
-    symbol: 'ETH',
-  },
-  {
-    decimals: 6,
-    iconUrl: '/img/usdc.svg',
-    key: 'USDC',
-    label: 'USDC',
-    symbol: 'USDC',
-  },
-];
 
 export interface SponsorshipState {
   status: 'idle' | 'pending' | 'success' | 'error';
