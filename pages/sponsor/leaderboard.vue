@@ -3,14 +3,43 @@ import { get, set } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import { fetchWithCsrf } from '~/utils/api';
-import { formatDate } from '~/utils/date';
+import { commonAttrs, getMetadata } from '~/utils/metadata';
+
+const description = 'rotki\'s sponsor leaderboard';
+
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
+
+useHead({
+  title: 'Leaderboard | rotki',
+  meta: [
+    ...getMetadata('Leaderboard | rotki', description, baseUrl, `${baseUrl}/sponsor/leaderboard`),
+  ],
+  ...commonAttrs(),
+});
 
 definePageMeta({
   layout: 'sponsor',
 });
 
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const leaderboardData = ref<LeaderboardResponse | null>(null);
+
+interface PaginationData {
+  page: number;
+  total: number;
+  limit: number;
+  limits?: number[];
+}
+
+// Pagination state
+const paginationData = ref<PaginationData>({
+  page: 1,
+  total: 0,
+  limit: 10,
+  limits: [10, 25, 50, 100],
+});
 
 // Clipboard functionality
 const clipboardSource = ref('');
@@ -20,37 +49,55 @@ const { copy } = useClipboard({ source: clipboardSource });
 const { t } = useI18n({ useScope: 'global' });
 
 const LeaderboardEntry = z.object({
-  rank: z.number(),
+  rank: z.number().nullable(),
   address: z.string(),
   bronzeCount: z.number(),
   silverCount: z.number(),
   goldCount: z.number(),
+  totalCount: z.number(),
   points: z.number(),
   ensName: z.string().nullable().optional(),
 });
 
 const LeaderboardResponse = z.object({
-  total: z.number(),
-  lastUpdated: z.string().datetime(),
-  data: z.array(LeaderboardEntry),
+  count: z.number(),
+  next: z.string().nullable(),
+  previous: z.string().nullable(),
+  results: z.array(LeaderboardEntry),
 });
 
 type LeaderboardResponse = z.infer<typeof LeaderboardResponse>;
 
-const currentLeaderboard = computed(() => {
+type LeaderboardEntry = z.infer<typeof LeaderboardEntry>;
+
+const currentLeaderboard = computed<LeaderboardEntry[]>(() => {
   const data = get(leaderboardData);
-  if (!data || !data.data)
+  if (!data || !data.results)
     return [];
 
-  return data.data;
+  return data.results;
 });
 
-async function fetchLeaderboard() {
+async function fetchLeaderboard(): Promise<void> {
   try {
     set(loading, true);
-    const response = await fetchWithCsrf('/webapi/leaderboard/');
+    const { page, limit } = get(paginationData);
+    const offset = (page - 1) * limit;
+    const response = await fetchWithCsrf(`/webapi/leaderboard/`, {
+      method: 'GET',
+      query: {
+        offset,
+        limit,
+      },
+    });
     const validatedResponse = LeaderboardResponse.parse(response);
     set(leaderboardData, validatedResponse);
+
+    // Update total count in pagination
+    set(paginationData, {
+      ...get(paginationData),
+      total: validatedResponse.count,
+    });
   }
   catch (error_) {
     console.error('Error fetching leaderboard:', error_);
@@ -60,7 +107,12 @@ async function fetchLeaderboard() {
   }
 }
 
-function formatAddressDisplay(holder: z.infer<typeof LeaderboardEntry>) {
+function formatAddressDisplay(holder: LeaderboardEntry): {
+  primary: string;
+  secondary: null;
+  showTooltip: boolean;
+  isEns: boolean;
+} {
   if (holder.ensName) {
     return {
       primary: `${holder.ensName} - ${shortenAddress(holder.address)}`,
@@ -84,6 +136,11 @@ function shortenAddress(address: string): string {
 function copyToClipboard(text: string) {
   set(clipboardSource, text);
   copy();
+}
+
+async function handlePaginationChange(newPagination: PaginationData): Promise<void> {
+  set(paginationData, newPagination);
+  await fetchLeaderboard();
 }
 
 onMounted(async () => {
@@ -198,7 +255,7 @@ onMounted(async () => {
                           : 'text-rui-text-secondary',
                     ]"
                   >
-                    #{{ user.rank }}
+                    #{{ user.rank || (index + 1 + (paginationData.page - 1) * paginationData.limit) }}
                   </div>
                 </div>
               </div>
@@ -222,12 +279,24 @@ onMounted(async () => {
         </RuiCard>
 
         <p class="text-xs text-rui-text-secondary mt-2 italic">
-          {{ leaderboardData?.lastUpdated ? t('sponsor.leaderboard.last_updated', { date: formatDate(leaderboardData.lastUpdated, 'MMMM DD, YYYY hh:mm z') }) : t('sponsor.leaderboard.updated_every_hour') }}
+          {{ t('sponsor.leaderboard.updated_every_hour') }}
         </p>
+
+        <!-- Pagination -->
+        <div
+          v-if="paginationData.total > 0"
+          class="mt-4"
+        >
+          <RuiTablePagination
+            :model-value="paginationData"
+            :loading="loading"
+            @update:model-value="handlePaginationChange($event)"
+          />
+        </div>
       </div>
 
       <!-- Call to Action -->
-      <div class="text-center mt-6">
+      <div class="text-center mt-6 border-t border-default">
         <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 max-w-md mx-auto">
           <h3 class="text-2xl font-bold mb-1">
             {{ t('sponsor.leaderboard.call_to_action.title') }}

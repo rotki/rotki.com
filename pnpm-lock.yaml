@@ -19,10 +19,10 @@ importers:
         version: 0.11.1(magicast@0.3.5)(pinia@3.0.3(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3)))
       '@reown/appkit':
         specifier: 1.7.11
-        version: 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+        version: 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-adapter-ethers':
         specifier: 1.7.11
-        version: 1.7.11(@ethersproject/sha2@5.7.0)(db0@0.3.2(better-sqlite3@11.10.0))(ethers@6.14.4)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+        version: 1.7.11(@ethersproject/sha2@5.7.0)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ethers@6.14.4)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@vuelidate/core':
         specifier: 2.0.3
         version: 2.0.3(vue@3.5.17(typescript@5.8.3))
@@ -37,7 +37,7 @@ importers:
         version: 13.4.0(vue@3.5.17(typescript@5.8.3))
       '@vueuse/nuxt':
         specifier: 13.4.0
-        version: 13.4.0(magicast@0.3.5)(nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
+        version: 13.4.0(magicast@0.3.5)(nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       '@vueuse/shared':
         specifier: 13.4.0
         version: 13.4.0(vue@3.5.17(typescript@5.8.3))
@@ -86,7 +86,7 @@ importers:
         version: 2.5.0(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))
       '@nuxt/image':
         specifier: 1.10.0
-        version: 1.10.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)
+        version: 1.10.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)
       '@nuxt/test-utils':
         specifier: 3.19.1
         version: 3.19.1(@types/node@24.0.3)(@vue/test-utils@2.4.6)(happy-dom@17.6.3)(jiti@2.4.2)(magicast@0.3.5)(sass@1.89.2)(terser@5.43.1)(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.0.3)(happy-dom@17.6.3)(jiti@2.4.2)(msw@2.10.2(@types/node@24.0.3)(typescript@5.8.3))(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(yaml@2.8.0)
@@ -114,6 +114,9 @@ importers:
       '@types/qrcode':
         specifier: 1.5.5
         version: 1.5.5
+      '@vercel/kv':
+        specifier: ^3.0.0
+        version: 3.0.0
       '@vitest/coverage-v8':
         specifier: 3.2.4
         version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.0.3)(happy-dom@17.6.3)(jiti@2.4.2)(msw@2.10.2(@types/node@24.0.3)(typescript@5.8.3))(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))
@@ -146,7 +149,7 @@ importers:
         version: 2.10.2(@types/node@24.0.3)(typescript@5.8.3)
       nuxt:
         specifier: 3.17.5
-        version: 3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0)
+        version: 3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0)
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -192,6 +195,9 @@ importers:
       typescript:
         specifier: 5.8.3
         version: 5.8.3
+      unstorage:
+        specifier: ^1.16.0
+        version: 1.16.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
       vite:
         specifier: 6.3.5
         version: 6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
@@ -2129,6 +2135,13 @@ packages:
     resolution: {integrity: sha512-IYuXJCuwBOVV0H73l6auaZwtAPHjCPBJkxd4Co0yO6dSjDM5Na5OceaxhUmJLZ3z8kuEGhTYWIHH7PchGztnlg==}
     cpu: [x64]
     os: [win32]
+
+  '@upstash/redis@1.35.1':
+    resolution: {integrity: sha512-sIMuAMU9IYbE2bkgDby8KLoQKRiBMXn0moXxqLvUmQ7VUu2CvulZLtK8O0x3WQZFvvZhU5sRC2/lOVZdGfudkA==}
+
+  '@vercel/kv@3.0.0':
+    resolution: {integrity: sha512-pKT8fRnfyYk2MgvyB6fn6ipJPCdfZwiKDdw7vB+HL50rjboEBHDVBEcnwfkEpVSp2AjNtoaOUH7zG+bVC/rvSg==}
+    engines: {node: '>=14.6'}
 
   '@vercel/nft@0.29.4':
     resolution: {integrity: sha512-6lLqMNX3TuycBPABycx7A9F1bHQR7kiQln6abjFbPrf5C/05qHM9M5E4PeTE59c7z8g6vHnx1Ioihb2AQl7BTA==}
@@ -9120,7 +9133,7 @@ snapshots:
       - utf-8-validate
       - vue
 
-  '@nuxt/image@1.10.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)':
+  '@nuxt/image@1.10.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)':
     dependencies:
       '@nuxt/kit': 3.17.5(magicast@0.3.5)
       consola: 3.4.2
@@ -9133,7 +9146,7 @@ snapshots:
       std-env: 3.9.0
       ufo: 1.6.1
     optionalDependencies:
-      ipx: 2.1.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
+      ipx: 2.1.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9668,17 +9681,17 @@ snapshots:
 
   '@poppinss/exception@1.2.1': {}
 
-  '@reown/appkit-adapter-ethers@1.7.11(@ethersproject/sha2@5.7.0)(db0@0.3.2(better-sqlite3@11.10.0))(ethers@6.14.4)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@reown/appkit-adapter-ethers@1.7.11(@ethersproject/sha2@5.7.0)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ethers@6.14.4)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@ethersproject/sha2': 5.7.0
-      '@reown/appkit': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-controllers': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-controllers': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-polyfills': 1.7.11
-      '@reown/appkit-scaffold-ui': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
-      '@reown/appkit-utils': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
+      '@reown/appkit-scaffold-ui': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
+      '@reown/appkit-utils': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
       '@reown/appkit-wallet': 1.7.11(typescript@5.8.3)
-      '@walletconnect/universal-provider': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/universal-provider': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       ethers: 6.14.4
       valtio: 1.13.2(react@18.3.1)
     optionalDependencies:
@@ -9734,11 +9747,11 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-controllers@1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@reown/appkit-controllers@1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-wallet': 1.7.11(typescript@5.8.3)
-      '@walletconnect/universal-provider': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/universal-provider': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       valtio: 1.13.2(react@18.3.1)
       viem: 2.31.3(typescript@5.8.3)(zod@3.25.67)
     transitivePeerDependencies:
@@ -9768,12 +9781,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-pay@1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@reown/appkit-pay@1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-controllers': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-ui': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-utils': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
+      '@reown/appkit-controllers': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-ui': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-utils': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
       lit: 3.3.0
       valtio: 1.13.2(react@18.3.1)
     transitivePeerDependencies:
@@ -9807,12 +9820,12 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@reown/appkit-scaffold-ui@1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)':
+  '@reown/appkit-scaffold-ui@1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)':
     dependencies:
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-controllers': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-ui': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-utils': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
+      '@reown/appkit-controllers': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-ui': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-utils': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
       '@reown/appkit-wallet': 1.7.11(typescript@5.8.3)
       lit: 3.3.0
     transitivePeerDependencies:
@@ -9843,10 +9856,10 @@ snapshots:
       - valtio
       - zod
 
-  '@reown/appkit-ui@1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@reown/appkit-ui@1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-controllers': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-controllers': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-wallet': 1.7.11(typescript@5.8.3)
       lit: 3.3.0
       qrcode: 1.5.3
@@ -9877,15 +9890,15 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-utils@1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)':
+  '@reown/appkit-utils@1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)':
     dependencies:
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-controllers': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-controllers': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-polyfills': 1.7.11
       '@reown/appkit-wallet': 1.7.11(typescript@5.8.3)
       '@wallet-standard/wallet': 1.1.0
       '@walletconnect/logger': 2.1.2
-      '@walletconnect/universal-provider': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/universal-provider': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       valtio: 1.13.2(react@18.3.1)
       viem: 2.31.3(typescript@5.8.3)(zod@3.25.67)
     transitivePeerDependencies:
@@ -9926,18 +9939,18 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@reown/appkit@1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@reown/appkit@1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@reown/appkit-common': 1.7.11(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-controllers': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-pay': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-controllers': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-pay': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
       '@reown/appkit-polyfills': 1.7.11
-      '@reown/appkit-scaffold-ui': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
-      '@reown/appkit-ui': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
-      '@reown/appkit-utils': 1.7.11(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
+      '@reown/appkit-scaffold-ui': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
+      '@reown/appkit-ui': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(zod@3.25.67)
+      '@reown/appkit-utils': 1.7.11(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(valtio@1.13.2(react@18.3.1))(zod@3.25.67)
       '@reown/appkit-wallet': 1.7.11(typescript@5.8.3)
-      '@walletconnect/types': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
-      '@walletconnect/universal-provider': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/types': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/universal-provider': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       bs58: 6.0.0
       semver: 7.7.2
       valtio: 1.13.2(react@18.3.1)
@@ -10597,6 +10610,14 @@ snapshots:
   '@unrs/rspack-resolver-binding-win32-x64-msvc@1.3.0':
     optional: true
 
+  '@upstash/redis@1.35.1':
+    dependencies:
+      uncrypto: 0.1.3
+
+  '@vercel/kv@3.0.0':
+    dependencies:
+      '@upstash/redis': 1.35.1
+
   '@vercel/nft@0.29.4(rollup@4.44.0)':
     dependencies:
       '@mapbox/node-pre-gyp': 2.0.0
@@ -10887,13 +10908,13 @@ snapshots:
 
   '@vueuse/metadata@13.4.0': {}
 
-  '@vueuse/nuxt@13.4.0(magicast@0.3.5)(nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))':
+  '@vueuse/nuxt@13.4.0(magicast@0.3.5)(nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3))':
     dependencies:
       '@nuxt/kit': 3.17.5(magicast@0.3.5)
       '@vueuse/core': 13.4.0(vue@3.5.17(typescript@5.8.3))
       '@vueuse/metadata': 13.4.0
       local-pkg: 1.1.1
-      nuxt: 3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0)
+      nuxt: 3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0)
       vue: 3.5.17(typescript@5.8.3)
     transitivePeerDependencies:
       - magicast
@@ -10908,21 +10929,21 @@ snapshots:
     dependencies:
       '@wallet-standard/base': 1.1.0
 
-  '@walletconnect/core@2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@walletconnect/core@2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-provider': 1.0.14
       '@walletconnect/jsonrpc-types': 1.0.4
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/jsonrpc-ws-connection': 1.0.16
-      '@walletconnect/keyvaluestorage': 1.1.1(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/keyvaluestorage': 1.1.1(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
       '@walletconnect/logger': 2.1.2
       '@walletconnect/relay-api': 1.0.11
       '@walletconnect/relay-auth': 1.1.0
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/types': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       '@walletconnect/window-getters': 1.0.1
       es-toolkit: 1.39.3
       events: 3.3.0
@@ -11002,11 +11023,11 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@walletconnect/keyvaluestorage@1.1.1(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)':
+  '@walletconnect/keyvaluestorage@1.1.1(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)':
     dependencies:
       '@walletconnect/safe-json': 1.0.2
       idb-keyval: 6.2.2
-      unstorage: 1.16.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
+      unstorage: 1.16.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -11047,16 +11068,16 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/sign-client@2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@walletconnect/sign-client@2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
-      '@walletconnect/core': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/core': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/logger': 2.1.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/types': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       events: 3.3.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -11086,12 +11107,12 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/types@2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)':
+  '@walletconnect/types@2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)':
     dependencies:
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-types': 1.0.4
-      '@walletconnect/keyvaluestorage': 1.1.1(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/keyvaluestorage': 1.1.1(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
       '@walletconnect/logger': 2.1.2
       events: 3.3.0
     transitivePeerDependencies:
@@ -11114,18 +11135,18 @@ snapshots:
       - ioredis
       - uploadthing
 
-  '@walletconnect/universal-provider@2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@walletconnect/universal-provider@2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@walletconnect/events': 1.0.1
       '@walletconnect/jsonrpc-http-connection': 1.0.8
       '@walletconnect/jsonrpc-provider': 1.0.14
       '@walletconnect/jsonrpc-types': 1.0.4
       '@walletconnect/jsonrpc-utils': 1.0.8
-      '@walletconnect/keyvaluestorage': 1.1.1(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/keyvaluestorage': 1.1.1(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
       '@walletconnect/logger': 2.1.2
-      '@walletconnect/sign-client': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
-      '@walletconnect/types': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
-      '@walletconnect/utils': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/sign-client': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
+      '@walletconnect/types': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/utils': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)
       es-toolkit: 1.39.3
       events: 3.3.0
     transitivePeerDependencies:
@@ -11153,7 +11174,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@walletconnect/utils@2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
+  '@walletconnect/utils@2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)(typescript@5.8.3)(zod@3.25.67)':
     dependencies:
       '@msgpack/msgpack': 3.1.2
       '@noble/ciphers': 1.3.0
@@ -11161,12 +11182,12 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
       '@walletconnect/jsonrpc-utils': 1.0.8
-      '@walletconnect/keyvaluestorage': 1.1.1(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/keyvaluestorage': 1.1.1(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
       '@walletconnect/relay-api': 1.0.11
       '@walletconnect/relay-auth': 1.1.0
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
-      '@walletconnect/types': 2.21.3(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
+      '@walletconnect/types': 2.21.3(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(ioredis@5.6.1)
       '@walletconnect/window-getters': 1.0.1
       '@walletconnect/window-metadata': 1.0.1
       blakejs: 1.2.1
@@ -13648,7 +13669,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ipx@2.1.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1):
+  ipx@2.1.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1):
     dependencies:
       '@fastify/accept-negotiator': 1.1.0
       citty: 0.1.6
@@ -13664,7 +13685,7 @@ snapshots:
       sharp: 0.32.6
       svgo: 3.3.2
       ufo: 1.6.1
-      unstorage: 1.16.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
+      unstorage: 1.16.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
       xss: 1.0.15
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -14766,7 +14787,7 @@ snapshots:
       p-wait-for: 5.0.2
       qs: 6.14.0
 
-  nitropack@2.11.12(better-sqlite3@11.10.0)(idb-keyval@6.2.2):
+  nitropack@2.11.12(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(idb-keyval@6.2.2):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@netlify/functions': 3.1.10(rollup@4.44.0)
@@ -14834,7 +14855,7 @@ snapshots:
       unenv: 2.0.0-rc.17
       unimport: 5.0.1
       unplugin-utils: 0.2.4
-      unstorage: 1.16.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
+      unstorage: 1.16.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
       untyped: 2.0.0
       unwasm: 0.3.9
       youch: 4.1.0-beta.8
@@ -14985,7 +15006,7 @@ snapshots:
       - magicast
       - vue
 
-  nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0):
+  nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@24.0.3)(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(db0@0.3.2(better-sqlite3@11.10.0))(eslint@9.29.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(meow@13.2.0)(optionator@0.9.4)(rollup@4.44.0)(sass@1.89.2)(stylelint@16.21.0(typescript@5.8.3))(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0):
     dependencies:
       '@nuxt/cli': 3.25.1(magicast@0.3.5)
       '@nuxt/devalue': 2.0.2
@@ -15020,7 +15041,7 @@ snapshots:
       mlly: 1.7.4
       mocked-exports: 0.1.1
       nanotar: 0.2.0
-      nitropack: 2.11.12(better-sqlite3@11.10.0)(idb-keyval@6.2.2)
+      nitropack: 2.11.12(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(better-sqlite3@11.10.0)(idb-keyval@6.2.2)
       nypm: 0.6.0
       ofetch: 1.4.1
       ohash: 2.0.11
@@ -15042,7 +15063,7 @@ snapshots:
       unimport: 5.0.1
       unplugin: 2.3.5
       unplugin-vue-router: 0.12.0(vue-router@4.5.1(vue@3.5.17(typescript@5.8.3)))(vue@3.5.17(typescript@5.8.3))
-      unstorage: 1.16.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
+      unstorage: 1.16.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1)
       untyped: 2.0.0
       vue: 3.5.17(typescript@5.8.3)
       vue-bundle-renderer: 2.1.1
@@ -17144,7 +17165,7 @@ snapshots:
       picomatch: 4.0.2
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.16.0(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1):
+  unstorage@1.16.0(@upstash/redis@1.35.1)(@vercel/kv@3.0.0)(db0@0.3.2(better-sqlite3@11.10.0))(idb-keyval@6.2.2)(ioredis@5.6.1):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -17155,6 +17176,8 @@ snapshots:
       ofetch: 1.4.1
       ufo: 1.6.1
     optionalDependencies:
+      '@upstash/redis': 1.35.1
+      '@vercel/kv': 3.0.0
       db0: 0.3.2(better-sqlite3@11.10.0)
       idb-keyval: 6.2.2
       ioredis: 5.6.1
