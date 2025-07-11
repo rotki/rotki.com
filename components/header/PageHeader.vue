@@ -105,9 +105,9 @@ watch(
 }
 
 .wrapper {
-  @apply transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex space-y-4;
+  @apply transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4;
   @apply md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap;
-  @apply xl:justify-between lg:space-y-0;
+  @apply xl:justify-between xl:gap-y-0;
 
   &__closed {
     @apply -left-full md:left-0;
