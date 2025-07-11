@@ -1,4 +1,5 @@
 import process from 'node:process';
+import rotkiTheme from '@rotki/ui-library/theme';
 
 const nonIndexed = [
   '/activation',
@@ -96,6 +97,9 @@ export default defineNuxtConfig({
   },
 
   i18n: {
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
     defaultLocale: 'en-US',
     lazy: true,
     locales: [{ code: 'en-US', file: 'en.json', language: 'en-US' }],
@@ -178,6 +182,23 @@ export default defineNuxtConfig({
     exclude: nonIndexed,
   },
   ssr: true,
+  tailwindcss: {
+    config: {
+      content: [
+        './components/**/*.{vue,js,ts}',
+        './layouts/**/*.vue',
+        './pages/**/*.vue',
+      ],
+      darkMode: 'class',
+      mode: 'jit',
+      plugins: [rotkiTheme],
+      theme: {
+        container: {
+          center: true,
+        },
+      },
+    },
+  },
   vite: {
     css: {
       preprocessorOptions: {
