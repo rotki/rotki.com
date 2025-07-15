@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { IPFS_URL, ROTKI_SPONSORSHIP_ABI } from '~/composables/rotki-sponsorship/constants';
 import { CACHE_TTL } from '~/server/utils/cache';
 import { createMetadataCacheKey, createTierCacheKey } from '~/server/utils/cache-keys';
+import { createCachedFunction } from '~/server/utils/cached-function';
 import { handleApiError } from '~/server/utils/errors';
 import { Multicall } from '~/server/utils/multicall';
 import { getServerNftConfig } from '~/server/utils/nft-config';
@@ -52,7 +53,7 @@ const getContractInterface = (() => {
 })();
 
 // Fetch metadata with caching and deduplication
-const fetchMetadata = defineCachedFunction(async (metadataURI: string): Promise<any> => {
+const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<any> => {
   const cacheKey = createMetadataCacheKey(metadataURI);
 
   return deduplicatedFetch(cacheKey, async () => {
@@ -83,7 +84,7 @@ const fetchMetadata = defineCachedFunction(async (metadataURI: string): Promise<
 });
 
 // Get current release ID with caching
-const getCurrentReleaseId = defineCachedFunction(async (config: NftConfig): Promise<number> => deduplicatedFetch(`releaseId:${config.CONTRACT_ADDRESS}`, async () => {
+const getCurrentReleaseId = createCachedFunction(async (config: NftConfig): Promise<number> => deduplicatedFetch(`releaseId:${config.CONTRACT_ADDRESS}`, async () => {
   const provider = createProvider(config.RPC_URL);
   const contract = createContract(provider, config.CONTRACT_ADDRESS);
   const releaseId = await contract.currentReleaseId();
@@ -150,7 +151,7 @@ async function fetchSingleTierInfoDirect(tierId: number, releaseId: number, conf
 }
 
 // Cached version of tier info fetching
-const fetchSingleTierInfo = defineCachedFunction(fetchSingleTierInfoDirect, {
+const fetchSingleTierInfo = createCachedFunction(fetchSingleTierInfoDirect, {
   getKey: (tierId: number, releaseId: number, config: NftConfig) => createTierCacheKey(config.CONTRACT_ADDRESS, releaseId, tierId),
   maxAge: CACHE_TTL.TIER_DATA,
   name: 'fetchSingleTierInfo',
