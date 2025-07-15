@@ -2,6 +2,7 @@ import type { H3Event } from 'h3';
 import { Buffer } from 'node:buffer';
 import { useLogger } from '~/utils/use-logger';
 import { CACHE_TTL } from './cache';
+import { getCacheService } from './cache-service';
 import { retryWithBackoff } from './retry';
 
 const logger = useLogger('image-cache');
@@ -27,7 +28,7 @@ export async function streamImageWithCache(
   cacheKey: string,
   ttl: number = CACHE_TTL.IMAGE,
 ): Promise<void> {
-  const storage = useStorage('cache');
+  const storage = getCacheService();
   const metadataKey = `${cacheKey}:metadata`;
 
   // Try to get cached metadata
@@ -213,7 +214,7 @@ export async function streamImageWithCache(
  * Invalidate cached image
  */
 export async function invalidateImageCache(cacheKey: string): Promise<void> {
-  const storage = useStorage('cache');
+  const storage = getCacheService();
   const metadataKey = `${cacheKey}:metadata`;
 
   // Get metadata to know how many chunks to delete
