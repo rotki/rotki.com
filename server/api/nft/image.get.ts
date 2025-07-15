@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { IPFS_URL } from '~/composables/rotki-sponsorship/constants';
 import { CACHE_TTL } from '~/server/utils/cache';
 import { createImageCacheKey } from '~/server/utils/cache-keys';
+import { getCacheService } from '~/server/utils/cache-service';
 import { handleApiError } from '~/server/utils/errors';
 import { handleConditionalRequest, invalidateImageCache, streamImageWithCache } from '~/server/utils/image-cache';
 import { deduplicatedFetch } from '~/server/utils/request-dedup';
@@ -49,7 +50,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Check conditional request headers for cached metadata
-    const storage = useStorage('cache');
+    const storage = getCacheService();
     const metadataKey = `${cacheKey}:metadata`;
     const cachedMetadata = await storage.getItem<any>(metadataKey);
 
