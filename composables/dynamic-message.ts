@@ -1,8 +1,8 @@
+import { get, set } from '@vueuse/core';
 import {
   DashboardSchema,
   type VisibilityPeriod,
 } from '@/types/dynamic-messages';
-import { get, set } from '@vueuse/core';
 import { convertKeys } from '~/utils/api';
 
 export const useDynamicMessages = createSharedComposable(() => {

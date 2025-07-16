@@ -21,6 +21,7 @@ export default rotki({
     ? {
         src: '**',
         localesDirectory: 'i18n/locales',
+        enableNoUnusedKeys: 'ci',
         overrides: {
           '@intlify/vue-i18n/no-raw-text': [
             'error',

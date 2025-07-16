@@ -57,7 +57,6 @@ pnpm release      # Bump version and generate changelog
 1. **Component Organization**: Components organized by feature domain (`components/account/`, `components/checkout/`, etc.)
 
 2. **Composables Pattern**: Business logic extracted into composables:
-
    - `useAuth()` - Authentication state
    - `useWeb3Payment()` - Crypto payment handling
    - `useRotkiSponsorship()` - NFT sponsorship functionality

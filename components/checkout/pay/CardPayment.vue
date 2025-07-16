@@ -88,8 +88,8 @@ async function submit() {
     const paymentToken = savedCard
       ? savedCard.token
       : await addCard({
-        paymentMethodNonce: nonce,
-      });
+          paymentMethodNonce: nonce,
+        });
 
     const paymentNonce = await createCardNonce({
       paymentToken,
