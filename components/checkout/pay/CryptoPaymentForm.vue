@@ -46,6 +46,7 @@ const { copy: copyToClipboard } = useClipboard({ source: qrText });
 
 const {
   connected,
+  address,
   pay,
   isOpen,
   open,
@@ -311,12 +312,18 @@ watch(discountCodeModel, (curr, prev) => {
             @click="open()"
           >
             <RuiIcon
-              name="lu-link-2"
+              name="lu-wallet"
               size="20"
             />
           </RuiButton>
         </template>
       </div>
+    </div>
+    <div
+      v-if="connected && address"
+      class="text-sm text-rui-text-secondary mt-2"
+    >
+      {{ t('sponsor.sponsor_page.connected_to', { address: truncateAddress(address) }) }}
     </div>
   </div>
 
