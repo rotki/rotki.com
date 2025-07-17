@@ -849,7 +849,8 @@
   "sponsor": {
     "tabs": {
       "sponsor": "Sponsor",
-      "leaderboard": "Leaderboard"
+      "leaderboard": "Leaderboard",
+      "submit_name": "Submit Name"
     },
     "leaderboard": {
       "title": "Sponsor Leaderboard",
@@ -870,7 +871,7 @@
         "points_breakdown": {
           "gold": "Gold = 10 pts",
           "silver": "Silver = 5 pts",
-          "bronze": "Bronze = 1 pts"
+          "bronze": "Bronze = 2 pts"
         }
       },
       "last_updated": "Last Updated: {date}",
@@ -880,6 +881,43 @@
         "button": "Become a Sponsor"
       },
       "updated_every_hour": "Updated every hour"
+    },
+    "submit_name": {
+      "title": "Submit Your Display Name",
+      "description": "Choose a display name that will appear on the sponsor leaderboard and other places, depending on the tier. Do this only after you mint an NFT.",
+      "name_label": "Display Name",
+      "name_hint": "Optional. 3-30 characters.",
+      "address_label": "Wallet Address",
+      "address_hint": "Your connected wallet address",
+      "token_id_label": "NFT Token ID",
+      "token_id_hint": "The ID of your sponsor NFT",
+      "connect_wallet": "Connect Wallet",
+      "sign_message": "Sign Message",
+      "sign_hint": "Sign a message to verify ownership of this wallet",
+      "submit": "Submit Name",
+      "success": "Your display name has been submitted successfully!",
+      "view_leaderboard": "View Leaderboard",
+      "image_label": "Profile Image",
+      "optional": "Optional",
+      "upload_image": "Click to upload image",
+      "image_requirements": "JPEG, PNG, WebP • Max 5MB",
+      "email_label": "Email Address",
+      "email_hint": "Optional. We'll use this to contact you if needed.",
+      "error": {
+        "too_short": "Name must be at least 3 characters long",
+        "too_long": "Name must be at most 30 characters long",
+        "invalid_chars": "Name can only contain letters, numbers, spaces, hyphens, underscores, and dots",
+        "invalid_email": "Please enter a valid email address",
+        "wallet_connect": "Failed to connect wallet",
+        "sign_failed": "Failed to sign message",
+        "submit_failed": "Failed to submit display name",
+        "image_too_large": "Image must be less than 5MB",
+        "invalid_image_type": "Image must be JPEG, PNG, or WebP",
+        "at_least_one_required": "Please provide either a display name or an image",
+        "token_id_required": "NFT Token ID is required",
+        "token_id_invalid": "NFT Token ID must be a number",
+        "sign_required": "Please sign the message to verify ownership"
+      }
     },
     "sponsor_page": {
       "title": "Sponsor next rotki release",
@@ -923,6 +961,7 @@
         "thank_you_with_release": "Thank you for sponsoring the \"{release}\" rotki release! 🚀",
         "thank_you_upcoming": "Thank you for sponsoring the upcoming rotki release! 🚀",
         "view_etherscan": "View on Etherscan",
+        "request_name": "Request Display Name",
         "view_leaderboard": "View Leaderboard",
         "close": "Close"
       }

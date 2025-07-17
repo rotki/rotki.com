@@ -13,7 +13,7 @@ import {
 } from '@reown/appkit/networks';
 import { createAppKit } from '@reown/appkit/vue';
 import { get, set } from '@vueuse/core';
-import { BrowserProvider, type Signer } from 'ethers';
+import { BrowserProvider, getAddress, type Signer } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
 // Patch the showUnsupportedChainUI method to no-op
@@ -74,7 +74,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   appKit.subscribeAccount((account) => {
     set(errorMessage, '');
     set(connected, account.isConnected);
-    set(address, account.address);
+    set(address, account.isConnected && account.address ? getAddress(account.address) : undefined);
     onAccountChange?.(account.isConnected);
 
     if (account.isConnected) {
@@ -138,6 +138,15 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     }
   }
 
+  async function signMessage(message: string): Promise<string> {
+    if (!get(connected)) {
+      throw new Error('Wallet not connected');
+    }
+
+    const signer = await getSigner();
+    return signer.signMessage(message);
+  }
+
   function setError(error: string): void {
     set(errorMessage, error);
     onError?.(error);
@@ -164,6 +173,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     // Methods
     open: async () => appKit.open(),
     setError,
+    signMessage,
     switchNetwork,
 
     validateNetwork,
