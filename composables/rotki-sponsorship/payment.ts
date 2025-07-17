@@ -1,5 +1,5 @@
 import type { SponsorshipState } from '~/composables/rotki-sponsorship/types';
-import { get, set } from '@vueuse/core';
+import { get, set, useLocalStorage } from '@vueuse/core';
 import { Contract, ethers, type Signer, type TransactionResponse } from 'ethers';
 import { refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
 import { usePaymentTokens } from '~/composables/rotki-sponsorship/use-payment-tokens';
@@ -67,6 +67,7 @@ export function useRotkiSponsorshipPayment() {
   const { t } = useI18n({ useScope: 'global' });
   const { fetchPaymentTokens, getPriceForTier, getTokenBySymbol, paymentTokens } = usePaymentTokens();
   const { CHAIN_ID } = useNftConfig();
+  const storedNftIds = useLocalStorage<number[]>('rotki-sponsor-nft-ids', []);
 
   const connection = useWeb3Connection({
     chainId: get(CHAIN_ID),
@@ -167,7 +168,7 @@ export function useRotkiSponsorshipPayment() {
 
       // Check if tier is sold out (maxSupply = 0 means unlimited)
       if (supply.maxSupply > 0 && supply.currentSupply >= supply.maxSupply) {
-        throw new Error(`${tierKey.charAt(0).toUpperCase() + tierKey.slice(1)} tier is sold out`);
+        throw new Error(`${toTitleCase(tierKey)} tier is sold out`);
       }
 
       const signer = await getSigner();
@@ -182,10 +183,43 @@ export function useRotkiSponsorshipPayment() {
       const receipt = await tx.wait();
 
       if (receipt?.status === 1) {
+        // Parse the NFTMinted event to get the token ID
+        let tokenId: string | undefined;
+
+        const { CONTRACT_ADDRESS: contractAddress } = useNftConfig();
+        const contract = new Contract(get(contractAddress), ROTKI_SPONSORSHIP_ABI, signer);
+
+        // Find the NFTMinted event in the receipt logs
+        for (const log of receipt.logs) {
+          try {
+            const parsedLog = contract.interface.parseLog({
+              data: log.data,
+              topics: log.topics as string[],
+            });
+
+            if (parsedLog?.name === 'NFTMinted' && parsedLog.args.minter.toLowerCase() === get(address)?.toLowerCase()) {
+              tokenId = parsedLog.args.tokenId.toString();
+              break;
+            }
+          }
+          catch {
+            // Skip logs that don't match our event
+          }
+        }
+
         set(sponsorshipState, {
           status: 'success',
+          tokenId,
           txHash: tx.hash,
         });
+
+        // Store NFT ID in localStorage
+        if (tokenId) {
+          const numericId = parseInt(tokenId);
+          if (!get(storedNftIds).includes(numericId)) {
+            set(storedNftIds, [...get(storedNftIds), numericId]);
+          }
+        }
 
         // Supply data will be refreshed on next mint call
       }

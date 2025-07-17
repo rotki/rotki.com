@@ -36,6 +36,7 @@ export interface SponsorshipState {
   status: 'idle' | 'pending' | 'success' | 'error';
   txHash?: string;
   error?: string;
+  tokenId?: string;
 }
 
 export interface NftConfig {

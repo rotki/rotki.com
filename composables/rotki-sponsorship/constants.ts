@@ -9,6 +9,7 @@ export const ROTKI_SPONSORSHIP_ABI = [
   'function getTierInfo(uint256 releaseId, uint256 tierId) external view returns (uint256 maxSupply, uint256 currentSupply, string memory metadataURI)',
   'function currentReleaseId() external view returns (uint256)',
   'function mint(uint256 tierId, address paymentToken) external payable',
+  'event NFTMinted(uint256 indexed tokenId, uint256 indexed releaseId, uint256 indexed tierId, address minter)',
 ];
 
 export const ERC20_ABI = [
