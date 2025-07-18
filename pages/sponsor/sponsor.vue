@@ -545,8 +545,20 @@ onMounted(async () => {
             </ButtonLink>
 
             <ButtonLink
-              to="/sponsor/leaderboard"
+              :to="`/sponsor/submit-name${sponsorshipState.tokenId ? `?tokenId=${sponsorshipState.tokenId}` : ''}`"
               variant="default"
+              color="primary"
+              class="w-full"
+            >
+              <template #prepend>
+                <RuiIcon name="lu-user-plus" />
+              </template>
+              {{ t('sponsor.sponsor_page.success_dialog.request_name') }}
+            </ButtonLink>
+
+            <ButtonLink
+              to="/sponsor/leaderboard"
+              variant="outlined"
               color="primary"
               class="w-full"
             >

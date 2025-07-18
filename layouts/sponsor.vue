@@ -29,6 +29,11 @@ const tabs = [
     icon: 'lu-trophy',
     to: '/sponsor/leaderboard',
   },
+  {
+    label: t('sponsor.tabs.submit_name'),
+    icon: 'lu-user-plus',
+    to: '/sponsor/submit-name',
+  },
 ];
 </script>
 
