@@ -23,6 +23,11 @@ const imageFile = ref<File | null>(null);
 const imagePreview = ref<string>('');
 const tokenId = ref<string>('');
 const email = ref<string>('');
+const isCheckingNft = ref<boolean>(false);
+const nftTier = ref<'bronze' | 'silver' | 'gold' | undefined>();
+const nftCheckError = ref<string>('');
+const nftReleaseId = ref<number | undefined>();
+const nftReleaseName = ref<string>('');
 
 const { connected: isConnected, address, open: connect, signMessage: signMessageWeb3 } = useWeb3Connection();
 
@@ -194,9 +199,62 @@ async function handleSubmit(): Promise<void> {
   }
 }
 
+async function checkNftMetadata(): Promise<void> {
+  const tokenIdValue = get(tokenId);
+  if (!tokenIdValue || !Number.isInteger(Number(tokenIdValue))) {
+    set(nftCheckError, t('sponsor.submit_name.error.invalid_token_id'));
+    return;
+  }
+
+  try {
+    set(isCheckingNft, true);
+    set(nftCheckError, '');
+    set(nftTier, undefined);
+    set(nftReleaseId, undefined);
+    set(nftReleaseName, '');
+
+    // Fetch NFT metadata from the API with cache busting
+    const response = await $fetch<{
+      tokenId: number;
+      releaseId: number;
+      tierId: number;
+      tier: 'bronze' | 'silver' | 'gold';
+      owner: string;
+      releaseName: string;
+      metadata: any;
+    }>(`/api/nft/${tokenIdValue}?_t=${Date.now()}`);
+
+    if (response && response.tier) {
+      set(nftTier, response.tier);
+      set(nftReleaseId, response.releaseId);
+      // Use release name from metadata if available, otherwise show v{releaseId}
+      if (response.releaseName) {
+        // If release name doesn't start with 'v', add it
+        set(nftReleaseName, response.releaseName.startsWith('v') ? response.releaseName : `v${response.releaseName}`);
+      }
+      else {
+        set(nftReleaseName, `v${response.releaseId}`);
+      }
+    }
+    else {
+      set(nftCheckError, t('sponsor.submit_name.error.nft_not_found'));
+    }
+  }
+  catch (error: any) {
+    set(nftCheckError, error.data?.message || t('sponsor.submit_name.error.check_failed'));
+  }
+  finally {
+    set(isCheckingNft, false);
+  }
+}
+
 watch([displayName, imageFile, tokenId, email], () => {
   set(hasSigned, false);
   set(signature, '');
+  set(nftTier, undefined);
+  set(nftReleaseId, undefined);
+  set(nftReleaseName, '');
+  set(nftCheckError, '');
 });
 
 onMounted(() => {
@@ -303,19 +361,60 @@ onMounted(() => {
             </div>
           </div>
 
-          <RuiAutoComplete
-            v-model="tokenId"
-            :label="t('sponsor.submit_name.token_id_label')"
-            :hint="t('sponsor.submit_name.token_id_hint')"
-            :error-messages="toMessages(v$.tokenId)"
-            :disabled="isSubmitting"
-            :options="storedNftIds"
-            clearable
-            custom-value
-            auto-select-first
-            variant="outlined"
-            color="primary"
-          />
+          <div class="flex items-start gap-2">
+            <RuiAutoComplete
+              v-model="tokenId"
+              :label="t('sponsor.submit_name.token_id_label')"
+              :hint="t('sponsor.submit_name.token_id_hint')"
+              :error-messages="toMessages(v$.tokenId)"
+              :disabled="isSubmitting"
+              :options="storedNftIds"
+              clearable
+              custom-value
+              auto-select-first
+              variant="outlined"
+              color="primary"
+              class="flex-1"
+            />
+            <RuiButton
+              :disabled="!tokenId || isSubmitting"
+              :loading="isCheckingNft"
+              variant="outlined"
+              color="primary"
+              class="h-14"
+              @click="checkNftMetadata()"
+            >
+              {{ t('sponsor.submit_name.check') }}
+            </RuiButton>
+          </div>
+          <RuiAlert
+            v-if="nftTier"
+            type="info"
+            class="-mt-2"
+          >
+            <i18n-t
+              keypath="sponsor.submit_name.nft_info"
+              tag="span"
+            >
+              <template #tokenId>
+                {{ tokenId }}
+              </template>
+              <template #tier>
+                <strong>{{ nftTier }} tier</strong>
+              </template>
+              <template #releaseName>
+                <strong>{{ nftReleaseName }}</strong>
+              </template>
+            </i18n-t>
+          </RuiAlert>
+          <div
+            v-if="nftCheckError"
+            class="px-2"
+          >
+            <p class="text-sm text-rui-error">
+              {{ nftCheckError }}
+            </p>
+          </div>
 
           <RuiTextField
             v-model="email"

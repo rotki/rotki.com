@@ -916,8 +916,15 @@
         "at_least_one_required": "Please provide either a display name or an image",
         "token_id_required": "NFT Token ID is required",
         "token_id_invalid": "NFT Token ID must be a number",
-        "sign_required": "Please sign the message to verify ownership"
-      }
+        "sign_required": "Please sign the message to verify ownership",
+        "invalid_token_id": "Please enter a valid NFT Token ID",
+        "check_failed": "Failed to check NFT metadata",
+        "nft_not_found": "NFT not found or invalid token ID"
+      },
+      "check": "Check",
+      "tier": "Tier",
+      "in_release": "in release {releaseName}",
+      "nft_info": "NFT with id #{tokenId} is in {tier} for release {releaseName}"
     },
     "sponsor_page": {
       "title": "Sponsor next rotki release",
