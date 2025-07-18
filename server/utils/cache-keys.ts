@@ -65,3 +65,10 @@ export function createMetadataCacheKey(metadataURI: string): string {
 export function createImageCacheKey(imageUrl: string): string {
   return `image:${normalizeUrl(imageUrl)}`;
 }
+
+/**
+ * Create a cache key for NFT token data
+ */
+export function createNftTokenCacheKey(contractAddress: string, tokenId: number): string {
+  return `token:${contractAddress.toLowerCase()}:${tokenId}`;
+}
