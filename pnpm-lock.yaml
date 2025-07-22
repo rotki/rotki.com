@@ -103,8 +103,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0(eslint@9.29.0(jiti@2.4.2))(typescript@5.8.3)
       '@rotki/ui-library':
-        specifier: 2.5.0
-        version: 2.5.0(@vueuse/core@13.4.0(vue@3.5.17(typescript@5.8.3)))(@vueuse/shared@13.4.0(vue@3.5.17(typescript@5.8.3)))(dayjs@1.11.13)(vue@3.5.17(typescript@5.8.3))
+        specifier: 2.5.2
+        version: 2.5.2(@vueuse/core@13.4.0(vue@3.5.17(typescript@5.8.3)))(@vueuse/shared@13.4.0(vue@3.5.17(typescript@5.8.3)))(dayjs@1.11.13)(vue@3.5.17(typescript@5.8.3))
       '@types/braintree-web':
         specifier: 3.96.17
         version: 3.96.17
@@ -1747,8 +1747,8 @@ packages:
     peerDependencies:
       eslint: ^9.20.0
 
-  '@rotki/ui-library@2.5.0':
-    resolution: {integrity: sha512-rNsKrj/UH86fOs3TZsC8SxdQqsvndjg0toS7IEXfaHP+j7aMkRiwbiJuBZnHGsM/QaU0f4qN5OYyET3GCH7vtQ==}
+  '@rotki/ui-library@2.5.2':
+    resolution: {integrity: sha512-w9I+HUITYdVVUIfbcRz5G9r0D+oKKSNLYtYvpH+0JORgfV16u+fC9ZqUTG01J3fyynzG1JVAhXNo6M0BzA3PCg==}
     engines: {node: '>=22 <23', pnpm: '>=10 <11'}
     peerDependencies:
       '@vueuse/core': '>13.0.0'
@@ -10031,7 +10031,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@rotki/ui-library@2.5.0(@vueuse/core@13.4.0(vue@3.5.17(typescript@5.8.3)))(@vueuse/shared@13.4.0(vue@3.5.17(typescript@5.8.3)))(dayjs@1.11.13)(vue@3.5.17(typescript@5.8.3))':
+  '@rotki/ui-library@2.5.2(@vueuse/core@13.4.0(vue@3.5.17(typescript@5.8.3)))(@vueuse/shared@13.4.0(vue@3.5.17(typescript@5.8.3)))(dayjs@1.11.13)(vue@3.5.17(typescript@5.8.3))':
     dependencies:
       '@vueuse/core': 13.4.0(vue@3.5.17(typescript@5.8.3))
       '@vueuse/shared': 13.4.0(vue@3.5.17(typescript@5.8.3))
