@@ -65,6 +65,13 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     themeMode: 'light',
   });
 
+  // Initialize state from current appKit connection
+  const currentAccount = appKit.getAccount();
+  if (currentAccount && currentAccount.isConnected) {
+    set(connected, true);
+    set(address, currentAccount.address ? getAddress(currentAccount.address) : undefined);
+  }
+
   const getBrowserProvider = (): BrowserProvider => {
     assert(appKit);
     const walletProvider = appKit.getProvider('eip155');
@@ -151,10 +158,6 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     set(errorMessage, error);
     onError?.(error);
   }
-
-  onUnmounted(async () => {
-    await appKit.disconnect();
-  });
 
   return {
     // State
