@@ -854,7 +854,7 @@
     },
     "leaderboard": {
       "title": "Sponsor Leaderboard",
-      "subtitle": "Our top supporters making a difference",
+      "subtitle": "Recognizing those funding privacy-first, local software",
       "loading": "Loading leaderboard...",
       "empty_state": {
         "title": "No leaderboard data available",
@@ -876,8 +876,8 @@
       },
       "last_updated": "Last Updated: {date}",
       "call_to_action": {
-        "title": "Join Our Sponsors",
-        "description": "Support our project and see your name on this leaderboard!",
+        "title": "Support rotki. Get recognized.",
+        "description": "Mint a sponsor NFT to help fund independent, privacy-first software and earn your place on the leaderboard.",
         "button": "Become a Sponsor"
       },
       "updated_every_hour": "Updated every hour"
@@ -897,7 +897,9 @@
       "submit": "Submit Name",
       "success": "Your display name has been submitted successfully!",
       "view_leaderboard": "View Leaderboard",
-      "image_label": "Profile Image",
+      "image_label": "Image",
+      "image_hint_silver": "Image to put in download page for this release",
+      "image_hint_gold": "Image to put in on the app for this release",
       "optional": "Optional",
       "upload_image": "Click to upload image",
       "image_requirements": "JPEG, PNG, WebP • Max 5MB",
@@ -928,7 +930,7 @@
     },
     "sponsor_page": {
       "title": "Sponsor next rotki release",
-      "description": "Support rotki development by minting exclusive NFTs. Each tier unlocks special benefits and shows your commitment to the project. The more NFTs you hold, the higher you'll appear on the {leaderboard_link}",
+      "description": "Support the development of rotki by minting exclusive NFTs tied to a given release. Each tier comes with special perks and demonstrates your role in sustaining OSS aligned apps. The more NFTs you hold, the higher you'll appear on the {leaderboard_link}",
       "leaderboard_link_text": "leaderboard",
       "nft_image": {
         "failed_to_load": "Failed to load",
@@ -957,7 +959,8 @@
       "connected_to": "Connected to: {address}",
       "benefits": {
         "title": "What you get:",
-        "benefits_label": "Benefits: {benefits}"
+        "benefits_label": "Perks: {benefits}",
+        "tier_sponsorship": "{tier} tier sponsorship for rotki release {releaseName}."
       },
       "error": {
         "minting_failed": "Minting Failed"
@@ -968,8 +971,8 @@
         "thank_you_with_release": "Thank you for sponsoring the \"{release}\" rotki release! 🚀",
         "thank_you_upcoming": "Thank you for sponsoring the upcoming rotki release! 🚀",
         "view_etherscan": "View on Etherscan",
-        "request_name": "Request Display Name",
-        "view_leaderboard": "View Leaderboard",
+        "request_name": "Add display name",
+        "view_leaderboard": "View leaderboard",
         "close": "Close"
       }
     }

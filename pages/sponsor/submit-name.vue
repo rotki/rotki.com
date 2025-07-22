@@ -281,86 +281,6 @@ onMounted(() => {
           class="flex flex-col gap-6"
           @submit.prevent="handleSubmit()"
         >
-          <RuiTextField
-            v-model="displayName"
-            :label="t('sponsor.submit_name.name_label')"
-            :hint="t('sponsor.submit_name.name_hint')"
-            :error-messages="toMessages(v$.displayName)"
-            :disabled="isSubmitting"
-            variant="outlined"
-            color="primary"
-          />
-
-          <div>
-            <label class="block text-sm font-medium mb-2">
-              {{ t('sponsor.submit_name.image_label') }}
-              <span class="text-rui-text-secondary">({{ t('sponsor.submit_name.optional') }})</span>
-            </label>
-
-            <div
-              v-if="!imagePreview"
-              class="relative mt-3"
-            >
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                class="hidden"
-                :disabled="isSubmitting"
-                @change="handleImageChange($event)"
-              />
-              <label
-                for="image-upload"
-                class="flex flex-col items-center justify-center w-full h-32 border border-dashed border-rui-grey-300 dark:border-rui-grey-600 rounded-lg cursor-pointer hover:border-rui-primary transition-colors"
-              >
-                <RuiIcon
-                  name="lu-upload"
-                  size="24"
-                  class="mb-2 text-rui-text-secondary"
-                />
-                <span class="text-sm text-rui-text-secondary">{{ t('sponsor.submit_name.upload_image') }}</span>
-                <span class="text-xs text-rui-text-disabled mt-1">{{ t('sponsor.submit_name.image_requirements') }}</span>
-              </label>
-            </div>
-
-            <div
-              v-else
-              class="relative flex items-start"
-            >
-              <img
-                :src="imagePreview"
-                alt="Profile preview"
-                class="w-32 h-32 object-cover rounded-lg mt-3"
-              />
-              <RuiButton
-                icon
-                size="sm"
-                color="error"
-                class="-ml-3"
-                :disabled="isSubmitting"
-                @click="removeImage()"
-              >
-                <RuiIcon
-                  name="lu-x"
-                  size="16"
-                />
-              </RuiButton>
-            </div>
-
-            <div
-              v-if="toMessages(v$.imageFile).length > 0"
-              class="mt-2"
-            >
-              <p
-                v-for="error in toMessages(v$.imageFile)"
-                :key="error"
-                class="text-sm text-rui-error"
-              >
-                {{ error }}
-              </p>
-            </div>
-          </div>
-
           <div class="flex items-start gap-2">
             <RuiAutoComplete
               v-model="tokenId"
@@ -414,6 +334,90 @@ onMounted(() => {
             <p class="text-sm text-rui-error">
               {{ nftCheckError }}
             </p>
+          </div>
+
+          <RuiTextField
+            v-model="displayName"
+            :label="t('sponsor.submit_name.name_label')"
+            :hint="t('sponsor.submit_name.name_hint')"
+            :error-messages="toMessages(v$.displayName)"
+            :disabled="isSubmitting"
+            variant="outlined"
+            color="primary"
+          />
+
+          <div v-if="nftTier === 'silver' || nftTier === 'gold'">
+            <label class="block text-sm font-medium mb-2">
+              {{ t('sponsor.submit_name.image_label') }}
+              <span class="text-rui-text-secondary">({{ t('sponsor.submit_name.optional') }})</span>
+            </label>
+
+            <div
+              v-if="!imagePreview"
+              class="relative mt-3"
+            >
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                class="hidden"
+                :disabled="isSubmitting"
+                @change="handleImageChange($event)"
+              />
+              <label
+                for="image-upload"
+                class="flex flex-col items-center justify-center w-full h-32 border border-dashed border-rui-grey-300 dark:border-rui-grey-600 rounded-lg cursor-pointer hover:border-rui-primary transition-colors"
+              >
+                <RuiIcon
+                  name="lu-upload"
+                  size="24"
+                  class="mb-2 text-rui-text-secondary"
+                />
+                <span class="text-sm text-rui-text-secondary">{{ t('sponsor.submit_name.upload_image') }}</span>
+                <span class="text-xs text-rui-text-disabled mt-1">{{ t('sponsor.submit_name.image_requirements') }}</span>
+              </label>
+            </div>
+            <div
+              v-else
+              class="relative flex items-start"
+            >
+              <img
+                :src="imagePreview"
+                alt="Profile preview"
+                class="w-32 h-32 object-cover rounded-lg mt-3"
+              />
+              <RuiButton
+                icon
+                size="sm"
+                color="error"
+                class="-ml-3"
+                :disabled="isSubmitting"
+                @click="removeImage()"
+              >
+                <RuiIcon
+                  name="lu-x"
+                  size="16"
+                />
+              </RuiButton>
+            </div>
+
+            <div
+              v-if="toMessages(v$.imageFile).length > 0"
+              class="pt-1 px-3 text-rui-error text-sm text-caption"
+            >
+              <p
+                v-for="error in toMessages(v$.imageFile)"
+                :key="error"
+              >
+                {{ error }}
+              </p>
+            </div>
+            <div
+              v-else
+              class="pt-1 px-3 text-rui-text-secondary text-sm text-caption"
+            >
+              {{ nftTier === 'silver' ? t('sponsor.submit_name.image_hint_silver') : t('sponsor.submit_name.image_hint_gold') }}
+            </div>
           </div>
 
           <RuiTextField

@@ -8,7 +8,7 @@ import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/
 import { useLeaderboardMetadata } from '~/composables/use-leaderboard-metadata';
 import { fetchWithCsrf } from '~/utils/api';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
-import { truncateAddress } from '~/utils/text';
+import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
 const description = 'Sponsor rotki\'s next release';
@@ -41,6 +41,29 @@ const { t } = useI18n({ useScope: 'global' });
 // Fetch leaderboard metadata on mount to ensure config is available
 const { fetchMetadata } = useLeaderboardMetadata();
 
+// Fetch sponsorship tier content
+const { fallbackToLocalOnError } = useRemoteOrLocal();
+
+const { data: sponsorshipTiers } = await useAsyncData('sponsorship-tiers', () => fallbackToLocalOnError(
+  async () => await queryCollection('sponsorshipTiersRemote').all(),
+  async () => await queryCollection('sponsorshipTiersLocal').all(),
+));
+
+// Convert array to object keyed by tier
+const tierContent = computed(() => {
+  const tiers = get(sponsorshipTiers);
+  if (!tiers)
+    return {};
+
+  return tiers.reduce((acc, item) => {
+    acc[item.tier] = {
+      description: item.description,
+      benefits: item.benefits,
+    };
+    return acc;
+  }, {} as Record<string, { description: string; benefits: string }>);
+});
+
 const {
   connected,
   address,
@@ -63,7 +86,6 @@ const { data: sponsorshipData, pending: isLoading } = await useSponsorshipData()
 
 const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
 const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
-const tierBenefits = computed(() => get(sponsorshipData)?.tierBenefits || {});
 const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
 const error = computed(() => get(sponsorshipData)?.error);
 
@@ -456,14 +478,17 @@ onMounted(async () => {
               {{ t('sponsor.sponsor_page.benefits.title') }}
             </h6>
             <div
-              v-if="tierBenefits[selectedTier]"
+              v-if="tierContent[selectedTier]"
               class="text-sm text-rui-text-secondary"
             >
-              <p class="mb-2">
-                {{ tierBenefits[selectedTier].description }}
+              <p>
+                {{ t('sponsor.sponsor_page.benefits.tier_sponsorship', { tier: toTitleCase(selectedTier), releaseName }) }}
               </p>
-              <p class="font-medium">
-                {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: tierBenefits[selectedTier].benefits }) }}
+              <p v-if="tierContent[selectedTier].description">
+                {{ tierContent[selectedTier].description }}
+              </p>
+              <p class="font-medium mt-1">
+                {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: tierContent[selectedTier].benefits }) }}
               </p>
             </div>
             <div
