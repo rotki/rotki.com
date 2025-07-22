@@ -5,6 +5,7 @@ import { asSitemapCollection } from '@nuxtjs/sitemap/content';
 const DOCUMENTS = 'content/documents/*.md';
 const JOBS = 'content/jobs/*.md';
 const TESTIMONIALS = 'content/testimonials/*.md';
+const SPONSORSHIP_TIERS = 'content/sponsorship-tiers/*.md';
 
 function getSource(path: string, dataOrigin: 'remote' | 'local'): CollectionSource {
   if (dataOrigin === 'remote') {
@@ -45,6 +46,12 @@ const testimonialSchema = z.object({
   visible: z.boolean(),
 });
 
+const sponsorshipTierSchema = z.object({
+  benefits: z.string(),
+  description: z.string(),
+  tier: z.enum(['bronze', 'silver', 'gold']),
+});
+
 function getDocumentsCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
   return defineCollection({
     schema: documentSchema,
@@ -69,12 +76,22 @@ function getTestimonialsCollection(dataOrigin: 'remote' | 'local'): DefinedColle
   }));
 }
 
+function getSponsorshipTiersCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
+  return defineCollection(asRobotsCollection({
+    schema: sponsorshipTierSchema,
+    source: getSource(SPONSORSHIP_TIERS, dataOrigin),
+    type: 'data',
+  }));
+}
+
 export default defineContentConfig({
   collections: {
     documentsLocal: getDocumentsCollection('local'),
     documentsRemote: getDocumentsCollection('remote'),
     jobsLocal: getJobsCollection('local'),
     jobsRemote: getJobsCollection('remote'),
+    sponsorshipTiersLocal: getSponsorshipTiersCollection('local'),
+    sponsorshipTiersRemote: getSponsorshipTiersCollection('remote'),
     testimonialsLocal: getTestimonialsCollection('local'),
     testimonialsRemote: getTestimonialsCollection('remote'),
   },
