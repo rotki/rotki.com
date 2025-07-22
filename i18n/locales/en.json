@@ -884,7 +884,7 @@
     },
     "submit_name": {
       "title": "Submit Your Display Name",
-      "description": "Choose a display name that will appear on the sponsor leaderboard and other places, depending on the tier. Do this only after you mint an NFT.",
+      "description": "Choose a display name that will be shown on the download page or app, depending on the tier. Do this only after you mint an NFT.",
       "name_label": "Display Name",
       "name_hint": "Optional. 3-30 characters.",
       "address_label": "Wallet Address",
