@@ -22,7 +22,7 @@ const tabs = [
   {
     label: t('sponsor.tabs.sponsor'),
     icon: 'lu-handshake',
-    to: '/sponsor/sponsor',
+    to: '/sponsor/mint',
   },
   {
     label: t('sponsor.tabs.leaderboard'),

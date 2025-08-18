@@ -1,12 +1,15 @@
-import type { NftConfig } from '~/composables/rotki-sponsorship/types';
-import { ethers } from 'ethers';
+import type {
+  NftConfig,
+  TierMetadata,
+  TokenMetadata,
+} from '~/composables/rotki-sponsorship/types';
 import { z } from 'zod';
-import { IPFS_URL, ROTKI_SPONSORSHIP_ABI } from '~/composables/rotki-sponsorship/constants';
+import { findTierById, normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { CACHE_TTL } from '~/server/utils/cache';
 import { createNftTokenCacheKey } from '~/server/utils/cache-keys';
 import { createCachedFunction } from '~/server/utils/cached-function';
 import { handleApiError } from '~/server/utils/errors';
-import { getServerNftConfig } from '~/server/utils/nft-config';
+import { createContract, createProvider, getServerNftConfig } from '~/server/utils/nft-config';
 import { deduplicatedFetch } from '~/server/utils/request-dedup';
 import { retryWithBackoff } from '~/server/utils/retry';
 import { useLogger } from '~/utils/use-logger';
@@ -24,41 +27,12 @@ const paramsSchema = z.object({
   }),
 });
 
-interface TokenMetadata {
-  tokenId: number;
-  releaseId: number;
-  tierId: number;
-  owner: string;
-  metadataURI: string;
-  metadata: any;
-  imageUrl?: string;
-  tierName: 'bronze' | 'silver' | 'gold';
-  releaseName: string;
-}
-
-/**
- * Create provider instance per request to avoid singleton issues
- */
-function createProvider(rpcUrl: string): ethers.JsonRpcProvider {
-  return new ethers.JsonRpcProvider(rpcUrl);
-}
-
-/**
- * Create contract instance per request
- */
-function createContract(provider: ethers.JsonRpcProvider, contractAddress: string): ethers.Contract {
-  return new ethers.Contract(contractAddress, ROTKI_SPONSORSHIP_ABI, provider);
-}
-
 // Fetch metadata with caching and deduplication
-const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<any> => {
+const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<TierMetadata> => {
   const cacheKey = `metadata:${metadataURI}`;
 
   return deduplicatedFetch(cacheKey, async () => {
-    let metadataUrl = metadataURI;
-    if (metadataURI.startsWith('ipfs://')) {
-      metadataUrl = `${IPFS_URL}${metadataURI.slice(7)}`;
-    }
+    const metadataUrl = normalizeIpfsUrl(metadataURI);
 
     const response = await retryWithBackoff(async () => {
       const res = await fetch(metadataUrl);
@@ -130,7 +104,7 @@ async function fetchTokenDataDirect(tokenId: number, config: NftConfig): Promise
     if (tierMetadataURI) {
       try {
         const tierMetadata = await fetchMetadata(tierMetadataURI);
-        const releaseAttribute = tierMetadata.attributes?.find((attr: any) =>
+        const releaseAttribute = tierMetadata.attributes?.find(attr =>
           attr.trait_type === 'Release' || attr.trait_type === 'Release Name',
         );
         releaseName = releaseAttribute?.value || '';
@@ -142,13 +116,6 @@ async function fetchTokenDataDirect(tokenId: number, config: NftConfig): Promise
       }
     }
 
-    // Map tier ID to name
-    const tierNames: Record<number, 'bronze' | 'silver' | 'gold'> = {
-      0: 'bronze',
-      1: 'silver',
-      2: 'gold',
-    };
-
     return {
       imageUrl,
       metadata,
@@ -157,7 +124,7 @@ async function fetchTokenDataDirect(tokenId: number, config: NftConfig): Promise
       releaseId: Number(releaseId),
       releaseName,
       tierId: Number(tierId),
-      tierName: tierNames[Number(tierId)] || 'bronze',
+      tierName: findTierById(tierId)?.key || 'bronze',
       tokenId,
     };
   }
@@ -174,7 +141,7 @@ const fetchTokenData = createCachedFunction(fetchTokenDataDirect, {
   name: 'fetchTokenData',
 });
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<TokenMetadata> => {
   try {
     // Validate parameters
     const params = await getValidatedRouterParams(event, data => paramsSchema.parse(data));
@@ -199,21 +166,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Return simplified response for frontend
-    return {
-      metadata: {
-        attributes: tokenData.metadata.attributes,
-        description: tokenData.metadata.description,
-        image: tokenData.imageUrl,
-        name: tokenData.metadata.name,
-      },
-      owner: tokenData.owner,
-      releaseId: tokenData.releaseId,
-      releaseName: tokenData.releaseName,
-      tier: tokenData.tierName,
-      tierId: tokenData.tierId,
-      tokenId: tokenData.tokenId,
-    };
+    return tokenData;
   }
   catch (error) {
     handleApiError(event, error);

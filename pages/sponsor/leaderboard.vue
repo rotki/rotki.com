@@ -2,11 +2,12 @@
 import { get, set } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
+import { useLeaderboardMetadata } from '~/composables/rotki-sponsorship/use-leaderboard-metadata';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { useLeaderboardMetadata } from '~/composables/use-leaderboard-metadata';
 import { formatDate } from '~/utils/date';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { useLogger } from '~/utils/use-logger';
+import { getTierMedal } from '../../utils/nft-tiers';
 
 const description = 'rotki\'s sponsor leaderboard';
 
@@ -95,7 +96,7 @@ async function fetchLeaderboard(): Promise<void> {
     set(loading, true);
     const { page, limit } = get(paginationData);
     const offset = (page - 1) * limit;
-    const response = await fetchWithCsrf(`/webapi/leaderboard/`, {
+    const response = await fetchWithCsrf(`/webapi/nfts/leaderboard/`, {
       method: 'GET',
       query: {
         offset,
@@ -241,9 +242,9 @@ onMounted(async () => {
                   </div>
                   <div class="text-rui-text-secondary text-sm space-y-1">
                     <div class="flex gap-4">
-                      <span>{{ t('sponsor.leaderboard.nft_counts.gold', { count: user.goldCount }) }}</span>
-                      <span>{{ t('sponsor.leaderboard.nft_counts.silver', { count: user.silverCount }) }}</span>
-                      <span>{{ t('sponsor.leaderboard.nft_counts.bronze', { count: user.bronzeCount }) }}</span>
+                      <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('gold'), count: user.goldCount }) }}</span>
+                      <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('silver'), count: user.silverCount }) }}</span>
+                      <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('bronze'), count: user.bronzeCount }) }}</span>
                     </div>
                     <div class="flex items-center gap-2">
                       <RuiTooltip :open-delay="400">
@@ -325,7 +326,7 @@ onMounted(async () => {
           </p>
           <ButtonLink
             variant="outlined"
-            to="/sponsor/sponsor"
+            to="/sponsor/mint"
             size="lg"
             color="primary"
             class="mx-auto"

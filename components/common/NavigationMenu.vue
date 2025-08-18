@@ -73,7 +73,7 @@ const menus: (Menu | MenuParent)[] = [
   },
   {
     label: t('navigation_menu.sponsor'),
-    to: '/sponsor/sponsor',
+    to: '/sponsor/mint',
     highlightExactActive: true,
     buttonProps: {
       color: 'primary',

@@ -1,14 +1,12 @@
-import type { TierInfoResult } from '~/composables/rotki-sponsorship/metadata';
-import type { NftConfig } from '~/composables/rotki-sponsorship/types';
-import { ethers } from 'ethers';
+import type { NftConfig, TierInfoResult, TierMetadata } from '~/composables/rotki-sponsorship/types';
 import { z } from 'zod';
-import { IPFS_URL, ROTKI_SPONSORSHIP_ABI } from '~/composables/rotki-sponsorship/constants';
+import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { CACHE_TTL } from '~/server/utils/cache';
-import { createMetadataCacheKey, createTierCacheKey } from '~/server/utils/cache-keys';
+import { createMetadataCacheKey, createNftCurrentReleaseIdKey, createTierCacheKey } from '~/server/utils/cache-keys';
 import { createCachedFunction } from '~/server/utils/cached-function';
 import { handleApiError } from '~/server/utils/errors';
 import { Multicall } from '~/server/utils/multicall';
-import { getServerNftConfig } from '~/server/utils/nft-config';
+import { createContract, createProvider, getContractInterface, getServerNftConfig } from '~/server/utils/nft-config';
 import { deduplicatedFetch } from '~/server/utils/request-dedup';
 import { retryWithBackoff } from '~/server/utils/retry';
 import { useLogger } from '~/utils/use-logger';
@@ -25,42 +23,12 @@ const querySchema = z.object({
   }),
 });
 
-/**
- * Create provider instance per request to avoid singleton issues
- */
-function createProvider(rpcUrl: string): ethers.JsonRpcProvider {
-  return new ethers.JsonRpcProvider(rpcUrl);
-}
-
-/**
- * Create contract instance per request
- */
-function createContract(provider: ethers.JsonRpcProvider, contractAddress: string): ethers.Contract {
-  return new ethers.Contract(contractAddress, ROTKI_SPONSORSHIP_ABI, provider);
-}
-
-/**
- * Get contract interface (this can be cached as it's stateless)
- */
-const getContractInterface = (() => {
-  let iface: ethers.Interface | undefined;
-  return () => {
-    if (!iface) {
-      iface = new ethers.Interface(ROTKI_SPONSORSHIP_ABI);
-    }
-    return iface;
-  };
-})();
-
 // Fetch metadata with caching and deduplication
-const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<any> => {
+const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<TierMetadata> => {
   const cacheKey = createMetadataCacheKey(metadataURI);
 
   return deduplicatedFetch(cacheKey, async () => {
-    let metadataUrl = metadataURI;
-    if (metadataURI.startsWith('ipfs://')) {
-      metadataUrl = `${IPFS_URL}${metadataURI.slice(7)}`;
-    }
+    const metadataUrl = normalizeIpfsUrl(metadataURI);
 
     const response = await retryWithBackoff(async () => {
       const res = await fetch(metadataUrl);
@@ -90,7 +58,7 @@ const getCurrentReleaseId = createCachedFunction(async (config: NftConfig): Prom
   const releaseId = await contract.currentReleaseId();
   return Number(releaseId);
 }), {
-  getKey: config => `releaseId:${config.CONTRACT_ADDRESS}:current`,
+  getKey: config => createNftCurrentReleaseIdKey(config.CONTRACT_ADDRESS),
   maxAge: CACHE_TTL.RELEASE_ID,
   name: 'getCurrentReleaseId',
 });
@@ -125,11 +93,11 @@ async function fetchSingleTierInfoDirect(tierId: number, releaseId: number, conf
     }
 
     // Extract benefits
-    const benefitsAttribute = metadata.attributes?.find((attr: any) => attr.trait_type === 'Benefits');
+    const benefitsAttribute = metadata.attributes?.find(attr => attr.trait_type === 'Benefits');
     const benefits = benefitsAttribute?.value || '';
 
     // Extract release name
-    const releaseAttribute = metadata.attributes?.find((attr: any) =>
+    const releaseAttribute = metadata.attributes?.find(attr =>
       attr.trait_type === 'Release' || attr.trait_type === 'Release Name',
     );
     const releaseName = releaseAttribute?.value || metadata.name || '';
@@ -244,11 +212,11 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number, config: 
             }
 
             // Extract benefits
-            const benefitsAttribute = metadata.attributes?.find((attr: any) => attr.trait_type === 'Benefits');
+            const benefitsAttribute = metadata.attributes?.find(attr => attr.trait_type === 'Benefits');
             const benefits = benefitsAttribute?.value || '';
 
             // Extract release name
-            const releaseAttribute = metadata.attributes?.find((attr: any) =>
+            const releaseAttribute = metadata.attributes?.find(attr =>
               attr.trait_type === 'Release' || attr.trait_type === 'Release Name',
             );
             const releaseName = releaseAttribute?.value || metadata.name || '';

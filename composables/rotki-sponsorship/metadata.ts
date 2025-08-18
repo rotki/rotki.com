@@ -1,21 +1,12 @@
-import type { TierBenefits, TierSupply } from './types';
+import type { TierBenefits, TierInfoResult, TierSupply } from './types';
 import { get } from '@vueuse/shared';
 import { ethers } from 'ethers';
+import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { useLogger } from '~/utils/use-logger';
 import { useNftConfig } from './config';
-import { IPFS_URL, ROTKI_SPONSORSHIP_ABI } from './constants';
+import { ROTKI_SPONSORSHIP_ABI } from './constants';
 
 const logger = useLogger('rotki-sponsorship-metadata');
-
-export interface TierInfoResult {
-  maxSupply: number;
-  currentSupply: number;
-  metadataURI: string;
-  imageUrl: string;
-  description: string;
-  benefits: string;
-  releaseName: string;
-}
 
 export async function fetchTierInfo(tierId: number, tierKey: string): Promise<TierInfoResult | undefined> {
   try {
@@ -31,10 +22,7 @@ export async function fetchTierInfo(tierId: number, tierKey: string): Promise<Ti
     }
 
     // Convert metadataURI (IPFS CID) to HTTP URL to fetch the JSON metadata
-    let metadataUrl = metadataURI;
-    if (metadataURI.startsWith('ipfs://')) {
-      metadataUrl = `${IPFS_URL}${metadataURI.slice(7)}`;
-    }
+    const metadataUrl = normalizeIpfsUrl(metadataURI);
 
     // Fetch the metadata JSON
     const metadataResponse = await fetch(metadataUrl);
@@ -45,10 +33,7 @@ export async function fetchTierInfo(tierId: number, tierKey: string): Promise<Ti
     const metadata = await metadataResponse.json();
 
     // Extract image URL from metadata.image
-    let imageUrl = metadata.image;
-    if (imageUrl && imageUrl.startsWith('ipfs://')) {
-      imageUrl = `${IPFS_URL}${imageUrl.slice(7)}`;
-    }
+    const imageUrl = normalizeIpfsUrl(metadata.image);
 
     // Extract benefits from attributes
     const benefitsAttribute = metadata.attributes?.find((attr: any) => attr.trait_type === 'Benefits');

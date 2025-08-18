@@ -1,5 +1,11 @@
 import type { NftConfig } from '~/composables/rotki-sponsorship/types';
-import { CHAIN_CONFIGS, FALLBACK_CHAIN, FALLBACK_CONTRACT_ADDRESS } from '~/composables/rotki-sponsorship/constants';
+import { ethers } from 'ethers';
+import {
+  CHAIN_CONFIGS,
+  FALLBACK_CHAIN,
+  FALLBACK_CONTRACT_ADDRESS,
+  ROTKI_SPONSORSHIP_ABI,
+} from '~/composables/rotki-sponsorship/constants';
 import { useLogger } from '~/utils/use-logger';
 
 // Storage for detecting contract address changes
@@ -12,7 +18,7 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     const { baseUrl } = useRuntimeConfig().public;
 
     // Use the proxy utility to get the backend URL
-    const apiUrl = `${baseUrl}/webapi/leaderboard/metadata/`;
+    const apiUrl = `${baseUrl}/webapi/nfts/leaderboard/metadata/`;
 
     // Log the URL for debugging
     logger.warn('[Server] Fetching leaderboard metadata from:', apiUrl);
@@ -59,3 +65,30 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     };
   }
 }
+
+/**
+ * Create provider instance per request to avoid singleton issues
+ */
+export function createProvider(rpcUrl: string): ethers.JsonRpcProvider {
+  return new ethers.JsonRpcProvider(rpcUrl);
+}
+
+/**
+ * Create contract instance per request
+ */
+export function createContract(provider: ethers.JsonRpcProvider, contractAddress: string): ethers.Contract {
+  return new ethers.Contract(contractAddress, ROTKI_SPONSORSHIP_ABI, provider);
+}
+
+/**
+ * Get contract interface (this can be cached as it's stateless)
+ */
+export const getContractInterface = (() => {
+  let iface: ethers.Interface | undefined;
+  return () => {
+    if (!iface) {
+      iface = new ethers.Interface(ROTKI_SPONSORSHIP_ABI);
+    }
+    return iface;
+  };
+})();

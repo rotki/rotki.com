@@ -8,7 +8,7 @@ import { useLogger } from '~/utils/use-logger';
 const LeaderboardMetadataSchema = z.object({
   chain: z.enum(['sepolia', 'ethereum']),
   contractAddress: z.string(),
-  lastUpdated: z.string(),
+  lastUpdated: z.string().nullable(),
 });
 
 export type LeaderboardMetadata = z.infer<typeof LeaderboardMetadataSchema>;
@@ -24,7 +24,7 @@ const error = ref<Error>();
 
 export function useLeaderboardMetadata() {
   const contractAddress = computed<string | undefined>(() => get(metadata)?.contractAddress);
-  const lastUpdated = computed<string | undefined>(() => get(metadata)?.lastUpdated);
+  const lastUpdated = computed<string | null | undefined>(() => get(metadata)?.lastUpdated);
   const chain = computed<'sepolia' | 'ethereum' | undefined>(() => get(metadata)?.chain);
 
   const chainConfig = computed<ChainConfig | undefined>(() => {
@@ -45,7 +45,7 @@ export function useLeaderboardMetadata() {
       set(loading, true);
       set(error, undefined);
 
-      const response = await fetchWithCsrf('/webapi/leaderboard/metadata/', {
+      const response = await fetchWithCsrf('/webapi/nfts/leaderboard/metadata/', {
         method: 'GET',
       });
 

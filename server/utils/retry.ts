@@ -1,3 +1,5 @@
+import { createTimeoutPromise } from '~/utils/timeout';
+
 /**
  * Smart retry logic with exponential backoff
  */
@@ -48,7 +50,7 @@ export async function retryWithBackoff<T>(
       );
 
       if (i < opts.maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await createTimeoutPromise(delay, resolve => resolve());
       }
     }
   }

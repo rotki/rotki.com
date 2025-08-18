@@ -18,11 +18,6 @@ export interface ApiResponse<T, M = string> {
   readonly message: M;
 }
 
-export interface SponsorNameResponse {
-  success: boolean;
-  message?: string;
-}
-
 const StringArray = z.array(z.string());
 
 export const ApiError = z.union([z.string(), z.record(StringArray)]);

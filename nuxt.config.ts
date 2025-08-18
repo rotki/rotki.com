@@ -35,6 +35,7 @@ const referrer = insecureProxy ? baseUrl : `${baseUrl}`; // change to ${baseUrl}
 
 const proxy = {
   host: domain,
+  mediaTarget: `${baseUrl}/media`,
   referrer,
   target: `${baseUrl}/webapi`,
 };
@@ -118,6 +119,15 @@ export default defineNuxtConfig({
 
   nitro: {
     devProxy: {
+      '/media': {
+        changeOrigin: true,
+        headers: {
+          host: proxy.host,
+          origin: proxy.referrer,
+          referer: proxy.referrer,
+        },
+        target: proxy.mediaTarget,
+      },
       '/webapi': {
         changeOrigin: true,
         headers: {

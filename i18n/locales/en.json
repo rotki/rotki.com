@@ -199,6 +199,7 @@
     "continue": "Continue",
     "download": "Download",
     "download_for_free": "Download rotki for free",
+    "edit": "Edit",
     "generate": "Generate",
     "get_advanced_plan": "Get Advanced Plan",
     "get_in_touch": "Get In Touch Now",
@@ -860,11 +861,7 @@
         "title": "No leaderboard data available",
         "alt": "No leaderboard data available"
       },
-      "nft_counts": {
-        "bronze": "🥉 {count} NFTs",
-        "silver": "🥈 {count} NFTs",
-        "gold": "🥇 {count} NFTs"
-      },
+      "nft_counts": "{medal} {count} NFTs",
       "points": "{points} points",
       "tooltip": {
         "copy_address": "Click to copy full address",
@@ -889,14 +886,24 @@
       "name_hint": "Optional. 3-30 characters.",
       "address_label": "Wallet Address",
       "address_hint": "Your connected wallet address",
+      "connected_address": "Connected Address",
       "token_id_label": "NFT Token ID",
       "token_id_hint": "The ID of your sponsor NFT",
       "connect_wallet": "Connect Wallet",
+      "connect_wallet_first": "Please connect your wallet to submit or view your NFT names",
+      "connect_to_submit": "Connect your wallet to submit your NFT name",
+      "connect_to_view_submissions": "Connect your wallet to view your NFT submissions",
       "sign_message": "Sign Message",
       "sign_hint": "Sign a message to verify ownership of this wallet",
       "submit": "Submit Name",
+      "update": "Update Name",
       "success": "Your display name has been submitted successfully!",
-      "view_leaderboard": "View Leaderboard",
+      "view_submissions": "View Your Submissions",
+      "your_submissions": "Your Submissions",
+      "no_submissions": "No submissions found",
+      "cancel_edit": "Cancel Edit",
+      "tier_info": "{tier} tier",
+      "tier_in_release": "in release {release}",
       "image_label": "Image",
       "image_hint_silver": "Image to put in download page for this release",
       "image_hint_gold": "Image to put in on the app for this release",
@@ -921,7 +928,8 @@
         "sign_required": "Please sign the message to verify ownership",
         "invalid_token_id": "Please enter a valid NFT Token ID",
         "check_failed": "Failed to check NFT metadata",
-        "nft_not_found": "NFT not found or invalid token ID"
+        "nft_not_found": "NFT not found or invalid token ID",
+        "not_owner": "This NFT is not owned by your connected wallet address"
       },
       "check": "Check",
       "tier": "Tier",
@@ -966,7 +974,7 @@
         "minting_failed": "Minting Failed"
       },
       "success_dialog": {
-        "title": "NFT Minted Successfully!",
+        "title": "NFT #{id} Minted Successfully!",
         "success_message": "Your {tier} sponsorship NFT has been minted successfully!",
         "thank_you_with_release": "Thank you for sponsoring the \"{release}\" rotki release! 🚀",
         "thank_you_upcoming": "Thank you for sponsoring the upcoming rotki release! 🚀",
