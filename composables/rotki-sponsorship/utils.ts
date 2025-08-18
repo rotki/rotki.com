@@ -1,4 +1,4 @@
-import { get } from '@vueuse/shared';
+import { IPFS_URL } from '~/composables/rotki-sponsorship/constants';
 import { SPONSORSHIP_TIERS, type TierSupply } from './types';
 
 /**
@@ -27,20 +27,16 @@ export function findTierByKey(tierKey: string) {
 /**
  * Find tier by id with proper typing
  */
-export function findTierById(tierId: number) {
-  return SPONSORSHIP_TIERS.find(t => t.tierId === tierId);
+export function findTierById(tierId: number | string) {
+  return SPONSORSHIP_TIERS.find(t => t.tierId === Number(tierId));
 }
 
 /**
- * Create combined data computed property helper
+ * Convert IPFS URL to HTTP URL
  */
-export function createCombinedComputed<T>(
-  ssrDataRef: Ref<any>,
-  ssrProperty: string,
-  fallbackRef: Ref<T>,
-): ComputedRef<T> {
-  return computed<T>(() => {
-    const ssrDataValue = get(ssrDataRef);
-    return ssrDataValue?.[ssrProperty] || get(fallbackRef);
-  });
+export function normalizeIpfsUrl(url: string): string {
+  if (url && url.startsWith('ipfs://')) {
+    return `${IPFS_URL}${url.slice(7)}`;
+  }
+  return url;
 }

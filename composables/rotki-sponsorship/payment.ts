@@ -4,9 +4,17 @@ import { Contract, ethers, type Signer, type TransactionResponse } from 'ethers'
 import { refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
 import { usePaymentTokens } from '~/composables/rotki-sponsorship/use-payment-tokens';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
+import { createTimeoutPromise } from '~/utils/timeout';
 import { useLogger } from '~/utils/use-logger';
 import { useNftConfig } from './config';
 import { ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI } from './constants';
+
+const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+interface StoredNft {
+  id: number;
+  address: string;
+}
 
 async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
   const { CONTRACT_ADDRESS } = useNftConfig();
@@ -67,7 +75,8 @@ export function useRotkiSponsorshipPayment() {
   const { t } = useI18n({ useScope: 'global' });
   const { fetchPaymentTokens, getPriceForTier, getTokenBySymbol, paymentTokens } = usePaymentTokens();
   const { CHAIN_ID } = useNftConfig();
-  const storedNftIds = useLocalStorage<number[]>('rotki-sponsor-nft-ids', []);
+
+  const storedNftIds = useLocalStorage<StoredNft[]>('rotki-sponsor-nft-ids-v2', []);
 
   const connection = useWeb3Connection({
     chainId: get(CHAIN_ID),
@@ -179,8 +188,45 @@ export function useRotkiSponsorshipPayment() {
         txHash: tx.hash,
       });
 
-      // Wait for transaction confirmation
-      const receipt = await tx.wait();
+      // Create a timeout promise (5 minutes)
+      const timeoutPromise = createTimeoutPromise(TRANSACTION_TIMEOUT, (_, reject) => {
+        reject(new Error('Transaction timeout - please check your wallet for the transaction status'));
+      });
+
+      // Wait for transaction confirmation with timeout
+      let receipt;
+      try {
+        receipt = await Promise.race([
+          tx.wait(),
+          timeoutPromise,
+        ]);
+      }
+      catch (waitError: any) {
+        // Check if transaction was replaced/cancelled
+        if (waitError.code === 'TRANSACTION_REPLACED') {
+          if (waitError.replacement && waitError.replacement.hash === waitError.replacement.to) {
+            // Transaction was cancelled (replacement tx sent to self)
+            throw new Error('Transaction was cancelled');
+          }
+          else if (waitError.replacement) {
+            // Transaction was replaced with a different one (speed up)
+            // Try to wait for the replacement transaction
+            try {
+              receipt = await waitError.replacement.wait();
+            }
+            catch {
+              throw new Error('Transaction was replaced but failed to confirm');
+            }
+          }
+          else {
+            throw new Error('Transaction was replaced or cancelled');
+          }
+        }
+        else {
+          // Re-throw other errors (including timeout)
+          throw waitError;
+        }
+      }
 
       if (receipt?.status === 1) {
         // Parse the NFTMinted event to get the token ID
@@ -213,11 +259,15 @@ export function useRotkiSponsorshipPayment() {
           txHash: tx.hash,
         });
 
-        // Store NFT ID in localStorage
-        if (tokenId) {
+        // Store NFT ID with address in localStorage
+        if (tokenId && get(address)) {
           const numericId = parseInt(tokenId);
-          if (!get(storedNftIds).includes(numericId)) {
-            set(storedNftIds, [...get(storedNftIds), numericId]);
+          const currentAddress = get(address)!.toLowerCase();
+          const stored = get(storedNftIds);
+
+          // Check if this NFT ID is already stored for this address
+          if (!stored.some(nft => nft.id === numericId && nft.address.toLowerCase() === currentAddress)) {
+            set(storedNftIds, [...stored, { address: currentAddress, id: numericId }]);
           }
         }
 
@@ -260,13 +310,52 @@ export function useRotkiSponsorshipPayment() {
     return checkTokenAllowanceContract(token.address, token.decimals, signer);
   }
 
+  async function checkTransactionStatus(txHash: string) {
+    try {
+      const provider = getBrowserProvider();
+      const receipt = await provider.getTransactionReceipt(txHash);
+
+      if (receipt) {
+        const status = receipt.status === 1 ? 'success' : 'failed';
+        return { receipt, status };
+      }
+      else {
+        // Transaction is still pending or doesn't exist
+        const tx = await provider.getTransaction(txHash);
+        if (tx) {
+          return { status: 'pending', transaction: tx };
+        }
+        else {
+          return { status: 'not_found' };
+        }
+      }
+    }
+    catch (error) {
+      logger.error('Failed to check transaction status:', error);
+      return { error, status: 'error' };
+    }
+  }
+
+  // Computed property to get NFT IDs for the current connected address
+  const currentAddressNftIds = computed<number[]>(() => {
+    const currentAddress = get(address);
+    if (!currentAddress)
+      return [];
+
+    return get(storedNftIds)
+      .filter(nft => nft.address.toLowerCase() === currentAddress.toLowerCase())
+      .map(nft => nft.id);
+  });
+
   return {
     // Connection state and methods
     ...connectionMethods,
     address,
     approveToken,
     checkTokenAllowance,
+    checkTransactionStatus,
     connected,
+    currentAddressNftIds: readonly(currentAddressNftIds),
     error: readonly(error),
     getPriceForTier,
     isExpectedChain,
@@ -276,6 +365,7 @@ export function useRotkiSponsorshipPayment() {
     paymentTokens,
     selectedCurrency,
     sponsorshipState: readonly(sponsorshipState),
+    storedNftIds: readonly(storedNftIds),
     transactionUrl,
   };
 }

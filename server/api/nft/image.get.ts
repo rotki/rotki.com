@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IPFS_URL } from '~/composables/rotki-sponsorship/constants';
+import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { CACHE_TTL } from '~/server/utils/cache';
 import { createImageCacheKey } from '~/server/utils/cache-keys';
 import { getCacheService } from '~/server/utils/cache-service';
@@ -22,14 +22,6 @@ const querySchema = z.object({
     },
   ),
 });
-
-// Convert IPFS URL to HTTP URL
-function normalizeIpfsUrl(url: string): string {
-  if (url.startsWith('ipfs://')) {
-    return `${IPFS_URL}${url.slice(7)}`;
-  }
-  return url;
-}
 
 export default defineEventHandler(async (event) => {
   try {

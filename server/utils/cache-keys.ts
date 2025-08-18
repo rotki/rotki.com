@@ -72,3 +72,10 @@ export function createImageCacheKey(imageUrl: string): string {
 export function createNftTokenCacheKey(contractAddress: string, tokenId: number): string {
   return `token:${contractAddress.toLowerCase()}:${tokenId}`;
 }
+
+/**
+ * Create a cache key for current release ID
+ */
+export function createNftCurrentReleaseIdKey(contractAddress: string): string {
+  return `releaseId:${contractAddress.toLowerCase()}:current`;
+}

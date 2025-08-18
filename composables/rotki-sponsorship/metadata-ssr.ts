@@ -1,5 +1,4 @@
-import type { TierInfoResult } from './metadata';
-import type { TierBenefits, TierSupply } from './types';
+import type { TierBenefits, TierInfoResult, TierSupply } from './types';
 import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('rotki-sponsorship-metadata-ssr');

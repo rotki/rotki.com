@@ -1,6 +1,6 @@
 import { get } from '@vueuse/shared';
 import { computed } from 'vue';
-import { useLeaderboardMetadata } from '~/composables/use-leaderboard-metadata';
+import { useLeaderboardMetadata } from '~/composables/rotki-sponsorship/use-leaderboard-metadata';
 import { CHAIN_CONFIGS, FALLBACK_CHAIN, FALLBACK_CONTRACT_ADDRESS } from './constants';
 
 // For client-side usage (composables)

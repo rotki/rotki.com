@@ -4,10 +4,11 @@ import { useSponsorshipData } from '~/composables/rotki-sponsorship';
 import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
+import { useLeaderboardMetadata } from '~/composables/rotki-sponsorship/use-leaderboard-metadata';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
-import { useLeaderboardMetadata } from '~/composables/use-leaderboard-metadata';
 import { fetchWithCsrf } from '~/utils/api';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { getTierClasses } from '~/utils/nft-tiers';
 import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
@@ -20,7 +21,7 @@ const {
 useHead({
   title: 'Sponsor | rotki',
   meta: [
-    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor/sponsor`),
+    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor/mint`),
   ],
   ...commonAttrs(),
 });
@@ -401,7 +402,7 @@ onMounted(async () => {
                   :value="tier.key"
                   name="tier"
                   :hide-details="true"
-                  class="font-bold"
+                  class="font-bold uppercase"
                   color="primary"
                   :label="tier.label"
                 />
@@ -530,7 +531,7 @@ onMounted(async () => {
               class="text-rui-success"
               size="24"
             />
-            <span class="text-h6 font-bold">{{ t('sponsor.sponsor_page.success_dialog.title') }}</span>
+            <span class="text-h6 font-bold">{{ t('sponsor.sponsor_page.success_dialog.title', { id: sponsorshipState.tokenId }) }}</span>
           </div>
         </template>
 
@@ -542,11 +543,7 @@ onMounted(async () => {
           </p>
           <p
             class="font-medium px-4 py-3 rounded-lg"
-            :class="{
-              'bg-amber-100 text-amber-800': selectedTier === 'bronze',
-              'bg-gray-100 text-gray-800': selectedTier === 'silver',
-              'bg-yellow-100 text-yellow-800': selectedTier === 'gold',
-            }"
+            :class="getTierClasses(selectedTier)"
           >
             {{ releaseName
               ? t('sponsor.sponsor_page.success_dialog.thank_you_with_release', { release: releaseName })

@@ -1,4 +1,8 @@
+import { z } from 'zod';
+
 export type TierKey = 'bronze' | 'silver' | 'gold';
+
+export const TierKeyEnum = z.enum(['bronze', 'silver', 'gold']);
 
 export interface SponsorshipTier {
   key: TierKey;
@@ -23,6 +27,11 @@ export interface TierBenefits {
   benefits: string;
 }
 
+export interface TierInfoResult extends TierSupply, TierBenefits {
+  imageUrl: string;
+  releaseName: string;
+}
+
 export interface PaymentToken {
   symbol: string;
   address: string;
@@ -44,4 +53,41 @@ export interface NftConfig {
   CONTRACT_ADDRESS: string;
   RPC_URL: string;
   hasContractChanged: boolean;
+}
+
+export const TierMetadataAttribute = z.object({
+  trait_type: z.string(),
+  value: z.string(),
+});
+
+export const TierMetadataAttributes = z.array(TierMetadataAttribute);
+
+export const TierMetadata = z.object({
+  attributes: TierMetadataAttributes.optional(),
+  description: z.string(),
+  image: z.string(),
+  name: z.string(),
+});
+
+export type TierMetadata = z.infer<typeof TierMetadata>;
+
+export const TokenMetadata = z.object({
+  imageUrl: z.string().optional(),
+  metadata: TierMetadata,
+  metadataURI: z.string(),
+  owner: z.string(),
+  releaseId: z.number(),
+  releaseName: z.string(),
+  tierId: z.number(),
+  tierName: TierKeyEnum,
+  tokenId: z.number(),
+});
+
+export type TokenMetadata = z.infer<typeof TokenMetadata>;
+
+export interface SimpleTokenMetadata {
+  tier: TierKey;
+  releaseId: number;
+  releaseName: string;
+  owner: string;
 }
