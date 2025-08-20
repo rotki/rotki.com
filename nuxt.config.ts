@@ -142,7 +142,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/home/**': { index: false },
+    '/home/**': { robots: false },
   },
 
   runtimeConfig: {
@@ -195,15 +195,6 @@ export default defineNuxtConfig({
       theme: {
         container: {
           center: true,
-        },
-      },
-    },
-  },
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern',
         },
       },
     },
