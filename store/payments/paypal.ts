@@ -1,4 +1,5 @@
 import { set } from '@vueuse/core';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
   type ApiResponse,
   type CreatePaypalNonceRequest,
@@ -7,13 +8,13 @@ import {
   SavedPaypalResponse,
   type VaultPaypalRequest,
 } from '~/types';
-import { fetchWithCsrf } from '~/utils/api';
 import { useLogger } from '~/utils/use-logger';
 
 export const usePaymentPaypalStore = defineStore('payments/paypal', () => {
   const paypal = ref<SavedPaypalAccount>();
 
   const logger = useLogger('paypal');
+  const { fetchWithCsrf } = useFetchWithCsrf();
 
   const getPaypal = async (): Promise<void> => {
     try {

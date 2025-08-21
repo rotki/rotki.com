@@ -5,7 +5,10 @@ import { server } from '~/tests/mocks/server';
 mockNuxtImport('useRuntimeConfig', () => () => {
   const { BACKEND_URL } = import.meta.env;
   return {
-    app: { baseURL: '/' },
+    app: {
+      baseURL: '/',
+      buildId: 'test',
+    },
     public: {
       backendUrl: BACKEND_URL,
       baseUrl: BACKEND_URL,

@@ -1,8 +1,8 @@
 import type { ApiResponse } from '~/types';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
-import { fetchWithCsrf } from '~/utils/api';
 
 interface VATCheckSuccess {
   readonly success: true;
@@ -26,6 +26,7 @@ interface UseVATCheckReturn {
 
 export function useVatCheck(): UseVATCheckReturn {
   const { account } = storeToRefs(useMainStore());
+  const { fetchWithCsrf } = useFetchWithCsrf();
 
   const refreshVATCheckStatus = async (): Promise<void> => {
     try {

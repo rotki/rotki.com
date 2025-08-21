@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
-import { fetchWithCsrf } from '~/utils/api';
 import { useLogger } from '~/utils/use-logger';
 
 const route = useRoute();
@@ -14,6 +14,7 @@ const mainStore = useMainStore();
 const { getAccount } = mainStore;
 const { account } = storeToRefs(mainStore);
 const logger = useLogger();
+const { fetchWithCsrf } = useFetchWithCsrf();
 
 async function validateToken() {
   try {

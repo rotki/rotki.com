@@ -4,11 +4,12 @@ import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
-import { fetchWithCsrf } from '~/utils/api';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 
 const logger = useLogger();
+const { fetchWithCsrf } = useFetchWithCsrf();
 
 function setupTokenValidation() {
   const route = useRoute();

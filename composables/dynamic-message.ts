@@ -3,7 +3,7 @@ import {
   DashboardSchema,
   type VisibilityPeriod,
 } from '@/types/dynamic-messages';
-import { convertKeys } from '~/utils/api';
+import { convertKeys } from '~/composables/use-fetch-with-csrf';
 
 export const useDynamicMessages = createSharedComposable(() => {
   const { public: { testing } } = useRuntimeConfig();
