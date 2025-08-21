@@ -17,10 +17,13 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  let ensName: string | undefined;
+
   try {
     // Validate query parameters
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
-    const { _invalidate, name: ensName, network = 'mainnet' } = query;
+    const { _invalidate, name, network = 'mainnet' } = query;
+    ensName = name;
 
     // Create cache key using ENS name and network
     const cacheKey = createImageCacheKey(`ens:${network}:${ensName}`);
@@ -54,14 +57,23 @@ export default defineEventHandler(async (event) => {
 
     logger.debug(`Successfully processed avatar for: ${ensName}`);
   }
-  catch (error) {
+  catch (error: any) {
     // Set cache headers for error responses to prevent caching errors
     setResponseHeaders(event, {
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
     });
 
-    // Use enhanced error handling
+    // Handle 404 errors specifically (ENS name has no avatar)
+    if (error.statusCode === 404 || error.statusMessage?.includes('404')) {
+      logger.debug(`No avatar found for ENS name: ${ensName}`);
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'No avatar found for this ENS name',
+      });
+    }
+
+    // Use enhanced error handling for other errors
     handleApiError(event, error);
   }
 });
