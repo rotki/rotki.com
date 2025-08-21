@@ -7,6 +7,7 @@ import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
+import { convertKeys, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
   Account,
   ActionResultResponse,
@@ -28,7 +29,6 @@ import {
   UpdateProfileResponse,
 } from '~/types';
 import { PaymentError } from '~/types/codes';
-import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 import { formatSeconds } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
@@ -44,6 +44,7 @@ export const useMainStore = defineStore('main', () => {
   const resumeError = ref('');
 
   const logger = useLogger('store');
+  const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
 
   const getAccount = async (): Promise<void> => {
     try {
@@ -580,6 +581,11 @@ export const useMainStore = defineStore('main', () => {
     stopCountdown();
     startCountdown();
   };
+
+  setHooks({
+    logout,
+    refresh: refreshSession,
+  });
 
   return {
     account,

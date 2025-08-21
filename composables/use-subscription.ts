@@ -1,8 +1,8 @@
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
 import { ActionResultResponse, type Subscription } from '~/types';
-import { fetchWithCsrf } from '~/utils/api';
 import { assert } from '~/utils/assert';
 
 interface UseSubscriptionReturn {
@@ -14,6 +14,7 @@ export function useSubscription(): UseSubscriptionReturn {
   const store = useMainStore();
   const { account, cancellationError, resumeError } = storeToRefs(store);
   const { getAccount } = store;
+  const { fetchWithCsrf } = useFetchWithCsrf();
 
   const resumeUserSubscription = async (identifier: string) => {
     const acc = get(account);

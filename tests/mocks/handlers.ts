@@ -3,6 +3,12 @@ import { http, HttpResponse } from 'msw';
 const { BACKEND_URL } = import.meta.env;
 
 export const handlers = [
+  // Mock app manifest requests to prevent errors during test initialization
+  http.get('*/_nuxt/builds/meta/*.json', () =>
+    HttpResponse.json({
+      id: 'test',
+      timestamp: Date.now(),
+    })),
   http.options(`${BACKEND_URL}/webapi/csrf/`, () => HttpResponse.json({}, {
     headers: {
       'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',

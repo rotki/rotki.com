@@ -2,13 +2,15 @@ import type { Country } from '~/composables/countries';
 import type { Account, ApiResponse } from '~/types';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchWithCsrf, setHooks } from '~/utils/api';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 const logout = vi.fn();
 const refresh = vi.fn();
+
+const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
 setHooks({ logout, refresh });
 
-describe('api utilities', () => {
+describe('useFetchWithCsrf composable', () => {
   afterEach(() => {
     logout.mockReset();
     refresh.mockReset();

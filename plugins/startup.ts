@@ -1,16 +1,16 @@
+import { get } from '@vueuse/core';
+import { useSessionIdCookie } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
-import { SESSION_COOKIE } from '~/utils/api';
 
 export default defineNuxtPlugin(async () => {
   const { name } = useRoute();
   if (name === 'health')
     return;
 
-  const sessionId = useCookie(SESSION_COOKIE).value;
+  const sessionId = useSessionIdCookie();
 
-  if (sessionId) {
+  if (get(sessionId)) {
     const { getAccount } = useMainStore();
-
     return getAccount();
   }
 });

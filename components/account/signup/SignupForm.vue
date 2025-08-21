@@ -10,7 +10,7 @@ import type {
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useRedirectUrl } from '~/composables/redirect-url';
-import { fetchWithCsrf } from '~/utils/api';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 const { t } = useI18n({ useScope: 'global' });
 const { captchaId, resetCaptcha } = useRecaptcha();
@@ -41,7 +41,7 @@ const loading = ref<boolean>(false);
 const externalResults = ref<ValidationErrors>({});
 
 const route = useRoute();
-
+const { fetchWithCsrf } = useFetchWithCsrf();
 const { saveRedirectUrl } = useRedirectUrl();
 
 async function signup({
