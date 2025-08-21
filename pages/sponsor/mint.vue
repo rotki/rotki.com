@@ -420,13 +420,13 @@ onMounted(async () => {
                     </template>
                     <template v-else>
                       {{ t('sponsor.sponsor_page.pricing.minted_with_max', { current: tierSupply[tier.key].currentSupply, max: tierSupply[tier.key].maxSupply }) }}
+                      <span
+                        v-if="tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply)"
+                        class="text-sm text-rui-error font-medium"
+                      >
+                        {{ t('sponsor.sponsor_page.pricing.sold_out') }}
+                      </span>
                     </template>
-                  </div>
-                  <div
-                    v-if="tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply)"
-                    class="text-sm text-rui-error font-medium"
-                  >
-                    {{ t('sponsor.sponsor_page.pricing.sold_out') }}
                   </div>
                 </div>
               </RuiCard>

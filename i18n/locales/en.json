@@ -953,7 +953,7 @@
         "loading": "Loading...",
         "minted": "{current} minted",
         "minted_with_max": "{current}/{max} minted",
-        "sold_out": "Sold Out"
+        "sold_out": "(Sold Out)"
       },
       "buttons": {
         "connect_wallet": "Connect Wallet",
