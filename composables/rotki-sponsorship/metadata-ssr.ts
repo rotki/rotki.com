@@ -6,7 +6,6 @@ const logger = useLogger('rotki-sponsorship-metadata-ssr');
 interface TierInfoResponse {
   tiers: Record<number, TierInfoResult | undefined>;
   releaseId: number | undefined;
-  cached: boolean;
 }
 
 /**
@@ -55,7 +54,7 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
 
     // Add timestamp to force cache bypass when needed
     if (forceRefresh) {
-      params._t = Date.now().toString();
+      params.skipCache = 'true';
     }
 
     const response = await $fetch<TierInfoResponse>('/api/nft/tier-info', {
