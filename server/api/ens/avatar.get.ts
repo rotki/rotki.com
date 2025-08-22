@@ -11,9 +11,9 @@ const logger = useLogger('ens-avatar-proxy');
 
 // Request validation schema
 const querySchema = z.object({
-  _invalidate: z.string().optional(), // Force cache invalidation
   name: z.string().regex(/^[\dA-Za-z-]+\.[\dA-Za-z]+$/, 'Invalid ENS name format'),
   network: z.enum(['mainnet', 'sepolia']).default('mainnet').optional(),
+  skipCache: z.string().optional(), // Force cache invalidation
 });
 
 export default defineEventHandler(async (event) => {
@@ -22,14 +22,14 @@ export default defineEventHandler(async (event) => {
   try {
     // Validate query parameters
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
-    const { _invalidate, name, network = 'mainnet' } = query;
+    const { name, network = 'mainnet', skipCache } = query;
     ensName = name;
 
     // Create cache key using ENS name and network
     const cacheKey = createImageCacheKey(`ens:${network}:${ensName}`);
 
     // Check for cache invalidation request
-    if (_invalidate) {
+    if (skipCache) {
       await invalidateImageCache(cacheKey);
       logger.info(`Cache invalidated for ENS avatar: ${ensName} on ${network}`);
     }

@@ -155,7 +155,7 @@ export default defineEventHandler(async (event): Promise<TokenMetadata> => {
 
     // Check for cache busting parameter
     const query = getQuery(event);
-    const skipCache = !!query._t;
+    const { skipCache } = query;
 
     if (skipCache) {
       // Clear the cache for this specific token

@@ -15,7 +15,7 @@ const logger = useLogger('nft-tier-info-api');
 
 // Request validation schema
 const querySchema = z.object({
-  _t: z.string().optional(), // Timestamp for cache busting
+  skipCache: z.string().optional(), // Timestamp for cache busting
   tierIds: z.string().optional().transform((val) => {
     if (!val)
       return [];
@@ -281,7 +281,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Validate query parameters
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
-    const { _t, tierIds } = query;
+    const { skipCache, tierIds } = query;
 
     // If no specific tier IDs requested, return empty result
     if (!tierIds || tierIds.length === 0) {
@@ -296,7 +296,7 @@ export default defineEventHandler(async (event) => {
     const config = await getServerNftConfig();
 
     // Clear release ID cache if cache busting
-    if (_t) {
+    if (skipCache) {
       await clearCachedFunction(releaseIdCacheOptions, config);
     }
 
@@ -311,12 +311,12 @@ export default defineEventHandler(async (event) => {
 
     if (useMulticall) {
       // Use multicall for batch fetching
-      tiers = await fetchTierInfoBatch(tierIds, releaseId, config, !!_t);
+      tiers = await fetchTierInfoBatch(tierIds, releaseId, config, !!skipCache);
     }
     else {
       // Single tier fetch
       const tierPromises = tierIds.map(async (tierId) => {
-        if (_t) {
+        if (skipCache) {
           // Clear cache when cache busting
           await clearCachedFunction(tierInfoCacheOptions, tierId, releaseId, config);
         }
@@ -332,7 +332,6 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      cached: !_t, // If _t is provided, we're bypassing cache
       releaseId,
       tiers,
     };
