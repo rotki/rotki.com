@@ -117,9 +117,14 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       if (import.meta.client && ['post', 'delete', 'put', 'patch'].includes(options?.method?.toLowerCase() ?? ''))
         token = await initCsrf();
 
+      // Check if the body is FormData
+      const isFormData = options.body instanceof FormData;
+
       let headers: any = {
-        'accept': 'application/json',
-        'content-type': 'application/json',
+        accept: 'application/json',
+        // Only set content-type for non-FormData requests
+        // FormData will set its own boundary parameter for multipart/form-data
+        ...(!isFormData && { 'content-type': 'application/json' }),
         ...(token && { [CSRF_HEADER]: token }),
       };
 
@@ -141,7 +146,10 @@ export const useFetchWithCsrf = createSharedComposable(() => {
 
       options.headers = headers;
       options.baseURL = baseUrl;
-      options.body = convertKeys(options.body, false, false);
+      // Only convert keys for non-FormData bodies
+      if (!isFormData) {
+        options.body = convertKeys(options.body, false, false);
+      }
     },
     onResponse({ response }): Promise<void> | void {
       const status = response.status;
