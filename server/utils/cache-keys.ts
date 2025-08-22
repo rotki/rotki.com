@@ -22,7 +22,7 @@ export function normalizeUrl(url: string): string {
     // For HTTP(S) URLs
     // Sort query params and remove tracking params
     const params = new URLSearchParams(parsed.search);
-    const allowedParams = ['token', 'network', 'tierIds', '_t']; // whitelist approach
+    const allowedParams = ['token', 'network', 'tierIds', 'skipCache']; // whitelist approach
 
     const filtered = new URLSearchParams();
     const sortedKeys = Array.from(params.keys()).sort();

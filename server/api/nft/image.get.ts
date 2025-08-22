@@ -12,7 +12,7 @@ const logger = useLogger('nft-image-proxy');
 
 // Request validation schema
 const querySchema = z.object({
-  _invalidate: z.string().optional(), // Force cache invalidation
+  skipCache: z.string().optional(), // Force cache invalidation
   url: z.string().url().refine(
     url =>
       // Only allow IPFS URLs
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Validate query parameters
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
-    const { _invalidate, url } = query;
+    const { skipCache, url } = query;
 
     // Normalize the URL
     const normalizedUrl = normalizeIpfsUrl(url);
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     const cacheKey = createImageCacheKey(url);
 
     // Check for cache invalidation request
-    if (_invalidate) {
+    if (skipCache) {
       await invalidateImageCache(cacheKey);
       logger.info(`Cache invalidated for: ${url}`);
     }
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     }
 
     logger.debug(`Processing image request: ${normalizedUrl}`, {
-      invalidate: !!_invalidate,
+      invalidate: !!skipCache,
     });
 
     // Use request deduplication to prevent multiple concurrent fetches

@@ -48,6 +48,11 @@ watch(isConnected, (connected) => {
     set(editingSubmission, undefined);
   }
 });
+
+watch(address, () => {
+  set(showSubmissionsList, false);
+  set(editingSubmission, undefined);
+});
 </script>
 
 <template>

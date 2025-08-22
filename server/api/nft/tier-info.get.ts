@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { CACHE_TTL } from '~/server/utils/cache';
 import { createMetadataCacheKey, createNftCurrentReleaseIdKey, createTierCacheKey } from '~/server/utils/cache-keys';
-import { createCachedFunction } from '~/server/utils/cached-function';
+import { clearCachedFunction, createCachedFunction } from '~/server/utils/cached-function';
 import { handleApiError } from '~/server/utils/errors';
 import { Multicall } from '~/server/utils/multicall';
 import { createContract, createProvider, getContractInterface, getServerNftConfig } from '~/server/utils/nft-config';
@@ -15,13 +15,20 @@ const logger = useLogger('nft-tier-info-api');
 
 // Request validation schema
 const querySchema = z.object({
-  _t: z.string().optional(), // Timestamp for cache busting
+  skipCache: z.string().optional(), // Timestamp for cache busting
   tierIds: z.string().optional().transform((val) => {
     if (!val)
       return [];
     return val.split(',').map(id => parseInt(id, 10)).filter(id => !isNaN(id));
   }),
 });
+
+// Cache options for metadata
+const metadataCacheOptions = {
+  getKey: (metadataURI: string) => createMetadataCacheKey(metadataURI),
+  maxAge: CACHE_TTL.METADATA,
+  name: 'fetchMetadata',
+};
 
 // Fetch metadata with caching and deduplication
 const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<TierMetadata> => {
@@ -45,11 +52,14 @@ const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<
 
     return response.json();
   });
-}, {
-  getKey: (metadataURI: string) => createMetadataCacheKey(metadataURI),
-  maxAge: CACHE_TTL.METADATA,
-  name: 'fetchMetadata',
-});
+}, metadataCacheOptions);
+
+// Cache options for release ID
+const releaseIdCacheOptions = {
+  getKey: (config: NftConfig) => createNftCurrentReleaseIdKey(config.CONTRACT_ADDRESS),
+  maxAge: CACHE_TTL.RELEASE_ID,
+  name: 'getCurrentReleaseId',
+};
 
 // Get current release ID with caching
 const getCurrentReleaseId = createCachedFunction(async (config: NftConfig): Promise<number> => deduplicatedFetch(`releaseId:${config.CONTRACT_ADDRESS}`, async () => {
@@ -57,14 +67,10 @@ const getCurrentReleaseId = createCachedFunction(async (config: NftConfig): Prom
   const contract = createContract(provider, config.CONTRACT_ADDRESS);
   const releaseId = await contract.currentReleaseId();
   return Number(releaseId);
-}), {
-  getKey: config => createNftCurrentReleaseIdKey(config.CONTRACT_ADDRESS),
-  maxAge: CACHE_TTL.RELEASE_ID,
-  name: 'getCurrentReleaseId',
-});
+}), releaseIdCacheOptions);
 
 // Non-cached version of tier info fetching
-async function fetchSingleTierInfoDirect(tierId: number, releaseId: number, config: NftConfig): Promise<TierInfoResult | undefined> {
+async function fetchSingleTierInfo(tierId: number, releaseId: number, config: NftConfig): Promise<TierInfoResult | undefined> {
   try {
     const provider = createProvider(config.RPC_URL);
     const contract = createContract(provider, config.CONTRACT_ADDRESS);
@@ -118,12 +124,15 @@ async function fetchSingleTierInfoDirect(tierId: number, releaseId: number, conf
   }
 }
 
-// Cached version of tier info fetching
-const fetchSingleTierInfo = createCachedFunction(fetchSingleTierInfoDirect, {
+// Cache options for tier info
+const tierInfoCacheOptions = {
   getKey: (tierId: number, releaseId: number, config: NftConfig) => createTierCacheKey(config.CONTRACT_ADDRESS, releaseId, tierId),
   maxAge: CACHE_TTL.TIER_DATA,
-  name: 'fetchSingleTierInfo',
-});
+  name: 'fetchCachedSingleTierInfo',
+};
+
+// Cached version of tier info fetching
+const fetchCachedSingleTierInfo = createCachedFunction(fetchSingleTierInfo, tierInfoCacheOptions);
 
 // Batch fetch tier info using multicall
 async function fetchTierInfoBatch(tierIds: number[], releaseId: number, config: NftConfig, skipCache = false): Promise<Record<number, TierInfoResult | undefined>> {
@@ -133,13 +142,14 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number, config: 
   const uncachedTierIds: number[] = [];
   const cachePromises = tierIds.map(async (tierId) => {
     if (skipCache) {
-      // Skip cache when force refreshing
+      // Clear cache for this tier when force refreshing
+      await clearCachedFunction(tierInfoCacheOptions, tierId, releaseId, config);
       uncachedTierIds.push(tierId);
     }
     else {
       // Try to get from cache using the cached function
       try {
-        const cached = await fetchSingleTierInfo(tierId, releaseId, config);
+        const cached = await fetchCachedSingleTierInfo(tierId, releaseId, config);
         if (cached !== undefined) {
           results[tierId] = cached;
         }
@@ -233,10 +243,8 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number, config: 
 
             results[tierId] = tierInfo;
 
-            // Cache the result if not skipping cache
-            if (!skipCache) {
-              await fetchSingleTierInfo(tierId, releaseId, config);
-            }
+            // Cache the result using the cached function (it will update the cache)
+            await fetchCachedSingleTierInfo(tierId, releaseId, config);
           }).catch((error) => {
             logger.error(`Failed to fetch metadata for tier ${tierId}:`, error);
             results[tierId] = undefined;
@@ -257,7 +265,7 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number, config: 
     // Fallback to individual fetches if multicall fails
     for (const tierId of uncachedTierIds) {
       try {
-        results[tierId] = await fetchSingleTierInfoDirect(tierId, releaseId, config);
+        results[tierId] = await fetchSingleTierInfo(tierId, releaseId, config);
       }
       catch (error) {
         logger.error(`Failed to fetch tier ${tierId}:`, error);
@@ -273,7 +281,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Validate query parameters
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
-    const { _t, tierIds } = query;
+    const { skipCache, tierIds } = query;
 
     // If no specific tier IDs requested, return empty result
     if (!tierIds || tierIds.length === 0) {
@@ -287,7 +295,12 @@ export default defineEventHandler(async (event) => {
     // Get config once at the beginning of the request
     const config = await getServerNftConfig();
 
-    // Get current release ID
+    // Clear release ID cache if cache busting
+    if (skipCache) {
+      await clearCachedFunction(releaseIdCacheOptions, config);
+    }
+
+    // Get current release ID (will fetch fresh if cache was cleared)
     const releaseId = await getCurrentReleaseId(config);
     logger.info(`Current release ID: ${releaseId}`);
 
@@ -298,15 +311,17 @@ export default defineEventHandler(async (event) => {
 
     if (useMulticall) {
       // Use multicall for batch fetching
-      tiers = await fetchTierInfoBatch(tierIds, releaseId, config, !!_t);
+      tiers = await fetchTierInfoBatch(tierIds, releaseId, config, !!skipCache);
     }
     else {
       // Single tier fetch
       const tierPromises = tierIds.map(async (tierId) => {
-        // Use direct fetch when cache busting, otherwise use cached version
-        const data = _t
-          ? await fetchSingleTierInfoDirect(tierId, releaseId, config)
-          : await fetchSingleTierInfo(tierId, releaseId, config);
+        if (skipCache) {
+          // Clear cache when cache busting
+          await clearCachedFunction(tierInfoCacheOptions, tierId, releaseId, config);
+        }
+        // Always use cached version (will fetch fresh data if cache was cleared)
+        const data = await fetchCachedSingleTierInfo(tierId, releaseId, config);
         return { data, tierId };
       });
 
@@ -317,7 +332,6 @@ export default defineEventHandler(async (event) => {
     }
 
     return {
-      cached: !_t, // If _t is provided, we're bypassing cache
       releaseId,
       tiers,
     };

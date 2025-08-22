@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { findTierById, normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { CACHE_TTL } from '~/server/utils/cache';
 import { createNftTokenCacheKey } from '~/server/utils/cache-keys';
-import { createCachedFunction } from '~/server/utils/cached-function';
+import { clearCachedFunction, createCachedFunction } from '~/server/utils/cached-function';
 import { handleApiError } from '~/server/utils/errors';
 import { createContract, createProvider, getServerNftConfig } from '~/server/utils/nft-config';
 import { deduplicatedFetch } from '~/server/utils/request-dedup';
@@ -56,7 +56,7 @@ const fetchMetadata = createCachedFunction(async (metadataURI: string): Promise<
 });
 
 // Fetch token data from contract
-async function fetchTokenDataDirect(tokenId: number, config: NftConfig): Promise<TokenMetadata | null> {
+async function fetchTokenData(tokenId: number, config: NftConfig): Promise<TokenMetadata | null> {
   try {
     const provider = createProvider(config.RPC_URL);
     const contract = createContract(provider, config.CONTRACT_ADDRESS);
@@ -134,12 +134,15 @@ async function fetchTokenDataDirect(tokenId: number, config: NftConfig): Promise
   }
 }
 
-// Cached version of token data fetching
-const fetchTokenData = createCachedFunction(fetchTokenDataDirect, {
+// Cache options for token data
+const tokenDataCacheOptions = {
   getKey: (tokenId: number, config: NftConfig) => createNftTokenCacheKey(config.CONTRACT_ADDRESS, tokenId),
   maxAge: CACHE_TTL.TIER_DATA,
-  name: 'fetchTokenData',
-});
+  name: 'fetchCachedTokenData',
+};
+
+// Cached version of token data fetching
+const fetchCachedTokenData = createCachedFunction(fetchTokenData, tokenDataCacheOptions);
 
 export default defineEventHandler(async (event): Promise<TokenMetadata> => {
   try {
@@ -152,12 +155,14 @@ export default defineEventHandler(async (event): Promise<TokenMetadata> => {
 
     // Check for cache busting parameter
     const query = getQuery(event);
-    const skipCache = !!query._t;
+    const { skipCache } = query;
 
-    // Fetch token data
-    const tokenData = skipCache
-      ? await fetchTokenDataDirect(tokenId, config)
-      : await fetchTokenData(tokenId, config);
+    if (skipCache) {
+      // Clear the cache for this specific token
+      await clearCachedFunction(tokenDataCacheOptions, tokenId, config);
+    }
+
+    const tokenData = await fetchCachedTokenData(tokenId, config);
 
     if (!tokenData) {
       throw createError({
