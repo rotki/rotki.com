@@ -13,7 +13,12 @@ export function useRemoteOrLocal(): UseRemoteOrLocalReturn {
     }
 
     try {
-      return await remote();
+      const result = await remote();
+      if (result && (!Array.isArray(result) || result.length > 0)) {
+        return result;
+      }
+
+      return await local();
     }
     catch (error: any) {
       logger.error(

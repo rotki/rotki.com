@@ -13,7 +13,7 @@ import {
 } from '@reown/appkit/networks';
 import { createAppKit } from '@reown/appkit/vue';
 import { get, set } from '@vueuse/core';
-import { BrowserProvider, type Signer } from 'ethers';
+import { BrowserProvider, getAddress, type Signer } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
 // Patch the showUnsupportedChainUI method to no-op
@@ -37,6 +37,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   const isOpen = ref<boolean>(false);
   const connectedChainId = ref<bigint>();
   const errorMessage = ref<string>('');
+  const address = ref<string>();
 
   const logger = useLogger('web3-connection');
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
@@ -64,6 +65,13 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     themeMode: 'light',
   });
 
+  // Initialize state from current appKit connection
+  const currentAccount = appKit.getAccount();
+  if (currentAccount && currentAccount.isConnected) {
+    set(connected, true);
+    set(address, currentAccount.address ? getAddress(currentAccount.address) : undefined);
+  }
+
   const getBrowserProvider = (): BrowserProvider => {
     assert(appKit);
     const walletProvider = appKit.getProvider('eip155');
@@ -73,6 +81,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   appKit.subscribeAccount((account) => {
     set(errorMessage, '');
     set(connected, account.isConnected);
+    set(address, account.isConnected && account.address ? getAddress(account.address) : undefined);
     onAccountChange?.(account.isConnected);
 
     if (account.isConnected) {
@@ -83,6 +92,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     }
     else {
       set(connectedChainId, undefined);
+      set(address, undefined);
     }
   });
 
@@ -135,19 +145,25 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     }
   }
 
+  async function signMessage(message: string): Promise<string> {
+    if (!get(connected)) {
+      throw new Error('Wallet not connected');
+    }
+
+    const signer = await getSigner();
+    return signer.signMessage(message);
+  }
+
   function setError(error: string): void {
     set(errorMessage, error);
     onError?.(error);
   }
 
-  onUnmounted(async () => {
-    await appKit.disconnect();
-  });
-
   return {
+    // State
+    address: readonly(address),
     // Internal appKit instance (for advanced usage)
     appKit,
-    // State
     connected: readonly(connected),
     connectedChainId: readonly(connectedChainId),
     errorMessage: readonly(errorMessage),
@@ -160,6 +176,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     // Methods
     open: async () => appKit.open(),
     setError,
+    signMessage,
     switchNetwork,
 
     validateNetwork,

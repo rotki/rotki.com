@@ -138,6 +138,10 @@ const emit = defineEmits<{
 - Import `get` and `set` from `@vueuse/shared`
 - This provides better consistency and readability across the codebase
 
+#### Prefer `undefined` instead of `null`
+
+- If you have to create a ref where there is a possibility for it to be empty, always use `const name = ref<string>()` instead of `const name = ref<string | null>(null)`.
+
 #### Correct Examples:
 
 ```typescript
