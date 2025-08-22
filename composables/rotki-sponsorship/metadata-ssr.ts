@@ -6,7 +6,6 @@ const logger = useLogger('rotki-sponsorship-metadata-ssr');
 interface TierInfoResponse {
   tiers: Record<number, TierInfoResult | undefined>;
   releaseId: number | undefined;
-  cached: boolean;
 }
 
 /**

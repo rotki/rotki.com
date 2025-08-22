@@ -28,3 +28,12 @@ export function createCachedFunction<T, ArgsT extends unknown[] = any[]>(
     return result;
   };
 }
+
+export async function clearCachedFunction<ArgsT extends unknown[] = any[]>(
+  opts: CacheOptions<ArgsT>,
+  ...args: ArgsT
+): Promise<void> {
+  const cache = getCacheService();
+  const key = opts.getKey(...args);
+  await cache.removeItem(key);
+}
