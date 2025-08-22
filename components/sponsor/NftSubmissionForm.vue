@@ -6,6 +6,7 @@ import { email as emailValidation, helpers, maxLength, minLength, numeric, requi
 import { get, set } from '@vueuse/shared';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
+import { useSiweAuth } from '~/composables/siwe-auth';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { toMessages } from '~/utils/validation';
 
@@ -26,10 +27,6 @@ const { t } = useI18n();
 const { fetchNftMetadata } = useNftMetadata();
 
 const displayName = ref<string>('');
-const signature = ref<string>('');
-const signatureTimestamp = ref<number>(0);
-const hasSigned = ref<boolean>(false);
-const isSigning = ref<boolean>(false);
 const isSubmitting = ref<boolean>(false);
 const error = ref<string>('');
 const success = ref<boolean>(false);
@@ -46,9 +43,9 @@ const nftOwner = ref<string>('');
 const isNftOwnerValid = ref<boolean>(false);
 const hasCheckedNft = ref<boolean>(false);
 
-const { signMessage: signMessageWeb3 } = useWeb3Connection();
 const { currentAddressNftIds } = useRotkiSponsorshipPayment();
 const { fetchWithCsrf } = useFetchWithCsrf();
+const { authenticatedRequest, isAuthenticating } = useSiweAuth();
 
 // Compute NFT options including the editing NFT ID if not in the list
 const nftIdOptions = computed<number[]>(() => {
@@ -138,18 +135,12 @@ function handleImageChange(event: Event): void {
   };
   reader.readAsDataURL(file);
 
-  // Reset signature when image changes
-  set(hasSigned, false);
-  set(signature, '');
-  set(signatureTimestamp, 0);
+  // Image changed, will need to re-authenticate if needed
 }
 
 function removeImage(): void {
   set(imageFile, null);
   set(imagePreview, '');
-  set(hasSigned, false);
-  set(signature, '');
-  set(signatureTimestamp, 0);
 }
 
 async function handleSubmit(): Promise<void> {
@@ -175,34 +166,10 @@ async function handleSubmit(): Promise<void> {
       }
     }
 
-    // Sign message if not already signed
-    if (!get(hasSigned)) {
-      set(isSigning, true);
-      try {
-        // Generate timestamp in seconds (matching backend expectation)
-        const timestamp = Math.floor(Date.now() / 1000);
-        const message = `I am the owner of address ${props.address} at ${timestamp}`;
-        const sig = await signMessageWeb3(message);
-
-        set(signature, sig);
-        set(hasSigned, true);
-        // Store timestamp for submission
-        set(signatureTimestamp, timestamp);
-      }
-      catch {
-        throw new Error(t('sponsor.submit_name.error.sign_failed'));
-      }
-      finally {
-        set(isSigning, false);
-      }
-    }
-
     // Use FormData to send both text data and file
     const formData = new FormData();
     formData.append('evm_address', props.address || '');
     formData.append('display_name', get(displayName).trim());
-    formData.append('signature', get(signature));
-    formData.append('timestamp', get(signatureTimestamp).toString());
 
     const tokenIdVal = get(tokenId);
     if (tokenIdVal) {
@@ -219,10 +186,13 @@ async function handleSubmit(): Promise<void> {
       formData.append('image_file', file);
     }
 
-    await fetchWithCsrf('/webapi/nfts/holder-submission/', {
+    // Use authenticatedRequest to handle auth and retry logic
+    const submitFormData = () => fetchWithCsrf('/webapi/nfts/holder-submission/', {
       method: 'POST',
       body: formData,
     });
+
+    await authenticatedRequest(props.address || '', submitFormData);
 
     // Reset form
     set(displayName, '');
@@ -230,9 +200,6 @@ async function handleSubmit(): Promise<void> {
     set(email, '');
     set(imageFile, null);
     set(imagePreview, '');
-    set(hasSigned, false);
-    set(signature, '');
-    set(signatureTimestamp, 0);
 
     await nextTick(() => {
       set(success, true);
@@ -241,7 +208,12 @@ async function handleSubmit(): Promise<void> {
     emit('submission-success');
   }
   catch (error_: any) {
-    set(error, error_.data?.message || t('sponsor.submit_name.error.submit_failed'));
+    if (error_.message?.includes('Authentication required')) {
+      set(error, t('sponsor.submit_name.error.sign_failed'));
+    }
+    else {
+      set(error, error_.data?.message || t('sponsor.submit_name.error.submit_failed'));
+    }
   }
   finally {
     set(isSubmitting, false);
@@ -296,17 +268,10 @@ async function checkNftMetadata(): Promise<void> {
   }
 }
 
-// Watch for changes to reset signature and clear success message
+// Watch for changes to clear success message
 watch([displayName, imageFile, email], () => {
   // Clear success message when user starts editing
   set(success, false);
-
-  // Don't reset signature when editing
-  if (!props.editingSubmission) {
-    set(hasSigned, false);
-    set(signature, '');
-    set(signatureTimestamp, 0);
-  }
 });
 
 watch(tokenId, (tokenId) => {
@@ -315,12 +280,7 @@ watch(tokenId, (tokenId) => {
     set(success, false);
   }
 
-  // Reset signature and NFT metadata when token ID changes
-  if (!props.editingSubmission) {
-    set(hasSigned, false);
-    set(signature, '');
-    set(signatureTimestamp, 0);
-  }
+  // Reset NFT metadata when token ID changes
   set(nftTier, undefined);
   set(nftReleaseId, undefined);
   set(nftReleaseName, '');
@@ -518,7 +478,7 @@ onMounted(() => {
           color="primary"
           size="lg"
           class="w-full"
-          :loading="isSubmitting || isSigning"
+          :loading="isSubmitting || isAuthenticating"
           :disabled="v$.$invalid || (hasCheckedNft && !isNftOwnerValid)"
         >
           {{ editingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
