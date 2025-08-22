@@ -6,6 +6,7 @@ import { email as emailValidation, helpers, maxLength, minLength, numeric, requi
 import { get, set } from '@vueuse/shared';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { toMessages } from '~/utils/validation';
 
 interface Props {
@@ -47,6 +48,7 @@ const hasCheckedNft = ref<boolean>(false);
 
 const { signMessage: signMessageWeb3 } = useWeb3Connection();
 const { currentAddressNftIds } = useRotkiSponsorshipPayment();
+const { fetchWithCsrf } = useFetchWithCsrf();
 
 // Compute NFT options including the editing NFT ID if not in the list
 const nftIdOptions = computed<number[]>(() => {
@@ -217,7 +219,7 @@ async function handleSubmit(): Promise<void> {
       formData.append('image_file', file);
     }
 
-    await fetch('/webapi/nfts/holder-submission/', {
+    await fetchWithCsrf('/webapi/nfts/holder-submission/', {
       method: 'POST',
       body: formData,
     });
