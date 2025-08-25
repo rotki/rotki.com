@@ -274,9 +274,9 @@ watch([displayName, imageFile, email], () => {
   set(success, false);
 });
 
-watch(tokenId, (tokenId) => {
+watch(tokenId, async (newTokenId, oldTokenId) => {
   // Clear success message when user starts editing
-  if (tokenId) {
+  if (newTokenId) {
     set(success, false);
   }
 
@@ -288,6 +288,11 @@ watch(tokenId, (tokenId) => {
   set(nftOwner, '');
   set(isNftOwnerValid, false);
   set(hasCheckedNft, false);
+
+  // Automatically check NFT metadata when a valid token ID is selected
+  if (newTokenId && newTokenId !== oldTokenId && Number.isInteger(Number(newTokenId)) && props.isConnected) {
+    await checkNftMetadata();
+  }
 });
 
 // Load editing submission data
@@ -312,6 +317,7 @@ onMounted(() => {
   const tokenIdParam = route.query.tokenId as string;
   if (tokenIdParam && !props.editingSubmission) {
     set(tokenId, tokenIdParam);
+    checkNftMetadata();
   }
 });
 </script>
@@ -322,44 +328,30 @@ onMounted(() => {
       class="flex flex-col gap-6"
       @submit.prevent="handleSubmit()"
     >
-      <div class="flex items-start gap-2">
-        <RuiAutoComplete
-          v-model="tokenId"
-          :label="t('sponsor.submit_name.token_id_label')"
-          :hint="t('sponsor.submit_name.token_id_hint')"
-          :error-messages="toMessages(v$.tokenId)"
-          :disabled="isSubmitting"
-          :options="nftIdOptions"
-          clearable
-          custom-value
-          auto-select-first
-          variant="outlined"
-          color="primary"
-          class="flex-1"
-        />
-        <RuiButton
-          :disabled="!tokenId || isSubmitting || !isConnected"
-          :loading="isCheckingNft"
-          variant="outlined"
-          color="primary"
-          class="h-14"
-          @click="checkNftMetadata()"
-        >
-          {{ t('sponsor.submit_name.check') }}
-        </RuiButton>
-      </div>
+      <RuiAutoComplete
+        v-model="tokenId"
+        :label="t('sponsor.submit_name.token_id_label')"
+        :hint="t('sponsor.submit_name.token_id_hint')"
+        :error-messages="toMessages(v$.tokenId)"
+        :disabled="isSubmitting"
+        :options="nftIdOptions"
+        :loading="isCheckingNft"
+        clearable
+        custom-value
+        auto-select-first
+        variant="outlined"
+        color="primary"
+      />
 
       <RuiAlert
         v-if="nftCheckError"
         type="error"
-        class="-mt-2"
       >
         {{ nftCheckError }}
       </RuiAlert>
       <RuiAlert
         v-else-if="nftTier"
         type="info"
-        class="-mt-2"
       >
         <i18n-t
           keypath="sponsor.submit_name.nft_info"

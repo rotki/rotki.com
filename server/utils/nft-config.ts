@@ -13,7 +13,7 @@ let lastContractAddress: string | undefined;
 
 // For server-side usage (API endpoints)
 export async function getServerNftConfig(): Promise<NftConfig> {
-  const logger = useLogger();
+  const logger = useLogger('nft-config');
   try {
     const { baseUrl } = useRuntimeConfig().public;
 
@@ -21,7 +21,7 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     const apiUrl = `${baseUrl}/webapi/nfts/leaderboard/metadata/`;
 
     // Log the URL for debugging
-    logger.warn('[Server] Fetching leaderboard metadata from:', apiUrl);
+    logger.debug('Fetching leaderboard metadata from:', apiUrl);
 
     // Fetch metadata from the API - this is public data, no auth needed
     const response = await $fetch<{
@@ -50,7 +50,7 @@ export async function getServerNftConfig(): Promise<NftConfig> {
   }
   catch (error: any) {
     // Fallback to default values if metadata fetch fails
-    logger.warn('Failed to fetch NFT config metadata:', error?.data || error?.message || error);
+    logger.error('Failed to fetch NFT config metadata:', error?.data || error?.message || error);
 
     // Log more details about the error for debugging
     if (error?.status === 404) {
