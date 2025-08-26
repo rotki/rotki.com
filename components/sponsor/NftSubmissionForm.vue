@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { TierKey } from '~/composables/rotki-sponsorship/types';
+import type { StoredNft, TierKey } from '~/composables/rotki-sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
 import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import ExistingSubmissionDialog from '~/components/sponsor/ExistingSubmissionDialog.vue';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship';
-import { type StoredNft, useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
+import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';

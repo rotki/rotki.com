@@ -13,7 +13,7 @@ export function useRotkiSponsorshipSSR() {
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});
   const releaseName = ref<string>('');
-  const releaseId = ref<number | undefined>();
+  const releaseId = ref<number>();
   const isLoading = ref<boolean>(false);
   const error = ref<string>();
 

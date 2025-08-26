@@ -1,7 +1,11 @@
-import type { SponsorshipState } from '~/composables/rotki-sponsorship/types';
 import { get, set, useLocalStorage } from '@vueuse/core';
 import { Contract, ethers, type Signer, type TransactionResponse } from 'ethers';
 import { refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
+import {
+  type SponsorshipState,
+  StoredNft,
+  StoredNftArraySchema,
+} from '~/composables/rotki-sponsorship/types';
 import { usePaymentTokens } from '~/composables/rotki-sponsorship/use-payment-tokens';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { createTimeoutPromise } from '~/utils/timeout';
@@ -10,13 +14,6 @@ import { useNftConfig } from './config';
 import { ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI } from './constants';
 
 const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-
-export interface StoredNft {
-  id: number | string;
-  address: string;
-  tier: number;
-  releaseId: number;
-}
 
 async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
   const { CONTRACT_ADDRESS } = useNftConfig();
@@ -84,12 +81,13 @@ export function useRotkiSponsorshipPayment() {
         if (!v)
           return [];
         try {
-          return JSON.parse(v).map((n: any) => ({
-            address: n.address,
-            id: n.id,
-            releaseId: n.releaseId ?? 1,
-            tier: n.tier ?? -1,
-          }));
+          const parsed = JSON.parse(v);
+          const result = StoredNftArraySchema.safeParse(parsed);
+          if (result.success) {
+            return result.data;
+          }
+          // Fallback for legacy data format with defaults
+          return parsed.map((n: any) => StoredNft.parse(n));
         }
         catch { return []; }
       },
