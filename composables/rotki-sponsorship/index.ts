@@ -13,6 +13,7 @@ export function useRotkiSponsorshipSSR() {
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});
   const releaseName = ref<string>('');
+  const releaseId = ref<number>();
   const isLoading = ref<boolean>(false);
   const error = ref<string>();
 
@@ -26,12 +27,13 @@ export function useRotkiSponsorshipSSR() {
 
     try {
       // Load tier data from server API (includes images, supply, benefits)
-      const { benefits, images, releaseName: fetchedReleaseName, supplies } = await loadNFTImagesAndSupplySSR(SPONSORSHIP_TIERS, forceRefresh);
+      const { benefits, images, releaseId: fetchedReleaseId, releaseName: fetchedReleaseName, supplies } = await loadNFTImagesAndSupplySSR(SPONSORSHIP_TIERS, forceRefresh);
 
       set(nftImages, images);
       set(tierSupply, supplies);
       set(tierBenefits, benefits);
       set(releaseName, fetchedReleaseName);
+      set(releaseId, fetchedReleaseId);
 
       logger.info('Successfully loaded all tier data via SSR');
     }
@@ -54,6 +56,7 @@ export function useRotkiSponsorshipSSR() {
     isTierAvailable,
     loadAll,
     nftImages: readonly(nftImages),
+    releaseId: readonly(releaseId),
     releaseName: readonly(releaseName),
     tierBenefits: readonly(tierBenefits),
     tierSupply: readonly(tierSupply),
@@ -79,6 +82,7 @@ export async function useSponsorshipData() {
     return {
       error: get(ssr.error),
       nftImages: get(ssr.nftImages),
+      releaseId: get(ssr.releaseId),
       releaseName: get(ssr.releaseName),
       tierBenefits: get(ssr.tierBenefits),
       tierSupply: get(ssr.tierSupply),

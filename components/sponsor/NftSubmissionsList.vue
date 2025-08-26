@@ -17,7 +17,7 @@ const emit = defineEmits<{
   'close': [];
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { submissions, isLoading: isLoadingSubmissions, error: submissionsError, fetchSubmissions } = useNftSubmissions();
 const { open: openWalletConnect } = useWeb3Connection();
 const { fetchNftMetadata } = useNftMetadata();

@@ -8,7 +8,7 @@ definePageMeta({
   layout: 'sponsor',
 });
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { connected: isConnected, address } = useWeb3Connection();
 const { fetchSubmissions } = useNftSubmissions();
 
@@ -95,12 +95,13 @@ watch(address, () => {
 
       <!-- Submission Form -->
       <NftSubmissionForm
-        v-show="!showSubmissionsList"
+        v-if="!showSubmissionsList"
         :address="address"
         :is-connected="isConnected"
         :editing-submission="editingSubmission"
         @submission-success="handleSubmissionSuccess()"
         @cancel-edit="handleCancelEdit()"
+        @edit-submission="handleEditSubmission($event)"
       />
     </div>
   </section>

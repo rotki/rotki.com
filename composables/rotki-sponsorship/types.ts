@@ -23,7 +23,6 @@ export interface TierSupply {
 }
 
 export interface TierBenefits {
-  description: string;
   benefits: string;
 }
 
@@ -91,3 +90,15 @@ export interface SimpleTokenMetadata {
   releaseName: string;
   owner: string;
 }
+
+// Zod schema for StoredNft validation
+export const StoredNft = z.object({
+  address: z.string(),
+  id: z.union([z.number(), z.string()]),
+  releaseId: z.number().default(1),
+  tier: z.number().default(-1),
+});
+
+export type StoredNft = z.infer<typeof StoredNft>;
+
+export const StoredNftArraySchema = z.array(StoredNft);

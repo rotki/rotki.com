@@ -1,7 +1,11 @@
-import type { SponsorshipState } from '~/composables/rotki-sponsorship/types';
 import { get, set, useLocalStorage } from '@vueuse/core';
 import { Contract, ethers, type Signer, type TransactionResponse } from 'ethers';
 import { refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
+import {
+  type SponsorshipState,
+  StoredNft,
+  StoredNftArraySchema,
+} from '~/composables/rotki-sponsorship/types';
 import { usePaymentTokens } from '~/composables/rotki-sponsorship/use-payment-tokens';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { createTimeoutPromise } from '~/utils/timeout';
@@ -10,11 +14,6 @@ import { useNftConfig } from './config';
 import { ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI } from './constants';
 
 const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-
-interface StoredNft {
-  id: number;
-  address: string;
-}
 
 async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
   const { CONTRACT_ADDRESS } = useNftConfig();
@@ -76,7 +75,25 @@ export function useRotkiSponsorshipPayment() {
   const { fetchPaymentTokens, getPriceForTier, getTokenBySymbol, paymentTokens } = usePaymentTokens();
   const { CHAIN_ID } = useNftConfig();
 
-  const storedNftIds = useLocalStorage<StoredNft[]>('rotki-sponsor-nft-ids-v2', []);
+  const storedNftIds = useLocalStorage<StoredNft[]>('rotki-sponsor-nft-ids', [], {
+    serializer: {
+      read: (v: string) => {
+        if (!v)
+          return [];
+        try {
+          const parsed = JSON.parse(v);
+          const result = StoredNftArraySchema.safeParse(parsed);
+          if (result.success) {
+            return result.data;
+          }
+          // Fallback for legacy data format with defaults
+          return parsed.map((n: any) => StoredNft.parse(n));
+        }
+        catch { return []; }
+      },
+      write: (v: StoredNft[]) => JSON.stringify(v),
+    },
+  });
 
   const connection = useWeb3Connection({
     chainId: get(CHAIN_ID),
@@ -136,7 +153,7 @@ export function useRotkiSponsorshipPayment() {
     }
   }
 
-  async function mintSponsorshipNFT(tierId: number, currency = 'ETH'): Promise<void> {
+  async function mintSponsorshipNFT(tierId: number, currency = 'ETH', releaseId?: number): Promise<void> {
     if (get(sponsorshipState).status === 'pending') {
       throw new Error('Minting already in progress');
     }
@@ -167,8 +184,12 @@ export function useRotkiSponsorshipPayment() {
         throw new Error(`Price not available for ${tierKey} tier in ${currency}`);
       }
 
-      // Get supply info using user's provider if connected
+      // Get supply info and release ID using user's provider if connected
       const provider = get(connected) ? getBrowserProvider() : undefined;
+      const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
+      const ethersProvider = provider || new ethers.JsonRpcProvider(get(RPC_URL));
+      const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, ethersProvider);
+      const currentReleaseId = releaseId || await contract.currentReleaseId();
       const supplies = await refreshSupplyData(provider);
       const supply = supplies[tierKey];
       if (!supply) {
@@ -259,7 +280,7 @@ export function useRotkiSponsorshipPayment() {
           txHash: tx.hash,
         });
 
-        // Store NFT ID with address in localStorage
+        // Store NFT ID with address, tier, and release ID in localStorage
         if (tokenId && get(address)) {
           const numericId = parseInt(tokenId);
           const currentAddress = get(address)!.toLowerCase();
@@ -267,7 +288,12 @@ export function useRotkiSponsorshipPayment() {
 
           // Check if this NFT ID is already stored for this address
           if (!stored.some(nft => nft.id === numericId && nft.address.toLowerCase() === currentAddress)) {
-            set(storedNftIds, [...stored, { address: currentAddress, id: numericId }]);
+            set(storedNftIds, [...stored, {
+              address: currentAddress,
+              id: numericId,
+              releaseId: Number(currentReleaseId),
+              tier: tierId,
+            }]);
           }
         }
 
@@ -337,14 +363,13 @@ export function useRotkiSponsorshipPayment() {
   }
 
   // Computed property to get NFT IDs for the current connected address
-  const currentAddressNftIds = computed<number[]>(() => {
+  const currentAddressNfts = computed<StoredNft[]>(() => {
     const currentAddress = get(address);
     if (!currentAddress)
       return [];
 
     return get(storedNftIds)
-      .filter(nft => nft.address.toLowerCase() === currentAddress.toLowerCase())
-      .map(nft => nft.id);
+      .filter(nft => nft.address.toLowerCase() === currentAddress.toLowerCase());
   });
 
   return {
@@ -355,7 +380,7 @@ export function useRotkiSponsorshipPayment() {
     checkTokenAllowance,
     checkTransactionStatus,
     connected,
-    currentAddressNftIds: readonly(currentAddressNftIds),
+    currentAddressNfts: readonly(currentAddressNfts),
     error: readonly(error),
     getPriceForTier,
     isExpectedChain,
