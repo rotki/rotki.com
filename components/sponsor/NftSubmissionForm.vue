@@ -45,7 +45,9 @@ const hasCheckedNft = ref<boolean>(false);
 
 const { currentAddressNftIds } = useRotkiSponsorshipPayment();
 const { fetchWithCsrf } = useFetchWithCsrf();
-const { authenticatedRequest, isAuthenticating } = useSiweAuth();
+const { authenticatedRequest, isAuthenticating, isSessionValid } = useSiweAuth();
+
+const isAuthenticated = computed<boolean>(() => props.isConnected && !!props.address && isSessionValid(props.address));
 
 // Compute NFT options including the editing NFT ID if not in the list
 const nftIdOptions = computed<number[]>(() => {
@@ -333,7 +335,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.token_id_label')"
         :hint="t('sponsor.submit_name.token_id_hint')"
         :error-messages="toMessages(v$.tokenId)"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || !isAuthenticated"
         :options="nftIdOptions"
         :loading="isCheckingNft"
         clearable
@@ -374,7 +376,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.name_label')"
         :hint="t('sponsor.submit_name.name_hint')"
         :error-messages="toMessages(v$.displayName)"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || !isAuthenticated"
         variant="outlined"
         color="primary"
       />
@@ -394,7 +396,7 @@ onMounted(() => {
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/webp"
             class="hidden"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !isAuthenticated"
             @change="handleImageChange($event)"
           />
           <label
@@ -424,7 +426,7 @@ onMounted(() => {
             size="sm"
             color="error"
             class="-ml-3"
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || !isAuthenticated"
             @click="removeImage()"
           >
             <RuiIcon
@@ -458,7 +460,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.email_label')"
         :hint="t('sponsor.submit_name.email_hint')"
         :error-messages="toMessages(v$.email)"
-        :disabled="isSubmitting"
+        :disabled="isSubmitting || !isAuthenticated"
         type="email"
         variant="outlined"
         color="primary"
@@ -471,10 +473,16 @@ onMounted(() => {
           size="lg"
           class="w-full"
           :loading="isSubmitting || isAuthenticating"
-          :disabled="v$.$invalid || (hasCheckedNft && !isNftOwnerValid)"
+          :disabled="!isAuthenticated || v$.$invalid || (hasCheckedNft && !isNftOwnerValid)"
         >
           {{ editingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>
+        <p
+          v-if="!isAuthenticated"
+          class="mt-2 text-sm text-rui-text-secondary text-center"
+        >
+          {{ t('sponsor.submit_name.sign_required') }}
+        </p>
       </div>
 
       <div v-else>

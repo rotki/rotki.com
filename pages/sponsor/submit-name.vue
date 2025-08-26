@@ -67,7 +67,9 @@ watch(address, () => {
       </p>
 
       <!-- Wallet Connection Card -->
-      <SponsorWalletConnectionCard @view-submissions="loadSubmissions()" />
+      <SponsorWalletConnectionCard
+        @view-submissions="loadSubmissions()"
+      />
 
       <!-- Action buttons -->
       <div
