@@ -897,9 +897,9 @@
       "sign_hint": "Sign a message to verify ownership of this wallet",
       "sign_to_continue": "Sign Message to Continue",
       "sign_required": "Please sign the message to verify your wallet ownership",
-      "submit": "Submit Name",
-      "update": "Update Name",
-      "success": "Your display name has been submitted successfully!",
+      "submit": "Submit Data",
+      "update": "Update Submission",
+      "success": "Your data has been submitted successfully!",
       "view_submissions": "View Your Submissions",
       "your_submissions": "Your Submissions",
       "no_submissions": "No submissions found",
@@ -937,6 +937,16 @@
       "tier": "Tier",
       "in_release": "in release {releaseName}",
       "nft_info": "NFT with id #{tokenId} is in {tier} for release {releaseName}"
+    },
+    "existing_submission": {
+      "title": "Existing Submission Found",
+      "message": "A submission already exists for NFT #{nftId}.",
+      "display_name": "Display Name",
+      "has_image": "Image uploaded",
+      "email": "Email",
+      "question": "Would you like to edit this submission?",
+      "edit_button": "Edit Existing",
+      "cancel_button": "Cancel"
     },
     "sponsor_page": {
       "title": "Sponsor next rotki release",

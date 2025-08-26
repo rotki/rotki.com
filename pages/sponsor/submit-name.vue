@@ -97,12 +97,13 @@ watch(address, () => {
 
       <!-- Submission Form -->
       <NftSubmissionForm
-        v-show="!showSubmissionsList"
+        v-if="!showSubmissionsList"
         :address="address"
         :is-connected="isConnected"
         :editing-submission="editingSubmission"
         @submission-success="handleSubmissionSuccess()"
         @cancel-edit="handleCancelEdit()"
+        @edit-submission="handleEditSubmission($event)"
       />
     </div>
   </section>

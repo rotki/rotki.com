@@ -4,8 +4,10 @@ import type { NftSubmission } from '~/types/sponsor';
 import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import ExistingSubmissionDialog from '~/components/sponsor/ExistingSubmissionDialog.vue';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
+import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
 import { useSiweAuth } from '~/composables/siwe-auth';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { toMessages } from '~/utils/validation';
@@ -21,6 +23,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   'submission-success': [];
   'cancel-edit': [];
+  'edit-submission': [submission: NftSubmission];
 }>();
 
 const { t } = useI18n();
@@ -42,10 +45,14 @@ const nftReleaseName = ref<string>('');
 const nftOwner = ref<string>('');
 const isNftOwnerValid = ref<boolean>(false);
 const hasCheckedNft = ref<boolean>(false);
+const existingSubmission = ref<NftSubmission | null>(null);
+const showExistingSubmissionDialog = ref<boolean>(false);
+const isCheckingExistingSubmission = ref<boolean>(false);
 
 const { currentAddressNftIds } = useRotkiSponsorshipPayment();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { authenticatedRequest, isAuthenticating, isSessionValid } = useSiweAuth();
+const { checkSubmissionByNftId } = useNftSubmissions();
 
 const isAuthenticated = computed<boolean>(() => props.isConnected && !!props.address && isSessionValid(props.address));
 
@@ -222,6 +229,30 @@ async function handleSubmit(): Promise<void> {
   }
 }
 
+async function checkExistingSubmission(nftId: number): Promise<void> {
+  if (!props.address)
+    return;
+
+  try {
+    set(isCheckingExistingSubmission, true);
+    const submission = await checkSubmissionByNftId(props.address, nftId);
+
+    if (submission) {
+      set(existingSubmission, submission);
+      set(showExistingSubmissionDialog, true);
+    }
+  }
+  catch (error: any) {
+    // If authentication fails, it will be handled when they try to submit
+    if (!error.message?.includes('Authentication required')) {
+      console.error('Error checking existing submission:', error);
+    }
+  }
+  finally {
+    set(isCheckingExistingSubmission, false);
+  }
+}
+
 async function checkNftMetadata(): Promise<void> {
   const tokenIdValue = get(tokenId);
   if (!tokenIdValue || !Number.isInteger(Number(tokenIdValue))) {
@@ -237,6 +268,7 @@ async function checkNftMetadata(): Promise<void> {
     set(nftReleaseName, '');
     set(nftOwner, '');
     set(isNftOwnerValid, false);
+    set(existingSubmission, null);
 
     // Use the composable to fetch NFT metadata
     const metadata = await fetchNftMetadata(tokenIdValue);
@@ -254,6 +286,12 @@ async function checkNftMetadata(): Promise<void> {
 
         if (!isOwner) {
           set(nftCheckError, t('sponsor.submit_name.error.not_owner'));
+        }
+        else {
+          // Check for existing submission if owner is valid and not already editing this NFT
+          if (!props.editingSubmission || props.editingSubmission.nftId !== Number(tokenIdValue)) {
+            await checkExistingSubmission(Number(tokenIdValue));
+          }
         }
       }
     }
@@ -335,7 +373,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.token_id_label')"
         :hint="t('sponsor.submit_name.token_id_hint')"
         :error-messages="toMessages(v$.tokenId)"
-        :disabled="isSubmitting || !isAuthenticated"
+        :disabled="isSubmitting || !isAuthenticated || !!props.editingSubmission"
         :options="nftIdOptions"
         :loading="isCheckingNft"
         clearable
@@ -515,4 +553,12 @@ onMounted(() => {
       </RuiAlert>
     </form>
   </RuiCard>
+
+  <!-- Existing Submission Dialog -->
+  <ExistingSubmissionDialog
+    v-model="showExistingSubmissionDialog"
+    :submission="existingSubmission"
+    @edit="existingSubmission && emit('edit-submission', existingSubmission)"
+    @cancel="showExistingSubmissionDialog = false; tokenId = ''"
+  />
 </template>

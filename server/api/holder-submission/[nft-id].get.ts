@@ -20,8 +20,19 @@ export default defineEventHandler(async (event) => {
 
     const { public: { baseUrl } } = useRuntimeConfig();
 
-    // Forward request to backend API
-    const response = await $fetch<{ submission: NftSubmission | null }>(`${baseUrl}/webapi/nfts/holder-submission/id/${nftId}/`);
+    // Get cookies from the incoming request
+    const cookies = parseCookies(event);
+    const headers: Record<string, string> = {};
+
+    // Forward the siwe cookie if it exists
+    if (cookies.siwe) {
+      headers.Cookie = `siwe=${cookies.siwe}`;
+    }
+
+    // Forward request to backend API with authentication cookie
+    const response = await $fetch<{ submission: NftSubmission | null }>(`${baseUrl}/webapi/nfts/holder-submission/id/${nftId}/`, {
+      headers,
+    });
 
     return response;
   }
@@ -31,6 +42,14 @@ export default defineEventHandler(async (event) => {
     // Return null submission if not found
     if (error.statusCode === 404) {
       return { submission: null };
+    }
+
+    // Handle authentication errors
+    if (error.statusCode === 401 || error.statusCode === 403) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Authentication required',
+      });
     }
 
     handleApiError(event, error);
