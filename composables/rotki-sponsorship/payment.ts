@@ -11,10 +11,10 @@ import { ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI } from './constants';
 
 const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
-interface StoredNft {
-  id: number;
+export interface StoredNft {
+  id: number | string;
   address: string;
-  tier: number; // 0 = bronze, 1 = silver, 2 = gold
+  tier: number;
   releaseId: number;
 }
 
@@ -365,14 +365,13 @@ export function useRotkiSponsorshipPayment() {
   }
 
   // Computed property to get NFT IDs for the current connected address
-  const currentAddressNftIds = computed<number[]>(() => {
+  const currentAddressNfts = computed<StoredNft[]>(() => {
     const currentAddress = get(address);
     if (!currentAddress)
       return [];
 
     return get(storedNftIds)
-      .filter(nft => nft.address.toLowerCase() === currentAddress.toLowerCase())
-      .map(nft => nft.id);
+      .filter(nft => nft.address.toLowerCase() === currentAddress.toLowerCase());
   });
 
   return {
@@ -383,7 +382,7 @@ export function useRotkiSponsorshipPayment() {
     checkTokenAllowance,
     checkTransactionStatus,
     connected,
-    currentAddressNftIds: readonly(currentAddressNftIds),
+    currentAddressNfts: readonly(currentAddressNfts),
     error: readonly(error),
     getPriceForTier,
     isExpectedChain,

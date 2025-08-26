@@ -5,11 +5,14 @@ import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import ExistingSubmissionDialog from '~/components/sponsor/ExistingSubmissionDialog.vue';
-import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import { type StoredNft, useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
+import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { useSiweAuth } from '~/composables/siwe-auth';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { getTierClasses } from '~/utils/nft-tiers';
 import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 
@@ -52,28 +55,40 @@ const existingSubmission = ref<NftSubmission | null>(null);
 const showExistingSubmissionDialog = ref<boolean>(false);
 const isCheckingExistingSubmission = ref<boolean>(false);
 
-const { currentAddressNftIds } = useRotkiSponsorshipPayment();
+const { currentAddressNfts } = useRotkiSponsorshipPayment();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { authenticatedRequest, isAuthenticating, isSessionValid } = useSiweAuth();
 const { checkSubmissionByNftId } = useNftSubmissions();
+const { data: sponsorshipData } = await useSponsorshipData();
 
 const logger = useLogger();
 
 const isAuthenticated = computed<boolean>(() => props.isConnected && !!props.address && isSessionValid(props.address));
 
 // Compute NFT options including the editing NFT ID if not in the list
-const nftIdOptions = computed<number[]>(() => {
-  const ids = [...get(currentAddressNftIds)];
+const nftIdOptions = computed<StoredNft[]>(() => {
+  const currentReleaseId = get(sponsorshipData)?.releaseId;
+  let nfts = [...get(currentAddressNfts)];
+
+  // Filter by current release ID if available
+  if (currentReleaseId !== undefined) {
+    nfts = nfts.filter(nft => nft.releaseId === currentReleaseId);
+  }
 
   // If editing and the NFT ID is not in the list, add it
   if (props.editingSubmission) {
     const editingId = props.editingSubmission.nftId;
-    if (!ids.includes(editingId)) {
-      ids.push(editingId);
+    if (!nfts.some(nft => nft.id === editingId)) {
+      nfts.push({
+        address: props.address?.toLowerCase() || '',
+        id: editingId,
+        releaseId: props.editingSubmission.releaseId ?? 1,
+        tier: -1, // Unknown tier for external NFTs
+      });
     }
   }
 
-  return ids.sort((a, b) => a - b);
+  return nfts.sort((a, b) => Number(a.id) - Number(b.id));
 });
 
 // Custom validators
@@ -428,12 +443,29 @@ onMounted(() => {
         :disabled="shouldDisableFields || !!props.editingSubmission"
         :options="nftIdOptions"
         :loading="isCheckingNft"
+        key-attr="id"
+        text-attr="id"
         clearable
         custom-value
         auto-select-first
         variant="outlined"
         color="primary"
-      />
+      >
+        <template #item="{ item }">
+          <div class="flex items-center justify-between w-full gap-2">
+            <div>
+              {{ item.id }}
+            </div>
+            <div
+              v-if="findTierById(item.tier)"
+              :class="getTierClasses(findTierById(item.tier)?.key)"
+              class="rounded-md px-2"
+            >
+              {{ findTierById(item.tier)?.label }}
+            </div>
+          </div>
+        </template>
+      </RuiAutoComplete>
 
       <RuiAlert
         v-if="nftCheckError"
