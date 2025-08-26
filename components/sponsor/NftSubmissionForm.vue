@@ -10,6 +10,7 @@ import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
 import { useSiweAuth } from '~/composables/siwe-auth';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 
 interface Props {
@@ -26,7 +27,7 @@ const emit = defineEmits<{
   'edit-submission': [submission: NftSubmission];
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { fetchNftMetadata } = useNftMetadata();
 
 const displayName = ref<string>('');
@@ -55,6 +56,8 @@ const { currentAddressNftIds } = useRotkiSponsorshipPayment();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { authenticatedRequest, isAuthenticating, isSessionValid } = useSiweAuth();
 const { checkSubmissionByNftId } = useNftSubmissions();
+
+const logger = useLogger();
 
 const isAuthenticated = computed<boolean>(() => props.isConnected && !!props.address && isSessionValid(props.address));
 
@@ -262,7 +265,7 @@ async function checkExistingSubmission(nftId: number): Promise<void> {
   catch (error: any) {
     // If authentication fails, it will be handled when they try to submit
     if (!error.message?.includes('Authentication required')) {
-      console.error('Error checking existing submission:', error);
+      logger.error('Error checking existing submission:', error);
     }
   }
   finally {
@@ -324,6 +327,20 @@ async function checkNftMetadata(): Promise<void> {
     set(hasCheckedNft, true);
   }
 }
+
+function handleEdit() {
+  const submission = get(existingSubmission);
+  if (submission) {
+    emit('edit-submission', submission);
+  }
+}
+
+function handleCancelEdit() {
+  set(showExistingSubmissionDialog, false);
+  set(tokenId, '');
+}
+
+const shouldDisableFields = computed(() => get(isSubmitting) || !get(isAuthenticated));
 
 // Watch for changes to clear success message
 watch([displayName, imageFile, email], () => {
@@ -408,7 +425,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.token_id_label')"
         :hint="t('sponsor.submit_name.token_id_hint')"
         :error-messages="toMessages(v$.tokenId)"
-        :disabled="isSubmitting || !isAuthenticated || !!props.editingSubmission"
+        :disabled="shouldDisableFields || !!props.editingSubmission"
         :options="nftIdOptions"
         :loading="isCheckingNft"
         clearable
@@ -449,7 +466,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.name_label')"
         :hint="t('sponsor.submit_name.name_hint')"
         :error-messages="toMessages(v$.displayName)"
-        :disabled="isSubmitting || !isAuthenticated"
+        :disabled="shouldDisableFields"
         variant="outlined"
         color="primary"
       />
@@ -469,7 +486,7 @@ onMounted(() => {
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/webp"
             class="hidden"
-            :disabled="isSubmitting || !isAuthenticated"
+            :disabled="shouldDisableFields"
             @change="handleImageChange($event)"
           />
           <label
@@ -499,7 +516,7 @@ onMounted(() => {
             size="sm"
             color="error"
             class="-ml-3"
-            :disabled="isSubmitting || !isAuthenticated"
+            :disabled="shouldDisableFields"
             @click="removeImage()"
           >
             <RuiIcon
@@ -533,7 +550,7 @@ onMounted(() => {
         :label="t('sponsor.submit_name.email_label')"
         :hint="t('sponsor.submit_name.email_hint')"
         :error-messages="toMessages(v$.email)"
-        :disabled="isSubmitting || !isAuthenticated"
+        :disabled="shouldDisableFields"
         type="email"
         variant="outlined"
         color="primary"
@@ -593,7 +610,7 @@ onMounted(() => {
   <ExistingSubmissionDialog
     v-model="showExistingSubmissionDialog"
     :submission="existingSubmission"
-    @edit="existingSubmission && emit('edit-submission', existingSubmission)"
-    @cancel="showExistingSubmissionDialog = false; tokenId = ''"
+    @edit="handleEdit()"
+    @cancel="handleCancelEdit()"
   />
 </template>

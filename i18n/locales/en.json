@@ -895,7 +895,7 @@
       "connect_to_view_submissions": "Connect your wallet to view your NFT submissions",
       "sign_message": "Sign Message",
       "sign_hint": "Sign a message to verify ownership of this wallet",
-      "sign_to_continue": "Sign Message to Continue",
+      "sign_to_continue": "Sign in with Ethereum",
       "sign_required": "Please sign the message to verify your wallet ownership",
       "submit": "Submit Data",
       "update": "Update Submission",

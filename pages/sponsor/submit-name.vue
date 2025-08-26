@@ -8,7 +8,7 @@ definePageMeta({
   layout: 'sponsor',
 });
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { connected: isConnected, address } = useWeb3Connection();
 const { fetchSubmissions } = useNftSubmissions();
 
@@ -67,9 +67,7 @@ watch(address, () => {
       </p>
 
       <!-- Wallet Connection Card -->
-      <SponsorWalletConnectionCard
-        @view-submissions="loadSubmissions()"
-      />
+      <SponsorWalletConnectionCard @view-submissions="loadSubmissions()" />
 
       <!-- Action buttons -->
       <div

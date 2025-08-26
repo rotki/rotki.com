@@ -35,14 +35,16 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
   supplies: Record<string, TierSupply>;
   benefits: Record<string, TierBenefits>;
   releaseName: string;
+  releaseId: number | undefined;
 }> {
   const images: Record<string, string> = {};
   const supplies: Record<string, TierSupply> = {};
   const benefits: Record<string, TierBenefits> = {};
   let releaseName = '';
+  let releaseId: number | undefined;
 
   if (tiers.length === 0) {
-    return { benefits, images, releaseName, supplies };
+    return { benefits, images, releaseId: undefined, releaseName, supplies };
   }
 
   try {
@@ -60,6 +62,9 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
     const response = await $fetch<TierInfoResponse>('/api/nft/tier-info', {
       params,
     });
+
+    // Store the releaseId from the response
+    releaseId = response.releaseId;
 
     // Process the results
     for (const tier of tiers) {
@@ -103,5 +108,5 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
     }
   }
 
-  return { benefits, images, releaseName, supplies };
+  return { benefits, images, releaseId, releaseName, supplies };
 }

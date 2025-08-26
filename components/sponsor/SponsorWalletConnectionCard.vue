@@ -6,7 +6,7 @@ import { useLogger } from '~/utils/use-logger';
 const emit = defineEmits<{
   'view-submissions': [];
 }>();
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 const { connected: isConnected, address, open } = useWeb3Connection();
 const { isSessionValid, isAuthenticating, authenticate } = useSiweAuth();
 
@@ -96,9 +96,10 @@ async function handleSignMessage(): Promise<void> {
         @click="handleSignMessage()"
       >
         <template #prepend>
-          <RuiIcon
-            name="lu-shield-check"
-            size="16"
+          <img
+            class="size-4 brightness-[75%] invert"
+            alt="ethereum"
+            src="/img/chains/ethereum.svg"
           />
         </template>
         {{ t('sponsor.submit_name.sign_to_continue') }}

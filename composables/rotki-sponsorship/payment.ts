@@ -14,6 +14,8 @@ const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 interface StoredNft {
   id: number;
   address: string;
+  tier: number; // 0 = bronze, 1 = silver, 2 = gold
+  releaseId: number;
 }
 
 async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
@@ -76,7 +78,24 @@ export function useRotkiSponsorshipPayment() {
   const { fetchPaymentTokens, getPriceForTier, getTokenBySymbol, paymentTokens } = usePaymentTokens();
   const { CHAIN_ID } = useNftConfig();
 
-  const storedNftIds = useLocalStorage<StoredNft[]>('rotki-sponsor-nft-ids-v2', []);
+  const storedNftIds = useLocalStorage<StoredNft[]>('rotki-sponsor-nft-ids', [], {
+    serializer: {
+      read: (v: string) => {
+        if (!v)
+          return [];
+        try {
+          return JSON.parse(v).map((n: any) => ({
+            address: n.address,
+            id: n.id,
+            releaseId: n.releaseId ?? 1,
+            tier: n.tier ?? -1,
+          }));
+        }
+        catch { return []; }
+      },
+      write: (v: StoredNft[]) => JSON.stringify(v),
+    },
+  });
 
   const connection = useWeb3Connection({
     chainId: get(CHAIN_ID),
@@ -136,7 +155,7 @@ export function useRotkiSponsorshipPayment() {
     }
   }
 
-  async function mintSponsorshipNFT(tierId: number, currency = 'ETH'): Promise<void> {
+  async function mintSponsorshipNFT(tierId: number, currency = 'ETH', releaseId?: number): Promise<void> {
     if (get(sponsorshipState).status === 'pending') {
       throw new Error('Minting already in progress');
     }
@@ -167,8 +186,12 @@ export function useRotkiSponsorshipPayment() {
         throw new Error(`Price not available for ${tierKey} tier in ${currency}`);
       }
 
-      // Get supply info using user's provider if connected
+      // Get supply info and release ID using user's provider if connected
       const provider = get(connected) ? getBrowserProvider() : undefined;
+      const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
+      const ethersProvider = provider || new ethers.JsonRpcProvider(get(RPC_URL));
+      const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, ethersProvider);
+      const currentReleaseId = releaseId || await contract.currentReleaseId();
       const supplies = await refreshSupplyData(provider);
       const supply = supplies[tierKey];
       if (!supply) {
@@ -259,7 +282,7 @@ export function useRotkiSponsorshipPayment() {
           txHash: tx.hash,
         });
 
-        // Store NFT ID with address in localStorage
+        // Store NFT ID with address, tier, and release ID in localStorage
         if (tokenId && get(address)) {
           const numericId = parseInt(tokenId);
           const currentAddress = get(address)!.toLowerCase();
@@ -267,7 +290,12 @@ export function useRotkiSponsorshipPayment() {
 
           // Check if this NFT ID is already stored for this address
           if (!stored.some(nft => nft.id === numericId && nft.address.toLowerCase() === currentAddress)) {
-            set(storedNftIds, [...stored, { address: currentAddress, id: numericId }]);
+            set(storedNftIds, [...stored, {
+              address: currentAddress,
+              id: numericId,
+              releaseId: Number(currentReleaseId),
+              tier: tierId,
+            }]);
           }
         }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NftSubmission } from '~/types/sponsor';
+import { set } from '@vueuse/core';
 import NftSubmissionItem from '~/components/sponsor/NftSubmissionItem.vue';
 
 const isOpen = defineModel<boolean>({ required: true });
@@ -13,15 +14,15 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 
 function handleEdit(): void {
-  isOpen.value = false;
+  set(isOpen, false);
   emit('edit');
 }
 
 function handleCancel(): void {
-  isOpen.value = false;
+  set(isOpen, false);
   emit('cancel');
 }
 </script>

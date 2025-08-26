@@ -87,6 +87,7 @@ const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipDa
 
 const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
 const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
+const releaseId = computed(() => get(sponsorshipData)?.releaseId);
 const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
 const error = computed(() => get(sponsorshipData)?.error);
 
@@ -127,7 +128,7 @@ async function handleMint() {
     if (!tier)
       return;
 
-    await mintSponsorshipNFT(tier.tierId, get(selectedCurrency));
+    await mintSponsorshipNFT(tier.tierId, get(selectedCurrency), get(releaseId));
   }
   catch (error) {
     logger.error('Minting failed:', error);
