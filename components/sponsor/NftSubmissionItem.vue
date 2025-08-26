@@ -14,7 +14,7 @@ defineEmits<{
   'edit-submission': [submission: NftSubmission];
 }>();
 
-const { t } = useI18n();
+const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

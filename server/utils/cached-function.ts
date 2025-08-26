@@ -23,7 +23,7 @@ export function createCachedFunction<T, ArgsT extends unknown[] = any[]>(
 
     // Execute function and cache result
     const result = await fn(...args);
-    await cache.setItem(key, result, opts.maxAge);
+    await cache.setItem(key, result, { ttl: opts.maxAge });
 
     return result;
   };

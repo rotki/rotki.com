@@ -46,7 +46,6 @@ export async function fetchTierInfo(tierId: number, tierKey: string): Promise<Ti
     return {
       benefits,
       currentSupply: Number(currentSupply),
-      description: metadata.description || '',
       imageUrl,
       maxSupply: Number(maxSupply),
       metadataURI,
@@ -81,7 +80,6 @@ export async function loadNFTImagesAndSupply(tiers: { key: string; tierId: numbe
       };
       benefits[tier.key] = {
         benefits: tierInfo.benefits,
-        description: tierInfo.description,
       };
       if (tierInfo.releaseName && !releaseName) {
         releaseName = tierInfo.releaseName;

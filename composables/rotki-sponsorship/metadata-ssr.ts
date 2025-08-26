@@ -35,14 +35,16 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
   supplies: Record<string, TierSupply>;
   benefits: Record<string, TierBenefits>;
   releaseName: string;
+  releaseId: number | undefined;
 }> {
   const images: Record<string, string> = {};
   const supplies: Record<string, TierSupply> = {};
   const benefits: Record<string, TierBenefits> = {};
   let releaseName = '';
+  let releaseId: number | undefined;
 
   if (tiers.length === 0) {
-    return { benefits, images, releaseName, supplies };
+    return { benefits, images, releaseId: undefined, releaseName, supplies };
   }
 
   try {
@@ -61,6 +63,9 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
       params,
     });
 
+    // Store the releaseId from the response
+    releaseId = response.releaseId;
+
     // Process the results
     for (const tier of tiers) {
       const tierInfo = response.tiers[tier.tierId];
@@ -73,7 +78,6 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
         };
         benefits[tier.key] = {
           benefits: tierInfo.benefits,
-          description: tierInfo.description,
         };
         if (tierInfo.releaseName && !releaseName) {
           releaseName = tierInfo.releaseName;
@@ -96,7 +100,6 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
         };
         benefits[tier.key] = {
           benefits: tierInfo.benefits,
-          description: tierInfo.description,
         };
         if (tierInfo.releaseName && !releaseName) {
           releaseName = tierInfo.releaseName;
@@ -105,5 +108,5 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
     }
   }
 
-  return { benefits, images, releaseName, supplies };
+  return { benefits, images, releaseId, releaseName, supplies };
 }
