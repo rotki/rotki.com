@@ -59,11 +59,10 @@ const tierContent = computed(() => {
 
   return tiers.reduce((acc, item) => {
     acc[item.tier] = {
-      description: item.description,
       benefits: item.benefits,
     };
     return acc;
-  }, {} as Record<string, { description: string; benefits: string }>);
+  }, {} as Record<string, { benefits: string }>);
 });
 
 const {
@@ -486,9 +485,6 @@ onMounted(async () => {
             >
               <p>
                 {{ t('sponsor.sponsor_page.benefits.tier_sponsorship', { tier: toTitleCase(selectedTier), releaseName }) }}
-              </p>
-              <p v-if="tierContent[selectedTier].description">
-                {{ tierContent[selectedTier].description }}
               </p>
               <p class="font-medium mt-1">
                 {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: tierContent[selectedTier].benefits }) }}

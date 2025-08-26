@@ -111,7 +111,6 @@ async function fetchSingleTierInfo(tierId: number, releaseId: number, config: Nf
     return {
       benefits,
       currentSupply: Number(currentSupply),
-      description: metadata.description || '',
       imageUrl,
       maxSupply: Number(maxSupply),
       metadataURI,
@@ -234,7 +233,6 @@ async function fetchTierInfoBatch(tierIds: number[], releaseId: number, config: 
             const tierInfo: TierInfoResult = {
               benefits,
               currentSupply: Number(currentSupply),
-              description: metadata.description || '',
               imageUrl,
               maxSupply: Number(maxSupply),
               metadataURI,

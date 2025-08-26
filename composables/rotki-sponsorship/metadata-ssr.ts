@@ -73,7 +73,6 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
         };
         benefits[tier.key] = {
           benefits: tierInfo.benefits,
-          description: tierInfo.description,
         };
         if (tierInfo.releaseName && !releaseName) {
           releaseName = tierInfo.releaseName;
@@ -96,7 +95,6 @@ export async function loadNFTImagesAndSupplySSR(tiers: { key: string; tierId: nu
         };
         benefits[tier.key] = {
           benefits: tierInfo.benefits,
-          description: tierInfo.description,
         };
         if (tierInfo.releaseName && !releaseName) {
           releaseName = tierInfo.releaseName;

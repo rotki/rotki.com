@@ -23,7 +23,6 @@ export interface TierSupply {
 }
 
 export interface TierBenefits {
-  description: string;
   benefits: string;
 }
 
