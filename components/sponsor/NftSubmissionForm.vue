@@ -35,6 +35,8 @@ const error = ref<string>('');
 const success = ref<boolean>(false);
 const imageFile = ref<File | null>(null);
 const imagePreview = ref<string>('');
+const deleteImage = ref<boolean>(false);
+const hasExistingImage = ref<boolean>(false);
 const tokenId = ref<string>('');
 const email = ref<string>('');
 const isCheckingNft = ref<boolean>(false);
@@ -137,6 +139,9 @@ function handleImageChange(event: Event): void {
 
   set(imageFile, file);
 
+  // If we're replacing an existing image, we don't need to delete it
+  set(deleteImage, false);
+
   // Create preview
   const reader = new FileReader();
   reader.onloadend = () => {
@@ -150,6 +155,11 @@ function handleImageChange(event: Event): void {
 function removeImage(): void {
   set(imageFile, null);
   set(imagePreview, '');
+
+  // If we had an existing image, mark it for deletion
+  if (get(hasExistingImage)) {
+    set(deleteImage, true);
+  }
 }
 
 async function handleSubmit(): Promise<void> {
@@ -195,6 +205,11 @@ async function handleSubmit(): Promise<void> {
       formData.append('image_file', file);
     }
 
+    // Add deleteImage flag if editing and user wants to delete the image
+    if (props.editingSubmission && get(deleteImage)) {
+      formData.append('delete_image', 'true');
+    }
+
     // Use authenticatedRequest to handle auth and retry logic
     const submitFormData = () => fetchWithCsrf('/webapi/nfts/holder-submission/', {
       method: 'POST',
@@ -209,6 +224,8 @@ async function handleSubmit(): Promise<void> {
     set(email, '');
     set(imageFile, null);
     set(imagePreview, '');
+    set(deleteImage, false);
+    set(hasExistingImage, false);
 
     await nextTick(() => {
       set(success, true);
@@ -341,13 +358,31 @@ watch(() => props.editingSubmission, (submission) => {
     set(tokenId, submission.nftId.toString());
     set(displayName, submission.displayName || '');
     set(email, submission.email || '');
-    // Clear image fields as we can't load existing images
+
+    // Load existing image if available
+    if (submission.imageUrl) {
+      set(imagePreview, submission.imageUrl);
+      set(hasExistingImage, true);
+    }
+    else {
+      set(imagePreview, '');
+      set(hasExistingImage, false);
+    }
+
+    // Reset file and delete flag
     set(imageFile, null);
-    set(imagePreview, '');
+    set(deleteImage, false);
+
     // When editing, assume NFT ownership is valid (they already submitted it)
     set(isNftOwnerValid, true);
     // Check NFT metadata for the loaded submission
     checkNftMetadata();
+  }
+  else {
+    // Reset image states when not editing
+    set(imagePreview, '');
+    set(hasExistingImage, false);
+    set(deleteImage, false);
   }
 }, { immediate: true });
 
