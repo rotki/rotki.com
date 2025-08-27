@@ -936,7 +936,8 @@
       "check": "Check",
       "tier": "Tier",
       "in_release": "in release {releaseName}",
-      "nft_info": "NFT with id #{tokenId} is in {tier} for release {releaseName}"
+      "nft_info": "NFT with id #{tokenId} is in {tier} for release {releaseName}",
+      "terms_note": "* Submitted text and images are subject to review. rotki reserves the right to reject or request changes to any content that is offensive, illegal, misleading, scam-related, or otherwise inconsistent with our values."
     },
     "existing_submission": {
       "title": "Existing Submission Found",
