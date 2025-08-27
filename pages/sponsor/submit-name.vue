@@ -69,21 +69,6 @@ watch(address, () => {
       <!-- Wallet Connection Card -->
       <SponsorWalletConnectionCard @view-submissions="loadSubmissions()" />
 
-      <!-- Action buttons -->
-      <div
-        v-if="editingSubmission && !showSubmissionsList"
-        class="mb-4 flex justify-end"
-      >
-        <RuiButton
-          variant="text"
-          color="secondary"
-          size="sm"
-          @click="handleCancelEdit()"
-        >
-          {{ t('sponsor.submit_name.cancel_edit') }}
-        </RuiButton>
-      </div>
-
       <!-- Submissions List -->
       <NftSubmissionsList
         v-if="showSubmissionsList"
