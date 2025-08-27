@@ -103,6 +103,11 @@ watch(address, () => {
         @cancel-edit="handleCancelEdit()"
         @edit-submission="handleEditSubmission($event)"
       />
+
+      <!-- Terms Notice -->
+      <div class="mt-6 text-sm text-rui-text-secondary">
+        {{ t('sponsor.submit_name.terms_note') }}
+      </div>
     </div>
   </section>
 </template>
