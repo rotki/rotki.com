@@ -32,7 +32,7 @@ definePageMeta({
 
 const logger = useLogger();
 
-const selectedTier = ref('bronze');
+const selectedTier = ref<string>('bronze');
 const isApproving = ref<boolean>(false);
 const tokenAllowance = ref<string>('0');
 const showSuccessDialog = ref(false);
@@ -94,7 +94,10 @@ const error = computed(() => get(sponsorshipData)?.error);
 async function handleApprove() {
   try {
     set(isApproving, true);
-    const tier = findTierByKey(get(selectedTier));
+    const tierKey = get(selectedTier);
+    if (!tierKey)
+      return;
+    const tier = findTierByKey(tierKey);
     if (!tier)
       return;
 
@@ -124,7 +127,10 @@ async function handleApprove() {
 
 async function handleMint() {
   try {
-    const tier = findTierByKey(get(selectedTier));
+    const tierKey = get(selectedTier);
+    if (!tierKey)
+      return;
+    const tier = findTierByKey(tierKey);
     if (!tier)
       return;
 
@@ -135,59 +141,6 @@ async function handleMint() {
     await refreshSponsorshipData();
   }
 }
-
-const needsApproval = computed<boolean>(() => {
-  const currency = get(selectedCurrency);
-  const token = get(paymentTokens).find(t => t.symbol === currency);
-
-  if (!token || token.address === ETH_ADDRESS)
-    return false;
-
-  const selectedTierKey = get(selectedTier) as TierKey;
-  const price = token.prices[selectedTierKey];
-  const allowance = get(tokenAllowance);
-
-  return !!(price && parseFloat(allowance) < parseFloat(price));
-});
-
-const buttonText = computed(() => {
-  const selectedTierKey = get(selectedTier);
-  const tier = findTierByKey(selectedTierKey);
-  const currency = get(selectedCurrency);
-
-  if (!get(connected))
-    return t('sponsor.sponsor_page.buttons.connect_wallet');
-  if (!get(isExpectedChain))
-    return t('sponsor.sponsor_page.buttons.switch_network');
-  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
-    return t('sponsor.sponsor_page.buttons.sold_out', { tier: tier?.label });
-  if (get(isApproving))
-    return t('sponsor.sponsor_page.buttons.approving');
-  if (get(needsApproval))
-    return t('sponsor.sponsor_page.buttons.approve', { currency });
-  if (get(sponsorshipState).status === 'pending')
-    return t('sponsor.sponsor_page.buttons.minting');
-  return t('sponsor.sponsor_page.buttons.mint', { tier: tier?.label });
-});
-
-const buttonAction = computed(() => {
-  const selectedTierKey = get(selectedTier);
-
-  if (!get(connected))
-    return open;
-  if (!get(isExpectedChain))
-    return () => switchNetwork();
-  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
-    return () => {};
-  if (get(needsApproval))
-    return handleApprove;
-  return handleMint;
-});
-
-const isButtonDisabled = computed(() => {
-  const selectedTierKey = get(selectedTier);
-  return get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
-});
 
 const availableTokens = computed(() => get(paymentTokens));
 
@@ -205,10 +158,97 @@ const tierPriceDisplay = computed<Record<string, string>>(() => {
   const priceGetter = get(getPriceForTier);
   SPONSORSHIP_TIERS.forEach((tier) => {
     const price = priceGetter(currency, tier.key);
-    result[tier.key] = price ? `${price} ${currency}` : t('sponsor.sponsor_page.pricing.loading');
+    result[tier.key] = price ? `${price} ${currency}` : '0';
   });
 
   return result;
+});
+
+const visibleTiers = computed(() => {
+  const currency = get(selectedCurrency);
+  const priceGetter = get(getPriceForTier);
+
+  if (get(isLoadingPaymentTokens)) {
+    return SPONSORSHIP_TIERS;
+  }
+
+  return SPONSORSHIP_TIERS.filter((tier) => {
+    const price = priceGetter(currency, tier.key);
+    return price && parseFloat(price) > 0;
+  });
+});
+
+const needsApproval = computed<boolean>(() => {
+  const currency = get(selectedCurrency);
+  const token = get(paymentTokens).find(t => t.symbol === currency);
+  const selectedTierKey = get(selectedTier);
+
+  if (!token || token.address === ETH_ADDRESS)
+    return false;
+
+  const price = token.prices[selectedTierKey as TierKey];
+  const allowance = get(tokenAllowance);
+
+  return !!(price && parseFloat(allowance) < parseFloat(price));
+});
+
+const buttonText = computed(() => {
+  const selectedTierKey = get(selectedTier);
+  const tier = findTierByKey(selectedTierKey);
+  const currency = get(selectedCurrency);
+  const visible = get(visibleTiers);
+
+  if (!get(connected))
+    return t('sponsor.sponsor_page.buttons.connect_wallet');
+  if (!get(isExpectedChain))
+    return t('sponsor.sponsor_page.buttons.switch_network');
+  if (visible.length === 0)
+    return t('sponsor.sponsor_page.buttons.no_tiers_available');
+  if (!tier)
+    return t('sponsor.sponsor_page.buttons.select_tier');
+  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
+    return t('sponsor.sponsor_page.buttons.sold_out', { tier: tier.label });
+  if (get(isApproving))
+    return t('sponsor.sponsor_page.buttons.approving');
+  if (get(needsApproval))
+    return t('sponsor.sponsor_page.buttons.approve', { currency });
+  if (get(sponsorshipState).status === 'pending')
+    return t('sponsor.sponsor_page.buttons.minting');
+  return t('sponsor.sponsor_page.buttons.mint', { tier: tier.label });
+});
+
+const buttonAction = computed(() => {
+  const selectedTierKey = get(selectedTier);
+  const visible = get(visibleTiers);
+
+  if (!get(connected))
+    return open;
+  if (!get(isExpectedChain))
+    return () => switchNetwork();
+  if (visible.length === 0)
+    return () => {};
+  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
+    return () => {};
+  if (get(needsApproval))
+    return handleApprove;
+  return handleMint;
+});
+
+const isButtonDisabled = computed(() => {
+  const selectedTierKey = get(selectedTier);
+  const visible = get(visibleTiers);
+  return visible.length === 0 || get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
+});
+
+// Auto-select first visible tier if current selection is not visible
+watchEffect(() => {
+  const visible = get(visibleTiers);
+  const current = get(selectedTier);
+
+  if (visible.length > 0 && // If current tier is not in the visible list, select the first visible one
+    !visible.some(tier => tier.key === current)) {
+    set(selectedTier, visible[0].key);
+  }
 });
 
 async function checkAllowanceIfNeeded() {
@@ -257,6 +297,9 @@ watch(() => get(sponsorshipState).status, async (newStatus) => {
     if (state.txHash) {
       await onMintingSuccess(state.txHash);
     }
+
+    // Refresh sponsorship data after successful minting
+    await refreshSponsorshipData();
   }
 });
 
@@ -388,7 +431,7 @@ onMounted(async () => {
             </h6>
             <div class="space-y-3">
               <RuiCard
-                v-for="tier in SPONSORSHIP_TIERS"
+                v-for="tier in visibleTiers"
                 :key="tier.key"
                 class="tier-option"
                 content-class="flex items-center justify-between h-16 !py-2 transition-all cursor-pointer"
@@ -431,6 +474,12 @@ onMounted(async () => {
                   </div>
                 </div>
               </RuiCard>
+              <div
+                v-if="visibleTiers.length === 0 && !isLoadingPaymentTokens"
+                class="text-center py-8 text-rui-text-secondary"
+              >
+                {{ t('sponsor.sponsor_page.no_tiers_available') }}
+              </div>
             </div>
           </div>
 
