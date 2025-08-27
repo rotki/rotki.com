@@ -4,7 +4,6 @@ import type { NftSubmission } from '~/types/sponsor';
 import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
-import ExistingSubmissionDialog from '~/components/sponsor/ExistingSubmissionDialog.vue';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
@@ -52,7 +51,6 @@ const nftOwner = ref<string>('');
 const isNftOwnerValid = ref<boolean>(false);
 const hasCheckedNft = ref<boolean>(false);
 const existingSubmission = ref<NftSubmission | null>(null);
-const showExistingSubmissionDialog = ref<boolean>(false);
 const isCheckingExistingSubmission = ref<boolean>(false);
 
 const { currentAddressNfts } = useRotkiSponsorshipPayment();
@@ -88,7 +86,12 @@ const nftIdOptions = computed<StoredNft[]>(() => {
     }
   }
 
-  return nfts.sort((a, b) => Number(a.id) - Number(b.id));
+  // Filter unique NFTs by ID
+  const uniqueNfts = nfts.filter((nft, index, self) =>
+    index === self.findIndex(n => n.id === nft.id),
+  );
+
+  return uniqueNfts.sort((a, b) => Number(a.id) - Number(b.id)).map(item => ({ ...item, id: item.id.toString() }));
 });
 
 // Custom validators
@@ -273,8 +276,29 @@ async function checkExistingSubmission(nftId: number): Promise<void> {
     const submission = await checkSubmissionByNftId(props.address, nftId);
 
     if (submission) {
+      // Directly populate the form fields with existing submission data
+      set(displayName, submission.displayName || '');
+      set(email, submission.email || '');
+
+      // Load existing image if available
+      if (submission.imageUrl) {
+        set(imagePreview, submission.imageUrl);
+        set(hasExistingImage, true);
+      }
+      else {
+        set(imagePreview, '');
+        set(hasExistingImage, false);
+      }
+
+      // Reset file and delete flag
+      set(imageFile, null);
+      set(deleteImage, false);
+
+      // Store the existing submission for tracking
       set(existingSubmission, submission);
-      set(showExistingSubmissionDialog, true);
+
+      // Emit edit-submission event to trigger editing mode
+      emit('edit-submission', submission);
     }
   }
   catch (error: any) {
@@ -353,16 +377,15 @@ async function checkNftMetadata(): Promise<void> {
   }
 }
 
-function handleEdit() {
-  const submission = get(existingSubmission);
-  if (submission) {
-    emit('edit-submission', submission);
-  }
-}
-
 function handleCancelEdit() {
-  set(showExistingSubmissionDialog, false);
   set(tokenId, '');
+  set(existingSubmission, null);
+  set(displayName, '');
+  set(email, '');
+  set(imagePreview, '');
+  set(hasExistingImage, false);
+  set(deleteImage, false);
+  set(imageFile, null);
   emit('cancel-edit');
 }
 
@@ -649,7 +672,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           :loading="isSubmitting || isAuthenticating"
           :disabled="!isAuthenticated || v$.$invalid || (hasCheckedNft && !isNftOwnerValid)"
         >
-          {{ editingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
+          {{ editingSubmission || existingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>
         <p
           v-if="!isAuthenticated"
@@ -667,7 +690,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           class="w-full"
           disabled
         >
-          {{ editingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
+          {{ editingSubmission || existingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>
         <p class="mt-2 text-sm text-rui-text-secondary">
           {{ t('sponsor.submit_name.connect_to_submit') }}
@@ -689,12 +712,4 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
       </RuiAlert>
     </form>
   </RuiCard>
-
-  <!-- Existing Submission Dialog -->
-  <ExistingSubmissionDialog
-    v-model="showExistingSubmissionDialog"
-    :submission="existingSubmission"
-    @edit="handleEdit()"
-    @cancel="handleCancelEdit()"
-  />
 </template>

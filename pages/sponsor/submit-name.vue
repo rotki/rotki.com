@@ -26,7 +26,6 @@ function handleEditSubmission(submission: NftSubmission): void {
 
 function handleCancelEdit(): void {
   set(editingSubmission, undefined);
-  set(showSubmissionsList, true);
 }
 
 async function handleSubmissionSuccess(): Promise<void> {
