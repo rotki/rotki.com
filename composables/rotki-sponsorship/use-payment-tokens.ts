@@ -16,8 +16,8 @@ export function usePaymentTokens() {
     if (isNaN(num))
       return price;
 
-    // Convert to string and remove scientific notation if needed
-    let formatted = num.toFixed(18);
+    // Convert to string
+    let formatted = num.toString();
 
     // Remove trailing zeros after decimal point
     formatted = formatted.replace(/\.?0+$/, '');
