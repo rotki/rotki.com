@@ -82,7 +82,7 @@ const nftIdOptions = computed<StoredNft[]>(() => {
       nfts.push({
         address: props.address?.toLowerCase() || '',
         id: editingId,
-        releaseId: props.editingSubmission.releaseId ?? 1,
+        releaseId: currentReleaseId,
         tier: -1, // Unknown tier for external NFTs
       });
     }
@@ -314,6 +314,16 @@ async function checkNftMetadata(): Promise<void> {
       set(nftReleaseName, metadata.releaseName || '');
       set(nftOwner, metadata.owner || '');
 
+      // Check if NFT's releaseId matches current releaseId
+      const currentReleaseId = get(sponsorshipData)?.releaseId;
+      if (currentReleaseId !== undefined && metadata.releaseId !== currentReleaseId) {
+        // Store the release names for use in the template
+        set(nftCheckError, 'wrong_release');
+        set(nftReleaseName, metadata.releaseName || `Release ${metadata.releaseId}`);
+        set(isNftOwnerValid, false);
+        return;
+      }
+
       // Check if the NFT is owned by the connected address
       if (metadata.owner && props.address) {
         const isOwner = metadata.owner.toLowerCase() === props.address.toLowerCase();
@@ -481,7 +491,21 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
         v-if="nftCheckError"
         type="error"
       >
-        {{ nftCheckError }}
+        <i18n-t
+          v-if="nftCheckError === 'wrong_release'"
+          keypath="sponsor.submit_name.error.wrong_release"
+          tag="span"
+        >
+          <template #nftRelease>
+            <strong>{{ nftReleaseName }}</strong>
+          </template>
+          <template #currentRelease>
+            <strong>{{ sponsorshipData?.releaseName || `Release ${sponsorshipData?.releaseId}` }}</strong>
+          </template>
+        </i18n-t>
+        <template v-else>
+          {{ nftCheckError }}
+        </template>
       </RuiAlert>
       <RuiAlert
         v-else-if="nftTier"

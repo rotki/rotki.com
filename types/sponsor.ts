@@ -8,9 +8,8 @@ export const NftSubmission = z.object({
   email: z.string().nullable(),
   imageUrl: z.string().nullable(),
   nftId: z.number(),
-  releaseId: z.number().optional(),
-  releaseName: z.string().optional(),
-  tier: z.custom<TierKey>().optional(),
+  releaseVersion: z.string().optional(),
+  tierId: z.custom<TierKey>().optional(),
   updatedAt: z.string(),
 });
 

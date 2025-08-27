@@ -931,7 +931,9 @@
         "invalid_token_id": "Please enter a valid NFT Token ID",
         "check_failed": "Failed to check NFT metadata",
         "nft_not_found": "NFT not found or invalid token ID",
-        "not_owner": "This NFT is not owned by your connected wallet address"
+        "not_owner": "This NFT is not owned by your connected wallet address",
+        "wrong_release": "This NFT is from {nftRelease} but submissions are only accepted for {currentRelease}",
+        "cannot_edit_previous_release": "Cannot edit submissions from previous releases"
       },
       "check": "Check",
       "tier": "Tier",

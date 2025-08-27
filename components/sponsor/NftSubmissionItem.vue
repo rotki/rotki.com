@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { NftSubmission } from '~/types/sponsor';
+import { get } from '@vueuse/shared';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { formatDate } from '~/utils/date';
 
 defineProps<{
   submission: NftSubmission;
-  nftMetadata?: {
-    tier?: string;
-    releaseName?: string;
-  };
 }>();
 
 defineEmits<{
@@ -15,6 +14,9 @@ defineEmits<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
+const { data: sponsorshipData } = await useSponsorshipData();
+const currentReleaseName = computed(() => get(sponsorshipData)?.releaseName);
 </script>
 
 <template>
@@ -29,19 +31,19 @@ const { t } = useI18n({ useScope: 'global' });
             NFT #{{ submission.nftId }}
           </RuiChip>
           <RuiChip
-            v-if="nftMetadata?.tier"
+            v-if="isDefined(submission.tierId)"
             size="sm"
             variant="outlined"
-            :class="getTierClasses(nftMetadata?.tier)"
+            :class="getTierClasses(findTierById(submission.tierId)?.key)"
           >
             <span class="mr-1">
-              {{ getTierMedal(nftMetadata.tier) }}
+              {{ getTierMedal(findTierById(submission.tierId)?.key) }}
             </span>
-            <span class="uppercase font-medium mr-1">{{ t('sponsor.submit_name.tier_info', { tier: nftMetadata.tier }) }}</span>
-            <span v-if="nftMetadata?.releaseName">
+            <span class="uppercase font-medium mr-1">{{ t('sponsor.submit_name.tier_info', { tier: findTierById(submission.tierId)?.label }) }}</span>
+            <span v-if="submission?.releaseVersion">
               <i18n-t keypath="sponsor.submit_name.tier_in_release">
                 <template #release>
-                  <span class="font-medium">{{ nftMetadata.releaseName }}</span>
+                  <span class="font-medium">{{ submission.releaseVersion }}</span>
                 </template>
               </i18n-t>
             </span>
@@ -71,6 +73,7 @@ const { t } = useI18n({ useScope: 'global' });
       </div>
       <div class="flex items-center gap-2">
         <RuiButton
+          v-if="currentReleaseName === submission.releaseVersion"
           variant="outlined"
           size="sm"
           color="primary"
@@ -84,6 +87,26 @@ const { t } = useI18n({ useScope: 'global' });
           </template>
           {{ t('actions.edit') }}
         </RuiButton>
+        <RuiTooltip
+          v-else
+        >
+          <template #activator>
+            <RuiButton
+              variant="outlined"
+              size="sm"
+              disabled
+            >
+              <template #prepend>
+                <RuiIcon
+                  name="lu-pencil"
+                  size="16"
+                />
+              </template>
+              {{ t('actions.edit') }}
+            </RuiButton>
+          </template>
+          {{ t('sponsor.submit_name.error.cannot_edit_previous_release') }}
+        </RuiTooltip>
       </div>
     </div>
   </div>
