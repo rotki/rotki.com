@@ -18,8 +18,9 @@ const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
   const { CONTRACT_ADDRESS } = useNftConfig();
   const tokenContract = new Contract(tokenAddress, ERC20_ABI, signer);
-  const amountBN = ethers.parseUnits(amount, decimals);
-  return tokenContract.approve(get(CONTRACT_ADDRESS), amountBN);
+  // Use max uint256 for unlimited allowance
+  const maxAllowance = ethers.MaxUint256;
+  return tokenContract.approve(get(CONTRACT_ADDRESS), maxAllowance);
 }
 
 async function checkTokenAllowanceContract(tokenAddress: string, decimals: number, signer: Signer): Promise<string> {

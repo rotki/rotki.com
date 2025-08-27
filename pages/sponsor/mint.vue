@@ -189,7 +189,10 @@ const needsApproval = computed<boolean>(() => {
   const price = token.prices[selectedTierKey as TierKey];
   const allowance = get(tokenAllowance);
 
-  return !!(price && parseFloat(allowance) < parseFloat(price));
+  // Check if allowance is less than required price
+  // Also check if it's not already set to max (unlimited)
+  const maxAllowance = Number.MAX_SAFE_INTEGER; // Very large number to represent unlimited
+  return !!(price && parseFloat(allowance) < parseFloat(price) && parseFloat(allowance) < maxAllowance);
 });
 
 const buttonText = computed(() => {

@@ -126,7 +126,7 @@ const atLeastOneRequired = helpers.withMessage(
 const rules = computed(() => ({
   displayName: {
     minLength: get(displayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_short'), minLength(3)) : {},
-    maxLength: helpers.withMessage(() => t('sponsor.submit_name.error.too_long'), maxLength(30)),
+    maxLength: get(displayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_long'), maxLength(30)) : {},
     validNameChars,
   },
   imageFile: {
@@ -427,9 +427,27 @@ onMounted(() => {
     checkNftMetadata();
   }
 });
+
+const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
+  item: StoredNft;
+}>();
 </script>
 
 <template>
+  <DefineNftIdOption #default="{ item }">
+    <div class="flex items-center gap-2">
+      <div>
+        {{ item.id }}
+      </div>
+      <div
+        v-if="findTierById(item.tier)"
+        :class="getTierClasses(findTierById(item.tier)?.key)"
+        class="rounded-md px-2 py-0.5 text-xs"
+      >
+        {{ findTierById(item.tier)?.label }}
+      </div>
+    </div>
+  </DefineNftIdOption>
   <RuiCard class="!p-4">
     <form
       class="flex flex-col gap-6"
@@ -452,18 +470,10 @@ onMounted(() => {
         color="primary"
       >
         <template #item="{ item }">
-          <div class="flex items-center justify-between w-full gap-2">
-            <div>
-              {{ item.id }}
-            </div>
-            <div
-              v-if="findTierById(item.tier)"
-              :class="getTierClasses(findTierById(item.tier)?.key)"
-              class="rounded-md px-2"
-            >
-              {{ findTierById(item.tier)?.label }}
-            </div>
-          </div>
+          <ReuseNftIdOption :item="item" />
+        </template>
+        <template #selection="{ item }">
+          <ReuseNftIdOption :item="item" />
         </template>
       </RuiAutoComplete>
 

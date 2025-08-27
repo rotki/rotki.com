@@ -4,8 +4,8 @@ import { z } from 'zod';
 
 export const NftSubmission = z.object({
   createdAt: z.string(),
-  displayName: z.string().optional(),
-  email: z.string().optional(),
+  displayName: z.string().nullable(),
+  email: z.string().nullable(),
   imageUrl: z.string().nullable(),
   nftId: z.number(),
   releaseId: z.number().optional(),
