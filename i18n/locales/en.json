@@ -961,6 +961,7 @@
         "not_available": "{tier} NFT",
         "image_not_available": "Image not available"
       },
+      "no_payment_tokens_available": "No payment tokens available",
       "payment_currency": "Payment Currency",
       "select_tier": "Select Tier",
       "pricing": {
