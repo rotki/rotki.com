@@ -151,7 +151,19 @@ async function handleMint() {
   }
 }
 
-const availableTokens = computed(() => get(paymentTokens));
+const availableTokens = computed(() =>
+  // Filter out tokens that have all zero prices for all tiers
+  get(paymentTokens).filter((token) => {
+    if (!token.prices)
+      return false;
+
+    // Check if at least one tier has a non-zero price
+    return SPONSORSHIP_TIERS.some((tier) => {
+      const price = token.prices[tier.key as TierKey];
+      return price && parseFloat(price) > 0;
+    });
+  }),
+);
 
 const tierPriceDisplay = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
@@ -241,7 +253,6 @@ const buttonAction = computed(() => {
     return () => {};
   if (!isTierAvailable(selectedTierKey, get(tierSupply)))
     return () => {};
-  // Note: approval is now handled by the RuiMenu, not here
   if (get(needsApproval))
     return () => {}; // No-op, the menu handles it
   return handleMint;
@@ -266,6 +277,17 @@ watchEffect(() => {
   if (visible.length > 0 && // If current tier is not in the visible list, select the first visible one
     !visible.some(tier => tier.key === current)) {
     set(selectedTier, visible[0].key);
+  }
+});
+
+// Auto-select first available token if current selection is not available
+watchEffect(() => {
+  const available = get(availableTokens);
+  const current = get(selectedCurrency);
+
+  if (available.length > 0 &&
+    !available.some(token => token.symbol === current)) {
+    set(selectedCurrency, available[0].symbol);
   }
 });
 
@@ -419,7 +441,7 @@ onMounted(async () => {
               />
             </div>
             <div
-              v-else
+              v-else-if="availableTokens.length > 0"
               class="flex gap-2"
             >
               <RuiButton
@@ -440,10 +462,19 @@ onMounted(async () => {
                 {{ token.symbol }}
               </RuiButton>
             </div>
+            <div
+              v-else
+              class="text-rui-text-secondary"
+            >
+              {{ t('sponsor.sponsor_page.no_payment_tokens_available') }}
+            </div>
           </div>
 
           <!-- Tier Selection -->
-          <div class="space-y-4">
+          <div
+            v-if="availableTokens.length > 0"
+            class="space-y-4"
+          >
             <h6 class="font-bold">
               {{ t('sponsor.sponsor_page.select_tier') }}
             </h6>
@@ -492,12 +523,6 @@ onMounted(async () => {
                   </div>
                 </div>
               </RuiCard>
-              <div
-                v-if="visibleTiers.length === 0 && !isLoadingPaymentTokens"
-                class="text-center py-8 text-rui-text-secondary"
-              >
-                {{ t('sponsor.sponsor_page.no_tiers_available') }}
-              </div>
             </div>
           </div>
 
