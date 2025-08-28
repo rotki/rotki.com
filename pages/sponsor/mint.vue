@@ -28,6 +28,7 @@ useHead({
 
 definePageMeta({
   layout: 'sponsor',
+  middleware: 'sponsorship',
 });
 
 const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;

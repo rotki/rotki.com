@@ -1,6 +1,13 @@
 import process from 'node:process';
 import rotkiTheme from '@rotki/ui-library/theme';
 
+const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
+
+const sponsorRoutes = [
+  '/sponsor',
+  '/sponsor/**',
+];
+
 const nonIndexed = [
   '/activation',
   '/home',
@@ -20,11 +27,11 @@ const nonIndexed = [
   '/account-deleted',
   '/md/',
   '/documents/',
-  '/api/content/**',
+  '/api/**',
   '/_nuxt/**',
   '/testimonials/**',
   '/oauth/**',
-  '/api/oauth/**',
+  ...(!sponsorshipEnabled ? sponsorRoutes : []),
 ];
 
 const domain = process.env.PROXY_DOMAIN ?? 'localhost';
@@ -149,6 +156,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/home/**': { robots: false },
+    ...(!sponsorshipEnabled ? { '/sponsor/**': { robots: false } } : {}),
   },
 
   runtimeConfig: {
@@ -173,6 +181,7 @@ export default defineNuxtConfig({
       recaptcha: {
         siteKey: '',
       },
+      sponsorshipEnabled: false,
       testing: true,
       walletConnect: {
         projectId: '',

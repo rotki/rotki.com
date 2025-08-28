@@ -25,6 +25,15 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   try {
+    // Check if sponsorship feature is enabled
+    const { public: { sponsorshipEnabled } } = useRuntimeConfig();
+    if (!sponsorshipEnabled) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Not Found',
+      });
+    }
+
     // Validate query parameters
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
     const { skipCache, url } = query;

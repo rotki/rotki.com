@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ButtonProps } from '@rotki/ui-library';
+import { get } from '@vueuse/shared';
 
 const { t } = useI18n({ useScope: 'global' });
+const { isEnabled: isSponsorshipEnabled } = useSponsorshipFeature();
 
 interface Menu {
   label: string;
@@ -22,7 +24,7 @@ function isParent(item: Menu | MenuParent): item is MenuParent {
   return 'children' in item;
 }
 
-const menus: (Menu | MenuParent)[] = [
+const baseMenus: (Menu | MenuParent)[] = [
   {
     label: t('navigation_menu.home'),
     to: '/',
@@ -71,16 +73,25 @@ const menus: (Menu | MenuParent)[] = [
       },
     ],
   },
-  {
-    label: t('navigation_menu.sponsor'),
-    to: '/sponsor/mint',
-    highlightExactActive: true,
-    buttonProps: {
-      color: 'primary',
-      variant: 'outlined',
-    },
-  },
 ];
+
+const sponsorMenu: Menu = {
+  label: t('navigation_menu.sponsor'),
+  to: '/sponsor/mint',
+  highlightExactActive: true,
+  buttonProps: {
+    color: 'primary',
+    variant: 'outlined',
+  },
+};
+
+const menus = computed<(Menu | MenuParent)[]>(() => {
+  const allMenus = [...baseMenus];
+  if (get(isSponsorshipEnabled)) {
+    allMenus.push(sponsorMenu);
+  }
+  return allMenus;
+});
 
 const { isMdAndDown } = useBreakpoint();
 </script>
