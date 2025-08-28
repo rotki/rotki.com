@@ -970,14 +970,20 @@
         "minted_with_max": "{current}/{max} minted",
         "sold_out": "(Sold Out)"
       },
+      "approval": {
+        "unlimited_button": "Approve Unlimited",
+        "exact_button": "Approve {amount} {currency}"
+      },
       "buttons": {
         "connect_wallet": "Connect Wallet",
         "switch_network": "Switch Network",
         "sold_out": "{tier} Sold Out",
-        "approving": "Approving USDC...",
+        "approving": "Approving {currency}...",
         "approve": "Approve {currency}",
+        "confirm_approve": "Confirm Approval",
         "minting": "Minting...",
-        "mint": "Mint {tier} sponsorship NFT"
+        "mint": "Mint {tier} sponsorship NFT",
+        "no_tiers_available": "No tiers available"
       },
       "connected_to": "Connected to: {address}",
       "benefits": {
