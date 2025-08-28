@@ -30,11 +30,17 @@ definePageMeta({
   layout: 'sponsor',
 });
 
+const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
+
+type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
+
 const logger = useLogger();
 
 const selectedTier = ref<string>('bronze');
 const isApproving = ref<boolean>(false);
 const tokenAllowance = ref<string>('0');
+const approvalType = ref<ApprovalType>(APPROVAL_TYPE.UNLIMITED);
+const showApprovalOptions = ref<boolean>(false);
 const showSuccessDialog = ref(false);
 
 const { t } = useI18n({ useScope: 'global' });
@@ -91,7 +97,8 @@ const releaseId = computed(() => get(sponsorshipData)?.releaseId);
 const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
 const error = computed(() => get(sponsorshipData)?.error);
 
-async function handleApprove() {
+async function handleApprove(selectedApprovalType: ApprovalType) {
+  set(approvalType, selectedApprovalType);
   try {
     set(isApproving, true);
     const tierKey = get(selectedTier);
@@ -110,7 +117,8 @@ async function handleApprove() {
     if (!price)
       return;
 
-    const tx = await approveToken(currency, price);
+    const isUnlimited = get(approvalType) === APPROVAL_TYPE.UNLIMITED;
+    const tx = await approveToken(currency, price, isUnlimited);
     await tx.wait();
 
     // Refresh allowance after approval
@@ -122,6 +130,7 @@ async function handleApprove() {
   }
   finally {
     set(isApproving, false);
+    set(showApprovalOptions, false);
   }
 }
 
@@ -142,7 +151,19 @@ async function handleMint() {
   }
 }
 
-const availableTokens = computed(() => get(paymentTokens));
+const availableTokens = computed(() =>
+  // Filter out tokens that have all zero prices for all tiers
+  get(paymentTokens).filter((token) => {
+    if (!token.prices)
+      return false;
+
+    // Check if at least one tier has a non-zero price
+    return SPONSORSHIP_TIERS.some((tier) => {
+      const price = token.prices[tier.key as TierKey];
+      return price && parseFloat(price) > 0;
+    });
+  }),
+);
 
 const tierPriceDisplay = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
@@ -189,7 +210,10 @@ const needsApproval = computed<boolean>(() => {
   const price = token.prices[selectedTierKey as TierKey];
   const allowance = get(tokenAllowance);
 
-  return !!(price && parseFloat(allowance) < parseFloat(price));
+  // Check if allowance is less than required price
+  // Also check if it's not already set to max (unlimited)
+  const maxAllowance = Number.MAX_SAFE_INTEGER; // Very large number to represent unlimited
+  return !!(price && parseFloat(allowance) < parseFloat(price) && parseFloat(allowance) < maxAllowance);
 });
 
 const buttonText = computed(() => {
@@ -230,7 +254,7 @@ const buttonAction = computed(() => {
   if (!isTierAvailable(selectedTierKey, get(tierSupply)))
     return () => {};
   if (get(needsApproval))
-    return handleApprove;
+    return () => {}; // No-op, the menu handles it
   return handleMint;
 });
 
@@ -238,6 +262,11 @@ const isButtonDisabled = computed(() => {
   const selectedTierKey = get(selectedTier);
   const visible = get(visibleTiers);
   return visible.length === 0 || get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
+});
+
+// Reset approval options when tier or currency changes
+watch([selectedTier, selectedCurrency], () => {
+  set(showApprovalOptions, false);
 });
 
 // Auto-select first visible tier if current selection is not visible
@@ -248,6 +277,17 @@ watchEffect(() => {
   if (visible.length > 0 && // If current tier is not in the visible list, select the first visible one
     !visible.some(tier => tier.key === current)) {
     set(selectedTier, visible[0].key);
+  }
+});
+
+// Auto-select first available token if current selection is not available
+watchEffect(() => {
+  const available = get(availableTokens);
+  const current = get(selectedCurrency);
+
+  if (available.length > 0 &&
+    !available.some(token => token.symbol === current)) {
+    set(selectedCurrency, available[0].symbol);
   }
 });
 
@@ -401,7 +441,7 @@ onMounted(async () => {
               />
             </div>
             <div
-              v-else
+              v-else-if="availableTokens.length > 0"
               class="flex gap-2"
             >
               <RuiButton
@@ -422,10 +462,19 @@ onMounted(async () => {
                 {{ token.symbol }}
               </RuiButton>
             </div>
+            <div
+              v-else
+              class="text-rui-text-secondary"
+            >
+              {{ t('sponsor.sponsor_page.no_payment_tokens_available') }}
+            </div>
           </div>
 
           <!-- Tier Selection -->
-          <div class="space-y-4">
+          <div
+            v-if="availableTokens.length > 0"
+            class="space-y-4"
+          >
             <h6 class="font-bold">
               {{ t('sponsor.sponsor_page.select_tier') }}
             </h6>
@@ -474,23 +523,80 @@ onMounted(async () => {
                   </div>
                 </div>
               </RuiCard>
-              <div
-                v-if="visibleTiers.length === 0 && !isLoadingPaymentTokens"
-                class="text-center py-8 text-rui-text-secondary"
-              >
-                {{ t('sponsor.sponsor_page.no_tiers_available') }}
-              </div>
             </div>
           </div>
 
-          <!-- Mint Button -->
+          <!-- Mint/Approval Button -->
           <div class="pt-4">
             <div class="flex gap-1 overflow-hidden">
+              <!-- Approval Menu for when approval is needed -->
+              <RuiMenu
+                v-if="needsApproval && !isApproving"
+                v-model="showApprovalOptions"
+                :popper="{ placement: 'bottom' }"
+                class="w-full"
+                wrapper-class="w-full"
+              >
+                <template #activator="{ attrs }">
+                  <RuiButton
+                    color="primary"
+                    size="lg"
+                    class="w-full flex-1 [&_span]:!text-wrap"
+                    :disabled="isButtonDisabled"
+                    v-bind="attrs"
+                  >
+                    <template #prepend>
+                      <RuiIcon name="lu-shield-check" />
+                    </template>
+                    {{ t('sponsor.sponsor_page.buttons.approve', { currency: selectedCurrency }) }}
+                    <template #append>
+                      <RuiIcon
+                        name="lu-chevron-down"
+                        size="16"
+                      />
+                    </template>
+                  </RuiButton>
+                </template>
+                <template #default="{ width }">
+                  <div :style="{ width: `${width}px` }">
+                    <RuiButton
+                      variant="list"
+                      @click="handleApprove(APPROVAL_TYPE.UNLIMITED)"
+                    >
+                      {{ t('sponsor.sponsor_page.approval.unlimited_button') }}
+                    </RuiButton>
+                    <RuiButton
+                      variant="list"
+                      @click="handleApprove(APPROVAL_TYPE.EXACT)"
+                    >
+                      {{ t('sponsor.sponsor_page.approval.exact_button', {
+                        amount: getPriceForTier(selectedCurrency, selectedTier as TierKey),
+                        currency: selectedCurrency,
+                      }) }}
+                    </RuiButton>
+                  </div>
+                </template>
+              </RuiMenu>
+
+              <!-- Loading state while approving -->
               <RuiButton
+                v-if="isApproving"
                 color="primary"
                 size="lg"
                 class="w-full flex-1 [&_span]:!text-wrap"
-                :loading="sponsorshipState.status === 'pending' || isApproving"
+                :loading="true"
+                disabled
+              >
+                {{ t('sponsor.sponsor_page.buttons.approving') }}
+              </RuiButton>
+
+              <!-- Regular mint button -->
+              <RuiButton
+                v-if="!needsApproval && !isApproving"
+                color="primary"
+                size="lg"
+                class="w-full flex-1 [&_span]:!text-wrap"
+                :loading="sponsorshipState.status === 'pending'"
                 :disabled="isButtonDisabled"
                 @click="buttonAction()"
               >

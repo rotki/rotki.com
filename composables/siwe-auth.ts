@@ -8,6 +8,11 @@ interface SiweSession {
   expiresAt: number;
 }
 
+const SIWE_ERROR_KEYS = [
+  'Missing siwe cookie',
+  'SIWE expired',
+];
+
 export function useSiweAuth() {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { address, connected, signMessage: signMessageWeb3 } = useWeb3Connection();
@@ -134,7 +139,7 @@ export function useSiweAuth() {
     }
     catch (error: any) {
       // If we get 403 with missing cookie, force re-authentication and retry
-      if (error.statusCode === 403 && error.data?.detail?.includes('Missing siwe cookie')) {
+      if (error.statusCode === 403 && SIWE_ERROR_KEYS.some(item => error.data?.detail?.includes(item))) {
         logger.debug('Cookie expired on backend, forcing re-authentication');
 
         // Clear the session and try to authenticate again

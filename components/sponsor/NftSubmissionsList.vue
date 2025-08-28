@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import type { SimpleTokenMetadata } from '~/composables/rotki-sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
-import { get, set } from '@vueuse/shared';
 import NftSubmissionItem from '~/components/sponsor/NftSubmissionItem.vue';
-import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
 import { useLogger } from '~/utils/use-logger';
 
@@ -20,11 +17,8 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 const { submissions, isLoading: isLoadingSubmissions, error: submissionsError, fetchSubmissions } = useNftSubmissions();
 const { open: openWalletConnect } = useWeb3Connection();
-const { fetchNftMetadata } = useNftMetadata();
 
 const logger = useLogger();
-
-const nftMetadataCache = ref<Record<number, SimpleTokenMetadata>>({});
 
 async function loadSubmissions(): Promise<void> {
   if (!props.isConnected || !props.address) {
@@ -41,21 +35,6 @@ async function connectWallet(): Promise<void> {
     logger.error('Failed to connect wallet:', error);
   }
 }
-
-// Fetch NFT metadata for all submissions
-watch(submissions, async (newSubmissions) => {
-  for (const submission of newSubmissions) {
-    if (!get(nftMetadataCache)[submission.nftId]) {
-      const metadata = await fetchNftMetadata(submission.nftId);
-      if (metadata) {
-        set(nftMetadataCache, {
-          ...get(nftMetadataCache),
-          [submission.nftId]: metadata,
-        });
-      }
-    }
-  }
-});
 
 onMounted(() => {
   loadSubmissions();
@@ -148,7 +127,6 @@ onMounted(() => {
         v-for="submission in submissions"
         :key="submission.nftId"
         :submission="submission"
-        :nft-metadata="nftMetadataCache[submission.nftId]"
         @edit-submission="emit('edit-submission', $event)"
       />
     </div>
