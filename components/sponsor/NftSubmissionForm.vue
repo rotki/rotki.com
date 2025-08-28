@@ -300,6 +300,10 @@ async function checkExistingSubmission(nftId: number): Promise<void> {
       // Emit edit-submission event to trigger editing mode
       emit('edit-submission', submission);
     }
+    else {
+      // No existing submission, clear form for new submission
+      clearFormForNewSubmission();
+    }
   }
   catch (error: any) {
     // If authentication fails, it will be handled when they try to submit
@@ -357,10 +361,8 @@ async function checkNftMetadata(): Promise<void> {
           set(nftCheckError, t('sponsor.submit_name.error.not_owner'));
         }
         else {
-          // Check for existing submission if owner is valid and not already editing this NFT
-          if (!props.editingSubmission || props.editingSubmission.nftId !== Number(tokenIdValue)) {
-            await checkExistingSubmission(Number(tokenIdValue));
-          }
+          // Check for existing submission if owner is valid
+          await checkExistingSubmission(Number(tokenIdValue));
         }
       }
     }
@@ -377,8 +379,7 @@ async function checkNftMetadata(): Promise<void> {
   }
 }
 
-function handleCancelEdit() {
-  set(tokenId, '');
+function clearFormForNewSubmission(): void {
   set(existingSubmission, null);
   set(displayName, '');
   set(email, '');
@@ -386,7 +387,6 @@ function handleCancelEdit() {
   set(hasExistingImage, false);
   set(deleteImage, false);
   set(imageFile, null);
-  emit('cancel-edit');
 }
 
 const shouldDisableFields = computed(() => get(isSubmitting) || !get(isAuthenticated));
@@ -412,15 +412,20 @@ watch(tokenId, async (newTokenId, oldTokenId) => {
   set(isNftOwnerValid, false);
   set(hasCheckedNft, false);
 
+  // Clear the form if token ID is cleared
+  if (!newTokenId) {
+    clearFormForNewSubmission();
+    emit('cancel-edit');
+  }
   // Automatically check NFT metadata when a valid token ID is selected
-  if (newTokenId && newTokenId !== oldTokenId && Number.isInteger(Number(newTokenId)) && props.isConnected) {
+  else if (newTokenId !== oldTokenId && Number.isInteger(Number(newTokenId)) && props.isConnected) {
     await checkNftMetadata();
   }
 });
 
 // Load editing submission data
 watch(() => props.editingSubmission, (submission) => {
-  if (submission) {
+  if (submission && get(tokenId) !== submission.nftId.toString()) {
     set(tokenId, submission.nftId.toString());
     set(displayName, submission.displayName || '');
     set(email, submission.email || '');
@@ -441,14 +446,8 @@ watch(() => props.editingSubmission, (submission) => {
 
     // When editing, assume NFT ownership is valid (they already submitted it)
     set(isNftOwnerValid, true);
-    // Check NFT metadata for the loaded submission
-    checkNftMetadata();
-  }
-  else {
-    // Reset image states when not editing
-    set(imagePreview, '');
-    set(hasExistingImage, false);
-    set(deleteImage, false);
+    // Store existing submission
+    set(existingSubmission, submission);
   }
 }, { immediate: true });
 
@@ -487,46 +486,29 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
       class="flex flex-col gap-6"
       @submit.prevent="handleSubmit()"
     >
-      <div class="flex gap-3">
-        <RuiAutoComplete
-          v-model="tokenId"
-          :label="t('sponsor.submit_name.token_id_label')"
-          :hint="t('sponsor.submit_name.token_id_hint')"
-          :error-messages="toMessages(v$.tokenId)"
-          :disabled="shouldDisableFields || !!props.editingSubmission"
-          :options="nftIdOptions"
-          :loading="isCheckingNft"
-          key-attr="id"
-          text-attr="id"
-          clearable
-          custom-value
-          auto-select-first
-          variant="outlined"
-          color="primary"
-        >
-          <template #item="{ item }">
-            <ReuseNftIdOption :item="item" />
-          </template>
-          <template #selection="{ item }">
-            <ReuseNftIdOption :item="item" />
-          </template>
-        </RuiAutoComplete>
-
-        <div
-          v-if="editingSubmission"
-          class="mb-4 flex justify-end"
-        >
-          <RuiButton
-            variant="text"
-            color="secondary"
-            class="!h-14"
-            size="sm"
-            @click="handleCancelEdit()"
-          >
-            {{ t('sponsor.submit_name.cancel_edit') }}
-          </RuiButton>
-        </div>
-      </div>
+      <RuiAutoComplete
+        v-model="tokenId"
+        :label="t('sponsor.submit_name.token_id_label')"
+        :hint="t('sponsor.submit_name.token_id_hint')"
+        :error-messages="toMessages(v$.tokenId)"
+        :disabled="shouldDisableFields"
+        :options="nftIdOptions"
+        :loading="isCheckingNft"
+        key-attr="id"
+        text-attr="id"
+        clearable
+        custom-value
+        auto-select-first
+        variant="outlined"
+        color="primary"
+      >
+        <template #item="{ item }">
+          <ReuseNftIdOption :item="item" />
+        </template>
+        <template #selection="{ item }">
+          <ReuseNftIdOption :item="item" />
+        </template>
+      </RuiAutoComplete>
 
       <RuiAlert
         v-if="nftCheckError"

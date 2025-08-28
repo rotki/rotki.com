@@ -545,9 +545,6 @@ onMounted(async () => {
                     :disabled="isButtonDisabled"
                     v-bind="attrs"
                   >
-                    <template #prepend>
-                      <RuiIcon name="lu-shield-check" />
-                    </template>
                     {{ t('sponsor.sponsor_page.buttons.approve', { currency: selectedCurrency }) }}
                     <template #append>
                       <RuiIcon
