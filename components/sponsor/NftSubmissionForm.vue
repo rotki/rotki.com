@@ -4,7 +4,6 @@ import type { NftSubmission } from '~/types/sponsor';
 import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
-import ExistingSubmissionDialog from '~/components/sponsor/ExistingSubmissionDialog.vue';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
@@ -52,7 +51,6 @@ const nftOwner = ref<string>('');
 const isNftOwnerValid = ref<boolean>(false);
 const hasCheckedNft = ref<boolean>(false);
 const existingSubmission = ref<NftSubmission | null>(null);
-const showExistingSubmissionDialog = ref<boolean>(false);
 const isCheckingExistingSubmission = ref<boolean>(false);
 
 const { currentAddressNfts } = useRotkiSponsorshipPayment();
@@ -82,13 +80,18 @@ const nftIdOptions = computed<StoredNft[]>(() => {
       nfts.push({
         address: props.address?.toLowerCase() || '',
         id: editingId,
-        releaseId: props.editingSubmission.releaseId ?? 1,
+        releaseId: currentReleaseId || 1,
         tier: -1, // Unknown tier for external NFTs
       });
     }
   }
 
-  return nfts.sort((a, b) => Number(a.id) - Number(b.id));
+  // Filter unique NFTs by ID
+  const uniqueNfts = nfts.filter((nft, index, self) =>
+    index === self.findIndex(n => n.id === nft.id),
+  );
+
+  return uniqueNfts.sort((a, b) => Number(a.id) - Number(b.id)).map(item => ({ ...item, id: item.id.toString() }));
 });
 
 // Custom validators
@@ -119,14 +122,14 @@ const validImageType = helpers.withMessage(
 
 const atLeastOneRequired = helpers.withMessage(
   () => t('sponsor.submit_name.error.at_least_one_required'),
-  () => get(displayName).trim().length > 0 || get(imageFile) !== null,
+  () => get(displayName).trim().length > 0 || get(imageFile) !== null || get(email).trim().length > 0,
 );
 
 // Validation rules
 const rules = computed(() => ({
   displayName: {
     minLength: get(displayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_short'), minLength(3)) : {},
-    maxLength: helpers.withMessage(() => t('sponsor.submit_name.error.too_long'), maxLength(30)),
+    maxLength: get(displayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_long'), maxLength(30)) : {},
     validNameChars,
   },
   imageFile: {
@@ -273,8 +276,29 @@ async function checkExistingSubmission(nftId: number): Promise<void> {
     const submission = await checkSubmissionByNftId(props.address, nftId);
 
     if (submission) {
+      // Directly populate the form fields with existing submission data
+      set(displayName, submission.displayName || '');
+      set(email, submission.email || '');
+
+      // Load existing image if available
+      if (submission.imageUrl) {
+        set(imagePreview, submission.imageUrl);
+        set(hasExistingImage, true);
+      }
+      else {
+        set(imagePreview, '');
+        set(hasExistingImage, false);
+      }
+
+      // Reset file and delete flag
+      set(imageFile, null);
+      set(deleteImage, false);
+
+      // Store the existing submission for tracking
       set(existingSubmission, submission);
-      set(showExistingSubmissionDialog, true);
+
+      // Emit edit-submission event to trigger editing mode
+      emit('edit-submission', submission);
     }
   }
   catch (error: any) {
@@ -314,6 +338,16 @@ async function checkNftMetadata(): Promise<void> {
       set(nftReleaseName, metadata.releaseName || '');
       set(nftOwner, metadata.owner || '');
 
+      // Check if NFT's releaseId matches current releaseId
+      const currentReleaseId = get(sponsorshipData)?.releaseId;
+      if (currentReleaseId !== undefined && metadata.releaseId !== currentReleaseId) {
+        // Store the release names for use in the template
+        set(nftCheckError, 'wrong_release');
+        set(nftReleaseName, metadata.releaseName || `Release ${metadata.releaseId}`);
+        set(isNftOwnerValid, false);
+        return;
+      }
+
       // Check if the NFT is owned by the connected address
       if (metadata.owner && props.address) {
         const isOwner = metadata.owner.toLowerCase() === props.address.toLowerCase();
@@ -343,16 +377,16 @@ async function checkNftMetadata(): Promise<void> {
   }
 }
 
-function handleEdit() {
-  const submission = get(existingSubmission);
-  if (submission) {
-    emit('edit-submission', submission);
-  }
-}
-
 function handleCancelEdit() {
-  set(showExistingSubmissionDialog, false);
   set(tokenId, '');
+  set(existingSubmission, null);
+  set(displayName, '');
+  set(email, '');
+  set(imagePreview, '');
+  set(hasExistingImage, false);
+  set(deleteImage, false);
+  set(imageFile, null);
+  emit('cancel-edit');
 }
 
 const shouldDisableFields = computed(() => get(isSubmitting) || !get(isAuthenticated));
@@ -427,51 +461,92 @@ onMounted(() => {
     checkNftMetadata();
   }
 });
+
+const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
+  item: StoredNft;
+}>();
 </script>
 
 <template>
+  <DefineNftIdOption #default="{ item }">
+    <div class="flex items-center gap-2">
+      <div>
+        {{ item.id }}
+      </div>
+      <div
+        v-if="findTierById(item.tier)"
+        :class="getTierClasses(findTierById(item.tier)?.key)"
+        class="rounded-md px-2 py-0.5 text-xs"
+      >
+        {{ findTierById(item.tier)?.label }}
+      </div>
+    </div>
+  </DefineNftIdOption>
   <RuiCard class="!p-4">
     <form
       class="flex flex-col gap-6"
       @submit.prevent="handleSubmit()"
     >
-      <RuiAutoComplete
-        v-model="tokenId"
-        :label="t('sponsor.submit_name.token_id_label')"
-        :hint="t('sponsor.submit_name.token_id_hint')"
-        :error-messages="toMessages(v$.tokenId)"
-        :disabled="shouldDisableFields || !!props.editingSubmission"
-        :options="nftIdOptions"
-        :loading="isCheckingNft"
-        key-attr="id"
-        text-attr="id"
-        clearable
-        custom-value
-        auto-select-first
-        variant="outlined"
-        color="primary"
-      >
-        <template #item="{ item }">
-          <div class="flex items-center justify-between w-full gap-2">
-            <div>
-              {{ item.id }}
-            </div>
-            <div
-              v-if="findTierById(item.tier)"
-              :class="getTierClasses(findTierById(item.tier)?.key)"
-              class="rounded-md px-2"
-            >
-              {{ findTierById(item.tier)?.label }}
-            </div>
-          </div>
-        </template>
-      </RuiAutoComplete>
+      <div class="flex gap-3">
+        <RuiAutoComplete
+          v-model="tokenId"
+          :label="t('sponsor.submit_name.token_id_label')"
+          :hint="t('sponsor.submit_name.token_id_hint')"
+          :error-messages="toMessages(v$.tokenId)"
+          :disabled="shouldDisableFields || !!props.editingSubmission"
+          :options="nftIdOptions"
+          :loading="isCheckingNft"
+          key-attr="id"
+          text-attr="id"
+          clearable
+          custom-value
+          auto-select-first
+          variant="outlined"
+          color="primary"
+        >
+          <template #item="{ item }">
+            <ReuseNftIdOption :item="item" />
+          </template>
+          <template #selection="{ item }">
+            <ReuseNftIdOption :item="item" />
+          </template>
+        </RuiAutoComplete>
+
+        <div
+          v-if="editingSubmission"
+          class="mb-4 flex justify-end"
+        >
+          <RuiButton
+            variant="text"
+            color="secondary"
+            class="!h-14"
+            size="sm"
+            @click="handleCancelEdit()"
+          >
+            {{ t('sponsor.submit_name.cancel_edit') }}
+          </RuiButton>
+        </div>
+      </div>
 
       <RuiAlert
         v-if="nftCheckError"
         type="error"
       >
-        {{ nftCheckError }}
+        <i18n-t
+          v-if="nftCheckError === 'wrong_release'"
+          keypath="sponsor.submit_name.error.wrong_release"
+          tag="span"
+        >
+          <template #nftRelease>
+            <strong>{{ nftReleaseName }}</strong>
+          </template>
+          <template #currentRelease>
+            <strong>{{ sponsorshipData?.releaseName || `Release ${sponsorshipData?.releaseId}` }}</strong>
+          </template>
+        </i18n-t>
+        <template v-else>
+          {{ nftCheckError }}
+        </template>
       </RuiAlert>
       <RuiAlert
         v-else-if="nftTier"
@@ -597,7 +672,7 @@ onMounted(() => {
           :loading="isSubmitting || isAuthenticating"
           :disabled="!isAuthenticated || v$.$invalid || (hasCheckedNft && !isNftOwnerValid)"
         >
-          {{ editingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
+          {{ editingSubmission || existingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>
         <p
           v-if="!isAuthenticated"
@@ -615,7 +690,7 @@ onMounted(() => {
           class="w-full"
           disabled
         >
-          {{ editingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
+          {{ editingSubmission || existingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>
         <p class="mt-2 text-sm text-rui-text-secondary">
           {{ t('sponsor.submit_name.connect_to_submit') }}
@@ -637,12 +712,4 @@ onMounted(() => {
       </RuiAlert>
     </form>
   </RuiCard>
-
-  <!-- Existing Submission Dialog -->
-  <ExistingSubmissionDialog
-    v-model="showExistingSubmissionDialog"
-    :submission="existingSubmission"
-    @edit="handleEdit()"
-    @cancel="handleCancelEdit()"
-  />
 </template>

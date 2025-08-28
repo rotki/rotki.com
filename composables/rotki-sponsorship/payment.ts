@@ -15,11 +15,16 @@ import { ERC20_ABI, ETH_ADDRESS, ROTKI_SPONSORSHIP_ABI } from './constants';
 
 const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
-async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer): Promise<TransactionResponse> {
+async function approveTokenContract(tokenAddress: string, amount: string, decimals: number, signer: Signer, unlimited = true): Promise<TransactionResponse> {
   const { CONTRACT_ADDRESS } = useNftConfig();
   const tokenContract = new Contract(tokenAddress, ERC20_ABI, signer);
-  const amountBN = ethers.parseUnits(amount, decimals);
-  return tokenContract.approve(get(CONTRACT_ADDRESS), amountBN);
+
+  // Use max uint256 for unlimited allowance or parse the specific amount
+  const approvalAmount = unlimited
+    ? ethers.MaxUint256
+    : ethers.parseUnits(amount, decimals);
+
+  return tokenContract.approve(get(CONTRACT_ADDRESS), approvalAmount);
 }
 
 async function checkTokenAllowanceContract(tokenAddress: string, decimals: number, signer: Signer): Promise<string> {
@@ -296,8 +301,6 @@ export function useRotkiSponsorshipPayment() {
             }]);
           }
         }
-
-        // Supply data will be refreshed on next mint call
       }
       else {
         throw new Error('Transaction failed');
@@ -316,14 +319,14 @@ export function useRotkiSponsorshipPayment() {
     }
   }
 
-  async function approveToken(currency: string, amount: string) {
+  async function approveToken(currency: string, amount: string, unlimited = true) {
     const token = get(getTokenBySymbol)(currency);
     if (!token || token.address === ETH_ADDRESS) {
       throw new Error('Cannot approve ETH or invalid token');
     }
 
     const signer = await getSigner();
-    return approveTokenContract(token.address, amount, token.decimals, signer);
+    return approveTokenContract(token.address, amount, token.decimals, signer, unlimited);
   }
 
   async function checkTokenAllowance(currency: string) {
