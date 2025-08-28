@@ -2,7 +2,6 @@
 import type { NftSubmission } from '~/types/sponsor';
 import { get } from '@vueuse/shared';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship';
-import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { formatDate } from '~/utils/date';
 
 defineProps<{
@@ -23,32 +22,7 @@ const currentReleaseName = computed(() => get(sponsorshipData)?.releaseName);
   <div class="border border-rui-grey-300 dark:border-rui-grey-700 rounded-lg p-3">
     <div class="flex items-start justify-between">
       <div class="flex-1">
-        <div class="flex items-center gap-2 mb-2">
-          <RuiChip
-            variant="outlined"
-            size="sm"
-          >
-            NFT #{{ submission.nftId }}
-          </RuiChip>
-          <RuiChip
-            v-if="isDefined(submission.tierId)"
-            size="sm"
-            variant="outlined"
-            :class="getTierClasses(findTierById(submission.tierId)?.key)"
-          >
-            <span class="mr-1">
-              {{ getTierMedal(findTierById(submission.tierId)?.key) }}
-            </span>
-            <span class="uppercase font-medium mr-1">{{ t('sponsor.submit_name.tier_info', { tier: findTierById(submission.tierId)?.label }) }}</span>
-            <span v-if="submission?.releaseVersion">
-              <i18n-t keypath="sponsor.submit_name.tier_in_release">
-                <template #release>
-                  <span class="font-medium">{{ submission.releaseVersion }}</span>
-                </template>
-              </i18n-t>
-            </span>
-          </RuiChip>
-        </div>
+        <NftSubmissionItemChips :submission="submission" />
         <img
           v-if="submission.imageUrl"
           :src="submission.imageUrl"

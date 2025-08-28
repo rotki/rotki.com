@@ -30,12 +30,16 @@ definePageMeta({
   layout: 'sponsor',
 });
 
+const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
+
+type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
+
 const logger = useLogger();
 
 const selectedTier = ref<string>('bronze');
 const isApproving = ref<boolean>(false);
 const tokenAllowance = ref<string>('0');
-const approvalType = ref<'unlimited' | 'exact'>('unlimited');
+const approvalType = ref<ApprovalType>(APPROVAL_TYPE.UNLIMITED);
 const showApprovalOptions = ref<boolean>(false);
 const showSuccessDialog = ref(false);
 
@@ -93,7 +97,8 @@ const releaseId = computed(() => get(sponsorshipData)?.releaseId);
 const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
 const error = computed(() => get(sponsorshipData)?.error);
 
-async function handleApprove() {
+async function handleApprove(selectedApprovalType: ApprovalType) {
+  set(approvalType, selectedApprovalType);
   try {
     set(isApproving, true);
     const tierKey = get(selectedTier);
@@ -112,7 +117,7 @@ async function handleApprove() {
     if (!price)
       return;
 
-    const isUnlimited = get(approvalType) === 'unlimited';
+    const isUnlimited = get(approvalType) === APPROVAL_TYPE.UNLIMITED;
     const tx = await approveToken(currency, price, isUnlimited);
     await tx.wait();
 
@@ -125,6 +130,7 @@ async function handleApprove() {
   }
   finally {
     set(isApproving, false);
+    set(showApprovalOptions, false);
   }
 }
 
@@ -530,13 +536,13 @@ onMounted(async () => {
                   <div :style="{ width: `${width}px` }">
                     <RuiButton
                       variant="list"
-                      @click="approvalType = 'unlimited'; handleApprove(); showApprovalOptions = false"
+                      @click="handleApprove(APPROVAL_TYPE.UNLIMITED)"
                     >
                       {{ t('sponsor.sponsor_page.approval.unlimited_button') }}
                     </RuiButton>
                     <RuiButton
                       variant="list"
-                      @click="approvalType = 'exact'; handleApprove(); showApprovalOptions = false"
+                      @click="handleApprove(APPROVAL_TYPE.EXACT)"
                     >
                       {{ t('sponsor.sponsor_page.approval.exact_button', {
                         amount: getPriceForTier(selectedCurrency, selectedTier as TierKey),
