@@ -25,6 +25,7 @@ useHead({
 
 definePageMeta({
   layout: 'sponsor',
+  middleware: 'sponsorship',
 });
 
 const logger = useLogger();

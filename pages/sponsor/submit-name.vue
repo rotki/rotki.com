@@ -6,6 +6,7 @@ import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submi
 
 definePageMeta({
   layout: 'sponsor',
+  middleware: 'sponsorship',
 });
 
 const { t } = useI18n({ useScope: 'global' });

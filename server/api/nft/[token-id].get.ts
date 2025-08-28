@@ -146,6 +146,15 @@ const fetchCachedTokenData = createCachedFunction(fetchTokenData, tokenDataCache
 
 export default defineEventHandler(async (event): Promise<TokenMetadata> => {
   try {
+    // Check if sponsorship feature is enabled
+    const { public: { sponsorshipEnabled } } = useRuntimeConfig();
+    if (!sponsorshipEnabled) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Not Found',
+      });
+    }
+
     // Validate parameters
     const params = await getValidatedRouterParams(event, data => paramsSchema.parse(data));
     const tokenId = params['token-id'];
