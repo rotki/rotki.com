@@ -25,7 +25,7 @@ export const ERC20_ABI = [
 export const CHAIN_CONFIGS = {
   ethereum: {
     chainId: 1,
-    rpcUrl: 'https://ethereum.gateway.tenderly.co',
+    rpcUrl: 'https://eth.merkle.io',
   },
   sepolia: {
     chainId: 11155111,
