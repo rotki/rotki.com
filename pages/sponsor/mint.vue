@@ -43,6 +43,7 @@ const tokenAllowance = ref<string>('0');
 const approvalType = ref<ApprovalType>(APPROVAL_TYPE.UNLIMITED);
 const showApprovalOptions = ref<boolean>(false);
 const showSuccessDialog = ref(false);
+const showExampleSponsors = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -64,12 +65,14 @@ const tierContent = computed(() => {
   if (!tiers)
     return {};
 
-  return tiers.reduce((acc, item) => {
-    acc[item.tier] = {
+  const result: Record<string, { benefits: string; example: string[] }> = {};
+  for (const item of tiers) {
+    result[item.tier] = {
       benefits: item.benefits,
+      example: item.example || [],
     };
-    return acc;
-  }, {} as Record<string, { benefits: string }>);
+  }
+  return result;
 });
 
 const {
@@ -643,6 +646,40 @@ onMounted(async () => {
               <p class="font-medium mt-1">
                 {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: tierContent[selectedTier].benefits }) }}
               </p>
+
+              <!-- Example Sponsor Images -->
+              <div
+                v-if="tierContent[selectedTier].example && tierContent[selectedTier].example.length > 0"
+                class="mt-4"
+              >
+                <RuiButton
+                  variant="text"
+                  size="sm"
+                  color="primary"
+                  class="!p-0 font-medium text-rui-text hover:text-rui-primary"
+                  @click="showExampleSponsors = !showExampleSponsors"
+                >
+                  <template #append>
+                    <RuiIcon
+                      :name="showExampleSponsors ? 'lu-chevron-down' : 'lu-chevron-right'"
+                      size="16"
+                    />
+                  </template>
+                  {{ t('sponsor.sponsor_page.benefits.see_examples') }}
+                </RuiButton>
+                <div
+                  v-if="showExampleSponsors"
+                  class="flex flex-wrap gap-2 mt-2"
+                >
+                  <img
+                    v-for="(imageUrl, index) in tierContent[selectedTier].example"
+                    :key="index"
+                    :src="imageUrl"
+                    :alt="`Sponsor example ${index + 1}`"
+                    class="w-full rounded-md object-cover"
+                  />
+                </div>
+              </div>
             </div>
             <div
               v-else

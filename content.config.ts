@@ -49,6 +49,7 @@ const testimonialSchema = z.object({
 const sponsorshipTierSchema = z.object({
   benefits: z.string(),
   description: z.string(),
+  example: z.array(z.string()).optional(),
   tier: z.enum(['bronze', 'silver', 'gold']),
 });
 
