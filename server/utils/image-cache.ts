@@ -34,7 +34,7 @@ export async function streamImageWithCache(
   // Try to get cached metadata
   const cachedMetadata = await storage.getItem<ImageMetadata>(metadataKey);
 
-  if (cachedMetadata) {
+  if (cachedMetadata && cachedMetadata.contentLength && cachedMetadata.contentType && cachedMetadata.totalChunks) {
     logger.debug(`Cache hit for ${url}`);
 
     // Set response headers from cached metadata
