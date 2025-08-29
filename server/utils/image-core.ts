@@ -155,7 +155,7 @@ export async function warmImageCache(imageUrls: string[], options: { maxConcurre
     }
   }
 
-  logger.info(`Image cache warming completed: ${results.filter(r => r.cached).length}/${imageUrls.length} successful`);
+  logger.info(`Image cache updating completed: ${results.filter(r => r.cached).length}/${imageUrls.length} successful`);
   return results;
 }
 

@@ -145,6 +145,13 @@ export default defineNuxtConfig({
         target: proxy.target,
       },
     },
+    experimental: {
+      tasks: true,
+    },
+    scheduledTasks: {
+      // Run `ntf:cache` task every 5 minutes
+      '*/5 * * * *': ['nft:cache'],
+    },
   },
 
   robots: {
