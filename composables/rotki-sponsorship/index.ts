@@ -1,7 +1,6 @@
 import { get, set } from '@vueuse/shared';
 import { useLogger } from '~/utils/use-logger';
-import { loadNFTImagesAndSupplySSR } from './metadata-ssr';
-import { SPONSORSHIP_TIERS, type TierBenefits, type TierSupply } from './types';
+import { SPONSORSHIP_TIERS, type TierBenefits, type TierInfoResult, type TierSupply } from './types';
 import { isTierAvailable as isTierAvailableUtil } from './utils';
 
 /**
@@ -26,16 +25,49 @@ export function useRotkiSponsorshipSSR() {
     set(error, undefined);
 
     try {
-      // Load tier data from server API (includes images, supply, benefits)
-      const { benefits, images, releaseId: fetchedReleaseId, releaseName: fetchedReleaseName, supplies } = await loadNFTImagesAndSupplySSR(SPONSORSHIP_TIERS, forceRefresh);
+      // Load tier data from the tier-info API endpoint
+      const tierIds = SPONSORSHIP_TIERS.map(t => t.tierId).join(',');
+      const params: Record<string, string> = { tierIds };
+
+      if (forceRefresh) {
+        params.skipCache = 'true';
+      }
+
+      const response = await $fetch<{ tiers: Record<number, TierInfoResult | undefined>; releaseId: number }>('/api/nft/tier-info', {
+        params,
+      });
+
+      const images: Record<string, string> = {};
+      const supplies: Record<string, TierSupply> = {};
+      const benefits: Record<string, TierBenefits> = {};
+      let fetchedReleaseName = '';
+
+      // Process the results
+      for (const tier of SPONSORSHIP_TIERS) {
+        const tierInfo = response.tiers[tier.tierId];
+        if (tierInfo) {
+          images[tier.key] = tierInfo.imageUrl;
+          supplies[tier.key] = {
+            currentSupply: tierInfo.currentSupply,
+            maxSupply: tierInfo.maxSupply,
+            metadataURI: tierInfo.metadataURI,
+          };
+          benefits[tier.key] = {
+            benefits: tierInfo.benefits,
+          };
+          if (tierInfo.releaseName && !fetchedReleaseName) {
+            fetchedReleaseName = tierInfo.releaseName;
+          }
+        }
+      }
 
       set(nftImages, images);
       set(tierSupply, supplies);
       set(tierBenefits, benefits);
       set(releaseName, fetchedReleaseName);
-      set(releaseId, fetchedReleaseId);
+      set(releaseId, response.releaseId);
 
-      logger.info('Successfully loaded all tier data via SSR');
+      logger.info('Successfully loaded all tier data via API');
     }
     catch (error_) {
       const errorMessage = 'Failed to load tier data';

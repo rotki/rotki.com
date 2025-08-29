@@ -1,11 +1,7 @@
 import { z } from 'zod';
-import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
-import { CACHE_TTL } from '~/server/utils/cache';
-import { createImageCacheKey } from '~/server/utils/cache-keys';
-import { getCacheService } from '~/server/utils/cache-service';
 import { handleApiError } from '~/server/utils/errors';
-import { handleConditionalRequest, invalidateImageCache, streamImageWithCache } from '~/server/utils/image-cache';
-import { deduplicatedFetch } from '~/server/utils/request-dedup';
+import { handleConditionalRequest } from '~/server/utils/image-cache';
+import { getCachedImageMetadata, streamImageWithCacheWrapper } from '~/server/utils/image-core';
 import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('nft-image-proxy');
@@ -38,39 +34,20 @@ export default defineEventHandler(async (event) => {
     const query = await getValidatedQuery(event, data => querySchema.parse(data));
     const { skipCache, url } = query;
 
-    // Normalize the URL
-    const normalizedUrl = normalizeIpfsUrl(url);
-
-    // Create cache key
-    const cacheKey = createImageCacheKey(url);
-
-    // Check for cache invalidation request
-    if (skipCache) {
-      await invalidateImageCache(cacheKey);
-      logger.info(`Cache invalidated for: ${url}`);
-    }
-
     // Check conditional request headers for cached metadata
-    const storage = getCacheService();
-    const metadataKey = `${cacheKey}:metadata`;
-    const cachedMetadata = await storage.getItem<any>(metadataKey);
+    const cachedMetadata = await getCachedImageMetadata(url);
 
     if (cachedMetadata && handleConditionalRequest(event, cachedMetadata.etag, cachedMetadata.lastModified)) {
       return null; // 304 response already sent
     }
 
-    logger.debug(`Processing image request: ${normalizedUrl}`, {
-      invalidate: !!skipCache,
-    });
+    const shouldSkipCache = !!skipCache;
+    logger.debug(`Processing image request: ${url} invalidated: ${shouldSkipCache}`);
 
-    // Use request deduplication to prevent multiple concurrent fetches
-    await deduplicatedFetch(cacheKey, async () => {
-      // Stream and cache the image
-      await streamImageWithCache(event, normalizedUrl, cacheKey, CACHE_TTL.IMAGE);
-      return true;
-    });
+    // Use the image core wrapper to handle streaming and caching
+    await streamImageWithCacheWrapper(event, url, shouldSkipCache);
 
-    logger.debug(`Successfully processed image: ${normalizedUrl}`);
+    logger.debug(`Successfully processed image: ${url}`);
   }
   catch (error) {
     // Set cache headers for error responses to prevent caching errors
