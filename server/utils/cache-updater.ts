@@ -3,9 +3,9 @@ import { warmImageCache } from '~/server/utils/image-core';
 import { fetchCachedSingleTierInfo, getCurrentReleaseId, getNftConfig } from '~/server/utils/nft-core';
 import { useLogger } from '~/utils/use-logger';
 
-const logger = useLogger('nft-cache-warmer');
+const logger = useLogger('nft-cache-updater');
 
-export interface CacheWarmingResult {
+export interface CacheUpdateResult {
   images: Record<string, string>;
   supplies: Record<string, { currentSupply: number; maxSupply: number; metadataURI: string }>;
   benefits: Record<string, { benefits: string }>;
@@ -16,10 +16,10 @@ export interface CacheWarmingResult {
 }
 
 /**
- * Warm NFT cache by directly calling server functions instead of making HTTP requests
+ * Update NFT cache by directly calling server functions instead of making HTTP requests
  */
-export async function warmNftCacheDirect(): Promise<CacheWarmingResult> {
-  const result: CacheWarmingResult = {
+export async function updateNftCacheDirect(): Promise<CacheUpdateResult> {
+  const result: CacheUpdateResult = {
     benefits: {},
     errors: [],
     images: {},
@@ -88,7 +88,7 @@ export async function warmNftCacheDirect(): Promise<CacheWarmingResult> {
     return result;
   }
   catch (error) {
-    const errorMsg = `Cache warming failed: ${error instanceof Error ? error.message : String(error)}`;
+    const errorMsg = `Cache updating failed: ${error instanceof Error ? error.message : String(error)}`;
     logger.error(errorMsg);
     result.errors.push(errorMsg);
     result.success = false;
@@ -97,10 +97,10 @@ export async function warmNftCacheDirect(): Promise<CacheWarmingResult> {
 }
 
 /**
- * Warm image cache by directly caching images without HTTP requests
+ * Update image cache by directly caching images without HTTP requests
  */
-export async function warmImageCacheDirect(cacheResult: CacheWarmingResult): Promise<{ success: number; failed: number }> {
-  logger.info('Starting image cache warming');
+export async function updateImageCacheDirect(cacheResult: CacheUpdateResult): Promise<{ success: number; failed: number }> {
+  logger.info('Starting image cache updating');
 
   // Extract image URLs from the cache result
   const imageUrls: string[] = [];
@@ -121,11 +121,11 @@ export async function warmImageCacheDirect(cacheResult: CacheWarmingResult): Pro
   }
 
   if (imageUrls.length === 0) {
-    logger.warn('[Cache Warmer] No image URLs found to warm');
+    logger.warn('[Cache Updater] No image URLs found to update');
     return { failed: 0, success: 0 };
   }
 
-  // Warm images using the direct caching function
+  // Update images using the direct caching function
   const imageResults = await warmImageCache(imageUrls, {
     maxConcurrency: 3, // Be gentle on IPFS gateways
     skipCache: false, // Don't skip cache since we want to populate it
@@ -134,22 +134,22 @@ export async function warmImageCacheDirect(cacheResult: CacheWarmingResult): Pro
   const successful = imageResults.filter(r => r.cached).length;
   const failed = imageResults.filter(r => !r.cached).length;
 
-  logger.info(`Image cache warming complete: ${successful}/${imageUrls.length} successful, ${failed} failed`);
+  logger.info(`Image cache updating complete: ${successful}/${imageUrls.length} successful, ${failed} failed`);
 
   return { failed, success: successful };
 }
 
 /**
- * Complete cache warming process - tiers and images
+ * Complete cache updating process - tiers and images
  */
-export async function performCompleteCacheWarming(): Promise<{
-  tierCaching: CacheWarmingResult;
+export async function performCompleteCacheUpdate(): Promise<{
+  tierCaching: CacheUpdateResult;
   imageCaching: { success: number; failed: number };
 }> {
-  logger.info('Starting complete cache warming process');
+  logger.info('Starting complete cache updating process');
 
-  // First, warm the tier data cache
-  const tierResult = await warmNftCacheDirect();
+  // First, update the tier data cache
+  const tierResult = await updateNftCacheDirect();
 
   if (!tierResult.success) {
     logger.error('Tier caching failed, skipping image caching');
@@ -161,10 +161,10 @@ export async function performCompleteCacheWarming(): Promise<{
 
   logger.success(`Tier caching completed successfully for ${Object.keys(tierResult.supplies).length} tiers`);
 
-  // Then warm the image cache using the results from tier caching
-  const imageResult = await warmImageCacheDirect(tierResult);
+  // Then update the image cache using the results from tier caching
+  const imageResult = await updateImageCacheDirect(tierResult);
 
-  logger.success(`Complete cache warming finished: ${Object.keys(tierResult.supplies).length} tiers, ${imageResult.success} images`);
+  logger.success(`Complete cache updating finished: ${Object.keys(tierResult.supplies).length} tiers, ${imageResult.success} images`);
 
   return {
     imageCaching: imageResult,
