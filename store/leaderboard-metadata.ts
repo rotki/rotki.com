@@ -1,5 +1,4 @@
 import { get, set } from '@vueuse/shared';
-import { computed, ref } from 'vue';
 import { z } from 'zod';
 import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
@@ -18,11 +17,13 @@ interface ChainConfig {
   rpcUrl: string;
 }
 
-const metadata = ref<LeaderboardMetadata>();
-const loading = ref<boolean>(false);
-const error = ref<Error>();
+export const useLeaderboardMetadataStore = defineStore('leaderboard-metadata', () => {
+  // State
+  const metadata = ref<LeaderboardMetadata>();
+  const loading = ref<boolean>(false);
+  const error = ref<Error>();
 
-export function useLeaderboardMetadata() {
+  // Getters
   const contractAddress = computed<string | undefined>(() => get(metadata)?.contractAddress);
   const lastUpdated = computed<string | null | undefined>(() => get(metadata)?.lastUpdated);
   const chain = computed<'sepolia' | 'ethereum' | undefined>(() => get(metadata)?.chain);
@@ -37,9 +38,10 @@ export function useLeaderboardMetadata() {
   const chainId = computed<number | undefined>(() => get(chainConfig)?.chainId);
   const rpcUrl = computed<string | undefined>(() => get(chainConfig)?.rpcUrl);
 
-  const logger = useLogger('use-leaderboard-metadata');
+  const logger = useLogger('leaderboard-metadata-store');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
+  // Actions
   async function fetchMetadata(): Promise<void> {
     try {
       set(loading, true);
@@ -62,15 +64,17 @@ export function useLeaderboardMetadata() {
   }
 
   return {
-    chain,
+    // State
+    chain: readonly(chain),
     chainConfig: readonly(chainConfig),
     chainId: readonly(chainId),
     contractAddress: readonly(contractAddress),
     error: readonly(error),
+    // Actions
     fetchMetadata,
     lastUpdated: readonly(lastUpdated),
     loading: readonly(loading),
     metadata: readonly(metadata),
     rpcUrl: readonly(rpcUrl),
   };
-}
+});

@@ -1,11 +1,11 @@
 import { get } from '@vueuse/shared';
 import { computed } from 'vue';
-import { useLeaderboardMetadata } from '~/composables/rotki-sponsorship/use-leaderboard-metadata';
+import { useLeaderboardMetadataStore } from '~/store/leaderboard-metadata';
 import { CHAIN_CONFIGS, FALLBACK_CHAIN, FALLBACK_CONTRACT_ADDRESS } from './constants';
 
 // For client-side usage (composables)
 export function useNftConfig() {
-  const { chainId, contractAddress, rpcUrl } = useLeaderboardMetadata();
+  const { chainId, contractAddress, rpcUrl } = storeToRefs(useLeaderboardMetadataStore());
 
   return {
     CHAIN_ID: computed<number>(() => get(chainId) || CHAIN_CONFIGS[FALLBACK_CHAIN].chainId),
