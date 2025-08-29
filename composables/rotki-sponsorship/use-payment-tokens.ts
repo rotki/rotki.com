@@ -11,23 +11,8 @@ export function usePaymentTokens() {
   const logger = useLogger('payment-tokens');
 
   function formatPrice(price: string): string {
-    // Remove unnecessary trailing zeros after decimal point
     const num = parseFloat(price);
-    if (isNaN(num))
-      return price;
-
-    // Convert to string
-    let formatted = num.toString();
-
-    // Remove trailing zeros after decimal point
-    formatted = formatted.replace(/\.?0+$/, '');
-
-    // If it's a whole number, add .0 to maintain decimal format
-    if (!formatted.includes('.')) {
-      formatted += '.0';
-    }
-
-    return formatted;
+    return num.toString();
   }
 
   async function fetchPaymentTokens(): Promise<void> {
