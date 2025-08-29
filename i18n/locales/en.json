@@ -989,7 +989,8 @@
       "benefits": {
         "title": "What you get:",
         "benefits_label": "Perks: {benefits}",
-        "tier_sponsorship": "{tier} tier sponsorship for rotki release {releaseName}."
+        "tier_sponsorship": "{tier} tier sponsorship for rotki release {releaseName}.",
+        "see_examples": "See how it looks like"
       },
       "error": {
         "minting_failed": "Minting Failed"
