@@ -2,8 +2,8 @@
 import { get, set } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
-import { useLeaderboardMetadata } from '~/composables/rotki-sponsorship/use-leaderboard-metadata';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useLeaderboardMetadataStore } from '~/store/leaderboard-metadata';
 import { formatDate } from '~/utils/date';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { useLogger } from '~/utils/use-logger';
@@ -57,7 +57,9 @@ const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
 
 // Leaderboard metadata
-const { lastUpdated, fetchMetadata } = useLeaderboardMetadata();
+const leaderboardStore = useLeaderboardMetadataStore();
+const { fetchMetadata } = leaderboardStore;
+const { lastUpdated } = storeToRefs(leaderboardStore);
 
 // Breakpoint detection
 const { isMdAndDown } = useBreakpoint();

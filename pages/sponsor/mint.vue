@@ -4,9 +4,9 @@ import { useSponsorshipData } from '~/composables/rotki-sponsorship';
 import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
-import { useLeaderboardMetadata } from '~/composables/rotki-sponsorship/use-leaderboard-metadata';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useLeaderboardMetadataStore } from '~/store/leaderboard-metadata';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { getTierClasses } from '~/utils/nft-tiers';
 import { toTitleCase, truncateAddress } from '~/utils/text';
@@ -49,7 +49,7 @@ const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
 
 // Fetch leaderboard metadata on mount to ensure config is available
-const { fetchMetadata } = useLeaderboardMetadata();
+const { fetchMetadata } = useLeaderboardMetadataStore();
 
 // Fetch sponsorship tier content
 const { fallbackToLocalOnError } = useRemoteOrLocal();
@@ -204,6 +204,10 @@ const visibleTiers = computed(() => {
 });
 
 const needsApproval = computed<boolean>(() => {
+  // Don't show approval if not on the expected chain
+  if (!get(isExpectedChain))
+    return false;
+
   const currency = get(selectedCurrency);
   const token = get(paymentTokens).find(t => t.symbol === currency);
   const selectedTierKey = get(selectedTier);
@@ -296,6 +300,10 @@ watchEffect(() => {
 });
 
 async function checkAllowanceIfNeeded() {
+  if (!get(isExpectedChain)) {
+    return;
+  }
+
   const currency = get(selectedCurrency);
   const token = get(paymentTokens).find(t => t.symbol === currency);
 
@@ -310,8 +318,7 @@ async function checkAllowanceIfNeeded() {
   }
 }
 
-watch(selectedCurrency, checkAllowanceIfNeeded);
-watch(connected, checkAllowanceIfNeeded);
+watch([selectedCurrency, connected, isExpectedChain], checkAllowanceIfNeeded);
 
 // Function to call after successful minting
 async function onMintingSuccess(txHash: string) {
@@ -347,7 +354,7 @@ watch(() => get(sponsorshipState).status, async (newStatus) => {
   }
 });
 
-onMounted(async () => {
+onBeforeMount(async () => {
   // Fetch metadata to ensure config is available
   await fetchMetadata();
   // Only load currencies and check allowance on client-side

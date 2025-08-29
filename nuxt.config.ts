@@ -189,7 +189,7 @@ export default defineNuxtConfig({
         siteKey: '',
       },
       sponsorshipEnabled: false,
-      testing: true,
+      testing: false,
       walletConnect: {
         projectId: '',
       },

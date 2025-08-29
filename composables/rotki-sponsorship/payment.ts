@@ -101,7 +101,7 @@ export function useRotkiSponsorshipPayment() {
   });
 
   const connection = useWeb3Connection({
-    chainId: get(CHAIN_ID),
+    chainId: CHAIN_ID, // Pass the computed ref directly
     onAccountChange: (isConnected) => {
       if (!isConnected) {
         set(sponsorshipState, { status: 'idle' });

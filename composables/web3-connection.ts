@@ -25,7 +25,7 @@ const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepo
 const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis];
 
 export interface Web3ConnectionConfig {
-  chainId?: number;
+  chainId?: MaybeRef<number>;
   onAccountChange?: (isConnected: boolean) => void;
   onError?: (error: string) => void;
 }
@@ -42,7 +42,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   const logger = useLogger('web3-connection');
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
 
-  const defaultNetwork = getNetwork(chainId);
+  const defaultNetwork = getNetwork(get(chainId));
 
   const appKit = createAppKit({
     adapters: [new EthersAdapter()],
@@ -70,6 +70,10 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   if (currentAccount && currentAccount.isConnected) {
     set(connected, true);
     set(address, currentAccount.address ? getAddress(currentAccount.address) : undefined);
+    const caipNetworkId = appKit.getCaipNetworkId();
+    if (isDefined(caipNetworkId)) {
+      set(connectedChainId, BigInt(caipNetworkId));
+    }
   }
 
   const getBrowserProvider = (): BrowserProvider => {
@@ -101,7 +105,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   });
 
   const isExpectedChain = computed<boolean>(() => {
-    const expectedChainId = chainId;
+    const expectedChainId = get(chainId);
     const currentChainId = get(connectedChainId);
 
     if (!isDefined(connectedChainId) || !expectedChainId) {
@@ -121,7 +125,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   }
 
   async function switchNetwork(targetChainId?: number): Promise<void> {
-    const network = getNetwork(targetChainId || chainId);
+    const network = getNetwork(targetChainId || get(chainId));
     await appKit.switchNetwork(network);
   }
 
@@ -137,7 +141,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   async function validateNetwork(expectedChainId?: number): Promise<void> {
     const provider = getBrowserProvider();
     const network = await provider.getNetwork();
-    const targetChainId = expectedChainId || chainId;
+    const targetChainId = expectedChainId || get(chainId);
 
     if (targetChainId && network.chainId !== BigInt(targetChainId)) {
       const expectedNetwork = getNetwork(targetChainId);
