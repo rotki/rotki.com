@@ -44,6 +44,7 @@ const approvalType = ref<ApprovalType>(APPROVAL_TYPE.UNLIMITED);
 const showApprovalOptions = ref<boolean>(false);
 const showSuccessDialog = ref(false);
 const showExampleSponsors = ref<boolean>(false);
+const imageLoading = ref<boolean>(true);
 
 const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -390,12 +391,19 @@ onBeforeMount(async () => {
             </div>
             <div
               v-else-if="nftImages[selectedTier]"
-              class="w-full h-full bg-rui-grey-50"
+              class="w-full h-full bg-rui-grey-50 relative"
             >
               <img
                 :src="nftImages[selectedTier]"
                 :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: findTierByKey(selectedTier)?.label })"
-                class="w-full h-full object-cover rounded-lg"
+                class="w-full h-full object-cover rounded-lg z-[2]"
+                @loadstart="imageLoading = true"
+                @load="imageLoading = false"
+                @error="imageLoading = false"
+              />
+              <RuiSkeletonLoader
+                v-if="imageLoading"
+                class="absolute top-0 left-0 z-[1] w-full h-full"
               />
             </div>
             <div
