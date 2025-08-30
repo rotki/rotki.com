@@ -94,7 +94,7 @@ const {
   isLoadingPaymentTokens,
 } = useRotkiSponsorshipPayment();
 
-const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData } = await useSponsorshipData();
+const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData } = useSponsorshipData();
 
 const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
 const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});

@@ -99,7 +99,7 @@ export function useRotkiSponsorshipSSR() {
  * Composable for easy data fetching with useLazyAsyncData
  * This should be used in pages/components for SSR data loading
  */
-export async function useSponsorshipData() {
+export function useSponsorshipData() {
   const ssr = useRotkiSponsorshipSSR();
   const forceRefresh = ref(false);
   const route = useRoute();
@@ -107,7 +107,7 @@ export async function useSponsorshipData() {
   // Use a stable key for SSR deduplication
   const dataKey = 'sponsorship-data';
 
-  const { data, error, pending, refresh: refreshData } = await useAsyncData(dataKey, async () => {
+  const { data, error, pending, refresh: refreshData } = useAsyncData(dataKey, async () => {
     await ssr.loadAll(get(forceRefresh));
     // Reset force refresh flag after use
     set(forceRefresh, false);
