@@ -854,13 +854,12 @@
       "submit_name": "Submit Name"
     },
     "leaderboard": {
+      "be_the_first": "Be the first to {mint}",
+      "mint": "mint rotki sponsorship NFT",
       "title": "Sponsor Leaderboard",
       "subtitle": "Recognizing those funding privacy-first, local software",
       "loading": "Loading leaderboard...",
-      "empty_state": {
-        "title": "No leaderboard data available",
-        "alt": "No leaderboard data available"
-      },
+      "empty_state": "Leaderboard data is empty",
       "nft_counts": "{medal} {count} NFTs",
       "points": "{points} points",
       "tooltip": {
