@@ -187,6 +187,8 @@ onMounted(async () => {
               circular
               color="primary"
               variant="indeterminate"
+              size="38"
+              class="my-5"
             />
             <p class="text-rui-text-secondary">
               {{ t('sponsor.leaderboard.loading') }}
@@ -291,13 +293,24 @@ onMounted(async () => {
             class="text-center py-12"
           >
             <img
-              :alt="t('sponsor.leaderboard.empty_state.alt')"
+              :alt="t('sponsor.leaderboard.empty_state')"
               class="w-24 mx-auto"
-              src="/img/not-found.svg"
+              src="/img/no_data_placeholder.svg"
             />
-            <p class="text-rui-text-secondary text-lg">
-              {{ t('sponsor.leaderboard.empty_state.title') }}
+            <p class="text-rui-text-secondary text">
+              {{ t('sponsor.leaderboard.empty_state') }}
             </p>
+            <i18n-t keypath="sponsor.leaderboard.be_the_first">
+              <template #mint>
+                <ButtonLink
+                  color="primary"
+                  inline
+                  to="/sponsor/mint"
+                >
+                  {{ t('sponsor.leaderboard.mint') }}
+                </ButtonLink>
+              </template>
+            </i18n-t>
           </div>
         </RuiCard>
 
