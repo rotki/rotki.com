@@ -1,31 +1,22 @@
 import { get, set } from '@vueuse/shared';
-import { z } from 'zod';
 import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { SponsorshipMetadata } from '~/types/sponsor';
 import { useLogger } from '~/utils/use-logger';
-
-const LeaderboardMetadataSchema = z.object({
-  chain: z.enum(['sepolia', 'ethereum']),
-  contractAddress: z.string(),
-  lastUpdated: z.string().nullable(),
-});
-
-export type LeaderboardMetadata = z.infer<typeof LeaderboardMetadataSchema>;
 
 interface ChainConfig {
   chainId: number;
   rpcUrl: string;
 }
 
-export const useLeaderboardMetadataStore = defineStore('leaderboard-metadata', () => {
+export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', () => {
   // State
-  const metadata = ref<LeaderboardMetadata>();
+  const metadata = ref<SponsorshipMetadata>();
   const loading = ref<boolean>(false);
   const error = ref<Error>();
 
   // Getters
   const contractAddress = computed<string | undefined>(() => get(metadata)?.contractAddress);
-  const lastUpdated = computed<string | null | undefined>(() => get(metadata)?.lastUpdated);
   const chain = computed<'sepolia' | 'ethereum' | undefined>(() => get(metadata)?.chain);
 
   const chainConfig = computed<ChainConfig | undefined>(() => {
@@ -47,15 +38,15 @@ export const useLeaderboardMetadataStore = defineStore('leaderboard-metadata', (
       set(loading, true);
       set(error, undefined);
 
-      const response = await fetchWithCsrf('/webapi/nfts/leaderboard/metadata/', {
+      const response = await fetchWithCsrf('/webapi/nfts/release/current', {
         method: 'GET',
       });
 
-      const validatedResponse = LeaderboardMetadataSchema.parse(response);
+      const validatedResponse = SponsorshipMetadata.parse(response);
       set(metadata, validatedResponse);
     }
     catch (error_: any) {
-      logger.error('Error fetching leaderboard metadata:', error_);
+      logger.error('Error fetching sponsorship metadata:', error_);
       set(error, error_);
     }
     finally {
@@ -72,7 +63,6 @@ export const useLeaderboardMetadataStore = defineStore('leaderboard-metadata', (
     error: readonly(error),
     // Actions
     fetchMetadata,
-    lastUpdated: readonly(lastUpdated),
     loading: readonly(loading),
     metadata: readonly(metadata),
     rpcUrl: readonly(rpcUrl),

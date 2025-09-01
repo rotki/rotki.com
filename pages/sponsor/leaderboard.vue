@@ -3,11 +3,53 @@ import { get, set } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { useLeaderboardMetadataStore } from '~/store/leaderboard-metadata';
 import { formatDate } from '~/utils/date';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { getTierMedal } from '~/utils/nft-tiers';
 import { useLogger } from '~/utils/use-logger';
-import { getTierMedal } from '../../utils/nft-tiers';
+
+interface PaginationData {
+  page: number;
+  total: number;
+  limit: number;
+  limits?: number[];
+}
+
+// Pagination state
+const paginationData = ref<PaginationData>({
+  page: 1,
+  total: 0,
+  limit: 10,
+  limits: [10, 25, 50, 100],
+});
+
+const LeaderboardEntry = z.object({
+  rank: z.number().nullable(),
+  address: z.string(),
+  bronzeCount: z.number(),
+  silverCount: z.number(),
+  goldCount: z.number(),
+  totalCount: z.number(),
+  points: z.number(),
+  ensName: z.string().nullable(),
+});
+
+const LeaderboardResponse = z.object({
+  count: z.number(),
+  next: z.string().nullable(),
+  previous: z.string().nullable(),
+  results: z.array(LeaderboardEntry),
+});
+
+type LeaderboardResponse = z.infer<typeof LeaderboardResponse>;
+
+type LeaderboardEntry = z.infer<typeof LeaderboardEntry>;
+
+const LeaderboardMetadata = z.object({
+  lastUpdated: z.string().nullable(),
+});
+
+type LeaderboardMetadata = z.infer<typeof LeaderboardMetadata>;
 
 const description = 'rotki\'s sponsor leaderboard';
 
@@ -33,21 +75,6 @@ const logger = useLogger();
 const loading = ref<boolean>(false);
 const leaderboardData = ref<LeaderboardResponse>();
 
-interface PaginationData {
-  page: number;
-  total: number;
-  limit: number;
-  limits?: number[];
-}
-
-// Pagination state
-const paginationData = ref<PaginationData>({
-  page: 1,
-  total: 0,
-  limit: 10,
-  limits: [10, 25, 50, 100],
-});
-
 // Clipboard functionality
 const clipboardSource = ref('');
 const { copy } = useClipboard({ source: clipboardSource });
@@ -56,35 +83,10 @@ const { copy } = useClipboard({ source: clipboardSource });
 const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
 
-// Leaderboard metadata
-const leaderboardStore = useLeaderboardMetadataStore();
-const { fetchMetadata } = leaderboardStore;
-const { lastUpdated } = storeToRefs(leaderboardStore);
+const lastUpdated = ref<string>('');
 
 // Breakpoint detection
 const { isMdAndDown } = useBreakpoint();
-
-const LeaderboardEntry = z.object({
-  rank: z.number().nullable(),
-  address: z.string(),
-  bronzeCount: z.number(),
-  silverCount: z.number(),
-  goldCount: z.number(),
-  totalCount: z.number(),
-  points: z.number(),
-  ensName: z.string().nullable(),
-});
-
-const LeaderboardResponse = z.object({
-  count: z.number(),
-  next: z.string().nullable(),
-  previous: z.string().nullable(),
-  results: z.array(LeaderboardEntry),
-});
-
-type LeaderboardResponse = z.infer<typeof LeaderboardResponse>;
-
-type LeaderboardEntry = z.infer<typeof LeaderboardEntry>;
 
 const currentLeaderboard = computed<LeaderboardEntry[]>(() => {
   const data = get(leaderboardData);
@@ -117,6 +119,22 @@ async function fetchLeaderboard(): Promise<void> {
   }
   catch (error_) {
     logger.error('Error fetching leaderboard:', error_);
+  }
+  finally {
+    set(loading, false);
+  }
+}
+
+async function fetchLeaderboardMetadata(): Promise<void> {
+  try {
+    set(loading, true);
+    const response = await fetchWithCsrf<LeaderboardMetadata>(`/webapi/nfts/leaderboard/metadata`, {
+      method: 'GET',
+    });
+    set(lastUpdated, LeaderboardMetadata.parse(response).lastUpdated);
+  }
+  catch (error_) {
+    logger.error('Error fetching leaderboard metadata:', error_);
   }
   finally {
     set(loading, false);
@@ -160,7 +178,7 @@ async function handlePaginationChange(newPagination: PaginationData): Promise<vo
 onMounted(async () => {
   await Promise.all([
     fetchLeaderboard(),
-    fetchMetadata(),
+    fetchLeaderboardMetadata(),
   ]);
 });
 </script>

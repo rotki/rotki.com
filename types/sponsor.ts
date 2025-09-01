@@ -18,3 +18,11 @@ export type NftSubmission = z.infer<typeof NftSubmission>;
 export const NftSubmissions = z.array(NftSubmission);
 
 export type NftSubmissions = z.infer<typeof NftSubmissions>;
+
+export const SponsorshipMetadata = z.object({
+  chain: z.enum(['sepolia', 'ethereum']),
+  contractAddress: z.string(),
+  releaseId: z.number(),
+});
+
+export type SponsorshipMetadata = z.infer<typeof SponsorshipMetadata>;

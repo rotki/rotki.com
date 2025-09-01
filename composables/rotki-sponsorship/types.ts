@@ -51,6 +51,7 @@ export interface NftConfig {
   CHAIN_ID: number;
   CONTRACT_ADDRESS: string;
   RPC_URL: string;
+  RELEASE_ID: number;
   hasContractChanged: boolean;
 }
 

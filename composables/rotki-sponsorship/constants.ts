@@ -1,4 +1,4 @@
-export const IPFS_URL = 'https://gateway.pinata.cloud/ipfs/';
+export const IPFS_URL = 'https://ipfs.io/ipfs/';
 
 // Payment token addresses
 export const ETH_ADDRESS = '0x0000000000000000000000000000000000000000';

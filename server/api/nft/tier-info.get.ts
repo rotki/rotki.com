@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Get current release ID (will fetch fresh if cache was cleared)
-    const releaseId = await getCurrentReleaseId(config);
+    const releaseId = config.RELEASE_ID || await getCurrentReleaseId(config);
     logger.info(`Current release ID: ${releaseId}`);
 
     // Check if we can use multicall for batch operations
