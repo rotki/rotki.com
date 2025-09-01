@@ -2,10 +2,9 @@ import type { NftConfig } from '~/composables/rotki-sponsorship/types';
 import { ethers } from 'ethers';
 import {
   CHAIN_CONFIGS,
-  FALLBACK_CHAIN,
-  FALLBACK_CONTRACT_ADDRESS,
   ROTKI_SPONSORSHIP_ABI,
 } from '~/composables/rotki-sponsorship/constants';
+import { getWorkingRpcUrl } from '~/composables/rotki-sponsorship/rpc-checker';
 import { SponsorshipMetadata } from '~/types/sponsor';
 import { convertKeys } from '~/utils/object';
 import { useLogger } from '~/utils/use-logger';
@@ -44,30 +43,26 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     }
     lastContractAddress = contractAddress;
 
+    // Find a working RPC URL
+    const workingRpcUrl = await getWorkingRpcUrl(chainConfig.rpcUrls);
+
     return {
       CHAIN_ID: chainConfig.chainId,
       CONTRACT_ADDRESS: contractAddress,
       hasContractChanged,
       RELEASE_ID: releaseId,
-      RPC_URL: chainConfig.rpcUrl,
+      RPC_URL: workingRpcUrl,
     };
   }
   catch (error: any) {
-    // Fallback to default values if metadata fetch fails
+    // Log the error for debugging
     logger.error('Failed to fetch NFT config metadata:', error?.data || error?.message || error);
 
-    // Log more details about the error for debugging
-    if (error?.status === 404) {
-      logger.warn('Leaderboard metadata endpoint not found. Using fallback values.');
-    }
-
-    return {
-      CHAIN_ID: CHAIN_CONFIGS[FALLBACK_CHAIN].chainId,
-      CONTRACT_ADDRESS: FALLBACK_CONTRACT_ADDRESS,
-      hasContractChanged: false,
-      RELEASE_ID: 0,
-      RPC_URL: CHAIN_CONFIGS[FALLBACK_CHAIN].rpcUrl,
-    };
+    // Throw an error instead of using fallback values
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'NFT configuration service unavailable',
+    });
   }
 }
 

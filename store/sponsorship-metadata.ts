@@ -1,12 +1,13 @@
 import { get, set } from '@vueuse/shared';
 import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
+import { getWorkingRpcUrl } from '~/composables/rotki-sponsorship/rpc-checker';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { SponsorshipMetadata } from '~/types/sponsor';
 import { useLogger } from '~/utils/use-logger';
 
 interface ChainConfig {
   chainId: number;
-  rpcUrl: string;
+  rpcUrls: readonly string[];
 }
 
 export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', () => {
@@ -14,6 +15,8 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
   const metadata = ref<SponsorshipMetadata>();
   const loading = ref<boolean>(false);
   const error = ref<Error>();
+  const workingRpcUrl = ref<string>();
+  const rpcCheckPromise = ref<Promise<string>>();
 
   // Getters
   const contractAddress = computed<string | undefined>(() => get(metadata)?.contractAddress);
@@ -27,7 +30,30 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
   });
 
   const chainId = computed<number | undefined>(() => get(chainConfig)?.chainId);
-  const rpcUrl = computed<string | undefined>(() => get(chainConfig)?.rpcUrl);
+
+  // Get the working RPC URL with fallback logic
+  const rpcUrl = computed<string | undefined>(() => {
+    const config = get(chainConfig);
+    if (!config?.rpcUrls)
+      return undefined;
+
+    // If we already have a working URL for this chain, return it
+    if (get(workingRpcUrl)) {
+      return get(workingRpcUrl);
+    }
+
+    // If check is not in progress, start it
+    if (!get(rpcCheckPromise)) {
+      set(rpcCheckPromise, getWorkingRpcUrl(config.rpcUrls).then((url) => {
+        set(workingRpcUrl, url);
+        set(rpcCheckPromise, undefined);
+        return url;
+      }));
+    }
+
+    // Return the first URL as immediate fallback while checking
+    return config.rpcUrls[0];
+  });
 
   const logger = useLogger('leaderboard-metadata-store');
   const { fetchWithCsrf } = useFetchWithCsrf();
@@ -53,6 +79,12 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
       set(loading, false);
     }
   }
+
+  // Reset working RPC when chain changes
+  watch(chain, () => {
+    set(workingRpcUrl, undefined);
+    set(rpcCheckPromise, undefined);
+  });
 
   return {
     // State

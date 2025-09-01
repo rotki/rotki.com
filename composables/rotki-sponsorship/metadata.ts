@@ -11,7 +11,7 @@ const logger = useLogger('rotki-sponsorship-metadata');
 export async function fetchTierInfo(tierId: number, tierKey: string): Promise<TierInfoResult | undefined> {
   try {
     const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
-    const provider = new ethers.JsonRpcProvider(get(RPC_URL));
+    const provider = createProvider(get(RPC_URL));
     const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, provider);
 
     const releaseId = await contract.currentReleaseId();

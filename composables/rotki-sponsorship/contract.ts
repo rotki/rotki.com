@@ -12,7 +12,7 @@ export async function refreshSupplyData(provider?: ethers.Provider): Promise<Rec
     const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
     const supplies: Record<string, TierSupply> = {};
     // Use provided provider or fall back to public RPC
-    const ethersProvider = provider || new ethers.JsonRpcProvider(get(RPC_URL));
+    const ethersProvider = provider || createProvider(get(RPC_URL));
     const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, ethersProvider);
     const releaseId = await contract.currentReleaseId();
 
