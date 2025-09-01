@@ -12,7 +12,7 @@ const querySchema = z.object({
   url: z.string().url().refine(
     url =>
       // Only allow IPFS URLs
-      url.startsWith('ipfs://') || url.includes('gateway.pinata.cloud/ipfs/'),
+      url.startsWith('ipfs://'),
     {
       message: 'Only IPFS URLs are allowed',
     },

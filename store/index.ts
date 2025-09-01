@@ -7,7 +7,7 @@ import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { acceptHMRUpdate, defineStore } from 'pinia';
-import { convertKeys, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
   Account,
   ActionResultResponse,
@@ -30,6 +30,7 @@ import {
 } from '~/types';
 import { PaymentError } from '~/types/codes';
 import { assert } from '~/utils/assert';
+import { convertKeys } from '~/utils/object';
 import { formatSeconds } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 

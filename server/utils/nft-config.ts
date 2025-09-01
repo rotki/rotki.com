@@ -6,6 +6,8 @@ import {
   FALLBACK_CONTRACT_ADDRESS,
   ROTKI_SPONSORSHIP_ABI,
 } from '~/composables/rotki-sponsorship/constants';
+import { SponsorshipMetadata } from '~/types/sponsor';
+import { convertKeys } from '~/utils/object';
 import { useLogger } from '~/utils/use-logger';
 
 // Storage for detecting contract address changes
@@ -18,33 +20,35 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     const { baseUrl } = useRuntimeConfig().public;
 
     // Use the proxy utility to get the backend URL
-    const apiUrl = `${baseUrl}/webapi/nfts/leaderboard/metadata/`;
+    const apiUrl = `${baseUrl}/webapi/nfts/release/current/`;
 
     // Log the URL for debugging
-    logger.debug('Fetching leaderboard metadata from:', apiUrl);
+    logger.debug('Fetching sponsorship metadata from:', apiUrl);
 
     // Fetch metadata from the API - this is public data, no auth needed
-    const response = await $fetch<{
-      contract_address: string;
-      chain: 'sepolia' | 'ethereum';
-    }>(apiUrl);
+    const response = await $fetch<SponsorshipMetadata>(apiUrl, {
+      parseResponse(responseText: string) {
+        return convertKeys(JSON.parse(responseText), true, false);
+      },
+    });
+    const { chain, contractAddress, releaseId } = SponsorshipMetadata.parse(response);
 
-    const chainConfig = CHAIN_CONFIGS[response.chain];
-    const currentAddress = response.contract_address;
+    const chainConfig = CHAIN_CONFIGS[chain];
 
     // Check if contract address has changed
-    const hasContractChanged = lastContractAddress !== undefined && lastContractAddress !== currentAddress;
+    const hasContractChanged = lastContractAddress !== undefined && lastContractAddress !== contractAddress;
     if (hasContractChanged) {
-      logger.warn(`Contract address changed from ${lastContractAddress} to ${currentAddress}`);
+      logger.warn(`Contract address changed from ${lastContractAddress} to ${contractAddress}`);
       // The cache will be automatically invalidated when defineCachedFunction
       // detects the key has changed (since we include contract address in cache keys)
     }
-    lastContractAddress = currentAddress;
+    lastContractAddress = contractAddress;
 
     return {
       CHAIN_ID: chainConfig.chainId,
-      CONTRACT_ADDRESS: currentAddress,
+      CONTRACT_ADDRESS: contractAddress,
       hasContractChanged,
+      RELEASE_ID: releaseId,
       RPC_URL: chainConfig.rpcUrl,
     };
   }
@@ -61,6 +65,7 @@ export async function getServerNftConfig(): Promise<NftConfig> {
       CHAIN_ID: CHAIN_CONFIGS[FALLBACK_CHAIN].chainId,
       CONTRACT_ADDRESS: FALLBACK_CONTRACT_ADDRESS,
       hasContractChanged: false,
+      RELEASE_ID: 0,
       RPC_URL: CHAIN_CONFIGS[FALLBACK_CHAIN].rpcUrl,
     };
   }

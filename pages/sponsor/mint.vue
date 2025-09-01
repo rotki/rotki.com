@@ -6,7 +6,7 @@ import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/paym
 import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { useLeaderboardMetadataStore } from '~/store/leaderboard-metadata';
+import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { getTierClasses } from '~/utils/nft-tiers';
 import { toTitleCase, truncateAddress } from '~/utils/text';
@@ -50,7 +50,7 @@ const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
 
 // Fetch leaderboard metadata on mount to ensure config is available
-const { fetchMetadata } = useLeaderboardMetadataStore();
+const { fetchMetadata } = useSponsorshipMetadataStore();
 
 // Fetch sponsorship tier content
 const { fallbackToLocalOnError } = useRemoteOrLocal();
@@ -92,6 +92,7 @@ const {
   approveToken,
   checkTokenAllowance,
   isLoadingPaymentTokens,
+  resetSponsorshipState,
 } = useRotkiSponsorshipPayment();
 
 const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData } = useSponsorshipData();
@@ -371,12 +372,8 @@ onBeforeMount(async () => {
       <div class="lg:w-1/2 flex justify-center">
         <div class="nft-image-container w-full flex justify-center lg:block">
           <div class="aspect-square w-full max-w-md md:max-w-full bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
-            <RuiSkeletonLoader
-              v-if="isLoading"
-              class="w-full h-full"
-            />
             <div
-              v-else-if="error"
+              v-if="error"
               class="text-rui-error text-center"
             >
               <div class="text-lg font-medium">
@@ -394,6 +391,7 @@ onBeforeMount(async () => {
               class="w-full h-full bg-rui-grey-50 relative"
             >
               <img
+                :key="nftImages[selectedTier]"
                 :src="nftImages[selectedTier]"
                 :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: findTierByKey(selectedTier)?.label })"
                 class="w-full h-full object-cover rounded-lg z-[2]"
@@ -406,6 +404,10 @@ onBeforeMount(async () => {
                 class="absolute top-0 left-0 z-[1] w-full h-full"
               />
             </div>
+            <RuiSkeletonLoader
+              v-else-if="isLoading"
+              class="w-full h-full"
+            />
             <div
               v-else
               class="text-rui-text-secondary text-center"
@@ -461,7 +463,7 @@ onBeforeMount(async () => {
             </div>
             <div
               v-else-if="availableTokens.length > 0"
-              class="flex gap-2"
+              class="flex flex-wrap gap-2 max-w-full"
             >
               <RuiButton
                 v-for="token in availableTokens"
@@ -544,6 +546,20 @@ onBeforeMount(async () => {
               </RuiCard>
             </div>
           </div>
+
+          <!-- Transaction Status -->
+          <RuiAlert
+            v-if="sponsorshipState.status === 'error'"
+            type="error"
+            class="mt-4"
+            closeable
+            @close="resetSponsorshipState()"
+          >
+            <template #title>
+              {{ t('sponsor.sponsor_page.error.minting_failed') }}
+            </template>
+            {{ sponsorshipState.error }}
+          </RuiAlert>
 
           <!-- Mint/Approval Button -->
           <div class="pt-4">
@@ -705,19 +721,6 @@ onBeforeMount(async () => {
               <RuiSkeletonLoader />
             </div>
           </div>
-
-          <!-- Transaction Status -->
-
-          <RuiAlert
-            v-if="sponsorshipState.status === 'error'"
-            type="error"
-            class="mt-4"
-          >
-            <template #title>
-              {{ t('sponsor.sponsor_page.error.minting_failed') }}
-            </template>
-            {{ sponsorshipState.error }}
-          </RuiAlert>
         </div>
       </div>
     </div>

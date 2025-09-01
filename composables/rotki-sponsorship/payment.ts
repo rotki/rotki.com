@@ -339,30 +339,8 @@ export function useRotkiSponsorshipPayment() {
     return checkTokenAllowanceContract(token.address, token.decimals, signer);
   }
 
-  async function checkTransactionStatus(txHash: string) {
-    try {
-      const provider = getBrowserProvider();
-      const receipt = await provider.getTransactionReceipt(txHash);
-
-      if (receipt) {
-        const status = receipt.status === 1 ? 'success' : 'failed';
-        return { receipt, status };
-      }
-      else {
-        // Transaction is still pending or doesn't exist
-        const tx = await provider.getTransaction(txHash);
-        if (tx) {
-          return { status: 'pending', transaction: tx };
-        }
-        else {
-          return { status: 'not_found' };
-        }
-      }
-    }
-    catch (error) {
-      logger.error('Failed to check transaction status:', error);
-      return { error, status: 'error' };
-    }
+  function resetSponsorshipState() {
+    set(sponsorshipState, { status: 'idle' });
   }
 
   // Computed property to get NFT IDs for the current connected address
@@ -381,7 +359,6 @@ export function useRotkiSponsorshipPayment() {
     address,
     approveToken,
     checkTokenAllowance,
-    checkTransactionStatus,
     connected,
     currentAddressNfts: readonly(currentAddressNfts),
     error: readonly(error),
@@ -391,6 +368,7 @@ export function useRotkiSponsorshipPayment() {
     loadPaymentTokens,
     mintSponsorshipNFT,
     paymentTokens,
+    resetSponsorshipState,
     selectedCurrency,
     sponsorshipState: readonly(sponsorshipState),
     storedNftIds: readonly(storedNftIds),
