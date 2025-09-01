@@ -25,15 +25,19 @@ export const ERC20_ABI = [
 export const CHAIN_CONFIGS = {
   ethereum: {
     chainId: 1,
-    rpcUrl: 'https://eth.merkle.io',
+    rpcUrls: [
+      'https://eth.merkle.io',
+      'https://eth.llamarpc.com',
+      'https://ethereum-rpc.publicnode.com',
+      'https://rpc.mevblocker.io',
+    ],
   },
   sepolia: {
     chainId: 11155111,
-    rpcUrl: 'https://sepolia.gateway.tenderly.co',
+    rpcUrls: [
+      'https://sepolia.gateway.tenderly.co',
+      'https://sepolia.drpc.org',
+      'https://ethereum-sepolia-rpc.publicnode.com',
+    ],
   },
 } as const;
-
-// Fallback values for when metadata is not available
-export const FALLBACK_CONTRACT_ADDRESS = '0x9C4Ac51128b3B29c8c4C76c960a07c17b8290557';
-
-export const FALLBACK_CHAIN = 'sepolia';

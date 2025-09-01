@@ -992,7 +992,8 @@
         "see_examples": "See how it looks like"
       },
       "error": {
-        "minting_failed": "Minting Failed"
+        "minting_failed": "Minting Failed",
+        "unavailable": "The sponsorship page is currently unavailable. Please try again later."
       },
       "success_dialog": {
         "title": "NFT #{id} Minted Successfully!",

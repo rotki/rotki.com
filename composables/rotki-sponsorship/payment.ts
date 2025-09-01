@@ -192,7 +192,7 @@ export function useRotkiSponsorshipPayment() {
       // Get supply info and release ID using user's provider if connected
       const provider = get(connected) ? getBrowserProvider() : undefined;
       const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
-      const ethersProvider = provider || new ethers.JsonRpcProvider(get(RPC_URL));
+      const ethersProvider = provider || createProvider(get(RPC_URL));
       const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, ethersProvider);
       const currentReleaseId = releaseId || await contract.currentReleaseId();
       const supplies = await refreshSupplyData(provider);

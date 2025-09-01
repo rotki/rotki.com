@@ -50,7 +50,9 @@ const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
 
 // Fetch leaderboard metadata on mount to ensure config is available
-const { fetchMetadata } = useSponsorshipMetadataStore();
+const sponsorshipMetadataStore = useSponsorshipMetadataStore();
+const { error: metadataError } = storeToRefs(sponsorshipMetadataStore);
+const { fetchMetadata } = sponsorshipMetadataStore;
 
 // Fetch sponsorship tier content
 const { fallbackToLocalOnError } = useRemoteOrLocal();
@@ -95,7 +97,7 @@ const {
   resetSponsorshipState,
 } = useRotkiSponsorshipPayment();
 
-const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData } = useSponsorshipData();
+const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData, error: dataError } = useSponsorshipData();
 
 const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
 const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
@@ -359,14 +361,40 @@ watch(() => get(sponsorshipState).status, async (newStatus) => {
 onBeforeMount(async () => {
   // Fetch metadata to ensure config is available
   await fetchMetadata();
-  // Only load currencies and check allowance on client-side
-  await loadPaymentTokens();
-  await checkAllowanceIfNeeded();
+
+  // Only continue if metadata fetch was successful
+  if (!get(metadataError)) {
+    // Only load currencies and check allowance on client-side
+    await loadPaymentTokens();
+    await checkAllowanceIfNeeded();
+  }
 });
 </script>
 
 <template>
-  <div class="marketplace-container">
+  <!-- Show 404 error if metadata fetch failed -->
+  <div
+    v-if="metadataError || dataError"
+    class="my-20 flex items-center justify-center"
+  >
+    <div class="flex flex-col gap-4 justify-center items-center text-center p-8">
+      <img
+        class="w-40"
+        alt="rotki maintenance"
+        src="/img/maintenance.svg"
+      />
+
+      <p class="text-rui-text-secondary">
+        {{ t('sponsor.sponsor_page.error.unavailable') }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Normal content when metadata loads successfully -->
+  <div
+    v-else
+    class="marketplace-container"
+  >
     <div class="flex flex-col lg:flex-row gap-10 max-w-6xl mx-auto">
       <!-- NFT Image Section -->
       <div class="lg:w-1/2 flex justify-center">
