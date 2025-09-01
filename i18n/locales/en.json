@@ -993,7 +993,7 @@
       },
       "error": {
         "minting_failed": "Minting Failed",
-        "unavailable": "The sponsorship page is currently unavailable. Please try again later."
+        "unavailable": "Something went wrong while loading the NFT sponsorship page. \nIf it persists, please contact {email}"
       },
       "success_dialog": {
         "title": "NFT #{id} Minted Successfully!",
