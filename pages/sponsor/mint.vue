@@ -31,6 +31,12 @@ definePageMeta({
   middleware: 'sponsorship',
 });
 
+const {
+  public: {
+    contact: { supportEmail, supportEmailMailto },
+  },
+} = useRuntimeConfig();
+
 const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
 
 type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
@@ -372,7 +378,6 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <!-- Show 404 error if metadata fetch failed -->
   <div
     v-if="metadataError || dataError"
     class="my-20 flex items-center justify-center"
@@ -380,13 +385,25 @@ onBeforeMount(async () => {
     <div class="flex flex-col gap-4 justify-center items-center text-center p-8">
       <img
         class="w-40"
-        alt="rotki maintenance"
+        alt="sponsorship page unavailable"
         src="/img/maintenance.svg"
       />
 
-      <p class="text-rui-text-secondary">
-        {{ t('sponsor.sponsor_page.error.unavailable') }}
-      </p>
+      <div class="text-rui-text-secondary whitespace-break-spaces">
+        <i18n-t keypath="sponsor.sponsor_page.error.unavailable">
+          <template #email>
+            <ButtonLink
+              inline
+              color="primary"
+              :to="supportEmailMailto"
+              class="underline"
+              external
+            >
+              {{ supportEmail }}
+            </ButtonLink>
+          </template>
+        </i18n-t>
+      </div>
     </div>
   </div>
 
