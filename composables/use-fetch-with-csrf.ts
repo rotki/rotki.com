@@ -1,8 +1,9 @@
+import { isClient } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { convertKeys } from '~/utils/object';
 import { useLogger } from '~/utils/use-logger';
 
-export const useSessionIdCookie = createSharedComposable(() => useCookie('sessionid'));
+export const useSessionIdCookie = () => useCookie('sessionid');
 
 export const useFetchWithCsrf = createSharedComposable(() => {
   const CSRF_HEADER = 'X-CSRFToken';
@@ -97,6 +98,9 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       }
     },
     onResponse({ response }): Promise<void> | void {
+      if (!isClient) {
+        return;
+      }
       const status = response.status;
       if ([HTTP_STATUS.OK].includes(status) && isDefined(refresh))
         get(refresh)();
@@ -104,14 +108,19 @@ export const useFetchWithCsrf = createSharedComposable(() => {
     async onResponseError({ response }): Promise<void> {
       const status = response.status;
 
-      if ([HTTP_STATUS.UNAUTHORIZED].includes(status)) {
-        await navigateTo('/login');
-        if (isDefined(logout))
-          await get(logout)();
-      }
-
       if ([HTTP_STATUS.INTERNAL_SERVER_ERROR].includes(status))
         logger.error('[Error]', response.body);
+
+      if (!isClient) {
+        return;
+      }
+
+      if ([HTTP_STATUS.UNAUTHORIZED].includes(status)) {
+        await navigateTo('/login');
+        if (isDefined(logout)) {
+          await get(logout)();
+        }
+      }
     },
     parseResponse(responseText: string) {
       return convertKeys(JSON.parse(responseText), true, false);
