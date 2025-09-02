@@ -13,14 +13,14 @@ export default defineTask({
     // eslint-disable-next-line node/prefer-global/process
     const instanceId = process.env.pm_id || process.env.NODE_APP_INSTANCE || '0';
     if (instanceId !== '0') {
-      logger.info(`Skipping cache updating task on PM2 instance ${instanceId}`);
+      logger.debug(`Skipping cache updating task on PM2 instance ${instanceId}`);
       return { reason: 'not primary PM2 instance', result: 'skipped' };
     }
 
     // Check if sponsorship feature is enabled
     const { public: { sponsorshipEnabled } } = useRuntimeConfig();
     if (!sponsorshipEnabled) {
-      logger.info('Sponsorship feature is disabled, skipping cache updating');
+      logger.debug('Sponsorship feature is disabled, skipping cache updating');
       return { reason: 'sponsorship disabled', result: 'skipped' };
     }
 

@@ -231,7 +231,7 @@ export async function invalidateImageCache(cacheKey: string): Promise<void> {
     deletePromises.push(storage.removeItem(metadataKey));
 
     await Promise.all(deletePromises);
-    logger.info(`Invalidated cache for ${cacheKey} (${metadata.totalChunks} chunks)`);
+    logger.debug(`Invalidated cache for ${cacheKey} (${metadata.totalChunks} chunks)`);
   }
 }
 
