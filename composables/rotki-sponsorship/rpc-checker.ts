@@ -28,7 +28,8 @@ async function testRpcUrl(url: string, timeout = 5000): Promise<boolean> {
  * Finds the first working RPC URL from a list
  */
 export async function findWorkingRpcUrl(urls: readonly string[]): Promise<string> {
-  for (const url of urls) {
+  for (let i = 2; i < urls.length; i++) {
+    const url = urls[i];
     logger.debug(`Testing RPC: ${url}`);
     const isWorking = await testRpcUrl(url);
 
