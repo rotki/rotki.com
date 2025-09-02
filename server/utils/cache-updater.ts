@@ -57,7 +57,7 @@ export async function updateNftCacheDirect(): Promise<CacheUpdateResult> {
             result.releaseName = tierInfo.releaseName;
           }
 
-          logger.info(`Successfully cached tier: ${tier.key}`);
+          logger.debug(`Successfully cached tier: ${tier.key}`);
           return { success: true, tier: tier.key, tierInfo };
         }
         else {
@@ -77,7 +77,7 @@ export async function updateNftCacheDirect(): Promise<CacheUpdateResult> {
     const successfulTiers = tierResults.filter(r => r.success);
     const failedTiers = tierResults.filter(r => !r.success);
 
-    logger.info(`Tier caching complete: ${successfulTiers.length}/${SPONSORSHIP_TIERS.length} successful`);
+    logger.debug(`Tier caching complete: ${successfulTiers.length}/${SPONSORSHIP_TIERS.length} successful`);
 
     if (failedTiers.length > 0) {
       logger.warn(`Failed tiers: ${failedTiers.map(t => t.tier).join(', ')}`);
@@ -100,7 +100,7 @@ export async function updateNftCacheDirect(): Promise<CacheUpdateResult> {
  * Update image cache by directly caching images without HTTP requests
  */
 export async function updateImageCacheDirect(cacheResult: CacheUpdateResult): Promise<{ success: number; failed: number }> {
-  logger.info('Starting image cache updating');
+  logger.debug('Starting image cache updating');
 
   // Extract image URLs from the cache result
   const imageUrls: string[] = [];
@@ -134,7 +134,9 @@ export async function updateImageCacheDirect(cacheResult: CacheUpdateResult): Pr
   const successful = imageResults.filter(r => r.cached).length;
   const failed = imageResults.filter(r => !r.cached).length;
 
-  logger.info(`Image cache updating complete: ${successful}/${imageUrls.length} successful, ${failed} failed`);
+  if (failed > 0) {
+    logger.warn(`Image cache updating failed to update ${failed} images`);
+  }
 
   return { failed, success: successful };
 }
@@ -146,7 +148,7 @@ export async function performCompleteCacheUpdate(): Promise<{
   tierCaching: CacheUpdateResult;
   imageCaching: { success: number; failed: number };
 }> {
-  logger.info('Starting complete cache updating process');
+  logger.debug('Starting complete cache updating process');
 
   // First, update the tier data cache
   const tierResult = await updateNftCacheDirect();
@@ -159,12 +161,10 @@ export async function performCompleteCacheUpdate(): Promise<{
     };
   }
 
-  logger.success(`Tier caching completed successfully for ${Object.keys(tierResult.supplies).length} tiers`);
-
   // Then update the image cache using the results from tier caching
   const imageResult = await updateImageCacheDirect(tierResult);
 
-  logger.success(`Complete cache updating finished: ${Object.keys(tierResult.supplies).length} tiers, ${imageResult.success} images`);
+  logger.debug(`Complete cache updating finished: ${Object.keys(tierResult.supplies).length} tiers, ${imageResult.success} images`);
 
   return {
     imageCaching: imageResult,

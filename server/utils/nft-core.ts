@@ -146,7 +146,7 @@ export async function fetchTierInfoBatch(tierIds: number[], releaseId: number, c
 
   await Promise.all(cachePromises);
 
-  logger.info(`Cache check complete. Cached: ${tierIds.length - uncachedTierIds.length}, Uncached: ${uncachedTierIds.length}`);
+  logger.debug(`Cache check complete. Cached: ${tierIds.length - uncachedTierIds.length}, Uncached: ${uncachedTierIds.length}`);
 
   // If all tiers are cached, return early
   if (uncachedTierIds.length === 0) {
@@ -288,7 +288,7 @@ export async function fetchTokenData(tokenId: number, config: NftConfig): Promis
       owner = await contract.ownerOf(tokenId);
     }
     catch {
-      logger.info(`Token ${tokenId} does not exist`);
+      logger.warn(`Token ${tokenId} does not exist`);
       return null;
     }
 
@@ -299,7 +299,7 @@ export async function fetchTokenData(tokenId: number, config: NftConfig): Promis
       contract.tokenURI(tokenId),
     ]);
 
-    logger.info(`Token ${tokenId} data:`, {
+    logger.debug(`Token ${tokenId} data:`, {
       metadataURI,
       owner,
       releaseId: Number(releaseId),
@@ -330,7 +330,7 @@ export async function fetchTokenData(tokenId: number, config: NftConfig): Promis
         );
         releaseName = releaseAttribute?.value || '';
 
-        logger.info(`Tier ${tierId} release name: ${releaseName}`);
+        logger.debug(`Tier ${tierId} release name: ${releaseName}`);
       }
       catch (error) {
         logger.error(`Error fetching tier metadata for release name:`, error);

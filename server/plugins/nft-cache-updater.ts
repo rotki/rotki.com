@@ -7,7 +7,7 @@ export default defineNitroPlugin(() => {
   // Skip during build process
   // eslint-disable-next-line node/prefer-global/process
   if (process.env.NODE_ENV === 'prerender' || process.env.NITRO_PRESET === 'nitro-prerender') {
-    logger.info('Skipping cache updating during build/prerender');
+    logger.debug('Skipping cache updating during build/prerender');
     return;
   }
 
@@ -15,7 +15,7 @@ export default defineNitroPlugin(() => {
   // eslint-disable-next-line node/prefer-global/process
   const instanceId = process.env.pm_id || process.env.NODE_APP_INSTANCE || '0';
   if (instanceId !== '0') {
-    logger.info(`Skipping cache updating on PM2 instance ${instanceId}`);
+    logger.debug(`Skipping cache updating on PM2 instance ${instanceId}`);
     return;
   }
 
@@ -31,7 +31,7 @@ export default defineNitroPlugin(() => {
   // Delay cache updating to ensure all services are initialized
   const updateCache = async (): Promise<void> => {
     try {
-      logger.info('Beginning delayed cache updating...');
+      logger.debug('Beginning delayed cache updating...');
       const result = await performCompleteCacheUpdate();
 
       if (result.tierCaching.success) {

@@ -29,7 +29,7 @@ export async function fetchAndCacheImage(url: string, skipCache = false): Promis
     // Check for cache invalidation request
     if (skipCache) {
       await invalidateImageCache(cacheKey);
-      logger.info(`Cache invalidated for: ${url}`);
+      logger.debug(`Cache invalidated for: ${url}`);
     }
 
     logger.debug(`Processing image request: ${normalizedUrl}`, {
@@ -112,7 +112,7 @@ export async function streamImageWithCacheWrapper(event: any, url: string, skipC
 
   if (skipCache) {
     await invalidateImageCache(cacheKey);
-    logger.info(`Cache invalidated for: ${url}`);
+    logger.debug(`Cache invalidated for: ${url}`);
   }
 
   await deduplicatedFetch(cacheKey, async () => {
@@ -155,7 +155,7 @@ export async function warmImageCache(imageUrls: string[], options: { maxConcurre
     }
   }
 
-  logger.info(`Image cache updating completed: ${results.filter(r => r.cached).length}/${imageUrls.length} successful`);
+  logger.debug(`Image cache updating completed: ${results.filter(r => r.cached).length}/${imageUrls.length} successful`);
   return results;
 }
 
