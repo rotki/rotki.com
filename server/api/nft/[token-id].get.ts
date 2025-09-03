@@ -1,10 +1,10 @@
 import type { TokenMetadata } from '~/composables/rotki-sponsorship/types';
 import { z } from 'zod';
+import { nftCoreService } from '~/server/features/sponsorship/nft/core';
 import { handleApiError } from '~/server/utils/errors';
-import { clearTokenDataCache, fetchCachedTokenData, getNftConfig } from '~/server/utils/nft-core';
 
 // Request validation schema
-const paramsSchema = z.object({
+const ParametersSchema = z.object({
   'token-id': z.string().transform((val) => {
     const id = parseInt(val, 10);
     if (isNaN(id) || id < 0) {
@@ -15,42 +15,18 @@ const paramsSchema = z.object({
 });
 
 export default defineEventHandler(async (event): Promise<TokenMetadata> => {
+  const { public: { sponsorshipEnabled } } = useRuntimeConfig();
+  if (!sponsorshipEnabled) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Not Found',
+    });
+  }
+
   try {
-    // Check if sponsorship feature is enabled
-    const { public: { sponsorshipEnabled } } = useRuntimeConfig();
-    if (!sponsorshipEnabled) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Not Found',
-      });
-    }
+    const { 'token-id': tokenId } = await getValidatedRouterParams(event, data => ParametersSchema.parse(data));
 
-    // Validate parameters
-    const params = await getValidatedRouterParams(event, data => paramsSchema.parse(data));
-    const tokenId = params['token-id'];
-
-    // Get config
-    const config = await getNftConfig();
-
-    // Check for cache busting parameter
-    const query = getQuery(event);
-    const { skipCache } = query;
-
-    if (skipCache) {
-      // Clear the cache for this specific token
-      await clearTokenDataCache(tokenId, config);
-    }
-
-    const tokenData = await fetchCachedTokenData(tokenId, config);
-
-    if (!tokenData) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Token not found',
-      });
-    }
-
-    return tokenData;
+    return await nftCoreService.fetchCachedTokenData(tokenId);
   }
   catch (error) {
     handleApiError(event, error);

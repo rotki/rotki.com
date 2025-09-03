@@ -4,11 +4,10 @@ import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 
 // For client-side usage (composables)
 export function useNftConfig() {
-  const { chainId, contractAddress, rpcUrl } = storeToRefs(useSponsorshipMetadataStore());
+  const { chainId, contractAddress } = storeToRefs(useSponsorshipMetadataStore());
 
   return {
     CHAIN_ID: computed<number>(() => get(chainId) || 0),
     CONTRACT_ADDRESS: computed<string>(() => get(contractAddress) || ''),
-    RPC_URL: computed<string>(() => get(rpcUrl) || ''),
   };
 }
