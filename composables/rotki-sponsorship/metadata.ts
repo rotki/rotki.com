@@ -1,36 +1,82 @@
-import type { TierBenefits, TierInfoResult, TierSupply } from './types';
+import type { TierInfoResult } from './types';
 import { get } from '@vueuse/shared';
 import { ethers } from 'ethers';
 import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
 import { useLogger } from '~/utils/use-logger';
 import { useNftConfig } from './config';
-import { ROTKI_SPONSORSHIP_ABI } from './constants';
+import { CHAIN_CONFIGS, ROTKI_SPONSORSHIP_ABI } from './constants';
+import { getRpcManager } from './rpc-checker';
 
 const logger = useLogger('rotki-sponsorship-metadata');
 
 export async function fetchTierInfo(tierId: number, tierKey: string): Promise<TierInfoResult | undefined> {
   try {
-    const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
-    const provider = createProvider(get(RPC_URL));
-    const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, provider);
+    const { CHAIN_ID, CONTRACT_ADDRESS } = useNftConfig();
+    const contractAddress = get(CONTRACT_ADDRESS);
+    const chainId = get(CHAIN_ID);
 
-    const releaseId = await contract.currentReleaseId();
-    const [maxSupply, currentSupply, metadataURI] = await contract.getTierInfo(releaseId, tierId);
+    // Get chain config to access RPC URLs
+    const chainConfig = Object.values(CHAIN_CONFIGS).find(config => config.chainId === chainId);
+    if (!chainConfig) {
+      throw new Error(`Unsupported chain ID: ${chainId}`);
+    }
 
-    if (!metadataURI) {
+    // Get singleton RPC manager for this chain
+    const rpcManager = getRpcManager(chainId, chainConfig.rpcUrls);
+
+    // Execute contract calls with automatic RPC fallback
+    const result = await rpcManager.executeWithFallback(async (provider: ethers.JsonRpcProvider) => {
+      const contract = new ethers.Contract(contractAddress, ROTKI_SPONSORSHIP_ABI, provider);
+
+      // Get release ID and tier info
+      const releaseId = await contract.currentReleaseId();
+      const [maxSupply, currentSupply, metadataURI] = await contract.getTierInfo(releaseId, tierId);
+
+      return {
+        currentSupply: Number(currentSupply),
+        maxSupply: Number(maxSupply),
+        metadataURI: metadataURI as string,
+      };
+    });
+
+    if (!result.metadataURI) {
+      logger.warn(`No metadata URI found for tier ${tierKey} (ID: ${tierId})`);
       return undefined;
     }
 
-    // Convert metadataURI (IPFS CID) to HTTP URL to fetch the JSON metadata
-    const metadataUrl = normalizeIpfsUrl(metadataURI);
+    // Fetch metadata with retries
+    let metadata: any;
+    try {
+      const metadataUrl = normalizeIpfsUrl(result.metadataURI);
 
-    // Fetch the metadata JSON
-    const metadataResponse = await fetch(metadataUrl);
-    if (!metadataResponse.ok) {
-      throw new Error(`Metadata fetch error: ${metadataResponse.status}`);
+      // Retry metadata fetch with exponential backoff
+      let retries = 3;
+      let delay = 1000;
+
+      while (retries > 0) {
+        try {
+          const metadataResponse = await fetch(metadataUrl);
+          if (!metadataResponse.ok) {
+            throw new Error(`Metadata fetch error: ${metadataResponse.status}`);
+          }
+          metadata = await metadataResponse.json();
+          break;
+        }
+        catch (error: any) {
+          retries--;
+          if (retries === 0) {
+            throw error;
+          }
+          logger.debug(`Metadata fetch failed, retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // Exponential backoff
+        }
+      }
     }
-
-    const metadata = await metadataResponse.json();
+    catch (error: any) {
+      logger.error(`Failed to fetch metadata for tier ${tierKey}:`, error?.message);
+      throw error;
+    }
 
     // Extract image URL from metadata.image
     const imageUrl = normalizeIpfsUrl(metadata.image);
@@ -45,10 +91,10 @@ export async function fetchTierInfo(tierId: number, tierKey: string): Promise<Ti
 
     return {
       benefits,
-      currentSupply: Number(currentSupply),
+      currentSupply: result.currentSupply,
       imageUrl,
-      maxSupply: Number(maxSupply),
-      metadataURI,
+      maxSupply: result.maxSupply,
+      metadataURI: result.metadataURI,
       releaseName: releaseNameFromMetadata,
     };
   }
@@ -56,36 +102,4 @@ export async function fetchTierInfo(tierId: number, tierKey: string): Promise<Ti
     logger.error(`Error fetching tier info for ${tierKey}:`, error_);
     return undefined;
   }
-}
-
-export async function loadNFTImagesAndSupply(tiers: { key: string; tierId: number }[]): Promise<{
-  images: Record<string, string>;
-  supplies: Record<string, TierSupply>;
-  benefits: Record<string, TierBenefits>;
-  releaseName: string;
-}> {
-  const images: Record<string, string> = {};
-  const supplies: Record<string, TierSupply> = {};
-  const benefits: Record<string, TierBenefits> = {};
-  let releaseName = '';
-
-  for (const tier of tiers) {
-    const tierInfo = await fetchTierInfo(tier.tierId, tier.key);
-    if (tierInfo) {
-      images[tier.key] = tierInfo.imageUrl;
-      supplies[tier.key] = {
-        currentSupply: tierInfo.currentSupply,
-        maxSupply: tierInfo.maxSupply,
-        metadataURI: tierInfo.metadataURI,
-      };
-      benefits[tier.key] = {
-        benefits: tierInfo.benefits,
-      };
-      if (tierInfo.releaseName && !releaseName) {
-        releaseName = tierInfo.releaseName;
-      }
-    }
-  }
-
-  return { benefits, images, releaseName, supplies };
 }
