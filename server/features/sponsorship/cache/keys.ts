@@ -72,17 +72,3 @@ export function createImageCacheKey(imageUrl: string): string {
 export function createNftTokenCacheKey(contractAddress: string, tokenId: number): string {
   return `token:${contractAddress.toLowerCase()}:${tokenId}`;
 }
-
-/**
- * Create a cache key for current release ID
- */
-export function createNftCurrentReleaseIdKey(contractAddress: string): string {
-  return `releaseId:${contractAddress.toLowerCase()}:current`;
-}
-
-/**
- * Create a deduplication key for tier batch fetching
- */
-export function createTierBatchDedupKey(contractAddress: string, releaseId: number, tierIds: number[]): string {
-  return `dedup:tiers:${contractAddress.toLowerCase()}:${releaseId}:${tierIds.sort().join(',')}`;
-}

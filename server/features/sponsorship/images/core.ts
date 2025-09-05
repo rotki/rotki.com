@@ -270,13 +270,6 @@ export class ImageCoreService {
   }
 
   /**
-   * Get cached image metadata
-   */
-  async getCachedImageMetadata(url: string): Promise<ImageMetadata | null> {
-    return imageCacheManager.getImageMetadata(url);
-  }
-
-  /**
    * Handle conditional requests for cached images (including cached 404s)
    */
   async handleConditionalRequest(event: H3Event, url: string): Promise<boolean> {

@@ -1,4 +1,5 @@
-import { ethers } from 'ethers';
+import type { ethers } from 'ethers';
+import { ContractFactory } from '~/composables/rotki-sponsorship/contract';
 
 // Multicall3 contract address (same on most chains including Sepolia)
 const MULTICALL3_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
@@ -37,7 +38,7 @@ export class Multicall {
   private contract: ethers.Contract;
 
   constructor(provider: ethers.Provider) {
-    this.contract = new ethers.Contract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+    this.contract = ContractFactory.createContract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
   }
 
   async aggregate(calls: Call[]): Promise<Result[]> {
