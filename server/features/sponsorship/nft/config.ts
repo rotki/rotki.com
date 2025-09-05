@@ -1,10 +1,5 @@
 import type { NftConfig } from '~/composables/rotki-sponsorship/types';
-import { ethers } from 'ethers';
-import {
-  CHAIN_CONFIGS,
-  ROTKI_SPONSORSHIP_ABI,
-} from '~/composables/rotki-sponsorship/constants';
-import { getWorkingRpcUrl } from '~/composables/rotki-sponsorship/rpc-checker';
+import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
 import { SponsorshipMetadata } from '~/types/sponsor';
 import { convertKeys } from '~/utils/object';
 import { useLogger } from '~/utils/use-logger';
@@ -43,15 +38,11 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     }
     lastContractAddress = contractAddress;
 
-    // Find a working RPC URL
-    const workingRpcUrl = await getWorkingRpcUrl(chainConfig.rpcUrls);
-
     return {
       CHAIN_ID: chainConfig.chainId,
       CONTRACT_ADDRESS: contractAddress,
       hasContractChanged,
       RELEASE_ID: releaseId,
-      RPC_URL: workingRpcUrl,
     };
   }
   catch (error: any) {
@@ -65,30 +56,3 @@ export async function getServerNftConfig(): Promise<NftConfig> {
     });
   }
 }
-
-/**
- * Create provider instance per request to avoid singleton issues
- */
-export function createProvider(rpcUrl: string): ethers.JsonRpcProvider {
-  return new ethers.JsonRpcProvider(rpcUrl);
-}
-
-/**
- * Create contract instance per request
- */
-export function createContract(provider: ethers.JsonRpcProvider, contractAddress: string): ethers.Contract {
-  return new ethers.Contract(contractAddress, ROTKI_SPONSORSHIP_ABI, provider);
-}
-
-/**
- * Get contract interface (this can be cached as it's stateless)
- */
-export const getContractInterface = (() => {
-  let iface: ethers.Interface | undefined;
-  return () => {
-    if (!iface) {
-      iface = new ethers.Interface(ROTKI_SPONSORSHIP_ABI);
-    }
-    return iface;
-  };
-})();

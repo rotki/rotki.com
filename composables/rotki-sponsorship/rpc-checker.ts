@@ -1,70 +1,270 @@
+import { ethers } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
-const logger = useLogger('server-rpc-checker');
+const logger = useLogger('rpc-checker');
+
+// ============================================================================
+// TYPES & INTERFACES
+// ============================================================================
+
+interface CircuitBreaker {
+  failureCount: number;
+  lastFailTime: number;
+  state: 'closed' | 'open' | 'half-open';
+}
+
+interface RpcHealthStatus {
+  url: string;
+  isHealthy: boolean;
+  lastChecked: number;
+  failureCount: number;
+  circuitBreaker: CircuitBreaker;
+}
+
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+const CIRCUIT_BREAKER_CONFIG = {
+  failureThreshold: 3,
+  recoveryTimeout: 60 * 1000, // 60 seconds
+  rpcCallTimeout: 30 * 1000, // 30 seconds timeout for RPC calls
+};
+
+// ============================================================================
+// GLOBAL STATE
+// ============================================================================
+
+// RPC health tracking
+const rpcHealthMap = new Map<string, RpcHealthStatus>();
+
+// Global RPC manager instances cached by chain
+const rpcManagers = new Map<number, RpcManager>();
+
+// ============================================================================
+// CIRCUIT BREAKER FUNCTIONS
+// ============================================================================
 
 /**
- * Tests if an RPC URL is working by attempting to get the block number
+ * Initialize RPC health status
  */
-async function testRpcUrl(url: string, timeout = 5000): Promise<boolean> {
-  try {
-    const provider = createProvider(url);
-
-    await Promise.race([
-      provider.getBlockNumber(),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), timeout),
-      ),
-    ]);
-
-    return true;
-  }
-  catch (error: any) {
-    logger.debug(`RPC ${url} failed: ${error?.message}`);
-    return false;
-  }
+function initRpcHealth(url: string): RpcHealthStatus {
+  return {
+    circuitBreaker: {
+      failureCount: 0,
+      lastFailTime: 0,
+      state: 'closed',
+    },
+    failureCount: 0,
+    isHealthy: true,
+    lastChecked: 0,
+    url,
+  };
 }
 
 /**
- * Finds the first working RPC URL from a list
+ * Get or create RPC health status
  */
-export async function findWorkingRpcUrl(urls: readonly string[]): Promise<string> {
-  for (let i = 2; i < urls.length; i++) {
-    const url = urls[i];
-    logger.debug(`Testing RPC: ${url}`);
-    const isWorking = await testRpcUrl(url);
+function getRpcHealth(url: string): RpcHealthStatus {
+  let health = rpcHealthMap.get(url);
+  if (!health) {
+    health = initRpcHealth(url);
+    rpcHealthMap.set(url, health);
+  }
+  return health;
+}
 
-    if (isWorking) {
-      logger.info(`Using RPC: ${url}`);
-      return url;
+/**
+ * Update circuit breaker state based on success/failure
+ */
+function updateCircuitBreaker(health: RpcHealthStatus, success: boolean): void {
+  const now = Date.now();
+
+  if (success) {
+    // Reset on success
+    health.circuitBreaker.failureCount = 0;
+    health.circuitBreaker.state = 'closed';
+    health.isHealthy = true;
+    health.failureCount = 0;
+  }
+  else {
+    // Increment failure count
+    health.circuitBreaker.failureCount++;
+    health.circuitBreaker.lastFailTime = now;
+    health.failureCount++;
+    health.isHealthy = false;
+
+    // Open circuit if threshold reached
+    if (health.circuitBreaker.failureCount >= CIRCUIT_BREAKER_CONFIG.failureThreshold) {
+      health.circuitBreaker.state = 'open';
+      logger.warn(`Circuit breaker opened for RPC: ${health.url}`);
     }
   }
 
-  // If none work, return the first one as fallback
-  logger.warn('No working RPC found, using first URL as fallback');
-  return urls[0];
+  health.lastChecked = now;
 }
 
-// Cache for working RPC URLs to avoid repeated checks
-const rpcCache = new Map<string, { url: string; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+/**
+ * Check if RPC can be used based on circuit breaker state
+ */
+function canUseRpc(health: RpcHealthStatus): boolean {
+  const now = Date.now();
+
+  switch (health.circuitBreaker.state) {
+    case 'closed':
+      return true;
+    case 'open':
+      // Check if recovery timeout has passed
+      if (now - health.circuitBreaker.lastFailTime > CIRCUIT_BREAKER_CONFIG.recoveryTimeout) {
+        health.circuitBreaker.state = 'half-open';
+        logger.debug(`Circuit breaker half-open for RPC: ${health.url}`);
+        return true;
+      }
+      return false;
+    case 'half-open':
+      return true;
+    default:
+      return false;
+  }
+}
+
+// ============================================================================
+// RPC MANAGER CLASS
+// ============================================================================
 
 /**
- * Gets a working RPC URL with caching
+ * RPC Manager class for handling fallback and circuit breaking
  */
-export async function getWorkingRpcUrl(urls: readonly string[]): Promise<string> {
-  const cacheKey = urls.join(',');
-  const cached = rpcCache.get(cacheKey);
+export class RpcManager {
+  private readonly rpcUrls: readonly string[];
+  private readonly providerCache = new Map<string, ethers.JsonRpcProvider>();
+  private currentRpcUrl: string | undefined;
 
-  // Return cached URL if still fresh
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.url;
+  constructor(rpcUrls: readonly string[]) {
+    this.rpcUrls = rpcUrls;
   }
 
-  // Find a working URL
-  const workingUrl = await findWorkingRpcUrl(urls);
+  /**
+   * Get or create a cached provider for the given RPC URL
+   */
+  private getProvider(rpcUrl: string): ethers.JsonRpcProvider {
+    let provider = this.providerCache.get(rpcUrl);
+    if (!provider) {
+      provider = new ethers.JsonRpcProvider(rpcUrl);
+      this.providerCache.set(rpcUrl, provider);
+      logger.debug(`Created new provider for RPC: ${rpcUrl}`);
+    }
+    return provider;
+  }
 
-  // Cache the result
-  rpcCache.set(cacheKey, { timestamp: Date.now(), url: workingUrl });
+  /**
+   * Clear cached provider for a specific RPC URL
+   */
+  private clearProvider(rpcUrl: string): void {
+    this.providerCache.delete(rpcUrl);
+    logger.debug(`Cleared cached provider for RPC: ${rpcUrl}`);
+  }
 
-  return workingUrl;
+  /**
+   * Get the next healthy RPC URL
+   */
+  private getNextHealthyRpc(startIndex: number = 0): string {
+    // Try to find a healthy RPC starting from the given index
+    for (let i = startIndex; i < this.rpcUrls.length; i++) {
+      const url = this.rpcUrls[i];
+      const health = getRpcHealth(url);
+
+      if (canUseRpc(health)) {
+        return url;
+      }
+    }
+
+    // If no healthy RPC found, return first available (fallback behavior)
+    logger.warn('No healthy RPC found, using first available as fallback');
+    return this.rpcUrls[0];
+  }
+
+  /**
+   * Execute a contract call with automatic RPC fallback
+   */
+  async executeWithFallback<T>(
+    contractCall: (provider: ethers.JsonRpcProvider) => Promise<T>,
+    maxRetries: number = this.rpcUrls.length,
+  ): Promise<T> {
+    let lastError: Error | undefined;
+
+    for (let attempt = 0; attempt < maxRetries && attempt < this.rpcUrls.length; attempt++) {
+      const rpcUrl = this.getNextHealthyRpc(attempt);
+      const health = getRpcHealth(rpcUrl);
+
+      // Skip if circuit breaker is open
+      if (!canUseRpc(health)) {
+        logger.debug(`Skipping RPC ${rpcUrl} - circuit breaker open`);
+        continue;
+      }
+
+      try {
+        // Use cached provider - only creates new one if not cached
+        const provider = this.getProvider(rpcUrl);
+
+        // Track if we switch to a different RPC
+        const rpcChanged = this.currentRpcUrl && this.currentRpcUrl !== rpcUrl;
+        if (rpcChanged) {
+          logger.warn(`Switching RPC from ${this.currentRpcUrl} to ${rpcUrl}`);
+        }
+        this.currentRpcUrl = rpcUrl;
+
+        logger.debug(`Attempting contract call with RPC: ${rpcUrl} (attempt ${attempt + 1})`);
+
+        // Create a timeout promise that rejects after the configured timeout
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error(`RPC call timed out after ${CIRCUIT_BREAKER_CONFIG.rpcCallTimeout / 1000} seconds for ${rpcUrl}`));
+          }, CIRCUIT_BREAKER_CONFIG.rpcCallTimeout);
+        });
+
+        // Race between the contract call and timeout
+        const result = await Promise.race([
+          contractCall(provider),
+          timeoutPromise,
+        ]);
+
+        // Mark as successful
+        updateCircuitBreaker(health, true);
+        logger.debug(`Contract call successful with RPC: ${rpcUrl}`);
+
+        return result;
+      }
+      catch (error: any) {
+        lastError = error;
+        logger.warn(`Contract call failed with RPC ${rpcUrl}:`, error?.message);
+
+        // Mark as failed and clear cached provider for this RPC
+        updateCircuitBreaker(health, false);
+        this.clearProvider(rpcUrl);
+      }
+    }
+
+    // All RPCs failed
+    const errorMessage = `All RPC endpoints failed after ${maxRetries} attempts. Last error: ${lastError?.message}`;
+    logger.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+}
+
+// ============================================================================
+// SINGLETON MANAGER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get or create a singleton RPC manager for a specific chain
+ */
+export function getRpcManager(chainId: number, rpcUrls: readonly string[]): RpcManager {
+  let manager = rpcManagers.get(chainId);
+  if (!manager) {
+    manager = new RpcManager(rpcUrls);
+    rpcManagers.set(chainId, manager);
+    logger.debug(`Created RPC manager for chain ${chainId} with ${rpcUrls.length} RPCs`);
+  }
+  return manager;
 }

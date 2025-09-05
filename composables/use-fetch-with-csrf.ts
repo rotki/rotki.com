@@ -1,4 +1,4 @@
-import { isClient } from '@vueuse/core';
+import { createSharedComposable, isClient } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { convertKeys } from '~/utils/object';
 import { useLogger } from '~/utils/use-logger';

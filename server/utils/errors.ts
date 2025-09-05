@@ -21,12 +21,15 @@ export class ApiError extends Error {
  * Handle API errors with proper logging and user-friendly messages
  */
 export function handleApiError(event: H3Event, error: any): never {
-  logger.error('API Error:', {
+  const method = event.node.req.method;
+  const url = event.node.req.url;
+  const message = error.message || 'Unknown error';
+
+  // Log with clear, readable format
+  logger.error(`API Error: ${method} ${url} - ${message}`, {
     details: error.details,
-    error: error.message,
-    method: event.node.req.method,
     stack: error.stack,
-    url: event.node.req.url,
+    statusCode: error.statusCode,
   });
 
   if (error instanceof ApiError) {

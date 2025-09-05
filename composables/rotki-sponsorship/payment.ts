@@ -1,6 +1,6 @@
 import { get, set, useLocalStorage } from '@vueuse/core';
 import { Contract, ethers, type Signer, type TransactionResponse } from 'ethers';
-import { refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
+import { ContractFactory, refreshSupplyData } from '~/composables/rotki-sponsorship/contract';
 import {
   type SponsorshipState,
   StoredNft,
@@ -191,10 +191,10 @@ export function useRotkiSponsorshipPayment() {
 
       // Get supply info and release ID using user's provider if connected
       const provider = get(connected) ? getBrowserProvider() : undefined;
-      const { CONTRACT_ADDRESS, RPC_URL } = useNftConfig();
-      const ethersProvider = provider || createProvider(get(RPC_URL));
-      const contract = new ethers.Contract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, ethersProvider);
-      const currentReleaseId = releaseId || await contract.currentReleaseId();
+      const currentReleaseId = releaseId || await ContractFactory.executeWithContract(
+        async contract => contract.currentReleaseId(),
+        provider,
+      );
       const supplies = await refreshSupplyData(provider);
       const supply = supplies[tierKey];
       if (!supply) {
@@ -258,8 +258,7 @@ export function useRotkiSponsorshipPayment() {
         // Parse the NFTMinted event to get the token ID
         let tokenId: string | undefined;
 
-        const { CONTRACT_ADDRESS: contractAddress } = useNftConfig();
-        const contract = new Contract(get(contractAddress), ROTKI_SPONSORSHIP_ABI, signer);
+        const contract = ContractFactory.getContractWithUserProvider(signer);
 
         // Find the NFTMinted event in the receipt logs
         for (const log of receipt.logs) {
