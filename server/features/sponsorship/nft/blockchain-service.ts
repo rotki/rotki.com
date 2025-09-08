@@ -38,8 +38,18 @@ export class BlockchainService {
         { args: [], method: 'currentReleaseId' },
       ]);
 
-      if (!releaseIdResults[0].success) {
-        throw new Error('Failed to fetch current release ID');
+      // Check if multicall failed and fallback to direct call
+      if (!releaseIdResults[0].success || releaseIdResults[0].value === undefined) {
+        this.logger.warn('Multicall failed for currentReleaseId, falling back to direct call');
+
+        try {
+          const releaseId = Number(await contract.currentReleaseId());
+          this.logger.debug(`Retrieved release ID (via fallback): ${releaseId}`);
+          return releaseId;
+        }
+        catch (error) {
+          throw new Error(`Failed to fetch current release ID: ${String(error)}`);
+        }
       }
 
       const releaseId = Number(releaseIdResults[0].value);
@@ -70,6 +80,38 @@ export class BlockchainService {
         { args: [tokenId], method: 'tokenTierId' },
         { args: [tokenId], method: 'tokenURI' },
       ]);
+
+      // Check if multicall returned empty results and fallback to individual calls
+      const isEmptyResult = firstBatchResults.every(result => !result.success || !result.value);
+      if (isEmptyResult) {
+        this.logger.warn('Multicall returned empty results, falling back to individual calls');
+
+        try {
+          // Fallback to individual contract calls
+          const owner = await contract.ownerOf(tokenId);
+          const releaseId = Number(await contract.tokenReleaseId(tokenId));
+          const tierId = Number(await contract.tokenTierId(tokenId));
+          const metadataURI = await contract.tokenURI(tokenId);
+
+          this.logger.debug(`Token ${tokenId} basic data (via fallback):`, {
+            metadataURI,
+            owner,
+            releaseId,
+            tierId,
+          });
+
+          return {
+            metadataURI,
+            owner,
+            releaseId,
+            tierId,
+          };
+        }
+        catch (error) {
+          this.logger.warn(`Token ${tokenId} does not exist or error occurred:`, error);
+          return null;
+        }
+      }
 
       // Check if token exists
       if (!firstBatchResults[0].success) {
@@ -112,13 +154,31 @@ export class BlockchainService {
       const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
       const multicall = new Multicall(provider);
 
+      this.logger.debug(`Fetching tier info for tier ${tierId}, release ${releaseId} via from ${config.CONTRACT_ADDRESS}`);
+
       const tierResults = await multicall.callSameContract(contract, [
         { args: [releaseId, tierId], method: 'getTierInfo' },
       ]);
 
+      // Check if multicall returned empty result and fallback to individual call
       if (!tierResults[0].success || !tierResults[0].value) {
-        this.logger.warn(`Failed to fetch tier info for tier ${tierId}, release ${releaseId}`);
-        return null;
+        this.logger.warn(`Multicall failed for tier ${tierId}, release ${releaseId}, falling back to individual call`);
+
+        try {
+          // Fallback to individual contract call
+          const tierInfo = await contract.getTierInfo(releaseId, tierId);
+          const [maxSupply, currentSupply, metadataURI] = tierInfo;
+
+          return {
+            currentSupply: Number(currentSupply),
+            maxSupply: Number(maxSupply),
+            metadataURI,
+          };
+        }
+        catch (error) {
+          this.logger.warn(`Failed to fetch tier info for tier ${tierId}, release ${releaseId}:`, error);
+          return null;
+        }
       }
 
       const [maxSupply, currentSupply, metadataURI] = tierResults[0].value;
@@ -157,31 +217,81 @@ export class BlockchainService {
 
       const tierResults = await multicall.callSameContract(contract, tierInfoCalls);
 
-      // Process results
+      // Check if all multicall results are empty
+      const allEmpty = tierResults.every(result => !result.success || !result.value);
+
+      if (allEmpty) {
+        this.logger.warn('All multicall results are empty, falling back to individual calls');
+
+        // Fallback to individual calls for all tiers
+        const results: Record<number, {
+          maxSupply: number;
+          currentSupply: number;
+          metadataURI: string;
+        } | null> = {};
+
+        for (const tierId of tierIds) {
+          try {
+            const tierInfo = await contract.getTierInfo(releaseId, tierId);
+            const [maxSupply, currentSupply, metadataURI] = tierInfo;
+
+            this.logger.debug(`Tier ${tierId} (via fallback): currentSupply=${Number(currentSupply)}, maxSupply=${Number(maxSupply)}`);
+
+            results[tierId] = {
+              currentSupply: Number(currentSupply),
+              maxSupply: Number(maxSupply),
+              metadataURI,
+            };
+          }
+          catch (error) {
+            this.logger.warn(`Failed to fetch tier info for tier ${tierId}:`, error);
+            results[tierId] = null;
+          }
+        }
+
+        return results;
+      }
+
+      // Process multicall results (some might have failed individually)
       const results: Record<number, {
         maxSupply: number;
         currentSupply: number;
         metadataURI: string;
       } | null> = {};
 
-      tierResults.forEach((result, index) => {
+      for (const [index, result] of tierResults.entries()) {
         const tierId = tierIds[index];
 
         if (!result.success || !result.value) {
-          results[tierId] = null;
-          return;
+          // Try individual call for this specific tier
+          try {
+            this.logger.debug(`Tier ${tierId} failed in multicall, trying individual call`);
+            const tierInfo = await contract.getTierInfo(releaseId, tierId);
+            const [maxSupply, currentSupply, metadataURI] = tierInfo;
+
+            results[tierId] = {
+              currentSupply: Number(currentSupply),
+              maxSupply: Number(maxSupply),
+              metadataURI,
+            };
+          }
+          catch (error) {
+            this.logger.warn(`Failed to fetch tier info for tier ${tierId} even with fallback:`, error);
+            results[tierId] = null;
+          }
         }
+        else {
+          const [maxSupply, currentSupply, metadataURI] = result.value;
 
-        const [maxSupply, currentSupply, metadataURI] = result.value;
+          this.logger.debug(`Tier ${tierId}: currentSupply=${Number(currentSupply)}, maxSupply=${Number(maxSupply)}`);
 
-        this.logger.debug(`Tier ${tierId}: currentSupply=${Number(currentSupply)}, maxSupply=${Number(maxSupply)}`);
-
-        results[tierId] = {
-          currentSupply: Number(currentSupply),
-          maxSupply: Number(maxSupply),
-          metadataURI,
-        };
-      });
+          results[tierId] = {
+            currentSupply: Number(currentSupply),
+            maxSupply: Number(maxSupply),
+            metadataURI,
+          };
+        }
+      }
 
       return results;
     });

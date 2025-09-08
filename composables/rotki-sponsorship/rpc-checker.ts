@@ -27,8 +27,8 @@ interface RpcHealthStatus {
 
 const CIRCUIT_BREAKER_CONFIG = {
   failureThreshold: 3,
-  recoveryTimeout: 60 * 1000, // 60 seconds
-  rpcCallTimeout: 30 * 1000, // 30 seconds timeout for RPC calls
+  recoveryTimeout: 60 * 1000,
+  rpcCallTimeout: 60 * 1000,
 };
 
 // ============================================================================
