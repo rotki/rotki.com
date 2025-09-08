@@ -18,11 +18,11 @@ importers:
         specifier: 0.11.2
         version: 0.11.2(magicast@0.3.5)(pinia@3.0.3(typescript@5.8.3)(vue@3.5.18(typescript@5.8.3)))
       '@reown/appkit':
-        specifier: 1.8.1
-        version: 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: 1.8.2
+        version: 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
       '@reown/appkit-adapter-ethers':
-        specifier: 1.8.1
-        version: 1.8.1(@ethersproject/sha2@5.8.0)(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ethers@6.15.0)(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+        specifier: 1.8.2
+        version: 1.8.2(@ethersproject/sha2@5.8.0)(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ethers@6.15.0)(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
       '@vuelidate/core':
         specifier: 2.0.3
         version: 2.0.3(vue@3.5.18(typescript@5.8.3))
@@ -1935,40 +1935,40 @@ packages:
   '@poppinss/exception@1.2.2':
     resolution: {integrity: sha512-m7bpKCD4QMlFCjA/nKTs23fuvoVFoA83brRKmObCUNmi/9tVu8Ve3w4YQAnJu4q3Tjf5fr685HYIC/IA2zHRSg==}
 
-  '@reown/appkit-adapter-ethers@1.8.1':
-    resolution: {integrity: sha512-EArvzH3M71PXIh2bcL/a5+r8mHAg9KASzz2X+YqyqxhNsOMLNvlu6l/uzR8ypjfL9M6yq1ec8xGfaQ6sDHm/Pg==}
+  '@reown/appkit-adapter-ethers@1.8.2':
+    resolution: {integrity: sha512-gm1I+BkbxV/uoE1xMzsiDMd/K8rsJbzEgUWOe2Da2Gz2Yx3Zu8yciMOfkmSOekPZUqCqZnIMBXuaAvgmA5U8zA==}
     peerDependencies:
       '@ethersproject/sha2': 5.8.0
       ethers: '>=6'
 
-  '@reown/appkit-common@1.8.1':
-    resolution: {integrity: sha512-VhhMnmD7aUAHGgCLbkrlM3Ek99aIMZiduPqExNe/6L/sORrPPoChnBqjVEBP2g4bErVU2BFIFhxo5oIVuP0fTg==}
+  '@reown/appkit-common@1.8.2':
+    resolution: {integrity: sha512-xlo1pRh1DkZfB7I1JkeC8ELlsM7ziSG/oJig1KgTsNZPQdYC9fADWY7vH/daUUkgS8QQbINc7HW8WAR1DkA+dw==}
 
-  '@reown/appkit-controllers@1.8.1':
-    resolution: {integrity: sha512-k720RMJbXhTFrSsAZrvgu+WAF3Sk8d5iHXo1wKmfNXxzpXeF7f5DlWijye/r7nMVXQGbtZFkjTm54ti7+5UfjQ==}
+  '@reown/appkit-controllers@1.8.2':
+    resolution: {integrity: sha512-ccGbuiKNceCmh8JxtcDFc115fosJ2abcSfDo4HVSSgew/4rPzqIsD/TPfBLgk2KOAi7RF4keC5mckHHIWfmoFw==}
 
-  '@reown/appkit-pay@1.8.1':
-    resolution: {integrity: sha512-5NM01g0ygtiGsPUR9N/GaBwyAtZir1Bg+iHZLUNrWOOS36dycEv2bOY1YvrCNgC9sWkQIMr4wiyukiybk3BANQ==}
+  '@reown/appkit-pay@1.8.2':
+    resolution: {integrity: sha512-8rBB/sNty9P4oKVgETFmUXh6iFfbr+UWmpN7TThtMAFXuAGevbHKIF4ZXNjvF63L5knpOF8elVNNmSXyxHpInA==}
 
-  '@reown/appkit-polyfills@1.8.1':
-    resolution: {integrity: sha512-jr3m9x1yFyU2W7re551p6mxd5YpxCwfil/bG2ZrFADFwwDXLEYyz1MvXnP2ZJ57WNyFelm9kwB8xFQLqoZwZ8A==}
+  '@reown/appkit-polyfills@1.8.2':
+    resolution: {integrity: sha512-D1npLFY3q/X6qh241lh47DfL1EaPpMEeVtV7c2HFdmitUgXqc2BgH7mhMfpI3UgaT42+eP5+W+KanZwwyraNPw==}
 
-  '@reown/appkit-scaffold-ui@1.8.1':
-    resolution: {integrity: sha512-NrjlEU69+yePbJKrnFl7k7cynl0nthQ4E84POL3TVyuLh894KjSzfHkqmP603R49sYVzuczP3JxMRjsrXXQ2vw==}
+  '@reown/appkit-scaffold-ui@1.8.2':
+    resolution: {integrity: sha512-AmcMlrovF6NLsopRGgjRYoWMx9R04Tf7G4g+O3I/I09iKv+whz3yjQDePuxhymsCbH5pUvuGkmvVl3mMvhCR0Q==}
 
-  '@reown/appkit-ui@1.8.1':
-    resolution: {integrity: sha512-iWY1zufKj+gDjQ7zxgnFBj+qJ+9gvN0mJWt5r0P1HYemiIV3VP7HUTxgOqTqTW3ggs4RzQy2sVY0Pli7V6m+1Q==}
+  '@reown/appkit-ui@1.8.2':
+    resolution: {integrity: sha512-tdYFBmFLIQzqO0QYo6KJTWJ8UZ5yyqmQ4+YnD1PL4pIMPAaFcVB9ZP0ESSX1eX+bGKkBc+I/rbwKgyqTIJLV9Q==}
 
-  '@reown/appkit-utils@1.8.1':
-    resolution: {integrity: sha512-WK+Fy17Qv4Vdx/L9gvCoBd3oikONIcrfkGmstk83+lQcM0krNHLPEA2gWytBOtetW+1bt+IwTaF2m4PKCrgIDw==}
+  '@reown/appkit-utils@1.8.2':
+    resolution: {integrity: sha512-MBhZBCSMNeP6zQ/NVDqEK4DZttUMLEtO/G5WK4Yhzvzra54Z5VIzTPg5bnNe+ntAJ19AL2P7dh8RjaazdMN7Aw==}
     peerDependencies:
       valtio: 2.1.5
 
-  '@reown/appkit-wallet@1.8.1':
-    resolution: {integrity: sha512-luqzVqQdY+WlxFTQsH0RK53dAYhNfIyyimSkkIcNCnMIWYfq2xseeaKeSwViF+af1ae7tYEqZdq/6ohbMizPaw==}
+  '@reown/appkit-wallet@1.8.2':
+    resolution: {integrity: sha512-cENbBX4WLwkLpIXwH6w+Ys9gmPVnQtGz59/UaO/+nsCxpy+yJcH1yjXyktiLYUBq64ZPGBluYYXg2zJgSCL+nA==}
 
-  '@reown/appkit@1.8.1':
-    resolution: {integrity: sha512-6asyPS7uHWNgTlMH2P4IqQVZKSW9NGb7XNA+nMLpHV2dMmXn0D+tpY0j4477DC/ekNCFK2bieVk4WsYgyd6jHg==}
+  '@reown/appkit@1.8.2':
+    resolution: {integrity: sha512-nCFMGQX3+XHTmd8pkWtyGRj+INFgeg0sRYxLZKQktvFsiR98BFjP9DQIErIujdk2chRx5mX0gGc5s9OvaRJNyA==}
 
   '@rolldown/pluginutils@1.0.0-beta.29':
     resolution: {integrity: sha512-NIJgOsMjbxAXvoGq/X0gD7VPMQ8j9g0BiDaNjVNVjvl+iKXxL3Jre0v31RmBYeLEmkbj2s02v8vFTbUXi5XS2Q==}
@@ -10396,16 +10396,16 @@ snapshots:
 
   '@poppinss/exception@1.2.2': {}
 
-  '@reown/appkit-adapter-ethers@1.8.1(@ethersproject/sha2@5.8.0)(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ethers@6.15.0)(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@reown/appkit-adapter-ethers@1.8.2(@ethersproject/sha2@5.8.0)(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ethers@6.15.0)(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
       '@ethersproject/sha2': 5.8.0
-      '@reown/appkit': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-polyfills': 1.8.1
-      '@reown/appkit-scaffold-ui': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
-      '@reown/appkit-wallet': 1.8.1(typescript@5.8.3)
+      '@reown/appkit': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-polyfills': 1.8.2
+      '@reown/appkit-scaffold-ui': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
+      '@reown/appkit-wallet': 1.8.2(typescript@5.8.3)
       '@walletconnect/universal-provider': 2.21.7(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
       ethers: 6.15.0
       valtio: 2.1.5(@types/react@19.1.10)(react@18.3.1)
@@ -10440,7 +10440,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-common@1.8.1(typescript@5.8.3)(zod@3.22.4)':
+  '@reown/appkit-common@1.8.2(typescript@5.8.3)(zod@3.22.4)':
     dependencies:
       big.js: 6.2.2
       dayjs: 1.11.13
@@ -10451,7 +10451,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-common@1.8.1(typescript@5.8.3)(zod@3.25.76)':
+  '@reown/appkit-common@1.8.2(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
       big.js: 6.2.2
       dayjs: 1.11.13
@@ -10462,10 +10462,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-controllers@1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@reown/appkit-controllers@1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-wallet': 1.8.1(typescript@5.8.3)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-wallet': 1.8.2(typescript@5.8.3)
       '@walletconnect/universal-provider': 2.21.7(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
       valtio: 2.1.5(@types/react@19.1.10)(react@18.3.1)
       viem: 2.34.0(typescript@5.8.3)(zod@3.25.76)
@@ -10496,12 +10496,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-pay@1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@reown/appkit-pay@1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-ui': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-ui': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
       lit: 3.3.0
       valtio: 2.1.5(@types/react@19.1.10)(react@18.3.1)
     transitivePeerDependencies:
@@ -10531,17 +10531,17 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-polyfills@1.8.1':
+  '@reown/appkit-polyfills@1.8.2':
     dependencies:
       buffer: 6.0.3
 
-  '@reown/appkit-scaffold-ui@1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)':
+  '@reown/appkit-scaffold-ui@1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)':
     dependencies:
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-ui': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
-      '@reown/appkit-wallet': 1.8.1(typescript@5.8.3)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-ui': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
+      '@reown/appkit-wallet': 1.8.2(typescript@5.8.3)
       lit: 3.3.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -10571,12 +10571,12 @@ snapshots:
       - valtio
       - zod
 
-  '@reown/appkit-ui@1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@reown/appkit-ui@1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
       '@phosphor-icons/webcomponents': 2.1.5
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-wallet': 1.8.1(typescript@5.8.3)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-wallet': 1.8.2(typescript@5.8.3)
       lit: 3.3.0
       qrcode: 1.5.3
     transitivePeerDependencies:
@@ -10606,12 +10606,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-utils@1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)':
+  '@reown/appkit-utils@1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)':
     dependencies:
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-polyfills': 1.8.1
-      '@reown/appkit-wallet': 1.8.1(typescript@5.8.3)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-polyfills': 1.8.2
+      '@reown/appkit-wallet': 1.8.2(typescript@5.8.3)
       '@wallet-standard/wallet': 1.1.0
       '@walletconnect/logger': 2.1.2
       '@walletconnect/universal-provider': 2.21.7(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
@@ -10644,10 +10644,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-wallet@1.8.1(typescript@5.8.3)':
+  '@reown/appkit-wallet@1.8.2(typescript@5.8.3)':
     dependencies:
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.22.4)
-      '@reown/appkit-polyfills': 1.8.1
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.22.4)
+      '@reown/appkit-polyfills': 1.8.2
       '@walletconnect/logger': 2.1.2
       zod: 3.22.4
     transitivePeerDependencies:
@@ -10655,16 +10655,16 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@reown/appkit@1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
+  '@reown/appkit@1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)':
     dependencies:
-      '@reown/appkit-common': 1.8.1(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-pay': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-polyfills': 1.8.1
-      '@reown/appkit-scaffold-ui': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
-      '@reown/appkit-ui': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
-      '@reown/appkit-wallet': 1.8.1(typescript@5.8.3)
+      '@reown/appkit-common': 1.8.2(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-pay': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-polyfills': 1.8.2
+      '@reown/appkit-scaffold-ui': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
+      '@reown/appkit-ui': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.2(@netlify/blobs@9.1.2)(@types/react@19.1.10)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(react@18.3.1)(typescript@5.8.3)(valtio@2.1.5(@types/react@19.1.10)(react@18.3.1))(zod@3.25.76)
+      '@reown/appkit-wallet': 1.8.2(typescript@5.8.3)
       '@walletconnect/universal-provider': 2.21.7(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(ioredis@5.7.0)(typescript@5.8.3)(zod@3.25.76)
       bs58: 6.0.0
       semver: 7.7.2
