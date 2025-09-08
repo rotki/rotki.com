@@ -8,8 +8,6 @@ import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
-import { getTierClasses } from '~/utils/nft-tiers';
-import { toTitleCase, truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
 const description = 'Sponsor rotki\'s next release';
@@ -43,14 +41,11 @@ type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
 
 const logger = useLogger();
 
-const selectedTier = ref<string>('bronze');
+const selectedTier = ref<TierKey>('bronze');
 const isApproving = ref<boolean>(false);
 const tokenAllowance = ref<string>('0');
 const approvalType = ref<ApprovalType>(APPROVAL_TYPE.UNLIMITED);
-const showApprovalOptions = ref<boolean>(false);
-const showSuccessDialog = ref(false);
-const showExampleSponsors = ref<boolean>(false);
-const imageLoading = ref<boolean>(true);
+const showSuccessDialog = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -144,7 +139,6 @@ async function handleApprove(selectedApprovalType: ApprovalType) {
   }
   finally {
     set(isApproving, false);
-    set(showApprovalOptions, false);
   }
 }
 
@@ -282,11 +276,6 @@ const isButtonDisabled = computed(() => {
   return visible.length === 0 || get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
 });
 
-// Reset approval options when tier or currency changes
-watch([selectedTier, selectedCurrency], () => {
-  set(showApprovalOptions, false);
-});
-
 // Auto-select first visible tier if current selection is not visible
 watchEffect(() => {
   const visible = get(visibleTiers);
@@ -415,60 +404,13 @@ onBeforeMount(async () => {
     <div class="flex flex-col lg:flex-row gap-10 max-w-6xl mx-auto">
       <!-- NFT Image Section -->
       <div class="lg:w-1/2 flex justify-center">
-        <div class="nft-image-container w-full flex justify-center lg:block">
-          <div class="aspect-square w-full max-w-md md:max-w-full bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
-            <div
-              v-if="error"
-              class="text-rui-error text-center"
-            >
-              <div class="text-lg font-medium">
-                {{ t('sponsor.sponsor_page.nft_image.failed_to_load') }}
-              </div>
-              <button
-                class="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
-                @click="$router.go(0)"
-              >
-                {{ t('sponsor.sponsor_page.nft_image.retry') }}
-              </button>
-            </div>
-            <div
-              v-else-if="nftImages[selectedTier]"
-              class="w-full h-full bg-rui-grey-50 relative"
-            >
-              <img
-                :key="nftImages[selectedTier]"
-                :src="nftImages[selectedTier]"
-                :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: findTierByKey(selectedTier)?.label })"
-                class="w-full h-full object-cover rounded-lg z-[2]"
-                @loadstart="imageLoading = true"
-                @load="imageLoading = false"
-                @error="imageLoading = false"
-              />
-              <RuiSkeletonLoader
-                v-if="imageLoading"
-                class="absolute top-0 left-0 z-[0] w-full h-full"
-              />
-            </div>
-            <RuiSkeletonLoader
-              v-else-if="isLoading"
-              class="w-full h-full"
-            />
-            <div
-              v-else
-              class="text-rui-text-secondary text-center"
-            >
-              <div class="text-4xl mb-2">
-                🎨
-              </div>
-              <div class="text-lg font-medium">
-                {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: findTierByKey(selectedTier)?.label }) }}
-              </div>
-              <div class="text-sm text-rui-text-secondary mt-1">
-                {{ t('sponsor.sponsor_page.nft_image.image_not_available') }}
-              </div>
-            </div>
-          </div>
-        </div>
+        <MintNftImage
+          :selected-tier="selectedTier"
+          :nft-images="nftImages"
+          :is-loading="isLoading"
+          :error="!!error"
+          @retry="$router.go(0)"
+        />
       </div>
 
       <!-- Options and Description Section -->
@@ -492,105 +434,20 @@ onBeforeMount(async () => {
           </div>
 
           <!-- Currency Selection -->
-          <div class="space-y-4">
-            <h6 class="font-bold">
-              {{ t('sponsor.sponsor_page.payment_currency') }}
-            </h6>
-            <div
-              v-if="isLoadingPaymentTokens"
-              class="flex gap-2"
-            >
-              <RuiSkeletonLoader
-                v-for="i in 2"
-                :key="i"
-                class="w-20 h-8"
-              />
-            </div>
-            <div
-              v-else-if="availableTokens.length > 0"
-              class="flex flex-wrap gap-2 max-w-full"
-            >
-              <RuiButton
-                v-for="token in availableTokens"
-                :key="token.symbol"
-                :variant="selectedCurrency === token.symbol ? 'default' : 'outlined'"
-                color="primary"
-                size="sm"
-                @click="selectedCurrency = token.symbol"
-              >
-                <template #prepend>
-                  <CryptoAssetIcon
-                    class="bg-white rounded-full"
-                    :icon-url="token.icon_url"
-                    :name="token.symbol"
-                  />
-                </template>
-                {{ token.symbol }}
-              </RuiButton>
-            </div>
-            <div
-              v-else
-              class="text-rui-text-secondary"
-            >
-              {{ t('sponsor.sponsor_page.no_payment_tokens_available') }}
-            </div>
-          </div>
+          <MintCurrencySelection
+            v-model="selectedCurrency"
+            :available-tokens="availableTokens"
+            :is-loading="isLoadingPaymentTokens"
+          />
 
           <!-- Tier Selection -->
-          <div
+          <MintTierSelection
             v-if="availableTokens.length > 0"
-            class="space-y-4"
-          >
-            <h6 class="font-bold">
-              {{ t('sponsor.sponsor_page.select_tier') }}
-            </h6>
-            <div class="space-y-3">
-              <RuiCard
-                v-for="tier in visibleTiers"
-                :key="tier.key"
-                class="tier-option"
-                content-class="flex items-center justify-between h-16 !py-2 transition-all cursor-pointer"
-                :class="{
-                  '!border-rui-primary': selectedTier === tier.key,
-                  'opacity-60': tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply),
-                }"
-                @click="selectedTier = tier.key"
-              >
-                <RuiRadio
-                  :id="tier.key"
-                  v-model="selectedTier"
-                  :value="tier.key"
-                  name="tier"
-                  :hide-details="true"
-                  class="font-bold uppercase"
-                  color="primary"
-                  :label="tier.label"
-                />
-                <div class="flex flex-col items-end">
-                  <div class="text-lg font-bold text-rui-primary">
-                    {{ tierPriceDisplay[tier.key] }}
-                  </div>
-                  <div
-                    v-if="tierSupply[tier.key]"
-                    class="text-sm text-rui-text-secondary"
-                  >
-                    <template v-if="tierSupply[tier.key].maxSupply === 0">
-                      {{ t('sponsor.sponsor_page.pricing.minted', { current: tierSupply[tier.key].currentSupply }) }}
-                    </template>
-                    <template v-else>
-                      {{ t('sponsor.sponsor_page.pricing.minted_with_max', { current: tierSupply[tier.key].currentSupply, max: tierSupply[tier.key].maxSupply }) }}
-                      <span
-                        v-if="tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply)"
-                        class="text-sm text-rui-error font-medium"
-                      >
-                        {{ t('sponsor.sponsor_page.pricing.sold_out') }}
-                      </span>
-                    </template>
-                  </div>
-                </div>
-              </RuiCard>
-            </div>
-          </div>
+            v-model="selectedTier"
+            :tier-supply="tierSupply"
+            :tier-price-display="tierPriceDisplay"
+            :visible-tiers="visibleTiers"
+          />
 
           <!-- Transaction Status -->
           <RuiAlert
@@ -607,260 +464,40 @@ onBeforeMount(async () => {
           </RuiAlert>
 
           <!-- Mint/Approval Button -->
-          <div class="pt-4">
-            <div class="flex gap-1 overflow-hidden">
-              <!-- Approval Menu for when approval is needed -->
-              <RuiMenu
-                v-if="needsApproval && !isApproving"
-                v-model="showApprovalOptions"
-                :popper="{ placement: 'bottom' }"
-                class="w-full"
-                wrapper-class="w-full"
-              >
-                <template #activator="{ attrs }">
-                  <RuiButton
-                    color="primary"
-                    size="lg"
-                    class="w-full flex-1 [&_span]:!text-wrap"
-                    :disabled="isButtonDisabled"
-                    v-bind="attrs"
-                  >
-                    {{ t('sponsor.sponsor_page.buttons.approve', { currency: selectedCurrency }) }}
-                    <template #append>
-                      <RuiIcon
-                        name="lu-chevron-down"
-                        size="16"
-                      />
-                    </template>
-                  </RuiButton>
-                </template>
-                <template #default="{ width }">
-                  <div :style="{ width: `${width}px` }">
-                    <RuiButton
-                      variant="list"
-                      @click="handleApprove(APPROVAL_TYPE.UNLIMITED)"
-                    >
-                      {{ t('sponsor.sponsor_page.approval.unlimited_button') }}
-                    </RuiButton>
-                    <RuiButton
-                      variant="list"
-                      @click="handleApprove(APPROVAL_TYPE.EXACT)"
-                    >
-                      {{ t('sponsor.sponsor_page.approval.exact_button', {
-                        amount: getPriceForTier(selectedCurrency, selectedTier as TierKey),
-                        currency: selectedCurrency,
-                      }) }}
-                    </RuiButton>
-                  </div>
-                </template>
-              </RuiMenu>
-
-              <!-- Loading state while approving -->
-              <RuiButton
-                v-if="isApproving"
-                color="primary"
-                size="lg"
-                class="w-full flex-1 [&_span]:!text-wrap"
-                :loading="true"
-                disabled
-              >
-                {{ t('sponsor.sponsor_page.buttons.approving') }}
-              </RuiButton>
-
-              <!-- Regular mint button -->
-              <RuiButton
-                v-if="!needsApproval && !isApproving"
-                color="primary"
-                size="lg"
-                class="w-full flex-1 [&_span]:!text-wrap"
-                :loading="sponsorshipState.status === 'pending'"
-                :disabled="isButtonDisabled"
-                @click="buttonAction()"
-              >
-                <template #prepend>
-                  <RuiIcon
-                    v-if="connected"
-                    name="lu-external-link"
-                  />
-                  <RuiIcon
-                    v-else
-                    name="lu-wallet"
-                  />
-                </template>
-                {{ buttonText }}
-              </RuiButton>
-              <RuiButton
-                v-if="connected"
-                size="lg"
-                color="secondary"
-                class="!px-3"
-                @click="open()"
-              >
-                <RuiIcon name="lu-wallet" />
-              </RuiButton>
-            </div>
-            <div
-              v-if="connected && address"
-              class="text-sm text-rui-text-secondary mt-2"
-            >
-              {{ t('sponsor.sponsor_page.connected_to', { address: truncateAddress(address) }) }}
-            </div>
-          </div>
+          <MintButton
+            :connected="connected"
+            :address="address"
+            :is-expected-chain="isExpectedChain"
+            :needs-approval="needsApproval"
+            :is-approving="isApproving"
+            :is-button-disabled="isButtonDisabled"
+            :button-text="buttonText"
+            :button-action="buttonAction"
+            :selected-currency="selectedCurrency"
+            :selected-tier="selectedTier"
+            :sponsorship-status="sponsorshipState.status"
+            :get-price-for-tier="getPriceForTier"
+            :open="open"
+            @approve="handleApprove($event)"
+          />
 
           <!-- Benefits Info -->
-          <div class="bg-rui-grey-100 p-4 rounded-lg">
-            <h6 class="font-bold mb-2">
-              {{ t('sponsor.sponsor_page.benefits.title') }}
-            </h6>
-            <div
-              v-if="tierContent[selectedTier]"
-              class="text-sm text-rui-text-secondary"
-            >
-              <p>
-                {{ t('sponsor.sponsor_page.benefits.tier_sponsorship', { tier: toTitleCase(selectedTier), releaseName }) }}
-              </p>
-              <p class="font-medium mt-1">
-                {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: tierContent[selectedTier].benefits }) }}
-              </p>
-
-              <!-- Example Sponsor Images -->
-              <div
-                v-if="tierContent[selectedTier].example && tierContent[selectedTier].example.length > 0"
-                class="mt-4"
-              >
-                <RuiButton
-                  variant="text"
-                  size="sm"
-                  color="primary"
-                  class="!p-0 font-medium text-rui-text hover:text-rui-primary"
-                  @click="showExampleSponsors = !showExampleSponsors"
-                >
-                  <template #append>
-                    <RuiIcon
-                      :name="showExampleSponsors ? 'lu-chevron-down' : 'lu-chevron-right'"
-                      size="16"
-                    />
-                  </template>
-                  {{ t('sponsor.sponsor_page.benefits.see_examples') }}
-                </RuiButton>
-                <div
-                  v-if="showExampleSponsors"
-                  class="flex flex-wrap gap-2 mt-2"
-                >
-                  <img
-                    v-for="(imageUrl, index) in tierContent[selectedTier].example"
-                    :key="index"
-                    :src="imageUrl"
-                    :alt="`Sponsor example ${index + 1}`"
-                    class="w-full rounded-md object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-            <div
-              v-else
-              class="space-y-2"
-            >
-              <RuiSkeletonLoader />
-              <RuiSkeletonLoader />
-              <RuiSkeletonLoader />
-            </div>
-          </div>
+          <MintBenefitsInfo
+            :selected-tier="selectedTier"
+            :tier-content="tierContent"
+            :release-name="releaseName"
+          />
         </div>
       </div>
     </div>
 
     <!-- Success Dialog -->
-    <RuiDialog
+    <MintSuccessDialog
       v-model="showSuccessDialog"
-      max-width="400px"
-    >
-      <RuiCard content-class="!pt-0">
-        <template #header>
-          <div class="flex items-center gap-3">
-            <RuiIcon
-              name="lu-circle-check"
-              class="text-rui-success"
-              size="24"
-            />
-            <span class="text-h6 font-bold">{{ t('sponsor.sponsor_page.success_dialog.title', { id: sponsorshipState.tokenId }) }}</span>
-          </div>
-        </template>
-
-        <div class="space-y-4">
-          <p class="text-rui-text-secondary">
-            {{ t('sponsor.sponsor_page.success_dialog.success_message', {
-              tier: findTierByKey(selectedTier)?.label,
-            }) }}
-          </p>
-          <p
-            class="font-medium px-4 py-3 rounded-lg"
-            :class="getTierClasses(selectedTier)"
-          >
-            {{ releaseName
-              ? t('sponsor.sponsor_page.success_dialog.thank_you_with_release', { release: releaseName })
-              : t('sponsor.sponsor_page.success_dialog.thank_you_upcoming')
-            }}
-          </p>
-
-          <div class="flex flex-col gap-3 pt-2">
-            <ButtonLink
-              v-if="transactionUrl"
-              :to="transactionUrl"
-              variant="outlined"
-              color="primary"
-              class="w-full"
-              external
-            >
-              <template #prepend>
-                <RuiIcon name="lu-external-link" />
-              </template>
-              {{ t('sponsor.sponsor_page.success_dialog.view_etherscan') }}
-            </ButtonLink>
-
-            <ButtonLink
-              :to="`/sponsor/submit-name${sponsorshipState.tokenId ? `?tokenId=${sponsorshipState.tokenId}` : ''}`"
-              variant="default"
-              color="primary"
-              class="w-full"
-            >
-              <template #prepend>
-                <RuiIcon name="lu-user-plus" />
-              </template>
-              {{ t('sponsor.sponsor_page.success_dialog.request_name') }}
-            </ButtonLink>
-
-            <ButtonLink
-              to="/sponsor/leaderboard"
-              variant="outlined"
-              color="primary"
-              class="w-full"
-            >
-              <template #prepend>
-                <RuiIcon name="lu-trophy" />
-              </template>
-              {{ t('sponsor.sponsor_page.success_dialog.view_leaderboard') }}
-            </ButtonLink>
-          </div>
-        </div>
-
-        <template #footer>
-          <div class="flex justify-end w-full">
-            <RuiButton
-              variant="text"
-              color="primary"
-              @click="showSuccessDialog = false"
-            >
-              {{ t('sponsor.sponsor_page.success_dialog.close') }}
-            </RuiButton>
-          </div>
-        </template>
-      </RuiCard>
-    </RuiDialog>
-
-    <Confetti
-      v-if="showSuccessDialog"
-      class="absolute top-0 left-0 w-full h-full z-[10000]"
+      :selected-tier="selectedTier"
+      :token-id="sponsorshipState.tokenId"
+      :release-name="releaseName"
+      :transaction-url="transactionUrl"
     />
   </div>
 </template>

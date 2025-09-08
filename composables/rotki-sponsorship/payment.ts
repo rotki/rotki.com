@@ -131,7 +131,7 @@ export function useRotkiSponsorshipPayment() {
       return `${explorerUrl}/tx/${state.txHash}`;
     }
 
-    return null;
+    return undefined;
   });
 
   async function loadPaymentTokens() {
