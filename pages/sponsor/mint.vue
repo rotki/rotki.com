@@ -21,7 +21,7 @@ const {
 useHead({
   title: 'Sponsor | rotki',
   meta: [
-    ...getMetadata('Sponsor | rotki', description, baseUrl, `${baseUrl}/sponsor/mint`),
+    ...getMetadata('Sponsor | rotki', description, `${baseUrl}/sponsor/mint`, baseUrl, 'mint.png'),
   ],
   ...commonAttrs(),
 });
@@ -446,7 +446,7 @@ onBeforeMount(async () => {
               />
               <RuiSkeletonLoader
                 v-if="imageLoading"
-                class="absolute top-0 left-0 z-[1] w-full h-full"
+                class="absolute top-0 left-0 z-[0] w-full h-full"
               />
             </div>
             <RuiSkeletonLoader

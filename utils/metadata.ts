@@ -3,8 +3,9 @@ export function getMetadata(
   description: string,
   url: string,
   baseUrl: string,
+  imageName = 'share.png',
 ) {
-  const imageUrl = `${baseUrl}/img/share.png`;
+  const imageUrl = `${baseUrl}/img/og/${imageName}`;
   return [
     {
       content: description,

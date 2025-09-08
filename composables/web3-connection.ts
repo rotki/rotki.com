@@ -63,6 +63,9 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     networks: [defaultNetwork],
     projectId,
     themeMode: 'light',
+    themeVariables: {
+      '--w3m-font-family': 'Roboto, sans-serif',
+    },
   });
 
   // Initialize state from current appKit connection
