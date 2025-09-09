@@ -9,7 +9,7 @@ defineProps<{
   plans: MappedPlan[];
   selectedPeriod: PricingPeriod;
   compact?: boolean;
-  featuresLabel: { title: string; children: string[] }[];
+  featuresLabel: string[];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -17,7 +17,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div
-    class="grid"
+    class="grid relative"
     :style="{
       gridTemplateColumns: `repeat(${plans.length + 1}, 1fr)`,
     }"
@@ -84,39 +84,22 @@ const { t } = useI18n({ useScope: 'global' });
       :key="mainIndex"
     >
       <div
-        class="p-4 text-rui-primary font-medium"
-        :class="{ 'pt-16': mainIndex > 0 }"
+        :class="{ 'bg-gray-50': mainIndex % 2 === 0 }"
+        class="px-4 py-3.5 font-medium"
       >
-        {{ featureLabel.title }}
+        {{ featureLabel }}
       </div>
-      <div
+      <template
         v-for="plan in plans"
         :key="plan.name"
-        class="h-full"
-        :class="{ 'border-x-2 border-rui-primary': isMostPopularPlan(plan) }"
-      />
-      <template
-        v-for="(item, smallIndex) in featureLabel.children"
-        :key="smallIndex"
       >
-        <div
-          :class="{ 'bg-gray-50': smallIndex % 2 === 0 }"
-          class="px-4 py-3.5 font-medium"
-        >
-          {{ item }}
-        </div>
-        <template
-          v-for="plan in plans"
-          :key="plan.name"
-        >
-          <PricingTableCell
-            :value="plan.features[mainIndex][smallIndex] "
-            :class="{
-              'bg-gray-50': smallIndex % 2 === 0,
-              'border-x-2 border-rui-primary': isMostPopularPlan(plan),
-            }"
-          />
-        </template>
+        <PricingTableCell
+          :value="plan.features[mainIndex]"
+          :class="{
+            'bg-gray-50': mainIndex % 2 === 0,
+            'border-x-2 border-rui-primary': isMostPopularPlan(plan),
+          }"
+        />
       </template>
     </template>
     <template v-if="!compact">
@@ -124,14 +107,13 @@ const { t } = useI18n({ useScope: 'global' });
       <div
         v-for="plan in plans"
         :key="plan.name"
-        class="flex flex-col p-4 xl:p-6"
+        class="flex flex-col p-2"
         :class="{ 'border-x-2 border-rui-primary rounded-b-xl border-b-2': isMostPopularPlan(plan) }"
-      >
-        <PricingTableButton
-          :selected-period="selectedPeriod"
-          :plan="plan"
-        />
-      </div>
+      />
     </template>
+    <div
+      v-if="compact"
+      class="w-full absolute bottom-0 left-0 h-20 bg-gradient-to-b from-transparent to-white"
+    />
   </div>
 </template>

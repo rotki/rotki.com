@@ -9,7 +9,7 @@ const props = defineProps<{
   plans: MappedPlan[];
   selectedPeriod: PricingPeriod;
   compact?: boolean;
-  featuresLabel: { title: string; children: string[] }[];
+  featuresLabel: string[];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -86,38 +86,17 @@ const tab = ref(props.plans[0].name);
             />
           </div>
 
-          <template
-            v-for="(featureLabel, mainIndex) in featuresLabel"
-            :key="mainIndex"
-          >
-            <div
-              class="p-4 text-rui-primary font-medium"
-              :class="{ 'pt-8': mainIndex > 0 }"
-            >
-              {{ featureLabel.title }}
-            </div>
-            <template
-              v-for="(item, smallIndex) in featureLabel.children"
-              :key="smallIndex"
-            >
-              <PricingTableCell
-                :label="item"
-                :value="plan.features[mainIndex][smallIndex] "
-                :class="{
-                  'bg-gray-50': smallIndex % 2 === 0,
-                }"
-              />
-            </template>
-          </template>
-          <div
-            v-if="!compact"
-            class="pt-8 px-4"
-          >
-            <PricingTableButton
-              :selected-period="selectedPeriod"
-              :plan="plan"
+          <template v-if="!isCustomPlan(plan)">
+            <PricingTableCell
+              v-for="(featureLabel, mainIndex) in featuresLabel"
+              :key="mainIndex"
+              :label="featureLabel"
+              :value="plan.features[mainIndex] "
+              :class="{
+                'bg-gray-50': mainIndex % 2 === 0,
+              }"
             />
-          </div>
+          </template>
         </div>
       </RuiTabItem>
     </RuiTabItems>
