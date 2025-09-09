@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { MappedPlan } from '~/components/pricings/type';
+import type { FeatureValue, MappedPlan } from '~/components/pricings/type';
 import { get } from '@vueuse/core';
+import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
 import { type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 
 const props = withDefaults(
@@ -16,49 +17,89 @@ const props = withDefaults(
 
 const { t } = useI18n({ useScope: 'global' });
 
+const featuresLabel = computed<string[]>(() => {
+  // Aggregate all unique labels from all plans' descriptions
+  const labelSet = new Set<string>();
+
+  props.tiersData.forEach((item) => {
+    if (item.description) {
+      item.description.forEach((desc) => {
+        labelSet.add(desc.label);
+      });
+    }
+  });
+
+  return Array.from(labelSet);
+});
+
+// Helper function to calculate prices
+function calculatePrices(item: any, isYearly: boolean): { monthlyPrice: number; yearlyPrice: number } {
+  if (item.yearlyPlan && item.monthlyPlan) {
+    const yearlyPrice = parseFloat(item.yearlyPlan.price);
+    const monthlyPrice = !isYearly ? parseFloat(item.monthlyPlan.price) : (yearlyPrice / 12);
+    return { monthlyPrice, yearlyPrice };
+  }
+  if (item.yearlyPlan && !item.monthlyPlan) {
+    const yearlyPrice = parseFloat(item.yearlyPlan.price);
+    return { monthlyPrice: yearlyPrice / 12, yearlyPrice };
+  }
+  if (item.monthlyPlan && !item.yearlyPlan) {
+    const monthlyPrice = parseFloat(item.monthlyPlan.price);
+    return { monthlyPrice, yearlyPrice: monthlyPrice * 12 };
+  }
+  return { monthlyPrice: 0, yearlyPrice: 0 };
+}
+
+// Helper function to get feature value for a plan
+function getFeatureValue(plan: Omit<MappedPlan, 'features'>, label: string, descriptionMap: Map<string, Map<string, FeatureValue>>): FeatureValue {
+  if (isFreePlan(plan))
+    return undefined;
+  if (isCustomPlan(plan))
+    return '';
+
+  const planDescriptions = descriptionMap.get(plan.name);
+  return planDescriptions?.get(label) ?? undefined;
+}
+
 const plans = computed<MappedPlan[]>(() => {
   const isYearly = props.selectedPeriod === PricingPeriod.YEARLY;
 
   const regularPlan: Omit<MappedPlan, 'features'>[] = [];
+  const descriptionMap = new Map<string, Map<string, FeatureValue>>();
 
-  props.tiersData
-    .forEach((item) => {
-      // Skip if yearly plan is needed but doesn't exist
-      if (isYearly && !item.yearlyPlan)
-        return;
-      // Skip if monthly plan is needed but doesn't exist
-      if (!isYearly && !item.monthlyPlan)
-        return;
-
-      let yearlyPrice = 0;
-      let monthlyPrice = 0;
-
-      if (item.yearlyPlan && item.monthlyPlan) {
-        yearlyPrice = parseFloat(item.yearlyPlan.price);
-        monthlyPrice = !isYearly ? parseFloat(item.monthlyPlan.price) : (yearlyPrice / 12);
-      }
-      else if (item.yearlyPlan && !item.monthlyPlan) {
-        yearlyPrice = parseFloat(item.yearlyPlan.price);
-        monthlyPrice = yearlyPrice / 12;
-      }
-      else if (item.monthlyPlan && !item.yearlyPlan) {
-        monthlyPrice = parseFloat(item.monthlyPlan.price);
-        yearlyPrice = monthlyPrice * 12;
-      }
-
-      // Format prices to remove trailing zeros
-      const formattedMonthlyPrice = formatCurrency(monthlyPrice);
-      const formattedYearlyPrice = formatCurrency(yearlyPrice);
-
-      regularPlan.push({
-        name: item.name,
-        displayedName: t('pricing.plans.plan', { plan: toTitleCase(item.name) }),
-        mainPriceDisplay: `€ ${formattedMonthlyPrice}`,
-        secondaryPriceDisplay: isYearly ? t('pricing.billed_annually', { price: formattedYearlyPrice }) : t('pricing.billed_monthly'),
-        type: 'regular',
-        isMostPopular: item.isMostPopular,
+  // Build a map of plan descriptions for feature mapping
+  props.tiersData.forEach((item) => {
+    if (item.description) {
+      const planDescriptions = new Map<string, FeatureValue>();
+      item.description.forEach((desc) => {
+        planDescriptions.set(desc.label, desc.value);
       });
+      descriptionMap.set(item.name, planDescriptions);
+    }
+  });
+
+  // Process regular plans
+  props.tiersData.forEach((item) => {
+    // Skip if required plan doesn't exist
+    if ((isYearly && !item.yearlyPlan) || (!isYearly && !item.monthlyPlan)) {
+      return;
+    }
+
+    const { monthlyPrice, yearlyPrice } = calculatePrices(item, isYearly);
+    const formattedMonthlyPrice = formatCurrency(monthlyPrice);
+    const formattedYearlyPrice = formatCurrency(yearlyPrice);
+
+    regularPlan.push({
+      name: item.name,
+      displayedName: t('pricing.plans.plan', { plan: toTitleCase(item.name) }),
+      mainPriceDisplay: `€ ${formattedMonthlyPrice}`,
+      secondaryPriceDisplay: isYearly
+        ? t('pricing.billed_annually', { price: formattedYearlyPrice })
+        : t('pricing.billed_monthly'),
+      type: 'regular',
+      isMostPopular: item.isMostPopular,
     });
+  });
 
   const freeTier: Omit<MappedPlan, 'features'> = {
     name: 'starter',
@@ -74,64 +115,22 @@ const plans = computed<MappedPlan[]>(() => {
     type: 'custom',
   };
 
-  return [
-    freeTier,
-    ...regularPlan,
-    customTier,
-  ].map(item => ({
-    ...item,
-    features: [
-      [
-        true,
-        'Something',
-        'Something',
-        true,
-        false,
-        false,
-      ],
-      [
-        true,
-        'Something',
-        'Something',
-        true,
-        false,
-        false,
-      ],
-    ],
+  // Combine all plans and map features
+  const labels = get(featuresLabel);
+  const allPlans = [freeTier, ...regularPlan, customTier];
+
+  return allPlans.map(plan => ({
+    ...plan,
+    features: labels.map(label => getFeatureValue(plan, label, descriptionMap)),
   }));
 });
 
-// TODO: get this information from backend
-const featuresLabel = [
-  {
-    title: 'Overview',
-    children: [
-      'Basic Features',
-      'Something',
-      'Something',
-      'Something',
-    ],
-  },
-  {
-    title: 'Overview',
-    children: [
-      'Basic Features',
-      'Something',
-      'Something',
-      'Something',
-    ],
-  },
-];
+const allowCompact = computed<boolean>(() => props.compact && get(featuresLabel).length > 0);
+const compactView = ref<boolean>(get(allowCompact));
 
-const allowCompact = computed(() => props.compact && featuresLabel.length > 0);
-const compactView = ref(get(allowCompact));
-
-const displayedFeaturesLabel = computed(() => {
-  if (get(compactView)) {
-    return [featuresLabel[0]];
-  }
-  return featuresLabel;
-});
+const displayedFeaturesLabel = computed<string[]>(() =>
+  get(compactView) ? [get(featuresLabel)[0]] : get(featuresLabel),
+);
 
 const { isLgAndUp } = useBreakpoint();
 </script>

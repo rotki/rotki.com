@@ -1,13 +1,13 @@
 <script setup lang="ts">
 defineProps<{
   label?: string;
-  value: true | false | string;
+  value?: number | string | boolean;
 }>();
 </script>
 
 <template>
   <div
-    class="px-4 py-2 flex gap-2 justify-center items-center text-center"
+    class="px-4 xl:px-6 py-2 flex gap-2 items-center text-sm"
     :class="{ '!justify-start': label }"
   >
     <div
@@ -16,7 +16,10 @@ defineProps<{
     >
       {{ label }}
     </div>
-    <template v-if="typeof value === 'string'">
+    <template v-if="value === ''">
+      &nbsp;
+    </template>
+    <template v-else-if="typeof value === 'string' || typeof value === 'number'">
       {{ value }}
     </template>
     <template v-else-if="value">
@@ -28,9 +31,9 @@ defineProps<{
     </template>
     <template v-else>
       <RuiIcon
+        class="text-rui-text-secondary"
         name="lu-minus"
         size="24"
-        color="success"
       />
     </template>
   </div>

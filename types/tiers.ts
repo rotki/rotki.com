@@ -5,7 +5,13 @@ export const PremiumTierPlan = z.object({
   price: z.string(),
 }).nullable();
 
+export const PremiumTierInfoDescription = z.object({
+  label: z.string(),
+  value: z.union([z.string(), z.number(), z.boolean()]),
+});
+
 export const PremiumTierInfo = z.object({
+  description: z.array(PremiumTierInfoDescription),
   limits: z.object({
     maxBackupSizeMb: z.number(),
   }),
@@ -14,7 +20,7 @@ export const PremiumTierInfo = z.object({
   yearlyPlan: PremiumTierPlan,
 }).transform(data => ({
   ...data,
-  isMostPopular: data.name === 'pelican', // TODO: get this from backend
+  isMostPopular: data.name === 'next', // TODO: get this from backend
 }));
 
 export type PremiumTierInfo = z.infer<typeof PremiumTierInfo>;
