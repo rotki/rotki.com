@@ -55,7 +55,7 @@ function getFeatureValue(plan: Omit<MappedPlan, 'features'>, label: string, desc
   if (isFreePlan(plan))
     return undefined;
   if (isCustomPlan(plan))
-    return '';
+    return t('pricing.custom_plan_highest_tier');
 
   const planDescriptions = descriptionMap.get(plan.name);
   return planDescriptions?.get(label) ?? undefined;
@@ -78,6 +78,17 @@ const plans = computed<MappedPlan[]>(() => {
     }
   });
 
+  // Find the highest price among all regular plans
+  let maxPrice = 0;
+  props.tiersData.forEach((item) => {
+    if ((isYearly && item.yearlyPlan) || (!isYearly && item.monthlyPlan)) {
+      const { monthlyPrice } = calculatePrices(item, isYearly);
+      if (monthlyPrice > maxPrice) {
+        maxPrice = monthlyPrice;
+      }
+    }
+  });
+
   // Process regular plans
   props.tiersData.forEach((item) => {
     // Skip if required plan doesn't exist
@@ -97,7 +108,7 @@ const plans = computed<MappedPlan[]>(() => {
         ? t('pricing.billed_annually', { price: formattedYearlyPrice })
         : t('pricing.billed_monthly'),
       type: 'regular',
-      isMostPopular: item.isMostPopular,
+      isMostPopular: monthlyPrice === maxPrice,
     });
   });
 
@@ -106,6 +117,7 @@ const plans = computed<MappedPlan[]>(() => {
     displayedName: t('pricing.plans.starter_plan'),
     mainPriceDisplay: t('pricing.free'),
     type: 'free',
+    isMostPopular: false,
   };
 
   const customTier: Omit<MappedPlan, 'features'> = {
@@ -113,6 +125,7 @@ const plans = computed<MappedPlan[]>(() => {
     displayedName: t('pricing.plans.custom_plan'),
     mainPriceDisplay: t('pricing.contact_us'),
     type: 'custom',
+    isMostPopular: false,
   };
 
   // Combine all plans and map features

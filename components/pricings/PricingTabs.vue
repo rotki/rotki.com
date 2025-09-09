@@ -86,17 +86,15 @@ const tab = ref(props.plans[0].name);
             />
           </div>
 
-          <template v-if="!isCustomPlan(plan)">
-            <PricingTableCell
-              v-for="(featureLabel, mainIndex) in featuresLabel"
-              :key="mainIndex"
-              :label="featureLabel"
-              :value="plan.features[mainIndex] "
-              :class="{
-                'bg-gray-50': mainIndex % 2 === 0,
-              }"
-            />
-          </template>
+          <PricingTableCell
+            v-for="(featureLabel, mainIndex) in featuresLabel"
+            :key="mainIndex"
+            :label="featureLabel"
+            :value="plan.features[mainIndex] "
+            :class="{
+              'bg-gray-50': mainIndex % 2 === 0,
+            }"
+          />
         </div>
       </RuiTabItem>
     </RuiTabItems>

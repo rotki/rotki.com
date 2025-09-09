@@ -7,6 +7,7 @@ import { formatCurrency } from '~/utils/text';
 const props = withDefaults(
   defineProps<{
     plan: AvailablePlan;
+    isMostPopular?: boolean;
     selected?: boolean;
     period: PricingPeriod;
     readonly?: boolean;
@@ -14,6 +15,7 @@ const props = withDefaults(
   }>(),
   {
     selected: false,
+    isMostPopular: false,
   },
 );
 
@@ -24,7 +26,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { plan, period, selected } = toRefs(props);
+const { plan, period, selected, isMostPopular } = toRefs(props);
 
 const price = computed<string | undefined>(() => {
   const { monthlyPlan, yearlyPlan } = get(plan);
@@ -54,7 +56,7 @@ watch(price, (price) => {
     @click="emit('click')"
   >
     <RuiChip
-      v-if="plan.isMostPopular"
+      v-if="isMostPopular"
       color="primary"
       class="mb-2 !min-h-4"
       :class="{

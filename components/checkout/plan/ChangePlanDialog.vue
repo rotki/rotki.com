@@ -4,6 +4,7 @@ import type { AvailablePlan } from '~/types';
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { getMostPopularPlanName } from '~/components/pricings/utils';
 import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 
@@ -51,6 +52,8 @@ function select(plan: AvailablePlan) {
     plan: plan.tierName,
   });
 }
+
+const mostPopularPlanName = getMostPopularPlanName(availablePlans);
 
 watch(visible, (visible) => {
   if (!visible)
@@ -105,6 +108,7 @@ onBeforeMount(async () => {
             :key="plan.tierName"
             class="hover:bg-rui-grey-100 transition-all"
             :plan="plan"
+            :is-most-popular="plan.tierName === mostPopularPlanName"
             readonly
             :disabled="warning && !confirmed"
             :period="selectedPlanPeriod"
