@@ -161,8 +161,13 @@ export class RpcManager {
    * Clear cached provider for a specific RPC URL
    */
   private clearProvider(rpcUrl: string): void {
-    this.providerCache.delete(rpcUrl);
-    logger.debug(`Cleared cached provider for RPC: ${rpcUrl}`);
+    const provider = this.providerCache.get(rpcUrl);
+    if (provider) {
+      // Destroy the provider to stop all background tasks
+      provider.destroy();
+      this.providerCache.delete(rpcUrl);
+      logger.debug(`Cleared and destroyed provider for RPC: ${rpcUrl}`);
+    }
   }
 
   /**
