@@ -7,7 +7,7 @@ export interface MappedPlan {
   displayedName: string;
   mainPriceDisplay: string;
   type: PlanType;
-  isMostPopular?: boolean;
+  isMostPopular: boolean;
   secondaryPriceDisplay?: string;
   features: FeatureValue[];
 }

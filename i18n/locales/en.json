@@ -771,6 +771,7 @@
       "description": "Simple, transparent pricing that grows with you. Try any plan free for 30 days."
     },
     "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
+    "custom_plan_highest_tier": "Highest among all the tiers.",
     "per_month": "/month",
     "per_year": "/year",
     "most_popular_plan": "Most popular plan",

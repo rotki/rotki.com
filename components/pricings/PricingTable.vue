@@ -98,6 +98,7 @@ const { t } = useI18n({ useScope: 'global' });
           :class="{
             'bg-gray-50': mainIndex % 2 === 0,
             'border-x-2 border-rui-primary': isMostPopularPlan(plan),
+            'font-medium': isCustomPlan(plan),
           }"
         />
       </template>

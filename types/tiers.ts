@@ -18,10 +18,7 @@ export const PremiumTierInfo = z.object({
   monthlyPlan: PremiumTierPlan,
   name: z.string(),
   yearlyPlan: PremiumTierPlan,
-}).transform(data => ({
-  ...data,
-  isMostPopular: data.name === 'next', // TODO: get this from backend
-}));
+});
 
 export type PremiumTierInfo = z.infer<typeof PremiumTierInfo>;
 
