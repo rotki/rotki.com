@@ -1,5 +1,15 @@
 import process from 'node:process';
 import rotkiTheme from '@rotki/ui-library/theme';
+import {
+  baseCSP,
+  braintreeBaseCSP,
+  createDevCSP,
+  mergeCSP,
+  paypalCSP,
+  recaptchaCSP,
+  threeDSecureCSP,
+  walletConnectCSP,
+} from './csp-config';
 
 const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
 
@@ -46,6 +56,11 @@ const proxy = {
   referrer,
   target: `${baseUrl}/webapi`,
 };
+
+// Dynamic port configuration for development CSP
+const devPort = Number(process.env.NUXT_DEV_PORT) || 3000;
+const hmrPort = Number(process.env.NUXT_HMR_PORT) || 4000;
+const devCSP = createDevCSP(devPort, hmrPort);
 
 export default defineNuxtConfig({
   app: {
@@ -122,6 +137,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     './modules/ui-library/module.ts',
     '@nuxt/image',
+    'nuxt-security',
   ],
 
   nitro: {
@@ -164,6 +180,128 @@ export default defineNuxtConfig({
   routeRules: {
     '/home/**': { robots: false },
     ...(!sponsorshipEnabled ? { '/sponsor/**': { robots: false } } : {}),
+
+    // Legacy checkout/pay route (can be removed once unused)
+    '/checkout/pay': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            recaptchaCSP,
+            braintreeBaseCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
+    // Card payment page with 3D Secure
+    '/checkout/pay/card': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            recaptchaCSP,
+            braintreeBaseCSP,
+            threeDSecureCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
+
+    // Crypto payment pages with WalletConnect
+    '/checkout/pay/crypto': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            walletConnectCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+          crossOriginOpenerPolicy: 'unsafe-none', // Required for Coinbase Wallet SDK
+        },
+      },
+    },
+
+    // Payment method selection page (base Braintree)
+    '/checkout/pay/method': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            recaptchaCSP,
+            braintreeBaseCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
+
+    // PayPal payment page
+    '/checkout/pay/paypal': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            recaptchaCSP,
+            braintreeBaseCSP,
+            paypalCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
+
+    '/checkout/pay/request-crypto': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            walletConnectCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+          crossOriginOpenerPolicy: 'unsafe-none', // Required for Coinbase Wallet SDK
+        },
+      },
+    },
+
+    '/password/recover': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            recaptchaCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
+    // Account pages with reCAPTCHA
+    '/signup': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            recaptchaCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
+
+    // Sponsor pages with WalletConnect
+    '/sponsor/**': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            walletConnectCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+          crossOriginOpenerPolicy: 'unsafe-none', // Required for Coinbase Wallet SDK
+        },
+      },
+    },
   },
 
   runtimeConfig: {
@@ -198,6 +336,19 @@ export default defineNuxtConfig({
       host: '',
       password: '',
     },
+  },
+
+  security: {
+    enabled: process.env.SKIP_CSP !== 'true',
+    headers: {
+      // Base CSP for all pages (minimal, most restrictive)
+      contentSecurityPolicy: process.env.NODE_ENV === 'development'
+        ? mergeCSP(baseCSP, devCSP)
+        : baseCSP,
+    },
+    hidePoweredBy: false,
+    nonce: true,
+    sri: true,
   },
 
   site: {

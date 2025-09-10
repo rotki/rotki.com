@@ -82,16 +82,7 @@ async function next() {
   });
 
   if (get(authenticated)) {
-    if (method === PaymentMethod.CARD) {
-      // For card payments we use href instead of router to trigger a server reload
-      // This need to happen due to the CSP policy required for 3DSecure v2
-      window.location.href = new URL(
-        `${window.location.origin}${href}`,
-      ).toString();
-    }
-    else {
-      await navigateTo(href);
-    }
+    await navigateToWithCSPSupport(href);
   }
   else {
     await navigateTo({
