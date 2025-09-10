@@ -3,6 +3,7 @@ import type { Plan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -41,9 +42,9 @@ function select(plan: Plan) {
   set(identifier, plan.months);
 }
 
-function next() {
+async function next(): Promise<void> {
   set(processing, true);
-  navigateTo({
+  await navigateToWithCSPSupport({
     name: 'checkout-pay-method',
     query: { ...route.query, plan: get(identifier) },
   });
