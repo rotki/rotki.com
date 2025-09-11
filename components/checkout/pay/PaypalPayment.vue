@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 import type { PaymentStep, SelectedPlan } from '~/types';
 import type { PayEvent } from '~/types/common';
 import { get, set } from '@vueuse/core';
-import { client, paypalCheckout } from 'braintree-web';
+import { getBraintreeClient, getBraintreePayPal, useBraintreeScript } from '~/composables/use-braintree-script';
 import { usePaymentPaypalStore } from '~/store/payments/paypal';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -16,9 +16,6 @@ interface ErrorMessage {
 const props = defineProps<{
   token: string;
   plan: SelectedPlan;
-  success: boolean;
-  failure: boolean;
-  pending: boolean;
   loading: boolean;
   status: PaymentStep;
 }>();
@@ -33,7 +30,11 @@ const { t } = useI18n({ useScope: 'global' });
 const { paymentMethodId } = usePaymentMethodParam();
 const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
-const { token, plan, loading, pending, success } = toRefs(props);
+const { token, plan, loading, status } = toRefs(props);
+
+// Derive boolean states from status
+const success = computed<boolean>(() => get(status).type === 'success');
+const pending = computed<boolean>(() => get(status).type === 'pending');
 const error = ref<ErrorMessage | null>(null);
 const accepted = ref(false);
 const mustAcceptRefund = ref(false);
@@ -62,11 +63,13 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
     else
       paypalActions?.enable();
   });
-  const btClient = await client.create({
+  const clientModule = getBraintreeClient();
+  const paypalModule = getBraintreePayPal();
+  const btClient = await clientModule.create({
     authorization: get(token),
   });
 
-  const btPayPalCheckout = await paypalCheckout.create({
+  const btPayPalCheckout = await paypalModule.create({
     client: btClient,
   });
   await btPayPalCheckout.loadPayPalSDK({
@@ -153,9 +156,26 @@ const stopWatcher = watchEffect(() => {
     redirect();
 });
 
+// Load Braintree scripts for PayPal
+const { ready: scriptReady, error: scriptError } = useBraintreeScript('paypal');
+
+// Watch for script loading errors
+watch(scriptError, (scriptErr) => {
+  if (scriptErr) {
+    set(error, {
+      title: t('subscription.error.init_error'),
+      message: scriptErr.message,
+    });
+  }
+});
+
 onMounted(async () => {
   try {
     set(initializing, true);
+
+    // Wait for scripts to be ready
+    await until(scriptReady).toBe(true);
+
     btClient = await initializeBraintree(token, plan, p => emit('pay', p));
     set(initializing, false);
   }

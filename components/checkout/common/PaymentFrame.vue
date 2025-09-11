@@ -1,26 +1,35 @@
 <script setup lang="ts">
-import type { IdleStep, PaymentStep, StepType } from '~/types';
-import { get, toRefs } from '@vueuse/core';
+import type { PaymentStep } from '~/types';
+import { get, set, toRefs } from '@vueuse/core';
+
+const step = defineModel<PaymentStep>('step', { required: true });
 
 const props = defineProps<{
-  step: PaymentStep;
+  loading?: boolean;
+}>();
+
+defineSlots<{
+  default: (props: {
+    status: PaymentStep;
+  }) => any;
+  description: () => any;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { step } = toRefs(props);
+const { loading } = toRefs(props);
 
-function useType(type: StepType | IdleStep) {
-  return computed(() => get(step).type === type);
+const isLoading = computed<boolean>(() => get(loading) || false);
+
+function dismissFailure(): void {
+  if (get(step).type === 'failure') {
+    set(step, { type: 'idle' });
+  }
 }
-
-const isPending = useType('pending');
-const isSuccess = useType('success');
-const isFailure = useType('failure');
 </script>
 
 <template>
-  <div :class="$style.content">
+  <div class="flex flex-col w-full max-w-[29rem] mx-auto mt-8 lg:mt-0 grow">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_3.title') }}
     </CheckoutTitle>
@@ -31,45 +40,34 @@ const isFailure = useType('failure');
       </CheckoutDescription>
     </slot>
 
-    <slot
-      :failure="isFailure"
-      :pending="isPending"
-      :success="isSuccess"
-      :status="step"
-    />
+    <div class="min-h-[25rem]">
+      <div
+        v-if="isLoading"
+        class="flex justify-center items-center h-full"
+      >
+        <RuiProgress
+          variant="indeterminate"
+          size="48"
+          circular
+          color="primary"
+        />
+      </div>
+      <slot
+        v-else
+        :status="step"
+      />
+    </div>
   </div>
+
+  <FloatingNotification
+    :timeout="10000"
+    :visible="step.type === 'failure'"
+    closeable
+    @dismiss="dismissFailure()"
+  >
+    <template #title>
+      {{ step.title }}
+    </template>
+    {{ step.message }}
+  </FloatingNotification>
 </template>
-
-<style lang="scss" module>
-.loader {
-  @apply min-h-[25rem];
-}
-
-.braintree {
-  @apply ml-1 w-[7.5rem];
-}
-
-.text {
-  @apply pt-0.5;
-}
-
-.description {
-  @apply flex flex-row justify-center;
-}
-
-.content {
-  @apply flex flex-col w-full max-w-[29rem] mx-auto mt-8 lg:mt-0 grow;
-}
-
-.action {
-  @apply text-rui-primary-darker text-center mt-3 mb-1;
-}
-
-.action-wrapper {
-  @apply flex flex-row justify-center;
-}
-
-.close {
-  @apply flex flex-row justify-center mt-4;
-}
-</style>

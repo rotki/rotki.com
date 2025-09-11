@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields';
+import type { Client } from 'braintree-web';
+import type { HostedFields, HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields';
 import type { Ref } from 'vue';
 import { get, set } from '@vueuse/core';
-import { type Client, type HostedFields, hostedFields } from 'braintree-web';
+import { getBraintreeHostedFields } from '~/composables/use-braintree-script';
 import { assert } from '~/utils/assert';
 
 interface FieldStatus {
@@ -143,7 +144,8 @@ function setupHostedFields() {
   };
 
   const create = async (client: Client) => {
-    _fields = await hostedFields.create({
+    const hostedFieldsModule = getBraintreeHostedFields();
+    _fields = await hostedFieldsModule.create({
       client,
       styles: {
         'body': {

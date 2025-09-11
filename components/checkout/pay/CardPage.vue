@@ -1,43 +1,46 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
-import { usePaymentCardsStore } from '~/store/payments/cards';
+import type { SavedCard } from '~/types';
+import { get, set } from '@vueuse/core';
+import { useBraintreeScript } from '~/composables/use-braintree-script';
+import { usePaymentCards } from '~/composables/use-payment-cards';
 
+const isInitialLoad = ref<boolean>(true);
+
+const { ready: braintreeReady } = useBraintreeScript('card');
 const { token, step, plan, pending, loading, submit } = useBraintree();
+const { getCard } = usePaymentCards();
 
-const store = usePaymentCardsStore();
-const { getCard } = store;
-const { card } = storeToRefs(store);
-const loadingCard = ref(false);
+const { data: card, pending: loadingCard, refresh: refreshCard } = await useAsyncData(
+  'saved-card',
+  async () => await getCard(),
+  {
+    default: (): SavedCard | undefined => undefined,
+  },
+);
 
-onBeforeMount(async () => {
-  set(loadingCard, true);
-  await getCard();
-  set(loadingCard, false);
+watch(loadingCard, (isLoading) => {
+  if (!isLoading && get(isInitialLoad)) {
+    set(isInitialLoad, false);
+  }
 });
 </script>
 
 <template>
-  <PaymentFrame :step="step">
-    <template #default="slotProps">
-      <div
-        v-if="!(token && plan) || loading || loadingCard"
-        class="flex justify-center my-10"
-      >
-        <RuiProgress
-          variant="indeterminate"
-          size="48"
-          circular
-          color="primary"
-        />
-      </div>
+  <PaymentFrame
+    v-model:step="step"
+    :loading="!(token && plan) || loading || (loadingCard && isInitialLoad) || !braintreeReady"
+  >
+    <template #default="{ status }">
       <CardPayment
-        v-else
+        v-if="plan"
         :card="card"
-        v-bind="slotProps"
+        :status="status"
         :plan="plan"
         :token="token"
         @pay="submit($event)"
         @update:pending="pending = $event"
+        @card-deleted="refreshCard()"
+        @card-added="refreshCard()"
       />
     </template>
   </PaymentFrame>

@@ -1,4 +1,3 @@
-import { set } from '@vueuse/core';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
   type ApiResponse,
@@ -10,13 +9,11 @@ import {
 } from '~/types';
 import { useLogger } from '~/utils/use-logger';
 
-export const usePaymentCardsStore = defineStore('payments/cards', () => {
-  const card = ref<SavedCard>();
-
+export function usePaymentCards() {
   const logger = useLogger('card-payment');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  const getCard = async (): Promise<void> => {
+  const getCard = async (): Promise<SavedCard | undefined> => {
     try {
       const response = await fetchWithCsrf<SavedCardResponse>(
         '/webapi/payment/btr/cards/',
@@ -25,10 +22,11 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
         },
       );
       const parsedResponse = SavedCardResponse.parse(response);
-      set(card, parsedResponse.cardDetails);
+      return parsedResponse.cardDetails || undefined;
     }
     catch (error) {
       logger.error(error);
+      return undefined;
     }
   };
 
@@ -59,7 +57,6 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
           method: 'DELETE',
         },
       );
-      set(card, null);
     }
     catch (error) {
       logger.error(error);
@@ -85,9 +82,8 @@ export const usePaymentCardsStore = defineStore('payments/cards', () => {
 
   return {
     addCard,
-    card,
     createCardNonce,
     deleteCard,
     getCard,
   };
-});
+}

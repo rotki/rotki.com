@@ -7,7 +7,6 @@ definePageMeta({
     'authentication',
     'unverified',
     'subscriber',
-    'csp',
   ],
 });
 
