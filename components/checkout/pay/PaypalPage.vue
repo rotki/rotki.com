@@ -3,22 +3,14 @@ const { token, step, plan, pending, loading, submit, reset } = useBraintree();
 </script>
 
 <template>
-  <PaymentFrame :step="step">
-    <template #default="slotProps">
-      <div
-        v-if="!(token && plan) || !loading"
-        class="flex justify-center my-10"
-      >
-        <RuiProgress
-          variant="indeterminate"
-          size="48"
-          circular
-          color="primary"
-        />
-      </div>
+  <PaymentFrame
+    v-model:step="step"
+    :loading="!(token && plan) || !loading"
+  >
+    <template #default="{ status }">
       <PaypalPayment
-        v-else
-        v-bind="slotProps"
+        v-if="plan"
+        :status="status"
         :loading="loading"
         :plan="plan"
         :token="token"

@@ -11,9 +11,6 @@ import { useLogger } from '~/utils/use-logger';
 const props = defineProps<{
   token: string;
   plan: SelectedPlan;
-  success: boolean;
-  failure: boolean;
-  pending: boolean;
   status: PaymentStep;
   card: SavedCard | undefined;
 }>();
@@ -33,7 +30,11 @@ interface ErrorMessage {
   message: string;
 }
 
-const { token, plan, success, pending, card } = toRefs(props);
+const { token, plan, status, card } = toRefs(props);
+
+// Derive boolean states from status
+const success = computed<boolean>(() => get(status).type === 'success');
+const pending = computed<boolean>(() => get(status).type === 'pending');
 const verify = ref(false);
 const challengeVisible = ref(false);
 const paying = ref(false);
@@ -297,16 +298,6 @@ onUnmounted(() => {
       {{ error?.title }}
     </template>
     {{ error?.message }}
-  </FloatingNotification>
-
-  <FloatingNotification
-    :timeout="10000"
-    :visible="failure"
-  >
-    <template #title>
-      {{ status?.title }}
-    </template>
-    {{ status?.message }}
   </FloatingNotification>
 </template>
 

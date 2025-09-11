@@ -24,23 +24,15 @@ watch(loadingCard, (isLoading) => {
 </script>
 
 <template>
-  <PaymentFrame :step="step">
-    <template #default="slotProps">
-      <div
-        v-if="!(token && plan) || loading || (loadingCard && isInitialLoad)"
-        class="flex justify-center my-10"
-      >
-        <RuiProgress
-          variant="indeterminate"
-          size="48"
-          circular
-          color="primary"
-        />
-      </div>
+  <PaymentFrame
+    v-model:step="step"
+    :loading="!(token && plan) || loading || (loadingCard && isInitialLoad)"
+  >
+    <template #default="{ status }">
       <CardPayment
-        v-else
+        v-if="plan"
         :card="card"
-        v-bind="slotProps"
+        :status="status"
         :plan="plan"
         :token="token"
         @pay="submit($event)"
