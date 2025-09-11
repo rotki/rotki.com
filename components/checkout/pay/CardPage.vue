@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
-import { usePaymentCardsStore } from '~/store/payments/cards';
+import type { SavedCard } from '~/types';
+import { get, set } from '@vueuse/core';
+import { usePaymentCards } from '~/composables/use-payment-cards';
+
+const isInitialLoad = ref<boolean>(true);
 
 const { token, step, plan, pending, loading, submit } = useBraintree();
+const { getCard } = usePaymentCards();
 
-const store = usePaymentCardsStore();
-const { getCard } = store;
-const { card } = storeToRefs(store);
-const loadingCard = ref(false);
+const { data: card, pending: loadingCard, refresh: refreshCard } = await useAsyncData(
+  'saved-card',
+  async () => await getCard(),
+  {
+    default: (): SavedCard | undefined => undefined,
+  },
+);
 
-onBeforeMount(async () => {
-  set(loadingCard, true);
-  await getCard();
-  set(loadingCard, false);
+watch(loadingCard, (isLoading) => {
+  if (!isLoading && get(isInitialLoad)) {
+    set(isInitialLoad, false);
+  }
 });
 </script>
 
@@ -20,7 +27,7 @@ onBeforeMount(async () => {
   <PaymentFrame :step="step">
     <template #default="slotProps">
       <div
-        v-if="!(token && plan) || loading || loadingCard"
+        v-if="!(token && plan) || loading || (loadingCard && isInitialLoad)"
         class="flex justify-center my-10"
       >
         <RuiProgress
@@ -38,6 +45,8 @@ onBeforeMount(async () => {
         :token="token"
         @pay="submit($event)"
         @update:pending="pending = $event"
+        @card-deleted="refreshCard()"
+        @card-added="refreshCard()"
       />
     </template>
   </PaymentFrame>
