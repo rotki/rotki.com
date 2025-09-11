@@ -137,29 +137,21 @@ onMounted(async () => {
 </script>
 
 <template>
-  <PaymentFrame :step="step">
+  <PaymentFrame
+    v-model:step="step"
+    :loading="loading"
+  >
     <template #description>
       <CheckoutDescription>
         {{ t('home.plans.tiers.step_3.subtitle') }}
       </CheckoutDescription>
     </template>
-    <template #default="{ pending, success, failure, status }">
-      <div
-        v-if="loading"
-        class="flex justify-center my-10"
-      >
-        <RuiProgress
-          variant="indeterminate"
-          size="48"
-          circular
-          color="primary"
-        />
-      </div>
+    <template #default="{ status }">
       <CryptoPaymentForm
-        v-else-if="data && plan"
-        v-bind="{ success, failure, status, pending }"
+        v-if="data && plan"
         v-model:error="error"
         v-model:state="paymentState"
+        :status="status"
         :data="data"
         :loading="loading"
         :plan="plan"
@@ -168,7 +160,7 @@ onMounted(async () => {
 
       <div
         v-else
-        class="flex gap-4 justify-center w-full mt-auto"
+        class="flex gap-4 justify-center w-full mt-auto pt-8"
       >
         <RuiButton
           class="w-1/2"

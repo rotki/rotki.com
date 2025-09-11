@@ -15,9 +15,6 @@ const state = defineModel<StepType | IdleStep>('state', { required: true });
 const props = defineProps<{
   data: CryptoPayment;
   plan: number;
-  pending: boolean;
-  success: boolean;
-  failure: boolean;
   loading: boolean;
   status: PaymentStep;
 }>();
@@ -26,7 +23,11 @@ const emit = defineEmits<{
   (e: 'change'): void;
 }>();
 
-const { data, pending, loading, success } = toRefs(props);
+const { data, loading, status } = toRefs(props);
+
+// Derive boolean states from status
+const success = computed<boolean>(() => get(status).type === 'success');
+const pending = computed<boolean>(() => get(status).type === 'pending');
 
 const canvas = useTemplateRef('canvas');
 const qrText = ref<string>('');
@@ -91,11 +92,6 @@ stopWatcher = watchEffect(() => {
   if (get(success))
     redirect();
 });
-
-function dismissNotification() {
-  set(state, 'idle');
-  set(error, '');
-}
 
 watch(canvas, async (canvas) => {
   if (!canvas)
@@ -258,18 +254,6 @@ watch(canvas, async (canvas) => {
       {{ t('sponsor.sponsor_page.connected_to', { address: truncateAddress(address) }) }}
     </div>
   </div>
-
-  <FloatingNotification
-    :timeout="10000"
-    closeable
-    :visible="failure"
-    @dismiss="dismissNotification()"
-  >
-    <template #title>
-      {{ status?.title }}
-    </template>
-    {{ status?.message }}
-  </FloatingNotification>
 
   <ChangeCryptoPayment
     v-model="showChangePaymentDialog"
