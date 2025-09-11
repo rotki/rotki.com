@@ -16,9 +16,6 @@ interface ErrorMessage {
 const props = defineProps<{
   token: string;
   plan: SelectedPlan;
-  success: boolean;
-  failure: boolean;
-  pending: boolean;
   loading: boolean;
   status: PaymentStep;
 }>();
@@ -33,7 +30,11 @@ const { t } = useI18n({ useScope: 'global' });
 const { paymentMethodId } = usePaymentMethodParam();
 const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
-const { token, plan, loading, pending, success } = toRefs(props);
+const { token, plan, loading, status } = toRefs(props);
+
+// Derive boolean states from status
+const success = computed<boolean>(() => get(status).type === 'success');
+const pending = computed<boolean>(() => get(status).type === 'pending');
 const error = ref<ErrorMessage | null>(null);
 const accepted = ref(false);
 const mustAcceptRefund = ref(false);
