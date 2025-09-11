@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import type { PaymentStep, SavedCard, SelectedPlan } from '~/types';
 import type { PayEvent } from '~/types/common';
 import { get, set } from '@vueuse/core';
-import {
-  type Client,
-  client,
-  type ThreeDSecure,
-  threeDSecure,
-} from 'braintree-web';
-import { usePaymentCardsStore } from '~/store/payments/cards';
+import { type Client, create } from 'braintree-web/client';
+import { create as createThreeDSecure, type ThreeDSecure, type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
+import { usePaymentCards } from '~/composables/use-payment-cards';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
@@ -24,8 +19,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'pay', payment: PayEvent): void;
-  (e: 'update:pending', pending: boolean): void;
+  'pay': [payment: PayEvent];
+  'update:pending': [pending: boolean];
+  'card-deleted': [];
+  'card-added': [];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -46,7 +43,8 @@ const formInitializing = ref(true);
 const accepted = ref(false);
 const error = ref<ErrorMessage | null>(null);
 
-let btThreeDSecure: ThreeDSecure;
+const btClient = ref<Client | null>(null);
+const btThreeDSecure = ref<ThreeDSecure | null>(null);
 
 const formValid = ref(false);
 const valid = logicAnd(accepted, formValid);
@@ -54,13 +52,9 @@ const valid = logicAnd(accepted, formValid);
 const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
 
-const { addCard, createCardNonce } = usePaymentCardsStore();
+const { addCard, createCardNonce } = usePaymentCards();
 
 const logger = useLogger('card-payment');
-
-function updatePending() {
-  emit('update:pending', true);
-}
 
 async function back() {
   await navigateTo({
@@ -74,7 +68,20 @@ async function back() {
 
 const cardForm = ref();
 
+function updatePending() {
+  emit('update:pending', true);
+}
+
 async function submit() {
+  const threeDSecureInstance = get(btThreeDSecure);
+  if (!threeDSecureInstance) {
+    set(error, {
+      title: t('subscription.error.init_error'),
+      message: 'Braintree 3D Secure not initialized',
+    });
+    return;
+  }
+
   set(paying, true);
 
   const onClose = () => set(challengeVisible, false);
@@ -90,6 +97,11 @@ async function submit() {
       : await addCard({
           paymentMethodNonce: nonce,
         });
+
+    // If we just added a new card, emit event to refresh card data
+    if (!savedCard) {
+      emit('card-added');
+    }
 
     const paymentNonce = await createCardNonce({
       paymentToken,
@@ -109,10 +121,10 @@ async function submit() {
 
     set(verify, true);
 
-    btThreeDSecure.on('authentication-modal-close', onClose);
-    btThreeDSecure.on('authentication-modal-render', onRender);
+    threeDSecureInstance.on('authentication-modal-close', onClose);
+    threeDSecureInstance.on('authentication-modal-render', onRender);
 
-    const payload = await btThreeDSecure.verifyCard(options);
+    const payload = await threeDSecureInstance.verifyCard(options);
     set(challengeVisible, false);
 
     const threeDSecureInfo = payload.threeDSecureInfo;
@@ -146,8 +158,8 @@ async function submit() {
     set(paying, false);
     set(verify, false);
     set(challengeVisible, false);
-    btThreeDSecure.off('authentication-modal-close', onClose);
-    btThreeDSecure.off('authentication-modal-render', onRender);
+    threeDSecureInstance.off('authentication-modal-close', onClose);
+    threeDSecureInstance.off('authentication-modal-render', onRender);
   }
 }
 
@@ -167,20 +179,19 @@ function redirect() {
   window.location.href = url.toString();
 }
 
-const btClient = ref<Client | null>(null);
-
 onBeforeMount(async () => {
   try {
     set(initializing, true);
-    const newClient = await client.create({
+    const newClient = await create({
       authorization: get(token),
     });
     set(btClient, newClient);
 
-    btThreeDSecure = await threeDSecure.create({
+    const newThreeDSecure = await createThreeDSecure({
       version: '2',
       client: newClient,
     });
+    set(btThreeDSecure, newThreeDSecure);
   }
   catch (error_: any) {
     set(error, {
@@ -194,7 +205,7 @@ onBeforeMount(async () => {
 });
 
 onUnmounted(() => {
-  btThreeDSecure?.teardown();
+  get(btThreeDSecure)?.teardown();
 });
 </script>
 
@@ -209,6 +220,7 @@ onUnmounted(() => {
         :client="btClient"
         @update:form-valid="formValid = $event"
         @update:initializing="formInitializing = $event"
+        @card-deleted="emit('card-deleted')"
       />
       <CardForm
         v-else

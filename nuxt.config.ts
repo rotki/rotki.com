@@ -189,6 +189,7 @@ export default defineNuxtConfig({
             baseCSP,
             recaptchaCSP,
             braintreeBaseCSP,
+            threeDSecureCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
         },
