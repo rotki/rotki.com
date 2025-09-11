@@ -1,12 +1,10 @@
 <script setup lang="ts">
+import type { Client } from 'braintree-web';
+import type { VaultManager } from 'braintree-web/vault-manager';
 import type { SavedCard } from '~/types';
 import { get, set } from '@vueuse/core';
-import {
-  type Client,
-  type VaultManager,
-  vaultManager,
-} from 'braintree-web';
-import { usePaymentCardsStore } from '~/store/payments/cards';
+import { getBraintreeVaultManager } from '~/composables/use-braintree-script';
+import { usePaymentCards } from '~/composables/use-payment-cards';
 import { assert } from '~/utils/assert';
 
 interface ErrorMessage {
@@ -21,9 +19,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:error', error: ErrorMessage): void;
-  (e: 'update:form-valid', valid: boolean): void;
-  (e: 'update:initializing', initializing: boolean): void;
+  'update:error': [error: ErrorMessage];
+  'update:form-valid': [valid: boolean];
+  'update:initializing': [initializing: boolean];
+  'card-deleted': [];
 }>();
 
 const { client, card } = toRefs(props);
@@ -57,7 +56,8 @@ function setupVaults() {
   };
 
   const create = async (client: Client) => {
-    _vaults = await vaultManager.create({
+    const vaultManagerModule = getBraintreeVaultManager();
+    _vaults = await vaultManagerModule.create({
       client,
     });
   };
@@ -73,7 +73,7 @@ function setupVaults() {
     teardown,
   };
 }
-const { deleteCard } = usePaymentCardsStore();
+const { deleteCard } = usePaymentCards();
 const vaults = setupVaults();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -124,6 +124,7 @@ async function handleDeleteCard() {
   set(deleteLoading, true);
   await deleteCard(get(card).token);
   set(deleteLoading, false);
+  emit('card-deleted');
 }
 
 watchImmediate(payloadError, (payloadError) => {

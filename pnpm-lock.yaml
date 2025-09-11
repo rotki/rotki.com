@@ -44,9 +44,6 @@ importers:
       better-sqlite3:
         specifier: 12.2.0
         version: 12.2.0
-      braintree-web:
-        specifier: 3.126.0
-        version: 3.126.0
       ethers:
         specifier: 6.15.0
         version: 6.15.0
@@ -87,6 +84,9 @@ importers:
       '@nuxt/image':
         specifier: 1.11.0
         version: 1.11.0(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(idb-keyval@6.2.2)(ioredis@5.7.0)(magicast@0.3.5)
+      '@nuxt/scripts':
+        specifier: 0.11.13
+        version: 0.11.13(@netlify/blobs@9.1.2)(@unhead/vue@2.0.14(vue@3.5.18(typescript@5.8.3)))(db0@0.3.2(better-sqlite3@12.2.0))(idb-keyval@6.2.2)(ioredis@5.7.0)(magicast@0.3.5)(typescript@5.8.3)(vue@3.5.18(typescript@5.8.3))
       '@nuxt/test-utils':
         specifier: 3.19.2
         version: 3.19.2(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.3.0)(happy-dom@18.0.1)(jiti@2.5.1)(msw@2.10.5(@types/node@24.3.0)(typescript@5.8.3))(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
@@ -362,36 +362,6 @@ packages:
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
-
-  '@braintree/asset-loader@2.0.0':
-    resolution: {integrity: sha512-7Zs3/g3lPTfkdtWr7cKh3tk1pDruXR++TXwGKkx7BPuTjjLNFul2JSfI+ScHzNU4u/gZNPNQagsSTlYxIhBgMA==}
-
-  '@braintree/asset-loader@2.0.3':
-    resolution: {integrity: sha512-uREap1j30wKRlC0mK99nNPMpEp77NtB6XixpDfFJPZHmkrmw7IB4skKe+26LZBK1H6oSainFhAyKoP7x3eyOKA==}
-
-  '@braintree/browser-detection@1.17.2':
-    resolution: {integrity: sha512-DdEX09uYs6kHwGt4cbONlxlta/0hfmrDUncP6EtfZxFVywNF9LeRUyon+2LihJTbqgSnGqz9ZL450hkqBd6oSw==}
-
-  '@braintree/browser-detection@2.0.2':
-    resolution: {integrity: sha512-Zrv/pyodvwv/hsjsBKXKVcwHZOkx4A/5Cy2hViXtqghAhLd3483bYUIfHZJE5JKTrd018ny1FI5pN1PHFtW7vw==}
-
-  '@braintree/event-emitter@0.4.1':
-    resolution: {integrity: sha512-X41357O3OXUDlnwMvS1m0GQEn3zB3s3flOBeg2J5OBvLvdJEIAVpPkblABPtsPrlciDSvfv1aSG5ixHPgFH0Zg==}
-
-  '@braintree/extended-promise@1.0.0':
-    resolution: {integrity: sha512-E9529FJNG4OgeeLJ00vNs3TW67+AeSQobJg0hwfsQk29hgK4bVBsvQHVD4nwDuDD1Czon90K88gfQIFadAMs0w==}
-
-  '@braintree/iframer@2.0.1':
-    resolution: {integrity: sha512-t1zJX5+f1yxHAzBJPaQT/XVMocKodUqjTE+hYvuxxWjqEZIbH8/eT5b5n767jY16mYw3+XiDkKHqcp4Pclq1wg==}
-
-  '@braintree/sanitize-url@7.0.4':
-    resolution: {integrity: sha512-hPYRrKFoI+nuckPgDJfyYAkybFvheo4usS0Vw0HNAe+fmGBQA5Az37b/yStO284atBoqqdOUhKJ3d9Zw3PQkcQ==}
-
-  '@braintree/uuid@1.0.1':
-    resolution: {integrity: sha512-Tgu5GoODkf4oj4aLlVIapEPEfjitIHrg5ftqY6pa5Ghr4ZUA9XtZIIZ6ZPdP9x8/X0lt/FB8tRq83QuCQCwOrA==}
-
-  '@braintree/wrap-promise@2.1.0':
-    resolution: {integrity: sha512-UIrJB+AfKU0CCfbMoWrsGpd2D/hBpY/SGgFI6WRHPOwhaZ3g9rz1weiJ6eb6L9KgVyunT7s2tckcPkbHw+NzeA==}
 
   '@bundled-es-modules/cookie@2.0.1':
     resolution: {integrity: sha512-8o+5fRPLNbjbdGRRmJj3h6Hh1AQJf2dk3qQ/5ZFb+PXkRNiSoMGGUKlsgLfrxneb72axVJyIYji64E2+nNfYyw==}
@@ -1288,6 +1258,24 @@ packages:
     resolution: {integrity: sha512-0237FcmSklop7qZUzldPn01wF6R1subQpkhgJKciONV3n4pu4DDYObTLzG9R3zGvXYRNfeMX38ktxVY2TMQ3AQ==}
     engines: {node: ^14.18.0 || >=16.10.0}
 
+  '@nuxt/scripts@0.11.13':
+    resolution: {integrity: sha512-8es3Mt8TxM+77icxI+Gelds0txaYR0ZfLORB9I2bgUC6p6ID0n3F+7aoEhCWiyVKgVd2cI17yCJwXSPABN5xTg==}
+    peerDependencies:
+      '@stripe/stripe-js': ^7.0.0
+      '@types/google.maps': ^3.58.1
+      '@types/vimeo__player': ^2.18.3
+      '@types/youtube': ^0.1.0
+      '@unhead/vue': ^2.0.3
+    peerDependenciesMeta:
+      '@stripe/stripe-js':
+        optional: true
+      '@types/google.maps':
+        optional: true
+      '@types/vimeo__player':
+        optional: true
+      '@types/youtube':
+        optional: true
+
   '@nuxt/telemetry@2.6.6':
     resolution: {integrity: sha512-Zh4HJLjzvm3Cq9w6sfzIFyH9ozK5ePYVfCUzzUQNiZojFsI2k1QkSBrVI9BGc6ArKXj/O6rkI6w7qQ+ouL8Cag==}
     engines: {node: '>=18.12.0'}
@@ -1902,9 +1890,6 @@ packages:
   '@parcel/watcher@2.5.1':
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
-
-  '@paypal/accelerated-checkout-loader@1.1.0':
-    resolution: {integrity: sha512-S2KkIpq15VnxYyI0tycvfYiNsqdsg2a92El2huYUVLsWnBbubl8toYK8khaP5nnxZ0MGl9mEB9Y9axmfOw2Yvg==}
 
   '@phosphor-icons/webcomponents@2.1.5':
     resolution: {integrity: sha512-JcvQkZxvcX2jK+QCclm8+e8HXqtdFW9xV4/kk2aL9Y3dJA2oQVt+pzbv1orkumz3rfx4K9mn9fDoMr1He1yr7Q==}
@@ -3195,9 +3180,6 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  braintree-web@3.126.0:
-    resolution: {integrity: sha512-SMwjROEua14tcNAakoxI3SRzt7odux7w9eTKNWeQ9yEnfehknDquyXzVb2PZ3mBJuyFNHSaI511HlYLJnGto5A==}
-
   browserslist@4.25.3:
     resolution: {integrity: sha512-cDGv1kkDI4/0e5yON9yM5G/0A5u8sf5TnmdX5C9qHzI9PPu++sQ9zjm1k9NiOrf3riY4OkK0zSGqfvJyJsgCBQ==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
@@ -3290,9 +3272,6 @@ packages:
 
   caniuse-lite@1.0.30001735:
     resolution: {integrity: sha512-EV/laoX7Wq2J9TQlyIXRxTJqIw4sxfXS4OYgudGxBYRuTv0q7AM6yMEpU/Vo1I94thg9U6EZ2NfZx9GJq83u7w==}
-
-  card-validator@10.0.3:
-    resolution: {integrity: sha512-xOEDsK3hojV0OIpmrR64eZGpngnOqRDEP20O+WSRtvjLSW6nyekW4i2N9SzYg679uFO3RyHcFHxb+mml5tXc4A==}
 
   caseless@0.12.0:
     resolution: {integrity: sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==}
@@ -3614,9 +3593,6 @@ packages:
   crc32-stream@6.0.0:
     resolution: {integrity: sha512-piICUB6ei4IlTv1+653yq5+KoqfBYmj9bw6LqXoOneTMDXk5nM1qt12mFW1caG3LlJXEKW1Bp0WggEmIfQB34g==}
     engines: {node: '>= 14'}
-
-  credit-card-type@10.1.0:
-    resolution: {integrity: sha512-yd9ebGqWQ9zDvxrvCOkX80GiTvVJ28940uIMqRA58Cu3ReiPkOS4p45d9Y2cmJZtZgp90WdwLSiUtI8lHDgE2g==}
 
   cron-parser@4.9.0:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
@@ -4066,10 +4042,6 @@ packages:
   env-paths@3.0.0:
     resolution: {integrity: sha512-dtJUTepzMW3Lm/NPxRf3wP4642UWhjL2sQxc+ym2YMj1m/H2zDNQOlezafzkHwn6sMstjHTwG6iQQsctDW/b1A==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
-  envify@4.1.0:
-    resolution: {integrity: sha512-IKRVVoAYr4pIx4yIWNsz9mOsboxlNXiu7TNBnem/K/uTHdkyzXWDzHCK7UTolqBbgaBz0tQHsD3YNls0uIIjiw==}
-    hasBin: true
 
   environment@1.1.0:
     resolution: {integrity: sha512-xUtoPkMggbz0MPyPiIWr1Kp4aeWJjDZ6SMvURhimjdZgsRuDplF5/s9hcgGhyXMhs+6vpnuoiZ2kFiu3FMnS8Q==}
@@ -4585,9 +4557,6 @@ packages:
   fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
 
-  framebus@6.0.3:
-    resolution: {integrity: sha512-G/N2p+kFZ1xPBge7tbtTq2KcTR1kSKs1rVbTqH//WdtvJSexS33fsTTOq3yfUWvUczqhujyaFc+omawC9YyRBg==}
-
   fresh@0.5.2:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
@@ -5003,9 +4972,6 @@ packages:
   ini@4.1.1:
     resolution: {integrity: sha512-QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
-  inject-stylesheet@6.0.2:
-    resolution: {integrity: sha512-sswMueya1LXEfwcy7KXPuq3zAW6HvgAeViApEhIaCviCkP4XYoKrQj8ftEmxPmIHn88X4R3xOAsnN/QCPvVKWw==}
 
   ioredis@5.7.0:
     resolution: {integrity: sha512-NUcA93i1lukyXU+riqEyPtSEkyFq8tX90uL659J+qpCZ3rEdViB/APC58oAhIh3+bJln2hzdlZbBZsGNrlsR8g==}
@@ -5571,8 +5537,8 @@ packages:
     resolution: {integrity: sha512-8ngQgLhcT0t3YBdn9CGkZqCYlvwW9pm7aWJwd7AxseVWf1RU8ZHCQvG1mt3N5vvUme+pXTcHB8G/7fE666U8Vw==}
     engines: {node: '>=20.18.0'}
 
-  magic-string@0.30.17:
-    resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
+  magic-string@0.30.19:
+    resolution: {integrity: sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw==}
 
   magicast@0.3.5:
     resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
@@ -6727,9 +6693,6 @@ packages:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
     engines: {node: '>= 0.6.0'}
 
-  promise-polyfill@8.2.3:
-    resolution: {integrity: sha512-Og0+jCRQetV84U8wVjMNccfGCnMQ9mGs9Hv78QFe+pSDD3gWTpz0y+1QCuxy5d/vBFuZ3iwP2eycAkvqIMPmWg==}
-
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
@@ -6977,9 +6940,6 @@ packages:
   restore-cursor@5.1.0:
     resolution: {integrity: sha512-oMA2dcrw6u0YfxJQXm342bFKX/E4sG9rbTzO9ptUcR/e8A33cHuvStiYOwH7fszkZlZ1z/ta9AAoPk2F4qIOHA==}
     engines: {node: '>=18'}
-
-  restricted-input@4.0.3:
-    resolution: {integrity: sha512-VpkwT5Fr3DhvoRZfPnmHDhnYAYETjjNzDlvA4NlW0iknFS47C5X4OCHEpOOxaPjvmka5V8d1ty1jVVoorZKvHg==}
 
   reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
@@ -7738,11 +7698,6 @@ packages:
   type-level-regexp@0.1.17:
     resolution: {integrity: sha512-wTk4DH3cxwk196uGLK/E9pE45aLfeKJacKmcEgEOA/q5dnPGNxXt0cfYdFxb57L+sEpf1oJH4Dnx/pnRcku9jg==}
 
-  typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-
   typescript@5.8.3:
     resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
@@ -7867,8 +7822,8 @@ packages:
     resolution: {integrity: sha512-4/u/j4FrCKdi17jaxuJA0jClGxB1AvU2hw/IuayPc4ay1XGaJs/rbb4v5WKwAjNifjmXK9PIFyuPiaK8azyR9w==}
     engines: {node: '>=14.0.0'}
 
-  unplugin@2.3.6:
-    resolution: {integrity: sha512-+/MdXl8bLTXI2lJF22gUBeCFqZruEpL/oM9f8wxCuKh9+Mw9qeul3gTqgbKpMeOFlusCzc0s7x2Kax2xKW+FQg==}
+  unplugin@2.3.10:
+    resolution: {integrity: sha512-6NCPkv1ClwH+/BGE9QeoTIl09nuiAt0gS28nn1PvYXsGKRwM2TCbFA2QiilmehPDTXIe684k4rZI1yl3A1PCUw==}
     engines: {node: '>=18.12.0'}
 
   unstorage@1.16.1:
@@ -7976,6 +7931,14 @@ packages:
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
+
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
@@ -8677,26 +8640,6 @@ snapshots:
       '@babel/helper-validator-identifier': 7.27.1
 
   '@bcoe/v8-coverage@1.0.2': {}
-
-  '@braintree/asset-loader@2.0.0': {}
-
-  '@braintree/asset-loader@2.0.3': {}
-
-  '@braintree/browser-detection@1.17.2': {}
-
-  '@braintree/browser-detection@2.0.2': {}
-
-  '@braintree/event-emitter@0.4.1': {}
-
-  '@braintree/extended-promise@1.0.0': {}
-
-  '@braintree/iframer@2.0.1': {}
-
-  '@braintree/sanitize-url@7.0.4': {}
-
-  '@braintree/uuid@1.0.1': {}
-
-  '@braintree/wrap-promise@2.1.0': {}
 
   '@bundled-es-modules/cookie@2.0.1':
     dependencies:
@@ -9784,6 +9727,48 @@ snapshots:
       std-env: 3.9.0
       ufo: 1.6.1
 
+  '@nuxt/scripts@0.11.13(@netlify/blobs@9.1.2)(@unhead/vue@2.0.14(vue@3.5.18(typescript@5.8.3)))(db0@0.3.2(better-sqlite3@12.2.0))(idb-keyval@6.2.2)(ioredis@5.7.0)(magicast@0.3.5)(typescript@5.8.3)(vue@3.5.18(typescript@5.8.3))':
+    dependencies:
+      '@nuxt/kit': 4.0.3(magicast@0.3.5)
+      '@unhead/vue': 2.0.14(vue@3.5.18(typescript@5.8.3))
+      '@vueuse/core': 13.7.0(vue@3.5.18(typescript@5.8.3))
+      consola: 3.4.2
+      defu: 6.1.4
+      h3: 1.15.4
+      magic-string: 0.30.19
+      ofetch: 1.4.1
+      ohash: 2.0.11
+      pathe: 2.0.3
+      pkg-types: 2.3.0
+      sirv: 3.0.1
+      std-env: 3.9.0
+      ufo: 1.6.1
+      unplugin: 2.3.10
+      unstorage: 1.16.1(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(idb-keyval@6.2.2)(ioredis@5.7.0)
+      valibot: 1.1.0(typescript@5.8.3)
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/kv'
+      - aws4fetch
+      - db0
+      - idb-keyval
+      - ioredis
+      - magicast
+      - typescript
+      - uploadthing
+      - vue
+
   '@nuxt/telemetry@2.6.6(magicast@0.3.5)':
     dependencies:
       '@nuxt/kit': 3.18.1(magicast@0.3.5)
@@ -9813,7 +9798,7 @@ snapshots:
       get-port-please: 3.2.0
       h3: 1.15.4
       local-pkg: 1.1.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       node-fetch-native: 1.6.7
       node-mock-http: 1.0.2
       ofetch: 1.4.1
@@ -9824,7 +9809,7 @@ snapshots:
       std-env: 3.9.0
       tinyexec: 1.0.1
       ufo: 1.6.1
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       vitest-environment-nuxt: 1.0.1(@vue/test-utils@2.4.6)(happy-dom@18.0.1)(magicast@0.3.5)(typescript@5.8.3)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.3.0)(happy-dom@18.0.1)(jiti@2.5.1)(msw@2.10.5(@types/node@24.3.0)(typescript@5.8.3))(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
       vue: 3.5.18(typescript@5.8.3)
     optionalDependencies:
@@ -9853,7 +9838,7 @@ snapshots:
       h3: 1.15.4
       jiti: 2.5.1
       knitwork: 1.2.0
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       mocked-exports: 0.1.1
       ohash: 2.0.11
@@ -9911,7 +9896,7 @@ snapshots:
       devalue: 5.1.1
       h3: 1.15.4
       knitwork: 1.2.0
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       nuxt-define: 1.0.0
       oxc-parser: 0.81.0
@@ -9920,7 +9905,7 @@ snapshots:
       pathe: 2.0.3
       typescript: 5.9.2
       ufo: 1.6.1
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       unplugin-vue-router: 0.14.0(@vue/compiler-sfc@3.5.18)(vue-router@4.5.1(vue@3.5.18(typescript@5.8.3)))(vue@3.5.18(typescript@5.8.3))
       unstorage: 1.16.1(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(idb-keyval@6.2.2)(ioredis@5.7.0)
       vue-i18n: 11.1.11(vue@3.5.18(typescript@5.8.3))
@@ -10378,12 +10363,6 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@paypal/accelerated-checkout-loader@1.1.0':
-    dependencies:
-      '@braintree/asset-loader': 2.0.0
-      envify: 4.1.0
-      typescript: 4.9.5
-
   '@phosphor-icons/webcomponents@2.1.5':
     dependencies:
       lit: 3.3.0
@@ -10734,7 +10713,7 @@ snapshots:
       estree-walker: 2.0.2
       fdir: 6.5.0(picomatch@4.0.3)
       is-reference: 1.2.1
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       picomatch: 4.0.3
     optionalDependencies:
       rollup: 4.46.4
@@ -10743,7 +10722,7 @@ snapshots:
     dependencies:
       '@rollup/pluginutils': 5.2.0(rollup@4.46.4)
       estree-walker: 2.0.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
     optionalDependencies:
       rollup: 4.46.4
 
@@ -10766,7 +10745,7 @@ snapshots:
   '@rollup/plugin-replace@6.0.2(rollup@4.46.4)':
     dependencies:
       '@rollup/pluginutils': 5.2.0(rollup@4.46.4)
-      magic-string: 0.30.17
+      magic-string: 0.30.19
     optionalDependencies:
       rollup: 4.46.4
 
@@ -11414,7 +11393,7 @@ snapshots:
       istanbul-lib-report: 3.0.1
       istanbul-lib-source-maps: 5.0.6
       istanbul-reports: 3.2.0
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       magicast: 0.3.5
       std-env: 3.9.0
       test-exclude: 7.0.1
@@ -11445,7 +11424,7 @@ snapshots:
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
-      magic-string: 0.30.17
+      magic-string: 0.30.19
     optionalDependencies:
       msw: 2.10.5(@types/node@24.3.0)(typescript@5.8.3)
       vite: 7.1.3(@types/node@24.3.0)(jiti@2.5.1)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
@@ -11463,7 +11442,7 @@ snapshots:
   '@vitest/snapshot@3.2.4':
     dependencies:
       '@vitest/pretty-format': 3.2.4
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       pathe: 2.0.3
 
   '@vitest/spy@3.2.4':
@@ -11558,7 +11537,7 @@ snapshots:
       '@vue/compiler-ssr': 3.5.18
       '@vue/shared': 3.5.18
       estree-walker: 2.0.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       postcss: 8.5.6
       source-map-js: 1.2.1
 
@@ -12388,24 +12367,6 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  braintree-web@3.126.0:
-    dependencies:
-      '@braintree/asset-loader': 2.0.3
-      '@braintree/browser-detection': 2.0.2
-      '@braintree/event-emitter': 0.4.1
-      '@braintree/extended-promise': 1.0.0
-      '@braintree/iframer': 2.0.1
-      '@braintree/sanitize-url': 7.0.4
-      '@braintree/uuid': 1.0.1
-      '@braintree/wrap-promise': 2.1.0
-      '@paypal/accelerated-checkout-loader': 1.1.0
-      card-validator: 10.0.3
-      credit-card-type: 10.1.0
-      framebus: 6.0.3
-      inject-stylesheet: 6.0.2
-      promise-polyfill: 8.2.3
-      restricted-input: 4.0.3
-
   browserslist@4.25.3:
     dependencies:
       caniuse-lite: 1.0.30001735
@@ -12515,10 +12476,6 @@ snapshots:
       lodash.uniq: 4.5.0
 
   caniuse-lite@1.0.30001735: {}
-
-  card-validator@10.0.3:
-    dependencies:
-      credit-card-type: 10.1.0
 
   caseless@0.12.0:
     optional: true
@@ -12821,8 +12778,6 @@ snapshots:
     dependencies:
       crc-32: 1.2.2
       readable-stream: 4.7.0
-
-  credit-card-type@10.1.0: {}
 
   cron-parser@4.9.0:
     dependencies:
@@ -13275,11 +13230,6 @@ snapshots:
   env-paths@2.2.1: {}
 
   env-paths@3.0.0: {}
-
-  envify@4.1.0:
-    dependencies:
-      esprima: 4.0.1
-      through: 2.3.8
 
   environment@1.1.0: {}
 
@@ -13916,10 +13866,6 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
-  framebus@6.0.3:
-    dependencies:
-      '@braintree/uuid': 1.0.1
-
   fresh@0.5.2: {}
 
   fresh@2.0.0: {}
@@ -14412,7 +14358,7 @@ snapshots:
       exsolve: 1.0.7
       mocked-exports: 0.1.1
       pathe: 2.0.3
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       unplugin-utils: 0.2.5
 
   imurmurhash@0.1.4: {}
@@ -14439,8 +14385,6 @@ snapshots:
     optional: true
 
   ini@4.1.1: {}
-
-  inject-stylesheet@6.0.2: {}
 
   ioredis@5.7.0:
     dependencies:
@@ -15073,18 +15017,18 @@ snapshots:
   magic-regexp@0.10.0:
     dependencies:
       estree-walker: 3.0.3
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       regexp-tree: 0.1.27
       type-level-regexp: 0.1.17
       ufo: 1.6.1
-      unplugin: 2.3.6
+      unplugin: 2.3.10
 
   magic-string-ast@1.0.2:
     dependencies:
-      magic-string: 0.30.17
+      magic-string: 0.30.19
 
-  magic-string@0.30.17:
+  magic-string@0.30.19:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
@@ -15656,7 +15600,7 @@ snapshots:
       klona: 2.0.6
       knitwork: 1.2.0
       listhen: 1.9.0
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       magicast: 0.3.5
       mime: 4.0.7
       mlly: 1.7.4
@@ -15892,7 +15836,7 @@ snapshots:
       jiti: 2.5.1
       klona: 2.0.6
       knitwork: 1.2.0
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       mocked-exports: 0.1.1
       nanotar: 0.2.0
@@ -15919,7 +15863,7 @@ snapshots:
       uncrypto: 0.1.3
       unctx: 2.4.1
       unimport: 5.2.0
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       unplugin-vue-router: 0.15.0(@vue/compiler-sfc@3.5.18)(typescript@5.8.3)(vue-router@4.5.1(vue@3.5.18(typescript@5.8.3)))(vue@3.5.18(typescript@5.8.3))
       unstorage: 1.16.1(@netlify/blobs@9.1.2)(db0@0.3.2(better-sqlite3@12.2.0))(idb-keyval@6.2.2)(ioredis@5.7.0)
       untyped: 2.0.0
@@ -16728,8 +16672,6 @@ snapshots:
 
   process@0.11.10: {}
 
-  promise-polyfill@8.2.3: {}
-
   prompts@2.4.2:
     dependencies:
       kleur: 3.0.3
@@ -17062,10 +17004,6 @@ snapshots:
     dependencies:
       onetime: 7.0.0
       signal-exit: 4.1.0
-
-  restricted-input@4.0.3:
-    dependencies:
-      '@braintree/browser-detection': 1.17.2
 
   reusify@1.1.0: {}
 
@@ -17936,8 +17874,6 @@ snapshots:
 
   type-level-regexp@0.1.17: {}
 
-  typescript@4.9.5: {}
-
   typescript@5.8.3: {}
 
   typescript@5.9.2: {}
@@ -17958,8 +17894,8 @@ snapshots:
     dependencies:
       acorn: 8.15.0
       estree-walker: 3.0.3
-      magic-string: 0.30.17
-      unplugin: 2.3.6
+      magic-string: 0.30.19
+      unplugin: 2.3.10
 
   undici-types@6.19.8: {}
 
@@ -18001,7 +17937,7 @@ snapshots:
       escape-string-regexp: 5.0.0
       estree-walker: 3.0.3
       local-pkg: 1.1.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       pathe: 2.0.3
       picomatch: 4.0.3
@@ -18009,7 +17945,7 @@ snapshots:
       scule: 1.3.0
       strip-literal: 3.0.0
       tinyglobby: 0.2.14
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       unplugin-utils: 0.2.5
 
   unist-builder@4.0.0:
@@ -18059,7 +17995,7 @@ snapshots:
       '@babel/parser': 7.28.3
       '@babel/traverse': 7.28.3
       '@rollup/pluginutils': 5.2.0(rollup@4.46.4)
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       unplugin: 1.16.1
     transitivePeerDependencies:
       - rollup
@@ -18079,12 +18015,12 @@ snapshots:
       fast-glob: 3.3.3
       json5: 2.2.3
       local-pkg: 1.1.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       pathe: 2.0.3
       picomatch: 4.0.3
       scule: 1.3.0
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       unplugin-utils: 0.2.5
       yaml: 2.8.1
     optionalDependencies:
@@ -18101,14 +18037,14 @@ snapshots:
       chokidar: 4.0.3
       json5: 2.2.3
       local-pkg: 1.1.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       muggle-string: 0.4.1
       pathe: 2.0.3
       picomatch: 4.0.3
       scule: 1.3.0
       tinyglobby: 0.2.14
-      unplugin: 2.3.6
+      unplugin: 2.3.10
       unplugin-utils: 0.2.5
       yaml: 2.8.1
     optionalDependencies:
@@ -18122,7 +18058,7 @@ snapshots:
       acorn: 8.15.0
       webpack-virtual-modules: 0.6.2
 
-  unplugin@2.3.6:
+  unplugin@2.3.10:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.15.0
@@ -18165,11 +18101,11 @@ snapshots:
   unwasm@0.3.11:
     dependencies:
       knitwork: 1.2.0
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       mlly: 1.7.4
       pathe: 2.0.3
       pkg-types: 2.3.0
-      unplugin: 2.3.6
+      unplugin: 2.3.10
 
   update-browserslist-db@1.1.3(browserslist@4.25.3):
     dependencies:
@@ -18198,6 +18134,10 @@ snapshots:
 
   uuid@8.3.2:
     optional: true
+
+  valibot@1.1.0(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
 
   validate-npm-package-license@3.0.4:
     dependencies:
@@ -18358,7 +18298,7 @@ snapshots:
     dependencies:
       estree-walker: 3.0.3
       exsolve: 1.0.7
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       pathe: 2.0.3
       source-map-js: 1.2.1
       vite: 7.1.3(@types/node@24.3.0)(jiti@2.5.1)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
@@ -18410,7 +18350,7 @@ snapshots:
       chai: 5.3.1
       debug: 4.4.1(supports-color@8.1.1)
       expect-type: 1.2.2
-      magic-string: 0.30.17
+      magic-string: 0.30.19
       pathe: 2.0.3
       picomatch: 4.0.3
       std-env: 3.9.0

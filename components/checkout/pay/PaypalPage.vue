@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { useBraintreeScript } from '~/composables/use-braintree-script';
+
+// Initialize Braintree script loading
+const { ready: braintreeReady } = useBraintreeScript('paypal');
+
 const { token, step, plan, pending, loading, submit, reset } = useBraintree();
 </script>
 
@@ -6,7 +11,7 @@ const { token, step, plan, pending, loading, submit, reset } = useBraintree();
   <PaymentFrame :step="step">
     <template #default="slotProps">
       <div
-        v-if="!(token && plan)"
+        v-if="!(token && plan) || !braintreeReady"
         class="flex justify-center my-10"
       >
         <RuiProgress
