@@ -3,7 +3,6 @@ import type { AvailablePlan } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
-import { getMostPopularPlanName } from '~/components/pricings/utils';
 import { useCountries } from '~/composables/countries';
 import { useMainStore } from '~/store';
 import { useTiersStore } from '~/store/tiers';
@@ -33,8 +32,6 @@ function isSelected(plan: AvailablePlan) {
 const selectedPlan = computed<AvailablePlan | undefined>(
   () => get(availablePlans)?.find(plan => isSelected(plan)),
 );
-
-const mostPopularPlanName = getMostPopularPlanName(availablePlans);
 
 function select(plan: AvailablePlan) {
   set(selectedPlanName, plan.tierName);
@@ -93,7 +90,6 @@ const notes = computed(() => [
           v-for="(plan) in availablePlans"
           :key="plan.tierName"
           :plan="plan"
-          :is-most-popular="plan.tierName === mostPopularPlanName"
           :period="selectedPlanPeriod"
           :selected="isSelected(plan)"
           @click="select(plan)"

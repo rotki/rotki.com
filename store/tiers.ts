@@ -12,7 +12,29 @@ export const useTiersStore = defineStore('tiers', () => {
     tiers: [],
   });
 
-  const availablePlans = computed(() => get(availablePlansData).tiers);
+  const availablePlans = computed<AvailablePlansResponse['tiers']>(() => {
+    const plans = get(availablePlansData).tiers;
+    if (!plans || plans.length === 0)
+      return plans;
+
+    // Find the plan with the highest price to mark as most popular
+    let maxPrice = 0;
+    let mostPopularTierName: string | undefined;
+
+    plans.forEach((plan) => {
+      const price = Number.parseFloat(plan.monthlyPlan?.price || plan.yearlyPlan?.price || '0');
+      if (price > maxPrice) {
+        maxPrice = price;
+        mostPopularTierName = plan.tierName;
+      }
+    });
+
+    // Return plans with isMostPopular flag set
+    return plans.map(plan => ({
+      ...plan,
+      isMostPopular: plan.tierName === mostPopularTierName,
+    }));
+  });
   const country = computed(() => get(availablePlansData).settings?.country);
 
   const { fetchWithCsrf } = useFetchWithCsrf();

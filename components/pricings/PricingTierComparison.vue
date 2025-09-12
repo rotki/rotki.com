@@ -2,7 +2,7 @@
 import type { FeatureValue, MappedPlan } from '~/components/pricings/type';
 import { get } from '@vueuse/core';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
-import { type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
+import { type PremiumTierInfo, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 
 const props = withDefaults(
   defineProps<{
@@ -32,8 +32,12 @@ const featuresLabel = computed<string[]>(() => {
   return Array.from(labelSet);
 });
 
+function hasPlanForPeriod(plan: PremiumTierInfo, isYearly: boolean): boolean {
+  return isYearly ? !!plan.yearlyPlan : !!plan.monthlyPlan;
+}
+
 // Helper function to calculate prices
-function calculatePrices(item: any, isYearly: boolean): { monthlyPrice: number; yearlyPrice: number } {
+function calculatePrices(item: PremiumTierInfo, isYearly: boolean): { monthlyPrice: number; yearlyPrice: number } {
   if (item.yearlyPlan && item.monthlyPlan) {
     const yearlyPrice = parseFloat(item.yearlyPlan.price);
     const monthlyPrice = !isYearly ? parseFloat(item.monthlyPlan.price) : (yearlyPrice / 12);
@@ -66,9 +70,11 @@ const plans = computed<MappedPlan[]>(() => {
 
   const regularPlan: Omit<MappedPlan, 'features'>[] = [];
   const descriptionMap = new Map<string, Map<string, FeatureValue>>();
+  let maxPrice = 0;
 
-  // Build a map of plan descriptions for feature mapping
+  // Build description map and find highest price in a single loop
   props.tiersData.forEach((item) => {
+    // Build plan descriptions map
     if (item.description) {
       const planDescriptions = new Map<string, FeatureValue>();
       item.description.forEach((desc) => {
@@ -76,12 +82,9 @@ const plans = computed<MappedPlan[]>(() => {
       });
       descriptionMap.set(item.name, planDescriptions);
     }
-  });
 
-  // Find the highest price among all regular plans
-  let maxPrice = 0;
-  props.tiersData.forEach((item) => {
-    if ((isYearly && item.yearlyPlan) || (!isYearly && item.monthlyPlan)) {
+    // Find the highest price among all regular plans
+    if (hasPlanForPeriod(item, isYearly)) {
       const { monthlyPrice } = calculatePrices(item, isYearly);
       if (monthlyPrice > maxPrice) {
         maxPrice = monthlyPrice;
@@ -92,7 +95,7 @@ const plans = computed<MappedPlan[]>(() => {
   // Process regular plans
   props.tiersData.forEach((item) => {
     // Skip if required plan doesn't exist
-    if ((isYearly && !item.yearlyPlan) || (!isYearly && !item.monthlyPlan)) {
+    if (!hasPlanForPeriod(item, isYearly)) {
       return;
     }
 
