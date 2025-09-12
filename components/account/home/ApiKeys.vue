@@ -1,21 +1,10 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
+import { useApiKeys } from '~/composables/use-api-keys';
 
-const store = useMainStore();
-const { account } = storeToRefs(store);
-
-const loading = ref(false);
-
-const apiKey = computed(() => account.value?.apiKey ?? '');
-const apiSecret = computed(() => account.value?.apiSecret ?? '');
-const hasApiKeys = computed(() => apiKey.value && apiSecret.value);
+const { apiKey, apiSecret, hasApiKeys, loading, updateKeys } = useApiKeys();
 
 async function regenerateKeys() {
-  set(loading, true);
-  await store.updateKeys();
-  set(loading, false);
+  await updateKeys();
 }
 
 const { t } = useI18n({ useScope: 'global' });

@@ -1,9 +1,11 @@
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import { usePaymentApi } from '~/composables/use-payment-api';
 import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(async () => {
   const store = useMainStore();
+  const paymentApi = usePaymentApi();
   const { account } = storeToRefs(store);
   if (!isDefined(account))
     return;
@@ -17,7 +19,7 @@ export default defineNuxtRouteMiddleware(async () => {
   if (pending.length > 0) {
     const { durationInMonths, identifier, status } = pending[0];
     const id = status === 'Pending' ? undefined : identifier;
-    const response = await store.checkPendingCryptoPayment(id);
+    const response = await paymentApi.checkPendingCryptoPayment(id);
 
     if (response.isError)
       return;

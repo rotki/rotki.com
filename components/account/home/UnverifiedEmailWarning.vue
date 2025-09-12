@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
 import { set } from '@vueuse/core';
-import { useMainStore } from '~/store';
+import { useAccountApi } from '~/composables/use-account-api';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useMainStore();
+const accountApi = useAccountApi();
 
 const success = ref<boolean>(false);
 const error = ref<string>('');
@@ -19,7 +19,7 @@ function reset() {
 
 async function resend() {
   reset();
-  const result: ActionResult = await store.resendVerificationCode(t);
+  const result: ActionResult = await accountApi.resendVerificationCode(t);
 
   if (result.success)
     set(success, true);

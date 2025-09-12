@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { requiredUnless } from '@vuelidate/validators';
-import { get, objectOmit, set } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
+import { get, set } from '@vueuse/core';
+import { useProfileUpdate } from '~/composables/use-profile-update';
 import { useVatCheck } from '~/composables/use-vat-check';
-import { useMainStore } from '~/store';
 import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
 import { toMessages } from '~/utils/validation';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useMainStore();
 const state = reactive({
   firstName: '',
   lastName: '',
@@ -19,17 +17,24 @@ const state = reactive({
   vatId: '',
 });
 
-const loading = ref<boolean>(false);
-const done = ref<boolean>(false);
 const vatSuccessMessage = ref<string>('');
 const vatErrorMessage = ref<string>('');
 const loadingCheck = ref<boolean>(false);
-const $externalResults = ref<Record<string, string[]>>({});
 const remainingTime = ref<number>(0);
 
-const { account } = storeToRefs(store);
+const waitUntilTime = useLocalStorage<number>('rotki.vat_check.wait_until_time', 0);
 
-const movedOffline = computed<boolean>(() => get(account)?.address.movedOffline ?? false);
+const [DefineVAT, ReuseVAT] = createReusableTemplate();
+const { refreshVATCheckStatus, checkVAT } = useVatCheck();
+
+const {
+  $externalResults,
+  account,
+  done,
+  loading,
+  movedOffline,
+  updateProfile,
+} = useProfileUpdate();
 
 const rules = {
   firstName: { required: requiredUnless(movedOffline) },
@@ -37,11 +42,6 @@ const rules = {
   companyName: {},
   vatId: {},
 };
-
-const waitUntilTime = useLocalStorage<number>('rotki.vat_check.wait_until_time', 0);
-
-const [DefineVAT, ReuseVAT] = createReusableTemplate();
-const { refreshVATCheckStatus, checkVAT } = useVatCheck();
 
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
@@ -113,35 +113,12 @@ function reset() {
 }
 
 async function update() {
-  const userAccount = get(account);
-  if (!userAccount)
-    return;
-
-  const isValid = await get(v$).$validate();
-  if (!isValid)
-    return;
-
-  set(loading, true);
-
-  const payload = objectOmit(
-    {
-      ...userAccount.address,
-      ...state,
-    },
-    ['movedOffline'],
-  );
-  const { success, message } = await store.updateProfile(payload);
-  if (success)
-    set(done, true);
-  else if (message && typeof message !== 'string')
-    set($externalResults, message);
-
-  set(loading, false);
+  await updateProfile(v$, state);
 }
 
 async function handleCheckVATClick() {
   set(loadingCheck, true);
-  await update();
+  await updateProfile(v$, state);
   const checkResult = await checkVAT();
   await refreshVATCheckStatus();
 

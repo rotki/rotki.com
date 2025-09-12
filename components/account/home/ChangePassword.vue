@@ -3,13 +3,13 @@ import type { ActionResult } from '~/types/common';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store';
+import { useAccountApi } from '~/composables/use-account-api';
 import { toMessages } from '~/utils/validation';
 
 const loading = ref(false);
 const success = ref(false);
 
-const store = useMainStore();
+const accountApi = useAccountApi();
 
 const state = reactive({
   currentPassword: '',
@@ -37,7 +37,7 @@ let pendingTimeout: any;
 
 async function changePassword() {
   set(loading, true);
-  const result: ActionResult = await store.changePassword(state);
+  const result: ActionResult = await accountApi.changePassword(state);
   set(loading, false);
   if (result.message && typeof result.message !== 'string')
     set($externalResults, result.message);

@@ -5,11 +5,13 @@ import type {
 } from '~/types';
 import type { PayEvent } from '~/types/common';
 import { get, set } from '@vueuse/core';
-import { useMainStore } from '~/store';
+import { useAccountRefresh } from '~/composables/use-app-events';
+import { usePaymentApi } from '~/composables/use-payment-api';
 
 export function useBraintree() {
   const { t } = useI18n({ useScope: 'global' });
-  const store = useMainStore();
+  const paymentApi = usePaymentApi();
+  const { requestRefresh } = useAccountRefresh();
   const route = useRoute();
   const router = useRouter();
   const checkout = ref<CardCheckout | null>(null);
@@ -52,7 +54,7 @@ export function useBraintree() {
   async function loadPlan(months: string) {
     set(loadingPlan, true);
     const plan = parseInt(months);
-    const data = await store.checkout(plan);
+    const data = await paymentApi.checkout(plan);
     set(loadingPlan, false);
     if (data.isError)
       router.back();
@@ -79,10 +81,13 @@ export function useBraintree() {
 
   const submit = async ({ months, nonce }: PayEvent) => {
     set(pending, true);
-    const result = await store.pay({
+    const result = await paymentApi.pay({
       months,
       paymentMethodNonce: nonce,
     });
+    // Request account refresh after payment
+    requestRefresh();
+
     if (result.isError)
       set(paymentError, result.error.message);
     else
