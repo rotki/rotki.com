@@ -46,7 +46,7 @@ watch(price, (price) => {
 <template>
   <div
     v-if="price"
-    class="rounded-xl border border-default p-4 cursor-pointer"
+    class="rounded-xl border border-default p-4 cursor-pointer hover:bg-rui-grey-100 transition-all"
     :class="{
       '!border-rui-primary': selected,
       '!bg-rui-grey-100': disabled,

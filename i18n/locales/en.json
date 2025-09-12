@@ -229,7 +229,8 @@
     "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
-    "update": "Update"
+    "update": "Update",
+    "upgrade": "Upgrade plan"
   },
   "auth": {
     "activation": {
@@ -367,10 +368,12 @@
     "actions": "actions",
     "amount": "Amount",
     "here": "here",
+    "monthly": "monthly",
     "none": "none",
     "plan": "plan",
     "status": "status",
-    "vat": "{vat}% VAT"
+    "vat": "{vat}% VAT",
+    "yearly": "yearly"
   },
   "copy_button": {
     "copied": "Copied to clipboard",
@@ -882,6 +885,20 @@
     "unlock": {
       "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape.",
       "title": "Unlock Premium Features"
+    }
+  },
+  "upgrade_plan": {
+    "title": "Upgrade Your Plan",
+    "description": "Select a higher tier plan to unlock more features and capabilities.",
+    "current_plan": "Current plan: {plan} ({period})",
+    "no_higher_plans": "You're already on the highest available plan for your subscription period.",
+    "error": {
+      "title": "Upgrade Failed",
+      "message": "Failed to upgrade your subscription. Please try again later."
+    },
+    "success": {
+      "title": "Upgrade Successful",
+      "message": "Your subscription has been successfully upgraded to {plan}."
     }
   },
   "recaptcha": {

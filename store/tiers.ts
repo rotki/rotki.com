@@ -1,6 +1,6 @@
 import { get, set } from '@vueuse/core';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { AvailablePlansResponse } from '~/types';
+import { type AvailablePlans, AvailablePlansResponse } from '~/types';
 import { PremiumTiersInfo } from '~/types/tiers';
 
 export const useTiersStore = defineStore('tiers', () => {
@@ -12,7 +12,7 @@ export const useTiersStore = defineStore('tiers', () => {
     tiers: [],
   });
 
-  const availablePlans = computed<AvailablePlansResponse['tiers']>(() => {
+  const availablePlans = computed<AvailablePlans>(() => {
     const plans = get(availablePlansData).tiers;
     if (!plans || plans.length === 0)
       return plans;
