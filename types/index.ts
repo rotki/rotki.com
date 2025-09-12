@@ -108,6 +108,7 @@ const Plan = z.object({
 });
 
 export const AvailablePlan = z.object({
+  isMostPopular: z.boolean().default(false),
   monthlyPlan: z.object({
     planId: z.number(),
     price: z.string(),
