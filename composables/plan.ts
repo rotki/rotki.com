@@ -83,7 +83,12 @@ export function useSubscriptionIdParam() {
     const query = get(route).query;
     return typeof query.id === 'string' ? query.id : undefined;
   });
-  return { subscriptionId };
+
+  const upgradeSubId = computed(() => {
+    const query = get(route).query;
+    return typeof query.upgradeSubId === 'string' ? query.upgradeSubId : undefined;
+  });
+  return { subscriptionId, upgradeSubId };
 }
 
 export function usePaymentMethodParam() {

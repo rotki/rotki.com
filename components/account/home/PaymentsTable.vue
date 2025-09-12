@@ -8,6 +8,7 @@ import type { UserPayment } from '~/types/account';
 import { useMainStore } from '~/store';
 import { DiscountType } from '~/types/payment';
 import { formatDate } from '~/utils/date';
+import { getPlanNameFor } from '~/utils/plans';
 import { toTitleCase } from '~/utils/text';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -21,7 +22,7 @@ const headers: DataTableColumn<UserPayment>[] = [
   {
     label: t('common.plan'),
     key: 'plan',
-    cellClass: 'font-bold uppercase',
+    cellClass: 'font-bold',
     class: '[&_button]:capitalize',
     sortable: true,
   },
@@ -51,7 +52,8 @@ const headers: DataTableColumn<UserPayment>[] = [
 ];
 
 const store = useMainStore();
-const { userPayments } = storeToRefs(store);
+const { userPayments, userPaymentsLoading } = storeToRefs(store);
+const { getPayments } = store;
 
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<UserPayment>[]>([
@@ -64,12 +66,26 @@ const sort = ref<DataTableSortColumn<UserPayment>[]>([
 
 <template>
   <div>
-    <div class="text-h6 mb-6">
+    <div class="flex items-center gap-2 text-h6 mb-6">
       {{ t('account.payments.title') }}
+      <RuiButton
+        variant="text"
+        color="primary"
+        icon
+        :loading="userPaymentsLoading"
+        class="!p-2"
+        @click="getPayments()"
+      >
+        <RuiIcon
+          name="lu-refresh-cw"
+          size="16"
+        />
+      </RuiButton>
     </div>
     <RuiDataTable
       v-model:pagination="pagination"
       v-model:sort="sort"
+      :loading="userPaymentsLoading"
       :cols="headers"
       :empty="{ description: t('account.payments.no_payments_found') }"
       row-attr="identifier"
@@ -77,7 +93,18 @@ const sort = ref<DataTableSortColumn<UserPayment>[]>([
       outlined
     >
       <template #item.plan="{ row }">
-        {{ row.legacy ? '-' : row.plan }}
+        <template v-if="row.legacy">
+          -
+        </template>
+        <template v-else>
+          <div>{{ getPlanNameFor(t, { name: row.plan, durationInMonths: row.durationInMonths }) }}</div>
+          <div
+            v-if="row.isUpgrade && row.originalPlan"
+            class="text-[10px] leading-[1.2] text-rui-text-secondary uppercase whitespace-nowrap"
+          >
+            {{ t('account.payments.upgraded_from', { plan: row.originalPlan }) }}
+          </div>
+        </template>
       </template>
       <template #item.paidAt="{ row }">
         {{ formatDate(row.paidAt) }}

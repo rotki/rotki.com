@@ -12,7 +12,9 @@ const {
   step,
   submit,
   token,
+  checkoutData,
 } = useBraintree();
+
 const store = usePaymentCardsStore();
 const { getCard } = store;
 const { card } = storeToRefs(store);
@@ -28,8 +30,9 @@ onBeforeMount(async () => {
   <PaymentFrame :step="step">
     <template #default="slotProps">
       <CardPayment
-        v-if="token && selectedPlan && !loading && !loadingCard"
+        v-if="checkoutData && token && selectedPlan && !loading && !loadingCard"
         v-bind="slotProps"
+        :checkout-data="checkoutData"
         :card="card"
         :plan="selectedPlan"
         :token="token"

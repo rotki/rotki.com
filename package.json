@@ -103,6 +103,7 @@
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
+      "@reown/appkit",
       "cypress",
       "msw",
       "sharp"

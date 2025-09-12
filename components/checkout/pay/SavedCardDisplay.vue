@@ -18,12 +18,14 @@ const props = defineProps<{
   client: Client;
   card: SavedCard;
   disabled: boolean;
+  noDelete?: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'update:error', error: ErrorMessage): void;
   (e: 'update:form-valid', valid: boolean): void;
   (e: 'update:initializing', initializing: boolean): void;
+  (e: 'card-deleted', card: SavedCard): void;
 }>();
 
 const { client, card } = toRefs(props);
@@ -78,7 +80,7 @@ const vaults = setupVaults();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const last4Digits = computed<string>(() => `**** **** **** ${props.card.last4}`);
+const last4Digits = computed<string>(() => `•••• •••• •••• ${props.card.last4}`);
 
 async function checkPaymentMethods() {
   const methods = await vaults.get().fetchPaymentMethods();
@@ -116,14 +118,21 @@ function submit() {
 }
 
 function deleteCardClick() {
+  if (props.noDelete) {
+    return;
+  }
   set(showDeleteConfirmation, true);
 }
 
 async function handleDeleteCard() {
+  if (props.noDelete) {
+    return;
+  }
   set(showDeleteConfirmation, false);
   set(deleteLoading, true);
   await deleteCard(get(card).token);
   set(deleteLoading, false);
+  emit('card-deleted', get(card));
 }
 
 watchImmediate(payloadError, (payloadError) => {
@@ -172,6 +181,7 @@ defineExpose({ submit });
       </div>
     </div>
     <RuiButton
+      v-if="!noDelete"
       icon
       size="lg"
       color="error"
@@ -193,7 +203,7 @@ defineExpose({ submit });
     v-model="showDeleteConfirmation"
     max-width="500"
   >
-    <RuiCard>
+    <RuiCard content-class="!pt-0">
       <template #header>
         {{ t('home.plans.tiers.step_3.saved_card.delete.title') }}
       </template>
@@ -201,7 +211,7 @@ defineExpose({ submit });
       <div class="flex justify-end gap-4 pt-4">
         <RuiButton
           variant="text"
-          color="primary"
+          color="secondary"
           @click="showDeleteConfirmation = false"
         >
           {{ t('actions.cancel') }}

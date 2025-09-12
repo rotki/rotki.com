@@ -16,3 +16,15 @@ export function canBuyNewSubscription(account: Account | null, subscriptions: Us
 
   return renewableSubscriptions.length > 0;
 }
+
+export function isSubActive(sub: UserSubscription) {
+  return sub.status === 'Active';
+}
+
+export function isSubPending(sub: UserSubscription) {
+  return sub.status === 'Pending';
+}
+
+export function isSubRequestingUpgrade(sub: UserSubscription) {
+  return sub.status === 'Upgrade Requested';
+}

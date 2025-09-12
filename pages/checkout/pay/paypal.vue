@@ -6,7 +6,7 @@ definePageMeta({
     'maintenance',
     'authentication',
     'unverified',
-    'subscriber',
+    'subscriber-or-upgrade',
     'csp',
     'valid-plan-id',
   ],

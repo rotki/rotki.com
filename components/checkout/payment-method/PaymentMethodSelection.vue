@@ -85,7 +85,7 @@ async function next() {
   });
 
   if (get(authenticated)) {
-    if (method === PaymentMethod.CARD) {
+    if (method !== PaymentMethod.BLOCKCHAIN) {
       // For card payments we use href instead of router to trigger a server reload
       // This need to happen due to the CSP policy required for 3DSecure v2
       window.location.href = new URL(
