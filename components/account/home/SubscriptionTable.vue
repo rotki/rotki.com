@@ -9,6 +9,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx, Subscription } from '~/types';
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import { usePaymentApi } from '~/composables/use-payment-api';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
 
@@ -26,6 +27,7 @@ const resumeStatus = ref<string>('');
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
+const paymentApi = usePaymentApi();
 const { subscriptions, resumeError, cancellationError } = storeToRefs(store);
 
 const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
@@ -80,7 +82,7 @@ const pendingPaymentCurrency = computedAsync(async () => {
   if (subs.length === 0)
     return undefined;
 
-  const response = await store.checkPendingCryptoPayment(subs[0].identifier);
+  const response = await paymentApi.checkPendingCryptoPayment(subs[0].identifier);
 
   if (response.isError || !response.result.pending)
     return undefined;

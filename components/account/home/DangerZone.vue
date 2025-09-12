@@ -2,6 +2,7 @@
 import type { ActionResult } from '~/types/common';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import { useAccountApi } from '~/composables/use-account-api';
 import { useMainStore } from '~/store';
 
 const confirm = ref(false);
@@ -9,6 +10,7 @@ const usernameConfirmation = ref('');
 const error = ref('');
 
 const store = useMainStore();
+const accountApi = useAccountApi();
 const { account } = storeToRefs(store);
 
 const username = computed(() => get(account)?.username);
@@ -27,7 +29,7 @@ const { start, stop } = useTimeoutFn(
 async function deleteAccount() {
   dismissNotification();
   set(confirm, false);
-  const result: ActionResult = await store.deleteAccount({
+  const result: ActionResult = await accountApi.deleteAccount({
     username: get(usernameConfirmation),
   });
   if (result.success) {

@@ -2,6 +2,8 @@ import type { Ref } from 'vue';
 import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
+import { useAccountRefresh } from '~/composables/use-app-events';
+import { usePaymentApi } from '~/composables/use-payment-api';
 import { useMainStore } from '~/store';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -32,7 +34,9 @@ interface ExecutePaymentParams {
 }
 
 export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
-  const { getPendingSubscription, markTransactionStarted } = useMainStore();
+  const { getPendingSubscription } = useMainStore();
+  const paymentApi = usePaymentApi();
+  const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('web3-payment');
   const { t } = useI18n({ useScope: 'global' });
   const pendingTx = usePendingTx();
@@ -104,7 +108,8 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       hash: tx.hash,
       subscriptionId: subscription?.identifier,
     });
-    await markTransactionStarted();
+    paymentApi.markTransactionStarted().catch(error => logger.error('Failed to mark transaction as started:', error));
+    requestRefresh();
     start();
   }
 

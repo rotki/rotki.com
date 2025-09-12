@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
+import { useAccountRefresh } from '~/composables/use-app-events';
+import { usePaymentApi } from '~/composables/use-payment-api';
 import { useMainStore } from '~/store';
 import { PaymentError } from '~/types/codes';
 import { PaymentMethod } from '~/types/payment';
@@ -13,13 +16,10 @@ const data = ref<CryptoPayment>();
 const error = ref<string>('');
 const paymentState = ref<StepType | IdleStep>('idle');
 
-const {
-  cryptoPayment,
-  switchCryptoPlan,
-  deletePendingPayment,
-  subscriptions,
-  getAccount,
-} = useMainStore();
+const store = useMainStore();
+const paymentApi = usePaymentApi();
+const { requestRefresh } = useAccountRefresh();
+const { subscriptions } = storeToRefs(store);
 
 const { plan } = usePlanParams();
 const { currency } = useCurrencyParams();
@@ -79,7 +79,7 @@ function back() {
 
 async function changePaymentMethod() {
   set(loading, true);
-  const response = await deletePendingPayment();
+  const response = await paymentApi.deletePendingPayment();
 
   if (!response.isError) {
     back();
@@ -94,7 +94,7 @@ watch(plan, async (plan) => {
   const selectedCurrency = get(currency);
   assert(selectedCurrency);
   set(loading, true);
-  const response = await switchCryptoPlan(
+  const response = await paymentApi.switchCryptoPlan(
     plan,
     selectedCurrency,
     get(subscriptionId) ?? get(currentCryptoSubscriptionId),
@@ -113,8 +113,8 @@ onMounted(async () => {
   if (selectedPlan && selectedCurrency) {
     set(loading, true);
     const subId = get(subscriptionId);
-    const result = await cryptoPayment(selectedPlan, selectedCurrency, subId);
-    await getAccount();
+    const result = await paymentApi.cryptoPayment(selectedPlan, selectedCurrency, subId);
+    requestRefresh();
     if (result.isError) {
       if (result.code === PaymentError.UNVERIFIED)
         set(error, t('subscription.error.unverified_email'));

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { get, objectOmit, set } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
+import { get } from '@vueuse/core';
+import { useProfileUpdate } from '~/composables/use-profile-update';
 import { toMessages } from '~/utils/validation';
 
-const store = useMainStore();
 const state = reactive({
   address1: '',
   address2: '',
@@ -15,18 +13,14 @@ const state = reactive({
   country: '',
 });
 
-const loading = ref(false);
-const done = ref(false);
-
-const { account } = storeToRefs(store);
-
-const movedOffline = computed(
-  () => get(account)?.address.movedOffline ?? false,
-);
-
-onBeforeMount(() => {
-  reset();
-});
+const {
+  $externalResults,
+  account,
+  done,
+  loading,
+  movedOffline,
+  updateProfile,
+} = useProfileUpdate();
 
 const rules = {
   address1: { required },
@@ -35,8 +29,6 @@ const rules = {
   postcode: { required },
   country: { required },
 };
-
-const $externalResults = ref<Record<string, string[]>>({});
 
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
@@ -70,31 +62,12 @@ function reset() {
 }
 
 async function update() {
-  const userAccount = get(account);
-  if (!userAccount)
-    return;
-
-  const isValid = await get(v$).$validate();
-  if (!isValid)
-    return;
-
-  set(loading, true);
-
-  const payload = objectOmit(
-    {
-      ...userAccount.address,
-      ...state,
-    },
-    ['movedOffline'],
-  );
-  const { success, message } = await store.updateProfile(payload);
-  if (success)
-    set(done, true);
-  else if (message && typeof message !== 'string')
-    set($externalResults, message);
-
-  set(loading, false);
+  await updateProfile(v$, state);
 }
+
+onBeforeMount(() => {
+  reset();
+});
 
 const { t } = useI18n({ useScope: 'global' });
 </script>
