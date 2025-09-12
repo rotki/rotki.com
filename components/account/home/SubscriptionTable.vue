@@ -9,8 +9,11 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx, UserSubscription } from '~/types';
 import { get, set, useIntervalFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import UpgradePlanDialog from '~/components/account/home/UpgradePlanDialog.vue';
+import { getMostPopularPlanName } from '~/components/pricings/utils';
 import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
+import { useTiersStore } from '~/store/tiers';
 import { PaymentMethod } from '~/types/payment';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
@@ -22,12 +25,14 @@ const showCancelDialog = ref<boolean>(false);
 const cancelling = ref<boolean>(false);
 const resuming = ref<boolean>(false);
 const resumingSubscription = ref<UserSubscription>();
+const upgradingSubscription = ref<UserSubscription>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { getSubscriptions } = store;
 const { userSubscriptions } = storeToRefs(store);
+const { availablePlans } = storeToRefs(useTiersStore());
 
 const { checkPendingCryptoPayment } = usePaymentCryptoStore();
 
@@ -131,11 +136,28 @@ async function resumeSubscription(sub: UserSubscription): Promise<void> {
   set(resuming, false);
 }
 
-function hasAction(sub: UserSubscription, action: 'renew' | 'cancel') {
-  if (action === 'cancel')
+function hasAction(sub: UserSubscription, action: 'renew' | 'cancel' | 'upgrade') {
+  if (action === 'cancel') {
     return sub.status !== 'Pending' && sub.actions.includes('cancel');
-  else if (action === 'renew')
+  }
+  else if (action === 'renew') {
     return sub.actions.includes('renew');
+  }
+  else if (action === 'upgrade') {
+    // Check if the subscription can be upgraded
+    if (!sub.isActive || sub.isSoftCanceled || sub.isLegacy || !sub.actions.includes('cancel'))
+      return false;
+
+    const plans = get(availablePlans);
+    if (plans.length === 0)
+      return false;
+
+    // Get the highest plan name (most popular is the highest priced)
+    const highestPlanName = getMostPopularPlanName(plans);
+
+    // If current plan is not the highest, it can be upgraded
+    return highestPlanName && highestPlanName !== sub.planName;
+  }
 
   return false;
 }
@@ -143,6 +165,7 @@ function hasAction(sub: UserSubscription, action: 'renew' | 'cancel') {
 function displayActions(sub: UserSubscription) {
   return hasAction(sub, 'renew')
     || hasAction(sub, 'cancel')
+    || hasAction(sub, 'upgrade')
     || isPending(sub)
     || sub.isSoftCanceled;
 }
@@ -248,6 +271,15 @@ onUnmounted(() => pause());
           class="flex gap-2 justify-end"
         >
           <RuiButton
+            v-if="hasAction(row, 'upgrade')"
+            variant="text"
+            type="button"
+            color="primary"
+            @click="upgradingSubscription = row"
+          >
+            {{ t('actions.upgrade') }}
+          </RuiButton>
+          <RuiButton
             v-if="hasAction(row, 'cancel')"
             :loading="cancelling"
             variant="text"
@@ -327,5 +359,7 @@ onUnmounted(() => pause());
       v-model="resumingSubscription"
       @confirm="resumeSubscription($event)"
     />
+
+    <UpgradePlanDialog v-model:subscription="upgradingSubscription" />
   </div>
 </template>
