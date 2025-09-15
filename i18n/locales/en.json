@@ -72,6 +72,12 @@
         "notification": {
           "title": "Cancellation Failure"
         },
+        "status": {
+          "pending": "Cancellation request queued...",
+          "in_progress": "Processing cancellation...",
+          "completed": "Cancellation completed successfully",
+          "failed": "Cancellation failed"
+        },
         "subscription_status": {
           "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all rotki premium features.",
           "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."

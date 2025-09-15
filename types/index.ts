@@ -120,6 +120,20 @@ export const ActionResultResponse = z.object({
 
 export type ActionResultResponse = z.infer<typeof ActionResultResponse>;
 
+export const TaskResponse = z.object({
+  taskId: z.string(),
+});
+
+export type TaskResponse = z.infer<typeof TaskResponse>;
+
+export const TaskStatusResponse = z.object({
+  error: z.string().optional(),
+  result: z.boolean().optional(),
+  status: z.enum(['pending', 'in_progress', 'completed', 'failed']),
+});
+
+export type TaskStatusResponse = z.infer<typeof TaskStatusResponse>;
+
 const Plan = z.object({
   discount: z.number(),
   months: z.number(),

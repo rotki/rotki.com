@@ -17,6 +17,7 @@ const sort = ref<DataTableSortColumn<Subscription>[]>([]);
 const selectedSubscription = ref<Subscription>();
 const showCancelDialog = ref<boolean>(false);
 const cancelling = ref<boolean>(false);
+const cancellationStatus = ref<string>('');
 const resuming = ref<boolean>(false);
 const resumingSubscription = ref<Subscription>();
 
@@ -161,8 +162,14 @@ function confirmCancel(sub: Subscription) {
 async function cancelSubscription(sub: Subscription) {
   set(showCancelDialog, false);
   set(cancelling, true);
-  await cancelUserSubscription(sub);
+  set(cancellationStatus, '');
+
+  await cancelUserSubscription(sub, (status: string) => {
+    set(cancellationStatus, status);
+  });
+
   set(cancelling, false);
+  set(cancellationStatus, '');
   set(selectedSubscription, undefined);
 }
 
@@ -232,16 +239,23 @@ onUnmounted(() => pause());
           v-if="displayActions(row)"
           class="flex gap-2 justify-end"
         >
-          <RuiButton
-            v-if="hasAction(row, 'cancel')"
-            :loading="cancelling"
-            variant="text"
-            type="button"
-            color="warning"
-            @click="confirmCancel(row)"
-          >
-            {{ t('actions.cancel') }}
-          </RuiButton>
+          <RuiTooltip v-if="hasAction(row, 'cancel')">
+            <template #activator>
+              <RuiButton
+                :loading="cancelling && selectedSubscription?.identifier === row.identifier"
+                :disabled="cancelling"
+                variant="text"
+                type="button"
+                color="warning"
+                @click="confirmCancel(row)"
+              >
+                {{ t('actions.cancel') }}
+              </RuiButton>
+            </template>
+            <span v-if="cancelling && selectedSubscription?.identifier === row.identifier && cancellationStatus">
+              {{ t(`account.subscriptions.cancellation.status.${cancellationStatus}`) }}
+            </span>
+          </RuiTooltip>
           <ButtonLink
             v-if="hasAction(row, 'renew')"
             :disabled="cancelling"
