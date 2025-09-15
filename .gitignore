@@ -97,3 +97,4 @@ tests/e2e/videos
 tests/e2e/screenshots
 tests/**/coverage
 .data/content
+planning
