@@ -10,6 +10,7 @@ import {
   threeDSecureCSP,
   walletConnectCSP,
 } from './csp-config';
+import { removeNoncePlaceholders } from './utils/csp-utils';
 
 const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
 
@@ -256,12 +257,13 @@ export default defineNuxtConfig({
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(
-            baseCSP,
+            removeNoncePlaceholders(baseCSP),
             recaptchaCSP,
             braintreeBaseCSP,
             paypalCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
+          crossOriginOpenerPolicy: 'same-origin-allow-popups',
         },
       },
     },
