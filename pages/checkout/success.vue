@@ -3,14 +3,13 @@ import { navigateTo } from '#app';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
-  middleware: ['maintenance', 'authentication', 'unverified', 'subscriber'],
+  middleware: ['payment-success'],
 });
 
 useHead({
   title: 'payment success',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Payment for rotki premium subscription completed',
     },
@@ -24,7 +23,7 @@ const { t } = useI18n({ useScope: 'global' });
 useAutoLogout();
 
 const route = useRoute();
-const crypto = computed(() => !!route.query.crypto);
+const crypto = computed<boolean>(() => !!route.query.crypto);
 </script>
 
 <template>

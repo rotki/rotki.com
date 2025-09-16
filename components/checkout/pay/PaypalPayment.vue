@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { Ref } from 'vue';
-import type { PaymentStep, SelectedPlan } from '~/types';
-import type { PayEvent } from '~/types/common';
+import type { PaymentStep } from '~/types';
 import { get, set } from '@vueuse/core';
-import { client, paypalCheckout } from 'braintree-web';
+import { paypalCheckout } from 'braintree-web';
 import { usePaymentPaypalStore } from '~/store/payments/paypal';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -14,61 +12,64 @@ interface ErrorMessage {
 }
 
 const props = defineProps<{
-  token: string;
-  plan: SelectedPlan;
-  loading: boolean;
   status: PaymentStep;
 }>();
 
-const emit = defineEmits<{
-  'pay': [plan: PayEvent];
-  'update:pending': [pending: boolean];
-  'clear:errors': [];
-}>();
-
 const { t } = useI18n({ useScope: 'global' });
-const { paymentMethodId } = usePaymentMethodParam();
 const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
-
-const { token, plan, loading, status } = toRefs(props);
-
-// Derive boolean states from status
-const success = computed<boolean>(() => get(status).type === 'success');
-const pending = computed<boolean>(() => get(status).type === 'pending');
-const error = ref<ErrorMessage | null>(null);
-const accepted = ref(false);
-const mustAcceptRefund = ref(false);
-const paying = ref(false);
-const initializing = ref(false);
-
-const processing = computed(() => get(paying) || get(loading) || get(pending));
-
-let btClient: braintree.Client | null = null;
-
 const logger = useLogger('paypal-payment');
 
-async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, pay: (plan: PayEvent) => void) {
-  let paypalActions: any = null;
-  watch(accepted, (val) => {
-    if (val)
-      paypalActions?.enable();
-    else
-      paypalActions?.disable();
+const { status } = toRefs(props);
+const { token, plan, btClient, submit } = useBraintree();
 
-    set(mustAcceptRefund, !val);
+const pending = computed<boolean>(() => get(status).type === 'pending');
+const error = ref<ErrorMessage>();
+const accepted = ref<boolean>(false);
+const paying = ref<boolean>(false);
+const initializing = ref<boolean>(false);
+
+const processing = computed<boolean>(() => get(paying) || get(pending));
+
+async function initializePayPal(): Promise<void> {
+  const client = get(btClient);
+  const currentPlan = get(plan);
+  const currentToken = get(token);
+
+  if (!client || !currentPlan || !currentToken) {
+    logger.warn('Missing required data for PayPal initialization');
+    return;
+  }
+
+  function processPayment(months: number, nonce: string): void {
+    submit({
+      months,
+      nonce,
+    }).then(async () => {
+      sessionStorage.setItem('payment-completed', 'true');
+      await navigateTo('/checkout/success');
+    }).catch((error_: any) => {
+      logger.error('PayPal payment submission failed:', error_);
+    });
+  }
+
+  let paypalActions: any = null;
+
+  watch(accepted, (isAccepted) => {
+    if (isAccepted)
+      paypalActions?.enable();
+    else
+      paypalActions?.disable();
   });
-  watch(processing, (val) => {
-    if (val)
+
+  watch(processing, (isProcessing) => {
+    if (isProcessing)
       paypalActions?.disable();
     else
       paypalActions?.enable();
-  });
-  const btClient = await client.create({
-    authorization: get(token),
   });
 
   const btPayPalCheckout = await paypalCheckout.create({
-    client: btClient,
+    client,
   });
 
   await btPayPalCheckout.loadPayPalSDK({
@@ -77,90 +78,64 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
     commit: true,
     intent: 'tokenize',
     components: 'buttons',
-    // Pass CSP nonce to PayPal SDK via data attributes
-    dataAttributes: {},
   });
 
   const paypal = window.paypal;
   assert(paypal);
 
-  paypal
-    .Buttons({
-      createBillingAgreement: async () => {
-        set(paying, true);
-        logger.debug(`Creating payment for ${get(plan).finalPriceInEur} EUR`);
-        return await btPayPalCheckout.createPayment({
-          flow: 'vault' as any,
-          amount: get(plan).finalPriceInEur,
-          currency: 'EUR',
-        });
-      },
-      onApprove: async (data) => {
-        set(paying, true);
-        logger.debug(`User approved PayPal payment`);
-        const token = await btPayPalCheckout.tokenizePayment(data);
-        const vaultedToken = await addPaypal({ paymentMethodNonce: token.nonce });
-        const vaultedNonce = await createPaypalNonce({ paymentToken: vaultedToken });
-        pay({
-          months: get(plan).months,
-          nonce: vaultedNonce,
-        });
-        return token;
-      },
-      onError: (error) => {
-        set(paying, false);
-        logger.error('PayPal payment failed with error', error);
-      },
-      onCancel: () => {
-        set(paying, false);
-        logger.info('PayPal payment was cancelled by user');
-      },
-      onInit: (_, actions) => {
-        paypalActions = actions;
-        const userAcceptedPolicy = get(accepted);
-        if (!userAcceptedPolicy) {
-          assert('disable' in actions && typeof actions.disable === 'function');
-          actions.disable();
-        }
-      },
-      onClick: () => {
-        if (!get(accepted))
-          set(mustAcceptRefund, true);
-      },
-    })
-    .render('#paypal-button');
+  paypal.Buttons({
+    createBillingAgreement: async () => {
+      set(paying, true);
+      logger.debug(`Creating payment for ${currentPlan.finalPriceInEur} EUR`);
+      return await btPayPalCheckout.createPayment({
+        flow: 'vault' as any,
+        amount: currentPlan.finalPriceInEur,
+        currency: 'EUR',
+      });
+    },
+    onApprove: async (data) => {
+      set(paying, true);
+      logger.debug('User approved PayPal payment');
+      const tokenResponse = await btPayPalCheckout.tokenizePayment(data);
+      const vaultedToken = await addPaypal({ paymentMethodNonce: tokenResponse.nonce });
+      const vaultedNonce = await createPaypalNonce({ paymentToken: vaultedToken });
 
-  return btClient;
+      processPayment(currentPlan.months, vaultedNonce);
+
+      return tokenResponse;
+    },
+    onError: (error) => {
+      set(paying, false);
+      logger.error('PayPal payment failed with error', error);
+    },
+    onCancel: () => {
+      set(paying, false);
+      logger.info('PayPal payment was cancelled by user');
+    },
+    onInit: (_, actions) => {
+      paypalActions = actions;
+      paypalActions.disable();
+    },
+  }).render('#paypal-button');
 }
 
-function clearError() {
-  set(error, null);
-}
+async function back(): Promise<void> {
+  const currentPlan = get(plan);
+  if (!currentPlan)
+    return;
 
-async function back() {
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
-      plan: get(plan).months,
-      method: get(paymentMethodId),
+      plan: currentPlan.months,
     },
   });
 }
 
-function redirect() {
-  navigateTo({ name: 'checkout-success' });
-  stopWatcher();
-}
-
-const stopWatcher = watchEffect(() => {
-  if (get(success))
-    redirect();
-});
-
 onMounted(async () => {
   try {
     set(initializing, true);
-    btClient = await initializeBraintree(token, plan, p => emit('pay', p));
+    await initializePayPal();
     set(initializing, false);
   }
   catch (error_: any) {
@@ -170,29 +145,25 @@ onMounted(async () => {
     });
   }
 });
-
-onUnmounted(async () => {
-  await btClient?.teardown(() => {});
-});
 </script>
 
 <template>
   <div class="my-6 grow flex flex-col">
     <div
       id="paypal-button"
-      :class="[
-        $style.buttons,
-        { [$style.buttons__disabled]: mustAcceptRefund || processing },
-      ]"
+      :class="{
+        'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing,
+      }"
     />
     <SelectedPlanOverview
+      v-if="plan"
       :plan="plan"
       :disabled="processing || initializing"
     />
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"
-      :class="$style.policy"
+      class="my-8"
     />
     <div
       v-if="pending"
@@ -205,7 +176,7 @@ onUnmounted(async () => {
         <span>{{ status?.message }}</span>
       </RuiAlert>
     </div>
-    <div :class="$style.button">
+    <div class="flex gap-4 justify-center w-full mt-auto">
       <RuiButton
         :disabled="processing"
         :loading="pending || initializing"
@@ -218,17 +189,11 @@ onUnmounted(async () => {
     </div>
   </div>
 
-  <FloatingNotification :visible="mustAcceptRefund">
-    <template #title>
-      {{ t('policies.refund.accept_title') }}
-    </template>
-    {{ t('policies.refund.accept_message') }}
-  </FloatingNotification>
   <FloatingNotification
     :timeout="10000"
     :visible="!!error"
     closeable
-    @dismiss="clearError()"
+    @dismiss="error = undefined"
   >
     <template #title>
       {{ error?.title }}
@@ -236,19 +201,3 @@ onUnmounted(async () => {
     {{ error?.message }}
   </FloatingNotification>
 </template>
-
-<style lang="scss" module>
-.policy {
-  @apply my-8;
-}
-
-.buttons {
-  &__disabled {
-    @apply opacity-50 cursor-not-allowed pointer-events-none;
-  }
-}
-
-.button {
-  @apply flex gap-4 justify-center w-full mt-auto;
-}
-</style>

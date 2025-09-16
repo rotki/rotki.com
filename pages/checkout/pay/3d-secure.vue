@@ -82,6 +82,7 @@ async function handleRetry(): Promise<void> {
 
     // Clear stored data and redirect to success page
     clearStoredData();
+    sessionStorage.setItem('payment-completed', 'true');
     await navigateTo('/checkout/success');
   }
   catch {

@@ -60,7 +60,7 @@ const selected = computed<PaymentMethodItem | undefined>(() =>
 async function back() {
   await navigateTo({
     name: 'checkout-pay',
-    query: { plan: get(plan), method: get(selected) ? get(method) : undefined },
+    query: { plan: get(plan) },
   });
 }
 
@@ -70,14 +70,12 @@ async function next() {
   set(processing, true);
   const selectedMethod = get(selected);
   assert(selectedMethod);
-  const { name, id: method } = selectedMethod;
-
+  const { name } = selectedMethod;
   const { href } = router.resolve({
     name,
     query: {
       plan: get(plan),
       id: get(identifier),
-      method,
     },
   });
 
