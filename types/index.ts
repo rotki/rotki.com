@@ -44,6 +44,7 @@ const SubscriptionStatus = z.enum([
   'Cancelled but still active',
   'Pending',
   'Past Due',
+  'Upgrade Requested',
 ] as const);
 
 export const UserSubscription = z.object({
@@ -58,6 +59,7 @@ export const UserSubscription = z.object({
   nextBillingAmount: z.number(),
   paymentProvider: z.string(),
   pending: z.boolean().default(false),
+  planId: z.number().optional(),
   planName: z.string(),
   status: SubscriptionStatus,
 });
@@ -216,6 +218,34 @@ export const PendingCryptoPaymentResponse = z.object({
 
 export type PendingCryptoPaymentResponse = z.infer<typeof PendingCryptoPaymentResponse>;
 
+const CryptoUpgradePayment = PendingCryptoPayment.extend({
+  fromPlan: z.object({
+    id: z.number(),
+    tier: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+  ),
+  toPlan: z.object({
+    id: z.number(),
+    tier: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+  ),
+});
+
+export type CryptoUpgradePayment = z.infer<typeof CryptoUpgradePayment>;
+
+export const CryptoUpgradePaymentResponse = z.object({
+  message: z.string().optional(),
+  result: CryptoUpgradePayment.optional(),
+});
+
+export type CryptoUpgradePaymentResponse = z.infer<typeof CryptoUpgradePaymentResponse>;
+
 z.object({
   message: z.string().optional(),
   result: z.boolean().optional(),
@@ -321,4 +351,5 @@ export interface PendingTx {
   subscriptionId: string;
   chainId: number;
   blockExplorerUrl: string;
+  isUpgrade: boolean;
 }
