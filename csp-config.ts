@@ -28,9 +28,10 @@ export const baseCSP: ContentSecurityPolicyValue = {
   ],
   'object-src': ['\'none\''],
   'report-uri': ['/api/csp/violation'],
-  'script-src': ['\'self\'', '\'unsafe-inline\'', '\'unsafe-eval\''],
-  'script-src-elem': ['\'self\'', '\'unsafe-inline\''],
-  'style-src': ['\'self\'', '\'unsafe-inline\'', 'fonts.googleapis.com'],
+  // Use nonce placeholders - nuxt-security will replace with actual nonces
+  'script-src': ['\'self\'', '\'unsafe-eval\'', '\'nonce-{{nonce}}\''], // nonce for inline scripts
+  'script-src-elem': ['\'self\'', '\'nonce-{{nonce}}\''], // nonce for script elements
+  'style-src': ['\'self\'', '\'unsafe-inline\'', 'fonts.googleapis.com'], // Keep for styles
   'worker-src': ['\'self\''],
 };
 
@@ -39,6 +40,9 @@ export function createDevCSP(devPort = 3000, hmrPort = 4000): ContentSecurityPol
   return {
     'connect-src': [`ws://localhost:${hmrPort}/ws`],
     'frame-src': [`http://localhost:${devPort}/__nuxt_devtools__/client/`],
+    // Allow Vite dev client scripts with nonces
+    'script-src': [`http://localhost:${devPort}`],
+    'script-src-elem': [`http://localhost:${devPort}`],
   };
 }
 
@@ -147,10 +151,14 @@ export const paypalCSP: ContentSecurityPolicyValue = {
   'script-src': [
     '*.paypal.com',
     'www.paypalobjects.com',
+    // Allow nonce-based inline scripts for PayPal
+    '\'nonce-{{nonce}}\'',
   ],
   'script-src-elem': [
     '*.paypal.com',
     'www.paypalobjects.com',
+    // Allow nonce-based script elements for PayPal
+    '\'nonce-{{nonce}}\'',
   ],
 };
 
