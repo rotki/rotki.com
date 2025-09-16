@@ -5,20 +5,24 @@ import type {
 } from '~/types';
 import type { PayEvent } from '~/types/common';
 import { get, set } from '@vueuse/core';
+import { type Client, create } from 'braintree-web/client';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/composables/use-payment-api';
 
-export function useBraintree() {
+function useBraintreeInternal() {
   const { t } = useI18n({ useScope: 'global' });
   const paymentApi = usePaymentApi();
   const { requestRefresh } = useAccountRefresh();
   const route = useRoute();
   const router = useRouter();
   const checkout = ref<CardCheckout | null>(null);
-  const loadingPlan = ref(false);
-  const pending = ref(false);
-  const paymentSuccess = ref(false);
-  const paymentError = ref('');
+  const loadingPlan = ref<boolean>(false);
+  const pending = ref<boolean>(false);
+  const paymentSuccess = ref<boolean>(false);
+  const paymentError = ref<string>('');
+  const btClient = ref<Client>();
+  const clientError = ref<string>();
+  const clientInitializing = ref<boolean>(false);
 
   const step = computed<PaymentStep>(() => {
     const isPending = get(pending);
@@ -79,6 +83,34 @@ export function useBraintree() {
     return payload.braintreeClientToken;
   });
 
+  // Initialize Braintree client when token is available
+  const initializeClient = async () => {
+    const currentToken = get(token);
+    if (!currentToken || get(btClient) || get(clientInitializing))
+      return;
+
+    set(clientInitializing, true);
+    try {
+      const newClient = await create({
+        authorization: currentToken,
+      });
+      set(btClient, newClient);
+    }
+    catch (error: any) {
+      set(clientError, error.message);
+    }
+    finally {
+      set(clientInitializing, false);
+    }
+  };
+
+  // Watch for token changes to initialize client
+  watch(token, async (newToken) => {
+    if (newToken && !get(btClient)) {
+      await initializeClient();
+    }
+  }, { immediate: true });
+
   const submit = async ({ months, nonce }: PayEvent) => {
     set(pending, true);
     const result = await paymentApi.pay({
@@ -103,6 +135,9 @@ export function useBraintree() {
   };
 
   return {
+    btClient: readonly(btClient),
+    clientError: readonly(clientError),
+    clientInitializing: readonly(clientInitializing),
     loading: loadingPlan,
     pending,
     plan,
@@ -112,3 +147,5 @@ export function useBraintree() {
     token,
   };
 }
+
+export const useBraintree = createSharedComposable(useBraintreeInternal);

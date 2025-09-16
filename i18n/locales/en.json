@@ -223,6 +223,7 @@
     "renew": "Renew",
     "reset": "Reset",
     "resume": "Resume",
+    "retry": "Retry",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
     "update": "Update"
@@ -597,6 +598,10 @@
             "pay_with_wallet": "Pay with wallet",
             "switch_network": "Switch Network"
           }
+        },
+        "step_4": {
+          "description": "Secure authentication verification",
+          "title": "3D Secure Verification"
         }
       },
       "total": "Total {total}€"
@@ -1044,7 +1049,38 @@
     "success": {
       "message": "Your payment was processed successfully. Visit the account management page to manage your account.",
       "title": "Payment Success"
-    }
+    },
+    "3d_secure": {
+      "page_title": "3D Secure Verification",
+      "page_description": "Secure payment verification in progress. Please complete the authentication challenge if prompted.",
+      "leave_confirmation": "Are you sure you want to leave? This will cancel the payment verification process.",
+      "error_title": "Verification Failed",
+      "error_help": "If the problem persists, please try a different payment method or contact support.",
+      "invalid_params_title": "Invalid Verification Request",
+      "invalid_params_message": "The 3D Secure verification cannot be completed because the required parameters are missing or invalid.",
+      "possible_causes": "Possible causes",
+      "cause_direct_access": "Accessing this page directly instead of through the payment flow",
+      "cause_expired_session": "The verification session has expired",
+      "cause_browser_refresh": "Refreshing or navigating back from this page",
+      "back_to_payment_selection": "Back to Payment Selection",
+      "success_title": "Verification Successful",
+      "success_message": "Your payment has been successfully verified and processed. Welcome to rotki premium!",
+      "go_to_dashboard": "Go to Dashboard",
+      "payment_complete_notice": "Your subscription is now active. Check out our ",
+      "setup_guide": "setup guide",
+      "get_started_text": " to get started with rotki premium.",
+      "initializing": "Initializing secure payment verification...",
+      "ready": "Ready for verification",
+      "verifying": "Preparing your bank's verification interface...",
+      "challenge_active": "Complete the verification challenge",
+      "success": "Verification successful",
+      "error": "Verification failed",
+      "challenge_instructions": "Please complete the security challenge below",
+      "security_notice": "This page uses bank-grade security to protect your payment information"
+    },
+    "selected_plan": "Selected Plan",
+    "months": "month | months",
+    "change_payment_method": "Change Payment Method"
   },
   "oauth": {
     "title": "OAuth Integration",

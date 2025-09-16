@@ -33,8 +33,6 @@ watch(loadingCard, (isLoading) => {
         v-if="plan"
         :card="card"
         :status="status"
-        :plan="plan"
-        :token="token"
         @pay="submit($event)"
         @update:pending="pending = $event"
         @card-deleted="refreshCard()"

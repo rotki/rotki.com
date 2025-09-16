@@ -30,6 +30,7 @@ const nonIndexed = [
   '/checkout/pay',
   '/checkout/pay/method',
   '/checkout/pay/card',
+  '/checkout/pay/3d-secure',
   '/checkout/pay/crypto',
   '/checkout/pay/paypal',
   '/checkout/pay/request-crypto',
@@ -195,6 +196,19 @@ export default defineNuxtConfig({
         },
       },
     },
+    // Dedicated 3D Secure verification page
+    '/checkout/pay/3d-secure': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            braintreeBaseCSP,
+            threeDSecureCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
     // Card payment page with 3D Secure
     '/checkout/pay/card': {
       security: {
@@ -203,7 +217,6 @@ export default defineNuxtConfig({
             baseCSP,
             recaptchaCSP,
             braintreeBaseCSP,
-            threeDSecureCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
         },

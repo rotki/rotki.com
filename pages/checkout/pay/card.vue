@@ -14,7 +14,6 @@ useHead({
   title: 'pay with credit card',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Pay with Credit Card for your rotki premium subscription',
     },

@@ -18,7 +18,6 @@ interface ErrorMessage {
 }
 
 const props = defineProps<{
-  client: Client;
   disabled: boolean;
   processing: boolean;
 }>();
@@ -41,7 +40,8 @@ function updateInitializing(valid: boolean) {
   emit('update:initializing', valid);
 }
 
-const { client, processing } = toRefs(props);
+const { processing } = toRefs(props);
+const { btClient: client } = useBraintree();
 
 const defaultStatus: FieldStatus = {
   valid: false,
@@ -241,7 +241,11 @@ const { t } = useI18n({ useScope: 'global' });
 onMounted(async () => {
   try {
     updateInitializing(true);
-    await fields.create(get(client));
+    const currentClient = get(client);
+    if (!currentClient) {
+      throw new Error('Braintree client not available');
+    }
+    await fields.create(currentClient);
     fields.setup(focused, empty, {
       numberStatus,
       expirationDateStatus,

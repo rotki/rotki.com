@@ -242,6 +242,24 @@ export interface PaymentStep {
   closeable?: boolean;
 }
 
+export const CHECKOUT_ROUTE_NAMES = [
+  'checkout-pay',
+  'checkout-pay-method',
+  'checkout-pay-request-crypto',
+  'checkout-pay-crypto',
+  'checkout-pay-card',
+  'checkout-pay-paypal',
+  'checkout-pay-3d-secure',
+] as const;
+
+export type CheckoutRouteName = typeof CHECKOUT_ROUTE_NAMES[number];
+
+export interface CheckoutStep {
+  title: string;
+  description: string;
+  names: CheckoutRouteName[];
+}
+
 export const SavedCard = z.object({
   expiresAt: z.string(),
   imageUrl: z.string(),

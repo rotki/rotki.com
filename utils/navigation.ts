@@ -9,6 +9,7 @@ const SPECIAL_CSP_ROUTES = [
   '/checkout/pay/method',
   '/checkout/pay/paypal',
   '/checkout/pay/request-crypto',
+  '/checkout/pay/3d-secure',
   // Auth routes
   '/signup',
   '/password/recover',

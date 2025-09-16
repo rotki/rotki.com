@@ -2,6 +2,7 @@
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
+import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -9,32 +10,58 @@ const route = useRoute();
 const store = useMainStore();
 const { plans } = storeToRefs(store);
 
-const steps = computed(() => [
-  {
-    title: t('home.plans.tiers.step_1.title'),
-    description: t('home.plans.tiers.step_1.description'),
-    names: ['checkout-pay'],
-  },
-  {
-    title: t('home.plans.tiers.step_2.title'),
-    description: t('home.plans.tiers.step_2.description'),
-    names: ['checkout-pay-method'],
-  },
-  {
-    title: t('home.plans.tiers.step_3.title'),
-    description: t('home.plans.tiers.step_3.description'),
-    names: [
-      'checkout-pay-request-crypto',
-      'checkout-pay-crypto',
-      'checkout-pay-card',
-      'checkout-pay-paypal',
-    ],
-  },
-]);
+const isCardOrSecureRoute = computed<boolean>(() => {
+  const routeName = route.name;
+  if (!Array.prototype.includes.call(CHECKOUT_ROUTE_NAMES, routeName)) {
+    return false;
+  }
+  return routeName === 'checkout-pay-card' || routeName === 'checkout-pay-3d-secure';
+});
 
-const step = computed(() => {
+const steps = computed<CheckoutStep[]>(() => {
+  const baseSteps: CheckoutStep[] = [
+    {
+      title: t('home.plans.tiers.step_1.title'),
+      description: t('home.plans.tiers.step_1.description'),
+      names: ['checkout-pay'],
+    },
+    {
+      title: t('home.plans.tiers.step_2.title'),
+      description: t('home.plans.tiers.step_2.description'),
+      names: ['checkout-pay-method'],
+    },
+    {
+      title: t('home.plans.tiers.step_3.title'),
+      description: t('home.plans.tiers.step_3.description'),
+      names: [
+        'checkout-pay-request-crypto',
+        'checkout-pay-crypto',
+        'checkout-pay-card',
+        'checkout-pay-paypal',
+      ],
+    },
+  ];
+
+  // Only add step 4 for card and 3D secure routes
+  if (get(isCardOrSecureRoute)) {
+    baseSteps.push({
+      title: t('home.plans.tiers.step_4.title'),
+      description: t('home.plans.tiers.step_4.description'),
+      names: ['checkout-pay-3d-secure'],
+    });
+  }
+
+  return baseSteps;
+});
+
+const step = computed<number>(() => {
+  const routeName = route.name;
+  if (!Array.prototype.includes.call(CHECKOUT_ROUTE_NAMES, routeName)) {
+    return 1; // Default to first step if route name is invalid
+  }
+
   const index = get(steps).findIndex(step =>
-    step.names.includes(String(route.name)),
+    Array.prototype.includes.call(step.names, routeName),
   );
   return index + 1;
 });
