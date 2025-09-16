@@ -70,6 +70,10 @@
       "title": "Your latest payments"
     },
     "subscriptions": {
+      "actions": {
+        "cancel": "Cancel subscription",
+        "resume": "Resume subscription"
+      },
       "cancellation": {
         "actions": {
           "no": "No, don't cancel",
@@ -95,6 +99,7 @@
         "description": "You canceled this subscription, but it will remain active until {date}",
         "status": "Active until {date}"
       },
+      "explorer": "See in Explorer",
       "headers": {
         "cost_in_symbol_per_period": "Cost in {symbol} per period",
         "created": "Created",
@@ -123,7 +128,11 @@
         "title": "Resume your rotki subscription"
       },
       "resume_hint": "Resume the active billing of your subscription from {date}",
-      "title": "Subscription History"
+      "title": "Subscription History",
+      "upgrade": {
+        "upgrade": "Upgrade plan",
+        "cancel": "Cancel Upgrade Request"
+      }
     },
     "tabs": {
       "account_details": "Account Details",
@@ -226,11 +235,10 @@
     "regenerate": "Regenerate",
     "renew": "Renew",
     "reset": "Reset",
-    "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
     "update": "Update",
-    "upgrade": "Upgrade plan"
+    "upgrade": "Upgrade"
   },
   "auth": {
     "activation": {
@@ -605,6 +613,8 @@
           "start": "Pay Now",
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
+          "upgrade_plan_description": "The final amount will be deducted based on the remaining time of the current subscription (pro rata).",
+          "upgrade_to_plan": "Upgrade to plan:",
           "wallet": {
             "connect_wallet": "Connect wallet",
             "notice": "You can pay directly via your wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",

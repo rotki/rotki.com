@@ -35,6 +35,7 @@ export const useMainStore = defineStore('main', () => {
   const userPayments = ref<UserPayments>([]);
   const cancellationError = ref('');
   const resumeError = ref('');
+  const userSubscriptionLoading = ref<boolean>(false);
 
   const logger = useLogger('store');
   const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
@@ -58,6 +59,7 @@ export const useMainStore = defineStore('main', () => {
 
   const getSubscriptions = async (): Promise<void> => {
     try {
+      set(userSubscriptionLoading, true);
       const response = await fetchWithCsrf<ApiResponse<Account>>(
         '/webapi/2/history/subscriptions',
         {
@@ -68,6 +70,9 @@ export const useMainStore = defineStore('main', () => {
     }
     catch (error) {
       logger.error(error);
+    }
+    finally {
+      set(userSubscriptionLoading, false);
     }
   };
 
@@ -368,6 +373,7 @@ export const useMainStore = defineStore('main', () => {
     updateKeys,
     updateProfile,
     userPayments,
+    userSubscriptionLoading,
     userSubscriptions,
   };
 });

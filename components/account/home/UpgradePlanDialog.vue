@@ -3,18 +3,15 @@ import type { AvailablePlan, UserSubscription } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
-import { getMostPopularPlanName } from '~/components/pricings/utils';
+import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
 import { useSubscription } from '~/composables/use-subscription';
 import { useMainStore } from '~/store';
 import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 
-const props = defineProps<{
-  subscription: UserSubscription | undefined;
-}>();
+const subscription = defineModel<UserSubscription | undefined>({ required: true });
 
 const emit = defineEmits<{
-  (e: 'update:subscription', value: UserSubscription | undefined): void;
   (e: 'upgrade', plan: AvailablePlan): void;
 }>();
 
@@ -22,7 +19,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 const store = useTiersStore();
 const { availablePlans } = storeToRefs(store);
-const { upgradeSubscription } = useSubscription();
+const { upgradeBraintreeSubscription } = useSubscription();
 const { refreshUserData } = useMainStore();
 
 const upgrading = ref<boolean>(false);
@@ -38,19 +35,17 @@ const alert = reactive<{
 });
 
 const visible = computed<boolean>({
-  get: () => !!props.subscription,
+  get: () => !!get(subscription),
   set: (value) => {
     if (!value) {
-      emit('update:subscription', undefined);
+      set(subscription, undefined);
       alert.show = false;
       set(selectedPlan, undefined);
     }
   },
 });
 
-const currentPeriod = computed<PricingPeriod>(() =>
-  props.subscription?.durationInMonths === 12 ? PricingPeriod.YEARLY : PricingPeriod.MONTHLY,
-);
+const currentPeriod = computed<PricingPeriod>(() => getPricingPeriod(get(subscription)?.durationInMonths));
 
 function getPlanPrice(plan: AvailablePlan, isYearly: boolean): number {
   const pricing = isYearly ? plan.yearlyPlan : plan.monthlyPlan;
@@ -64,19 +59,19 @@ function hasPlanPricing(plan: AvailablePlan, isYearly: boolean): boolean {
 
 const higherPlans = computed<AvailablePlan[]>(() => {
   const plans = get(availablePlans);
-  const subscription = props.subscription;
+  const sub = get(subscription);
 
-  if (!subscription || plans.length === 0) {
+  if (!sub || plans.length === 0) {
     return [];
   }
 
-  const highestPlanName = getMostPopularPlanName(plans);
-  if (subscription.planName === highestPlanName) {
+  const highestPlanName = getHighestPlanOnPeriod(plans, sub.durationInMonths);
+  if (sub.planName === highestPlanName) {
     return [];
   }
 
   const isYearly = get(currentPeriod) === PricingPeriod.YEARLY;
-  const currentPlan = plans.find(plan => plan.tierName === subscription.planName);
+  const currentPlan = plans.find(plan => plan.tierName === sub.planName);
 
   if (!currentPlan) {
     return [];
@@ -95,10 +90,10 @@ function selectPlan(plan: AvailablePlan) {
 }
 
 async function submitUpgrade() {
-  const subscription = props.subscription;
+  const sub = get(subscription);
   const plan = get(selectedPlan);
 
-  if (!subscription || !plan) {
+  if (!sub || !plan) {
     logger.error('No subscription or plan selected');
     return;
   }
@@ -117,7 +112,20 @@ async function submitUpgrade() {
   alert.show = false;
 
   try {
-    const result = await upgradeSubscription(subscription.id, planId);
+    if (sub.paymentProvider === 'crypto') {
+      navigateTo({
+        name: 'checkout-pay-request-crypto',
+        query: {
+          planId,
+          period,
+          plan: plan.tierName,
+          upgradeSubId: sub.id,
+        },
+      });
+      return;
+    }
+
+    const result = await upgradeBraintreeSubscription(sub, planId);
 
     if (result.isError) {
       Object.assign(alert, {
@@ -181,16 +189,12 @@ function cancel(): void {
       </template>
 
       <div class="space-y-4">
-        <div class="text-rui-text-secondary">
-          {{ t('upgrade_plan.description') }}
-        </div>
-
         <div
           v-if="higherPlans.length === 0"
-          class="text-center py-8"
+          class="text-center py-8 flex flex-col items-center"
         >
           <RuiIcon
-            name="lu-arrow-up-circle"
+            name="lu-circle-arrow-up"
             size="48"
             class="text-rui-text-disabled mb-4"
           />
@@ -199,20 +203,25 @@ function cancel(): void {
           </p>
         </div>
 
-        <div
-          v-else
-          class="space-y-3"
-        >
-          <SelectablePlan
-            v-for="plan in higherPlans"
-            :key="plan.tierName"
-            :plan="plan"
-            :period="currentPeriod"
-            :selected="selectedPlan?.tierName === plan.tierName"
-            :disabled="upgrading"
-            @click="selectPlan(plan)"
-          />
-        </div>
+        <template v-else>
+          <div class="text-rui-text-secondary">
+            {{ t('upgrade_plan.description') }}
+          </div>
+
+          <div
+            class="space-y-3"
+          >
+            <SelectablePlan
+              v-for="plan in higherPlans"
+              :key="plan.tierName"
+              :plan="plan"
+              :period="currentPeriod"
+              :selected="selectedPlan?.tierName === plan.tierName"
+              :disabled="upgrading"
+              @click="selectPlan(plan)"
+            />
+          </div>
+        </template>
 
         <RuiAlert
           v-if="alert.show"
