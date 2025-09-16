@@ -239,7 +239,10 @@ onUnmounted(() => pause());
           v-if="displayActions(row)"
           class="flex gap-2 justify-end"
         >
-          <RuiTooltip v-if="hasAction(row, 'cancel')">
+          <RuiTooltip
+            v-if="hasAction(row, 'cancel')"
+            :disabled="!cancelling"
+          >
             <template #activator>
               <RuiButton
                 :loading="cancelling && selectedSubscription?.identifier === row.identifier"
