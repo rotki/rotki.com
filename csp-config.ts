@@ -151,14 +151,12 @@ export const paypalCSP: ContentSecurityPolicyValue = {
   'script-src': [
     '*.paypal.com',
     'www.paypalobjects.com',
-    // Allow nonce-based inline scripts for PayPal
-    '\'nonce-{{nonce}}\'',
+    '\'unsafe-inline\'',
   ],
   'script-src-elem': [
     '*.paypal.com',
     'www.paypalobjects.com',
-    // Allow nonce-based script elements for PayPal
-    '\'nonce-{{nonce}}\'',
+    '\'unsafe-inline\'',
   ],
 };
 

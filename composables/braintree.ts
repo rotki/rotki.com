@@ -51,8 +51,10 @@ function useBraintreeInternal() {
     return { type: 'idle' };
   });
 
-  watchEffect(async () => {
-    await loadPlan(route.query.plan as string);
+  watchEffect(() => {
+    loadPlan(route.query.plan as string).catch((error) => {
+      logger.error('Failed to load plan:', error);
+    });
   });
 
   async function loadPlan(months: string) {

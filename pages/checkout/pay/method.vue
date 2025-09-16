@@ -10,7 +10,6 @@ useHead({
   title: 'select payment method',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Select how to pay for your rotki premium subscription',
     },
