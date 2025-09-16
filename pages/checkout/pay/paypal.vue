@@ -14,7 +14,6 @@ useHead({
   title: 'pay with paypal',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Pay with Paypal for your rotki premium subscription',
     },

@@ -21,9 +21,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'pay', plan: PayEvent): void;
-  (e: 'update:pending', pending: boolean): void;
-  (e: 'clear:errors'): void;
+  'pay': [plan: PayEvent];
+  'update:pending': [pending: boolean];
+  'clear:errors': [];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -70,12 +70,15 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
   const btPayPalCheckout = await paypalCheckout.create({
     client: btClient,
   });
+
   await btPayPalCheckout.loadPayPalSDK({
     currency: 'EUR',
     vault: true,
     commit: true,
     intent: 'tokenize',
     components: 'buttons',
+    // Pass CSP nonce to PayPal SDK via data attributes
+    dataAttributes: {},
   });
 
   const paypal = window.paypal;

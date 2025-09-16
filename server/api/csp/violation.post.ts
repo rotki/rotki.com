@@ -7,7 +7,29 @@ const cspViolationReportSchema = z.object({
   'csp-report': z.object({
     'blocked-uri': z.string().optional(),
     'column-number': z.number().int().positive().optional(),
-    'document-uri': z.string().url('Invalid document URI'),
+    // document-uri can be special values like 'about', 'data:', 'blob:', or actual URLs
+    'document-uri': z.string().refine((uri) => {
+      // Allow special URI schemes and actual URLs
+      if (!uri)
+        return false;
+
+      // Special cases that are valid in CSP reports
+      const specialSchemes = ['about', 'data:', 'blob:', 'javascript:', 'inline'];
+      if (specialSchemes.some(scheme => uri.startsWith(scheme))) {
+        return true;
+      }
+
+      // Try to validate as URL for regular cases
+      try {
+        // eslint-disable-next-line no-new
+        new URL(uri);
+        return true;
+      }
+      catch {
+        // If not a valid URL, still accept if it's a reasonable string
+        return uri.length > 0 && uri.length < 2048;
+      }
+    }, 'Invalid document URI format'),
     'effective-directive': z.string().optional(),
     'line-number': z.number().int().positive().optional(),
     'original-policy': z.string().min(1, 'Original policy is required'),

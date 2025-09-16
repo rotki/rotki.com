@@ -14,7 +14,6 @@ interface ErrorMessage {
 }
 
 const props = defineProps<{
-  client: Client;
   card: SavedCard;
   disabled: boolean;
 }>();
@@ -26,7 +25,8 @@ const emit = defineEmits<{
   'card-deleted': [];
 }>();
 
-const { client, card } = toRefs(props);
+const { card } = toRefs(props);
+const { btClient: client } = useBraintree();
 
 const deleteLoading = ref(false);
 const showDeleteConfirmation = ref(false);
@@ -134,7 +134,11 @@ watchImmediate(payloadError, (payloadError) => {
 onMounted(async () => {
   try {
     updateInitializing(true);
-    await vaults.create(get(client));
+    const currentClient = get(client);
+    if (!currentClient) {
+      throw new Error('Braintree client not available');
+    }
+    await vaults.create(currentClient);
     await checkPaymentMethods();
   }
   catch (error_: any) {
