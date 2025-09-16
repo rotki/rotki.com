@@ -1,8 +1,9 @@
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useTaskPolling } from '~/composables/use-task-polling';
 import { useMainStore } from '~/store';
-import { ActionResultResponse, type Subscription, TaskResponse, TaskStatusResponse } from '~/types';
+import { ActionResultResponse, type Subscription, TaskResponse } from '~/types';
 import { assert } from '~/utils/assert';
 
 interface UseSubscriptionReturn {
@@ -15,6 +16,7 @@ export function useSubscription(): UseSubscriptionReturn {
   const { account, cancellationError, resumeError } = storeToRefs(store);
   const { getAccount } = store;
   const { fetchWithCsrf } = useFetchWithCsrf();
+  const { pollTaskStatus } = useTaskPolling();
 
   const resumeUserSubscription = async (identifier: string) => {
     const acc = get(account);
@@ -60,37 +62,28 @@ export function useSubscription(): UseSubscriptionReturn {
         onProgress('pending');
 
       // Step 2: Poll for task completion
-      const pollStatus = async (): Promise<void> => {
-        const statusResponse = await fetchWithCsrf<TaskStatusResponse>(
-          `/webapi/task/status/${taskId}/`,
-        );
-        const status = TaskStatusResponse.parse(statusResponse);
+      const status = await pollTaskStatus(taskId, {
+        onProgress,
+      });
 
-        if (onProgress)
-          onProgress(status.status);
-
-        if (status.status === 'pending' || status.status === 'in_progress') {
-          // Continue polling after 1 second
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          return pollStatus();
+      // Handle the final status
+      if (status.status === 'completed') {
+        if (status.result) {
+          await getAccount();
         }
-
-        if (status.status === 'completed') {
-          if (status.result) {
-            await getAccount();
-          }
-          else {
-            throw new Error('Cancellation completed but result was false');
-          }
+        else {
+          throw new Error('Cancellation completed but result was false');
         }
-        else if (status.status === 'failed') {
-          throw new Error(status.error || 'Cancellation task failed');
-        }
-      };
-
-      await pollStatus();
+      }
+      else if (status.status === 'failed') {
+        throw new Error(status.error || 'Cancellation task failed');
+      }
     }
     catch (error: any) {
+      // Clean up state on any error
+      if (onProgress)
+        onProgress('failed');
+
       let message = error.message;
       if (error instanceof FetchError) {
         if (error.status === 404) {
