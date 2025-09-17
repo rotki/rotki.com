@@ -1,4 +1,6 @@
+import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
 import { get } from '@vueuse/core';
+import { isDefined } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
