@@ -1,3 +1,4 @@
+import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
 import { useMainStore } from '~/store';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
