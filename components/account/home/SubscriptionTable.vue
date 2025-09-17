@@ -20,6 +20,8 @@ const cancelling = ref<boolean>(false);
 const cancellationStatus = ref<string>('');
 const resuming = ref<boolean>(false);
 const resumingSubscription = ref<Subscription>();
+const resumeStatus = ref<string>('');
+const selectedResumeSubscription = ref<Subscription>();
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -121,9 +123,18 @@ function isPending(sub: Subscription) {
 }
 
 async function resumeSubscription(sub: Subscription): Promise<void> {
+  set(resumingSubscription, undefined);
   set(resuming, true);
-  await resumeUserSubscription(sub.identifier);
+  set(resumeStatus, '');
+  set(selectedResumeSubscription, sub);
+
+  await resumeUserSubscription(sub.identifier, (status: string) => {
+    set(resumeStatus, status);
+  });
+
   set(resuming, false);
+  set(resumeStatus, '');
+  set(selectedResumeSubscription, undefined);
 }
 
 function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
@@ -292,10 +303,14 @@ onUnmounted(() => pause());
           >
             {{ t('account.subscriptions.payment_detail') }}
           </ButtonLink>
-          <RuiTooltip v-if="row.isSoftCanceled">
+          <RuiTooltip
+            v-if="row.isSoftCanceled"
+            :disabled="!resuming"
+          >
             <template #activator>
               <RuiButton
-                :loading="resuming"
+                :loading="resuming && selectedResumeSubscription?.identifier === row.identifier"
+                :disabled="resuming"
                 variant="text"
                 type="button"
                 color="info"
@@ -304,7 +319,12 @@ onUnmounted(() => pause());
                 {{ t('actions.resume') }}
               </RuiButton>
             </template>
-            {{ t('account.subscriptions.resume_hint', { date: row.nextActionDate }) }}
+            <span v-if="resuming && selectedResumeSubscription?.identifier === row.identifier && resumeStatus">
+              {{ t(`account.subscriptions.resume.status.${resumeStatus}`) }}
+            </span>
+            <span v-else>
+              {{ t('account.subscriptions.resume_hint', { date: row.nextActionDate }) }}
+            </span>
           </RuiTooltip>
         </div>
         <div

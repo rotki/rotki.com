@@ -24,9 +24,10 @@ const display = computed({
   },
 });
 
-async function resumeSubscription() {
+async function resumeSubscription(): Promise<void> {
   if (!isDefined(modelValue))
     return;
+
   emit('confirm', get(modelValue));
   set(modelValue, undefined);
 }
