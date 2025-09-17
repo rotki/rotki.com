@@ -339,7 +339,7 @@ onUnmounted(() => pause());
       <template #item.actions="{ row }">
         <div
           v-if="displayActions(row)"
-          class="flex flex-col items-start"
+          class="flex flex-col items-start gap-1"
         >
           <RuiButton
             v-if="hasAction(row, 'upgrade')"

@@ -217,7 +217,7 @@ function cancel(): void {
               :plan="plan"
               :period="currentPeriod"
               :selected="selectedPlan?.tierName === plan.tierName"
-              :disabled="upgrading"
+              :disabled="upgrading || alert.show"
               @click="selectPlan(plan)"
             />
           </div>
