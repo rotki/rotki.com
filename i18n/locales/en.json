@@ -579,8 +579,8 @@
           },
           "payment_description": "Payments are safely processed with Braintree a PayPal Service",
           "saved_card": {
-            "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
             "card_expired": "The card has expired. Please use a different card.",
+            "delete_expired_card": "Please delete the expired card and add a new one to continue.",
             "delete": {
               "description": "Are you sure you want to remove this card?",
               "title": "Remove Saved Card"
@@ -739,6 +739,17 @@
   },
   "page_header": {
     "manage_premium": "Manage Premium"
+  },
+  "logo": {
+    "alt": "rotki logo"
+  },
+  "payment": {
+    "card": {
+      "number": "Card Number",
+      "expiration": "Expiration",
+      "cvv": "CVV",
+      "card_image_alt": "Card"
+    }
   },
   "policies": {
     "refund": {
@@ -1044,7 +1055,8 @@
     "progress": {
       "payment_progress": "Payment in progress",
       "payment_progress_message": "Please confirm your transaction...",
-      "payment_progress_wait": "Please wait while your payment is processed..."
+      "payment_progress_wait": "Please wait while your payment is processed...",
+      "processing": "Processing"
     },
     "success": {
       "message": "Your payment was processed successfully. Visit the account management page to manage your account.",
@@ -1079,8 +1091,7 @@
       "security_notice": "This page uses bank-grade security to protect your payment information"
     },
     "selected_plan": "Selected Plan",
-    "months": "month | months",
-    "change_payment_method": "Change Payment Method"
+    "months": "month | months"
   },
   "oauth": {
     "title": "OAuth Integration",
