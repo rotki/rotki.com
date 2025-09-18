@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+}
+
+@layer components {
+  .container {
+    @apply px-4 md:px-12 xl:px-16;
+  }
+}

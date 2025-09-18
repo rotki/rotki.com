@@ -1,0 +1,38 @@
+{
+  "name": "@rotki/card-payment",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite-ssg build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "serve": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@fontsource/roboto": "catalog:",
+    "@vueuse/core": "catalog:",
+    "braintree-web": "catalog:",
+    "vue": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@rotki/ui-library": "catalog:",
+    "@tsconfig/node22": "22.0.2",
+    "@types/braintree-web": "catalog:",
+    "@types/jsdom": "21.1.7",
+    "@types/node": "22.16.5",
+    "@unhead/vue": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "autoprefixer": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-ssg": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}
