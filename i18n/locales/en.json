@@ -67,6 +67,7 @@
       "paid": "Paid",
       "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
+      "upgraded_from": "Upgrade from {plan}",
       "title": "Your latest payments"
     },
     "subscriptions": {

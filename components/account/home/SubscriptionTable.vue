@@ -36,7 +36,7 @@ const { t } = useI18n({ useScope: 'global' });
 // Store references
 const store = useMainStore();
 const { getSubscriptions } = store;
-const { userSubscriptions, userSubscriptionLoading } = storeToRefs(store);
+const { userSubscriptions, userSubscriptionsLoading } = storeToRefs(store);
 const { availablePlans } = storeToRefs(useTiersStore());
 const { checkPendingCryptoPayment, cancelUpgradeRequest } = usePaymentCryptoStore();
 
@@ -276,7 +276,7 @@ onUnmounted(() => pause());
         variant="text"
         color="primary"
         icon
-        :loading="userSubscriptionLoading"
+        :loading="userSubscriptionsLoading"
         class="!p-2"
         @click="getSubscriptions()"
       >
@@ -291,7 +291,7 @@ onUnmounted(() => pause());
       v-model:sort="sort"
       :cols="headers"
       :rows="userSubscriptions"
-      :loading="userSubscriptionLoading"
+      :loading="userSubscriptionsLoading"
       :empty="{
         description: t('account.subscriptions.no_subscriptions_found'),
       }"
