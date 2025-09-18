@@ -144,6 +144,11 @@ export default defineNuxtConfig({
 
   nitro: {
     devProxy: {
+      '/checkout/pay/card': {
+        changeOrigin: true,
+        target: 'http://localhost:3001/checkout/pay/card',
+        ws: true,
+      },
       '/media': {
         changeOrigin: true,
         headers: {

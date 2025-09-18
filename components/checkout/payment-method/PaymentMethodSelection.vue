@@ -71,13 +71,41 @@ async function next() {
   const selectedMethod = get(selected);
   assert(selectedMethod);
   const { name } = selectedMethod;
-  const { href } = router.resolve({
-    name,
-    query: {
-      plan: get(plan),
-      id: get(identifier),
-    },
-  });
+
+  let href: string;
+
+  try {
+    // Try to use router.resolve first
+    const resolved = router.resolve({
+      name,
+      query: {
+        plan: get(plan),
+        id: get(identifier),
+      },
+    });
+    href = resolved.href;
+  }
+  catch (error) {
+    // Fallback to manual URL construction if router resolve fails
+    console.warn('Router resolve failed, falling back to manual URL construction:', error);
+
+    // Map route names to paths
+    const routeMap: Record<string, string> = {
+      'checkout-pay-card': '/checkout/pay/card',
+      'checkout-pay-crypto': '/checkout/pay/crypto',
+      'checkout-pay-paypal': '/checkout/pay/paypal',
+      'checkout-pay-request-crypto': '/checkout/pay/request-crypto',
+    };
+
+    const basePath = routeMap[name] || '/checkout/pay/method';
+    const params: Record<string, string> = {
+      ...(isDefined(plan) && { plan: get(plan).toString() }),
+      ...(isDefined(identifier) && { id: get(identifier) }),
+    };
+    const queryString = new URLSearchParams(params).toString();
+
+    href = queryString ? `${basePath}?${queryString}` : basePath;
+  }
 
   if (get(authenticated)) {
     await navigateToWithCSPSupport(href);
