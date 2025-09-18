@@ -113,6 +113,12 @@
         "notification": {
           "title": "Your subscription was successfully resumed."
         },
+        "status": {
+          "pending": "Resume request queued...",
+          "in_progress": "Processing resume...",
+          "completed": "Resume completed successfully",
+          "failed": "Resume failed"
+        },
         "title": "Resume your rotki subscription"
       },
       "resume_hint": "Resume the active billing of your subscription from {date}",

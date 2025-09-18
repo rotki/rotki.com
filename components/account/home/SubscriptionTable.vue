@@ -14,19 +14,19 @@ import { PaymentMethod } from '~/types/payment';
 
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<Subscription>[]>([]);
-const selectedSubscription = ref<Subscription>();
-const showCancelDialog = ref<boolean>(false);
+
 const cancelling = ref<boolean>(false);
+const subscriptionToCancel = ref<Subscription>();
 const cancellationStatus = ref<string>('');
+
 const resuming = ref<boolean>(false);
-const resumingSubscription = ref<Subscription>();
+const subscriptionToResume = ref<Subscription>();
 const resumeStatus = ref<string>('');
-const selectedResumeSubscription = ref<Subscription>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
-const { subscriptions } = storeToRefs(store);
+const { subscriptions, resumeError, cancellationError } = storeToRefs(store);
 
 const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
 const pendingTx = usePendingTx();
@@ -122,11 +122,14 @@ function isPending(sub: Subscription) {
   return sub.status === 'Pending';
 }
 
+function clickResume(sub: Subscription) {
+  set(subscriptionToResume, sub);
+}
+
 async function resumeSubscription(sub: Subscription): Promise<void> {
-  set(resumingSubscription, undefined);
   set(resuming, true);
   set(resumeStatus, '');
-  set(selectedResumeSubscription, sub);
+  set(resumeError, '');
 
   await resumeUserSubscription(sub.identifier, (status: string) => {
     set(resumeStatus, status);
@@ -134,7 +137,7 @@ async function resumeSubscription(sub: Subscription): Promise<void> {
 
   set(resuming, false);
   set(resumeStatus, '');
-  set(selectedResumeSubscription, undefined);
+  set(subscriptionToResume, undefined);
 }
 
 function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
@@ -165,15 +168,14 @@ function getChipStatusColor(status: string): ContextColorsType | undefined {
   return map[status];
 }
 
-function confirmCancel(sub: Subscription) {
-  set(selectedSubscription, sub);
-  set(showCancelDialog, true);
+function clickCancel(sub: Subscription) {
+  set(subscriptionToCancel, sub);
 }
 
 async function cancelSubscription(sub: Subscription) {
-  set(showCancelDialog, false);
   set(cancelling, true);
   set(cancellationStatus, '');
+  set(cancellationError, '');
 
   await cancelUserSubscription(sub, (status: string) => {
     set(cancellationStatus, status);
@@ -181,7 +183,7 @@ async function cancelSubscription(sub: Subscription) {
 
   set(cancelling, false);
   set(cancellationStatus, '');
-  set(selectedSubscription, undefined);
+  set(subscriptionToCancel, undefined);
 }
 
 function getBlockExplorerLink(pending: PendingTx): RouteLocationRaw {
@@ -256,17 +258,17 @@ onUnmounted(() => pause());
           >
             <template #activator>
               <RuiButton
-                :loading="cancelling && selectedSubscription?.identifier === row.identifier"
+                :loading="cancelling && subscriptionToCancel?.identifier === row.identifier"
                 :disabled="cancelling"
                 variant="text"
                 type="button"
-                color="warning"
-                @click="confirmCancel(row)"
+                color="error"
+                @click="clickCancel(row)"
               >
                 {{ t('actions.cancel') }}
               </RuiButton>
             </template>
-            <span v-if="cancelling && selectedSubscription?.identifier === row.identifier && cancellationStatus">
+            <span v-if="cancelling && subscriptionToCancel?.identifier === row.identifier && cancellationStatus">
               {{ t(`account.subscriptions.cancellation.status.${cancellationStatus}`) }}
             </span>
           </RuiTooltip>
@@ -309,17 +311,17 @@ onUnmounted(() => pause());
           >
             <template #activator>
               <RuiButton
-                :loading="resuming && selectedResumeSubscription?.identifier === row.identifier"
+                :loading="resuming && subscriptionToResume?.identifier === row.identifier"
                 :disabled="resuming"
                 variant="text"
                 type="button"
                 color="info"
-                @click="resumingSubscription = row"
+                @click="clickResume(row)"
               >
                 {{ t('actions.resume') }}
               </RuiButton>
             </template>
-            <span v-if="resuming && selectedResumeSubscription?.identifier === row.identifier && resumeStatus">
+            <span v-if="resuming && subscriptionToResume?.identifier === row.identifier && resumeStatus">
               {{ t(`account.subscriptions.resume.status.${resumeStatus}`) }}
             </span>
             <span v-else>
@@ -337,13 +339,14 @@ onUnmounted(() => pause());
     </RuiDataTable>
 
     <CancelSubscription
-      v-model="showCancelDialog"
-      :subscription="selectedSubscription"
-      @cancel="cancelSubscription($event)"
+      v-model="subscriptionToCancel"
+      :loading="cancelling"
+      @confirm="cancelSubscription($event)"
     />
 
     <ResumeSubscriptionDialog
-      v-model="resumingSubscription"
+      v-model="subscriptionToResume"
+      :loading="resuming"
       @confirm="resumeSubscription($event)"
     />
   </div>

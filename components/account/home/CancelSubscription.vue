@@ -4,30 +4,24 @@ import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
-const props = defineProps<{
-  subscription?: Subscription;
-  modelValue: boolean;
+const modelValue = defineModel<Subscription | undefined>({ required: true });
+
+defineProps<{
+  loading: boolean;
 }>();
 
 const emit = defineEmits<{
-  (event: 'update:model-value', value: boolean): void;
-  (event: 'clear:errors'): void;
-  (event: 'cancel', val: Subscription): void;
+  confirm: [val: Subscription];
 }>();
 
-const { subscription } = toRefs(props);
-const isPending = computed(() => get(subscription)?.status === 'Pending');
-const store = useMainStore();
-const { cancellationError } = storeToRefs(store);
+const isPending = computed(() => get(modelValue)?.status === 'Pending');
+const { cancellationError } = storeToRefs(useMainStore());
 
 function cancelSubscription() {
-  const sub = get(subscription);
-  if (!sub) {
-    emit('update:model-value', false);
+  if (!isDefined(modelValue))
     return;
-  }
 
-  emit('cancel', sub);
+  emit('confirm', get(modelValue));
 }
 
 const { t } = useI18n({ useScope: 'global' });
@@ -35,9 +29,9 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <RuiDialog
-    :model-value="modelValue"
+    :model-value="!!modelValue && !loading"
     max-width="900"
-    @update:model-value="emit('update:model-value', $event)"
+    @close="modelValue = undefined"
   >
     <RuiCard>
       <template #header>
@@ -80,8 +74,8 @@ const { t } = useI18n({ useScope: 'global' });
                 t(
                   'account.subscriptions.cancellation.subscription_status.normal',
                   {
-                    start_date: subscription?.createdDate ?? '',
-                    end_date: subscription?.nextActionDate ?? '',
+                    start_date: modelValue?.createdDate ?? '',
+                    end_date: modelValue?.nextActionDate ?? '',
                   },
                 )
               }}
@@ -91,7 +85,7 @@ const { t } = useI18n({ useScope: 'global' });
                 t(
                   'account.subscriptions.cancellation.subscription_status.pending',
                   {
-                    start_date: subscription?.createdDate ?? '',
+                    start_date: modelValue?.createdDate ?? '',
                   },
                 )
               }}
@@ -104,7 +98,7 @@ const { t } = useI18n({ useScope: 'global' });
         <RuiButton
           color="primary"
           variant="text"
-          @click="emit('update:model-value', false)"
+          @click="modelValue = undefined"
         >
           {{ t('account.subscriptions.cancellation.actions.no') }}
         </RuiButton>

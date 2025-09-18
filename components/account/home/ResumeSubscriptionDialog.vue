@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import type { Subscription } from '~/types';
-import { get, set } from '@vueuse/core';
+import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
 const modelValue = defineModel<Subscription | undefined>({ required: true });
+
+defineProps<{
+  loading: boolean;
+}>();
 
 const emit = defineEmits<{
   confirm: [val: Subscription];
@@ -14,29 +18,19 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { resumeError } = storeToRefs(useMainStore());
 
-const display = computed({
-  get() {
-    return !!get(modelValue);
-  },
-  set(value) {
-    if (!value)
-      set(modelValue, undefined);
-  },
-});
-
 async function resumeSubscription(): Promise<void> {
   if (!isDefined(modelValue))
     return;
 
   emit('confirm', get(modelValue));
-  set(modelValue, undefined);
 }
 </script>
 
 <template>
   <RuiDialog
-    v-model="display"
+    :model-value="!!modelValue && !loading"
     max-width="900"
+    @close="modelValue = undefined"
   >
     <RuiCard>
       <template #header>
