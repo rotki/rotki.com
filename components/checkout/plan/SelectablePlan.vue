@@ -46,9 +46,9 @@ watch(price, (price) => {
 <template>
   <div
     v-if="price"
-    class="rounded-xl border border-default p-4 cursor-pointer"
+    class="rounded-xl border border-default p-4 cursor-pointer hover:bg-rui-grey-100 transition-all"
     :class="{
-      '!border-rui-primary': selected,
+      '!border-rui-primary': selected && !disabled,
       '!bg-rui-grey-100': disabled,
     }"
     @click="emit('click')"
@@ -89,6 +89,7 @@ watch(price, (price) => {
       </div>
       <CheckMark
         v-if="!readonly"
+        :disabled="disabled"
         :selected="selected"
       />
     </div>

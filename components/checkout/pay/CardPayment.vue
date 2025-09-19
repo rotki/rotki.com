@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import type { CardPaymentRequest, PaymentStep, SavedCard, SelectedPlan } from '~/types';
+import type {
+  CardCheckout,
+  CardPaymentRequest,
+  PaymentStep,
+  SavedCard,
+  SelectedPlan,
+  UpgradeCardCheckout,
+} from '~/types';
 import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
 import {
@@ -22,6 +29,7 @@ const props = defineProps<{
   status: PaymentStep;
   nextPayment: number;
   card: SavedCard | undefined;
+  checkoutData: CardCheckout | UpgradeCardCheckout;
 }>();
 
 const emit = defineEmits<{
@@ -37,7 +45,15 @@ interface ErrorMessage {
   message: string;
 }
 
-const { token, plan, success, pending, card } = toRefs(props);
+const {
+  token,
+  plan,
+  success,
+  pending,
+  card,
+  checkoutData,
+} = toRefs(props);
+
 const verify = ref(false);
 const challengeVisible = ref(false);
 const paying = ref(false);
@@ -59,6 +75,7 @@ const disabled = logicOr(processing, initializing, formInitializing, success);
 const { addCard, createCardNonce } = usePaymentCardsStore();
 const { planParams } = usePlanParams();
 const { planId } = usePlanIdParam();
+const { upgradeSubId } = useSubscriptionIdParam();
 
 const logger = useLogger('card-payment');
 
@@ -67,6 +84,12 @@ function updatePending() {
 }
 
 async function back() {
+  if (isDefined(upgradeSubId)) {
+    return navigateTo({
+      name: 'home-subscription',
+    });
+  }
+
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
@@ -80,6 +103,12 @@ async function back() {
 const cardForm = ref();
 
 const grandTotal = computed<number>(() => {
+  const data = get(checkoutData);
+
+  if ('finalAmount' in data) {
+    return parseFloat(data.finalAmount);
+  }
+
   const selectedPlan = get(plan);
   const discountVal = get(discountInfo);
   if (!discountVal || !discountVal.isValid) {
@@ -137,6 +166,7 @@ async function submit() {
         discountCode: get(discountCode) || undefined,
         paymentMethodNonce: payload.nonce,
         planId,
+        upgradeSubId: get(upgradeSubId),
       });
     }
     else {
@@ -222,6 +252,7 @@ onUnmounted(() => {
         :card="card"
         :disabled="disabled"
         :client="btClient"
+        :no-delete="isDefined(upgradeSubId)"
         @update:form-valid="formValid = $event"
         @update:initializing="formInitializing = $event"
       />
@@ -248,18 +279,26 @@ onUnmounted(() => {
       />
     </div>
     <RuiDivider class="mt-6" />
+    <UpgradePlanOverview
+      v-if="isDefined(upgradeSubId)"
+      :next-payment="nextPayment"
+      :plan="plan"
+    />
     <SelectedPlanOverview
+      v-else
       :plan="plan"
       :next-payment="nextPayment"
       :disabled="disabled"
     />
     <DiscountCodeInput
+      v-if="!isDefined(upgradeSubId)"
       v-model="discountCode"
       v-model:discount-info="discountInfo"
       :plan="plan"
       class="mt-6"
     />
     <PaymentGrandTotal
+      :upgrade="isDefined(upgradeSubId)"
       :grand-total="grandTotal"
       class="mt-6"
     />

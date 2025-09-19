@@ -6,6 +6,8 @@ import {
   ActionResultResponse,
   type CryptoPayment,
   CryptoPaymentResponse,
+  type CryptoUpgradePayment,
+  CryptoUpgradePaymentResponse,
   PaymentAssetResponse,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
@@ -186,10 +188,41 @@ export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
     }
   };
 
-  const markTransactionStarted = async (): Promise<Result<boolean>> => {
+  const checkCryptoUpgradePayment = async (
+    subscriptionId?: string,
+  ): Promise<Result<CryptoUpgradePayment>> => {
+    try {
+      const response = await fetchWithCsrf<CryptoUpgradePaymentResponse>(
+        '/webapi/2/crypto/payment/upgrade/',
+        {
+          params: convertKeys({ subscriptionId }, false, false),
+        },
+      );
+      const data = CryptoUpgradePaymentResponse.parse(response);
+      if (data.result) {
+        return {
+          isError: false,
+          result: data.result,
+        };
+      }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
+    }
+    catch (error: any) {
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+  };
+
+  const markTransactionStarted = async (isUpgrade: boolean): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/2/crypto/payment/pending/',
+        isUpgrade ? 'webapi/2/crypto/payment/upgrade/' : 'webapi/2/crypto/payment/pending/',
         {
           method: 'PATCH',
         },
@@ -217,7 +250,40 @@ export const usePaymentCryptoStore = defineStore('payments/crypto', () => {
     }
   };
 
+  const cancelUpgradeRequest = async (subscriptionId: string): Promise<Result<boolean>> => {
+    try {
+      const response = await fetchWithCsrf<ActionResultResponse>('webapi/2/crypto/upgrade/cancel', {
+        body: {
+          subscriptionId,
+        },
+        method: 'POST',
+      });
+      const data = ActionResultResponse.parse(response);
+      refreshSubscriptionsAndPayments();
+      if (data.result) {
+        return {
+          isError: false,
+          result: data.result,
+        };
+      }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
+    }
+    catch (error: any) {
+      refreshSubscriptionsAndPayments();
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+  };
+
   return {
+    cancelUpgradeRequest,
+    checkCryptoUpgradePayment,
     checkPendingCryptoPayment,
     cryptoPayment,
     deletePendingCryptoPayment,

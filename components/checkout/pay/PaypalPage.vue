@@ -8,14 +8,27 @@ const {
   step,
   submit,
   token,
+  checkoutData,
 } = useBraintree();
 </script>
 
 <template>
   <PaymentFrame :step="step">
     <template #default="slotProps">
+      <PaypalPayment
+        v-if="checkoutData && token && selectedPlan && !loading"
+        v-bind="slotProps"
+        :loading="loading"
+        :plan="selectedPlan"
+        :token="token"
+        :checkout-data="checkoutData"
+        :next-payment="nextPayment"
+        @submit="submit($event)"
+        @update:pending="pending = $event"
+        @clear:errors="reset()"
+      />
       <div
-        v-if="!(token && selectedPlan)"
+        v-else
         class="flex justify-center my-10"
       >
         <RuiProgress
@@ -25,17 +38,6 @@ const {
           color="primary"
         />
       </div>
-      <PaypalPayment
-        v-else
-        v-bind="slotProps"
-        :loading="loading"
-        :plan="selectedPlan"
-        :token="token"
-        :next-payment="nextPayment"
-        @submit="submit($event)"
-        @update:pending="pending = $event"
-        @clear:errors="reset()"
-      />
     </template>
   </PaymentFrame>
 </template>

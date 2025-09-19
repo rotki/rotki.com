@@ -44,6 +44,7 @@ const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('card-payment-form');
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
 
+const { upgradeSubId } = useSubscriptionIdParam();
 const {
   connected,
   address,
@@ -70,6 +71,12 @@ const paymentAmount = computed<string>(() => {
 });
 
 const processing = logicOr(pending, loading);
+
+function back() {
+  navigateTo({
+    name: 'home-subscription',
+  });
+}
 
 function redirect() {
   navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
@@ -121,20 +128,7 @@ watch(canvas, async (canvas) => {
   set(qrText, await createPaymentQR(get(data), canvas));
 });
 
-const grandTotal = computed<number>(() => {
-  const selectedPlan = get(plan);
-
-  if (!selectedPlan)
-    return 0;
-
-  const discountVal = get(discountInfo);
-
-  if (!discountVal || !discountVal.isValid) {
-    return selectedPlan.price;
-  }
-
-  return discountVal.finalPrice;
-});
+const grandTotal = computed<number>(() => get(data).finalPriceInEur);
 
 watchImmediate(discountCode, (discountCode) => {
   if (discountCode) {
@@ -162,14 +156,19 @@ watch(discountCodeModel, (curr, prev) => {
 <template>
   <div :class="$style.wrapper">
     <div class="mb-4">
-      <SelectedPlanOverview
+      <UpgradePlanOverview
+        v-if="isDefined(upgradeSubId)"
         :plan="plan"
-        :next-payment="0"
+      />
+      <SelectedPlanOverview
+        v-else
+        :plan="plan"
         :disabled="processing"
         warning
       />
 
       <DiscountCodeInput
+        v-if="!isDefined(upgradeSubId)"
         v-model="discountCodeModel"
         v-model:discount-info="discountInfo"
         :plan="plan"
@@ -177,6 +176,7 @@ watch(discountCodeModel, (curr, prev) => {
       />
 
       <PaymentGrandTotal
+        :upgrade="isDefined(upgradeSubId)"
         :grand-total="grandTotal"
         class="mt-6"
       />
@@ -260,6 +260,21 @@ watch(discountCodeModel, (curr, prev) => {
     <div class="my-4 flex flex-col sm:flex-row gap-4">
       <div class="grow">
         <RuiButton
+          v-if="isDefined(upgradeSubId)"
+          size="lg"
+          class="w-full"
+          @click="back()"
+        >
+          <template #prepend>
+            <RuiIcon
+              name="lu-arrow-left"
+              size="16"
+            />
+          </template>
+          {{ t('actions.back') }}
+        </RuiButton>
+        <RuiButton
+          v-else
           :disabled="processing"
           size="lg"
           class="w-full"
@@ -291,7 +306,7 @@ watch(discountCodeModel, (curr, prev) => {
             color="primary"
             size="lg"
             class="w-full"
-            @click="pay()"
+            @click="pay(isDefined(upgradeSubId))"
           >
             {{ t('home.plans.tiers.step_3.wallet.pay_with_wallet') }}
           </RuiButton>

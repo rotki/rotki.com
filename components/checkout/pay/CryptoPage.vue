@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { CryptoPayment, IdleStep, PaymentStep, StepType } from '~/types';
 import { get, set } from '@vueuse/core';
+import { isEqual } from 'es-toolkit';
+import { useSubscription } from '~/composables/use-subscription';
 import { useMainStore } from '~/store';
 import { usePaymentCryptoStore } from '~/store/payments/crypto';
 import { PaymentError } from '~/types/codes';
@@ -19,9 +21,10 @@ const { refreshUserData } = store;
 const { userSubscriptions } = storeToRefs(store);
 
 const { cryptoPayment, switchCryptoPlan, deletePendingCryptoPayment } = usePaymentCryptoStore();
+const { upgradeCryptoSubscription } = useSubscription();
 
 const { currency } = useCurrencyParams();
-const { subscriptionId } = useSubscriptionIdParam();
+const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 const { discountCode } = useDiscountCodeParams();
 
 const { selectedPlan } = useSelectedPlan();
@@ -63,6 +66,12 @@ const currentCryptoSubscriptionId = computed(() => {
 const usedSubscriptionId = computed(() => get(subscriptionId) ?? get(currentCryptoSubscriptionId));
 
 function back() {
+  if (isDefined(upgradeSubId)) {
+    return navigateTo({
+      name: 'home-subscription',
+    });
+  }
+
   const id = get(usedSubscriptionId);
 
   const name = id
@@ -92,8 +101,8 @@ async function changePaymentMethod() {
   }
 }
 
-watch([selectedPlan, discountCode], async ([plan, discountCode]) => {
-  if (!plan) {
+watch([selectedPlan, discountCode], async ([plan, discountCode], [oldPlan, oldDiscountCode]) => {
+  if (!plan || (isEqual(plan, oldPlan) && isEqual(discountCode, oldDiscountCode))) {
     return;
   }
 
@@ -121,12 +130,19 @@ onMounted(async () => {
 
   if (selectedPlanVal && selectedCurrency) {
     set(loading, true);
-    const result = await cryptoPayment(
-      selectedPlanVal,
-      selectedCurrency,
-      get(usedSubscriptionId),
-      get(discountCode),
-    );
+
+    const result = isDefined(upgradeSubId)
+      ? await upgradeCryptoSubscription(
+          get(upgradeSubId),
+          selectedPlanVal.planId,
+          selectedCurrency,
+        )
+      : await cryptoPayment(
+          selectedPlanVal,
+          selectedCurrency,
+          get(usedSubscriptionId),
+          get(discountCode),
+        );
 
     await refreshUserData();
     if (result.isError) {
