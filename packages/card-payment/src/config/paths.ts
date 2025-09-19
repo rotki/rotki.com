@@ -30,9 +30,9 @@ export const paths = {
 export const assetPaths = {
   /**
    * Card payment app assets (e.g., app-specific favicons, images)
-   * Example: ./favicon.ico (relative to app base)
+   * Example: /favicon.ico (relative to app base)
    */
-  appAsset: (path: string): string => `./${path.replace(/^\//, '')}`,
+  appAsset: (path: string): string => `${paths.appUrlBase}/${path.replace(/^\//, '')}`,
 
   /**
    * Main site assets (e.g., OG images, main site favicons)
