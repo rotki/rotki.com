@@ -4,12 +4,9 @@ import { get, set } from '@vueuse/core';
 import ErrorState from '~/components/checkout/3d-secure/ErrorState.vue';
 import InvalidParamsState from '~/components/checkout/3d-secure/InvalidParamsState.vue';
 import LoadingState from '~/components/checkout/3d-secure/LoadingState.vue';
-import { useAccountRefresh } from '~/composables/use-app-events';
-import { usePaymentApi } from '~/composables/use-payment-api';
 import { useThreeDSecure } from '~/composables/use-three-d-secure';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
-// Page configuration - same as other payment pages
 definePageMeta({
   middleware: [
     'maintenance',
@@ -21,7 +18,6 @@ definePageMeta({
 
 const { t } = useI18n({ useScope: 'global' });
 
-// SEO - same pattern as other payment pages
 useHead({
   title: '3D Secure Verification',
   meta: [
@@ -34,147 +30,63 @@ useHead({
   ...commonAttrs(),
 });
 
-// Use 3D Secure composable
 const {
   state,
   error,
   challengeVisible,
   isProcessing,
-  canRetry,
-  getStoredParams,
-  initialize,
-  verify,
-  navigateToPayment,
+  initializeProcess,
   cleanup,
   clearStoredData,
 } = useThreeDSecure();
 
-// Use payment API for finalizing payment
-const paymentApi = usePaymentApi();
-const { requestRefresh } = useAccountRefresh();
-
-// Component state
 const params = ref<ThreeDSecureParams>();
 const hasValidParams = computed<boolean>(() => !!get(params));
 
 /**
- * Handle retry verification
- */
-async function handleRetry(): Promise<void> {
-  const storedParams = get(params);
-  if (!storedParams)
-    return;
-
-  try {
-    const payEvent = await verify(storedParams);
-    // If verification succeeds, finalize payment with API call
-    const result = await paymentApi.pay({
-      months: payEvent.months,
-      paymentMethodNonce: payEvent.nonce,
-    });
-
-    if (result.isError) {
-      throw new Error(result.error.message);
-    }
-
-    // Request account refresh after successful payment
-    requestRefresh();
-
-    // Clear stored data and redirect to success page
-    clearStoredData();
-    sessionStorage.setItem('payment-completed', 'true');
-    await navigateTo('/checkout/success');
-  }
-  catch {
-    // Error handled by the composable state
-  }
-}
-
-/**
- * Handle navigation back to payment page
+ * Handle navigation back to appropriate payment page
+ * - If we have valid params: go to card page for the plan
+ * - If no valid params: go to payment method selection
  */
 function handleBack(): void {
   const storedParams = get(params);
   if (storedParams) {
-    navigateToPayment(storedParams.planMonths, storedParams.paymentMethodId);
+    window.location.href = `/checkout/pay/card?plan=${storedParams.planMonths}`;
   }
   else {
-    // Fallback navigation
     navigateTo('/checkout/pay/method');
   }
 }
 
 /**
- * Handle navigation back to payment selection
+ * Start the 3D Secure process on page load
  */
-function handleBackToSelection(): void {
-  navigateTo('/checkout/pay/method');
-}
+async function startProcess(): Promise<void> {
+  const result = await initializeProcess();
 
-/**
- * Initialize the 3D Secure process
- */
-async function initializeProcess(): Promise<void> {
-  // Get stored parameters
-  const storedParams = getStoredParams();
-
-  if (!storedParams) {
-    // No valid parameters found
-    return;
-  }
-
-  set(params, storedParams);
-
-  try {
-    // Initialize Braintree
-    await initialize(storedParams);
-
-    // Start verification automatically
-    const payEvent = await verify(storedParams);
-
-    // If verification succeeds, finalize payment with API call
-    const result = await paymentApi.pay({
-      months: payEvent.months,
-      paymentMethodNonce: payEvent.nonce,
-    });
-
-    if (result.isError) {
-      throw new Error(result.error.message);
-    }
-
-    // Request account refresh after successful payment
-    requestRefresh();
-
-    // Clear stored data and redirect to success page
-    clearStoredData();
+  if (result.success) {
     await navigateTo('/checkout/success');
   }
-  catch (initError) {
-    // Error is handled by the composable
-    console.error('3D Secure process failed:', initError);
+  else if (result.params) {
+    set(params, result.params);
   }
 }
 
-// Initialize on mount
 onBeforeMount(async () => {
-  await initializeProcess();
+  await startProcess();
 });
 
-// Cleanup on unmount
 onUnmounted(() => {
   cleanup();
 });
 
-// Prevent navigation away during processing and clean up data
 onBeforeRouteLeave((to, from, next) => {
   if (get(isProcessing)) {
-    // Allow navigation but clean up resources
     cleanup();
     clearStoredData();
     next();
   }
   else {
-    // Always clear stored data when leaving the page
     cleanup();
     clearStoredData();
     next();
@@ -205,15 +117,13 @@ onBeforeRouteLeave((to, from, next) => {
     <ErrorState
       v-else-if="state === 'error' && hasValidParams"
       :error="error"
-      :can-retry="canRetry"
-      @retry="handleRetry()"
       @back="handleBack()"
     />
 
     <!-- Invalid Parameters State -->
     <InvalidParamsState
       v-else
-      @back-to-selection="handleBackToSelection()"
+      @back-to-selection="handleBack()"
     />
   </div>
 </template>
