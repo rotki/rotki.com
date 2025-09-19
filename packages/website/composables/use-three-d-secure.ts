@@ -2,19 +2,16 @@ import type { PayEvent } from '~/types/common';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createThreeDSecure, type ThreeDSecure, type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
+import { useAccountRefresh } from '~/composables/use-app-events';
+import { usePaymentApi } from '~/composables/use-payment-api';
 import {
   type ThreeDSecureParams,
   ThreeDSecureParamsSchema,
-  type ThreeDSecureResult,
-  ThreeDSecureResultSchema,
   type ThreeDSecureState,
-
 } from '~/types/three-d-secure';
-import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_KEY = 'threeDSecureData';
-const RESULT_KEY = 'threeDSecureResult';
 
 /**
  * Composable for managing 3D Secure verification flow
@@ -32,24 +29,6 @@ export function useThreeDSecure() {
     const currentState = get(state);
     return currentState === 'initializing' || currentState === 'verifying' || currentState === 'challenge-active';
   });
-
-  const canRetry = computed<boolean>(() => {
-    const currentState = get(state);
-    return currentState === 'error' || currentState === 'ready';
-  });
-
-  /**
-   * Store 3D Secure parameters in session storage
-   */
-  function storeParams(params: ThreeDSecureParams): void {
-    const result = ThreeDSecureParamsSchema.safeParse(params);
-    if (!result.success) {
-      logger.error('Invalid 3D Secure parameters:', result.error);
-      throw new Error('Invalid parameters provided');
-    }
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(result.data));
-    logger.debug('3D Secure parameters stored');
-  }
 
   /**
    * Retrieve 3D Secure parameters from session storage
@@ -78,49 +57,10 @@ export function useThreeDSecure() {
   }
 
   /**
-   * Store 3D Secure result in session storage
-   */
-  function storeResult(result: ThreeDSecureResult): void {
-    const validation = ThreeDSecureResultSchema.safeParse(result);
-    if (!validation.success) {
-      logger.error('Invalid 3D Secure result:', validation.error);
-      return;
-    }
-    sessionStorage.setItem(RESULT_KEY, JSON.stringify(validation.data));
-  }
-
-  /**
-   * Retrieve and consume 3D Secure result from session storage
-   */
-  function getAndConsumeResult(): ThreeDSecureResult | undefined {
-    try {
-      const stored = sessionStorage.getItem(RESULT_KEY);
-      if (!stored) {
-        return undefined;
-      }
-
-      sessionStorage.removeItem(RESULT_KEY);
-
-      const parsed = JSON.parse(stored);
-      const result = ThreeDSecureResultSchema.safeParse(parsed);
-      if (!result.success) {
-        logger.error('Invalid stored 3D Secure result:', result.error);
-        return undefined;
-      }
-      return result.data;
-    }
-    catch (parseError) {
-      logger.error('Failed to parse stored 3D Secure result:', parseError);
-      return undefined;
-    }
-  }
-
-  /**
    * Clear stored 3D Secure data
    */
   function clearStoredData(): void {
     sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(RESULT_KEY);
   }
 
   /**
@@ -179,7 +119,7 @@ export function useThreeDSecure() {
       // with responsive width for mobile
       iframe.style.width = '100%';
       iframe.style.maxWidth = '500px';
-      iframe.style.height = '600px';
+      iframe.style.minHeight = '400px';
       iframe.style.border = 'none';
       iframe.style.borderRadius = '8px';
       const container = document.getElementById('threeds-iframe-container');
@@ -220,11 +160,6 @@ export function useThreeDSecure() {
           months: params.planMonths,
           nonce: payload.nonce,
         };
-        storeResult({
-          nonce: payload.nonce,
-          planMonths: params.planMonths,
-          success: true,
-        });
 
         logger.info('3D Secure verification successful');
         return payEvent;
@@ -232,11 +167,6 @@ export function useThreeDSecure() {
       else {
         const status = (threeDSecureInfo as any)?.status as string | undefined;
         const errorMsg = `Authentication failed${status ? `: ${status.replaceAll('_', ' ')}` : ''}`;
-        storeResult({
-          error: errorMsg,
-          planMonths: params.planMonths,
-          success: false,
-        });
 
         set(error, errorMsg);
         set(state, 'error');
@@ -248,13 +178,6 @@ export function useThreeDSecure() {
       set(challengeVisible, false);
       set(state, 'error');
       const errorMsg = verifyError.message || 'Verification failed';
-      if (!get(error)) {
-        storeResult({
-          error: errorMsg,
-          planMonths: params.planMonths,
-          success: false,
-        });
-      }
 
       set(error, errorMsg);
       logger.error('3D Secure verification error:', verifyError);
@@ -267,30 +190,58 @@ export function useThreeDSecure() {
   }
 
   /**
-   * Navigate to 3D Secure verification page
+   * Complete 3D Secure verification and finalize payment
    */
-  async function navigateToVerification(params: ThreeDSecureParams): Promise<void> {
-    try {
-      storeParams(params);
-      await navigateToWithCSPSupport('/checkout/pay/3d-secure');
+  async function verifyAndFinalizePayment(params: ThreeDSecureParams): Promise<void> {
+    // These composables need to be inside the function since they can only be used at component level
+    const paymentApi = usePaymentApi();
+    const { requestRefresh } = useAccountRefresh();
+
+    // Initialize Braintree
+    await initialize(params);
+
+    // Start verification
+    const payEvent = await verify(params);
+
+    // Finalize payment with API call
+    const result = await paymentApi.pay({
+      months: payEvent.months,
+      paymentMethodNonce: payEvent.nonce,
+    });
+
+    if (result.isError) {
+      throw new Error(result.error.message);
     }
-    catch (navError) {
-      logger.error('Failed to navigate to 3D Secure page:', navError);
-      throw navError;
-    }
+
+    // Request account refresh and prepare for success navigation
+    requestRefresh();
+    sessionStorage.setItem('payment-completed', 'true');
+    clearStoredData();
   }
 
   /**
-   * Navigate back to payment page with plan persistence
+   * Initialize the entire 3D Secure process
+   * Gets stored parameters and runs the complete flow
    */
-  async function navigateToPayment(planMonths: number, paymentMethodId?: string): Promise<void> {
-    await navigateTo({
-      name: 'checkout-pay-card',
-      query: {
-        plan: planMonths.toString(),
-        ...(paymentMethodId && { method: paymentMethodId }),
-      },
-    });
+  async function initializeProcess(): Promise<{ success: boolean; params?: ThreeDSecureParams }> {
+    // Get stored parameters
+    const storedParams = getStoredParams();
+
+    if (!storedParams) {
+      // No valid parameters found
+      return { success: false };
+    }
+
+    try {
+      // Complete the entire 3D Secure and payment flow
+      await verifyAndFinalizePayment(storedParams);
+      return { success: true, params: storedParams };
+    }
+    catch (initError) {
+      // Error is handled by the composable state
+      console.error('3D Secure process failed:', initError);
+      return { success: false, params: storedParams };
+    }
   }
 
   /**
@@ -303,18 +254,12 @@ export function useThreeDSecure() {
   }
 
   return {
-    canRetry: readonly(canRetry),
     challengeVisible: readonly(challengeVisible),
     cleanup,
     clearStoredData,
     error: readonly(error),
-    getAndConsumeResult,
-    getStoredParams,
-    initialize,
+    initializeProcess,
     isProcessing: readonly(isProcessing),
-    navigateToPayment,
-    navigateToVerification,
     state: readonly(state),
-    verify,
   };
 }
