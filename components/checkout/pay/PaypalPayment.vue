@@ -227,6 +227,7 @@ onUnmounted(async () => {
   <div class="mb-6 grow flex flex-col">
     <UpgradePlanOverview
       v-if="isDefined(upgradeSubId)"
+      :next-payment="nextPayment"
       :plan="plan"
     />
     <SelectedPlanOverview
@@ -243,6 +244,7 @@ onUnmounted(async () => {
       class="mt-6"
     />
     <PaymentGrandTotal
+      :upgrade="isDefined(upgradeSubId)"
       :grand-total="grandTotal"
       class="mt-6"
     />

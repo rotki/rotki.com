@@ -5,6 +5,7 @@ import { getPlanNameFor } from '~/utils/plans';
 
 const props = defineProps<{
   plan: SelectedPlan;
+  nextPayment?: number;
 }>();
 
 const { plan } = toRefs(props);
@@ -23,13 +24,18 @@ const name = computed<string>(() => {
       {{ t('home.plans.tiers.step_3.upgrade_to_plan') }}
     </div>
     <div class="pt-1 flex items-center justify-between gap-4">
-      <div>
-        <div class="text-body-1 font-bold mr-1 text-rui-text-secondary">
-          {{ name }}
-        </div>
-        <div class="text-xs text-rui-text-secondary">
-          {{ t('home.plans.tiers.step_3.upgrade_plan_description') }}
-        </div>
+      <div class="text-body-1 font-bold mr-1 text-rui-text-secondary">
+        {{ name }}
+      </div>
+      <div
+        v-if="nextPaymentDate"
+        class="text-xs text-rui-text-secondary italic"
+      >
+        {{
+          t('selected_plan_overview.next_payment', {
+            date: nextPaymentDate,
+          })
+        }}
       </div>
     </div>
   </RuiCard>

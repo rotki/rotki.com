@@ -176,6 +176,7 @@ watch(discountCodeModel, (curr, prev) => {
       />
 
       <PaymentGrandTotal
+        :upgrade="isDefined(upgradeSubId)"
         :grand-total="grandTotal"
         class="mt-6"
       />

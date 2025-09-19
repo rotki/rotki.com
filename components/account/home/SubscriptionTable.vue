@@ -21,7 +21,12 @@ import { isSubActive, isSubPending, isSubRequestingUpgrade } from '~/utils/subsc
 
 // Component state
 const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<UserSubscription>[]>([]);
+const sort = ref<DataTableSortColumn<UserSubscription>[]>([
+  {
+    column: 'createdDate',
+    direction: 'desc',
+  },
+]);
 const selectedSubscription = ref<UserSubscription>();
 const showCancelDialog = ref<boolean>(false);
 const cancelling = ref<boolean>(false);

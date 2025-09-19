@@ -280,6 +280,7 @@ onUnmounted(() => {
     <RuiDivider class="mt-6" />
     <UpgradePlanOverview
       v-if="isDefined(upgradeSubId)"
+      :next-payment="nextPayment"
       :plan="plan"
     />
     <SelectedPlanOverview
@@ -296,6 +297,7 @@ onUnmounted(() => {
       class="mt-6"
     />
     <PaymentGrandTotal
+      :upgrade="isDefined(upgradeSubId)"
       :grand-total="grandTotal"
       class="mt-6"
     />

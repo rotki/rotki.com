@@ -614,7 +614,7 @@
           "start": "Pay Now",
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
-          "upgrade_plan_description": "The final amount will be deducted based on the remaining time of the current subscription (pro rata).",
+          "upgrade_plan_description": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.",
           "upgrade_to_plan": "Upgrade to plan:",
           "wallet": {
             "connect_wallet": "Connect wallet",
