@@ -69,6 +69,25 @@ export default defineEventHandler(async (event) => {
 
   const report = parseResult.data['csp-report'];
 
+  // Filter out browser extension violations
+  const sourceFile = report['source-file'];
+  if (sourceFile?.startsWith('moz-extension') ||
+    sourceFile?.startsWith('chrome-extension') ||
+    sourceFile?.startsWith('safari-extension') ||
+    sourceFile?.startsWith('edge-extension')) {
+    logger.debug('CSP violation from browser extension filtered out', {
+      sourceFile,
+      documentUri: report['document-uri'],
+      violatedDirective: report['violated-directive'],
+    });
+
+    return {
+      message: 'Browser extension violation filtered out',
+      status: 'ignored',
+      reason: 'browser-extension',
+    };
+  }
+
   // Log the violation with structured data
   logger.error('CSP Violation detected', {
     blockedUri: report['blocked-uri'],

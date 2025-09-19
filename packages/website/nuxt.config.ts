@@ -212,19 +212,8 @@ export default defineNuxtConfig({
             threeDSecureCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
-        },
-      },
-    },
-    // Card payment page with 3D Secure
-    '/checkout/pay/card': {
-      security: {
-        headers: {
-          contentSecurityPolicy: mergeCSP(
-            baseCSP,
-            recaptchaCSP,
-            braintreeBaseCSP,
-            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
-          ),
+          crossOriginEmbedderPolicy: 'unsafe-none', // Match card payment page
+          crossOriginResourcePolicy: 'cross-origin', // Allow Braintree resources
         },
       },
     },
