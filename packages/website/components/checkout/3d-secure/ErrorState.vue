@@ -1,21 +1,15 @@
 <script setup lang="ts">
 interface Props {
   error: string;
-  canRetry: boolean;
 }
 
 defineProps<Props>();
 
 const emit = defineEmits<{
-  retry: [];
   back: [];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-
-function handleRetry() {
-  emit('retry');
-}
 
 function handleBack() {
   emit('back');
@@ -40,30 +34,23 @@ function handleBack() {
     </h2>
 
     <!-- Error message -->
-    <div class="bg-rui-error-lighter/10 border border-rui-error-lighter rounded-lg p-4 mb-6 max-w-md mx-auto">
-      <p class="text-rui-error text-sm">
+    <div class="mb-6 max-w-md mx-auto">
+      <RuiAlert
+        type="error"
+        class="text-left"
+      >
         {{ error }}
-      </p>
+      </RuiAlert>
     </div>
 
     <!-- Action buttons -->
-    <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+    <div class="flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto">
       <RuiButton
-        variant="outlined"
+        class="w-full"
+        size="lg"
         @click="handleBack()"
       >
         {{ t('actions.back') }}
-      </RuiButton>
-
-      <RuiButton
-        v-if="canRetry"
-        color="primary"
-        @click="handleRetry()"
-      >
-        <template #prepend>
-          <RuiIcon name="lu-refresh-cw" />
-        </template>
-        {{ t('actions.retry') }}
       </RuiButton>
     </div>
 

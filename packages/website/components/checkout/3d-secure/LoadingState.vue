@@ -21,7 +21,7 @@ const loadingMessages = computed(() => ({
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center py-12">
+  <div class="flex flex-col items-center justify-center py-8">
     <!-- Loading indicator for non-challenge states -->
     <div
       v-if="!challengeVisible"
@@ -32,7 +32,7 @@ const loadingMessages = computed(() => ({
         size="48"
         circular
         color="primary"
-        class="mb-4"
+        class="my-4"
       />
 
       <p class="text-rui-text-secondary text-center max-w-md">
@@ -53,26 +53,22 @@ const loadingMessages = computed(() => ({
     <!-- Challenge iframe container - Always in DOM, visibility controlled -->
     <div
       v-show="challengeVisible"
-      class="w-full max-w-2xl"
+      class="w-full max-w-2xl mx-auto flex flex-col items-center"
     >
-      <div class="mb-4 p-4 bg-rui-grey-50 dark:bg-rui-grey-800 rounded-lg">
-        <div class="flex items-center gap-2 text-sm">
-          <RuiIcon
-            name="lu-shield-check"
-            size="16"
-            color="primary"
-          />
+      <div class="mb-4">
+        <RuiAlert
+          type="info"
+          variant="outlined"
+          icon="lu-shield-check"
+        >
           <span class="font-medium">
             {{ t('subscription.3d_secure.challenge_instructions') }}
           </span>
-        </div>
+        </RuiAlert>
       </div>
 
       <!-- iframe container - Always in DOM -->
-      <div
-        id="threeds-iframe-container"
-        class="min-h-[600px] w-full max-w-[500px] mx-auto"
-      />
+      <div id="threeds-iframe-container" />
     </div>
   </div>
 </template>
