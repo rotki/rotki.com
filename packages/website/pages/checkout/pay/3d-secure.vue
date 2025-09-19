@@ -1,0 +1,129 @@
+<script setup lang="ts">
+import type { ThreeDSecureParams } from '~/types/three-d-secure';
+import { get, set } from '@vueuse/core';
+import ErrorState from '~/components/checkout/3d-secure/ErrorState.vue';
+import InvalidParamsState from '~/components/checkout/3d-secure/InvalidParamsState.vue';
+import LoadingState from '~/components/checkout/3d-secure/LoadingState.vue';
+import { useThreeDSecure } from '~/composables/use-three-d-secure';
+import { commonAttrs, noIndex } from '~/utils/metadata';
+
+definePageMeta({
+  middleware: [
+    'maintenance',
+    'authentication',
+    'unverified',
+    'subscriber',
+  ],
+});
+
+const { t } = useI18n({ useScope: 'global' });
+
+useHead({
+  title: '3D Secure Verification',
+  meta: [
+    {
+      name: 'description',
+      content: '3D Secure verification for secure credit card payment processing',
+    },
+    noIndex(),
+  ],
+  ...commonAttrs(),
+});
+
+const {
+  state,
+  error,
+  challengeVisible,
+  isProcessing,
+  initializeProcess,
+  cleanup,
+  clearStoredData,
+} = useThreeDSecure();
+
+const params = ref<ThreeDSecureParams>();
+const hasValidParams = computed<boolean>(() => !!get(params));
+
+/**
+ * Handle navigation back to appropriate payment page
+ * - If we have valid params: go to card page for the plan
+ * - If no valid params: go to payment method selection
+ */
+function handleBack(): void {
+  const storedParams = get(params);
+  if (storedParams) {
+    window.location.href = `/checkout/pay/card?plan=${storedParams.planMonths}`;
+  }
+  else {
+    navigateTo('/checkout/pay/method');
+  }
+}
+
+/**
+ * Start the 3D Secure process on page load
+ */
+async function startProcess(): Promise<void> {
+  const result = await initializeProcess();
+
+  if (result.success) {
+    await navigateTo('/checkout/success');
+  }
+  else if (result.params) {
+    set(params, result.params);
+  }
+}
+
+onBeforeMount(async () => {
+  await startProcess();
+});
+
+onUnmounted(() => {
+  cleanup();
+});
+
+onBeforeRouteLeave((to, from, next) => {
+  if (get(isProcessing)) {
+    cleanup();
+    clearStoredData();
+    next();
+  }
+  else {
+    cleanup();
+    clearStoredData();
+    next();
+  }
+});
+</script>
+
+<template>
+  <div class="container mx-auto px-4 py-8 max-w-2xl min-h-[60vh]">
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold mb-2">
+        {{ t('subscription.3d_secure.page_title') }}
+      </h1>
+      <p class="text-rui-text-secondary max-w-md mx-auto">
+        {{ t('subscription.3d_secure.page_description') }}
+      </p>
+    </div>
+
+    <!-- Loading States -->
+    <LoadingState
+      v-if="isProcessing"
+      :state="state"
+      :challenge-visible="challengeVisible"
+    />
+
+    <!-- Error State -->
+    <ErrorState
+      v-else-if="state === 'error' && hasValidParams"
+      :error="error"
+      @back="handleBack()"
+    />
+
+    <!-- Invalid Parameters State -->
+    <InvalidParamsState
+      v-else
+      @back-to-selection="handleBack()"
+    />
+  </div>
+</template>

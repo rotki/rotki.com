@@ -77,6 +77,9 @@ dist
 # vuepress build output
 .vuepress/dist
 
+# vite-ssg
+.vite-ssg-temp
+
 # Serverless directories
 .serverless
 
@@ -97,4 +100,4 @@ tests/e2e/videos
 tests/e2e/screenshots
 tests/**/coverage
 .data/content
-planning
+planning/
