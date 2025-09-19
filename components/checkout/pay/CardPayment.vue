@@ -252,6 +252,7 @@ onUnmounted(() => {
         :card="card"
         :disabled="disabled"
         :client="btClient"
+        :no-delete="isDefined(upgradeSubId)"
         @update:form-valid="formValid = $event"
         @update:initializing="formInitializing = $event"
       />

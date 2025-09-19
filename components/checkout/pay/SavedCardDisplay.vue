@@ -18,6 +18,7 @@ const props = defineProps<{
   client: Client;
   card: SavedCard;
   disabled: boolean;
+  noDelete?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -116,10 +117,16 @@ function submit() {
 }
 
 function deleteCardClick() {
+  if (props.noDelete) {
+    return;
+  }
   set(showDeleteConfirmation, true);
 }
 
 async function handleDeleteCard() {
+  if (props.noDelete) {
+    return;
+  }
   set(showDeleteConfirmation, false);
   set(deleteLoading, true);
   await deleteCard(get(card).token);
@@ -172,6 +179,7 @@ defineExpose({ submit });
       </div>
     </div>
     <RuiButton
+      v-if="!noDelete"
       icon
       size="lg"
       color="error"
