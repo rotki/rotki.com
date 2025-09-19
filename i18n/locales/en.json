@@ -905,7 +905,10 @@
     "no_higher_plans": "You're already on the highest available plan for your subscription period.",
     "error": {
       "title": "Upgrade Failed",
-      "message": "Failed to upgrade your subscription. Please try again later."
+      "message": "Failed to upgrade your subscription. Please try again later.",
+      "no_selected_plan": "No subscription or plan selected",
+      "plan_not_found": "Plan ID not found for selected period",
+      "payment_method_unknown": "Cannot determine the previous payment method"
     },
     "success": {
       "title": "Upgrade Successful",

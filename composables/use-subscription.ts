@@ -15,7 +15,6 @@ import { assert } from '~/utils/assert';
 interface UseSubscriptionReturn {
   cancelUserSubscription: (sub: UserSubscription) => Promise<void>;
   resumeUserSubscription: (sub: UserSubscription) => Promise<void>;
-  upgradeBraintreeSubscription: (subscription: UserSubscription, planId: number) => Promise<Result<boolean>>;
   upgradeCryptoSubscription: (subId: string, planId: number, currency: string) => Promise<Result<CryptoPayment, PaymentError>>;
 }
 
@@ -69,44 +68,6 @@ export function useSubscription(): UseSubscriptionReturn {
     }
   };
 
-  const upgradeBraintreeSubscription = async (subscription: UserSubscription, planId: number): Promise<Result<boolean>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        '/webapi/2/braintree/upgrade',
-        {
-          body: {
-            planId,
-            subscriptionId: subscription.id,
-          },
-          method: 'POST',
-        },
-      );
-      const data = ActionResultResponse.parse(response);
-      if (data.result) {
-        await getSubscriptions();
-        return {
-          isError: false,
-          result: true,
-        };
-      }
-      return {
-        error: new Error(data.message || 'Upgrade failed'),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      let message = error.message;
-      if (error instanceof FetchError && error.status === 400) {
-        message = ActionResultResponse.parse(error.data).message;
-      }
-      return {
-        error: new Error(message),
-        isError: true,
-      };
-    }
-  };
-
   const upgradeCryptoSubscription = async (subId: string, planId: number, currency: string): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
@@ -143,7 +104,6 @@ export function useSubscription(): UseSubscriptionReturn {
   return {
     cancelUserSubscription,
     resumeUserSubscription,
-    upgradeBraintreeSubscription,
     upgradeCryptoSubscription,
   };
 }

@@ -1,29 +1,22 @@
 <script setup lang="ts">
-import type { AvailablePlan, UserSubscription } from '~/types';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
 import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
-import { useSubscription } from '~/composables/use-subscription';
-import { useMainStore } from '~/store';
 import { useTiersStore } from '~/store/tiers';
+import { type AvailablePlan, PaymentMethod, type UserSubscription } from '~/types';
 import { PricingPeriod } from '~/types/tiers';
 
 const subscription = defineModel<UserSubscription | undefined>({ required: true });
-
-const emit = defineEmits<{
-  (e: 'upgrade', plan: AvailablePlan): void;
-}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useTiersStore();
 const { availablePlans } = storeToRefs(store);
-const { upgradeBraintreeSubscription } = useSubscription();
-const { refreshUserData } = useMainStore();
+const router = useRouter();
 
-const upgrading = ref<boolean>(false);
 const selectedPlan = ref<AvailablePlan>();
+const loading = ref<boolean>(false);
 const alert = reactive<{
   show: boolean;
   type: 'success' | 'error';
@@ -52,11 +45,6 @@ function getPlanPrice(plan: AvailablePlan, isYearly: boolean): number {
   return pricing?.price ? Number.parseFloat(pricing.price) : 0;
 }
 
-function hasPlanPricing(plan: AvailablePlan, isYearly: boolean): boolean {
-  const pricing = isYearly ? plan.yearlyPlan : plan.monthlyPlan;
-  return !!pricing?.price;
-}
-
 const higherPlans = computed<AvailablePlan[]>(() => {
   const plans = get(availablePlans);
   const sub = get(subscription);
@@ -80,7 +68,7 @@ const higherPlans = computed<AvailablePlan[]>(() => {
   const currentPrice = getPlanPrice(currentPlan, isYearly);
 
   return plans.filter(plan =>
-    hasPlanPricing(plan, isYearly) && getPlanPrice(plan, isYearly) > currentPrice,
+    getPlanPrice(plan, isYearly) > currentPrice,
   );
 });
 
@@ -94,7 +82,8 @@ async function submitUpgrade() {
   const plan = get(selectedPlan);
 
   if (!sub || !plan) {
-    logger.error('No subscription or plan selected');
+    alert.show = true;
+    alert.message = t('upgrade_plan.error.no_selected_plan');
     return;
   }
 
@@ -104,63 +93,47 @@ async function submitUpgrade() {
     : plan.monthlyPlan?.planId;
 
   if (!planId) {
-    logger.error('Plan ID not found for selected period');
+    alert.show = true;
+    alert.message = t('upgrade_plan.error.plan_not_found');
     return;
   }
 
-  set(upgrading, true);
+  const paymentMethod = sub.paymentMethod;
+  if (!paymentMethod) {
+    alert.show = true;
+    alert.message = t('upgrade_plan.error.payment_method_unknown');
+    return;
+  }
+
   alert.show = false;
 
-  try {
-    if (sub.paymentProvider === 'crypto') {
-      navigateTo({
-        name: 'checkout-pay-request-crypto',
-        query: {
-          planId,
-          period,
-          plan: plan.tierName,
-          upgradeSubId: sub.id,
-        },
-      });
-      return;
-    }
+  const queryParams = {
+    planId,
+    period,
+    plan: plan.tierName,
+    upgradeSubId: sub.id,
+  };
 
-    const result = await upgradeBraintreeSubscription(sub, planId);
+  const routeName = {
+    [PaymentMethod.CRYPTO]: 'checkout-pay-request-crypto',
+    [PaymentMethod.CARD]: 'checkout-pay-card',
+    [PaymentMethod.PAYPAL]: 'checkout-pay-paypal',
+  }[paymentMethod];
 
-    if (result.isError) {
-      Object.assign(alert, {
-        type: 'error',
-        message: result.error?.message || t('upgrade_plan.error.message'),
-        show: true,
-      });
-    }
-    else {
-      Object.assign(alert, {
-        type: 'success',
-        message: t('upgrade_plan.success.message', { plan: plan.tierName }),
-        show: true,
-      });
+  const { href } = router.resolve({
+    name: routeName,
+    query: queryParams,
+  });
 
-      // Refresh data and emit upgrade event
-      await refreshUserData();
-      emit('upgrade', plan);
+  set(loading, true);
 
-      // Close dialog after a short delay to show success message
-      setTimeout(() => {
-        set(visible, false);
-      }, 2000);
-    }
+  if (paymentMethod !== PaymentMethod.CRYPTO) {
+    window.location.href = new URL(
+      `${window.location.origin}${href}`,
+    ).toString();
   }
-  catch (error: any) {
-    logger.error('Failed to upgrade subscription:', error);
-    Object.assign(alert, {
-      type: 'error',
-      message: error.message || t('upgrade_plan.error.message'),
-      show: true,
-    });
-  }
-  finally {
-    set(upgrading, false);
+  else {
+    navigateTo(href);
   }
 }
 
@@ -217,7 +190,7 @@ function cancel(): void {
               :plan="plan"
               :period="currentPeriod"
               :selected="selectedPlan?.tierName === plan.tierName"
-              :disabled="upgrading || alert.show"
+              :disabled="alert.show"
               @click="selectPlan(plan)"
             />
           </div>
@@ -237,7 +210,6 @@ function cancel(): void {
           <RuiButton
             variant="outlined"
             color="primary"
-            :disabled="upgrading"
             @click="cancel()"
           >
             {{ t('actions.cancel') }}
@@ -245,8 +217,7 @@ function cancel(): void {
           <RuiButton
             v-if="higherPlans.length > 0"
             color="primary"
-            :disabled="!selectedPlan || upgrading"
-            :loading="upgrading"
+            :disabled="!selectedPlan || loading"
             @click="submitUpgrade()"
           >
             {{ t('actions.upgrade') }}
