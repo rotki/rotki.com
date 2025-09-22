@@ -21,12 +21,11 @@ interface PaymentMethodItem {
 const store = useMainStore();
 
 const { plan } = usePlanParams();
-const { paymentMethodId } = usePaymentMethodParam();
 
 const { identifier } = toRefs(props);
 const { authenticated } = storeToRefs(store);
 
-const method = ref<PaymentMethod>(get(paymentMethodId));
+const method = ref<PaymentMethod>();
 const processing = ref<boolean>(false);
 
 const paymentMethods: PaymentMethodItem[] = [
