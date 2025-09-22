@@ -12,6 +12,10 @@ export const createApp = ViteSSG(App, ({ app }) => {
     console.error('Global error:', err, info);
   };
 
-  const rui = createRui();
+  const rui = createRui({
+    theme: {
+      mode: 'light',
+    },
+  });
   app.use(rui);
 });
