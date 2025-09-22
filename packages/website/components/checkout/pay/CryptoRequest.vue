@@ -6,11 +6,10 @@ import { usePaymentCryptoStore } from '~/store/payments/crypto';
 const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
-const acceptRefundPolicy = ref(false);
+const acceptRefundPolicy = ref<boolean>(false);
 const processing = ref<boolean>(false);
 
 const { plan } = usePlanParams();
-const { paymentMethodId } = usePaymentMethodParam();
 const { subscriptionId } = useSubscriptionIdParam();
 
 async function back() {
@@ -18,7 +17,6 @@ async function back() {
     name: 'checkout-pay-method',
     query: {
       plan: get(plan),
-      method: get(paymentMethodId),
       id: get(subscriptionId),
     },
   });
@@ -28,12 +26,11 @@ const currency = ref('');
 
 function submit() {
   set(processing, true);
-  navigateTo({
+  navigateToWithCSPSupport({
     name: 'checkout-pay-crypto',
     query: {
       plan: get(plan),
       currency: get(currency),
-      method: get(paymentMethodId),
       id: get(subscriptionId),
     },
   });
@@ -46,7 +43,7 @@ onBeforeMount(async () => {
   await cryptoStore.fetchPaymentAssets();
 });
 
-const valid = computed(() => get(acceptRefundPolicy) && !!get(currency));
+const valid = computed<boolean>(() => get(acceptRefundPolicy) && !!get(currency));
 </script>
 
 <template>

@@ -53,14 +53,3 @@ export function useSubscriptionIdParam() {
   });
   return { subscriptionId };
 }
-
-export function usePaymentMethodParam() {
-  const route = useRoute();
-  const paymentMethodId = computed(() => {
-    // NB: this param name is also used in backend email links,
-    // if changed, kindly sync with backend team to update email links as well.
-    const { method } = get(route).query;
-    return typeof method === 'string' ? Number(method) : -1;
-  });
-  return { paymentMethodId };
-}
