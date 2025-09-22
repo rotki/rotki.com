@@ -223,7 +223,7 @@ export default defineNuxtConfig({
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(
-            baseCSP,
+            removeNoncePlaceholders(baseCSP),
             walletConnectCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
@@ -258,6 +258,8 @@ export default defineNuxtConfig({
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
           crossOriginOpenerPolicy: 'same-origin-allow-popups',
+          crossOriginEmbedderPolicy: 'unsafe-none', // Required for PayPal SDK
+          crossOriginResourcePolicy: 'cross-origin', // Allow PayPal resources
         },
       },
     },
@@ -304,7 +306,7 @@ export default defineNuxtConfig({
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(
-            baseCSP,
+            removeNoncePlaceholders(baseCSP),
             walletConnectCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),

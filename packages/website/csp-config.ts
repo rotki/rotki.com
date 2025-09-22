@@ -38,11 +38,15 @@ export const baseCSP: ContentSecurityPolicyValue = {
 // Development-only additions - dynamic port configuration
 export function createDevCSP(devPort = 3000, hmrPort = 4000): ContentSecurityPolicyValue {
   return {
-    'connect-src': [`ws://localhost:${hmrPort}/ws`],
-    'frame-src': [`http://localhost:${devPort}/__nuxt_devtools__/client/`],
+    'connect-src': [
+      `localhost:${hmrPort}`,
+      `ws://localhost:${hmrPort}`,
+      `wss://localhost:${hmrPort}`,
+    ],
+    'frame-src': [`localhost:${devPort}`],
     // Allow Vite dev client scripts with nonces
-    'script-src': [`http://localhost:${devPort}`],
-    'script-src-elem': [`http://localhost:${devPort}`],
+    'script-src': [`localhost:${devPort}`],
+    'script-src-elem': [`localhost:${devPort}`],
   };
 }
 
@@ -113,6 +117,25 @@ export const walletConnectCSP: ContentSecurityPolicyValue = {
     'https://tokens-data.1inch.io',
     'https://tokens.1inch.io',
     'https://ipfs.io',
+  ],
+  // Allow extension scripts to run
+  'script-src': [
+    // Browser extension protocols
+    'chrome-extension:',
+    'moz-extension:',
+    'safari-web-extension:',
+    'edge-extension:',
+    // Allow inline scripts for wallet injections
+    '\'unsafe-inline\'',
+  ],
+  'script-src-elem': [
+    // Browser extension protocols
+    'chrome-extension:',
+    'moz-extension:',
+    'safari-web-extension:',
+    'edge-extension:',
+    // Allow inline scripts for wallet injections
+    '\'unsafe-inline\'',
   ],
 };
 

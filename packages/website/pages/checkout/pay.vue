@@ -72,8 +72,8 @@ onBeforeMount(() => {
   removeStoredRedirectUrl();
 });
 
-onMounted(async () => {
-  await store.getPlans();
+onMounted(() => {
+  store.getPlans().catch(() => {});
 });
 </script>
 
