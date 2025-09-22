@@ -129,7 +129,6 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/devtools',
-    '@nuxtjs/robots',
     '@nuxtjs/sitemap',
     '@nuxt/content',
     '@nuxtjs/i18n',
@@ -177,18 +176,7 @@ export default defineNuxtConfig({
     },
   },
 
-  robots: {
-    groups: [{
-      disallow: nonIndexed,
-      userAgent: '*',
-    }],
-  },
-
   routeRules: {
-    '/home/**': { robots: false },
-    ...(!sponsorshipEnabled ? { '/sponsor/**': { robots: false } } : {}),
-
-    // Legacy checkout/pay route (can be removed once unused)
     '/checkout/pay': {
       security: {
         headers: {
@@ -358,7 +346,7 @@ export default defineNuxtConfig({
         ? mergeCSP(baseCSP, devCSP)
         : baseCSP,
     },
-    hidePoweredBy: false,
+    hidePoweredBy: true,
     nonce: true,
     sri: true,
   },
