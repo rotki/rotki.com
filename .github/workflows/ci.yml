@@ -114,6 +114,7 @@ jobs:
 
       - name: Set .env
         run: cp .env.test .env
+        working-directory: packages/website
 
       - name: Run cypress tests
         uses: cypress-io/github-action@v6
@@ -122,6 +123,7 @@ jobs:
           browser: chrome
           wait-on: 'http://127.0.0.1:3000'
           install: false
+          working-directory: packages/website
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
