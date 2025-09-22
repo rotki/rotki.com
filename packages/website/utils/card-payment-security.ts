@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3';
+import type { ContentSecurityPolicyValue } from 'nuxt-security';
 import { baseCSP, braintreeBaseCSP, createDevCSP, mergeCSP } from '~/csp-config';
 import { cspObjectToString } from '~/utils/csp-header';
 
@@ -17,6 +18,15 @@ export function applyCardPaymentHtmlSecurityHeaders(event: H3Event): void {
     );
     cspConfigs.push(devCSP);
   }
+
+  // Add additional CSP for card payment specific needs
+  const cardPaymentCSP: ContentSecurityPolicyValue = {
+    'img-src': [
+      'rotki.com',
+      'localhost',
+    ],
+  };
+  cspConfigs.push(cardPaymentCSP);
 
   const mergedCSP = mergeCSP(...cspConfigs);
   const cspHeaderValue = cspObjectToString(mergedCSP);

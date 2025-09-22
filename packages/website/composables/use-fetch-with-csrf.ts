@@ -27,6 +27,7 @@ export const useFetchWithCsrf = createSharedComposable(() => {
   const logger = useLogger('fetch');
   const { public: { baseUrl } } = useRuntimeConfig();
   const csrfToken = useCookie(CSRF_COOKIE);
+  const sessionId = useSessionIdCookie();
 
   function setHooks(hooks: {
     logout: () => Promise<void>;
@@ -79,9 +80,19 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       }
 
       if (import.meta.server || import.meta.env.NODE_ENV === 'test') {
-        const cookieString = event
-          ? event.headers.get('cookie')
-          : useRequestHeaders(['cookie']).cookie;
+        let cookieString = event?.headers.get('cookie');
+
+        try {
+          const requestHeaders = useRequestHeaders(['cookie']);
+          cookieString = requestHeaders.cookie;
+        }
+        catch (error: any) {
+          logger.error(error);
+          const session = get(sessionId);
+          if (session && token) {
+            cookieString = `${CSRF_COOKIE}=${token}; sessionid=${session}`;
+          }
+        }
 
         headers = {
           ...headers,
