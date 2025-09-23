@@ -14,6 +14,7 @@ const props = withDefaults(
   }>(),
   {
     warning: false,
+    nextPayment: undefined,
   },
 );
 

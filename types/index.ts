@@ -44,7 +44,19 @@ const SubscriptionStatus = z.enum([
   'Cancelled but still active',
   'Pending',
   'Past Due',
+  'Upgrade Requested',
 ] as const);
+
+export enum PaymentProvider {
+  BRAINTREE = 'braintree',
+  CRYPTO = 'crypto',
+}
+
+export enum PaymentMethod {
+  PAYPAL = 'paypal',
+  CARD = 'card',
+  CRYPTO = 'crypto',
+}
 
 export const UserSubscription = z.object({
   actions: StringArray,
@@ -56,8 +68,11 @@ export const UserSubscription = z.object({
   isSoftCanceled: z.boolean().default(false),
   nextActionDate: z.string(),
   nextBillingAmount: z.number(),
-  paymentProvider: z.string(),
+  paymentMethod: z.nativeEnum(PaymentMethod).optional(),
+  paymentProvider: z.nativeEnum(PaymentProvider),
+  paymentToken: z.string().optional(),
   pending: z.boolean().default(false),
+  planId: z.number().optional(),
   planName: z.string(),
   status: SubscriptionStatus,
 });
@@ -156,7 +171,7 @@ export interface SelectedPlan {
 const CardCheckout = z
   .object({
     braintreeClientToken: z.string(),
-    nextPayment: z.number(),
+    nextPayment: z.number().default(0),
   });
 
 export type CardCheckout = z.infer<typeof CardCheckout>;
@@ -166,6 +181,13 @@ export const CardCheckoutResponse = z.object({
 });
 
 export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>;
+
+export const UpgradeCardCheckout = CardCheckout.extend({
+  finalAmount: z.string(),
+  fullAmount: z.string(),
+});
+
+export type UpgradeCardCheckout = z.infer<typeof UpgradeCardCheckout>;
 
 const CryptoPayment = z.object({
   chainId: z.number(),
@@ -216,6 +238,34 @@ export const PendingCryptoPaymentResponse = z.object({
 
 export type PendingCryptoPaymentResponse = z.infer<typeof PendingCryptoPaymentResponse>;
 
+const CryptoUpgradePayment = PendingCryptoPayment.extend({
+  fromPlan: z.object({
+    id: z.number(),
+    tier: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+  ),
+  toPlan: z.object({
+    id: z.number(),
+    tier: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+  ),
+});
+
+export type CryptoUpgradePayment = z.infer<typeof CryptoUpgradePayment>;
+
+export const CryptoUpgradePaymentResponse = z.object({
+  message: z.string().optional(),
+  result: CryptoUpgradePayment.optional(),
+});
+
+export type CryptoUpgradePaymentResponse = z.infer<typeof CryptoUpgradePaymentResponse>;
+
 z.object({
   message: z.string().optional(),
   result: z.boolean().optional(),
@@ -227,6 +277,7 @@ export interface CreateCardRequest {
 
 export interface CardPaymentRequest extends CreateCardRequest {
   planId: number;
+  upgradeSubId?: string;
   discountCode?: string;
 }
 
@@ -245,6 +296,7 @@ export const SavedCard = z.object({
   expiresAt: z.string(),
   imageUrl: z.string(),
   last4: z.string(),
+  linked: z.boolean(),
   token: z.string(),
 });
 
@@ -256,6 +308,13 @@ export const SavedCardResponse = z.object({
 });
 
 export type SavedCardResponse = z.infer<typeof SavedCardResponse>;
+
+export const SavedCardsResponse = z.object({
+  cards: z.array(SavedCard),
+  message: z.string().optional(),
+});
+
+export type SavedCardsResponse = z.infer<typeof SavedCardsResponse>;
 
 export interface CreateCardNonceRequest {
   paymentToken: string;
@@ -321,4 +380,5 @@ export interface PendingTx {
   subscriptionId: string;
   chainId: number;
   blockExplorerUrl: string;
+  isUpgrade: boolean;
 }

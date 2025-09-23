@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import type { CardPaymentRequest, PaymentStep, SavedCard, SelectedPlan } from '~/types';
+import type {
+  CardCheckout,
+  CardPaymentRequest,
+  PaymentStep,
+  SavedCard,
+  SelectedPlan,
+  UpgradeCardCheckout,
+} from '~/types';
 import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
 import {
@@ -9,6 +16,7 @@ import {
   type ThreeDSecure,
   threeDSecure,
 } from 'braintree-web';
+import CardSelectionDialog from '~/components/checkout/pay/CardSelectionDialog.vue';
 import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import { usePaymentCardsStore } from '~/store/payments/cards';
 import { useLogger } from '~/utils/use-logger';
@@ -22,6 +30,7 @@ const props = defineProps<{
   status: PaymentStep;
   nextPayment: number;
   card: SavedCard | undefined;
+  checkoutData: CardCheckout | UpgradeCardCheckout;
 }>();
 
 const emit = defineEmits<{
@@ -37,7 +46,15 @@ interface ErrorMessage {
   message: string;
 }
 
-const { token, plan, success, pending, card } = toRefs(props);
+const {
+  token,
+  plan,
+  success,
+  pending,
+  card,
+  checkoutData,
+} = toRefs(props);
+
 const verify = ref(false);
 const challengeVisible = ref(false);
 const paying = ref(false);
@@ -56,17 +73,81 @@ let btThreeDSecure: ThreeDSecure;
 const processing = logicOr(paying, pending);
 const disabled = logicOr(processing, initializing, formInitializing, success);
 
-const { addCard, createCardNonce } = usePaymentCardsStore();
+const store = usePaymentCardsStore();
+const { addCard, createCardNonce } = store;
+const { cards } = storeToRefs(store);
 const { planParams } = usePlanParams();
 const { planId } = usePlanIdParam();
+const { upgradeSubId } = useSubscriptionIdParam();
 
 const logger = useLogger('card-payment');
+
+// Card selection
+const selectedCard = ref<SavedCard | undefined>();
+const showCardSelectionDialog = ref<boolean>(false);
+
+// Function to find a linked card
+function findLinkedCard(): SavedCard | undefined {
+  const availableCards = get(cards);
+  return availableCards.find(c => c.linked);
+}
+
+// Initialize selectedCard with the linked card, or fall back to the default card
+watchImmediate([card, cards], () => {
+  if (!get(selectedCard)) {
+    // First try to find a linked card
+    const linkedCard = findLinkedCard();
+    if (linkedCard) {
+      set(selectedCard, linkedCard);
+    }
+    // Otherwise use the default card passed as prop
+    else if (get(card)) {
+      set(selectedCard, get(card));
+    }
+  }
+});
+
+function handleCardSelection(card: SavedCard) {
+  set(selectedCard, card);
+}
+
+async function handleCardDeleted(deletedCard: SavedCard) {
+  // Reload cards from the store to get the updated list
+  await store.getCards();
+
+  const currentCards = get(cards);
+
+  // If the deleted card was selected, select another one
+  if (get(selectedCard)?.token === deletedCard.token) {
+    if (currentCards.length > 0) {
+      // First try to select a linked card
+      const linkedCard = findLinkedCard();
+      if (linkedCard) {
+        set(selectedCard, linkedCard);
+      }
+      else {
+        // Otherwise select the first available card
+        set(selectedCard, currentCards[0]);
+      }
+    }
+    else {
+      // No cards left
+      set(selectedCard, undefined);
+    }
+  }
+}
 
 function updatePending() {
   emit('update:pending', true);
 }
 
 async function back() {
+  if (isDefined(upgradeSubId)) {
+    return navigateTo({
+      name: 'home-subscription',
+    });
+  }
+
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
@@ -80,6 +161,12 @@ async function back() {
 const cardForm = ref();
 
 const grandTotal = computed<number>(() => {
+  const data = get(checkoutData);
+
+  if ('finalAmount' in data) {
+    return parseFloat(data.finalAmount);
+  }
+
   const selectedPlan = get(plan);
   const discountVal = get(discountInfo);
   if (!discountVal || !discountVal.isValid) {
@@ -98,7 +185,7 @@ async function submit() {
   try {
     const { nonce, bin } = await get(cardForm).submit();
 
-    const savedCard = get(card);
+    const savedCard = get(selectedCard);
 
     const paymentToken = savedCard
       ? savedCard.token
@@ -137,6 +224,7 @@ async function submit() {
         discountCode: get(discountCode) || undefined,
         paymentMethodNonce: payload.nonce,
         planId,
+        upgradeSubId: get(upgradeSubId),
       });
     }
     else {
@@ -216,15 +304,36 @@ onUnmounted(() => {
 <template>
   <div class="my-6 grow flex flex-col">
     <template v-if="btClient">
-      <SavedCardDisplay
-        v-if="card"
-        ref="cardForm"
-        :card="card"
-        :disabled="disabled"
-        :client="btClient"
-        @update:form-valid="formValid = $event"
-        @update:initializing="formInitializing = $event"
-      />
+      <div v-if="selectedCard">
+        <SavedCardDisplay
+          ref="cardForm"
+          :card="selectedCard"
+          :disabled="disabled"
+          :client="btClient"
+          :no-delete="isDefined(upgradeSubId)"
+          @update:form-valid="formValid = $event"
+          @update:initializing="formInitializing = $event"
+          @card-deleted="handleCardDeleted($event)"
+        />
+        <!-- Button to change card -->
+        <div class="flex justify-end mt-4">
+          <RuiButton
+            variant="text"
+            size="sm"
+            :disabled="disabled"
+            @click="showCardSelectionDialog = true"
+          >
+            <template #prepend>
+              <RuiIcon name="lu-credit-card" />
+            </template>
+            {{
+              t('home.plans.tiers.step_3.saved_card.use_other_card', {
+                count: cards.length > 1 ? `(${cards.length - 1})` : undefined,
+              })
+            }}
+          </RuiButton>
+        </div>
+      </div>
       <CardForm
         v-else
         ref="cardForm"
@@ -248,18 +357,26 @@ onUnmounted(() => {
       />
     </div>
     <RuiDivider class="mt-6" />
+    <UpgradePlanOverview
+      v-if="isDefined(upgradeSubId)"
+      :next-payment="nextPayment"
+      :plan="plan"
+    />
     <SelectedPlanOverview
+      v-else
       :plan="plan"
       :next-payment="nextPayment"
       :disabled="disabled"
     />
     <DiscountCodeInput
+      v-if="!isDefined(upgradeSubId)"
       v-model="discountCode"
       v-model:discount-info="discountInfo"
       :plan="plan"
       class="mt-6"
     />
     <PaymentGrandTotal
+      :upgrade="isDefined(upgradeSubId)"
       :grand-total="grandTotal"
       class="mt-6"
     />
@@ -328,6 +445,13 @@ onUnmounted(() => {
     </template>
     {{ status?.message }}
   </FloatingNotification>
+
+  <CardSelectionDialog
+    v-model="showCardSelectionDialog"
+    :cards="cards"
+    :selected-card="selectedCard"
+    @select="handleCardSelection($event)"
+  />
 </template>
 
 <style lang="scss" module>

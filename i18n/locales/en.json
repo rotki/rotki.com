@@ -67,9 +67,14 @@
       "paid": "Paid",
       "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
+      "upgraded_from": "Upgrade from {plan}",
       "title": "Your latest payments"
     },
     "subscriptions": {
+      "actions": {
+        "cancel": "Cancel subscription",
+        "resume": "Resume subscription"
+      },
       "cancellation": {
         "actions": {
           "no": "No, don't cancel",
@@ -95,6 +100,7 @@
         "description": "You canceled this subscription, but it will remain active until {date}",
         "status": "Active until {date}"
       },
+      "explorer": "See in Explorer",
       "headers": {
         "cost_in_symbol_per_period": "Cost in {symbol} per period",
         "created": "Created",
@@ -123,14 +129,19 @@
         "title": "Resume your rotki subscription"
       },
       "resume_hint": "Resume the active billing of your subscription from {date}",
-      "title": "Subscription History"
+      "title": "Subscription History",
+      "upgrade": {
+        "upgrade": "Upgrade plan",
+        "cancel": "Cancel Upgrade Request"
+      }
     },
     "tabs": {
       "account_details": "Account Details",
       "address": "Address",
       "customer_information": "Customer Information",
       "devices": "Devices List",
-      "subscription": "Subscription"
+      "subscription": "Subscription",
+      "payment_methods": "Payment Methods"
     },
     "unverified_email": {
       "message": {
@@ -205,6 +216,7 @@
     "title": "Details"
   },
   "actions": {
+    "add_card": "Add card",
     "apply": "Apply",
     "back": "Back",
     "cancel": "Cancel",
@@ -226,10 +238,11 @@
     "regenerate": "Regenerate",
     "renew": "Renew",
     "reset": "Reset",
-    "resume": "Resume",
+    "set_default": "Set as default",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
-    "update": "Update"
+    "update": "Update",
+    "upgrade": "Upgrade"
   },
   "auth": {
     "activation": {
@@ -366,11 +379,16 @@
   "common": {
     "actions": "actions",
     "amount": "Amount",
+    "card": "Card",
+    "error": "Error",
+    "error_occurred": "An error occurred",
     "here": "here",
+    "monthly": "monthly",
     "none": "none",
     "plan": "plan",
     "status": "status",
-    "vat": "{vat}% VAT"
+    "vat": "{vat}% VAT",
+    "yearly": "yearly"
   },
   "copy_button": {
     "copied": "Copied to clipboard",
@@ -398,6 +416,19 @@
     "read_the_doc": "Read the documentation"
   },
   "home": {
+    "account": {
+      "payment_methods": {
+        "add_card": "Add card",
+        "cannot_delete_linked_card": "This card is used for subscription auto-renewal and cannot be deleted",
+        "default_card": "Default card",
+        "link_card": "Set for auto-renewal",
+        "linked_card": "Auto-renewal card",
+        "no_cards": "No saved cards",
+        "no_cards_description": "Add a payment card to make future purchases easier",
+        "subtitle": "Manage your saved payment cards",
+        "title": "Payment Methods"
+      }
+    },
     "advantages": {
       "local_app": {
         "description": "rotki is a local-first application with a strong focus on user privacy.",
@@ -594,14 +625,18 @@
             "cannot_use_card": "Something went wrong. Please refresh the page or use a different card.",
             "card_expired": "The card has expired. Please use a different card.",
             "delete": {
-              "description": "Are you sure you want to ree this card?",
+              "description": "Are you sure you want to remove this card?",
               "title": "Remove Saved Card"
             },
-            "expiry": "Expiry {expiresAt}"
+            "expiry": "Expiry {expiresAt}",
+            "select_card": "Select Card",
+            "use_other_card": "Use other cards {count}"
           },
           "start": "Pay Now",
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
+          "upgrade_plan_description": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.",
+          "upgrade_to_plan": "Upgrade to plan:",
           "wallet": {
             "connect_wallet": "Connect wallet",
             "notice": "You can pay directly via your wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
@@ -884,6 +919,23 @@
       "title": "Unlock Premium Features"
     }
   },
+  "upgrade_plan": {
+    "title": "Upgrade Your Plan",
+    "description": "Select a higher tier plan to unlock more features and capabilities.",
+    "current_plan": "Current plan: {plan} ({period})",
+    "no_higher_plans": "You're already on the highest available plan for your subscription period.",
+    "error": {
+      "title": "Upgrade Failed",
+      "message": "Failed to upgrade your subscription. Please try again later.",
+      "no_selected_plan": "No subscription or plan selected",
+      "plan_not_found": "Plan ID not found for selected period",
+      "payment_method_unknown": "Cannot determine the previous payment method"
+    },
+    "success": {
+      "title": "Upgrade Successful",
+      "message": "Your subscription has been successfully upgraded to {plan}."
+    }
+  },
   "recaptcha": {
     "expired_captcha": "Invalid or expired captcha, please try again"
   },
@@ -1149,6 +1201,25 @@
         "line_4": "A modular system that many contributors outside our team can extend. For example, if someone wants to integrate tax accounting rules for a specific jurisdiction, they are experts on or integrate a chain they know of."
       },
       "title": "Vision"
+    }
+  },
+  "payment_methods": {
+    "title": "Payment Methods",
+    "description": "Manage your saved payment methods for subscriptions and purchases",
+    "add_card": "Add Card",
+    "add_first_card": "Add Your First Card",
+    "add_new_card": "Add New Card",
+    "no_cards": "No payment methods saved yet",
+    "save_card": "Save Card",
+    "delete_card": "Delete Card",
+    "card_brand": "Card brand",
+    "expires": "Expires",
+    "initializing": "Initializing payment form...",
+    "errors": {
+      "initialize_failed": "Failed to initialize payment form",
+      "add_failed": "Failed to add card",
+      "delete_failed": "Failed to delete card",
+      "load_failed": "Failed to load payment methods"
     }
   }
 }

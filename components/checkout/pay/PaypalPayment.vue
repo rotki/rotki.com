@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import type { CardPaymentRequest, PaymentStep, SelectedPlan } from '~/types';
+import type { CardCheckout, CardPaymentRequest, PaymentStep, SelectedPlan, UpgradeCardCheckout } from '~/types';
 import type { DiscountInfo } from '~/types/payment';
 import { get, set } from '@vueuse/core';
 import { client, paypalCheckout } from 'braintree-web';
@@ -23,6 +23,7 @@ const props = defineProps<{
   loading: boolean;
   status: PaymentStep;
   nextPayment: number;
+  checkoutData: CardCheckout | UpgradeCardCheckout;
 }>();
 
 const emit = defineEmits<{
@@ -33,7 +34,16 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { token, plan, loading, pending, success, nextPayment } = toRefs(props);
+const {
+  token,
+  plan,
+  loading,
+  pending,
+  success,
+  nextPayment,
+  checkoutData,
+} = toRefs(props);
+
 const error = ref<ErrorMessage | null>(null);
 const accepted = ref(false);
 const mustAcceptRefund = ref(false);
@@ -47,14 +57,21 @@ const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 
 const { planParams } = usePlanParams();
 const { planId } = usePlanIdParam();
+const { upgradeSubId } = useSubscriptionIdParam();
 
-const processing = computed(() => get(paying) || get(loading) || get(pending));
+const processing = logicOr(paying, loading, pending);
 
 let btClient: braintree.Client | null = null;
 
 const logger = useLogger('paypal-payment');
 
 const grandTotal = computed<number>(() => {
+  const data = get(checkoutData);
+
+  if ('finalAmount' in data) {
+    return parseFloat(data.finalAmount);
+  }
+
   const selectedPlan = get(plan);
   const discountVal = get(discountInfo);
   if (!discountVal || !discountVal.isValid) {
@@ -126,6 +143,7 @@ async function initializeBraintree(token: Ref<string>, plan: Ref<SelectedPlan>, 
           paymentMethodNonce: vaultedNonce,
           discountCode: get(discountCode) || undefined,
           planId,
+          upgradeSubId: get(upgradeSubId),
         });
         return token;
       },
@@ -160,6 +178,12 @@ function clearError() {
 }
 
 async function back() {
+  if (isDefined(upgradeSubId)) {
+    return navigateTo({
+      name: 'home-subscription',
+    });
+  }
+
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
@@ -201,18 +225,26 @@ onUnmounted(async () => {
 
 <template>
   <div class="mb-6 grow flex flex-col">
+    <UpgradePlanOverview
+      v-if="isDefined(upgradeSubId)"
+      :next-payment="nextPayment"
+      :plan="plan"
+    />
     <SelectedPlanOverview
+      v-else
       :plan="plan"
       :next-payment="nextPayment"
       :disabled="processing || initializing"
     />
     <DiscountCodeInput
+      v-if="!isDefined(upgradeSubId)"
       v-model="discountCode"
       v-model:discount-info="discountInfo"
       :plan="plan"
       class="mt-6"
     />
     <PaymentGrandTotal
+      :upgrade="isDefined(upgradeSubId)"
       :grand-total="grandTotal"
       class="mt-6"
     />

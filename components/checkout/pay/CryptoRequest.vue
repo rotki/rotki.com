@@ -16,20 +16,27 @@ const discountInfo = ref<DiscountInfo>();
 
 const { planParams } = usePlanParams();
 const { paymentMethodId } = usePaymentMethodParam();
-const { subscriptionId } = useSubscriptionIdParam();
+const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 
 const { selectedPlan } = useSelectedPlan();
 const cryptoStore = usePaymentCryptoStore();
 
 async function back() {
-  await navigateTo({
-    name: 'checkout-pay-method',
-    query: {
-      ...get(planParams),
-      method: get(paymentMethodId),
-      id: get(subscriptionId),
-    },
-  });
+  if (isDefined(upgradeSubId)) {
+    await navigateTo({
+      name: 'home-subscription',
+    });
+  }
+  else {
+    await navigateTo({
+      name: 'checkout-pay-method',
+      query: {
+        ...get(planParams),
+        method: get(paymentMethodId),
+        id: get(subscriptionId),
+      },
+    });
+  }
 }
 
 function submit() {
@@ -42,6 +49,7 @@ function submit() {
       method: get(paymentMethodId),
       id: get(subscriptionId),
       discountCode: get(discountCode),
+      upgradeSubId: get(upgradeSubId),
     },
   });
 }
@@ -79,12 +87,17 @@ const grandTotal = computed<number>(() => {
     <CryptoPaymentInfo />
     <template v-if="selectedPlan">
       <RuiDivider class="mt-8 mb-4" />
-      <SelectedPlanOverview
+      <UpgradePlanOverview
+        v-if="isDefined(upgradeSubId)"
         :plan="selectedPlan"
-        :next-payment="0"
+      />
+      <SelectedPlanOverview
+        v-else
+        :plan="selectedPlan"
       />
 
       <DiscountCodeInput
+        v-if="!isDefined(upgradeSubId)"
         v-model="discountCode"
         v-model:discount-info="discountInfo"
         :plan="selectedPlan"
@@ -92,6 +105,7 @@ const grandTotal = computed<number>(() => {
       />
 
       <PaymentGrandTotal
+        v-if="!isDefined(upgradeSubId)"
         :grand-total="grandTotal"
         class="mt-6"
       />

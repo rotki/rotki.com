@@ -46,6 +46,11 @@ const tabs = [
     to: '/home/subscription',
   },
   {
+    label: t('account.tabs.payment_methods'),
+    icon: 'lu-credit-card',
+    to: '/home/payment-methods',
+  },
+  {
     label: t('account.tabs.devices'),
     icon: 'lu-laptop-minimal',
     to: '/home/devices',
@@ -75,7 +80,7 @@ const tabs = [
         <div class="text-h4 mb-6">
           {{ t('account.welcome') }} {{ name }}
         </div>
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row gap-8">
           <div class="hidden lg:block w-[270px] shrink-0">
             <RuiTabs
               v-model="tabModelValue"
