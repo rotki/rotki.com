@@ -2,7 +2,6 @@
 import { get } from '@vueuse/core';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
-const { public: { baseUrl } } = useRuntimeConfig();
 const { path } = useRoute();
 const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { t } = useI18n({ useScope: 'global' });
@@ -27,8 +26,7 @@ else {
     meta: getMetadata(
       meta.title,
       meta.description,
-      `${baseUrl}${path}`,
-      baseUrl,
+      path,
     ),
     ...commonAttrs(),
   });

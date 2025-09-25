@@ -6,13 +6,9 @@ const { t } = useI18n({ useScope: 'global' });
 const title = 'integrations';
 const description = 'Supported blockchains, exchanges, and protocols in rotki';
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
 useHead({
   title,
-  meta: getMetadata(title, description, `${baseUrl}/integrations/`, baseUrl),
+  meta: getMetadata(title, description, '/integrations/'),
   ...commonAttrs(),
 });
 

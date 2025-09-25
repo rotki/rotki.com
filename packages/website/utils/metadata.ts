@@ -1,11 +1,17 @@
 export function getMetadata(
   title: string,
   description: string,
-  url: string,
-  baseUrl: string,
+  path: string,
   imageName = 'share.png',
 ) {
+  const {
+    public: { baseUrl },
+  } = useRuntimeConfig();
+
+  const url = baseUrl + path;
+
   const imageUrl = `${baseUrl}/img/og/${imageName}`;
+
   return [
     {
       content: description,

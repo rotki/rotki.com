@@ -5,8 +5,6 @@ import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const props = defineProps<{ path: string }>();
 
-const { public: { baseUrl } } = useRuntimeConfig();
-
 const { fallbackToLocalOnError } = useRemoteOrLocal();
 
 const { data: document } = await useAsyncData(props.path, async () => fallbackToLocalOnError(
@@ -22,8 +20,7 @@ else {
     meta: getMetadata(
       get(document)?.title ?? '',
       get(document)?.description ?? '',
-      `${baseUrl}${props.path}`,
-      baseUrl,
+      props.path,
     ),
     ...commonAttrs(),
   });

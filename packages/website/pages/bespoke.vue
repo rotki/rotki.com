@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { commonAttrs } from '~/utils/metadata';
+import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const {
   public: {
@@ -7,15 +7,11 @@ const {
   },
 } = useRuntimeConfig();
 
+const title = 'Bespoke Accounting Service';
+
 useHead({
-  title: 'Bespoke Accounting Service',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'rotki bespoke accounting service - Deep expertise in crypto accounting since 2017',
-    },
-  ],
+  title,
+  meta: getMetadata(title, 'rotki bespoke accounting service - Deep expertise in crypto accounting since 2017', '/bespoke'),
   ...commonAttrs(),
 });
 

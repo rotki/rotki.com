@@ -53,14 +53,10 @@ type LeaderboardMetadata = z.infer<typeof LeaderboardMetadata>;
 
 const description = 'rotki\'s sponsor leaderboard';
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
 useHead({
   title: 'Leaderboard | rotki',
   meta: [
-    ...getMetadata('Leaderboard | rotki', description, baseUrl, `${baseUrl}/sponsor/leaderboard`),
+    ...getMetadata('Leaderboard | rotki', description, '/sponsor/leaderboard'),
   ],
   ...commonAttrs(),
 });

@@ -19,13 +19,9 @@ const title = t('jobs.title');
 const header = t('jobs.header');
 const subheader = t('jobs.description');
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
 useHead({
   title,
-  meta: getMetadata(title, header, `${baseUrl}/jobs`, baseUrl),
+  meta: getMetadata(title, header, '/jobs'),
   ...commonAttrs(),
 });
 

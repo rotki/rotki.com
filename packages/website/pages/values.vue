@@ -1,15 +1,9 @@
 <script lang="ts" setup>
-import { commonAttrs } from '~/utils/metadata';
+import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 useHead({
   title: 'values',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'Values of rotki',
-    },
-  ],
+  meta: getMetadata('rotki', 'Values of rotki', '/values'),
   ...commonAttrs(),
 });
 

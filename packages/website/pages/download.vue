@@ -2,17 +2,11 @@
 import type { DownloadItem } from '~/types/download';
 import { get } from '@vueuse/core';
 import { useAppDownload } from '~/composables/download';
-import { commonAttrs } from '~/utils/metadata';
+import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 useHead({
   title: 'download',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'Download rotki',
-    },
-  ],
+  meta: getMetadata('rotki', 'Download rotki', '/download'),
   ...commonAttrs(),
 });
 

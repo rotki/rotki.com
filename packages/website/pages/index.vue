@@ -8,10 +8,6 @@ const description
 const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`;
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
 useHead({
   title: 'rotki',
   meta: [
@@ -19,7 +15,7 @@ useHead({
       name: 'keywords',
       content: keywords,
     },
-    ...getMetadata('rotki', description, baseUrl, baseUrl),
+    ...getMetadata('rotki', description, ''),
   ],
   ...commonAttrs(),
 });

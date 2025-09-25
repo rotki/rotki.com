@@ -12,14 +12,10 @@ import { useLogger } from '~/utils/use-logger';
 
 const description = 'Sponsor rotki\'s next release';
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
 useHead({
   title: 'Sponsor | rotki',
   meta: [
-    ...getMetadata('Sponsor | rotki', description, `${baseUrl}/sponsor/mint`, baseUrl, 'mint.png'),
+    ...getMetadata('Sponsor | rotki', description, '/sponsor/mint', 'mint.png'),
   ],
   ...commonAttrs(),
 });

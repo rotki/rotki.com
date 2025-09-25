@@ -6,12 +6,9 @@ const { t } = useI18n({ useScope: 'global' });
 const title = 'refund policy';
 const description = 'Rotki Refund and Cancellation Policy';
 
-const config = useRuntimeConfig();
-const baseUrl = config.public.baseUrl;
-
 useHead({
   title,
-  meta: getMetadata(title, description, `${baseUrl}/refund-policy/`, baseUrl),
+  meta: getMetadata(title, description, '/refund-policy/'),
   ...commonAttrs(),
 });
 </script>
