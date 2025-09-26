@@ -177,6 +177,16 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Global no-cache rule for HTML to prevent CSP nonce mismatches
+    ...(process.env.NODE_ENV !== 'development'
+      ? {
+          '/**': {
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+            },
+          },
+        }
+      : {}),
     '/checkout/pay': {
       security: {
         headers: {
