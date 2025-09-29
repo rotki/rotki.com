@@ -1,33 +1,20 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
-const { t } = useI18n({ useScope: 'global' });
-
-const { account } = storeToRefs(useMainStore());
-
-const name = computed<string>(() => {
-  const accountVal = get(account);
-  if (!accountVal)
-    return '';
-
-  const { firstName, lastName, movedOffline } = accountVal.address;
-
-  if (movedOffline) {
-    return accountVal.username;
-  }
-
-  return `${firstName} ${lastName}`;
-});
+interface TabItem {
+  icon: string;
+  label: string;
+  to: string;
+}
 
 useHead({
   title: 'account',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Manage your rotki premium account',
     },
@@ -36,31 +23,49 @@ useHead({
   ...commonAttrs(),
 });
 
-useAutoLogout();
-const tabModelValue = ref();
+const { t } = useI18n({ useScope: 'global' });
 
-const tabs = [
-  {
-    label: t('account.tabs.subscription'),
-    icon: 'lu-crown',
-    to: '/home/subscription',
-  },
-  {
-    label: t('account.tabs.account_details'),
-    icon: 'lu-circle-user-round',
-    to: '/home/account-details',
-  },
-  {
-    label: t('account.tabs.customer_information'),
-    icon: 'lu-info',
-    to: '/home/customer-information',
-  },
-  {
-    label: t('account.tabs.address'),
-    icon: 'lu-map-pin',
-    to: '/home/address',
-  },
-];
+const tabModelValue = ref<string>();
+
+const { account } = storeToRefs(useMainStore());
+
+useAutoLogout();
+
+const name = computed<string>(() => {
+  const userAccount = get(account);
+  if (!userAccount)
+    return '';
+
+  const { firstName, lastName, movedOffline } = userAccount.address;
+
+  if (movedOffline) {
+    return userAccount.username;
+  }
+
+  return `${firstName} ${lastName}`;
+});
+
+const tabs = computed<TabItem[]>(() => [{
+  label: t('account.tabs.subscription'),
+  icon: 'lu-crown',
+  to: '/home/subscription',
+}, {
+  label: t('account.tabs.devices'),
+  icon: 'lu-laptop-minimal',
+  to: '/home/devices',
+}, {
+  label: t('account.tabs.account_details'),
+  icon: 'lu-circle-user-round',
+  to: '/home/account-details',
+}, {
+  label: t('account.tabs.customer_information'),
+  icon: 'lu-info',
+  to: '/home/customer-information',
+}, {
+  label: t('account.tabs.address'),
+  icon: 'lu-map-pin',
+  to: '/home/address',
+}]);
 </script>
 
 <template>

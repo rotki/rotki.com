@@ -8,6 +8,10 @@ export interface ActionResult {
 
 export interface BaseErrorObject { $message: string | Ref<string> }
 
-export interface PayEvent { months: number; nonce: string }
+export interface PayEvent {
+  planId: number;
+  paymentMethodNonce: string;
+  discountCode?: string;
+}
 
 export type ValidationErrors = Record<string, string[] | string>;

@@ -8,6 +8,7 @@ definePageMeta({
     'unverified',
     'subscriber',
     'pending-payment',
+    'valid-plan-id',
   ],
 });
 
@@ -15,7 +16,6 @@ useHead({
   title: 'pay with crypto',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content:
         'Create a request to pay with Crypto for your rotki premium subscription',

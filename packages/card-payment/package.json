@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fontsource/roboto": "catalog:",
+    "@rotki/card-payment-common": "workspace:*",
     "@vueuse/core": "catalog:",
     "braintree-web": "catalog:",
     "vue": "catalog:",
@@ -20,10 +21,10 @@
   },
   "devDependencies": {
     "@rotki/ui-library": "catalog:",
-    "@tsconfig/node22": "22.0.2",
+    "@tsconfig/node22": "catalog:",
     "@types/braintree-web": "catalog:",
     "@types/jsdom": "27.0.0",
-    "@types/node": "22.18.12",
+    "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vue/tsconfig": "catalog:",
@@ -32,6 +33,7 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
+    "vite-plugin-vue-devtools": "8.0.3",
     "vite-ssg": "catalog:",
     "vue-tsc": "catalog:"
   }

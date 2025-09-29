@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import type { Subscription } from '~/types';
-import { get } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
+import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import { get } from '@vueuse/shared';
+import { formatDate } from '~/utils/date';
 
-const modelValue = defineModel<Subscription | undefined>({ required: true });
+const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 
 defineProps<{
   loading: boolean;
 }>();
 
 const emit = defineEmits<{
-  confirm: [val: Subscription];
+  confirm: [val: UserSubscription];
 }>();
 
-const isPending = computed(() => get(modelValue)?.status === 'Pending');
-const { cancellationError } = storeToRefs(useMainStore());
+const isPending = computed<boolean>(() => get(modelValue)?.status === 'Pending');
+// Remove store usage since notifications are handled at layout level
 
 function cancelSubscription() {
   if (!isDefined(modelValue))
@@ -69,27 +68,31 @@ const { t } = useI18n({ useScope: 'global' });
           </template>
 
           <template #subscription_status>
-            <span v-if="!isPending">
-              {{
-                t(
-                  'account.subscriptions.cancellation.subscription_status.normal',
-                  {
-                    start_date: modelValue?.createdDate ?? '',
-                    end_date: modelValue?.nextActionDate ?? '',
-                  },
-                )
-              }}
-            </span>
-            <span v-else>
-              {{
-                t(
-                  'account.subscriptions.cancellation.subscription_status.pending',
-                  {
-                    start_date: modelValue?.createdDate ?? '',
-                  },
-                )
-              }}
-            </span>
+            <i18n-t
+              v-if="!isPending"
+              keypath="account.subscriptions.cancellation.subscription_status.normal"
+            >
+              <template #start_date>
+                <strong>
+                  {{ formatDate(modelValue?.createdDate) }}
+                </strong>
+              </template>
+              <template #end_date>
+                <strong>
+                  {{ formatDate(modelValue?.nextActionDate) }}
+                </strong>
+              </template>
+            </i18n-t>
+            <i18n-t
+              v-else
+              keypath="account.subscriptions.cancellation.subscription_status.pending"
+            >
+              <template #start_date>
+                <strong>
+                  {{ formatDate(modelValue?.createdDate) }}
+                </strong>
+              </template>
+            </i18n-t>
           </template>
         </i18n-t>
       </div>
@@ -112,16 +115,4 @@ const { t } = useI18n({ useScope: 'global' });
       </div>
     </RuiCard>
   </RuiDialog>
-
-  <FloatingNotification
-    :timeout="3000"
-    :visible="!!cancellationError"
-    closeable
-    @dismiss="cancellationError = ''"
-  >
-    <template #title>
-      {{ t('account.subscriptions.cancellation.notification.title') }}
-    </template>
-    {{ cancellationError }}
-  </FloatingNotification>
 </template>

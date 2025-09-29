@@ -1,27 +1,21 @@
-import type {
-  Account,
-  Plan,
-  Subscription,
-} from '~/types';
+import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { LoginCredentials } from '~/types/login';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import { useAccountApi } from '~/composables/use-account-api';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useAuthApi } from '~/composables/use-auth-api';
+import { useFetchUserSubscriptions } from '~/composables/use-fetch-user-subscriptions';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { usePaymentApi } from '~/composables/use-payment-api';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_TIMEOUT = 3600000;
 
 export const useMainStore = defineStore('main', () => {
-  const authenticated = ref(false);
-  const account = ref<Account | null>(null);
-  const plans = ref<Plan[] | null>(null);
-  const authenticatedOnPlansLoad = ref(false);
-  const cancellationError = ref('');
-  const resumeError = ref('');
+  const authenticated = ref<boolean>(false);
+  const account = ref<Account>();
+  const canBuy = ref<boolean>(true);
+  const pendingSubscriptionId = ref<string>();
 
   const logger = useLogger('store');
   const { setHooks } = useFetchWithCsrf();
@@ -29,14 +23,58 @@ export const useMainStore = defineStore('main', () => {
   // API composables
   const accountApi = useAccountApi();
   const authApi = useAuthApi();
-  const paymentApi = usePaymentApi();
+  const { fetchUserSubscriptions } = useFetchUserSubscriptions();
   const { onRefresh } = useAccountRefresh();
+
+  const updateCanBuy = async (): Promise<void> => {
+    const accountVal = get(account);
+
+    if (!accountVal) {
+      set(canBuy, true);
+      set(pendingSubscriptionId, undefined);
+      return;
+    }
+
+    try {
+      const { hasActiveSubscription } = accountVal;
+
+      if (!hasActiveSubscription) {
+        set(canBuy, true);
+        set(pendingSubscriptionId, undefined);
+        return;
+      }
+
+      const subscriptions = await fetchUserSubscriptions();
+      if (subscriptions.length === 0) {
+        set(canBuy, true);
+        set(pendingSubscriptionId, undefined);
+        return;
+      }
+
+      const renewableSubscriptions = subscriptions.filter(({ actions }) =>
+        actions.includes('renew'),
+      );
+
+      const pendingSubscription = subscriptions.find(({ status }) => status === 'Pending');
+
+      set(canBuy, renewableSubscriptions.length > 0);
+      set(pendingSubscriptionId, pendingSubscription?.id);
+    }
+    catch (error) {
+      logger.error('Failed to update canBuy status:', error);
+      // Default to true on error to not block users
+      set(canBuy, true);
+      set(pendingSubscriptionId, undefined);
+    }
+  };
 
   const getAccount = async (): Promise<void> => {
     const accountData = await accountApi.getAccount();
     if (accountData) {
       set(authenticated, true);
       set(account, accountData);
+      // Update canBuy after account is set
+      await updateCanBuy();
     }
   };
 
@@ -62,43 +100,6 @@ export const useMainStore = defineStore('main', () => {
     return errorMessage;
   };
 
-  const subscriptions = computed<Subscription[]>(() => {
-    const userAccount = get(account);
-    if (!userAccount)
-      return [];
-
-    return userAccount.subscriptions;
-  });
-
-  const getPlans = async (): Promise<void> => {
-    if (get(plans) && get(authenticated) === get(authenticatedOnPlansLoad)) {
-      logger.debug('plans already loaded');
-      return;
-    }
-
-    const plansData = await paymentApi.getPlans();
-    if (plansData) {
-      set(plans, plansData.filter(plan => plan.months === 1 || plan.months === 12));
-      set(authenticatedOnPlansLoad, get(authenticated));
-    }
-  };
-
-  function getPendingSubscription({ amount, date, duration }: {
-    amount: string;
-    duration: number;
-    date: number;
-  }): Subscription | undefined {
-    const subDate = new Date(date * 1000);
-    return get(subscriptions).find((subscription) => {
-      const [day, month, year] = subscription.createdDate.split('/').map(Number);
-      const createdDate = new Date(year, month - 1, day);
-      return subscription.status === 'Pending'
-        && subscription.durationInMonths === duration
-        && subscription.nextBillingAmount === amount
-        && createdDate.toDateString() === subDate.toDateString();
-    });
-  }
-
   const { start: startCountdown, stop: stopCountdown } = useTimeoutFn(
     async () => {
       logger.debug('session expired, logging out');
@@ -114,6 +115,8 @@ export const useMainStore = defineStore('main', () => {
     }
     set(authenticated, false);
     set(account, null);
+    set(canBuy, true); // Reset to default
+    set(pendingSubscriptionId, undefined);
   }
 
   const refreshSession = () => {
@@ -132,16 +135,12 @@ export const useMainStore = defineStore('main', () => {
   return {
     account,
     authenticated,
-    cancellationError,
+    canBuy: readonly(canBuy),
     getAccount,
-    getPendingSubscription,
-    getPlans,
     login,
     logout,
-    plans,
+    pendingSubscriptionId: readonly(pendingSubscriptionId),
     refreshSession,
-    resumeError,
-    subscriptions,
   };
 });
 

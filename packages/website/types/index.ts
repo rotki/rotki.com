@@ -1,3 +1,5 @@
+import { AddressSchema } from '@rotki/card-payment-common/schemas/account';
+import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { z } from 'zod';
 
 interface ResultError<Code = undefined> {
@@ -13,80 +15,11 @@ interface ResultSuccess<T> {
 
 export type Result<T, Code = undefined> = ResultError<Code> | ResultSuccess<T>;
 
-export interface ApiResponse<T, M = string> {
-  readonly result: T | null;
-  readonly message: M;
-}
-
 const StringArray = z.array(z.string());
 
 export const ApiError = z.union([z.string(), z.record(StringArray)]);
 
 export type ApiError = z.infer<typeof ApiError>;
-
-export const Address = z.object({
-  address1: z.string(),
-  address2: z.string(),
-  city: z.string(),
-  companyName: z.string(),
-  country: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  movedOffline: z.boolean(),
-  postcode: z.string(),
-  vatId: z.string(),
-});
-
-const SubStatus = z.enum([
-  'Active',
-  'Cancelled',
-  'Cancelled but still active',
-  'Pending',
-  'Past Due',
-] as const);
-
-export const Subscription = z.object({
-  actions: StringArray,
-  createdDate: z.string(),
-  durationInMonths: z.number().nonnegative(),
-  identifier: z.string().min(1),
-  isSoftCanceled: z.boolean().default(false),
-  nextActionDate: z.string(),
-  nextBillingAmount: z.string(),
-  pending: z.boolean().default(false),
-  planName: z.string(),
-  status: SubStatus,
-});
-
-export type Subscription = z.infer<typeof Subscription>;
-
-export const Payment = z.object({
-  eurAmount: z.string(),
-  identifier: z.string().min(1),
-  isRefund: z.boolean().optional().default(false),
-  paidAt: z.string(),
-  plan: z.string(),
-});
-
-export type Payment = z.infer<typeof Payment>;
-
-export const Account = z.object({
-  address: Address,
-  apiKey: z.string(),
-  apiSecret: z.string(),
-  canUsePremium: z.boolean(),
-  dateNow: z.string(),
-  email: z.string().min(1),
-  emailConfirmed: z.boolean(),
-  hasActiveSubscription: z.boolean(),
-  payments: z.array(Payment),
-  subscriptions: z.array(Subscription),
-  username: z.string().min(1),
-  vat: z.number(),
-  vatIdStatus: z.string(),
-});
-
-export type Account = z.infer<typeof Account>;
 
 export const ApiKeys = z.object({
   apiKey: z.string().min(1),
@@ -103,7 +36,7 @@ export const ChangePasswordResponse = z.object({
 export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>;
 
 const UpdateProfile = z.object({
-  address: Address,
+  address: AddressSchema,
 });
 
 export const UpdateProfileResponse = z.object({
@@ -112,13 +45,6 @@ export const UpdateProfileResponse = z.object({
 });
 
 export type UpdateProfileResponse = z.infer<typeof UpdateProfileResponse>;
-
-export const ActionResultResponse = z.object({
-  message: z.string().optional(),
-  result: z.boolean().optional(),
-});
-
-export type ActionResultResponse = z.infer<typeof ActionResultResponse>;
 
 export const TaskResponse = z.object({
   taskId: z.string(),
@@ -134,60 +60,22 @@ export const TaskStatusResponse = z.object({
 
 export type TaskStatusResponse = z.infer<typeof TaskStatusResponse>;
 
-const Plan = z.object({
-  discount: z.number().optional().default(0),
-  months: z.number(),
-  priceFiat: z.string(),
-});
-
-export type Plan = z.infer<typeof Plan>;
-
-const PremiumData = z.object({
-  plans: z.array(Plan),
-});
-
-export const PremiumResponse = z.object({
-  result: PremiumData,
-});
-
-export type PremiumResponse = z.infer<typeof PremiumResponse>;
-
-const SelectedPlan = z.object({
-  finalPriceInEur: z.string(),
-  months: z.number(),
-  priceInEur: z.string(),
-  startDate: z.number(),
-  vat: z.number(),
-});
-
-export type SelectedPlan = z.infer<typeof SelectedPlan>;
-
-const CardCheckout = z
-  .object({
-    braintreeClientToken: z.string(),
-  })
-  .merge(SelectedPlan);
-
-export type CardCheckout = z.infer<typeof CardCheckout>;
-
-export const CardCheckoutResponse = z.object({
-  result: CardCheckout,
-});
-
-export type CardCheckoutResponse = z.infer<typeof CardCheckoutResponse>;
-
 const CryptoPayment = z.object({
-  chainId: z.number().optional(),
+  chainId: z.number(),
   chainName: z.string(),
   cryptoAddress: z.string(),
   cryptocurrency: z.string(),
   decimals: z.number().optional(),
-  finalPriceInCrypto: z.string().min(1),
-  finalPriceInEur: z.string().min(1),
+  durationInMonths: z.number(),
+  finalPriceInCrypto: z.number(),
+  finalPriceInEur: z.number(),
+  firstPayment: z.boolean(),
   hoursForPayment: z.number(),
   iconUrl: z.string().optional(),
   months: z.number(),
-  startDate: z.number(),
+  numberOfMonths: z.number(),
+  startDate: z.number().nullable(),
+  subscriptionId: z.string(),
   tokenAddress: z.string().nullish(),
   transactionStarted: z.boolean(),
   vat: z.number(),
@@ -204,6 +92,11 @@ export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>;
 
 const PendingCryptoPayment = z.object({
   currency: z.string().optional(),
+  discount: z.object({
+    codeName: z.string(),
+    discountedAmountEur: z.string(),
+    discountType: z.nativeEnum(DiscountType),
+  }).optional(),
   pending: z.boolean(),
   transactionStarted: z.boolean().optional(),
 });
@@ -216,19 +109,6 @@ export const PendingCryptoPaymentResponse = z.object({
 });
 
 export type PendingCryptoPaymentResponse = z.infer<typeof PendingCryptoPaymentResponse>;
-
-z.object({
-  message: z.string().optional(),
-  result: z.boolean().optional(),
-});
-
-export interface CreateCardRequest {
-  paymentMethodNonce: string;
-}
-
-export interface CardPaymentRequest extends CreateCardRequest {
-  months: number;
-}
 
 export type StepType = 'pending' | 'failure' | 'success';
 
@@ -259,31 +139,9 @@ export interface CheckoutStep {
   names: CheckoutRouteName[];
 }
 
-export const SavedCard = z.object({
-  expiresAt: z.string(),
-  imageUrl: z.string(),
-  last4: z.string(),
-  token: z.string(),
-});
-
-export type SavedCard = z.infer<typeof SavedCard>;
-
-export const SavedCardResponse = z.object({
-  cardDetails: SavedCard.optional(),
-  message: z.string().optional(),
-});
-
-export type SavedCardResponse = z.infer<typeof SavedCardResponse>;
-
 export interface CreateCardNonceRequest {
   paymentToken: string;
 }
-
-export const CreateCardNonceResponse = z.object({
-  paymentNonce: z.string(),
-});
-
-export type CreateCardNonceResponse = z.infer<typeof CreateCardNonceResponse>;
 
 export const PaymentAsset = z.object({
   address: z.string().optional(),

@@ -1,22 +1,19 @@
 <script setup lang="ts">
-import type { Subscription } from '~/types';
-import { get } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
+import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import { get } from '@vueuse/shared';
+import { formatDate } from '~/utils/date';
 
-const modelValue = defineModel<Subscription | undefined>({ required: true });
+const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 
 defineProps<{
   loading: boolean;
 }>();
 
 const emit = defineEmits<{
-  confirm: [val: Subscription];
+  confirm: [val: UserSubscription];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-
-const { resumeError } = storeToRefs(useMainStore());
 
 async function resumeSubscription(): Promise<void> {
   if (!isDefined(modelValue))
@@ -38,7 +35,7 @@ async function resumeSubscription(): Promise<void> {
       </template>
 
       <div class="whitespace-break-spaces mb-4">
-        <div v-if="!!modelValue">
+        <div v-if="modelValue">
           <ul class="list-disc ml-5 font-medium">
             <li>
               <i18n-t
@@ -82,7 +79,7 @@ async function resumeSubscription(): Promise<void> {
                 class="font-medium"
               >
                 <template #date>
-                  <span class="font-normal">{{ modelValue.nextActionDate }}</span>
+                  <span class="font-normal">{{ formatDate(modelValue.nextActionDate) }}</span>
                 </template>
               </i18n-t>
             </li>
@@ -103,7 +100,7 @@ async function resumeSubscription(): Promise<void> {
         </RuiButton>
 
         <RuiButton
-          color="info"
+          color="primary"
           @click="resumeSubscription()"
         >
           {{ t('account.subscriptions.resume.actions.yes') }}
@@ -111,16 +108,4 @@ async function resumeSubscription(): Promise<void> {
       </div>
     </RuiCard>
   </RuiDialog>
-
-  <FloatingNotification
-    :timeout="3000"
-    :visible="!!resumeError"
-    closeable
-    @dismiss="resumeError = ''"
-  >
-    <template #title>
-      {{ t('account.subscriptions.resume.notification.title') }}
-    </template>
-    {{ resumeError }}
-  </FloatingNotification>
 </template>

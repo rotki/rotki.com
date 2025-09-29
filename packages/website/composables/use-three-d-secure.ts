@@ -1,14 +1,14 @@
 import type { PayEvent } from '~/types/common';
+import {
+  type ThreeDSecureParams,
+  ThreeDSecureParamsSchema,
+  type ThreeDSecureState,
+} from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createThreeDSecure, type ThreeDSecure, type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/composables/use-payment-api';
-import {
-  type ThreeDSecureParams,
-  ThreeDSecureParamsSchema,
-  type ThreeDSecureState,
-} from '~/types/three-d-secure';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_KEY = 'threeDSecureData';
@@ -157,8 +157,9 @@ export function useThreeDSecure() {
 
       if (threeDSecureInfo.liabilityShifted) {
         const payEvent: PayEvent = {
-          months: params.planMonths,
-          nonce: payload.nonce,
+          discountCode: params.discountCode,
+          paymentMethodNonce: payload.nonce,
+          planId: params.planId,
         };
 
         logger.info('3D Secure verification successful');
@@ -205,8 +206,9 @@ export function useThreeDSecure() {
 
     // Finalize payment with API call
     const result = await paymentApi.pay({
-      months: payEvent.months,
-      paymentMethodNonce: payEvent.nonce,
+      planId: payEvent.planId,
+      paymentMethodNonce: payEvent.paymentMethodNonce,
+      discountCode: payEvent.discountCode,
     });
 
     if (result.isError) {
