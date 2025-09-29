@@ -3,8 +3,7 @@ import type { CryptoPayment, IdleStep, PendingTx, StepType } from '~/types';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { Contract, parseUnits, type Signer, type TransactionResponse } from 'ethers';
 import { useAccountRefresh } from '~/composables/use-app-events';
-import { usePaymentApi } from '~/composables/use-payment-api';
-import { useMainStore } from '~/store';
+import { useCryptoPaymentApi } from '~/composables/use-crypto-payment-api';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
@@ -34,8 +33,7 @@ interface ExecutePaymentParams {
 }
 
 export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
-  const { getPendingSubscription } = useMainStore();
-  const paymentApi = usePaymentApi();
+  const paymentApi = useCryptoPaymentApi();
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('web3-payment');
   const { t } = useI18n({ useScope: 'global' });
@@ -78,7 +76,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     } = payment;
 
     const currency = cryptocurrency.split(':')[1];
-    const value = parseUnits(finalPriceInCrypto, decimals);
+    const value = parseUnits(finalPriceInCrypto.toString(), decimals);
 
     let tx: TransactionResponse;
 
@@ -96,17 +94,11 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
 
     logger.info(`transaction is pending: ${tx.hash}`);
 
-    const subscription = getPendingSubscription({
-      amount: payment.finalPriceInEur,
-      date: payment.startDate,
-      duration: payment.months,
-    });
-
     set(pendingTx, {
       blockExplorerUrl,
       chainId: payment.chainId,
       hash: tx.hash,
-      subscriptionId: subscription?.identifier,
+      subscriptionId: payment.subscriptionId.toString(),
     });
     paymentApi.markTransactionStarted().catch(error => logger.error('Failed to mark transaction as started:', error));
     requestRefresh();

@@ -1,4 +1,4 @@
-import type { ApiResponse } from '~/types';
+import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 export interface Country {

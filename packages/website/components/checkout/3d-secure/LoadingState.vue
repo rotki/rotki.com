@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ThreeDSecureState } from '~/types/three-d-secure';
+import type { ThreeDSecureState } from '@rotki/card-payment-common/schemas/three-d-secure';
 
 interface Props {
   state: ThreeDSecureState;

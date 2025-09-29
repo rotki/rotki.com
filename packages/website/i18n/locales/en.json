@@ -40,6 +40,17 @@
       "title": "Delete account",
       "unable_to_delete": "You cannot delete your account while you have an active subscription."
     },
+    "devices": {
+      "no_devices_found": "No devices found",
+      "headers": {
+        "label": "Label",
+        "last_seen": "Last Seen at"
+      },
+      "delete": {
+        "title": "Delete Device",
+        "description": "Are you sure you want to delete the device \"{label}\"? This action cannot be undone."
+      }
+    },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
       "no_premium_found": "No premium subscription found. Select your {plan}.",
@@ -47,13 +58,16 @@
     },
     "payments": {
       "headers": {
-        "amount_in_symbol": "Amount in {symbol}",
+        "method": "Method",
+        "paid_amount": "Paid Amount",
         "paid_at": "Paid at"
       },
       "no_payments_found": "No payments found",
       "paid": "Paid",
+      "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
-      "title": "Your latest payments"
+      "title": "Your latest payments",
+      "legacy": "Legacy"
     },
     "subscriptions": {
       "cancellation": {
@@ -127,6 +141,7 @@
       "account_details": "Account Details",
       "address": "Address",
       "customer_information": "Customer Information",
+      "devices": "Devices List",
       "subscription": "Subscription"
     },
     "unverified_email": {
@@ -208,14 +223,13 @@
     "change": "Change",
     "confirm": "Confirm",
     "continue": "Continue",
+    "delete": "Delete",
     "download": "Download",
     "download_for_free": "Download rotki for free",
     "edit": "Edit",
     "generate": "Generate",
-    "get_advanced_plan": "Get Advanced Plan",
-    "get_in_touch": "Get In Touch Now",
     "get_premium": "Get Premium",
-    "get_premium_plan": "Get Premium Plan",
+    "get_started": "Get started",
     "get_started_for_free": "Get started for free",
     "go_back_home": "Go back home",
     "regenerate": "Regenerate",
@@ -364,8 +378,7 @@
     "here": "here",
     "none": "none",
     "plan": "plan",
-    "status": "status",
-    "vat": "{vat}% VAT"
+    "status": "status"
   },
   "copy_button": {
     "copied": "Copied to clipboard",
@@ -487,49 +500,29 @@
     "plans": {
       "cannot_continue": "You cannot continue because you have an active subscription. Click here to",
       "choose": "Choose Plan",
+      "login_to_show_prices": "Prices shown for global, {login} to show prices for your location",
+      "country_prices": "Prices shown for {country}. Not your country? {login}",
       "plan_selected": "Plan selected",
-      "details": {
-        "advanced": {
-          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
-          "title": "Advanced"
-        },
-        "custom": {
-          "subtitle": "Get in touch with us to tailor the plan to your needs.",
-          "title": "Want a custom tailored plan?"
-        },
-        "free": {
-          "price": "Free",
-          "subtitle": "Anyone can download the application and start using it for free.",
-          "title": "Starter Plan"
-        },
-        "premium": {
-          "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
-          "title": "Premium Plan"
-        },
-        "recommended": "Recommended"
-      },
-      "most_popular": "Most popular",
       "names": {
-        "for": "{name} for",
         "monthly": "Monthly",
+        "monthly_billing": "Monthly Billing",
         "numeric": "{months} Months",
-        "plan": "Premium Plan ({name})",
-        "yearly": "Yearly"
+        "plan": "{name} Plan ({period})",
+        "yearly": "Yearly",
+        "yearly_billing": "Yearly billing"
       },
       "per_month": "month",
       "saving": "save {months} months vs monthly",
       "tiers": {
         "step_1": {
           "description": "Choose the different plans we offer",
-          "maybe_vat": "VAT may apply depending on your jurisdiction",
           "notes": {
             "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
-          "title": "Premium Plans",
-          "vat": "The prices include a +{vat}% VAT tax"
+          "title": "Subscription Plans"
         },
         "step_2": {
           "description": "Select one of the different methods",
@@ -542,12 +535,23 @@
             "title": "Change Payment",
             "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent."
           },
+          "chose": "Your choice:",
           "description": "Proceed to the payment",
+          "discount": {
+            "applied": "Discount code applied:",
+            "apply_code": "Apply code",
+            "hint": "Optional. Enter a discount code to apply savings to your purchase.",
+            "you_save": "You save €{amount}",
+            "percent_off": "({percentage}% off)",
+            "label": "Discount code"
+          },
+          "grand_total": "Grand Total",
           "labels": {
             "network": "Network",
             "to_address": "Send to address",
             "token": "Token",
-            "token_contract": "Token contract: "
+            "token_contract": "Token contract: ",
+            "select_network_and_token": "Select network and token to pay"
           },
           "notes": {
             "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
@@ -557,6 +561,9 @@
           "payment_description": "Payments are safely processed with Braintree a PayPal Service",
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
+          "qr": {
+            "click_to_copy": "Click to copy"
+          },
           "wallet": {
             "connect_wallet": "Connect wallet",
             "notice": "You can pay directly via your wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
@@ -681,6 +688,7 @@
     "jobs": "Jobs",
     "legal": "Legal",
     "privacy_policy": "Privacy Policy",
+    "pricing": "Pricing",
     "product": "Product",
     "resources": "Resources",
     "rotki_premium": "rotki Premium",
@@ -715,6 +723,28 @@
         "action": "Refunds/Cancellation Policy",
         "text": "I have read and agreed to the {action}"
       }
+    }
+  },
+  "pricing": {
+    "billed_annually": "Billed annually in € {price}",
+    "billed_monthly": "Billed monthly in EUR",
+    "header": {
+      "title": "Compare our plans and find yours",
+      "heading": "Pricing",
+      "description": "Simple, transparent pricing that grows with you. Try any plan free for 30 days."
+    },
+    "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
+    "custom_plan_highest_tier": "Highest among all the tiers.",
+    "per_month": "/month",
+    "most_popular_plan": "Most popular plan",
+    "max_saved_annually": "Save {percent}% Annually",
+    "see_all_features": "See all features",
+    "see_less_features": "See less features",
+    "free": "Free",
+    "plans": {
+      "custom_plan": "Custom plan",
+      "starter_plan": "Starter plan",
+      "plan": "{plan} plan"
     }
   },
   "products": {
@@ -822,13 +852,14 @@
   "selected_plan_overview": {
     "includes_vat": "(includes {vat}% VAT)",
     "plan": "{period} recurring subscription | {period} subscription",
-    "price": "Price: {finalPriceInEur} € {vat}",
+    "price": "Price: {price} € {vat}",
     "starting": "Starting Date: {date}",
     "renew_period": "{months} month | 1 year ({months} months)",
-    "vat": "({priceInEur}€ + {vat}% VAT)",
+    "vat": "({basePrice}€ + {vat}% VAT)",
     "recurring_info": "You will be charged automatically each {period} until you cancel",
     "one_time_payment": "Crypto payments are non-recurring (one time payment). \nManual renewal is required.",
     "month": "month",
+    "next_payment": "Renews on: {date}",
     "year": "year"
   },
   "signup_address": {

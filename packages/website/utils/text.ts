@@ -56,3 +56,19 @@ export function truncateAddress(address: string, truncLength = 4): string {
 export function removeTrailingSlash(url: string): string {
   return url.replace(/\/+$/, '');
 }
+
+/**
+ * Formats a number as currency with comma as thousand separator
+ * @param value - The number to format
+ * @param decimals - Number of decimal places (default: 2)
+ * @returns Formatted currency string
+ * @example
+ * formatCurrency(1234.56); // "1,234.56"
+ * formatCurrency(1000000); // "1,000,000.00"
+ */
+export function formatCurrency(value: number, decimals = 2): string {
+  return value.toLocaleString('en-US', {
+    maximumFractionDigits: decimals,
+    minimumFractionDigits: decimals,
+  });
+}

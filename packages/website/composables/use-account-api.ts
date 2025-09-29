@@ -1,13 +1,16 @@
 import type { ComposerTranslation } from 'vue-i18n';
 import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
 import type { ActionResult } from '~/types/common';
+import { type Account, AccountSchema } from '@rotki/card-payment-common/schemas/account';
+import {
+  type ActionResultResponse,
+  ActionResultResponseSchema,
+  type ApiResponse,
+} from '@rotki/card-payment-common/schemas/api';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
-  Account,
-  ActionResultResponse,
   ApiKeys,
-  type ApiResponse,
   ChangePasswordResponse,
   ResendVerificationResponse,
   UpdateProfileResponse,
@@ -27,7 +30,7 @@ export function useAccountApi() {
   /**
    * Fetch account data from API
    */
-  const getAccount = async (): Promise<Account | null> => {
+  const getAccount = async (): Promise<Account | undefined> => {
     try {
       const response = await fetchWithCsrf<ApiResponse<Account>>(
         '/webapi/account/',
@@ -35,15 +38,15 @@ export function useAccountApi() {
           method: 'GET',
         },
       );
-      const parsed = Account.safeParse(response.result);
+      const parsed = AccountSchema.safeParse(response.result);
       if (!parsed.success) {
-        return logParseFailure(parsed, logger, 'account response', response.result, null);
+        return logParseFailure(parsed, logger, 'account response', response.result, undefined);
       }
       return parsed.data;
     }
     catch (error) {
       logger.error('Failed to fetch account:', error);
-      return null;
+      return undefined;
     }
   };
 
@@ -96,7 +99,7 @@ export function useAccountApi() {
         },
       );
 
-      const parsed = ActionResultResponse.safeParse(response);
+      const parsed = ActionResultResponseSchema.safeParse(response);
       if (!parsed.success) {
         return logParseFailure(parsed, logger, 'delete account response', response, {
           message: 'Invalid response format',

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SavedCardType } from '@/types';
+import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { set } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { deleteCard } from '@/utils/api';
 
 interface Props {
-  savedCard: SavedCardType;
+  savedCard: SavedCard;
   disabled?: boolean;
 }
 
