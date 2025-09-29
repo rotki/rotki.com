@@ -1,4 +1,4 @@
-import type { ApiResponse } from '~/types';
+import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-defineProps<{ modelValue: boolean; disabled?: boolean }>();
+const modelValue = defineModel<boolean>({ required: true });
 
-const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): void }>();
+defineProps<{ disabled?: boolean }>();
 
 const { t } = useI18n({ useScope: 'global' });
 </script>
@@ -9,10 +9,10 @@ const { t } = useI18n({ useScope: 'global' });
 <template>
   <RuiCheckbox
     id="refund"
+    v-model="modelValue"
     :disabled="disabled"
-    :model-value="modelValue"
     color="primary"
-    @update:model-value="emit('update:modelValue', $event)"
+    hide-details
   >
     <i18n-t
       keypath="policies.refund.accept_policy.text"
@@ -24,6 +24,7 @@ const { t } = useI18n({ useScope: 'global' });
           to="/refund-policy"
           color="primary"
           tag="span"
+          class="underline"
           :class="$style.link"
           external
           target="_blank"

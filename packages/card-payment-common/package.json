@@ -1,0 +1,74 @@
+{
+  "name": "@rotki/card-payment-common",
+  "version": "1.0.0",
+  "description": "Shared types and schemas for rotki card payment applications",
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./schemas/payment": {
+      "types": "./src/schemas/payment.ts",
+      "import": "./src/schemas/payment.ts"
+    },
+    "./schemas/discount": {
+      "types": "./src/schemas/discount.ts",
+      "import": "./src/schemas/discount.ts"
+    },
+    "./schemas/checkout": {
+      "types": "./src/schemas/checkout.ts",
+      "import": "./src/schemas/checkout.ts"
+    },
+    "./schemas/api": {
+      "types": "./src/schemas/api.ts",
+      "import": "./src/schemas/api.ts"
+    },
+    "./utils/object": {
+      "types": "./src/utils/object.ts",
+      "import": "./src/utils/object.ts"
+    },
+    "./schemas/account": {
+      "types": "./src/schemas/account.ts",
+      "import": "./src/schemas/account.ts"
+    },
+    "./schemas/three-d-secure": {
+      "types": "./src/schemas/three-d-secure.ts",
+      "import": "./src/schemas/three-d-secure.ts"
+    },
+    "./schemas/plans": {
+      "types": "./src/schemas/plans.ts",
+      "import": "./src/schemas/plans.ts"
+    },
+    "./schemas/subscription": {
+      "types": "./src/schemas/subscription.ts",
+      "import": "./src/schemas/subscription.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "peerDependencies": {
+    "zod": "^3.0.0"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "catalog:",
+    "@types/node": "catalog:",
+    "tsdown": "0.15.4",
+    "typescript": "catalog:"
+  }
+}

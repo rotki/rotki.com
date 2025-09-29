@@ -6,10 +6,6 @@ import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
 
-const props = defineProps<{ identifier?: string }>();
-
-const { t } = useI18n({ useScope: 'global' });
-
 interface PaymentMethodItem {
   id: PaymentMethod;
   label: string;
@@ -18,111 +14,138 @@ interface PaymentMethodItem {
   class: string;
 }
 
-const store = useMainStore();
+interface RouteMap {
+  [key: string]: string;
+}
 
-const { plan } = usePlanParams();
+const props = defineProps<{
+  identifier?: string;
+}>();
+
+const { t } = useI18n({ useScope: 'global' });
+const router = useRouter();
 
 const { identifier } = toRefs(props);
-const { authenticated } = storeToRefs(store);
-
-const method = ref<PaymentMethod>();
+const selectedMethod = ref<PaymentMethod>();
 const processing = ref<boolean>(false);
 
-const paymentMethods: PaymentMethodItem[] = [
-  {
-    id: PaymentMethod.BLOCKCHAIN,
-    label: 'Blockchain',
-    icon: 'lu-blockchain',
-    name: 'checkout-pay-request-crypto',
-    class: 'sm:col-start-1',
-  },
-  {
-    id: PaymentMethod.CARD,
-    label: 'Card',
-    icon: 'lu-credit-card',
-    name: 'checkout-pay-card',
-    class: 'sm:col-start-2',
-  },
-  {
-    id: PaymentMethod.PAYPAL,
-    label: 'Paypal',
-    icon: 'lu-paypal',
-    name: 'checkout-pay-paypal',
-    class: 'sm:col-start-2',
-  },
-];
+const store = useMainStore();
+const { authenticated } = storeToRefs(store);
 
-const selected = computed<PaymentMethodItem | undefined>(() =>
-  get(paymentMethods).find(m => get(method) === m.id),
+const { planId } = usePlanIdParam();
+
+const paymentMethods: readonly PaymentMethodItem[] = Object.freeze([{
+  id: PaymentMethod.BLOCKCHAIN,
+  label: 'Blockchain',
+  icon: 'lu-blockchain' as RuiIcons,
+  name: 'checkout-pay-request-crypto',
+  class: 'sm:col-start-1',
+}, {
+  id: PaymentMethod.CARD,
+  label: 'Card',
+  icon: 'lu-credit-card' as RuiIcons,
+  name: 'checkout-pay-card',
+  class: 'sm:col-start-2',
+}, {
+  id: PaymentMethod.PAYPAL,
+  label: 'Paypal',
+  icon: 'lu-paypal' as RuiIcons,
+  name: 'checkout-pay-paypal',
+  class: 'sm:col-start-2',
+}]);
+
+const routeMap: RouteMap = {
+  'checkout-pay-card': '/checkout/pay/card',
+  'checkout-pay-crypto': '/checkout/pay/crypto',
+  'checkout-pay-paypal': '/checkout/pay/paypal',
+  'checkout-pay-request-crypto': '/checkout/pay/request-crypto',
+};
+
+const selectedPaymentMethod = computed<PaymentMethodItem | undefined>(() =>
+  paymentMethods.find(({ id }) => get(selectedMethod) === id),
 );
 
-async function back() {
+const isMethodSelected = computed<(method: PaymentMethod) => boolean>(
+  () => (method: PaymentMethod) => get(selectedMethod) === method,
+);
+
+const queryParams = computed<Record<string, string>>(() => {
+  const result: Record<string, string> = {};
+  const selectedPlanId = get(planId);
+
+  if (selectedPlanId) {
+    result.planId = String(selectedPlanId);
+  }
+
+  if (isDefined(identifier)) {
+    result.id = get(identifier)!;
+  }
+
+  return result;
+});
+
+function selectPaymentMethod(method: PaymentMethod): void {
+  set(selectedMethod, method);
+}
+
+function buildNavigationUrl(routeName: string): string {
+  try {
+    const resolved = router.resolve({
+      name: routeName,
+      query: get(queryParams),
+    });
+    return resolved.href;
+  }
+  catch (error) {
+    console.warn('Router resolve failed, falling back to manual URL construction:', error);
+    const basePath = routeMap[routeName] || '/checkout/pay/method';
+    const queryString = new URLSearchParams(get(queryParams)).toString();
+    return queryString ? `${basePath}?${queryString}` : basePath;
+  }
+}
+
+async function handleBack(): Promise<void> {
+  const selectedPlanId = get(planId);
+  if (!selectedPlanId) {
+    await navigateTo({ name: 'checkout-pay' });
+    return;
+  }
+
   await navigateTo({
     name: 'checkout-pay',
-    query: { plan: get(plan) },
+    query: {
+      planId: String(selectedPlanId),
+    },
   });
 }
 
-const router = useRouter();
+async function handleContinue(): Promise<void> {
+  const selected = get(selectedPaymentMethod);
+  assert(selected, 'No payment method selected');
 
-async function next() {
   set(processing, true);
-  const selectedMethod = get(selected);
-  assert(selectedMethod);
-  const { name } = selectedMethod;
-
-  let href: string;
 
   try {
-    // Try to use router.resolve first
-    const resolved = router.resolve({
-      name,
-      query: {
-        plan: get(plan),
-        id: get(identifier),
-      },
-    });
-    href = resolved.href;
+    const href = buildNavigationUrl(selected.name);
+
+    if (get(authenticated)) {
+      await navigateToWithCSPSupport(href);
+    }
+    else {
+      await navigateTo({
+        path: '/login',
+        query: {
+          redirectUrl: encodeURIComponent(href),
+        },
+      });
+    }
   }
   catch (error) {
-    // Fallback to manual URL construction if router resolve fails
-    console.warn('Router resolve failed, falling back to manual URL construction:', error);
-
-    // Map route names to paths
-    const routeMap: Record<string, string> = {
-      'checkout-pay-card': '/checkout/pay/card',
-      'checkout-pay-crypto': '/checkout/pay/crypto',
-      'checkout-pay-paypal': '/checkout/pay/paypal',
-      'checkout-pay-request-crypto': '/checkout/pay/request-crypto',
-    };
-
-    const basePath = routeMap[name] || '/checkout/pay/method';
-    const params: Record<string, string> = {
-      ...(isDefined(plan) && { plan: get(plan).toString() }),
-      ...(isDefined(identifier) && { id: get(identifier) }),
-    };
-    const queryString = new URLSearchParams(params).toString();
-
-    href = queryString ? `${basePath}?${queryString}` : basePath;
+    console.error('Navigation failed:', error);
   }
-
-  if (get(authenticated)) {
-    await navigateToWithCSPSupport(href);
+  finally {
+    set(processing, false);
   }
-  else {
-    await navigateTo({
-      path: '/login',
-      query: {
-        redirectUrl: encodeURIComponent(href),
-      },
-    });
-  }
-}
-
-const isSelected = (m: PaymentMethod) => get(method) === m;
-
-function select(m: PaymentMethod) {
-  set(method, m);
 }
 </script>
 
@@ -137,9 +160,9 @@ function select(m: PaymentMethod) {
         <PaymentMethodItem
           v-for="item in paymentMethods"
           :key="item.id"
-          :selected="isSelected(item.id)"
+          :selected="isMethodSelected(item.id)"
           :class="item.class"
-          @click="select(item.id)"
+          @click="selectPaymentMethod(item.id)"
         >
           <div class="w-10 h-10 rounded-full bg-rui-grey-400 text-white flex items-center justify-center">
             <RuiIcon :name="item.icon" />
@@ -155,17 +178,23 @@ function select(m: PaymentMethod) {
         :disabled="processing"
         class="w-full"
         size="lg"
-        @click="back()"
+        @click="handleBack()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
       <RuiButton
-        :disabled="!selected"
+        :disabled="!selectedPaymentMethod"
         :loading="processing"
         class="w-full"
         color="primary"
         size="lg"
-        @click="next()"
+        @click="handleContinue()"
       >
         {{ t('actions.continue') }}
       </RuiButton>

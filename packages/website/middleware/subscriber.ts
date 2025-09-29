@@ -1,12 +1,15 @@
 import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
+import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
-import { canBuyNewSubscription } from '~/utils/subscription';
 
 export default defineNuxtRouteMiddleware(async () => {
-  const { account } = useMainStore();
-  const canBuy = canBuyNewSubscription(account);
+  const store = useMainStore();
+  const { canBuy } = storeToRefs(store);
 
-  if (!canBuy) {
+  // Ensure account data is loaded
+  await store.getAccount();
+
+  if (!canBuy.value) {
     return navigateTo('/home/subscription');
   }
 });

@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { useMainStore } from '~/store';
+import { useTiersStore } from '~/store/tiers';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const route = useRoute();
-const store = useMainStore();
-const { plans } = storeToRefs(store);
+const store = useTiersStore();
+const { availablePlans } = storeToRefs(store);
 
 const isCardOrSecureRoute = computed<boolean>(() => {
   const routeName = route.name;
@@ -70,10 +70,7 @@ const { removeStoredRedirectUrl } = useRedirectUrl();
 
 onBeforeMount(() => {
   removeStoredRedirectUrl();
-});
-
-onMounted(() => {
-  store.getPlans().catch(() => {});
+  store.getAvailablePlans().catch(() => {});
 });
 </script>
 
@@ -83,7 +80,7 @@ onMounted(() => {
   >
     <div class="flex justify-center grow">
       <RuiProgress
-        v-if="!plans"
+        v-if="!availablePlans"
         circular
         class="mt-20"
         color="primary"
