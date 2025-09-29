@@ -1,21 +1,28 @@
 <script setup lang="ts">
-import type { CheckoutData, SavedCardType } from '@/types';
+import type { CheckoutData } from '@rotki/card-payment-common/schemas/checkout';
+import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
+import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { addCard, createCardNonce } from '@/utils/api';
+import DiscountCodeInput from './DiscountCodeInput.vue';
 import NewCardForm from './NewCardForm.vue';
 import PaymentButtons from './PaymentButtons.vue';
+import PaymentGrandTotal from './PaymentGrandTotal.vue';
 import PlanSummary from './PlanSummary.vue';
 import SavedCardDisplay from './SavedCardDisplay.vue';
 import TermsAcceptance from './TermsAcceptance.vue';
 
 const error = defineModel<string>('error', { required: true });
-const savedCard = defineModel<SavedCardType | undefined>('savedCard', { required: true });
+const savedCard = defineModel<SavedCard | undefined>('savedCard', { required: true });
 
-const { planData } = defineProps<{
+const { planData, selectedPlan } = defineProps<{
   planData: CheckoutData;
+  selectedPlan: SelectedPlan;
 }>();
 
 const emit = defineEmits<{
@@ -29,6 +36,10 @@ const newCardForm = ref<InstanceType<typeof NewCardForm>>();
 const isProcessing = ref<boolean>(false);
 const acceptedTerms = ref<boolean>(false);
 const newCardFormValid = ref<boolean>(false);
+
+// Discount state
+const discountCode = ref<string>('');
+const discountInfo = ref<DiscountInfo>();
 
 const isFormValid = computed<boolean>(() => {
   const card = get(savedCard);
@@ -59,7 +70,7 @@ async function initializeBraintreeClient(): Promise<void> {
   }
 }
 
-async function getSavedCardBin(card: SavedCardType): Promise<string> {
+async function getSavedCardBin(card: SavedCard): Promise<string> {
   let vaultManager: VaultManager | null = null;
 
   try {
@@ -129,13 +140,20 @@ async function processPayment(): Promise<void> {
       paymentToken,
     });
 
+    // Calculate final amount considering discount
+    const discountVal = get(discountInfo);
+    const finalAmount = discountVal && discountVal.isValid && discountVal.finalPrice
+      ? discountVal.finalPrice.toString()
+      : selectedPlan.price.toString();
+
     // Store data for 3D Secure if needed
-    const threeDSecureParams = {
+    const threeDSecureParams: ThreeDSecureParams = {
       token: planData.braintreeClientToken,
-      planMonths: planData.months,
-      amount: planData.finalPriceInEur,
+      planId: selectedPlan.planId,
+      amount: finalAmount,
       nonce: paymentNonce,
       bin: paymentBin,
+      discountCode: get(discountCode) || undefined,
     };
 
     sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
@@ -200,7 +218,27 @@ onUnmounted(async () => {
       <hr class="my-8 border-rui-grey-300" />
 
       <!-- Plan Summary -->
-      <PlanSummary :plan-data="planData" />
+      <PlanSummary
+        :selected-plan="selectedPlan"
+        :next-payment="planData.nextPayment"
+      />
+
+      <!-- Discount Code Input -->
+      <div class="mt-6">
+        <DiscountCodeInput
+          v-model="discountCode"
+          v-model:discount-info="discountInfo"
+          :selected-plan="selectedPlan"
+        />
+      </div>
+
+      <!-- Payment Grand Total -->
+      <div class="mt-6">
+        <PaymentGrandTotal
+          :selected-plan="selectedPlan"
+          :discount-info="discountInfo"
+        />
+      </div>
 
       <!-- Accept Refund Policy -->
       <TermsAcceptance

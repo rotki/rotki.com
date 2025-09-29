@@ -1,31 +1,22 @@
 import { get } from '@vueuse/core';
 
-const availablePlans = [1, 3, 6, 12];
-
 type CurrencyParam = string | null;
 
-export function usePlanParams() {
+type DiscountCodeParam = string | undefined;
+
+export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
   const route = useRoute();
-  const plan = computed(() => {
+  const planId = computed(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
-    const { plan } = route.query;
-    if (typeof plan !== 'string')
-      return -1;
+    const { planId } = route.query;
+    if (!planId)
+      return undefined;
 
-    const selectedPlan = parseInt(plan);
-    if (
-      isNaN(selectedPlan)
-      || !isFinite(selectedPlan)
-      || !availablePlans.includes(selectedPlan)
-    ) {
-      return -1;
-    }
-
-    return selectedPlan;
+    return typeof planId === 'string' ? parseInt(planId) : undefined;
   });
 
-  return { plan };
+  return { planId };
 }
 
 export function useCurrencyParams() {
@@ -41,6 +32,21 @@ export function useCurrencyParams() {
   });
 
   return { currency };
+}
+
+export function useDiscountCodeParams() {
+  const route = useRoute();
+  const discountCode = computed<DiscountCodeParam>(() => {
+    // NB: this param name is also used in backend email links,
+    // if changed, kindly sync with backend team to update email links as well.
+    const { discountCode } = route.query;
+    if (typeof discountCode !== 'string' || !discountCode)
+      return undefined;
+
+    return discountCode;
+  });
+
+  return { discountCode };
 }
 
 export function useSubscriptionIdParam() {

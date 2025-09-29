@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type {
   ContextColorsType,
   DataTableColumn,
@@ -6,75 +7,52 @@ import type {
   TablePaginationData,
 } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
-import type { PendingTx, Subscription } from '~/types';
-import { get, set, useIntervalFn } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
-import { usePaymentApi } from '~/composables/use-payment-api';
-import { useMainStore } from '~/store';
+import type { PendingTx } from '~/types';
+import { get, set, useIntervalFn } from '@vueuse/shared';
+import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { PaymentMethod } from '~/types/payment';
-
-const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<Subscription>[]>([]);
-
-const cancelling = ref<boolean>(false);
-const subscriptionToCancel = ref<Subscription>();
-const cancellationStatus = ref<string>('');
-
-const resuming = ref<boolean>(false);
-const subscriptionToResume = ref<Subscription>();
-const resumeStatus = ref<string>('');
+import { formatDate } from '~/utils/date';
+import { getPlanNameFor } from '~/utils/plans';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useMainStore();
-const paymentApi = usePaymentApi();
-const { subscriptions, resumeError, cancellationError } = storeToRefs(store);
+const pagination = ref<TablePaginationData>();
+const sort = ref<DataTableSortColumn<UserSubscription>>({
+  column: 'createdDate',
+  direction: 'desc',
+});
+const subscriptionToCancel = ref<UserSubscription>();
+const subscriptionToResume = ref<UserSubscription>();
 
+const subscriptionOpsStore = useSubscriptionOperationsStore();
+const {
+  cancellationStatus,
+  cancelling,
+  resumeStatus,
+  resuming,
+} = storeToRefs(subscriptionOpsStore);
+const {
+  clearCancellationState,
+  clearResumeState,
+  setCancellationStatus,
+  setCancelling,
+  setResumeStatus,
+  setResuming,
+} = subscriptionOpsStore;
+
+const { userSubscriptions, loading, refresh: refreshSubscriptions } = useUserSubscriptions();
 const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
 const pendingTx = usePendingTx();
+const paymentApi = useCryptoPaymentApi();
 const { pause, resume, isActive } = useIntervalFn(
-  async () => await store.getAccount(),
+  async () => await refreshSubscriptions(),
   60000,
 );
 
-const headers: DataTableColumn<Subscription>[] = [
-  {
-    label: t('common.plan'),
-    key: 'planName',
-    cellClass: 'font-bold',
-    class: 'capitalize',
-  },
-  {
-    label: t('account.subscriptions.headers.created'),
-    key: 'createdDate',
-    sortable: true,
-  },
-  {
-    label: t('account.subscriptions.headers.next_billing'),
-    key: 'nextActionDate',
-    sortable: true,
-  },
-  {
-    label: t('account.subscriptions.headers.cost_in_symbol_per_period', {
-      symbol: '€',
-    }),
-    key: 'nextBillingAmount',
-    sortable: true,
-    align: 'end',
-  },
-  { label: t('common.status'), key: 'status', class: 'capitalize' },
-  {
-    label: t('common.actions'),
-    key: 'actions',
-    align: 'end',
-    class: 'capitalize',
-  },
-];
+const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
 
-const pending = computed(() => get(subscriptions).filter(sub => sub.pending));
-
-const renewableSubscriptions = computed(() =>
-  get(subscriptions).filter(({ actions }) => actions.includes('renew')),
+const renewableSubscriptions = computed<UserSubscription[]>(() =>
+  get(userSubscriptions).filter(({ actions }) => actions.includes('renew')),
 );
 
 const pendingPaymentCurrency = computedAsync(async () => {
@@ -82,7 +60,7 @@ const pendingPaymentCurrency = computedAsync(async () => {
   if (subs.length === 0)
     return undefined;
 
-  const response = await paymentApi.checkPendingCryptoPayment(subs[0].identifier);
+  const response = await paymentApi.checkPendingCryptoPayment(subs[0].id);
 
   if (response.isError || !response.result.pending)
     return undefined;
@@ -102,7 +80,7 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
     const sub = subs[0];
     link.query = {
       plan: sub.durationInMonths.toString(),
-      id: sub.identifier,
+      id: sub.id,
       method: PaymentMethod.BLOCKCHAIN,
     };
   }
@@ -120,42 +98,59 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
 
 const pendingPaymentLink: RouteLocationRaw = { path: '/checkout/pay/method' };
 
-function isPending(sub: Subscription) {
-  return sub.status === 'Pending';
+const headers: DataTableColumn<UserSubscription>[] = [{
+  label: t('common.plan'),
+  key: 'planName',
+  cellClass: 'font-bold',
+  class: 'capitalize',
+}, {
+  label: t('account.subscriptions.headers.created'),
+  key: 'createdDate',
+  sortable: true,
+}, {
+  label: t('account.subscriptions.headers.next_billing'),
+  key: 'nextActionDate',
+  sortable: true,
+}, {
+  label: t('account.subscriptions.headers.cost_in_symbol_per_period', {
+    symbol: '€',
+  }),
+  key: 'nextBillingAmount',
+  sortable: true,
+  align: 'end',
+}, { label: t('common.status'), key: 'status', class: 'capitalize' }, {
+  label: t('common.actions'),
+  key: 'actions',
+  align: 'end',
+  class: 'capitalize',
+}];
+
+function isPending(subscription: UserSubscription): boolean {
+  return subscription.status === 'Pending';
 }
 
-function clickResume(sub: Subscription) {
-  set(subscriptionToResume, sub);
+function clickResume(subscription: UserSubscription): void {
+  set(subscriptionToResume, subscription);
 }
 
-async function resumeSubscription(sub: Subscription): Promise<void> {
-  set(resuming, true);
-  set(resumeStatus, '');
-  set(resumeError, '');
-
-  await resumeUserSubscription(sub.identifier, (status: string) => {
-    set(resumeStatus, status);
-  });
-
-  set(resuming, false);
-  set(resumeStatus, '');
-  set(subscriptionToResume, undefined);
+function clickCancel(subscription: UserSubscription): void {
+  set(subscriptionToCancel, subscription);
 }
 
-function hasAction(sub: Subscription, action: 'renew' | 'cancel') {
+function hasAction(subscription: UserSubscription, action: 'renew' | 'cancel'): boolean {
   if (action === 'cancel')
-    return sub.status !== 'Pending' && sub.actions.includes('cancel');
+    return subscription.status !== 'Pending' && subscription.actions.includes('cancel');
   else if (action === 'renew')
-    return sub.actions.includes('renew');
+    return subscription.actions.includes('renew');
 
   return false;
 }
 
-function displayActions(sub: Subscription) {
-  return hasAction(sub, 'renew')
-    || hasAction(sub, 'cancel')
-    || isPending(sub)
-    || sub.isSoftCanceled;
+function displayActions(subscription: UserSubscription): boolean {
+  return hasAction(subscription, 'renew')
+    || hasAction(subscription, 'cancel')
+    || isPending(subscription)
+    || subscription.isSoftCanceled;
 }
 
 function getChipStatusColor(status: string): ContextColorsType | undefined {
@@ -170,30 +165,39 @@ function getChipStatusColor(status: string): ContextColorsType | undefined {
   return map[status];
 }
 
-function clickCancel(sub: Subscription) {
-  set(subscriptionToCancel, sub);
-}
-
-async function cancelSubscription(sub: Subscription) {
-  set(cancelling, true);
-  set(cancellationStatus, '');
-  set(cancellationError, '');
-
-  await cancelUserSubscription(sub, (status: string) => {
-    set(cancellationStatus, status);
-  });
-
-  set(cancelling, false);
-  set(cancellationStatus, '');
-  set(subscriptionToCancel, undefined);
-}
-
 function getBlockExplorerLink(pending: PendingTx): RouteLocationRaw {
   return {
     path: `${pending.blockExplorerUrl}/${pending.hash}`,
   };
 }
 
+async function resumeSubscription(subscription: UserSubscription): Promise<void> {
+  clearResumeState();
+  setResuming(true);
+
+  await resumeUserSubscription(subscription, (status: string) => {
+    setResumeStatus(status);
+  });
+
+  await refreshSubscriptions();
+  clearResumeState();
+  set(subscriptionToResume, undefined);
+}
+
+async function cancelSubscription(subscription: UserSubscription): Promise<void> {
+  clearCancellationState();
+  setCancelling(true);
+
+  await cancelUserSubscription(subscription, (status: string) => {
+    setCancellationStatus(status);
+  });
+
+  await refreshSubscriptions();
+  clearCancellationState();
+  set(subscriptionToCancel, undefined);
+}
+
+// Watchers
 watch(pending, (pending) => {
   if (pending.length === 0)
     pause();
@@ -201,6 +205,7 @@ watch(pending, (pending) => {
     resume();
 });
 
+// Lifecycle hooks
 onUnmounted(() => pause());
 </script>
 
@@ -213,13 +218,23 @@ onUnmounted(() => pause());
       v-model:pagination="pagination"
       v-model:sort="sort"
       :cols="headers"
-      :rows="subscriptions"
+      :rows="userSubscriptions"
+      :loading="loading"
       :empty="{
         description: t('account.subscriptions.no_subscriptions_found'),
       }"
-      row-attr="identifier"
+      row-attr="id"
       outlined
     >
+      <template #item.planName="{ row }">
+        {{ row.isLegacy ? row.planName : getPlanNameFor(t, { name: row.planName, durationInMonths: row.durationInMonths }) }}
+      </template>
+      <template #item.createdDate="{ row }">
+        {{ formatDate(row.createdDate) }}
+      </template>
+      <template #item.nextActionDate="{ row }">
+        {{ formatDate(row.nextActionDate) }}
+      </template>
       <template #item.status="{ row }">
         <RuiChip
           size="sm"
@@ -233,15 +248,15 @@ onUnmounted(() => pause());
                   class="text-white"
                   name="lu-info"
                 />
-                {{ t('account.subscriptions.cancelled_but_still_active.status', { date: row.nextActionDate }) }}
+                {{ t('account.subscriptions.cancelled_but_still_active.status', { date: formatDate(row.nextActionDate) }) }}
               </div>
             </template>
-            {{ t('account.subscriptions.cancelled_but_still_active.description', { date: row.nextActionDate }) }}
+            {{ t('account.subscriptions.cancelled_but_still_active.description', { date: formatDate(row.nextActionDate) }) }}
           </RuiTooltip>
           <template v-else>
             {{ row.status }}
             <RuiProgress
-              v-if="isPending(row) && pendingTx && row.identifier === pendingTx.subscriptionId"
+              v-if="isPending(row) && pendingTx && row.id === pendingTx.subscriptionId"
               thickness="2"
               variant="indeterminate"
             />
@@ -260,7 +275,7 @@ onUnmounted(() => pause());
           >
             <template #activator>
               <RuiButton
-                :loading="cancelling && subscriptionToCancel?.identifier === row.identifier"
+                :loading="cancelling && subscriptionToCancel?.id === row.id"
                 :disabled="cancelling"
                 variant="text"
                 type="button"
@@ -270,7 +285,7 @@ onUnmounted(() => pause());
                 {{ t('actions.cancel') }}
               </RuiButton>
             </template>
-            <span v-if="cancelling && subscriptionToCancel?.identifier === row.identifier && cancellationStatus">
+            <span v-if="cancelling && subscriptionToCancel?.id === row.id && cancellationStatus">
               {{ t(`account.subscriptions.cancellation.status.${cancellationStatus}`) }}
             </span>
           </RuiTooltip>
@@ -282,7 +297,10 @@ onUnmounted(() => pause());
           >
             {{ t('actions.renew') }}
           </ButtonLink>
-          <RuiTooltip v-if="pendingTx && row.identifier === pendingTx.subscriptionId">
+          <RuiTooltip
+            v-if="pendingTx && row.id === pendingTx.subscriptionId"
+            tooltip-class="w-48"
+          >
             <template #activator>
               <ButtonLink
                 external
@@ -313,7 +331,7 @@ onUnmounted(() => pause());
           >
             <template #activator>
               <RuiButton
-                :loading="resuming && subscriptionToResume?.identifier === row.identifier"
+                :loading="resuming && subscriptionToResume?.id === row.id"
                 :disabled="resuming"
                 variant="text"
                 type="button"
@@ -323,7 +341,7 @@ onUnmounted(() => pause());
                 {{ t('actions.resume') }}
               </RuiButton>
             </template>
-            <span v-if="resuming && subscriptionToResume?.identifier === row.identifier && resumeStatus">
+            <span v-if="resuming && subscriptionToResume?.id === row.id && resumeStatus">
               {{ t(`account.subscriptions.resume.status.${resumeStatus}`) }}
             </span>
             <span v-else>

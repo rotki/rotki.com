@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ApiResponse } from '~/types';
+import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import type { ValidationErrors } from '~/types/common';
 import type {
   SignupAccountPayload,

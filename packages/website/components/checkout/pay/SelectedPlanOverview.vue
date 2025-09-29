@@ -1,126 +1,112 @@
 <script setup lang="ts">
-import type { CryptoPayment, SelectedPlan } from '~/types';
+import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
+import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
 
-const props = withDefaults(
-  defineProps<{
-    plan: SelectedPlan | CryptoPayment;
-    crypto?: boolean;
-    warning?: boolean;
-    disabled?: boolean;
-  }>(),
-  {
-    crypto: false,
-    warning: false,
-  },
-);
+const props = withDefaults(defineProps<{
+  plan: SelectedPlan;
+  warning?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+  nextPayment?: number;
+  internalMode?: boolean;
+}>(), {
+  warning: false,
+  internalMode: false,
+  disabled: false,
+  loading: false,
+});
 
-const { plan } = toRefs(props);
+const emit = defineEmits<{
+  'plan-change': [plan: SelectedPlan];
+}>();
+
+const { plan, nextPayment } = toRefs(props);
 const router = useRouter();
 
 const selection = ref(false);
 
-const name = computed(() => getPlanNameFor(get(plan).months));
-const date = computed(() => {
-  const currentPlan = get(plan);
-  const date = new Date(currentPlan.startDate * 1000);
-  return date.toLocaleDateString();
+const { t } = useI18n({ useScope: 'global' });
+
+const name = computed<string>(() => {
+  const selectedPlan = get(plan);
+  return `${getPlanNameFor(t, selectedPlan)} - € ${selectedPlan.price.toFixed(2)}`;
 });
 
-const vatOverview = computed(() => {
-  const cPlan = get(plan);
-  if (!(cPlan.vat && 'priceInEur' in cPlan))
+const nextPaymentDate = computed<string | undefined>(() => {
+  const next = get(nextPayment);
+  if (!next) {
     return undefined;
-
-  return {
-    vat: cPlan.vat,
-    priceInEur: cPlan.priceInEur,
-  };
+  }
+  const date = new Date(next * 1000);
+  return formatDate(date);
 });
 
 function select() {
   set(selection, true);
 }
 
-function switchTo(months: number) {
+function switchTo(selectedPlan: SelectedPlan) {
   set(selection, false);
-  const currentRoute = get(router.currentRoute);
 
-  navigateTo({
-    path: currentRoute.path,
-    query: {
-      ...currentRoute.query,
-      plan: months.toString(),
-    },
-  });
+  if (props.internalMode) {
+    // Internal mode: emit the plan change to parent
+    emit('plan-change', selectedPlan);
+  }
+  else {
+    // Normal mode: update route
+    const currentRoute = get(router.currentRoute);
+    navigateTo({
+      path: currentRoute.path,
+      query: {
+        ...currentRoute.query,
+        planId: selectedPlan.planId.toString(),
+      },
+    });
+  }
 }
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <PlanOverview>
-    <span :class="$style.plan">{{ name }}</span>
-    <i18n-t
-      keypath="selected_plan_overview.plan"
-      scope="global"
-    >
-      <template #date>
-        {{ date }}
-      </template>
-      <template #finalPriceInEur>
-        {{ plan.finalPriceInEur }}
-      </template>
-      <template #vat>
-        <span v-if="vatOverview && !crypto">
-          {{ t('selected_plan_overview.vat', vatOverview) }}
-        </span>
-        <span v-else-if="plan.vat">
+  <RuiCard class="h-auto mt-6">
+    <div class="text-rui-text text-h6">
+      {{ t('home.plans.tiers.step_3.chose') }}
+    </div>
+    <div class="pt-1 flex items-center justify-between gap-4">
+      <div>
+        <div class="text-body-1 font-bold mr-1 text-rui-text-secondary">
+          {{ name }}
+        </div>
+        <div
+          v-if="nextPaymentDate"
+          class="text-xs text-rui-text-secondary italic"
+        >
           {{
-            t('selected_plan_overview.includes_vat', {
-              vat: plan.vat,
+            t('selected_plan_overview.next_payment', {
+              date: nextPaymentDate,
             })
           }}
-        </span>
-      </template>
-    </i18n-t>
-    <span>
-      {{
-        t(
-          'selected_plan_overview.renew_period',
-          {
-            months: plan.months,
-          },
-          plan.months,
-        )
-      }}
-    </span>
+        </div>
+      </div>
 
-    <template #action>
-      <RuiButton
-        :class="$style.change"
-        :disabled="disabled"
-        color="primary"
-        variant="text"
-        @click="select()"
-      >
-        {{ t('actions.change') }}
-      </RuiButton>
-      <ChangePlanDialog
-        :crypto="crypto"
-        :warning="warning"
-        :vat="vatOverview?.vat ?? plan.vat"
-        :visible="selection"
-        @cancel="selection = false"
-        @select="switchTo($event)"
-      />
-    </template>
-  </PlanOverview>
+      <div>
+        <RuiButton
+          :disabled="disabled"
+          :loading="loading"
+          color="primary"
+          variant="text"
+          @click="select()"
+        >
+          {{ t('actions.change') }}
+        </RuiButton>
+        <ChangePlanDialog
+          :warning="warning"
+          :visible="selection"
+          @cancel="selection = false"
+          @select="switchTo($event)"
+        />
+      </div>
+    </div>
+  </RuiCard>
 </template>
-
-<style lang="scss" module>
-.plan {
-  @apply text-body-1 font-bold mr-1;
-}
-</style>

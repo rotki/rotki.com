@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { Account, CheckoutData, SavedCardType } from '@/types';
+import type { CheckoutData } from '@rotki/card-payment-common/schemas/checkout';
+import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { useHead } from '@unhead/vue';
 import { set } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
@@ -10,12 +12,13 @@ import LoadingState from '@/components/LoadingState.vue';
 import { assetPaths, paths } from '@/config/paths';
 import DefaultLayout from '@/layouts/default.vue';
 import {
-  canBuyNewSubscription,
   checkout,
-  getAccount,
+  findSelectedPlanById,
+  getAvailablePlans,
   getSavedCard,
 } from '@/utils/api';
 import { getUrlParam, navigation } from '@/utils/navigation';
+import { canBuyNewSubscription } from '@/utils/navigation-guard';
 
 // Configure head management for SSG
 useHead({
@@ -60,9 +63,10 @@ const isLoading = ref<boolean>(true);
 const loadingMessage = ref<string>('Checking authentication...');
 const errorMessage = ref<string>('');
 
-const plan = ref<string>(getUrlParam('plan', '12')!);
+const plan = ref<string>();
 const planData = ref<CheckoutData>();
-const savedCard = ref<SavedCardType>();
+const selectedPlan = ref<SelectedPlan>();
+const savedCard = ref<SavedCard>();
 
 const steps = [{
   title: 'Plan Selection',
@@ -88,37 +92,40 @@ const steps = [{
 
 async function load() {
   try {
+    // Validate plan ID parameter
+    set(loadingMessage, 'Validating plan...');
+
+    const planIdParam = getUrlParam('planId');
+    if (!planIdParam) {
+      set(errorMessage, 'No plan selected. Please select a plan first.');
+      set(isLoading, false);
+      return;
+    }
+
+    const planId = parseInt(planIdParam);
+    if (isNaN(planId) || planId <= 0) {
+      set(errorMessage, 'Invalid plan ID. Please select a valid plan.');
+      set(isLoading, false);
+      return;
+    }
+
+    set(plan, planIdParam);
+
     // Check user authentication
     set(loadingMessage, 'Checking authentication...');
-    const account: Account | null = await getAccount();
 
-    if (!account) {
-      // User is not logged in
-      console.warn('User not authenticated, redirecting to subscription page');
-      navigation.goToSubscription();
-      return;
-    }
-
-    if (!account.emailConfirmed) {
-      // User email not verified
-      console.warn('User email not confirmed, redirecting to subscription page');
-      navigation.goToSubscription();
-      return;
-    }
-
-    if (!canBuyNewSubscription(account)) {
-      // User cannot buy a new subscription
-      console.warn('User cannot buy new subscription, redirecting to subscription page');
+    const canBuy = await canBuyNewSubscription();
+    if (!canBuy) {
       navigation.goToSubscription();
       return;
     }
 
     set(loadingMessage, 'Initializing payment...');
-    const planId = parseInt(plan.value);
 
-    // Load checkout data and saved card in parallel
-    const [checkoutData, savedCardData] = await Promise.all([
+    // Load checkout data, available plans, and saved card in parallel
+    const [checkoutData, availablePlansData, savedCardData] = await Promise.all([
       checkout(planId),
+      getAvailablePlans(),
       getSavedCard(),
     ]);
 
@@ -128,8 +135,23 @@ async function load() {
       return;
     }
 
+    if (!availablePlansData) {
+      set(errorMessage, 'Failed to load plan information. Please try again.');
+      set(isLoading, false);
+      return;
+    }
+
+    // Find the selected plan by planId
+    const foundPlan = findSelectedPlanById(availablePlansData, planId);
+    if (!foundPlan) {
+      set(errorMessage, 'Invalid plan selected. Please try again.');
+      set(isLoading, false);
+      return;
+    }
+
     set(planData, checkoutData);
-    set(savedCard, savedCardData);
+    set(selectedPlan, foundPlan);
+    set(savedCard, savedCardData?.[0]);
   }
   catch (error) {
     console.error('Initialization error:', error);
@@ -143,7 +165,7 @@ async function load() {
 async function refreshCard(): Promise<void> {
   try {
     const card = await getSavedCard();
-    set(savedCard, card);
+    set(savedCard, card?.[0]);
   }
   catch (error: any) {
     console.error('Error refreshing card:', error);
@@ -166,11 +188,11 @@ onMounted(async () => {
       v-else-if="errorMessage"
       :message="errorMessage"
       button-text="Go Back"
-      @button-click="navigation.goToPaymentMethod(plan)"
+      @button-click="plan ? navigation.goToPaymentMethod(plan) : navigation.goToHome()"
     />
 
     <CheckoutLayout
-      v-else-if="planData"
+      v-else-if="planData && selectedPlan"
       :steps="steps"
       :current-step="3"
     >
@@ -178,6 +200,7 @@ onMounted(async () => {
         v-model:error="errorMessage"
         v-model:saved-card="savedCard"
         :plan-data="planData"
+        :selected-plan="selectedPlan"
         @payment-success="navigation.goTo3DSecure()"
         @go-back="navigation.goToPaymentMethod(plan)"
         @refresh-card="refreshCard()"

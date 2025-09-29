@@ -1,113 +1,221 @@
 <script lang="ts" setup>
-import type { Plan } from '~/types';
+import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { useCountries } from '~/composables/countries';
 import { useMainStore } from '~/store';
-import { navigateToWithCSPSupport } from '~/utils/navigation';
-import { canBuyNewSubscription } from '~/utils/subscription';
+import { useTiersStore } from '~/store/tiers';
+import { PricingPeriod } from '~/types/tiers';
+import { getCountryName } from '~/utils/countries';
 
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
-const { plan: savedPlan } = usePlanParams();
 
-const { account, authenticated, plans } = storeToRefs(useMainStore());
-
-const identifier = ref<number>(get(savedPlan));
 const processing = ref<boolean>(false);
 
-const selected = computed<Plan | undefined>(
-  () => get(plans)?.find(plan => plan.months === get(identifier)),
-);
+const { planId } = usePlanIdParam();
+const selectedPlanName = ref<string | undefined>();
+const selectedPlanPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
 
-const cryptoPrice = computed(() => {
-  const plan = get(selected);
-  if (!plan)
-    return 0;
+const mainStore = useMainStore();
+const tiersStore = useTiersStore();
+const { account, canBuy } = storeToRefs(mainStore);
+const { country, availablePlans } = storeToRefs(tiersStore);
+const { getPlanDetailsFromId } = tiersStore;
+const { countries } = useCountries();
 
-  return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2);
+const selectedPlan = computed<AvailablePlan | undefined>(() => {
+  const plans = get(availablePlans);
+  const selectedName = get(selectedPlanName);
+
+  if (!plans || !selectedName) {
+    return undefined;
+  }
+
+  return plans.find(plan => plan.tierName === selectedName);
 });
 
-const vat = computed(() => get(account)?.vat);
+const countryName = computed<string>(
+  () => getCountryName(get(country), get(countries)),
+);
 
-const notes = computed(() => [
+const planNotes = computed<string[]>(() => [
   t('home.plans.tiers.step_1.notes.line_1'),
   t('home.plans.tiers.step_1.notes.line_2'),
   t('home.plans.tiers.step_1.notes.line_3'),
   t('home.plans.tiers.step_1.notes.line_4'),
 ]);
 
-const isSelected = (plan: Plan) => plan === get(selected);
+const selectedPlanId = computed<number | undefined>(() => {
+  const plan = get(selectedPlan);
+  const period = get(selectedPlanPeriod);
 
-function select(plan: Plan) {
-  set(identifier, plan.months);
+  if (!plan) {
+    return undefined;
+  }
+
+  const isMonthly = period === PricingPeriod.MONTHLY;
+  return isMonthly ? plan.monthlyPlan?.planId : plan.yearlyPlan?.planId;
+});
+
+function isPlanSelected(plan: AvailablePlan): boolean {
+  return plan.tierName === get(selectedPlanName);
 }
 
-async function next(): Promise<void> {
+function selectPlan(plan: AvailablePlan): void {
+  set(selectedPlanName, plan.tierName);
+}
+
+function clearSelection(): void {
+  set(selectedPlanName, undefined);
+}
+
+async function handleContinue(): Promise<void> {
+  const planId = get(selectedPlanId);
+
+  if (!planId) {
+    return;
+  }
+
   set(processing, true);
-  await navigateToWithCSPSupport({
-    name: 'checkout-pay-method',
-    query: { ...route.query, plan: get(identifier) },
-  });
+
+  try {
+    await navigateTo({
+      name: 'checkout-pay-method',
+      query: {
+        ...route.query,
+        planId,
+      },
+    });
+  }
+  finally {
+    set(processing, false);
+  }
 }
 
-const canBuy = reactify(canBuyNewSubscription)(account);
+// Extract planName and period from planId parameter if it exists
+function initializeFromPlanId(): void {
+  const currentPlanId = get(planId);
+
+  if (!currentPlanId) {
+    return;
+  }
+
+  const details = getPlanDetailsFromId(currentPlanId);
+
+  if (details) {
+    set(selectedPlanName, details.planName);
+    set(selectedPlanPeriod, details.period);
+  }
+}
+
+// Watch for changes in planId or availablePlans and initialize selection
+watch([planId, availablePlans], initializeFromPlanId, { immediate: true });
 </script>
 
 <template>
-  <div :class="$style.container">
+  <div class="flex flex-col w-full grow">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
-    <CheckoutDescription>
-      <span v-if="vat">{{ t('home.plans.tiers.step_1.vat', { vat }) }}</span>
-      <span v-if="!authenticated">
-        {{ t('home.plans.tiers.step_1.maybe_vat') }}
-      </span>
-    </CheckoutDescription>
 
-    <div :class="$style.selection">
-      <div :class="$style.selectable">
+    <div class="pt-12">
+      <PricingPeriodTab
+        v-model="selectedPlanPeriod"
+        :data="availablePlans"
+      />
+
+      <div class="flex flex-col gap-4 py-8">
+        <template v-if="availablePlans.length === 0">
+          <div
+            v-for="i in 2"
+            :key="i"
+            class="rounded-xl border border-default p-4 flex flex-col gap-2"
+          >
+            <RuiSkeletonLoader class="w-20 h-7" />
+            <RuiSkeletonLoader class="w-28 h-7" />
+          </div>
+        </template>
         <SelectablePlan
-          v-for="plan in plans"
-          :key="plan.months"
+          v-for="(plan) in availablePlans"
+          :key="plan.tierName"
           :plan="plan"
-          :popular="plan.months === 12"
-          :selected="isSelected(plan)"
-          @click="select(plan)"
+          :period="selectedPlanPeriod"
+          :selected="isPlanSelected(plan)"
+          @click="selectPlan(plan)"
+          @clear="clearSelection()"
         />
-      </div>
-
-      <div
-        v-if="selected"
-        :class="$style.hint"
-      >
-        {{ t('home.plans.tiers.step_1.crypto_hint', { cryptoPrice }) }}
       </div>
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
-      <div :class="$style.notes">
+      <div class="flex flex-col gap-3">
         <div
-          v-for="(line, i) in notes"
+          v-for="(line, i) in planNotes"
           :key="i"
-          :class="$style.note"
+          class="flex gap-2"
         >
           <RuiIcon
-            :class="$style.note__icon"
+            class="text-rui-text-secondary shrink-0"
             name="lu-circle-arrow-right"
+            size="20"
           />
-          <p>{{ line }}</p>
+          <p class="text-sm">
+            {{ line }}
+          </p>
         </div>
       </div>
 
-      <div :class="$style.continue">
+      <div
+        v-if="!account"
+        class="flex flex-col gap-2 mt-8 -mb-6"
+      >
+        <div class="text-sm text-rui-text-secondary">
+          <i18n-t
+            v-if="country"
+            keypath="home.plans.country_prices"
+            tag="div"
+          >
+            <template #country>
+              {{ countryName }}
+            </template>
+            <template #login>
+              <ButtonLink
+                to="/login"
+                inline
+                color="primary"
+              >
+                {{ t('auth.login.title') }}
+              </ButtonLink>
+            </template>
+          </i18n-t>
+          <i18n-t
+            v-else
+            keypath="home.plans.login_to_show_prices"
+            tag="div"
+          >
+            <template #login>
+              <ButtonLink
+                to="/login"
+                inline
+                color="primary"
+              >
+                {{ t('auth.login.title') }}
+              </ButtonLink>
+            </template>
+          </i18n-t>
+        </div>
+      </div>
+
+      <div class="mt-8">
         <RuiButton
-          :disabled="!selected || !canBuy"
+          :disabled="!selectedPlan || !canBuy"
           :loading="processing"
           class="w-full"
           color="primary"
           size="lg"
-          @click="next()"
+          @click="handleContinue()"
         >
           {{ t('actions.continue') }}
         </RuiButton>
@@ -131,37 +239,3 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.container {
-  @apply flex flex-col w-full grow;
-}
-
-.selection {
-  @apply flex flex-col w-full justify-center my-8;
-}
-
-.selectable {
-  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 xl:gap-4;
-}
-
-.hint {
-  @apply mt-3 text-base italic text-rui-text;
-}
-
-.continue {
-  @apply mt-[2.63rem];
-}
-
-.notes {
-  @apply flex flex-col gap-3;
-
-  .note {
-    @apply flex gap-3;
-
-    &__icon {
-      @apply text-black/[.54] shrink-0;
-    }
-  }
-}
-</style>

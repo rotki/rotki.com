@@ -34,10 +34,11 @@ export const navigation = {
 
   /**
    * Navigate back to payment method selection
-   * @param plan - The plan ID (e.g., '12', '24')
+   * @param planId - The plan ID
    */
-  goToPaymentMethod(plan: string): void {
-    window.location.href = `${routes.paymentMethod}?plan=${plan}`;
+  goToPaymentMethod(planId: string | undefined): void {
+    const href = `${routes.paymentMethod}`;
+    window.location.href = planId ? `${href}?planId=${planId}` : href;
   },
 
   /**
