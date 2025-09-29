@@ -1,57 +1,79 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 
+const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
-const { uid, token } = route.params;
-const validating = ref(true);
-const isValid = ref(false);
+
+const uid = route.params.uid as string;
+const token = route.params.token as string;
+
+const validating = ref<boolean>(true);
+const isValid = ref<boolean>(false);
+const error = ref<string | null>(null);
 
 const mainStore = useMainStore();
-const { getAccount } = mainStore;
+const { requestRefresh } = useAccountRefresh();
 const { account } = storeToRefs(mainStore);
-const logger = useLogger();
+const { getLastRedirectUrl } = useRedirectUrl();
+const logger = useLogger('account-activation');
 const { fetchWithCsrf } = useFetchWithCsrf();
 
-async function validateToken() {
+const lastPaymentLink = computed<string | undefined>(() => {
+  const accountVal = get(account);
+  if (accountVal?.username) {
+    return getLastRedirectUrl(accountVal.username);
+  }
+  return undefined;
+});
+
+async function validateActivationToken(): Promise<void> {
+  if (!uid || !token) {
+    set(error, 'Missing activation parameters');
+    set(validating, false);
+    return;
+  }
+
   try {
     await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`);
     set(isValid, true);
+    set(error, null);
+    logger.debug('Account activation successful');
   }
-  catch (error: any) {
-    if (!(error instanceof FetchError && error.status === 404))
-      logger.debug(error);
+  catch (activationError: any) {
+    if (activationError instanceof FetchError && activationError.status === 404) {
+      set(error, 'Invalid or expired activation link');
+    }
+    else {
+      set(error, 'Activation failed. Please try again.');
+      logger.error('Activation error:', activationError);
+    }
+    set(isValid, false);
   }
   finally {
     set(validating, false);
   }
 }
 
-onBeforeMount(async () => {
-  await validateToken();
-  if (get(isValid))
-    await getAccount();
-});
-const { t } = useI18n({ useScope: 'global' });
-
-const { getLastRedirectUrl } = useRedirectUrl();
-
-const lastPaymentLink = computed(() => {
-  const accountVal = get(account);
-  if (accountVal && accountVal.username)
-    return getLastRedirectUrl(accountVal.username);
-
-  return undefined;
-});
-
-function redirectToPaymentLink() {
+function handlePaymentRedirect(): void {
   const paymentLink = get(lastPaymentLink);
-  if (paymentLink)
+  if (paymentLink) {
     window.location.href = paymentLink;
+  }
 }
+
+// Lifecycle hooks
+onBeforeMount(async () => {
+  await validateActivationToken();
+
+  if (get(isValid)) {
+    requestRefresh();
+  }
+});
 </script>
 
 <template>
@@ -111,7 +133,7 @@ function redirectToPaymentLink() {
             color="primary"
             class="inline-flex py-0 !px-1 !text-[1em]"
             variant="text"
-            @click="redirectToPaymentLink()"
+            @click="handlePaymentRedirect()"
           >
             {{ t('common.here') }}
           </RuiButton>

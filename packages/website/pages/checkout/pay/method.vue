@@ -1,9 +1,14 @@
 <script lang="ts" setup>
-import { get } from '@vueuse/core';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
-  middleware: ['maintenance', 'unverified', 'pending-payment', 'subscriber'],
+  middleware: [
+    'maintenance',
+    'unverified',
+    'pending-payment',
+    'subscriber',
+    'valid-plan-id',
+  ],
 });
 
 useHead({
@@ -18,15 +23,7 @@ useHead({
   ...commonAttrs(),
 });
 
-// NB: this param name is also used in backend email links,
-// if changed, kindly sync with backend team to update email links as well.
-const { plan } = usePlanParams();
 const { subscriptionId } = useSubscriptionIdParam();
-
-onBeforeMount(() => {
-  if (!get(plan))
-    navigateTo({ name: 'checkout-pay' });
-});
 </script>
 
 <template>

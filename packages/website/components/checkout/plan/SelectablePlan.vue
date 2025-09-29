@@ -1,76 +1,117 @@
 <script lang="ts" setup>
-import type { Plan } from '~/types';
+import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/core';
-import { getPlanSelectionName } from '~/utils/plans';
-
-interface PlanWithDiscount extends Plan {
-  freeMonths?: number;
-  paidMonths?: number;
-  originalPrice?: string;
-  originalMonthlyPrice?: string;
-}
+import { PricingPeriod } from '~/types/tiers';
+import { formatCurrency, toTitleCase } from '~/utils/text';
 
 const props = withDefaults(defineProps<{
-  plan: PlanWithDiscount;
-  selected: boolean;
-  popular?: boolean;
+  plan: AvailablePlan;
+  selected?: boolean;
+  period: PricingPeriod;
+  readonly?: boolean;
+  disabled?: boolean;
 }>(), {
-  popular: false,
+  selected: false,
 });
 
-const emit = defineEmits<{ click: [] }>();
+const emit = defineEmits<{
+  click: [];
+  clear: [];
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { plan } = toRefs(props);
+const { plan, period, selected } = toRefs(props);
 
-const name = computed<string>(() => getPlanSelectionName(get(plan).months));
+const price = computed<string | undefined>(() => {
+  const { monthlyPlan, yearlyPlan } = get(plan);
+  const periodVal = get(period);
 
-const totalPrice = computed<string>(() => get(plan).priceFiat);
-
-const price = computed<string>(() => {
-  const { months, priceFiat } = get(plan);
-  return (parseFloat(priceFiat) / months).toFixed(2);
+  const targetPlan = periodVal === PricingPeriod.YEARLY ? yearlyPlan : monthlyPlan;
+  if (!targetPlan)
+    return undefined;
+  return formatCurrency(parseFloat(targetPlan.price));
 });
 
-function click() {
-  emit('click');
-}
+const discountInfo = computed<{
+  discount: number;
+  freeMonths: number;
+  originalPrice: string;
+  monthlyPrice: string;
+} | undefined>(() => {
+  const { monthlyPlan, yearlyPlan } = get(plan);
+  const periodVal = get(period);
+
+  // Only calculate discount for yearly plans
+  if (periodVal !== PricingPeriod.YEARLY || !monthlyPlan || !yearlyPlan)
+    return undefined;
+
+  const monthlyPrice = parseFloat(monthlyPlan.price);
+  const yearlyPrice = parseFloat(yearlyPlan.price);
+  const monthlyTotal = monthlyPrice * 12;
+  const savings = monthlyTotal - yearlyPrice;
+
+  if (savings <= 0)
+    return undefined;
+
+  const discountPercentage = Math.round((savings / monthlyTotal) * 100);
+  const freeMonths = Math.round(savings / monthlyPrice);
+
+  return {
+    discount: discountPercentage,
+    freeMonths,
+    originalPrice: formatCurrency(monthlyTotal),
+    monthlyPrice: formatCurrency(yearlyPrice / 12),
+  };
+});
+
+watch(price, (price) => {
+  if (!price && get(selected)) {
+    emit('clear');
+  }
+});
 </script>
 
 <template>
   <div
-    class="min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-6 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
-    :class="{ 'border-rui-primary': selected }"
-    @click="click()"
+    v-if="price"
+    class="flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
+    :class="{
+      '!border-rui-primary': selected,
+      '!bg-rui-grey-100': disabled,
+    }"
+    @click="emit('click')"
   >
-    <div class="flex justify-between items-start w-full h-12">
+    <div class="flex items-center h-0 justify-center relative w-full">
       <RuiChip
-        v-if="popular"
+        v-if="plan.isMostPopular"
+        class="-top-[2.9rem] absolute"
         color="primary"
         size="sm"
-        content-class="text-xs"
       >
-        {{ t('home.plans.most_popular') }}
+        {{ t('pricing.most_popular_plan') }}
       </RuiChip>
+    </div>
+
+    <div class="w-full flex justify-start items-center my-1 h-8">
       <RuiChip
-        v-if="plan.discount"
+        v-if="discountInfo"
         size="sm"
         class="!bg-green-400 font-bold text-xs"
       >
-        {{ plan.discount }}% OFF
+        {{ discountInfo.discount }}% OFF
       </RuiChip>
     </div>
 
-    <div class="text-h5 text-rui-text mb-3">
-      {{ name }}
+    <div class="text-h5 text-rui-text mb-6">
+      {{ t('pricing.plans.plan', { plan: toTitleCase(plan.tierName) }) }}
     </div>
 
     <div
-      v-if="plan.originalPrice"
-      class="text-base text-rui-text-secondary line-through font-normal opacity-70 h-6 mb-1"
+      v-if="discountInfo"
+      class="text-base text-rui-text-secondary line-through font-normal opacity-70 h-6 flex items-center justify-center mb-1"
     >
-      {{ plan.originalPrice }}€
+      {{ discountInfo.originalPrice }}€
     </div>
     <div
       v-else
@@ -78,18 +119,21 @@ function click() {
     />
 
     <div class="font-black text-[2.5rem] leading-none text-rui-text">
-      {{ totalPrice }}€
+      {{ price }}€
     </div>
 
-    <div class="text-sm text-rui-text-secondary mt-3 mb-4 font-normal flex flex-col justify-start h-[2.75rem]">
-      <div>{{ price }}€/{{ t('home.plans.per_month') }}</div>
+    <div class="text-sm text-rui-text-secondary mt-3 mb-6 font-normal flex flex-col items-center justify-start h-[2.75rem]">
+      <div v-if="discountInfo">
+        {{ discountInfo.monthlyPrice }}€/{{ t('home.plans.per_month') }}
+      </div>
       <div
-        v-if="plan.freeMonths"
-        class="text-xs text-red-600"
+        v-if="discountInfo"
+        class="text-xs"
       >
-        {{ t('home.plans.saving', { months: plan.freeMonths }) }}
+        {{ t('home.plans.saving', { months: discountInfo.freeMonths }) }}
       </div>
     </div>
+
     <RuiButton
       :color="selected ? 'primary' : undefined"
       class="w-full"

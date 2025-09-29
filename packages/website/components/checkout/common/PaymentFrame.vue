@@ -43,7 +43,7 @@ function dismissFailure(): void {
     <div class="min-h-[25rem]">
       <div
         v-if="isLoading"
-        class="flex justify-center items-center h-full"
+        class="flex justify-center items-center min-h-[25rem]"
       >
         <RuiProgress
           variant="indeterminate"

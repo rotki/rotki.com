@@ -37,7 +37,7 @@
     "@rotki/eslint-plugin": "1.2.0",
     "bumpp": "10.3.1",
     "cac": "6.7.14",
-    "consola": "3.3.3",
+    "consola": "3.4.2",
     "eslint": "9.38.0",
     "eslint-plugin-nuxt": "4.0.0",
     "husky": "9.1.7",

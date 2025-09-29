@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
+import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentStep } from '~/types';
 import { get, set } from '@vueuse/core';
 import { paypalCheckout } from 'braintree-web';
-import { usePaymentPaypalStore } from '~/store/payments/paypal';
+import { usePaypalApi } from '~/composables/use-paypal-api';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
@@ -16,40 +18,72 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-const { addPaypal, createPaypalNonce } = usePaymentPaypalStore();
 const logger = useLogger('paypal-payment');
 
 const { status } = toRefs(props);
-const { token, plan, btClient, submit } = useBraintree();
-
-const pending = computed<boolean>(() => get(status).type === 'pending');
 const error = ref<ErrorMessage>();
 const accepted = ref<boolean>(false);
 const paying = ref<boolean>(false);
 const initializing = ref<boolean>(false);
+const discountCode = ref<string>('');
+const discountInfo = ref<DiscountInfo>();
+
+const { addPaypalAccount, createPaypalNonce } = usePaypalApi();
+const { token, selectedPlan, btClient, submit, nextPayment } = useBraintree();
+const { planId } = usePlanIdParam();
+
+const pending = computed<boolean>(() => get(status).type === 'pending');
 
 const processing = computed<boolean>(() => get(paying) || get(pending));
 
+const grandTotal = computed<number>(() => {
+  const plan = get(selectedPlan);
+  const discountVal = get(discountInfo);
+
+  if (!plan) {
+    return 0;
+  }
+
+  if (!discountVal || !discountVal.isValid) {
+    return plan.price;
+  }
+
+  return discountVal.finalPrice;
+});
+
+async function processPayment(planId: number, nonce: string): Promise<void> {
+  try {
+    const discount = get(discountCode);
+    const payload: CardPaymentRequest = {
+      planId,
+      paymentMethodNonce: nonce,
+    };
+
+    if (discount) {
+      payload.discountCode = discount;
+    }
+
+    await submit(payload);
+    sessionStorage.setItem('payment-completed', 'true');
+    await navigateTo('/checkout/success');
+  }
+  catch (error_: any) {
+    logger.error('PayPal payment submission failed:', error_);
+    set(error, {
+      title: t('subscription.error.payment_failure'),
+      message: error_.message || t('subscription.error.payment_failure'),
+    });
+  }
+}
+
 async function initializePayPal(): Promise<void> {
   const client = get(btClient);
-  const currentPlan = get(plan);
+  const currentPlan = get(selectedPlan);
   const currentToken = get(token);
 
   if (!client || !currentPlan || !currentToken) {
     logger.warn('Missing required data for PayPal initialization');
     return;
-  }
-
-  function processPayment(months: number, nonce: string): void {
-    submit({
-      months,
-      nonce,
-    }).then(async () => {
-      sessionStorage.setItem('payment-completed', 'true');
-      await navigateTo('/checkout/success');
-    }).catch((error_: any) => {
-      logger.error('PayPal payment submission failed:', error_);
-    });
   }
 
   let paypalActions: any = null;
@@ -86,10 +120,11 @@ async function initializePayPal(): Promise<void> {
   paypal.Buttons({
     createBillingAgreement: async () => {
       set(paying, true);
-      logger.debug(`Creating payment for ${currentPlan.finalPriceInEur} EUR`);
+      const grandTotalVal = get(grandTotal);
+      logger.debug(`Creating payment for ${grandTotalVal} EUR`);
       return await btPayPalCheckout.createPayment({
         flow: 'vault' as any,
-        amount: currentPlan.finalPriceInEur,
+        amount: grandTotalVal,
         currency: 'EUR',
       });
     },
@@ -97,10 +132,9 @@ async function initializePayPal(): Promise<void> {
       set(paying, true);
       logger.debug('User approved PayPal payment');
       const tokenResponse = await btPayPalCheckout.tokenizePayment(data);
-      const vaultedToken = await addPaypal({ paymentMethodNonce: tokenResponse.nonce });
+      const vaultedToken = await addPaypalAccount({ paymentMethodNonce: tokenResponse.nonce });
       const vaultedNonce = await createPaypalNonce({ paymentToken: vaultedToken });
-
-      processPayment(currentPlan.months, vaultedNonce);
+      await processPayment(currentPlan.planId, vaultedNonce);
 
       return tokenResponse;
     },
@@ -119,15 +153,18 @@ async function initializePayPal(): Promise<void> {
   }).render('#paypal-button');
 }
 
-async function back(): Promise<void> {
-  const currentPlan = get(plan);
-  if (!currentPlan)
+async function navigateBack(): Promise<void> {
+  const currentPlanId = get(planId);
+
+  if (!currentPlanId) {
+    await navigateTo({ name: 'checkout-pay-method' });
     return;
+  }
 
   await navigateTo({
     name: 'checkout-pay-method',
     query: {
-      plan: currentPlan.months,
+      planId: String(currentPlanId),
     },
   });
 }
@@ -136,34 +173,50 @@ onMounted(async () => {
   try {
     set(initializing, true);
     await initializePayPal();
-    set(initializing, false);
   }
   catch (error_: any) {
+    logger.error('Failed to initialize PayPal:', error_);
     set(error, {
       title: t('subscription.error.init_error'),
-      message: error_.message,
+      message: error_.message || t('subscription.error.init_error'),
     });
+  }
+  finally {
+    set(initializing, false);
   }
 });
 </script>
 
 <template>
-  <div class="my-6 grow flex flex-col">
-    <div
-      id="paypal-button"
-      :class="{
-        'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing,
-      }"
-    />
+  <div class="mb-6 grow flex flex-col">
     <SelectedPlanOverview
-      v-if="plan"
-      :plan="plan"
+      v-if="selectedPlan"
+      :plan="selectedPlan"
+      :next-payment="nextPayment"
       :disabled="processing || initializing"
+    />
+    <DiscountCodeInput
+      v-if="selectedPlan"
+      v-model="discountCode"
+      v-model:discount-info="discountInfo"
+      :plan="selectedPlan"
+      class="mt-6"
+    />
+    <PaymentGrandTotal
+      :grand-total="grandTotal"
+      class="mt-6"
     />
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"
       class="my-8"
+    />
+    <div
+      id="paypal-button"
+      class="mb-8"
+      :class="[
+        { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
+      ]"
     />
     <div
       v-if="pending"
@@ -182,8 +235,14 @@ onMounted(async () => {
         :loading="pending || initializing"
         class="w-1/2"
         size="lg"
-        @click="back()"
+        @click="navigateBack()"
       >
+        <template #prepend>
+          <RuiIcon
+            name="lu-arrow-left"
+            size="16"
+          />
+        </template>
         {{ t('actions.back') }}
       </RuiButton>
     </div>

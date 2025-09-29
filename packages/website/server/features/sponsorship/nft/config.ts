@@ -1,7 +1,7 @@
 import type { NftConfig } from '~/composables/rotki-sponsorship/types';
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
 import { SponsorshipMetadata } from '~/types/sponsor';
-import { convertKeys } from '~/utils/object';
 import { useLogger } from '~/utils/use-logger';
 
 // Storage for detecting contract address changes

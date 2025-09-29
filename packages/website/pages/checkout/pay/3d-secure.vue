@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ThreeDSecureParams } from '~/types/three-d-secure';
+import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get, set } from '@vueuse/core';
 import ErrorState from '~/components/checkout/3d-secure/ErrorState.vue';
 import InvalidParamsState from '~/components/checkout/3d-secure/InvalidParamsState.vue';
@@ -51,7 +51,7 @@ const hasValidParams = computed<boolean>(() => !!get(params));
 function handleBack(): void {
   const storedParams = get(params);
   if (storedParams) {
-    window.location.href = `/checkout/pay/card?plan=${storedParams.planMonths}`;
+    window.location.href = `/checkout/pay/card?planId=${storedParams.planId}`;
   }
   else {
     navigateTo('/checkout/pay/method');

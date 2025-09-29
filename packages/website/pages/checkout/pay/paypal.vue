@@ -7,6 +7,7 @@ definePageMeta({
     'authentication',
     'unverified',
     'subscriber',
+    'valid-plan-id',
   ],
 });
 
