@@ -102,5 +102,7 @@ tests/**/coverage
 .data/content
 planning/
 
-**/.claude/
+# Claude AI assistant cache
+.claude/
+
 .tmp/

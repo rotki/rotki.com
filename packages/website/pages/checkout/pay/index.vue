@@ -9,7 +9,6 @@ useHead({
   title: 'select premium plan',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Select your rotki premium plan',
     },

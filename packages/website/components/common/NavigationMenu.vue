@@ -46,6 +46,11 @@ const baseMenus: (Menu | MenuParent)[] = [
     ],
   },
   {
+    label: t('navigation_menu.pricing'),
+    to: '/pricing',
+    highlightActive: true,
+  },
+  {
     label: t('navigation_menu.integration.title'),
     description: t('navigation_menu.integration.description'),
     to: '/integrations',
@@ -97,9 +102,7 @@ const { isMdAndDown } = useBreakpoint();
 </script>
 
 <template>
-  <div
-    class="flex flex-wrap md:justify-center md:gap-x-1 lg:gap-x-2 xl:gap-x-4"
-  >
+  <div class="flex flex-wrap md:justify-center md:gap-x-1 lg:gap-x-2">
     <template v-for="menu in menus">
       <ButtonLink
         v-if="!isParent(menu)"

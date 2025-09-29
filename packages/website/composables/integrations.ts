@@ -1,6 +1,6 @@
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import LocalIntegrationData from '~/public/integrations/all.json';
 import { IntegrationData, type IntegrationItem } from '~/types/integrations';
-import { convertKeys } from '~/utils/object';
 
 export const useIntegrationsData = createSharedComposable(() => {
   const { public: { isDev, testing } } = useRuntimeConfig();

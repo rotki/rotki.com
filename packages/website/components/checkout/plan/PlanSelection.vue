@@ -1,36 +1,47 @@
 <script lang="ts" setup>
-import type { Plan } from '~/types';
+import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { useCountries } from '~/composables/countries';
 import { useMainStore } from '~/store';
-import { navigateToWithCSPSupport } from '~/utils/navigation';
-import { canBuyNewSubscription } from '~/utils/subscription';
-
-interface PlanWithDiscount extends Plan {
-  freeMonths?: number;
-  paidMonths?: number;
-  originalPrice?: string;
-  originalMonthlyPrice?: string;
-}
+import { useTiersStore } from '~/store/tiers';
+import { PricingPeriod } from '~/types/tiers';
+import { getCountryName } from '~/utils/countries';
 
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
-const { plan: savedPlan } = usePlanParams();
 
-const { account, authenticated, plans } = storeToRefs(useMainStore());
-
-const identifier = ref<number>(get(savedPlan));
 const processing = ref<boolean>(false);
 
-const selected = computed<Plan | undefined>(
-  () => get(plans)?.find(plan => plan.months === get(identifier)),
+const { planId } = usePlanIdParam();
+const selectedPlanName = ref<string | undefined>();
+const selectedPlanPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
+
+const mainStore = useMainStore();
+const tiersStore = useTiersStore();
+const { account, canBuy } = storeToRefs(mainStore);
+const { country, availablePlans } = storeToRefs(tiersStore);
+const { getPlanDetailsFromId } = tiersStore;
+const { countries } = useCountries();
+
+const selectedPlan = computed<AvailablePlan | undefined>(() => {
+  const plans = get(availablePlans);
+  const selectedName = get(selectedPlanName);
+
+  if (!plans || !selectedName) {
+    return undefined;
+  }
+
+  return plans.find(plan => plan.tierName === selectedName);
+});
+
+const countryName = computed<string>(
+  () => getCountryName(get(country), get(countries)),
 );
 
-const vat = computed(() => get(account)?.vat);
-
-const notes = computed<string[]>(() => {
-  const selectedPlan = get(selected);
-  const period = selectedPlan?.months === 1
+const planNotes = computed<string[]>(() => {
+  const period = get(selectedPlanPeriod) === PricingPeriod.MONTHLY
     ? t('selected_plan_overview.month')
     : t('selected_plan_overview.year');
 
@@ -42,59 +53,71 @@ const notes = computed<string[]>(() => {
   ];
 });
 
-const plansWithDiscount = computed<PlanWithDiscount[]>(() => {
-  const allPlans = get(plans);
-  if (!allPlans || allPlans.length < 2)
-    return allPlans || [];
+const selectedPlanId = computed<number | undefined>(() => {
+  const plan = get(selectedPlan);
+  const period = get(selectedPlanPeriod);
 
-  const monthlyPlan = allPlans.find(plan => plan.months === 1);
-  const yearlyPlan = allPlans.find(plan => plan.months === 12);
+  if (!plan) {
+    return undefined;
+  }
 
-  if (!monthlyPlan || !yearlyPlan)
-    return allPlans;
-
-  const monthlyPlanPrice = parseFloat(monthlyPlan.priceFiat);
-  const monthlyTotal = monthlyPlanPrice * 12;
-  const yearlyTotal = parseFloat(yearlyPlan.priceFiat);
-  const savings = monthlyTotal - yearlyTotal;
-  const discountPercentage = Math.round((savings / monthlyTotal) * 100);
-  const freeMonths = Math.round((savings / monthlyPlanPrice));
-
-  return allPlans.map((plan): PlanWithDiscount => {
-    if (plan.months !== 12) {
-      return plan;
-    }
-
-    const paidMonths = plan.months - freeMonths;
-    const originalPrice = (monthlyPlanPrice * 12).toFixed(2);
-    const originalMonthlyPrice = monthlyPlanPrice.toFixed(2);
-
-    return {
-      ...plan,
-      discount: discountPercentage,
-      freeMonths,
-      originalMonthlyPrice,
-      originalPrice,
-      paidMonths,
-    };
-  });
+  const isMonthly = period === PricingPeriod.MONTHLY;
+  return isMonthly ? plan.monthlyPlan?.planId : plan.yearlyPlan?.planId;
 });
 
-const isSelected = (plan: Plan) => plan.months === get(identifier);
-
-function select(plan: Plan) {
-  set(identifier, plan.months);
+function isPlanSelected(plan: AvailablePlan): boolean {
+  return plan.tierName === get(selectedPlanName);
 }
 
-async function next(): Promise<void> {
+function selectPlan(plan: AvailablePlan): void {
+  set(selectedPlanName, plan.tierName);
+}
+
+function clearSelection(): void {
+  set(selectedPlanName, undefined);
+}
+
+async function handleContinue(): Promise<void> {
+  const planId = get(selectedPlanId);
+
+  if (!planId) {
+    return;
+  }
+
   set(processing, true);
-  await navigateToWithCSPSupport({
-    name: 'checkout-pay-method',
-    query: { ...route.query, plan: get(identifier) },
-  });
+
+  try {
+    await navigateTo({
+      name: 'checkout-pay-method',
+      query: {
+        ...route.query,
+        planId,
+      },
+    });
+  }
+  finally {
+    set(processing, false);
+  }
 }
 
-const canBuy = reactify(canBuyNewSubscription)(account);
+// Extract planName and period from planId parameter if it exists
+function initializeFromPlanId(): void {
+  const currentPlanId = get(planId);
+
+  if (!currentPlanId) {
+    return;
+  }
+
+  const details = getPlanDetailsFromId(currentPlanId);
+
+  if (details) {
+    set(selectedPlanName, details.planName);
+    set(selectedPlanPeriod, details.period);
+  }
+}
+
+// Watch for changes in planId or availablePlans and initialize selection
+watch([planId, availablePlans], initializeFromPlanId, { immediate: true });
 </script>
 
 <template>
@@ -102,54 +125,107 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
-    <CheckoutDescription>
-      <span v-if="vat">{{ t('home.plans.tiers.step_1.vat', { vat }) }}</span>
-      <span v-if="!authenticated">
-        {{ t('home.plans.tiers.step_1.maybe_vat') }}
-      </span>
-    </CheckoutDescription>
 
-    <div class="flex flex-col w-full justify-center my-8">
-      <div class="w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 xl:gap-8">
+    <div class="pt-12">
+      <PricingPeriodTab
+        v-model="selectedPlanPeriod"
+        :data="availablePlans"
+      />
+
+      <div class="flex flex-col gap-4 py-8">
+        <template v-if="availablePlans.length === 0">
+          <div
+            v-for="i in 2"
+            :key="i"
+            class="rounded-xl border border-default p-4 flex flex-col gap-2"
+          >
+            <RuiSkeletonLoader class="w-20 h-7" />
+            <RuiSkeletonLoader class="w-28 h-7" />
+          </div>
+        </template>
         <SelectablePlan
-          v-for="plan in plansWithDiscount"
-          :key="plan.months"
+          v-for="(plan) in availablePlans"
+          :key="plan.tierName"
           :plan="plan"
-          :popular="plan.months === 12"
-          :selected="isSelected(plan)"
-          @click="select(plan)"
+          :period="selectedPlanPeriod"
+          :selected="isPlanSelected(plan)"
+          @click="selectPlan(plan)"
+          @clear="clearSelection()"
         />
       </div>
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
-      <div class="flex flex-col gap-4">
-        <div
-          v-for="(line, i) in notes"
-          :key="i"
-          class="flex gap-3 items-start"
-        >
-          <div class="mt-0.5 shrink-0">
-            <RuiIcon
-              class="text-rui-primary"
-              name="lu-circle-check"
-              size="20"
-            />
+      <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
+        <div class="flex flex-col gap-3">
+          <div
+            v-for="(line, i) in planNotes"
+            :key="i"
+            class="flex gap-2 items-start"
+          >
+            <div class="mt-0.5 shrink-0">
+              <RuiIcon
+                class="text-rui-primary"
+                name="lu-circle-check"
+                size="20"
+              />
+            </div>
+            <p class="text-rui-text text-sm leading-relaxed">
+              {{ line }}
+            </p>
           </div>
-          <p class="text-rui-text text-sm leading-relaxed">
-            {{ line }}
-          </p>
+        </div>
+      </div>
+
+      <div
+        v-if="!account"
+        class="flex flex-col gap-2 mt-8 -mb-6"
+      >
+        <div class="text-sm text-rui-text-secondary">
+          <i18n-t
+            v-if="country"
+            keypath="home.plans.country_prices"
+            tag="div"
+          >
+            <template #country>
+              {{ countryName }}
+            </template>
+            <template #login>
+              <ButtonLink
+                to="/login"
+                inline
+                color="primary"
+              >
+                {{ t('auth.login.title') }}
+              </ButtonLink>
+            </template>
+          </i18n-t>
+          <i18n-t
+            v-else
+            keypath="home.plans.login_to_show_prices"
+            tag="div"
+          >
+            <template #login>
+              <ButtonLink
+                to="/login"
+                inline
+                color="primary"
+              >
+                {{ t('auth.login.title') }}
+              </ButtonLink>
+            </template>
+          </i18n-t>
         </div>
       </div>
 
       <div class="mt-[2.63rem]">
         <RuiButton
-          :disabled="!selected || !canBuy"
+          :disabled="!selectedPlan || !canBuy"
           :loading="processing"
           class="w-full"
           color="primary"
           size="lg"
-          @click="next()"
+          @click="handleContinue()"
         >
           {{ t('actions.continue') }}
         </RuiButton>

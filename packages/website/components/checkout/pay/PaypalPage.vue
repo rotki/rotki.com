@@ -1,15 +1,15 @@
 <script setup lang="ts">
-const { token, step, plan, btClient } = useBraintree();
+const { token, step, selectedPlan, btClient } = useBraintree();
 </script>
 
 <template>
   <PaymentFrame
     v-model:step="step"
-    :loading="!(token && plan)"
+    :loading="!(token && selectedPlan)"
   >
     <template #default="{ status }">
       <PaypalPayment
-        v-if="plan && btClient"
+        v-if="selectedPlan && btClient"
         :status="status"
       />
     </template>

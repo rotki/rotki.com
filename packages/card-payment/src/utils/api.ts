@@ -1,17 +1,16 @@
-import { paths } from '@/config/paths';
+import { type AvailablePlansResponse, AvailablePlansResponseSchema, type CheckoutData, CheckoutResponseSchema, type PriceBreakdown, PriceBreakdownSchema, type SelectedPlan } from '@rotki/card-payment-common';
+import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
 import {
-  type Account,
-  AccountResponse,
   type AddCardPayload,
-  type CheckoutData,
-  CheckoutResponse,
   type CreateCardNoncePayload,
-  CreateCardNonceResponse,
-  SavedCard,
-  SavedCardResponse,
-  type SavedCardType,
-} from '@/types';
-import { convertKeys } from './object';
+  CreateCardNonceResponseSchema,
+  type SavedCard,
+  SavedCardResponseSchema,
+  SavedCardSchema,
+} from '@rotki/card-payment-common/schemas/payment';
+import { type UserSubscriptions, UserSubscriptionsResponseSchema } from '@rotki/card-payment-common/schemas/subscription';
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { paths } from '@/config/paths';
 
 // CSRF Token handling
 let csrfToken: string | null = null;
@@ -73,7 +72,7 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
 
     const data = await response.json();
     const transformedData = convertKeys(data, true, false);
-    const parsedCard = SavedCard.safeParse(transformedData);
+    const parsedCard = SavedCardSchema.safeParse(transformedData);
     if (!parsedCard.success) {
       console.error('Failed to parse SavedCard response:', {
         data,
@@ -104,7 +103,7 @@ export async function createCardNonce(payload: CreateCardNoncePayload): Promise<
 
     const data = await response.json();
     const transformedData = convertKeys(data, true, false);
-    const parsedResponse = CreateCardNonceResponse.safeParse(transformedData);
+    const parsedResponse = CreateCardNonceResponseSchema.safeParse(transformedData);
     if (!parsedResponse.success) {
       console.error('Failed to parse CreateCardNonce response:', {
         data,
@@ -139,7 +138,7 @@ export async function deleteCard(token: string): Promise<void> {
   }
 }
 
-export async function getSavedCard(): Promise<SavedCardType | undefined> {
+export async function getSavedCard(): Promise<SavedCard[]> {
   try {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/payment/btr/cards/`, {
       method: 'GET',
@@ -147,7 +146,7 @@ export async function getSavedCard(): Promise<SavedCardType | undefined> {
 
     if (!response.ok) {
       if (response.status === 404) {
-        return undefined;
+        return [];
       }
       const errorText = await response.text();
       throw new Error(`HTTP ${response.status}: ${errorText}`);
@@ -155,26 +154,26 @@ export async function getSavedCard(): Promise<SavedCardType | undefined> {
 
     const data = await response.json();
     const transformedData = convertKeys(data, true, false);
-    const parsedResponse = SavedCardResponse.safeParse(transformedData);
+    const parsedResponse = SavedCardResponseSchema.safeParse(transformedData);
     if (!parsedResponse.success) {
       console.error('Failed to parse SavedCardResponse:', {
         data,
         error: parsedResponse.error,
         transformedData,
       });
-      return undefined;
+      return [];
     }
-    return parsedResponse.data.cardDetails;
+    return parsedResponse.data.cards;
   }
   catch (error: any) {
     console.error('Failed to get saved card:', error);
     // Return undefined for no saved card instead of throwing
-    return undefined;
+    return [];
   }
 }
 
 // Account API functions
-export async function getAccount(): Promise<Account | null> {
+export async function getAccount(): Promise<Account | undefined> {
   try {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/account/`, {
       method: 'GET',
@@ -182,33 +181,34 @@ export async function getAccount(): Promise<Account | null> {
 
     if (!response.ok) {
       console.error('Failed to fetch account:', response.status);
-      return null;
+      return undefined;
     }
 
     const data = await response.json();
     const transformedData = convertKeys(data, true, false);
-    const parsedResponse = AccountResponse.safeParse(transformedData);
+    const parsedResponse = AccountResponseSchema.safeParse(transformedData);
     if (!parsedResponse.success) {
       console.error('Failed to parse Account response:', {
         error: parsedResponse.error,
         originalData: data,
         transformedData,
       });
-      return null;
+      return undefined;
     }
-    return parsedResponse.data.result || null;
+    return parsedResponse.data.result || undefined;
   }
   catch (error: any) {
     console.error('Failed to get account:', error);
-    return null;
+    return undefined;
   }
 }
 
 // Checkout API functions
 export async function checkout(planId: number): Promise<CheckoutData | null> {
   try {
-    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/checkout/card/${planId}/`, {
-      method: 'GET',
+    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/braintree/payments`, {
+      method: 'PUT',
+      body: JSON.stringify({ plan_id: planId }),
     });
 
     if (!response.ok) {
@@ -218,7 +218,7 @@ export async function checkout(planId: number): Promise<CheckoutData | null> {
 
     const data = await response.json();
     const transformedData = convertKeys(data, true, false);
-    const parsedResponse = CheckoutResponse.safeParse(transformedData);
+    const parsedResponse = CheckoutResponseSchema.safeParse(transformedData);
     if (!parsedResponse.success) {
       console.error('Failed to parse Checkout response:', {
         data,
@@ -236,19 +236,123 @@ export async function checkout(planId: number): Promise<CheckoutData | null> {
   }
 }
 
-// Subscription utility functions
-export function canBuyNewSubscription(account: Account | null): boolean {
-  if (!account)
-    return true;
+// Plans API functions
+export async function getAvailablePlans(): Promise<AvailablePlansResponse | null> {
+  try {
+    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/available-tiers`, {
+      method: 'GET',
+    });
 
-  const { hasActiveSubscription, subscriptions } = account;
+    if (!response.ok) {
+      console.error('Failed to fetch available plans:', response.status);
+      return null;
+    }
 
-  if (!hasActiveSubscription)
-    return true;
+    const data = await response.json();
+    // Convert snake_case keys to camelCase for schema parsing
+    const transformedData = convertKeys(data, true, false);
+    const parsedResponse = AvailablePlansResponseSchema.safeParse(transformedData);
+    if (!parsedResponse.success) {
+      console.error('Failed to parse AvailablePlansResponse:', {
+        data,
+        error: parsedResponse.error,
+        transformedData,
+      });
+      return null;
+    }
+    return parsedResponse.data;
+  }
+  catch (error: any) {
+    console.error('Failed to get available plans:', error);
+    return null;
+  }
+}
 
-  const renewableSubscriptions = subscriptions.filter(({ actions }) =>
-    actions.includes('renew'),
-  );
+export async function getPriceBreakdown(planId: number): Promise<PriceBreakdown | undefined> {
+  try {
+    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/plans/${planId}/price-breakdown`, {
+      method: 'GET',
+    });
 
-  return renewableSubscriptions.length > 0;
+    if (!response.ok) {
+      console.error('Failed to fetch price breakdown:', response.status);
+      return undefined;
+    }
+
+    const data = await response.json();
+    const transformedData = convertKeys(data, true, false);
+    const parsedResponse = PriceBreakdownSchema.safeParse(transformedData);
+    if (!parsedResponse.success) {
+      console.error('Failed to parse PriceBreakdown:', {
+        data,
+        error: parsedResponse.error,
+        transformedData,
+      });
+      return undefined;
+    }
+    return parsedResponse.data;
+  }
+  catch (error: any) {
+    console.error('Failed to get price breakdown:', error);
+    return undefined;
+  }
+}
+
+export function findSelectedPlanById(availablePlans: AvailablePlansResponse, planId: number): SelectedPlan | undefined {
+  const plans = availablePlans.tiers;
+
+  for (const tier of plans) {
+    // Check monthly plan
+    if (tier.monthlyPlan?.planId === planId) {
+      return {
+        planId: tier.monthlyPlan.planId,
+        name: tier.tierName,
+        price: parseFloat(tier.monthlyPlan.price),
+        durationInMonths: 1,
+      };
+    }
+
+    // Check yearly plan
+    if (tier.yearlyPlan?.planId === planId) {
+      return {
+        planId: tier.yearlyPlan.planId,
+        name: tier.tierName,
+        price: parseFloat(tier.yearlyPlan.price),
+        durationInMonths: 12,
+      };
+    }
+  }
+
+  return undefined;
+}
+
+// Subscription API functions
+export async function fetchUserSubscriptions(): Promise<UserSubscriptions> {
+  try {
+    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/history/subscriptions`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch user subscriptions:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    const transformedData = convertKeys(data, true, false);
+    const parsedResponse = UserSubscriptionsResponseSchema.safeParse(transformedData);
+    if (!parsedResponse.success) {
+      console.error('Failed to parse UserSubscriptionsResponse:', {
+        data,
+        error: parsedResponse.error,
+        transformedData,
+      });
+      return [];
+    }
+    return parsedResponse.data.result || [];
+  }
+  catch (error: any) {
+    console.error('Failed to fetch user subscriptions:', error);
+    return [];
+  }
 }

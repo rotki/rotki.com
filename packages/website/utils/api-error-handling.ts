@@ -1,8 +1,9 @@
 import type { SafeParseError } from 'zod';
+import type { Result } from '~/types';
 import type { ActionResult } from '~/types/common';
 import type { useLogger } from '~/utils/use-logger';
+import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { FetchError } from 'ofetch';
-import { ActionResultResponse, type Result } from '~/types';
 import { PaymentError } from '~/types/codes';
 
 /**
@@ -12,7 +13,7 @@ export function getErrorMessage(error: any): string {
   if (error instanceof FetchError) {
     const status = error?.status || -1;
     if (status === 400 && error.response) {
-      const parsed = ActionResultResponse.safeParse(error.data);
+      const parsed = ActionResultResponseSchema.safeParse(error.data);
       if (parsed.success) {
         return parsed.data.message || 'Unknown error';
       }
@@ -48,7 +49,7 @@ export function handlePaymentError<T>(originalError: any): Result<T, PaymentErro
 
   if (originalError instanceof FetchError) {
     if (originalError.status === 400) {
-      const parsed = ActionResultResponse.safeParse(originalError.data);
+      const parsed = ActionResultResponseSchema.safeParse(originalError.data);
       const message = parsed.success ? parsed.data.message : originalError.message;
       error = new Error(message);
     }

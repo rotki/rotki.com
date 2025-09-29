@@ -1,9 +1,9 @@
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { get, set } from '@vueuse/core';
 import {
   DashboardSchema,
   type VisibilityPeriod,
 } from '@/types/dynamic-messages';
-import { convertKeys } from '~/utils/object';
 
 export const useDynamicMessages = createSharedComposable(() => {
   const { public: { testing } } = useRuntimeConfig();
