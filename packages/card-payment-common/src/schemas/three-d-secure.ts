@@ -11,6 +11,7 @@ export const ThreeDSecureParamsSchema = z.object({
   planId: z.number().int().positive('Plan ID must be positive'),
   token: z.string().min(1, 'Token is required'),
   discountCode: z.string().optional(),
+  upgradeSubId: z.string().optional(),
 });
 
 export type ThreeDSecureParams = z.infer<typeof ThreeDSecureParamsSchema>;

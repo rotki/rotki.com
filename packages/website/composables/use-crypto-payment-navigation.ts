@@ -6,7 +6,7 @@ import { useUserSubscriptions } from '~/composables/use-user-subscriptions';
  */
 export function useCryptoPaymentNavigation() {
   const { userSubscriptions } = useUserSubscriptions();
-  const { subscriptionId } = useSubscriptionIdParam();
+  const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
   const { planId } = usePlanIdParam();
 
   /**
@@ -77,6 +77,7 @@ export function useCryptoPaymentNavigation() {
   return {
     currentCryptoSubscriptionId,
     usedSubscriptionId,
+    upgradeSubId,
     navigateBack,
     navigateToSuccess,
     navigateToSubscription,

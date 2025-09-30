@@ -1,4 +1,12 @@
-import { type AvailablePlansResponse, AvailablePlansResponseSchema, type CheckoutData, CheckoutResponseSchema, type SelectedPlan } from '@rotki/card-payment-common';
+import {
+  type AvailablePlansResponse,
+  AvailablePlansResponseSchema,
+  type CheckoutData,
+  CheckoutResponseSchema,
+  type SelectedPlan,
+  type UpgradeData,
+  UpgradeDataSchema,
+} from '@rotki/card-payment-common';
 import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
 import {
   type AddCardPayload,
@@ -204,7 +212,7 @@ export async function getAccount(): Promise<Account | undefined> {
 }
 
 // Checkout API functions
-export async function checkout(planId: number): Promise<CheckoutData | null> {
+export async function getCardCheckoutData(planId: number): Promise<CheckoutData | null> {
   try {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/braintree/payments`, {
       method: 'PUT',
@@ -234,6 +242,35 @@ export async function checkout(planId: number): Promise<CheckoutData | null> {
     console.error('Failed to initialize checkout:', error);
     return null;
   }
+}
+
+export async function getUpdateCardCheckoutData(planId: number): Promise<UpgradeData | null> {
+  try {
+    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/braintree/upgrade/quote`, {
+      method: 'POST',
+      body: JSON.stringify({ plan_id: planId }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to initialize checkout:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const transformedData = convertKeys(data, true, false);
+    return UpgradeDataSchema.parse(transformedData);
+  }
+  catch (error: any) {
+    console.error('Failed to initialize checkout:', error);
+    return null;
+  }
+}
+
+export async function checkout(planId: number, upgradeSubId: string | null): Promise<UpgradeData | CheckoutData | null> {
+  if (upgradeSubId) {
+    return getUpdateCardCheckoutData(planId);
+  }
+  return getCardCheckoutData(planId);
 }
 
 // Plans API functions

@@ -1,16 +1,18 @@
-import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
+import { navigateTo } from '#imports';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
 
-export default defineNuxtRouteMiddleware(async () => {
+export default defineNuxtRouteMiddleware(async (to) => {
   const store = useMainStore();
   const { canBuy } = storeToRefs(store);
 
   // Ensure account data is loaded
   await store.getAccount();
 
-  if (!get(canBuy)) {
+  const upgradeSubId = to.query.upgradeSubId;
+
+  if (!get(canBuy) && !upgradeSubId) {
     return navigateTo('/home/subscription');
   }
 });

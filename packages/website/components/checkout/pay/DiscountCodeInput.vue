@@ -102,6 +102,7 @@ function reset() {
       :error-messages="discountInfo?.error"
       :hint="t('home.plans.tiers.step_3.discount.hint')"
       :disabled="disabled"
+      prepend-icon="lu-tag"
     >
       <template #append>
         <RuiButton

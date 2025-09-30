@@ -187,6 +187,17 @@ export default defineNuxtConfig({
           },
         }
       : {}),
+    '/home/payment-methods': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            baseCSP,
+            braintreeBaseCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+        },
+      },
+    },
     '/checkout/pay': {
       security: {
         headers: {

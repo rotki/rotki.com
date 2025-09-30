@@ -29,7 +29,7 @@ const crypto = computed<boolean>(() => !!route.query.crypto);
 <template>
   <PageContainer>
     <PageContent>
-      <div class="text-center py-12 max-w-[26rem] mx-auto">
+      <div class="text-center max-w-[26rem] mx-auto">
         <!-- Success icon -->
         <div class="mb-6">
           <RuiIcon
