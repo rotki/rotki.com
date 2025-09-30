@@ -34,6 +34,7 @@ let stopWatcher: WatchHandle;
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
 const navigation = useCryptoPaymentNavigation();
+const { upgradeSubId } = navigation;
 
 // Use shared state for error and payment state management
 const { errorMessage, paymentState, planSwitchLoading, web3ProcessingLoading } = useCryptoPaymentState();
@@ -52,20 +53,7 @@ const {
 // Computed properties
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
 
-const grandTotal = computed<number>(() => {
-  const selectedPlan = get(plan);
-
-  if (!selectedPlan)
-    return 0;
-
-  const discountVal = get(discountInfo);
-
-  if (!discountVal || !discountVal.isValid) {
-    return selectedPlan.price;
-  }
-
-  return discountVal.finalPrice ?? 0;
-});
+const grandTotal = computed<number>(() => get(data).finalPriceInEur);
 
 // Success redirect handler
 function redirect(): void {
@@ -121,10 +109,12 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
         :loading="planSwitchLoading"
         internal-mode
         warning
+        :upgrade="!!upgradeSubId"
         @plan-change="handleInternalPlanChange($event)"
       />
 
       <DiscountCodeInput
+        v-if="!upgradeSubId"
         v-model="discountCodeModel"
         v-model:discount-info="discountInfo"
         :plan="plan"
@@ -134,6 +124,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
 
       <PaymentGrandTotal
         :grand-total="grandTotal"
+        :upgrade="!!upgradeSubId"
         :loading="planSwitchLoading"
         class="mt-6"
       />
@@ -193,7 +184,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
           :is-expected-chain="isExpectedChain"
           :processing="web3ProcessingLoading || planSwitchLoading"
           @connect="open()"
-          @pay="pay()"
+          @pay="pay(!!upgradeSubId)"
           @switch-network="switchNetwork()"
           @open-wallet="open()"
         />

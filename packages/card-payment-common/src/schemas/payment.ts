@@ -22,6 +22,7 @@ export const CardPaymentRequestSchema = z.object({
   discountCode: z.string().nullish(),
   paymentMethodNonce: z.string(),
   planId: z.number(),
+  upgradeSubId: z.string().optional(),
 });
 
 // Payment response schema (alias of request schema)

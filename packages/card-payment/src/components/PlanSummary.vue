@@ -3,6 +3,7 @@ import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { computed } from 'vue';
 
 interface Props {
+  upgrade: boolean;
   selectedPlan: SelectedPlan;
   nextPayment?: number;
 }
@@ -46,9 +47,9 @@ const nextPaymentDate = computed<string | undefined>(() => {
 </script>
 
 <template>
-  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mt-6">
-    <div class="text-gray-900 text-lg font-semibold mb-1">
-      Your selected plan
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <div class="text-gray-900 text-lg font-semibold mb-2">
+      {{ upgrade ? 'Upgrade to plan' : 'Your selected plan' }}
     </div>
     <div class="flex items-center justify-between gap-4">
       <div>

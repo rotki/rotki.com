@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+export enum PaymentProvider {
+  BRAINTREE = 'braintree',
+  CRYPTO = 'crypto',
+}
+
+export enum PaymentMethod {
+  PAYPAL = 'paypal',
+  CARD = 'card',
+  CRYPTO = 'crypto',
+}
+
 const StringArray = z.array(z.string());
 
 // Subscription status enum
@@ -9,6 +20,7 @@ export const SubscriptionStatusSchema = z.enum([
   'Cancelled but still active',
   'Pending',
   'Past Due',
+  'Upgrade Requested',
 ]);
 
 export type SubscriptionStatus = z.infer<typeof SubscriptionStatusSchema>;
@@ -24,8 +36,11 @@ export const SubscriptionSchema = z.object({
   isSoftCanceled: z.boolean().default(false),
   nextActionDate: z.string(),
   nextBillingAmount: z.number(),
-  paymentProvider: z.string(),
+  paymentMethod: z.nativeEnum(PaymentMethod).optional(),
+  paymentProvider: z.nativeEnum(PaymentProvider),
+  paymentToken: z.string().optional(),
   pending: z.boolean().default(false),
+  planId: z.number().optional(),
   planName: z.string(),
   status: SubscriptionStatusSchema,
 });
