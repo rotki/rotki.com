@@ -33,7 +33,7 @@ const { t } = useI18n({ useScope: 'global' });
     <div>
       <div class="space-y-5">
         <RuiTextField
-          id="email"
+          id="username"
           v-model="username"
           disabled
           dense

@@ -7,7 +7,7 @@ definePageMeta({
     'maintenance',
     'authentication',
     'unverified',
-    'subscriber',
+    'subscriber-or-upgrade',
     'valid-plan-id',
   ],
 });

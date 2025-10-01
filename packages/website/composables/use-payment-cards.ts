@@ -9,22 +9,30 @@ import {
   SavedCardResponseSchema,
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
+import { set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
 interface UsePaymentCardsReturn {
+  cards: Ref<SavedCard[]>;
+  loading: Ref<boolean>;
   addCard: (request: AddCardPayload) => Promise<string>;
   createCardNonce: (request: CreateCardNoncePayload) => Promise<string>;
   deleteCard: (token: string) => Promise<void>;
-  getCards: () => Promise<SavedCard[]>;
+  getCards: () => Promise<void>;
+  setDefaultCard: (token: string) => Promise<void>;
 }
 
 export function usePaymentCards(): UsePaymentCardsReturn {
+  const cards = ref<SavedCard[]>([]);
+  const loading = ref<boolean>(false);
+
   const logger = useLogger('card-payment');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  const getCards = async (): Promise<SavedCard[]> => {
+  const getCards = async (): Promise<void> => {
     try {
+      set(loading, true);
       const response = await fetchWithCsrf<SavedCardResponse>(
         '/webapi/payment/btr/cards/',
         {
@@ -32,11 +40,13 @@ export function usePaymentCards(): UsePaymentCardsReturn {
         },
       );
       const parsedResponse = SavedCardResponseSchema.parse(response);
-      return parsedResponse.cards;
+      set(cards, parsedResponse.cards);
     }
     catch (error) {
       logger.error(error);
-      return [];
+    }
+    finally {
+      set(loading, false);
     }
   };
 
@@ -50,6 +60,7 @@ export function usePaymentCards(): UsePaymentCardsReturn {
         },
       );
       const parsed = SavedCardSchema.parse(response);
+      await getCards();
       return parsed.token;
     }
     catch (error: any) {
@@ -67,9 +78,28 @@ export function usePaymentCards(): UsePaymentCardsReturn {
           method: 'DELETE',
         },
       );
+      await getCards();
     }
     catch (error) {
       logger.error(error);
+    }
+  };
+
+  const setDefaultCard = async (token: string): Promise<void> => {
+    try {
+      await fetchWithCsrf<ApiResponse<boolean>>(
+        '/webapi/2/braintree/cards/default',
+        {
+          body: { payment_token: token },
+          method: 'POST',
+        },
+      );
+      // Refresh cards list to get updated state from server
+      await getCards();
+    }
+    catch (error) {
+      logger.error(error);
+      throw error;
     }
   };
 
@@ -92,9 +122,12 @@ export function usePaymentCards(): UsePaymentCardsReturn {
   };
 
   return {
+    cards,
+    loading,
     addCard,
     createCardNonce,
     deleteCard,
+    setDefaultCard,
     getCards,
   };
 }

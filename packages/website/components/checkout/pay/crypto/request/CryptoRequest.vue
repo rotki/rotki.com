@@ -14,11 +14,18 @@ const discountCode = ref('');
 const discountInfo = ref<DiscountInfo>();
 
 const { planId } = usePlanIdParam();
-const { subscriptionId } = useSubscriptionIdParam();
+const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 
 const { selectedPlan } = useSelectedPlan();
 
 async function back() {
+  if (isDefined(upgradeSubId)) {
+    navigateTo({
+      name: 'home-subscription',
+    });
+    return;
+  }
+
   const currentPlanId = get(planId);
   const query: Record<string, string> = {};
 
@@ -61,6 +68,11 @@ function submit() {
     query.discountCode = discount;
   }
 
+  const upgradeId = get(upgradeSubId);
+  if (upgradeId) {
+    query.upgradeSubId = upgradeId;
+  }
+
   navigateToWithCSPSupport({
     name: 'checkout-pay-crypto',
     query,
@@ -97,11 +109,13 @@ const grandTotal = computed<number>(() => {
     <template v-if="selectedPlan">
       <RuiDivider class="mt-8 mb-4" />
       <SelectedPlanOverview
+        :upgrade="!!upgradeSubId"
         :plan="selectedPlan"
         :next-payment="0"
       />
 
       <DiscountCodeInput
+        v-if="!upgradeSubId"
         v-model="discountCode"
         v-model:discount-info="discountInfo"
         :plan="selectedPlan"
@@ -109,6 +123,7 @@ const grandTotal = computed<number>(() => {
       />
 
       <PaymentGrandTotal
+        :upgrade="!!upgradeSubId"
         :grand-total="grandTotal"
         class="mt-6"
       />
