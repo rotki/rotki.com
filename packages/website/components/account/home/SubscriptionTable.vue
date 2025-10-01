@@ -8,8 +8,13 @@ import type {
 } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx } from '~/types';
+import { isCancelledButActive, isSubActive, isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { get, set, useIntervalFn } from '@vueuse/shared';
+import CancelUpgradeDialog from '~/components/account/home/CancelUpgradeDialog.vue';
+import UpgradePlanDialog from '~/components/account/home/UpgradePlanDialog.vue';
+import { getHighestPlanOnPeriod } from '~/components/pricings/utils';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
+import { useTiersStore } from '~/store/tiers';
 import { PaymentMethod } from '~/types/payment';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
@@ -23,6 +28,7 @@ const sort = ref<DataTableSortColumn<UserSubscription>>({
 });
 const subscriptionToCancel = ref<UserSubscription>();
 const subscriptionToResume = ref<UserSubscription>();
+const subscriptionToUpgradeCancel = ref<UserSubscription>();
 
 const subscriptionOpsStore = useSubscriptionOperationsStore();
 const {
@@ -30,7 +36,14 @@ const {
   cancelling,
   resumeStatus,
   resuming,
+  upgradingSubscription,
+  cancellingUpgrade,
 } = storeToRefs(subscriptionOpsStore);
+
+const tiersStore = useTiersStore();
+const { availablePlans } = storeToRefs(tiersStore);
+const { getAvailablePlans } = tiersStore;
+
 const {
   clearCancellationState,
   clearResumeState,
@@ -55,7 +68,7 @@ const renewableSubscriptions = computed<UserSubscription[]>(() =>
   get(userSubscriptions).filter(({ actions }) => actions.includes('renew')),
 );
 
-const pendingPaymentCurrency = computedAsync(async () => {
+const pendingPaymentCurrency = computedAsync<string | undefined>(async () => {
   const subs = get(renewableSubscriptions);
   if (subs.length === 0)
     return undefined;
@@ -97,6 +110,7 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
   return link;
 });
 
+const actionsClasses = '!px-1 !py-0 hover:underline !leading-[1.2rem] gap-1';
 const pendingPaymentLink: RouteLocationRaw = { path: '/checkout/pay/method' };
 
 const headers: DataTableColumn<UserSubscription>[] = [{
@@ -122,13 +136,9 @@ const headers: DataTableColumn<UserSubscription>[] = [{
 }, { label: t('common.status'), key: 'status', class: 'capitalize' }, {
   label: t('common.actions'),
   key: 'actions',
-  align: 'end',
+  align: 'start',
   class: 'capitalize',
 }];
-
-function isPending(subscription: UserSubscription): boolean {
-  return subscription.status === 'Pending';
-}
 
 function clickResume(subscription: UserSubscription): void {
   set(subscriptionToResume, subscription);
@@ -138,20 +148,56 @@ function clickCancel(subscription: UserSubscription): void {
   set(subscriptionToCancel, subscription);
 }
 
-function hasAction(subscription: UserSubscription, action: 'renew' | 'cancel'): boolean {
-  if (action === 'cancel')
-    return subscription.status !== 'Pending' && subscription.actions.includes('cancel');
-  else if (action === 'renew')
-    return subscription.actions.includes('renew');
-
-  return false;
+function clickCancelUpgrade(subscription: UserSubscription): void {
+  set(subscriptionToUpgradeCancel, subscription);
 }
 
-function displayActions(subscription: UserSubscription): boolean {
-  return hasAction(subscription, 'renew')
-    || hasAction(subscription, 'cancel')
-    || isPending(subscription)
-    || subscription.isSoftCanceled;
+// Helper functions for subscription actions
+function canCancelSubscription(sub: UserSubscription): boolean {
+  return !isSubPending(sub) && !isSubRequestingUpgrade(sub) && sub.actions.includes('cancel');
+}
+
+function canRenewSubscription(sub: UserSubscription): boolean {
+  return sub.actions.includes('renew');
+}
+
+function canUpgradeSubscription(sub: UserSubscription): boolean {
+  if (!isSubActive(sub) || sub.isSoftCanceled || sub.isLegacy || !sub.actions.includes('cancel'))
+    return false;
+
+  const plans = get(availablePlans);
+  if (plans.length === 0)
+    return false;
+
+  const highestPlanName = getHighestPlanOnPeriod(plans, sub.durationInMonths);
+  return !!highestPlanName && highestPlanName !== sub.planName;
+}
+
+function canContinuePayment(sub: UserSubscription): boolean {
+  return isSubPending(sub) || isSubRequestingUpgrade(sub);
+}
+
+function hasAction(sub: UserSubscription, action: 'renew' | 'cancel' | 'upgrade' | 'continue_payment'): boolean {
+  switch (action) {
+    case 'cancel':
+      return canCancelSubscription(sub);
+    case 'renew':
+      return canRenewSubscription(sub);
+    case 'upgrade':
+      return canUpgradeSubscription(sub);
+    case 'continue_payment':
+      return canContinuePayment(sub);
+    default:
+      return false;
+  }
+}
+
+function displayActions(sub: UserSubscription): boolean {
+  return canRenewSubscription(sub)
+    || canCancelSubscription(sub)
+    || canUpgradeSubscription(sub)
+    || canContinuePayment(sub)
+    || sub.isSoftCanceled;
 }
 
 function getChipStatusColor(status: string): ContextColorsType | undefined {
@@ -160,10 +206,32 @@ function getChipStatusColor(status: string): ContextColorsType | undefined {
     'Cancelled but still active': 'success',
     'Cancelled': 'error',
     'Pending': 'warning',
+    'Upgrade Requested': 'warning',
     'Past Due': 'warning',
   };
 
   return map[status];
+}
+
+function isCryptoPaymentPending(row: UserSubscription): boolean {
+  const tx = get(pendingTx);
+  if (!tx)
+    return false;
+
+  const isPendingWithoutUpgrade = isSubPending(row) && !tx.isUpgrade;
+  const isUpgradeWithUpgrade = isSubRequestingUpgrade(row) && tx.isUpgrade;
+  return (isPendingWithoutUpgrade || isUpgradeWithUpgrade) && row.id === tx.subscriptionId;
+}
+
+function shouldShowPaymentDetail(row: UserSubscription): boolean {
+  return (isSubPending(row) || isSubRequestingUpgrade(row)) && !isCryptoPaymentPending(row);
+}
+
+function getPlanDisplayName(row: UserSubscription): string {
+  if (row.isLegacy)
+    return row.planName;
+
+  return getPlanNameFor(t, { name: row.planName, durationInMonths: row.durationInMonths });
 }
 
 function getBlockExplorerLink(pending: PendingTx): RouteLocationRaw {
@@ -198,6 +266,14 @@ async function cancelSubscription(subscription: UserSubscription): Promise<void>
   set(subscriptionToCancel, undefined);
 }
 
+async function cancelUpgrade(subscriptionId: string): Promise<void> {
+  set(cancellingUpgrade, true);
+  await paymentApi.cancelUpgradeRequest(subscriptionId);
+  await refreshSubscriptions();
+  set(cancellingUpgrade, false);
+  set(subscriptionToUpgradeCancel, undefined);
+}
+
 // Watchers
 watch(pending, (pending) => {
   if (pending.length === 0)
@@ -208,12 +284,27 @@ watch(pending, (pending) => {
 
 // Lifecycle hooks
 onUnmounted(() => pause());
+
+onBeforeMount(() => getAvailablePlans());
 </script>
 
 <template>
   <div>
-    <div class="text-h6 mb-6">
+    <div class="flex items-center gap-2 text-h6 mb-6">
       {{ t('account.subscriptions.title') }}
+      <RuiButton
+        variant="text"
+        color="primary"
+        icon
+        :loading="loading"
+        class="!p-2"
+        @click="refreshSubscriptions()"
+      >
+        <RuiIcon
+          name="lu-refresh-cw"
+          size="16"
+        />
+      </RuiButton>
     </div>
     <RuiDataTable
       v-model:pagination="pagination"
@@ -228,7 +319,7 @@ onUnmounted(() => pause());
       outlined
     >
       <template #item.planName="{ row }">
-        {{ row.isLegacy ? row.planName : getPlanNameFor(t, { name: row.planName, durationInMonths: row.durationInMonths }) }}
+        {{ getPlanDisplayName(row) }}
       </template>
       <template #item.createdDate="{ row }">
         {{ formatDate(row.createdDate) }}
@@ -241,7 +332,7 @@ onUnmounted(() => pause());
           size="sm"
           :color="getChipStatusColor(row.status)"
         >
-          <RuiTooltip v-if="row.status === 'Cancelled but still active'">
+          <RuiTooltip v-if="isCancelledButActive(row)">
             <template #activator>
               <div class="flex py-0.5 items-center gap-1">
                 <RuiIcon
@@ -257,7 +348,7 @@ onUnmounted(() => pause());
           <template v-else>
             {{ row.status }}
             <RuiProgress
-              v-if="isPending(row) && pendingTx && row.id === pendingTx.subscriptionId"
+              v-if="isCryptoPaymentPending(row)"
               thickness="2"
               variant="indeterminate"
             />
@@ -268,8 +359,26 @@ onUnmounted(() => pause());
       <template #item.actions="{ row }">
         <div
           v-if="displayActions(row)"
-          class="flex gap-2 justify-end"
+          class="flex flex-col items-start gap-1"
         >
+          <RuiButton
+            v-if="hasAction(row, 'upgrade')"
+            variant="text"
+            type="button"
+            color="primary"
+            :class="actionsClasses"
+            size="sm"
+            @click="upgradingSubscription = row"
+          >
+            <template #prepend>
+              <RuiIcon
+                name="lu-circle-arrow-up"
+                size="12"
+              />
+            </template>
+            {{ t('account.subscriptions.upgrade.upgrade') }}
+          </RuiButton>
+
           <RuiTooltip
             v-if="hasAction(row, 'cancel')"
             :disabled="!cancelling"
@@ -281,9 +390,17 @@ onUnmounted(() => pause());
                 variant="text"
                 type="button"
                 color="error"
+                :class="actionsClasses"
+                size="sm"
                 @click="clickCancel(row)"
               >
-                {{ t('actions.cancel') }}
+                <template #prepend>
+                  <RuiIcon
+                    name="lu-circle-x"
+                    size="12"
+                  />
+                </template>
+                {{ t('account.subscriptions.actions.cancel') }}
               </RuiButton>
             </template>
             <span v-if="cancelling && subscriptionToCancel?.id === row.id && cancellationStatus">
@@ -294,12 +411,20 @@ onUnmounted(() => pause());
             v-if="hasAction(row, 'renew')"
             :disabled="cancelling"
             :to="renewLink"
-            color="primary"
+            :class="actionsClasses"
+            size="sm"
+            color="info"
           >
+            <template #prepend>
+              <RuiIcon
+                name="lu-repeat"
+                size="12"
+              />
+            </template>
             {{ t('actions.renew') }}
           </ButtonLink>
           <RuiTooltip
-            v-if="pendingTx && row.id === pendingTx.subscriptionId"
+            v-if="isCryptoPaymentPending(row)"
             tooltip-class="w-48"
           >
             <template #activator>
@@ -307,25 +432,55 @@ onUnmounted(() => pause());
                 external
                 icon
                 color="primary"
+                :class="actionsClasses"
+                size="sm"
                 :to="getBlockExplorerLink(pendingTx)"
               >
-                <RuiIcon
-                  name="lu-link"
-                  :size="18"
-                />
+                <template #prepend>
+                  <RuiIcon
+                    name="lu-link"
+                    size="12"
+                  />
+                </template>
+                {{ t('account.subscriptions.explorer') }}
               </ButtonLink>
             </template>
             {{ t('account.subscriptions.pending_tx') }}
           </RuiTooltip>
           <!-- link will not work due to middleware if there is a transaction started -->
           <ButtonLink
-            v-else-if="isPending(row)"
+            v-else-if="shouldShowPaymentDetail(row)"
             :disabled="cancelling"
             :to="pendingPaymentLink"
+            :class="actionsClasses"
             color="primary"
+            size="sm"
           >
+            <template #prepend>
+              <RuiIcon
+                name="lu-circle-arrow-right"
+                size="12"
+              />
+            </template>
             {{ t('account.subscriptions.payment_detail') }}
           </ButtonLink>
+          <RuiButton
+            v-if="isSubRequestingUpgrade(row) && !isCryptoPaymentPending(row)"
+            color="warning"
+            variant="text"
+            size="sm"
+            :class="actionsClasses"
+            :loading="cancellingUpgrade"
+            @click="clickCancelUpgrade(row)"
+          >
+            <template #prepend>
+              <RuiIcon
+                name="lu-circle-x"
+                size="12"
+              />
+            </template>
+            {{ t('account.subscriptions.upgrade.cancel') }}
+          </RuiButton>
           <RuiTooltip
             v-if="row.isSoftCanceled"
             :disabled="!resuming"
@@ -337,9 +492,17 @@ onUnmounted(() => pause());
                 variant="text"
                 type="button"
                 color="info"
+                size="sm"
+                :class="actionsClasses"
                 @click="clickResume(row)"
               >
-                {{ t('actions.resume') }}
+                <template #prepend>
+                  <RuiIcon
+                    name="lu-circle-play"
+                    size="12"
+                  />
+                </template>
+                {{ t('account.subscriptions.actions.resume') }}
               </RuiButton>
             </template>
             <span v-if="resuming && subscriptionToResume?.id === row.id && resumeStatus">
@@ -369,6 +532,17 @@ onUnmounted(() => pause());
       v-model="subscriptionToResume"
       :loading="resuming"
       @confirm="resumeSubscription($event)"
+    />
+
+    <UpgradePlanDialog
+      v-if="upgradingSubscription"
+      v-model="upgradingSubscription"
+    />
+
+    <CancelUpgradeDialog
+      v-model="subscriptionToUpgradeCancel"
+      :loading="cancellingUpgrade"
+      @confirm="cancelUpgrade($event)"
     />
   </div>
 </template>

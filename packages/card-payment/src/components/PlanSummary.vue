@@ -6,6 +6,7 @@ import { computed, onMounted, ref } from 'vue';
 import { getPriceBreakdown } from '@/utils/api';
 
 interface Props {
+  upgrade: boolean;
   selectedPlan: SelectedPlan;
   nextPayment?: number;
 }
@@ -108,8 +109,8 @@ onMounted(() => {
 
 <template>
   <div class="mb-6">
-    <h3 class="text-body-1 font-medium text-rui-text mb-3">
-      Selected Plan
+    <h3 class="text-body-1 font-medium text-rui-text mb-2">
+      {{ upgrade ? 'Upgrade to plan' : 'Your selected plan' }}
     </h3>
     <div class="p-4 border rounded-lg">
       <div class="flex justify-between items-center">

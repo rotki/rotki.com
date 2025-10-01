@@ -75,9 +75,9 @@ watch(price, (price) => {
 <template>
   <div
     v-if="price"
-    class="flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
+    class="rounded-xl flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
     :class="{
-      '!border-rui-primary': selected,
+      '!border-rui-primary': selected && !disabled,
       '!bg-rui-grey-100': disabled,
     }"
     @click="emit('click')"
@@ -137,6 +137,7 @@ watch(price, (price) => {
     <RuiButton
       :color="selected ? 'primary' : undefined"
       class="w-full"
+      :disabled="disabled"
     >
       <template
         v-if="selected"

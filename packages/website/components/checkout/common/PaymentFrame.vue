@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { PaymentStep } from '~/types';
-import { get, set, toRefs } from '@vueuse/core';
+import { get, toRefs } from '@vueuse/core';
 
 const step = defineModel<PaymentStep>('step', { required: true });
 
 const props = defineProps<{
   loading?: boolean;
 }>();
+
+const emit = defineEmits<{ (e: 'clear-errors'): void }>();
 
 defineSlots<{
   default: (props: {
@@ -22,9 +24,7 @@ const { loading } = toRefs(props);
 const isLoading = computed<boolean>(() => get(loading) || false);
 
 function dismissFailure(): void {
-  if (get(step).type === 'failure') {
-    set(step, { type: 'idle' });
-  }
+  emit('clear-errors');
 }
 </script>
 

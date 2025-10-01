@@ -117,8 +117,7 @@ export function useThreeDSecure() {
       }
       // Use standard 3D Secure 2.0 window size (500x600)
       // with responsive width for mobile
-      iframe.style.width = '100%';
-      iframe.style.maxWidth = '500px';
+      iframe.style.maxWidth = '100%';
       iframe.style.minHeight = '400px';
       iframe.style.border = 'none';
       iframe.style.borderRadius = '8px';
@@ -160,6 +159,7 @@ export function useThreeDSecure() {
           discountCode: params.discountCode,
           paymentMethodNonce: payload.nonce,
           planId: params.planId,
+          upgradeSubId: params.upgradeSubId,
         };
 
         logger.info('3D Secure verification successful');
@@ -209,6 +209,7 @@ export function useThreeDSecure() {
       planId: payEvent.planId,
       paymentMethodNonce: payEvent.paymentMethodNonce,
       discountCode: payEvent.discountCode,
+      upgradeSubId: payEvent.upgradeSubId,
     });
 
     if (result.isError) {

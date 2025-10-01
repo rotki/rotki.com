@@ -72,8 +72,8 @@ watch(canvas, async (canvas) => {
 
 <template>
   <div class="qr-code-section">
-    <div class="flex justify-center mb-4">
-      <div class="border mx-auto">
+    <div class="flex justify-center mb-3">
+      <div class="border mx-auto rounded-md">
         <!-- Loading placeholder -->
         <div
           v-if="loading"
@@ -119,7 +119,7 @@ watch(canvas, async (canvas) => {
       </div>
     </div>
 
-    <p class="text-center text-sm text-rui-text-secondary mb-6">
+    <p class="text-center text-sm text-rui-text-secondary mb-3">
       {{ t('home.plans.tiers.step_3.qr.click_to_copy') }}
     </p>
   </div>
