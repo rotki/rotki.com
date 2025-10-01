@@ -1,7 +1,7 @@
 import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentStep, Result } from '~/types';
 import { type ActionResultResponse, ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
-import { type CheckoutData as CardCheckout, type CheckoutResponse, CheckoutResponseSchema } from '@rotki/card-payment-common/schemas/checkout';
+import { type CheckoutData as CardCheckout, type UpgradeData as CardUpgrade, type CheckoutResponse, CheckoutResponseSchema, UpgradeDataSchema } from '@rotki/card-payment-common/schemas/checkout';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { FetchError } from 'ofetch';
@@ -10,7 +10,7 @@ import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useSelectedPlan } from '~/composables/use-selected-plan';
 
 function useBraintreeInternal() {
-  const checkoutData = ref<CardCheckout | null>(null);
+  const checkoutData = ref<CardCheckout | CardUpgrade | null>(null);
   const loadingPlan = ref<boolean>(false);
   const pending = ref<boolean>(false);
   const paymentSuccess = ref<boolean>(false);
@@ -25,6 +25,37 @@ function useBraintreeInternal() {
   const { fetchWithCsrf } = useFetchWithCsrf();
 
   const { planId } = usePlanIdParam();
+  const { upgradeSubId } = useSubscriptionIdParam();
+
+  async function getUpdateCardCheckoutData(planId: number): Promise<Result<CardUpgrade>> {
+    set(loadingPlan, true);
+    try {
+      const response = await fetchWithCsrf<CardUpgrade>(
+        `/webapi/2/braintree/upgrade/quote`,
+        {
+          body: {
+            planId,
+          },
+          method: 'POST',
+        },
+      );
+      const data = UpgradeDataSchema.parse(response);
+      return {
+        isError: false,
+        result: data,
+      };
+    }
+    catch (error: any) {
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+    finally {
+      set(loadingPlan, false);
+    }
+  }
 
   async function getCardCheckoutData(planId: number): Promise<Result<CardCheckout>> {
     set(loadingPlan, true);
@@ -57,23 +88,41 @@ function useBraintreeInternal() {
   }
 
   async function loadPlan(planId: number): Promise<void> {
-    const data = await getCardCheckoutData(planId);
+    const data =
+      isDefined(upgradeSubId)
+        ? await getUpdateCardCheckoutData(planId)
+        : await getCardCheckoutData(planId);
+
     if (data.isError)
       router.back();
     else
       set(checkoutData, data.result);
   }
 
-  const submit = async (payload: CardPaymentRequest): Promise<void> => {
+  const submit = async ({ upgradeSubId, ...payload }: CardPaymentRequest) => {
     set(pending, true);
     try {
-      await fetchWithCsrf<ActionResultResponse>(
-        '/webapi/2/braintree/payments',
-        {
-          body: payload,
-          method: 'POST',
-        },
-      );
+      if (isDefined(upgradeSubId)) {
+        await fetchWithCsrf<ActionResultResponse>(
+          '/webapi/2/braintree/upgrade',
+          {
+            body: {
+              ...payload,
+              subscriptionId: upgradeSubId,
+            },
+            method: 'POST',
+          },
+        );
+      }
+      else {
+        await fetchWithCsrf<ActionResultResponse>(
+          '/webapi/2/braintree/payments',
+          {
+            body: payload,
+            method: 'POST',
+          },
+        );
+      }
       requestRefresh();
       set(paymentSuccess, true);
     }
@@ -198,6 +247,7 @@ function useBraintreeInternal() {
     step,
     submit,
     token,
+    checkoutData,
   };
 }
 

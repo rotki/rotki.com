@@ -1,5 +1,6 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { LoginCredentials } from '~/types/login';
+import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import { useAccountApi } from '~/composables/use-account-api';
@@ -55,7 +56,7 @@ export const useMainStore = defineStore('main', () => {
         actions.includes('renew'),
       );
 
-      const pendingSubscription = subscriptions.find(({ status }) => status === 'Pending');
+      const pendingSubscription = subscriptions.find(sub => isSubPending(sub) || isSubRequestingUpgrade(sub));
 
       set(canBuy, renewableSubscriptions.length > 0);
       set(pendingSubscriptionId, pendingSubscription?.id);
@@ -135,11 +136,11 @@ export const useMainStore = defineStore('main', () => {
   return {
     account,
     authenticated,
-    canBuy: readonly(canBuy),
+    canBuy: computed(() => get(canBuy)),
     getAccount,
     login,
     logout,
-    pendingSubscriptionId: readonly(pendingSubscriptionId),
+    pendingSubscriptionId: computed(() => get(pendingSubscriptionId)),
     refreshSession,
   };
 });

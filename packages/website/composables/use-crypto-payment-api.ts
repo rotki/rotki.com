@@ -5,6 +5,8 @@ import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
   type CryptoPayment,
   CryptoPaymentResponse,
+  type CryptoUpgradePayment,
+  CryptoUpgradePaymentResponse,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
   type Result,
@@ -61,6 +63,63 @@ export function useCryptoPaymentApi() {
     }
   };
 
+  const upgradeCryptoSubscription = async (planId: number, currency: string, subId: string): Promise<Result<CryptoPayment, PaymentError>> => {
+    try {
+      const response = await fetchWithCsrf<CryptoPaymentResponse>(
+        '/webapi/2/crypto/upgrade',
+        {
+          body: {
+            cryptocurrencyIdentifier: currency,
+            planId,
+            subscriptionId: subId,
+          },
+          method: 'POST',
+        },
+      );
+      const { result } = CryptoPaymentResponse.parse(response);
+      assert(result);
+      return {
+        isError: false,
+        result,
+      };
+    }
+    catch (error: any) {
+      logger.error('Crypto payment failed:', error);
+      return handlePaymentError(error);
+    }
+  };
+
+  const checkCryptoUpgradePayment = async (
+    subscriptionId?: string,
+  ): Promise<Result<CryptoUpgradePayment>> => {
+    try {
+      const response = await fetchWithCsrf<CryptoUpgradePaymentResponse>(
+        '/webapi/2/crypto/payment/upgrade/',
+        {
+          params: convertKeys({ subscriptionId }, false, false),
+        },
+      );
+      const data = CryptoUpgradePaymentResponse.parse(response);
+      if (data.result) {
+        return {
+          isError: false,
+          result: data.result,
+        };
+      }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
+    }
+    catch (error: any) {
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+  };
+
   /**
    * Check pending crypto payment status
    */
@@ -95,10 +154,10 @@ export function useCryptoPaymentApi() {
   /**
    * Mark crypto payment transaction as started
    */
-  const markTransactionStarted = async (): Promise<Result<boolean>> => {
+  const markTransactionStarted = async (isUpgrade: boolean): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/2/crypto/payment/pending/',
+        isUpgrade ? 'webapi/2/crypto/payment/upgrade/' : 'webapi/2/crypto/payment/pending/',
         {
           method: 'PATCH',
         },
@@ -180,11 +239,43 @@ export function useCryptoPaymentApi() {
     }
   };
 
+  const cancelUpgradeRequest = async (subscriptionId: string): Promise<Result<boolean>> => {
+    try {
+      const response = await fetchWithCsrf<ActionResultResponse>('webapi/2/crypto/upgrade/cancel', {
+        body: {
+          subscriptionId,
+        },
+        method: 'POST',
+      });
+      const data = ActionResultResponseSchema.parse(response);
+      if (data.result) {
+        return {
+          isError: false,
+          result: data.result,
+        };
+      }
+      return {
+        error: new Error(data.message),
+        isError: true,
+      };
+    }
+    catch (error: any) {
+      logger.error(error);
+      return {
+        error,
+        isError: true,
+      };
+    }
+  };
+
   return {
     checkPendingCryptoPayment,
+    checkCryptoUpgradePayment,
     cryptoPayment,
     deletePendingPayment,
     markTransactionStarted,
     switchCryptoPlan,
+    cancelUpgradeRequest,
+    upgradeCryptoSubscription,
   };
 }

@@ -21,7 +21,7 @@ const loadingMessages = computed(() => ({
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center py-8">
+  <div class="flex flex-col items-center justify-center">
     <!-- Loading indicator for non-challenge states -->
     <div
       v-if="!challengeVisible"
@@ -68,7 +68,10 @@ const loadingMessages = computed(() => ({
       </div>
 
       <!-- iframe container - Always in DOM -->
-      <div id="threeds-iframe-container" />
+      <div
+        id="threeds-iframe-container"
+        class="max-w-full"
+      />
     </div>
   </div>
 </template>

@@ -12,6 +12,7 @@ export interface PayEvent {
   planId: number;
   paymentMethodNonce: string;
   discountCode?: string;
+  upgradeSubId?: string;
 }
 
 export type ValidationErrors = Record<string, string[] | string>;

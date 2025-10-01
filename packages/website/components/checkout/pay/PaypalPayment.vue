@@ -29,14 +29,21 @@ const discountCode = ref<string>('');
 const discountInfo = ref<DiscountInfo>();
 
 const { addPaypalAccount, createPaypalNonce } = usePaypalApi();
-const { token, selectedPlan, btClient, submit, nextPayment } = useBraintree();
+const { token, selectedPlan, btClient, submit, nextPayment, checkoutData } = useBraintree();
 const { planId } = usePlanIdParam();
+const { upgradeSubId } = useSubscriptionIdParam();
 
 const pending = computed<boolean>(() => get(status).type === 'pending');
 
 const processing = computed<boolean>(() => get(paying) || get(pending));
 
 const grandTotal = computed<number>(() => {
+  const data = get(checkoutData);
+
+  if (data && 'finalAmount' in data) {
+    return parseFloat(data.finalAmount);
+  }
+
   const plan = get(selectedPlan);
   const discountVal = get(discountInfo);
 
@@ -54,6 +61,7 @@ const grandTotal = computed<number>(() => {
 async function processPayment(planId: number, nonce: string): Promise<void> {
   try {
     const discount = get(discountCode);
+    const upgradeId = get(upgradeSubId);
     const payload: CardPaymentRequest = {
       planId,
       paymentMethodNonce: nonce,
@@ -61,6 +69,10 @@ async function processPayment(planId: number, nonce: string): Promise<void> {
 
     if (discount) {
       payload.discountCode = discount;
+    }
+
+    if (upgradeId) {
+      payload.upgradeSubId = upgradeId;
     }
 
     await submit(payload);
@@ -154,6 +166,13 @@ async function initializePayPal(): Promise<void> {
 }
 
 async function navigateBack(): Promise<void> {
+  if (get(upgradeSubId)) {
+    await navigateTo({
+      name: 'home-subscription',
+    });
+    return;
+  }
+
   const currentPlanId = get(planId);
 
   if (!currentPlanId) {
@@ -192,11 +211,12 @@ onMounted(async () => {
     <SelectedPlanOverview
       v-if="selectedPlan"
       :plan="selectedPlan"
+      :upgrade="!!upgradeSubId"
       :next-payment="nextPayment"
       :disabled="processing || initializing"
     />
     <DiscountCodeInput
-      v-if="selectedPlan"
+      v-if="selectedPlan && !upgradeSubId"
       v-model="discountCode"
       v-model:discount-info="discountInfo"
       :plan="selectedPlan"
@@ -204,6 +224,7 @@ onMounted(async () => {
     />
     <PaymentGrandTotal
       :grand-total="grandTotal"
+      :upgrade="!!upgradeSubId"
       class="mt-6"
     />
     <AcceptRefundPolicy

@@ -16,12 +16,12 @@ const { t } = useI18n({ useScope: 'global' });
   >
     <div class="mb-4 p-3 rounded-full bg-green-100 dark:bg-green-900/20">
       <RuiIcon
-        name="lu-check-circle"
+        name="lu-circle-check"
         class="text-green-600 dark:text-green-400"
         size="48"
       />
     </div>
-    <h3 class="text-xl font-semibold text-rui-text mb-2">
+    <h3 class="text-xl font-semibold text-rui-text mb-1">
       {{ t('subscription.success.payment_successful') }}
     </h3>
     <p class="text-rui-text-secondary">
@@ -42,7 +42,7 @@ const { t } = useI18n({ useScope: 'global' });
         color="primary"
       />
     </div>
-    <h3 class="text-lg font-medium text-rui-text mb-2">
+    <h3 class="text-lg font-medium text-rui-text mb-1">
       {{ status.title }}
     </h3>
     <p class="text-rui-text-secondary">
@@ -53,11 +53,11 @@ const { t } = useI18n({ useScope: 'global' });
   <!-- Error state (handled by PaymentFrame, but can add visual feedback here) -->
   <div
     v-else-if="status.type === 'failure'"
-    class="flex flex-col items-center justify-center py-4 text-center"
+    class="flex flex-col items-center justify-center py-14 text-center"
   >
     <div class="mb-3 p-2 rounded-full bg-red-100 dark:bg-red-900/20">
       <RuiIcon
-        name="lu-alert-circle"
+        name="lu-circle-x"
         class="text-red-600 dark:text-red-400"
         size="32"
       />

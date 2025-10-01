@@ -1,4 +1,4 @@
-import type { ActionResultResponse } from '@rotki/card-payment-common/schemas/api';
+import type { ActionResultResponse } from '@rotki/card-payment-common';
 import type { Result } from '~/types';
 import type { PaymentError } from '~/types/codes';
 import { type CheckoutData as CardCheckout, CheckoutResponseSchema } from '@rotki/card-payment-common/schemas/checkout';
@@ -62,12 +62,36 @@ export function usePaymentApi() {
   /**
    * Process card payment
    */
-  const pay = async (request: CardPaymentRequest): Promise<Result<true, PaymentError>> => {
+  const pay = async ({ upgradeSubId, ...payload }: CardPaymentRequest): Promise<Result<true, PaymentError>> => {
     try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
+      if (upgradeSubId) {
+        const response = await fetchWithCsrf<ActionResultResponse>(
+          '/webapi/2/braintree/upgrade',
+          {
+            body: {
+              ...payload,
+              subscriptionId: upgradeSubId,
+            },
+            method: 'POST',
+          },
+        );
+
+        if (response.result) {
+          return {
+            isError: false,
+            result: true,
+          };
+        }
+        return {
+          isError: true,
+          error: new Error(response.message || 'Failed to upgrade payment'),
+        };
+      }
+
+      const response = await fetchWithCsrf<CardPaymentRequest>(
         '/webapi/2/braintree/payments',
         {
-          body: request,
+          body: payload,
           method: 'POST',
         },
       );

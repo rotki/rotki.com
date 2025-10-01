@@ -66,10 +66,14 @@
       "paid": "Paid",
       "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
-      "title": "Your latest payments",
-      "legacy": "Legacy"
+      "upgraded_from": "Upgrade from {plan}",
+      "title": "Your latest payments"
     },
     "subscriptions": {
+      "actions": {
+        "cancel": "Cancel subscription",
+        "resume": "Resume subscription"
+      },
       "cancellation": {
         "actions": {
           "no": "No, don't cancel",
@@ -101,6 +105,7 @@
         "description": "You canceled this subscription, but it will remain active until {date}",
         "status": "Active until {date}"
       },
+      "explorer": "See in Explorer",
       "headers": {
         "cost_in_symbol_per_period": "Cost in {symbol} per period",
         "created": "Created",
@@ -135,14 +140,27 @@
         "title": "Resume your rotki subscription"
       },
       "resume_hint": "Resume the active billing of your subscription from {date}",
-      "title": "Subscription History"
+      "title": "Subscription History",
+      "upgrade": {
+        "upgrade": "Upgrade plan",
+        "cancel": "Cancel Upgrade Request",
+        "cancel_dialog": {
+          "title": "Cancel Upgrade Request",
+          "description": "Are you sure you want to cancel this upgrade request?\n\nIMPORTANT: Only proceed if you have NOT already sent a cryptocurrency payment for this upgrade. If you have already initiated a crypto payment, please do not cancel the upgrade request as it may cause issues with payment processing.\n\nIf you haven't made any payment yet, it's safe to proceed with the cancellation.",
+          "actions": {
+            "no": "No, keep the upgrade request",
+            "yes": "Yes, cancel the upgrade"
+          }
+        }
+      }
     },
     "tabs": {
       "account_details": "Account Details",
       "address": "Address",
       "customer_information": "Customer Information",
       "devices": "Devices List",
-      "subscription": "Subscription"
+      "subscription": "Subscription",
+      "payment_methods": "Payment Methods"
     },
     "unverified_email": {
       "message": {
@@ -217,6 +235,7 @@
     "title": "Details"
   },
   "actions": {
+    "add_card": "Add card",
     "apply": "Apply",
     "back": "Back",
     "cancel": "Cancel",
@@ -238,7 +257,8 @@
     "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
-    "update": "Update"
+    "update": "Update",
+    "upgrade": "Upgrade"
   },
   "auth": {
     "activation": {
@@ -375,10 +395,15 @@
   "common": {
     "actions": "actions",
     "amount": "Amount",
+    "card": "Card",
+    "error": "Error",
+    "error_occurred": "An error occurred",
     "here": "here",
+    "monthly": "monthly",
     "none": "none",
     "plan": "plan",
-    "status": "status"
+    "status": "status",
+    "yearly": "yearly"
   },
   "copy_button": {
     "copied": "Copied to clipboard",
@@ -406,6 +431,18 @@
     "read_the_doc": "Read the documentation"
   },
   "home": {
+    "account": {
+      "payment_methods": {
+        "add_card": "Add card",
+        "cannot_delete_linked_card": "This card is used for subscription auto-renewal and cannot be deleted",
+        "link_card": "Set for auto-renewal",
+        "linked_card": "Auto-renewal card",
+        "no_cards": "No saved cards",
+        "no_cards_description": "Add a payment card to make future purchases easier",
+        "subtitle": "Manage your saved payment cards",
+        "title": "Payment Methods"
+      }
+    },
     "advantages": {
       "local_app": {
         "description": "rotki is a local-first application with a strong focus on user privacy.",
@@ -559,8 +596,17 @@
             "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
           },
           "payment_description": "Payments are safely processed with Braintree a PayPal Service",
+          "saved_card": {
+            "delete": {
+              "description": "Are you sure you want to remove this card?",
+              "title": "Remove Saved Card"
+            },
+            "expiry": "Expiry {expiresAt}"
+          },
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
+          "upgrade_plan_description": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.",
+          "upgrade_to_plan": "Upgrade to plan:",
           "qr": {
             "click_to_copy": "Click to copy"
           },
@@ -846,6 +892,17 @@
       "title": "Unlock Premium Features"
     }
   },
+  "upgrade_plan": {
+    "title": "Upgrade Your Plan",
+    "description": "Select a higher tier plan to unlock more features and capabilities.",
+    "current_plan": "Current plan: {plan} ({period})",
+    "no_higher_plans": "You're already on the highest available plan for your subscription period.",
+    "error": {
+      "no_selected_plan": "No subscription or plan selected",
+      "plan_not_found": "Plan ID not found for selected period",
+      "payment_method_unknown": "Cannot determine the previous payment method"
+    }
+  },
   "recaptcha": {
     "expired_captcha": "Invalid or expired captcha, please try again"
   },
@@ -1015,6 +1072,7 @@
       "title": "Transaction Pending"
     },
     "error": {
+      "check_details_and_retry": "Check the detail and try again.",
       "init_error": "Initialization Error",
       "payment_failure": "Payment Failure",
       "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
@@ -1136,5 +1194,10 @@
       },
       "title": "Vision"
     }
+  },
+  "payment_methods": {
+    "title": "Payment Methods",
+    "add_card": "Add Card",
+    "no_cards": "No payment methods saved yet"
   }
 }

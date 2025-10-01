@@ -21,7 +21,7 @@ export function useUserPayments(): UseUserPaymentsReturn {
     'user-payments',
     async () => {
       const response = await fetchWithCsrf<ApiResponse<UserPayments>>(
-        '/webapi/2/history/payments',
+        '/webapi/2/history/payments/',
         {
           method: 'GET',
         },

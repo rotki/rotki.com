@@ -1,3 +1,4 @@
+import type { Subscription as UserSubscription } from '@rotki/card-payment-common';
 import { set } from '@vueuse/shared';
 import { defineStore } from 'pinia';
 
@@ -9,6 +10,9 @@ export const useSubscriptionOperationsStore = defineStore('subscription-operatio
   const resumeError = ref<string>('');
   const resumeStatus = ref<string>('');
   const resuming = ref<boolean>(false);
+
+  const upgradingSubscription = ref<UserSubscription>();
+  const cancellingUpgrade = ref<boolean>(false);
 
   // Actions
   function setCancellationError(error: string): void {
@@ -62,5 +66,7 @@ export const useSubscriptionOperationsStore = defineStore('subscription-operatio
     setResumeError,
     setResumeStatus,
     setResuming,
+    upgradingSubscription,
+    cancellingUpgrade,
   };
 });
