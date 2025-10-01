@@ -23,6 +23,7 @@ export function useCryptoPaymentFlow(
   const { t } = useI18n({ useScope: 'global' });
   const router = useRouter();
   const { planId } = usePlanIdParam();
+  const { upgradeSubId } = useSubscriptionIdParam();
   const tiersStore = useTiersStore();
   const { getSelectedPlanFromId, getAvailablePlans } = tiersStore;
 
@@ -75,6 +76,7 @@ export function useCryptoPaymentFlow(
     currencyId: string,
     subscriptionId: string | undefined,
     discountCode: string | undefined,
+    upgradeSubId: string | undefined,
   ): Promise<void> => {
     if (!plan || !currencyId) {
       await navigateTo('/products');
@@ -85,12 +87,18 @@ export function useCryptoPaymentFlow(
     state.setError('');
 
     try {
-      const result = await api.cryptoPayment(
-        plan.planId,
-        currencyId,
-        subscriptionId,
-        discountCode,
-      );
+      const result = upgradeSubId
+        ? await api.upgradeCryptoSubscription(
+            plan.planId,
+            currencyId,
+            get(upgradeSubId),
+          )
+        : await api.cryptoPayment(
+            plan.planId,
+            currencyId,
+            subscriptionId,
+            discountCode,
+          );
 
       requestRefresh();
 
@@ -235,7 +243,7 @@ export function useCryptoPaymentFlow(
    * Mark transaction as started
    */
   const markTransactionStarted = async (): Promise<void> => {
-    await api.markTransactionStarted();
+    await api.markTransactionStarted(!!get(upgradeSubId));
     requestRefresh();
   };
 
@@ -267,7 +275,7 @@ export function useCryptoPaymentFlow(
     }
 
     // Initial payment setup
-    await initializePayment(plan, currencyVal, get(subscriptionId), get(discountCode));
+    await initializePayment(plan, currencyVal, get(subscriptionId), get(discountCode), get(upgradeSubId));
 
     // Start the watcher after initialization completes
     resume();

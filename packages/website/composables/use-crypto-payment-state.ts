@@ -101,7 +101,7 @@ export const useCryptoPaymentState = createSharedComposable(() => {
     selectedPlan: readonly(selectedPlan),
     errorMessage,
     paymentState,
-    paymentStep: readonly(paymentStep),
+    paymentStep,
 
     // State modifiers
     setLoading,

@@ -1,26 +1,35 @@
 <script setup lang="ts">
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/checkout';
+import type { CheckoutData, SelectedPlan, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
+import { get } from '@vueuse/core';
 import { computed } from 'vue';
 
-const { selectedPlan, discountInfo } = defineProps<{
+const { selectedPlan, discountInfo, planData, upgrade } = defineProps<{
+  planData: CheckoutData | UpgradeData;
   selectedPlan: SelectedPlan;
   discountInfo?: DiscountInfo;
+  upgrade: boolean;
 }>();
 
 const grandTotal = computed<number>(() => {
-  const basePrice = selectedPlan.price;
+  const data = get(planData);
 
-  if (!discountInfo || !discountInfo.isValid) {
-    return basePrice;
+  if ('finalAmount' in data) {
+    return parseFloat(data.finalAmount);
   }
 
-  return discountInfo.finalPrice || basePrice;
+  const plan = get(selectedPlan);
+  const discountVal = get(discountInfo);
+  if (discountVal && discountVal.isValid && discountVal.finalPrice) {
+    return discountVal.finalPrice;
+  }
+
+  return plan.price;
 });
 
 const originalPrice = computed<number>(() => selectedPlan.price);
 
-const hasDiscount = computed<boolean>(() => !!(discountInfo && discountInfo.isValid));
+const hasDiscount = computed<boolean>(() => discountInfo && discountInfo.isValid && !('finalAmount' in get(planData)));
 
 const savings = computed<number>(() => {
   if (!hasDiscount.value)
@@ -64,6 +73,34 @@ const savings = computed<number>(() => {
         >
           You save €{{ savings.toFixed(2) }}!
         </div>
+      </div>
+    </div>
+
+    <div
+      v-if="upgrade"
+      class="flex gap-3 my-4 bg-blue-50 rounded-md p-4 text-blue-900 text-sm"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="fill-transparent"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+        />
+        <path d="M12 16v-4" />
+        <path d="M12 8h.01" />
+      </svg>
+
+      <div class="flex-1">
+        Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.
       </div>
     </div>
   </div>
