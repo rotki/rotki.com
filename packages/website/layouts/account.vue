@@ -9,6 +9,7 @@ interface TabItem {
   icon: string;
   label: string;
   to: string;
+  reload?: boolean;
 }
 
 useHead({
@@ -50,6 +51,11 @@ const tabs = computed<TabItem[]>(() => [{
   icon: 'lu-crown',
   to: '/home/subscription',
 }, {
+  label: t('account.tabs.payment_methods'),
+  icon: 'lu-credit-card',
+  to: '/home/payment-methods',
+  reload: true,
+}, {
   label: t('account.tabs.devices'),
   icon: 'lu-laptop-minimal',
   to: '/home/devices',
@@ -88,6 +94,7 @@ const tabs = computed<TabItem[]>(() => [{
                 :key="tab.to"
                 link
                 :to="tab.to"
+                :target="tab.reload ? '_top' : undefined"
               >
                 <template #prepend>
                   <RuiIcon :name="tab.icon" />
@@ -107,6 +114,7 @@ const tabs = computed<TabItem[]>(() => [{
                 :key="tab.to"
                 link
                 :to="tab.to"
+                :target="tab.reload ? '_top' : undefined"
               >
                 <template #prepend>
                   <RuiIcon

@@ -7,6 +7,7 @@ import {
   type InvalidDiscountInfo,
   type ValidDiscountInfo,
 } from '@rotki/card-payment-common/schemas/discount';
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { get, set, watchImmediate } from '@vueuse/core';
 import { computed, ref, toRefs, watch } from 'vue';
 import { fetchWithCSRF } from '@/utils/api';
@@ -61,19 +62,22 @@ const appliedDiscountAmount = computed<string>(() => {
   return info.discountedAmount.toFixed(2) || '';
 });
 
-async function fetchDiscountInfo(discountValue: string): Promise<void> {
+async function fetchDiscountInfo(discountCode: string): Promise<void> {
   const { planId } = get(selectedPlan);
   set(loading, true);
   try {
     const response = await fetchWithCSRF(`/webapi/2/discounts`, {
       method: 'POST',
-      body: JSON.stringify({
-        discountCode: discountValue,
+      body: JSON.stringify(convertKeys({
+        discountCode,
         planId,
-      }),
+      }, false, false)),
     });
 
-    const parsed = DiscountInfoSchema.parse(response);
+    const data = await response.json();
+    const transformedData = convertKeys(data, true, false);
+
+    const parsed = DiscountInfoSchema.parse(transformedData);
     set(discountInfo, parsed);
   }
   catch (error: any) {
@@ -138,7 +142,7 @@ watch(value, () => {
     >
       <div class="relative w-full flex items-center">
         <div class="flex items-center shrink-0">
-          <div class="ml-3 mr-2">
+          <div class="ml-3">
             <svg
               class="w-6 h-6 text-black/[0.54]"
               fill="none"
@@ -165,18 +169,14 @@ watch(value, () => {
             @blur="focused = false"
           />
           <label
-            class="left-0 text-base leading-[3.5] text-rui-text-secondary pointer-events-none absolute flex h-full w-full select-none transition-all border-0 border-transparent"
+            class="left-0 text-base leading-[3.5] text-rui-text-secondary pointer-events-none absolute flex h-full w-full select-none transition-all border-0 border-transparent pl-12"
             :class="{
               'leading-tight text-xs -top-5': value || focused,
               'top-0': !value && !focused,
               'text-rui-error': hasError,
               'text-rui-primary': focused && !hasError,
               'text-rui-success': !hasError && value && !focused,
-              'pl-3': !value && !focused,
-              'pl-4': value || focused,
-            }"
-            :style="{
-              paddingLeft: (value || focused) ? '0.75rem' : 'calc(0.75rem + 2.25rem)',
+              '!pl-4': value || focused,
             }"
           >
             Discount Code
@@ -191,7 +191,7 @@ watch(value, () => {
             }"
           >
             <legend class="opacity-0 text-xs whitespace-break-spaces">
-              <span v-if="value || focused">  Discount Code  </span>
+              <span v-if="value || focused">{{ '  Discount Code  ' }}</span>
               <span v-else>&#8203;</span>
             </legend>
           </fieldset>
@@ -201,7 +201,7 @@ watch(value, () => {
           :disabled="!value || loading"
           class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-sm font-medium rounded transition-colors z-10"
           :class="{
-            'bg-gray-300 text-gray-500 cursor-not-allowed': !value || loading,
+            'bg-gray-300 text-neutral-500 cursor-not-allowed': !value || loading,
             'bg-rui-primary text-white hover:bg-rui-primary-darker': value && !loading,
           }"
         >
@@ -213,32 +213,35 @@ watch(value, () => {
       <!-- Error message -->
       <p
         v-if="hasError"
-        class="text-xs text-red-600 ml-[3.25rem]"
+        class="text-xs leading-3 text-red-600 ml-2"
       >
         {{ errorMessage }}
       </p>
 
       <!-- Hint -->
-      <p class="text-xs text-gray-500 ml-[3.25rem]">
-        Enter a valid discount code to reduce your total
+      <p
+        v-else
+        class="text-xs leading-3 text-neutral-500 ml-2"
+      >
+        Optional. Enter a discount code to apply savings to your purchase.
       </p>
     </form>
 
     <!-- Applied Discount Display -->
     <div
       v-else
-      class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-md"
+      class="flex items-center justify-between p-3 border border-green-700 rounded-md"
     >
       <div class="flex-1">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-xs text-gray-600">Applied:</span>
-          <span class="text-xs font-bold uppercase text-green-700">
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-neutral-500">Discount code applied:</span>
+          <span class="text-xs font-bold uppercase">
             {{ model }}
           </span>
         </div>
-        <div class="text-sm font-semibold text-green-600">
+        <div class="text-sm font-semibold text-green-700">
           <template v-if="isValidDiscount(discountInfo)">
-            You save {{ discountInfo.discountedAmount }}
+            You save € {{ discountInfo.discountedAmount }}
             <template v-if="appliedDiscountAmount">
               ({{ appliedDiscountAmount }})
             </template>
@@ -248,7 +251,7 @@ watch(value, () => {
 
       <!-- Remove button -->
       <button
-        class="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
+        class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all"
         aria-label="Remove discount"
         @click="reset()"
       >

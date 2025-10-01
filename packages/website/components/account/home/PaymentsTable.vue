@@ -17,7 +17,7 @@ const sort = ref<DataTableSortColumn<UserPayment>>({
   direction: 'desc',
 });
 
-const { userPayments, loading } = useUserPayments();
+const { userPayments, loading, refresh } = useUserPayments();
 
 const headers: DataTableColumn<UserPayment>[] = [{
   label: t('account.payments.headers.paid_at'),
@@ -26,7 +26,7 @@ const headers: DataTableColumn<UserPayment>[] = [{
 }, {
   label: t('common.plan'),
   key: 'plan',
-  cellClass: 'font-bold uppercase',
+  cellClass: 'font-bold',
   class: '[&_button]:capitalize',
   sortable: true,
 }, {
@@ -53,8 +53,21 @@ const headers: DataTableColumn<UserPayment>[] = [{
 
 <template>
   <div>
-    <div class="text-h6 mb-6">
+    <div class="flex items-center gap-2 text-h6 mb-6">
       {{ t('account.payments.title') }}
+      <RuiButton
+        variant="text"
+        color="primary"
+        icon
+        :loading="loading"
+        class="!p-2"
+        @click="refresh()"
+      >
+        <RuiIcon
+          name="lu-refresh-cw"
+          size="16"
+        />
+      </RuiButton>
     </div>
     <RuiDataTable
       v-model:pagination="pagination"
@@ -67,7 +80,18 @@ const headers: DataTableColumn<UserPayment>[] = [{
       outlined
     >
       <template #item.plan="{ row }">
-        {{ row.legacy ? t('account.payments.legacy') : row.plan }}
+        <template v-if="row.legacy">
+          -
+        </template>
+        <template v-else>
+          <div>{{ getPlanNameFor(t, { name: row.plan, durationInMonths: row.durationInMonths }) }}</div>
+          <div
+            v-if="row.isUpgrade && row.originalPlan"
+            class="text-[10px] leading-[1.2] text-rui-text-secondary uppercase whitespace-nowrap"
+          >
+            {{ t('account.payments.upgraded_from', { plan: row.originalPlan }) }}
+          </div>
+        </template>
       </template>
       <template #item.paidAt="{ row }">
         {{ formatDate(row.paidAt) }}

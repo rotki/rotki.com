@@ -11,6 +11,7 @@ const {
   cryptoPaymentData,
   selectedPlan,
   paymentStep,
+  setError,
 } = useCryptoPaymentState();
 
 const navigation = useCryptoPaymentNavigation();
@@ -53,6 +54,7 @@ onMounted(async () => {
   <PaymentFrame
     v-model:step="paymentStep"
     :loading="loading"
+    @clear-errors="setError('')"
   >
     <template #description>
       <CheckoutDescription>

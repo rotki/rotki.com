@@ -20,7 +20,7 @@ export function useUserDevices(): UseUserDevicesReturn {
     'user-devices',
     async () => {
       const response = await fetchWithCsrf<UserDevices>(
-        'webapi/2/devices',
+        'webapi/2/devices/',
         {
           method: 'GET',
         },

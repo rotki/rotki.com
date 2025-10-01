@@ -23,7 +23,10 @@ const { t } = useI18n({ useScope: 'global' });
           @click="regenerateKeys()"
         >
           <template #prepend>
-            <RuiIcon name="lu-refresh-cw" />
+            <RuiIcon
+              name="lu-refresh-cw"
+              size="18"
+            />
           </template>
           {{ hasApiKeys ? t('actions.regenerate') : t('actions.generate') }}
         </RuiButton>

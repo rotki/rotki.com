@@ -110,6 +110,34 @@ export const PendingCryptoPaymentResponse = z.object({
 
 export type PendingCryptoPaymentResponse = z.infer<typeof PendingCryptoPaymentResponse>;
 
+const CryptoUpgradePayment = PendingCryptoPayment.extend({
+  fromPlan: z.object({
+    id: z.number(),
+    tier: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+  ),
+  toPlan: z.object({
+    id: z.number(),
+    tier: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+  ),
+});
+
+export type CryptoUpgradePayment = z.infer<typeof CryptoUpgradePayment>;
+
+export const CryptoUpgradePaymentResponse = z.object({
+  message: z.string().optional(),
+  result: CryptoUpgradePayment.optional(),
+});
+
+export type CryptoUpgradePaymentResponse = z.infer<typeof CryptoUpgradePaymentResponse>;
+
 export type StepType = 'pending' | 'failure' | 'success';
 
 export type IdleStep = 'idle';
@@ -197,4 +225,5 @@ export interface PendingTx {
   subscriptionId: string;
   chainId: number;
   blockExplorerUrl: string;
+  isUpgrade: boolean;
 }

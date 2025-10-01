@@ -1,4 +1,4 @@
-import { type AvailablePlan, type AvailablePlansResponse, AvailablePlansResponseSchema, type PriceBreakdown, PriceBreakdownSchema, type SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { type AvailablePlan, type AvailablePlans, type AvailablePlansResponse, AvailablePlansResponseSchema, type PriceBreakdown, PriceBreakdownSchema, type SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
@@ -12,7 +12,7 @@ export const useTiersStore = defineStore('tiers', () => {
     tiers: [],
   });
 
-  const availablePlans = computed<AvailablePlansResponse['tiers']>(() => {
+  const availablePlans = computed<AvailablePlans>(() => {
     const plans = get(availablePlansData).tiers;
     if (!plans || plans.length === 0)
       return plans;

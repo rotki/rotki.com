@@ -16,7 +16,7 @@ const { disabled = false } = defineProps<Props>();
       <input
         v-model="acceptedTerms"
         type="checkbox"
-        class="h-5 w-5 accent-rui-primary border-2 border-rui-grey-300 rounded focus:ring-rui-primary"
+        class="h-5 w-5 accent-rui-primary border-2 border-rui-grey-300 rounded focus:ring-rui-primary cursor-pointer"
         :disabled="disabled"
       />
       <span class="ml-3 text-body-2 text-rui-text-secondary">

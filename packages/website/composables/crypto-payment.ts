@@ -30,6 +30,7 @@ interface ExecutePaymentParams {
   signer: Signer;
   payment: CryptoPayment;
   blockExplorerUrl: string;
+  isUpgrade: boolean;
 }
 
 export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | IdleStep>, errorMessage: Ref<string>) {
@@ -65,7 +66,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
     ...connectionMethods
   } = connection;
 
-  async function executePayment({ blockExplorerUrl, payment, signer }: ExecutePaymentParams): Promise<void> {
+  async function executePayment({ blockExplorerUrl, isUpgrade, payment, signer }: ExecutePaymentParams): Promise<void> {
     stop();
     const {
       cryptoAddress: to,
@@ -98,14 +99,15 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       blockExplorerUrl,
       chainId: payment.chainId,
       hash: tx.hash,
+      isUpgrade,
       subscriptionId: payment.subscriptionId.toString(),
     });
-    paymentApi.markTransactionStarted().catch(error => logger.error('Failed to mark transaction as started:', error));
+    paymentApi.markTransactionStarted(isUpgrade).catch(error => logger.error('Failed to mark transaction as started:', error));
     requestRefresh();
     start();
   }
 
-  const pay = async (): Promise<void> => {
+  const pay = async (isUpgrade: boolean): Promise<void> => {
     if (get(state) === 'pending')
       return;
 
@@ -139,6 +141,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
         blockExplorerUrl: url ? `${url}/tx/` : '',
         payment,
         signer,
+        isUpgrade,
       });
     }
     catch (error: any) {

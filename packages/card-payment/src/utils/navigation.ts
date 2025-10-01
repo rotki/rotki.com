@@ -21,8 +21,9 @@ export const navigation = {
   /**
    * Navigate to 3D Secure verification
    */
-  goTo3DSecure(): void {
-    window.location.href = routes.threeDSecure;
+  goTo3DSecure(upgradeSubId: string | null): void {
+    const href = routes.threeDSecure;
+    window.location.href = upgradeSubId ? `${href}?upgradeSubId=${upgradeSubId}` : href;
   },
 
   /**
@@ -37,7 +38,7 @@ export const navigation = {
    * @param planId - The plan ID
    */
   goToPaymentMethod(planId: string | undefined): void {
-    const href = `${routes.paymentMethod}`;
+    const href = routes.paymentMethod;
     window.location.href = planId ? `${href}?planId=${planId}` : href;
   },
 

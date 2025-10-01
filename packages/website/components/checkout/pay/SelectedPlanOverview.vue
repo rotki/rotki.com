@@ -16,12 +16,14 @@ const props = withDefaults(defineProps<{
   loading?: boolean;
   nextPayment?: number;
   internalMode?: boolean;
+  upgrade?: boolean;
 }>(), {
   crypto: false,
   warning: false,
   internalMode: false,
   disabled: false,
   loading: false,
+  upgrade: false,
 });
 
 const emit = defineEmits<{
@@ -120,7 +122,7 @@ onMounted(() => {
 <template>
   <RuiCard class="h-auto mt-6">
     <div class="text-rui-text text-h6">
-      {{ t('home.plans.tiers.step_3.chose') }}
+      {{ upgrade ? t('home.plans.tiers.step_3.upgrade_to_plan') : t('home.plans.tiers.step_3.chose') }}
     </div>
     <div class="pt-1 flex items-center justify-between gap-4">
       <div>
@@ -195,7 +197,7 @@ onMounted(() => {
           </template>
         </div>
 
-        <div>
+        <div v-if="!upgrade">
           <RuiButton
             :disabled="disabled"
             :loading="loading"
