@@ -787,17 +787,17 @@
         "heading": "Enhanced Data Insights",
         "title": "Graphs & Analytics"
       },
-      "defi": {
-        "description": "Gain detailed insights into supported DeFi protocols. Analyze your Liquity, Aave, Compound, MakerDAO positions. Understand your Yearn vaults and track your swaps on platforms like Uniswap, Paraswap and more.",
-        "title": "DeFi"
-      },
       "detailed_graphs": {
         "description": "Access a wide array of analytics and graphs. Analyze your total net value over time, asset value distributions, and the worth distribution per asset or location.",
         "title": "Detailed Graphs"
       },
-      "exclusive_perks": {
-        "description": "Enjoy various perks like dark mode, customizable color layouts, and alerts for your MakerDAO CDP position, notifying you by email when it crosses certain thresholds.",
-        "title": "Exclusive perks"
+      "enriched_transactions": {
+        "description": "Connect your Monerium and Gnosis Pay accounts to automatically enrich your blockchain transactions with detailed metadata, including bank transfer details, credit card merchant data, and payment descriptions.",
+        "title": "Enriched protocol transactions"
+      },
+      "events_analysis": {
+        "description": "View detailed insights about your activities, including ETH spent, exchanges/protocols used, number of transactions per chain, and Gnosis Pay usage.",
+        "title": "Events Analysis"
       },
       "higher_limits": {
         "description": "Say goodbye to limits. With rotki Premium, you can process more trades, transactions, deposits/withdrawals, and historic events. The limits increase with each premium tier, providing greater flexibility and control.",
