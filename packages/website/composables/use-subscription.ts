@@ -47,10 +47,9 @@ export function useSubscription(): UseSubscriptionReturn {
     let errorMessage: string | null = null;
 
     try {
+      onProgress?.('pending');
       const taskResponse = await fetchWithCsrf<TaskResponse>(url, { method });
       const { taskId } = TaskResponse.parse(taskResponse);
-
-      onProgress?.('pending');
 
       const status = await pollTaskStatus(taskId, { onProgress });
 

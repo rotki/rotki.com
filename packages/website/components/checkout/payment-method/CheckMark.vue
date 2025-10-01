@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 defineProps<{
   selected: boolean;
+  disabled?: boolean;
 }>();
 </script>
 
@@ -8,6 +9,7 @@ defineProps<{
   <RuiRadio
     :model-value="selected"
     :value="true"
+    :disabled="disabled"
     color="primary"
     hide-details
   />

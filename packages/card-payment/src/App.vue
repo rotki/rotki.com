@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { CheckoutData } from '@rotki/card-payment-common/schemas/checkout';
+import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { useHead } from '@unhead/vue';
-import { set } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
 import CardPayment from '@/components/CardPayment.vue';
 import CheckoutLayout from '@/components/CheckoutLayout.vue';
@@ -64,9 +64,12 @@ const loadingMessage = ref<string>('Checking authentication...');
 const errorMessage = ref<string>('');
 
 const plan = ref<string>();
-const planData = ref<CheckoutData>();
+const upgradeSubId = ref<string | null>(null);
+const planData = ref<CheckoutData | UpgradeData>();
 const selectedPlan = ref<SelectedPlan>();
-const savedCard = ref<SavedCard>();
+const selectedCard = ref<SavedCard>();
+
+const cards = ref<SavedCard[]>([]);
 
 const steps = [{
   title: 'Plan Selection',
@@ -115,7 +118,10 @@ async function load() {
     set(loadingMessage, 'Checking authentication...');
 
     const canBuy = await canBuyNewSubscription();
-    if (!canBuy) {
+    const upgradeId = getUrlParam('upgradeSubId');
+    set(upgradeSubId, upgradeId);
+
+    if (!canBuy && !upgradeId) {
       navigation.goToSubscription();
       return;
     }
@@ -124,7 +130,7 @@ async function load() {
 
     // Load checkout data, available plans, and saved card in parallel
     const [checkoutData, availablePlansData, savedCardData] = await Promise.all([
-      checkout(planId),
+      checkout(planId, upgradeId),
       getAvailablePlans(),
       getSavedCard(),
     ]);
@@ -151,7 +157,9 @@ async function load() {
 
     set(planData, checkoutData);
     set(selectedPlan, foundPlan);
-    set(savedCard, savedCardData?.[0]);
+    set(cards, savedCardData);
+    const linkedCard = savedCardData?.find(card => card.linked);
+    set(selectedCard, linkedCard || savedCardData?.[0]);
   }
   catch (error) {
     console.error('Initialization error:', error);
@@ -164,11 +172,22 @@ async function load() {
 
 async function refreshCard(): Promise<void> {
   try {
-    const card = await getSavedCard();
-    set(savedCard, card?.[0]);
+    const savedCardData = await getSavedCard();
+    set(cards, savedCardData);
+    const linkedCard = savedCardData?.find(c => c.linked);
+    set(selectedCard, linkedCard || savedCardData?.[0]);
   }
   catch (error: any) {
     console.error('Error refreshing card:', error);
+  }
+}
+
+function back(): void {
+  if (get(upgradeSubId)) {
+    navigation.goToSubscription();
+  }
+  else {
+    navigation.goToPaymentMethod(get(plan));
   }
 }
 
@@ -198,11 +217,13 @@ onMounted(async () => {
     >
       <CardPayment
         v-model:error="errorMessage"
-        v-model:saved-card="savedCard"
+        v-model:selected-card="selectedCard"
+        :cards="cards"
         :plan-data="planData"
         :selected-plan="selectedPlan"
-        @payment-success="navigation.goTo3DSecure()"
-        @go-back="navigation.goToPaymentMethod(plan)"
+        :upgrade-sub-id="upgradeSubId"
+        @payment-success="navigation.goTo3DSecure(upgradeSubId)"
+        @go-back="back()"
         @refresh-card="refreshCard()"
       />
     </CheckoutLayout>
