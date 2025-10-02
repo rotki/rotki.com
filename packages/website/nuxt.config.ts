@@ -195,6 +195,7 @@ export default defineNuxtConfig({
             braintreeBaseCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
+          crossOriginResourcePolicy: 'cross-origin', // Allow Braintree resources
         },
       },
     },
@@ -226,7 +227,6 @@ export default defineNuxtConfig({
         },
       },
     },
-
     // Crypto payment pages with WalletConnect
     '/checkout/pay/crypto': {
       security: {
@@ -240,7 +240,6 @@ export default defineNuxtConfig({
         },
       },
     },
-
     // Payment method selection page (base Braintree)
     '/checkout/pay/method': {
       security: {
@@ -254,7 +253,6 @@ export default defineNuxtConfig({
         },
       },
     },
-
     // PayPal payment page
     '/checkout/pay/paypal': {
       security: {
@@ -272,7 +270,6 @@ export default defineNuxtConfig({
         },
       },
     },
-
     '/checkout/pay/request-crypto': {
       security: {
         headers: {
@@ -285,7 +282,6 @@ export default defineNuxtConfig({
         },
       },
     },
-
     '/password/recover': {
       security: {
         headers: {
@@ -309,7 +305,6 @@ export default defineNuxtConfig({
         },
       },
     },
-
     // Sponsor pages with WalletConnect
     '/sponsor/**': {
       security: {
