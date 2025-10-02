@@ -212,6 +212,7 @@ export default defineNuxtConfig({
             braintreeBaseCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
+          crossOriginEmbedderPolicy: 'unsafe-none', // Match card payment page
           crossOriginResourcePolicy: 'cross-origin', // Allow Braintree resources
         },
       },
