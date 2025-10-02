@@ -59,7 +59,7 @@ const pendingTx = usePendingTx();
 const paymentApi = useCryptoPaymentApi();
 const { pause, resume, isActive } = useIntervalFn(
   async () => await refreshSubscriptions(),
-  60000,
+  30000,
 );
 
 const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
