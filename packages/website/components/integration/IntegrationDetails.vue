@@ -164,7 +164,7 @@ const { isMdAndUp } = useBreakpoint();
                   <template #activator>
                     <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
                       <img
-                        class="w-full h-full"
+                        class="w-full h-full object-contain"
                         :src="item.image"
                         :alt="item.label"
                       />

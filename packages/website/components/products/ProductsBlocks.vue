@@ -19,12 +19,12 @@ const data = [
     description: t('products.features.detailed_graphs.description'),
   },
   {
-    title: t('products.features.defi.title'),
-    description: t('products.features.defi.description'),
+    title: t('products.features.events_analysis.title'),
+    description: t('products.features.events_analysis.description'),
   },
   {
-    title: t('products.features.exclusive_perks.title'),
-    description: t('products.features.exclusive_perks.description'),
+    title: t('products.features.enriched_transactions.title'),
+    description: t('products.features.enriched_transactions.description'),
   },
 ];
 </script>
@@ -36,7 +36,7 @@ const data = [
         <div
           v-for="item in data"
           :key="item.title"
-          class="rounded-xl bg-rui-primary/[0.08] px-4 pt-6 pb-8 md:px-6 md:pt-8 md:pb-14 flex flex-col gap-4"
+          class="rounded-xl bg-rui-primary/[0.08] px-4 pt-6 pb-8 md:px-6 md:pt-8 md:pb-10 flex flex-col gap-4"
         >
           <h6 class="text-h6">
             {{ item.title }}
