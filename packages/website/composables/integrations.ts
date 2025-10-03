@@ -9,7 +9,7 @@ export const useIntegrationsData = createSharedComposable(() => {
     const branch = testing ? 'develop' : 'main';
     try {
       const response = await $fetch<IntegrationData>(
-        `https://raw.githubusercontent.com/rotki/rotki.com/${branch}/public/integrations/all.json`,
+        `https://raw.githubusercontent.com/rotki/rotki.com/${branch}/packages/website/public/integrations/all.json`,
         {
           parseResponse(responseText: string) {
             return convertKeys(JSON.parse(responseText), true, false);
