@@ -5,7 +5,12 @@ type OAuthMode = 'app' | 'docker';
 
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
-const config = useRuntimeConfig();
+const {
+  public: {
+    moneriumClientId,
+    moneriumAuthBaseUrl,
+  },
+} = useRuntimeConfig();
 const logger = useLogger();
 
 const mode = computed(() => route.query.mode as OAuthMode);
@@ -18,9 +23,6 @@ const refreshToken = ref('');
 const expiresIn = ref<number>();
 const currentMode = ref<OAuthMode>();
 
-const moneriumClientId = (config.public.moneriumClientId as string | undefined) ?? '53ac5f39-a038-11f0-882b-4a4d188cc07d';
-const moneriumAuthBaseUrl = (config.public.moneriumAuthBaseUrl as string | undefined) ?? 'https://api.monerium.dev';
-
 const CODE_VERIFIER_KEY_PREFIX = 'rotki-monerium-pkce-';
 
 if (!moneriumClientId)
@@ -28,11 +30,29 @@ if (!moneriumClientId)
 
 function generateRandomString(length: number = 96): string {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-  const randomValues = crypto.getRandomValues(new Uint8Array(length));
+  const charsetLength = charset.length;
+  const maxValid = 256 - (256 % charsetLength);
   let output = '';
-  randomValues.forEach((value) => {
-    output += charset[value % charset.length];
-  });
+  const randomValues = new Uint8Array(length * 2); // Get extra bytes for rejection sampling
+  crypto.getRandomValues(randomValues);
+
+  let i = 0;
+  while (output.length < length && i < randomValues.length) {
+    const value = randomValues[i++];
+    // Rejection sampling: only use values that don't introduce bias
+    if (value < maxValid)
+      output += charset[value % charsetLength];
+  }
+
+  // If we need more bytes, get them (unlikely but possible)
+  while (output.length < length) {
+    const extraBytes = new Uint8Array(1);
+    crypto.getRandomValues(extraBytes);
+    const value = extraBytes[0];
+    if (value < maxValid)
+      output += charset[value % charsetLength];
+  }
+
   return output;
 }
 
@@ -84,7 +104,10 @@ async function handleMoneriumAuth() {
 
     storeVerifier(storageKey, codeVerifier);
 
+    // Get current URL origin
     const redirectUri = `${window.location.origin}/oauth/monerium`;
+
+    // Build Monerium OAuth URL
     const params = new URLSearchParams({
       client_id: moneriumClientId,
       redirect_uri: redirectUri,
@@ -149,7 +172,7 @@ async function exchangeCodeForToken(code: string, redirectUri: string, codeVerif
       body: {
         client_id: moneriumClientId,
         code,
-        redirect_uri,
+        redirect_uri: redirectUri,
         code_verifier: codeVerifier,
       },
     },
@@ -221,10 +244,15 @@ async function handleOAuthCallback() {
     const tokenResponse = await exchangeCodeForToken(code, redirectUri, codeVerifier);
 
     if (tokenResponse.access_token) {
-      if (originalMode === 'app')
+      set(accessToken, tokenResponse.access_token);
+      set(refreshToken, tokenResponse.refresh_token);
+
+      if (originalMode === 'app') {
         handleAppModeCompletion(tokenResponse);
-      else
+      }
+      else {
         handleDockerModeCompletion(tokenResponse);
+      }
     }
     else {
       throw new Error(t('oauth_monerium.errors.no_access_token'));

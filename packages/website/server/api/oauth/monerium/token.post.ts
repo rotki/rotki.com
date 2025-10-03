@@ -1,6 +1,13 @@
 import { z } from 'zod';
 import { useLogger } from '~/utils/use-logger';
 
+interface MoneriumTokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  token_type: string;
+}
+
 const tokenRequestSchema = z.object({
   client_id: z.string().min(1, 'Client ID is required'),
   code: z.string().min(1, 'Authorization code is required'),
@@ -30,7 +37,7 @@ export default defineEventHandler(async (event) => {
     if (moneriumClientSecret)
       payload.append('client_secret', moneriumClientSecret);
 
-    return await $fetch(`${moneriumAuthBaseUrl}/auth/token`, {
+    return await $fetch<MoneriumTokenResponse>(`${moneriumAuthBaseUrl}/auth/token`, {
       method: 'POST',
       body: payload,
       headers: {

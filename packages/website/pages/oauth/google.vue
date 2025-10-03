@@ -10,7 +10,11 @@ type OAuthMode = 'app' | 'docker';
 
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
-const config = useRuntimeConfig();
+const {
+  public: {
+    googleClientId,
+  },
+} = useRuntimeConfig();
 const logger = useLogger();
 
 // Get mode from query parameters
@@ -23,9 +27,6 @@ const completed = ref(false);
 const accessToken = ref<string>('');
 const refreshToken = ref<string>('');
 const currentMode = ref<OAuthMode>();
-
-// Check if required environment variables are available
-const googleClientId = config.public.googleClientId;
 
 if (!googleClientId) {
   set(error, t('oauth.errors.client_id_not_configured'));

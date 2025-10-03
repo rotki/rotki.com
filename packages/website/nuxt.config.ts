@@ -334,8 +334,8 @@ export default defineNuxtConfig({
       isDev: process.env.NODE_ENV === 'development',
       loglevel: 3, // Setting info loglevel as the default.
       maintenance: false,
-      moneriumAuthBaseUrl: 'https://api.monerium.dev',
-      moneriumClientId: '53ac5f39-a038-11f0-882b-4a4d188cc07d',
+      moneriumAuthBaseUrl: '',
+      moneriumClientId: '',
       recaptcha: {
         siteKey: '',
       },
