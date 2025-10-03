@@ -10,7 +10,7 @@
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitcoin-cash.svg",
-      "label": "Bitcoin Cash"
+      "label": "Bitcoin cash"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kusama.svg",
@@ -103,7 +103,8 @@
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/crypto_com.svg",
-      "label": "Cryptocom"
+      "label": "Cryptocom",
+      "isExchangeWithKey": true
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitstamp.svg",
@@ -208,6 +209,10 @@
       "label": "Aave"
     },
     {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/account_delegation.svg",
+      "label": "Account delegation"
+    },
+    {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/aerodrome.png",
       "label": "Aerodrome Finance"
     },
@@ -234,6 +239,10 @@
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/base.svg",
       "label": "Basenames"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/beefy_finance_light.svg",
+      "label": "Beefy Finance"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/blur.png",
@@ -270,6 +279,10 @@
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/degen.svg",
       "label": "Degen"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/digixdao.jpg",
+      "label": "DigixDAO"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/diva.svg",
@@ -357,10 +370,10 @@
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/harvest.svg",
-      "label": "Harve Finance"
+      "label": "Harvest Finance"
     },
     {
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/hedgey_dark.svg",
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/hedgey_light.svg",
       "label": "Hedgey"
     },
     {
@@ -404,6 +417,10 @@
       "label": "Locked GNO"
     },
     {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/magpie.png",
+      "label": "Magpie"
+    },
+    {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg",
       "label": "Makerdao DSR"
     },
@@ -418,6 +435,10 @@
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/makerdao.svg",
       "label": "Makerdao vault"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/merkl_light.svg",
+      "label": "Merkl"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/metamask.svg",
@@ -492,10 +513,6 @@
       "label": "Scroll"
     },
     {
-      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/sdai.svg",
-      "label": "SDAI contract"
-    },
-    {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/shapeshift.svg",
       "label": "Shapeshift"
     },
@@ -520,6 +537,10 @@
       "label": "Stakedao"
     },
     {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/summer_fi.svg",
+      "label": "Summer.fi"
+    },
+    {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/sushiswap.svg",
       "label": "Sushiswap"
     },
@@ -541,7 +562,7 @@
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/velodrome.png",
-      "label": "Velodrome finance"
+      "label": "Velodrome Finance"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/votium.png",
