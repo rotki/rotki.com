@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import process from 'node:process';
 import rotkiTheme from '@rotki/ui-library/theme';
 import {
@@ -13,6 +14,9 @@ import {
 import { removeNoncePlaceholders } from './utils/csp-utils';
 
 const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
+
+// Build identifier for unique chunk names per deployment
+const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
 
 const sponsorRoutes = [
   '/sponsor',
@@ -140,6 +144,19 @@ export default defineNuxtConfig({
     '@nuxt/image',
     'nuxt-security',
   ],
+
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // Include build identifier to ensure unique filenames per deployment
+          // Format: _nuxt/chunkName-buildId-contentHash.js
+          chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
+          entryFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
+        },
+      },
+    },
+  },
 
   nitro: {
     devProxy: {
