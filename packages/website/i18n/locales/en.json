@@ -1113,6 +1113,20 @@
       "oauth_error": "OAuth error: {error}"
     }
   },
+  "oauth_monerium": {
+    "title": "Monerium OAuth Integration",
+    "description": "Click the button below to authenticate with Monerium",
+    "button": "Continue with Monerium",
+    "expires_in_label": "Expires in {seconds} seconds",
+    "errors": {
+      "client_id_not_configured": "Monerium client ID is not configured",
+      "invalid_mode": "Invalid mode provided. Mode must be 'app' or 'docker'",
+      "initiate_flow_failed": "Failed to initiate OAuth flow",
+      "token_exchange_failed": "Failed to exchange authorization code for access token",
+      "no_access_token": "No access token received",
+      "oauth_error": "OAuth error: {error}"
+    }
+  },
   "values": {
     "contact_section": {
       "discord": {

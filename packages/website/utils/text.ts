@@ -9,7 +9,9 @@ export function toTitleCase(string: string): string {
   if (!string)
     return '';
 
-  return string.split(' ')
+  const spacedString = string.replace(/_/g, ' ');
+
+  return spacedString.split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 }
@@ -49,4 +51,8 @@ export function truncateAddress(address: string, truncLength = 4): string {
     length - truncLength,
     length,
   )}`;
+}
+
+export function removeTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, '');
 }
