@@ -10,7 +10,11 @@ type OAuthMode = 'app' | 'docker';
 
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
-const config = useRuntimeConfig();
+const {
+  public: {
+    googleClientId,
+  },
+} = useRuntimeConfig();
 const logger = useLogger();
 
 // Get mode from query parameters
@@ -23,9 +27,6 @@ const completed = ref(false);
 const accessToken = ref<string>('');
 const refreshToken = ref<string>('');
 const currentMode = ref<OAuthMode>();
-
-// Check if required environment variables are available
-const googleClientId = config.public.googleClientId;
 
 if (!googleClientId) {
   set(error, t('oauth.errors.client_id_not_configured'));
@@ -147,12 +148,16 @@ async function exchangeCodeForToken(code: string, redirectUri: string) {
 function handleAppModeCompletion(accessTokenValue: string, refreshToken?: string) {
   // Redirect to rotki://oauth with access token
   const callbackUrl = new URL('rotki://oauth/success');
+  callbackUrl.searchParams.set('service', 'google');
   callbackUrl.searchParams.set('access_token', accessTokenValue);
   callbackUrl.searchParams.set('token_type', 'Bearer');
 
   if (refreshToken) {
     callbackUrl.searchParams.set('refresh_token', refreshToken);
   }
+
+  if (googleClientId)
+    callbackUrl.searchParams.set('client_id', googleClientId);
 
   // Set completed state and show message before redirecting
   set(completed, true);
@@ -169,6 +174,7 @@ function handleAppModeCompletion(accessTokenValue: string, refreshToken?: string
 function handleAppModeFailure(errorMessage?: string) {
   // Redirect to rotki://oauth/failure to notify the application
   const callbackUrl = new URL('rotki://oauth/failure');
+  callbackUrl.searchParams.set('service', 'google');
 
   // Add error message to the URL if provided
   if (errorMessage) {
