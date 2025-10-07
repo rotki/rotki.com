@@ -68,3 +68,7 @@ export function formatCurrency(value: number, decimals = 2): string {
     minimumFractionDigits: decimals,
   });
 }
+
+export function removeTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, '');
+}

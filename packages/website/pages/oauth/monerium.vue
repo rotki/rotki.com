@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
+import { removeTrailingSlash } from '~/utils/text';
 
 type OAuthMode = 'app' | 'docker';
 
@@ -117,7 +118,7 @@ async function handleMoneriumAuth() {
       state,
     });
 
-    window.location.href = `${moneriumAuthBaseUrl}/auth?${params.toString()}`;
+    window.location.href = `${removeTrailingSlash(moneriumAuthBaseUrl)}/auth?${params.toString()}`;
   }
   catch (error_) {
     logger.error('Monerium OAuth error:', error_);

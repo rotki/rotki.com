@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { removeTrailingSlash } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
 interface MoneriumTokenResponse {
@@ -37,7 +38,7 @@ export default defineEventHandler(async (event) => {
     if (moneriumClientSecret)
       payload.append('client_secret', moneriumClientSecret);
 
-    return await $fetch<MoneriumTokenResponse>(`${moneriumAuthBaseUrl}/auth/token`, {
+    return await $fetch<MoneriumTokenResponse>(`${removeTrailingSlash(moneriumAuthBaseUrl)}/auth/token`, {
       method: 'POST',
       body: payload,
       headers: {
