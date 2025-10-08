@@ -28,7 +28,7 @@ else {
 </script>
 
 <template>
-  <div class="py-10 md:py-20 border-b border-rui-grey-300">
+  <div class="py-6 md:py-12 border-b border-rui-grey-300">
     <div class="container flex flex-col lg:flex-row gap-8 justify-between">
       <div v-if="document?.subtitle">
         <div
@@ -58,12 +58,14 @@ else {
     </div>
   </div>
 
-  <div class="py-10 md:py-20">
-    <div class="container lg:max-w-[720px]">
-      <ContentRenderer
-        v-if="document"
-        :value="document"
-      />
+  <div class="py-6 md:py-12 border-b border-rui-grey-300">
+    <div class="container">
+      <div class="max-w-[900px]">
+        <ContentRenderer
+          v-if="document"
+          :value="document"
+        />
+      </div>
     </div>
   </div>
 </template>

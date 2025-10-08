@@ -757,11 +757,7 @@
       "accept_policy": {
         "action": "Refunds/Cancellation Policy",
         "text": "I have read and agreed to the {action}"
-      },
-      "accept_title": "Refund policy",
-      "non_refundable": "refunds are not allowed",
-      "policy": "rotki has features that can be used in a daily basis to assist users with assets, portfolio management and analytics. But one of the main features is assistance with tax reporting, which is something that is used infrequently. Due to this nature of rotki subscription {non_refundable}. You can at any time cancel your subscription and from that point on no more payments will be made.",
-      "title": "rotki Refund and Cancellation Policy"
+      }
     }
   },
   "products": {
