@@ -550,6 +550,10 @@
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
+          "price_bump": "To maintain quality and development pace, we're introducing tiered subscriptions. \n\nCurrent Premium subscribers will automatically move to the {basicTier} (shown here) at {newPrice} (incl. VAT) from November 10th, 2025 and onwards. \n\nYou can cancel before then if you prefer, otherwise your next billing cycle switches automatically. \n\nSee {link} for details.",
+          "this_blog_post": "this blog post",
+          "basic_tier": "basic tier",
+          "new_price": "€25/month",
           "title": "Premium Plans",
           "vat": "The prices include a +{vat}% VAT tax"
         },

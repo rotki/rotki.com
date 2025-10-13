@@ -9,6 +9,7 @@ import { canBuyNewSubscription } from '~/utils/subscription';
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
 const { plan: savedPlan } = usePlanParams();
+const PRICE_INCREASE_LINK = 'https://blog.rotki.com/2025/10/13/rotki-tiers';
 
 const { account, authenticated, plans } = storeToRefs(useMainStore());
 
@@ -86,6 +87,37 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
+      <RuiAlert
+        type="warning"
+        class="mb-4 whitespace-break-spaces"
+      >
+        <i18n-t
+          keypath="home.plans.tiers.step_1.price_bump"
+        >
+          <template #link>
+            <ButtonLink
+              inline
+              color="primary"
+              :to="PRICE_INCREASE_LINK"
+              external
+              class="hover:underline"
+            >
+              {{ t('home.plans.tiers.step_1.this_blog_post') }}
+            </ButtonLink>
+          </template>
+          <template #basicTier>
+            <strong>
+              {{ t('home.plans.tiers.step_1.basic_tier') }}
+            </strong>
+          </template>
+          <template #newPrice>
+            <strong>
+              {{ t('home.plans.tiers.step_1.new_price') }}
+            </strong>
+          </template>
+        </i18n-t>
+      </RuiAlert>
+
       <div :class="$style.notes">
         <div
           v-for="(line, i) in notes"
