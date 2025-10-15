@@ -59,7 +59,9 @@ function useBraintreeInternal() {
 
   async function loadPlan(months: string) {
     set(loadingPlan, true);
-    const plan = parseInt(months);
+    let plan = parseInt(months);
+    if (plan !== 12)
+      plan = 1;
     const data = await paymentApi.checkout(plan);
     set(loadingPlan, false);
     if (data.isError)

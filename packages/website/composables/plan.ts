@@ -1,6 +1,6 @@
 import { get } from '@vueuse/core';
 
-const availablePlans = [1, 3, 6, 12];
+const availablePlans = [1, 12];
 
 type CurrencyParam = string | null;
 

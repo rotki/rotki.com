@@ -68,6 +68,15 @@ export function getUrlParam(key: string, defaultValue?: string): string | null {
   return params.get(key) || defaultValue || null;
 }
 
+export function getDurationFromUrlParam(key: string): string {
+  const params = getUrlParam(key);
+  if (!params || params === '12') {
+    return '12';
+  }
+
+  return '1';
+}
+
 /**
  * Get numeric query parameter value
  * @param key - The parameter key
