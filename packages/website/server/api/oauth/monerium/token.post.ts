@@ -19,14 +19,32 @@ const tokenRequestSchema = z.object({
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const logger = useLogger('oauth.monerium.token');
-  const moneriumClientSecret = config.moneriumClientSecret as string | undefined;
-  const moneriumAuthBaseUrl = (config.public.moneriumAuthBaseUrl as string | undefined) ?? 'https://api.monerium.dev';
+  const moneriumClientSecret = config.moneriumClientSecret;
+  const moneriumAuthBaseUrl = config.public.moneriumAuthBaseUrl;
+
+  if (!moneriumClientSecret) {
+    logger.error('Monerium client secret is not configured on the server');
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'OAuth configuration error please contact the server administrator',
+    });
+  }
 
   const body = await readBody(event);
 
-  try {
-    const { client_id, code, redirect_uri, code_verifier } = tokenRequestSchema.parse(body);
+  const parseResult = tokenRequestSchema.safeParse(body);
 
+  if (!parseResult.success) {
+    logger.error('Validation error:', parseResult.error.errors);
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid request parameters',
+      data: parseResult.error.errors,
+    });
+  }
+
+  try {
+    const { client_id, code, redirect_uri, code_verifier } = parseResult.data;
     const payload = new URLSearchParams({
       client_id,
       code,
@@ -47,15 +65,6 @@ export default defineEventHandler(async (event) => {
     });
   }
   catch (error) {
-    if (error instanceof z.ZodError) {
-      logger.error('Validation error:', error.errors);
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid request parameters',
-        data: error.errors,
-      });
-    }
-
     logger.error('Monerium OAuth token exchange error:', error);
     throw createError({
       statusCode: 500,
