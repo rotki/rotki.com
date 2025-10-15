@@ -78,7 +78,7 @@ export const useMainStore = defineStore('main', () => {
 
     const plansData = await paymentApi.getPlans();
     if (plansData) {
-      set(plans, plansData);
+      set(plans, plansData.filter(plan => plan.months === 1 || plan.months === 12));
       set(authenticatedOnPlansLoad, get(authenticated));
     }
   };

@@ -15,7 +15,7 @@ import {
   getAccount,
   getSavedCard,
 } from '@/utils/api';
-import { getUrlParam, navigation } from '@/utils/navigation';
+import { getDurationFromUrlParam, navigation } from '@/utils/navigation';
 
 // Configure head management for SSG
 useHead({
@@ -60,7 +60,7 @@ const isLoading = ref<boolean>(true);
 const loadingMessage = ref<string>('Checking authentication...');
 const errorMessage = ref<string>('');
 
-const plan = ref<string>(getUrlParam('plan', '12')!);
+const plan = ref<string>(getDurationFromUrlParam('plan'));
 const planData = ref<CheckoutData>();
 const savedCard = ref<SavedCardType>();
 
