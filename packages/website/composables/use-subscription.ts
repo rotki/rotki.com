@@ -8,17 +8,23 @@ import { useSubscriptionOperationsStore } from '~/store/subscription-operations'
 import { TaskResponse } from '~/types';
 import { useLogger } from '~/utils/use-logger';
 
-function getErrorMessage(error: any): string {
-  let message = error.message || 'An unexpected error occurred';
+function getErrorMessage(error: unknown): string {
+  let message = 'An unexpected error occurred';
 
   if (error instanceof FetchError) {
     if (error.status === 404) {
-      message = ActionResultResponseSchema.parse(error.data).message;
+      const parsed = ActionResultResponseSchema.safeParse(error.data);
+      if (parsed.success && parsed.data.message) {
+        message = parsed.data.message;
+      }
     }
     else if (error.status === 202) {
       // This is expected for the initial call, shouldn't happen here
       message = 'Unexpected response format';
     }
+  }
+  else if (error instanceof Error) {
+    message = error.message;
   }
 
   return message;
@@ -32,7 +38,7 @@ interface UseSubscriptionReturn {
 export function useSubscription(): UseSubscriptionReturn {
   const { requestRefresh } = useAccountRefresh();
   const subscriptionOpsStore = useSubscriptionOperationsStore();
-  const { setCancellationError, setResumeError } = subscriptionOpsStore;
+  const { setError } = subscriptionOpsStore;
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { pollTaskStatus } = useTaskPolling();
   const logger = useLogger('subscription');
@@ -41,10 +47,9 @@ export function useSubscription(): UseSubscriptionReturn {
     url: string,
     method: 'PATCH' | 'DELETE',
     taskName: string,
-    setError: (error: string) => void,
     onProgress?: (status: string) => void,
   ): Promise<void> {
-    let errorMessage: string | null = null;
+    let errorMessage: string | undefined;
 
     try {
       onProgress?.('pending');
@@ -62,7 +67,7 @@ export function useSubscription(): UseSubscriptionReturn {
         ? `${taskName} completed but result was false`
         : status.error || `${taskName} task failed`;
     }
-    catch (error: any) {
+    catch (error: unknown) {
       errorMessage = getErrorMessage(error);
     }
 
@@ -79,7 +84,6 @@ export function useSubscription(): UseSubscriptionReturn {
       `/webapi/2/subscriptions/${id}/resume/`,
       'PATCH',
       'Resume subscription',
-      setResumeError,
       onProgress,
     );
   };
@@ -89,7 +93,6 @@ export function useSubscription(): UseSubscriptionReturn {
       `/webapi/2/subscriptions/${id}/`,
       'DELETE',
       'Cancel subscription',
-      setCancellationError,
       onProgress,
     );
   };
