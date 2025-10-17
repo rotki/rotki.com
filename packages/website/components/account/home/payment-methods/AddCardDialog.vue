@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/core';
-import { type Client, create } from 'braintree-web/client';
 import { ref } from 'vue';
 import CardForm from '~/components/account/home/payment-methods/CardForm.vue';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useBraintreeClient } from '~/composables/use-braintree-client';
 import { useLogger } from '~/utils/use-logger';
 
 const showDialog = defineModel<boolean>({ required: true });
@@ -14,45 +13,17 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('add-card-dialog');
-const { fetchWithCsrf } = useFetchWithCsrf();
 
 const { addCard } = usePaymentCards();
+const { client, clientError, initializeClient, teardownClient } = useBraintreeClient();
 
-const client = ref<Client>();
 const isProcessing = ref<boolean>(false);
 const cardFormValid = ref<boolean>(false);
-const error = ref<{ title: string; message: string } | null>(null);
+const error = ref<{ title: string; message: string }>();
 
 const cardForm = ref<InstanceType<typeof CardForm>>();
 
 const isFormValid = logicAnd(cardFormValid, logicNot(isProcessing));
-
-// Initialize Braintree client when dialog opens
-async function initializeBraintreeClient() {
-  if (get(client)) {
-    return;
-  }
-
-  try {
-    const tokenResponse = await fetchWithCsrf<{ braintreeClientToken: string }>(
-      '/webapi/2/braintree/customer',
-      {
-        method: 'GET',
-      },
-    );
-
-    set(client, await create({
-      authorization: tokenResponse.braintreeClientToken,
-    }));
-  }
-  catch (error: any) {
-    logger.error('Failed to initialize Braintree:', error);
-    set(error, {
-      title: t('subscription.error.init_error'),
-      message: error.message,
-    });
-  }
-}
 
 async function handleAddCard() {
   if (!get(cardForm) || !get(isFormValid)) {
@@ -63,7 +34,11 @@ async function handleAddCard() {
     set(isProcessing, true);
     const form = get(cardForm);
     if (!form) {
-      throw new Error('New card form not available');
+      set(error, {
+        title: t('common.error'),
+        message: 'New card form not available',
+      });
+      return;
     }
     set(error, null);
 
@@ -77,7 +52,7 @@ async function handleAddCard() {
     emit('success');
 
     // Reset form state
-    set(error, null);
+    set(error, undefined);
   }
   catch (error: any) {
     logger.error('Failed to add card:', error);
@@ -99,11 +74,27 @@ function handleCancel() {
 
 // Initialize Braintree when dialog opens
 watch(showDialog, async (isOpen) => {
-  if (isOpen) {
-    set(error, null);
-    set(cardFormValid, false);
-    await initializeBraintreeClient();
+  if (!isOpen) {
+    return;
   }
+  set(error, null);
+  set(cardFormValid, false);
+  await initializeClient();
+});
+
+// Watch for client errors from composable
+watch(clientError, (errorMessage) => {
+  if (!errorMessage) {
+    return;
+  }
+  set(error, {
+    title: t('subscription.error.init_error'),
+    message: errorMessage,
+  });
+});
+
+onUnmounted(async () => {
+  await teardownClient();
 });
 </script>
 
@@ -125,7 +116,7 @@ watch(showDialog, async (isOpen) => {
         :title="error.title"
         :text="error.message"
         closeable
-        @close="error = null"
+        @close="error = undefined"
       />
 
       <!-- Card Form -->
