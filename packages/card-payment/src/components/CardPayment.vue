@@ -9,7 +9,8 @@ import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { addCard, createCardNonce } from '@/utils/api';
-import BaseButton from './BaseButton.vue';
+import AddCardDialog from './AddCardDialog.vue';
+import CardSelectionDialog from './CardSelectionDialog.vue';
 import DiscountCodeInput from './DiscountCodeInput.vue';
 import NewCardForm from './NewCardForm.vue';
 import PaymentButtons from './PaymentButtons.vue';
@@ -41,9 +42,6 @@ const acceptedTerms = ref<boolean>(false);
 const newCardFormValid = ref<boolean>(false);
 const showCardSelectionDialog = ref<boolean>(false);
 const showAddCardDialog = ref<boolean>(false);
-const addCardForm = ref<InstanceType<typeof NewCardForm>>();
-const addCardFormValid = ref<boolean>(false);
-const isAddingCard = ref<boolean>(false);
 const pendingCardToken = ref<string>();
 
 // Discount state
@@ -149,7 +147,9 @@ async function processPayment(): Promise<void> {
     else {
       const form = get(newCardForm);
       if (!form) {
-        throw new Error('New card form not available');
+        set(error, 'New card form not available');
+        set(isProcessing, false);
+        return;
       }
 
       const { nonce, bin } = await form.tokenize();
@@ -189,35 +189,13 @@ function handleCardDeleted(): void {
   emit('refresh-card');
 }
 
-async function handleAddCard(): Promise<void> {
-  if (!get(addCardFormValid)) {
-    return;
-  }
+function handleCardAdded(token: string): void {
+  set(pendingCardToken, token);
+  emit('refresh-card');
+}
 
-  set(isAddingCard, true);
-  set(error, '');
-
-  try {
-    const form = get(addCardForm);
-    if (!form) {
-      throw new Error('Add card form not available');
-    }
-
-    const { nonce } = await form.tokenize();
-    const newCardToken = await addCard({
-      paymentMethodNonce: nonce,
-    });
-
-    set(pendingCardToken, newCardToken);
-    emit('refresh-card');
-    set(showAddCardDialog, false);
-  }
-  catch (error: any) {
-    set(error, error.message || 'Failed to add card');
-  }
-  finally {
-    set(isAddingCard, false);
-  }
+function handleSelectCard(card: SavedCard): void {
+  set(selectedCard, card);
 }
 
 // Watch for cards changes to select newly added card
@@ -342,113 +320,22 @@ onUnmounted(async () => {
       />
     </div>
 
-    <!-- Card Selection Modal -->
-    <div
-      v-if="showCardSelectionDialog"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      @click.self="showCardSelectionDialog = false"
-    >
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-lg font-medium text-rui-text mb-4">
-          Select a Card
-        </h3>
-        <div class="space-y-3 mb-6">
-          <button
-            v-for="card in cards"
-            :key="card.token"
-            type="button"
-            class="w-full p-4 flex items-center gap-4 border rounded-md transition-all hover:border-rui-primary"
-            :class="selectedCard?.token === card.token ? 'border-rui-primary bg-rui-primary/5' : 'border-rui-grey-300'"
-            @click="selectedCard = card; showCardSelectionDialog = false"
-          >
-            <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center">
-              <img
-                :src="card.imageUrl"
-                alt="Card image"
-                class="w-full h-full object-contain object-center"
-              />
-            </div>
-            <div class="grow text-left">
-              <div class="text-rui-text">
-                •••• •••• •••• {{ card.last4 }}
-              </div>
-              <div class="text-sm text-rui-text-secondary">
-                Expires {{ card.expiresAt }}
-              </div>
-            </div>
-            <svg
-              v-if="selectedCard?.token === card.token"
-              class="w-5 h-5 text-rui-primary"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="flex justify-between">
-          <BaseButton
-            variant="primary"
-            size="sm"
-            @click="showCardSelectionDialog = false; showAddCardDialog = true"
-          >
-            Add new card
-          </BaseButton>
-          <BaseButton
-            variant="ghost"
-            size="sm"
-            @click="showCardSelectionDialog = false"
-          >
-            Cancel
-          </BaseButton>
-        </div>
-      </div>
-    </div>
+    <!-- Card Selection Dialog -->
+    <CardSelectionDialog
+      v-model:open="showCardSelectionDialog"
+      :cards="cards"
+      :selected-card="selectedCard"
+      :disabled="isProcessing"
+      @select-card="handleSelectCard($event)"
+      @add-new-card="showAddCardDialog = true"
+    />
 
-    <!-- Add Card Modal -->
-    <div
-      v-if="showAddCardDialog"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      @click.self="showAddCardDialog = false"
-    >
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-lg font-medium text-rui-text mb-4">
-          Add New Card
-        </h3>
-        <div class="mb-6">
-          <NewCardForm
-            v-if="client"
-            ref="addCardForm"
-            :client="client"
-            :disabled="isAddingCard"
-            @validation-change="addCardFormValid = $event"
-            @error="error = $event"
-          />
-        </div>
-        <div class="flex justify-end gap-4">
-          <BaseButton
-            variant="ghost"
-            size="sm"
-            :disabled="isAddingCard"
-            @click="showAddCardDialog = false"
-          >
-            Cancel
-          </BaseButton>
-          <BaseButton
-            variant="primary"
-            size="sm"
-            :disabled="!addCardFormValid"
-            :loading="isAddingCard"
-            @click="handleAddCard()"
-          >
-            {{ isAddingCard ? 'Adding...' : 'Add Card' }}
-          </BaseButton>
-        </div>
-      </div>
-    </div>
+    <!-- Add Card Dialog -->
+    <AddCardDialog
+      v-model:open="showAddCardDialog"
+      :client="client"
+      @card-added="handleCardAdded($event)"
+      @error="error = $event"
+    />
   </div>
 </template>
