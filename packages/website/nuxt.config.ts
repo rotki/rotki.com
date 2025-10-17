@@ -352,7 +352,7 @@ export default defineNuxtConfig({
       loglevel: 3, // Setting info loglevel as the default.
       maintenance: false,
       moneriumAuthBaseUrl: 'https://api.monerium.dev',
-      moneriumClientId: '',
+      moneriumAuthorizationCodeFlowClientId: '',
       recaptcha: {
         siteKey: '',
       },

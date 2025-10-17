@@ -1,0 +1,405 @@
+TOP 50 PULL REQUESTS FROM LAST 3 YEARS - SORTED BY LINE CHANGES (DESCENDING)
+Repository: rotki/rotki.com
+Generated: 2025-10-15 12:11:49
+====================================================================================================
+
+
+#1 - PR #48
+Title: Nuxt 3 migration
+Merged: 2023-03-06T08:39:05Z
+Total Changes: 34945 lines (+15436/-19509)
+Files Changed: 322
+URL: https://github.com/rotki/rotki.com/pull/48
+----------------------------------------------------------------------------------------------------
+
+#2 - PR #218
+Title: Deps
+Merged: 2024-05-07T10:57:18Z
+Total Changes: 17197 lines (+9925/-7272)
+Files Changed: 25
+URL: https://github.com/rotki/rotki.com/pull/218
+----------------------------------------------------------------------------------------------------
+
+#3 - PR #367
+Title: Reduce number of scripts loaded in card payment page 
+Merged: 2025-09-23T16:11:27Z
+Total Changes: 9726 lines (+6920/-2806)
+Files Changed: 530
+URL: https://github.com/rotki/rotki.com/pull/367
+----------------------------------------------------------------------------------------------------
+
+#4 - PR #60
+Title: chore: introduces rotki/eslint-config
+Merged: 2023-03-07T11:14:44Z
+Total Changes: 7592 lines (+4062/-3530)
+Files Changed: 194
+URL: https://github.com/rotki/rotki.com/pull/60
+----------------------------------------------------------------------------------------------------
+
+#5 - PR #306
+Title: chore: update dependencies
+Merged: 2025-06-20T15:36:50Z
+Total Changes: 7075 lines (+3485/-3590)
+Files Changed: 2
+URL: https://github.com/rotki/rotki.com/pull/306
+----------------------------------------------------------------------------------------------------
+
+#6 - PR #247
+Title: Dependencies
+Merged: 2024-10-04T15:30:51Z
+Total Changes: 6946 lines (+3273/-3673)
+Files Changed: 20
+URL: https://github.com/rotki/rotki.com/pull/247
+----------------------------------------------------------------------------------------------------
+
+#7 - PR #239
+Title: chore: dependency updates
+Merged: 2024-08-13T13:01:18Z
+Total Changes: 6617 lines (+2905/-3712)
+Files Changed: 17
+URL: https://github.com/rotki/rotki.com/pull/239
+----------------------------------------------------------------------------------------------------
+
+#8 - PR #161
+Title: Dependency update
+Merged: 2023-12-15T11:48:08Z
+Total Changes: 6478 lines (+3234/-3244)
+Files Changed: 13
+URL: https://github.com/rotki/rotki.com/pull/161
+----------------------------------------------------------------------------------------------------
+
+#9 - PR #155
+Title: chore: update dependencies
+Merged: 2023-10-16T15:24:50Z
+Total Changes: 6246 lines (+3295/-2951)
+Files Changed: 8
+URL: https://github.com/rotki/rotki.com/pull/155
+----------------------------------------------------------------------------------------------------
+
+#10 - PR #39
+Title: Updates dependencies for frontend
+Merged: 2022-11-17T17:28:44Z
+Total Changes: 6129 lines (+2383/-3746)
+Files Changed: 8
+URL: https://github.com/rotki/rotki.com/pull/39
+----------------------------------------------------------------------------------------------------
+
+#11 - PR #255
+Title: chore: update dependencies
+Merged: 2024-11-19T14:34:27Z
+Total Changes: 5972 lines (+2932/-3040)
+Files Changed: 18
+URL: https://github.com/rotki/rotki.com/pull/255
+----------------------------------------------------------------------------------------------------
+
+#12 - PR #335
+Title: Update dependencies
+Merged: 2025-08-20T09:43:14Z
+Total Changes: 5718 lines (+3444/-2274)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/335
+----------------------------------------------------------------------------------------------------
+
+#13 - PR #90
+Title: Dependency Updates
+Merged: 2023-04-14T14:41:30Z
+Total Changes: 5394 lines (+2023/-3371)
+Files Changed: 37
+URL: https://github.com/rotki/rotki.com/pull/90
+----------------------------------------------------------------------------------------------------
+
+#14 - PR #283
+Title: chore: update dependencies
+Merged: 2025-03-12T11:02:39Z
+Total Changes: 5288 lines (+2577/-2711)
+Files Changed: 71
+URL: https://github.com/rotki/rotki.com/pull/283
+----------------------------------------------------------------------------------------------------
+
+#15 - PR #180
+Title: chore: updates eslint-config to v2
+Merged: 2024-02-05T14:04:06Z
+Total Changes: 5193 lines (+2996/-2197)
+Files Changed: 197
+URL: https://github.com/rotki/rotki.com/pull/180
+----------------------------------------------------------------------------------------------------
+
+#16 - PR #267
+Title: chore: upgrade dependencies
+Merged: 2025-01-24T10:28:44Z
+Total Changes: 4905 lines (+2656/-2249)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/267
+----------------------------------------------------------------------------------------------------
+
+#17 - PR #300
+Title: chore: update website dependencies
+Merged: 2025-05-02T09:42:56Z
+Total Changes: 4702 lines (+2979/-1723)
+Files Changed: 2
+URL: https://github.com/rotki/rotki.com/pull/300
+----------------------------------------------------------------------------------------------------
+
+#18 - PR #85
+Title: chore: bumps pnpm to v8
+Merged: 2023-03-31T10:05:21Z
+Total Changes: 4646 lines (+2217/-2429)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/85
+----------------------------------------------------------------------------------------------------
+
+#19 - PR #188
+Title: chore: update dependencies
+Merged: 2024-03-15T12:18:56Z
+Total Changes: 4626 lines (+2347/-2279)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/188
+----------------------------------------------------------------------------------------------------
+
+#20 - PR #109
+Title: chore: updates eslint-config
+Merged: 2023-07-17T09:11:56Z
+Total Changes: 4350 lines (+2069/-2281)
+Files Changed: 73
+URL: https://github.com/rotki/rotki.com/pull/109
+----------------------------------------------------------------------------------------------------
+
+#21 - PR #369
+Title: chore: update dependencies and pnpm version
+Merged: 2025-09-15T12:02:01Z
+Total Changes: 4297 lines (+1581/-2716)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/369
+----------------------------------------------------------------------------------------------------
+
+#22 - PR #167
+Title: Dependency Updates
+Merged: 2024-01-05T10:51:01Z
+Total Changes: 4251 lines (+1789/-2462)
+Files Changed: 6
+URL: https://github.com/rotki/rotki.com/pull/167
+----------------------------------------------------------------------------------------------------
+
+#23 - PR #297
+Title: feat(frontend): premium tiers
+Merged: 2025-06-30T14:06:23Z
+Total Changes: 4219 lines (+2724/-1495)
+Files Changed: 78
+URL: https://github.com/rotki/rotki.com/pull/297
+----------------------------------------------------------------------------------------------------
+
+#24 - PR #93
+Title: chore: updates dependencies applies new lint rules
+Merged: 2023-05-26T11:27:49Z
+Total Changes: 4074 lines (+2364/-1710)
+Files Changed: 52
+URL: https://github.com/rotki/rotki.com/pull/93
+----------------------------------------------------------------------------------------------------
+
+#25 - PR #360
+Title: refactor: improve caching and rpc fallback
+Merged: 2025-09-08T08:27:32Z
+Total Changes: 4070 lines (+2510/-1560)
+Files Changed: 32
+URL: https://github.com/rotki/rotki.com/pull/360
+----------------------------------------------------------------------------------------------------
+
+#26 - PR #263
+Title: feat: update dependencies
+Merged: 2024-12-18T18:13:07Z
+Total Changes: 3894 lines (+1940/-1954)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/263
+----------------------------------------------------------------------------------------------------
+
+#27 - PR #211
+Title: chore: update dependencies
+Merged: 2024-04-04T16:36:38Z
+Total Changes: 3455 lines (+1750/-1705)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/211
+----------------------------------------------------------------------------------------------------
+
+#28 - PR #116
+Title: feat: setup layout and theme
+Merged: 2023-07-24T18:45:18Z
+Total Changes: 3386 lines (+384/-3002)
+Files Changed: 118
+URL: https://github.com/rotki/rotki.com/pull/116
+----------------------------------------------------------------------------------------------------
+
+#29 - PR #271
+Title: chore: update deps
+Merged: 2025-02-07T13:47:55Z
+Total Changes: 3290 lines (+1527/-1763)
+Files Changed: 2
+URL: https://github.com/rotki/rotki.com/pull/271
+----------------------------------------------------------------------------------------------------
+
+#30 - PR #272
+Title: Migrate to nuxt content v3
+Merged: 2025-02-12T12:34:56Z
+Total Changes: 3060 lines (+1633/-1427)
+Files Changed: 17
+URL: https://github.com/rotki/rotki.com/pull/272
+----------------------------------------------------------------------------------------------------
+
+#31 - PR #379
+Title: feat: latest upgrade tier
+Merged: 2025-10-01T11:10:55Z
+Total Changes: 2988 lines (+2637/-351)
+Files Changed: 75
+URL: https://github.com/rotki/rotki.com/pull/379
+----------------------------------------------------------------------------------------------------
+
+#32 - PR #181
+Title: chore: downgrade vue to 3.4.5
+Merged: 2024-02-05T16:54:30Z
+Total Changes: 2979 lines (+1269/-1710)
+Files Changed: 4
+URL: https://github.com/rotki/rotki.com/pull/181
+----------------------------------------------------------------------------------------------------
+
+#33 - PR #145
+Title: feat: revamp profile pages
+Merged: 2023-09-27T11:36:08Z
+Total Changes: 2896 lines (+1471/-1425)
+Files Changed: 58
+URL: https://github.com/rotki/rotki.com/pull/145
+----------------------------------------------------------------------------------------------------
+
+#34 - PR #151
+Title: feat(Payments): update payment flow ui and components
+Merged: 2023-10-16T08:52:21Z
+Total Changes: 2890 lines (+1702/-1188)
+Files Changed: 49
+URL: https://github.com/rotki/rotki.com/pull/151
+----------------------------------------------------------------------------------------------------
+
+#35 - PR #165
+Title: refactor: revamp homepage
+Merged: 2024-01-03T10:10:12Z
+Total Changes: 2815 lines (+788/-2027)
+Files Changed: 86
+URL: https://github.com/rotki/rotki.com/pull/165
+----------------------------------------------------------------------------------------------------
+
+#36 - PR #321
+Title: chore: merge main_features to staging
+Merged: 2025-07-07T15:19:40Z
+Total Changes: 2766 lines (+2582/-184)
+Files Changed: 27
+URL: https://github.com/rotki/rotki.com/pull/321
+----------------------------------------------------------------------------------------------------
+
+#37 - PR #231
+Title: Updates some of the dependencies
+Merged: 2024-07-22T10:53:10Z
+Total Changes: 2708 lines (+1649/-1059)
+Files Changed: 7
+URL: https://github.com/rotki/rotki.com/pull/231
+----------------------------------------------------------------------------------------------------
+
+#38 - PR #322
+Title: feat: cache nft metadata and image in SSR
+Merged: 2025-07-15T13:51:46Z
+Total Changes: 2650 lines (+2235/-415)
+Files Changed: 31
+URL: https://github.com/rotki/rotki.com/pull/322
+----------------------------------------------------------------------------------------------------
+
+#39 - PR #289
+Title: Update to node 22
+Merged: 2025-03-21T13:12:08Z
+Total Changes: 2617 lines (+1223/-1394)
+Files Changed: 8
+URL: https://github.com/rotki/rotki.com/pull/289
+----------------------------------------------------------------------------------------------------
+
+#40 - PR #235
+Title: feat: integrate wallet connect
+Merged: 2024-11-22T14:37:32Z
+Total Changes: 2573 lines (+1898/-675)
+Files Changed: 17
+URL: https://github.com/rotki/rotki.com/pull/235
+----------------------------------------------------------------------------------------------------
+
+#41 - PR #256
+Title: Minor adjustments in crypto payments
+Merged: 2024-11-27T12:34:33Z
+Total Changes: 2545 lines (+1309/-1236)
+Files Changed: 84
+URL: https://github.com/rotki/rotki.com/pull/256
+----------------------------------------------------------------------------------------------------
+
+#42 - PR #62
+Title: Migrate documents to markdown
+Merged: 2023-03-09T09:31:50Z
+Total Changes: 2508 lines (+1809/-699)
+Files Changed: 19
+URL: https://github.com/rotki/rotki.com/pull/62
+----------------------------------------------------------------------------------------------------
+
+#43 - PR #118
+Title: refactor: update auth pages to new design
+Merged: 2023-07-31T11:32:45Z
+Total Changes: 2265 lines (+1354/-911)
+Files Changed: 44
+URL: https://github.com/rotki/rotki.com/pull/118
+----------------------------------------------------------------------------------------------------
+
+#44 - PR #179
+Title: Update dependencies and node
+Merged: 2024-02-05T12:20:26Z
+Total Changes: 2152 lines (+1358/-794)
+Files Changed: 7
+URL: https://github.com/rotki/rotki.com/pull/179
+----------------------------------------------------------------------------------------------------
+
+#45 - PR #102
+Title: Updates dependencies and forces docker build to use the lockfile on install
+Merged: 2023-06-15T09:08:54Z
+Total Changes: 2128 lines (+1117/-1011)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/102
+----------------------------------------------------------------------------------------------------
+
+#46 - PR #311
+Title: feat: nft page
+Merged: 2025-07-07T14:48:40Z
+Total Changes: 2074 lines (+1902/-172)
+Files Changed: 20
+URL: https://github.com/rotki/rotki.com/pull/311
+----------------------------------------------------------------------------------------------------
+
+#47 - PR #69
+Title: chore: updates dependencies
+Merged: 2023-03-17T17:43:41Z
+Total Changes: 1869 lines (+1175/-694)
+Files Changed: 3
+URL: https://github.com/rotki/rotki.com/pull/69
+----------------------------------------------------------------------------------------------------
+
+#48 - PR #125
+Title: Updates site dependencies and deployment configuration
+Merged: 2023-08-02T15:48:23Z
+Total Changes: 1641 lines (+886/-755)
+Files Changed: 7
+URL: https://github.com/rotki/rotki.com/pull/125
+----------------------------------------------------------------------------------------------------
+
+#49 - PR #350
+Title: fix: add nft cache warmer
+Merged: 2025-08-29T11:28:32Z
+Total Changes: 1470 lines (+923/-547)
+Files Changed: 12
+URL: https://github.com/rotki/rotki.com/pull/350
+----------------------------------------------------------------------------------------------------
+
+#50 - PR #110
+Title: chore: updates dependencies
+Merged: 2023-07-17T11:11:58Z
+Total Changes: 1393 lines (+766/-627)
+Files Changed: 11
+URL: https://github.com/rotki/rotki.com/pull/110
+----------------------------------------------------------------------------------------------------
