@@ -101,3 +101,5 @@ tests/e2e/screenshots
 tests/**/coverage
 .data/content
 planning/
+
+**/.claude/

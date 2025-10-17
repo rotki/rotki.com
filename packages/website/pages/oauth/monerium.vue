@@ -30,7 +30,7 @@ useHead({
 
 const {
   public: {
-    moneriumClientId,
+    moneriumAuthorizationCodeFlowClientId,
     moneriumAuthBaseUrl,
   },
 } = useRuntimeConfig();
@@ -45,11 +45,11 @@ const {
   generateStorageKey,
 } = usePkce('rotki-monerium-pkce-');
 
-if (!moneriumClientId)
+if (!moneriumAuthorizationCodeFlowClientId)
   set(error, t('oauth_monerium.errors.client_id_not_configured'));
 
 async function handleMoneriumAuth() {
-  if (!moneriumClientId) {
+  if (!moneriumAuthorizationCodeFlowClientId) {
     set(error, t('oauth_monerium.errors.client_id_not_configured'));
     return;
   }
@@ -81,7 +81,7 @@ async function handleMoneriumAuth() {
 
     // Build Monerium OAuth URL
     const params = new URLSearchParams({
-      client_id: moneriumClientId,
+      client_id: moneriumAuthorizationCodeFlowClientId,
       redirect_uri: redirectUri,
       response_type: 'code',
       code_challenge: codeChallenge,
@@ -112,7 +112,7 @@ async function exchangeCodeForToken(code: string, redirectUri: string, codeVerif
     {
       method: 'POST',
       body: {
-        client_id: moneriumClientId,
+        client_id: moneriumAuthorizationCodeFlowClientId,
         code,
         redirect_uri: redirectUri,
         code_verifier: codeVerifier,
@@ -142,7 +142,7 @@ async function handleOAuthCallback() {
 
     if (tokenResponse.access_token) {
       if (originalMode === 'app') {
-        handleAppModeCompletion(tokenResponse, moneriumClientId);
+        handleAppModeCompletion(tokenResponse, moneriumAuthorizationCodeFlowClientId);
       }
       else {
         handleDockerModeCompletion(tokenResponse);
