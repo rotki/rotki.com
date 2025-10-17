@@ -1,16 +1,18 @@
-export * from './schemas/api.js';
-
-export * from './schemas/checkout.js';
-
-export * from './schemas/discount.js';
-
 // Main entry point - only re-export the most commonly used items
-export * from './schemas/payment.js';
+export * from './schemas/api';
 
-export * from './schemas/plans.js';
+export * from './schemas/checkout';
 
-export * from './schemas/subscription.js';
+export * from './schemas/discount';
 
-export * from './schemas/three-d-secure.js';
+export * from './schemas/payment';
+
+export * from './schemas/plans';
+
+export * from './schemas/subscription';
+
+export * from './schemas/three-d-secure';
+
+export * from './utils/checkout';
 
 export * from './utils/subscription';

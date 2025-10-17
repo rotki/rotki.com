@@ -35,6 +35,10 @@
       "types": "./src/utils/object.ts",
       "import": "./src/utils/object.ts"
     },
+    "./utils/checkout": {
+      "types": "./src/utils/checkout.ts",
+      "import": "./src/utils/checkout.ts"
+    },
     "./schemas/account": {
       "types": "./src/schemas/account.ts",
       "import": "./src/schemas/account.ts"

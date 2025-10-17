@@ -4,6 +4,7 @@ import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
+import { getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
@@ -110,21 +111,9 @@ async function getSavedCardBin(card: SavedCard): Promise<string> {
   }
 }
 
-const finalAmount = computed<number>(() => {
-  const data = get(planData);
-
-  if ('finalAmount' in data) {
-    return parseFloat(data.finalAmount);
-  }
-
-  const plan = get(selectedPlan);
-  const discountVal = get(discountInfo);
-  if (discountVal && discountVal.isValid && discountVal.finalPrice) {
-    return discountVal.finalPrice;
-  }
-
-  return plan.price;
-});
+const finalAmount = computed<number>(() =>
+  getFinalAmount(get(planData), get(selectedPlan), get(discountInfo)),
+);
 
 async function processPayment(): Promise<void> {
   if (!get(isFormValid)) {
