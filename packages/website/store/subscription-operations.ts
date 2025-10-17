@@ -1,72 +1,55 @@
-import type { Subscription as UserSubscription } from '@rotki/card-payment-common';
+import type { SubscriptionActionType } from '~/components/account/home/subscription-table/types';
 import { set } from '@vueuse/shared';
 import { defineStore } from 'pinia';
 
 export const useSubscriptionOperationsStore = defineStore('subscription-operations', () => {
-  // State
-  const cancellationError = ref<string>('');
-  const cancellationStatus = ref<string>('');
-  const cancelling = ref<boolean>(false);
-  const resumeError = ref<string>('');
-  const resumeStatus = ref<string>('');
-  const resuming = ref<boolean>(false);
-
-  const upgradingSubscription = ref<UserSubscription>();
-  const cancellingUpgrade = ref<boolean>(false);
+  // Unified operation state
+  const operationType = ref<SubscriptionActionType>();
+  const inProgress = ref<boolean>(false);
+  const status = ref<string>();
+  const error = ref<string>();
 
   // Actions
-  function setCancellationError(error: string): void {
-    set(cancellationError, error);
+  function setOperationType(type: SubscriptionActionType | undefined): void {
+    set(operationType, type);
   }
 
-  function setResumeError(error: string): void {
-    set(resumeError, error);
+  function setInProgress(value: boolean): void {
+    set(inProgress, value);
   }
 
-  function setCancellationStatus(status: string): void {
-    set(cancellationStatus, status);
+  function setStatus(value: string): void {
+    set(status, value);
   }
 
-  function setResumeStatus(status: string): void {
-    set(resumeStatus, status);
+  function setError(value: string): void {
+    set(error, value);
   }
 
-  function setCancelling(value: boolean): void {
-    set(cancelling, value);
+  function startOperation(type: SubscriptionActionType): void {
+    set(operationType, type);
+    set(inProgress, true);
+    set(status, undefined);
+    set(error, undefined);
   }
 
-  function setResuming(value: boolean): void {
-    set(resuming, value);
-  }
-
-  function clearCancellationState(): void {
-    set(cancellationError, '');
-    set(cancellationStatus, '');
-    set(cancelling, false);
-  }
-
-  function clearResumeState(): void {
-    set(resumeError, '');
-    set(resumeStatus, '');
-    set(resuming, false);
+  function clearOperation(): void {
+    set(operationType, undefined);
+    set(inProgress, false);
+    set(status, undefined);
+    set(error, undefined);
   }
 
   return {
-    cancellationError,
-    cancellationStatus,
-    cancelling,
-    clearCancellationState,
-    clearResumeState,
-    resumeError,
-    resumeStatus,
-    resuming,
-    setCancellationError,
-    setCancellationStatus,
-    setCancelling,
-    setResumeError,
-    setResumeStatus,
-    setResuming,
-    upgradingSubscription,
-    cancellingUpgrade,
+    clearOperation,
+    error,
+    inProgress,
+    operationType,
+    setError,
+    setInProgress,
+    setOperationType,
+    setStatus,
+    startOperation,
+    status,
   };
 });
