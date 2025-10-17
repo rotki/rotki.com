@@ -2,6 +2,7 @@
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentStep } from '~/types';
+import { getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
 import { paypalCheckout } from 'braintree-web';
 import { usePaypalApi } from '~/composables/use-paypal-api';
@@ -39,23 +40,13 @@ const processing = computed<boolean>(() => get(paying) || get(pending));
 
 const grandTotal = computed<number>(() => {
   const data = get(checkoutData);
-
-  if (data && 'finalAmount' in data) {
-    return parseFloat(data.finalAmount);
-  }
-
   const plan = get(selectedPlan);
-  const discountVal = get(discountInfo);
 
-  if (!plan) {
+  if (!data || !plan) {
     return 0;
   }
 
-  if (!discountVal || !discountVal.isValid) {
-    return plan.price;
-  }
-
-  return discountVal.finalPrice;
+  return getFinalAmount(data, plan, get(discountInfo));
 });
 
 async function processPayment(planId: number, nonce: string): Promise<void> {
