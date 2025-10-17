@@ -2,6 +2,7 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
@@ -19,8 +20,8 @@ const { userSubscriptions } = useUserSubscriptions();
 const { requestRefresh } = useAccountRefresh();
 
 const subscriptionOpsStore = useSubscriptionOperationsStore();
-const { cancellationError, resumeError } = storeToRefs(subscriptionOpsStore);
-const { setCancellationError, setResumeError } = subscriptionOpsStore;
+const { error, operationType } = storeToRefs(subscriptionOpsStore);
+const { setError } = subscriptionOpsStore;
 
 const premium = computed<boolean>(() => get(account)?.canUsePremium ?? false);
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
@@ -31,24 +32,20 @@ const canUsePremium = computed<boolean>(() => {
   return get(account)?.canUsePremium || arePending.length > 0;
 });
 
-const subscriptionError = computed<string>(() => get(resumeError) || get(cancellationError));
+const subscriptionError = computed<string>(() => get(error) || '');
 const subscriptionErrorTitle = computed<string>(() => {
-  if (get(resumeError)) {
+  const type = get(operationType);
+  if (type === SubscriptionAction.RESUME) {
     return t('account.subscriptions.resume.notification.title');
   }
-  if (get(cancellationError)) {
+  if (type === SubscriptionAction.CANCEL) {
     return t('account.subscriptions.cancellation.notification.title');
   }
   return '';
 });
 
 function dismissSubscriptionError(): void {
-  if (get(resumeError)) {
-    setResumeError('');
-  }
-  else if (get(cancellationError)) {
-    setCancellationError('');
-  }
+  setError('');
 }
 
 onBeforeMount(() => {
