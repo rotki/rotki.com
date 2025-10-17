@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { CheckoutData, SelectedPlan, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
+import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
+import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { getFinalAmount, isUpgradeData } from '@rotki/card-payment-common/utils/checkout';
 import { get } from '@vueuse/core';
 import { computed } from 'vue';
 
@@ -11,25 +13,16 @@ const { selectedPlan, discountInfo, planData, upgrade } = defineProps<{
   upgrade: boolean;
 }>();
 
-const grandTotal = computed<number>(() => {
-  const data = get(planData);
-
-  if ('finalAmount' in data) {
-    return parseFloat(data.finalAmount);
-  }
-
-  const plan = get(selectedPlan);
-  const discountVal = get(discountInfo);
-  if (discountVal && discountVal.isValid && discountVal.finalPrice) {
-    return discountVal.finalPrice;
-  }
-
-  return plan.price;
-});
+const grandTotal = computed<number>(() =>
+  getFinalAmount(get(planData), get(selectedPlan), get(discountInfo)),
+);
 
 const originalPrice = computed<number>(() => selectedPlan.price);
 
-const hasDiscount = computed<boolean>(() => discountInfo && discountInfo.isValid && !('finalAmount' in get(planData)));
+const hasDiscount = computed<boolean>(() => {
+  const discount = get(discountInfo);
+  return !!discount && discount.isValid && !isUpgradeData(get(planData));
+});
 
 const savings = computed<number>(() => {
   if (!hasDiscount.value)

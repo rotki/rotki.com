@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
+import { getDiscountedPrice } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
 import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 
@@ -87,13 +88,7 @@ const grandTotal = computed<number>(() => {
   if (!plan)
     return 0;
 
-  const discountVal = get(discountInfo);
-
-  if (!discountVal || !discountVal.isValid) {
-    return plan.price;
-  }
-
-  return discountVal.finalPrice ?? 0;
+  return getDiscountedPrice(plan, get(discountInfo));
 });
 </script>
 
