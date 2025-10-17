@@ -62,11 +62,11 @@ async function handleSetDefault(card: SavedCard) {
     set(settingDefault, card.token);
     await setDefaultCard(card.token);
   }
-  catch (error: any) {
-    logger.error('Failed to set default card:', error);
+  catch (_error: any) {
+    logger.error('Failed to set default card:', _error);
     set(error, {
       title: t('common.error'),
-      message: error.message || t('common.error_occurred'),
+      message: _error.message || t('common.error_occurred'),
     });
   }
   finally {
@@ -134,10 +134,11 @@ function getCardTooltip(card: SavedCard): string | undefined {
         type="error"
         class="mb-6"
         :title="error.title"
-        :text="error.message"
         closeable
         @close="error = null"
-      />
+      >
+        {{ error.message }}
+      </RuiAlert>
 
       <!-- Cards List -->
       <div
