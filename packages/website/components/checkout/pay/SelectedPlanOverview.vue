@@ -61,16 +61,38 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <PlanOverview>
-    <span :class="$style.plan">{{ name }}</span>
+    <div
+      :class="$style.plan"
+      class="text-rui-text"
+    >
+      {{ name }}
+    </div>
     <i18n-t
       keypath="selected_plan_overview.plan"
+      :plural="crypto ? 0 : 1"
       scope="global"
+      tag="div"
+      class="font-medium whitespace-break-spaces"
     >
-      <template #date>
-        {{ date }}
+      <template #period>
+        {{
+          t('selected_plan_overview.renew_period',
+            {
+              months: plan.months,
+            },
+            plan.months,
+          )
+        }}
       </template>
+    </i18n-t>
+    <i18n-t
+      keypath="selected_plan_overview.price"
+      scope="global"
+      tag="div"
+      class="mt-3"
+    >
       <template #finalPriceInEur>
-        {{ plan.finalPriceInEur }}
+        <span class="font-bold">{{ plan.finalPriceInEur }}</span>
       </template>
       <template #vat>
         <span v-if="vatOverview && !crypto">
@@ -85,17 +107,28 @@ const { t } = useI18n({ useScope: 'global' });
         </span>
       </template>
     </i18n-t>
-    <span>
-      {{
-        t(
-          'selected_plan_overview.renew_period',
-          {
-            months: plan.months,
-          },
-          plan.months,
-        )
-      }}
-    </span>
+    <i18n-t
+      v-if="!crypto"
+      keypath="selected_plan_overview.starting"
+      scope="global"
+      tag="div"
+    >
+      <template #date>
+        <span class="font-bold">{{ date }}</span>
+      </template>
+    </i18n-t>
+    <div class="text-xs mt-1 italic whitespace-break-spaces">
+      <template v-if="!crypto">
+        {{
+          t('selected_plan_overview.recurring_info', {
+            period: plan.months === 12 ? t('selected_plan_overview.year') : t('selected_plan_overview.month'),
+          })
+        }}
+      </template>
+      <template v-else>
+        {{ t('selected_plan_overview.one_time_payment') }}
+      </template>
+    </div>
 
     <template #action>
       <RuiButton

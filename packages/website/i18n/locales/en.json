@@ -534,7 +534,7 @@
         "for": "{name} for",
         "monthly": "Monthly",
         "numeric": "{months} Months",
-        "plan": "{name} Plan.",
+        "plan": "Premium Plan ({name})",
         "yearly": "Yearly"
       },
       "per_month": "per month",
@@ -868,9 +868,15 @@
   },
   "selected_plan_overview": {
     "includes_vat": "(includes {vat}% VAT)",
-    "plan": "Starting from ({date}) {finalPriceInEur}€ {vat} {renew}",
-    "renew_period": "every {months} month | every {months} months",
-    "vat": "({priceInEur}€ + {vat}% VAT)"
+    "plan": "{period} recurring subscription | {period} subscription",
+    "price": "Price: {finalPriceInEur} € {vat}",
+    "starting": "Starting Date: {date}",
+    "renew_period": "{months} month | 1 year ({months} months)",
+    "vat": "({priceInEur}€ + {vat}% VAT)",
+    "recurring_info": "You will be charged automatically each {period} until you cancel",
+    "one_time_payment": "Crypto payments are non-recurring (one time payment). \nManual renewal is required.",
+    "month": "month",
+    "year": "year"
   },
   "signup_address": {
     "title": "Address"
