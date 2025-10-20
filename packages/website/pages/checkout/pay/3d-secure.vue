@@ -35,6 +35,7 @@ const {
   error,
   challengeVisible,
   isProcessing,
+  paymentInfo,
   initializeProcess,
   cleanup,
   clearStoredData,
@@ -111,6 +112,7 @@ onBeforeRouteLeave((to, from, next) => {
       v-if="isProcessing"
       :state="state"
       :challenge-visible="challengeVisible"
+      :payment-info="paymentInfo"
     />
 
     <!-- Error State -->

@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import type { ThreeDSecureState } from '@rotki/card-payment-common/schemas/three-d-secure';
+import type { PaymentInfo, ThreeDSecureState } from '@rotki/card-payment-common/schemas/three-d-secure';
+import PaymentInfoCard from '~/components/checkout/3d-secure/PaymentInfoCard.vue';
 
 interface Props {
   state: ThreeDSecureState;
   challengeVisible: boolean;
+  paymentInfo: PaymentInfo | undefined;
 }
 
-defineProps<Props>();
+const { state, challengeVisible, paymentInfo } = defineProps<Props>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const loadingMessages = computed(() => ({
+const loadingMessages = computed<Record<ThreeDSecureState, string>>(() => ({
   'initializing': t('subscription.3d_secure.initializing'),
   'ready': t('subscription.3d_secure.ready'),
   'verifying': t('subscription.3d_secure.verifying'),
@@ -22,6 +24,13 @@ const loadingMessages = computed(() => ({
 
 <template>
   <div class="flex flex-col items-center justify-center">
+    <!-- Payment Information -->
+    <PaymentInfoCard
+      v-if="paymentInfo"
+      :payment-info="paymentInfo"
+      class="mb-2 -mt-2"
+    />
+
     <!-- Loading indicator for non-challenge states -->
     <div
       v-if="!challengeVisible"
@@ -55,7 +64,7 @@ const loadingMessages = computed(() => ({
       v-show="challengeVisible"
       class="w-full max-w-2xl mx-auto flex flex-col items-center"
     >
-      <div class="mb-4">
+      <div class="my-3">
         <RuiAlert
           type="info"
           variant="outlined"
