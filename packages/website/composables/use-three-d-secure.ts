@@ -1,5 +1,6 @@
 import type { PayEvent } from '~/types/common';
 import {
+  type PaymentInfo,
   type ThreeDSecureParams,
   ThreeDSecureParamsSchema,
   type ThreeDSecureState,
@@ -13,10 +14,21 @@ import { useLogger } from '~/utils/use-logger';
 
 const SESSION_KEY = 'threeDSecureData';
 
+interface UseThreeDSecureReturn {
+  cleanup: () => void;
+  clearStoredData: () => void;
+  initializeProcess: () => Promise<{ success: boolean; params?: ThreeDSecureParams }>;
+  challengeVisible: Readonly<Ref<boolean>>;
+  error: Readonly<Ref<string>>;
+  isProcessing: ComputedRef<boolean>;
+  state: Readonly<Ref<ThreeDSecureState>>;
+  paymentInfo: Readonly<Ref<PaymentInfo | undefined>>;
+}
+
 /**
  * Composable for managing 3D Secure verification flow
  */
-export function useThreeDSecure() {
+export function useThreeDSecure(): UseThreeDSecureReturn {
   const logger = useLogger('three-d-secure');
 
   const state = ref<ThreeDSecureState>('initializing');
@@ -24,6 +36,7 @@ export function useThreeDSecure() {
   const challengeVisible = ref<boolean>(false);
   const btClient = ref<Client>();
   const btThreeDSecure = ref<ThreeDSecure>();
+  const paymentInfo = ref<PaymentInfo>();
 
   const isProcessing = computed<boolean>(() => {
     const currentState = get(state);
@@ -235,6 +248,13 @@ export function useThreeDSecure() {
       return { success: false };
     }
 
+    logger.info('storedParams', storedParams);
+    set(paymentInfo, {
+      durationInMonths: storedParams.durationInMonths.toString(),
+      amount: storedParams.amount,
+      finalAmount: storedParams.finalAmount,
+    });
+
     try {
       // Complete the entire 3D Secure and payment flow
       await verifyAndFinalizePayment(storedParams);
@@ -257,12 +277,13 @@ export function useThreeDSecure() {
   }
 
   return {
-    challengeVisible: readonly(challengeVisible),
     cleanup,
     clearStoredData,
-    error: readonly(error),
     initializeProcess,
-    isProcessing: readonly(isProcessing),
+    challengeVisible: readonly(challengeVisible),
+    error: readonly(error),
+    isProcessing,
     state: readonly(state),
+    paymentInfo: readonly(paymentInfo),
   };
 }
