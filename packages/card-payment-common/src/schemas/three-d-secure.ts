@@ -5,6 +5,7 @@ import { z } from 'zod';
  */
 export const ThreeDSecureParamsSchema = z.object({
   amount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Invalid amount format'),
+  finalAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Invalid amount format'),
   bin: z.string().min(4, 'BIN must be at least 4 characters'),
   nonce: z.string().min(1, 'Nonce is required'),
   paymentMethodId: z.string().optional(),
@@ -12,9 +13,16 @@ export const ThreeDSecureParamsSchema = z.object({
   token: z.string().min(1, 'Token is required'),
   discountCode: z.string().optional(),
   upgradeSubId: z.string().optional(),
+  durationInMonths: z.number().int().positive('duration must be positive'),
 });
 
 export type ThreeDSecureParams = z.infer<typeof ThreeDSecureParamsSchema>;
+
+export interface PaymentInfo {
+  amount: string;
+  finalAmount: string;
+  durationInMonths: string;
+}
 
 /**
  * 3D Secure verification state
