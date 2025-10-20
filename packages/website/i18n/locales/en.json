@@ -1196,7 +1196,15 @@
       "success": "Verification successful",
       "error": "Verification failed",
       "challenge_instructions": "Please complete the security challenge below",
-      "security_notice": "This page uses bank-grade security to protect your payment information"
+      "security_notice": "This page uses bank-grade security to protect your payment information",
+      "payment_info": {
+        "title": "Payment Summary",
+        "charge_today": "Charge today",
+        "recurring_charge": "Recurring charge",
+        "per_month": "per month",
+        "per_year": "per year",
+        "approval_notice": "By completing this verification, you approve recurring payments of {amount}€ {period} until you cancel your subscription."
+      }
     },
     "selected_plan": "Selected Plan",
     "months": "month | months"

@@ -155,14 +155,17 @@ async function processPayment(): Promise<void> {
     });
 
     // Store data for 3D Secure if needed
+    const plan = get(selectedPlan);
     const threeDSecureParams: ThreeDSecureParams = {
       token: planData.braintreeClientToken,
       planId: selectedPlan.planId,
-      amount: get(finalAmount).toString(),
+      amount: plan.price.toString(),
+      finalAmount: get(finalAmount).toString(),
       nonce: paymentNonce,
       bin: paymentBin,
       discountCode: get(discountCode) || undefined,
       upgradeSubId: get(upgradeSubId) || undefined,
+      durationInMonths: plan.durationInMonths,
     };
 
     sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
