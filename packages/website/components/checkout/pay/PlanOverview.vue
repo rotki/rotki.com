@@ -1,15 +1,8 @@
-<script setup lang="ts">
-const { t } = useI18n({ useScope: 'global' });
-</script>
-
 <template>
   <div :class="$style.content">
     <RuiCard>
       <div class="flex gap-4">
-        <div class="flex flex-col">
-          <div :class="$style.title">
-            {{ t('home.plans.tiers.step_3.chose') }}
-          </div>
+        <div class="flex flex-col flex-1">
           <div :class="$style.body">
             <div :class="$style.description">
               <slot />
@@ -35,7 +28,7 @@ const { t } = useI18n({ useScope: 'global' });
 }
 
 .title {
-  @apply text-rui-text text-h6;
+  @apply text-rui-text font-medium;
 }
 
 .description {
