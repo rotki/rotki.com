@@ -548,7 +548,12 @@
             "line_1": "The selected payment method will be billed the total amount for the subscription immediately.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
-            "line_4": "Subscriptions can be canceled from the account page at any point in time."
+            "line_4": "Subscriptions can be canceled from the account page at any point in time.",
+            "line_5": "This is a recurring {status} subscription. You will be charged automatically each {period} until you cancel",
+            "yearly": "yearly",
+            "monthly": "monthly",
+            "year": "year",
+            "month": "month"
           },
           "price_bump": "To maintain quality and development pace, we're introducing tiered subscriptions. \n\nCurrent Premium subscribers will automatically move to the {basicTier} (shown here) at {newPrice} (incl. VAT) from November 10th, 2025 and onwards. \n\nYou can cancel before then if you prefer, otherwise your next billing cycle switches automatically. \n\nSee {link} for details.",
           "this_blog_post": "this blog post",

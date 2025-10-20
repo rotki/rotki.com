@@ -160,6 +160,7 @@ onMounted(async () => {
       :plan="plan"
       :disabled="processing || initializing"
     />
+    <SubscriptionNotes />
     <AcceptRefundPolicy
       v-model="accepted"
       :disabled="processing || initializing"

@@ -30,13 +30,6 @@ const cryptoPrice = computed(() => {
 
 const vat = computed(() => get(account)?.vat);
 
-const notes = computed(() => [
-  t('home.plans.tiers.step_1.notes.line_1'),
-  t('home.plans.tiers.step_1.notes.line_2'),
-  t('home.plans.tiers.step_1.notes.line_3'),
-  t('home.plans.tiers.step_1.notes.line_4'),
-]);
-
 const isSelected = (plan: Plan) => plan === get(selected);
 
 function select(plan: Plan) {
@@ -89,7 +82,7 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
       <RuiAlert
         type="warning"
-        class="mb-4 whitespace-break-spaces"
+        class="whitespace-break-spaces"
       >
         <i18n-t
           keypath="home.plans.tiers.step_1.price_bump"
@@ -118,19 +111,7 @@ const canBuy = reactify(canBuyNewSubscription)(account);
         </i18n-t>
       </RuiAlert>
 
-      <div :class="$style.notes">
-        <div
-          v-for="(line, i) in notes"
-          :key="i"
-          :class="$style.note"
-        >
-          <RuiIcon
-            :class="$style.note__icon"
-            name="lu-circle-arrow-right"
-          />
-          <p>{{ line }}</p>
-        </div>
-      </div>
+      <SubscriptionNotes />
 
       <div :class="$style.continue">
         <RuiButton
@@ -183,17 +164,5 @@ const canBuy = reactify(canBuyNewSubscription)(account);
 
 .continue {
   @apply mt-[2.63rem];
-}
-
-.notes {
-  @apply flex flex-col gap-3;
-
-  .note {
-    @apply flex gap-3;
-
-    &__icon {
-      @apply text-black/[.54] shrink-0;
-    }
-  }
 }
 </style>

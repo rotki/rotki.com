@@ -24,6 +24,18 @@ const emit = defineEmits<{
   'refresh-card': [];
 }>();
 
+const notes = computed(() => {
+  const isYearly = planData.months === 12;
+
+  return [
+    `This is a recurring ${isYearly ? 'yearly' : 'monthly'} subscription. You will be charged automatically each ${isYearly ? 'year' : 'month'} until you cancel`,
+    'The selected payment method will be billed the total amount for the subscription immediately.',
+    'New billing cycle starts at UTC midnight after the subscription has ran out.',
+    'An invoice is generated for each payment and you can access it from your account page.',
+    'Subscriptions can be canceled from the account page at any point in time.',
+  ];
+});
+
 const client = ref<Client>();
 const newCardForm = ref<InstanceType<typeof NewCardForm>>();
 const isProcessing = ref<boolean>(false);
@@ -201,6 +213,34 @@ onUnmounted(async () => {
 
       <!-- Plan Summary -->
       <PlanSummary :plan-data="planData" />
+
+      <div class="flex flex-col gap-3 text-black/[.54] text-sm border-t pt-6">
+        <div
+          v-for="(line, i) in notes"
+          :key="i"
+          class="flex gap-3"
+        >
+          <svg
+            class="_rui-icon_z22yv_315 text-black/[.54] shrink-0"
+            height="24"
+            width="24"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2,12 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z M12 16 L16 12 L12 8 M8 12h8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <p>{{ line }}</p>
+        </div>
+      </div>
 
       <!-- Accept Refund Policy -->
       <TermsAcceptance
