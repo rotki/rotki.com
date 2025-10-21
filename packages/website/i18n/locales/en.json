@@ -43,8 +43,7 @@
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
       "no_premium_found": "No premium subscription found. Select your {plan}.",
-      "plan": "premium subscription plan",
-      "title": "rotki Premium"
+      "plan": "premium subscription plan"
     },
     "payments": {
       "headers": {
@@ -223,7 +222,6 @@
     "renew": "Renew",
     "reset": "Reset",
     "resume": "Resume",
-    "retry": "Retry",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
     "update": "Update"
@@ -451,26 +449,6 @@
       }
     },
     "evm_protocols": {
-      "protocols": {
-        "aave": {
-          "title": "AAVE"
-        },
-        "balancer": {
-          "title": "Balancer"
-        },
-        "compound": {
-          "title": "Compound"
-        },
-        "maker_dao": {
-          "title": "Maker DAO"
-        },
-        "uniswap": {
-          "title": "Uniswap"
-        },
-        "yearn_vaults": {
-          "title": "Yearn vaults"
-        }
-      },
       "subtitle": "Manage assets across multiple protocols across EVM networks.",
       "title": "EVM protocols",
       "key_features": "Key Features",
@@ -568,7 +546,6 @@
             "title": "Change Payment",
             "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent."
           },
-          "chose": "You chose:",
           "description": "Proceed to the payment",
           "labels": {
             "network": "Network",
@@ -582,16 +559,6 @@
             "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
           },
           "payment_description": "Payments are safely processed with Braintree a PayPal Service",
-          "saved_card": {
-            "card_expired": "The card has expired. Please use a different card.",
-            "delete_expired_card": "Please delete the expired card and add a new one to continue.",
-            "delete": {
-              "description": "Are you sure you want to remove this card?",
-              "title": "Remove Saved Card"
-            },
-            "expiry": "Expiry {expiresAt}"
-          },
-          "start": "Start Subscription",
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
           "wallet": {
@@ -747,17 +714,8 @@
   "logo": {
     "alt": "rotki logo"
   },
-  "payment": {
-    "card": {
-      "number": "Card Number",
-      "expiration": "Expiration",
-      "cvv": "CVV",
-      "card_image_alt": "Card"
-    }
-  },
   "policies": {
     "refund": {
-      "accept_message": "You need to accept the refund policy before proceeding",
       "accept_policy": {
         "action": "Refunds/Cancellation Policy",
         "text": "I have read and agreed to the {action}"
@@ -917,17 +875,12 @@
       "description": "Choose a display name that will be shown on the download page or app, depending on the tier. Do this only after you mint an NFT.",
       "name_label": "Display Name",
       "name_hint": "Optional. 3-30 characters.",
-      "address_label": "Wallet Address",
-      "address_hint": "Your connected wallet address",
       "connected_address": "Connected Address",
       "token_id_label": "NFT Token ID",
       "token_id_hint": "The ID of your sponsor NFT",
       "connect_wallet": "Connect Wallet",
-      "connect_wallet_first": "Please connect your wallet to submit or view your NFT names",
       "connect_to_submit": "Connect your wallet to submit your NFT name",
       "connect_to_view_submissions": "Connect your wallet to view your NFT submissions",
-      "sign_message": "Sign Message",
-      "sign_hint": "Sign a message to verify ownership of this wallet",
       "sign_to_continue": "Sign in with Ethereum",
       "sign_required": "Please sign the message to verify your wallet ownership",
       "submit": "Submit Data",
@@ -951,7 +904,6 @@
         "too_long": "Name must be at most 30 characters long",
         "invalid_chars": "Name can only contain letters, numbers, spaces, hyphens, underscores, and dots",
         "invalid_email": "Please enter a valid email address",
-        "wallet_connect": "Failed to connect wallet",
         "sign_failed": "Failed to sign message",
         "submit_failed": "Failed to submit display name",
         "image_too_large": "Image must be less than 5MB",
@@ -959,7 +911,6 @@
         "at_least_one_required": "Please provide either a display name or an image",
         "token_id_required": "NFT Token ID is required",
         "token_id_invalid": "NFT Token ID must be a number",
-        "sign_required": "Please sign the message to verify ownership",
         "invalid_token_id": "Please enter a valid NFT Token ID",
         "check_failed": "Failed to check NFT metadata",
         "nft_not_found": "NFT not found or invalid token ID",
@@ -967,21 +918,9 @@
         "wrong_release": "This NFT is from {nftRelease} but submissions are only accepted for {currentRelease}",
         "cannot_edit_previous_release": "Cannot edit submissions from previous releases"
       },
-      "check": "Check",
       "tier": "Tier",
-      "in_release": "in release {releaseName}",
       "nft_info": "NFT with id #{tokenId} is in {tier} for release {releaseName}",
       "terms_note": "* Submitted text and images are subject to review. rotki reserves the right to reject or request changes to any content that is offensive, illegal, misleading, scam-related, or otherwise inconsistent with our values."
-    },
-    "existing_submission": {
-      "title": "Existing Submission Found",
-      "message": "A submission already exists for NFT #{nftId}.",
-      "display_name": "Display Name",
-      "has_image": "Image uploaded",
-      "email": "Email",
-      "question": "Would you like to edit this submission?",
-      "edit_button": "Edit Existing",
-      "cancel_button": "Cancel"
     },
     "sponsor_page": {
       "title": "Sponsor next rotki release",
@@ -1013,7 +952,6 @@
         "sold_out": "{tier} Sold Out",
         "approving": "Approving {currency}...",
         "approve": "Approve {currency}",
-        "confirm_approve": "Confirm Approval",
         "minting": "Minting...",
         "mint": "Mint {tier} sponsorship NFT",
         "no_tiers_available": "No tiers available"
@@ -1051,18 +989,14 @@
       "title": "Transaction Pending"
     },
     "error": {
-      "auth_failed_3d_secure": "3D Secure authentication failed",
-      "auth_failed_3d_secure_message": "The 3D Secure authentication of your card failed ({status}). Please try a different payment method.",
       "init_error": "Initialization Error",
-      "payment_error": "Payment Error",
       "payment_failure": "Payment Failure",
       "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
     },
     "progress": {
       "payment_progress": "Payment in progress",
       "payment_progress_message": "Please confirm your transaction...",
-      "payment_progress_wait": "Please wait while your payment is processed...",
-      "processing": "Processing"
+      "payment_progress_wait": "Please wait while your payment is processed..."
     },
     "success": {
       "message": "Your payment was processed successfully. Visit the account management page to manage your account.",
@@ -1071,7 +1005,6 @@
     "3d_secure": {
       "page_title": "3D Secure Verification",
       "page_description": "Secure payment verification in progress. Please complete the authentication challenge if prompted.",
-      "leave_confirmation": "Are you sure you want to leave? This will cancel the payment verification process.",
       "error_title": "Verification Failed",
       "error_help": "If the problem persists, please try a different payment method or contact support.",
       "invalid_params_title": "Invalid Verification Request",
@@ -1081,9 +1014,6 @@
       "cause_expired_session": "The verification session has expired",
       "cause_browser_refresh": "Refreshing or navigating back from this page",
       "back_to_payment_selection": "Back to Payment Selection",
-      "success_title": "Verification Successful",
-      "success_message": "Your payment has been successfully verified and processed. Welcome to rotki premium!",
-      "go_to_dashboard": "Go to Dashboard",
       "payment_complete_notice": "Your subscription is now active. Check out our ",
       "setup_guide": "setup guide",
       "get_started_text": " to get started with rotki premium.",
@@ -1095,9 +1025,7 @@
       "error": "Verification failed",
       "challenge_instructions": "Please complete the security challenge below",
       "security_notice": "This page uses bank-grade security to protect your payment information"
-    },
-    "selected_plan": "Selected Plan",
-    "months": "month | months"
+    }
   },
   "oauth": {
     "title": "OAuth Integration",
@@ -1129,8 +1057,7 @@
       "invalid_mode": "Invalid mode provided. Mode must be 'app' or 'docker'",
       "initiate_flow_failed": "Failed to initiate OAuth flow",
       "token_exchange_failed": "Failed to exchange authorization code for access token",
-      "no_access_token": "No access token received",
-      "oauth_error": "OAuth error: {error}"
+      "no_access_token": "No access token received"
     }
   },
   "values": {
