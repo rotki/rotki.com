@@ -100,8 +100,9 @@ const renewLink = computed<{ path: string; query: Record<string, string> }>(() =
 
   if (subs.length > 0) {
     const sub = subs[0];
+    const durationInMonths = sub.durationInMonths === 12 ? 12 : 1;
     link.query = {
-      plan: sub.durationInMonths.toString(),
+      plan: durationInMonths.toString(),
       id: sub.identifier,
       method: PaymentMethod.BLOCKCHAIN,
     };
