@@ -40,10 +40,6 @@ function select(months: number) {
   return emit('select', months);
 }
 
-function getPrice(plan: Plan) {
-  return get(crypto) ? plan.priceCrypto : plan.priceFiat;
-}
-
 watch(visible, (visible) => {
   if (!visible)
     set(confirmed, false);
@@ -73,7 +69,7 @@ onMounted(async () => await store.getPlans());
         <div :class="$style.name">
           {{ t('home.plans.names.plan', { name: getPlanName(plan.months) }) }}
         </div>
-        {{ getPrice(plan) }}€
+        {{ plan.priceFiat }}€
         <span v-if="vat">+ {{ t('common.vat', { vat }) }}</span>
         {{
           t(
