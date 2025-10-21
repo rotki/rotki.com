@@ -519,7 +519,6 @@
       "save_discount": "Save {discount}%",
       "tiers": {
         "step_1": {
-          "crypto_hint": "* When paying with crypto the monthly price is {cryptoPrice} €",
           "description": "Choose the different plans we offer",
           "maybe_vat": "VAT may apply depending on your jurisdiction",
           "notes": {

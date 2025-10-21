@@ -20,14 +20,6 @@ const selected = computed<Plan | undefined>(
   () => get(plans)?.find(plan => plan.months === get(identifier)),
 );
 
-const cryptoPrice = computed(() => {
-  const plan = get(selected);
-  if (!plan)
-    return 0;
-
-  return (parseFloat(plan.priceCrypto) / plan.months).toFixed(2);
-});
-
 const vat = computed(() => get(account)?.vat);
 
 const notes = computed(() => [
@@ -76,13 +68,6 @@ const canBuy = reactify(canBuyNewSubscription)(account);
           :selected="isSelected(plan)"
           @click="select(plan)"
         />
-      </div>
-
-      <div
-        v-if="selected"
-        :class="$style.hint"
-      >
-        {{ t('home.plans.tiers.step_1.crypto_hint', { cryptoPrice }) }}
       </div>
     </div>
 
@@ -175,10 +160,6 @@ const canBuy = reactify(canBuyNewSubscription)(account);
 
 .selectable {
   @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 xl:gap-8;
-}
-
-.hint {
-  @apply mt-3 text-base italic text-rui-text;
 }
 
 .continue {
