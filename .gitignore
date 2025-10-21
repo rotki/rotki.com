@@ -103,3 +103,4 @@ tests/**/coverage
 planning/
 
 **/.claude/
+.tmp/

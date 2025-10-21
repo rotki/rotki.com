@@ -25,6 +25,8 @@
     "cypress:open": "pnpm --filter @rotki/website cypress:open",
     "cypress:run": "pnpm --filter @rotki/website cypress:run",
     "coverage": "pnpm --filter @rotki/website coverage",
+    "i18n:check": "node scripts/check-i18n.mjs",
+    "i18n:clean": "node scripts/check-i18n.mjs --delete",
     "prepare": "husky",
     "release": "bumpp -r --no-push"
   },
@@ -34,6 +36,8 @@
     "@rotki/eslint-config": "4.5.0",
     "@rotki/eslint-plugin": "1.2.0",
     "bumpp": "10.3.1",
+    "cac": "6.7.14",
+    "consola": "3.3.3",
     "eslint": "9.38.0",
     "eslint-plugin-nuxt": "4.0.0",
     "husky": "9.1.7",
