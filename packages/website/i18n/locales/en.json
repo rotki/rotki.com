@@ -487,6 +487,7 @@
     "plans": {
       "cannot_continue": "You cannot continue because you have an active subscription. Click here to",
       "choose": "Choose Plan",
+      "plan_selected": "Plan selected",
       "details": {
         "advanced": {
           "subtitle": "Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
