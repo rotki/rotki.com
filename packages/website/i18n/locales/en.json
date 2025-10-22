@@ -515,22 +515,18 @@
         "plan": "Premium Plan ({name})",
         "yearly": "Yearly"
       },
-      "per_month": "per month",
-      "save_discount": "Save {discount}%",
+      "per_month": "month",
+      "saving": "save {months} months vs monthly",
       "tiers": {
         "step_1": {
           "description": "Choose the different plans we offer",
           "maybe_vat": "VAT may apply depending on your jurisdiction",
           "notes": {
-            "line_1": "The selected payment method will be billed the total amount for the subscription immediately.",
+            "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
-          "price_bump": "To maintain quality and development pace, we're introducing tiered subscriptions. \n\nCurrent Premium subscribers will automatically move to the {basicTier} (shown here) at {newPrice} (incl. VAT) from November 10th, 2025 and onwards. \n\nYou can cancel before then if you prefer, otherwise your next billing cycle switches automatically. \n\nSee {link} for details.",
-          "this_blog_post": "this blog post",
-          "basic_tier": "basic tier",
-          "new_price": "€25/month",
           "title": "Premium Plans",
           "vat": "The prices include a +{vat}% VAT tax"
         },
@@ -573,8 +569,7 @@
           "description": "Secure authentication verification",
           "title": "3D Secure Verification"
         }
-      },
-      "total": "Total {total}€"
+      }
     },
     "premium_features": {
       "features": {

@@ -6,10 +6,16 @@ import { useMainStore } from '~/store';
 import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { canBuyNewSubscription } from '~/utils/subscription';
 
+interface PlanWithDiscount extends Plan {
+  freeMonths?: number;
+  paidMonths?: number;
+  originalPrice?: string;
+  originalMonthlyPrice?: string;
+}
+
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
 const { plan: savedPlan } = usePlanParams();
-const PRICE_INCREASE_LINK = 'https://blog.rotki.com/2025/10/13/rotki-tiers';
 
 const { account, authenticated, plans } = storeToRefs(useMainStore());
 
@@ -22,14 +28,59 @@ const selected = computed<Plan | undefined>(
 
 const vat = computed(() => get(account)?.vat);
 
-const notes = computed(() => [
-  t('home.plans.tiers.step_1.notes.line_1'),
-  t('home.plans.tiers.step_1.notes.line_2'),
-  t('home.plans.tiers.step_1.notes.line_3'),
-  t('home.plans.tiers.step_1.notes.line_4'),
-]);
+const notes = computed<string[]>(() => {
+  const selectedPlan = get(selected);
+  const period = selectedPlan?.months === 1
+    ? t('selected_plan_overview.month')
+    : t('selected_plan_overview.year');
 
-const isSelected = (plan: Plan) => plan === get(selected);
+  return [
+    t('home.plans.tiers.step_1.notes.line_1', { period }),
+    t('home.plans.tiers.step_1.notes.line_2'),
+    t('home.plans.tiers.step_1.notes.line_3'),
+    t('home.plans.tiers.step_1.notes.line_4'),
+  ];
+});
+
+const plansWithDiscount = computed<PlanWithDiscount[]>(() => {
+  const allPlans = get(plans);
+  if (!allPlans || allPlans.length < 2)
+    return allPlans || [];
+
+  const monthlyPlan = allPlans.find(plan => plan.months === 1);
+  const yearlyPlan = allPlans.find(plan => plan.months === 12);
+
+  if (!monthlyPlan || !yearlyPlan)
+    return allPlans;
+
+  const monthlyPlanPrice = parseFloat(monthlyPlan.priceFiat);
+  const monthlyTotal = monthlyPlanPrice * 12;
+  const yearlyTotal = parseFloat(yearlyPlan.priceFiat);
+  const savings = monthlyTotal - yearlyTotal;
+  const discountPercentage = Math.round((savings / monthlyTotal) * 100);
+  const freeMonths = Math.round((savings / monthlyPlanPrice));
+
+  return allPlans.map((plan): PlanWithDiscount => {
+    if (plan.months !== 12) {
+      return plan;
+    }
+
+    const paidMonths = plan.months - freeMonths;
+    const originalPrice = (monthlyPlanPrice * 12).toFixed(2);
+    const originalMonthlyPrice = monthlyPlanPrice.toFixed(2);
+
+    return {
+      ...plan,
+      discount: discountPercentage,
+      freeMonths,
+      originalMonthlyPrice,
+      originalPrice,
+      paidMonths,
+    };
+  });
+});
+
+const isSelected = (plan: Plan) => plan.months === get(identifier);
 
 function select(plan: Plan) {
   set(identifier, plan.months);
@@ -47,7 +98,7 @@ const canBuy = reactify(canBuyNewSubscription)(account);
 </script>
 
 <template>
-  <div :class="$style.container">
+  <div class="flex flex-col w-full grow">
     <CheckoutTitle>
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
@@ -58,10 +109,10 @@ const canBuy = reactify(canBuyNewSubscription)(account);
       </span>
     </CheckoutDescription>
 
-    <div :class="$style.selection">
-      <div :class="$style.selectable">
+    <div class="flex flex-col w-full justify-center my-8">
+      <div class="w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 xl:gap-8">
         <SelectablePlan
-          v-for="plan in plans"
+          v-for="plan in plansWithDiscount"
           :key="plan.months"
           :plan="plan"
           :popular="plan.months === 12"
@@ -72,52 +123,26 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     </div>
 
     <div class="max-w-[27.5rem] mx-auto flex flex-col justify-between grow">
-      <RuiAlert
-        type="warning"
-        class="mb-4 whitespace-break-spaces"
-      >
-        <i18n-t
-          keypath="home.plans.tiers.step_1.price_bump"
-        >
-          <template #link>
-            <ButtonLink
-              inline
-              color="primary"
-              :to="PRICE_INCREASE_LINK"
-              external
-              class="hover:underline"
-            >
-              {{ t('home.plans.tiers.step_1.this_blog_post') }}
-            </ButtonLink>
-          </template>
-          <template #basicTier>
-            <strong>
-              {{ t('home.plans.tiers.step_1.basic_tier') }}
-            </strong>
-          </template>
-          <template #newPrice>
-            <strong>
-              {{ t('home.plans.tiers.step_1.new_price') }}
-            </strong>
-          </template>
-        </i18n-t>
-      </RuiAlert>
-
-      <div :class="$style.notes">
+      <div class="flex flex-col gap-4">
         <div
           v-for="(line, i) in notes"
           :key="i"
-          :class="$style.note"
+          class="flex gap-3 items-start"
         >
-          <RuiIcon
-            :class="$style.note__icon"
-            name="lu-circle-arrow-right"
-          />
-          <p>{{ line }}</p>
+          <div class="mt-0.5 shrink-0">
+            <RuiIcon
+              class="text-rui-primary"
+              name="lu-circle-check"
+              size="20"
+            />
+          </div>
+          <p class="text-rui-text text-sm leading-relaxed">
+            {{ line }}
+          </p>
         </div>
       </div>
 
-      <div :class="$style.continue">
+      <div class="mt-[2.63rem]">
         <RuiButton
           :disabled="!selected || !canBuy"
           :loading="processing"
@@ -148,33 +173,3 @@ const canBuy = reactify(canBuyNewSubscription)(account);
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.container {
-  @apply flex flex-col w-full grow;
-}
-
-.selection {
-  @apply flex flex-col w-full justify-center my-8;
-}
-
-.selectable {
-  @apply w-full lg:w-auto grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 xl:gap-8;
-}
-
-.continue {
-  @apply mt-[2.63rem];
-}
-
-.notes {
-  @apply flex flex-col gap-3;
-
-  .note {
-    @apply flex gap-3;
-
-    &__icon {
-      @apply text-black/[.54] shrink-0;
-    }
-  }
-}
-</style>

@@ -3,24 +3,32 @@ import type { Plan } from '~/types';
 import { get } from '@vueuse/core';
 import { getPlanSelectionName } from '~/utils/plans';
 
-const props = withDefaults(
-  defineProps<{
-    plan: Plan;
-    selected: boolean;
-    popular?: boolean;
-  }>(),
-  { popular: false },
-);
+interface PlanWithDiscount extends Plan {
+  freeMonths?: number;
+  paidMonths?: number;
+  originalPrice?: string;
+  originalMonthlyPrice?: string;
+}
 
-const emit = defineEmits<{ (e: 'click'): void }>();
+const props = withDefaults(defineProps<{
+  plan: PlanWithDiscount;
+  selected: boolean;
+  popular?: boolean;
+}>(), {
+  popular: false,
+});
+
+const emit = defineEmits<{ click: [] }>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const { plan } = toRefs(props);
 
-const name = computed(() => getPlanSelectionName(get(plan).months));
-const totalPrice = computed(() => get(plan).priceFiat);
-const price = computed(() => {
+const name = computed<string>(() => getPlanSelectionName(get(plan).months));
+
+const totalPrice = computed<string>(() => get(plan).priceFiat);
+
+const price = computed<string>(() => {
   const { months, priceFiat } = get(plan);
   return (parseFloat(priceFiat) / months).toFixed(2);
 });
@@ -32,7 +40,8 @@ function click() {
 
 <template>
   <div
-    :class="[$style.plan, { [$style.selected]: selected }]"
+    class="flex flex-col items-center min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
+    :class="{ 'border-rui-primary': selected }"
     @click="click()"
   >
     <div class="flex items-center h-0 justify-center relative w-full">
@@ -45,18 +54,45 @@ function click() {
         {{ t('home.plans.most_popular') }}
       </RuiChip>
     </div>
-    <CheckMark :selected="selected" />
-    <div :class="$style.name">
+
+    <div class="w-full flex justify-between items-center my-1 h-8">
+      <div class="h-full flex items-center">
+        <div
+          v-if="plan.discount"
+          class="px-2.5 py-1 text-[0.625rem] font-bold uppercase tracking-wider bg-green-400 text-black rounded-full whitespace-nowrap"
+        >
+          {{ plan.discount }}% OFF
+        </div>
+      </div>
+      <CheckMark :selected="selected" />
+    </div>
+    <div class="text-h5 text-rui-text mb-6">
       {{ name }}
     </div>
-    <div :class="$style.emphasis">
-      {{ price }}€
+
+    <div
+      v-if="plan.originalPrice"
+      class="text-base text-rui-text-secondary line-through font-normal opacity-70 h-6 flex items-center justify-center mb-1"
+    >
+      {{ plan.originalPrice }}€
     </div>
-    <div :class="$style.monthly">
-      {{ t('home.plans.per_month') }}
+    <div
+      v-else
+      class="h-7"
+    />
+
+    <div class="font-black text-[2.5rem] leading-none text-rui-text">
+      {{ totalPrice }}€
     </div>
-    <div :class="$style.total">
-      {{ t('home.plans.total', { total: totalPrice }) }}
+
+    <div class="text-sm text-rui-text-secondary mt-3 mb-6 font-normal flex flex-col items-center justify-start h-[2.75rem]">
+      <div>{{ price }}€/{{ t('home.plans.per_month') }}</div>
+      <div
+        v-if="plan.freeMonths"
+        class="text-xs"
+      >
+        {{ t('home.plans.saving', { months: plan.freeMonths }) }}
+      </div>
     </div>
     <RuiButton
       :color="selected ? 'primary' : undefined"
@@ -64,49 +100,5 @@ function click() {
     >
       {{ t('home.plans.choose') }}
     </RuiButton>
-
-    <div
-      v-if="plan.discount"
-      :class="$style.discount"
-    >
-      <RuiIcon
-        class="text-black/60"
-        name="lu-donate-fill"
-      />
-      <span>
-        {{ t('home.plans.save_discount', { discount: plan.discount }) }}
-      </span>
-    </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.plan {
-  @apply flex flex-col items-center min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8;
-  @apply border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12];
-
-  &.selected {
-    @apply border-rui-primary;
-  }
-}
-
-.name {
-  @apply text-h5 text-rui-text mb-4;
-}
-
-.emphasis {
-  @apply font-black text-h3 text-rui-text;
-}
-
-.monthly {
-  @apply text-body-1 text-rui-secondary mt-4;
-}
-
-.total {
-  @apply mb-4 sm:mb-8 text-body-1 text-rui-primary;
-}
-
-.discount {
-  @apply flex gap-[0.62rem] text-base mt-2;
-}
-</style>
