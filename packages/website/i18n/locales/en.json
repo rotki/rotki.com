@@ -607,6 +607,9 @@
           },
           "subtitle": "Payments by crypto can have slower processing times.",
           "title": "Payment Details",
+          "how_crypto_works": "How crypto payments work",
+          "select_payment": "Select network and token to pay",
+          "order_summary": "Order Summary",
           "upgrade_plan_description": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.",
           "upgrade_to_plan": "Upgrade to plan:",
           "qr": {
