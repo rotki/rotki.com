@@ -93,43 +93,68 @@ const grandTotal = computed<number>(() => {
 </script>
 
 <template>
-  <div :class="$style.content">
-    <CheckoutTitle>
-      {{ t('home.plans.tiers.step_3.title') }}
-    </CheckoutTitle>
-    <CheckoutDescription>
-      {{ t('home.plans.tiers.step_3.subtitle') }}
-    </CheckoutDescription>
-    <CryptoPaymentInfo />
-    <template v-if="selectedPlan">
-      <RuiDivider class="mt-8 mb-4" />
-      <SelectedPlanOverview
-        :upgrade="!!upgradeSubId"
-        :plan="selectedPlan"
-        crypto
-      />
+  <div class="w-full max-w-7xl mx-auto md:p-6">
+    <div class="mb-8">
+      <CheckoutTitle>
+        {{ t('home.plans.tiers.step_3.title') }}
+      </CheckoutTitle>
+      <CheckoutDescription>
+        {{ t('home.plans.tiers.step_3.subtitle') }}
+      </CheckoutDescription>
+    </div>
 
-      <DiscountCodeInput
-        v-if="!upgradeSubId"
-        v-model="discountCode"
-        v-model:discount-info="discountInfo"
-        :plan="selectedPlan"
-        class="mt-6"
-      />
+    <div class="flex flex-col gap-8 md:gap-10 xl:grid xl:grid-cols-[1.5fr_1fr] xl:gap-12 xl:items-start">
+      <div class="flex flex-col gap-6 min-w-0">
+        <CryptoPaymentInfo class="mb-2" />
 
-      <PaymentGrandTotal
-        :upgrade="!!upgradeSubId"
-        :grand-total="grandTotal"
-        class="mt-6"
-      />
-    </template>
-    <CryptoAssetSelector v-model="currency" />
+        <RuiCard>
+          <div class="text-lg font-medium mb-6">
+            {{ t('home.plans.tiers.step_3.select_payment') }}
+          </div>
+          <CryptoAssetSelector v-model="currency" />
+        </RuiCard>
+      </div>
+
+      <aside
+        v-if="selectedPlan"
+        class="w-full xl:sticky xl:top-8 xl:self-start"
+      >
+        <RuiCard>
+          <div class="text-lg font-medium mb-6">
+            {{ t('home.plans.tiers.step_3.order_summary') }}
+          </div>
+
+          <SelectedPlanOverview
+            :upgrade="!!upgradeSubId"
+            :plan="selectedPlan"
+            crypto
+          />
+
+          <RuiDivider class="my-6" />
+
+          <DiscountCodeInput
+            v-if="!upgradeSubId"
+            v-model="discountCode"
+            v-model:discount-info="discountInfo"
+            :plan="selectedPlan"
+            class="mb-6"
+          />
+
+          <PaymentGrandTotal
+            :upgrade="!!upgradeSubId"
+            :grand-total="grandTotal"
+          />
+        </RuiCard>
+      </aside>
+    </div>
+
     <AcceptRefundPolicy
       v-model="acceptRefundPolicy"
-      :class="$style.policy"
+      class="mt-6 max-w-[27.5rem] mx-auto w-full"
       :disabled="processing"
     />
-    <div :class="$style.buttons">
+
+    <div class="flex gap-4 justify-center w-full mt-6 mx-auto max-w-[27.5rem]">
       <RuiButton
         v-if="!subscriptionId"
         :disabled="processing"
@@ -158,17 +183,3 @@ const grandTotal = computed<number>(() => {
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.content {
-  @apply flex flex-col w-full max-w-[27.5rem] mx-auto grow;
-}
-
-.policy {
-  @apply my-8;
-}
-
-.buttons {
-  @apply flex gap-4 justify-center w-full mt-auto;
-}
-</style>
