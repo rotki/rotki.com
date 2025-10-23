@@ -68,6 +68,12 @@ const step = computed<number>(() => {
 
 const { removeStoredRedirectUrl } = useRedirectUrl();
 
+// Routes that use two-column layout and need special spacing
+const isTwoColumnLayout = computed<boolean>(() => {
+  const twoColumnRoutes = ['checkout-pay-request-crypto'];
+  return twoColumnRoutes.includes(route.name as string);
+});
+
 onBeforeMount(() => {
   removeStoredRedirectUrl();
   store.getAvailablePlans().catch(() => {});
@@ -76,7 +82,10 @@ onBeforeMount(() => {
 
 <template>
   <div
-    class="container flex flex-col lg:flex-row py-8 lg:py-14 h-full grow"
+    class="container flex flex-col lg:flex-row h-full grow"
+    :class="[
+      isTwoColumnLayout ? 'lg:py-8' : 'py-4 lg:py-8',
+    ]"
   >
     <div class="flex justify-center grow">
       <RuiProgress
@@ -88,11 +97,17 @@ onBeforeMount(() => {
       />
       <form
         v-else
-        class="max-w-full flex flex-col items-center justify-between"
+        class="flex flex-col justify-between"
+        :class="[
+          isTwoColumnLayout ? 'w-full' : 'max-w-full items-center',
+        ]"
         @submit.prevent
       >
         <NuxtPage />
-        <div class="py-10 lg:px-4 w-full max-w-[29rem]">
+        <div
+          v-if="!isTwoColumnLayout"
+          class="py-10 lg:px-4 w-full max-w-[29rem]"
+        >
           <RuiFooterStepper
             :model-value="step"
             :pages="steps.length"
