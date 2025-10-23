@@ -119,7 +119,7 @@ watch(canvas, async (canvas) => {
       </div>
     </div>
 
-    <p class="text-center text-sm text-rui-text-secondary mb-3">
+    <p class="text-center text-sm text-rui-text-secondary">
       {{ t('home.plans.tiers.step_3.qr.click_to_copy') }}
     </p>
   </div>
