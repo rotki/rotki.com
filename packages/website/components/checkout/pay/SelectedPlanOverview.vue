@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<{
   disabled: false,
   loading: false,
   upgrade: false,
+  nextPayment: undefined,
 });
 
 const emit = defineEmits<{

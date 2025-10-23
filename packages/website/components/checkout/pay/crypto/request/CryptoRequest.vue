@@ -106,7 +106,7 @@ const grandTotal = computed<number>(() => {
       <SelectedPlanOverview
         :upgrade="!!upgradeSubId"
         :plan="selectedPlan"
-        :next-payment="0"
+        crypto
       />
 
       <DiscountCodeInput

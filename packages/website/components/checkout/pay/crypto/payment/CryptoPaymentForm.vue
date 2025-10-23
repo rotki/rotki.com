@@ -104,7 +104,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
     <div class="mb-4">
       <SelectedPlanOverview
         :plan="plan"
-        :next-payment="0"
+        crypto
         :disabled="planSwitchLoading || web3ProcessingLoading"
         :loading="planSwitchLoading"
         internal-mode
