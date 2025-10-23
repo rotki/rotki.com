@@ -59,7 +59,7 @@ onBeforeMount(() => {
     <PremiumPlaceholder v-else-if="!canUsePremium" />
     <ApiKeys v-if="premium" />
     <SubscriptionTable v-if="emailConfirmed" />
-    <PaymentsTable />
+    <PaymentsTable :pending="pending" />
 
     <!-- Unified subscription error notification -->
     <FloatingNotification
