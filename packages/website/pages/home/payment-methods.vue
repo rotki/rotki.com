@@ -1,12 +1,19 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import { get, set } from '@vueuse/core';
+import { get, objectPick, set } from '@vueuse/core';
 import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
 import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCardDialog.vue';
 import AccountPaymentCard from '~/components/account/home/payment-methods/PaymentCard.vue';
+import ThreeDSecureModal, { type ThreeDSecureVerificationData } from '~/components/account/home/payment-methods/ThreeDSecureModal.vue';
+import { useFetchUserSubscriptions } from '~/composables/use-fetch-user-subscriptions';
 import { usePaymentCards } from '~/composables/use-payment-cards';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
+
+interface CardOperation {
+  mode: 'default' | 'reauthorize';
+  token: string;
+}
 
 definePageMeta({
   layout: 'account',
@@ -16,25 +23,25 @@ definePageMeta({
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('payment-methods');
 
-const { cards, loading, getCards, setDefaultCard } = usePaymentCards();
-
 const showAddCardDialog = ref<boolean>(false);
 const showDeleteDialog = ref<boolean>(false);
-const error = ref<{ title: string; message: string } | null>(null);
-const settingDefault = ref<string | null>(null);
-const cardToDelete = ref<SavedCard | null>(null);
-const deletingCard = ref<string | null>(null);
+const showThreeDSecureModal = ref<boolean>(false);
+const isReauthorization = ref<boolean>(false);
+const deletingCard = ref<boolean>(false);
+
+const cardOperation = ref<CardOperation>();
+const cardToDelete = ref<SavedCard>();
+const verificationData = ref<ThreeDSecureVerificationData>();
+
+const error = ref<{ title: string; message: string }>();
 
 const { account } = storeToRefs(useMainStore());
 
-async function loadCards() {
-  try {
-    await getCards();
-  }
-  catch (error: any) {
-    logger.error('Failed to load cards:', error);
-  }
-}
+const { cards, loading, refresh } = usePaymentCards();
+const { fetchUserSubscriptions } = useFetchUserSubscriptions();
+
+const hasCards = computed<boolean>(() => get(cards).length > 0);
+const hasActiveSubscription = computed<boolean>(() => !!get(account)?.hasActiveSubscription);
 
 function confirmDeleteCard(card: SavedCard) {
   set(cardToDelete, card);
@@ -43,45 +50,88 @@ function confirmDeleteCard(card: SavedCard) {
 
 function handleDeleteError(deleteError: { title: string; message: string }) {
   set(error, deleteError);
-  set(deletingCard, null);
 }
 
 function handleDeleteSuccess() {
-  set(cardToDelete, null);
-  set(deletingCard, null);
-  loadCards();
+  set(cardToDelete, undefined);
+  refresh();
 }
 
-async function handleSetDefault(card: SavedCard) {
-  // Don't set if it's already linked
-  if (card.linked) {
-    return;
-  }
+async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Promise<void> {
+  set(error, undefined);
+  set(isReauthorization, isReauth);
+
+  const actionType = isReauth ? 'reauthorization' : 'card verification';
+  const mode = isReauth ? 'reauthorize' : 'default';
 
   try {
-    set(settingDefault, card.token);
-    await setDefaultCard(card.token);
+    set(cardOperation, { mode, token: card.token });
+
+    const subscriptions = await fetchUserSubscriptions();
+    const activeSubscription = subscriptions.find(sub => sub.isActive);
+
+    if (!activeSubscription) {
+      logger.error(`No active subscription found for 3DS ${actionType}`);
+      set(error, {
+        title: t('common.error'),
+        message: t('home.account.payment_methods.no_active_subscription'),
+      });
+      return;
+    }
+
+    set(verificationData, {
+      cardToken: card.token,
+      subscriptionData: objectPick(activeSubscription, ['nextBillingAmount', 'nextActionDate', 'durationInMonths']),
+    });
+    set(showThreeDSecureModal, true);
   }
   catch (_error: any) {
-    logger.error('Failed to set default card:', _error);
+    logger.error(`Failed to initialize ${actionType}:`, _error);
     set(error, {
       title: t('common.error'),
       message: _error.message || t('common.error_occurred'),
     });
   }
   finally {
-    set(settingDefault, null);
+    set(cardOperation, undefined);
   }
 }
 
-onBeforeMount(async () => {
-  await loadCards();
-});
+async function handleSetDefault(card: SavedCard): Promise<void> {
+  if (card.linked) {
+    return;
+  }
+  await initiate3DSVerification(card, false);
+}
 
-const hasCards = computed<boolean>(() => get(cards).length > 0);
-const hasActiveSubscription = computed<boolean>(() =>
-  !!get(account)?.hasActiveSubscription,
-);
+async function handleReauthorize(card: SavedCard): Promise<void> {
+  await initiate3DSVerification(card, true);
+}
+
+function handleThreeDSecureSuccess(): void {
+  set(showThreeDSecureModal, false);
+  set(verificationData, undefined);
+  refresh();
+}
+
+function handleThreeDSecureError(verifyError: Error): void {
+  logger.error('3DS verification failed:', verifyError);
+  set(error, {
+    title: t('common.error'),
+    message: verifyError.message || t('common.error_occurred'),
+  });
+  set(showThreeDSecureModal, false);
+  set(verificationData, undefined);
+}
+
+function isCardLoading(card: SavedCard): boolean {
+  const operation = get(cardOperation);
+  return operation?.token === card.token && (operation.mode === 'default' || operation.mode === 'reauthorize');
+}
+
+function isCardDeleting(card: SavedCard): boolean {
+  return get(deletingCard) && get(cardToDelete)?.token === card.token;
+}
 
 function getCardTooltip(card: SavedCard): string | undefined {
   if (card.linked) {
@@ -128,19 +178,17 @@ function getCardTooltip(card: SavedCard): string | undefined {
     </div>
 
     <div v-else>
-      <!-- Error Alert -->
       <RuiAlert
         v-if="error"
         type="error"
         class="mb-6"
         :title="error.title"
         closeable
-        @close="error = null"
+        @close="error = undefined"
       >
         {{ error.message }}
       </RuiAlert>
 
-      <!-- Cards List -->
       <div
         v-if="hasCards"
         class="flex flex-col gap-2 mb-6"
@@ -149,19 +197,19 @@ function getCardTooltip(card: SavedCard): string | undefined {
           v-for="card in cards"
           :key="card.token"
           :card="card"
-          :loading="settingDefault === card.token"
-          :disabled="!!settingDefault || !!deletingCard"
-          :deleting="deletingCard === card.token"
+          :loading="isCardLoading(card)"
+          :disabled="!!cardOperation || deletingCard"
+          :deleting="isCardDeleting(card)"
           :delete-disabled="card.linked"
           :delete-tooltip="getCardTooltip(card)"
           :is-linked="card.linked"
           :show-link-button="hasActiveSubscription"
           @set-default="handleSetDefault(card)"
+          @reauthorize="handleReauthorize(card)"
           @delete="confirmDeleteCard(card)"
         />
       </div>
 
-      <!-- Empty State -->
       <div
         v-else
         class="flex flex-col gap-2 items-center text-center py-12"
@@ -180,19 +228,26 @@ function getCardTooltip(card: SavedCard): string | undefined {
       </div>
     </div>
 
-    <!-- Delete Card Dialog -->
     <DeleteCardDialog
       v-model="showDeleteDialog"
+      v-model:deleting="deletingCard"
       :card="cardToDelete"
-      @update:deleting="deletingCard = $event ? cardToDelete?.token ?? null : null"
       @success="handleDeleteSuccess()"
       @error="handleDeleteError($event)"
     />
 
-    <!-- Add Card Dialog -->
     <AddCardDialog
       v-model="showAddCardDialog"
-      @success="loadCards()"
+      @success="refresh()"
+    />
+
+    <ThreeDSecureModal
+      v-if="verificationData"
+      v-model="showThreeDSecureModal"
+      :verification-data="verificationData"
+      :is-reauthorization="isReauthorization"
+      @success="handleThreeDSecureSuccess()"
+      @error="handleThreeDSecureError($event)"
     />
   </div>
 </template>

@@ -1,39 +1,38 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import { set } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import { useLogger } from '~/utils/use-logger';
 
 interface Props {
-  card: SavedCard | null;
+  card: SavedCard | undefined;
+}
+
+interface Emits {
+  success: [];
+  error: [error: { title: string; message: string }];
 }
 
 const showDialog = defineModel<boolean>({ required: true });
+const deleting = defineModel<boolean>('deleting', { default: false });
 
 const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  'update:deleting': [value: boolean];
-  'success': [];
-  'error': [error: { title: string; message: string }];
-}>();
+const emit = defineEmits<Emits>();
 
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('delete-card-dialog');
 
 const { deleteCard } = usePaymentCards();
 
-const deleting = ref<boolean>(false);
-
-async function handleDeleteCard() {
-  if (!props.card) {
+async function handleDeleteCard(): Promise<void> {
+  const card = get(props).card;
+  if (!card) {
     return;
   }
 
   try {
     set(deleting, true);
-    emit('update:deleting', true);
     set(showDialog, false);
-    await deleteCard(props.card.token);
+    await deleteCard(card.token);
     emit('success');
   }
   catch (error: any) {
@@ -45,11 +44,10 @@ async function handleDeleteCard() {
   }
   finally {
     set(deleting, false);
-    emit('update:deleting', false);
   }
 }
 
-function handleCancel() {
+function handleCancel(): void {
   set(showDialog, false);
 }
 </script>
