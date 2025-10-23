@@ -210,10 +210,11 @@ export default defineNuxtConfig({
           contentSecurityPolicy: mergeCSP(
             baseCSP,
             braintreeBaseCSP,
+            threeDSecureCSP,
             ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
           ),
           crossOriginEmbedderPolicy: 'unsafe-none', // Match card payment page
-          crossOriginResourcePolicy: 'cross-origin', // Allow Braintree resources
+          crossOriginResourcePolicy: 'cross-origin', // Allow Braintree and 3DS resources
         },
       },
     },
