@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type {
   DataTableColumn,
   DataTableSortColumn,
@@ -8,6 +9,10 @@ import type { UserPayment } from '~/types/account';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { formatDate } from '~/utils/date';
 import { toTitleCase } from '~/utils/text';
+
+const props = defineProps<{
+  pending: UserSubscription[];
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -49,6 +54,12 @@ const headers: DataTableColumn<UserPayment>[] = [{
   align: 'end',
   class: 'capitalize',
 }];
+
+watch(() => props.pending, (pendingIs, pendingWas) => {
+  if (pendingIs.length === 0 && pendingWas.length > 0) {
+    refresh();
+  }
+});
 </script>
 
 <template>
