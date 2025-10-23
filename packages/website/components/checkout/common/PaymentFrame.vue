@@ -6,6 +6,7 @@ const step = defineModel<PaymentStep>('step', { required: true });
 
 const props = defineProps<{
   loading?: boolean;
+  wide?: boolean;
 }>();
 
 const emit = defineEmits<{ (e: 'clear-errors'): void }>();
@@ -19,9 +20,10 @@ defineSlots<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { loading } = toRefs(props);
+const { loading, wide } = toRefs(props);
 
 const isLoading = computed<boolean>(() => get(loading) || false);
+const isWide = computed<boolean>(() => get(wide) || false);
 
 function dismissFailure(): void {
   emit('clear-errors');
@@ -29,18 +31,25 @@ function dismissFailure(): void {
 </script>
 
 <template>
-  <div class="flex flex-col w-full max-w-[29rem] mx-auto mt-8 lg:mt-0 grow">
-    <CheckoutTitle>
-      {{ t('home.plans.tiers.step_3.title') }}
-    </CheckoutTitle>
+  <div
+    class="flex flex-col w-full mx-auto grow"
+    :class="[
+      isWide ? 'max-w-7xl md:p-6' : 'max-w-[29rem] mt-8 lg:mt-0',
+    ]"
+  >
+    <div class="mb-8">
+      <CheckoutTitle>
+        {{ t('home.plans.tiers.step_3.title') }}
+      </CheckoutTitle>
 
-    <slot name="description">
-      <CheckoutDescription>
-        {{ t('home.plans.tiers.step_3.payment_description') }}
-      </CheckoutDescription>
-    </slot>
+      <slot name="description">
+        <CheckoutDescription>
+          {{ t('home.plans.tiers.step_3.payment_description') }}
+        </CheckoutDescription>
+      </slot>
+    </div>
 
-    <div class="min-h-[25rem]">
+    <div :class="isWide ? '' : 'min-h-[25rem]'">
       <div
         v-if="isLoading"
         class="flex justify-center items-center min-h-[25rem]"

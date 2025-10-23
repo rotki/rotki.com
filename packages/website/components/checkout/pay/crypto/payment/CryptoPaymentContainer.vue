@@ -54,6 +54,7 @@ onMounted(async () => {
   <PaymentFrame
     v-model:step="paymentStep"
     :loading="loading"
+    wide
     @clear-errors="setError('')"
   >
     <template #description>

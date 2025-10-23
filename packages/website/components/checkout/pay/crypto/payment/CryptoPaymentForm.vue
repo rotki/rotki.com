@@ -99,69 +99,86 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
 </script>
 
 <template>
-  <div class="flex flex-col grow">
-    <!-- Plan and Discount Section -->
-    <div class="mb-4">
-      <SelectedPlanOverview
-        :plan="plan"
-        crypto
-        :disabled="planSwitchLoading || web3ProcessingLoading"
-        :loading="planSwitchLoading"
-        internal-mode
-        warning
-        :upgrade="!!upgradeSubId"
-        @plan-change="handleInternalPlanChange($event)"
-      />
+  <div>
+    <div class="flex flex-col gap-8 md:gap-10 xl:grid xl:grid-cols-[1.5fr_1fr] xl:gap-12 xl:items-start">
+      <!-- Main Content (Left Column) -->
+      <div class="flex flex-col gap-6 min-w-0">
+        <!-- QR Code + Payment Details Section -->
+        <RuiCard>
+          <CryptoPaymentQr
+            :data="data"
+            :is-wallet-open="isOpen"
+            :loading="planSwitchLoading"
+          />
 
-      <DiscountCodeInput
-        v-if="!upgradeSubId"
-        v-model="discountCodeModel"
-        v-model:discount-info="discountInfo"
-        :plan="plan"
-        :disabled="planSwitchLoading || web3ProcessingLoading"
-        class="mt-6"
-      />
+          <RuiDivider class="my-6" />
 
-      <PaymentGrandTotal
-        :grand-total="grandTotal"
-        :upgrade="!!upgradeSubId"
-        :loading="planSwitchLoading"
-        class="mt-6"
-      />
-    </div>
+          <CryptoPaymentDetails
+            :data="data"
+            :loading="planSwitchLoading"
+          />
+        </RuiCard>
 
-    <!-- QR Code Section -->
-    <CryptoPaymentQr
-      :data="data"
-      :is-wallet-open="isOpen"
-      :loading="planSwitchLoading"
-    />
+        <!-- Instructions -->
+        <RuiAlert
+          type="info"
+          class="text-sm"
+        >
+          <div>
+            {{ t('home.plans.tiers.step_3.wallet.notice') }}
+          </div>
 
-    <!-- Payment Details Section -->
-    <CryptoPaymentDetails
-      :data="data"
-      :loading="planSwitchLoading"
-      class="mt-8"
-    />
-
-    <RuiDivider class="mt-8" />
-
-    <!-- Instructions -->
-    <div class="text-rui-text mt-6 mb-6 text-sm">
-      {{ t('home.plans.tiers.step_3.wallet.notice') }}
-
-      <div class="font-bold mt-3">
-        <p>
-          {{ t('home.plans.tiers.step_3.wallet.paid_notice_1') }}
-        </p>
-        <p>
-          {{ t('home.plans.tiers.step_3.wallet.paid_notice_2') }}
-        </p>
+          <div class="font-bold mt-3">
+            <p>
+              {{ t('home.plans.tiers.step_3.wallet.paid_notice_1') }}
+            </p>
+            <p>
+              {{ t('home.plans.tiers.step_3.wallet.paid_notice_2') }}
+            </p>
+          </div>
+        </RuiAlert>
       </div>
+
+      <!-- Sidebar (Right Column) -->
+      <aside class="w-full xl:sticky xl:top-8 xl:self-start">
+        <RuiCard>
+          <div class="text-lg font-medium mb-6">
+            {{ t('home.plans.tiers.step_3.order_summary') }}
+          </div>
+
+          <SelectedPlanOverview
+            :plan="plan"
+            crypto
+            :disabled="planSwitchLoading || web3ProcessingLoading"
+            :loading="planSwitchLoading"
+            internal-mode
+            warning
+            :upgrade="!!upgradeSubId"
+            @plan-change="handleInternalPlanChange($event)"
+          />
+
+          <RuiDivider class="my-6" />
+
+          <DiscountCodeInput
+            v-if="!upgradeSubId"
+            v-model="discountCodeModel"
+            v-model:discount-info="discountInfo"
+            :plan="plan"
+            :disabled="planSwitchLoading || web3ProcessingLoading"
+            class="mb-6"
+          />
+
+          <PaymentGrandTotal
+            :grand-total="grandTotal"
+            :upgrade="!!upgradeSubId"
+            :loading="planSwitchLoading"
+          />
+        </RuiCard>
+      </aside>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="my-4 flex flex-col sm:flex-row gap-4">
+    <!-- Action Buttons (Outside Grid) -->
+    <div class="flex flex-col sm:flex-row gap-4 mt-6 mx-auto w-full max-w-[27.5rem]">
       <div class="grow">
         <RuiButton
           :disabled="planSwitchLoading || web3ProcessingLoading"

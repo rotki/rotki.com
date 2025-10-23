@@ -70,7 +70,7 @@ const { removeStoredRedirectUrl } = useRedirectUrl();
 
 // Routes that use two-column layout and need special spacing
 const isTwoColumnLayout = computed<boolean>(() => {
-  const twoColumnRoutes = ['checkout-pay-request-crypto'];
+  const twoColumnRoutes = ['checkout-pay-request-crypto', 'checkout-pay-crypto'];
   return twoColumnRoutes.includes(route.name as string);
 });
 
