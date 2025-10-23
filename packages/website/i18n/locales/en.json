@@ -437,8 +437,10 @@
         "cannot_delete_linked_card": "This card is used for subscription auto-renewal and cannot be deleted",
         "link_card": "Set for auto-renewal",
         "linked_card": "Auto-renewal card",
+        "no_active_subscription": "No active subscription found",
         "no_cards": "No saved cards",
         "no_cards_description": "Add a payment card to make future purchases easier",
+        "reauthorize": "Re-authorize",
         "subtitle": "Manage your saved payment cards",
         "title": "Payment Methods"
       }
@@ -1206,6 +1208,14 @@
   "payment_methods": {
     "title": "Payment Methods",
     "add_card": "Add Card",
-    "no_cards": "No payment methods saved yet"
+    "no_cards": "No payment methods saved yet",
+    "three_d_secure": {
+      "title": "Card Verification",
+      "verification_message": "If prompted, please complete the 3D Secure verification to continue.",
+      "billing_info_title": "Important Billing Information",
+      "billing_info_replace": "By confirming, this card will replace your current payment method.",
+      "billing_info_reauth": "By confirming, you are re-authorizing this payment method.",
+      "billing_info_schedule": "Starting from {date}, this card will be charged {amount}€ {period} until you cancel your subscription."
+    }
   }
 }
