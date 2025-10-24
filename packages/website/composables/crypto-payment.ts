@@ -112,6 +112,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, state: Ref<StepType | I
       return;
 
     set(state, 'pending');
+    set(errorMessage, '');
 
     try {
       if (!get(connected)) {

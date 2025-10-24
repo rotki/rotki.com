@@ -2,6 +2,7 @@
 import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { CryptoPayment } from '~/types';
 import { getDiscountedPrice, getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, toRefs } from '@vueuse/core';
 
@@ -13,7 +14,7 @@ const props = withDefaults(
     plan: SelectedPlan;
     upgradeSubId?: string;
     nextPayment?: number;
-    checkoutData?: CheckoutData | UpgradeData | null;
+    checkoutData?: CheckoutData | UpgradeData | CryptoPayment | null;
     crypto?: boolean;
     disabled?: boolean;
     loading?: boolean;
@@ -66,8 +67,13 @@ const grandTotal = computed<number>(() => {
     return 0;
   }
 
-  // If checkoutData is available, use getFinalAmount (handles upgrades)
+  // If checkoutData is available
   if (currentCheckoutData) {
+    // Check if it's CryptoPayment with finalPriceInEur (for crypto upgrades)
+    if ('finalPriceInEur' in currentCheckoutData) {
+      return currentCheckoutData.finalPriceInEur;
+    }
+    // Otherwise use getFinalAmount (handles card payment upgrades)
     return getFinalAmount(currentCheckoutData, currentPlan, currentDiscountInfo);
   }
 
@@ -101,7 +107,10 @@ function handlePlanChange(newPlan: SelectedPlan): void {
       @plan-change="handlePlanChange($event)"
     />
 
-    <RuiDivider :class="spacingClass" />
+    <RuiDivider
+      v-if="!upgradeSubId"
+      :class="spacingClass"
+    />
 
     <DiscountCodeInput
       v-if="!upgradeSubId"
