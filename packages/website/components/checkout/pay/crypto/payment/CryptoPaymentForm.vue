@@ -8,7 +8,6 @@ import ChangeCryptoPayment from '~/components/checkout/pay/crypto/ChangeCryptoPa
 import CryptoPaymentDetails from '~/components/checkout/pay/crypto/payment/CryptoPaymentDetails.vue';
 import CryptoPaymentQr from '~/components/checkout/pay/crypto/payment/CryptoPaymentQr.vue';
 import CryptoWalletActions from '~/components/checkout/pay/crypto/payment/CryptoWalletActions.vue';
-import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import { useCryptoPaymentNavigation } from '~/composables/use-crypto-payment-navigation';
 import { useCryptoPaymentState } from '~/composables/use-crypto-payment-state';
 
@@ -52,8 +51,6 @@ const {
 
 // Computed properties
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
-
-const grandTotal = computed<number>(() => get(data).finalPriceInEur);
 
 // Success redirect handler
 function redirect(): void {
@@ -141,39 +138,18 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
 
       <!-- Sidebar (Right Column) -->
       <aside class="w-full xl:sticky xl:top-8 xl:self-start">
-        <RuiCard>
-          <div class="text-lg font-medium mb-6">
-            {{ t('home.plans.tiers.step_3.order_summary') }}
-          </div>
-
-          <SelectedPlanOverview
-            :plan="plan"
-            crypto
-            :disabled="planSwitchLoading || web3ProcessingLoading"
-            :loading="planSwitchLoading"
-            internal-mode
-            warning
-            :upgrade="!!upgradeSubId"
-            @plan-change="handleInternalPlanChange($event)"
-          />
-
-          <RuiDivider class="my-6" />
-
-          <DiscountCodeInput
-            v-if="!upgradeSubId"
-            v-model="discountCodeModel"
-            v-model:discount-info="discountInfo"
-            :plan="plan"
-            :disabled="planSwitchLoading || web3ProcessingLoading"
-            class="mb-6"
-          />
-
-          <PaymentGrandTotal
-            :grand-total="grandTotal"
-            :upgrade="!!upgradeSubId"
-            :loading="planSwitchLoading"
-          />
-        </RuiCard>
+        <OrderSummaryCard
+          v-model:discount-code="discountCodeModel"
+          v-model:discount-info="discountInfo"
+          :plan="plan"
+          :upgrade-sub-id="upgradeSubId"
+          :disabled="planSwitchLoading || web3ProcessingLoading"
+          :loading="planSwitchLoading"
+          crypto
+          internal-mode
+          warning
+          @plan-change="handleInternalPlanChange($event)"
+        />
       </aside>
     </div>
 

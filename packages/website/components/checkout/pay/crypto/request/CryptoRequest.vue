@@ -1,43 +1,34 @@
 <script lang="ts" setup>
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
-import { getDiscountedPrice } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
-import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
+import { buildQueryParams } from '~/utils/query';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const acceptRefundPolicy = ref<boolean>(false);
 const processing = ref<boolean>(false);
 
-const currency = ref('');
+const currency = ref<string>('');
 
-const discountCode = ref('');
+const discountCode = ref<string>('');
 const discountInfo = ref<DiscountInfo>();
 
 const { planId } = usePlanIdParam();
 const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
-
 const { selectedPlan } = useSelectedPlan();
 
-async function back() {
+const valid = computed<boolean>(() => get(acceptRefundPolicy) && !!get(currency));
+
+async function back(): Promise<void> {
   if (isDefined(upgradeSubId)) {
-    navigateTo({
-      name: 'home-subscription',
-    });
+    await navigateTo({ name: 'home-subscription' });
     return;
   }
 
-  const currentPlanId = get(planId);
-  const query: Record<string, string> = {};
-
-  if (currentPlanId) {
-    query.planId = String(currentPlanId);
-  }
-
-  const id = get(subscriptionId);
-  if (id) {
-    query.id = id;
-  }
+  const query = buildQueryParams({
+    planId: get(planId),
+    id: get(subscriptionId),
+  });
 
   await navigateTo({
     name: 'checkout-pay-method',
@@ -45,55 +36,26 @@ async function back() {
   });
 }
 
-function submit() {
+function submit(): void {
   set(processing, true);
-  const currentPlanId = get(planId);
-  const query: Record<string, string> = {};
 
-  if (currentPlanId) {
-    query.planId = String(currentPlanId);
-  }
-
-  const selectedCurrency = get(currency);
-  if (selectedCurrency) {
-    query.currency = selectedCurrency;
-  }
-
-  const id = get(subscriptionId);
-  if (id) {
-    query.id = id;
-  }
-
-  const discount = get(discountCode);
-  if (discount) {
-    query.discountCode = discount;
-  }
-
-  const upgradeId = get(upgradeSubId);
-  if (upgradeId) {
-    query.upgradeSubId = upgradeId;
-  }
+  const query = buildQueryParams({
+    planId: get(planId),
+    currency: get(currency),
+    id: get(subscriptionId),
+    discountCode: get(discountCode),
+    upgradeSubId: get(upgradeSubId),
+  });
 
   navigateToWithCSPSupport({
     name: 'checkout-pay-crypto',
     query,
   });
 }
-
-const valid = computed<boolean>(() => get(acceptRefundPolicy) && !!get(currency));
-
-const grandTotal = computed<number>(() => {
-  const plan = get(selectedPlan);
-
-  if (!plan)
-    return 0;
-
-  return getDiscountedPrice(plan, get(discountInfo));
-});
 </script>
 
 <template>
-  <div class="w-full max-w-7xl mx-auto md:p-6">
+  <div class="w-full max-w-7xl mx-auto md:px-4">
     <div class="mb-8">
       <CheckoutTitle>
         {{ t('home.plans.tiers.step_3.title') }}
@@ -119,32 +81,13 @@ const grandTotal = computed<number>(() => {
         v-if="selectedPlan"
         class="w-full xl:sticky xl:top-8 xl:self-start"
       >
-        <RuiCard>
-          <div class="text-lg font-medium mb-6">
-            {{ t('home.plans.tiers.step_3.order_summary') }}
-          </div>
-
-          <SelectedPlanOverview
-            :upgrade="!!upgradeSubId"
-            :plan="selectedPlan"
-            crypto
-          />
-
-          <RuiDivider class="my-6" />
-
-          <DiscountCodeInput
-            v-if="!upgradeSubId"
-            v-model="discountCode"
-            v-model:discount-info="discountInfo"
-            :plan="selectedPlan"
-            class="mb-6"
-          />
-
-          <PaymentGrandTotal
-            :upgrade="!!upgradeSubId"
-            :grand-total="grandTotal"
-          />
-        </RuiCard>
+        <OrderSummaryCard
+          v-model:discount-code="discountCode"
+          v-model:discount-info="discountInfo"
+          :plan="selectedPlan"
+          :upgrade-sub-id="upgradeSubId"
+          crypto
+        />
       </aside>
     </div>
 
