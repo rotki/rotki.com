@@ -70,7 +70,7 @@ const { removeStoredRedirectUrl } = useRedirectUrl();
 
 // Routes that use two-column layout and need special spacing
 const isTwoColumnLayout = computed<boolean>(() => {
-  const twoColumnRoutes = ['checkout-pay-request-crypto', 'checkout-pay-crypto'];
+  const twoColumnRoutes = ['checkout-pay-request-crypto', 'checkout-pay-crypto', 'checkout-pay-paypal'];
   return twoColumnRoutes.includes(route.name as string);
 });
 
@@ -104,13 +104,13 @@ onBeforeMount(() => {
         @submit.prevent
       >
         <NuxtPage />
-        <div
-          v-if="!isTwoColumnLayout"
-          class="py-10 lg:px-4 w-full max-w-[29rem]"
-        >
+        <div class="block py-10 lg:px-4 w-full lg:hidden">
           <RuiFooterStepper
             :model-value="step"
             :pages="steps.length"
+            :class="[
+              isTwoColumnLayout ? 'max-w-7xl' : 'max-w-[29rem]',
+            ]"
             variant="pill"
           />
         </div>
