@@ -65,8 +65,10 @@ const vatOverview = computed<VatOverview | undefined>(() => {
     return undefined;
   }
 
+  const vat = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : vatRate;
+
   return {
-    vat: vatRate,
+    vat,
     basePrice: breakdown.basePrice,
   };
 });
