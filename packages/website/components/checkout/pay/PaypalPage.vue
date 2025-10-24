@@ -6,6 +6,7 @@ const { token, step, selectedPlan, btClient } = useBraintree();
   <PaymentFrame
     v-model:step="step"
     :loading="!(token && selectedPlan)"
+    wide
   >
     <template #default="{ status }">
       <PaypalPayment

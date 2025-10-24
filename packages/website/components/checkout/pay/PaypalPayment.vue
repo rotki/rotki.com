@@ -198,54 +198,78 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mb-6 grow flex flex-col">
-    <SelectedPlanOverview
-      v-if="selectedPlan"
-      :plan="selectedPlan"
-      :upgrade="!!upgradeSubId"
-      :next-payment="nextPayment"
-      :disabled="processing || initializing"
-    />
-    <DiscountCodeInput
-      v-if="selectedPlan && !upgradeSubId"
-      v-model="discountCode"
-      v-model:discount-info="discountInfo"
-      :plan="selectedPlan"
-      class="mt-6"
-    />
-    <PaymentGrandTotal
-      :grand-total="grandTotal"
-      :upgrade="!!upgradeSubId"
-      class="mt-6"
-    />
-    <AcceptRefundPolicy
-      v-model="accepted"
-      :disabled="processing || initializing"
-      class="my-8"
-    />
-    <div
-      id="paypal-button"
-      class="mb-8"
-      :class="[
-        { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
-      ]"
-    />
-    <div
-      v-if="pending"
-      class="my-8"
-    >
-      <RuiAlert type="info">
-        <template #title>
-          {{ status?.title }}
-        </template>
-        <span>{{ status?.message }}</span>
-      </RuiAlert>
+  <div>
+    <div class="flex flex-col gap-6 xl:grid xl:grid-cols-[1.5fr_1fr] xl:gap-8 xl:items-start">
+      <!-- Main Content (Left Column) -->
+      <div class="flex flex-col gap-6 min-w-0">
+        <RuiCard>
+          <AcceptRefundPolicy
+            v-model="accepted"
+            :disabled="processing || initializing"
+            class="mb-4"
+          />
+
+          <div
+            id="paypal-button"
+            :class="[
+              { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
+            ]"
+          />
+
+          <div
+            v-if="pending"
+            class="mt-4"
+          >
+            <RuiAlert type="info">
+              <template #title>
+                {{ status?.title }}
+              </template>
+              <span>{{ status?.message }}</span>
+            </RuiAlert>
+          </div>
+        </RuiCard>
+      </div>
+
+      <!-- Sidebar (Right Column) -->
+      <aside class="w-full xl:sticky xl:top-8 xl:self-start">
+        <RuiCard>
+          <div class="text-lg font-medium mb-4">
+            {{ t('home.plans.tiers.step_3.order_summary') }}
+          </div>
+
+          <SelectedPlanOverview
+            v-if="selectedPlan"
+            :plan="selectedPlan"
+            :upgrade="!!upgradeSubId"
+            :next-payment="nextPayment"
+            :disabled="processing || initializing"
+          />
+
+          <RuiDivider class="my-4" />
+
+          <DiscountCodeInput
+            v-if="selectedPlan && !upgradeSubId"
+            v-model="discountCode"
+            v-model:discount-info="discountInfo"
+            :plan="selectedPlan"
+            :disabled="processing || initializing"
+            class="mb-4"
+          />
+
+          <PaymentGrandTotal
+            :grand-total="grandTotal"
+            :upgrade="!!upgradeSubId"
+          />
+        </RuiCard>
+      </aside>
     </div>
-    <div class="flex gap-4 justify-center w-full mt-auto">
+
+    <!-- Action Buttons (Outside Grid) -->
+    <div class="flex gap-4 justify-center w-full mt-4 mx-auto max-w-[27.5rem]">
       <RuiButton
         :disabled="processing"
         :loading="pending || initializing"
-        class="w-1/2"
+        class="w-full"
         size="lg"
         @click="navigateBack()"
       >
