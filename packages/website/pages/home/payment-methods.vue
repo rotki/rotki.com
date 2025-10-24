@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import { PaymentProvider, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get, objectPick, set } from '@vueuse/core';
 import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
 import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCardDialog.vue';
@@ -28,6 +29,7 @@ const showDeleteDialog = ref<boolean>(false);
 const showThreeDSecureModal = ref<boolean>(false);
 const isReauthorization = ref<boolean>(false);
 const deletingCard = ref<boolean>(false);
+const activeSubscription = ref<Subscription>();
 
 const cardOperation = ref<CardOperation>();
 const cardToDelete = ref<SavedCard>();
@@ -42,6 +44,20 @@ const { fetchUserSubscriptions } = useFetchUserSubscriptions();
 
 const hasCards = computed<boolean>(() => get(cards).length > 0);
 const hasActiveSubscription = computed<boolean>(() => !!get(account)?.hasActiveSubscription);
+const hasActiveCryptoSubscription = computed<boolean>(() =>
+  get(activeSubscription)?.paymentProvider === PaymentProvider.CRYPTO,
+);
+
+async function loadActiveSubscription(): Promise<void> {
+  try {
+    const subscriptions = await fetchUserSubscriptions();
+    const active = subscriptions.find(sub => sub.isActive);
+    set(activeSubscription, active);
+  }
+  catch (error) {
+    logger.error('Failed to fetch subscriptions:', error);
+  }
+}
 
 function confirmDeleteCard(card: SavedCard) {
   set(cardToDelete, card);
@@ -67,10 +83,15 @@ async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Prom
   try {
     set(cardOperation, { mode, token: card.token });
 
-    const subscriptions = await fetchUserSubscriptions();
-    const activeSubscription = subscriptions.find(sub => sub.isActive);
+    // Use cached active subscription or fetch if not available
+    let active = get(activeSubscription);
+    if (!active) {
+      const subscriptions = await fetchUserSubscriptions();
+      active = subscriptions.find(sub => sub.isActive);
+      set(activeSubscription, active);
+    }
 
-    if (!activeSubscription) {
+    if (!active) {
       logger.error(`No active subscription found for 3DS ${actionType}`);
       set(error, {
         title: t('common.error'),
@@ -79,9 +100,19 @@ async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Prom
       return;
     }
 
+    // Prevent card operations for crypto subscriptions
+    if (active.paymentProvider === PaymentProvider.CRYPTO) {
+      logger.error(`Cannot perform ${actionType} on crypto subscription`);
+      set(error, {
+        title: t('common.error'),
+        message: t('home.account.payment_methods.crypto_subscription_no_card_operations'),
+      });
+      return;
+    }
+
     set(verificationData, {
       cardToken: card.token,
-      subscriptionData: objectPick(activeSubscription, ['nextBillingAmount', 'nextActionDate', 'durationInMonths']),
+      subscriptionData: objectPick(active, ['nextBillingAmount', 'nextActionDate', 'durationInMonths']),
     });
     set(showThreeDSecureModal, true);
   }
@@ -139,6 +170,12 @@ function getCardTooltip(card: SavedCard): string | undefined {
   }
   return undefined;
 }
+
+onMounted(() => {
+  loadActiveSubscription().catch((error) => {
+    logger.error('Failed to load active subscription:', error);
+  });
+});
 </script>
 
 <template>
@@ -166,7 +203,7 @@ function getCardTooltip(card: SavedCard): string | undefined {
       </div>
     </div>
 
-    <div v-if="loading && cards.length === 0">
+    <div v-if="loading && !hasCards">
       <div class="flex justify-center w-full py-12">
         <RuiProgress
           variant="indeterminate"
@@ -177,7 +214,22 @@ function getCardTooltip(card: SavedCard): string | undefined {
       </div>
     </div>
 
-    <div v-else>
+    <div
+      v-else
+      class="relative"
+    >
+      <!-- Loading overlay for refreshes -->
+      <div
+        v-if="loading"
+        class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg"
+      >
+        <RuiProgress
+          variant="indeterminate"
+          size="48"
+          circular
+          color="primary"
+        />
+      </div>
       <RuiAlert
         v-if="error"
         type="error"
@@ -198,12 +250,12 @@ function getCardTooltip(card: SavedCard): string | undefined {
           :key="card.token"
           :card="card"
           :loading="isCardLoading(card)"
-          :disabled="!!cardOperation || deletingCard"
+          :disabled="!!cardOperation || deletingCard || hasActiveCryptoSubscription"
           :deleting="isCardDeleting(card)"
           :delete-disabled="card.linked"
           :delete-tooltip="getCardTooltip(card)"
           :is-linked="card.linked"
-          :show-link-button="hasActiveSubscription"
+          :show-link-button="hasActiveSubscription && !hasActiveCryptoSubscription"
           @set-default="handleSetDefault(card)"
           @reauthorize="handleReauthorize(card)"
           @delete="confirmDeleteCard(card)"
