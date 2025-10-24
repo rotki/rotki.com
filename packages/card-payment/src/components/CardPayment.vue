@@ -217,7 +217,7 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full max-w-7xl mx-auto lg:px-4 grow">
+  <div class="flex flex-col w-full max-w-7xl mx-auto grow">
     <!-- Title -->
     <div class="mb-6">
       <h4 class="font-bold text-h4 text-rui-text mb-3">
@@ -307,7 +307,7 @@ onUnmounted(async () => {
     <TermsAcceptance
       v-model:accepted-terms="acceptedTerms"
       :disabled="isProcessing"
-      class="mt-6 max-w-[27.5rem] mx-auto w-full"
+      class="max-w-[27.5rem] mx-auto w-full"
     />
 
     <!-- Pending Payment Message (Outside Grid) -->
@@ -321,7 +321,7 @@ onUnmounted(async () => {
     </div>
 
     <!-- Action Buttons (Outside Grid) -->
-    <div class="mt-6 max-w-[27.5rem] mx-auto w-full">
+    <div class="max-w-[27.5rem] mx-auto w-full">
       <PaymentButtons
         :disabled="!isFormValid"
         :processing="isProcessing"
