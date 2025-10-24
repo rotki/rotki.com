@@ -34,10 +34,10 @@ function dismissFailure(): void {
   <div
     class="flex flex-col w-full mx-auto grow"
     :class="[
-      isWide ? 'max-w-7xl md:p-6' : 'max-w-[29rem] mt-8 lg:mt-0',
+      isWide ? 'max-w-7xl md:p-4' : 'max-w-[29rem] mt-8 lg:mt-0',
     ]"
   >
-    <div class="mb-8">
+    <div class="mb-6">
       <CheckoutTitle>
         {{ t('home.plans.tiers.step_3.title') }}
       </CheckoutTitle>
