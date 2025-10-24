@@ -143,6 +143,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
           v-model:discount-info="discountInfo"
           :plan="plan"
           :upgrade-sub-id="upgradeSubId"
+          :checkout-data="data"
           :disabled="planSwitchLoading || web3ProcessingLoading"
           :loading="planSwitchLoading"
           crypto
