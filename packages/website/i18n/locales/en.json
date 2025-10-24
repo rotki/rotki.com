@@ -435,6 +435,7 @@
       "payment_methods": {
         "add_card": "Add card",
         "cannot_delete_linked_card": "This card is used for subscription auto-renewal and cannot be deleted",
+        "crypto_subscription_no_card_operations": "Card operations are not available for cryptocurrency subscriptions",
         "link_card": "Set for auto-renewal",
         "linked_card": "Auto-renewal card",
         "no_active_subscription": "No active subscription found",
