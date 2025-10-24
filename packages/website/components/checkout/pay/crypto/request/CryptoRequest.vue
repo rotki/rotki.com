@@ -55,7 +55,7 @@ function submit(): void {
 </script>
 
 <template>
-  <div class="w-full max-w-7xl mx-auto md:px-4">
+  <div class="w-full max-w-7xl mx-auto">
     <div class="mb-8">
       <CheckoutTitle>
         {{ t('home.plans.tiers.step_3.title') }}
