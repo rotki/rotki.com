@@ -231,36 +231,20 @@ onMounted(async () => {
       </div>
 
       <!-- Sidebar (Right Column) -->
-      <aside class="w-full xl:sticky xl:top-8 xl:self-start">
-        <RuiCard>
-          <div class="text-lg font-medium mb-4">
-            {{ t('home.plans.tiers.step_3.order_summary') }}
-          </div>
-
-          <SelectedPlanOverview
-            v-if="selectedPlan"
-            :plan="selectedPlan"
-            :upgrade="!!upgradeSubId"
-            :next-payment="nextPayment"
-            :disabled="processing || initializing"
-          />
-
-          <RuiDivider class="my-4" />
-
-          <DiscountCodeInput
-            v-if="selectedPlan && !upgradeSubId"
-            v-model="discountCode"
-            v-model:discount-info="discountInfo"
-            :plan="selectedPlan"
-            :disabled="processing || initializing"
-            class="mb-4"
-          />
-
-          <PaymentGrandTotal
-            :grand-total="grandTotal"
-            :upgrade="!!upgradeSubId"
-          />
-        </RuiCard>
+      <aside
+        v-if="selectedPlan"
+        class="w-full xl:sticky xl:top-8 xl:self-start"
+      >
+        <OrderSummaryCard
+          v-model:discount-code="discountCode"
+          v-model:discount-info="discountInfo"
+          :plan="selectedPlan"
+          :checkout-data="checkoutData"
+          :upgrade-sub-id="upgradeSubId"
+          :next-payment="nextPayment"
+          :disabled="processing || initializing"
+          compact
+        />
       </aside>
     </div>
 
