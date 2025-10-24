@@ -1077,7 +1077,6 @@
       "title": "Transaction Pending"
     },
     "error": {
-      "check_details_and_retry": "Check the detail and try again.",
       "init_error": "Initialization Error",
       "payment_failure": "Payment Failure",
       "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
