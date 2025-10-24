@@ -20,14 +20,17 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="container flex flex-col lg:flex-row max-lg:py-8 lg:py-14 h-full grow mx-auto">
+  <div class="container flex flex-col lg:flex-row max-lg:py-4 lg:py-8 h-full grow mx-auto">
     <div class="flex justify-center grow order-1 lg:order-1">
       <div class="flex justify-center grow">
         <!-- Main content slot -->
         <div class="grow">
           <slot />
-          <!-- Footer Stepper (horizontal) - Pill variant for mobile/tablet -->
-          <HorizontalStepper :steps="steps" />
+          <!-- Footer Stepper (horizontal) - Pill variant for mobile/tablet only -->
+          <HorizontalStepper
+            :steps="steps"
+            class="lg:hidden"
+          />
         </div>
       </div>
       <!-- Vertical Stepper (desktop only) -->

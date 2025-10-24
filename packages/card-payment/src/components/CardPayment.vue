@@ -217,93 +217,111 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col w-full max-w-[29rem] mx-auto mt-8 lg:mt-0 grow">
+  <div class="flex flex-col w-full max-w-7xl mx-auto lg:px-4 grow">
     <!-- Title -->
-    <h4 class="font-bold text-h4 text-rui-text text-center mb-3">
-      Payment Details
-    </h4>
-    <div class="text-body-1 text-center text-rui-text-secondary mb-6">
-      Payments are safely processed with Braintree a PayPal Service
+    <div class="mb-6">
+      <h4 class="font-bold text-h4 text-rui-text mb-3">
+        Payment Details
+      </h4>
+      <div class="text-body-1 text-rui-text-secondary">
+        Payments are safely processed with Braintree a PayPal Service
+      </div>
     </div>
 
-    <!-- Payment Form -->
-    <div class="my-6 grow flex flex-col">
-      <!-- Saved Card Display -->
-      <div v-if="selectedCard">
-        <SavedCardDisplay
-          :card="selectedCard"
-          :disabled="isProcessing"
-          @card-deleted="handleCardDeleted()"
-          @error="error = $event"
-        />
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_1fr] xl:gap-8 xl:items-start">
+      <!-- Left Column: Payment Form -->
+      <div class="flex flex-col gap-6 min-w-0">
+        <!-- Card Input Section -->
+        <div class="bg-white rounded-lg border border-rui-grey-300 p-6">
+          <!-- Saved Card Display -->
+          <div v-if="selectedCard">
+            <SavedCardDisplay
+              :card="selectedCard"
+              :disabled="isProcessing"
+              @card-deleted="handleCardDeleted()"
+              @error="error = $event"
+            />
 
-        <!-- Button to change card -->
-        <div class="flex justify-end mt-4">
-          <button
+            <!-- Button to change card -->
+            <div class="flex justify-end mt-4">
+              <button
+                :disabled="isProcessing"
+                class="text-sm text-neutral-500 hover:bg-neutral-100 px-1.5 py-0.5 rounded-md hover:underline"
+                @click="showCardSelectionDialog = true"
+              >
+                Use other cards {{ cards.length > 1 ? `(${cards.length - 1})` : undefined }}
+              </button>
+            </div>
+          </div>
+
+          <!-- New Card Form (only show if no saved card) -->
+          <NewCardForm
+            v-else-if="client"
+            ref="newCardForm"
+            :client="client"
             :disabled="isProcessing"
-            class="text-sm text-neutral-500 hover:bg-neutral-100 px-1.5 py-0.5 rounded-md hover:underline"
-            @click="showCardSelectionDialog = true"
-          >
-            Use other cards {{ cards.length > 1 ? `(${cards.length - 1})` : undefined }}
-          </button>
+            @validation-change="newCardFormValid = $event"
+            @error="error = $event"
+          />
         </div>
       </div>
 
-      <!-- New Card Form (only show if no saved card) -->
-      <NewCardForm
-        v-else-if="client"
-        ref="newCardForm"
-        :client="client"
-        :disabled="isProcessing"
-        @validation-change="newCardFormValid = $event"
-        @error="error = $event"
-      />
+      <!-- Right Column: Order Summary -->
+      <aside class="w-full xl:sticky xl:top-8 xl:self-start">
+        <div class="bg-white rounded-lg border border-rui-grey-300 p-6">
+          <div class="text-lg font-medium mb-4">
+            Order Summary
+          </div>
 
-      <!-- Divider -->
-      <hr class="my-6 border-rui-grey-300" />
+          <!-- Plan Summary -->
+          <PlanSummary
+            :upgrade="!!upgradeSubId"
+            :selected-plan="selectedPlan"
+            :next-payment="planData.nextPayment"
+          />
 
-      <!-- Plan Summary -->
-      <PlanSummary
-        :upgrade="!!upgradeSubId"
-        :selected-plan="selectedPlan"
-        :next-payment="planData.nextPayment"
-      />
+          <hr class="my-4 border-rui-grey-300" />
 
-      <!-- Discount Code Input -->
-      <DiscountCodeInput
-        v-if="!upgradeSubId"
-        v-model="discountCode"
-        v-model:discount-info="discountInfo"
-        class="mt-6"
-        :selected-plan="selectedPlan"
-      />
+          <!-- Discount Code Input -->
+          <DiscountCodeInput
+            v-if="!upgradeSubId"
+            v-model="discountCode"
+            v-model:discount-info="discountInfo"
+            :selected-plan="selectedPlan"
+            class="mb-4"
+          />
 
-      <!-- Payment Grand Total -->
-      <PaymentGrandTotal
-        class="mt-6"
-        :upgrade="!!upgradeSubId"
-        :plan-data="planData"
-        :selected-plan="selectedPlan"
-        :discount-info="discountInfo"
-      />
-
-      <!-- Accept Refund Policy -->
-      <TermsAcceptance
-        v-model:accepted-terms="acceptedTerms"
-        :disabled="isProcessing"
-      />
-
-      <!-- Pending Payment Message -->
-      <div
-        v-if="isProcessing"
-        class="my-4"
-      >
-        <div class="p-4 bg-orange-50 border border-orange-200 rounded-md text-orange-800 text-sm">
-          Processing payment, please wait...
+          <!-- Payment Grand Total -->
+          <PaymentGrandTotal
+            :upgrade="!!upgradeSubId"
+            :plan-data="planData"
+            :selected-plan="selectedPlan"
+            :discount-info="discountInfo"
+          />
         </div>
-      </div>
+      </aside>
+    </div>
 
-      <!-- Action Buttons -->
+    <!-- Accept Refund Policy (Outside Grid) -->
+    <TermsAcceptance
+      v-model:accepted-terms="acceptedTerms"
+      :disabled="isProcessing"
+      class="mt-6 max-w-[27.5rem] mx-auto w-full"
+    />
+
+    <!-- Pending Payment Message (Outside Grid) -->
+    <div
+      v-if="isProcessing"
+      class="mt-4 max-w-[27.5rem] mx-auto w-full"
+    >
+      <div class="p-4 bg-orange-50 border border-orange-200 rounded-md text-orange-800 text-sm">
+        Processing payment, please wait...
+      </div>
+    </div>
+
+    <!-- Action Buttons (Outside Grid) -->
+    <div class="mt-6 max-w-[27.5rem] mx-auto w-full">
       <PaymentButtons
         :disabled="!isFormValid"
         :processing="isProcessing"
