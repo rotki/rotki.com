@@ -15,7 +15,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto">
+  <div class="flex gap-4 justify-center w-full max-w-[27.5rem] mx-auto">
     <BaseButton
       variant="secondary"
       class="w-full"

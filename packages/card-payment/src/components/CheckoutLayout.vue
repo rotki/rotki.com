@@ -20,8 +20,8 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="container flex flex-col lg:flex-row max-lg:py-4 lg:py-8 h-full grow mx-auto">
-    <div class="flex justify-center grow order-1 lg:order-1">
+  <div class="container flex flex-col lg:flex-row py-8 h-full grow mx-auto px-4">
+    <div class="flex justify-center grow order-1 lg:order-1 gap-20">
       <div class="flex justify-center grow">
         <!-- Main content slot -->
         <div class="grow">

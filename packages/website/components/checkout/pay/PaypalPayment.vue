@@ -249,7 +249,7 @@ onMounted(async () => {
     </div>
 
     <!-- Action Buttons (Outside Grid) -->
-    <div class="flex gap-4 justify-center w-full mt-4 mx-auto max-w-[27.5rem]">
+    <div class="flex gap-4 justify-center w-full mt-8 mx-auto max-w-[27.5rem]">
       <RuiButton
         :disabled="processing"
         :loading="pending || initializing"
