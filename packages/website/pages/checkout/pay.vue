@@ -84,7 +84,7 @@ onBeforeMount(() => {
   <div
     class="container flex flex-col lg:flex-row h-full grow"
     :class="[
-      isTwoColumnLayout ? 'lg:py-8' : 'py-4 lg:py-8',
+      isTwoColumnLayout ? 'py-8 gap-20' : 'py-4 lg:py-8',
     ]"
   >
     <div class="flex justify-center grow">
