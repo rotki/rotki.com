@@ -1,69 +1,50 @@
 <script setup lang="ts">
 import type { PaymentStep } from '~/types';
+import { get } from '@vueuse/core';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   status: PaymentStep;
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
+const isVisible = computed<boolean>(() => {
+  const status = get(props).status;
+  return status.type === 'pending';
+});
 </script>
 
 <template>
-  <!-- Success state -->
-  <div
-    v-if="status.type === 'success'"
-    class="flex flex-col items-center justify-center py-8 text-center"
-  >
-    <div class="mb-4 p-3 rounded-full bg-green-100 dark:bg-green-900/20">
-      <RuiIcon
-        name="lu-circle-check"
-        class="text-green-600 dark:text-green-400"
-        size="48"
-      />
-    </div>
-    <h3 class="text-xl font-semibold text-rui-text mb-1">
-      {{ t('subscription.success.payment_successful') }}
-    </h3>
-    <p class="text-rui-text-secondary">
-      {{ t('subscription.success.redirecting') }}
-    </p>
-  </div>
-
-  <!-- Pending state -->
-  <div
-    v-else-if="status.type === 'pending'"
-    class="flex flex-col items-center justify-center py-8 text-center"
-  >
-    <div class="mb-4">
-      <RuiProgress
-        variant="indeterminate"
-        size="48"
-        circular
-        color="primary"
-      />
-    </div>
-    <h3 class="text-lg font-medium text-rui-text mb-1">
-      {{ status.title }}
-    </h3>
-    <p class="text-rui-text-secondary">
-      {{ status.message }}
-    </p>
-  </div>
-
-  <!-- Error state (handled by PaymentFrame, but can add visual feedback here) -->
-  <div
-    v-else-if="status.type === 'failure'"
-    class="flex flex-col items-center justify-center py-14 text-center"
-  >
-    <div class="mb-3 p-2 rounded-full bg-red-100 dark:bg-red-900/20">
-      <RuiIcon
-        name="lu-circle-x"
-        class="text-red-600 dark:text-red-400"
-        size="32"
-      />
-    </div>
-    <p class="text-sm text-rui-text-secondary">
-      {{ t('subscription.error.check_details_and_retry') }}
-    </p>
-  </div>
+  <!-- Overlay Modal -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition-opacity duration-300 ease-in-out"
+      leave-active-class="transition-opacity duration-300 ease-in-out"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+      appear
+    >
+      <div
+        v-if="isVisible"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      >
+        <!-- Pending state -->
+        <div class="flex flex-col items-center justify-center text-center px-4">
+          <div class="mb-4">
+            <RuiProgress
+              variant="indeterminate"
+              size="48"
+              circular
+              color="primary"
+            />
+          </div>
+          <h3 class="text-lg font-medium text-white mb-1">
+            {{ status.title }}
+          </h3>
+          <p class="text-white/80">
+            {{ status.message }}
+          </p>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
