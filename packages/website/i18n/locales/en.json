@@ -580,8 +580,9 @@
           "discount": {
             "applied": "Discount code applied:",
             "apply_code": "Apply code",
+            "first_payment_only": "* Applies to first payment only",
             "hint": "Optional. Enter a discount code to apply savings to your purchase.",
-            "you_save": "You save €{amount}",
+            "you_save": "You save {amount}€",
             "percent_off": "({percentage}% off)",
             "label": "Discount code"
           },
