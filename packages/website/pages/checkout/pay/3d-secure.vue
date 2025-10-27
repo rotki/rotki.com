@@ -96,7 +96,7 @@ onBeforeRouteLeave((to, from, next) => {
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 max-w-2xl min-h-[60vh]">
+  <div class="container mx-auto px-4 py-8 max-w-2xl lg:max-w-6xl min-h-[60vh]">
     <!-- Page Header -->
     <div class="text-center mb-8">
       <h1 class="text-3xl font-bold mb-2">
