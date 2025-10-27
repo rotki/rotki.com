@@ -122,9 +122,11 @@ function handlePlanChange(newPlan: SelectedPlan): void {
     />
 
     <PaymentGrandTotal
+      :plan="plan"
       :grand-total="grandTotal"
       :upgrade="!!upgradeSubId"
       :loading="loading"
+      :discount-info="discountInfo"
     />
   </RuiCard>
 </template>
