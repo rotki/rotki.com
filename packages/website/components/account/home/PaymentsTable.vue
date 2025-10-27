@@ -25,24 +25,24 @@ const sort = ref<DataTableSortColumn<UserPayment>>({
 const { userPayments, loading, refresh } = useUserPayments();
 
 const headers: DataTableColumn<UserPayment>[] = [{
-  label: t('account.payments.headers.paid_at'),
-  key: 'paidAt',
-  sortable: true,
-}, {
   label: t('common.plan'),
   key: 'plan',
   cellClass: 'font-bold',
   class: '[&_button]:capitalize',
   sortable: true,
 }, {
-  label: t('account.payments.headers.paid_amount'),
-  key: 'finalPrice',
+  label: t('account.payments.headers.paid_at'),
+  key: 'paidAt',
   sortable: true,
-  align: 'end',
 }, {
   label: t('account.payments.headers.method'),
   key: 'paidUsing',
   sortable: true,
+}, {
+  label: t('account.payments.headers.paid_amount'),
+  key: 'finalPrice',
+  sortable: true,
+  align: 'end',
 }, {
   label: t('common.status'),
   key: 'status',
@@ -51,7 +51,6 @@ const headers: DataTableColumn<UserPayment>[] = [{
 }, {
   label: t('common.actions'),
   key: 'actions',
-  align: 'end',
   class: 'capitalize',
 }];
 
@@ -148,7 +147,7 @@ watch(() => props.pending, (pendingIs, pendingWas) => {
               </template>
             </i18n-t>
           </RuiTooltip>
-          € {{ row.eurAmount }}
+          {{ row.eurAmount }} €
         </div>
       </template>
       <template #item.paidUsing="{ row }">
@@ -164,12 +163,18 @@ watch(() => props.pending, (pendingIs, pendingWas) => {
       </template>
 
       <template #item.actions="{ row }">
-        <div class="flex gap-2 justify-end">
+        <div class="flex flex-col items-start gap-1">
           <ButtonLink
             :to="row.legacy ? `/webapi/download/receipt/${row.identifier}/` : `/webapi/2/invoices/${row.identifier}/`"
             color="primary"
             external
           >
+            <template #prepend>
+              <RuiIcon
+                name="lu-download"
+                size="16"
+              />
+            </template>
             {{ t('actions.download') }}
           </ButtonLink>
         </div>
