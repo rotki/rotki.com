@@ -82,7 +82,7 @@ const loadingMessages = computed<Record<ThreeDSecureState, string>>(() => ({
         <!-- iframe container - Always in DOM -->
         <div
           id="threeds-iframe-container"
-          class="w-full"
+          class="w-full [&>div]:w-full [&_iframe]:w-full"
         />
       </div>
     </div>

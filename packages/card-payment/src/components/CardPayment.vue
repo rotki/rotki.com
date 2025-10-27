@@ -313,7 +313,7 @@ onUnmounted(async () => {
     <!-- Pending Payment Message (Outside Grid) -->
     <div
       v-if="isProcessing"
-      class="mt-4 max-w-[27.5rem] mx-auto w-full"
+      class="mb-8 max-w-[27.5rem] mx-auto w-full"
     >
       <div class="p-4 bg-orange-50 border border-orange-200 rounded-md text-orange-800 text-sm">
         Processing payment, please wait...
