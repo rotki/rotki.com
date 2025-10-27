@@ -1082,6 +1082,12 @@
       "payment_failure": "Payment Failure",
       "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
     },
+    "payment": {
+      "failure": {
+        "title": "Payment Failed",
+        "message": "We were unable to process your payment. Please try again or select a different payment method."
+      }
+    },
     "progress": {
       "payment_progress": "Payment in progress",
       "payment_progress_message": "Please confirm your transaction...",
