@@ -118,38 +118,42 @@ function reset() {
     </RuiTextField>
   </form>
 
-  <div
-    v-else
-    class="rounded-md px-3 h-14 flex items-center justify-between border border-rui-success"
-  >
-    <div>
-      <div class="flex items-center gap-1">
-        <div class="text-xs text-rui-text-secondary">
-          {{ t('home.plans.tiers.step_3.discount.applied') }}
-        </div>
-        <div class="text-xs font-bold uppercase">
-          {{ model }}
-        </div>
-      </div>
-      <div class="flex gap-1 font-bold text-sm text-rui-primary">
-        <div class="text-rui-success">
-          {{ t('home.plans.tiers.step_3.discount.you_save', { amount: discountInfo.discountedAmount }) }}
-          <template v-if="discountInfo.discountType === DiscountType.PERCENTAGE">
-            {{
-              t('home.plans.tiers.step_3.discount.percent_off', {
-                percentage: discountInfo.discountAmount,
-              })
-            }}
-          </template>
-        </div>
-      </div>
-    </div>
-    <RuiButton
-      icon
-      variant="text"
-      @click="reset()"
+  <div v-else>
+    <div
+      class="rounded-md px-3 h-14 flex items-center justify-between border border-rui-success"
     >
-      <RuiIcon name="lu-x" />
-    </RuiButton>
+      <div>
+        <div class="flex items-center gap-1">
+          <div class="text-xs text-rui-text-secondary">
+            {{ t('home.plans.tiers.step_3.discount.applied') }}
+          </div>
+          <div class="text-xs font-bold uppercase">
+            {{ model }}
+          </div>
+        </div>
+        <div class="flex gap-1 font-bold text-sm text-rui-primary">
+          <div class="text-rui-success">
+            {{ t('home.plans.tiers.step_3.discount.you_save', { amount: discountInfo.discountedAmount }) }}
+            <template v-if="discountInfo.discountType === DiscountType.PERCENTAGE">
+              {{
+                t('home.plans.tiers.step_3.discount.percent_off', {
+                  percentage: discountInfo.discountAmount,
+                })
+              }}
+            </template>
+          </div>
+        </div>
+      </div>
+      <RuiButton
+        icon
+        variant="text"
+        @click="reset()"
+      >
+        <RuiIcon name="lu-x" />
+      </RuiButton>
+    </div>
+    <div class="text-xs text-rui-text-secondary mt-2">
+      {{ t('home.plans.tiers.step_3.discount.first_payment_only') }}
+    </div>
   </div>
 </template>
