@@ -52,14 +52,9 @@ const errorMessage = computed<string>(() => {
 
 const appliedDiscountAmount = computed<string>(() => {
   const info = get(discountInfo);
-  if (!isValidDiscount(info))
-    return '';
-
-  if (info.discountType === DiscountType.PERCENTAGE && info.discountAmount) {
-    return `${info.discountAmount}% off`;
-  }
-
-  return info.discountedAmount.toFixed(2) || '';
+  return isValidDiscount(info) && info.discountType === DiscountType.PERCENTAGE && info.discountAmount
+    ? `${info.discountAmount}% off`
+    : '';
 });
 
 async function fetchDiscountInfo(discountCode: string): Promise<void> {
@@ -228,47 +223,51 @@ watch(value, () => {
     </form>
 
     <!-- Applied Discount Display -->
-    <div
-      v-else
-      class="flex items-center justify-between p-3 border border-green-700 rounded-md"
-    >
-      <div class="flex-1">
-        <div class="flex items-center gap-1">
-          <span class="text-xs text-neutral-500">Discount code applied:</span>
-          <span class="text-xs font-bold uppercase">
-            {{ model }}
-          </span>
-        </div>
-        <div class="text-sm font-semibold text-green-700">
-          <template v-if="isValidDiscount(discountInfo)">
-            You save € {{ discountInfo.discountedAmount }}
-            <template v-if="appliedDiscountAmount">
-              ({{ appliedDiscountAmount }})
-            </template>
-          </template>
-        </div>
-      </div>
-
-      <!-- Remove button -->
-      <button
-        class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all"
-        aria-label="Remove discount"
-        @click="reset()"
+    <div v-else>
+      <div
+        class="flex items-center justify-between p-3 border border-green-700 rounded-md"
       >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <div class="flex-1">
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-neutral-500">Discount code applied:</span>
+            <span class="text-xs font-bold uppercase">
+              {{ model }}
+            </span>
+          </div>
+          <div class="text-sm font-semibold text-green-700">
+            <template v-if="isValidDiscount(discountInfo)">
+              You save {{ discountInfo.discountedAmount }} €
+              <template v-if="appliedDiscountAmount">
+                ({{ appliedDiscountAmount }})
+              </template>
+            </template>
+          </div>
+        </div>
+
+        <!-- Remove button -->
+        <button
+          class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all"
+          aria-label="Remove discount"
+          @click="reset()"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="text-xs text-neutral-500 mt-2">
+        * Applies to first payment only
+      </div>
     </div>
   </div>
 </template>
