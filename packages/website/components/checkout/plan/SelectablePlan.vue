@@ -75,7 +75,7 @@ watch(price, (price) => {
 <template>
   <div
     v-if="price"
-    class="rounded-xl flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-8 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
+    class="rounded-md flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-6 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
     :class="{
       '!border-rui-primary': selected && !disabled,
       '!bg-rui-grey-100': disabled,
@@ -85,7 +85,7 @@ watch(price, (price) => {
     <div class="flex items-center h-0 justify-center relative w-full">
       <RuiChip
         v-if="plan.isMostPopular"
-        class="-top-[2.9rem] absolute"
+        class="-top-[2.25rem] absolute"
         color="primary"
         size="sm"
       >
@@ -93,7 +93,10 @@ watch(price, (price) => {
       </RuiChip>
     </div>
 
-    <div class="w-full flex justify-start items-center my-1 h-8">
+    <div class="w-full flex justify-between items-center mb-4">
+      <div class="text-h5 text-rui-text">
+        {{ t('pricing.plans.plan', { plan: toTitleCase(plan.tierName) }) }}
+      </div>
       <RuiChip
         v-if="discountInfo"
         size="sm"
@@ -103,34 +106,21 @@ watch(price, (price) => {
       </RuiChip>
     </div>
 
-    <div class="text-h5 text-rui-text mb-6">
-      {{ t('pricing.plans.plan', { plan: toTitleCase(plan.tierName) }) }}
-    </div>
-
-    <div
-      v-if="discountInfo"
-      class="text-base text-rui-text-secondary line-through font-normal opacity-70 h-6 flex items-center justify-center mb-1"
-    >
-      {{ discountInfo.originalPrice }}€
-    </div>
-    <div
-      v-else
-      class="h-7"
-    />
-
-    <div class="font-black text-[2.5rem] leading-none text-rui-text">
-      {{ price }}€
-    </div>
-
-    <div class="text-sm text-rui-text-secondary mt-3 mb-6 font-normal flex flex-col items-center justify-start h-[2.75rem]">
-      <div v-if="discountInfo">
-        {{ discountInfo.monthlyPrice }}€/{{ t('home.plans.per_month') }}
+    <div class="flex items-baseline gap-2">
+      <div class="font-black text-[2.5rem] leading-none text-rui-text">
+        {{ price }}€
       </div>
       <div
         v-if="discountInfo"
-        class="text-xs"
+        class="text-base text-rui-text-secondary line-through font-normal opacity-70"
       >
-        {{ t('home.plans.saving', { months: discountInfo.freeMonths }) }}
+        {{ discountInfo.originalPrice }}€
+      </div>
+    </div>
+
+    <div class="text-sm text-rui-text-secondary mt-2 mb-4 font-normal min-h-[1.25rem]">
+      <div v-if="discountInfo">
+        {{ discountInfo.monthlyPrice }}€/{{ t('home.plans.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
       </div>
     </div>
 
