@@ -12,6 +12,7 @@ const {
   selectedPlan,
   paymentStep,
   setError,
+  errorMessage,
 } = useCryptoPaymentState();
 
 const navigation = useCryptoPaymentNavigation();
@@ -78,6 +79,7 @@ onMounted(async () => {
       <CryptoPaymentActions
         v-else
         :loading="loading"
+        :error="errorMessage"
         @back="navigation.navigateBack()"
       />
     </template>
