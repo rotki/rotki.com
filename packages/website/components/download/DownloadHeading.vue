@@ -6,6 +6,34 @@ const { t } = useI18n({ useScope: 'global' });
 
 const showAll = ref(false);
 
+const sponsors = [
+  {
+    name: 'Tay',
+    image: '/img/sponsorship-profiles/1.41.0_tay.png',
+    gold: true,
+  },
+  {
+    name: 'milady',
+    image: '/img/sponsorship-profiles/1.41.0_milady.png',
+  },
+  {
+    name: 'Slyde.eth',
+    image: '/img/sponsorship-profiles/1.41.0_Slyde.eth.png',
+  },
+  {
+    name: 'soxpert.eth',
+    image: '/img/sponsorship-profiles/1.41.0_soxpert.eth.png',
+  },
+  {
+    name: 'floar.eth',
+    image: '/img/sponsorship-profiles/1.41.0_floar.eth.png',
+  },
+  {
+    name: 'dsheets.eth',
+    image: '/img/sponsorship-profiles/1.41.0_dsheets.eth.svg',
+  },
+];
+
 function getOS() {
   const userAgent = navigator.userAgent.toLowerCase();
 
@@ -112,6 +140,48 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
           </div>
         </RuiAccordion>
       </RuiAccordions>
+
+      <div class="flex items-center mt-6 gap-12">
+        <div class="flex flex-col mb-4 w-[150px]">
+          <img
+            src="/img/laurel.svg"
+            class="w-full"
+          />
+          <div class="text-center -mt-11 text-sm">
+            <div>This release is</div>
+            <div class="text-rui-text-secondary">
+              Sponsored by:
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 grid items-center md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 gap-y-8">
+          <div
+            v-for="(sponsor, index) in sponsors"
+            :key="index"
+            class="flex flex-col gap-3"
+          >
+            <img
+              class="size-12 min-w-12 rounded-md overflow-hidden mx-auto"
+              :class="{ 'size-20 min-w-20': sponsor.gold }"
+              :src="sponsor.image"
+              :alt="sponsor.name"
+            />
+            <div class="flex flex-col items-center justify-between relative w-[12rem] max-w-full mx-auto">
+              <img
+                v-if="sponsor.gold"
+                src="/img/ribbon.png"
+                class="w-full h-[125%] absolute top-0 left-0 object-fill"
+              />
+              <div
+                class="text-sm font-bold text-left text-rui-text-secondary relative"
+                :class="{ 'text-yellow-900 max-w-[80%] px-0.5 text-center leading-8': sponsor.gold }"
+              >
+                {{ sponsor.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
