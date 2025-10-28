@@ -135,7 +135,7 @@ export const TaskStatusResponse = z.object({
 export type TaskStatusResponse = z.infer<typeof TaskStatusResponse>;
 
 const Plan = z.object({
-  discount: z.number(),
+  discount: z.number().optional().default(0),
   months: z.number(),
   priceFiat: z.string(),
 });
