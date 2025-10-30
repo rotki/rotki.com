@@ -15,6 +15,7 @@ const biggestProtocols: string[] = [
   'Morpho',
   'Base',
   'Arbitrum One',
+  'Hyperliquid',
   'Makerdao DSR',
   'Spark',
   'Compound',
