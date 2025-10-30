@@ -125,7 +125,7 @@ function reset() {
       <div>
         <div class="flex items-center gap-1">
           <div class="text-xs text-rui-text-secondary">
-            {{ t('home.plans.tiers.step_3.discount.applied') }}
+            {{ discountInfo.isReferral ? t('home.plans.tiers.step_3.discount.referral_applied') : t('home.plans.tiers.step_3.discount.applied') }}
           </div>
           <div class="text-xs font-bold uppercase">
             {{ model }}

@@ -2,6 +2,7 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import ReferralCode from '~/components/account/home/ReferralCode.vue';
 import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';
@@ -58,6 +59,7 @@ onBeforeMount(() => {
     <UnverifiedEmailWarning v-if="!emailConfirmed" />
     <PremiumPlaceholder v-else-if="!canUsePremium" />
     <ApiKeys v-if="premium" />
+    <ReferralCode v-if="emailConfirmed" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable :pending="pending" />
 
