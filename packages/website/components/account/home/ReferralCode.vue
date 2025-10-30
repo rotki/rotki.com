@@ -71,7 +71,7 @@ const shareButtons = computed<ShareButton[]>(() => {
   return [{
     name: 'Twitter',
     customIcon: TwitterIcon,
-    url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${message} ${shareUrl}`)}`,
+    url: `https://x.com/intent/post?text=${encodeURIComponent(`${message} ${shareUrl}`)}`,
     colorClass: 'text-[#000000] dark:text-[#FFFFFF]',
   }, {
     name: 'Farcaster',
