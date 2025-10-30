@@ -174,7 +174,7 @@ watch(value, () => {
               '!pl-4': value || focused,
             }"
           >
-            Discount Code
+            Discount/Referral Code
           </label>
           <fieldset
             class="absolute w-full top-0 left-0 pointer-events-none rounded border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
@@ -186,7 +186,7 @@ watch(value, () => {
             }"
           >
             <legend class="opacity-0 text-xs whitespace-break-spaces">
-              <span v-if="value || focused">{{ '  Discount Code  ' }}</span>
+              <span v-if="value || focused">{{ '  Discount/Referral Code  ' }}</span>
               <span v-else>&#8203;</span>
             </legend>
           </fieldset>
@@ -229,7 +229,9 @@ watch(value, () => {
       >
         <div class="flex-1">
           <div class="flex items-center gap-1">
-            <span class="text-xs text-neutral-500">Discount code applied:</span>
+            <span class="text-xs text-neutral-500">
+              {{ isValidDiscount(discountInfo) && discountInfo.isReferral ? 'Referral code applied:' : 'Discount code applied:' }}
+            </span>
             <span class="text-xs font-bold uppercase">
               {{ model }}
             </span>

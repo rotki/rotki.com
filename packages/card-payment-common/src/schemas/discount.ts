@@ -11,6 +11,7 @@ export const ValidDiscountInfoSchema = z.object({
   discountType: z.nativeEnum(DiscountType),
   finalPrice: z.number(),
   isValid: z.literal(true),
+  isReferral: z.boolean(),
 });
 
 export const InvalidDiscountInfoSchema = z.object({

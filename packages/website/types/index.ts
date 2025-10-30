@@ -28,6 +28,30 @@ export const ApiKeys = z.object({
 
 export type ApiKeys = z.infer<typeof ApiKeys>;
 
+const ReferralDiscountSchema = z.object({
+  amount: z.number(),
+  discountType: z.nativeEnum(DiscountType),
+  usesLeft: z.number(),
+  validUntil: z.string(),
+});
+
+const ReferralCodeWithDataSchema = z.object({
+  code: z.string().min(1),
+  discount: ReferralDiscountSchema,
+  hasReferral: z.literal(true),
+});
+
+const ReferralCodeWithoutDataSchema = z.object({
+  hasReferral: z.literal(false),
+});
+
+export const ReferralCodeResponse = z.discriminatedUnion('hasReferral', [
+  ReferralCodeWithDataSchema,
+  ReferralCodeWithoutDataSchema,
+]);
+
+export type ReferralCodeResponse = z.infer<typeof ReferralCodeResponse>;
+
 export const ChangePasswordResponse = z.object({
   message: ApiError.optional(),
   result: z.boolean().optional(),
