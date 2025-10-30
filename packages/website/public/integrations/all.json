@@ -55,6 +55,10 @@
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/zksync_lite.svg",
       "label": "ZKSync Lite"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/solana.svg",
+      "label": "Solana"
     }
   ],
   "exchanges": [
@@ -389,6 +393,10 @@
       "label": "Juicebox"
     },
     {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/jupiter.svg",
+      "label": "Jupiter"
+    },
+    {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/kraken.svg",
       "label": "Kraken"
     },
@@ -501,8 +509,24 @@
       "label": "Puffer"
     },
     {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/pump-fun.png",
+      "label": "Pump.fun"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/quickswap.png",
+      "label": "Quickswap"
+    },
+    {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/rainbow.svg",
       "label": "Rainbow swaps"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/rotki.svg",
+      "label": "Rotki"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/runmoney.png",
+      "label": "Runmoney"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/safemultisig.svg",
