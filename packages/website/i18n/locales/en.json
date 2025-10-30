@@ -15,6 +15,19 @@
       "not_generated": "You haven't generated an API key",
       "title": "API Credentials"
     },
+    "referral_code": {
+      "code": "Referral Code",
+      "description": "Generate a unique referral code to share with friends and earn rewards when they subscribe to rotki premium.",
+      "discount_amount": "People using this code get {amount}€ off their subscription",
+      "discount_benefit": "Referral Discount",
+      "discount_percentage": "People using this code get {percentage}% off their subscription",
+      "email_subject": "Save on rotki premium with my referral code",
+      "not_created": "You haven't created a referral code yet",
+      "share_description": "Share this referral code with friends to help them save on their rotki premium subscription.",
+      "share_message": "Join me on rotki premium and save {discount} with my referral code: {code}!",
+      "share_via": "Share via:",
+      "title": "Referral Code"
+    },
     "change_password": {
       "current_password": {
         "hint": "Enter your current account password. Only needed if you want to change password",
@@ -242,6 +255,7 @@
     "change": "Change",
     "confirm": "Confirm",
     "continue": "Continue",
+    "create": "Create",
     "delete": "Delete",
     "download": "Download",
     "download_for_free": "Download rotki for free",
@@ -399,6 +413,7 @@
     "error": "Error",
     "error_occurred": "An error occurred",
     "here": "here",
+    "loading": "Loading...",
     "monthly": "monthly",
     "none": "none",
     "plan": "plan",
@@ -579,12 +594,13 @@
           "description": "Proceed to the payment",
           "discount": {
             "applied": "Discount code applied:",
+            "referral_applied": "Referral code applied:",
             "apply_code": "Apply code",
             "first_payment_only": "* Applies to first payment only",
             "hint": "Optional. Enter a discount code to apply savings to your purchase.",
             "you_save": "You save {amount}€",
             "percent_off": "({percentage}% off)",
-            "label": "Discount code"
+            "label": "Discount/Referral Code"
           },
           "grand_total": "Grand Total",
           "labels": {
