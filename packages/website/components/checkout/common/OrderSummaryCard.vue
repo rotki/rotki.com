@@ -2,7 +2,7 @@
 import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import type { CryptoPayment } from '~/types';
+import type { CryptoPayment, CryptoUpgradeProrate } from '~/types';
 import { getDiscountedPrice, getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, toRefs } from '@vueuse/core';
 
@@ -14,7 +14,7 @@ const props = withDefaults(
     plan: SelectedPlan;
     upgradeSubId?: string;
     nextPayment?: number;
-    checkoutData?: CheckoutData | UpgradeData | CryptoPayment | null;
+    checkoutData?: CheckoutData | UpgradeData | CryptoPayment | CryptoUpgradeProrate | null;
     crypto?: boolean;
     disabled?: boolean;
     loading?: boolean;
@@ -73,6 +73,12 @@ const grandTotal = computed<number>(() => {
     if ('finalPriceInEur' in currentCheckoutData) {
       return currentCheckoutData.finalPriceInEur;
     }
+
+    // If it's a prorated crypto payment request
+    if ('finalAmount' in currentCheckoutData) {
+      return Number(currentCheckoutData.finalAmount);
+    }
+
     // Otherwise use getFinalAmount (handles card payment upgrades)
     return getFinalAmount(currentCheckoutData, currentPlan, currentDiscountInfo);
   }

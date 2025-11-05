@@ -7,6 +7,8 @@ import {
   CryptoPaymentResponse,
   type CryptoUpgradePayment,
   CryptoUpgradePaymentResponse,
+  type CryptoUpgradeProrate,
+  CryptoUpgradeProrateResponseSchema,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
   type Result,
@@ -86,6 +88,36 @@ export function useCryptoPaymentApi() {
     catch (error: any) {
       logger.error('Crypto payment failed:', error);
       return handlePaymentError(error);
+    }
+  };
+
+  const prorateCryptoUpgrade = async (planId: number, subscriptionId: string): Promise<Result<CryptoUpgradeProrate, Error>> => {
+    try {
+      const response = await fetchWithCsrf<unknown>(
+        '/webapi/2/crypto/upgrade/quote',
+        {
+          body: {
+            planId,
+            subscriptionId,
+          },
+          method: 'POST',
+        },
+      );
+
+      const { result } = CryptoUpgradeProrateResponseSchema.parse(response);
+      assert(result);
+
+      return {
+        result,
+        isError: false,
+      };
+    }
+    catch (error: unknown) {
+      logger.error('Crypto payment quote request failed:', error);
+      return {
+        error: error instanceof Error ? error : new Error('Unknown error'),
+        isError: true,
+      };
     }
   };
 
@@ -271,6 +303,7 @@ export function useCryptoPaymentApi() {
   return {
     checkPendingCryptoPayment,
     checkCryptoUpgradePayment,
+    prorateCryptoUpgrade,
     cryptoPayment,
     deletePendingPayment,
     markTransactionStarted,
