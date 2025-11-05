@@ -42,6 +42,13 @@ export function getSubscriptionTableHeaders(t: ComposerTranslation): DataTableCo
 /**
  * Pending payment link route
  */
-export const pendingPaymentLink: RouteLocationRaw = {
-  path: '/checkout/pay/method',
-};
+export function getPendingPaymentLink(planId: number | undefined, currency: string | undefined, upgradeSubId?: string): RouteLocationRaw {
+  return {
+    path: '/checkout/pay/crypto',
+    query: {
+      planId: planId?.toString(),
+      currency,
+      ...(upgradeSubId ? { upgradeSubId } : {}),
+    },
+  };
+}

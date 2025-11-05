@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
-import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { RouteLocationRaw } from 'vue-router';
 import { isSubRequestingUpgrade } from '@rotki/card-payment-common';
+import { PaymentProvider, type Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import { get, set } from '@vueuse/shared';
 import BlockExplorerActionButton from '~/components/account/home/subscription-table/actions/BlockExplorerActionButton.vue';
 import CancelActionButton from '~/components/account/home/subscription-table/actions/CancelActionButton.vue';
 import CancelUpgradeActionButton from '~/components/account/home/subscription-table/actions/CancelUpgradeActionButton.vue';
@@ -10,7 +11,7 @@ import PaymentDetailActionButton from '~/components/account/home/subscription-ta
 import RenewActionButton from '~/components/account/home/subscription-table/actions/RenewActionButton.vue';
 import ResumeActionButton from '~/components/account/home/subscription-table/actions/ResumeActionButton.vue';
 import UpgradeActionButton from '~/components/account/home/subscription-table/actions/UpgradeActionButton.vue';
-import { pendingPaymentLink } from '~/components/account/home/subscription-table/config';
+import { getPendingPaymentLink } from '~/components/account/home/subscription-table/config';
 import {
   type CryptoPaymentState,
   type OperationState,
@@ -18,6 +19,60 @@ import {
   type SubscriptionActionEvent,
   type SubscriptionActionType,
 } from './types';
+
+interface ActionConfig<T> {
+  props: T;
+  visible: boolean;
+}
+
+interface BaseActionProps {
+  actionsClasses: string;
+}
+
+interface NavigationActionProps extends BaseActionProps {
+  to: RouteLocationRaw;
+}
+
+interface DisableableNavigationActionProps extends NavigationActionProps {
+  disabled: boolean;
+}
+
+interface CancelActionProps extends BaseActionProps {
+  subscriptionId: string;
+  disabled: boolean;
+  loading: boolean;
+  cancellationStatus?: string;
+}
+
+interface ResumeActionProps extends BaseActionProps {
+  subscriptionId: string;
+  disabled: boolean;
+  loading: boolean;
+  nextActionDate: string;
+  resumeStatus?: string;
+}
+
+interface CancelUpgradeActionProps extends BaseActionProps {
+  loading: boolean;
+}
+
+interface ActionState {
+  upgrade: ActionConfig<BaseActionProps>;
+  cancel: ActionConfig<CancelActionProps>;
+  renew: ActionConfig<DisableableNavigationActionProps>;
+  blockExplorer: ActionConfig<NavigationActionProps>;
+  paymentDetail: ActionConfig<DisableableNavigationActionProps>;
+  cancelUpgrade: ActionConfig<CancelUpgradeActionProps>;
+  resume: ActionConfig<ResumeActionProps>;
+  shouldDisplay: boolean;
+}
+
+interface ActionContext {
+  subscription: UserSubscription;
+  baseProps: BaseActionProps;
+  operationState: OperationState;
+  cryptoPaymentState: CryptoPaymentState;
+}
 
 interface Props {
   subscription: UserSubscription;
@@ -35,133 +90,174 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { hasAction, displayActions } = useSubscriptionActions();
+const upgradePlanId = ref<number>();
 
-const { isCryptoPaymentPending, shouldShowPaymentDetail, getBlockExplorerLink } = useSubscriptionCryptoPayment({
+const { hasAction, displayActions } = useSubscriptionActions();
+const { checkCryptoUpgradePayment } = useCryptoPaymentApi();
+
+const { isCryptoPaymentPending, shouldShowPaymentDetail, getBlockExplorerLink, pendingPaymentCurrency } = useSubscriptionCryptoPayment({
   renewableSubscriptions: computed<UserSubscription[]>(() =>
-    props.subscription.actions.includes('renew') ? [props.subscription] : [],
+    isCryptoPendingOrRenewal(props.subscription) ? [props.subscription] : [],
   ),
 });
 
-interface ActionConfig<T> {
-  props: T;
-  visible: boolean;
+function isActionLoading(context: ActionContext, action: SubscriptionActionType): boolean {
+  const { inProgress, operationType, activeAction, activeSubscription } = context.operationState;
+  const subId = context.subscription.id;
+  return operationType === action && activeAction === action && inProgress && activeSubscription?.id === subId;
 }
 
-interface ActionState {
-  upgrade: ActionConfig<{ actionsClasses: string }>;
-  cancel: ActionConfig<{
-    actionsClasses: string;
-    cancellationStatus?: string;
-    disabled: boolean;
-    loading: boolean;
-    subscriptionId: string;
-  }>;
-  renew: ActionConfig<{
-    actionsClasses: string;
-    disabled: boolean;
-    to: RouteLocationRaw;
-  }>;
-  blockExplorer: ActionConfig<{
-    actionsClasses: string;
-    to: RouteLocationRaw;
-  }>;
-  paymentDetail: ActionConfig<{
-    actionsClasses: string;
-    disabled: boolean;
-    to: RouteLocationRaw;
-  }>;
-  cancelUpgrade: ActionConfig<{
-    actionsClasses: string;
-    loading: boolean;
-  }>;
-  resume: ActionConfig<{
-    actionsClasses: string;
-    disabled: boolean;
-    loading: boolean;
-    nextActionDate: string;
-    resumeStatus?: string;
-    subscriptionId: string;
-  }>;
-  shouldDisplay: boolean;
+function buildUpgradeAction(context: ActionContext): ActionConfig<BaseActionProps> {
+  const isCancelLoading = isActionLoading(context, SubscriptionAction.CANCEL);
+
+  return {
+    props: context.baseProps,
+    visible: hasAction(context.subscription, SubscriptionAction.UPGRADE, props.availablePlans) && !isCancelLoading,
+  };
+}
+
+function buildCancelAction(context: ActionContext): ActionConfig<CancelActionProps> {
+  const { inProgress, status } = context.operationState;
+  const isCancelLoading = isActionLoading(context, SubscriptionAction.CANCEL);
+  const subId = context.subscription.id;
+
+  return {
+    props: {
+      ...context.baseProps,
+      cancellationStatus: isCancelLoading && status ? status : undefined,
+      disabled: inProgress,
+      loading: isCancelLoading,
+      subscriptionId: subId,
+    },
+    visible: hasAction(context.subscription, SubscriptionAction.CANCEL),
+  };
+}
+
+function buildRenewAction(context: ActionContext): ActionConfig<DisableableNavigationActionProps> {
+  const { inProgress } = context.operationState;
+  const { renewLink } = context.cryptoPaymentState;
+
+  return {
+    props: {
+      ...context.baseProps,
+      disabled: inProgress,
+      to: renewLink,
+    },
+    visible: hasAction(context.subscription, SubscriptionAction.RENEW),
+  };
+}
+
+function buildBlockExplorerAction(context: ActionContext): ActionConfig<NavigationActionProps> {
+  const { pendingTx } = context.cryptoPaymentState;
+  const isPendingCrypto = isCryptoPaymentPending(context.subscription);
+  const blockExplorerLink = pendingTx ? getBlockExplorerLink(pendingTx) : { path: '' };
+
+  return {
+    props: {
+      ...context.baseProps,
+      to: blockExplorerLink,
+    },
+    visible: isPendingCrypto,
+  };
+}
+
+function buildPaymentDetailAction(context: ActionContext): ActionConfig<DisableableNavigationActionProps> {
+  const { inProgress } = context.operationState;
+  const subId = context.subscription.id;
+  const planId = get(upgradePlanId) ?? context.subscription.planId;
+  const isRequestingUpgrade = isSubRequestingUpgrade(context.subscription);
+  const upgradeSubId = isRequestingUpgrade ? subId : undefined;
+
+  const pendingPaymentLink = getPendingPaymentLink(planId, get(pendingPaymentCurrency), upgradeSubId);
+
+  return {
+    props: {
+      ...context.baseProps,
+      disabled: inProgress,
+      to: pendingPaymentLink,
+    },
+    visible: shouldShowPaymentDetail(context.subscription),
+  };
+}
+
+function buildCancelUpgradeAction(context: ActionContext): ActionConfig<CancelUpgradeActionProps> {
+  const { inProgress, operationType } = context.operationState;
+  const isCancelUpgradeLoading = operationType === SubscriptionAction.CANCEL_UPGRADE && inProgress;
+  const isRequestingUpgrade = isSubRequestingUpgrade(context.subscription);
+  const isPendingCrypto = isCryptoPaymentPending(context.subscription);
+
+  return {
+    props: {
+      ...context.baseProps,
+      loading: isCancelUpgradeLoading,
+    },
+    visible: isRequestingUpgrade && !isPendingCrypto,
+  };
+}
+
+function buildResumeAction(context: ActionContext): ActionConfig<ResumeActionProps> {
+  const { inProgress, status } = context.operationState;
+  const isResumeLoading = isActionLoading(context, SubscriptionAction.RESUME);
+  const subId = context.subscription.id;
+
+  return {
+    props: {
+      ...context.baseProps,
+      disabled: inProgress,
+      loading: isResumeLoading,
+      nextActionDate: context.subscription.nextActionDate,
+      resumeStatus: isResumeLoading && status ? status : undefined,
+      subscriptionId: subId,
+    },
+    visible: context.subscription.isSoftCanceled,
+  };
 }
 
 const actionState = computed<ActionState>(() => {
-  const { inProgress, operationType, status, activeAction, activeSubscription } = props.operationState;
-  const { pendingTx, renewLink } = props.cryptoPaymentState;
-
-  const isCancelLoading = operationType === SubscriptionAction.CANCEL && activeAction === SubscriptionAction.CANCEL && inProgress && activeSubscription?.id === props.subscription.id;
-  const isResumeLoading = operationType === SubscriptionAction.RESUME && activeAction === SubscriptionAction.RESUME && inProgress && activeSubscription?.id === props.subscription.id;
-  const isCancelUpgradeLoading = operationType === SubscriptionAction.CANCEL_UPGRADE && inProgress;
-  const isPendingCrypto = isCryptoPaymentPending(props.subscription);
-  const isRequestingUpgrade = isSubRequestingUpgrade(props.subscription);
-  const blockExplorerLink = pendingTx ? getBlockExplorerLink(pendingTx) : { path: '' };
-
-  const baseProps = { actionsClasses: props.actionsClasses };
+  const context: ActionContext = {
+    baseProps: { actionsClasses: props.actionsClasses },
+    cryptoPaymentState: props.cryptoPaymentState,
+    operationState: props.operationState,
+    subscription: props.subscription,
+  };
 
   return {
-    blockExplorer: {
-      props: {
-        ...baseProps,
-        to: blockExplorerLink,
-      },
-      visible: isPendingCrypto,
-    },
-    cancel: {
-      props: {
-        ...baseProps,
-        cancellationStatus: isCancelLoading && status ? status : undefined,
-        disabled: inProgress,
-        loading: isCancelLoading,
-        subscriptionId: props.subscription.id,
-      },
-      visible: hasAction(props.subscription, SubscriptionAction.CANCEL),
-    },
-    cancelUpgrade: {
-      props: {
-        ...baseProps,
-        loading: isCancelUpgradeLoading,
-      },
-      visible: isRequestingUpgrade && !isPendingCrypto,
-    },
-    paymentDetail: {
-      props: {
-        ...baseProps,
-        disabled: inProgress,
-        to: pendingPaymentLink,
-      },
-      visible: shouldShowPaymentDetail(props.subscription),
-    },
-    renew: {
-      props: {
-        ...baseProps,
-        disabled: inProgress,
-        to: renewLink,
-      },
-      visible: hasAction(props.subscription, SubscriptionAction.RENEW),
-    },
-    resume: {
-      props: {
-        ...baseProps,
-        disabled: inProgress,
-        loading: isResumeLoading,
-        nextActionDate: props.subscription.nextActionDate,
-        resumeStatus: isResumeLoading && status ? status : undefined,
-        subscriptionId: props.subscription.id,
-      },
-      visible: props.subscription.isSoftCanceled,
-    },
+    blockExplorer: buildBlockExplorerAction(context),
+    cancel: buildCancelAction(context),
+    cancelUpgrade: buildCancelUpgradeAction(context),
+    paymentDetail: buildPaymentDetailAction(context),
+    renew: buildRenewAction(context),
+    resume: buildResumeAction(context),
     shouldDisplay: displayActions(props.subscription, props.availablePlans),
-    upgrade: {
-      props: baseProps,
-      visible: hasAction(props.subscription, SubscriptionAction.UPGRADE, props.availablePlans) && !isCancelLoading,
-    },
+    upgrade: buildUpgradeAction(context),
   };
 });
+
+function isCryptoPendingOrRenewal(subscription: UserSubscription): boolean {
+  const isRenew = subscription.actions.includes('renew');
+  const isPendingCrypto = subscription.paymentProvider === PaymentProvider.CRYPTO && subscription.pending;
+  return isRenew || isPendingCrypto;
+}
 
 function handleAction(action: SubscriptionActionType): void {
   emit('action', { action, subscription: props.subscription });
 }
+
+watchImmediate(() => props.subscription, async (subscription) => {
+  if (!isSubRequestingUpgrade(subscription)) {
+    set(upgradePlanId, undefined);
+    return;
+  }
+
+  const upgradePaymentResponse = await checkCryptoUpgradePayment(subscription.id);
+  if (!upgradePaymentResponse.isError) {
+    const { toPlan: { id } } = upgradePaymentResponse.result;
+    set(upgradePlanId, id);
+  }
+  else {
+    set(upgradePlanId, undefined);
+  }
+});
 </script>
 
 <template>
