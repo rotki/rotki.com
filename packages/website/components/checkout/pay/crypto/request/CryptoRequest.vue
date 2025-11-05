@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
+import type { CryptoUpgradeProrate } from '~/types';
 import { get, set } from '@vueuse/core';
 import { buildQueryParams } from '~/utils/query';
 
@@ -9,6 +10,7 @@ const acceptRefundPolicy = ref<boolean>(false);
 const processing = ref<boolean>(false);
 
 const currency = ref<string>('');
+const prorate = ref<CryptoUpgradeProrate | null>(null);
 
 const discountCode = ref<string>('');
 const discountInfo = ref<DiscountInfo>();
@@ -16,6 +18,7 @@ const discountInfo = ref<DiscountInfo>();
 const { planId } = usePlanIdParam();
 const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 const { selectedPlan } = useSelectedPlan();
+const { prorateCryptoUpgrade } = useCryptoPaymentApi();
 
 const valid = computed<boolean>(() => get(acceptRefundPolicy) && !!get(currency));
 
@@ -52,6 +55,21 @@ function submit(): void {
     query,
   });
 }
+
+async function checkProration(): Promise<void> {
+  if (!isDefined(upgradeSubId) || !isDefined(planId)) {
+    return;
+  }
+
+  const quote = await prorateCryptoUpgrade(get(planId), get(upgradeSubId));
+  if (!quote.isError) {
+    set(prorate, quote.result);
+  }
+}
+
+onMounted(async () => {
+  checkProration().catch();
+});
 </script>
 
 <template>
@@ -85,6 +103,7 @@ function submit(): void {
           v-model:discount-code="discountCode"
           v-model:discount-info="discountInfo"
           :plan="selectedPlan"
+          :checkout-data="prorate"
           :upgrade-sub-id="upgradeSubId"
           crypto
         />
