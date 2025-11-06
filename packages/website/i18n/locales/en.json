@@ -623,7 +623,7 @@
             },
             "expiry": "Expiry {expiresAt}"
           },
-          "subtitle": "Payments by crypto can have slower processing times.",
+          "subtitle": "Complete your payment by sending the exact amount.",
           "title": "Payment Details",
           "how_crypto_works": "How crypto payments work",
           "select_payment": "Select network and token to pay",
