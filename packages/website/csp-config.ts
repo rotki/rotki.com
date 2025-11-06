@@ -185,19 +185,11 @@ export const paypalCSP: ContentSecurityPolicyValue = {
 
 // 3D Secure (for card payments)
 export const threeDSecureCSP: ContentSecurityPolicyValue = {
-  'connect-src': ['*.cardinalcommerce.com'],
+  'connect-src': ['*'],
   'form-action': ['\'self\'', '*'],
-  'frame-src': ['*'], // Required for 3D Secure iframes
-  'script-src': [
-    '*', // Required for dynamic 3D Secure scripts
-    'songbird.cardinalcommerce.com',
-    'songbirdstag.cardinalcommerce.com',
-  ],
-  'script-src-elem': [
-    '*', // Required for dynamic 3D Secure scripts
-    'songbird.cardinalcommerce.com',
-    'songbirdstag.cardinalcommerce.com',
-  ],
+  'frame-src': ['*'],
+  'script-src': ['*'],
+  'script-src-elem': ['*'],
 };
 
 /**
