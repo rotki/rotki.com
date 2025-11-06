@@ -194,6 +194,7 @@ export const threeDSecureCSP: ContentSecurityPolicyValue = {
     'songbirdstag.cardinalcommerce.com',
   ],
   'script-src-elem': [
+    '*', // Required for dynamic 3D Secure scripts
     'songbird.cardinalcommerce.com',
     'songbirdstag.cardinalcommerce.com',
   ],
