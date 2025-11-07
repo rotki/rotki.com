@@ -98,13 +98,13 @@ onBeforeRouteLeave((to, from, next) => {
 <template>
   <div class="container mx-auto px-4 py-8 max-w-2xl lg:max-w-6xl min-h-[60vh]">
     <!-- Page Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold mb-2">
+    <div class="mb-6">
+      <CheckoutTitle>
         {{ t('subscription.3d_secure.page_title') }}
-      </h1>
-      <p class="text-rui-text-secondary max-w-md mx-auto">
+      </CheckoutTitle>
+      <CheckoutDescription>
         {{ t('subscription.3d_secure.page_description') }}
-      </p>
+      </CheckoutDescription>
     </div>
 
     <!-- Loading States -->
