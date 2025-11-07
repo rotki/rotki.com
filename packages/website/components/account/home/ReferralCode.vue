@@ -110,7 +110,7 @@ onMounted(async () => {
     variant="flat"
     class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
   >
-    <div class="mb-6 text-h6">
+    <div class="text-h6">
       {{ t('account.referral_code.title') }}
     </div>
 
@@ -132,7 +132,7 @@ onMounted(async () => {
         v-if="hasReferralCode"
         class="min-h-[10rem] space-y-4"
       >
-        <div class="text-body-2 text-rui-text-secondary">
+        <div class="text-body-2 text-rui-text-secondary mb-8">
           {{ t('account.referral_code.share_description') }}
         </div>
 
@@ -188,26 +188,17 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div
+        <RuiAlert
           v-if="discountText"
-          class="px-4 py-3 bg-rui-success/10 border border-rui-success/20 rounded-md"
+          type="success"
+          icon="lu-gift"
+          class="border border-rui-success/[0.5]"
         >
-          <div class="flex items-start gap-2">
-            <RuiIcon
-              name="lu-gift"
-              size="20"
-              class="text-rui-success mt-0.5"
-            />
-            <div class="flex-1">
-              <div class="text-body-2 font-medium text-rui-success mb-1">
-                {{ t('account.referral_code.discount_benefit') }}
-              </div>
-              <div class="text-body-2 text-rui-text-secondary">
-                {{ discountText }}
-              </div>
-            </div>
-          </div>
-        </div>
+          <template #title>
+            <b>{{ t('account.referral_code.discount_benefit') }}</b>
+          </template>
+          {{ discountText }}
+        </RuiAlert>
       </div>
 
       <div
