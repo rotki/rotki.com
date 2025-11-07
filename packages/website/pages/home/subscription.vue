@@ -59,7 +59,7 @@ onBeforeMount(() => {
     <UnverifiedEmailWarning v-if="!emailConfirmed" />
     <PremiumPlaceholder v-else-if="!canUsePremium" />
     <ApiKeys v-if="premium" />
-    <ReferralCode v-if="emailConfirmed" />
+    <ReferralCode v-if="emailConfirmed && premium" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable :pending="pending" />
 
