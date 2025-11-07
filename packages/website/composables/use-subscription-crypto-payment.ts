@@ -1,8 +1,11 @@
-import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { Ref } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx } from '~/types';
 import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
+import {
+  PaymentProvider,
+  type Subscription as UserSubscription,
+} from '@rotki/card-payment-common/schemas/subscription';
 import { get, isDefined } from '@vueuse/shared';
 import { usePendingTx } from '~/composables/crypto-payment';
 import { PaymentMethod } from '~/types/payment';
@@ -90,7 +93,13 @@ export function useSubscriptionCryptoPayment({
    * Check if we should show payment detail link for this subscription
    */
   function shouldShowPaymentDetail(subscription: UserSubscription): boolean {
-    return (isSubPending(subscription) || isSubRequestingUpgrade(subscription)) && !isCryptoPaymentPending(subscription);
+    if (subscription.paymentProvider !== PaymentProvider.CRYPTO) {
+      return false;
+    }
+    const isPending = isSubPending(subscription);
+    const isUpgrade = isSubRequestingUpgrade(subscription);
+    const transactionNotInitiated = !isCryptoPaymentPending(subscription);
+    return (isPending || isUpgrade) && transactionNotInitiated;
   }
 
   /**
