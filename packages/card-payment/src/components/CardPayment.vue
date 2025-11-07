@@ -310,15 +310,38 @@ onUnmounted(async () => {
       class="max-w-[27.5rem] mx-auto w-full"
     />
 
-    <!-- Pending Payment Message (Outside Grid) -->
-    <div
-      v-if="isProcessing"
-      class="mb-8 max-w-[27.5rem] mx-auto w-full"
-    >
-      <div class="p-4 bg-orange-50 border border-orange-200 rounded-md text-orange-800 text-sm">
-        Processing payment, please wait...
-      </div>
-    </div>
+    <!-- Full Screen Processing Overlay -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-300 ease-in-out"
+        leave-active-class="transition-opacity duration-300 ease-in-out"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+        appear
+      >
+        <div
+          v-if="isProcessing"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        >
+          <div class="flex flex-col items-center justify-center text-center px-4">
+            <div class="mb-4">
+              <RuiProgress
+                variant="indeterminate"
+                :size="48"
+                :circular="true"
+                color="primary"
+              />
+            </div>
+            <h3 class="text-lg font-medium text-white mb-1">
+              Processing payment
+            </h3>
+            <p class="text-white/80">
+              Please wait and do not close this window...
+            </p>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Action Buttons (Outside Grid) -->
     <div class="max-w-[27.5rem] mx-auto w-full">
