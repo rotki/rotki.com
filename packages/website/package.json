@@ -1,6 +1,6 @@
 {
   "name": "@rotki/website",
-  "version": "2025.11.3",
+  "version": "2025.11.4",
   "private": true,
   "type": "module",
   "scripts": {
