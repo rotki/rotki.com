@@ -6,9 +6,12 @@ import {
   arbitrumSepolia,
   base,
   baseSepolia,
+  bsc,
   gnosis,
   mainnet,
   optimism,
+  polygon,
+  scroll,
   sepolia,
 } from '@reown/appkit/networks';
 import { createAppKit } from '@reown/appkit/vue';
@@ -22,16 +25,17 @@ ChainController.showUnsupportedChainUI = function () {
 };
 
 const testNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [sepolia, arbitrumSepolia, baseSepolia];
-const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis];
+const productionNetworks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet, arbitrum, base, optimism, gnosis, polygon, bsc, scroll];
 
 export interface Web3ConnectionConfig {
   chainId?: MaybeRef<number>;
   onAccountChange?: (isConnected: boolean) => void;
   onError?: (error: string) => void;
+  canSwitchNetwork?: boolean;
 }
 
 export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
-  const { chainId, onAccountChange, onError } = config;
+  const { chainId, onAccountChange, onError, canSwitchNetwork = false } = config;
 
   const connected = ref<boolean>(false);
   const isOpen = ref<boolean>(false);
@@ -43,6 +47,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
 
   const defaultNetwork = getNetwork(get(chainId));
+  const availableNetworks = testing ? testNetworks : productionNetworks;
 
   const appKit = createAppKit({
     adapters: [new EthersAdapter()],
@@ -60,7 +65,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
       name: 'Rotki',
       url: baseUrl,
     },
-    networks: [defaultNetwork],
+    networks: canSwitchNetwork ? availableNetworks : [defaultNetwork],
     projectId,
     themeMode: 'light',
     themeVariables: {
