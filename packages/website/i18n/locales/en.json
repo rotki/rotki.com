@@ -18,15 +18,16 @@
     "referral_code": {
       "code": "Referral Code",
       "description": "Generate a unique referral code to share with friends and earn rewards when they subscribe to rotki premium.",
-      "discount_amount": "People using this code get {amount}€ off their subscription",
+      "discount_amount": "People using this code get {amount}€ off their first subscription",
       "discount_benefit": "Referral Discount",
-      "discount_percentage": "People using this code get {percentage}% off their subscription",
+      "discount_percentage": "People using this code get {percentage}% off their first subscription",
       "email_subject": "Save on rotki premium with my referral code",
       "not_created": "You haven't created a referral code yet",
       "share_description": "Share this referral code with friends to help them save on their rotki premium subscription.",
       "share_message": "Join me on rotki premium and save {discount} with my referral code: {code}!",
       "share_via": "Share via:",
-      "title": "Referral Code"
+      "title": "Referral Code",
+      "coming_soon_hint": "Referral tracking and exclusive benefits are on the way, stay tuned."
     },
     "change_password": {
       "current_password": {

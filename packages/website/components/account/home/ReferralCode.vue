@@ -199,6 +199,16 @@ onMounted(async () => {
           </template>
           {{ discountText }}
         </RuiAlert>
+
+        <RuiAlert
+          type="info"
+          icon="lu-sparkles"
+          class="border border-rui-primary/[0.3]"
+        >
+          <template #title>
+            <b>{{ t('account.referral_code.coming_soon_hint') }}</b>
+          </template>
+        </RuiAlert>
       </div>
 
       <div
