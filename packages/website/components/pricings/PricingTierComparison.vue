@@ -189,7 +189,7 @@ function isFeatureFlag(label: string, descriptionMap: FeatureDescriptionMap): bo
 
 function getFeatureValue(plan: PlanBase, label: string, descriptionMap: FeatureDescriptionMap): FeatureValue {
   if (isFreePlan(plan)) {
-    if (label === 'Access your history events') {
+    if (label === 'Historical events limit') {
       return '1K events';
     }
     return undefined;
