@@ -1,16 +1,16 @@
 import type { AvailablePlan } from '@rotki/card-payment-common';
-import type { MappedPlan } from '~/components/pricings/type';
+import type { MappedPlan, PlanBase } from '~/components/pricings/type';
 import { PricingPeriod } from '~/types/tiers';
 
-export function isMostPopularPlan(plan: MappedPlan) {
+export function isMostPopularPlan(plan: MappedPlan): boolean {
   return plan.isMostPopular;
 }
 
-export function isFreePlan(plan: { type: string }) {
+export function isFreePlan(plan: PlanBase): boolean {
   return plan.type === 'free';
 }
 
-export function isCustomPlan(plan: { type: string }) {
+export function isCustomPlan(plan: PlanBase): boolean {
   return plan.type === 'custom';
 }
 
