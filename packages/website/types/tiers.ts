@@ -12,7 +12,7 @@ export const PremiumTierInfoDescription = z.object({
 
 export const PremiumTierInfo = z.object({
   description: z.array(PremiumTierInfoDescription),
-  limits: z.record(z.string(), z.number()),
+  limits: z.record(z.string(), z.union([z.boolean(), z.number()])),
   monthlyPlan: PremiumTierPlan,
   name: z.string(),
   yearlyPlan: PremiumTierPlan,
