@@ -799,16 +799,16 @@
     "billed_annually": "Billed annually in € {price}",
     "billed_monthly": "Billed monthly in EUR",
     "header": {
-      "title": "Compare our plans and find yours",
+      "title": "Choose a plan that fits your needs.",
       "heading": "Pricing",
-      "description": "Simple, transparent pricing that grows with you. Try any plan free for 30 days."
+      "description": "Compare features and limits across the available tiers."
     },
     "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
     "custom_plan_negotiable": "Negotiable",
     "custom_plan_bespoke_support": "Bespoke & Customization assistance",
     "per_month": "/month",
     "most_popular_plan": "Most popular plan",
-    "max_saved_annually": "Save {percent}% Annually",
+    "max_saved_annually": "Save {months} months vs monthly",
     "see_all_features": "See all features",
     "see_less_features": "See less features",
     "free": "Free",

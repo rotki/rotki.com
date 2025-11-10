@@ -24,9 +24,9 @@ const maxSavedAnnually = computed(() => {
 
       const monthlyTotal = monthlyPrice * 12;
       const saved = monthlyTotal - yearlyPrice;
-      const savedPercent = (saved / monthlyTotal) * 100;
+      const monthsSaved = saved / monthlyPrice;
 
-      return Math.round(savedPercent); // Round to nearest whole number
+      return Math.floor(monthsSaved); // Round down to nearest integer
     }),
   );
 });
@@ -61,11 +61,11 @@ const tabs = [
       class="flex items-start gap-2 text-rui-primary font-medium whitespace-nowrap -mt-8 -ml-4 relative z-1"
     >
       <img
-        :alt="t('pricing.max_saved_annually', { percent: maxSavedAnnually })"
+        :alt="t('pricing.max_saved_annually', { months: maxSavedAnnually })"
         class="w-14 mt-3"
         src="/img/pricing-arrow.svg"
       />
-      {{ t('pricing.max_saved_annually', { percent: maxSavedAnnually }) }}
+      {{ t('pricing.max_saved_annually', { months: maxSavedAnnually }) }}
     </div>
   </div>
 </template>
