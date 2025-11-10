@@ -3,12 +3,14 @@ import { z } from 'zod';
 export enum PaymentProvider {
   BRAINTREE = 'braintree',
   CRYPTO = 'crypto',
+  NONE = 'none',
 }
 
 export enum PaymentMethod {
   PAYPAL = 'paypal',
   CARD = 'card',
   CRYPTO = 'crypto',
+  FREE = 'free',
 }
 
 const StringArray = z.array(z.string());

@@ -101,7 +101,7 @@ async function submitUpgrade() {
   }
 
   const paymentMethod = sub.paymentMethod;
-  if (!paymentMethod) {
+  if (!paymentMethod || paymentMethod === PaymentMethod.FREE) {
     alert.show = true;
     alert.message = t('upgrade_plan.error.payment_method_unknown');
     return;
