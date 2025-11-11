@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import { PaymentProvider, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
+import { PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
 import { get, objectPick, set } from '@vueuse/core';
 import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
 import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCardDialog.vue';
 import AccountPaymentCard from '~/components/account/home/payment-methods/PaymentCard.vue';
+import PaymentCardSkeleton from '~/components/account/home/payment-methods/PaymentCardSkeleton.vue';
 import ThreeDSecureModal, { type ThreeDSecureVerificationData } from '~/components/account/home/payment-methods/ThreeDSecureModal.vue';
-import { useFetchUserSubscriptions } from '~/composables/use-fetch-user-subscriptions';
 import { usePaymentCards } from '~/composables/use-payment-cards';
+import { useUserSubscriptions } from '~/composables/use-user-subscriptions';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 
@@ -29,7 +30,6 @@ const showDeleteDialog = ref<boolean>(false);
 const showThreeDSecureModal = ref<boolean>(false);
 const isReauthorization = ref<boolean>(false);
 const deletingCard = ref<boolean>(false);
-const activeSubscription = ref<Subscription>();
 
 const cardOperation = ref<CardOperation>();
 const cardToDelete = ref<SavedCard>();
@@ -39,38 +39,28 @@ const error = ref<{ title: string; message: string }>();
 
 const { account } = storeToRefs(useMainStore());
 
-const { cards, loading, refresh } = usePaymentCards();
-const { fetchUserSubscriptions } = useFetchUserSubscriptions();
+const { cards, loading: cardsLoading, refresh: refreshCards } = usePaymentCards();
+const { activeSubscription, loading: subscriptionsLoading, refresh: refreshSubscriptions } = useUserSubscriptions();
 
+const loading = computed<boolean>(() => get(cardsLoading) || get(subscriptionsLoading));
 const hasCards = computed<boolean>(() => get(cards).length > 0);
 const hasActiveSubscription = computed<boolean>(() => !!get(account)?.hasActiveSubscription);
 const hasActiveCryptoSubscription = computed<boolean>(() =>
   get(activeSubscription)?.paymentProvider === PaymentProvider.CRYPTO,
 );
 
-async function loadActiveSubscription(): Promise<void> {
-  try {
-    const subscriptions = await fetchUserSubscriptions();
-    const active = subscriptions.find(sub => sub.isActive);
-    set(activeSubscription, active);
-  }
-  catch (error) {
-    logger.error('Failed to fetch subscriptions:', error);
-  }
-}
-
-function confirmDeleteCard(card: SavedCard) {
+function confirmDeleteCard(card: SavedCard): void {
   set(cardToDelete, card);
   set(showDeleteDialog, true);
 }
 
-function handleDeleteError(deleteError: { title: string; message: string }) {
+function handleDeleteError(deleteError: { title: string; message: string }): void {
   set(error, deleteError);
 }
 
-function handleDeleteSuccess() {
+async function handleDeleteSuccess(): Promise<void> {
   set(cardToDelete, undefined);
-  refresh();
+  await Promise.all([refreshCards(), refreshSubscriptions()]);
 }
 
 async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Promise<void> {
@@ -83,13 +73,7 @@ async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Prom
   try {
     set(cardOperation, { mode, token: card.token });
 
-    // Use cached active subscription or fetch if not available
-    let active = get(activeSubscription);
-    if (!active) {
-      const subscriptions = await fetchUserSubscriptions();
-      active = subscriptions.find(sub => sub.isActive);
-      set(activeSubscription, active);
-    }
+    const active = get(activeSubscription);
 
     if (!active) {
       logger.error(`No active subscription found for 3DS ${actionType}`);
@@ -139,10 +123,10 @@ async function handleReauthorize(card: SavedCard): Promise<void> {
   await initiate3DSVerification(card, true);
 }
 
-function handleThreeDSecureSuccess(): void {
+async function handleThreeDSecureSuccess(): Promise<void> {
   set(showThreeDSecureModal, false);
   set(verificationData, undefined);
-  refresh();
+  await Promise.all([refreshCards(), refreshSubscriptions()]);
 }
 
 function handleThreeDSecureError(verifyError: Error): void {
@@ -153,6 +137,10 @@ function handleThreeDSecureError(verifyError: Error): void {
   });
   set(showThreeDSecureModal, false);
   set(verificationData, undefined);
+}
+
+async function handleAddCardSuccess(): Promise<void> {
+  await Promise.all([refreshCards(), refreshSubscriptions()]);
 }
 
 function isCardLoading(card: SavedCard): boolean {
@@ -170,12 +158,6 @@ function getCardTooltip(card: SavedCard): string | undefined {
   }
   return undefined;
 }
-
-onMounted(() => {
-  loadActiveSubscription().catch((error) => {
-    logger.error('Failed to load active subscription:', error);
-  });
-});
 </script>
 
 <template>
@@ -204,13 +186,8 @@ onMounted(() => {
     </div>
 
     <div v-if="loading && !hasCards">
-      <div class="flex justify-center w-full py-12">
-        <RuiProgress
-          variant="indeterminate"
-          size="48"
-          circular
-          color="primary"
-        />
+      <div class="flex flex-col gap-2 mb-6">
+        <PaymentCardSkeleton />
       </div>
     </div>
 
@@ -290,7 +267,7 @@ onMounted(() => {
 
     <AddCardDialog
       v-model="showAddCardDialog"
-      @success="refresh()"
+      @success="handleAddCardSuccess()"
     />
 
     <ThreeDSecureModal
