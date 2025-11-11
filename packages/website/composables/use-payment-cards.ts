@@ -46,7 +46,8 @@ export function usePaymentCards(): UsePaymentCardsReturn {
     },
     {
       default: () => [],
-      lazy: true,
+      lazy: false,
+      server: false,
     },
   );
 
