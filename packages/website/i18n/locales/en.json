@@ -279,6 +279,7 @@
     "download_for_free": "Download rotki for free",
     "edit": "Edit",
     "generate": "Generate",
+    "get_plan": "Get {plan}",
     "get_premium": "Get Premium",
     "get_started": "Get started",
     "get_started_for_free": "Get started for free",
@@ -590,7 +591,7 @@
       "saving": "save {months} months vs monthly",
       "tiers": {
         "step_1": {
-          "description": "Choose the different plans we offer",
+          "description": "Choose a plan that fits your needs",
           "notes": {
             "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
@@ -818,19 +819,22 @@
     "billed_annually": "Billed annually in € {price}",
     "billed_monthly": "Billed monthly in EUR",
     "header": {
-      "title": "Choose a plan that fits your needs.",
-      "heading": "Pricing",
-      "description": "Compare features and limits across the available tiers."
+      "heading": "Pricing"
     },
     "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
     "custom_plan_negotiable": "Negotiable",
     "custom_plan_bespoke_support": "Bespoke & Customization assistance",
-    "per_month": "/month",
+    "per_month": "month",
     "most_popular_plan": "Most popular plan",
     "max_saved_annually": "Save {months} months vs monthly",
     "see_all_features": "See all features",
     "see_less_features": "See less features",
+    "compare_plans": "Compare plans",
+    "compare_all_features": "Compare all features",
+    "detailed_comparison": "See detailed comparison of all features across plans",
+    "everything_from": "Everything included in {plan}",
     "free": "Free",
+    "contact_us": "Contact us",
     "plans": {
       "custom_plan": "Custom plan",
       "starter_plan": "Starter plan",

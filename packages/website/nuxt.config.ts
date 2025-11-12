@@ -194,6 +194,8 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Redirect /pricing to /checkout/pay
+    '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
     // Global no-cache rule for HTML to prevent CSP nonce mismatches
     ...(process.env.NODE_ENV !== 'development'
       ? {
