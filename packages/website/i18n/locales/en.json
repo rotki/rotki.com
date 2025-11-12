@@ -874,7 +874,7 @@
         },
         "validators": {
           "description": "Free users can only see 4 Ethereum validators. Premium users enjoy higher limits on the number of Ethereum validators visible.",
-          "title": "Ethererum Validators"
+          "title": "Ethereum Validators"
         }
       },
       "monerium_and_backup": {
