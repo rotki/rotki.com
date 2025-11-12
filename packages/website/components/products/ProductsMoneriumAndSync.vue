@@ -4,13 +4,13 @@ const { t } = useI18n({ useScope: 'global' });
 const data = [
   {
     img: '/img/products/monerium.webp',
-    title: t('products.features.monerium_and_backup.monerium_api_keys.title'),
-    description: t('products.features.monerium_and_backup.monerium_api_keys.description'),
+    title: t('products.features.monerium_and_gnosis.monerium.title'),
+    description: t('products.features.monerium_and_gnosis.monerium.description'),
   },
   {
-    img: '/img/products/data_sync.webp',
-    title: t('products.features.monerium_and_backup.data_synchronization.title'),
-    description: t('products.features.monerium_and_backup.data_synchronization.description'),
+    img: '/img/products/gnosis_pay.webp',
+    title: t('products.features.monerium_and_gnosis.gnosis_pay.title'),
+    description: t('products.features.monerium_and_gnosis.gnosis_pay.description'),
   },
 ];
 </script>
@@ -20,10 +20,10 @@ const data = [
     <div class="container">
       <div class="flex flex-col gap-4 pb-10 lg:pb-20">
         <div class="text-rui-light-primary text-h6 font-medium">
-          {{ t('products.features.monerium_and_backup.heading') }}
+          {{ t('products.features.monerium_and_gnosis.heading') }}
         </div>
         <h3 class="text-h5 lg:text-h3 font-black">
-          {{ t('products.features.monerium_and_backup.title') }}
+          {{ t('products.features.monerium_and_gnosis.title') }}
         </h3>
       </div>
       <div class="grid md:grid-cols-2 gap-12">

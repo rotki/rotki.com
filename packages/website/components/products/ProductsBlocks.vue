@@ -11,8 +11,8 @@ const data = [
     description: t('products.features.staking.description'),
   },
   {
-    title: t('products.features.higher_limits.title'),
-    description: t('products.features.higher_limits.description'),
+    title: t('products.features.scales_with_your_need.title'),
+    description: t('products.features.scales_with_your_need.description'),
   },
   {
     title: t('products.features.detailed_graphs.title'),
