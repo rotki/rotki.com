@@ -120,7 +120,7 @@ watch(price, (price) => {
 
     <div class="text-sm text-rui-text-secondary mt-2 mb-4 font-normal min-h-[1.25rem]">
       <div v-if="discountInfo">
-        {{ discountInfo.monthlyPrice }}€/{{ t('home.plans.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
+        {{ discountInfo.monthlyPrice }}€/{{ t('pricing.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
       </div>
     </div>
 
