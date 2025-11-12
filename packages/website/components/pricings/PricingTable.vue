@@ -27,10 +27,11 @@ const { t } = useI18n({ useScope: 'global' });
       v-for="plan in plans"
       :key="plan.name"
       class="flex flex-col"
+      :class="{ 'bg-rui-primary rounded-t-xl': isMostPopularPlan(plan) }"
     >
       <div
         v-if="isMostPopularPlan(plan)"
-        class="rounded-t-xl bg-rui-primary text-white text-center font-medium text-sm py-3"
+        class="rounded-t-xl bg-rui-primary text-white text-center font-medium text-sm py-2"
       >
         {{ t('pricing.most_popular_plan') }}
       </div>
@@ -39,10 +40,10 @@ const { t } = useI18n({ useScope: 'global' });
         class="h-11"
       />
       <div
-        class="px-4 py-6 xl:px-6 xl:py-10 flex flex-col justify-between flex-1"
+        class="px-4 py-6 xl:px-6 xl:py-10 flex flex-col justify-between flex-1 bg-white rounded-t-xl"
         :class="{ 'border-x-2 border-rui-primary': isMostPopularPlan(plan) }"
       >
-        <div class="flex flex-col gap-4 mb-6">
+        <div class="flex flex-col gap-4 mb-6 bg-white">
           <div class="text-h6 text-rui-primary">
             {{ plan.displayedName }}
           </div>
@@ -55,7 +56,7 @@ const { t } = useI18n({ useScope: 'global' });
                 v-if="!isFreePlan(plan)"
                 class="text-lg font-medium"
               >
-                {{ t('pricing.per_month') }}
+                /{{ t('pricing.per_month') }}
               </div>
             </div>
             <div

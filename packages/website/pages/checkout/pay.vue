@@ -87,7 +87,7 @@ onBeforeMount(() => {
       isTwoColumnLayout ? 'py-8 gap-20' : 'py-4 lg:py-8',
     ]"
   >
-    <div class="flex justify-center grow">
+    <div class="flex justify-center grow overflow-hidden">
       <RuiProgress
         v-if="!availablePlans"
         circular
@@ -111,6 +111,7 @@ onBeforeMount(() => {
             :class="[
               isTwoColumnLayout ? 'max-w-7xl' : 'max-w-[29rem]',
             ]"
+            class="mx-auto"
             variant="pill"
           />
         </div>
