@@ -871,41 +871,45 @@
         "description": "View detailed insights about your activities, including ETH spent, exchanges/protocols used, number of transactions per chain, and Gnosis Pay usage.",
         "title": "Events Analysis"
       },
-      "higher_limits": {
-        "description": "Say goodbye to limits. With rotki Premium, you can process more trades, transactions, deposits/withdrawals, and historic events. The limits increase with each premium tier, providing greater flexibility and control.",
-        "title": "Higher Limits"
+      "scales_with_your_need": {
+        "description": "From Free to Basic and Basic to Advanced, each rotki plan unlocks higher limits for trades, events, and data giving you the freedom to choose the plan that fits your needs.",
+        "title": "Scales With Your Needs"
       },
       "limits": {
         "heading": "Expanded Capabilities for Premium Users",
         "history_view": {
-          "description": "Free users have a limit of the 100 most recent events in the history event viewer. As a premium user you have higher limits in the amount of events you can see.",
+          "description": "Free users can access up to 1,000 of their most recent events. Premium users unlock higher limits depending on their chosen plan.",
           "title": "History view"
         },
         "profit_loss_report": {
-          "description": "Free users are limited to the 100 most recent events in profit & loss report. Premium users benefit from higher limits for viewing events in profit & loss report.",
-          "title": "Profit & loss report events"
+          "description": "Free users are limited to the 1,000 most recent events in the profit & loss report. Premium users get higher limits based on their plan.",
+          "title": "Profit & Loss Reports"
         },
         "title": "Increased limits",
         "user_notes": {
-          "description": "Free users can add up to 10 notes. As a premium user, you have higher limits on the number of notes you can add.",
-          "title": "User notes"
+          "description": "Free users can add up to 10 notes. Premium users enjoy unlimited notes.",
+          "title": "User Notes"
         },
         "validators": {
-          "description": "Free users can only see 4 Ethereum validators. Premium users enjoy higher limits on the number of Ethereum validators visible.",
-          "title": "Ethererum Validators"
+          "description": "Free users can't track ETH staking. Premium users can track up to specific amounts of ETH depending on their chosen plan.",
+          "title": "Ethereum Staking"
         }
       },
-      "monerium_and_backup": {
-        "data_synchronization": {
-          "description": "As a premium user, you can upload your encrypted database to our server, synchronize it across devices, and use it as a backup. Your data remains encrypted with your password, ensuring privacy. Synced databases are automatically deleted one month after your subscription expires.",
-          "title": "Data synchronization"
+      "data_synchronization": {
+        "description": "Premium users can securely back up and sync their encrypted database across devices. Your data is always protected by your password and never visible to us. The available backup size depends on your plan, and synced databases are automatically deleted one month after your subscription expires.",
+        "title": "Data Synchronization"
+      },
+      "monerium_and_gnosis": {
+        "heading": "Enrich Transactions",
+        "monerium": {
+          "description": "Premium users can connect their Monerium account to enrich transactions across all supported chains with detailed bank transfer and bridging data.",
+          "title": "Monerium Bank Data"
         },
-        "heading": "Enrich Transactions and Synchronize Data",
-        "monerium_api_keys": {
-          "description": "Once you provide Monerium credentials as a premium user, all Monerium transactions on mainnet, Polygon, and Gnosis chain will be enriched with bank transfer data or chain bridging information.",
-          "title": "Monerium API Keys"
+        "gnosis_pay": {
+          "description": "Premium users can connect their Gnosis Pay controller to enrich all card transactions with detailed merchant information.",
+          "title": "Gnosis Pay Merchant Data"
         },
-        "title": "Monerium API Integration and Premium Data Backup"
+        "title": "Monerium and Gnosis Pay Integration"
       },
       "staking": {
         "description": "Track your staking activities across various chains and platforms like ETH, Liquity, Kraken, and more. Get detailed insights on total gains, performance, rewards breakdown, and individual staking events.",
@@ -915,13 +919,8 @@
         "description": "Effortlessly back up your data to our cloud and sync or restore it across multiple devices. Your data is encrypted and can only be decrypted with your password, ensuring complete privacy.",
         "title": "Sync data across multiple machines"
       },
-      "theme_customization": {
-        "description": "Reduce eye strain, improve text readability, and prolong your device's battery life with dark mode. Personalize the color scheme for both light and dark modes, and customize specific color palettes for the app theme within the settings",
-        "title": "Dark mode & theme customization"
-      },
       "timeframe": {
         "description": "Set the timeframe for the dashboard graph. Premium users have access to all options, while free users can choose between only \"2 Weeks\", and \"1 Week\".",
-        "heading": "Enhanced Customization Options",
         "title": "Timeframe Customization on Dashboard"
       }
     },
