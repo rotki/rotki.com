@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import type { FeatureDescriptionMap, FeatureValue, MappedPlan, PlanBase, PlanPrices } from '~/components/pricings/type';
+import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
+import type { FeatureDescriptionMap, FeatureValue, MappedPlan, PlanBase } from '~/components/pricings/type';
 import { get, set } from '@vueuse/shared';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
-import { type PremiumTierInfo, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
+import { TIER_NAMES } from '~/types/pricing';
+import { type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 
 const props = withDefaults(defineProps<{
+  availablePlans?: AvailablePlans;
   tiersData?: PremiumTiersInfo;
   selectedPeriod: PricingPeriod;
   compact?: boolean;
 }>(), {
+  availablePlans: () => [],
   tiersData: () => [],
 });
 
@@ -52,56 +56,40 @@ const descriptionMap = computed<FeatureDescriptionMap>(() => {
   return map;
 });
 
-const maxPrice = computed<number>(() => {
-  let max = 0;
-  const yearly = get(isYearly);
-
-  props.tiersData.forEach((item) => {
-    if (!hasPlanForPeriod(item, yearly)) {
-      return;
-    }
-
-    const { monthlyPrice } = calculatePrices(item, yearly);
-    if (monthlyPrice > max) {
-      max = monthlyPrice;
-    }
-  });
-
-  return max;
-});
-
 const regularPlans = computed<PlanBase[]>(() => {
   const yearly = get(isYearly);
-  const highest = get(maxPrice);
   const plans: PlanBase[] = [];
+  const available = props.availablePlans;
 
-  props.tiersData.forEach((item) => {
-    if (!hasPlanForPeriod(item, yearly)) {
+  available.forEach((availablePlan) => {
+    const targetPlan = yearly ? availablePlan.yearlyPlan : availablePlan.monthlyPlan;
+    if (!targetPlan) {
       return;
     }
 
-    const { monthlyPrice, yearlyPrice } = calculatePrices(item, yearly);
-    const formattedMonthlyPrice = formatCurrency(monthlyPrice);
-    const formattedYearlyPrice = formatCurrency(yearlyPrice);
+    const price = Number.parseFloat(targetPlan.price);
+    const formattedPrice = formatCurrency(price);
 
     plans.push({
-      id: yearly ? item.yearlyPlan?.id : item.monthlyPlan?.id,
-      name: item.name,
-      displayedName: t('pricing.plans.plan', { plan: toTitleCase(item.name) }),
-      mainPriceDisplay: `€ ${formattedMonthlyPrice}`,
+      id: targetPlan.planId,
+      name: availablePlan.tierName,
+      displayedName: t('pricing.plans.plan', { plan: toTitleCase(availablePlan.tierName) }),
+      mainPriceDisplay: yearly ? `€ ${formatCurrency(price / 12)}` : `€ ${formattedPrice}`,
       secondaryPriceDisplay: yearly
-        ? t('pricing.billed_annually', { price: formattedYearlyPrice })
+        ? t('pricing.billed_annually', { price: formattedPrice })
         : t('pricing.billed_monthly'),
       type: 'regular',
-      isMostPopular: monthlyPrice === highest,
+      isMostPopular: availablePlan.isMostPopular || false,
     });
   });
 
   return plans;
 });
 
+const freePlanFeatures = useFreePlanFeatures();
+
 const freeTier = computed<PlanBase>(() => ({
-  name: 'starter',
+  name: TIER_NAMES.FREE,
   displayedName: t('pricing.plans.starter_plan'),
   mainPriceDisplay: t('pricing.free'),
   type: 'free',
@@ -109,7 +97,7 @@ const freeTier = computed<PlanBase>(() => ({
 }));
 
 const customTier = computed<PlanBase>(() => ({
-  name: 'custom',
+  name: TIER_NAMES.CUSTOM,
   displayedName: t('pricing.plans.custom_plan'),
   mainPriceDisplay: t('pricing.contact_us'),
   type: 'custom',
@@ -133,50 +121,6 @@ const displayedFeaturesLabel = computed<string[]>(() =>
   get(compactView) ? [get(featuresLabel)[0]] : get(featuresLabel),
 );
 
-function hasPlanForPeriod(plan: PremiumTierInfo, isYearly: boolean): boolean {
-  return isYearly ? !!plan.yearlyPlan : !!plan.monthlyPlan;
-}
-
-function getPlanPrice(plan: PremiumTierInfo['yearlyPlan'] | PremiumTierInfo['monthlyPlan']): number {
-  return plan ? parseFloat(plan.price) : 0;
-}
-
-function calculateMonthlyFromYearly(yearlyPrice: number): number {
-  return yearlyPrice / 12;
-}
-
-function calculateYearlyFromMonthly(monthlyPrice: number): number {
-  return monthlyPrice * 12;
-}
-
-function calculatePrices(item: PremiumTierInfo, isYearly: boolean): PlanPrices {
-  const yearlyPrice = getPlanPrice(item.yearlyPlan);
-  const monthlyPrice = getPlanPrice(item.monthlyPlan);
-
-  if (yearlyPrice && monthlyPrice) {
-    return {
-      monthlyPrice: isYearly ? calculateMonthlyFromYearly(yearlyPrice) : monthlyPrice,
-      yearlyPrice,
-    };
-  }
-
-  if (yearlyPrice) {
-    return {
-      monthlyPrice: calculateMonthlyFromYearly(yearlyPrice),
-      yearlyPrice,
-    };
-  }
-
-  if (monthlyPrice) {
-    return {
-      monthlyPrice,
-      yearlyPrice: calculateYearlyFromMonthly(monthlyPrice),
-    };
-  }
-
-  return { monthlyPrice: 0, yearlyPrice: 0 };
-}
-
 function isFeatureFlag(label: string, descriptionMap: FeatureDescriptionMap): boolean {
   for (const [_planName, features] of descriptionMap) {
     const featureValue = features.get(label);
@@ -189,17 +133,15 @@ function isFeatureFlag(label: string, descriptionMap: FeatureDescriptionMap): bo
 
 function getFeatureValue(plan: PlanBase, label: string, descriptionMap: FeatureDescriptionMap): FeatureValue {
   if (isFreePlan(plan)) {
-    if (label === 'Historical events limit') {
-      return '1K events';
-    }
-    return undefined;
+    // Use shared free plan features
+    const feature = freePlanFeatures.find(f => f.label === label);
+    return feature?.value;
   }
 
   if (isCustomPlan(plan)) {
     if (label.toLowerCase().includes('support')) {
       return t('pricing.custom_plan_bespoke_support');
     }
-
     if (isFeatureFlag(label, descriptionMap)) {
       return true;
     }
