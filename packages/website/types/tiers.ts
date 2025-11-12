@@ -10,6 +10,8 @@ export const PremiumTierInfoDescription = z.object({
   value: z.union([z.string(), z.number(), z.boolean()]),
 });
 
+export type PremiumTierInfoDescription = z.infer<typeof PremiumTierInfoDescription>;
+
 export const PremiumTierInfo = z.object({
   description: z.array(PremiumTierInfoDescription),
   limits: z.record(z.string(), z.union([z.boolean(), z.number()])),

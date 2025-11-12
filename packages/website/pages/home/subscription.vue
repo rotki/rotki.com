@@ -2,11 +2,14 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import ActiveSubscriptionCard from '~/components/account/home/ActiveSubscriptionCard.vue';
+import ActiveSubscriptionCardSkeleton from '~/components/account/home/ActiveSubscriptionCardSkeleton.vue';
 import ReferralCode from '~/components/account/home/ReferralCode.vue';
 import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
+import { useTiersStore } from '~/store/tiers';
 
 definePageMeta({
   layout: 'account',
@@ -17,12 +20,15 @@ const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
-const { userSubscriptions } = useUserSubscriptions();
+const { userSubscriptions, activeSubscription, refresh, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
 const { requestRefresh } = useAccountRefresh();
 
 const subscriptionOpsStore = useSubscriptionOperationsStore();
 const { error, operationType } = storeToRefs(subscriptionOpsStore);
 const { setError } = subscriptionOpsStore;
+
+const tiersStore = useTiersStore();
+const { getAvailablePlans, getPremiumTiersInfo } = tiersStore;
 
 const premium = computed<boolean>(() => get(account)?.canUsePremium ?? false);
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
@@ -51,6 +57,8 @@ function dismissSubscriptionError(): void {
 
 onBeforeMount(() => {
   requestRefresh();
+  getAvailablePlans();
+  getPremiumTiersInfo();
 });
 </script>
 
@@ -58,6 +66,17 @@ onBeforeMount(() => {
   <div class="space-y-10">
     <UnverifiedEmailWarning v-if="!emailConfirmed" />
     <PremiumPlaceholder v-else-if="!canUsePremium" />
+
+    <template v-else>
+      <ActiveSubscriptionCardSkeleton v-if="initialSubscriptionsLoading" />
+      <ActiveSubscriptionCard
+        v-else-if="activeSubscription"
+        :subscription="activeSubscription"
+        @refresh="refresh()"
+      />
+      <PremiumPlaceholder v-else-if="!activeSubscription" />
+    </template>
+
     <ApiKeys v-if="premium" />
     <ReferralCode v-if="emailConfirmed && premium" />
     <SubscriptionTable v-if="emailConfirmed" />

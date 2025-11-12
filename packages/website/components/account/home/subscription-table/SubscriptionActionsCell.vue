@@ -80,9 +80,12 @@ interface Props {
   availablePlans: AvailablePlans;
   operationState: OperationState;
   cryptoPaymentState: CryptoPaymentState;
+  layout?: 'vertical' | 'horizontal';
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  layout: 'vertical',
+});
 
 const emit = defineEmits<{
   action: [event: SubscriptionActionEvent];
@@ -233,6 +236,13 @@ const actionState = computed<ActionState>(() => {
   };
 });
 
+const layoutClasses = computed<string>(() => {
+  if (props.layout === 'horizontal') {
+    return 'flex flex-wrap items-center gap-2';
+  }
+  return 'flex flex-col items-start gap-1';
+});
+
 function isCryptoPendingOrRenewal(subscription: UserSubscription): boolean {
   const isRenew = subscription.actions.includes('renew');
   const isPendingCrypto = subscription.paymentProvider === PaymentProvider.CRYPTO && subscription.pending;
@@ -263,7 +273,7 @@ watchImmediate(() => props.subscription, async (subscription) => {
 <template>
   <div
     v-if="actionState.shouldDisplay"
-    class="flex flex-col items-start gap-1"
+    :class="layoutClasses"
   >
     <UpgradeActionButton
       v-if="actionState.upgrade.visible"

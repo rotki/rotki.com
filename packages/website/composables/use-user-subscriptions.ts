@@ -1,11 +1,12 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { type Subscription as UserSubscription, type UserSubscriptions, UserSubscriptionsSchema } from '@rotki/card-payment-common/schemas/subscription';
-import { get } from '@vueuse/shared';
+import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
 interface UseUserSubscriptionsReturn {
   activeSubscription: ComputedRef<UserSubscription | undefined>;
+  initialLoading: Readonly<Ref<boolean>>;
   loading: Readonly<Ref<boolean>>;
   refresh: () => Promise<void>;
   userSubscriptions: Readonly<Ref<UserSubscription[]>>;
@@ -18,6 +19,8 @@ interface UseUserSubscriptionsReturn {
 export function useUserSubscriptions(): UseUserSubscriptionsReturn {
   const logger = useLogger('subscriptions');
   const { fetchWithCsrf } = useFetchWithCsrf();
+
+  const initialLoading = ref<boolean>(true);
 
   const {
     data: userSubscriptions,
@@ -48,6 +51,12 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
     },
   );
 
+  watch(loading, (isLoading) => {
+    if (!isLoading && get(initialLoading)) {
+      set(initialLoading, false);
+    }
+  });
+
   watch(error, (newError) => {
     if (newError) {
       logger.error('Subscription fetch error:', newError);
@@ -60,6 +69,7 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
 
   return {
     activeSubscription,
+    initialLoading: readonly(initialLoading),
     loading: readonly(loading),
     refresh,
     userSubscriptions: readonly(userSubscriptions) as Readonly<Ref<UserSubscription[]>>,

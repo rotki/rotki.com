@@ -68,7 +68,12 @@
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
       "no_premium_found": "No premium subscription found. Select your {plan}.",
-      "plan": "premium subscription plan"
+      "plan": "premium subscription plan",
+      "tagline": "Unlock the full power of rotki",
+      "features_starting_from": "Premium features starting from:",
+      "upgrade_now": "Upgrade Now",
+      "upgrade_from": "from {price}€/mo",
+      "view_all_plans": "View All Plans"
     },
     "payments": {
       "headers": {
@@ -84,6 +89,16 @@
       "title": "Your latest payments"
     },
     "subscriptions": {
+      "access_expires": "Access Expires",
+      "active_subscription": "Active Subscription",
+      "subscription": "Subscription",
+      "created_date": "Created Date",
+      "next_action_date": "Next Action Date",
+      "next_billing": "Next Billing",
+      "next_billing_amount": "Next Billing Amount",
+      "plan": "Plan",
+      "plan_limits": "Plan Limits",
+      "upgrade_available": "Upgrade Available",
       "actions": {
         "cancel": "Cancel subscription",
         "resume": "Resume subscription"
@@ -117,6 +132,7 @@
       },
       "cancelled_but_still_active": {
         "description": "You canceled this subscription, but it will remain active until {date}",
+        "no_charge": "won't be charged",
         "status": "Active until {date}"
       },
       "explorer": "See in Explorer",
@@ -418,6 +434,8 @@
     "monthly": "monthly",
     "none": "none",
     "plan": "plan",
+    "show_less": "Show less",
+    "show_more": "Show more",
     "status": "status",
     "yearly": "yearly"
   },

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
 import { get } from '@vueuse/shared';
+import ReferralCodeSkeleton from '~/components/account/home/ReferralCodeSkeleton.vue';
 import BlueskyIcon from '~/components/icons/BlueskyIcon.vue';
 import FarcasterIcon from '~/components/icons/FarcasterIcon.vue';
 import TwitterIcon from '~/components/icons/TwitterIcon.vue';
@@ -106,28 +107,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <RuiCard
-    variant="flat"
-    class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
-  >
-    <div class="text-h6">
+  <ReferralCodeSkeleton v-if="initialLoading" />
+  <div v-else>
+    <div class="text-h6 mb-6">
       {{ t('account.referral_code.title') }}
     </div>
 
-    <template v-if="initialLoading">
-      <div class="min-h-[10rem] flex items-center justify-center gap-2 text-rui-text-secondary">
-        <RuiProgress
-          circular
-          size="20"
-          thickness="2"
-          variant="indeterminate"
-          color="primary"
-        />
-        <span class="text-body-2">{{ t('common.loading') }}</span>
-      </div>
-    </template>
-
-    <template v-else>
+    <RuiCard
+      variant="flat"
+      class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
+    >
       <div
         v-if="hasReferralCode"
         class="min-h-[10rem] space-y-4"
@@ -232,6 +221,6 @@ onMounted(async () => {
           {{ t('actions.create') }}
         </RuiButton>
       </div>
-    </template>
-  </RuiCard>
+    </RuiCard>
+  </div>
 </template>

@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { DataTableColumn, DataTableSortColumn, TablePaginationData } from '@rotki/ui-library';
+import type {
+  CryptoPaymentState,
+  OperationState,
+  SubscriptionActionEvent,
+  SubscriptionActionType,
+} from '~/components/account/home/subscription-table/types';
 import { get, set } from '@vueuse/shared';
-import CancelUpgradeDialog from '~/components/account/home/CancelUpgradeDialog.vue';
 import { getSubscriptionTableHeaders } from '~/components/account/home/subscription-table/config';
 import SubscriptionActionsCell from '~/components/account/home/subscription-table/SubscriptionActionsCell.vue';
 import SubscriptionStatusChip from '~/components/account/home/subscription-table/SubscriptionStatusChip.vue';
 import SubscriptionTableHeader from '~/components/account/home/subscription-table/SubscriptionTableHeader.vue';
-import {
-  type CryptoPaymentState,
-  type OperationState,
-  SubscriptionAction,
-  type SubscriptionActionEvent,
-  type SubscriptionActionType,
-} from '~/components/account/home/subscription-table/types';
-import UpgradePlanDialog from '~/components/account/home/UpgradePlanDialog.vue';
+import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { useTiersStore } from '~/store/tiers';
 import { formatDate } from '~/utils/date';
@@ -38,21 +36,23 @@ const {
   status,
 } = storeToRefs(subscriptionOpsStore);
 
-const {
-  clearOperation,
-  setStatus,
-  startOperation,
-} = subscriptionOpsStore;
-
 const tiersStore = useTiersStore();
 const { availablePlans } = storeToRefs(tiersStore);
-const { getAvailablePlans } = tiersStore;
 
 // Composables
 const { userSubscriptions, loading, refresh: refreshSubscriptions } = useUserSubscriptions();
-const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
 const { getPlanDisplayName, actionsClasses } = useSubscriptionDisplay();
-const paymentApi = useCryptoPaymentApi();
+
+// Use centralized subscription operations composable
+const {
+  resumeSubscription: performResumeSubscription,
+  cancelSubscription: performCancelSubscription,
+  cancelUpgrade: performCancelUpgrade,
+} = useSubscriptionOperations({
+  onActionComplete: async () => {
+    await refreshSubscriptions();
+  },
+});
 
 // Computed properties
 const pending = computed<UserSubscription[]>(() =>
@@ -94,51 +94,23 @@ useSubscriptionPolling({
   refreshCallback: refreshSubscriptions,
 });
 
-// Action handlers
-function clearActiveState(): void {
-  clearOperation();
-  set(activeAction, undefined);
-  set(activeSubscription, undefined);
-}
-
+// Action handlers using centralized composable
 async function resumeSubscription(subscription: UserSubscription): Promise<void> {
-  startOperation(SubscriptionAction.RESUME);
-
-  await resumeUserSubscription(subscription, (statusMessage: string) => {
-    setStatus(statusMessage);
-  });
-
-  await refreshSubscriptions();
-  clearActiveState();
+  await performResumeSubscription(subscription, activeAction, activeSubscription);
 }
 
 async function cancelSubscription(subscription: UserSubscription): Promise<void> {
-  startOperation(SubscriptionAction.CANCEL);
-
-  await cancelUserSubscription(subscription, (statusMessage: string) => {
-    setStatus(statusMessage);
-  });
-
-  await refreshSubscriptions();
-  clearActiveState();
+  await performCancelSubscription(subscription, activeAction, activeSubscription);
 }
 
 async function cancelUpgrade(subscriptionId: string): Promise<void> {
-  startOperation(SubscriptionAction.CANCEL_UPGRADE);
-  await paymentApi.cancelUpgradeRequest(subscriptionId);
-  await refreshSubscriptions();
-  clearActiveState();
+  await performCancelUpgrade(subscriptionId, activeAction, activeSubscription);
 }
 
 function handleSubscriptionAction({ action, subscription }: SubscriptionActionEvent): void {
   set(activeAction, action);
   set(activeSubscription, subscription);
 }
-
-// Lifecycle hooks
-onBeforeMount(() => {
-  getAvailablePlans();
-});
 </script>
 
 <template>
@@ -191,30 +163,14 @@ onBeforeMount(() => {
       </template>
     </RuiDataTable>
 
-    <CancelSubscription
-      v-if="activeAction === SubscriptionAction.CANCEL && activeSubscription"
+    <SubscriptionDialogs
       v-model="activeSubscription"
-      :loading="operationType === SubscriptionAction.CANCEL && inProgress"
-      @confirm="cancelSubscription($event)"
-    />
-
-    <ResumeSubscriptionDialog
-      v-if="activeAction === SubscriptionAction.RESUME && activeSubscription"
-      v-model="activeSubscription"
-      :loading="operationType === SubscriptionAction.RESUME && inProgress"
-      @confirm="resumeSubscription($event)"
-    />
-
-    <UpgradePlanDialog
-      v-if="activeAction === SubscriptionAction.UPGRADE && activeSubscription"
-      v-model="activeSubscription"
-    />
-
-    <CancelUpgradeDialog
-      v-if="activeAction === SubscriptionAction.CANCEL_UPGRADE && activeSubscription"
-      v-model="activeSubscription"
-      :loading="operationType === SubscriptionAction.CANCEL_UPGRADE && inProgress"
-      @confirm="cancelUpgrade($event)"
+      :active-action="activeAction"
+      :in-progress="inProgress"
+      :operation-type="operationType"
+      @cancel-subscription="cancelSubscription($event)"
+      @resume-subscription="resumeSubscription($event)"
+      @cancel-upgrade="cancelUpgrade($event)"
     />
   </div>
 </template>
