@@ -20,9 +20,8 @@ const { t } = useI18n({ useScope: 'global' });
 <template>
   <ButtonLink
     v-if="isFreePlan(plan)"
-    class="w-full"
+    class="w-full py-2 xl:text-[1rem]"
     to="/download"
-    size="lg"
     color="primary"
     variant="outlined"
   >
@@ -31,8 +30,7 @@ const { t } = useI18n({ useScope: 'global' });
 
   <ButtonLink
     v-else-if="isCustomPlan(plan)"
-    class="w-full"
-    size="lg"
+    class="w-full py-2 xl:text-[1rem]"
     color="primary"
     variant="default"
     :to="emailMailto"
@@ -42,17 +40,16 @@ const { t } = useI18n({ useScope: 'global' });
 
   <ButtonLink
     v-else
-    class="w-full"
+    class="w-full py-2 xl:text-[1rem]"
     variant="default"
-    size="lg"
     color="primary"
     :to="{
-      name: 'checkout-pay',
+      name: 'checkout-pay-method',
       query: {
         planId: plan.id,
       },
     }"
   >
-    {{ t('actions.get_started') }}
+    {{ t('actions.get_plan', { plan: toTitleCase(plan.name) }) }}
   </ButtonLink>
 </template>
