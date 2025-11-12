@@ -46,6 +46,7 @@ const isCancelled = computed<boolean>(() => isCancelledButActive(props.subscript
         <div class="text-sm text-rui-text-secondary mt-1">
           {{ formattedDate }}
           <span
+            v-if="relativeTime"
             class="font-medium"
             :class="isCancelled ? 'text-rui-warning' : 'text-rui-primary'"
           >

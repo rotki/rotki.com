@@ -20,7 +20,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
-const { userSubscriptions, activeSubscription, refresh, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
+const { userSubscriptions, activeOrPendingSubscription, refresh, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
 const { requestRefresh } = useAccountRefresh();
 
 const subscriptionOpsStore = useSubscriptionOperationsStore();
@@ -70,11 +70,11 @@ onBeforeMount(() => {
     <template v-else>
       <ActiveSubscriptionCardSkeleton v-if="initialSubscriptionsLoading" />
       <ActiveSubscriptionCard
-        v-else-if="activeSubscription"
-        :subscription="activeSubscription"
+        v-else-if="activeOrPendingSubscription"
+        :subscription="activeOrPendingSubscription"
         @refresh="refresh()"
       />
-      <PremiumPlaceholder v-else-if="!activeSubscription" />
+      <PremiumPlaceholder v-else />
     </template>
 
     <ApiKeys v-if="premium" />

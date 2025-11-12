@@ -1,10 +1,12 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
+import { isSubActive, isSubPending } from '@rotki/card-payment-common';
 import { type Subscription as UserSubscription, type UserSubscriptions, UserSubscriptionsSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
 interface UseUserSubscriptionsReturn {
+  activeOrPendingSubscription: ComputedRef<UserSubscription | undefined>;
   activeSubscription: ComputedRef<UserSubscription | undefined>;
   initialLoading: Readonly<Ref<boolean>>;
   loading: Readonly<Ref<boolean>>;
@@ -51,6 +53,22 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
     },
   );
 
+  /**
+   * Returns the active subscription (truly active, not pending)
+   * Used for operations like payment method management
+   */
+  const activeSubscription = computed<UserSubscription | undefined>(() =>
+    get(userSubscriptions).find(sub => isSubActive(sub)),
+  );
+
+  /**
+   * Returns active or pending subscription for display purposes
+   * Used for displaying subscription details to the user
+   */
+  const activeOrPendingSubscription = computed<UserSubscription | undefined>(() =>
+    get(userSubscriptions).find(sub => isSubActive(sub) || isSubPending(sub)),
+  );
+
   watch(loading, (isLoading) => {
     if (!isLoading && get(initialLoading)) {
       set(initialLoading, false);
@@ -63,11 +81,8 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
     }
   });
 
-  const activeSubscription = computed<UserSubscription | undefined>(() =>
-    get(userSubscriptions).find(sub => sub.isActive),
-  );
-
   return {
+    activeOrPendingSubscription,
     activeSubscription,
     initialLoading: readonly(initialLoading),
     loading: readonly(loading),
