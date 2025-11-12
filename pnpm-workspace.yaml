@@ -4,7 +4,7 @@ packages:
 
 catalog:
   '@fontsource/roboto': 5.2.8
-  '@rotki/ui-library': 2.8.0
+  '@rotki/ui-library': 2.8.1
   '@types/braintree-web': 3.96.17
   '@types/node': 22.18.12
   '@tsconfig/node22': 22.0.2
