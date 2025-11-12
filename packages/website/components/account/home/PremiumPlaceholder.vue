@@ -22,14 +22,14 @@ const isLoading = computed<boolean>(() => get(tiersInformation).length === 0);
   <RuiCard class="!border-l-4 !border-l-rui-primary">
     <div class="space-y-6">
       <!-- Header -->
-      <div class="flex items-start gap-4">
+      <div class="flex items-center gap-4">
         <div
           class="rounded-full w-12 h-12 flex items-center justify-center bg-gradient-to-br from-rui-primary/10 to-rui-primary/5 shrink-0"
         >
           <AppLogo size="2" />
         </div>
         <div class="flex-1">
-          <div class="text-h6 font-bold mb-1">
+          <div class="text-h6 font-bold">
             {{ t('navigation_menu.rotki_premium') }}
           </div>
           <div class="text-body-2 text-rui-text-secondary">
@@ -92,7 +92,10 @@ const isLoading = computed<boolean>(() => get(tiersInformation).length === 0);
             class="w-full"
           >
             <template #prepend>
-              <RuiIcon name="lu-sparkles" />
+              <RuiIcon
+                name="lu-sparkles"
+                size="20"
+              />
             </template>
             <span class="flex items-center gap-2">
               {{ t('account.no_premium.upgrade_now') }}
