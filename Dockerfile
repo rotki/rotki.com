@@ -4,6 +4,9 @@ COPY ./ /build/
 
 WORKDIR /build
 
+ARG GIT_SHA
+ENV GIT_SHA=${GIT_SHA}
+
 ENV CYPRESS_INSTALL_BINARY=0
 
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
