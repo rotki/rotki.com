@@ -325,12 +325,7 @@ onUnmounted(async () => {
         >
           <div class="flex flex-col items-center justify-center text-center px-4">
             <div class="mb-4">
-              <RuiProgress
-                variant="indeterminate"
-                :size="48"
-                :circular="true"
-                color="primary"
-              />
+              <div class="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
             </div>
             <h3 class="text-lg font-medium text-white mb-1">
               Processing payment
