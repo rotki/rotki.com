@@ -113,17 +113,14 @@ function handlePlanChange(newPlan: SelectedPlan): void {
       @plan-change="handlePlanChange($event)"
     />
 
-    <RuiDivider
-      v-if="!upgradeSubId"
-      :class="spacingClass"
-    />
+    <RuiDivider :class="spacingClass" />
 
     <DiscountCodeInput
-      v-if="!upgradeSubId"
       v-model="discountCode"
       v-model:discount-info="discountInfo"
       :plan="plan"
       :disabled="disabled"
+      :upgrade-sub-id="upgradeSubId"
       :class="discountSpacingClass"
     />
 

@@ -15,8 +15,8 @@ export function isUpgradeData(
  * Calculate the final amount to charge based on checkout data, plan, and discount
  *
  * Priority:
- * 1. If upgrade data exists, use its finalAmount
- * 2. If valid discount exists, use its finalPrice
+ * 1. If valid discount exists, use its finalPrice
+ * 2. If upgrade data exists, use its finalAmount
  * 3. Otherwise, use the plan's base price
  */
 export function getFinalAmount(
@@ -24,14 +24,14 @@ export function getFinalAmount(
   selectedPlan: SelectedPlan,
   discountInfo?: DiscountInfo,
 ): number {
-  // If upgrade, return parsed finalAmount
-  if (isUpgradeData(data)) {
-    return parseFloat(data.finalAmount);
-  }
-
   // If valid discount exists, use its finalPrice
   if (discountInfo?.isValid && discountInfo.finalPrice) {
     return discountInfo.finalPrice;
+  }
+
+  // If upgrade, return parsed finalAmount
+  if (isUpgradeData(data)) {
+    return parseFloat(data.finalAmount);
   }
 
   // Default to plan price
