@@ -1,19 +1,33 @@
 <script setup lang="ts">
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
-import type { FeatureValue } from '~/components/pricings/type';
+import type { RouteLocationRaw } from 'vue-router';
 import { get } from '@vueuse/shared';
-import { PricingPeriod } from '~/types/tiers';
+import PricingFeatureItem from '~/components/pricings/PricingFeatureItem.vue';
+import { type PremiumTierInfoDescription, PricingPeriod } from '~/types/tiers';
+import { calculateYearlyDiscount, type DiscountInfo } from '~/utils/pricing';
 import { formatCurrency, toTitleCase } from '~/utils/text';
+
+interface CtaConfig {
+  label: string;
+  link: string | RouteLocationRaw;
+  variant: 'outlined' | 'default';
+}
 
 const props = withDefaults(defineProps<{
   plan?: AvailablePlan;
   period: PricingPeriod;
   type: 'free' | 'custom' | 'regular';
-  features?: Array<{ label: string; value: FeatureValue }>;
+  features?: PremiumTierInfoDescription[];
   includesEverythingFrom?: string;
 }>(), {
   features: () => [],
 });
+
+// Route/link constants
+const ROUTES = {
+  DOWNLOAD: '/download',
+  CHECKOUT: 'checkout-pay-method',
+} as const;
 
 const { t } = useI18n({ useScope: 'global' });
 const {
@@ -24,13 +38,18 @@ const {
 
 const { plan, period, type } = toRefs(props);
 
-const planType = computed(() => get(type));
-const currentPlan = computed(() => get(plan));
+const planType = computed<string>(() => get(type));
+const currentPlan = computed<AvailablePlan | undefined>(() => get(plan));
 const isYearly = computed<boolean>(() => get(period) === PricingPeriod.YEARLY);
+
+// Type guard helpers
+const isRegularPlan = computed<boolean>(() => get(planType) === 'regular');
+const isFreePlan = computed<boolean>(() => get(planType) === 'free');
+const isCustomPlan = computed<boolean>(() => get(planType) === 'custom');
 
 const price = computed<string | undefined>(() => {
   const plan = get(currentPlan);
-  if (get(planType) !== 'regular' || !plan) {
+  if (!get(isRegularPlan) || !plan) {
     return undefined;
   }
 
@@ -43,14 +62,9 @@ const price = computed<string | undefined>(() => {
   return formatCurrency(Number.parseFloat(targetPlan.price));
 });
 
-const discountInfo = computed<{
-  discount: number;
-  freeMonths: number;
-  originalPrice: string;
-  monthlyPrice: string;
-} | undefined>(() => {
+const discountInfo = computed<DiscountInfo | undefined>(() => {
   const plan = get(currentPlan);
-  if (get(planType) !== 'regular' || !plan) {
+  if (!get(isRegularPlan) || !plan) {
     return undefined;
   }
 
@@ -58,26 +72,11 @@ const discountInfo = computed<{
   const periodVal = get(period);
 
   // Only calculate discount for yearly plans
-  if (periodVal !== PricingPeriod.YEARLY || !monthlyPlan || !yearlyPlan)
+  if (periodVal !== PricingPeriod.YEARLY || !monthlyPlan || !yearlyPlan) {
     return undefined;
+  }
 
-  const monthlyPrice = Number.parseFloat(monthlyPlan.price);
-  const yearlyPrice = Number.parseFloat(yearlyPlan.price);
-  const monthlyTotal = monthlyPrice * 12;
-  const savings = monthlyTotal - yearlyPrice;
-
-  if (savings <= 0)
-    return undefined;
-
-  const discountPercentage = Math.round((savings / monthlyTotal) * 100);
-  const freeMonths = Math.round(savings / monthlyPrice);
-
-  return {
-    discount: discountPercentage,
-    freeMonths,
-    monthlyPrice: formatCurrency(yearlyPrice / 12),
-    originalPrice: formatCurrency(monthlyTotal),
-  };
+  return calculateYearlyDiscount(monthlyPlan.price, yearlyPlan.price);
 });
 
 const displayedFeatures = computed<Array<{ label: string; value: string }>>(() => {
@@ -98,18 +97,17 @@ const displayedFeatures = computed<Array<{ label: string; value: string }>>(() =
 
 const isMostPopular = computed<boolean>(() => {
   const plan = get(currentPlan);
-  if (get(planType) !== 'regular' || !plan) {
+  if (!get(isRegularPlan) || !plan) {
     return false;
   }
   return plan.isMostPopular || false;
 });
 
 const planName = computed<string>(() => {
-  const type = get(planType);
-  if (type === 'free') {
+  if (get(isFreePlan)) {
     return t('pricing.plans.starter_plan');
   }
-  if (type === 'custom') {
+  if (get(isCustomPlan)) {
     return t('pricing.plans.custom_plan');
   }
   const plan = get(currentPlan);
@@ -120,18 +118,17 @@ const planName = computed<string>(() => {
 });
 
 const mainPriceDisplay = computed<string>(() => {
-  const type = get(planType);
-  if (type === 'free') {
+  if (get(isFreePlan)) {
     return t('pricing.free');
   }
-  if (type === 'custom') {
+  if (get(isCustomPlan)) {
     return t('pricing.contact_us');
   }
-  return get(price) ? `€ ${get(price)}` : '';
+  return get(price) ? `${get(price)}€` : '';
 });
 
 const secondaryPriceDisplay = computed<string | undefined>(() => {
-  if (get(planType) !== 'regular' || !get(price)) {
+  if (!get(isRegularPlan) || !get(price)) {
     return undefined;
   }
 
@@ -139,7 +136,7 @@ const secondaryPriceDisplay = computed<string | undefined>(() => {
   const yearly = get(isYearly);
 
   if (yearly && discount) {
-    return `€ ${discount.monthlyPrice}/${t('pricing.per_month')}`;
+    return `${discount.monthlyPrice}€/${t('pricing.per_month')}`;
   }
 
   return yearly
@@ -148,7 +145,7 @@ const secondaryPriceDisplay = computed<string | undefined>(() => {
 });
 
 const savingsDisplay = computed<string | undefined>(() => {
-  if (get(planType) !== 'regular' || !get(isYearly)) {
+  if (!get(isRegularPlan) || !get(isYearly)) {
     return undefined;
   }
 
@@ -161,19 +158,18 @@ const savingsDisplay = computed<string | undefined>(() => {
 });
 
 // CTA configuration mapping
-const ctaConfig = computed(() => {
-  const type = get(planType);
+const ctaConfig = computed<CtaConfig>(() => {
   const plan = get(currentPlan);
 
-  if (type === 'free') {
+  if (get(isFreePlan)) {
     return {
       label: t('actions.start_now_for_free'),
-      link: '/download',
+      link: ROUTES.DOWNLOAD,
       variant: 'outlined' as const,
     };
   }
 
-  if (type === 'custom') {
+  if (get(isCustomPlan)) {
     return {
       label: t('values.contact_section.title'),
       link: emailMailto,
@@ -181,7 +177,7 @@ const ctaConfig = computed(() => {
     };
   }
 
-  if (type === 'regular' && plan) {
+  if (get(isRegularPlan) && plan) {
     const periodVal = get(period);
     const isMonthly = periodVal === PricingPeriod.MONTHLY;
     const planId = isMonthly ? plan.monthlyPlan?.planId : plan.yearlyPlan?.planId;
@@ -190,7 +186,7 @@ const ctaConfig = computed(() => {
       label: t('actions.get_plan', { plan: toTitleCase(plan.tierName) }),
       link: planId
         ? {
-            name: 'checkout-pay-method',
+            name: ROUTES.CHECKOUT,
             query: { planId },
           }
         : '',
@@ -204,10 +200,6 @@ const ctaConfig = computed(() => {
     variant: 'default' as const,
   };
 });
-
-const ctaLink = computed(() => get(ctaConfig).link);
-const ctaLabel = computed(() => get(ctaConfig).label);
-const ctaVariant = computed(() => get(ctaConfig).variant);
 </script>
 
 <template>
@@ -230,7 +222,7 @@ const ctaVariant = computed(() => get(ctaConfig).variant);
       <div class="flex items-center h-0 justify-center relative w-full" />
 
       <div class="w-full flex justify-between items-start mb-4 gap-2">
-        <div class="text-h6 text-rui-primary !leading-6">
+        <div class="text-h6 text-rui-primary !leading-6 whitespace-nowrap">
           {{ planName }}
         </div>
         <RuiChip
@@ -271,49 +263,32 @@ const ctaVariant = computed(() => get(ctaConfig).variant);
 
       <ButtonLink
         class="w-full mt-auto py-2 xl:text-[1rem]"
-        :to="ctaLink"
+        :to="ctaConfig.link"
         color="primary"
-        :variant="ctaVariant"
+        :variant="ctaConfig.variant"
       >
-        {{ ctaLabel }}
+        {{ ctaConfig.label }}
       </ButtonLink>
 
       <div
         v-if="includesEverythingFrom || displayedFeatures.length > 0"
         class="flex flex-col gap-2 flex-1 mt-6"
       >
-        <div
-          v-if="includesEverythingFrom"
-          class="flex gap-2 items-start text-sm"
-        >
-          <RuiIcon
-            class="text-rui-primary shrink-0 mt-0.5"
-            name="lu-circle-check"
-            size="16"
-          />
-          <span class="text-rui-text">
-            {{ t('pricing.everything_from', { plan: includesEverythingFrom }) }}
-          </span>
-        </div>
-        <div
+        <PricingFeatureItem v-if="includesEverythingFrom">
+          {{ t('pricing.everything_from', { plan: includesEverythingFrom }) }}
+        </PricingFeatureItem>
+
+        <PricingFeatureItem
           v-for="(feature, index) in displayedFeatures"
           :key="index"
-          class="flex gap-2 items-start text-sm"
         >
-          <RuiIcon
-            class="text-rui-primary shrink-0 mt-0.5"
-            name="lu-circle-check"
-            size="16"
-          />
-          <span class="text-rui-text">
-            <template v-if="feature.value">
-              <strong>{{ feature.label }}</strong>: {{ feature.value }}
-            </template>
-            <template v-else>
-              {{ feature.label }}
-            </template>
-          </span>
-        </div>
+          <template v-if="feature.value">
+            <strong>{{ feature.label }}</strong>: {{ feature.value }}
+          </template>
+          <template v-else>
+            {{ feature.label }}
+          </template>
+        </PricingFeatureItem>
       </div>
     </div>
   </div>

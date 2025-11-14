@@ -74,7 +74,7 @@ const regularPlans = computed<PlanBase[]>(() => {
       id: targetPlan.planId,
       name: availablePlan.tierName,
       displayedName: t('pricing.plans.plan', { plan: toTitleCase(availablePlan.tierName) }),
-      mainPriceDisplay: yearly ? `€ ${formatCurrency(price / 12)}` : `€ ${formattedPrice}`,
+      mainPriceDisplay: yearly ? `${formatCurrency(price / 12)}€` : `${formattedPrice}€`,
       secondaryPriceDisplay: yearly
         ? t('pricing.billed_annually', { price: formattedPrice })
         : t('pricing.billed_monthly'),
