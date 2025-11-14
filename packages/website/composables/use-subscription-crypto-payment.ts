@@ -8,7 +8,6 @@ import {
 } from '@rotki/card-payment-common/schemas/subscription';
 import { get, isDefined } from '@vueuse/shared';
 import { usePendingTx } from '~/composables/crypto-payment';
-import { PaymentMethod } from '~/types/payment';
 
 interface UseSubscriptionCryptoPaymentOptions {
   renewableSubscriptions: Ref<UserSubscription[]>;
@@ -60,8 +59,7 @@ export function useSubscriptionCryptoPayment({
       const sub = subs[0];
       link.query = {
         id: sub.id,
-        method: PaymentMethod.BLOCKCHAIN.toString(),
-        plan: sub.durationInMonths.toString(),
+        planId: sub.planId?.toString() ?? '',
       };
     }
 
@@ -69,7 +67,6 @@ export function useSubscriptionCryptoPayment({
       link.query = {
         ...link.query,
         currency: get(pendingPaymentCurrency),
-        method: PaymentMethod.BLOCKCHAIN.toString(),
       };
     }
 
