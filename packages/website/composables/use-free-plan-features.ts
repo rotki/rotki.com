@@ -1,6 +1,6 @@
-import type { FeatureValue } from '~/components/pricings/type';
+import type { PremiumTierInfoDescription } from '~/types/tiers';
 
-export function useFreePlanFeatures(): Array<{ label: string; value: FeatureValue }> {
+export function useFreePlanFeatures(): PremiumTierInfoDescription[] {
   return [
     {
       label: 'Essential features to get started',
