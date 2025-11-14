@@ -8,6 +8,7 @@ export function useCryptoPaymentNavigation() {
   const { userSubscriptions } = useUserSubscriptions();
   const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
   const { planId } = usePlanIdParam();
+  const { discountCode } = useDiscountCodeParams();
 
   /**
    * Get the current crypto subscription ID if exists
@@ -34,8 +35,11 @@ export function useCryptoPaymentNavigation() {
    */
   const navigateBack = async (): Promise<void> => {
     const id = get(usedSubscriptionId);
-    const routeName = id ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
+    const upgradeId = get(upgradeSubId);
+    const hasValidId = upgradeId || id;
+    const routeName = hasValidId ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
     const currentPlanId = get(planId);
+    const currentDiscountCode = get(discountCode);
 
     const query: Record<string, string> = {};
 
@@ -43,8 +47,15 @@ export function useCryptoPaymentNavigation() {
       query.planId = String(currentPlanId);
     }
 
-    if (id) {
+    if (upgradeId) {
+      query.upgradeSubId = upgradeId;
+    }
+    else if (id) {
       query.id = id;
+    }
+
+    if (currentDiscountCode) {
+      query.discountCode = currentDiscountCode;
     }
 
     await navigateTo({
