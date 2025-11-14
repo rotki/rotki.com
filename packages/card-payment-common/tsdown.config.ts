@@ -1,6 +1,6 @@
-import type { Options } from 'tsdown';
+import { defineConfig } from 'tsdown';
 
-const config: Options = {
+export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm'],
   outDir: 'dist',
@@ -8,6 +8,4 @@ const config: Options = {
   dts: true,
   external: ['zod'],
   platform: 'neutral',
-};
-
-export default config;
+});
