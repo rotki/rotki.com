@@ -18,30 +18,60 @@ import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
 /**
+ * Parameters for crypto payment (purchase/renewal)
+ */
+export interface CryptoPaymentParams {
+  planId: number;
+  cryptocurrencyIdentifier: string;
+  subscriptionId?: string;
+  discountCode?: string;
+}
+
+/**
+ * Parameters for crypto upgrade payment
+ */
+export interface CryptoUpgradePaymentParams {
+  planId: number;
+  cryptocurrencyIdentifier: string;
+  subscriptionId: string;
+  discountCode?: string;
+}
+
+interface UseCryptoPaymentApiReturn {
+  checkPendingCryptoPayment: (subscriptionId?: string) => Promise<Result<PendingCryptoPayment>>;
+  checkCryptoUpgradePayment: (subscriptionId?: string) => Promise<Result<CryptoUpgradePayment>>;
+  prorateCryptoUpgrade: (planId: number, subscriptionId: string) => Promise<Result<CryptoUpgradeProrate, Error>>;
+  cryptoPayment: (params: CryptoPaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
+  deletePendingPayment: () => Promise<Result<boolean>>;
+  markTransactionStarted: (isUpgrade: boolean) => Promise<Result<boolean>>;
+  switchCryptoPlan: (params: CryptoPaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
+  switchCryptoUpgradePlan: (params: CryptoUpgradePaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
+  cancelUpgradeRequest: (subscriptionId: string) => Promise<Result<boolean>>;
+  upgradeCryptoSubscription: (params: CryptoUpgradePaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
+}
+
+/**
  * Crypto payment API composable
  * Handles all crypto payment-related API operations
  */
-export function useCryptoPaymentApi() {
+export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
   const logger = useLogger('crypto-payment-api');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
   /**
    * Create crypto payment request
    */
-  const cryptoPayment = async (
-    plan: number,
-    currencyId: string,
-    subscriptionId?: string,
-    discountCode?: string,
-  ): Promise<Result<CryptoPayment, PaymentError>> => {
+  const cryptoPayment = async (params: CryptoPaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
+    const { planId, cryptocurrencyIdentifier, subscriptionId, discountCode } = params;
+
     try {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/2/crypto/payments',
         {
           body: convertKeys(
             {
-              cryptocurrencyIdentifier: currencyId,
-              planId: plan,
+              cryptocurrencyIdentifier,
+              planId,
               subscriptionId,
               discountCode,
             },
@@ -65,15 +95,18 @@ export function useCryptoPaymentApi() {
     }
   };
 
-  const upgradeCryptoSubscription = async (planId: number, currency: string, subId: string): Promise<Result<CryptoPayment, PaymentError>> => {
+  const upgradeCryptoSubscription = async (params: CryptoUpgradePaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
+    const { planId, cryptocurrencyIdentifier, subscriptionId, discountCode } = params;
+
     try {
       const response = await fetchWithCsrf<CryptoPaymentResponse>(
         '/webapi/2/crypto/upgrade',
         {
           body: {
-            cryptocurrencyIdentifier: currency,
+            cryptocurrencyIdentifier,
             planId,
-            subscriptionId: subId,
+            subscriptionId,
+            discountCode,
           },
           method: 'POST',
         },
@@ -128,7 +161,7 @@ export function useCryptoPaymentApi() {
       const response = await fetchWithCsrf<CryptoUpgradePaymentResponse>(
         '/webapi/2/crypto/payment/upgrade/',
         {
-          params: convertKeys({ subscriptionId }, false, false),
+          query: convertKeys({ subscriptionId }, false, false),
         },
       );
       const data = CryptoUpgradePaymentResponse.parse(response);
@@ -162,7 +195,7 @@ export function useCryptoPaymentApi() {
       const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(
         '/webapi/2/crypto/payment/pending/',
         {
-          params: convertKeys({ subscriptionId }, false, false),
+          query: convertKeys({ subscriptionId }, false, false),
         },
       );
       const data = PendingCryptoPaymentResponse.parse(response);
@@ -244,16 +277,11 @@ export function useCryptoPaymentApi() {
   /**
    * Switch crypto payment plan (delete current and create new)
    */
-  const switchCryptoPlan = async (
-    plan: number,
-    currency: string,
-    subscriptionId?: string,
-    discountCode?: string,
-  ): Promise<Result<CryptoPayment, PaymentError>> => {
+  const switchCryptoPlan = async (params: CryptoPaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
     try {
       const data = await deletePendingPayment();
       if (!data.isError) {
-        const payment = await cryptoPayment(plan, currency, subscriptionId, discountCode);
+        const payment = await cryptoPayment(params);
         if (payment.isError) {
           return payment;
         }
@@ -300,6 +328,36 @@ export function useCryptoPaymentApi() {
     }
   };
 
+  /**
+   * Switch crypto upgrade plan (cancel current upgrade and create new)
+   */
+  const switchCryptoUpgradePlan = async (params: CryptoUpgradePaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
+    const { subscriptionId } = params;
+
+    try {
+      // Cancel existing upgrade request
+      const cancelResult = await cancelUpgradeRequest(subscriptionId);
+      if (cancelResult.isError) {
+        return createSimpleErrorResult(cancelResult.error);
+      }
+
+      // Create new upgrade payment
+      const payment = await upgradeCryptoSubscription(params);
+      if (payment.isError) {
+        return payment;
+      }
+
+      return {
+        isError: false,
+        result: payment.result,
+      };
+    }
+    catch (error: any) {
+      logger.error('Failed to switch crypto upgrade plan:', error);
+      return createSimpleErrorResult(error);
+    }
+  };
+
   return {
     checkPendingCryptoPayment,
     checkCryptoUpgradePayment,
@@ -308,6 +366,7 @@ export function useCryptoPaymentApi() {
     deletePendingPayment,
     markTransactionStarted,
     switchCryptoPlan,
+    switchCryptoUpgradePlan,
     cancelUpgradeRequest,
     upgradeCryptoSubscription,
   };
