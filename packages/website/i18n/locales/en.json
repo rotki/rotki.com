@@ -587,18 +587,18 @@
         "yearly": "Yearly",
         "yearly_billing": "Yearly billing"
       },
-      "per_month": "month",
+      "per_month": "mo",
       "saving": "save {months} months vs monthly",
       "tiers": {
         "step_1": {
-          "description": "Choose a plan that fits your needs",
+          "description": "Select the premium plan that best fits your needs",
           "notes": {
             "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
-          "title": "Subscription Plans"
+          "title": "Premium Subscription Plans"
         },
         "step_2": {
           "description": "Select one of the different methods",
@@ -824,7 +824,7 @@
     "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
     "custom_plan_negotiable": "Negotiable",
     "custom_plan_bespoke_support": "Bespoke & Customization assistance",
-    "per_month": "month",
+    "per_month": "mo",
     "most_popular_plan": "Most popular plan",
     "max_saved_annually": "Save {months} months vs monthly",
     "see_all_features": "See all features",
@@ -1165,8 +1165,8 @@
         "title": "Payment Summary",
         "charge_today": "Charge today",
         "recurring_charge": "Recurring charge",
-        "per_month": "per month",
-        "per_year": "per year",
+        "per_month": "/mo",
+        "per_year": "/yr",
         "approval_notice": "By completing this verification, you approve recurring payments of {amount}€ {period} until you cancel your subscription."
       }
     }
