@@ -2,6 +2,8 @@
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import PricingCard from '~/components/pricings/PricingCard.vue';
+import PricingCardSkeleton from '~/components/pricings/PricingCardSkeleton.vue';
+import PricingFeatureItem from '~/components/pricings/PricingFeatureItem.vue';
 import PricingHeading from '~/components/pricings/PricingHeading.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import PricingTierComparison from '~/components/pricings/PricingTierComparison.vue';
@@ -11,6 +13,11 @@ import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 import { getCountryName } from '~/utils/countries';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
+
+// Route constants
+const ROUTES = {
+  LOGIN: '/login',
+} as const;
 
 const title = 'rotki pricing';
 const description = 'Pricing page for rotki subscription';
@@ -77,29 +84,23 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col max-w-full">
+  <div class="flex flex-col max-w-full mx-4 md:mx-8">
     <PricingHeading />
 
     <!-- Top Section: Pricing Cards -->
-    <div class="container flex flex-col gap-8 pb-10 md:pb-16">
+    <div class="flex flex-col gap-8 pb-10 md:pb-16 mt-6">
       <PricingPeriodTab
         v-model="selectedPricingPeriod"
         :data="availablePlans"
       />
 
-      <div class="flex flex-col lg:flex-row gap-4 w-full">
+      <div class="flex flex-col lg:flex-row gap-4 w-full max-w-[90rem] mx-auto">
         <template v-if="enrichedPlans.length === 0">
           <!-- Skeleton loaders for all cards -->
-          <div
+          <PricingCardSkeleton
             v-for="i in 4"
             :key="i"
-            class="rounded-xl border border-default p-4 xl:p-5 flex flex-col gap-4 flex-1"
-          >
-            <RuiSkeletonLoader class="w-32 h-6" />
-            <RuiSkeletonLoader class="w-40 h-10" />
-            <RuiSkeletonLoader class="w-full h-20" />
-            <RuiSkeletonLoader class="w-full h-10" />
-          </div>
+          />
         </template>
         <template v-else>
           <!-- Free Plan Card -->
@@ -107,7 +108,7 @@ onBeforeMount(async () => {
             type="free"
             :period="selectedPricingPeriod"
             :features="freePlanFeatures"
-            class="flex-1"
+            class="flex-1 min-w-0"
           />
 
           <!-- Regular Plans Cards -->
@@ -119,14 +120,14 @@ onBeforeMount(async () => {
             :period="selectedPricingPeriod"
             :features="enrichedPlan.features"
             :includes-everything-from="enrichedPlan.includesEverythingFrom"
-            class="flex-1"
+            class="flex-1 min-w-0"
           />
 
           <!-- Custom Plan Card -->
           <PricingCard
             type="custom"
             :period="selectedPricingPeriod"
-            class="flex-1"
+            class="flex-1 min-w-0"
           />
         </template>
       </div>
@@ -150,22 +151,12 @@ onBeforeMount(async () => {
 
       <div class="max-w-[42rem] mx-auto flex flex-col gap-6 mt-4">
         <div class="flex flex-col gap-3">
-          <div
+          <PricingFeatureItem
             v-for="(line, i) in planNotes"
             :key="i"
-            class="flex gap-2 items-start"
           >
-            <div class="mt-0.5 shrink-0">
-              <RuiIcon
-                class="text-rui-primary"
-                name="lu-circle-check"
-                size="20"
-              />
-            </div>
-            <p class="text-rui-text text-sm leading-relaxed">
-              {{ line }}
-            </p>
-          </div>
+            {{ line }}
+          </PricingFeatureItem>
         </div>
 
         <div
@@ -183,7 +174,7 @@ onBeforeMount(async () => {
               </template>
               <template #login>
                 <ButtonLink
-                  to="/login"
+                  :to="ROUTES.LOGIN"
                   inline
                   color="primary"
                 >
@@ -198,7 +189,7 @@ onBeforeMount(async () => {
             >
               <template #login>
                 <ButtonLink
-                  to="/login"
+                  :to="ROUTES.LOGIN"
                   inline
                   color="primary"
                 >
@@ -224,16 +215,19 @@ onBeforeMount(async () => {
           {{ t('pricing.detailed_comparison') }}
         </p>
       </div>
-      <PricingPeriodTab
-        v-model="selectedPricingPeriod"
-        class="flex lg:justify-center lg:-mr-60"
-        :data="availablePlans"
-      />
-      <PricingTierComparison
-        :selected-period="selectedPricingPeriod"
-        :available-plans="availablePlans"
-        :tiers-data="tiersInformation"
-      />
+      <div class="flex justify-center">
+        <PricingPeriodTab
+          v-model="selectedPricingPeriod"
+          :data="availablePlans"
+        />
+      </div>
+      <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <PricingTierComparison
+          :selected-period="selectedPricingPeriod"
+          :available-plans="availablePlans"
+          :tiers-data="tiersInformation"
+        />
+      </div>
     </div>
   </div>
 </template>
