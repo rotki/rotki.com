@@ -103,6 +103,7 @@ const CryptoPayment = z.object({
   tokenAddress: z.string().nullish(),
   transactionStarted: z.boolean(),
   vat: z.number(),
+  preDiscountAmount: z.string().optional(),
 });
 
 export type CryptoPayment = z.infer<typeof CryptoPayment>;

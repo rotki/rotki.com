@@ -71,6 +71,9 @@ const grandTotal = computed<number>(() => {
   if (currentCheckoutData) {
     // Check if it's CryptoPayment with finalPriceInEur (for crypto upgrades)
     if ('finalPriceInEur' in currentCheckoutData) {
+      if (currentCheckoutData.preDiscountAmount) {
+        return Number(currentCheckoutData.preDiscountAmount);
+      }
       return currentCheckoutData.finalPriceInEur;
     }
 
