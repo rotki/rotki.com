@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
   <div
-    class="px-4 xl:px-6 py-2 flex gap-2 items-center text-sm"
+    class="px-2 xl:px-3 py-1 flex gap-2 items-center text-sm"
     :class="{ '!justify-start': label }"
   >
     <div
