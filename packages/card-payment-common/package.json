@@ -72,7 +72,7 @@
   "devDependencies": {
     "@tsconfig/node22": "catalog:",
     "@types/node": "catalog:",
-    "tsdown": "0.15.9",
+    "tsdown": "0.16.4",
     "typescript": "catalog:"
   }
 }
