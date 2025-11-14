@@ -6,7 +6,7 @@ import type {
   SubscriptionActionEvent,
   SubscriptionActionType,
 } from '~/components/account/home/subscription-table/types';
-import { isCancelledButActive } from '@rotki/card-payment-common';
+import { isCancelledButActive, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import PlanLimitsList from '~/components/account/home/PlanLimitsList.vue';
@@ -102,8 +102,11 @@ const nextActionRelative = useTimeAgo(
   computed<Date>(() => new Date(props.subscription.nextActionDate)),
 );
 
-// Check if upgrade is available
-const isUpgradeAvailable = computed<boolean>(() => canUpgradeSubscription(props.subscription, get(availablePlans)));
+// Check if upgrade is pending
+const isUpgradePending = computed<boolean>(() => isSubRequestingUpgrade(props.subscription));
+
+// Check if upgrade is available (only if not already pending)
+const isUpgradeAvailable = computed<boolean>(() => !get(isUpgradePending) && canUpgradeSubscription(props.subscription, get(availablePlans)));
 
 // Action handlers using centralized composable
 async function resumeSubscription(subscription: UserSubscription): Promise<void> {
@@ -146,7 +149,20 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
             <div class="flex items-center gap-2">
               <span>{{ planDisplayName }}</span>
               <RuiChip
-                v-if="isUpgradeAvailable"
+                v-if="isUpgradePending"
+                size="sm"
+                color="warning"
+              >
+                <div class="flex items-center gap-1">
+                  <RuiIcon
+                    name="lu-clock"
+                    size="14"
+                  />
+                  {{ t('account.subscriptions.upgrade_pending') }}
+                </div>
+              </RuiChip>
+              <RuiChip
+                v-else-if="isUpgradeAvailable"
                 size="sm"
                 color="primary"
               >

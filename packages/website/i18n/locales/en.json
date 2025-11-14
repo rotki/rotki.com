@@ -99,6 +99,7 @@
       "plan": "Plan",
       "plan_limits": "Plan Limits",
       "upgrade_available": "Upgrade Available",
+      "upgrade_pending": "Upgrade Pending",
       "actions": {
         "cancel": "Cancel subscription",
         "resume": "Resume subscription"
