@@ -337,6 +337,18 @@ export default defineNuxtConfig({
         },
       },
     },
+    '/devconnect': {
+      security: {
+        headers: {
+          contentSecurityPolicy: mergeCSP(
+            removeNoncePlaceholders(baseCSP),
+            walletConnectCSP,
+            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
+          ),
+          crossOriginOpenerPolicy: 'unsafe-none', // Required for Coinbase Wallet SDK
+        },
+      },
+    },
   },
 
   runtimeConfig: {
