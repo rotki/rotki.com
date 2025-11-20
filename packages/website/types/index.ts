@@ -85,7 +85,7 @@ export const TaskStatusResponse = z.object({
 export type TaskStatusResponse = z.infer<typeof TaskStatusResponse>;
 
 const CryptoPayment = z.object({
-  chainId: z.number(),
+  chainId: z.number().optional(),
   chainName: z.string(),
   cryptoAddress: z.string(),
   cryptocurrency: z.string(),
