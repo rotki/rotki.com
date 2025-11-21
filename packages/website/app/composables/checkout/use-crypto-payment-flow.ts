@@ -1,14 +1,21 @@
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { Ref } from 'vue';
-import { pausableWatch } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
+import { useCryptoPaymentFlowPurchase } from '~/composables/checkout/use-crypto-payment-flow-purchase';
+import { useCryptoPaymentFlowUpgrade } from '~/composables/checkout/use-crypto-payment-flow-upgrade';
 import { useCryptoPaymentState } from '~/composables/checkout/use-crypto-payment-state';
 import { usePlanIdParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useTiersStore } from '~/store/tiers';
-import { PaymentError } from '~/types/codes';
 import { assert } from '~/utils/assert';
+
+interface UseCryptoPaymentFlowReturn {
+  handlePaymentMethodChange: () => Promise<boolean>;
+  markTransactionStarted: () => Promise<void>;
+  initialize: () => Promise<boolean>;
+  switchToNewPlan: (newPlan: SelectedPlan) => Promise<void>;
+}
 
 /**
  * Composable for managing crypto payment business logic and monitoring
@@ -17,16 +24,19 @@ export function useCryptoPaymentFlow(
   currency: Ref<string | null>,
   subscriptionId: Ref<string | undefined>,
   discountCode: Ref<string | undefined>,
-) {
+): UseCryptoPaymentFlowReturn {
   const state = useCryptoPaymentState();
   const api = useCryptoPaymentApi();
   const { requestRefresh } = useAccountRefresh();
-  const { t } = useI18n({ useScope: 'global' });
   const router = useRouter();
   const { planId } = usePlanIdParam();
   const { upgradeSubId } = useSubscriptionIdParam();
   const tiersStore = useTiersStore();
   const { getSelectedPlanFromId, getAvailablePlans } = tiersStore;
+
+  // Import purchase and upgrade flows
+  const purchaseFlow = useCryptoPaymentFlowPurchase();
+  const upgradeFlow = useCryptoPaymentFlowUpgrade();
 
   /**
    * Update the route planId without triggering reactive queries
@@ -42,8 +52,8 @@ export function useCryptoPaymentFlow(
     }, { replace: true });
   };
 
-  // Set up pausable watcher initially paused
-  const { pause, resume } = pausableWatch(
+  // Set up pausable watcher (Vue 3.5+ native)
+  const { pause, resume } = watch(
     [state.selectedPlan, discountCode],
     async ([newPlan, newDiscount]) => {
       if (!newPlan || get(state.loading) || !isDefined(currency)) {
@@ -52,9 +62,26 @@ export function useCryptoPaymentFlow(
 
       const currencyValue = get(currency);
       const subscriptionValue = get(subscriptionId);
+      const upgradeSubIdValue = get(upgradeSubId);
 
       try {
-        await switchPlan(newPlan, currencyValue, subscriptionValue, newDiscount);
+        // Route to appropriate flow
+        if (upgradeSubIdValue) {
+          await upgradeFlow.switchUpgradePlan({
+            planId: newPlan.planId,
+            cryptocurrencyIdentifier: currencyValue,
+            upgradeSubId: upgradeSubIdValue,
+            discountCode: newDiscount,
+          });
+        }
+        else {
+          await purchaseFlow.switchPurchasePlan({
+            planId: newPlan.planId,
+            cryptocurrencyIdentifier: currencyValue,
+            subscriptionId: subscriptionValue,
+            discountCode: newDiscount,
+          });
+        }
       }
       catch (error: any) {
         state.setError(error.message);
@@ -70,162 +97,59 @@ export function useCryptoPaymentFlow(
   pause();
 
   /**
-   * Initialize crypto payment
-   */
-  const initializePayment = async (
-    plan: SelectedPlan,
-    currencyId: string,
-    subscriptionId: string | undefined,
-    discountCode: string | undefined,
-    upgradeSubId: string | undefined,
-  ): Promise<void> => {
-    if (!plan || !currencyId) {
-      await navigateTo('/products');
-      return;
-    }
-
-    state.setLoading(true);
-    state.setError('');
-
-    try {
-      const result = upgradeSubId
-        ? await api.upgradeCryptoSubscription(
-            plan.planId,
-            currencyId,
-            get(upgradeSubId),
-          )
-        : await api.cryptoPayment(
-            plan.planId,
-            currencyId,
-            subscriptionId,
-            discountCode,
-          );
-
-      requestRefresh();
-
-      if (result.isError) {
-        const errorMsg = result.code === PaymentError.UNVERIFIED
-          ? t('subscription.error.unverified_email')
-          : result.error.message;
-        state.setError(errorMsg);
-      }
-      else if (result.result.transactionStarted) {
-        await navigateTo('/home/subscription');
-      }
-      else {
-        state.setPaymentData(result.result);
-      }
-    }
-    finally {
-      state.setLoading(false);
-    }
-  };
-
-  /**
-   * Switch to a different plan
-   */
-  async function switchPlan(
-    plan: SelectedPlan | undefined,
-    currencyId: string | undefined,
-    subscriptionId: string | undefined,
-    discountCode: string | undefined,
-  ): Promise<void> {
-    if (!plan || get(state.planSwitchLoading)) {
-      return;
-    }
-
-    assert(currencyId, 'Currency must be selected');
-
-    state.setPlanSwitchLoading(true);
-    state.setError('');
-
-    try {
-      const response = await api.switchCryptoPlan(
-        plan.planId,
-        currencyId,
-        subscriptionId,
-        discountCode,
-      );
-
-      if (!response.isError) {
-        state.setPaymentData(response.result);
-        // Wait for reactive updates to propagate to DOM
-        await nextTick();
-        state.setPlanSwitchLoading(false);
-      }
-      else {
-        state.setError(response.error.message);
-        state.setPlanSwitchLoading(false);
-      }
-    }
-    catch (error: any) {
-      state.setError(error.message);
-      state.setPlanSwitchLoading(false);
-    }
-    // Removed finally block - loading is now managed explicitly
-  }
-
-  /**
-   * Simplified switch plan method that uses reactive refs internally
+   * Router function to switch to a new plan (purchase/renewal or upgrade)
    */
   async function switchToNewPlan(newPlan: SelectedPlan): Promise<void> {
     const currencyVal = get(currency);
     const subscriptionVal = get(subscriptionId);
     const discountVal = get(discountCode);
+    const upgradeSubIdVal = get(upgradeSubId);
 
     assert(currencyVal, 'Currency must be selected');
 
-    // Start loading immediately
-    state.setPlanSwitchLoading(true);
-    state.setError('');
-
-    // Pause watcher to prevent reactive loops
-    pause();
-
-    try {
-      // 1. Call API first (no optimistic updates)
-      const response = await api.switchCryptoPlan(
-        newPlan.planId,
-        currencyVal,
-        subscriptionVal,
-        discountVal,
+    if (upgradeSubIdVal) {
+      // Upgrade flow
+      await upgradeFlow.switchToNewUpgradePlan(
+        {
+          plan: newPlan,
+          cryptocurrencyIdentifier: currencyVal,
+          upgradeSubId: upgradeSubIdVal,
+          discountCode: discountVal,
+        },
+        pause,
+        resume,
+        updateRoutePlanId,
       );
-
-      if (response.isError) {
-        throw new Error(response.error.message);
-      }
-
-      // 2. Update state only after successful API response
-      state.setSelectedPlan(newPlan);
-      await updateRoutePlanId(newPlan.planId);
-
-      // 3. Set payment data and wait for DOM updates
-      state.setPaymentData(response.result);
-      await nextTick();
-
-      // 4. Clear loading only after everything is updated
-      state.setPlanSwitchLoading(false);
     }
-    catch (error: any) {
-      // No rollback needed since no optimistic changes were made
-      state.setError(error.message);
-      state.setPlanSwitchLoading(false);
-      throw error;
-    }
-    finally {
-      // Resume watcher after everything completes
-      resume();
+    else {
+      // Purchase/Renewal flow
+      await purchaseFlow.switchToNewPurchasePlan(
+        {
+          plan: newPlan,
+          cryptocurrencyIdentifier: currencyVal,
+          subscriptionId: subscriptionVal,
+          discountCode: discountVal,
+        },
+        pause,
+        resume,
+        updateRoutePlanId,
+      );
     }
   }
 
   /**
-   * Handle payment method change
+   * Handle payment method change - routes to appropriate cancellation method
    */
   const handlePaymentMethodChange = async (): Promise<boolean> => {
     state.setLoading(true);
 
     try {
-      const response = await api.deletePendingPayment();
+      const upgradeSubIdVal = get(upgradeSubId);
+
+      // Determine which cancellation method to use
+      const response = upgradeSubIdVal
+        ? await api.cancelUpgradeRequest(upgradeSubIdVal)
+        : await api.deletePendingPayment();
 
       if (!response.isError) {
         return true;
@@ -275,8 +199,26 @@ export function useCryptoPaymentFlow(
       return false;
     }
 
-    // Initial payment setup
-    await initializePayment(plan, currencyVal, get(subscriptionId), get(discountCode), get(upgradeSubId));
+    const upgradeSubIdVal = get(upgradeSubId);
+    const discountCodeVal = get(discountCode);
+
+    // Route to appropriate initialization flow
+    if (upgradeSubIdVal) {
+      await upgradeFlow.initializeUpgradePayment({
+        plan,
+        cryptocurrencyIdentifier: currencyVal,
+        upgradeSubId: upgradeSubIdVal,
+        discountCode: discountCodeVal,
+      });
+    }
+    else {
+      await purchaseFlow.initializePurchasePayment({
+        plan,
+        cryptocurrencyIdentifier: currencyVal,
+        subscriptionId: get(subscriptionId),
+        discountCode: discountCodeVal,
+      });
+    }
 
     // Start the watcher after initialization completes
     resume();
@@ -285,7 +227,6 @@ export function useCryptoPaymentFlow(
   };
 
   return {
-    initializePayment,
     handlePaymentMethodChange,
     markTransactionStarted,
     initialize,

@@ -9,7 +9,7 @@ import AcceptRefundPolicy from '~/components/checkout/pay/AcceptRefundPolicy.vue
 import CryptoPaymentInfo from '~/components/checkout/pay/crypto/payment/CryptoPaymentInfo.vue';
 import CryptoAssetSelector from '~/components/checkout/pay/crypto/request/CryptoAssetSelector.vue';
 import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
-import { usePlanIdParam, useReferralCodeParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
+import { useDiscountCodeParams, usePlanIdParam, useReferralCodeParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
 import { useSelectedPlan } from '~/composables/checkout/use-selected-plan';
 import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { buildQueryParams } from '~/utils/query';
@@ -22,14 +22,16 @@ const processing = ref<boolean>(false);
 const currency = ref<string>('');
 const prorate = ref<CryptoUpgradeProrate | null>(null);
 
-const discountCode = ref<string>('');
 const discountInfo = ref<DiscountInfo>();
 
 const { planId } = usePlanIdParam();
 const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 const { referralCode } = useReferralCodeParam();
+const { discountCode: routeDiscountCode } = useDiscountCodeParams();
 const { selectedPlan } = useSelectedPlan();
 const { prorateCryptoUpgrade } = useCryptoPaymentApi();
+
+const discountCode = ref<string>(get(routeDiscountCode) ?? '');
 
 const valid = computed<boolean>(() => get(isRefundPolicyAccepted) && !!get(currency));
 

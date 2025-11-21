@@ -70,14 +70,13 @@ const grandTotal = computed<number>(() => {
     return 0;
   }
 
-  if (currentDiscountInfo) {
-    return getDiscountedPrice(currentPlan, currentDiscountInfo);
-  }
-
   // If checkoutData is available
   if (currentCheckoutData) {
     // Check if it's CryptoPayment with finalPriceInEur (for crypto upgrades)
     if ('finalPriceInEur' in currentCheckoutData) {
+      if (currentCheckoutData.preDiscountAmount) {
+        return Number(currentCheckoutData.preDiscountAmount);
+      }
       return currentCheckoutData.finalPriceInEur;
     }
 
@@ -120,17 +119,14 @@ function handlePlanChange(newPlan: SelectedPlan): void {
       @plan-change="handlePlanChange($event)"
     />
 
-    <RuiDivider
-      v-if="!upgradeSubId"
-      :class="spacingClass"
-    />
+    <RuiDivider :class="spacingClass" />
 
     <DiscountCodeInput
-      v-if="!upgradeSubId"
       v-model="discountCode"
       v-model:discount-info="discountInfo"
       :plan="plan"
       :disabled="disabled"
+      :upgrade-sub-id="upgradeSubId"
       :class="discountSpacingClass"
     />
 

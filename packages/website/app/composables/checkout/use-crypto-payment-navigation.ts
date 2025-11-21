@@ -1,5 +1,5 @@
 import { get } from '@vueuse/shared';
-import { usePlanIdParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
+import { useDiscountCodeParams, usePlanIdParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { buildQueryParams } from '~/utils/query';
 
@@ -10,6 +10,7 @@ export function useCryptoPaymentNavigation() {
   const { userSubscriptions } = useUserSubscriptions();
   const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
   const { planId } = usePlanIdParam();
+  const { discountCode } = useDiscountCodeParams();
 
   /**
    * Get the current crypto subscription ID if exists
@@ -36,8 +37,11 @@ export function useCryptoPaymentNavigation() {
    */
   const navigateBack = async (ref?: string): Promise<void> => {
     const id = get(usedSubscriptionId);
-    const routeName = id ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
+    const upgradeId = get(upgradeSubId);
+    const hasValidId = upgradeId || id;
+    const routeName = hasValidId ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
     const currentPlanId = get(planId);
+    const currentDiscountCode = get(discountCode);
 
     await navigateTo({
       name: routeName,
@@ -45,6 +49,8 @@ export function useCryptoPaymentNavigation() {
         id,
         planId: currentPlanId,
         ref,
+        discountCode: currentDiscountCode,
+        upgradeSubId: upgradeId,
       }),
     });
   };

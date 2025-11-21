@@ -291,10 +291,10 @@ onUnmounted(async () => {
 
           <!-- Discount Code Input -->
           <DiscountCodeInput
-            v-if="!upgradeSubId"
             v-model="discountCode"
             v-model:discount-info="discountInfo"
             :selected-plan="selectedPlan"
+            :upgrade-sub-id="upgradeSubId"
             class="mb-4"
           />
 

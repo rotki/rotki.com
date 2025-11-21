@@ -17,11 +17,17 @@ const grandTotal = computed<number>(() =>
   getFinalAmount(get(planData), get(selectedPlan), get(discountInfo)),
 );
 
-const originalPrice = computed<number>(() => selectedPlan.price);
+const originalPrice = computed<number>(() => {
+  const plan = get(planData);
+  if (isUpgradeData(plan)) {
+    return parseFloat(plan.finalAmount);
+  }
+  return get(selectedPlan).price;
+});
 
 const hasDiscount = computed<boolean>(() => {
   const discount = get(discountInfo);
-  return !!discount && discount.isValid && !isUpgradeData(get(planData));
+  return !!discount && discount.isValid;
 });
 
 const savings = computed<number>(() => {
