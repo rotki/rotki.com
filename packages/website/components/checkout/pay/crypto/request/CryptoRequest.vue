@@ -12,13 +12,15 @@ const processing = ref<boolean>(false);
 const currency = ref<string>('');
 const prorate = ref<CryptoUpgradeProrate | null>(null);
 
-const discountCode = ref<string>('');
 const discountInfo = ref<DiscountInfo>();
 
 const { planId } = usePlanIdParam();
 const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
+const { discountCode: routeDiscountCode } = useDiscountCodeParams();
 const { selectedPlan } = useSelectedPlan();
 const { prorateCryptoUpgrade } = useCryptoPaymentApi();
+
+const discountCode = ref<string>(get(routeDiscountCode) ?? '');
 
 const valid = computed<boolean>(() => get(acceptRefundPolicy) && !!get(currency));
 

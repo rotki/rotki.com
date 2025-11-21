@@ -11,20 +11,28 @@ const props = defineProps<{
   discountInfo?: DiscountInfo;
 }>();
 
-const { plan, discountInfo } = toRefs(props);
+const { discountInfo } = toRefs(props);
 
 const { t } = useI18n({ useScope: 'global' });
 
-const subtotal = computed<number>(() => get(plan).price);
+const subtotal = computed<number>(() => props.grandTotal);
 
 const hasDiscount = computed<boolean>(() => {
   const info = get(discountInfo);
-  return !!(info && info.isValid);
+  return info?.isValid ?? false;
 });
 
 const discountAmount = computed<number>(() => {
   const info = get(discountInfo);
   return info && info.isValid ? info.discountedAmount : 0;
+});
+
+const finalAmount = computed<number>(() => {
+  const discount = get(discountInfo);
+  if (discount && discount.isValid) {
+    return discount.finalPrice;
+  }
+  return props.grandTotal;
 });
 </script>
 
@@ -85,10 +93,10 @@ const discountAmount = computed<number>(() => {
           :loading="loading"
           class="w-20 h-7"
         >
-          {{ grandTotal.toFixed(2) }} €
+          {{ finalAmount.toFixed(2) }} €
         </RuiSkeletonLoader>
         <span v-else>
-          {{ grandTotal.toFixed(2) }} €
+          {{ finalAmount.toFixed(2) }} €
         </span>
       </div>
     </div>
