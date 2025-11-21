@@ -18,9 +18,10 @@ const discountInfo = defineModel<DiscountInfo | undefined>('discountInfo', { req
 
 const props = defineProps<{
   selectedPlan: SelectedPlan;
+  upgradeSubId?: string | null;
 }>();
 
-const { selectedPlan } = toRefs(props);
+const { selectedPlan, upgradeSubId } = toRefs(props);
 
 const value = ref<string>('');
 const loading = ref<boolean>(false);
@@ -59,14 +60,21 @@ const appliedDiscountAmount = computed<string>(() => {
 
 async function fetchDiscountInfo(discountCode: string): Promise<void> {
   const { planId } = get(selectedPlan);
+  const subId = get(upgradeSubId);
   set(loading, true);
   try {
+    const requestBody: Record<string, any> = {
+      discountCode,
+      planId,
+    };
+
+    if (subId) {
+      requestBody.subscriptionId = subId;
+    }
+
     const response = await fetchWithCSRF(`/webapi/2/discounts`, {
       method: 'POST',
-      body: JSON.stringify(convertKeys({
-        discountCode,
-        planId,
-      }, false, false)),
+      body: JSON.stringify(convertKeys(requestBody, false, false)),
     });
 
     const data = await response.json();
