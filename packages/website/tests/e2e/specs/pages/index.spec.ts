@@ -1,4 +1,36 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+const MOCK_RELEASE_RESPONSE = {
+  tag_name: 'v1.41.1',
+  assets: [
+    {
+      name: 'rotki-darwin_arm64-v1.41.1.dmg',
+      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_arm64-v1.41.1.dmg',
+    },
+    {
+      name: 'rotki-darwin_x64-v1.41.1.dmg',
+      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_x64-v1.41.1.dmg',
+    },
+    {
+      name: 'rotki-linux_x86_64-v1.41.1.AppImage',
+      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage',
+    },
+    {
+      name: 'rotki-win32_x64-v1.41.1.exe',
+      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-win32_x64-v1.41.1.exe',
+    },
+  ],
+};
+
+async function mockReleaseApi(page: Page): Promise<void> {
+  await page.route('**/api/releases/latest', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_RELEASE_RESPONSE),
+    });
+  });
+}
 
 test.describe('homepage', () => {
   test('successfully loads', async ({ page }) => {
@@ -51,19 +83,25 @@ test.describe('download page', () => {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
+    await mockReleaseApi(page);
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
     });
 
     // Mac has two download buttons (Apple Silicon and Intel)
-    await expect(
-      page.getByRole('button', { name: 'Download for MAC Apple Silicon' }),
-    ).toBeVisible();
+    const appleSiliconButton = page.getByRole('button', { name: 'Download for MAC Apple Silicon' });
+    const appleIntelButton = page.getByRole('button', { name: 'Download for MAC Intel' });
 
-    await expect(
-      page.getByRole('button', { name: 'Download for MAC Intel' }),
-    ).toBeVisible();
+    await expect(appleSiliconButton).toBeVisible();
+    await expect(appleIntelButton).toBeVisible();
+
+    // Verify href values
+    const appleSiliconHref = await appleSiliconButton.locator('..').getAttribute('href');
+    const appleIntelHref = await appleIntelButton.locator('..').getAttribute('href');
+
+    expect(appleSiliconHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_arm64-v1.41.1.dmg');
+    expect(appleIntelHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_x64-v1.41.1.dmg');
 
     await context.close();
   });
@@ -74,14 +112,18 @@ test.describe('download page', () => {
         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
+    await mockReleaseApi(page);
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
     });
 
-    await expect(
-      page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX' }),
-    ).toBeVisible();
+    const linuxButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX' });
+    await expect(linuxButton).toBeVisible();
+
+    // Verify href value
+    const linuxHref = await linuxButton.locator('..').getAttribute('href');
+    expect(linuxHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage');
 
     await context.close();
   });
@@ -92,19 +134,25 @@ test.describe('download page', () => {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
+    await mockReleaseApi(page);
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
     });
 
-    await expect(
-      page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for WINDOWS' }),
-    ).toBeVisible();
+    const windowsButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for WINDOWS' });
+    await expect(windowsButton).toBeVisible();
+
+    // Verify href value
+    const windowsHref = await windowsButton.locator('..').getAttribute('href');
+    expect(windowsHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-win32_x64-v1.41.1.exe');
 
     await context.close();
   });
 
   test('checks all download links!', async ({ page }) => {
+    await mockReleaseApi(page);
+
     await page.goto('/download', {
       waitUntil: 'networkidle',
     });

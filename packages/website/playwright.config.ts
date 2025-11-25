@@ -44,6 +44,9 @@ export default defineConfig({
   ],
   webServer: {
     command: useDev ? 'pnpm dev' : 'pnpm preview',
+    env: {
+      TEST: 'true', // Disable Vue DevTools during e2e tests
+    },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
