@@ -67,6 +67,10 @@ const grandTotal = computed<number>(() => {
     return 0;
   }
 
+  if (currentDiscountInfo) {
+    return getDiscountedPrice(currentPlan, currentDiscountInfo);
+  }
+
   // If checkoutData is available
   if (currentCheckoutData) {
     // Check if it's CryptoPayment with finalPriceInEur (for crypto upgrades)
