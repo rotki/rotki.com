@@ -27,7 +27,7 @@ async function resumeSubscription(): Promise<void> {
   <RuiDialog
     :model-value="!!modelValue && !loading"
     max-width="900"
-    @close="modelValue = undefined"
+    @closed="modelValue = undefined"
   >
     <RuiCard>
       <template #header>

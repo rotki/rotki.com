@@ -58,11 +58,17 @@
       "no_devices_found": "No devices found",
       "headers": {
         "label": "Label",
-        "last_seen": "Last Seen at"
+        "last_seen": "Last Seen at",
+        "platform": "Platform"
       },
       "delete": {
         "title": "Delete Device",
         "description": "Are you sure you want to delete the device \"{label}\"? This action cannot be undone."
+      },
+      "rename": {
+        "error": "Failed to rename device",
+        "label": "Device Name",
+        "title": "Rename Device"
       }
     },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
@@ -284,8 +290,10 @@
     "get_started_for_free": "Get started for free",
     "go_back_home": "Go back home",
     "regenerate": "Regenerate",
+    "rename": "Rename",
     "renew": "Renew",
     "reset": "Reset",
+    "save": "Save",
     "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",

@@ -35,6 +35,7 @@ export const UserDevice = z.object({
   id: z.number(),
   label: z.string(),
   lastSeenAt: z.string().datetime(),
+  platform: z.string(),
   uniqueId: z.string(),
   user: z.string(),
 });

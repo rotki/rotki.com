@@ -5,6 +5,7 @@ interface UseUserDevicesReturn {
   deleteDevice: (id: number) => Promise<void>;
   loading: Readonly<Ref<boolean>>;
   refresh: () => Promise<void>;
+  renameDevice: (id: number, label: string) => Promise<void>;
   userDevices: Readonly<Ref<UserDevice[]>>;
 }
 
@@ -36,9 +37,26 @@ export function useUserDevices(): UseUserDevicesReturn {
   async function deleteDevice(id: number): Promise<void> {
     try {
       await fetchWithCsrf(
-        `webapi/2/devices/${id}`,
+        `webapi/2/devices/${id}/`,
         {
           method: 'DELETE',
+        },
+      );
+      await refresh();
+    }
+    catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
+  async function renameDevice(id: number, label: string): Promise<void> {
+    try {
+      await fetchWithCsrf<UserDevice>(
+        `webapi/2/devices/${id}/`,
+        {
+          body: { label },
+          method: 'PUT',
         },
       );
       await refresh();
@@ -61,6 +79,7 @@ export function useUserDevices(): UseUserDevicesReturn {
     deleteDevice,
     loading: readonly(loading),
     refresh,
+    renameDevice,
     userDevices: readonly(userDevices) as Readonly<Ref<UserDevice[]>>,
   };
 }

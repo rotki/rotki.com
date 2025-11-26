@@ -26,7 +26,7 @@ const { t } = useI18n({ useScope: 'global' });
   <RuiDialog
     :model-value="!!modelValue && !loading"
     max-width="600"
-    @close="modelValue = undefined"
+    @closed="modelValue = undefined"
   >
     <RuiCard>
       <template #header>

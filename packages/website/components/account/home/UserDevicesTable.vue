@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import type { DataTableColumn, TablePaginationData } from '@rotki/ui-library';
 import type { UserDevice } from '~/types/account';
-import { useConfirmDialog } from '@vueuse/core';
+import { createReusableTemplate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { formatDate } from '~/utils/date';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const deleteLoading = ref<boolean>(false);
-const deviceToDelete = ref<UserDevice>();
 const pagination = ref<TablePaginationData>();
+const deviceToDelete = ref<UserDevice>();
+const deviceToRename = ref<UserDevice>();
+const deleteLoading = ref<boolean>(false);
+const renameLoading = ref<boolean>(false);
 
-const { deleteDevice: deleteDeviceCaller, loading, userDevices } = useUserDevices();
+const { loading, userDevices } = useUserDevices();
 
 const headers = computed<DataTableColumn<UserDevice>[]>(() => [{
   label: t('account.devices.headers.label'),
   key: 'label',
   cellClass: 'font-bold',
+}, {
+  label: t('account.devices.headers.platform'),
+  key: 'platform',
 }, {
   label: t('account.devices.headers.last_seen'),
   key: 'lastSeenAt',
@@ -28,46 +33,55 @@ const headers = computed<DataTableColumn<UserDevice>[]>(() => [{
   cellClass: 'flex justify-end',
 }]);
 
-const {
-  isRevealed: confirmDialog,
-  reveal: showConfirmDialog,
-  confirm: confirmDelete,
-  cancel: cancelDelete,
-} = useConfirmDialog();
-
-async function showDeleteConfirmation(device: UserDevice): Promise<void> {
-  set(deviceToDelete, device);
-  const { isCanceled } = await showConfirmDialog();
-
-  if (isCanceled) {
-    set(deviceToDelete, undefined);
-    return;
-  }
-
-  await deleteDevice();
+interface PlatformDisplay {
+  icon?: string;
+  image?: string;
+  label: string;
 }
 
-async function deleteDevice(): Promise<void> {
-  const device = get(deviceToDelete);
-  if (!device)
-    return;
+const platformMapping: Record<string, PlatformDisplay> = {
+  linux: { image: '/img/linux.svg', label: 'Linux' },
+  darwin: { icon: 'lu-os-apple', label: 'macOS' },
+  windows: { icon: 'lu-os-windows', label: 'Windows' },
+  docker: { image: '/img/docker.svg', label: 'Docker' },
+  kubernetes: { image: '/img/kubernetes.svg', label: 'Kubernetes' },
+};
 
-  set(deleteLoading, true);
-  try {
-    await deleteDeviceCaller(device.id);
-    set(deviceToDelete, undefined);
-  }
-  catch (error) {
-    logger.error('Failed to delete device:', error);
-  }
-  finally {
-    set(deleteLoading, false);
-  }
+function getPlatformDisplay(platform: string): PlatformDisplay {
+  return platformMapping[platform.toLowerCase()] || { label: platform };
+}
+
+const [DefinePlatformDisplay, ReusablePlatformDisplay] = createReusableTemplate<{ platform: PlatformDisplay }>();
+
+const isLoading = computed<boolean>(() => get(loading) || get(deleteLoading) || get(renameLoading));
+
+function showDeleteDialog(device: UserDevice): void {
+  set(deviceToDelete, device);
+}
+
+function showRenameDialog(device: UserDevice): void {
+  set(deviceToRename, { ...device });
 }
 </script>
 
 <template>
   <div>
+    <DefinePlatformDisplay #default="{ platform }">
+      <div class="flex items-center gap-2">
+        <RuiIcon
+          v-if="platform.icon"
+          :name="platform.icon"
+          size="20"
+        />
+        <img
+          v-else-if="platform.image"
+          :src="platform.image"
+          :alt="platform.label"
+          class="size-5 filter brightness-0"
+        />
+        <span>{{ platform.label }}</span>
+      </div>
+    </DefinePlatformDisplay>
     <div class="text-h6 mb-6">
       {{ t('account.tabs.devices') }}
     </div>
@@ -80,61 +94,54 @@ async function deleteDevice(): Promise<void> {
       :outlined="true"
       row-attr="id"
     >
+      <template #item.platform="{ row }">
+        <ReusablePlatformDisplay :platform="getPlatformDisplay(row.platform)" />
+      </template>
       <template #item.lastSeenAt="{ row }">
         {{ formatDate(row.lastSeenAt, 'MMMM DD, YYYY - HH:mm:ss') }}
       </template>
       <template #item.actions="{ row }">
-        <RuiButton
-          color="error"
-          :disabled="loading || deleteLoading"
-          @click="showDeleteConfirmation(row)"
-        >
-          <template #prepend>
-            <RuiIcon
-              name="lu-trash-2"
-              size="20"
-            />
-          </template>
-          {{ t('actions.delete') }}
-        </RuiButton>
-      </template>
-    </RuiDataTable>
-
-    <RuiDialog
-      v-model="confirmDialog"
-      max-width="500"
-    >
-      <RuiCard
-        content-class="!pt-0"
-      >
-        <template #header>
-          {{ t('account.devices.delete.title') }}
-        </template>
-        <i18n-t
-          tag="div"
-          keypath="account.devices.delete.description"
-        >
-          <template #label>
-            <strong>{{ deviceToDelete?.label }}</strong>
-          </template>
-        </i18n-t>
-        <div class="flex justify-end gap-4 pt-4">
+        <div class="flex gap-2">
           <RuiButton
             variant="text"
             color="primary"
-            @click="cancelDelete()"
+            :disabled="isLoading"
+            @click="showRenameDialog(row)"
           >
-            {{ t('actions.cancel') }}
+            <template #prepend>
+              <RuiIcon
+                name="lu-pencil"
+                size="20"
+              />
+            </template>
+            {{ t('actions.rename') }}
           </RuiButton>
           <RuiButton
             color="error"
-            :loading="deleteLoading"
-            @click="confirmDelete()"
+            variant="text"
+            :disabled="isLoading"
+            @click="showDeleteDialog(row)"
           >
+            <template #prepend>
+              <RuiIcon
+                name="lu-trash-2"
+                size="20"
+              />
+            </template>
             {{ t('actions.delete') }}
           </RuiButton>
         </div>
-      </RuiCard>
-    </RuiDialog>
+      </template>
+    </RuiDataTable>
+
+    <DeleteDeviceDialog
+      v-model="deviceToDelete"
+      v-model:loading="deleteLoading"
+    />
+
+    <RenameDeviceDialog
+      v-model="deviceToRename"
+      v-model:loading="renameLoading"
+    />
   </div>
 </template>
