@@ -1,49 +1,20 @@
+import type { GithubRelease } from '~/types/github';
 import { get, set } from '@vueuse/core';
 import { useLogger } from '~/utils/use-logger';
 
-interface Asset {
-  readonly name: string;
-
-  readonly browser_download_url: string;
-}
-
-interface GithubRelease {
-  readonly tag_name: string;
-  readonly assets: Asset[];
-}
-
 export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/releases/latest') {
-  const version = ref('');
-  const linuxUrl = ref(fallbackUrl);
-  const macOSUrl = ref(fallbackUrl);
-  const macOSArmUrl = ref(fallbackUrl);
-  const windowsUrl = ref(fallbackUrl);
+  const version = ref<string>('');
+  const linuxUrl = ref<string>(fallbackUrl);
+  const macOSUrl = ref<string>(fallbackUrl);
+  const macOSArmUrl = ref<string>(fallbackUrl);
+  const windowsUrl = ref<string>(fallbackUrl);
 
   const logger = useLogger('download');
 
-  function getUrl(assets: Asset[], filter: (asset: Asset) => boolean): string {
-    const matched = assets.filter(filter);
-    return matched.length === 0 ? fallbackUrl : matched[0].browser_download_url;
-  }
-
-  function isWindowApp(name: string): boolean {
-    return name.endsWith('.exe') && name.startsWith('rotki-win32');
-  }
-
-  function isLinuxApp(name: string): boolean {
-    return name.endsWith('.AppImage');
-  }
-
-  function isMacOsApp(name: string, arm64 = false): boolean {
-    const archMatch
-      = (arm64 && name.includes('arm64')) || (!arm64 && name.includes('x64'));
-    return archMatch && name.endsWith('.dmg');
-  }
-
-  const fetchLatestRelease = async () => {
+  const fetchLatestRelease = async (): Promise<void> => {
     try {
       const { data, refresh } = await useFetch<GithubRelease>(
-        'https://api.github.com/repos/rotki/rotki/releases/latest',
+        '/api/releases/latest',
       );
 
       if (!get(data))
@@ -52,24 +23,17 @@ export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/rel
       const latestRelease = get(data);
       if (latestRelease) {
         set(version, latestRelease.tag_name);
-        const assets: Asset[] = latestRelease.assets;
-        set(
-          macOSUrl,
-          getUrl(assets, ({ name }) => isMacOsApp(name)),
-        );
-
-        set(
-          macOSArmUrl,
-          getUrl(assets, ({ name }) => isMacOsApp(name, true)),
-        );
-        set(
-          linuxUrl,
-          getUrl(assets, ({ name }) => isLinuxApp(name)),
-        );
-        set(
-          windowsUrl,
-          getUrl(assets, ({ name }) => isWindowApp(name)),
-        );
+        // Server pre-filters to only downloadable assets (exe, AppImage, dmg)
+        for (const { name, browser_download_url: url } of latestRelease.assets) {
+          if (name.endsWith('.exe'))
+            set(windowsUrl, url);
+          else if (name.endsWith('.AppImage'))
+            set(linuxUrl, url);
+          else if (name.includes('arm64'))
+            set(macOSArmUrl, url);
+          else if (name.endsWith('.dmg'))
+            set(macOSUrl, url);
+        }
       }
     }
     catch (error) {
