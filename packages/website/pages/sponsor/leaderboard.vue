@@ -288,10 +288,11 @@ onMounted(async () => {
                   <div
                     class="text-2xl font-bold"
                     :class="[
-                      index === 0 ? 'text-yellow-400'
-                      : index === 1 ? 'text-gray-300'
-                        : index === 2 ? 'text-amber-500'
-                          : 'text-rui-text-secondary',
+                      paginationData.page === 1 && index <= 2 ? {
+                        'text-yellow-400': index === 0,
+                        'text-gray-300': index === 1,
+                        'text-amber-500': index === 2,
+                      } : 'text-rui-text-secondary',
                     ]"
                   >
                     #{{ user.rank || (index + 1 + (paginationData.page - 1) * paginationData.limit) }}
