@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaymentInfo } from '@rotki/card-payment-common/schemas/three-d-secure';
+import { get } from '@vueuse/core';
 
 interface Props {
   paymentInfo: PaymentInfo;
@@ -21,6 +22,15 @@ const billingPeriod = computed<string>(() =>
     ? t('subscription.3d_secure.payment_info.per_year')
     : t('subscription.3d_secure.payment_info.per_month'),
 );
+
+const approvalInfo = computed<Record<string, string>>(() => {
+  const { amount, finalAmount } = paymentInfo;
+  return {
+    amount,
+    immediateAmount: finalAmount,
+    period: get(billingPeriod),
+  };
+});
 </script>
 
 <template>
@@ -48,7 +58,7 @@ const billingPeriod = computed<string>(() =>
       <!-- Current charge (Grand Total) -->
       <div class="flex justify-between items-center py-4 border-y border-default">
         <span class="text-rui-text-secondary">{{ t('subscription.3d_secure.payment_info.charge_today') }}</span>
-        <span class="font-bold text-xl underline">€ {{ paymentInfo.finalAmount }}</span>
+        <span class="font-bold text-xl underline">{{ paymentInfo.finalAmount }}€</span>
       </div>
 
       <!-- Approval notice -->
@@ -56,7 +66,7 @@ const billingPeriod = computed<string>(() =>
         type="info"
         class="mt-4"
       >
-        {{ t('subscription.3d_secure.payment_info.approval_notice', { amount: paymentInfo.amount, period: billingPeriod }) }}
+        {{ t('subscription.3d_secure.payment_info.approval_notice', approvalInfo) }}
       </RuiAlert>
     </RuiCard>
   </div>
