@@ -33,6 +33,7 @@ const { addPaypalAccount, createPaypalNonce } = usePaypalApi();
 const { token, selectedPlan, btClient, submit, nextPayment, checkoutData } = useBraintree();
 const { planId } = usePlanIdParam();
 const { upgradeSubId } = useSubscriptionIdParam();
+const { referralCode } = useReferralCodeParam();
 
 const pending = computed<boolean>(() => get(status).type === 'pending');
 
@@ -178,6 +179,13 @@ async function navigateBack(): Promise<void> {
     },
   });
 }
+
+// Prefill discount code from referral code query param
+watchImmediate(referralCode, (ref) => {
+  if (ref && !get(discountCode)) {
+    set(discountCode, ref);
+  }
+});
 
 onMounted(async () => {
   try {

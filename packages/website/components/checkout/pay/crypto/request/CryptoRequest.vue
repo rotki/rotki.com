@@ -17,6 +17,7 @@ const discountInfo = ref<DiscountInfo>();
 
 const { planId } = usePlanIdParam();
 const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
+const { referralCode } = useReferralCodeParam();
 const { selectedPlan } = useSelectedPlan();
 const { prorateCryptoUpgrade } = useCryptoPaymentApi();
 
@@ -66,6 +67,13 @@ async function checkProration(): Promise<void> {
     set(prorate, quote.result);
   }
 }
+
+// Prefill discount code from referral code query param
+watchImmediate(referralCode, (ref) => {
+  if (ref && !get(discountCode)) {
+    set(discountCode, ref);
+  }
+});
 
 onMounted(async () => {
   checkProration().catch();

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ContextColorsType } from '@rotki/ui-library';
+import type { RouteLocationRaw } from 'vue-router';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '~/store';
@@ -17,12 +18,25 @@ withDefaults(
 const store = useMainStore();
 const { account } = storeToRefs(store);
 
-const allowNavigation = computed(() => {
+const { referralCode } = useReferralCodeParam();
+
+const allowNavigation = computed<boolean>(() => {
   if (!isDefined(account))
     return true;
 
   const { emailConfirmed } = get(account);
   return emailConfirmed;
+});
+
+const checkoutLink = computed<RouteLocationRaw>(() => {
+  const ref = get(referralCode);
+  if (ref) {
+    return {
+      path: '/checkout/pay',
+      query: { ref },
+    };
+  }
+  return '/checkout/pay';
 });
 
 const { t } = useI18n({ useScope: 'global' });
@@ -47,7 +61,7 @@ const { t } = useI18n({ useScope: 'global' });
     >
       <template #activator>
         <ButtonLink
-          to="/checkout/pay"
+          :to="checkoutLink"
           size="lg"
           variant="filled"
           :disabled="!allowNavigation"

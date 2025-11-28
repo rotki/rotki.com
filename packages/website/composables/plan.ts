@@ -49,6 +49,21 @@ export function useDiscountCodeParams() {
   return { discountCode };
 }
 
+type ReferralCodeParam = string | undefined;
+
+export function useReferralCodeParam() {
+  const route = useRoute();
+  const referralCode = computed<ReferralCodeParam>(() => {
+    const { ref } = route.query;
+    if (typeof ref !== 'string' || !ref)
+      return undefined;
+
+    return ref;
+  });
+
+  return { referralCode };
+}
+
 export function useSubscriptionIdParam() {
   const route = useRoute();
   const subscriptionId = computed(() => {
