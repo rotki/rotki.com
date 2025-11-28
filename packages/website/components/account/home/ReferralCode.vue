@@ -10,7 +10,9 @@ import { useReferralCode } from '~/composables/use-referral-code';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const shareUrl = 'https://rotki.com';
+const {
+  public: { baseUrl },
+} = useRuntimeConfig();
 
 interface ShareButton {
   icon?: string;
@@ -56,6 +58,14 @@ const discountAmount = computed<string>(() => {
   return `${amount}€`;
 });
 
+const shareUrl = computed<string>(() => {
+  const code = get(referralCode);
+  if (!code) {
+    return `${baseUrl}/products`;
+  }
+  return `${baseUrl}/products?ref=${encodeURIComponent(code)}`;
+});
+
 const shareMessage = computed<string>(() => {
   const code = get(referralCode);
   const discount = get(discountAmount);
@@ -68,31 +78,32 @@ const shareMessage = computed<string>(() => {
 const shareButtons = computed<ShareButton[]>(() => {
   const message = get(shareMessage);
   const subject = t('account.referral_code.email_subject');
+  const url = get(shareUrl);
 
   return [{
     name: 'Twitter',
     customIcon: TwitterIcon,
-    url: `https://x.com/intent/post?text=${encodeURIComponent(`${message} ${shareUrl}`)}`,
+    url: `https://x.com/intent/post?text=${encodeURIComponent(`${message} ${url}`)}`,
     colorClass: 'text-[#000000] dark:text-[#FFFFFF]',
   }, {
     name: 'Farcaster',
     customIcon: FarcasterIcon,
-    url: `https://farcaster.xyz/~/compose?text=${encodeURIComponent(`${message} ${shareUrl}`)}`,
+    url: `https://farcaster.xyz/~/compose?text=${encodeURIComponent(`${message} ${url}`)}`,
     colorClass: 'text-[#855DCD]',
   }, {
     name: 'Bluesky',
     customIcon: BlueskyIcon,
-    url: `https://bsky.app/intent/compose?text=${encodeURIComponent(`${message} ${shareUrl}`)}`,
+    url: `https://bsky.app/intent/compose?text=${encodeURIComponent(`${message} ${url}`)}`,
     colorClass: 'text-[#1285FE]',
   }, {
     name: 'WhatsApp',
     customIcon: WhatsAppIcon,
-    url: `https://wa.me/?text=${encodeURIComponent(`${message} ${shareUrl}`)}`,
+    url: `https://wa.me/?text=${encodeURIComponent(`${message} ${url}`)}`,
     colorClass: 'text-[#25D366]',
   }, {
     name: 'Email',
     icon: 'lu-mail',
-    url: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`${message}\n\n${shareUrl}`)}`,
+    url: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`${message}\n\n${url}`)}`,
     colorClass: 'text-rui-text-secondary',
   }];
 });
