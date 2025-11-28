@@ -36,6 +36,8 @@ const {
   },
 } = useRuntimeConfig();
 
+const { referralCode } = useReferralCodeParam();
+
 const { plan, period, type } = toRefs(props);
 
 const planType = computed<string>(() => get(type));
@@ -181,13 +183,19 @@ const ctaConfig = computed<CtaConfig>(() => {
     const periodVal = get(period);
     const isMonthly = periodVal === PricingPeriod.MONTHLY;
     const planId = isMonthly ? plan.monthlyPlan?.planId : plan.yearlyPlan?.planId;
+    const ref = get(referralCode);
+
+    const query: Record<string, string | number> = { planId: planId ?? '' };
+    if (ref) {
+      query.ref = ref;
+    }
 
     return {
       label: t('actions.get_plan', { plan: toTitleCase(plan.tierName) }),
       link: planId
         ? {
             name: ROUTES.CHECKOUT,
-            query: { planId },
+            query,
           }
         : '',
       variant: 'default' as const,

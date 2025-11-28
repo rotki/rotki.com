@@ -33,6 +33,7 @@ const store = useMainStore();
 const { authenticated } = storeToRefs(store);
 
 const { planId } = usePlanIdParam();
+const { referralCode } = useReferralCodeParam();
 
 const paymentMethods: readonly PaymentMethodItem[] = Object.freeze([{
   id: PaymentMethod.BLOCKCHAIN,
@@ -72,6 +73,7 @@ const isMethodSelected = computed<(method: PaymentMethod) => boolean>(
 const queryParams = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
   const selectedPlanId = get(planId);
+  const ref = get(referralCode);
 
   if (selectedPlanId) {
     result.planId = String(selectedPlanId);
@@ -79,6 +81,10 @@ const queryParams = computed<Record<string, string>>(() => {
 
   if (isDefined(identifier)) {
     result.id = get(identifier)!;
+  }
+
+  if (ref) {
+    result.ref = ref;
   }
 
   return result;

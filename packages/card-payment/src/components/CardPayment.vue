@@ -203,6 +203,12 @@ watch(() => cards, (newCards) => {
 });
 
 onMounted(async () => {
+  // Prefill discount code from referral code query param
+  const referralCodeParam = new URLSearchParams(window.location.search).get('ref');
+  if (referralCodeParam && !get(discountCode)) {
+    set(discountCode, referralCodeParam);
+  }
+
   await initializeBraintreeClient();
 });
 
