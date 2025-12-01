@@ -154,7 +154,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       threeDSecureInstance.on('authentication-iframe-available', iframeHandler);
 
       const options: ThreeDSecureVerifyOptions = {
-        amount: params.amount,
+        amount: params.finalAmount,
         bin: params.bin,
         challengeRequested: true,
         nonce: params.nonce,
