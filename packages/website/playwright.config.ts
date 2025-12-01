@@ -1,0 +1,51 @@
+import process from 'node:process';
+import { defineConfig, devices } from '@playwright/test';
+
+const useDev = !!process.env.DEV;
+const baseURL = 'http://localhost:3000';
+
+// Use system Chromium if PLAYWRIGHT_CHROMIUM_PATH is set (e.g., on Arch Linux)
+const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
+
+export default defineConfig({
+  testDir: './tests/e2e/specs',
+  testMatch: '**/*.spec.ts',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  timeout: 60000,
+  expect: {
+    timeout: 10000,
+  },
+  reporter: [
+    ['html', { outputFolder: 'playwright-report' }],
+    ['list'],
+  ],
+  use: {
+    baseURL,
+    trace: 'on-first-retry',
+    video: process.env.CI ? 'on-first-retry' : 'off',
+    screenshot: process.env.CI ? 'only-on-failure' : 'off',
+    viewport: { width: 1280, height: 720 },
+    ...(chromiumPath && {
+      launchOptions: {
+        executablePath: chromiumPath,
+        args: ['--headless=new'],
+      },
+    }),
+  },
+  outputDir: './tests/e2e/test-results',
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+  webServer: {
+    command: useDev ? 'pnpm dev' : 'pnpm preview',
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  },
+});

@@ -14,6 +14,7 @@ export default defineVitestConfig({
     exclude: [
       ...configDefaults.exclude,
       '.data/**',
+      'tests/e2e/**',
     ],
     globals: true,
     setupFiles: ['./tests/setup.ts'],

@@ -22,8 +22,9 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:watch": "pnpm --filter @rotki/website test:watch",
-    "cypress:open": "pnpm --filter @rotki/website cypress:open",
-    "cypress:run": "pnpm --filter @rotki/website cypress:run",
+    "test:e2e": "pnpm --filter @rotki/website test:e2e",
+    "test:e2e:dev": "pnpm --filter @rotki/website test:e2e:dev",
+    "test:e2e:ui": "pnpm --filter @rotki/website test:e2e:ui",
     "coverage": "pnpm --filter @rotki/website coverage",
     "i18n:check": "node scripts/check-i18n.mjs",
     "i18n:clean": "node scripts/check-i18n.mjs --delete",
@@ -60,7 +61,6 @@
       "unstorage": "1.17.1"
     },
     "ignoredBuiltDependencies": [
-      "cypress",
       "msw",
       "sharp"
     ],

@@ -18,12 +18,10 @@
     "typecheck": "npx nuxi typecheck",
     "test": "vitest run",
     "test:watch": "vitest --ui",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run --headless",
+    "test:e2e": "playwright test",
+    "test:e2e:dev": "DEV=true playwright test",
+    "test:e2e:ui": "DEV=true playwright test --ui",
     "coverage": "vitest run --coverage"
-  },
-  "optionalDependencies": {
-    "cypress": "15.6.0"
   },
   "dependencies": {
     "@nuxtjs/robots": "5.5.6",
@@ -55,6 +53,7 @@
     "@nuxt/test-utils": "3.19.2",
     "@nuxtjs/i18n": "10.2.0",
     "@nuxtjs/sitemap": "7.4.7",
+    "@playwright/test": "1.57.0",
     "@rotki/ui-library": "catalog:",
     "@types/braintree-web": "catalog:",
     "@types/paypal-checkout-components": "4.0.8",

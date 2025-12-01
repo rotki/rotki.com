@@ -96,10 +96,10 @@ sw.*
 *.swp
 
 # test files
-tests/e2e/videos
-tests/e2e/screenshots
-tests/**/coverage
+packages/website/tests/e2e/test-results
+packages/website/playwright-report
 .data/content
+
 planning/
 
 # Claude AI assistant cache

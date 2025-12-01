@@ -48,9 +48,7 @@ jobs:
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            ~/.cache/Cypress/
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -91,17 +89,17 @@ jobs:
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            ~/.cache/Cypress/
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies 👨🏻‍💻
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm cypress install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: packages/website
 
       - name: Run linter 👀
         run: pnpm run lint:all
@@ -116,29 +114,23 @@ jobs:
         run: cp .env.test .env
         working-directory: packages/website
 
-      - name: Run cypress tests
-        uses: cypress-io/github-action@v6
-        with:
-          start: pnpm run start
-          browser: chrome
-          wait-on: 'http://127.0.0.1:3000'
-          install: false
-          working-directory: packages/website
+      - name: Run e2e tests 🧪
+        run: pnpm run test:e2e
 
-      - name: Upload screenshots
+      - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: e2e-screenshots
-          path: tests/e2e/screenshots
+          name: playwright-report
+          path: packages/website/playwright-report/
           retention-days: 7
 
-      - name: Upload videos
+      - name: Upload test results
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
-          name: e2e-videos
-          path: tests/e2e/videos
+          name: e2e-test-results
+          path: packages/website/tests/e2e/test-results/
           retention-days: 7
 
   build-docker:
