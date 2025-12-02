@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { get } from '@vueuse/shared';
 import { useCryptoPaymentFlow } from '~/composables/use-crypto-payment-flow';
 import { useCryptoPaymentNavigation } from '~/composables/use-crypto-payment-navigation';
 import { useCryptoPaymentState } from '~/composables/use-crypto-payment-state';
@@ -28,7 +29,7 @@ const flow = useCryptoPaymentFlow(currency, navigation.usedSubscriptionId, disco
 async function handlePaymentMethodChange(): Promise<void> {
   const success = await flow.handlePaymentMethodChange();
   if (success) {
-    await navigation.navigateBack();
+    await navigation.navigateBack(get(discountCode));
   }
 }
 

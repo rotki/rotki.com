@@ -32,6 +32,7 @@ async function back(): Promise<void> {
   const query = buildQueryParams({
     planId: get(planId),
     id: get(subscriptionId),
+    ref: get(referralCode),
   });
 
   await navigateTo({

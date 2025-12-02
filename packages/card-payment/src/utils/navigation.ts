@@ -36,10 +36,22 @@ export const navigation = {
   /**
    * Navigate back to payment method selection
    * @param planId - The plan ID
+   * @param referralCode - The referral code
    */
-  goToPaymentMethod(planId: string | undefined): void {
+  goToPaymentMethod(planId: string | undefined, referralCode?: string | null): void {
     const href = routes.paymentMethod;
-    window.location.href = planId ? `${href}?planId=${planId}` : href;
+    const params = new URLSearchParams();
+
+    if (planId) {
+      params.set('planId', planId);
+    }
+
+    if (referralCode) {
+      params.set('ref', referralCode);
+    }
+
+    const queryString = params.toString();
+    window.location.href = queryString ? `${href}?${queryString}` : href;
   },
 
   /**

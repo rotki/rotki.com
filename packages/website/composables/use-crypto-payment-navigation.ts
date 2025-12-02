@@ -32,24 +32,18 @@ export function useCryptoPaymentNavigation() {
   /**
    * Navigate back to the appropriate page
    */
-  const navigateBack = async (): Promise<void> => {
+  const navigateBack = async (ref?: string): Promise<void> => {
     const id = get(usedSubscriptionId);
     const routeName = id ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
     const currentPlanId = get(planId);
 
-    const query: Record<string, string> = {};
-
-    if (currentPlanId) {
-      query.planId = String(currentPlanId);
-    }
-
-    if (id) {
-      query.id = id;
-    }
-
     await navigateTo({
       name: routeName,
-      query,
+      query: buildQueryParams({
+        id,
+        planId: currentPlanId,
+        ref,
+      }),
     });
   };
 

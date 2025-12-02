@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
+import { get } from '@vueuse/core';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
 
-defineProps<{
+const props = defineProps<{
   plan: MappedPlan;
   selectedPeriod: PricingPeriod;
 }>();
@@ -14,7 +16,21 @@ const {
   },
 } = useRuntimeConfig();
 
+const { referralCode } = useReferralCodeParam();
+
 const { t } = useI18n({ useScope: 'global' });
+
+const checkoutLink = computed<RouteLocationRaw>(() => {
+  const query = buildQueryParams({
+    planId: props.plan.id,
+    ref: get(referralCode),
+  });
+
+  return {
+    name: 'checkout-pay-method',
+    query,
+  };
+});
 </script>
 
 <template>
@@ -43,12 +59,7 @@ const { t } = useI18n({ useScope: 'global' });
     class="w-full py-2 xl:text-[1rem]"
     variant="default"
     color="primary"
-    :to="{
-      name: 'checkout-pay-method',
-      query: {
-        planId: plan.id,
-      },
-    }"
+    :to="checkoutLink"
   >
     {{ t('actions.get_plan', { plan: toTitleCase(plan.name) }) }}
   </ButtonLink>

@@ -165,18 +165,14 @@ async function navigateBack(): Promise<void> {
     return;
   }
 
-  const currentPlanId = get(planId);
-
-  if (!currentPlanId) {
-    await navigateTo({ name: 'checkout-pay-method' });
-    return;
-  }
+  const query = buildQueryParams({
+    planId: get(planId),
+    ref: get(referralCode),
+  });
 
   await navigateTo({
     name: 'checkout-pay-method',
-    query: {
-      planId: String(currentPlanId),
-    },
+    query,
   });
 }
 
