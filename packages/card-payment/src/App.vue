@@ -65,6 +65,7 @@ const errorMessage = ref<string>('');
 
 const plan = ref<string>();
 const upgradeSubId = ref<string | null>(null);
+const referralCode = ref<string | null>(null);
 const planData = ref<CheckoutData | UpgradeData>();
 const selectedPlan = ref<SelectedPlan>();
 const selectedCard = ref<SavedCard>();
@@ -119,7 +120,9 @@ async function load() {
 
     const canBuy = await canBuyNewSubscription();
     const upgradeId = getUrlParam('upgradeSubId');
+    const refParam = getUrlParam('ref');
     set(upgradeSubId, upgradeId);
+    set(referralCode, refParam);
 
     if (!canBuy && !upgradeId) {
       navigation.goToSubscription();
@@ -187,7 +190,7 @@ function back(): void {
     navigation.goToSubscription();
   }
   else {
-    navigation.goToPaymentMethod(get(plan));
+    navigation.goToPaymentMethod(get(plan), get(referralCode));
   }
 }
 
@@ -207,7 +210,7 @@ onMounted(async () => {
       v-else-if="errorMessage"
       :message="errorMessage"
       button-text="Go Back"
-      @button-click="plan ? navigation.goToPaymentMethod(plan) : navigation.goToHome()"
+      @button-click="plan ? navigation.goToPaymentMethod(plan, referralCode) : navigation.goToHome()"
     />
 
     <CheckoutLayout

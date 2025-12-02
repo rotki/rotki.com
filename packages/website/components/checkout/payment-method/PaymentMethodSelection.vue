@@ -111,17 +111,14 @@ function buildNavigationUrl(routeName: string): string {
 }
 
 async function handleBack(): Promise<void> {
-  const selectedPlanId = get(planId);
-  if (!selectedPlanId) {
-    await navigateTo({ name: 'checkout-pay' });
-    return;
-  }
+  const query = buildQueryParams({
+    planId: get(planId),
+    ref: get(referralCode),
+  });
 
   await navigateTo({
     name: 'checkout-pay',
-    query: {
-      planId: String(selectedPlanId),
-    },
+    query,
   });
 }
 
