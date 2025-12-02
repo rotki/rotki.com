@@ -1,12 +1,12 @@
-import type { NftConfig, TierInfoResult, TierMetadata, TokenMetadata } from '~/composables/rotki-sponsorship/types';
-import { findTierById, normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
-import { nftCacheManager } from '~/server/features/sponsorship/cache/managers/nft-cache-manager';
-import { blockchainService } from '~/server/features/sponsorship/nft/blockchain-service';
-import { getServerNftConfig } from '~/server/features/sponsorship/nft/config';
-import { metadataProcessor } from '~/server/features/sponsorship/nft/metadata-processor';
-import { deduplicatedFetch } from '~/server/utils/request-dedup';
-import { retryWithBackoff } from '~/server/utils/retry';
-import { useLogger } from '~/utils/use-logger';
+import type { NftConfig, TierInfoResult, TierMetadata, TokenMetadata } from '#shared/features/sponsorship/types';
+import { findTierById, normalizeIpfsUrl } from '#shared/features/sponsorship/utils';
+import { useLogger } from '#shared/utils/use-logger';
+import { nftCacheManager } from '~~/server/features/sponsorship/cache/managers/nft-cache-manager';
+import { blockchainService } from '~~/server/features/sponsorship/nft/blockchain-service';
+import { getServerNftConfig } from '~~/server/features/sponsorship/nft/config';
+import { metadataProcessor } from '~~/server/features/sponsorship/nft/metadata-processor';
+import { deduplicatedFetch } from '~~/server/utils/request-dedup';
+import { retryWithBackoff } from '~~/server/utils/retry';
 
 /**
  * NFT Core Service - Handles all NFT-related blockchain interactions

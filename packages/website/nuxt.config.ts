@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import process from 'node:process';
 import rotkiTheme from '@rotki/ui-library/theme';
+import { removeNoncePlaceholders } from './app/utils/csp-utils';
 import {
   baseCSP,
   braintreeBaseCSP,
@@ -11,7 +12,6 @@ import {
   threeDSecureCSP,
   walletConnectCSP,
 } from './csp-config';
-import { removeNoncePlaceholders } from './utils/csp-utils';
 
 const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
 
@@ -69,6 +69,25 @@ const hmrPort = Number(process.env.NUXT_HMR_PORT) || 4000;
 const devCSP = createDevCSP(devPort, hmrPort);
 
 export default defineNuxtConfig({
+  // TypeScript configuration for including additional files
+  typescript: {
+    tsConfig: {
+      // Include test files that need Nuxt context (paths relative to .nuxt/)
+      include: [
+        '../tests/**/*',
+      ],
+    },
+    nodeTsConfig: {
+      // Include config files in the node context (paths relative to .nuxt/)
+      include: [
+        '../vitest.config.ts',
+        '../playwright.config.ts',
+        '../content.config.ts',
+        '../csp-config.ts',
+      ],
+    },
+  },
+
   app: {
     head: {
       htmlAttrs: {
@@ -115,11 +134,15 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: '2024-08-13',
+  compatibilityDate: '2025-01-01',
 
-  components: [{ path: '~/components', pathPrefix: false }],
+  components: false,
 
-  css: [],
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  css: ['~/assets/css/tailwind.css'],
 
   devtools: {
     enabled: process.env.NODE_ENV === 'development' && !(!!process.env.CI || !!process.env.TEST),
@@ -414,9 +437,9 @@ export default defineNuxtConfig({
   tailwindcss: {
     config: {
       content: [
-        './components/**/*.{vue,js,ts}',
-        './layouts/**/*.vue',
-        './pages/**/*.vue',
+        './app/components/**/*.{vue,js,ts}',
+        './app/layouts/**/*.vue',
+        './app/pages/**/*.vue',
       ],
       darkMode: 'class',
       mode: 'jit',

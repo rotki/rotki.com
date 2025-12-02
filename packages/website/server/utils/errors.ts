@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3';
-import { useLogger } from '~/utils/use-logger';
+import { useLogger } from '#shared/utils/use-logger';
 
 const logger = useLogger('api-errors');
 

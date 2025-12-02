@@ -1,7 +1,7 @@
-import type { GithubRelease } from '~/types/github';
-import { CACHE_TTL } from '~/server/utils/cache';
-import { getCacheService } from '~/server/utils/cache-service';
-import { useLogger } from '~/utils/use-logger';
+import type { GithubRelease } from '#shared/types/github';
+import { useLogger } from '#shared/utils/use-logger';
+import { CACHE_TTL } from '~~/server/utils/cache';
+import { getCacheService } from '~~/server/utils/cache-service';
 
 export const CACHE_KEY = 'github:releases:latest';
 

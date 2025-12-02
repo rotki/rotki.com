@@ -1,7 +1,7 @@
+import { useLogger } from '#shared/utils/use-logger';
 import { createStorage, type Storage } from 'unstorage';
 import memoryDriver from 'unstorage/drivers/memory';
 import redisDriver from 'unstorage/drivers/redis';
-import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('cache-service');
 

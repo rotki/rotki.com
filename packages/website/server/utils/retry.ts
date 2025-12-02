@@ -1,4 +1,4 @@
-import { createTimeoutPromise } from '~/utils/timeout';
+import { createTimeoutPromise } from '#shared/utils/timeout';
 
 /**
  * Smart retry logic with exponential backoff

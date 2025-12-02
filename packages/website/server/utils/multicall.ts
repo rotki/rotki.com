@@ -1,5 +1,5 @@
 import type { ethers } from 'ethers';
-import { ContractFactory } from '~/composables/rotki-sponsorship/contract';
+import { ContractFactory } from '#shared/features/sponsorship/contract';
 
 // Multicall3 contract address (same on most chains including Sepolia)
 const MULTICALL3_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
@@ -49,8 +49,8 @@ export class Multicall {
     }));
 
     // Use staticCall to ensure this is a read-only call
-    const results = await this.contract.aggregate3.staticCall(formattedCalls);
-    return results;
+    const results = await this.contract.aggregate3?.staticCall(formattedCalls);
+    return results ?? [];
   }
 
   /**
@@ -72,6 +72,12 @@ export class Multicall {
     // Decode results
     return results.map((result, index) => {
       const call = calls[index];
+      if (!call) {
+        return {
+          error: 'Call not found',
+          success: false,
+        };
+      }
       if (!result.success && !call.allowFailure) {
         return {
           error: 'Call failed',
