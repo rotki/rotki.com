@@ -19,7 +19,7 @@ const { t } = useI18n({ useScope: 'global' });
   <div
     class="grid relative"
     :style="{
-      gridTemplateColumns: `minmax(200px, 250px) repeat(${plans.length}, minmax(200px, 1fr))`,
+      gridTemplateColumns: `minmax(195px, 250px) repeat(${plans.length}, minmax(195px, 1fr))`,
     }"
   >
     <div />
@@ -37,7 +37,7 @@ const { t } = useI18n({ useScope: 'global' });
       </div>
       <div
         v-else
-        class="h-11"
+        class="h-9"
       />
       <div
         class="px-2 py-3 xl:px-3 xl:py-5 flex flex-col justify-between flex-1 bg-white rounded-t-xl"

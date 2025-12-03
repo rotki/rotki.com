@@ -87,7 +87,7 @@ onBeforeMount(() => {
       isTwoColumnLayout ? 'py-8 gap-20' : 'py-4 lg:py-8',
     ]"
   >
-    <div class="flex justify-center grow overflow-hidden">
+    <div class="flex justify-center grow overflow-hidden min-w-min">
       <RuiProgress
         v-if="!availablePlans"
         circular

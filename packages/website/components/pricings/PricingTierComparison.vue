@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
 });
 
 const { t } = useI18n({ useScope: 'global' });
-const { isLgAndUp } = useBreakpoint();
+const { isXlAndUp } = useBreakpoint();
 
 const compactView = ref<boolean>(false);
 const isYearly = computed<boolean>(() => props.selectedPeriod === PricingPeriod.YEARLY);
@@ -160,7 +160,7 @@ watch(allowCompact, (value) => {
 <template>
   <ClientOnly>
     <PricingTable
-      v-if="isLgAndUp"
+      v-if="isXlAndUp"
       :plans="plans"
       :compact="compactView"
       :selected-period="selectedPeriod"
