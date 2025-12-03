@@ -79,6 +79,7 @@ const regularPlans = computed<PlanBase[]>(() => {
         ? t('pricing.billed_annually', { price: formattedPrice })
         : t('pricing.billed_monthly'),
       type: 'regular',
+      hidden: availablePlan.isCustom || false,
       isMostPopular: availablePlan.isMostPopular || false,
     });
   });
@@ -93,6 +94,7 @@ const freeTier = computed<PlanBase>(() => ({
   displayedName: t('pricing.plans.starter_plan'),
   mainPriceDisplay: t('pricing.free'),
   type: 'free',
+  hidden: false,
   isMostPopular: false,
 }));
 
@@ -101,13 +103,14 @@ const customTier = computed<PlanBase>(() => ({
   displayedName: t('pricing.plans.custom_plan'),
   mainPriceDisplay: t('pricing.contact_us'),
   type: 'custom',
+  hidden: false,
   isMostPopular: false,
 }));
 
 const plans = computed<MappedPlan[]>(() => {
   const labels = get(featuresLabel);
   const descriptions = get(descriptionMap);
-  const allPlans = [get(freeTier), ...get(regularPlans), get(customTier)];
+  const allPlans = [get(freeTier), ...get(regularPlans).filter(x => !x.hidden), get(customTier)];
 
   return allPlans.map(plan => ({
     ...plan,

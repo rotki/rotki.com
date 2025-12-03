@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const AvailablePlanSchema = z.object({
   isMostPopular: z.boolean().default(false),
+  isCustom: z.boolean().default(false),
   monthlyPlan: z.object({
     planId: z.number(),
     price: z.string(),
