@@ -1,6 +1,6 @@
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { server } from '~/tests/mocks/server';
+import { server } from '~~/tests/mocks/server';
 
 mockNuxtImport('useRuntimeConfig', () => () => {
   const { BACKEND_URL } = import.meta.env;

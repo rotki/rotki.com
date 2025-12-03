@@ -1,12 +1,12 @@
 import process from 'node:process';
-import { SPONSORSHIP_TIERS } from '~/composables/rotki-sponsorship/types';
-import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
-import { imageCacheManager } from '~/server/features/sponsorship/cache/managers/image-cache-manager';
-import { imageCoreService } from '~/server/features/sponsorship/images/core';
-import { nftCoreService } from '~/server/features/sponsorship/nft/core';
-import { CACHE_TTL } from '~/server/utils/cache';
-import { retryWithBackoff } from '~/server/utils/retry';
-import { useLogger } from '~/utils/use-logger';
+import { SPONSORSHIP_TIERS } from '#shared/features/sponsorship/types';
+import { normalizeIpfsUrl } from '#shared/features/sponsorship/utils';
+import { useLogger } from '#shared/utils/use-logger';
+import { imageCacheManager } from '~~/server/features/sponsorship/cache/managers/image-cache-manager';
+import { imageCoreService } from '~~/server/features/sponsorship/images/core';
+import { nftCoreService } from '~~/server/features/sponsorship/nft/core';
+import { CACHE_TTL } from '~~/server/utils/cache';
+import { retryWithBackoff } from '~~/server/utils/retry';
 
 const CACHE_FRESHNESS = {
   IMAGE_STALE_THRESHOLD: 24 * 60 * 60 * 1000, // 24 hours

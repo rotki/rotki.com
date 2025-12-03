@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
-import { imageCacheManager } from '~/server/features/sponsorship/cache/managers/image-cache-manager';
-import { useLogger } from '~/utils/use-logger';
+import { useLogger } from '#shared/utils/use-logger';
+import { imageCacheManager } from '~~/server/features/sponsorship/cache/managers/image-cache-manager';
 
 const logger = useLogger('image-streaming');
 

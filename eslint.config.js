@@ -27,9 +27,9 @@ export default rotki({
     'packages/website/vue-shims.d.ts',
     'packages/website/modules/**/*.ts',
     'packages/website/server/**/*.ts',
-    'packages/website/middleware/**/*.ts',
-    'packages/website/plugins/**/*.ts',
-    'packages/website/types/recaptcha.d.ts',
+    'packages/website/app/middleware/**/*.ts',
+    'packages/website/app/plugins/**/*.ts',
+    'packages/website/app/types/recaptcha.d.ts',
   ],
   rules: {
     'import/no-default-export': 'off',
@@ -43,7 +43,7 @@ export default rotki({
   },
 }, {
   files: [
-    'packages/website/utils/**/*',
+    'packages/website/app/utils/**/*',
   ],
   rules: {
     'node/prefer-global/process': 'off',
@@ -56,5 +56,6 @@ export default rotki({
     '**/.output/**',
     '**/coverage/**',
     '**/playwright-report/**',
+    '**/test-results/**',
   ],
 });

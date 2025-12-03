@@ -1,9 +1,9 @@
-import type { NftConfig } from '~/composables/rotki-sponsorship/types';
-import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
-import { ContractFactory } from '~/composables/rotki-sponsorship/contract';
-import { getRpcManager, type RpcManager } from '~/composables/rotki-sponsorship/rpc-checker';
-import { Multicall } from '~/server/utils/multicall';
-import { useLogger } from '~/utils/use-logger';
+import type { NftConfig } from '#shared/features/sponsorship/types';
+import { CHAIN_CONFIGS } from '#shared/features/sponsorship/constants';
+import { ContractFactory } from '#shared/features/sponsorship/contract';
+import { getRpcManager, type RpcManager } from '#shared/features/sponsorship/rpc-checker';
+import { useLogger } from '#shared/utils/use-logger';
+import { Multicall } from '~~/server/utils/multicall';
 
 /**
  * BlockchainService - Handles all blockchain interactions
@@ -38,12 +38,13 @@ export class BlockchainService {
         { args: [], method: 'currentReleaseId' },
       ]);
 
+      const firstResult = releaseIdResults[0];
       // Check if multicall failed and fallback to direct call
-      if (!releaseIdResults[0].success || releaseIdResults[0].value === undefined) {
+      if (!firstResult?.success || firstResult.value === undefined) {
         this.logger.warn('Multicall failed for currentReleaseId, falling back to direct call');
 
         try {
-          const releaseId = Number(await contract.currentReleaseId());
+          const releaseId = Number(await contract.currentReleaseId?.());
           this.logger.debug(`Retrieved release ID (via fallback): ${releaseId}`);
           return releaseId;
         }
@@ -52,7 +53,7 @@ export class BlockchainService {
         }
       }
 
-      const releaseId = Number(releaseIdResults[0].value);
+      const releaseId = Number(firstResult.value);
       this.logger.debug(`Retrieved release ID: ${releaseId}`);
       return releaseId;
     });
@@ -88,10 +89,10 @@ export class BlockchainService {
 
         try {
           // Fallback to individual contract calls
-          const owner = await contract.ownerOf(tokenId);
-          const releaseId = Number(await contract.tokenReleaseId(tokenId));
-          const tierId = Number(await contract.tokenTierId(tokenId));
-          const metadataURI = await contract.tokenURI(tokenId);
+          const owner = await contract.ownerOf?.(tokenId);
+          const releaseId = Number(await contract.tokenReleaseId?.(tokenId));
+          const tierId = Number(await contract.tokenTierId?.(tokenId));
+          const metadataURI = await contract.tokenURI?.(tokenId);
 
           this.logger.debug(`Token ${tokenId} basic data (via fallback):`, {
             metadataURI,
@@ -113,16 +114,21 @@ export class BlockchainService {
         }
       }
 
+      const ownerResult = firstBatchResults[0];
+      const releaseIdResult = firstBatchResults[1];
+      const tierIdResult = firstBatchResults[2];
+      const metadataURIResult = firstBatchResults[3];
+
       // Check if token exists
-      if (!firstBatchResults[0].success) {
+      if (!ownerResult?.success) {
         this.logger.warn(`Token ${tokenId} does not exist`);
         return null;
       }
 
-      const owner = firstBatchResults[0].value;
-      const releaseId = Number(firstBatchResults[1].value);
-      const tierId = Number(firstBatchResults[2].value);
-      const metadataURI = firstBatchResults[3].value;
+      const owner = ownerResult.value;
+      const releaseId = Number(releaseIdResult?.value);
+      const tierId = Number(tierIdResult?.value);
+      const metadataURI = metadataURIResult?.value;
 
       this.logger.debug(`Token ${tokenId} basic data:`, {
         metadataURI,
@@ -160,13 +166,16 @@ export class BlockchainService {
         { args: [releaseId, tierId], method: 'getTierInfo' },
       ]);
 
+      const tierResult = tierResults[0];
       // Check if multicall returned empty result and fallback to individual call
-      if (!tierResults[0].success || !tierResults[0].value) {
+      if (!tierResult?.success || !tierResult.value) {
         this.logger.warn(`Multicall failed for tier ${tierId}, release ${releaseId}, falling back to individual call`);
 
         try {
           // Fallback to individual contract call
-          const tierInfo = await contract.getTierInfo(releaseId, tierId);
+          const tierInfo = await contract.getTierInfo?.(releaseId, tierId);
+          if (!tierInfo)
+            return null;
           const [maxSupply, currentSupply, metadataURI] = tierInfo;
 
           return {
@@ -181,7 +190,7 @@ export class BlockchainService {
         }
       }
 
-      const [maxSupply, currentSupply, metadataURI] = tierResults[0].value;
+      const [maxSupply, currentSupply, metadataURI] = tierResult.value;
 
       return {
         currentSupply: Number(currentSupply),
@@ -232,7 +241,9 @@ export class BlockchainService {
 
         for (const tierId of tierIds) {
           try {
-            const tierInfo = await contract.getTierInfo(releaseId, tierId);
+            const tierInfo = await contract.getTierInfo?.(releaseId, tierId);
+            if (!tierInfo)
+              continue;
             const [maxSupply, currentSupply, metadataURI] = tierInfo;
 
             this.logger.debug(`Tier ${tierId} (via fallback): currentSupply=${Number(currentSupply)}, maxSupply=${Number(maxSupply)}`);
@@ -261,12 +272,16 @@ export class BlockchainService {
 
       for (const [index, result] of tierResults.entries()) {
         const tierId = tierIds[index];
+        if (tierId === undefined)
+          continue;
 
         if (!result.success || !result.value) {
           // Try individual call for this specific tier
           try {
             this.logger.debug(`Tier ${tierId} failed in multicall, trying individual call`);
-            const tierInfo = await contract.getTierInfo(releaseId, tierId);
+            const tierInfo = await contract.getTierInfo?.(releaseId, tierId);
+            if (!tierInfo)
+              continue;
             const [maxSupply, currentSupply, metadataURI] = tierInfo;
 
             results[tierId] = {
