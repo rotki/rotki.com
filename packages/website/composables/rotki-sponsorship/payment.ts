@@ -291,7 +291,7 @@ export function useRotkiSponsorshipPayment() {
           const stored = get(storedNftIds);
 
           // Check if this NFT ID is already stored for this address
-          if (!stored.some(nft => nft.id === numericId && nft.address.toLowerCase() === currentAddress)) {
+          if (stored && !stored.some(nft => nft.id === numericId && nft.address.toLowerCase() === currentAddress)) {
             set(storedNftIds, [...stored, {
               address: currentAddress,
               id: numericId,
@@ -348,7 +348,7 @@ export function useRotkiSponsorshipPayment() {
     if (!currentAddress)
       return [];
 
-    return get(storedNftIds)
+    return (get(storedNftIds) ?? [])
       .filter(nft => nft.address.toLowerCase() === currentAddress.toLowerCase());
   });
 

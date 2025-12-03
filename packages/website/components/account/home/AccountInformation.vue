@@ -153,7 +153,7 @@ function updateRemainingTime(): boolean {
   const now = Math.round(Date.now() / 1000);
   const endTime = get(waitUntilTime);
 
-  if (endTime > now) {
+  if (endTime && endTime > now) {
     set(remainingTime, endTime - now);
     return true;
   }

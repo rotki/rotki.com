@@ -59,7 +59,7 @@ watch(discountInfo, (info) => {
   }
 });
 
-watchImmediate(model, (model) => {
+watchImmediate(model, (model: string) => {
   set(value, model);
 });
 
