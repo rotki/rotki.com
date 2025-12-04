@@ -64,6 +64,9 @@ const tabs = [
         :alt="t('pricing.max_saved_annually', { months: maxSavedAnnually })"
         class="w-14 mt-3"
         src="/img/pricing-arrow.svg"
+        width="56"
+        height="56"
+        loading="lazy"
       />
       {{ t('pricing.max_saved_annually', { months: maxSavedAnnually }) }}
     </div>

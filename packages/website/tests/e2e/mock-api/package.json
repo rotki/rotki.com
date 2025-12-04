@@ -1,0 +1,12 @@
+{
+  "name": "e2e-mock-api",
+  "private": true,
+  "scripts": {
+    "dev": "nitro dev --port 9999",
+    "build": "nitro build",
+    "start": "node .output/server/index.mjs"
+  },
+  "devDependencies": {
+    "nitropack": "^2.11.12"
+  }
+}

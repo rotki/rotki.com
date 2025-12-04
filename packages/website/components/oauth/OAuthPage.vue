@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { OAuthMode } from '~/types/oauth';
+import CopyButton from '~/components/common/CopyButton.vue';
 
 interface Props {
   title: string;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import { get } from '@vueuse/shared';
+import { get, isDefined } from '@vueuse/shared';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { formatDate } from '~/utils/date';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
@@ -71,6 +72,7 @@ const { t } = useI18n({ useScope: 'global' });
             <i18n-t
               v-if="!isPending"
               keypath="account.subscriptions.cancellation.subscription_status.normal"
+              scope="global"
             >
               <template #start_date>
                 <strong>
@@ -85,6 +87,7 @@ const { t } = useI18n({ useScope: 'global' });
             </i18n-t>
             <i18n-t
               v-else
+              scope="global"
               keypath="account.subscriptions.cancellation.subscription_status.pending"
             >
               <template #start_date>

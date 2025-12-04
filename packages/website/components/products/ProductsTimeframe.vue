@@ -4,11 +4,15 @@ const { t } = useI18n({ useScope: 'global' });
 const features = [
   {
     img: '/img/products/timeframe.webp',
+    width: 616,
+    height: 280,
     title: t('products.features.timeframe.title'),
     description: t('products.features.timeframe.description'),
   },
   {
     img: '/img/products/data_sync.webp',
+    width: 616,
+    height: 234,
     title: t('products.features.data_synchronization.title'),
     description: t('products.features.data_synchronization.description'),
   },
@@ -28,10 +32,14 @@ const features = [
         ]"
       >
         <div class="flex-1 flex justify-center">
-          <img
+          <NuxtImg
             class="h-full w-full md:w-auto"
             :src="feature.img"
             :alt="feature.title"
+            :width="feature.width"
+            :height="feature.height"
+            format="webp"
+            loading="lazy"
           />
         </div>
         <div class="flex flex-col gap-4 flex-1">

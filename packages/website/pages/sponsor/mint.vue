@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import MintBenefitsInfo from '~/components/sponsor/MintBenefitsInfo.vue';
+import MintButton from '~/components/sponsor/MintButton.vue';
+import MintCurrencySelection from '~/components/sponsor/MintCurrencySelection.vue';
+import MintNftImage from '~/components/sponsor/MintNftImage.vue';
+import MintSuccessDialog from '~/components/sponsor/MintSuccessDialog.vue';
+import MintTierSelection from '~/components/sponsor/MintTierSelection.vue';
 import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
-import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
+import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-payment';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { useLogger } from '~/utils/use-logger';
@@ -372,10 +380,16 @@ onBeforeMount(async () => {
         class="w-40"
         alt="sponsorship page unavailable"
         src="/img/maintenance.svg"
+        width="160"
+        height="120"
+        loading="lazy"
       />
 
       <div class="text-rui-text-secondary whitespace-break-spaces">
-        <i18n-t keypath="sponsor.sponsor_page.error.unavailable">
+        <i18n-t
+          keypath="sponsor.sponsor_page.error.unavailable"
+          scope="global"
+        >
           <template #email>
             <ButtonLink
               inline

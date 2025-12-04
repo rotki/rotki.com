@@ -22,6 +22,8 @@ const copyright = `© Rotki Solutions GmbH 2018-${year}.`;
               src="/img/logo-small.svg"
               :alt="t('logo.alt')"
               class="h-10"
+              width="40"
+              height="40"
             />
           </NuxtLink>
 

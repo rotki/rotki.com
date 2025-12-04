@@ -31,8 +31,8 @@ export class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = new Multicall(provider);
+      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = await Multicall.create(provider);
 
       const releaseIdResults = await multicall.callSameContract(contract, [
         { args: [], method: 'currentReleaseId' },
@@ -70,8 +70,8 @@ export class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = new Multicall(provider);
+      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = await Multicall.create(provider);
 
       // Check if token exists and get basic data
       const firstBatchResults = await multicall.callSameContract(contract, [
@@ -151,8 +151,8 @@ export class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = new Multicall(provider);
+      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = await Multicall.create(provider);
 
       this.logger.debug(`Fetching tier info for tier ${tierId}, release ${releaseId} via from ${config.CONTRACT_ADDRESS}`);
 
@@ -206,8 +206,8 @@ export class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = new Multicall(provider);
+      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = await Multicall.create(provider);
 
       // Batch all getTierInfo calls
       const tierInfoCalls = tierIds.map(tierId => ({

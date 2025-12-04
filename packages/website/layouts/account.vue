@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
 import { commonAttrs, noIndex } from '~/utils/metadata';
@@ -25,6 +26,7 @@ useHead({
 });
 
 const { t } = useI18n({ useScope: 'global' });
+useAutoLogout();
 
 const tabModelValue = ref<string>();
 

@@ -1,12 +1,22 @@
 <script lang="ts" setup>
 import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { CryptoUpgradeProrate } from '~/types';
-import { get, set } from '@vueuse/core';
+import { get, isDefined, set } from '@vueuse/core';
+import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
+import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
+import OrderSummaryCard from '~/components/checkout/common/OrderSummaryCard.vue';
+import AcceptRefundPolicy from '~/components/checkout/pay/AcceptRefundPolicy.vue';
+import CryptoPaymentInfo from '~/components/checkout/pay/crypto/payment/CryptoPaymentInfo.vue';
+import CryptoAssetSelector from '~/components/checkout/pay/crypto/request/CryptoAssetSelector.vue';
+import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
+import { usePlanIdParam, useReferralCodeParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
+import { useSelectedPlan } from '~/composables/checkout/use-selected-plan';
+import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { buildQueryParams } from '~/utils/query';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const acceptRefundPolicy = ref<boolean>(false);
+const isRefundPolicyAccepted = ref<boolean>(false);
 const processing = ref<boolean>(false);
 
 const currency = ref<string>('');
@@ -21,7 +31,7 @@ const { referralCode } = useReferralCodeParam();
 const { selectedPlan } = useSelectedPlan();
 const { prorateCryptoUpgrade } = useCryptoPaymentApi();
 
-const valid = computed<boolean>(() => get(acceptRefundPolicy) && !!get(currency));
+const valid = computed<boolean>(() => get(isRefundPolicyAccepted) && !!get(currency));
 
 async function back(): Promise<void> {
   if (isDefined(upgradeSubId)) {
@@ -120,7 +130,7 @@ onMounted(async () => {
     </div>
 
     <AcceptRefundPolicy
-      v-model="acceptRefundPolicy"
+      v-model="isRefundPolicyAccepted"
       class="mt-6 max-w-[27.5rem] mx-auto w-full"
       :disabled="processing"
     />

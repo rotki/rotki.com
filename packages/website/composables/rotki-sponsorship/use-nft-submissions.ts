@@ -1,7 +1,8 @@
 import { set } from '@vueuse/shared';
-import { useSiweAuth } from '~/composables/siwe-auth';
+import { useSiweAuth } from '~/composables/rotki-sponsorship/use-siwe-auth';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { type NftSubmission, NftSubmissions } from '~/types/sponsor';
+import { useLogger } from '~/utils/use-logger';
 
 export function useNftSubmissions() {
   const submissions = ref<NftSubmissions>([]);

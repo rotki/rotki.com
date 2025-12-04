@@ -4,7 +4,9 @@ import { get, set } from '@vueuse/core';
 import ErrorState from '~/components/checkout/3d-secure/ErrorState.vue';
 import InvalidParamsState from '~/components/checkout/3d-secure/InvalidParamsState.vue';
 import LoadingState from '~/components/checkout/3d-secure/LoadingState.vue';
-import { useThreeDSecure } from '~/composables/use-three-d-secure';
+import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
+import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
+import { useThreeDSecure } from '~/composables/checkout/use-three-d-secure';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

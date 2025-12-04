@@ -16,11 +16,13 @@ const error = ref(false);
     >
       {{ name[0] }}
     </div>
-    <img
+    <NuxtImg
       v-if="iconUrl"
       class="w-full h-full"
       :class="{ hidden: pending || error }"
       :src="iconUrl"
+      width="24"
+      height="24"
       @loadstart="pending = true"
       @load="pending = false"
       @error="

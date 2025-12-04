@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import AppLogo from '~/components/common/AppLogo.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import FooterIconLinks from '~/components/footer/FooterIconLinks.vue';
+import FooterNavigation from '~/components/footer/FooterNavigation.vue';
+
 withDefaults(
   defineProps<{
     landing?: boolean;

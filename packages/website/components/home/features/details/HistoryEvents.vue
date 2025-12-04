@@ -28,10 +28,14 @@ const features = [
 <template>
   <div class="flex flex-col sm:flex-row items-center gap-10 md:gap-20">
     <div class="flex-1">
-      <img
+      <NuxtImg
         class="rounded-xl overflow-hidden"
         :alt="t('home.history_events.title')"
         src="/img/history_events.webp"
+        format="webp"
+        loading="lazy"
+        width="654"
+        height="523"
       />
     </div>
     <div class="flex flex-1 flex-col gap-2">

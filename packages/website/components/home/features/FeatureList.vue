@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import AppDashboard from '~/components/home/features/details/AppDashboard.vue';
+import EvmProtocols from '~/components/home/features/details/EvmProtocols.vue';
+import HistoryEvents from '~/components/home/features/details/HistoryEvents.vue';
+import ProfitLossReport from '~/components/home/features/details/ProfitLossReport.vue';
+import SupportedExchangeDetails from '~/components/home/features/details/SupportedExchangeDetails.vue';
+
 const model = ref(0);
 
 const { t } = useI18n({ useScope: 'global' });
@@ -68,6 +74,7 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
         <i18n-t
           class="text-h4 mb-10"
           tag="h4"
+          scope="global"
           keypath="home.rotki_offer"
         >
           <span class="text-rui-primary">rotki</span>
@@ -89,16 +96,16 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
         <RuiTabItem eager>
           <AppDashboard />
         </RuiTabItem>
-        <RuiTabItem eager>
+        <RuiTabItem>
           <SupportedExchangeDetails />
         </RuiTabItem>
-        <RuiTabItem eager>
+        <RuiTabItem>
           <HistoryEvents />
         </RuiTabItem>
-        <RuiTabItem eager>
+        <RuiTabItem>
           <EvmProtocols />
         </RuiTabItem>
-        <RuiTabItem eager>
+        <RuiTabItem>
           <ProfitLossReport />
         </RuiTabItem>
       </RuiTabItems>

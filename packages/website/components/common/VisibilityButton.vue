@@ -1,28 +1,28 @@
 <script lang="ts" setup>
+import { get, set } from '@vueuse/core';
+import InfoTooltip from '~/components/common/InfoTooltip.vue';
+import VisibilityIcon from '~/components/icons/VisibilityIcon.vue';
+
+const modelValue = defineModel<boolean>({ default: false });
+
 const props = withDefaults(
   defineProps<{
-    modelValue?: boolean;
     disabled?: boolean;
     showTooltipText?: string;
     hideTooltipText?: string;
   }>(),
   {
     disabled: false,
-    modelValue: false,
     showTooltipText: 'Show',
     hideTooltipText: 'Hide',
   },
 );
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void;
-}>();
-
-function toggle() {
+function toggle(): void {
   if (props.disabled)
     return;
 
-  emit('update:modelValue', !props.modelValue);
+  set(modelValue, !get(modelValue));
 }
 </script>
 

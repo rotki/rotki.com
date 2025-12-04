@@ -2,9 +2,11 @@
 import type { PriceBreakdown, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, isDefined, set } from '@vueuse/core';
 import { computed } from 'vue';
+import ChangePlanDialog from '~/components/checkout/plan/ChangePlanDialog.vue';
 import { useTiersStore } from '~/store/tiers';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
+import { logger } from '~/utils/use-logger';
 
 interface VatOverview { vat: string; basePrice: string }
 

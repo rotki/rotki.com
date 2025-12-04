@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useCountries } from '~/composables/use-countries';
+
 const modelValue = defineModel<string>({ required: true });
 
 withDefaults(

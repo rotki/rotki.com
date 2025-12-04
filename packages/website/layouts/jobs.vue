@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import PageFooter from '~/components/footer/PageFooter.vue';
 import Default from '~/layouts/default.vue';
 
 const { t } = useI18n({ useScope: 'global' });

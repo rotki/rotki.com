@@ -1,33 +1,29 @@
 <script lang="ts" setup>
 import type { Swiper } from 'swiper/types';
-import { get } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import 'swiper/css';
 
-const props = withDefaults(
+const swiper = defineModel<Swiper>('swiper');
+
+withDefaults(
   defineProps<{
     activeIndex: number;
     pages: number;
-    swiper?: Swiper;
     arrowButtons?: boolean;
   }>(),
   {
-    swiper: undefined,
     arrowButtons: false,
   },
 );
 
-const emit = defineEmits<{ (e: 'update:swiper', value: Swiper): void }>();
-
-const { swiper } = toRefs(props);
-
-function onNavigate(index: number) {
+function onNavigate(index: number): void {
   const s = get(swiper);
 
   if (!s)
     return;
 
   s.slideTo(index - 1);
-  emit('update:swiper', s);
+  set(swiper, s);
 }
 </script>
 

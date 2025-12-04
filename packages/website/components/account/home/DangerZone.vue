@@ -2,7 +2,8 @@
 import type { ActionResult } from '~/types/common';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { useAccountApi } from '~/composables/use-account-api';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import { useAccountApi } from '~/composables/account/use-account-api';
 import { useMainStore } from '~/store';
 
 const confirm = ref(false);

@@ -3,14 +3,17 @@ import type { TestimonialsLocalCollectionItem, TestimonialsRemoteCollectionItem 
 import type { Swiper, SwiperOptions } from 'swiper/types';
 import { get, set } from '@vueuse/core';
 import { SwiperSlide } from 'swiper/vue';
+import Carousel from '~/components/common/carousel/Carousel.vue';
+import CarouselControls from '~/components/common/carousel/CarouselControls.vue';
+import Testimonial from '~/components/home/testimonials/Testimonial.vue';
 
 defineProps<{
   testimonials: TestimonialsLocalCollectionItem[] | TestimonialsRemoteCollectionItem[];
 }>();
 
-const swiper = ref<Swiper>();
-const pages = ref(get(swiper)?.snapGrid.length ?? 1);
-const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
+const swiperInstance = ref<Swiper>();
+const pages = ref(get(swiperInstance)?.snapGrid.length ?? 1);
+const activeIndex = ref((get(swiperInstance)?.activeIndex ?? 0) + 1);
 const breakpoints: Record<number, SwiperOptions> = {
   // when window width is >= 320px
   320: {
@@ -40,7 +43,7 @@ const breakpoints: Record<number, SwiperOptions> = {
 };
 
 function onSwiperUpdate(s: Swiper) {
-  set(swiper, s);
+  set(swiperInstance, s);
   set(activeIndex, s.activeIndex + 1);
   set(pages, s.snapGrid.length);
 }
@@ -73,8 +76,8 @@ function onSwiperUpdate(s: Swiper) {
       </SwiperSlide>
     </Carousel>
     <CarouselControls
-      v-if="swiper"
-      v-model:swiper="swiper"
+      v-if="swiperInstance"
+      v-model:swiper="swiperInstance"
       :class="$style.stepper"
       :active-index="activeIndex"
       :pages="pages"

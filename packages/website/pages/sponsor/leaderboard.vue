@@ -2,10 +2,13 @@
 import { get, set } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
+import AddressAvatar from '~/components/common/AddressAvatar.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { formatDate } from '~/utils/date';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { getTierMedal } from '~/utils/nft-tiers';
+import { truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
 interface PaginationData {
@@ -311,11 +314,17 @@ onMounted(async () => {
               :alt="t('sponsor.leaderboard.empty_state')"
               class="w-24 mx-auto"
               src="/img/no_data_placeholder.svg"
+              width="96"
+              height="96"
+              loading="lazy"
             />
             <p class="text-rui-text-secondary text">
               {{ t('sponsor.leaderboard.empty_state') }}
             </p>
-            <i18n-t keypath="sponsor.leaderboard.be_the_first">
+            <i18n-t
+              keypath="sponsor.leaderboard.be_the_first"
+              scope="global"
+            >
               <template #mint>
                 <ButtonLink
                   color="primary"

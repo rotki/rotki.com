@@ -37,8 +37,16 @@ export interface DecodedResult<T = any> {
 export class Multicall {
   private contract: ethers.Contract;
 
-  constructor(provider: ethers.Provider) {
-    this.contract = ContractFactory.createContract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+  private constructor(contract: ethers.Contract) {
+    this.contract = contract;
+  }
+
+  /**
+   * Async factory method to create a Multicall instance
+   */
+  static async create(provider: ethers.Provider): Promise<Multicall> {
+    const contract = await ContractFactory.createContract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+    return new Multicall(contract);
   }
 
   async aggregate(calls: Call[]): Promise<Result[]> {

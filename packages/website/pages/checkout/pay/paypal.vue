@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PaypalPage from '~/components/checkout/pay/PaypalPage.vue';
+import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

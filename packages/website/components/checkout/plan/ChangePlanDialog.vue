@@ -2,9 +2,12 @@
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set, toRefs } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
+import { usePlanIdParam } from '~/composables/checkout/use-plan-params';
 import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
+import { logger } from '~/utils/use-logger';
 
 const props = withDefaults(defineProps<{
   visible: boolean;
@@ -12,16 +15,14 @@ const props = withDefaults(defineProps<{
 }>(), {
   warning: false,
 });
-
 const emit = defineEmits<{
   cancel: [];
   select: [plan: SelectedPlan];
 }>();
-
+const { planId } = usePlanIdParam();
 const { visible, warning } = toRefs(props);
 
 const { t } = useI18n({ useScope: 'global' });
-const { planId } = usePlanIdParam();
 
 const tiersStore = useTiersStore();
 const { getPlanDetailsFromId } = tiersStore;

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import AppLogo from '~/components/common/AppLogo.vue';
+import NavigationMenu from '~/components/common/NavigationMenu.vue';
 import { useMainStore } from '~/store';
 
 const { t } = useI18n({ useScope: 'global' });

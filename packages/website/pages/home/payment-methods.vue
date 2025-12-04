@@ -7,8 +7,8 @@ import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCa
 import AccountPaymentCard from '~/components/account/home/payment-methods/PaymentCard.vue';
 import PaymentCardSkeleton from '~/components/account/home/payment-methods/PaymentCardSkeleton.vue';
 import ThreeDSecureModal, { type ThreeDSecureVerificationData } from '~/components/account/home/payment-methods/ThreeDSecureModal.vue';
-import { usePaymentCards } from '~/composables/use-payment-cards';
-import { useUserSubscriptions } from '~/composables/use-user-subscriptions';
+import { usePaymentCards } from '~/composables/checkout/use-payment-cards';
+import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 

@@ -4,9 +4,14 @@ import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/paym
 import type { PaymentStep } from '~/types';
 import { getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
-import { paypalCheckout } from 'braintree-web';
-import { usePaypalApi } from '~/composables/use-paypal-api';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import OrderSummaryCard from '~/components/checkout/common/OrderSummaryCard.vue';
+import AcceptRefundPolicy from '~/components/checkout/pay/AcceptRefundPolicy.vue';
+import { useBraintree } from '~/composables/checkout/use-braintree';
+import { usePaypalApi } from '~/composables/checkout/use-paypal-api';
+import { usePlanIdParam, useReferralCodeParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
 import { assert } from '~/utils/assert';
+import { buildQueryParams } from '~/utils/query';
 import { useLogger } from '~/utils/use-logger';
 
 interface ErrorMessage {
@@ -106,6 +111,7 @@ async function initializePayPal(): Promise<void> {
       paypalActions?.enable();
   });
 
+  const paypalCheckout = await import('braintree-web/paypal-checkout');
   const btPayPalCheckout = await paypalCheckout.create({
     client,
   });

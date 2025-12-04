@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useApiKeys } from '~/composables/use-api-keys';
+import CopyButton from '~/components/common/CopyButton.vue';
+import { useApiKeys } from '~/composables/account/use-api-keys';
 
 const { apiKey, apiSecret, hasApiKeys, loading, updateKeys } = useApiKeys();
 

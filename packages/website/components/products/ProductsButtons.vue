@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { ContextColorsType } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
-import { get } from '@vueuse/core';
+import { get, isDefined } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useReferralCodeParam } from '~/composables/checkout/use-plan-params';
 import { useMainStore } from '~/store';
 
 withDefaults(

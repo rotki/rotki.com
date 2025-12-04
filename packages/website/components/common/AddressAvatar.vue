@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { useBlockie } from '~/composables/use-blockie';
+import { useBlockie } from '~/composables/web3/use-blockie';
 
 interface Props {
   ensName?: string | null;
@@ -70,19 +70,23 @@ watch(ensName, () => {
     />
 
     <!-- ENS Avatar image -->
-    <img
+    <NuxtImg
       v-else-if="avatarUrl && !hasError && ensName"
       :src="avatarUrl"
       :alt="`${ensName} avatar`"
+      width="40"
+      height="40"
       class="w-full h-full object-cover"
       @error="hasError = true"
     />
 
     <!-- Fallback to blockie -->
-    <img
+    <NuxtImg
       v-else-if="blockieUrl"
       :src="blockieUrl"
       :alt="`Blockie for ${address}`"
+      width="40"
+      height="40"
       class="w-full h-full"
     />
   </div>

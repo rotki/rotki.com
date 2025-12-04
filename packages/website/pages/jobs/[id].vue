@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { get } from '@vueuse/core';
+import { get, isDefined } from '@vueuse/core';
+import JobDetail from '~/components/jobs/JobDetail.vue';
+import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const { path } = useRoute();

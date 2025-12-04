@@ -2,7 +2,8 @@
 import { get, set } from '@vueuse/core';
 import { ref } from 'vue';
 import CardForm from '~/components/account/home/payment-methods/CardForm.vue';
-import { useBraintreeClient } from '~/composables/use-braintree-client';
+import { useBraintreeClient } from '~/composables/checkout/use-braintree-client';
+import { usePaymentCards } from '~/composables/checkout/use-payment-cards';
 import { useLogger } from '~/utils/use-logger';
 
 const showDialog = defineModel<boolean>({ required: true });

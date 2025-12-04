@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ statusCode: number }>();
 
-const emit = defineEmits<{ (e: 'handle-error'): void }>();
+const emit = defineEmits<{ 'handle-error': [] }>();
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -42,6 +42,9 @@ const otherHeight = inject('otherHeight', 0);
       :class="$style.image"
       alt="rotki maintenance"
       src="/img/not-found.svg"
+      width="640"
+      height="480"
+      loading="lazy"
     />
   </div>
 </template>
