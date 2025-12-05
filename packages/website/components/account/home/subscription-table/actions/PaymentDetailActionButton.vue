@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 
 interface Props {
   actionsClasses?: string;

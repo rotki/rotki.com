@@ -2,11 +2,12 @@
 import type { Component } from 'vue';
 import { get } from '@vueuse/shared';
 import ReferralCodeSkeleton from '~/components/account/home/ReferralCodeSkeleton.vue';
+import CopyButton from '~/components/common/CopyButton.vue';
 import BlueskyIcon from '~/components/icons/BlueskyIcon.vue';
 import FarcasterIcon from '~/components/icons/FarcasterIcon.vue';
 import TwitterIcon from '~/components/icons/TwitterIcon.vue';
 import WhatsAppIcon from '~/components/icons/WhatsAppIcon.vue';
-import { useReferralCode } from '~/composables/use-referral-code';
+import { useReferralCode } from '~/composables/account/use-referral-code';
 
 const { t } = useI18n({ useScope: 'global' });
 

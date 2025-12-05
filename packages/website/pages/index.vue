@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { useDynamicMessages } from '~/composables/dynamic-message';
+import DynamicMessageDisplay from '~/components/home/DynamicMessageDisplay.vue';
+import FeatureList from '~/components/home/features/FeatureList.vue';
+import HomeBanner from '~/components/home/HomeBanner.vue';
+import PremiumFeatures from '~/components/home/PremiumFeatures.vue';
+import Testimonials from '~/components/home/testimonials/Testimonials.vue';
+import PricingSection from '~/components/pricings/PricingSection.vue';
+import { useDynamicMessages } from '~/composables/use-dynamic-messages';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const description

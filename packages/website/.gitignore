@@ -1,5 +1,7 @@
 .output
 .nuxt
+.nitro
 .data
 playwright-report
 tests/e2e/test-results
+tests/e2e/mock-api/.nitro

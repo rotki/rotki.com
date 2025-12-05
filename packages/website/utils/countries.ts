@@ -1,4 +1,4 @@
-import type { Country } from '~/composables/countries';
+import type { Country } from '~/composables/use-countries';
 
 /**
  * Get the full country name from a country code

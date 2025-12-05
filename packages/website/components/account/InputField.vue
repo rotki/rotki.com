@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { BaseErrorObject } from '~/types/common';
+import { get, set } from '@vueuse/core';
+
+const modelValue = defineModel<string>({ required: true });
 
 const props = withDefaults(
   defineProps<{
     id: string;
-    modelValue: string;
     type?: string;
     label?: string;
     hint?: string;
@@ -29,34 +31,38 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void;
-  (e: 'enter'): void;
-  (e: 'blur'): void;
+  enter: [];
+  blur: [];
 }>();
 
-const inputField = ref<HTMLInputElement | null>(null);
+const inputField = ref<HTMLInputElement>();
 
-function input(event: Event) {
+function input(event: Event): void {
   const target = event.target;
   if (target)
-    emit('update:modelValue', (target as HTMLInputElement).value ?? '');
+    set(modelValue, (target as HTMLInputElement).value ?? '');
 }
-const value = toRef(props, 'modelValue');
-const lastMessage = ref('');
+
+const lastMessage = ref<string>('');
 watch(toRef(props, 'errorMessages'), (value) => {
-  if (value.length > 0 && lastMessage.value !== (value[0] as any).$message) {
-    inputField.value?.focus();
-    lastMessage.value = (value[0] as any).$message;
+  if (value.length > 0 && get(lastMessage) !== (value[0] as any).$message) {
+    get(inputField)?.focus();
+    set(lastMessage, (value[0] as any).$message);
   }
 });
 
-const isEmpty = computed(() => {
-  const currentValue = value.value;
+const isEmpty = computed<boolean>(() => {
+  const currentValue = get(modelValue);
   return !currentValue || currentValue.trim().length === 0;
 });
 
-const blur = () => emit('blur');
-const enter = () => emit('enter');
+function blur(): void {
+  emit('blur');
+}
+
+function enter(): void {
+  emit('enter');
+}
 </script>
 
 <template>
@@ -88,7 +94,7 @@ const enter = () => emit('enter');
             :placeholder="placeholder"
             :readonly="readonly"
             :type="type"
-            :value="value"
+            :value="modelValue"
             :autocomplete="autocomplete"
             @blur="blur()"
             @input="input($event)"

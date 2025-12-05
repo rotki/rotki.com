@@ -4,21 +4,29 @@ const { t } = useI18n({ useScope: 'global' });
 const data = [
   {
     img: '/img/products/history_limits.webp',
+    width: 616,
+    height: 234,
     title: t('products.features.limits.history_view.title'),
     description: t('products.features.limits.history_view.description'),
   },
   {
     img: '/img/products/ethereum_validators_limits.webp',
+    width: 616,
+    height: 234,
     title: t('products.features.limits.validators.title'),
     description: t('products.features.limits.validators.description'),
   },
   {
     img: '/img/products/pnl_report_events_limits.webp',
+    width: 616,
+    height: 234,
     title: t('products.features.limits.profit_loss_report.title'),
     description: t('products.features.limits.profit_loss_report.description'),
   },
   {
     img: '/img/products/user_notes_limits.webp',
+    width: 616,
+    height: 234,
     title: t('products.features.limits.user_notes.title'),
     description: t('products.features.limits.user_notes.description'),
   },
@@ -42,10 +50,14 @@ const data = [
           :key="item.title"
           class="flex flex-col gap-8"
         >
-          <img
+          <NuxtImg
             :src="item.img"
             :alt="item.title"
-            class="rounded-xl border border border-rui-grey-400"
+            :width="item.width"
+            :height="item.height"
+            format="webp"
+            loading="lazy"
+            class="rounded-xl border border-rui-grey-400"
           />
           <div class="flex flex-col gap-6">
             <h4 class="text-h5 xl:text-h4 font-bold">

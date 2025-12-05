@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { NftSubmission } from '~/types/sponsor';
 import { get, set } from '@vueuse/shared';
+import NftSubmissionForm from '~/components/sponsor/NftSubmissionForm.vue';
+import NftSubmissionsList from '~/components/sponsor/NftSubmissionsList.vue';
 import SponsorWalletConnectionCard from '~/components/sponsor/SponsorWalletConnectionCard.vue';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
+import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 
 definePageMeta({
   layout: 'sponsor',

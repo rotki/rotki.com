@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';
 
 const store = useMainStore();

@@ -3,7 +3,8 @@ import type { ActionResult } from '~/types/common';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
-import { useAccountApi } from '~/composables/use-account-api';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import { useAccountApi } from '~/composables/account/use-account-api';
 import { toMessages } from '~/utils/validation';
 
 const loading = ref(false);

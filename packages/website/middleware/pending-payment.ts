@@ -2,7 +2,8 @@ import { isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { getPricingPeriod } from '~/components/pricings/utils';
-import { useFetchUserSubscriptions } from '~/composables/use-fetch-user-subscriptions';
+import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
+import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
 import { useMainStore } from '~/store';
 import { PricingPeriod } from '~/types/tiers';
 

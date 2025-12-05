@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import ProductsButtons from '~/components/products/ProductsButtons.vue';
+
 const { t } = useI18n({ useScope: 'global' });
 </script>
 

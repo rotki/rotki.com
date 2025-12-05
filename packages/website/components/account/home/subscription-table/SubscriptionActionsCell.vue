@@ -12,6 +12,9 @@ import RenewActionButton from '~/components/account/home/subscription-table/acti
 import ResumeActionButton from '~/components/account/home/subscription-table/actions/ResumeActionButton.vue';
 import UpgradeActionButton from '~/components/account/home/subscription-table/actions/UpgradeActionButton.vue';
 import { getPendingPaymentLink } from '~/components/account/home/subscription-table/config';
+import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
+import { useSubscriptionActions } from '~/composables/subscription/use-subscription-actions';
+import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
 import {
   type CryptoPaymentState,
   type OperationState,
@@ -97,7 +100,6 @@ const upgradePlanId = ref<number>();
 
 const { hasAction, displayActions } = useSubscriptionActions();
 const { checkCryptoUpgradePayment } = useCryptoPaymentApi();
-
 const { isCryptoPaymentPending, shouldShowPaymentDetail, getBlockExplorerLink, pendingPaymentCurrency } = useSubscriptionCryptoPayment({
   renewableSubscriptions: computed<UserSubscription[]>(() =>
     isCryptoPendingOrRenewal(props.subscription) ? [props.subscription] : [],

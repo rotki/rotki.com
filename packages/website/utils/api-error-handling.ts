@@ -7,6 +7,13 @@ import { FetchError } from 'ofetch';
 import { PaymentError } from '~/types/codes';
 
 /**
+ * Check if error is a 401 Unauthorized response
+ */
+export function isUnauthorizedError(error: unknown): boolean {
+  return error instanceof FetchError && error.statusCode === 401;
+}
+
+/**
  * Extract error message from various error types
  */
 export function getErrorMessage(error: any): string {

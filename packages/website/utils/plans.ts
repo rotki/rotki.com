@@ -1,6 +1,7 @@
 import type { ComposerTranslation } from 'vue-i18n';
+import { toTitleCase } from '~/utils/text';
 
-export function getPlanName(t: ComposerTranslation, months: number) {
+export function getPlanName(t: ComposerTranslation, months: number): string {
   if (months === 1)
     return t(`home.plans.names.monthly`);
   else if (months === 12)

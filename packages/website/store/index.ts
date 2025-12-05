@@ -3,11 +3,12 @@ import type { LoginCredentials } from '~/types/login';
 import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { acceptHMRUpdate, defineStore } from 'pinia';
-import { useAccountApi } from '~/composables/use-account-api';
+import { useAccountApi } from '~/composables/account/use-account-api';
+import { useAuthApi } from '~/composables/account/use-auth-api';
+import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
-import { useAuthApi } from '~/composables/use-auth-api';
-import { useFetchUserSubscriptions } from '~/composables/use-fetch-user-subscriptions';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { isUnauthorizedError } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_TIMEOUT = 3600000;
@@ -62,7 +63,9 @@ export const useMainStore = defineStore('main', () => {
       set(pendingSubscriptionId, pendingSubscription?.id);
     }
     catch (error) {
-      logger.error('Failed to update canBuy status:', error);
+      if (!isUnauthorizedError(error)) {
+        logger.error('Failed to update canBuy status:', error);
+      }
       // Default to true on error to not block users
       set(canBuy, true);
       set(pendingSubscriptionId, undefined);

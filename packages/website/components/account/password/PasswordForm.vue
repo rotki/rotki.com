@@ -4,6 +4,7 @@ import { email, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useRecaptcha } from '~/composables/use-recaptcha';
 import { useLogger } from '~/utils/use-logger';
 
 const emailAddress = ref('');

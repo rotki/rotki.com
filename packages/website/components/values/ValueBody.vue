@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import ValueBodyItem from '~/components/values/ValueBodyItem.vue';
+
 const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center">
-    <img
+    <NuxtImg
       src="/img/scenery.webp"
       alt="Rotki values"
+      format="webp"
+      loading="lazy"
+      width="1500"
+      height="500"
     />
   </div>
   <div class="py-10 md:py-20 bg-rui-primary/[0.04]">

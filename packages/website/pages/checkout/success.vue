@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { navigateTo } from '#app';
+import PageContainer from '~/components/common/PageContainer.vue';
+import PageContent from '~/components/common/PageContent.vue';
+import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

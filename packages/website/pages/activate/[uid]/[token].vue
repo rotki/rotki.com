@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AccountActivate from '~/components/account/activation/AccountActivate.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

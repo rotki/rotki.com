@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PasswordReset from '~/components/account/password/PasswordReset.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

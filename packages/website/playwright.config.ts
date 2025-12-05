@@ -1,8 +1,9 @@
 import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 
-const useDev = !!process.env.DEV;
-const baseURL = 'http://localhost:3000';
+const port = process.env.PORT || '48123';
+const mockApiPort = '9999';
+const baseURL = process.env.BASE_URL || `http://localhost:${port}`;
 
 // Use system Chromium if PLAYWRIGHT_CHROMIUM_PATH is set (e.g., on Arch Linux)
 const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
@@ -42,13 +43,27 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: useDev ? 'pnpm dev' : 'pnpm preview',
-    env: {
-      TEST: 'true', // Disable Vue DevTools during e2e tests
+  webServer: [
+    // Mock API server - starts first
+    {
+      command: 'pnpm --filter e2e-mock-api dev',
+      url: `http://localhost:${mockApiPort}/webapi/2/available-tiers`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 60000,
     },
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+    // Main Nuxt app - uses mock API server as backend
+    {
+      command: 'pnpm dev',
+      env: {
+        NUXT_PORT: port,
+        PORT: port,
+        TEST: 'true',
+        // Point API calls to the mock server
+        NUXT_PUBLIC_BASE_URL: `http://localhost:${mockApiPort}`,
+      },
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+    },
+  ],
 });

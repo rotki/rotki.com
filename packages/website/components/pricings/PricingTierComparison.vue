@@ -2,9 +2,13 @@
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import type { FeatureDescriptionMap, FeatureValue, MappedPlan, PlanBase } from '~/components/pricings/type';
 import { get, set } from '@vueuse/shared';
+import PricingTable from '~/components/pricings/PricingTable.vue';
+import PricingTabs from '~/components/pricings/PricingTabs.vue';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
+import { useFreePlanFeatures } from '~/composables/checkout/use-free-plan-features';
 import { TIER_NAMES } from '~/types/pricing';
 import { type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
+import { formatCurrency, toTitleCase } from '~/utils/text';
 
 const props = withDefaults(defineProps<{
   availablePlans?: AvailablePlans;
@@ -88,7 +92,6 @@ const regularPlans = computed<PlanBase[]>(() => {
 });
 
 const freePlanFeatures = useFreePlanFeatures();
-
 const freeTier = computed<PlanBase>(() => ({
   name: TIER_NAMES.FREE,
   displayedName: t('pricing.plans.starter_plan'),

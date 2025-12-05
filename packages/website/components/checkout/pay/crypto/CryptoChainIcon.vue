@@ -52,6 +52,8 @@ const chainName = computed<string>(() => {
       class="w-full h-full"
       :class="{ hidden: pending || error }"
       :src="`/img/chains/${chainName}.svg`"
+      width="24"
+      height="24"
       @loadstart="pending = true"
       @load="pending = false"
       @error="

@@ -1,30 +1,25 @@
 <script setup lang="ts">
+import { get } from '@vueuse/core';
+
+const modelValue = defineModel<boolean>({ required: true });
+
 withDefaults(
   defineProps<{
     id?: string;
-    modelValue: boolean;
   }>(),
   {
     id: '',
   },
 );
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void;
-}>();
-
-function update(checked: boolean) {
-  emit('update:modelValue', checked);
-}
 </script>
 
 <template>
   <div :class="$style.checkbox">
     <input
       :id="id"
-      :modelValue="modelValue"
+      :checked="modelValue"
       type="checkbox"
-      @click="update(!modelValue)"
+      @click="modelValue = !get(modelValue)"
     />
     <label
       :class="$style.label"

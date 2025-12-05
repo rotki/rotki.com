@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import Confetti from '~/components/common/Confetti.vue';
 import { findTierByKey } from '~/composables/rotki-sponsorship/utils';
 import { getTierClasses } from '~/utils/nft-tiers';
 

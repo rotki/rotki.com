@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import ButtonLink from '~/components/common/ButtonLink.vue';
+
 const emit = defineEmits<{
-  (e: 'next'): void;
+  next: [];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });

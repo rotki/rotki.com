@@ -14,7 +14,12 @@ import SubscriptionActionsCell from '~/components/account/home/subscription-tabl
 import SubscriptionBillingSection from '~/components/account/home/SubscriptionBillingSection.vue';
 import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
 import SubscriptionInfoField from '~/components/account/home/SubscriptionInfoField.vue';
-import { useSubscriptionOperations } from '~/composables/use-subscription-operations';
+import { useSubscriptionActions } from '~/composables/subscription/use-subscription-actions';
+import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
+import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
+import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
+import { useSubscriptionPlanInfo } from '~/composables/subscription/use-subscription-plan-info';
+import { useSubscriptionStatus } from '~/composables/subscription/use-subscription-status';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { useTiersStore } from '~/store/tiers';
 import { formatDate } from '~/utils/date';

@@ -1,12 +1,19 @@
 <script lang="ts" setup>
 import type { RuiIcons } from '@rotki/ui-library';
-import { get, set } from '@vueuse/core';
+import { get, isDefined, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
+import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
+import PaymentMethodItem from '~/components/checkout/payment-method/PaymentMethodItem.vue';
+import { usePlanIdParam, useReferralCodeParam } from '~/composables/checkout/use-plan-params';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
-import { assert } from '~/utils/assert';
 
-interface PaymentMethodItem {
+import { assert } from '~/utils/assert';
+import { navigateToWithCSPSupport } from '~/utils/navigation';
+import { buildQueryParams } from '~/utils/query';
+
+interface PaymentMethodEntry {
   id: PaymentMethod;
   label: string;
   icon: RuiIcons;
@@ -21,7 +28,8 @@ interface RouteMap {
 const props = defineProps<{
   identifier?: string;
 }>();
-
+const { planId } = usePlanIdParam();
+const { referralCode } = useReferralCodeParam();
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
 
@@ -32,10 +40,7 @@ const processing = ref<boolean>(false);
 const store = useMainStore();
 const { authenticated } = storeToRefs(store);
 
-const { planId } = usePlanIdParam();
-const { referralCode } = useReferralCodeParam();
-
-const paymentMethods: readonly PaymentMethodItem[] = Object.freeze([{
+const paymentMethods: readonly PaymentMethodEntry[] = Object.freeze([{
   id: PaymentMethod.BLOCKCHAIN,
   label: 'Blockchain',
   icon: 'lu-blockchain' as RuiIcons,
@@ -62,7 +67,7 @@ const routeMap: RouteMap = {
   'checkout-pay-request-crypto': '/checkout/pay/request-crypto',
 };
 
-const selectedPaymentMethod = computed<PaymentMethodItem | undefined>(() =>
+const selectedPaymentMethod = computed<PaymentMethodEntry | undefined>(() =>
   paymentMethods.find(({ id }) => get(selectedMethod) === id),
 );
 

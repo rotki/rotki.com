@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { DownloadItem } from '~/types/download';
 import { get } from '@vueuse/core';
-import { useAppDownload } from '~/composables/download';
+import DownloadDocs from '~/components/download/DownloadDocs.vue';
+import DownloadHeading from '~/components/download/DownloadHeading.vue';
+import DownloadPreview from '~/components/download/DownloadPreview.vue';
+import { useAppDownload } from '~/composables/use-app-download';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 useHead({

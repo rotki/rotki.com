@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
+import PageFooter from '~/components/footer/PageFooter.vue';
+import PageHeader from '~/components/header/PageHeader.vue';
 
 const headerRef = ref<HTMLDivElement>();
 const footerRef = ref<HTMLDivElement>();
@@ -11,6 +13,10 @@ const otherHeight = computed<number>(
   () => get(topHeight) + get(bottomHeight) || 219,
 );
 
+const bodyStyle = computed<{ minHeight: string }>(() => ({
+  minHeight: `calc(100vh - ${get(otherHeight)}px)`,
+}));
+
 provide('otherHeight', otherHeight);
 </script>
 
@@ -18,7 +24,10 @@ provide('otherHeight', otherHeight);
   <div ref="headerRef">
     <PageHeader />
   </div>
-  <div :class="$style.body">
+  <div
+    class="flex flex-col"
+    :style="bodyStyle"
+  >
     <slot />
   </div>
   <div ref="footerRef">
@@ -27,10 +36,3 @@ provide('otherHeight', otherHeight);
     </slot>
   </div>
 </template>
-
-<style lang="scss" module>
-.body {
-  min-height: calc(100vh - v-bind(otherHeight) * 1px);
-  @apply flex flex-col;
-}
-</style>

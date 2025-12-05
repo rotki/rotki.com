@@ -6,18 +6,18 @@ import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { toMessages } from '~/utils/validation';
 
+const modelValue = defineModel<SignupCustomerInformationPayload>({ required: true });
+
 const props = defineProps<{
-  modelValue: SignupCustomerInformationPayload;
   externalResults: ValidationErrors;
 }>();
 
 const emit = defineEmits<{
-  (e: 'back'): void;
-  (e: 'next'): void;
-  (e: 'update:model-value', newValue: SignupCustomerInformationPayload): void;
+  back: [];
+  next: [];
 }>();
 
-const { modelValue, externalResults } = toRefs(props);
+const { externalResults } = toRefs(props);
 
 const rules = {
   firstName: { required },
@@ -43,8 +43,8 @@ watch(
   { immediate: true },
 );
 
-function updateValue(field: string, value: any) {
-  emit('update:model-value', {
+function updateValue(field: string, value: any): void {
+  set(modelValue, {
     ...get(modelValue),
     [field]: value,
   });

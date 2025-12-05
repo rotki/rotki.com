@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/core';
+import TextParagraph from '~/components/common/TextParagraph.vue';
 import JobDescription from '~/components/jobs/JobDescription.vue';
+import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 type JobsCollectionItem = JobsLocalCollectionItem | JobsRemoteCollectionItem;

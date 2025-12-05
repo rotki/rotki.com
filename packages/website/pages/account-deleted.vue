@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AccountDeletedPage from '~/components/account/delete/AccountDeletedPage.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 useHead({

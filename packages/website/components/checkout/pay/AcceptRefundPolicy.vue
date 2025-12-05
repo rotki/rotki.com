@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ButtonLink from '~/components/common/ButtonLink.vue';
+
 const modelValue = defineModel<boolean>({ required: true });
 
 defineProps<{ disabled?: boolean }>();

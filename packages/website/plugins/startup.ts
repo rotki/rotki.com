@@ -1,6 +1,7 @@
 import { get } from '@vueuse/core';
 import { useSessionIdCookie } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
+import { useLogger } from '~/utils/use-logger';
 
 export default defineNuxtPlugin(async () => {
   const { name } = useRoute();

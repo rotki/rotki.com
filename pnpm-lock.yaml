@@ -384,6 +384,12 @@ importers:
         specifier: 'catalog:'
         version: 3.1.5(typescript@5.9.3)
 
+  packages/website/tests/e2e/mock-api:
+    devDependencies:
+      nitropack:
+        specifier: ^2.11.12
+        version: 2.12.9(@netlify/blobs@9.1.2)(better-sqlite3@12.5.0)(idb-keyval@6.2.2)(rolldown@1.0.0-beta.53)
+
 packages:
 
   '@adraffy/ens-normalize@1.10.1':

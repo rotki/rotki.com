@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { JobsLocalCollectionItem, JobsRemoteCollectionItem, MinimarkTree } from '@nuxt/content';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { assert } from '~/utils/assert';
 
 const props = defineProps<{
   data: JobsLocalCollectionItem | JobsRemoteCollectionItem;

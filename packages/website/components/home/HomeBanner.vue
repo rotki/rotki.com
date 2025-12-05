@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
+import AppShowcaseSlider from '~/components/common/AppShowcaseSlider.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 
 const { t } = useI18n({ useScope: 'global' });
 

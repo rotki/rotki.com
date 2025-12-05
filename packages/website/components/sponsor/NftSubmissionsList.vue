@@ -2,6 +2,7 @@
 import type { NftSubmission } from '~/types/sponsor';
 import NftSubmissionItem from '~/components/sponsor/NftSubmissionItem.vue';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
+import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useLogger } from '~/utils/use-logger';
 
 const props = defineProps<{

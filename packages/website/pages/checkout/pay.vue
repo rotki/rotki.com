@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { useTiersStore } from '~/store/tiers';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 

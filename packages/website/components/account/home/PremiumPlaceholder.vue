@@ -2,6 +2,7 @@
 import type { PremiumTierInfo, PremiumTierInfoDescription } from '~/types/tiers';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import AppLogo from '~/components/common/AppLogo.vue';
 import { useTiersStore } from '~/store/tiers';
 
 const { t } = useI18n({ useScope: 'global' });

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const {
@@ -56,6 +57,7 @@ const services = computed(() => [
           tag="div"
           class="text-xl md:text-xl mx-auto text-rui-text-secondary text-justify"
           keypath="accounting.intro"
+          scope="global"
         >
           <template #twitter>
             <ButtonLink
@@ -94,10 +96,14 @@ const services = computed(() => [
       </div>
 
       <div class="rounded-xl overflow-hidden shadow-xl">
-        <img
+        <NuxtImg
           src="/img/accounting.webp"
           :alt="t('accounting.title')"
           class="w-full h-auto"
+          format="webp"
+          loading="lazy"
+          width="896"
+          height="504"
         />
       </div>
     </div>
@@ -135,6 +141,7 @@ const services = computed(() => [
           tag="div"
           class="font-bold dark text-sm"
           keypath="accounting.contact.message"
+          scope="global"
         >
           <template #email>
             <ButtonLink

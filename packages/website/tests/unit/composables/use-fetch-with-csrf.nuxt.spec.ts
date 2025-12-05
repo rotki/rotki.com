@@ -1,6 +1,6 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
-import type { Country } from '~/composables/countries';
+import type { Country } from '~/composables/use-countries';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';

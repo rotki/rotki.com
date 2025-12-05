@@ -30,6 +30,7 @@ export default rotki({
     'packages/website/middleware/**/*.ts',
     'packages/website/plugins/**/*.ts',
     'packages/website/types/recaptcha.d.ts',
+    'packages/website/tests/e2e/mock-api/routes/**/*.ts',
   ],
   rules: {
     'import/no-default-export': 'off',

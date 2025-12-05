@@ -36,6 +36,9 @@ const otherHeight = inject('otherHeight', 0);
       :class="$style.image"
       alt="rotki maintenance"
       src="/img/maintenance.svg"
+      width="640"
+      height="480"
+      loading="lazy"
     />
 
     <div class="flex flex-col gap-4">

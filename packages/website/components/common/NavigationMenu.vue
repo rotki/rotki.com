@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ButtonProps } from '@rotki/ui-library';
 import { get } from '@vueuse/shared';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-sponsorship-feature';
 
 const { t } = useI18n({ useScope: 'global' });
 const { isEnabled: isSponsorshipEnabled } = useSponsorshipFeature();

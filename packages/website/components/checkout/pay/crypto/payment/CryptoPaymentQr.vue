@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
 import { get, set, useClipboard } from '@vueuse/core';
-import { parseUnits } from 'ethers';
-import { toCanvas } from 'qrcode';
 import { useLogger } from '~/utils/use-logger';
 
 const props = defineProps<{
@@ -10,6 +8,18 @@ const props = defineProps<{
   isWalletOpen: boolean;
   loading?: boolean;
 }>();
+
+// Lazy load qrcode library
+async function getToCanvas(): Promise<typeof import('qrcode').toCanvas> {
+  const { toCanvas } = await import('qrcode');
+  return toCanvas;
+}
+
+// Lazy load ethers utilities
+async function getParseUnits(): Promise<typeof import('ethers/utils').parseUnits> {
+  const { parseUnits } = await import('ethers/utils');
+  return parseUnits;
+}
 
 const { data, isWalletOpen, loading } = toRefs(props);
 
@@ -38,6 +48,8 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
   }
   else {
     const chainId = payment.chainId;
+    // Lazy load parseUnits from ethers
+    const parseUnits = await getParseUnits();
     const tokenAmount = parseUnits(finalPriceInCrypto.toString(), decimals);
 
     if (!tokenAddress)
@@ -47,6 +59,7 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
   }
 
   logger.info(qrText);
+  const toCanvas = await getToCanvas();
   await toCanvas(canvas, qrText);
   return qrText;
 }

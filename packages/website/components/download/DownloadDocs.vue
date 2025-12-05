@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import ButtonLink from '~/components/common/ButtonLink.vue';
+
 const { t } = useI18n({ useScope: 'global' });
 </script>
 

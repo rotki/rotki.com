@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import BaseDisplay from '~/components/common/status/BaseDisplay.vue';
+import AlertIcon from '~/components/icons/AlertIcon.vue';
+
 defineProps<{
   title: string;
   message: string;

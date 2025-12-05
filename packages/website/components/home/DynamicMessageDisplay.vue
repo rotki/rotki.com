@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { DashboardMessage } from '@/types/dynamic-messages';
 import { get } from '@vueuse/core';
-import { useRandomStepper } from '~/composables/random-stepper';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useRandomStepper } from '~/composables/use-random-stepper';
 
 const props = defineProps<{
   messages: DashboardMessage[];

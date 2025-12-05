@@ -190,7 +190,9 @@ export async function getAccount(): Promise<Account | undefined> {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch account:', response.status);
+      if (response.status !== 401) {
+        console.error('Failed to fetch account:', response.status);
+      }
       return undefined;
     }
 

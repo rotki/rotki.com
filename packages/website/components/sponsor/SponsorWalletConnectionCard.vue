@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
-import { useSiweAuth } from '~/composables/siwe-auth';
+import { useSiweAuth } from '~/composables/rotki-sponsorship/use-siwe-auth';
+import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useLogger } from '~/utils/use-logger';
 
 const emit = defineEmits<{
@@ -100,6 +101,8 @@ async function handleSignMessage(): Promise<void> {
             class="size-4 brightness-[75%] invert"
             alt="ethereum"
             src="/img/chains/ethereum.svg"
+            width="16"
+            height="16"
           />
         </template>
         {{ t('sponsor.submit_name.sign_to_continue') }}

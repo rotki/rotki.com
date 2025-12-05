@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ButtonLink from '~/components/common/ButtonLink.vue';
+
 const { t } = useI18n({ useScope: 'global' });
 
 interface MenuItem {

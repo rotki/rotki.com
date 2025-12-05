@@ -9,7 +9,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: 'click'): void;
+  click: [];
 }>();
 
 const { disabled } = toRefs(props);

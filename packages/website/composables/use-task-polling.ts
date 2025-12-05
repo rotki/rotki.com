@@ -1,5 +1,6 @@
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { TaskStatusResponse } from '~/types';
+import { logger } from '~/utils/use-logger';
 
 export interface UseTaskPollingOptions {
   maxAttempts?: number;

@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import ValueBody from '~/components/values/ValueBody.vue';
+import ValueContact from '~/components/values/ValueContact.vue';
+import ValueHeading from '~/components/values/ValueHeading.vue';
+import ValueVision from '~/components/values/ValueVision.vue';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 useHead({

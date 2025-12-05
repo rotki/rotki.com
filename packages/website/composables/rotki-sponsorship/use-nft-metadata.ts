@@ -1,4 +1,5 @@
 import { type SimpleTokenMetadata, TokenMetadata } from '~/composables/rotki-sponsorship/types';
+import { useLogger } from '~/utils/use-logger';
 
 export function useNftMetadata() {
   const logger = useLogger();

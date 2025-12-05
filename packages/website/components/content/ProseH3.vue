@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useHeadings } from '~/composables/use-headings';
+
 const props = withDefaults(
   defineProps<{
     id?: string;

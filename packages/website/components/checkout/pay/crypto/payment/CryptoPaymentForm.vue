@@ -4,12 +4,14 @@ import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { WatchHandle } from 'vue';
 import type { CryptoPayment } from '~/types';
 import { get, set } from '@vueuse/core';
+import OrderSummaryCard from '~/components/checkout/common/OrderSummaryCard.vue';
 import ChangeCryptoPayment from '~/components/checkout/pay/crypto/ChangeCryptoPayment.vue';
 import CryptoPaymentDetails from '~/components/checkout/pay/crypto/payment/CryptoPaymentDetails.vue';
 import CryptoPaymentQr from '~/components/checkout/pay/crypto/payment/CryptoPaymentQr.vue';
 import CryptoWalletActions from '~/components/checkout/pay/crypto/payment/CryptoWalletActions.vue';
-import { useCryptoPaymentNavigation } from '~/composables/use-crypto-payment-navigation';
-import { useCryptoPaymentState } from '~/composables/use-crypto-payment-state';
+import { useWeb3Payment } from '~/composables/checkout/use-crypto-payment';
+import { useCryptoPaymentNavigation } from '~/composables/checkout/use-crypto-payment-navigation';
+import { useCryptoPaymentState } from '~/composables/checkout/use-crypto-payment-state';
 
 const props = defineProps<{
   data: CryptoPayment;

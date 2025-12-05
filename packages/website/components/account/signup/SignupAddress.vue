@@ -4,29 +4,31 @@ import type { SignupAddressPayload } from '~/types/signup';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
+import CountrySelect from '~/components/account/CountrySelect.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import Recaptcha from '~/components/common/Recaptcha.client.vue';
+import { useRecaptcha } from '~/composables/use-recaptcha';
 import { toMessages } from '~/utils/validation';
 
+const modelValue = defineModel<SignupAddressPayload>({ required: true });
+const captchaId = defineModel<number | undefined>('captchaId');
+
 const props = defineProps<{
-  modelValue: SignupAddressPayload;
   externalResults: ValidationErrors;
-  captchaId: number | undefined;
   loading: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'back'): void;
-  (
-    e: 'finish',
+  back: [];
+  finish: [
     events: {
       recaptchaToken: string;
       onExpired: () => void;
     },
-  ): void;
-  (e: 'update:model-value', newValue: SignupAddressPayload): void;
-  (e: 'update:captcha-id', captchaId: number): void;
+  ];
 }>();
 
-const { modelValue, externalResults } = toRefs(props);
+const { externalResults } = toRefs(props);
 
 const rules = {
   address1: { required },
@@ -46,9 +48,13 @@ const rules = {
 
 const terms = ref<boolean>(false);
 
-const recaptcha = useRecaptcha();
-const { recaptchaPassed, onError, onSuccess, onExpired, recaptchaToken }
-  = recaptcha;
+const {
+  recaptchaPassed,
+  onError,
+  onSuccess,
+  onExpired,
+  recaptchaToken,
+} = useRecaptcha();
 
 const $externalResults = ref<Record<string, string[]>>({});
 
@@ -75,18 +81,18 @@ watch(
   { immediate: true },
 );
 
-function updateValue(field: string, value: any) {
-  emit('update:model-value', {
+function updateValue(field: string, value: any): void {
+  set(modelValue, {
     ...get(modelValue),
     [field]: value,
   });
 }
 
-function setCaptchaId(captchaId: number) {
-  emit('update:captcha-id', captchaId);
+function setCaptchaId(id: number): void {
+  set(captchaId, id);
 }
 
-function finish() {
+function finish(): void {
   emit('finish', {
     recaptchaToken: get(recaptchaToken),
     onExpired,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get, set } from '@vueuse/core';
-import { useCardThreeDSecure } from '~/composables/use-card-three-d-secure';
+import { useCardThreeDSecure } from '~/composables/checkout/use-card-three-d-secure';
 import { formatDate } from '~/utils/date';
 import { formatCurrency } from '~/utils/text';
 
@@ -134,6 +134,7 @@ watch(model, (isOpen) => {
               <i18n-t
                 keypath="payment_methods.three_d_secure.billing_info_schedule"
                 tag="span"
+                scope="global"
               >
                 <template #date>
                   <span class="font-medium">{{ formatDate(verificationData.subscriptionData.nextActionDate) }}</span>

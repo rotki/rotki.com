@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { UserDevice } from '~/types/account';
 import { get, set } from '@vueuse/shared';
+import { useUserDevices } from '~/composables/account/use-user-devices';
+import { logger } from '~/utils/use-logger';
 
 const modelValue = defineModel<UserDevice | undefined>({ required: true });
 const loading = defineModel<boolean>('loading', { required: true });

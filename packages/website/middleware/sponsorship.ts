@@ -1,4 +1,5 @@
 import { get } from '@vueuse/shared';
+import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-sponsorship-feature';
 
 export default defineNuxtRouteMiddleware((to) => {
   const { isEnabled } = useSponsorshipFeature();

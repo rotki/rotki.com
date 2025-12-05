@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SignupForm from '~/components/account/signup/SignupForm.vue';
 import { commonAttrs } from '~/utils/metadata';
 
 definePageMeta({

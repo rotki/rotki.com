@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { get, set } from '@vueuse/core';
+import { usePaymentCards } from '~/composables/checkout/use-payment-cards';
 import { useLogger } from '~/utils/use-logger';
 
 interface Props {
@@ -69,10 +70,12 @@ function handleCancel(): void {
         class="mt-4 p-3 bg-rui-grey-50 rounded-md flex items-center gap-3"
       >
         <div class="rounded bg-white h-8 w-12 flex items-center justify-center">
-          <img
+          <NuxtImg
             :src="card.imageUrl"
             :alt="t('common.card')"
             class="w-full h-full object-contain object-center"
+            width="48"
+            height="32"
           />
         </div>
         <div>

@@ -98,6 +98,10 @@ sw.*
 # test files
 packages/website/tests/e2e/test-results
 packages/website/playwright-report
+
+test-results
+playwright-repor
+
 .data/content
 
 planning/
@@ -106,3 +110,4 @@ planning/
 .claude/
 
 .tmp/
+

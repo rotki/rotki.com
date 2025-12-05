@@ -5,6 +5,9 @@ import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { CryptoPayment, CryptoUpgradeProrate } from '~/types';
 import { getDiscountedPrice, getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, toRefs } from '@vueuse/core';
+import DiscountCodeInput from '~/components/checkout/pay/DiscountCodeInput.vue';
+import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
+import SelectedPlanOverview from '~/components/checkout/pay/SelectedPlanOverview.vue';
 
 const discountCode = defineModel<string>('discountCode', { required: true });
 const discountInfo = defineModel<DiscountInfo | undefined>('discountInfo', { required: true });

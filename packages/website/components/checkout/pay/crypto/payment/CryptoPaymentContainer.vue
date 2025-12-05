@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/shared';
-import { useCryptoPaymentFlow } from '~/composables/use-crypto-payment-flow';
-import { useCryptoPaymentNavigation } from '~/composables/use-crypto-payment-navigation';
-import { useCryptoPaymentState } from '~/composables/use-crypto-payment-state';
+import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
+import PaymentFrame from '~/components/checkout/common/PaymentFrame.vue';
+import CryptoPaymentActions from '~/components/checkout/pay/crypto/payment/CryptoPaymentActions.vue';
+import CryptoPaymentForm from '~/components/checkout/pay/crypto/payment/CryptoPaymentForm.vue';
+import CryptoPaymentStatus from '~/components/checkout/pay/crypto/payment/CryptoPaymentStatus.vue';
+import { useCryptoPaymentFlow } from '~/composables/checkout/use-crypto-payment-flow';
+import { useCryptoPaymentNavigation } from '~/composables/checkout/use-crypto-payment-navigation';
+import { useCryptoPaymentState } from '~/composables/checkout/use-crypto-payment-state';
+import { useCurrencyParams, useDiscountCodeParams } from '~/composables/checkout/use-plan-params';
 
 const { t } = useI18n({ useScope: 'global' });
 

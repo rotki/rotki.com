@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import type { DownloadItem, DownloadItemSingle } from '~/types/download';
+import type { DownloadItemSingle, DownloadItem as DownloadItemType } from '~/types/download';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import DownloadItem from '~/components/download/DownloadItem.vue';
 
-const props = defineProps<{ version: string; links: DownloadItem[] }>();
+const props = defineProps<{ version: string; links: DownloadItemType[] }>();
 const { t } = useI18n({ useScope: 'global' });
 
 const showAll = ref(false);
@@ -97,8 +99,10 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
                     v-else-if="item.image"
                     :src="item.image"
                     :alt="item.platform"
+                    width="20"
+                    height="20"
+                    loading="lazy"
                     class="brightness-0 invert"
-                    size="20px"
                   />
                 </template>
                 {{ t('download.download_for', { platform: item.platform }) }}
@@ -145,6 +149,10 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
         <div class="flex flex-col mb-4 w-[150px]">
           <img
             src="/img/laurel.svg"
+            alt="Sponsor laurel"
+            width="150"
+            height="100"
+            loading="lazy"
             class="w-full"
           />
           <div class="text-center -mt-11 text-sm">
@@ -165,11 +173,19 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
               :class="{ 'size-20 min-w-20': sponsor.gold }"
               :src="sponsor.image"
               :alt="sponsor.name"
+              :width="sponsor.gold ? 80 : 48"
+              :height="sponsor.gold ? 80 : 48"
+              loading="lazy"
             />
             <div class="flex flex-col items-center justify-between relative w-[12rem] max-w-full mx-auto">
-              <img
+              <NuxtImg
                 v-if="sponsor.gold"
                 src="/img/ribbon.png"
+                alt="Gold sponsor ribbon"
+                format="webp"
+                width="192"
+                height="48"
+                loading="lazy"
                 class="w-full h-[125%] absolute top-0 left-0 object-fill"
               />
               <div

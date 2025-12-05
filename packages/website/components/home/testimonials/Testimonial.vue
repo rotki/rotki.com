@@ -31,16 +31,24 @@ withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefine
           :href="url"
           target="_blank"
         >
-          <img
+          <NuxtImg
             :src="avatar"
             :alt="username"
+            width="32"
+            height="32"
+            format="webp"
+            loading="lazy"
             class="object-cover"
           />
         </a>
-        <img
+        <NuxtImg
           v-else
           :src="avatar"
           :alt="username"
+          width="32"
+          height="32"
+          format="webp"
+          loading="lazy"
           class="object-cover"
         />
       </span>

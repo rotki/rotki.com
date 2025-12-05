@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import IntegrationDetails from '~/components/integration/IntegrationDetails.vue';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -32,10 +33,14 @@ definePageMeta({
         </div>
       </div>
       <div class="flex justify-center lg:justify-end">
-        <img
+        <NuxtImg
           class="max-w-[384px] overflow-hidden h-full object-contain"
           :alt="t('home.exchanges.title')"
           src="/img/exchanges.png"
+          format="webp"
+          loading="lazy"
+          width="384"
+          height="207"
         />
       </div>
     </div>

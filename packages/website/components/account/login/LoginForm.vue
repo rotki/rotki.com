@@ -2,6 +2,7 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';
 
 const username = ref<string>('');

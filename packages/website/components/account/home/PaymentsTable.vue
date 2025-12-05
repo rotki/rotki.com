@@ -7,7 +7,10 @@ import type {
 } from '@rotki/ui-library';
 import type { UserPayment } from '~/types/account';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useUserPayments } from '~/composables/account/use-user-payments';
 import { formatDate } from '~/utils/date';
+import { getPlanNameFor } from '~/utils/plans';
 import { toTitleCase } from '~/utils/text';
 
 const props = defineProps<{

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PendingActivation from '~/components/account/activation/PendingActivation.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 useHead({

@@ -1,36 +1,4 @@
-import { expect, type Page, test } from '@playwright/test';
-
-const MOCK_RELEASE_RESPONSE = {
-  tag_name: 'v1.41.1',
-  assets: [
-    {
-      name: 'rotki-darwin_arm64-v1.41.1.dmg',
-      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_arm64-v1.41.1.dmg',
-    },
-    {
-      name: 'rotki-darwin_x64-v1.41.1.dmg',
-      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_x64-v1.41.1.dmg',
-    },
-    {
-      name: 'rotki-linux_x86_64-v1.41.1.AppImage',
-      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage',
-    },
-    {
-      name: 'rotki-win32_x64-v1.41.1.exe',
-      browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-win32_x64-v1.41.1.exe',
-    },
-  ],
-};
-
-async function mockReleaseApi(page: Page): Promise<void> {
-  await page.route('**/api/releases/latest', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(MOCK_RELEASE_RESPONSE),
-    });
-  });
-}
+import { expect, test } from '@playwright/test';
 
 test.describe('homepage', () => {
   test('successfully loads', async ({ page }) => {
@@ -39,15 +7,16 @@ test.describe('homepage', () => {
   });
 
   test('checks our homepage hero buttons!', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'networkidle' });
 
     await expect(
       page.getByRole('button', { name: 'Download rotki for free' }).first(),
     ).toBeVisible();
 
+    // Wait for the pricing section to load (it's wrapped in ClientOnly)
     await expect(
       page.getByRole('button', { name: 'Start now for free' }).first(),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 30000 });
 
     await expect(
       page.getByRole('button', { name: 'Get Premium' }).first(),
@@ -57,8 +26,9 @@ test.describe('homepage', () => {
 
 test.describe('download page', () => {
   test('download page loads properly', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Start now for free' }).first().click();
+    await page.goto('/', { waitUntil: 'networkidle' });
+    // Wait for the pricing section to load (it's wrapped in ClientOnly)
+    await page.getByRole('button', { name: 'Start now for free' }).first().click({ timeout: 30000 });
 
     await expect(page).toHaveURL(/.*\/download/);
 
@@ -83,7 +53,6 @@ test.describe('download page', () => {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
-    await mockReleaseApi(page);
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
@@ -112,7 +81,6 @@ test.describe('download page', () => {
         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
-    await mockReleaseApi(page);
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
@@ -134,7 +102,6 @@ test.describe('download page', () => {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
-    await mockReleaseApi(page);
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
@@ -151,8 +118,6 @@ test.describe('download page', () => {
   });
 
   test('checks all download links!', async ({ page }) => {
-    await mockReleaseApi(page);
-
     await page.goto('/download', {
       waitUntil: 'networkidle',
     });

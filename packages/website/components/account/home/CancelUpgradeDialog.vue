@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import { get } from '@vueuse/shared';
+import { get, isDefined } from '@vueuse/shared';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 

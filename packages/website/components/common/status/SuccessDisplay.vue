@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import BaseDisplay from '~/components/common/status/BaseDisplay.vue';
+import CheckCircle from '~/components/icons/CheckCircle.vue';
+
 defineProps<{
   message: string;
   title: string;

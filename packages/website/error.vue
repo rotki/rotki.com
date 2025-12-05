@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
 import GenericError from '~/components/error/GenericError.vue';
+import NotFoundError from '~/components/error/NotFoundError.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 defineOptions({

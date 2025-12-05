@@ -1,6 +1,7 @@
 packages:
   - .
   - packages/*
+  - packages/website/tests/e2e/mock-api
 
 catalog:
   '@fontsource/roboto': 5.2.9

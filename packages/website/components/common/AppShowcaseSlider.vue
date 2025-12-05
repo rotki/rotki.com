@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import type { Swiper } from 'swiper/types';
-import { get, set } from '@vueuse/core';
+import { set } from '@vueuse/core';
 import { SwiperSlide } from 'swiper/vue';
+import Carousel from '~/components/common/carousel/Carousel.vue';
+import CarouselControls from '~/components/common/carousel/CarouselControls.vue';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-const swiper = ref<Swiper>();
-const pages = ref(get(swiper)?.snapGrid.length ?? 1);
-const activeIndex = ref((get(swiper)?.activeIndex ?? 0) + 1);
+const swiperInstance = ref<Swiper>();
+const swiperReady = ref<boolean>(false);
+const activeIndex = ref<number>(1);
 
-const images = ref([]);
+const images = ref<string[]>([]);
 
-function scanImages() {
+function scanImages(): void {
   const assetContext = import.meta.glob(
     '~/public/img/screenshots/*.(png|jpe?g|webp)',
   );
@@ -23,10 +25,24 @@ function scanImages() {
   set(images, assetPaths);
 }
 
-function onSwiperUpdate(s: Swiper) {
-  set(swiper, s);
+function onSwiperUpdate(s: Swiper): void {
+  set(swiperInstance, s);
+  set(swiperReady, true);
   set(activeIndex, s.activeIndex + 1);
-  set(pages, s.snapGrid.length);
+}
+
+/**
+ * Determines if an image should be eagerly loaded (first image is LCP element)
+ */
+function getLoadingStrategy(index: number): 'eager' | 'lazy' {
+  return index === 0 ? 'eager' : 'lazy';
+}
+
+/**
+ * Returns fetch priority for images (first image gets high priority as it's the LCP element)
+ */
+function getFetchPriority(index: number): 'high' | 'auto' {
+  return index === 0 ? 'high' : 'auto';
 }
 
 scanImages();
@@ -54,9 +70,13 @@ scanImages();
         :key="i"
         class="relative pt-[56.2%] bg-rui-grey-100"
       >
-        <img
+        <NuxtImg
           :src="image"
           alt=" "
+          format="webp"
+          :loading="getLoadingStrategy(i)"
+          :fetchpriority="getFetchPriority(i)"
+          sizes="sm:100vw md:80vw lg:900px"
           class="w-full absolute h-full top-0 left-0"
         />
       </SwiperSlide>
@@ -64,10 +84,10 @@ scanImages();
     <div class="container relative !px-0">
       <div :class="$style.controls">
         <CarouselControls
-          v-if="swiper"
-          v-model:swiper="swiper"
+          v-model:swiper="swiperInstance"
           :active-index="activeIndex"
-          :pages="pages"
+          :pages="images.length"
+          :class="{ 'pointer-events-none': !swiperReady }"
           arrow-buttons
         />
         <div :class="$style.thumbnail">

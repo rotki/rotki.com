@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PasswordLinkSend from '~/components/account/password/PasswordLinkSend.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

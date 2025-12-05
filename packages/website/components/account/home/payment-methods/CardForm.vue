@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Client } from 'braintree-web/client';
+import type { HostedFields } from 'braintree-web/hosted-fields';
 import { get, set } from '@vueuse/core';
-import { create as createHostedFields, type HostedFields } from 'braintree-web/hosted-fields';
 import { computed, onMounted, onUnmounted, reactive, ref, toRefs, watch } from 'vue';
 
 interface Props {
@@ -68,6 +68,7 @@ async function initializeHostedFields(): Promise<void> {
   set(hostedFieldsInitializing, true);
 
   try {
+    const { create: createHostedFields } = await import('braintree-web/hosted-fields');
     const fieldsInstance = await createHostedFields({
       client: get(client),
       styles: {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SponsorshipTier } from '~/composables/rotki-sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
-import { get } from '@vueuse/shared';
+import { get, isDefined } from '@vueuse/shared';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { getTierClasses, getTierMedal } from '~/utils/nft-tiers';
 
@@ -41,7 +41,10 @@ const tierLabel = computed<string | undefined>(() => get(tier)?.label);
       </span>
       <span class="uppercase font-medium mr-1">{{ t('sponsor.submit_name.tier_info', { tier: tierLabel }) }}</span>
       <span v-if="submission.releaseVersion">
-        <i18n-t keypath="sponsor.submit_name.tier_in_release">
+        <i18n-t
+          keypath="sponsor.submit_name.tier_in_release"
+          scope="global"
+        >
           <template #release>
             <span class="font-medium">{{ submission.releaseVersion }}</span>
           </template>

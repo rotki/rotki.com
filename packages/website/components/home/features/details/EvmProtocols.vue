@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { IntegrationItem } from '~/types/integrations';
 import { get } from '@vueuse/core';
-import { useIntegrationsData } from '~/composables/integrations';
+import { useIntegrationsData } from '~/composables/use-integrations-data';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -108,9 +108,12 @@ const features = [
           <div
             class="w-full h-full bg-white rounded-lg p-1 min-[400px]:p-2 flex items-center justify-center border border-rui-grey-300 aspect-square"
           >
-            <img
+            <NuxtImg
               :src="item.image"
               :alt="item.label"
+              width="48"
+              height="48"
+              loading="lazy"
               class="w-full h-full"
             />
           </div>

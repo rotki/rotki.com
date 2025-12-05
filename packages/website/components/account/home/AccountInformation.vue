@@ -2,8 +2,10 @@
 import { useVuelidate } from '@vuelidate/core';
 import { requiredUnless } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
-import { useProfileUpdate } from '~/composables/use-profile-update';
-import { useVatCheck } from '~/composables/use-vat-check';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useProfileUpdate } from '~/composables/account/use-profile-update';
+import { useVatCheck } from '~/composables/checkout/use-vat-check';
 import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
 import { toMessages } from '~/utils/validation';

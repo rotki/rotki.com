@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import PaymentMethodSelection from '~/components/checkout/payment-method/PaymentMethodSelection.vue';
+import { useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

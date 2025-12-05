@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { ContextColorsType } from '@rotki/ui-library';
-import { get } from '@vueuse/core';
+import { get, isDefined } from '@vueuse/core';
 
 const props = withDefaults(
   defineProps<{
@@ -17,7 +17,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: 'dismiss'): void;
+  dismiss: [];
 }>();
 
 const { timeout, visible } = toRefs(props);

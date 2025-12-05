@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ statusCode: number; title: string }>();
 
-const emit = defineEmits<{ (e: 'handle-error'): void }>();
+const emit = defineEmits<{ 'handle-error': [] }>();
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

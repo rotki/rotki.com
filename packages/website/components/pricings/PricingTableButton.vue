@@ -3,7 +3,11 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
 import { get } from '@vueuse/core';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
+import { useReferralCodeParam } from '~/composables/checkout/use-plan-params';
+import { buildQueryParams } from '~/utils/query';
+import { toTitleCase } from '~/utils/text';
 
 const props = defineProps<{
   plan: MappedPlan;

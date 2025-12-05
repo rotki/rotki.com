@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ProductsButtons from '~/components/products/ProductsButtons.vue';
+
 const { t } = useI18n({ useScope: 'global' });
 </script>
 
@@ -22,6 +24,9 @@ const { t } = useI18n({ useScope: 'global' });
           class="w-[400px] md:flex-1 md:max-w-[600px]"
           src="/img/products/nudge.svg"
           :alt="t('products.unlock.title')"
+          width="600"
+          height="400"
+          loading="lazy"
         />
       </div>
     </div>

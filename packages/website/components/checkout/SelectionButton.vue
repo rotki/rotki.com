@@ -9,7 +9,7 @@ withDefaults(
   },
 );
 
-const emit = defineEmits<{ (e: 'click'): void }>();
+const emit = defineEmits<{ click: [] }>();
 
 function click() {
   emit('click');

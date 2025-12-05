@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { PaymentStep } from '~/types';
 import { get, toRefs } from '@vueuse/core';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
+import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
 
 const step = defineModel<PaymentStep>('step', { required: true });
 
@@ -9,7 +12,7 @@ const props = defineProps<{
   wide?: boolean;
 }>();
 
-const emit = defineEmits<{ (e: 'clear-errors'): void }>();
+const emit = defineEmits<{ 'clear-errors': [] }>();
 
 defineSlots<{
   default: (props: {
