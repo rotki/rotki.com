@@ -10,6 +10,7 @@ import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useUserPayments } from '~/composables/account/use-user-payments';
 import { formatDate } from '~/utils/date';
+import { discountAmount } from '~/utils/money';
 import { getPlanNameFor } from '~/utils/plans';
 import { toTitleCase } from '~/utils/text';
 
@@ -56,10 +57,6 @@ const headers: DataTableColumn<UserPayment>[] = [{
   key: 'actions',
   class: 'capitalize',
 }];
-
-function discountAmount(priceBeforeDiscount: number, eurAmount: number): string {
-  return (priceBeforeDiscount - eurAmount).toFixed(2);
-}
 
 watch(() => props.pending, (pendingIs, pendingWas) => {
   if (pendingIs.length === 0 && pendingWas.length > 0) {
