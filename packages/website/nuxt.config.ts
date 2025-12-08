@@ -188,6 +188,16 @@ export default defineNuxtConfig({
           chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           entryFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           manualChunks(id) {
+            // Vite preload helper - must be in a separate small chunk that other chunks import
+            // This prevents the heavy web3-appkit from being loaded just for the preload function
+            if (id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill')) {
+              return 'vite-helpers';
+            }
+            // Rollup commonjs interop helpers (virtual module \0commonjsHelpers.js)
+            // These are shared across many chunks - keep them separate from heavy libs
+            if (id.includes('\0commonjsHelpers')) {
+              return 'commonjs-helpers';
+            }
             // Heavy libraries first - order matters to prevent Vue being pulled in
             // Web3/Wallet connection - keep @reown packages together
             if (id.includes('@reown/appkit')) {
