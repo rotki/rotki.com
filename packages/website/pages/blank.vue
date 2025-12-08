@@ -5,7 +5,3 @@
 <template>
   <div />
 </template>
-
-<style lang="scss">
-// todo: remove
-</style>

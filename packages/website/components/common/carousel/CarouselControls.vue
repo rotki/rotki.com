@@ -29,7 +29,7 @@ function onNavigate(index: number): void {
 
 <template>
   <RuiFooterStepper
-    :class="$style.controls"
+    class="w-full"
     :model-value="activeIndex"
     :pages="pages"
     :arrow-buttons="arrowButtons"
@@ -37,9 +37,3 @@ function onNavigate(index: number): void {
     @update:model-value="onNavigate($event)"
   />
 </template>
-
-<style lang="scss" module>
-.controls {
-  width: 100%;
-}
-</style>

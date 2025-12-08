@@ -15,7 +15,7 @@ withDefaults(
 
 <template>
   <NuxtLink
-    :class="$style.link"
+    class="text-rui-primary hover:text-rui-primary-darker font-medium underline"
     :href="href"
     :target="target"
     :rel="rel"
@@ -23,9 +23,3 @@ withDefaults(
     <slot />
   </NuxtLink>
 </template>
-
-<style module lang="scss">
-.link {
-  @apply text-rui-primary hover:text-rui-primary-darker font-medium underline;
-}
-</style>

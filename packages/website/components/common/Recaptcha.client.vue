@@ -78,31 +78,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="$style.wrapper">
+  <div class="mt-4">
     <div
       ref="recaptchaEl"
-      :class="$style.recaptcha"
+      class="h-20"
     />
 
     <p
       v-if="invalid"
-      :class="$style.error"
+      class="text-xs text-[#e53935] mt-2"
     >
       {{ t('recaptcha.expired_captcha') }}
     </p>
   </div>
 </template>
-
-<style lang="scss" module>
-.wrapper {
-  @apply mt-4;
-
-  .recaptcha {
-    @apply h-20;
-  }
-}
-
-.error {
-  @apply text-xs text-[#e53935] mt-2;
-}
-</style>

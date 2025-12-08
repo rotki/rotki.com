@@ -6,22 +6,27 @@ const emit = defineEmits<{ 'handle-error': [] }>();
 const { t } = useI18n({ useScope: 'global' });
 
 const otherHeight = inject('otherHeight', 0);
+
+const wrapperStyle = computed<{ minHeight: string }>(() => ({
+  minHeight: `calc(100vh - ${otherHeight}px)`,
+}));
 </script>
 
 <template>
   <div
-    :class="[$style.wrapper]"
+    class="w-full flex flex-col-reverse lg:flex-row gap-8 lg:gap-20 items-center justify-center lg:justify-between text-center lg:text-left px-2 lg:px-4 py-4"
+    :style="wrapperStyle"
   >
     <div class="flex flex-col gap-4">
       <h6 class="text-h6 text-rui-primary">
         {{ statusCode }}
       </h6>
 
-      <h3 :class="$style.heading">
+      <h3 class="text-h3 font-black text-rui-text">
         {{ t('not_found.title') }}
       </h3>
 
-      <p :class="$style.description">
+      <p class="text-black/60 text-body-1 py-2 mb-0">
         {{ t('not_found.description.line_one') }} <br />
         {{ t('not_found.description.line_two') }}
       </p>
@@ -39,7 +44,7 @@ const otherHeight = inject('otherHeight', 0);
     </div>
 
     <img
-      :class="$style.image"
+      class="w-1/3 lg:w-1/2 max-w-[40rem]"
       alt="rotki maintenance"
       src="/img/not-found.svg"
       width="640"
@@ -48,27 +53,3 @@ const otherHeight = inject('otherHeight', 0);
     />
   </div>
 </template>
-
-<style module lang="scss">
-.wrapper {
-  @apply w-full flex flex-col-reverse lg:flex-row gap-8 lg:gap-20 items-center justify-center lg:justify-between;
-  @apply text-center lg:text-left px-2 lg:px-4 py-4;
-  min-height: calc(100vh - v-bind(otherHeight) * 1px);
-}
-
-.image {
-  @apply w-1/3 lg:w-1/2 max-w-[40rem];
-}
-
-.link {
-  @apply text-rui-primary hover:text-rui-primary-darker font-bold;
-}
-
-.heading {
-  @apply text-h3 font-black text-rui-text;
-}
-
-.description {
-  @apply text-black/60 text-body-1 py-2 mb-0;
-}
-</style>

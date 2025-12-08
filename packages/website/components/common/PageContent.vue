@@ -1,11 +1,5 @@
 <template>
-  <div :class="$style.content">
+  <div class="flex-row flex flex-grow h-full w-full py-16">
     <slot />
   </div>
 </template>
-
-<style lang="scss" module>
-.content {
-  @apply flex-row flex flex-grow h-full w-full py-16;
-}
-</style>

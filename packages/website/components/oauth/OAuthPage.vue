@@ -25,12 +25,16 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 const otherHeight = inject('otherHeight', 0);
+
+const wrapperStyle = computed<{ minHeight: string }>(() => ({
+  minHeight: `calc(100vh - ${otherHeight}px)`,
+}));
 </script>
 
 <template>
   <div
-    class="container"
-    :class="[$style.wrapper]"
+    class="container w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center text-center lg:text-left py-4"
+    :style="wrapperStyle"
   >
     <div class="max-w-md w-full">
       <div class="text-center">
@@ -125,11 +129,3 @@ const otherHeight = inject('otherHeight', 0);
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.wrapper {
-  @apply w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center;
-  @apply text-center lg:text-left py-4;
-  min-height: calc(100vh - v-bind(otherHeight) * 1px);
-}
-</style>

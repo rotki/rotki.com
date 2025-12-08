@@ -1,11 +1,5 @@
 <template>
-  <div :class="$style.description">
+  <div class="text-body-1 text-rui-text-secondary">
     <slot />
   </div>
 </template>
-
-<style lang="scss" module>
-.description {
-  @apply text-body-1 text-rui-text-secondary;
-}
-</style>

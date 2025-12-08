@@ -11,8 +11,8 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div :class="$style.wrapper">
-    <div :class="$style.icon">
+  <div class="p-4 lg:p-6 bg-rui-primary/[0.04] flex flex-col gap-y-4">
+    <div class="flex items-center justify-center p-3 size-12 bg-white rounded-[0.625rem] text-rui-primary">
       <RuiIcon
         v-if="data.icon"
         :name="data.icon"
@@ -27,12 +27,12 @@ const { t } = useI18n({ useScope: 'global' });
         loading="lazy"
       />
     </div>
-    <div :class="$style.body">
+    <div class="flex items-end md:items-start justify-between md:flex-col gap-x-4 gap-y-4 flex-wrap">
       <div>
-        <p :class="$style.for">
+        <p class="text-body-1 text-rui-text-secondary">
           {{ t('download.download_for') }}
         </p>
-        <h6 :class="$style.platform">
+        <h6 class="text-h6 font-medium">
           {{ data.platform }}
         </h6>
 
@@ -110,26 +110,3 @@ const { t } = useI18n({ useScope: 'global' });
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.wrapper {
-  @apply p-4 lg:p-6 bg-rui-primary/[0.04];
-  @apply flex flex-col gap-y-4;
-
-  .icon {
-    @apply flex items-center justify-center p-3 w-12 h-12 bg-white rounded-[0.625rem] text-rui-primary;
-  }
-
-  .body {
-    @apply flex items-end md:items-start justify-between md:flex-col gap-x-4 gap-y-4 flex-wrap;
-  }
-
-  .for {
-    @apply text-body-1 text-rui-text-secondary;
-  }
-
-  .platform {
-    @apply text-h6 font-medium;
-  }
-}
-</style>

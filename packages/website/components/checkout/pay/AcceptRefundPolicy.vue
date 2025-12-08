@@ -26,8 +26,7 @@ const { t } = useI18n({ useScope: 'global' });
           to="/refund-policy"
           color="primary"
           tag="span"
-          class="underline"
-          :class="$style.link"
+          class="underline !p-0 [display:unset] [&>span]:[display:unset_!important]"
           external
           target="_blank"
         >
@@ -37,15 +36,3 @@ const { t } = useI18n({ useScope: 'global' });
     </i18n-t>
   </RuiCheckbox>
 </template>
-
-<style module lang="scss">
-.link {
-  @apply p-0 #{!important};
-
-  display: unset;
-
-  :global(> span) {
-    display: unset !important;
-  }
-}
-</style>

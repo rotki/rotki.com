@@ -14,9 +14,9 @@ withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefine
 </script>
 
 <template>
-  <div :class="$style.content">
-    <span :class="$style.thumbnails">
-      <span :class="$style.icon">
+  <div class="flex flex-col gap-6">
+    <span class="flex gap-2">
+      <span class="p-2 bg-rui-primary rounded-lg text-white">
         <RuiIcon
           name="lu-message-circle"
           size="16"
@@ -24,7 +24,7 @@ withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefine
       </span>
       <span
         v-if="avatar"
-        :class="$style.avatar"
+        class="rounded-full w-8 h-8 overflow-hidden flex items-center justify-center"
       >
         <a
           v-if="url"
@@ -55,7 +55,7 @@ withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefine
     </span>
     <ContentRenderer :value="body">
       <ContentRenderer
-        :class="$style.text"
+        class="text-rui-text font-medium text-lg min-h-[8rem] text-justify [&_p]:mb-0"
         :value="body"
         tag="span"
       />
@@ -63,46 +63,16 @@ withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefine
     <a
       v-if="url"
       :href="url"
-      :class="$style.username"
+      class="text-body-1 text-sm text-rui-text-secondary"
       target="_blank"
     >
       {{ username }}
     </a>
     <span
       v-else
-      :class="$style.username"
+      class="text-body-1 text-sm text-rui-text-secondary"
     >
       {{ username }}
     </span>
   </div>
 </template>
-
-<style lang="scss" module>
-.content {
-  @apply flex flex-col gap-6;
-
-  .thumbnails {
-    @apply flex gap-2;
-
-    .icon {
-      @apply p-2 bg-rui-primary rounded-lg text-white;
-    }
-
-    .avatar {
-      @apply rounded-full w-8 h-8 overflow-hidden flex items-center justify-center;
-    }
-  }
-
-  .text {
-    @apply text-rui-text font-medium text-lg min-h-[8rem] text-justify;
-
-    p {
-      @apply mb-0;
-    }
-  }
-
-  .username {
-    @apply text-body-1 text-sm text-rui-text-secondary;
-  }
-}
-</style>

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/core';
-import TextParagraph from '~/components/common/TextParagraph.vue';
 import JobDescription from '~/components/jobs/JobDescription.vue';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
@@ -90,8 +89,11 @@ definePageMeta({
             </div>
           </div>
         </div>
-        <div v-else>
-          <TextParagraph>{{ t('jobs.no_open_roles') }}</TextParagraph>
+        <div
+          v-else
+          class="text-rui-grey-800 text-justify mt-4 text-sm sm:text-base md:text-lg"
+        >
+          {{ t('jobs.no_open_roles') }}
         </div>
       </div>
     </div>
