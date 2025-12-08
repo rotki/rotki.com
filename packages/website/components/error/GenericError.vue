@@ -7,10 +7,10 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <h1 :class="$style.title">
+  <h1 class="block text-red-500 font-bold text-6xl">
     {{ statusCode }}
   </h1>
-  <p :class="$style.subtitle">
+  <p class="block font-light text-rui-text my-8 text-3xl">
     {{ title }}
   </p>
 
@@ -26,13 +26,3 @@ const { t } = useI18n({ useScope: 'global' });
     </RuiButton>
   </div>
 </template>
-
-<style module lang="scss">
-.title {
-  @apply block text-red-500 font-bold text-6xl;
-}
-
-.subtitle {
-  @apply block font-light text-rui-text my-8 text-3xl;
-}
-</style>

@@ -6,7 +6,6 @@ useHead({
   title: 'account deleted',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'Your account has been successfully deleted',
     },
@@ -19,8 +18,3 @@ useHead({
 <template>
   <AccountDeletedPage />
 </template>
-
-<style lang="scss">
-@use '@/assets/css/media';
-@use '@/assets/css/main';
-</style>

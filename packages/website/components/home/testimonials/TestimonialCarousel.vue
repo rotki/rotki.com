@@ -50,7 +50,7 @@ function onSwiperUpdate(s: Swiper) {
 </script>
 
 <template>
-  <div :class="$style.content">
+  <div class="flex flex-col gap-4">
     <Carousel
       :autoplay="{
         delay: 10000,
@@ -58,7 +58,7 @@ function onSwiperUpdate(s: Swiper) {
         pauseOnMouseEnter: true,
       }"
       :breakpoints="breakpoints"
-      :class="$style.slider"
+      class="mb-12"
       auto-height
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
@@ -78,23 +78,9 @@ function onSwiperUpdate(s: Swiper) {
     <CarouselControls
       v-if="swiperInstance"
       v-model:swiper="swiperInstance"
-      :class="$style.stepper"
+      class="max-w-[17.5rem]"
       :active-index="activeIndex"
       :pages="pages"
     />
   </div>
 </template>
-
-<style lang="scss" module>
-.content {
-  @apply flex flex-col gap-4;
-
-  .slider {
-    @apply mb-12;
-  }
-
-  .stepper {
-    @apply max-w-[17.5rem];
-  }
-}
-</style>

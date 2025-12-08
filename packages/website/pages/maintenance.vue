@@ -5,7 +5,6 @@ useHead({
   title: 'maintenance',
   meta: [
     {
-      key: 'description',
       name: 'description',
       content: 'rotki is currently undergoing maintenance please come back later',
     },
@@ -25,15 +24,19 @@ if (!maintenance)
   navigateTo('/');
 
 const otherHeight = inject('otherHeight', 0);
+
+const wrapperStyle = computed<{ minHeight: string }>(() => ({
+  minHeight: `calc(100vh - ${otherHeight}px)`,
+}));
 </script>
 
 <template>
   <div
-    class="container"
-    :class="[$style.wrapper]"
+    class="container w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center text-center lg:text-left py-4"
+    :style="wrapperStyle"
   >
     <img
-      :class="$style.image"
+      class="w-1/3 lg:w-1/2 max-w-[40rem]"
       alt="rotki maintenance"
       src="/img/maintenance.svg"
       width="640"
@@ -46,16 +49,16 @@ const otherHeight = inject('otherHeight', 0);
         {{ t('maintenance.title') }}
       </h6>
 
-      <h3 :class="$style.heading">
+      <h3 class="text-h3 font-black text-rui-text">
         {{ t('maintenance.heading') }}
       </h3>
 
-      <p :class="$style.description">
+      <p class="text-black/60 text-body-1 pt-2 mb-0">
         {{ t('maintenance.description.line_one') }}
         <br />
         {{ t('maintenance.description.line_two') }}
         <a
-          :class="$style.link"
+          class="text-rui-primary hover:text-rui-primary-darker font-bold"
           :href="emailMailto"
           target="_blank"
         >
@@ -65,27 +68,3 @@ const otherHeight = inject('otherHeight', 0);
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.wrapper {
-  @apply w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center;
-  @apply text-center lg:text-left py-4;
-  min-height: calc(100vh - v-bind(otherHeight) * 1px);
-}
-
-.image {
-  @apply w-1/3 lg:w-1/2 max-w-[40rem];
-}
-
-.link {
-  @apply text-rui-primary hover:text-rui-primary-darker font-bold;
-}
-
-.heading {
-  @apply text-h3 font-black text-rui-text;
-}
-
-.description {
-  @apply text-black/60 text-body-1 pt-2 mb-0;
-}
-</style>

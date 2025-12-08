@@ -30,7 +30,7 @@ watch(
 <template>
   <div class="py-4 md:py-6 border-b border-rui-grey-200">
     <div class="container">
-      <div :class="$style['mobile-header']">
+      <div class="flex justify-between items-center md:hidden">
         <NuxtLink to="/">
           <AppLogo text />
         </NuxtLink>
@@ -46,7 +46,8 @@ watch(
         </div>
       </div>
       <div
-        :class="[$style.overlay, { [$style.overlay__closed]: !menuOpened }]"
+        class="fixed w-full h-screen bg-black/[0.5] z-[10] top-0 left-0 flex justify-end items-start p-4 md:hidden"
+        :class="{ 'invisible opacity-0': !menuOpened }"
         @click="menuOpened = false"
       >
         <RuiButton icon>
@@ -56,17 +57,20 @@ watch(
           />
         </RuiButton>
       </div>
-      <div :class="[$style.wrapper, { [$style.wrapper__closed]: !menuOpened }]">
+      <div
+        class="transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4 md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap xl:justify-between xl:gap-y-0"
+        :class="menuOpened ? 'left-0' : '-left-full md:left-0'"
+      >
         <NuxtLink
           to="/"
-          :class="$style.logo"
+          class="flex w-full px-4 md:justify-center md:px-0 lg:w-auto"
         >
           <AppLogo text />
         </NuxtLink>
 
-        <NavigationMenu :class="$style.navigation" />
+        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:w-auto md:flex-row md:border-y-0" />
 
-        <div :class="$style.auth">
+        <div class="flex flex-col space-y-2 px-4 md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0">
           <NuxtLink to="/home/subscription">
             <RuiButton
               rounded
@@ -95,45 +99,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.overlay {
-  @apply fixed w-full h-screen bg-black/[0.5] z-[10] top-0 left-0 flex justify-end items-start p-4;
-  @apply md:hidden;
-
-  &__closed {
-    @apply invisible opacity-0;
-  }
-}
-
-.wrapper {
-  @apply transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4;
-  @apply md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap;
-  @apply xl:justify-between xl:gap-y-0;
-
-  &__closed {
-    @apply -left-full md:left-0;
-  }
-}
-
-.mobile-header {
-  @apply flex justify-between items-center;
-  @apply md:hidden;
-}
-
-.logo {
-  @apply flex w-full px-4;
-  @apply md:justify-center md:px-0;
-  @apply lg:w-auto;
-}
-
-.navigation {
-  @apply grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200;
-  @apply md:w-auto md:flex-row md:border-y-0;
-}
-
-.auth {
-  @apply flex flex-col space-y-2 px-4;
-  @apply md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0;
-}
-</style>

@@ -45,7 +45,7 @@ pnpm release      # Bump version and generate changelog
 
 - **Framework**: Nuxt 3.17.5 with Vue 3.5.17 and TypeScript
 - **UI Library**: @rotki/ui-library (custom component library)
-- **Styling**: TailwindCSS + SCSS
+- **Styling**: TailwindCSS (preferred) + SCSS
 - **State Management**: Pinia with composition API
 - **Content**: @nuxt/content for markdown-based content
 - **Payment**: Braintree, PayPal, and crypto payments (Ethers.js)
@@ -188,6 +188,42 @@ function getUserById(id: number) {
 async function fetchData() {
   return await $fetch('/api/data');
 }
+```
+
+#### Styling Best Practices
+
+- **Prefer Tailwind classes in templates** over `<style>` blocks with `@apply` directives
+- Use inline Tailwind classes directly on elements whenever possible
+- Only use `<style>` blocks when absolutely necessary:
+  - CSS features not available in Tailwind (e.g., `v-bind()` for dynamic CSS values)
+  - Complex animations with `@keyframes`
+  - Pseudo-elements (`::before`, `::after`) with custom content
+  - Third-party component style overrides requiring `:deep()` or `:global()`
+- Avoid CSS modules (`$style`) for simple styling that can be done with Tailwind classes
+
+```vue
+<!-- ✅ Correct - Tailwind classes in template -->
+<template>
+  <div class="flex items-center gap-4 p-4 rounded-lg bg-white shadow-md">
+    <span class="text-rui-text font-bold text-lg">Title</span>
+  </div>
+</template>
+
+<!-- ❌ Incorrect - Using style block for simple styling -->
+<template>
+  <div :class="$style.container">
+    <span :class="$style.title">Title</span>
+  </div>
+</template>
+
+<style lang="scss" module>
+.container {
+  @apply flex items-center gap-4 p-4 rounded-lg bg-white shadow-md;
+}
+.title {
+  @apply text-rui-text font-bold text-lg;
+}
+</style>
 ```
 
 #### Pinia Store Structure

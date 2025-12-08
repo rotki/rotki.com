@@ -158,13 +158,13 @@ async function handleContinue(): Promise<void> {
 </script>
 
 <template>
-  <div :class="$style.content">
+  <div class="flex flex-col w-full grow">
     <CheckoutTitle>{{ t('home.plans.tiers.step_2.title') }}</CheckoutTitle>
     <CheckoutDescription>
       {{ t('home.plans.tiers.step_2.subtitle') }}
     </CheckoutDescription>
-    <div :class="$style.wrapper">
-      <div :class="$style.methods">
+    <div class="w-full justify-center grow my-8">
+      <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
         <PaymentMethodItem
           v-for="item in paymentMethods"
           :key="item.id"
@@ -181,7 +181,7 @@ async function handleContinue(): Promise<void> {
         </PaymentMethodItem>
       </div>
     </div>
-    <div :class="$style.buttons">
+    <div class="flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto">
       <RuiButton
         :disabled="processing"
         class="w-full"
@@ -209,21 +209,3 @@ async function handleContinue(): Promise<void> {
     </div>
   </div>
 </template>
-
-<style lang="scss" module>
-.content {
-  @apply flex flex-col w-full grow;
-}
-
-.wrapper {
-  @apply w-full justify-center grow my-8;
-}
-
-.methods {
-  @apply w-full grid grid-cols-1 sm:grid-cols-2 gap-4;
-}
-
-.buttons {
-  @apply flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto;
-}
-</style>

@@ -66,3 +66,15 @@ watch(visible, (show) => {
     </div>
   </Transition>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  @apply transition-opacity duration-[400ms];
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  @apply opacity-0;
+}
+</style>

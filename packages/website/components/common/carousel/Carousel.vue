@@ -22,7 +22,7 @@ withDefaults(defineProps<SwiperOptions>(), {
     :autoplay="autoplay"
     :breakpoints="breakpoints"
     :centered-slides="centeredSlides"
-    :class="$style.swiper"
+    class="w-full"
     :coverflow-effect="coverflowEffect"
     :direction="direction"
     :effect="effect"
@@ -39,9 +39,3 @@ withDefaults(defineProps<SwiperOptions>(), {
     <slot />
   </Swiper>
 </template>
-
-<style lang="scss" module>
-.swiper {
-  width: 100%;
-}
-</style>
