@@ -2,6 +2,7 @@ import { type AvailablePlan, type AvailablePlans, type AvailablePlansResponse, A
 import { get, set } from '@vueuse/core';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
+import { logger } from '~/utils/use-logger';
 
 export const useTiersStore = defineStore('tiers', () => {
   const tiersInformation = ref<PremiumTiersInfo>([]);

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TextFieldProps } from '@rotki/ui-library/components';
+import CopyButton from '~/components/common/CopyButton.vue';
 
 type Props = TextFieldProps & {
   copyValue: string;

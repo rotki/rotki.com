@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { DownloadItem } from '~/types/download';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 
 defineProps<{
   data: DownloadItem;
@@ -20,6 +22,9 @@ const { t } = useI18n({ useScope: 'global' });
         v-else-if="data.image"
         :src="data.image"
         :alt="data.platform"
+        width="24"
+        height="24"
+        loading="lazy"
       />
     </div>
     <div :class="$style.body">

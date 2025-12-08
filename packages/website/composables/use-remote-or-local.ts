@@ -1,3 +1,5 @@
+import { logger } from '~/utils/use-logger';
+
 type Awaitable<T> = () => Promise<T>;
 
 interface UseRemoteOrLocalReturn {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/core';
-import { useIntegrationsData } from '~/composables/integrations';
+import { useIntegrationsData } from '~/composables/use-integrations-data';
 
 enum TabCategory {
   ALL = 'all',
@@ -163,10 +163,13 @@ const { isMdAndUp } = useBreakpoint();
                 <RuiTooltip :open-delay="200">
                   <template #activator>
                     <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
-                      <img
+                      <NuxtImg
                         class="w-full h-full object-contain"
                         :src="item.image"
                         :alt="item.label"
+                        width="36"
+                        height="36"
+                        loading="lazy"
                       />
                     </div>
                   </template>

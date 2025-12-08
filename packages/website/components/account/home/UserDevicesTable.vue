@@ -3,6 +3,9 @@ import type { DataTableColumn, TablePaginationData } from '@rotki/ui-library';
 import type { UserDevice } from '~/types/account';
 import { createReusableTemplate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import DeleteDeviceDialog from '~/components/account/home/DeleteDeviceDialog.vue';
+import RenameDeviceDialog from '~/components/account/home/RenameDeviceDialog.vue';
+import { useUserDevices } from '~/composables/account/use-user-devices';
 import { formatDate } from '~/utils/date';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -78,6 +81,8 @@ function showRenameDialog(device: UserDevice): void {
           :src="platform.image"
           :alt="platform.label"
           class="size-5 filter brightness-0"
+          width="20"
+          height="20"
         />
         <span>{{ platform.label }}</span>
       </div>

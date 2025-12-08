@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { NftSubmission } from '~/types/sponsor';
 import { get } from '@vueuse/shared';
-import { useSponsorshipData } from '~/composables/rotki-sponsorship';
+import NftSubmissionItemChips from '~/components/sponsor/NftSubmissionItemChips.vue';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
 import { formatDate } from '~/utils/date';
 
 defineProps<{
@@ -23,11 +24,13 @@ const currentReleaseName = computed(() => get(sponsorshipData)?.releaseName);
     <div class="flex items-start justify-between">
       <div class="flex-1">
         <NftSubmissionItemChips :submission="submission" />
-        <img
+        <NuxtImg
           v-if="submission.imageUrl"
           :src="submission.imageUrl"
           alt="Submission image"
           class="size-12 rounded object-cover mt-3 mb-2"
+          width="48"
+          height="48"
         />
         <div
           v-if="submission.displayName"

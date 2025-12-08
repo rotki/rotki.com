@@ -1,12 +1,23 @@
+import type { Contract, Provider, Signer } from 'ethers';
 import { get } from '@vueuse/shared';
-import { ethers } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
-import { useNftConfig } from './config';
 import { CHAIN_CONFIGS, ROTKI_SPONSORSHIP_ABI } from './constants';
-import { getRpcManager } from './rpc-checker';
 import { SPONSORSHIP_TIERS, type TierSupply } from './types';
+import { useNftConfig } from './use-nft-config';
 
 const logger = useLogger('rotki-sponsorship-contract');
+
+// Lazy load ethers Contract
+async function createContract(address: string, abi: any[], providerOrSigner: Provider | Signer): Promise<Contract> {
+  const { Contract } = await import('ethers/contract');
+  return new Contract(address, abi, providerOrSigner);
+}
+
+// Lazy load RPC manager
+async function lazyGetRpcManager(chainId: number, rpcUrls: readonly string[]) {
+  const { getRpcManager } = await import('./rpc-checker');
+  return getRpcManager(chainId, rpcUrls);
+}
 
 /**
  * Factory for creating contract instances with RPC fallback
@@ -19,8 +30,8 @@ export const ContractFactory = {
    * @param providerOrSigner Provider or Signer instance
    * @returns Contract instance
    */
-  createContract(address: string, abi: any[], providerOrSigner: ethers.Provider | ethers.Signer): ethers.Contract {
-    return new ethers.Contract(address, abi, providerOrSigner);
+  async createContract(address: string, abi: any[], providerOrSigner: Provider | Signer): Promise<Contract> {
+    return createContract(address, abi, providerOrSigner);
   },
 
   /**
@@ -29,8 +40,8 @@ export const ContractFactory = {
    * @param contractAddress Contract address to use
    * @returns Contract instance
    */
-  createRotkiSponsorshipContract(providerOrSigner: ethers.Provider | ethers.Signer, contractAddress: string): ethers.Contract {
-    return this.createContract(contractAddress, ROTKI_SPONSORSHIP_ABI, providerOrSigner);
+  async createRotkiSponsorshipContract(providerOrSigner: Provider | Signer, contractAddress: string): Promise<Contract> {
+    return createContract(contractAddress, ROTKI_SPONSORSHIP_ABI, providerOrSigner);
   },
 
   /**
@@ -40,14 +51,14 @@ export const ContractFactory = {
    * @returns Promise with the contract call result
    */
   async executeWithContract<T>(
-    contractCall: (contract: ethers.Contract) => Promise<T>,
-    userProvider?: ethers.Provider,
+    contractCall: (contract: Contract) => Promise<T>,
+    userProvider?: Provider,
   ): Promise<T> {
     const { CHAIN_ID, CONTRACT_ADDRESS } = useNftConfig();
 
     if (userProvider) {
       // Use provided provider (from user wallet)
-      const contract = this.createRotkiSponsorshipContract(userProvider, get(CONTRACT_ADDRESS));
+      const contract = await this.createRotkiSponsorshipContract(userProvider, get(CONTRACT_ADDRESS));
       return contractCall(contract);
     }
     else {
@@ -58,10 +69,10 @@ export const ContractFactory = {
         throw new Error(`Unsupported chain ID: ${chainId}`);
       }
 
-      const rpcManager = getRpcManager(chainId, chainConfig.rpcUrls);
+      const rpcManager = await lazyGetRpcManager(chainId, chainConfig.rpcUrls);
 
       return rpcManager.executeWithFallback(async (ethersProvider) => {
-        const contract = this.createRotkiSponsorshipContract(ethersProvider, get(CONTRACT_ADDRESS));
+        const contract = await this.createRotkiSponsorshipContract(ethersProvider, get(CONTRACT_ADDRESS));
         return contractCall(contract);
       });
     }
@@ -73,7 +84,7 @@ export const ContractFactory = {
    * @param contractAddress Contract address to use
    * @returns Contract instance
    */
-  getContractWithProvider(provider: ethers.Provider, contractAddress: string): ethers.Contract {
+  async getContractWithProvider(provider: Provider, contractAddress: string): Promise<Contract> {
     return this.createRotkiSponsorshipContract(provider, contractAddress);
   },
 
@@ -82,13 +93,13 @@ export const ContractFactory = {
    * @param providerOrSigner Provider or Signer from user wallet
    * @returns Contract instance connected to user provider/signer
    */
-  getContractWithUserProvider(providerOrSigner: ethers.Provider | ethers.Signer): ethers.Contract {
+  async getContractWithUserProvider(providerOrSigner: Provider | Signer): Promise<Contract> {
     const { CONTRACT_ADDRESS } = useNftConfig();
-    return this.createRotkiSponsorshipContract(providerOrSigner, get(CONTRACT_ADDRESS));
+    return createContract(get(CONTRACT_ADDRESS), ROTKI_SPONSORSHIP_ABI, providerOrSigner);
   },
 };
 
-export async function refreshSupplyData(provider?: ethers.Provider): Promise<Record<string, TierSupply>> {
+export async function refreshSupplyData(provider?: Provider): Promise<Record<string, TierSupply>> {
   try {
     return await ContractFactory.executeWithContract(async (contract) => {
       const supplies: Record<string, TierSupply> = {};

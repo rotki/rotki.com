@@ -69,6 +69,23 @@ const hmrPort = Number(process.env.NUXT_HMR_PORT) || 4000;
 const devCSP = createDevCSP(devPort, hmrPort);
 
 export default defineNuxtConfig({
+  hooks: {
+    'build:manifest': (manifest) => {
+      // Disable prefetch and modulepreload for all chunks except fonts
+      // This prevents unnecessary network requests on initial page load
+      // while allowing critical fonts to preload for better CLS
+      for (const [key, item] of Object.entries(manifest)) {
+        const isFont = key.endsWith('.woff2') || key.endsWith('.woff') || key.endsWith('.ttf');
+        if (!isFont) {
+          item.prefetch = false;
+          item.preload = false;
+          item.dynamicImports = [];
+          item.imports = [];
+        }
+      }
+    },
+  },
+
   app: {
     head: {
       htmlAttrs: {
@@ -115,9 +132,11 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: '2024-08-13',
+  compatibilityDate: '2025-03-01',
 
-  components: [{ path: '~/components', pathPrefix: false }],
+  // Disable auto-import for application components - they should be imported explicitly
+  // Nuxt's built-in components (NuxtLink, NuxtPage, etc.) remain available
+  components: false,
 
   css: [],
 
@@ -125,10 +144,22 @@ export default defineNuxtConfig({
     enabled: process.env.NODE_ENV === 'development' && !(!!process.env.CI || !!process.env.TEST),
   },
 
+  experimental: {
+    defaults: {
+      nuxtLink: {
+        prefetch: false,
+      },
+    },
+  },
+
   i18n: {
     defaultLocale: 'en-US',
     locales: [{ code: 'en-US', file: 'en.json', language: 'en-US' }],
     strategy: 'no_prefix',
+  },
+
+  imports: {
+    scan: false,
   },
 
   modules: [
@@ -147,12 +178,60 @@ export default defineNuxtConfig({
 
   vite: {
     build: {
+      // Disable Vite's automatic modulepreload link injection
+      // Dynamic imports will still work, but won't preload dependencies
+      modulePreload: { polyfill: true, resolveDependencies: () => [] },
       rollupOptions: {
         output: {
           // Include build identifier to ensure unique filenames per deployment
           // Format: _nuxt/chunkName-buildId-contentHash.js
           chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           entryFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
+          manualChunks(id) {
+            // Heavy libraries first - order matters to prevent Vue being pulled in
+            // Web3/Wallet connection - keep @reown packages together
+            if (id.includes('@reown/appkit')) {
+              return 'web3-appkit';
+            }
+            // Ethers library
+            if (id.includes('node_modules/ethers')) {
+              return 'ethers';
+            }
+            // Braintree payment SDK - split by submodule
+            if (id.includes('braintree-web')) {
+              if (id.includes('/client'))
+                return 'braintree-client';
+              if (id.includes('/three-d-secure'))
+                return 'braintree-3ds';
+              if (id.includes('/paypal-checkout'))
+                return 'braintree-paypal';
+              if (id.includes('/hosted-fields'))
+                return 'braintree-hosted-fields';
+              if (id.includes('/vault-manager'))
+                return 'braintree-vault';
+              return 'braintree-core';
+            }
+            // Swiper carousel - only needed on pages with carousels
+            if (id.includes('swiper')) {
+              return 'swiper';
+            }
+            // QR code generation - only needed for crypto payments
+            if (id.includes('qrcode')) {
+              return 'qrcode';
+            }
+            // Common utilities - keep separate from heavy chunks
+            if (id.includes('node_modules/destr')) {
+              return 'utils';
+            }
+            if (id.includes('node_modules/dayjs')) {
+              return 'dayjs';
+            }
+            // Core framework - checked last so they don't end up in heavy chunks
+            // Vue/VueUse/Pinia - keep together to avoid circular deps
+            if (id.includes('node_modules/vue') || id.includes('node_modules/@vue') || id.includes('node_modules/pinia') || id.includes('node_modules/@vueuse')) {
+              return 'vue-core';
+            }
+          },
         },
       },
     },
@@ -194,6 +273,9 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/': {
+      prerender: true,
+    },
     // Redirect /pricing to /checkout/pay
     '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
     // Global no-cache rule for HTML to prevent CSP nonce mismatches
@@ -221,6 +303,7 @@ export default defineNuxtConfig({
       },
     },
     '/checkout/pay': {
+      prerender: true,
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(
@@ -328,18 +411,6 @@ export default defineNuxtConfig({
     },
     // Sponsor pages with WalletConnect
     '/sponsor/**': {
-      security: {
-        headers: {
-          contentSecurityPolicy: mergeCSP(
-            removeNoncePlaceholders(baseCSP),
-            walletConnectCSP,
-            ...(process.env.NODE_ENV === 'development' ? [devCSP] : []),
-          ),
-          crossOriginOpenerPolicy: 'unsafe-none', // Required for Coinbase Wallet SDK
-        },
-      },
-    },
-    '/devconnect': {
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(

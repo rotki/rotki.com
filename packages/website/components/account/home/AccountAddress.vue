@@ -2,7 +2,10 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get } from '@vueuse/core';
-import { useProfileUpdate } from '~/composables/use-profile-update';
+import CountrySelect from '~/components/account/CountrySelect.vue';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useProfileUpdate } from '~/composables/account/use-profile-update';
 import { toMessages } from '~/utils/validation';
 
 const state = reactive({

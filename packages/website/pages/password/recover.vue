@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PasswordForm from '~/components/account/password/PasswordForm.vue';
 import { commonAttrs } from '~/utils/metadata';
 
 definePageMeta({

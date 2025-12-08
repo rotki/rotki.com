@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 defineProps<{ selected: boolean }>();
 
-const emit = defineEmits<{ (e: 'click'): void }>();
+const emit = defineEmits<{ click: [] }>();
 </script>
 
 <template>

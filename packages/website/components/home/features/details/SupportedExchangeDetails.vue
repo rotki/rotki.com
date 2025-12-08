@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/core';
-import { useIntegrationsData } from '~/composables/integrations';
+import { useIntegrationsData } from '~/composables/use-integrations-data';
 
 const { t } = useI18n({ useScope: 'global' });
 const { data: integrationData } = useIntegrationsData();
@@ -30,9 +30,12 @@ const exchangesWithKeys = computed(() => get(integrationData).exchanges.filter(i
             class="flex items-center gap-3 text-subtitle-1 font-bold"
           >
             <div class="w-8 h-8 rounded-full overflow-hidden">
-              <img
+              <NuxtImg
                 :src="item.image"
                 :alt="item.label"
+                width="32"
+                height="32"
+                loading="lazy"
                 class="w-full h-full"
               />
             </div>
@@ -43,10 +46,14 @@ const exchangesWithKeys = computed(() => get(integrationData).exchanges.filter(i
     </div>
 
     <div class="flex-1">
-      <img
+      <NuxtImg
         class="overflow-hidden"
         :alt="t('home.exchanges.title')"
         src="/img/exchanges.png"
+        format="webp"
+        loading="lazy"
+        width="795"
+        height="428"
       />
     </div>
   </div>

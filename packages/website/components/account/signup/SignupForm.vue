@@ -9,8 +9,13 @@ import type {
 } from '~/types/signup';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
-import { useRedirectUrl } from '~/composables/redirect-url';
+import SignupAccount from '~/components/account/signup/SignupAccount.vue';
+import SignupAddress from '~/components/account/signup/SignupAddress.vue';
+import SignupCustomerInformation from '~/components/account/signup/SignupCustomerInformation.vue';
+import SignupIntroduction from '~/components/account/signup/SignupIntroduction.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useRecaptcha } from '~/composables/use-recaptcha';
+import { useRedirectUrl } from '~/composables/use-redirect-url';
 
 const { t } = useI18n({ useScope: 'global' });
 const { captchaId, resetCaptcha } = useRecaptcha();

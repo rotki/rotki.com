@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import type { JsonRpcProvider } from 'ethers';
 import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('rpc-checker');
@@ -132,12 +132,18 @@ function canUseRpc(health: RpcHealthStatus): boolean {
 // RPC MANAGER CLASS
 // ============================================================================
 
+// Lazy load JsonRpcProvider
+async function createJsonRpcProvider(rpcUrl: string): Promise<JsonRpcProvider> {
+  const { JsonRpcProvider } = await import('ethers/providers');
+  return new JsonRpcProvider(rpcUrl);
+}
+
 /**
  * RPC Manager class for handling fallback and circuit breaking
  */
 export class RpcManager {
   private readonly rpcUrls: readonly string[];
-  private readonly providerCache = new Map<string, ethers.JsonRpcProvider>();
+  private readonly providerCache = new Map<string, JsonRpcProvider>();
   private currentRpcUrl: string | undefined;
 
   constructor(rpcUrls: readonly string[]) {
@@ -147,10 +153,10 @@ export class RpcManager {
   /**
    * Get or create a cached provider for the given RPC URL
    */
-  private getProvider(rpcUrl: string): ethers.JsonRpcProvider {
+  private async getProvider(rpcUrl: string): Promise<JsonRpcProvider> {
     let provider = this.providerCache.get(rpcUrl);
     if (!provider) {
-      provider = new ethers.JsonRpcProvider(rpcUrl);
+      provider = await createJsonRpcProvider(rpcUrl);
       this.providerCache.set(rpcUrl, provider);
       logger.debug(`Created new provider for RPC: ${rpcUrl}`);
     }
@@ -193,7 +199,7 @@ export class RpcManager {
    * Execute a contract call with automatic RPC fallback
    */
   async executeWithFallback<T>(
-    contractCall: (provider: ethers.JsonRpcProvider) => Promise<T>,
+    contractCall: (provider: JsonRpcProvider) => Promise<T>,
     maxRetries: number = this.rpcUrls.length,
   ): Promise<T> {
     let lastError: Error | undefined;
@@ -210,7 +216,7 @@ export class RpcManager {
 
       try {
         // Use cached provider - only creates new one if not cached
-        const provider = this.getProvider(rpcUrl);
+        const provider = await this.getProvider(rpcUrl);
 
         // Track if we switch to a different RPC
         const rpcChanged = this.currentRpcUrl && this.currentRpcUrl !== rpcUrl;

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import JobTag from '~/components/jobs/JobTag.vue';
+
 defineProps<{
   job: {
     title?: string;

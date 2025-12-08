@@ -4,11 +4,15 @@ const { t } = useI18n({ useScope: 'global' });
 const data = [
   {
     img: '/img/products/monerium.webp',
+    width: 616,
+    height: 253,
     title: t('products.features.monerium_and_gnosis.monerium.title'),
     description: t('products.features.monerium_and_gnosis.monerium.description'),
   },
   {
     img: '/img/products/gnosis_pay.webp',
+    width: 616,
+    height: 253,
     title: t('products.features.monerium_and_gnosis.gnosis_pay.title'),
     description: t('products.features.monerium_and_gnosis.gnosis_pay.description'),
   },
@@ -32,10 +36,14 @@ const data = [
           :key="item.title"
           class="flex flex-col gap-8"
         >
-          <img
+          <NuxtImg
             :src="item.img"
             :alt="item.title"
-            class="rounded-xl w-full border border border-rui-grey-400"
+            :width="item.width"
+            :height="item.height"
+            format="webp"
+            loading="lazy"
+            class="rounded-xl w-full border border-rui-grey-400"
           />
 
           <div class="flex flex-col gap-6">

@@ -14,10 +14,10 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: 'error'): void;
-  (e: 'expired'): void;
-  (e: 'success', value: string): void;
-  (e: 'captcha-id', value: number): void;
+  'error': [];
+  'expired': [];
+  'success': [value: string];
+  'captcha-id': [value: number];
 }>();
 
 const {

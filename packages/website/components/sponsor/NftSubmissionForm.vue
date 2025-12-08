@@ -4,12 +4,12 @@ import type { NftSubmission } from '~/types/sponsor';
 import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
-import { useSponsorshipData } from '~/composables/rotki-sponsorship';
-import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/payment';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
+import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-payment';
+import { useSiweAuth } from '~/composables/rotki-sponsorship/use-siwe-auth';
+import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
-import { useSiweAuth } from '~/composables/siwe-auth';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { getTierClasses } from '~/utils/nft-tiers';
 import { useLogger } from '~/utils/use-logger';
@@ -517,6 +517,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
         <i18n-t
           v-if="nftCheckError === 'wrong_release'"
           keypath="sponsor.submit_name.error.wrong_release"
+          scope="global"
           tag="span"
         >
           <template #nftRelease>
@@ -536,6 +537,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
       >
         <i18n-t
           keypath="sponsor.submit_name.nft_info"
+          scope="global"
           tag="span"
         >
           <template #tokenId>
@@ -595,10 +597,12 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           v-else
           class="relative flex items-start"
         >
-          <img
+          <NuxtImg
             :src="imagePreview"
             alt="Profile preview"
             class="w-32 h-32 object-cover rounded-lg mt-3"
+            width="128"
+            height="128"
           />
           <RuiButton
             icon

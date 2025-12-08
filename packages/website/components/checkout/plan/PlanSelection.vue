@@ -2,8 +2,12 @@
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
+import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
-import { useCountries } from '~/composables/countries';
+import { usePlanIdParam } from '~/composables/checkout/use-plan-params';
+import { useCountries } from '~/composables/use-countries';
 import { useMainStore } from '~/store';
 import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
@@ -185,6 +189,7 @@ watch([planId, availablePlans], initializeFromPlanId, { immediate: true });
           <i18n-t
             v-if="country"
             keypath="home.plans.country_prices"
+            scope="global"
             tag="div"
           >
             <template #country>
@@ -203,6 +208,7 @@ watch([planId, availablePlans], initializeFromPlanId, { immediate: true });
           <i18n-t
             v-else
             keypath="home.plans.login_to_show_prices"
+            scope="global"
             tag="div"
           >
             <template #login>

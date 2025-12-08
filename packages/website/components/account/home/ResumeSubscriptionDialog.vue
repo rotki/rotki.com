@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import { get } from '@vueuse/shared';
+import { get, isDefined } from '@vueuse/shared';
 import { formatDate } from '~/utils/date';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
@@ -41,6 +41,7 @@ async function resumeSubscription(): Promise<void> {
               <i18n-t
                 keypath="account.subscriptions.resume.details.plan_name"
                 class="font-medium"
+                scope="global"
               >
                 <template #plan>
                   <span class="font-normal">{{ modelValue.planName }}</span>
@@ -51,6 +52,7 @@ async function resumeSubscription(): Promise<void> {
               <i18n-t
                 keypath="account.subscriptions.resume.details.billing_cycle"
                 class="font-medium"
+                scope="global"
               >
                 <template #duration>
                   <span class="font-normal">
@@ -64,6 +66,7 @@ async function resumeSubscription(): Promise<void> {
               <i18n-t
                 keypath="account.subscriptions.resume.details.billing_amount"
                 class="font-medium"
+                scope="global"
               >
                 <template #amount>
                   <span class="font-normal">
@@ -77,6 +80,7 @@ async function resumeSubscription(): Promise<void> {
               <i18n-t
                 keypath="account.subscriptions.resume.details.next_billing_date"
                 class="font-medium"
+                scope="global"
               >
                 <template #date>
                   <span class="font-normal">{{ formatDate(modelValue.nextActionDate) }}</span>

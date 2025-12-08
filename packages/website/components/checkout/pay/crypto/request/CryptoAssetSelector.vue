@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/core';
+import CryptoAssetIcon from '~/components/checkout/pay/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/components/checkout/pay/crypto/CryptoChainIcon.vue';
+import { usePaymentAssets } from '~/composables/checkout/use-payment-assets';
 import { toTitleCase } from '~/utils/text';
 
 const modelValue = defineModel<string>({ required: true });

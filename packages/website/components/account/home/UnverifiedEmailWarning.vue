@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
 import { set } from '@vueuse/core';
-import { useAccountApi } from '~/composables/use-account-api';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import { useAccountApi } from '~/composables/account/use-account-api';
 
 const { t } = useI18n({ useScope: 'global' });
 

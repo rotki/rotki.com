@@ -13,6 +13,11 @@ import SubscriptionActionsCell from '~/components/account/home/subscription-tabl
 import SubscriptionStatusChip from '~/components/account/home/subscription-table/SubscriptionStatusChip.vue';
 import SubscriptionTableHeader from '~/components/account/home/subscription-table/SubscriptionTableHeader.vue';
 import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
+import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
+import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
+import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
+import { useSubscriptionPolling } from '~/composables/subscription/use-subscription-polling';
+import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { useTiersStore } from '~/store/tiers';
 import { formatDate } from '~/utils/date';

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoginPage from '~/components/account/login/LoginPage.vue';
 import { commonAttrs } from '~/utils/metadata';
 
 definePageMeta({

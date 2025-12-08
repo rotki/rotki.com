@@ -4,21 +4,29 @@ const { t } = useI18n({ useScope: 'global' });
 const data = [
   {
     img: '/img/products/stats_asset_amount_value.webp',
+    width: 616,
+    height: 449,
     title: t('products.features.analytics.asset_amount_and_value.title'),
     description: t('products.features.analytics.asset_amount_and_value.description'),
   },
   {
     img: '/img/products/stats_distribution_asset.webp',
+    width: 616,
+    height: 449,
     title: t('products.features.analytics.distribution_assets.title'),
     description: t('products.features.analytics.distribution_assets.description'),
   },
   {
     img: '/img/products/stats_distribution_location.webp',
+    width: 616,
+    height: 449,
     title: t('products.features.analytics.distribution_locations.title'),
     description: t('products.features.analytics.distribution_locations.description'),
   },
   {
     img: '/img/products/stats_events_analysis.webp',
+    width: 616,
+    height: 449,
     title: t('products.features.analytics.events_analysis.title'),
     description: t('products.features.analytics.events_analysis.description'),
   },
@@ -42,9 +50,13 @@ const data = [
           :key="item.title"
           class="flex flex-col gap-8"
         >
-          <img
+          <NuxtImg
             :src="item.img"
             :alt="item.title"
+            :width="item.width"
+            :height="item.height"
+            format="webp"
+            loading="lazy"
             class="rounded-xl border border-rui-grey-400"
           />
           <div class="flex flex-col gap-6">
