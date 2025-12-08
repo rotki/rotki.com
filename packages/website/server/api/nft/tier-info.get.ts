@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { nftCoreService } from '~/server/features/sponsorship/nft/core';
-import { handleApiError } from '~/server/utils/errors';
+import { nftCoreService } from '~~/server/features/sponsorship/nft/core';
+import { handleApiError } from '~~/server/utils/errors';
 
 // Request validation schema
 const QuerySchema = z.object({

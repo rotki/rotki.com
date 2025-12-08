@@ -20,7 +20,7 @@ vi.stubGlobal('createError', (opts: { statusCode: number; statusMessage: string 
 vi.stubGlobal('$fetch', Object.assign(vi.fn(), { raw: mockFetchRaw }));
 
 // Mock the cache service module
-vi.mock('~/server/utils/cache-service', () => ({
+vi.mock('~~/server/utils/cache-service', () => ({
   getCacheService: () => mockCache,
 }));
 
@@ -64,7 +64,7 @@ describe('releases API handler', () => {
 
   beforeAll(async () => {
     // Dynamic import AFTER mocks are set up
-    const module = await import('~/server/api/releases/latest.get');
+    const module = await import('~~/server/api/releases/latest.get');
     handler = module.default;
     minimizePayload = module.minimizePayload;
     isDownloadableApp = module.isDownloadableApp;
@@ -133,7 +133,9 @@ describe('releases API handler', () => {
       const result = minimizePayload(fullResponse);
 
       expect(Object.keys(result).sort()).toEqual(['assets', 'tag_name']);
-      expect(Object.keys(result.assets[0]).sort()).toEqual(['browser_download_url', 'name']);
+      const firstAsset = result.assets[0];
+      expect(firstAsset).toBeDefined();
+      expect(Object.keys(firstAsset!).sort()).toEqual(['browser_download_url', 'name']);
       expect(result).not.toHaveProperty('id');
       expect(result).not.toHaveProperty('body');
     });
@@ -183,9 +185,9 @@ describe('releases API handler', () => {
       ]);
 
       const result = minimizePayload(fullResponse);
-      expect(result.assets[0].name).toContain('linux');
-      expect(result.assets[1].name).toContain('darwin');
-      expect(result.assets[2].name).toContain('win32');
+      expect(result.assets[0]?.name).toContain('linux');
+      expect(result.assets[1]?.name).toContain('darwin');
+      expect(result.assets[2]?.name).toContain('win32');
     });
   });
 

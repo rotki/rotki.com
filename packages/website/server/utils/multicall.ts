@@ -1,5 +1,5 @@
 import type { ethers } from 'ethers';
-import { ContractFactory } from '~/composables/rotki-sponsorship/contract';
+import { ContractFactory } from '#shared/features/sponsorship/contract';
 
 // Multicall3 contract address (same on most chains including Sepolia)
 const MULTICALL3_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
@@ -42,10 +42,10 @@ export class Multicall {
   }
 
   /**
-   * Async factory method to create a Multicall instance
+   * Factory method to create a Multicall instance
    */
-  static async create(provider: ethers.Provider): Promise<Multicall> {
-    const contract = await ContractFactory.createContract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
+  static create(provider: ethers.Provider): Multicall {
+    const contract = ContractFactory.createContract(MULTICALL3_ADDRESS, MULTICALL3_ABI, provider);
     return new Multicall(contract);
   }
 
@@ -56,8 +56,12 @@ export class Multicall {
       target: call.target,
     }));
 
+    const aggregate3 = this.contract.aggregate3;
+    if (!aggregate3)
+      throw new Error('Multicall contract does not support aggregate3');
+
     // Use staticCall to ensure this is a read-only call
-    const results = await this.contract.aggregate3.staticCall(formattedCalls);
+    const results = await aggregate3.staticCall(formattedCalls);
     return results;
   }
 
@@ -80,6 +84,12 @@ export class Multicall {
     // Decode results
     return results.map((result, index) => {
       const call = calls[index];
+      if (!call) {
+        return {
+          error: 'Call not found',
+          success: false,
+        };
+      }
       if (!result.success && !call.allowFailure) {
         return {
           error: 'Call failed',

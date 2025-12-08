@@ -80,7 +80,6 @@ import {
   LuX,
   LuXTwitter,
 } from '@rotki/ui-library';
-import '@fontsource/roboto/latin.css';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const RuiPlugin = createRui({

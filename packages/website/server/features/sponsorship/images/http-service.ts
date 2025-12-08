@@ -1,6 +1,6 @@
-import { ImageConfig } from '~/server/features/sponsorship/cache/managers/image-cache-manager';
-import { retryWithBackoff } from '~/server/utils/retry';
-import { useLogger } from '~/utils/use-logger';
+import { useLogger } from '#shared/utils/use-logger';
+import { ImageConfig } from '~~/server/features/sponsorship/cache/managers/image-cache-manager';
+import { retryWithBackoff } from '~~/server/utils/retry';
 
 const logger = useLogger('image-http-service');
 

@@ -2,7 +2,7 @@ import { createReadStream, existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join, normalize, relative } from 'node:path';
 import process from 'node:process';
-import { applyCardPaymentAssetSecurityHeaders, applyCardPaymentHtmlSecurityHeaders } from '~/utils/card-payment-security';
+import { applyCardPaymentAssetSecurityHeaders, applyCardPaymentHtmlSecurityHeaders } from '#shared/utils/card-payment-security';
 
 export default defineEventHandler(async (event) => {
   const path = getRouterParam(event, 'path') || '';

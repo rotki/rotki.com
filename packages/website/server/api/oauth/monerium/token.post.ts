@@ -1,6 +1,6 @@
+import { removeTrailingSlash } from '#shared/utils/text';
+import { useLogger } from '#shared/utils/use-logger';
 import { z } from 'zod';
-import { removeTrailingSlash } from '~/utils/text';
-import { useLogger } from '~/utils/use-logger';
 
 interface MoneriumTokenResponse {
   access_token: string;
