@@ -7,6 +7,10 @@ import CarouselControls from '~/components/common/carousel/CarouselControls.vue'
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
+defineProps<{
+  hideThumbnail?: boolean;
+}>();
+
 const swiperInstance = ref<Swiper>();
 const swiperReady = ref<boolean>(false);
 const activeIndex = ref<number>(1);
@@ -90,7 +94,10 @@ scanImages();
           :class="{ 'pointer-events-none': !swiperReady }"
           arrow-buttons
         />
-        <div :class="$style.thumbnail">
+        <div
+          v-if="!hideThumbnail"
+          :class="$style.thumbnail"
+        >
           <slot />
         </div>
       </div>
