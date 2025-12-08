@@ -1,4 +1,4 @@
-import type { TierMetadata } from '~/composables/rotki-sponsorship/types';
+import type { TierMetadata } from '#shared/features/sponsorship/types';
 
 /**
  * Metadata Processor - Handles extraction and processing of NFT metadata

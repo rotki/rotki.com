@@ -1,12 +1,12 @@
 import type { H3Event } from 'h3';
-import { normalizeIpfsUrl } from '~/composables/rotki-sponsorship/utils';
-import { createImageCacheKey } from '~/server/features/sponsorship/cache/keys';
-import { createImageCacheKeyBranded, createImageUrl, imageCacheManager, ImageConfig, type ImageMetadata } from '~/server/features/sponsorship/cache/managers/image-cache-manager';
-import { imageHttpService } from '~/server/features/sponsorship/images/http-service';
-import { imageStreamingService } from '~/server/features/sponsorship/images/streaming';
-import { CACHE_TTL } from '~/server/utils/cache';
-import { deduplicatedFetch } from '~/server/utils/request-dedup';
-import { useLogger } from '~/utils/use-logger';
+import { normalizeIpfsUrl } from '#shared/features/sponsorship/utils';
+import { useLogger } from '#shared/utils/use-logger';
+import { createImageCacheKey } from '~~/server/features/sponsorship/cache/keys';
+import { createImageCacheKeyBranded, createImageUrl, imageCacheManager, ImageConfig, type ImageMetadata } from '~~/server/features/sponsorship/cache/managers/image-cache-manager';
+import { imageHttpService } from '~~/server/features/sponsorship/images/http-service';
+import { imageStreamingService } from '~~/server/features/sponsorship/images/streaming';
+import { CACHE_TTL } from '~~/server/utils/cache';
+import { deduplicatedFetch } from '~~/server/utils/request-dedup';
 
 interface ImageCacheResult {
   cached: boolean;

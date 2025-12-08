@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import process from 'node:process';
 import rotkiTheme from '@rotki/ui-library/theme';
+import { removeNoncePlaceholders } from './app/utils/csp-utils';
 import {
   baseCSP,
   braintreeBaseCSP,
@@ -11,7 +12,6 @@ import {
   threeDSecureCSP,
   walletConnectCSP,
 } from './csp-config';
-import { removeNoncePlaceholders } from './utils/csp-utils';
 
 const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
 
@@ -134,11 +134,21 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-03-01',
 
+  future: {
+    compatibilityVersion: 4,
+  },
+
   // Disable auto-import for application components - they should be imported explicitly
   // Nuxt's built-in components (NuxtLink, NuxtPage, etc.) remain available
   components: false,
 
-  css: [],
+  css: [
+    '@fontsource/roboto/latin-400.css',
+    '@fontsource/roboto/latin-500.css',
+    '@fontsource/roboto/latin-600.css',
+    '@fontsource/roboto/latin-700.css',
+    '~/assets/css/tailwind.css',
+  ],
 
   devtools: {
     enabled: process.env.NODE_ENV === 'development' && !(!!process.env.CI || !!process.env.TEST),
@@ -492,12 +502,25 @@ export default defineNuxtConfig({
     exclude: nonIndexed,
   },
   ssr: true,
+
+  typescript: {
+    tsConfig: {
+      include: [
+        '../vitest.config.ts',
+        '../playwright.config.ts',
+        '../content.config.ts',
+        '../csp-config.ts',
+        '../tests/**/*.ts',
+      ],
+    },
+  },
+
   tailwindcss: {
     config: {
       content: [
-        './components/**/*.{vue,js,ts}',
-        './layouts/**/*.vue',
-        './pages/**/*.vue',
+        './app/components/**/*.{vue,js,ts}',
+        './app/layouts/**/*.vue',
+        './app/pages/**/*.vue',
       ],
       darkMode: 'class',
       mode: 'jit',

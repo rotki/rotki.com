@@ -1,4 +1,4 @@
-import { useLogger } from '~/utils/use-logger';
+import { useLogger } from '#shared/utils/use-logger';
 import { cacheUpdaterService } from '../../features/sponsorship/cache/cache-updater';
 
 const logger = useLogger('nft-cache-updater-task');

@@ -1,5 +1,5 @@
+import { useLogger } from '#shared/utils/use-logger';
 import { z } from 'zod';
-import { useLogger } from '~/utils/use-logger';
 
 // Known false positive patterns to filter out
 const KNOWN_FALSE_POSITIVES = [

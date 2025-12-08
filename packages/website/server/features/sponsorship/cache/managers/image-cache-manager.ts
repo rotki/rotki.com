@@ -1,9 +1,9 @@
 import { Buffer } from 'node:buffer';
+import { useLogger } from '#shared/utils/use-logger';
 import { z } from 'zod';
-import { createImageCacheKey } from '~/server/features/sponsorship/cache/keys';
-import { CACHE_TTL } from '~/server/utils/cache';
-import { type CacheService, getCacheService } from '~/server/utils/cache-service';
-import { useLogger } from '~/utils/use-logger';
+import { createImageCacheKey } from '~~/server/features/sponsorship/cache/keys';
+import { CACHE_TTL } from '~~/server/utils/cache';
+import { type CacheService, getCacheService } from '~~/server/utils/cache-service';
 
 // Branded types for better type safety
 type ImageUrl = string & { readonly __brand: 'ImageUrl' };
@@ -35,10 +35,10 @@ export function createImageUrl(url: string): ImageUrl {
   const result = supportedUrlSchema.safeParse(trimmedUrl);
 
   if (!result.success) {
-    const firstError = result.error.errors[0];
+    const firstError = result.error.errors[0]?.message ?? 'Unknown validation error';
     throw createError({
       statusCode: 400,
-      statusMessage: `Invalid URL: ${firstError.message}`,
+      statusMessage: `Invalid URL: ${firstError}`,
     });
   }
 

@@ -62,7 +62,7 @@
     "autoprefixer": "catalog:",
     "happy-dom": "18.0.1",
     "msw": "2.12.3",
-    "nuxt": "3.20.1",
+    "nuxt": "4.2.1",
     "nuxt-security": "2.5.0",
     "postcss": "catalog:",
     "postcss-html": "1.8.0",

@@ -1,9 +1,9 @@
-import type { NftConfig } from '~/composables/rotki-sponsorship/types';
-import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
-import { ContractFactory } from '~/composables/rotki-sponsorship/contract';
-import { getRpcManager, type RpcManager } from '~/composables/rotki-sponsorship/rpc-checker';
-import { Multicall } from '~/server/utils/multicall';
-import { useLogger } from '~/utils/use-logger';
+import type { NftConfig } from '#shared/features/sponsorship/types';
+import { CHAIN_CONFIGS } from '#shared/features/sponsorship/constants';
+import { ContractFactory } from '#shared/features/sponsorship/contract';
+import { getRpcManager, type RpcManager } from '#shared/features/sponsorship/rpc-checker';
+import { useLogger } from '#shared/utils/use-logger';
+import { Multicall } from '~~/server/utils/multicall';
 
 /**
  * BlockchainService - Handles all blockchain interactions
@@ -31,19 +31,23 @@ class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = await Multicall.create(provider);
+      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = Multicall.create(provider);
 
       const releaseIdResults = await multicall.callSameContract(contract, [
         { args: [], method: 'currentReleaseId' },
       ]);
 
+      const firstResult = releaseIdResults[0];
       // Check if multicall failed and fallback to direct call
-      if (!releaseIdResults[0].success || releaseIdResults[0].value === undefined) {
+      if (!firstResult?.success || firstResult.value === undefined) {
         this.logger.warn('Multicall failed for currentReleaseId, falling back to direct call');
 
         try {
-          const releaseId = Number(await contract.currentReleaseId());
+          const currentReleaseId = contract.currentReleaseId;
+          if (!currentReleaseId)
+            throw new Error('Contract does not support currentReleaseId');
+          const releaseId = Number(await currentReleaseId());
           this.logger.debug(`Retrieved release ID (via fallback): ${releaseId}`);
           return releaseId;
         }
@@ -52,7 +56,7 @@ class BlockchainService {
         }
       }
 
-      const releaseId = Number(releaseIdResults[0].value);
+      const releaseId = Number(firstResult.value);
       this.logger.debug(`Retrieved release ID: ${releaseId}`);
       return releaseId;
     });
@@ -70,8 +74,8 @@ class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = await Multicall.create(provider);
+      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = Multicall.create(provider);
 
       // Check if token exists and get basic data
       const firstBatchResults = await multicall.callSameContract(contract, [
@@ -88,10 +92,18 @@ class BlockchainService {
 
         try {
           // Fallback to individual contract calls
-          const owner = await contract.ownerOf(tokenId);
-          const releaseId = Number(await contract.tokenReleaseId(tokenId));
-          const tierId = Number(await contract.tokenTierId(tokenId));
-          const metadataURI = await contract.tokenURI(tokenId);
+          const ownerOf = contract.ownerOf;
+          const tokenReleaseId = contract.tokenReleaseId;
+          const tokenTierId = contract.tokenTierId;
+          const tokenURI = contract.tokenURI;
+
+          if (!ownerOf || !tokenReleaseId || !tokenTierId || !tokenURI)
+            throw new Error('Contract does not support required methods');
+
+          const owner = await ownerOf(tokenId);
+          const releaseId = Number(await tokenReleaseId(tokenId));
+          const tierId = Number(await tokenTierId(tokenId));
+          const metadataURI = await tokenURI(tokenId);
 
           this.logger.debug(`Token ${tokenId} basic data (via fallback):`, {
             metadataURI,
@@ -113,16 +125,21 @@ class BlockchainService {
         }
       }
 
+      const ownerResult = firstBatchResults[0];
+      const releaseResult = firstBatchResults[1];
+      const tierResult = firstBatchResults[2];
+      const metadataResult = firstBatchResults[3];
+
       // Check if token exists
-      if (!firstBatchResults[0].success) {
+      if (!ownerResult?.success) {
         this.logger.warn(`Token ${tokenId} does not exist`);
         return null;
       }
 
-      const owner = firstBatchResults[0].value;
-      const releaseId = Number(firstBatchResults[1].value);
-      const tierId = Number(firstBatchResults[2].value);
-      const metadataURI = firstBatchResults[3].value;
+      const owner = ownerResult.value;
+      const releaseId = Number(releaseResult?.value);
+      const tierId = Number(tierResult?.value);
+      const metadataURI = metadataResult?.value;
 
       this.logger.debug(`Token ${tokenId} basic data:`, {
         metadataURI,
@@ -151,8 +168,8 @@ class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = await Multicall.create(provider);
+      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = Multicall.create(provider);
 
       this.logger.debug(`Fetching tier info for tier ${tierId}, release ${releaseId} via from ${config.CONTRACT_ADDRESS}`);
 
@@ -160,13 +177,17 @@ class BlockchainService {
         { args: [releaseId, tierId], method: 'getTierInfo' },
       ]);
 
+      const tierResult = tierResults[0];
       // Check if multicall returned empty result and fallback to individual call
-      if (!tierResults[0].success || !tierResults[0].value) {
+      if (!tierResult?.success || !tierResult.value) {
         this.logger.warn(`Multicall failed for tier ${tierId}, release ${releaseId}, falling back to individual call`);
 
         try {
           // Fallback to individual contract call
-          const tierInfo = await contract.getTierInfo(releaseId, tierId);
+          const getTierInfo = contract.getTierInfo;
+          if (!getTierInfo)
+            throw new Error('Contract does not support getTierInfo');
+          const tierInfo = await getTierInfo(releaseId, tierId);
           const [maxSupply, currentSupply, metadataURI] = tierInfo;
 
           return {
@@ -181,7 +202,7 @@ class BlockchainService {
         }
       }
 
-      const [maxSupply, currentSupply, metadataURI] = tierResults[0].value;
+      const [maxSupply, currentSupply, metadataURI] = tierResult.value;
 
       return {
         currentSupply: Number(currentSupply),
@@ -206,8 +227,8 @@ class BlockchainService {
     const rpcManager = this.getRpcManagerForConfig(config);
 
     return rpcManager.executeWithFallback(async (provider) => {
-      const contract = await ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
-      const multicall = await Multicall.create(provider);
+      const contract = ContractFactory.getContractWithProvider(provider, config.CONTRACT_ADDRESS);
+      const multicall = Multicall.create(provider);
 
       // Batch all getTierInfo calls
       const tierInfoCalls = tierIds.map(tierId => ({
@@ -223,6 +244,10 @@ class BlockchainService {
       if (allEmpty) {
         this.logger.warn('All multicall results are empty, falling back to individual calls');
 
+        const getTierInfo = contract.getTierInfo;
+        if (!getTierInfo)
+          throw new Error('Contract does not support getTierInfo');
+
         // Fallback to individual calls for all tiers
         const results: Record<number, {
           maxSupply: number;
@@ -232,7 +257,7 @@ class BlockchainService {
 
         for (const tierId of tierIds) {
           try {
-            const tierInfo = await contract.getTierInfo(releaseId, tierId);
+            const tierInfo = await getTierInfo(releaseId, tierId);
             const [maxSupply, currentSupply, metadataURI] = tierInfo;
 
             this.logger.debug(`Tier ${tierId} (via fallback): currentSupply=${Number(currentSupply)}, maxSupply=${Number(maxSupply)}`);
@@ -259,14 +284,21 @@ class BlockchainService {
         metadataURI: string;
       } | null> = {};
 
+      const getTierInfo = contract.getTierInfo;
+
       for (const [index, result] of tierResults.entries()) {
         const tierId = tierIds[index];
+
+        if (tierId === undefined)
+          continue;
 
         if (!result.success || !result.value) {
           // Try individual call for this specific tier
           try {
             this.logger.debug(`Tier ${tierId} failed in multicall, trying individual call`);
-            const tierInfo = await contract.getTierInfo(releaseId, tierId);
+            if (!getTierInfo)
+              throw new Error('Contract does not support getTierInfo');
+            const tierInfo = await getTierInfo(releaseId, tierId);
             const [maxSupply, currentSupply, metadataURI] = tierInfo;
 
             results[tierId] = {

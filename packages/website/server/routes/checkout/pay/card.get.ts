@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
-import { applyCardPaymentHtmlSecurityHeaders } from '~/utils/card-payment-security';
+import { applyCardPaymentHtmlSecurityHeaders } from '#shared/utils/card-payment-security';
 
 export default defineEventHandler(async (event) => {
   // Apply security headers and set content type

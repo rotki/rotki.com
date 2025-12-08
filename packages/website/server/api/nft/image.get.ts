@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { imageCoreService } from '~/server/features/sponsorship/images/core';
-import { handleApiError } from '~/server/utils/errors';
+import { imageCoreService } from '~~/server/features/sponsorship/images/core';
+import { handleApiError } from '~~/server/utils/errors';
 
 // Request validation schema
 const QuerySchema = z.object({
