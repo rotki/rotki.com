@@ -57,6 +57,10 @@ const headers: DataTableColumn<UserPayment>[] = [{
   class: 'capitalize',
 }];
 
+function discountAmount(priceBeforeDiscount: number, eurAmount: number): string {
+  return (priceBeforeDiscount - eurAmount).toFixed(2);
+}
+
 watch(() => props.pending, (pendingIs, pendingWas) => {
   if (pendingIs.length === 0 && pendingWas.length > 0) {
     refresh();
@@ -138,7 +142,7 @@ watch(() => props.pending, (pendingIs, pendingWas) => {
             >
               <template #amount>
                 <div class="inline-flex gap-1">
-                  <b>{{ row.priceBeforeDiscount - row.eurAmount }}</b>
+                  <b>{{ discountAmount(row.priceBeforeDiscount, row.eurAmount) }}</b>
                   <template v-if="row.discount.type === DiscountType.PERCENTAGE">
                     {{
                       t('home.plans.tiers.step_3.discount.percent_off', {
