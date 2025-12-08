@@ -1,5 +1,15 @@
 import { expect, test } from '@playwright/test';
 
+const mockRelease = {
+  tag_name: 'v1.41.1',
+  assets: [
+    { name: 'rotki-darwin_arm64-v1.41.1.dmg', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_arm64-v1.41.1.dmg' },
+    { name: 'rotki-darwin_x64-v1.41.1.dmg', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_x64-v1.41.1.dmg' },
+    { name: 'rotki-linux_x86_64-v1.41.1.AppImage', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage' },
+    { name: 'rotki-win32_x64-v1.41.1.exe', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-win32_x64-v1.41.1.exe' },
+  ],
+};
+
 test.describe('homepage', () => {
   test('successfully loads', async ({ page }) => {
     await page.goto('/');
@@ -26,6 +36,7 @@ test.describe('homepage', () => {
 
 test.describe('download page', () => {
   test('download page loads properly', async ({ page }) => {
+    await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/', { waitUntil: 'networkidle' });
     // Wait for the pricing section to load (it's wrapped in ClientOnly)
     await page.getByRole('button', { name: 'Start now for free' }).first().click({ timeout: 30000 });
@@ -53,6 +64,7 @@ test.describe('download page', () => {
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
+    await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
@@ -81,6 +93,7 @@ test.describe('download page', () => {
         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
+    await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
@@ -102,6 +115,7 @@ test.describe('download page', () => {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     });
     const page = await context.newPage();
+    await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
 
     await page.goto('/download', {
       waitUntil: 'networkidle',
@@ -118,6 +132,7 @@ test.describe('download page', () => {
   });
 
   test('checks all download links!', async ({ page }) => {
+    await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/download', {
       waitUntil: 'networkidle',
     });
