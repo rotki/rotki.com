@@ -9,26 +9,26 @@ const MULTICALL3_ABI = [
   'function aggregate3(tuple(address target, bool allowFailure, bytes callData)[] calls) payable returns (tuple(bool success, bytes returnData)[])',
 ];
 
-export interface Call {
+interface Call {
   target: string;
   allowFailure?: boolean;
   callData: string;
 }
 
-export interface Result {
+interface Result {
   success: boolean;
   returnData: string;
 }
 
 // More convenient interface for contract calls
-export interface ContractCall {
+interface ContractCall {
   contract: ethers.Contract;
   method: string;
   args: any[];
   allowFailure?: boolean;
 }
 
-export interface DecodedResult<T = any> {
+interface DecodedResult<T = any> {
   success: boolean;
   value?: T;
   error?: string;

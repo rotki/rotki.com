@@ -1,7 +1,7 @@
 import type { ContentSecurityPolicyValue } from 'nuxt-security';
 import crypto from 'node:crypto';
 
-export function generateRandomNonce() {
+function generateRandomNonce() {
   const array = new Uint8Array(18);
   crypto.getRandomValues(array);
   return btoa(String.fromCharCode(...array));

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export type TierKey = 'bronze' | 'silver' | 'gold';
 
-export const TierKeyEnum = z.enum(['bronze', 'silver', 'gold']);
+const TierKeyEnum = z.enum(['bronze', 'silver', 'gold']);
 
 export interface SponsorshipTier {
   key: TierKey;
@@ -54,12 +54,12 @@ export interface NftConfig {
   hasContractChanged: boolean;
 }
 
-export const TierMetadataAttribute = z.object({
+const TierMetadataAttribute = z.object({
   trait_type: z.string(),
   value: z.string(),
 });
 
-export const TierMetadataAttributes = z.array(TierMetadataAttribute);
+const TierMetadataAttributes = z.array(TierMetadataAttribute);
 
 export const TierMetadata = z.object({
   attributes: TierMetadataAttributes.optional(),

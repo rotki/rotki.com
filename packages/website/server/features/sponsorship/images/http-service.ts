@@ -4,7 +4,7 @@ import { useLogger } from '~/utils/use-logger';
 
 const logger = useLogger('image-http-service');
 
-export interface ImageResponseHeaders {
+interface ImageResponseHeaders {
   contentLength: number;
   contentType: string;
   etag?: string;
@@ -15,7 +15,7 @@ export interface ImageResponseHeaders {
  * Image HTTP Service - Handles HTTP requests for images
  * Provides methods for fetching images with retry logic and proper error handling
  */
-export class ImageHttpService {
+class ImageHttpService {
   /**
    * Fetch image with retry logic and validation
    */

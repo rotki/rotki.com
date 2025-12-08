@@ -13,7 +13,7 @@ const CACHE_FRESHNESS = {
   NOT_FOUND_STALE_THRESHOLD: 6 * 60 * 60 * 1000, // 6 hours
 } as const;
 
-export interface CacheUpdateResult {
+interface CacheUpdateResult {
   images: Record<string, string>;
   supplies: Record<string, { currentSupply: number; maxSupply: number; metadataURI: string }>;
   benefits: Record<string, { benefits: string }>;
@@ -23,7 +23,7 @@ export interface CacheUpdateResult {
   errors: string[];
 }
 
-export interface CacheUpdateSummary {
+interface CacheUpdateSummary {
   tierCaching: CacheUpdateResult;
   imageCaching: { success: number; failed: number };
 }
@@ -31,7 +31,7 @@ export interface CacheUpdateSummary {
 /**
  * Cache Updater Service - Handles all cache updating operations
  */
-export class CacheUpdaterService {
+class CacheUpdaterService {
   private logger = useLogger('cache-updater-service');
 
   /** Check if cache updating should be skipped based on environment */

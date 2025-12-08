@@ -90,7 +90,7 @@ const eventBus = AppEventBus.getInstance();
 /**
  * Composable for general app events
  */
-export function useAppEvents() {
+function useAppEvents() {
   return {
     clear: eventBus.clear.bind(eventBus),
     emit: eventBus.emit.bind(eventBus),

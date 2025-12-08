@@ -4,7 +4,7 @@ import type { TierMetadata } from '~/composables/rotki-sponsorship/types';
  * Metadata Processor - Handles extraction and processing of NFT metadata
  * Provides methods to extract specific attributes from tier and token metadata
  */
-export class MetadataProcessor {
+class MetadataProcessor {
   /**
    * Extract and convert image URL to proxied format
    */

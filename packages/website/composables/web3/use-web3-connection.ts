@@ -11,7 +11,7 @@ let networkConfig: {
   productionNetworks: [AppKitNetwork, ...AppKitNetwork[]];
 } | undefined;
 
-export interface Web3ConnectionConfig {
+interface Web3ConnectionConfig {
   chainId?: MaybeRef<number>;
   onAccountChange?: (isConnected: boolean) => void;
   onError?: (error: string) => void;

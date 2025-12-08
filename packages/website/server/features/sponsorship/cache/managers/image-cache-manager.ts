@@ -6,9 +6,9 @@ import { type CacheService, getCacheService } from '~/server/utils/cache-service
 import { useLogger } from '~/utils/use-logger';
 
 // Branded types for better type safety
-export type ImageUrl = string & { readonly __brand: 'ImageUrl' };
+type ImageUrl = string & { readonly __brand: 'ImageUrl' };
 
-export type ImageCacheKey = string & { readonly __brand: 'ImageCacheKey' };
+type ImageCacheKey = string & { readonly __brand: 'ImageCacheKey' };
 
 // Zod schema for supported URL validation
 const supportedUrlSchema = z.string()

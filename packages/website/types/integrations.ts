@@ -7,7 +7,7 @@ export const IntegrationItem = z.object({
 
 export type IntegrationItem = z.infer<typeof IntegrationItem>;
 
-export const ExchangeIntegrationData = IntegrationItem.extend({
+const ExchangeIntegrationData = IntegrationItem.extend({
   isExchangeWithKey: z.boolean().optional(),
 });
 

@@ -204,16 +204,12 @@ export const CHECKOUT_ROUTE_NAMES = [
   'checkout-pay-3d-secure',
 ] as const;
 
-export type CheckoutRouteName = typeof CHECKOUT_ROUTE_NAMES[number];
+type CheckoutRouteName = typeof CHECKOUT_ROUTE_NAMES[number];
 
 export interface CheckoutStep {
   title: string;
   description: string;
   names: CheckoutRouteName[];
-}
-
-export interface CreateCardNonceRequest {
-  paymentToken: string;
 }
 
 export const PaymentAsset = z.object({

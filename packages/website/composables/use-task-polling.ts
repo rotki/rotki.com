@@ -2,13 +2,13 @@ import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { TaskStatusResponse } from '~/types';
 import { logger } from '~/utils/use-logger';
 
-export interface UseTaskPollingOptions {
+interface UseTaskPollingOptions {
   maxAttempts?: number;
   pollInterval?: number;
   onProgress?: (status: string) => void;
 }
 
-export interface UseTaskPollingReturn {
+interface UseTaskPollingReturn {
   pollTaskStatus: (taskId: string, options?: UseTaskPollingOptions) => Promise<TaskStatusResponse>;
 }
 

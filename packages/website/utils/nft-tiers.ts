@@ -3,7 +3,7 @@ interface TierConfig {
   classes: string;
 }
 
-export const TIER_CONFIG: Record<string, TierConfig> = {
+const TIER_CONFIG: Record<string, TierConfig> = {
   bronze: {
     classes: '!bg-orange-700 !text-orange-50',
     medal: '🥉',

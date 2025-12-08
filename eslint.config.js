@@ -57,5 +57,6 @@ export default rotki({
     '**/.output/**',
     '**/coverage/**',
     '**/playwright-report/**',
+    '**/test-results/**',
   ],
 });

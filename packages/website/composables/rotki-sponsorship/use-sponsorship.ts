@@ -7,7 +7,7 @@ import { isTierAvailable as isTierAvailableUtil } from './utils';
  * SSR-only version of useRotkiSponsorship
  * This is the main composable that should be used for data fetching
  */
-export function useRotkiSponsorshipSSR() {
+function useRotkiSponsorshipSSR() {
   const tierSupply = ref<Record<string, TierSupply>>({});
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});

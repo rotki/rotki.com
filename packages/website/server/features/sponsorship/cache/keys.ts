@@ -8,7 +8,7 @@
  * - Sorts and filters query parameters for HTTP URLs
  * - Ensures consistent casing
  */
-export function normalizeUrl(url: string): string {
+function normalizeUrl(url: string): string {
   try {
     const parsed = new URL(url);
 

@@ -8,7 +8,7 @@ import { CACHE_TTL } from '~/server/utils/cache';
 import { deduplicatedFetch } from '~/server/utils/request-dedup';
 import { useLogger } from '~/utils/use-logger';
 
-export interface ImageCacheResult {
+interface ImageCacheResult {
   cached: boolean;
   url: string;
   cacheKey: string;
@@ -19,7 +19,7 @@ export interface ImageCacheResult {
  * Provides efficient methods for fetching, caching, and streaming images
  * Uses ImageCacheManager for caching operations and includes comprehensive error handling
  */
-export class ImageCoreService {
+class ImageCoreService {
   private logger = useLogger('image-core');
 
   /**

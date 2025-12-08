@@ -17,19 +17,3 @@ export function removeNoncePlaceholders(csp: ContentSecurityPolicyValue): Conten
 
   return cleaned;
 }
-
-/**
- * Checks if a CSP configuration contains nonce placeholders
- */
-export function hasNoncePlaceholders(csp: ContentSecurityPolicyValue): boolean {
-  for (const values of Object.values(csp)) {
-    if (Array.isArray(values)) {
-      for (const value of values) {
-        if (value.includes('nonce-') || value.includes('{{nonce}}')) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}

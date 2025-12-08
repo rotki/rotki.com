@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const PremiumTierPlan = z.object({
+const PremiumTierPlan = z.object({
   id: z.number(),
   price: z.string(),
 }).nullable();

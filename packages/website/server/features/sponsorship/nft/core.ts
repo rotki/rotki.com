@@ -13,7 +13,7 @@ import { useLogger } from '~/utils/use-logger';
  * Provides efficient methods for fetching token data, tier information, and metadata
  * Uses multicall for batch operations and includes comprehensive caching
  */
-export class NftCoreService {
+class NftCoreService {
   private logger = useLogger('nft-core');
   private cachedConfig: NftConfig | undefined;
 

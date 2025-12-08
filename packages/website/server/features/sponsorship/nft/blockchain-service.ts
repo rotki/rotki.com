@@ -10,7 +10,7 @@ import { useLogger } from '~/utils/use-logger';
  * Provides methods for contract calls, multicall operations, and RPC management
  * Encapsulates all blockchain complexity away from business logic
  */
-export class BlockchainService {
+class BlockchainService {
   private logger = useLogger('blockchain-service');
 
   /**

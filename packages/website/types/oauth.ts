@@ -7,7 +7,7 @@ export interface OAuthTokenResponse {
   token_type?: string;
 }
 
-export interface OAuthState {
+interface OAuthState {
   mode: OAuthMode;
   timestamp: number;
 }

@@ -1,4 +1,4 @@
-export interface DownloadItemBase {
+interface DownloadItemBase {
   platform: string;
   icon?: 'lu-os-apple' | 'lu-os-windows';
   image?: string;

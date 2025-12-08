@@ -11,7 +11,7 @@ const logger = useLogger('nft-cache-manager');
  * Provides high-level caching methods for NFT metadata, tier info, and token data
  * Uses the generic CacheService for actual storage operations
  */
-export class NftCacheManager {
+class NftCacheManager {
   constructor(private cacheService: CacheService = getCacheService()) {}
 
   /**

@@ -1,4 +1,4 @@
-export type PlanType = 'regular' | 'free' | 'custom';
+type PlanType = 'regular' | 'free' | 'custom';
 
 export type FeatureValue = string | number | boolean | undefined;
 

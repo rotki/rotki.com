@@ -1,4 +1,4 @@
-export interface GithubReleaseAsset {
+interface GithubReleaseAsset {
   readonly name: string;
   readonly browser_download_url: string;
 }

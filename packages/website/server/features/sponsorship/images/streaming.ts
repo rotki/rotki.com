@@ -8,7 +8,7 @@ const logger = useLogger('image-streaming');
  * Image Streaming Utilities - Handles streaming and transform operations for images
  * Provides methods for creating transform streams and readable streams for image data
  */
-export class ImageStreamingService {
+class ImageStreamingService {
   /**
    * Create transform stream for caching while streaming
    */
