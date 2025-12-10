@@ -1,13 +1,11 @@
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/core';
 import { usePlanIdParam } from '~/composables/checkout/use-plan-params';
-import { useTiersStore } from '~/store/tiers';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 
 export function useSelectedPlan() {
   const { planId } = usePlanIdParam();
-
-  const tiersStore = useTiersStore();
-  const { getAvailablePlans, getSelectedPlanFromId } = tiersStore;
+  const { getSelectedPlanFromId } = useAvailablePlans();
 
   const selectedPlan = computed<SelectedPlan | undefined>(() => {
     const planIdVal = get(planId);
@@ -17,10 +15,6 @@ export function useSelectedPlan() {
     }
 
     return getSelectedPlanFromId(planIdVal);
-  });
-
-  onBeforeMount(async () => {
-    await getAvailablePlans();
   });
 
   return {

@@ -2,10 +2,9 @@
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { PaymentMethod, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get, set } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
 import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
 import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
-import { useTiersStore } from '~/store/tiers';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { PricingPeriod } from '~/types/tiers';
 import { navigateToWithCSPSupport } from '~/utils/navigation';
 
@@ -13,8 +12,7 @@ const subscription = defineModel<Subscription | undefined>({ required: true });
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useTiersStore();
-const { availablePlans } = storeToRefs(store);
+const { availablePlans } = useAvailablePlans();
 const router = useRouter();
 
 const selectedPlan = ref<AvailablePlan>();

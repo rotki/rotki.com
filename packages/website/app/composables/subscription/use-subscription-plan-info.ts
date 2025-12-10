@@ -1,14 +1,12 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { PremiumTierInfo, PremiumTierInfoDescription } from '~/types/tiers';
 import { get } from '@vueuse/shared';
-import { storeToRefs } from 'pinia';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
-import { useTiersStore } from '~/store/tiers';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 
 export function useSubscriptionPlanInfo(subscription: Ref<UserSubscription>) {
   const { getPlanDisplayName } = useSubscriptionDisplay();
-  const tiersStore = useTiersStore();
-  const { tiersInformation } = storeToRefs(tiersStore);
+  const { tiersInformation } = usePremiumTiersInfo();
 
   /**
    * Finds the tier information for the subscription's plan

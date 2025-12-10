@@ -1,15 +1,13 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
-import { useTiersStore } from '~/store/tiers';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const route = useRoute();
-const store = useTiersStore();
-const { availablePlans } = storeToRefs(store);
+const { pending: loadingPlans } = useAvailablePlans();
 
 const isCardOrSecureRoute = computed<boolean>(() => {
   const routeName = route.name;
@@ -77,7 +75,6 @@ const isTwoColumnLayout = computed<boolean>(() => {
 
 onBeforeMount(() => {
   removeStoredRedirectUrl();
-  store.getAvailablePlans().catch(() => {});
 });
 </script>
 
@@ -90,7 +87,7 @@ onBeforeMount(() => {
   >
     <div class="flex justify-center grow overflow-hidden min-w-min">
       <RuiProgress
-        v-if="!availablePlans"
+        v-if="loadingPlans"
         circular
         class="mt-20"
         color="primary"

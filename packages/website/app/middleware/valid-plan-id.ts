@@ -1,9 +1,8 @@
 import { get } from '@vueuse/core';
-import { useTiersStore } from '~/store/tiers';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const tiersStore = useTiersStore();
-  const { availablePlans } = storeToRefs(tiersStore);
+  const { availablePlans, refresh } = useAvailablePlans();
 
   const navigate = async () => {
     const { period, plan } = to.query;
@@ -24,7 +23,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Ensure available plans are loaded
   if (get(availablePlans).length === 0) {
-    await tiersStore.getAvailablePlans();
+    await refresh();
   }
 
   // Check if planId exists in any of the available plans

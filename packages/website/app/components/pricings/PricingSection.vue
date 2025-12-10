@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import PricingTierComparison from '~/components/pricings/PricingTierComparison.vue';
-import { useTiersStore } from '~/store/tiers';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 import { PricingPeriod } from '~/types/tiers';
 
 defineProps<{
@@ -11,15 +11,8 @@ defineProps<{
 
 const selectedPricingPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
 
-const store = useTiersStore();
-const { tiersInformation, availablePlans } = storeToRefs(store);
-
-onBeforeMount(async () => {
-  await Promise.all([
-    store.getPremiumTiersInfo(),
-    store.getAvailablePlans(),
-  ]);
-});
+const { availablePlans } = useAvailablePlans();
+const { tiersInformation } = usePremiumTiersInfo();
 </script>
 
 <template>

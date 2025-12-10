@@ -7,9 +7,10 @@ import PricingHeading from '~/components/pricings/PricingHeading.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import PricingTierComparison from '~/components/pricings/PricingTierComparison.vue';
 import PricingTierComparisonSkeleton from '~/components/pricings/PricingTierComparisonSkeleton.vue';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 import { useCountries } from '~/composables/use-countries';
 import { useMainStore } from '~/store';
-import { useTiersStore } from '~/store/tiers';
 import { PricingPeriod } from '~/types/tiers';
 import { getCountryName } from '~/utils/countries';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
@@ -42,9 +43,9 @@ const { t } = useI18n({ useScope: 'global' });
 const selectedPricingPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
 
 const mainStore = useMainStore();
-const tiersStore = useTiersStore();
 const { account } = storeToRefs(mainStore);
-const { country, availablePlans, tiersInformation } = storeToRefs(tiersStore);
+const { availablePlans, country } = useAvailablePlans();
+const { tiersInformation } = usePremiumTiersInfo();
 const { countries } = useCountries();
 
 const countryName = computed<string>(
@@ -62,13 +63,6 @@ const planNotes = computed<string[]>(() => {
     t('home.plans.tiers.step_1.notes.line_3'),
     t('home.plans.tiers.step_1.notes.line_4'),
   ];
-});
-
-onBeforeMount(async () => {
-  await Promise.all([
-    tiersStore.getAvailablePlans(),
-    tiersStore.getPremiumTiersInfo(),
-  ]);
 });
 </script>
 

@@ -1,22 +1,18 @@
 <script setup lang="ts">
 import type { PremiumTierInfo, PremiumTierInfoDescription } from '~/types/tiers';
 import { get } from '@vueuse/shared';
-import { storeToRefs } from 'pinia';
 import AppLogo from '~/components/common/AppLogo.vue';
-import { useTiersStore } from '~/store/tiers';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const tiersStore = useTiersStore();
-const { tiersInformation } = storeToRefs(tiersStore);
+const { tiersInformation, pending: isLoading } = usePremiumTiersInfo();
 
 const basicTier = computed<PremiumTierInfo | undefined>(() => get(tiersInformation)[0]);
 
 const monthlyPrice = computed<string | undefined>(() => get(basicTier)?.monthlyPlan?.price);
 
 const features = computed<PremiumTierInfoDescription[]>(() => get(basicTier)?.description.slice(0, 4) || []);
-
-const isLoading = computed<boolean>(() => get(tiersInformation).length === 0);
 </script>
 
 <template>

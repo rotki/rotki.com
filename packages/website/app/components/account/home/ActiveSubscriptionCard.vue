@@ -20,8 +20,8 @@ import { useSubscriptionDisplay } from '~/composables/subscription/use-subscript
 import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
 import { useSubscriptionPlanInfo } from '~/composables/subscription/use-subscription-plan-info';
 import { useSubscriptionStatus } from '~/composables/subscription/use-subscription-status';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
-import { useTiersStore } from '~/store/tiers';
 import { formatDate } from '~/utils/date';
 
 interface Props {
@@ -64,8 +64,7 @@ const {
   status,
 } = storeToRefs(subscriptionOpsStore);
 
-const tiersStore = useTiersStore();
-const { availablePlans } = storeToRefs(tiersStore);
+const { availablePlans } = useAvailablePlans();
 
 // Unified action state
 const activeAction = ref<SubscriptionActionType>();
