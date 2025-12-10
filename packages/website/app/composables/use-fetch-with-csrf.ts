@@ -82,12 +82,20 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       if (import.meta.server || import.meta.env.NODE_ENV === 'test') {
         let cookieString = event?.headers.get('cookie');
 
-        try {
-          const requestHeaders = useRequestHeaders(['cookie']);
-          cookieString = requestHeaders.cookie;
+        // Only try useRequestHeaders if we have a valid Nuxt context
+        const nuxtApp = tryUseNuxtApp();
+        if (nuxtApp) {
+          try {
+            const requestHeaders = useRequestHeaders(['cookie']);
+            cookieString = requestHeaders.cookie;
+          }
+          catch (error: any) {
+            logger.error(error);
+          }
         }
-        catch (error: any) {
-          logger.error(error);
+
+        // Fallback to session cookie if no cookie string from request headers
+        if (!cookieString) {
           const session = get(sessionId);
           if (session && token) {
             cookieString = `${CSRF_COOKIE}=${token}; sessionid=${session}`;
