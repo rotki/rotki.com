@@ -38,13 +38,10 @@ const tiersStore = useTiersStore();
 const { getAvailablePlans, getPremiumTiersInfo } = tiersStore;
 
 const premium = computed<boolean>(() => get(account)?.canUsePremium ?? false);
+const isSubscriber = computed<boolean>(() => get(account)?.hasActiveSubscription ?? false);
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
 const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
-
-const canUsePremium = computed<boolean>(() => {
-  const arePending = get(pending);
-  return get(account)?.canUsePremium || arePending.length > 0;
-});
+const canUsePremium = computed<boolean>(() => get(premium) || get(pending).length > 0);
 
 const subscriptionError = computed<string>(() => get(error) || '');
 const subscriptionErrorTitle = computed<string>(() => {
@@ -72,7 +69,7 @@ onBeforeMount(() => {
 <template>
   <div class="space-y-10">
     <UnverifiedEmailWarning v-if="!emailConfirmed" />
-    <PremiumPlaceholder v-else-if="!canUsePremium" />
+    <PremiumPlaceholder v-else-if="!canUsePremium && !isSubscriber" />
 
     <template v-else>
       <ActiveSubscriptionCardSkeleton v-if="initialSubscriptionsLoading" />
