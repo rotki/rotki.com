@@ -6,8 +6,8 @@ import { useCryptoPaymentFlowPurchase } from '~/composables/checkout/use-crypto-
 import { useCryptoPaymentFlowUpgrade } from '~/composables/checkout/use-crypto-payment-flow-upgrade';
 import { useCryptoPaymentState } from '~/composables/checkout/use-crypto-payment-state';
 import { usePlanIdParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useAccountRefresh } from '~/composables/use-app-events';
-import { useTiersStore } from '~/store/tiers';
 import { assert } from '~/utils/assert';
 
 interface UseCryptoPaymentFlowReturn {
@@ -31,8 +31,7 @@ export function useCryptoPaymentFlow(
   const router = useRouter();
   const { planId } = usePlanIdParam();
   const { upgradeSubId } = useSubscriptionIdParam();
-  const tiersStore = useTiersStore();
-  const { getSelectedPlanFromId, getAvailablePlans } = tiersStore;
+  const { getSelectedPlanFromId, refresh: refreshAvailablePlans } = useAvailablePlans();
 
   // Import purchase and upgrade flows
   const purchaseFlow = useCryptoPaymentFlowPurchase();
@@ -177,8 +176,8 @@ export function useCryptoPaymentFlow(
    * @returns true if initialization is successful, false if should navigate away
    */
   const initialize = async (): Promise<boolean> => {
-    // Load plans first
-    await getAvailablePlans();
+    // Ensure plans are loaded
+    await refreshAvailablePlans();
 
     // Get selected plan from planId
     const planIdVal = get(planId);

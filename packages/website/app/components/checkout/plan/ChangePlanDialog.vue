@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set, toRefs } from '@vueuse/core';
-import { storeToRefs } from 'pinia';
 import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { usePlanIdParam } from '~/composables/checkout/use-plan-params';
-import { useTiersStore } from '~/store/tiers';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { PricingPeriod } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';
 
@@ -24,9 +23,7 @@ const { visible, warning } = toRefs(props);
 
 const { t } = useI18n({ useScope: 'global' });
 
-const tiersStore = useTiersStore();
-const { getPlanDetailsFromId } = tiersStore;
-const { availablePlans } = storeToRefs(tiersStore);
+const { availablePlans, getPlanDetailsFromId } = useAvailablePlans();
 
 const confirmed = ref<boolean>(false);
 const selectedPlanPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
@@ -65,9 +62,7 @@ watch(visible, (visible) => {
   }
 });
 
-onBeforeMount(async () => {
-  tiersStore.getAvailablePlans().catch();
-
+onBeforeMount(() => {
   // Initialize period from current plan
   const currentPlan = get(currentPlanDetails);
   if (currentPlan?.period) {

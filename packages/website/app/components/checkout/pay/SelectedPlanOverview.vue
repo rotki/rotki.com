@@ -3,7 +3,7 @@ import type { PriceBreakdown, SelectedPlan } from '@rotki/card-payment-common/sc
 import { get, isDefined, set } from '@vueuse/core';
 import { computed } from 'vue';
 import ChangePlanDialog from '~/components/checkout/plan/ChangePlanDialog.vue';
-import { useTiersStore } from '~/store/tiers';
+import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
 import { logger } from '~/utils/use-logger';
@@ -42,7 +42,7 @@ const priceBreakdown = ref<PriceBreakdown>();
 const isLoadingPriceBreakdown = ref<boolean>(false);
 const selection = ref<boolean>(false);
 
-const tiersStore = useTiersStore();
+const { fetchPriceBreakdown: getPriceBreakdown } = useTiersApi();
 
 const name = computed<string>(() => getPlanNameFor(t, get(plan)));
 
@@ -78,7 +78,7 @@ const vatOverview = computed<VatOverview | undefined>(() => {
 async function fetchPriceBreakdown(): Promise<void> {
   set(isLoadingPriceBreakdown, true);
   try {
-    const breakdown = await tiersStore.getPriceBreakdown(get(plan).planId);
+    const breakdown = await getPriceBreakdown(get(plan).planId);
     set(priceBreakdown, breakdown);
   }
   catch (error) {

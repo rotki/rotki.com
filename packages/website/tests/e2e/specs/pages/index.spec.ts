@@ -39,6 +39,8 @@ test.describe('download page', () => {
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/', { waitUntil: 'networkidle' });
     // Wait for the pricing section to load (it's wrapped in ClientOnly)
+    // Click "See all features" first to expand the pricing section and avoid the gradient overlay
+    await page.getByRole('button', { name: 'See all features' }).click({ timeout: 30000 });
     await page.getByRole('button', { name: 'Start now for free' }).first().click({ timeout: 30000 });
 
     await expect(page).toHaveURL(/.*\/download/);

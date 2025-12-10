@@ -16,7 +16,6 @@ import { useUserSubscriptions } from '~/composables/subscription/use-user-subscr
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
-import { useTiersStore } from '~/store/tiers';
 
 definePageMeta({
   layout: 'account',
@@ -33,9 +32,6 @@ const { requestRefresh } = useAccountRefresh();
 const subscriptionOpsStore = useSubscriptionOperationsStore();
 const { error, operationType } = storeToRefs(subscriptionOpsStore);
 const { setError } = subscriptionOpsStore;
-
-const tiersStore = useTiersStore();
-const { getAvailablePlans, getPremiumTiersInfo } = tiersStore;
 
 const premium = computed<boolean>(() => get(account)?.canUsePremium ?? false);
 const isSubscriber = computed<boolean>(() => get(account)?.hasActiveSubscription ?? false);
@@ -61,8 +57,6 @@ function dismissSubscriptionError(): void {
 
 onBeforeMount(() => {
   requestRefresh();
-  getAvailablePlans();
-  getPremiumTiersInfo();
 });
 </script>
 

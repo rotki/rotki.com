@@ -18,8 +18,8 @@ import { useSubscriptionDisplay } from '~/composables/subscription/use-subscript
 import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
 import { useSubscriptionPolling } from '~/composables/subscription/use-subscription-polling';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
-import { useTiersStore } from '~/store/tiers';
 import { formatDate } from '~/utils/date';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -41,8 +41,7 @@ const {
   status,
 } = storeToRefs(subscriptionOpsStore);
 
-const tiersStore = useTiersStore();
-const { availablePlans } = storeToRefs(tiersStore);
+const { availablePlans } = useAvailablePlans();
 
 // Composables
 const { userSubscriptions, loading, refresh: refreshSubscriptions } = useUserSubscriptions();
