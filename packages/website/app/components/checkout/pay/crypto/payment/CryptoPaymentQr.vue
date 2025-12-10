@@ -102,7 +102,7 @@ watch(canvas, async (canvas) => {
               class="mb-2"
             />
             <p class="text-sm">
-              {{ t('subscription.progress.processing') }}
+              {{ t('common.loading') }}
             </p>
           </div>
         </div>
