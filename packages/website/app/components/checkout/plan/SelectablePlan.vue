@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
-import { get } from '@vueuse/core';
-import { PricingPeriod } from '~/types/tiers';
+import { get, set } from '@vueuse/core';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
+import { type PremiumTierInfoDescription, PricingPeriod } from '~/types/tiers';
 import { formatCurrency, toTitleCase } from '~/utils/text';
 
 const props = withDefaults(defineProps<{
@@ -19,9 +20,15 @@ const emit = defineEmits<{
   clear: [];
 }>();
 
+const MAX_VISIBLE_FEATURES = 3;
+
 const { t } = useI18n({ useScope: 'global' });
 
+const { tiersInformation } = usePremiumTiersInfo();
+
 const { plan, period, selected } = toRefs(props);
+
+const showAllFeatures = ref<boolean>(false);
 
 const price = computed<string | undefined>(() => {
   const { monthlyPlan, yearlyPlan } = get(plan);
@@ -64,6 +71,27 @@ const discountInfo = computed<{
     monthlyPrice: formatCurrency(yearlyPrice / 12),
   };
 });
+
+const planFeatures = computed<PremiumTierInfoDescription[]>(() => {
+  const tiers = get(tiersInformation);
+  const tierInfo = tiers.find(tier => tier.name === props.plan.tierName);
+  return tierInfo?.description ?? [];
+});
+
+const visibleFeatures = computed<PremiumTierInfoDescription[]>(() => {
+  const features = get(planFeatures);
+  if (get(showAllFeatures)) {
+    return features;
+  }
+  return features.slice(0, MAX_VISIBLE_FEATURES);
+});
+
+const hasMoreFeatures = computed<boolean>(() => get(planFeatures).length > MAX_VISIBLE_FEATURES);
+
+function toggleFeatures(event: MouseEvent): void {
+  event.stopPropagation();
+  set(showAllFeatures, !get(showAllFeatures));
+}
 
 watch(price, (price) => {
   if (!price && get(selected)) {
@@ -122,6 +150,47 @@ watch(price, (price) => {
       <div v-if="discountInfo">
         {{ discountInfo.monthlyPrice }}€/{{ t('pricing.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
       </div>
+    </div>
+
+    <div
+      v-if="visibleFeatures.length > 0"
+      class="mb-4 pb-4 border-b border-black/[0.08]"
+    >
+      <ul class="space-y-2">
+        <li
+          v-for="feature in visibleFeatures"
+          :key="feature.label"
+          class="flex items-center gap-2 text-sm text-rui-text-secondary"
+        >
+          <span class="flex-1">{{ feature.label }}</span>
+          <RuiIcon
+            v-if="typeof feature.value === 'boolean' && feature.value"
+            name="lu-circle-check"
+            size="16"
+            color="success"
+          />
+          <RuiIcon
+            v-else-if="typeof feature.value === 'boolean' && !feature.value"
+            name="lu-minus"
+            size="16"
+            class="text-rui-text-disabled"
+          />
+          <span
+            v-else
+            class="font-medium text-rui-primary"
+          >
+            {{ feature.value }}
+          </span>
+        </li>
+      </ul>
+      <button
+        v-if="hasMoreFeatures"
+        type="button"
+        class="mt-3 text-sm text-rui-primary hover:underline font-medium"
+        @click="toggleFeatures($event)"
+      >
+        {{ showAllFeatures ? t('pricing.see_less_features') : t('pricing.see_all_features') }}
+      </button>
     </div>
 
     <RuiButton
