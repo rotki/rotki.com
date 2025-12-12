@@ -2,6 +2,7 @@
 .nuxt
 .nitro
 .data
+coverage
 playwright-report
 tests/e2e/test-results
 tests/e2e/mock-api/.nitro

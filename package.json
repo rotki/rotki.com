@@ -2,7 +2,7 @@
   "name": "rotki.com",
   "version": "2025.12.2",
   "private": true,
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.25.0",
   "type": "module",
   "scripts": {
     "dev": "run-p dev:website dev:card",
@@ -31,8 +31,8 @@
     "release": "bumpp -r --no-push"
   },
   "devDependencies": {
-    "@commitlint/cli": "20.1.0",
-    "@commitlint/config-conventional": "20.0.0",
+    "@commitlint/cli": "20.2.0",
+    "@commitlint/config-conventional": "20.2.0",
     "@rotki/eslint-config": "4.5.0",
     "@rotki/eslint-plugin": "1.2.0",
     "bumpp": "10.3.2",
@@ -47,9 +47,7 @@
     "stylelint": "16.26.1",
     "stylelint-config-recommended-vue": "1.6.1",
     "stylelint-config-standard": "39.0.1",
-    "stylelint-config-standard-scss": "16.0.0",
-    "stylelint-order": "7.0.0",
-    "stylelint-scss": "6.12.1"
+    "stylelint-order": "7.0.0"
   },
   "engines": {
     "node": ">=22 <23",

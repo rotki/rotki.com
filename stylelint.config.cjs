@@ -1,31 +1,29 @@
 module.exports = {
-  plugins: ['stylelint-scss', 'stylelint-order'],
-  extends: ['stylelint-config-recommended-vue/scss'],
-  overrides: [
-    {
-      files: ['**/*.scss'],
-      customSyntax: 'postcss-scss',
-    },
-  ],
+  extends: ['stylelint-config-standard', 'stylelint-config-recommended-vue'],
+  plugins: ['stylelint-order'],
   rules: {
-    'at-rule-no-unknown': null,
-    'scss/at-rule-no-unknown': [
+    'at-rule-no-unknown': [
       true,
       {
         ignoreAtRules: [
-          /apply/,
-          /layer/,
-          /tailwind/,
-          /screen/,
-          /if/,
-          /else/,
-          /return/,
-          /function/,
-          /debug/,
+          'apply',
+          'config',
+          'layer',
+          'responsive',
+          'screen',
+          'tailwind',
+          'utility',
+          'variants',
         ],
       },
     ],
+    'function-no-unknown': [
+      true,
+      {
+        ignoreFunctions: ['theme'],
+      },
+    ],
+    'import-notation': 'string',
     'no-descending-specificity': null,
-    'scss/at-import-partial-extension': null,
   },
 };

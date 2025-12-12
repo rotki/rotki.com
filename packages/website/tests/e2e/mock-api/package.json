@@ -7,6 +7,6 @@
     "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
-    "nitropack": "^2.11.12"
+    "nitropack": "2.12.9"
   }
 }
