@@ -10,13 +10,56 @@ const mockRelease = {
   ],
 };
 
+const mockAvailableTiers = {
+  settings: {
+    is_authenticated: false,
+    country: null,
+  },
+  tiers: [
+    { tier_name: 'Free', monthly_plan: null, yearly_plan: null },
+    { tier_name: 'Basic', monthly_plan: { plan_id: 3, price: '25.00' }, yearly_plan: { plan_id: 4, price: '250.00' } },
+    { tier_name: 'Advanced', monthly_plan: { plan_id: 1, price: '45.00' }, yearly_plan: { plan_id: 2, price: '450.00' } },
+  ],
+};
+
+const mockTiersInfo = [
+  {
+    name: 'Basic',
+    monthly_plan: { price: '25.00', id: 3 },
+    yearly_plan: { price: '250.00', id: 4 },
+    limits: { eth_staked_limit: 128, limit_of_devices: 2, pnl_events_limit: 30000, max_backup_size_mb: 150, history_events_limit: 30000, reports_lookup_limit: 100 },
+    description: [
+      { label: 'Historical events limit', value: '30K events' },
+      { label: 'Encrypted data backups', value: 'Store up to 150MB' },
+    ],
+  },
+  {
+    name: 'Advanced',
+    monthly_plan: { price: '45.00', id: 1 },
+    yearly_plan: { price: '450.00', id: 2 },
+    limits: { eth_staked_limit: 384, limit_of_devices: 4, pnl_events_limit: 100000, max_backup_size_mb: 600, history_events_limit: 100000, reports_lookup_limit: 300 },
+    description: [
+      { label: 'Historical events limit', value: '100K events' },
+      { label: 'Encrypted data backups', value: 'Store up to 600MB' },
+    ],
+  },
+];
+
+async function setupTiersMocks(page: import('@playwright/test').Page): Promise<void> {
+  await page.route('**/webapi/2/available-tiers', async route => route.fulfill({ json: mockAvailableTiers }));
+  await page.route('**/webapi/2/tiers/info', async route => route.fulfill({ json: mockTiersInfo }));
+  await page.route('**/webapi/csrf/**', async route => route.fulfill({ json: { detail: 'CSRF cookie set' } }));
+}
+
 test.describe('homepage', () => {
   test('successfully loads', async ({ page }) => {
+    await setupTiersMocks(page);
     await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
   test('checks our homepage hero buttons!', async ({ page }) => {
+    await setupTiersMocks(page);
     await page.goto('/', { waitUntil: 'networkidle' });
 
     await expect(
@@ -36,8 +79,11 @@ test.describe('homepage', () => {
 
 test.describe('download page', () => {
   test('download page loads properly', async ({ page }) => {
+    await setupTiersMocks(page);
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/', { waitUntil: 'networkidle' });
+    // Scroll to the pricing section first to ensure it's in view
+    await page.locator('[data-cy="pricing-section"]').scrollIntoViewIfNeeded();
     // Wait for the pricing section to load (it's wrapped in ClientOnly)
     // Click "See all features" first to expand the pricing section and avoid the gradient overlay
     await page.getByRole('button', { name: 'See all features' }).click({ timeout: 30000 });

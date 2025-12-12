@@ -13,11 +13,17 @@ const defaultTiersInfo: PremiumTiersInfo = [];
 function usePremiumTiersInfoInternal(): UsePremiumTiersInfoReturn {
   const { fetchPremiumTiersInfo } = useTiersApi();
 
-  const { data: tiersInformation, pending } = useLazyAsyncData(
+  const { data: tiersInformation, pending, execute } = useLazyAsyncData(
     'premium-tiers-info',
     fetchPremiumTiersInfo,
-    { default: () => defaultTiersInfo },
+    {
+      default: () => defaultTiersInfo,
+      // Do not execute during SSR/prerender. Fetch on client after hydration.
+      server: false,
+    },
   );
+
+  onMounted(execute);
 
   return {
     pending,

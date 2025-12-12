@@ -29,10 +29,14 @@ const defaultAvailablePlansData: AvailablePlansResponse = {
 function useAvailablePlansInternal(): UseAvailablePlansReturn {
   const { fetchAvailablePlans } = useTiersApi();
 
-  const { data: availablePlansData, pending, refresh } = useLazyAsyncData(
+  const { data: availablePlansData, pending, refresh, execute } = useLazyAsyncData(
     'available-plans',
     fetchAvailablePlans,
-    { default: () => defaultAvailablePlansData },
+    {
+      default: () => defaultAvailablePlansData,
+      // Do not execute during SSR/prerender. Fetch on client after hydration.
+      server: false,
+    },
   );
 
   const availablePlans = computed<AvailablePlans>(() => {
@@ -103,6 +107,8 @@ function useAvailablePlansInternal(): UseAvailablePlansReturn {
       price: Number.parseFloat(foundPlan.price),
     };
   }
+
+  onMounted(execute);
 
   return {
     availablePlans,

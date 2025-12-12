@@ -47,6 +47,9 @@ export default defineConfig({
     // Mock API server - starts first
     {
       command: 'pnpm --filter e2e-mock-api dev',
+      env: {
+        ALLOWED_ORIGIN: `http://localhost:${port}`,
+      },
       url: `http://localhost:${mockApiPort}/webapi/2/available-tiers`,
       reuseExistingServer: !process.env.CI,
       timeout: 60000,
@@ -58,8 +61,10 @@ export default defineConfig({
         NUXT_PORT: port,
         PORT: port,
         TEST: 'true',
-        // Point API calls to the mock server
-        NUXT_PUBLIC_BASE_URL: `http://localhost:${mockApiPort}`,
+        NUXT_PUBLIC_BASE_URL: `http://localhost:${port}`,
+        // Configure devProxy to use mock server (http, not https)
+        PROXY_DOMAIN: `http://localhost:${mockApiPort}`,
+        PROXY_INSECURE: 'true',
       },
       url: baseURL,
       reuseExistingServer: !process.env.CI,

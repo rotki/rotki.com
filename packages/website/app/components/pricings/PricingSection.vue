@@ -16,7 +16,10 @@ const { tiersInformation } = usePremiumTiersInfo();
 </script>
 
 <template>
-  <div class="container flex flex-col gap-12 pb-10 md:pb-20">
+  <div
+    data-cy="pricing-section"
+    class="container flex flex-col gap-12 pb-10 md:pb-20"
+  >
     <PricingPeriodTab
       v-model="selectedPricingPeriod"
       :data="availablePlans"
