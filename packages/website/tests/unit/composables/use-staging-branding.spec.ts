@@ -82,7 +82,7 @@ describe('useStagingBranding', () => {
   });
 
   describe('localhost environment', () => {
-    it('should return isStaging as true for localhost', async () => {
+    it('should return isStaging as false for localhost in production mode', async () => {
       useRuntimeConfig.mockReturnValue({
         public: { isDev: false },
       });
@@ -93,7 +93,7 @@ describe('useStagingBranding', () => {
       const { useStagingBranding } = await import('~/composables/use-staging-branding');
       const { isStaging } = useStagingBranding();
 
-      expect(get(isStaging)).toBe(true);
+      expect(get(isStaging)).toBe(false);
 
       restore();
     });

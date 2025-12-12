@@ -1,9 +1,13 @@
+import type { Ref } from 'vue';
+import { createSharedComposable } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 
 const STAGING_HOSTNAME = 'staging.rotki.com';
 const LOCALHOST = 'localhost';
 
-export function useStagingBranding(): { isStaging: Readonly<Ref<boolean>> } {
+interface UseStagingBrandingReturn { isStaging: Readonly<Ref<boolean>> }
+
+export const useStagingBranding = createSharedComposable((): UseStagingBrandingReturn => {
   const { isDev } = useRuntimeConfig().public;
 
   // Get the request URL at setup time (when Nuxt instance is available)
@@ -14,10 +18,15 @@ export function useStagingBranding(): { isStaging: Readonly<Ref<boolean>> } {
     if (isDev)
       return true;
 
+    // On the server, do NOT treat localhost as staging because behind proxies
+    // the SSR hostname can be "localhost" even for production requests.
     if (import.meta.server)
-      return serverHostname === STAGING_HOSTNAME || serverHostname === LOCALHOST;
+      return serverHostname === STAGING_HOSTNAME;
 
-    return window.location.hostname === STAGING_HOSTNAME || window.location.hostname === LOCALHOST;
+    // On the client, allow localhost only for development; otherwise
+    // only staging.rotki.com should enable staging branding.
+    const hostname = window.location.hostname;
+    return hostname === STAGING_HOSTNAME || (isDev && hostname === LOCALHOST);
   });
 
   useHead(() => {
@@ -39,4 +48,4 @@ export function useStagingBranding(): { isStaging: Readonly<Ref<boolean>> } {
   return {
     isStaging: readonly(isStaging),
   };
-}
+});
