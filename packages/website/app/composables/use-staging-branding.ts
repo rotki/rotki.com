@@ -8,20 +8,18 @@ const LOCALHOST = 'localhost';
 interface UseStagingBrandingReturn { isStaging: Readonly<Ref<boolean>> }
 
 export const useStagingBranding = createSharedComposable((): UseStagingBrandingReturn => {
-  const { isDev } = useRuntimeConfig().public;
+  const { isDev, baseUrl } = useRuntimeConfig().public;
 
-  // Get the request URL at setup time (when Nuxt instance is available)
-  // to avoid "[nuxt] instance unavailable" errors when computed is evaluated later
-  const serverHostname = import.meta.server ? useRequestURL().hostname : undefined;
+  // Use NUXT_PUBLIC_BASE_URL for consistent hostname detection across SSR/prerender/client
+  const configHostname = baseUrl ? new URL(baseUrl).hostname : undefined;
 
   const isStaging = computed<boolean>(() => {
     if (isDev)
       return true;
 
-    // On the server, do NOT treat localhost as staging because behind proxies
-    // the SSR hostname can be "localhost" even for production requests.
+    // Use the configured base URL hostname for SSR and prerender
     if (import.meta.server)
-      return serverHostname === STAGING_HOSTNAME;
+      return configHostname === STAGING_HOSTNAME;
 
     // On the client, allow localhost only for development; otherwise
     // only staging.rotki.com should enable staging branding.
