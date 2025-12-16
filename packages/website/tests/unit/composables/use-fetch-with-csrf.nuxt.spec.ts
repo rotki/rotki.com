@@ -1,17 +1,23 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import type { Country } from '~/composables/use-countries';
+import type { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 const logout = vi.fn();
 const refresh = vi.fn();
 
-const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
-setHooks({ logout, refresh });
+let fetchWithCsrf: ReturnType<typeof useFetchWithCsrf>['fetchWithCsrf'];
 
 describe('useFetchWithCsrf composable', () => {
+  beforeAll(async () => {
+    const { useFetchWithCsrf } = await import('~/composables/use-fetch-with-csrf');
+    const result = useFetchWithCsrf();
+    fetchWithCsrf = result.fetchWithCsrf;
+    result.setHooks({ logout, refresh });
+  });
+
   afterEach(() => {
     logout.mockReset();
     refresh.mockReset();

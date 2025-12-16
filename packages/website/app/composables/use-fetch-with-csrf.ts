@@ -109,7 +109,7 @@ export const useFetchWithCsrf = createSharedComposable(() => {
         };
       }
 
-      options.headers = headers;
+      options.headers = new Headers(headers);
       options.baseURL = baseUrl;
       // Only convert keys for non-FormData bodies
       if (!isFormData) {

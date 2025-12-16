@@ -50,7 +50,7 @@
     "stylelint-order": "7.0.1"
   },
   "engines": {
-    "node": ">=22 <23",
+    "node": ">=24 <25",
     "pnpm": ">=10 <11"
   },
   "pnpm": {

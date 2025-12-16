@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@rotki/ui-library": "catalog:",
-    "@tsconfig/node22": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/braintree-web": "catalog:",
     "@types/jsdom": "27.0.0",
     "@types/node": "catalog:",

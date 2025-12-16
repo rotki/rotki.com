@@ -70,7 +70,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@tsconfig/node22": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/node": "catalog:",
     "tsdown": "0.19.0",
     "typescript": "catalog:"

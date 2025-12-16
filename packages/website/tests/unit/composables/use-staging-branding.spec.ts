@@ -3,11 +3,14 @@ import { get } from '@vueuse/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const { useRuntimeConfig } = vi.hoisted(() => ({
-  useRuntimeConfig: vi.fn(),
+  useRuntimeConfig: vi.fn().mockReturnValue({
+    app: { baseURL: '/', buildId: 'test' },
+    public: { isDev: false },
+  }),
 }));
 
 const { useRequestURL } = vi.hoisted(() => ({
-  useRequestURL: vi.fn(),
+  useRequestURL: vi.fn().mockReturnValue(new URL('https://rotki.com')),
 }));
 
 mockNuxtImport('useRuntimeConfig', () => useRuntimeConfig);

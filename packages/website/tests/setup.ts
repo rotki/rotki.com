@@ -1,5 +1,6 @@
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { createFetch } from 'ofetch';
+import { afterAll, afterEach } from 'vitest';
 import { server } from '~~/tests/mocks/server';
 
 mockNuxtImport('useRuntimeConfig', () => () => {
@@ -27,7 +28,13 @@ mockNuxtImport('useRuntimeConfig', () => () => {
   };
 });
 
-beforeAll(() => server.listen({ onUnhandledRequest: `error` }));
+// Start MSW before Nuxt environment initialization (which runs in beforeAll with @nuxt/test-utils v4)
+server.listen({ onUnhandledRequest: `error` });
+
+// Nuxt's auto-imported $fetch uses an internal fetch reference that MSW cannot intercept
+// in Vitest v4's Module Runner context. Replace it with a fresh ofetch instance that uses
+// the MSW-patched globalThis.fetch. See: https://github.com/nuxt/test-utils/issues/775
+globalThis.$fetch = createFetch() as typeof globalThis.$fetch;
 
 afterAll(() => server.close());
 

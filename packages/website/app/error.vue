@@ -10,7 +10,14 @@ defineOptions({
 
 const error = useError();
 
-const title = computed(() => get(error)?.message ?? '');
+const title = computed<string>(() => get(error)?.message ?? '');
+
+const statusCode = computed<number>(() => get(error)?.status ?? -1);
+
+const isClientError = computed<boolean>(() => {
+  const code = get(statusCode);
+  return code >= 404 && code < 500;
+});
 
 useHead(() => ({
   title,
@@ -18,14 +25,9 @@ useHead(() => ({
   ...commonAttrs(),
 }));
 
-const statusCode = computed(() => {
-  const err = get(error);
-  return err && 'statusCode' in err ? err.statusCode : -1;
-});
-
-const isClientError = computed(() => get(statusCode) >= 404 && get(statusCode) < 500);
-
-const handleError = () => clearError({ redirect: '/' });
+function handleError() {
+  return clearError({ redirect: '/' });
+}
 </script>
 
 <template>
