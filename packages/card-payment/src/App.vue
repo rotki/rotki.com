@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { useHead } from '@unhead/vue';
 import { get, set } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
@@ -66,7 +65,7 @@ const errorMessage = ref<string>('');
 const plan = ref<string>();
 const upgradeSubId = ref<string | null>(null);
 const referralCode = ref<string | null>(null);
-const planData = ref<CheckoutData | UpgradeData>();
+const planData = ref<PaymentBreakdownResponse>();
 const selectedPlan = ref<SelectedPlan>();
 const selectedCard = ref<SavedCard>();
 
@@ -133,7 +132,7 @@ async function load() {
 
     // Load checkout data, available plans, and saved card in parallel
     const [checkoutData, availablePlansData, savedCardData] = await Promise.all([
-      checkout(planId, upgradeId),
+      checkout(planId),
       getAvailablePlans(),
       getSavedCard(),
     ]);

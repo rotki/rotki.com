@@ -1,125 +1,74 @@
 <script setup lang="ts">
-import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { type DiscountInfo, DiscountInfoSchema, DiscountType } from '@rotki/card-payment-common/schemas/discount';
+import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 const model = defineModel<string>({ required: true });
 
-const discountInfo = defineModel<DiscountInfo | undefined>('discountInfo', { required: true });
-
 const props = defineProps<{
   plan: SelectedPlan;
+  crypto?: boolean;
   disabled?: boolean;
-  upgradeSubId?: string;
+  discountInfo?: PaymentBreakdownDiscount;
 }>();
 
-const { plan, disabled, upgradeSubId } = toRefs(props);
+const { disabled, discountInfo } = toRefs(props);
 
 const value = ref<string>('');
-const loading = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
-const { fetchWithCsrf } = useFetchWithCsrf();
 
-async function fetchDiscountInfo(value: string) {
-  const { planId } = get(plan);
-  const subId = get(upgradeSubId);
-  set(loading, true);
-  try {
-    const requestBody: Record<string, string | number | boolean> = {
-      discountCode: value,
-      planId,
-    };
-
-    if (subId) {
-      requestBody.isUpgrade = true;
-      requestBody.subscriptionId = subId;
-    }
-
-    const response = await fetchWithCsrf<ApiResponse<boolean>>(
-      '/webapi/2/discounts',
-      {
-        body: requestBody,
-        method: 'POST',
-      },
-    );
-
-    const parsed = DiscountInfoSchema.parse(response);
-    set(discountInfo, parsed);
-  }
-  catch (error: any) {
-    const errorData = error.response?._data;
-    set(discountInfo, {
-      isValid: false,
-      error: (errorData && 'error' in errorData) ? errorData.error.toString() : error.message,
-    });
-  }
-  finally {
-    set(loading, false);
-  }
-}
-
-watch(discountInfo, (info) => {
-  const internalValue = get(value);
-  if (info && info.isValid && internalValue) {
-    set(model, internalValue);
-  }
+// Check if discount is applied and valid
+const isApplied = computed<boolean>(() => {
+  const info = get(discountInfo);
+  return !!info && info.isValid;
 });
 
-watchImmediate(model, (model: string) => {
-  set(value, model);
-});
-
-watchImmediate([model, discountInfo, plan], async ([model, discountInfo]) => {
-  if (model && !discountInfo) {
-    await fetchDiscountInfo(model);
-  }
-});
-
-watch(plan, async () => {
-  const modelVal = get(model);
-  if (modelVal && get(discountInfo)) {
-    await fetchDiscountInfo(modelVal);
-  }
-});
-
-watch(value, () => {
+// Get error message if discount is invalid
+const errorMessage = computed<string | undefined>(() => {
   const info = get(discountInfo);
   if (info && !info.isValid) {
-    set(discountInfo, undefined);
+    return info.error;
   }
+  return undefined;
 });
 
-function reset() {
+// Sync internal value with model
+watchImmediate(model, (modelValue: string) => {
+  set(value, modelValue);
+});
+
+function apply(): void {
+  // Set model to trigger parent to refetch breakdown with discount code
+  set(model, get(value));
+}
+
+function reset(): void {
+  set(value, '');
   set(model, '');
-  set(discountInfo, undefined);
 }
 </script>
 
 <template>
   <form
-    v-if="!discountInfo || !discountInfo.isValid"
-    @submit.prevent="fetchDiscountInfo(value)"
+    v-if="!isApplied"
+    @submit.prevent="apply()"
   >
     <RuiTextField
       v-model="value"
       color="primary"
       variant="outlined"
       :label="t('home.plans.tiers.step_3.discount.label')"
-      :error-messages="discountInfo?.error"
+      :error-messages="errorMessage"
       :hint="t('home.plans.tiers.step_3.discount.hint')"
       :disabled="disabled"
       prepend-icon="lu-tag"
     >
       <template #append>
         <RuiButton
-          type="button"
+          type="submit"
           color="primary"
-          :loading="loading"
           :disabled="!value || disabled"
-          @click="fetchDiscountInfo(value)"
+          @click="apply()"
         >
           {{ t('home.plans.tiers.step_3.discount.apply_code') }}
         </RuiButton>
@@ -127,7 +76,7 @@ function reset() {
     </RuiTextField>
   </form>
 
-  <div v-else>
+  <div v-else-if="discountInfo && discountInfo.isValid">
     <div
       class="rounded-md px-3 h-14 flex items-center justify-between border border-rui-success"
     >
@@ -143,7 +92,7 @@ function reset() {
         <div class="flex gap-1 font-bold text-sm text-rui-primary">
           <div class="text-rui-success">
             {{ t('home.plans.tiers.step_3.discount.you_save', { amount: discountInfo.discountedAmount }) }}
-            <template v-if="discountInfo.discountType === DiscountType.PERCENTAGE">
+            <template v-if="discountInfo.discountType.includes('Percentage')">
               {{
                 t('home.plans.tiers.step_3.discount.percent_off', {
                   percentage: discountInfo.discountAmount,

@@ -1,112 +1,178 @@
 <script setup lang="ts">
-import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/core';
+import { formatDate } from '~/utils/date';
+
+interface VatBreakdown {
+  basePrice: string;
+  vatAmount: string;
+  vatRate: string;
+  fullAmount: string;
+}
 
 const props = defineProps<{
   plan: SelectedPlan;
   grandTotal: number;
   loading?: boolean;
-  upgrade?: boolean;
-  discountInfo?: DiscountInfo;
+  discountInfo?: PaymentBreakdownDiscount;
+  crypto?: boolean;
+  vatBreakdown?: VatBreakdown;
 }>();
 
-const { discountInfo } = toRefs(props);
+const { discountInfo, plan, crypto, vatBreakdown } = toRefs(props);
 
 const { t } = useI18n({ useScope: 'global' });
-
-const subtotal = computed<number>(() => props.grandTotal);
 
 const hasDiscount = computed<boolean>(() => {
   const info = get(discountInfo);
   return info?.isValid ?? false;
 });
 
+// Parse the string discount amount from breakdown response
 const discountAmount = computed<number>(() => {
   const info = get(discountInfo);
-  return info && info.isValid ? info.discountedAmount : 0;
+  return info && info.isValid ? parseFloat(info.discountedAmount) : 0;
 });
 
-const finalAmount = computed<number>(() => {
-  const discount = get(discountInfo);
-  if (discount && discount.isValid) {
-    return discount.finalPrice;
-  }
-  return props.grandTotal;
+// grandTotal already includes the discount from breakdown.finalAmount
+const finalAmount = computed<number>(() => props.grandTotal);
+
+const durationLabel = computed<string>(() => {
+  const currentPlan = get(plan);
+  if (currentPlan.durationInMonths === 12)
+    return t('selected_plan_overview.year');
+  return t('selected_plan_overview.month');
+});
+
+const renewalDate = computed<string>(() => {
+  const currentPlan = get(plan);
+  const today = new Date();
+  const renewal = new Date(today);
+  renewal.setMonth(renewal.getMonth() + currentPlan.durationInMonths);
+  return formatDate(renewal);
 });
 </script>
 
 <template>
-  <div>
-    <!-- Subtotal (only visible if discount is applied) -->
+  <div class="pt-4">
+    <!-- Discount section -->
     <div
       v-if="hasDiscount"
-      class="flex items-center justify-between mb-3"
+      class="space-y-2 pb-3"
     >
-      <div class="text-rui-text-secondary">
-        Subtotal:
+      <!-- Original price before discount -->
+      <div
+        v-if="vatBreakdown"
+        class="flex justify-between text-sm text-gray-500"
+      >
+        <span>{{ t('payment_grand_total.original_price') }}</span>
+        <span class="line-through">
+          <RuiSkeletonLoader
+            v-if="loading"
+            class="w-16 h-5"
+          />
+          <template v-else>
+            {{ vatBreakdown.fullAmount }} €
+          </template>
+        </span>
       </div>
-      <div>
-        <RuiSkeletonLoader
-          v-if="loading"
-          :loading="loading"
-          class="w-20 h-6"
-        >
-          {{ subtotal.toFixed(2) }} €
-        </RuiSkeletonLoader>
-        <span v-else>
-          {{ subtotal.toFixed(2) }} €
+
+      <!-- Discount savings -->
+      <div class="flex justify-between text-sm font-medium text-green-600">
+        <span>{{ t('payment_grand_total.discount_savings') }}</span>
+        <span>
+          <RuiSkeletonLoader
+            v-if="loading"
+            class="w-16 h-5"
+          />
+          <template v-else>
+            -{{ discountAmount.toFixed(2) }} €
+          </template>
         </span>
       </div>
     </div>
 
-    <!-- Discount (if applicable) -->
+    <!-- Divider between discount and total -->
     <div
       v-if="hasDiscount"
-      class="flex items-center justify-between mb-3"
+      class="border-t border-dashed border-gray-200 my-3"
+    />
+
+    <!-- VAT breakdown -->
+    <div
+      v-if="vatBreakdown"
+      class="space-y-1.5 pb-3"
     >
-      <div class="text-rui-success">
-        Discount:
+      <!-- Subtotal -->
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">{{ t('payment_grand_total.subtotal') }}</span>
+        <span class="font-medium text-rui-text">
+          <RuiSkeletonLoader
+            v-if="loading"
+            class="w-16 h-5"
+          />
+          <template v-else>
+            {{ vatBreakdown.basePrice }} €
+          </template>
+        </span>
       </div>
-      <div class="text-rui-success">
-        <RuiSkeletonLoader
-          v-if="loading"
-          :loading="loading"
-          class="w-20 h-6"
-        >
-          -{{ discountAmount.toFixed(2) }} €
-        </RuiSkeletonLoader>
-        <span v-else>
-          -{{ discountAmount.toFixed(2) }} €
+
+      <!-- VAT -->
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">{{ t('payment_grand_total.vat', { rate: vatBreakdown.vatRate }) }}</span>
+        <span class="font-medium text-rui-text">
+          <RuiSkeletonLoader
+            v-if="loading"
+            class="w-16 h-5"
+          />
+          <template v-else>
+            {{ vatBreakdown.vatAmount }} €
+          </template>
         </span>
       </div>
     </div>
 
-    <!-- Grand Total -->
-    <div class="flex items-center justify-between py-4 border-t border-default">
-      <div class="text-rui-text-secondary font-bold">
+    <!-- Grand total with emphasis -->
+    <div class="flex items-center justify-between pt-3 border-t border-gray-300">
+      <span class="text-gray-800 font-semibold">
         {{ t('home.plans.tiers.step_3.grand_total') }}
-      </div>
-      <div class="font-bold text-xl underline">
+      </span>
+      <div class="text-2xl font-bold text-rui-primary">
         <RuiSkeletonLoader
           v-if="loading"
-          :loading="loading"
-          class="w-20 h-7"
-        >
+          class="w-24 h-8"
+        />
+        <template v-else>
           {{ finalAmount.toFixed(2) }} €
-        </RuiSkeletonLoader>
-        <span v-else>
-          {{ finalAmount.toFixed(2) }} €
-        </span>
+        </template>
       </div>
     </div>
 
-    <RuiAlert
-      v-if="upgrade"
-      class="mt-4"
-      type="info"
+    <!-- Renewal info (only for card payments, not crypto) -->
+    <div
+      v-if="!crypto"
+      class="mt-3 text-xs text-gray-500 text-right"
     >
-      {{ t('home.plans.tiers.step_3.upgrade_plan_description') }}
-    </RuiAlert>
+      <i18n-t
+        keypath="selected_plan_overview.next_payment"
+        scope="global"
+        tag="div"
+      >
+        <template #date>
+          <span class="font-medium text-gray-700">{{ renewalDate }}</span>
+        </template>
+      </i18n-t>
+      <div class="italic mt-1">
+        {{ t('selected_plan_overview.recurring_info', { period: durationLabel }) }}
+      </div>
+    </div>
+
+    <!-- Crypto one-time payment info -->
+    <div
+      v-else
+      class="mt-3 text-xs text-gray-500 text-right italic whitespace-pre-line"
+    >
+      {{ t('selected_plan_overview.one_time_payment') }}
+    </div>
   </div>
 </template>

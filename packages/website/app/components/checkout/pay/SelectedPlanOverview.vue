@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { PriceBreakdown, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { get, isDefined, set } from '@vueuse/core';
+import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { get, set } from '@vueuse/core';
 import { computed } from 'vue';
 import ChangePlanDialog from '~/components/checkout/plan/ChangePlanDialog.vue';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
@@ -8,7 +8,9 @@ import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
 import { logger } from '~/utils/use-logger';
 
-interface VatOverview { vat: string; basePrice: string }
+interface VatOverview { vat: string; basePrice: string; vatAmount: string }
+
+const breakdown = defineModel<PaymentBreakdownResponse | undefined>('breakdown', { required: false });
 
 const props = withDefaults(defineProps<{
   plan: SelectedPlan;
@@ -16,9 +18,9 @@ const props = withDefaults(defineProps<{
   warning?: boolean;
   disabled?: boolean;
   loading?: boolean;
-  nextPayment?: number;
   internalMode?: boolean;
   upgrade?: boolean;
+  discountCode?: string;
 }>(), {
   crypto: false,
   warning: false,
@@ -26,7 +28,7 @@ const props = withDefaults(defineProps<{
   disabled: false,
   loading: false,
   upgrade: false,
-  nextPayment: undefined,
+  discountCode: undefined,
 });
 
 const emit = defineEmits<{
@@ -36,56 +38,73 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
 
-const { plan, nextPayment, internalMode } = toRefs(props);
-
-const priceBreakdown = ref<PriceBreakdown>();
-const isLoadingPriceBreakdown = ref<boolean>(false);
+const { plan, internalMode, crypto, upgrade, discountCode } = toRefs(props);
+const isLoadingBreakdown = ref<boolean>(false);
 const selection = ref<boolean>(false);
 
-const { fetchPriceBreakdown: getPriceBreakdown } = useTiersApi();
+const { fetchPaymentBreakdown } = useTiersApi();
 
 const name = computed<string>(() => getPlanNameFor(t, get(plan)));
 
 const date = computed<string>(() => formatDate(new Date()));
 
-const nextPaymentDate = computed<string | undefined>(() => {
-  if (!isDefined(nextPayment)) {
+const displayPrice = computed<string>(() => {
+  const currentBreakdown = get(breakdown);
+  if (currentBreakdown && !get(upgrade)) {
+    return currentBreakdown.fullAmount;
+  }
+  return get(plan).price.toString();
+});
+
+const proratedPrice = computed<string | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  if (!currentBreakdown || !get(upgrade)) {
     return undefined;
   }
-  const date = new Date(get(nextPayment) * 1000);
-  return formatDate(date);
+  return currentBreakdown.finalAmount;
 });
 
 const vatOverview = computed<VatOverview | undefined>(() => {
-  if (!isDefined(priceBreakdown)) {
+  const currentBreakdown = get(breakdown);
+  if (!currentBreakdown) {
     return undefined;
   }
-  const { vatRate, priceBreakdown: breakdown } = get(priceBreakdown);
 
-  const floatRate = parseFloat(vatRate);
+  const floatRate = parseFloat(currentBreakdown.vatRate);
   if (isFinite(floatRate) && floatRate <= 0) {
     return undefined;
   }
 
-  const vat = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : vatRate;
+  const vat = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
+
+  // Calculate base price from finalAmount - vatAmount for prorated VAT display
+  const finalAmount = parseFloat(currentBreakdown.finalAmount);
+  const vatAmount = parseFloat(currentBreakdown.vatAmount);
+  const basePrice = (finalAmount - vatAmount).toFixed(2);
 
   return {
     vat,
-    basePrice: breakdown.basePrice,
+    basePrice,
+    vatAmount: vatAmount.toFixed(2),
   };
 });
 
-async function fetchPriceBreakdown(): Promise<void> {
-  set(isLoadingPriceBreakdown, true);
+async function loadPaymentBreakdown(): Promise<void> {
+  set(isLoadingBreakdown, true);
   try {
-    const breakdown = await getPriceBreakdown(get(plan).planId);
-    set(priceBreakdown, breakdown);
+    const code = get(discountCode);
+    const response = await fetchPaymentBreakdown({
+      newPlanId: get(plan).planId,
+      isCryptoPayment: get(crypto),
+      ...(code ? { discountCode: code } : {}),
+    });
+    set(breakdown, response);
   }
   catch (error) {
-    logger.error('Failed to fetch price breakdown:', error);
+    logger.error('Failed to fetch payment breakdown:', error);
   }
   finally {
-    set(isLoadingPriceBreakdown, false);
+    set(isLoadingBreakdown, false);
   }
 }
 
@@ -115,113 +134,116 @@ function switchTo(selectedPlan: SelectedPlan): void {
 
 watch(plan, (newPlan, oldPlan) => {
   if (newPlan.planId !== oldPlan?.planId) {
-    fetchPriceBreakdown();
+    loadPaymentBreakdown();
   }
 });
 
+// Refresh breakdown when discount code changes
+watch(discountCode, () => {
+  loadPaymentBreakdown();
+});
+
 onMounted(() => {
-  fetchPriceBreakdown();
+  loadPaymentBreakdown();
 });
 </script>
 
 <template>
-  <RuiCard class="h-auto mt-6">
-    <div class="text-rui-text text-h6">
-      {{ upgrade ? t('home.plans.tiers.step_3.upgrade_to_plan') : t('home.plans.tiers.step_3.chose') }}
-    </div>
-    <div class="pt-1 flex items-center justify-between gap-4">
-      <div>
-        <div class="text-body-1 font-bold mr-1 text-rui-text-secondary">
-          {{ name }}
-        </div>
-
-        <i18n-t
-          keypath="selected_plan_overview.plan"
-          :plural="crypto ? 0 : 1"
-          scope="global"
-          tag="div"
-          class="font-medium whitespace-break-spaces"
+  <div class="mb-4">
+    <!-- Plan name with upgrade badge and change button -->
+    <div class="flex items-center justify-between mb-1">
+      <div class="flex items-center gap-2">
+        <span class="text-base font-semibold text-rui-text">{{ name }}</span>
+        <span
+          v-if="upgrade"
+          class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-rui-primary/10 text-rui-primary rounded-full"
         >
-          <template #period>
-            {{ t('selected_plan_overview.renew_period', { months: plan.durationInMonths }, plan.durationInMonths) }}
-          </template>
-        </i18n-t>
-
-        <i18n-t
-          keypath="selected_plan_overview.price"
-          scope="global"
-          tag="div"
-          class="mt-3"
-        >
-          <template #price>
-            <span class="font-bold">{{ plan.price }}</span>
-          </template>
-          <template #vat>
-            <span v-if="vatOverview && !crypto">
-              {{ t('selected_plan_overview.vat', { vat: vatOverview.vat, basePrice: vatOverview.basePrice }) }}
-            </span>
-            <span v-else-if="vatOverview">
-              {{ t('selected_plan_overview.includes_vat', { vat: vatOverview.vat }) }}
-            </span>
-          </template>
-        </i18n-t>
-
-        <i18n-t
-          v-if="!crypto"
-          keypath="selected_plan_overview.starting"
-          scope="global"
-          tag="div"
-        >
-          <template #date>
-            <span class="font-bold">{{ date }}</span>
-          </template>
-        </i18n-t>
-
-        <i18n-t
-          v-if="!crypto"
-          keypath="selected_plan_overview.next_payment"
-          tag="div"
-          scope="global"
-          class="text-xs text-rui-text-secondary"
-        >
-          <template #date>
-            <span class="font-bold">{{ nextPaymentDate }}</span>
-          </template>
-        </i18n-t>
-
-        <div class="text-xs mt-1 italic whitespace-break-spaces">
-          <template v-if="!crypto">
-            {{
-              t('selected_plan_overview.recurring_info', {
-                period: plan.durationInMonths === 12 ? t('selected_plan_overview.year') : t('selected_plan_overview.month'),
-              })
-            }}
-          </template>
-          <template v-else>
-            {{ t('selected_plan_overview.one_time_payment') }}
-          </template>
-        </div>
-
-        <div v-if="!upgrade">
-          <RuiButton
-            :disabled="disabled"
-            :loading="loading"
-            color="primary"
-            variant="text"
-            @click="select()"
-          >
-            {{ t('actions.change') }}
-          </RuiButton>
-          <ChangePlanDialog
-            :crypto="crypto"
-            :warning="warning"
-            :vat="vatOverview?.vat"
-            :visible="selection"
-            @cancel="selection = false"
-            @select="switchTo($event)"
+          <RuiIcon
+            name="lu-arrow-up"
+            size="12"
           />
-        </div>
+          {{ t('actions.upgrade') }}
+        </span>
+      </div>
+      <RuiButton
+        v-if="!upgrade"
+        :disabled="disabled"
+        :loading="loading"
+        color="primary"
+        variant="outlined"
+        size="sm"
+        @click="select()"
+      >
+        {{ t('actions.change') }}
+      </RuiButton>
+    </div>
+
+    <!-- Duration description -->
+    <i18n-t
+      keypath="selected_plan_overview.plan"
+      :plural="crypto ? 0 : 1"
+      scope="global"
+      tag="p"
+      class="text-sm text-gray-500 mb-3"
+    >
+      <template #period>
+        {{ t('selected_plan_overview.renew_period', { months: plan.durationInMonths }, plan.durationInMonths) }}
+      </template>
+    </i18n-t>
+
+    <!-- Price details -->
+    <div class="space-y-1.5 text-sm">
+      <!-- Full price -->
+      <div class="flex justify-between">
+        <span class="text-gray-600">
+          {{ proratedPrice ? t('selected_plan_overview.full_price_label') : t('selected_plan_overview.price_label') }}
+        </span>
+        <span :class="proratedPrice ? 'text-gray-400 line-through' : 'font-medium text-rui-text'">
+          {{ displayPrice }} €
+        </span>
+      </div>
+
+      <!-- Prorated price (upgrade only) -->
+      <div
+        v-if="proratedPrice"
+        class="flex justify-between items-center"
+      >
+        <span class="flex items-center gap-1 text-gray-600">
+          {{ t('selected_plan_overview.prorated_price_label') }}
+          <RuiTooltip
+            :popper="{ placement: 'top' }"
+            tooltip-class="max-w-xs"
+          >
+            <template #activator>
+              <RuiIcon
+                name="lu-info"
+                class="text-gray-400 cursor-help"
+                size="14"
+              />
+            </template>
+            {{ t('selected_plan_overview.proration_info') }}
+          </RuiTooltip>
+        </span>
+        <span class="font-medium text-rui-primary">{{ proratedPrice }} €</span>
+      </div>
+
+      <!-- Starting date -->
+      <div
+        v-if="!crypto"
+        class="flex justify-between pt-1"
+      >
+        <span class="text-gray-600">{{ t('selected_plan_overview.starting_label') }}</span>
+        <span class="font-medium text-rui-text">{{ date }}</span>
       </div>
     </div>
-  </RuiCard>
+
+    <ChangePlanDialog
+      :crypto="crypto"
+      :warning="warning"
+      :vat="vatOverview?.vat"
+      :visible="selection"
+      @cancel="selection = false"
+      @select="switchTo($event)"
+    />
+  </div>
 </template>

@@ -1,97 +1,126 @@
 <script setup lang="ts">
-import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
-import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { getFinalAmount, isUpgradeData } from '@rotki/card-payment-common/utils/checkout';
+import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/core';
 import { computed } from 'vue';
 
-const { selectedPlan, discountInfo, planData, upgrade } = defineProps<{
-  planData: CheckoutData | UpgradeData;
-  selectedPlan: SelectedPlan;
-  discountInfo?: DiscountInfo;
-  upgrade: boolean;
+interface VatBreakdown {
+  basePrice: string;
+  vatAmount: string;
+  vatRate: string;
+  fullAmount: string;
+}
+
+const { vatBreakdown, discountInfo, nextPayment, durationInMonths } = defineProps<{
+  vatBreakdown?: VatBreakdown;
+  discountInfo?: PaymentBreakdownDiscount;
+  nextPayment?: number;
+  durationInMonths?: number;
 }>();
 
-const grandTotal = computed<number>(() =>
-  getFinalAmount(get(planData), get(selectedPlan), get(discountInfo)),
-);
+const durationLabel = computed<string>(() => {
+  if (get(durationInMonths) === 12)
+    return 'year';
+  return 'month';
+});
 
-const originalPrice = computed<number>(() => {
-  const plan = get(planData);
-  if (isUpgradeData(plan)) {
-    return parseFloat(plan.finalAmount);
+function isValidDiscount(info: PaymentBreakdownDiscount | undefined): info is ValidPaymentBreakdownDiscount {
+  return !!(info && info.isValid);
+}
+
+const hasDiscount = computed<boolean>(() => isValidDiscount(get(discountInfo)));
+
+const grandTotal = computed<number>(() => {
+  const vat = get(vatBreakdown);
+  if (vat) {
+    return parseFloat(vat.basePrice) + parseFloat(vat.vatAmount);
   }
-  return get(selectedPlan).price;
+  return 0;
 });
 
-const hasDiscount = computed<boolean>(() => {
-  const discount = get(discountInfo);
-  return !!discount && discount.isValid;
-});
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
-const savings = computed<number>(() => {
-  if (!hasDiscount.value)
-    return 0;
-  return originalPrice.value - grandTotal.value;
+const nextPaymentDate = computed<string | undefined>(() => {
+  const payment = get(nextPayment);
+  if (!payment) {
+    return undefined;
+  }
+  return formatDate(new Date(payment * 1000));
 });
 </script>
 
 <template>
-  <div class="py-4 border-t border-gray-200">
-    <!-- Show breakdown if discount is applied -->
+  <div class="pt-4">
+    <!-- Discount section -->
     <div
       v-if="hasDiscount"
-      class="space-y-2 mb-3"
+      class="space-y-2 pb-3"
     >
-      <!-- Original price -->
-      <div class="flex justify-between text-sm text-gray-600">
-        <span>Subtotal:</span>
-        <span class="line-through">{{ originalPrice.toFixed(2) }} €</span>
+      <!-- Original price before discount -->
+      <div
+        v-if="vatBreakdown"
+        class="flex justify-between text-sm text-gray-500"
+      >
+        <span>Original price:</span>
+        <span class="line-through">{{ vatBreakdown.fullAmount }} €</span>
       </div>
 
-      <!-- Discount amount -->
-      <div class="flex justify-between text-sm text-green-600">
-        <span>Discount:</span>
-        <span>-{{ savings.toFixed(2) }} €</span>
+      <!-- Discount savings -->
+      <div
+        v-if="isValidDiscount(discountInfo)"
+        class="flex justify-between text-sm font-medium text-green-600"
+      >
+        <span>Discount savings:</span>
+        <span>-{{ discountInfo.discountedAmount }} €</span>
       </div>
     </div>
 
-    <!-- Grand total -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-700 font-medium">
+    <!-- Divider between discount and breakdown -->
+    <div
+      v-if="hasDiscount && vatBreakdown"
+      class="border-t border-dashed border-gray-200 my-3"
+    />
+
+    <!-- VAT breakdown section -->
+    <div
+      v-if="vatBreakdown"
+      class="space-y-2 pb-3"
+    >
+      <!-- Subtotal (base price before VAT) -->
+      <div class="flex justify-between text-sm text-gray-600">
+        <span>Subtotal:</span>
+        <span>{{ vatBreakdown.basePrice }} €</span>
+      </div>
+
+      <!-- VAT -->
+      <div class="flex justify-between text-sm text-gray-600">
+        <span>VAT ({{ vatBreakdown.vatRate }}%):</span>
+        <span>{{ vatBreakdown.vatAmount }} €</span>
+      </div>
+    </div>
+
+    <!-- Grand total with emphasis -->
+    <div class="flex items-center justify-between pt-3 border-t border-gray-300">
+      <span class="text-gray-800 font-semibold">
         Grand Total:
       </span>
-      <div class="text-xl font-bold text-gray-900 underline">
+      <div class="text-2xl font-bold text-rui-primary">
         {{ grandTotal.toFixed(2) }} €
       </div>
     </div>
 
-    <div
-      v-if="upgrade"
-      class="flex gap-3 my-4 bg-blue-50 rounded-md p-4 text-blue-900 text-sm"
-    >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="fill-transparent"
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-        />
-        <path d="M12 16v-4" />
-        <path d="M12 8h.01" />
-      </svg>
-
-      <div class="flex-1">
-        Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.
+    <!-- Renewal info -->
+    <div class="mt-3 text-xs text-gray-500 text-right">
+      <div v-if="nextPaymentDate">
+        Renews on: <span class="font-medium text-gray-700">{{ nextPaymentDate }}</span>
+      </div>
+      <div class="italic mt-1">
+        You will be charged automatically each {{ durationLabel }} until you cancel
       </div>
     </div>
   </div>

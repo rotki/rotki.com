@@ -1,27 +1,16 @@
-import type { CheckoutData, UpgradeData } from '../schemas/checkout';
 import type { DiscountInfo } from '../schemas/discount';
-import type { SelectedPlan } from '../schemas/plans';
+import type { PaymentBreakdownResponse, SelectedPlan } from '../schemas/plans';
 
 /**
- * Type guard to check if the checkout data is for an upgrade
- */
-export function isUpgradeData(
-  data: CheckoutData | UpgradeData,
-): data is UpgradeData {
-  return 'finalAmount' in data;
-}
-
-/**
- * Calculate the final amount to charge based on checkout data, plan, and discount
+ * Calculate the final amount to charge based on checkout data and discount
  *
  * Priority:
  * 1. If valid discount exists, use its finalPrice
- * 2. If upgrade data exists, use its finalAmount
- * 3. Otherwise, use the plan's base price
+ * 2. Otherwise, use the breakdown response finalAmount
  */
 export function getFinalAmount(
-  data: CheckoutData | UpgradeData,
-  selectedPlan: SelectedPlan,
+  data: PaymentBreakdownResponse,
+  _selectedPlan: SelectedPlan,
   discountInfo?: DiscountInfo,
 ): number {
   // If valid discount exists, use its finalPrice
@@ -29,13 +18,8 @@ export function getFinalAmount(
     return discountInfo.finalPrice;
   }
 
-  // If upgrade, return parsed finalAmount
-  if (isUpgradeData(data)) {
-    return parseFloat(data.finalAmount);
-  }
-
-  // Default to plan price
-  return selectedPlan.price;
+  // Use the finalAmount from breakdown response
+  return parseFloat(data.finalAmount);
 }
 
 /**

@@ -1,8 +1,6 @@
 // Main entry point - only re-export the most commonly used items
 export * from './schemas/api';
 
-export * from './schemas/checkout';
-
 export * from './schemas/discount';
 
 export * from './schemas/payment';
