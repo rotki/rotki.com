@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
-import type { CryptoUpgradeProrate } from '~/types';
+import type { PaymentBreakdownResponse } from '@rotki/card-payment-common/schemas/plans';
 import { get, isDefined, set } from '@vueuse/core';
 import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
 import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
@@ -8,11 +7,12 @@ import OrderSummaryCard from '~/components/checkout/common/OrderSummaryCard.vue'
 import AcceptRefundPolicy from '~/components/checkout/pay/AcceptRefundPolicy.vue';
 import CryptoPaymentInfo from '~/components/checkout/pay/crypto/payment/CryptoPaymentInfo.vue';
 import CryptoAssetSelector from '~/components/checkout/pay/crypto/request/CryptoAssetSelector.vue';
-import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
 import { useDiscountCodeParams, usePlanIdParam, useReferralCodeParam, useSubscriptionIdParam } from '~/composables/checkout/use-plan-params';
 import { useSelectedPlan } from '~/composables/checkout/use-selected-plan';
+import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { buildQueryParams } from '~/utils/query';
+import { logger } from '~/utils/use-logger';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -20,16 +20,14 @@ const isRefundPolicyAccepted = ref<boolean>(false);
 const processing = ref<boolean>(false);
 
 const currency = ref<string>('');
-const prorate = ref<CryptoUpgradeProrate | null>(null);
-
-const discountInfo = ref<DiscountInfo>();
+const paymentBreakdown = ref<PaymentBreakdownResponse | null>(null);
 
 const { planId } = usePlanIdParam();
 const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 const { referralCode } = useReferralCodeParam();
 const { discountCode: routeDiscountCode } = useDiscountCodeParams();
 const { selectedPlan } = useSelectedPlan();
-const { prorateCryptoUpgrade } = useCryptoPaymentApi();
+const { fetchPaymentBreakdown } = useTiersApi();
 
 const discountCode = ref<string>(get(routeDiscountCode) ?? '');
 
@@ -70,14 +68,20 @@ function submit(): void {
   });
 }
 
-async function checkProration(): Promise<void> {
+async function loadPaymentBreakdown(): Promise<void> {
   if (!isDefined(upgradeSubId) || !isDefined(planId)) {
     return;
   }
 
-  const quote = await prorateCryptoUpgrade(get(planId), get(upgradeSubId));
-  if (!quote.isError) {
-    set(prorate, quote.result);
+  try {
+    const breakdown = await fetchPaymentBreakdown({
+      newPlanId: get(planId),
+      isCryptoPayment: true,
+    });
+    set(paymentBreakdown, breakdown ?? null);
+  }
+  catch (error) {
+    logger.error('Failed to fetch payment breakdown:', error);
   }
 }
 
@@ -89,7 +93,7 @@ watchImmediate(referralCode, (ref) => {
 });
 
 onMounted(async () => {
-  checkProration().catch();
+  loadPaymentBreakdown().catch();
 });
 </script>
 
@@ -122,9 +126,8 @@ onMounted(async () => {
       >
         <OrderSummaryCard
           v-model:discount-code="discountCode"
-          v-model:discount-info="discountInfo"
           :plan="selectedPlan"
-          :checkout-data="prorate"
+          :checkout-data="paymentBreakdown"
           :upgrade-sub-id="upgradeSubId"
           crypto
         />

@@ -962,9 +962,16 @@
     "includes_vat": "(includes {vat}% VAT)",
     "plan": "{period} recurring subscription | {period} subscription",
     "price": "Price: {price} € {vat}",
+    "price_label": "Price:",
+    "full_price": "Full price: {price} € {vat}",
+    "full_price_label": "Full price:",
+    "prorated_price": "Prorated upgrade: {price} € {vat}",
+    "prorated_price_label": "Prorated price:",
+    "proration_info": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period.",
     "starting": "Starting Date: {date}",
+    "starting_label": "Starting:",
     "renew_period": "{months} month | 1 year ({months} months)",
-    "vat": "({basePrice}€ + {vat}% VAT)",
+    "vat": "({vat}% VAT: {basePrice}€ + {vatAmount}€)",
     "recurring_info": "You will be charged automatically each {period} until you cancel",
     "one_time_payment": "Crypto payments are non-recurring (one time payment). \nManual renewal is required.",
     "month": "month",
@@ -1259,6 +1266,12 @@
       },
       "title": "Vision"
     }
+  },
+  "payment_grand_total": {
+    "discount_savings": "Discount savings:",
+    "original_price": "Original price:",
+    "subtotal": "Subtotal:",
+    "vat": "VAT ({rate}%):"
   },
   "payment_methods": {
     "title": "Payment Methods",

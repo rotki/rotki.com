@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
-import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import type { CryptoPayment, CryptoUpgradeProrate } from '~/types';
-import { getDiscountedPrice, getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
+import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { CryptoPayment } from '~/types';
 import { get, toRefs } from '@vueuse/core';
 import DiscountCodeInput from '~/components/checkout/pay/DiscountCodeInput.vue';
 import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import SelectedPlanOverview from '~/components/checkout/pay/SelectedPlanOverview.vue';
 
+interface VatBreakdown {
+  basePrice: string;
+  vatAmount: string;
+  vatRate: string;
+  fullAmount: string;
+}
+
 const discountCode = defineModel<string>('discountCode', { required: true });
-const discountInfo = defineModel<DiscountInfo | undefined>('discountInfo', { required: true });
 
 const props = withDefaults(
   defineProps<{
     plan: SelectedPlan;
     upgradeSubId?: string;
     nextPayment?: number;
-    checkoutData?: CheckoutData | UpgradeData | CryptoPayment | CryptoUpgradeProrate | null;
+    checkoutData?: CryptoPayment | PaymentBreakdownResponse | null;
     crypto?: boolean;
     disabled?: boolean;
     loading?: boolean;
@@ -47,7 +50,6 @@ const { t } = useI18n({ useScope: 'global' });
 const {
   plan,
   upgradeSubId,
-  nextPayment,
   checkoutData,
   crypto,
   disabled,
@@ -57,40 +59,60 @@ const {
   compact,
 } = toRefs(props);
 
+// Breakdown from SelectedPlanOverview via v-model
+const breakdown = ref<PaymentBreakdownResponse>();
+
 const spacingClass = computed<string>(() => (get(compact) ? 'my-4' : 'my-6'));
 const titleSpacingClass = computed<string>(() => (get(compact) ? 'mb-4' : 'mb-6'));
 const discountSpacingClass = computed<string>(() => (get(compact) ? 'mb-4' : 'mb-6'));
 
+// Derive discountInfo from breakdown
+const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  return currentBreakdown?.discount ?? undefined;
+});
+
+// Derive vatBreakdown from breakdown
+const vatBreakdown = computed<VatBreakdown | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  if (!currentBreakdown) {
+    return undefined;
+  }
+
+  const floatRate = parseFloat(currentBreakdown.vatRate);
+  if (isFinite(floatRate) && floatRate <= 0) {
+    return undefined;
+  }
+
+  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
+  const finalAmount = parseFloat(currentBreakdown.finalAmount);
+  const vatAmount = parseFloat(currentBreakdown.vatAmount);
+  const basePrice = (finalAmount - vatAmount).toFixed(2);
+
+  return {
+    basePrice,
+    vatAmount: vatAmount.toFixed(2),
+    vatRate,
+    fullAmount: currentBreakdown.fullAmount,
+  };
+});
+
 const grandTotal = computed<number>(() => {
-  const currentPlan = get(plan);
-  const currentDiscountInfo = get(discountInfo);
+  const currentBreakdown = get(breakdown);
   const currentCheckoutData = get(checkoutData);
 
-  if (!currentPlan) {
-    return 0;
+  // Use breakdown if available
+  if (currentBreakdown) {
+    return parseFloat(currentBreakdown.finalAmount);
   }
 
-  // If checkoutData is available
-  if (currentCheckoutData) {
-    // Check if it's CryptoPayment with finalPriceInEur (for crypto upgrades)
-    if ('finalPriceInEur' in currentCheckoutData) {
-      if (currentCheckoutData.preDiscountAmount) {
-        return Number(currentCheckoutData.preDiscountAmount);
-      }
-      return currentCheckoutData.finalPriceInEur;
-    }
-
-    // If it's a prorated crypto payment request
-    if ('finalAmount' in currentCheckoutData) {
-      return Number(currentCheckoutData.finalAmount);
-    }
-
-    // Otherwise use getFinalAmount (handles card payment upgrades)
-    return getFinalAmount(currentCheckoutData, currentPlan, currentDiscountInfo);
+  // Fallback to checkoutData for crypto payments
+  if (currentCheckoutData && 'finalPriceInEur' in currentCheckoutData) {
+    return currentCheckoutData.finalPriceInEur;
   }
 
-  // Otherwise use simpler getDiscountedPrice
-  return getDiscountedPrice(currentPlan, currentDiscountInfo);
+  // Fallback to plan price
+  return get(plan).price;
 });
 
 function handlePlanChange(newPlan: SelectedPlan): void {
@@ -108,14 +130,15 @@ function handlePlanChange(newPlan: SelectedPlan): void {
     </div>
 
     <SelectedPlanOverview
+      v-model:breakdown="breakdown"
       :plan="plan"
       :upgrade="!!upgradeSubId"
-      :next-payment="nextPayment"
       :crypto="crypto"
       :disabled="disabled"
       :loading="loading"
       :internal-mode="internalMode"
       :warning="warning"
+      :discount-code="discountCode"
       @plan-change="handlePlanChange($event)"
     />
 
@@ -123,19 +146,20 @@ function handlePlanChange(newPlan: SelectedPlan): void {
 
     <DiscountCodeInput
       v-model="discountCode"
-      v-model:discount-info="discountInfo"
       :plan="plan"
+      :crypto="crypto"
       :disabled="disabled"
-      :upgrade-sub-id="upgradeSubId"
+      :discount-info="discountInfo"
       :class="discountSpacingClass"
     />
 
     <PaymentGrandTotal
       :plan="plan"
       :grand-total="grandTotal"
-      :upgrade="!!upgradeSubId"
       :loading="loading"
       :discount-info="discountInfo"
+      :crypto="crypto"
+      :vat-breakdown="vatBreakdown"
     />
   </RuiCard>
 </template>

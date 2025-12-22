@@ -43,6 +43,43 @@ export const PriceBreakdownSchema = z.object({
   country: z.string(),
 });
 
+// Discount info schemas for payment breakdown response (discriminated union)
+export const ValidPaymentBreakdownDiscountSchema = z.object({
+  isValid: z.literal(true),
+  isReferral: z.boolean(),
+  discountType: z.string(),
+  discountAmount: z.string(),
+  discountedAmount: z.string(),
+});
+
+export const InvalidPaymentBreakdownDiscountSchema = z.object({
+  isValid: z.literal(false),
+  error: z.string(),
+});
+
+export const PaymentBreakdownDiscountSchema = z.discriminatedUnion('isValid', [
+  ValidPaymentBreakdownDiscountSchema,
+  InvalidPaymentBreakdownDiscountSchema,
+]);
+
+// New unified payment breakdown response schema (POST /payment/breakdown)
+export const PaymentBreakdownResponseSchema = z.object({
+  fullAmount: z.string(),
+  finalAmount: z.string(),
+  vatRate: z.string(),
+  vatAmount: z.string(),
+  braintreeClientToken: z.string().optional(), // Only for non-crypto payments
+  nextPayment: z.number().default(0), // Next payment timestamp (for upgrades)
+  discount: PaymentBreakdownDiscountSchema.nullable(),
+});
+
+// Request schema for type safety
+export const PaymentBreakdownRequestSchema = z.object({
+  newPlanId: z.number(),
+  isCryptoPayment: z.boolean().optional().default(false),
+  discountCode: z.string().nullish(),
+});
+
 // Inferred types
 export type AvailablePlan = z.infer<typeof AvailablePlanSchema>;
 
@@ -53,3 +90,13 @@ export type AvailablePlansResponse = z.infer<typeof AvailablePlansResponseSchema
 export type SelectedPlan = z.infer<typeof SelectedPlanSchema>;
 
 export type PriceBreakdown = z.infer<typeof PriceBreakdownSchema>;
+
+export type ValidPaymentBreakdownDiscount = z.infer<typeof ValidPaymentBreakdownDiscountSchema>;
+
+export type InvalidPaymentBreakdownDiscount = z.infer<typeof InvalidPaymentBreakdownDiscountSchema>;
+
+export type PaymentBreakdownDiscount = z.infer<typeof PaymentBreakdownDiscountSchema>;
+
+export type PaymentBreakdownResponse = z.infer<typeof PaymentBreakdownResponseSchema>;
+
+export type PaymentBreakdownRequest = z.infer<typeof PaymentBreakdownRequestSchema>;

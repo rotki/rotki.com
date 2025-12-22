@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
+import { DiscountType } from '@rotki/card-payment-common';
 import { get } from '@vueuse/shared';
 import ReferralCodeSkeleton from '~/components/account/home/ReferralCodeSkeleton.vue';
 import CopyButton from '~/components/common/CopyButton.vue';
@@ -40,7 +41,7 @@ const discountText = computed<string>(() => {
   }
 
   const { amount, discountType } = data.discount;
-  if (discountType === 'Percentage') {
+  if (discountType === DiscountType.PERCENTAGE) {
     return t('account.referral_code.discount_percentage', { percentage: amount });
   }
   return t('account.referral_code.discount_amount', { amount });
@@ -53,7 +54,7 @@ const discountAmount = computed<string>(() => {
   }
 
   const { amount, discountType } = data.discount;
-  if (discountType === 'Percentage') {
+  if (discountType === DiscountType.PERCENTAGE) {
     return `${amount}%`;
   }
   return `${amount}€`;
