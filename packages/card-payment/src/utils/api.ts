@@ -1,13 +1,10 @@
 import {
   type AvailablePlansResponse,
   AvailablePlansResponseSchema,
-  type CheckoutData,
-  CheckoutResponseSchema,
-  type PriceBreakdown,
-  PriceBreakdownSchema,
+  type PaymentBreakdownRequest,
+  type PaymentBreakdownResponse,
+  PaymentBreakdownResponseSchema,
   type SelectedPlan,
-  type UpgradeData,
-  UpgradeDataSchema,
 } from '@rotki/card-payment-common';
 import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
 import { type UserSubscriptions, UserSubscriptionsResponseSchema } from '@rotki/card-payment-common/schemas/subscription';
@@ -93,65 +90,39 @@ export async function getAccount(): Promise<Account | undefined> {
 }
 
 // Checkout API functions
-export async function getCardCheckoutData(planId: number): Promise<CheckoutData | null> {
+export async function getPaymentBreakdown(params: PaymentBreakdownRequest): Promise<PaymentBreakdownResponse | null> {
   try {
-    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/braintree/payments`, {
-      method: 'PUT',
-      body: JSON.stringify({ plan_id: planId }),
+    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/payment/breakdown`, {
+      method: 'POST',
+      body: JSON.stringify(convertKeys(params, false, false)),
     });
 
     if (!response.ok) {
-      console.error('Failed to initialize checkout:', response.status);
+      console.error('Failed to fetch payment breakdown:', response.status);
       return null;
     }
 
     const data = await response.json();
     const transformedData = convertKeys(data, true, false);
-    const parsedResponse = CheckoutResponseSchema.safeParse(transformedData);
+    const parsedResponse = PaymentBreakdownResponseSchema.safeParse(transformedData);
     if (!parsedResponse.success) {
-      console.error('Failed to parse Checkout response:', {
+      console.error('Failed to parse PaymentBreakdownResponse:', {
         data,
         error: parsedResponse.error,
-        originalData: data,
         transformedData,
       });
       return null;
     }
-    return parsedResponse.data.result || null;
+    return parsedResponse.data;
   }
   catch (error: any) {
-    console.error('Failed to initialize checkout:', error);
+    console.error('Failed to fetch payment breakdown:', error);
     return null;
   }
 }
 
-export async function getUpdateCardCheckoutData(planId: number): Promise<UpgradeData | null> {
-  try {
-    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/braintree/upgrade/quote`, {
-      method: 'POST',
-      body: JSON.stringify({ plan_id: planId }),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to initialize checkout:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    return UpgradeDataSchema.parse(transformedData);
-  }
-  catch (error: any) {
-    console.error('Failed to initialize checkout:', error);
-    return null;
-  }
-}
-
-export async function checkout(planId: number, upgradeSubId: string | null): Promise<UpgradeData | CheckoutData | null> {
-  if (upgradeSubId) {
-    return getUpdateCardCheckoutData(planId);
-  }
-  return getCardCheckoutData(planId);
+export async function checkout(planId: number): Promise<PaymentBreakdownResponse | null> {
+  return getPaymentBreakdown({ newPlanId: planId, isCryptoPayment: false });
 }
 
 // Plans API functions
@@ -183,36 +154,6 @@ export async function getAvailablePlans(): Promise<AvailablePlansResponse | null
   catch (error: any) {
     console.error('Failed to get available plans:', error);
     return null;
-  }
-}
-
-export async function getPriceBreakdown(planId: number): Promise<PriceBreakdown | undefined> {
-  try {
-    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/plans/${planId}/price-breakdown`, {
-      method: 'GET',
-    });
-
-    if (!response.ok) {
-      console.error('Failed to fetch price breakdown:', response.status);
-      return undefined;
-    }
-
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = PriceBreakdownSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse PriceBreakdown:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      return undefined;
-    }
-    return parsedResponse.data;
-  }
-  catch (error: any) {
-    console.error('Failed to get price breakdown:', error);
-    return undefined;
   }
 }
 

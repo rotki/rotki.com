@@ -115,27 +115,6 @@ export const CryptoPaymentResponse = z.object({
 
 export type CryptoPaymentResponse = z.infer<typeof CryptoPaymentResponse>;
 
-const CryptoUpgradeProrateSchema = z.object({
-  subscriptionId: z.string(),
-  durationInMonths: z.number(),
-  planId: z.number(),
-  finalAmount: z.string(),
-  fullAmount: z.string(),
-  currency: z.literal('EUR'),
-  currentPlanPrice: z.string(),
-  newPlanPrice: z.string(),
-  currentPlanId: z.number(),
-  vatAmount: z.string(),
-  vatRate: z.string(),
-});
-
-export type CryptoUpgradeProrate = z.infer<typeof CryptoUpgradeProrateSchema>;
-
-export const CryptoUpgradeProrateResponseSchema = z.object({
-  message: ApiError.optional(),
-  result: CryptoUpgradeProrateSchema.optional(),
-});
-
 const PendingCryptoPayment = z.object({
   currency: z.string().optional(),
   discount: z.object({

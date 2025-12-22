@@ -1,4 +1,11 @@
-import { type AvailablePlansResponse, AvailablePlansResponseSchema, type PriceBreakdown, PriceBreakdownSchema } from '@rotki/card-payment-common/schemas/plans';
+import {
+  type AvailablePlansResponse,
+  AvailablePlansResponseSchema,
+  type PaymentBreakdownRequest,
+  type PaymentBreakdownResponse,
+  PaymentBreakdownResponseSchema,
+} from '@rotki/card-payment-common/schemas/plans';
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { type PremiumTiersInfo, PremiumTiersInfo as PremiumTiersInfoSchema } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';
@@ -56,15 +63,18 @@ export function useTiersApi() {
     }
   }
 
-  async function fetchPriceBreakdown(planId: number): Promise<PriceBreakdown | undefined> {
+  async function fetchPaymentBreakdown(params: PaymentBreakdownRequest): Promise<PaymentBreakdownResponse | undefined> {
     try {
-      const response = await fetchWithCsrf<PriceBreakdown>(
-        `/webapi/2/plans/${planId}/price-breakdown`,
-        { method: 'GET' },
+      const response = await fetchWithCsrf<PaymentBreakdownResponse>(
+        '/webapi/2/payment/breakdown',
+        {
+          body: convertKeys(params, false, false),
+          method: 'POST',
+        },
       );
-      const parsed = PriceBreakdownSchema.safeParse(response);
+      const parsed = PaymentBreakdownResponseSchema.safeParse(response);
       if (!parsed.success) {
-        logger.error('Failed to parse PriceBreakdown:', {
+        logger.error('Failed to parse PaymentBreakdownResponse:', {
           error: parsed.error,
           rawData: response,
         });
@@ -73,14 +83,14 @@ export function useTiersApi() {
       return parsed.data;
     }
     catch (error: any) {
-      logger.error(`Failed to fetch price breakdown: ${error.message}`);
+      logger.error(`Failed to fetch payment breakdown: ${error.message}`);
       return undefined;
     }
   }
 
   return {
     fetchAvailablePlans,
+    fetchPaymentBreakdown,
     fetchPremiumTiersInfo,
-    fetchPriceBreakdown,
   };
 }

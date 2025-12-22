@@ -2,6 +2,7 @@ import { defineNuxtPlugin } from '#app';
 import {
   createRui,
   LuArrowLeft,
+  LuArrowUp,
   LuBadgeDollarSign,
   LuBadgePercent,
   LuBlockchain,
@@ -85,6 +86,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const RuiPlugin = createRui({
     theme: {
       icons: [
+        LuArrowUp,
         LuOsApple,
         LuOsWindows,
         LuPaypal,

@@ -1,137 +1,66 @@
 <script setup lang="ts">
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import {
-  type DiscountInfo,
-  DiscountInfoSchema,
-  DiscountType,
-  type InvalidDiscountInfo,
-  type ValidDiscountInfo,
-} from '@rotki/card-payment-common/schemas/discount';
-import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { get, set, watchImmediate } from '@vueuse/core';
-import { computed, ref, toRefs, watch } from 'vue';
-import { fetchWithCSRF } from '@/utils/api';
+import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
+import { DiscountType } from '@rotki/card-payment-common';
+import { get, set } from '@vueuse/core';
+import { computed, ref, watch } from 'vue';
 
 const model = defineModel<string>({ required: true });
 
-const discountInfo = defineModel<DiscountInfo | undefined>('discountInfo', { required: true });
-
 const props = defineProps<{
-  selectedPlan: SelectedPlan;
-  upgradeSubId?: string | null;
+  discountInfo?: PaymentBreakdownDiscount;
+  loading?: boolean;
 }>();
 
-const { selectedPlan, upgradeSubId } = toRefs(props);
-
 const value = ref<string>('');
-const loading = ref<boolean>(false);
 const focused = ref<boolean>(false);
 
 // Type guards for discriminated union
-function isValidDiscount(info: DiscountInfo | undefined): info is ValidDiscountInfo {
+function isValidDiscount(info: PaymentBreakdownDiscount | undefined): info is ValidPaymentBreakdownDiscount {
   return !!(info && info.isValid);
 }
 
-function isInvalidDiscount(info: DiscountInfo | undefined): info is InvalidDiscountInfo {
+function isInvalidDiscount(info: PaymentBreakdownDiscount | undefined): info is PaymentBreakdownDiscount & { isValid: false } {
   return !!(info && !info.isValid);
 }
 
-const isApplied = computed<boolean>(() => {
-  const info = get(discountInfo);
-  return isValidDiscount(info);
-});
+const isApplied = computed<boolean>(() => isValidDiscount(props.discountInfo));
 
-const hasError = computed<boolean>(() => {
-  const info = get(discountInfo);
-  return isInvalidDiscount(info);
-});
+const hasError = computed<boolean>(() => isInvalidDiscount(props.discountInfo));
 
 const errorMessage = computed<string>(() => {
-  const info = get(discountInfo);
+  const info = props.discountInfo;
   return isInvalidDiscount(info) ? info.error : '';
 });
 
 const appliedDiscountAmount = computed<string>(() => {
-  const info = get(discountInfo);
+  const info = props.discountInfo;
   return isValidDiscount(info) && info.discountType === DiscountType.PERCENTAGE && info.discountAmount
     ? `${info.discountAmount}% off`
     : '';
 });
 
-async function fetchDiscountInfo(discountCode: string): Promise<void> {
-  const { planId } = get(selectedPlan);
-  const subId = get(upgradeSubId);
-  set(loading, true);
-  try {
-    const requestBody: Record<string, string | number | boolean> = {
-      discountCode,
-      planId,
-    };
-
-    if (subId) {
-      requestBody.isUpgrade = true;
-      requestBody.subscriptionId = subId;
-    }
-
-    const response = await fetchWithCSRF(`/webapi/2/discounts`, {
-      method: 'POST',
-      body: JSON.stringify(convertKeys(requestBody, false, false)),
-    });
-
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-
-    const parsed = DiscountInfoSchema.parse(transformedData);
-    set(discountInfo, parsed);
-  }
-  catch (error: any) {
-    set(discountInfo, {
-      isValid: false,
-      error: error.message || 'Invalid discount code',
-    });
-  }
-  finally {
-    set(loading, false);
+function applyCode(): void {
+  const code = get(value);
+  if (code) {
+    set(model, code);
   }
 }
 
 function reset(): void {
   set(model, '');
-  set(discountInfo, undefined);
+  set(value, '');
 }
 
-// Sync with external model
-watch(discountInfo, (info) => {
-  const internalValue = get(value);
-  if (info && info.isValid && internalValue) {
-    set(model, internalValue);
-  }
-});
-
+// Sync internal value with model
 watch(model, (modelValue) => {
   set(value, modelValue);
-});
+}, { immediate: true });
 
-// Auto-validate when component mounts with existing discount code
-watchImmediate([model, discountInfo], async ([modelValue, info]) => {
-  if (modelValue && !info) {
-    await fetchDiscountInfo(modelValue);
-  }
-});
-
-// Re-validate when plan changes
-watch(selectedPlan, async () => {
-  const modelVal = get(model);
-  if (modelVal && get(discountInfo)) {
-    await fetchDiscountInfo(modelVal);
-  }
-});
-
-// Clear invalid discount info when input changes
-watch(value, () => {
-  const info = get(discountInfo);
-  if (info && !info.isValid) {
-    set(discountInfo, undefined);
+// Clear error state when input changes
+watch(value, (newValue) => {
+  // If user is typing and there's an error, clear it by resetting model
+  if (newValue !== get(model) && hasError.value) {
+    set(model, '');
   }
 });
 </script>
@@ -142,7 +71,7 @@ watch(value, () => {
     <form
       v-if="!isApplied"
       class="space-y-2"
-      @submit.prevent="fetchDiscountInfo(value)"
+      @submit.prevent="applyCode()"
     >
       <div class="relative w-full flex items-center">
         <div class="flex items-center shrink-0">

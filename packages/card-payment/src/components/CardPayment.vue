@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import type { CheckoutData, UpgradeData } from '@rotki/card-payment-common/schemas/checkout';
-import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { getFinalAmount } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
@@ -24,7 +21,7 @@ const error = defineModel<string>('error', { required: true });
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
 
 const { planData, selectedPlan, upgradeSubId, cards } = defineProps<{
-  planData: CheckoutData | UpgradeData;
+  planData: PaymentBreakdownResponse;
   selectedPlan: SelectedPlan;
   upgradeSubId: string | null;
   cards: SavedCard[];
@@ -47,7 +44,48 @@ const pendingCardToken = ref<string>();
 
 // Discount state
 const discountCode = ref<string>('');
-const discountInfo = ref<DiscountInfo>();
+
+// Breakdown from PlanSummary via v-model
+const breakdown = ref<PaymentBreakdownResponse>();
+
+// VAT breakdown state
+interface VatBreakdown {
+  basePrice: string;
+  vatAmount: string;
+  vatRate: string;
+  fullAmount: string;
+}
+
+// Derive vatBreakdown from breakdown
+const vatBreakdown = computed<VatBreakdown | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  if (!currentBreakdown) {
+    return undefined;
+  }
+
+  const floatRate = parseFloat(currentBreakdown.vatRate);
+  if (isFinite(floatRate) && floatRate <= 0) {
+    return undefined;
+  }
+
+  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
+  const finalAmount = parseFloat(currentBreakdown.finalAmount);
+  const vatAmount = parseFloat(currentBreakdown.vatAmount);
+  const basePrice = (finalAmount - vatAmount).toFixed(2);
+
+  return {
+    basePrice,
+    vatAmount: vatAmount.toFixed(2),
+    vatRate,
+    fullAmount: currentBreakdown.fullAmount,
+  };
+});
+
+// Derive discountInfo from breakdown
+const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  return currentBreakdown?.discount ?? undefined;
+});
 
 const isFormValid = computed<boolean>(() => {
   const card = get(selectedCard);
@@ -111,9 +149,13 @@ async function getSavedCardBin(card: SavedCard): Promise<string> {
   }
 }
 
-const finalAmount = computed<number>(() =>
-  getFinalAmount(get(planData), get(selectedPlan), get(discountInfo)),
-);
+const finalAmount = computed<number>(() => {
+  const vat = get(vatBreakdown);
+  if (vat) {
+    return parseFloat(vat.basePrice) + parseFloat(vat.vatAmount);
+  }
+  return get(selectedPlan).price;
+});
 
 async function processPayment(): Promise<void> {
   if (!get(isFormValid)) {
@@ -282,9 +324,10 @@ onUnmounted(async () => {
 
           <!-- Plan Summary -->
           <PlanSummary
+            v-model:breakdown="breakdown"
             :upgrade="!!upgradeSubId"
             :selected-plan="selectedPlan"
-            :next-payment="planData.nextPayment"
+            :discount-code="discountCode || undefined"
           />
 
           <hr class="my-4 border-rui-grey-300" />
@@ -292,18 +335,16 @@ onUnmounted(async () => {
           <!-- Discount Code Input -->
           <DiscountCodeInput
             v-model="discountCode"
-            v-model:discount-info="discountInfo"
-            :selected-plan="selectedPlan"
-            :upgrade-sub-id="upgradeSubId"
+            :discount-info="discountInfo"
             class="mb-4"
           />
 
           <!-- Payment Grand Total -->
           <PaymentGrandTotal
-            :upgrade="!!upgradeSubId"
-            :plan-data="planData"
-            :selected-plan="selectedPlan"
+            :vat-breakdown="vatBreakdown"
             :discount-info="discountInfo"
+            :next-payment="planData.nextPayment"
+            :duration-in-months="selectedPlan.durationInMonths"
           />
         </div>
       </aside>
