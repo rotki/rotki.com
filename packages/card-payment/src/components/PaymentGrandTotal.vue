@@ -2,6 +2,7 @@
 import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/core';
 import { computed } from 'vue';
+import { formatDate } from '@/utils/date';
 
 interface VatBreakdown {
   basePrice: string;
@@ -36,14 +37,6 @@ const grandTotal = computed<number>(() => {
   }
   return 0;
 });
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
 
 const nextPaymentDate = computed<string | undefined>(() => {
   const payment = get(nextPayment);

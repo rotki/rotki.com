@@ -4,6 +4,7 @@ import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { computed, onMounted, ref, toRefs, watch } from 'vue';
 import { getPaymentBreakdown } from '@/utils/api';
+import { formatDate } from '@/utils/date';
 
 interface Props {
   upgrade: boolean;
@@ -58,14 +59,6 @@ function getPlanName(months: number): string {
 
 function getPlanNameFor(plan: SelectedPlan): string {
   return `${toTitleCase(plan.name)} ${getPlanName(plan.durationInMonths)}`;
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
 }
 
 async function loadPaymentBreakdown(): Promise<void> {

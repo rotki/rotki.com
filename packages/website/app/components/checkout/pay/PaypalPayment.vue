@@ -46,13 +46,12 @@ const processing = computed<boolean>(() => get(paying) || get(pending));
 
 const grandTotal = computed<number>(() => {
   const data = get(checkoutData);
-  const plan = get(selectedPlan);
 
-  if (!data || !plan) {
+  if (!data) {
     return 0;
   }
 
-  return getFinalAmount(data, plan, get(discountInfo));
+  return getFinalAmount(data, get(discountInfo));
 });
 
 async function processPayment(planId: number, nonce: string): Promise<void> {

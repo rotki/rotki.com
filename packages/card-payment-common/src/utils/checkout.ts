@@ -10,7 +10,6 @@ import type { PaymentBreakdownResponse, SelectedPlan } from '../schemas/plans';
  */
 export function getFinalAmount(
   data: PaymentBreakdownResponse,
-  _selectedPlan: SelectedPlan,
   discountInfo?: DiscountInfo,
 ): number {
   // If valid discount exists, use its finalPrice

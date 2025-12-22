@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { DiscountType } from '@rotki/card-payment-common';
 import { get, set } from '@vueuse/core';
 
 const model = defineModel<string>({ required: true });
@@ -92,7 +93,7 @@ function reset(): void {
         <div class="flex gap-1 font-bold text-sm text-rui-primary">
           <div class="text-rui-success">
             {{ t('home.plans.tiers.step_3.discount.you_save', { amount: discountInfo.discountedAmount }) }}
-            <template v-if="discountInfo.discountType.includes('Percentage')">
+            <template v-if="discountInfo.discountType.includes(DiscountType.PERCENTAGE)">
               {{
                 t('home.plans.tiers.step_3.discount.percent_off', {
                   percentage: discountInfo.discountAmount,

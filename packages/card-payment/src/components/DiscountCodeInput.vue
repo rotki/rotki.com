@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
+import { DiscountType } from '@rotki/card-payment-common';
 import { get, set } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
@@ -33,7 +34,7 @@ const errorMessage = computed<string>(() => {
 
 const appliedDiscountAmount = computed<string>(() => {
   const info = props.discountInfo;
-  return isValidDiscount(info) && info.discountType === 'PERCENTAGE' && info.discountAmount
+  return isValidDiscount(info) && info.discountType === DiscountType.PERCENTAGE && info.discountAmount
     ? `${info.discountAmount}% off`
     : '';
 });
