@@ -222,7 +222,7 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
   const markTransactionStarted = async (isUpgrade: boolean): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        isUpgrade ? 'webapi/2/crypto/payment/upgrade/' : 'webapi/2/crypto/payment/pending/',
+        isUpgrade ? '/webapi/2/crypto/payment/upgrade/' : '/webapi/2/crypto/payment/pending/',
         {
           method: 'PATCH',
         },
@@ -251,7 +251,7 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
   const deletePendingPayment = async (): Promise<Result<boolean>> => {
     try {
       const response = await fetchWithCsrf<ActionResultResponse>(
-        'webapi/2/crypto/payment/pending/',
+        '/webapi/2/crypto/payment/pending/',
         {
           method: 'DELETE',
         },
@@ -301,7 +301,7 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
 
   const cancelUpgradeRequest = async (subscriptionId: string): Promise<Result<boolean>> => {
     try {
-      const response = await fetchWithCsrf<ActionResultResponse>('webapi/2/crypto/upgrade/cancel', {
+      const response = await fetchWithCsrf<ActionResultResponse>('/webapi/2/crypto/upgrade/cancel', {
         body: {
           subscriptionId,
         },

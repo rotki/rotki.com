@@ -22,7 +22,7 @@ export function useUserDevices(): UseUserDevicesReturn {
     'user-devices',
     async () => {
       const response = await fetchWithCsrf<UserDevices>(
-        'webapi/2/devices/',
+        '/webapi/2/devices/',
         {
           method: 'GET',
         },
@@ -38,7 +38,7 @@ export function useUserDevices(): UseUserDevicesReturn {
   async function deleteDevice(id: number): Promise<void> {
     try {
       await fetchWithCsrf(
-        `webapi/2/devices/${id}/`,
+        `/webapi/2/devices/${id}/`,
         {
           method: 'DELETE',
         },
@@ -54,7 +54,7 @@ export function useUserDevices(): UseUserDevicesReturn {
   async function renameDevice(id: number, label: string): Promise<void> {
     try {
       await fetchWithCsrf<UserDevice>(
-        `webapi/2/devices/${id}/`,
+        `/webapi/2/devices/${id}/`,
         {
           body: { label },
           method: 'PUT',
