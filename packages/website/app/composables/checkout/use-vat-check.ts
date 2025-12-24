@@ -32,7 +32,7 @@ export function useVatCheck(): UseVATCheckReturn {
   const refreshVATCheckStatus = async (): Promise<void> => {
     try {
       const response = await fetchWithCsrf<ApiResponse<string>>(
-        'webapi/account/vat',
+        '/webapi/account/vat',
         {
           method: 'GET',
         },
@@ -71,7 +71,7 @@ export function useVatCheck(): UseVATCheckReturn {
   const checkVAT = async (): Promise<VATCheckResult | VATCheckRateLimited> => {
     try {
       const response = await fetchWithCsrf<ApiResponse<boolean>>(
-        'webapi/account/vat',
+        '/webapi/account/vat',
         {
           method: 'POST',
         },
