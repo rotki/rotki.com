@@ -24,9 +24,9 @@ const billingPeriod = computed<string>(() =>
 );
 
 const approvalInfo = computed<Record<string, string>>(() => {
-  const { amount, finalAmount } = paymentInfo;
+  const { renewingPrice, finalAmount } = paymentInfo;
   return {
-    amount,
+    renewingPrice,
     immediateAmount: finalAmount,
     period: get(billingPeriod),
   };
@@ -50,7 +50,7 @@ const approvalInfo = computed<Record<string, string>>(() => {
         <span class="text-rui-text-secondary">{{ t('subscription.3d_secure.payment_info.recurring_charge') }}</span>
         <div class="text-right">
           <div class="font-semibold text-rui-text">
-            {{ paymentInfo.amount }}€ <span class="text-sm text-rui-text-secondary font-normal">{{ billingPeriod }}</span>
+            {{ paymentInfo.renewingPrice }}€ <span class="text-sm text-rui-text-secondary font-normal">{{ billingPeriod }}</span>
           </div>
         </div>
       </div>

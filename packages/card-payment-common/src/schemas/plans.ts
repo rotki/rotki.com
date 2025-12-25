@@ -68,6 +68,7 @@ export const PaymentBreakdownResponseSchema = z.object({
   finalAmount: z.string(),
   vatRate: z.string(),
   vatAmount: z.string(),
+  renewingPrice: z.string(),
   braintreeClientToken: z.string().optional(), // Only for non-crypto payments
   nextPayment: z.number().default(0), // Next payment timestamp (for upgrades)
   discount: PaymentBreakdownDiscountSchema.nullable(),

@@ -256,6 +256,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       durationInMonths: storedParams.durationInMonths.toString(),
       amount: storedParams.amount,
       finalAmount: storedParams.finalAmount,
+      renewingPrice: storedParams.renewingPrice,
     });
 
     try {
