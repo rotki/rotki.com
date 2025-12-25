@@ -23,13 +23,9 @@ const ROUTES = {
 const title = 'rotki pricing';
 const description = 'Pricing page for rotki subscription';
 
-const {
-  public: { baseUrl },
-} = useRuntimeConfig();
-
 useHead({
   title,
-  meta: getMetadata(title, description, `${baseUrl}/checkout/pay/`, baseUrl),
+  meta: getMetadata(title, description, '/checkout/pay'),
   ...commonAttrs(),
 });
 
