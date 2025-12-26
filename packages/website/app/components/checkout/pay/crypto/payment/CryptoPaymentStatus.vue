@@ -25,7 +25,7 @@ const isVisible = computed<boolean>(() => {
     >
       <div
         v-if="isVisible"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
       >
         <!-- Pending state -->
         <div class="flex flex-col items-center justify-center text-center px-4">

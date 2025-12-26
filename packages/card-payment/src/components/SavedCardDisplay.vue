@@ -2,7 +2,7 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { set } from '@vueuse/core';
 import { computed, ref } from 'vue';
-import { deleteCard } from '@/utils/api';
+import { deleteCard } from '@/utils/card-api';
 import BaseButton from './BaseButton.vue';
 
 interface Props {

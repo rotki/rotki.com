@@ -2,7 +2,7 @@
 import type { Client } from 'braintree-web/client';
 import { get, set } from '@vueuse/core';
 import { ref } from 'vue';
-import { addCard } from '@/utils/api';
+import { addCard } from '@/utils/card-api';
 import BaseButton from './BaseButton.vue';
 import BaseDialog from './BaseDialog.vue';
 import NewCardForm from './NewCardForm.vue';

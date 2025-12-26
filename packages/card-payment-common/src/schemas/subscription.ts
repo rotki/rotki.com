@@ -23,6 +23,7 @@ export const SubscriptionStatusSchema = z.enum([
   'Pending',
   'Past Due',
   'Upgrade Requested',
+  'Payment Failed',
 ]);
 
 export type SubscriptionStatus = z.infer<typeof SubscriptionStatusSchema>;

@@ -35,6 +35,7 @@ export function useSubscriptionDisplay(): UseSubscriptionDisplayReturn {
       'Pending': 'warning',
       'Upgrade Requested': 'warning',
       'Past Due': 'warning',
+      'Payment Failed': 'error',
     };
 
     return statusColorMap[status];

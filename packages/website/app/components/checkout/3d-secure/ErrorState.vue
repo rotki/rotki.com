@@ -37,7 +37,7 @@ function handleBack() {
     <div class="mb-6 max-w-md mx-auto">
       <RuiAlert
         type="error"
-        class="text-left"
+        class="text-left whitespace-break-spaces"
       >
         {{ error }}
       </RuiAlert>

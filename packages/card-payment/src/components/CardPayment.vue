@@ -9,7 +9,7 @@ import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { addCard, createCardNonce } from '@/utils/api';
+import { addCard, createCardNonce } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
 import DiscountCodeInput from './DiscountCodeInput.vue';
@@ -72,9 +72,9 @@ async function initializeBraintreeClient(): Promise<void> {
       authorization: planData.braintreeClientToken,
     });
   }
-  catch (error: any) {
-    set(error, `Failed to initialize payment client: ${error.message}`);
-    console.error(error);
+  catch (error_: any) {
+    set(error, `Failed to initialize payment client: ${error_.message}`);
+    console.error(error_);
   }
 }
 
@@ -100,8 +100,8 @@ async function getSavedCardBin(card: SavedCard): Promise<string> {
 
     return '';
   }
-  catch (error) {
-    console.error('Failed to fetch bin from vault manager:', error);
+  catch (error_) {
+    console.error('Failed to fetch bin from vault manager:', error_);
     return '';
   }
   finally {
@@ -171,8 +171,8 @@ async function processPayment(): Promise<void> {
     sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
     emit('payment-success');
   }
-  catch (error: any) {
-    set(error, error.message || 'Payment failed. Please try again.');
+  catch (error_: any) {
+    set(error, error_.message || 'Payment failed. Please try again.');
     set(isProcessing, false);
   }
 }
@@ -216,8 +216,8 @@ onUnmounted(async () => {
   try {
     await client.value?.teardown(() => {});
   }
-  catch (error) {
-    console.error('Error during cleanup:', error);
+  catch (error_) {
+    console.error('Error during cleanup:', error_);
   }
 });
 </script>
@@ -327,7 +327,7 @@ onUnmounted(async () => {
       >
         <div
           v-if="isProcessing"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
         >
           <div class="flex flex-col items-center justify-center text-center px-4">
             <div class="mb-4">
