@@ -149,11 +149,25 @@ async function getSavedCardBin(card: SavedCard): Promise<string> {
   }
 }
 
-const finalAmount = computed<number>(() => {
-  const vat = get(vatBreakdown);
-  if (vat) {
-    return parseFloat(vat.basePrice) + parseFloat(vat.vatAmount);
+const grandTotal = computed<number>(() => {
+  const currentBreakdown = get(breakdown);
+
+  // Use breakdown if available
+  if (currentBreakdown) {
+    return parseFloat(currentBreakdown.finalAmount);
   }
+
+  return get(selectedPlan).price;
+});
+
+const renewingPrice = computed<number>(() => {
+  const currentBreakdown = get(breakdown);
+
+  // Use breakdown if available
+  if (currentBreakdown) {
+    return parseFloat(currentBreakdown.renewingPrice);
+  }
+
   return get(selectedPlan).price;
 });
 
@@ -202,7 +216,8 @@ async function processPayment(): Promise<void> {
       token: planData.braintreeClientToken,
       planId: selectedPlan.planId,
       amount: plan.price.toString(),
-      finalAmount: get(finalAmount).toString(),
+      finalAmount: get(grandTotal).toString(),
+      renewingPrice: get(renewingPrice).toString(),
       nonce: paymentNonce,
       bin: paymentBin,
       discountCode: get(discountCode) || undefined,
@@ -343,6 +358,7 @@ onUnmounted(async () => {
           <PaymentGrandTotal
             :vat-breakdown="vatBreakdown"
             :discount-info="discountInfo"
+            :grand-total="grandTotal"
             :next-payment="planData.nextPayment"
             :duration-in-months="selectedPlan.durationInMonths"
           />

@@ -6,6 +6,7 @@ import { z } from 'zod';
 export const ThreeDSecureParamsSchema = z.object({
   amount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Invalid amount format'),
   finalAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Invalid amount format'),
+  renewingPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, 'Invalid amount format'),
   bin: z.string().min(4, 'BIN must be at least 4 characters'),
   nonce: z.string().min(1, 'Nonce is required'),
   paymentMethodId: z.string().optional(),
@@ -22,6 +23,7 @@ export interface PaymentInfo {
   amount: string;
   finalAmount: string;
   durationInMonths: string;
+  renewingPrice: string;
 }
 
 /**

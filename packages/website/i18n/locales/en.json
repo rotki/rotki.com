@@ -1179,7 +1179,7 @@
         "recurring_charge": "Recurring charge",
         "per_month": "/mo",
         "per_year": "/yr",
-        "approval_notice": "By completing this verification, you agree to an immediate charge of {immediateAmount}€ and recurring payments of {amount}€ {period} until you cancel your subscription."
+        "approval_notice": "By completing this verification, you agree to an immediate charge of {immediateAmount}€ and recurring payments of {renewingPrice}€ {period} until you cancel your subscription."
       }
     }
   },

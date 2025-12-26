@@ -11,7 +11,14 @@ interface VatBreakdown {
   fullAmount: string;
 }
 
-const { vatBreakdown, discountInfo, nextPayment, durationInMonths } = defineProps<{
+const {
+  vatBreakdown,
+  grandTotal,
+  discountInfo,
+  nextPayment,
+  durationInMonths,
+} = defineProps<{
+  grandTotal: number;
   vatBreakdown?: VatBreakdown;
   discountInfo?: PaymentBreakdownDiscount;
   nextPayment?: number;
@@ -29,14 +36,6 @@ function isValidDiscount(info: PaymentBreakdownDiscount | undefined): info is Va
 }
 
 const hasDiscount = computed<boolean>(() => isValidDiscount(get(discountInfo)));
-
-const grandTotal = computed<number>(() => {
-  const vat = get(vatBreakdown);
-  if (vat) {
-    return parseFloat(vat.basePrice) + parseFloat(vat.vatAmount);
-  }
-  return 0;
-});
 
 const nextPaymentDate = computed<string | undefined>(() => {
   const payment = get(nextPayment);

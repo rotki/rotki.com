@@ -34,9 +34,6 @@ const discountAmount = computed<number>(() => {
   return info && info.isValid ? parseFloat(info.discountedAmount) : 0;
 });
 
-// grandTotal already includes the discount from breakdown.finalAmount
-const finalAmount = computed<number>(() => props.grandTotal);
-
 const durationLabel = computed<string>(() => {
   const currentPlan = get(plan);
   if (currentPlan.durationInMonths === 12)
@@ -143,7 +140,7 @@ const renewalDate = computed<string>(() => {
           class="w-24 h-8"
         />
         <template v-else>
-          {{ finalAmount.toFixed(2) }} €
+          {{ grandTotal.toFixed(2) }} €
         </template>
       </div>
     </div>
