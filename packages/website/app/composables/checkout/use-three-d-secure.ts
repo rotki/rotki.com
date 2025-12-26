@@ -263,9 +263,12 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       await verifyAndFinalizePayment(storedParams);
       return { success: true, params: storedParams };
     }
-    catch (initError) {
+    catch (initError: any) {
       // Error is handled by the composable state
-      console.error('3D Secure process failed:', initError);
+      const errorMessage = `3D Secure process failed:\n${initError.message || initError.toString()}`;
+      console.error(errorMessage);
+      set(state, 'error');
+      set(error, errorMessage);
       return { success: false, params: storedParams };
     }
   }
