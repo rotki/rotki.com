@@ -1,5 +1,6 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive } from '@rotki/card-payment-common';
+import { get } from '@vueuse/core';
 import { formatDate } from '~/utils/date';
 
 export function useSubscriptionStatus(subscription: Ref<UserSubscription>) {
@@ -9,7 +10,7 @@ export function useSubscriptionStatus(subscription: Ref<UserSubscription>) {
    * Returns formatted status text, including cancellation date for cancelled-but-active subscriptions
    */
   const statusDisplayText = computed<string>(() => {
-    const sub = subscription.value;
+    const sub = get(subscription);
     if (isCancelledButActive(sub)) {
       return t('account.subscriptions.cancelled_but_still_active.status', {
         date: formatDate(sub.nextActionDate),
@@ -22,9 +23,9 @@ export function useSubscriptionStatus(subscription: Ref<UserSubscription>) {
    * Returns CSS classes for card border styling based on subscription status
    */
   const statusCardClass = computed<string>(() => {
-    const status = subscription.value.status;
+    const status = get(subscription).status;
     // Error states (red)
-    if (status === 'Cancelled') {
+    if (status === 'Cancelled' || status === 'Payment Failed') {
       return '!border-l-4 !border-l-rui-error';
     }
     // Warning states (yellow/orange)

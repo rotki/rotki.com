@@ -15,8 +15,8 @@ import {
   checkout,
   findSelectedPlanById,
   getAvailablePlans,
-  getSavedCard,
 } from '@/utils/api';
+import { getSavedCard } from '@/utils/card-api';
 import { getUrlParam, navigation } from '@/utils/navigation';
 import { canBuyNewSubscription } from '@/utils/navigation-guard';
 
