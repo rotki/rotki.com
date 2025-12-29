@@ -74,6 +74,17 @@ Run with the development server with the following command:
 $ pnpm run dev
 ```
 
+## Testing Production Build Locally
+
+When testing locally, it's recommended to use the production build behind a proxy instead of the development server:
+
+```bash
+$ pnpm run build
+$ pnpm run preview
+```
+
+This is important because SSR (Server-Side Rendering) behaves differently between development mode and production builds. Running `pnpm run build` creates the same code that runs in production, and `pnpm run preview` runs a single-threaded Node server serving the final Nuxt app—similar to how it runs in Docker.
+
 ## Lint
 
 To fix any lint errors you have to run
