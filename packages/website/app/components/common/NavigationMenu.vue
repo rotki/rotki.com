@@ -104,7 +104,7 @@ const { isMdAndDown } = useBreakpoint();
 </script>
 
 <template>
-  <div class="flex flex-wrap md:justify-center md:gap-1 lg:gap-2">
+  <div class="flex flex-wrap md:justify-center gap-1 md:gap-1 lg:gap-2">
     <template v-for="menu in menus">
       <ButtonLink
         v-if="!isParent(menu)"
@@ -115,6 +115,7 @@ const { isMdAndDown } = useBreakpoint();
         :external="menu.external"
         :to="menu.to"
         v-bind="menu.buttonProps"
+        :class="{ '!px-3': menu.buttonProps }"
       >
         {{ menu.label }}
         <template
