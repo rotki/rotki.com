@@ -59,7 +59,7 @@ watch(
       </div>
       <div
         class="transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4 md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap xl:justify-between xl:gap-y-0"
-        :class="menuOpened ? 'left-0' : '-left-full md:left-0'"
+        :class="menuOpened ? 'left-0' : '!-left-full md:left-0'"
       >
         <NuxtLink
           to="/"
