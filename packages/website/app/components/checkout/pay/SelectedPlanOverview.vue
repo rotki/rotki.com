@@ -61,7 +61,7 @@ const proratedPrice = computed<string | undefined>(() => {
   if (!currentBreakdown || !get(upgrade)) {
     return undefined;
   }
-  return currentBreakdown.finalAmount;
+  return currentBreakdown.fullAmount;
 });
 
 const vatOverview = computed<VatOverview | undefined>(() => {

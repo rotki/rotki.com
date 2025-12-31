@@ -71,35 +71,36 @@ const crypto = computed<boolean>(() => !!route.query.crypto);
         </RuiButton>
 
         <!-- Success notice with setup link (only for non-crypto payments) -->
-        <div
-          v-if="!crypto"
-          class="text-center mt-4 p-4 bg-rui-grey-50 dark:bg-rui-grey-800 rounded-lg border border-rui-grey-200 dark:border-rui-grey-700"
-        >
-          <p class="text-xs text-rui-text-secondary">
-            {{ t('subscription.3d_secure.payment_complete_notice') }}
-            <NuxtLink
-              to="https://docs.rotki.com/usage-guides/#set-up-rotki-premium"
-              external
-              target="_blank"
-              class="text-rui-primary underline hover:text-rui-primary-darker font-medium"
-            >
-              {{ t('subscription.3d_secure.setup_guide') }}
-            </NuxtLink>
-            {{ t('subscription.3d_secure.get_started_text') }}
-          </p>
-        </div>
+        <template v-if="!crypto">
+          <div
+            class="text-center mt-4 p-4 bg-rui-grey-50 dark:bg-rui-grey-800 rounded-lg border border-rui-grey-200 dark:border-rui-grey-700"
+          >
+            <p class="text-xs text-rui-text-secondary">
+              {{ t('subscription.3d_secure.payment_complete_notice') }}
+              <NuxtLink
+                to="https://docs.rotki.com/usage-guides/#set-up-rotki-premium"
+                external
+                target="_blank"
+                class="text-rui-primary underline hover:text-rui-primary-darker font-medium"
+              >
+                {{ t('subscription.3d_secure.setup_guide') }}
+              </NuxtLink>
+              {{ t('subscription.3d_secure.get_started_text') }}
+            </p>
+          </div>
 
-        <!-- Security reassurance -->
-        <div class="mt-6 text-center">
-          <p class="text-xs text-rui-text-secondary flex items-center justify-center gap-1">
-            <RuiIcon
-              name="lu-shield-check"
-              size="16"
-              color="success"
-            />
-            Your payment details were processed securely
-          </p>
-        </div>
+          <!-- Security reassurance -->
+          <div class="mt-6 text-center">
+            <p class="text-xs text-rui-text-secondary flex items-center justify-center gap-1">
+              <RuiIcon
+                name="lu-shield-check"
+                size="16"
+                color="success"
+              />
+              Your payment details were processed securely
+            </p>
+          </div>
+        </template>
       </div>
     </PageContent>
   </PageContainer>

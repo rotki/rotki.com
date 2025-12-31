@@ -625,7 +625,7 @@
             "referral_applied": "Referral code applied:",
             "apply_code": "Apply code",
             "first_payment_only": "* Applies to first payment only",
-            "hint": "Optional. Enter a discount code to apply savings to your purchase.",
+            "hint": "Optional: Enter a discount code to apply savings to your purchase.",
             "you_save": "You save {amount}€",
             "percent_off": "({percentage}% off)",
             "label": "Discount/Referral Code"
@@ -639,7 +639,7 @@
             "select_network_and_token": "Select network and token to pay"
           },
           "notes": {
-            "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency based on the rates given by CryptoCompare",
+            "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency",
             "line_2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
           },
@@ -1127,7 +1127,7 @@
       "not_connected": "No account is connected"
     },
     "crypto_success": {
-      "message": "You should receive an e-mail confirming the activation of your subscription in the near future.",
+      "message": "Once minted, please wait up to 7 minutes for our system to process your payment. You will receive an e-mail confirming the activation of your subscription.",
       "title": "Transaction Pending"
     },
     "error": {

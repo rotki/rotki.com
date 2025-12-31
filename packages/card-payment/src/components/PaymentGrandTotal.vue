@@ -44,6 +44,15 @@ const nextPaymentDate = computed<string | undefined>(() => {
   }
   return formatDate(new Date(payment * 1000));
 });
+
+const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: string }>(() => {
+  const breakdown = get(vatBreakdown);
+  return {
+    subtotal: breakdown?.basePrice ?? grandTotal.toFixed(2),
+    vatRate: breakdown?.vatRate ?? '0',
+    vatAmount: breakdown?.vatAmount ?? '0',
+  };
+});
 </script>
 
 <template>
@@ -79,20 +88,17 @@ const nextPaymentDate = computed<string | undefined>(() => {
     />
 
     <!-- VAT breakdown section -->
-    <div
-      v-if="vatBreakdown"
-      class="space-y-2 pb-3"
-    >
+    <div class="space-y-2 pb-3">
       <!-- Subtotal (base price before VAT) -->
       <div class="flex justify-between text-sm text-gray-600">
         <span>Subtotal:</span>
-        <span>{{ vatBreakdown.basePrice }} €</span>
+        <span>{{ priceBreakdown.subtotal }} €</span>
       </div>
 
       <!-- VAT -->
       <div class="flex justify-between text-sm text-gray-600">
-        <span>VAT ({{ vatBreakdown.vatRate }}%):</span>
-        <span>{{ vatBreakdown.vatAmount }} €</span>
+        <span>VAT ({{ priceBreakdown.vatRate }}%):</span>
+        <span>{{ priceBreakdown.vatAmount }} €</span>
       </div>
     </div>
 

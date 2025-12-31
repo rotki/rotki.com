@@ -59,6 +59,7 @@ export function useCryptoPaymentNavigation() {
    * Navigate to success page
    */
   const navigateToSuccess = async (): Promise<void> => {
+    sessionStorage.setItem('payment-completed', 'true');
     await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
   };
 

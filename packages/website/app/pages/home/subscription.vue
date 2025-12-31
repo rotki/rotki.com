@@ -12,6 +12,7 @@ import ReferralCode from '~/components/account/home/ReferralCode.vue';
 import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
 import SubscriptionTable from '~/components/account/home/SubscriptionTable.vue';
 import UnverifiedEmailWarning from '~/components/account/home/UnverifiedEmailWarning.vue';
+import { useUserPayments } from '~/composables/account/use-user-payments';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';
@@ -26,7 +27,8 @@ const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
-const { userSubscriptions, activeOrPendingSubscription, refresh, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
+const { userSubscriptions, activeOrPendingSubscription, refresh: refreshSubscriptions, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
+const { refresh: refreshPayments } = useUserPayments();
 const { requestRefresh } = useAccountRefresh();
 
 const subscriptionOpsStore = useSubscriptionOperationsStore();
@@ -55,8 +57,9 @@ function dismissSubscriptionError(): void {
   setError('');
 }
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   requestRefresh();
+  await Promise.all([refreshSubscriptions(), refreshPayments()]);
 });
 </script>
 
@@ -70,7 +73,7 @@ onBeforeMount(() => {
       <ActiveSubscriptionCard
         v-else-if="activeOrPendingSubscription"
         :subscription="activeOrPendingSubscription"
-        @refresh="refresh()"
+        @refresh="refreshSubscriptions()"
       />
       <PremiumPlaceholder v-else />
     </template>

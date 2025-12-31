@@ -48,6 +48,15 @@ const renewalDate = computed<string>(() => {
   renewal.setMonth(renewal.getMonth() + currentPlan.durationInMonths);
   return formatDate(renewal);
 });
+
+const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: string }>(() => {
+  const breakdown = get(vatBreakdown);
+  return {
+    subtotal: breakdown?.basePrice ?? props.grandTotal.toFixed(2),
+    vatRate: breakdown?.vatRate ?? '0',
+    vatAmount: breakdown?.vatAmount ?? '0',
+  };
+});
 </script>
 
 <template>
@@ -96,10 +105,7 @@ const renewalDate = computed<string>(() => {
     />
 
     <!-- VAT breakdown -->
-    <div
-      v-if="vatBreakdown"
-      class="space-y-1.5 pb-3"
-    >
+    <div class="space-y-1.5 pb-3">
       <!-- Subtotal -->
       <div class="flex justify-between text-sm">
         <span class="text-gray-600">{{ t('payment_grand_total.subtotal') }}</span>
@@ -109,21 +115,21 @@ const renewalDate = computed<string>(() => {
             class="w-16 h-5"
           />
           <template v-else>
-            {{ vatBreakdown.basePrice }} €
+            {{ priceBreakdown.subtotal }} €
           </template>
         </span>
       </div>
 
       <!-- VAT -->
       <div class="flex justify-between text-sm">
-        <span class="text-gray-600">{{ t('payment_grand_total.vat', { rate: vatBreakdown.vatRate }) }}</span>
+        <span class="text-gray-600">{{ t('payment_grand_total.vat', { rate: priceBreakdown.vatRate }) }}</span>
         <span class="font-medium text-rui-text">
           <RuiSkeletonLoader
             v-if="loading"
             class="w-16 h-5"
           />
           <template v-else>
-            {{ vatBreakdown.vatAmount }} €
+            {{ priceBreakdown.vatAmount }} €
           </template>
         </span>
       </div>

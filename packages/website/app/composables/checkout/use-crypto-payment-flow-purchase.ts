@@ -86,7 +86,8 @@ export function useCryptoPaymentFlowPurchase(): UseCryptoPaymentFlowPurchaseRetu
         state.setError(errorMsg);
       }
       else if (result.result.transactionStarted) {
-        await navigateTo('/home/subscription');
+        sessionStorage.setItem('payment-completed', 'true');
+        await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
       }
       else {
         state.setPaymentData(result.result);
