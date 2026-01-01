@@ -156,7 +156,7 @@ watch(value, (newValue) => {
         v-else
         class="text-xs leading-3 text-neutral-500 ml-2"
       >
-        Optional. Enter a discount code to apply savings to your purchase.
+        Optional: Enter a discount code to apply savings to your purchase.
       </p>
     </form>
 
