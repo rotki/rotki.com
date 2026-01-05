@@ -294,7 +294,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': {
-      prerender: true,
+      prerender: false,
     },
     // Redirect /pricing to /checkout/pay
     '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
