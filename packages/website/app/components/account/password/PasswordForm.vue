@@ -3,30 +3,29 @@ import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/core';
 import { FetchError } from 'ofetch';
+import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRecaptcha } from '~/composables/use-recaptcha';
 import { useLogger } from '~/utils/use-logger';
 
-const emailAddress = ref('');
-const loading = ref(false);
+const emailAddress = ref<string>('');
+const loading = ref<boolean>(false);
+const $externalResults = ref({});
 
 const {
   onError,
-  onExpired,
   onSuccess,
-  resetCaptcha,
-  captchaId,
+  onExpired,
   recaptchaToken,
+  captchaId,
+  resetCaptcha,
 } = useRecaptcha();
 
-const rules = {
-  email: { required, email },
-  captcha: { required },
-};
-
-const $externalResults = ref({});
 const v$ = useVuelidate(
-  rules,
+  {
+    email: { required, email },
+    captcha: { required },
+  },
   { email: emailAddress, captcha: recaptchaToken },
   {
     $autoDirty: true,
@@ -36,6 +35,10 @@ const v$ = useVuelidate(
 
 const logger = useLogger('password-form');
 const { fetchWithCsrf } = useFetchWithCsrf();
+
+function setCaptchaId(id: number) {
+  set(captchaId, id);
+}
 
 async function reset() {
   set(loading, true);
@@ -94,13 +97,16 @@ const { t } = useI18n({ useScope: 'global' });
             color="primary"
           />
 
-          <Recaptcha
-            v-model:captcha-id="captchaId"
-            :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
-            @error="onError()"
-            @expired="onExpired()"
-            @success="onSuccess($event)"
-          />
+          <ClientOnly>
+            <Recaptcha
+              data-cy="recovery-captcha"
+              :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
+              @error="onError()"
+              @expired="onExpired()"
+              @success="onSuccess($event)"
+              @update:captcha-id="setCaptchaId($event)"
+            />
+          </ClientOnly>
         </div>
         <RuiButton
           color="primary"
