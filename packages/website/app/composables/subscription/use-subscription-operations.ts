@@ -1,8 +1,8 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { set } from '@vueuse/shared';
 import { SubscriptionAction, type SubscriptionActionType } from '~/components/account/home/subscription-table/types';
-import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
 import { useSubscription } from '~/composables/subscription/use-subscription';
+import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 
 interface UseSubscriptionOperationsOptions {

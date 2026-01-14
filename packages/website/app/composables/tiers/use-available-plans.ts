@@ -1,8 +1,9 @@
 import type { AvailablePlan, AvailablePlans, AvailablePlansResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ComputedRef, Ref } from 'vue';
-import { createSharedComposable, get } from '@vueuse/core';
+import { get, set, until } from '@vueuse/core';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { PricingPeriod } from '~/types/tiers';
+import { logger } from '~/utils/use-logger';
 
 interface PlanDetails {
   planName: string;
@@ -13,6 +14,7 @@ interface PlanDetails {
 interface UseAvailablePlansReturn {
   availablePlans: ComputedRef<AvailablePlans>;
   country: ComputedRef<string | undefined>;
+  execute: () => Promise<void>;
   getPlanDetailsFromId: (planId: number) => PlanDetails | undefined;
   getSelectedPlanFromId: (planId: number) => SelectedPlan | undefined;
   pending: Ref<boolean>;
@@ -26,18 +28,44 @@ const defaultAvailablePlansData: AvailablePlansResponse = {
   tiers: [],
 };
 
-function useAvailablePlansInternal(): UseAvailablePlansReturn {
+/**
+ * Composable for fetching available plans
+ * Uses useState to cache data and prevent duplicate fetches across components
+ */
+export function useAvailablePlans(): UseAvailablePlansReturn {
   const { fetchAvailablePlans } = useTiersApi();
 
-  const { data: availablePlansData, pending, refresh, execute } = useLazyAsyncData(
-    'available-plans',
-    fetchAvailablePlans,
-    {
-      default: () => defaultAvailablePlansData,
-      // Do not execute during SSR/prerender. Fetch on client after hydration.
-      server: false,
-    },
-  );
+  // useState persists across all component instances and contexts
+  const availablePlansData = useState<AvailablePlansResponse>('available-plans-data', () => defaultAvailablePlansData);
+  const pending = useState<boolean>('available-plans-pending', () => false);
+  const fetched = useState<boolean>('available-plans-fetched', () => false);
+
+  async function execute(): Promise<void> {
+    // Already fetched, skip
+    if (get(fetched))
+      return;
+
+    // Already fetching, wait for it to complete
+    if (get(pending)) {
+      await until(pending).toBe(false);
+      return;
+    }
+
+    set(pending, true);
+    try {
+      const response = await fetchAvailablePlans();
+      set(availablePlansData, response);
+      set(fetched, true);
+    }
+    finally {
+      set(pending, false);
+    }
+  }
+
+  async function refresh(): Promise<void> {
+    set(fetched, false);
+    return execute();
+  }
 
   const availablePlans = computed<AvailablePlans>(() => {
     const plans = get(availablePlansData)?.tiers ?? [];
@@ -108,16 +136,18 @@ function useAvailablePlansInternal(): UseAvailablePlansReturn {
     };
   }
 
-  onMounted(execute);
+  // Auto-fetch on first use if not already fetched
+  if (import.meta.client && !get(fetched) && !get(pending)) {
+    execute().catch(logger.error.bind(logger, 'Failed to fetch available plans:'));
+  }
 
   return {
     availablePlans,
     country,
+    execute,
     getPlanDetailsFromId,
     getSelectedPlanFromId,
     pending,
     refresh,
   };
 }
-
-export const useAvailablePlans = createSharedComposable(useAvailablePlansInternal);

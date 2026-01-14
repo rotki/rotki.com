@@ -2,9 +2,10 @@
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { PaymentMethod, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get, set } from '@vueuse/core';
-import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
 import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
+import SelectablePlan from '~/modules/checkout/components/plan/SelectablePlan.vue';
 import { PricingPeriod } from '~/types/tiers';
 import { navigateToWithCSPSupport } from '~/utils/navigation';
 
@@ -13,6 +14,7 @@ const subscription = defineModel<Subscription | undefined>({ required: true });
 const { t } = useI18n({ useScope: 'global' });
 
 const { availablePlans } = useAvailablePlans();
+const { tiersInformation } = usePremiumTiersInfo();
 const router = useRouter();
 
 const selectedPlan = ref<AvailablePlan>();
@@ -179,6 +181,7 @@ function cancel(): void {
               v-for="plan in higherPlans"
               :key="plan.tierName"
               :plan="plan"
+              :tiers-info="tiersInformation"
               :period="currentPeriod"
               :selected="selectedPlan?.tierName === plan.tierName"
               :disabled="alert.show"

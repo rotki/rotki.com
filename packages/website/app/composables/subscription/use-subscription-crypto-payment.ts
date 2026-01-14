@@ -6,9 +6,10 @@ import {
   PaymentProvider,
   type Subscription as UserSubscription,
 } from '@rotki/card-payment-common/schemas/subscription';
-import { get, isDefined } from '@vueuse/shared';
-import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
-import { usePendingTx } from '~/composables/checkout/use-pending-tx';
+import { get, set } from '@vueuse/shared';
+import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
+import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
+import { useLogger } from '~/utils/use-logger';
 
 interface UseSubscriptionCryptoPaymentOptions {
   renewableSubscriptions: Ref<UserSubscription[]>;
@@ -23,31 +24,23 @@ interface UseSubscriptionCryptoPaymentReturn {
   getBlockExplorerLink: (pendingTx: PendingTx) => RouteLocationRaw;
 }
 
+// Module-level state to prevent duplicate API calls across component instances
+// This is NOT reactive - it's just for deduplication
+let pendingFetchSubId: string | undefined;
+let fetchInProgress = false;
+
 export function useSubscriptionCryptoPayment({
   renewableSubscriptions,
 }: UseSubscriptionCryptoPaymentOptions): UseSubscriptionCryptoPaymentReturn {
+  const logger = useLogger('subscription-crypto-payment');
   const pendingTx = usePendingTx();
   const paymentApi = useCryptoPaymentApi();
 
-  /**
-   * Get the currency for any pending crypto payment
-   */
-  const pendingPaymentCurrency = computedAsync<string | undefined>(async () => {
-    const subs = get(renewableSubscriptions);
-    if (subs.length === 0)
-      return undefined;
+  // Use useState for reactive shared state across components
+  const pendingPaymentCurrency = useState<string | undefined>('pending-payment-currency', () => undefined);
 
-    const firstSub = subs[0];
-    if (!firstSub)
-      return undefined;
-
-    const response = await paymentApi.checkPendingCryptoPayment(firstSub.id);
-
-    if (response.isError || !response.result.pending)
-      return undefined;
-
-    return response.result.currency;
-  });
+  // Extract just the first subscription ID
+  const firstRenewableSubId = computed<string | undefined>(() => get(renewableSubscriptions)[0]?.id);
 
   /**
    * Get the link to renew a subscription with crypto payment
@@ -68,15 +61,48 @@ export function useSubscriptionCryptoPayment({
       };
     }
 
-    if (isDefined(pendingPaymentCurrency)) {
+    const currency = get(pendingPaymentCurrency);
+    if (currency) {
       link.query = {
         ...link.query,
-        currency: get(pendingPaymentCurrency),
+        currency,
       };
     }
 
     return link;
   });
+
+  /**
+   * Fetch pending payment currency - only if not already fetched for this subscription
+   */
+  async function fetchPendingCurrency(subId: string): Promise<void> {
+    // Synchronous check to prevent race conditions
+    if (pendingFetchSubId === subId || fetchInProgress) {
+      return;
+    }
+
+    // Set flags synchronously before async operation
+    fetchInProgress = true;
+    pendingFetchSubId = subId;
+
+    try {
+      const response = await paymentApi.checkPendingCryptoPayment(subId);
+
+      if (!response.isError && response.result.pending) {
+        set(pendingPaymentCurrency, response.result.currency);
+      }
+      else {
+        set(pendingPaymentCurrency, undefined);
+      }
+    }
+    catch (error) {
+      logger.error('Failed to check pending crypto payment:', error);
+      set(pendingPaymentCurrency, undefined);
+    }
+    finally {
+      fetchInProgress = false;
+    }
+  }
 
   /**
    * Check if a crypto payment is pending for this subscription
@@ -111,6 +137,15 @@ export function useSubscriptionCryptoPayment({
     return {
       path: `${pending.blockExplorerUrl}/${pending.hash}`,
     };
+  }
+
+  // Watch for subscription changes and fetch on the client only
+  if (import.meta.client) {
+    watch(firstRenewableSubId, async (subId) => {
+      if (subId && pendingFetchSubId !== subId) {
+        await fetchPendingCurrency(subId);
+      }
+    }, { immediate: true });
   }
 
   return {

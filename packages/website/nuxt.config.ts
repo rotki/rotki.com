@@ -529,6 +529,7 @@ export default defineNuxtConfig({
       content: [
         './app/components/**/*.{vue,js,ts}',
         './app/layouts/**/*.vue',
+        './app/modules/**/*.{vue,js,ts}',
         './app/pages/**/*.vue',
       ],
       darkMode: 'class',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
-import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
+import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
+import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

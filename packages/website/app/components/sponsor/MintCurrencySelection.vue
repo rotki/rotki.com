@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CryptoAssetIcon from '~/components/checkout/pay/crypto/CryptoAssetIcon.vue';
+import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 
 interface Token {
   symbol: string;

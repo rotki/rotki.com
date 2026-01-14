@@ -3,6 +3,7 @@ import { navigateTo } from '#app';
 import PageContainer from '~/components/common/PageContainer.vue';
 import PageContent from '~/components/common/PageContent.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
@@ -24,6 +25,10 @@ useHead({
 const { t } = useI18n({ useScope: 'global' });
 
 useAutoLogout();
+
+// Clear checkout state after successful payment
+const { reset } = useCheckout();
+reset();
 
 const route = useRoute();
 const crypto = computed<boolean>(() => !!route.query.crypto);

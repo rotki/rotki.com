@@ -8,6 +8,7 @@ import { useAuthApi } from '~/composables/account/use-auth-api';
 import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
 import { isUnauthorizedError } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
 
@@ -17,10 +18,10 @@ export const useMainStore = defineStore('main', () => {
   const authenticated = ref<boolean>(false);
   const account = ref<Account>();
   const canBuy = ref<boolean>(true);
-  const pendingSubscriptionId = ref<string>();
 
   const logger = useLogger('store');
   const { setHooks } = useFetchWithCsrf();
+  const { pendingSubscriptionId, setPendingSubscriptionId, clearPendingSubscriptionId } = usePendingSubscriptionId();
 
   // API composables
   const accountApi = useAccountApi();
@@ -33,7 +34,7 @@ export const useMainStore = defineStore('main', () => {
 
     if (!accountVal) {
       set(canBuy, true);
-      set(pendingSubscriptionId, undefined);
+      clearPendingSubscriptionId();
       return;
     }
 
@@ -42,14 +43,14 @@ export const useMainStore = defineStore('main', () => {
 
       if (!hasActiveSubscription) {
         set(canBuy, true);
-        set(pendingSubscriptionId, undefined);
+        clearPendingSubscriptionId();
         return;
       }
 
       const subscriptions = await fetchUserSubscriptions();
       if (subscriptions.length === 0) {
         set(canBuy, true);
-        set(pendingSubscriptionId, undefined);
+        clearPendingSubscriptionId();
         return;
       }
 
@@ -60,7 +61,7 @@ export const useMainStore = defineStore('main', () => {
       const pendingSubscription = subscriptions.find(sub => isSubPending(sub) || isSubRequestingUpgrade(sub));
 
       set(canBuy, renewableSubscriptions.length > 0);
-      set(pendingSubscriptionId, pendingSubscription?.id);
+      setPendingSubscriptionId(pendingSubscription?.id);
     }
     catch (error) {
       if (!isUnauthorizedError(error)) {
@@ -68,7 +69,7 @@ export const useMainStore = defineStore('main', () => {
       }
       // Default to true on error to not block users
       set(canBuy, true);
-      set(pendingSubscriptionId, undefined);
+      clearPendingSubscriptionId();
     }
   };
 
@@ -120,7 +121,7 @@ export const useMainStore = defineStore('main', () => {
     set(authenticated, false);
     set(account, null);
     set(canBuy, true); // Reset to default
-    set(pendingSubscriptionId, undefined);
+    clearPendingSubscriptionId();
   }
 
   const refreshSession = () => {

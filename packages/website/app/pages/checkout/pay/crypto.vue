@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CryptoPaymentContainer from '~/components/checkout/pay/crypto/payment/CryptoPaymentContainer.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import CryptoPayment from '~/modules/checkout/components/crypto/CryptoPayment.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
@@ -29,5 +29,5 @@ useAutoLogout();
 </script>
 
 <template>
-  <CryptoPaymentContainer />
+  <CryptoPayment />
 </template>

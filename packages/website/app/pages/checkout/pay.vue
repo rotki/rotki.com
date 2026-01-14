@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
-import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const route = useRoute();
-const { pending: loadingPlans } = useAvailablePlans();
 
 const isCardOrSecureRoute = computed<boolean>(() => {
   const routeName = route.name;
@@ -67,56 +65,31 @@ const step = computed<number>(() => {
 
 const { removeStoredRedirectUrl } = useRedirectUrl();
 
-// Routes that use two-column layout and need special spacing
-const isTwoColumnLayout = computed<boolean>(() => {
-  const twoColumnRoutes = ['checkout-pay-request-crypto', 'checkout-pay-crypto', 'checkout-pay-paypal'];
-  return twoColumnRoutes.includes(route.name as string);
-});
-
 onBeforeMount(() => {
   removeStoredRedirectUrl();
 });
 </script>
 
 <template>
-  <div
-    class="container flex flex-col lg:flex-row h-full grow"
-    :class="[
-      isTwoColumnLayout ? 'py-8 gap-20' : 'py-4 lg:py-8',
-    ]"
-  >
-    <div class="flex justify-center grow overflow-hidden min-w-min">
-      <RuiProgress
-        v-if="loadingPlans"
-        circular
-        class="mt-20"
-        color="primary"
-        variant="indeterminate"
-      />
+  <div class="container flex flex-col lg:flex-row h-full grow py-4 lg:py-8 gap-6 lg:gap-8">
+    <div class="flex grow overflow-hidden min-w-0">
       <form
-        v-else
-        class="flex flex-col justify-between"
-        :class="[
-          isTwoColumnLayout ? 'w-full' : 'max-w-full items-center',
-        ]"
+        class="flex flex-col justify-between w-full"
         @submit.prevent
       >
         <NuxtPage />
-        <div class="block py-10 lg:px-4 w-full lg:hidden">
+        <div class="block py-10 w-full lg:hidden">
           <RuiFooterStepper
             :model-value="step"
             :pages="steps.length"
-            :class="[
-              isTwoColumnLayout ? 'max-w-7xl' : 'max-w-[29rem]',
-            ]"
-            class="mx-auto"
+            class="mx-auto max-w-7xl"
             variant="pill"
           />
         </div>
       </form>
     </div>
 
-    <div class="hidden lg:block max-w-[20.8rem] sticky top-0 self-start">
+    <div class="hidden lg:block w-56 shrink-0 sticky top-8 self-start">
       <RuiStepper
         :step="step"
         :steps="steps"

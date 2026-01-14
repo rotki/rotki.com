@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get, set } from '@vueuse/core';
-import { useCardThreeDSecure } from '~/composables/checkout/use-card-three-d-secure';
+import { useCardThreeDSecure } from '~/modules/checkout/composables/use-card-three-d-secure';
 import { formatDate } from '~/utils/date';
 import { formatCurrency } from '~/utils/text';
 

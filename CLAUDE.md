@@ -276,6 +276,65 @@ export const useCounterStore = defineStore('counter', () => {
 - Composables for component-specific state
 - VueUse utilities for common reactive patterns
 
+### Nuxt Data Fetching
+
+#### Do NOT wrap `useLazyAsyncData` in `createSharedComposable`
+
+**Problem**: `createSharedComposable` from VueUse disposes its state when all subscriber components unmount. When a new component mounts and calls the composable, it creates a NEW `useLazyAsyncData` instance, triggering a fresh fetch. This causes infinite loops when:
+
+1. Component mounts → creates `useLazyAsyncData` → fetches data
+2. Data update causes reactive re-render → component unmounts
+3. `createSharedComposable` disposes state
+4. Component remounts → creates NEW `useLazyAsyncData` → fetches again → loop
+
+**Solution**: Nuxt's `useAsyncData`/`useLazyAsyncData` already deduplicates requests by key. Multiple components calling the same composable with the same key share the underlying data automatically.
+
+```typescript
+// ❌ Incorrect - DO NOT do this
+function useDataInternal() {
+  const { data } = useLazyAsyncData('my-key', fetchFn, { server: false });
+  return { data };
+}
+
+export const useData = createSharedComposable(useDataInternal);
+
+// ✅ Correct - Let Nuxt handle deduplication
+export function useData() {
+  const { data } = useLazyAsyncData('my-key', fetchFn, {
+    server: false,
+    dedupe: 'defer', // Prevents new requests if one is pending
+  });
+  return { data };
+}
+```
+
+Use `dedupe: 'defer'` to prevent simultaneous duplicate requests when multiple components mount at the same time.
+
+### API Fetching Conventions
+
+The `useFetchWithCsrf` composable handles all API requests and automatically performs key conversion:
+
+- **Request body**: Converts camelCase keys to snake_case before sending to the backend
+- **Response body**: Converts snake_case keys to camelCase when parsing responses
+
+This means:
+
+- Always use camelCase in TypeScript/Vue code
+- The backend API uses snake_case (Python convention)
+- The conversion is handled automatically - no manual transformation needed
+
+```typescript
+// ✅ Correct - Use camelCase in code
+const response = await fetchWithCsrf<PlanResponse>('/webapi/2/plans');
+console.log(response.tierName); // Automatically converted from tier_name
+
+// The request body is also converted automatically
+await fetchWithCsrf('/webapi/2/update', {
+  method: 'POST',
+  body: { planId: 123, isActive: true }, // Sent as plan_id, is_active
+});
+```
+
 ### Error Handling
 
 - Global error boundaries implemented

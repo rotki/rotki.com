@@ -63,7 +63,7 @@ export default defineConfig({
         TEST: 'true',
         NUXT_PUBLIC_BASE_URL: `http://localhost:${port}`,
         // Configure devProxy to use mock server (http, not https)
-        PROXY_DOMAIN: `http://localhost:${mockApiPort}`,
+        PROXY_DOMAIN: `localhost:${mockApiPort}`,
         PROXY_INSECURE: 'true',
       },
       url: baseURL,

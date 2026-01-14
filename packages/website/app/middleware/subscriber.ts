@@ -5,10 +5,12 @@ import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(async () => {
   const store = useMainStore();
-  const { canBuy } = storeToRefs(store);
+  const { canBuy, account } = storeToRefs(store);
 
-  // Ensure account data is loaded
-  await store.getAccount();
+  if (!get(account)) {
+    // Ensure account data is loaded
+    await store.getAccount();
+  }
 
   if (!get(canBuy)) {
     return navigateTo('/home/subscription');

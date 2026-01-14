@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import PaypalPage from '~/components/checkout/pay/PaypalPage.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import PaypalPayment from '~/modules/checkout/components/paypal/PaypalPayment.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
@@ -34,5 +34,5 @@ onBeforeRouteLeave((to, _from, next) => {
 </script>
 
 <template>
-  <PaypalPage />
+  <PaypalPayment />
 </template>

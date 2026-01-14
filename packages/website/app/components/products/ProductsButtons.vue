@@ -4,7 +4,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import { get, isDefined } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { useReferralCodeParam } from '~/composables/checkout/use-plan-params';
+import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';
 
 withDefaults(

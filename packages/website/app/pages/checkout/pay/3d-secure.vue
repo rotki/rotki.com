@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get, set } from '@vueuse/core';
-import ErrorState from '~/components/checkout/3d-secure/ErrorState.vue';
-import InvalidParamsState from '~/components/checkout/3d-secure/InvalidParamsState.vue';
-import LoadingState from '~/components/checkout/3d-secure/LoadingState.vue';
-import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
-import CheckoutTitle from '~/components/checkout/common/CheckoutTitle.vue';
-import { useThreeDSecure } from '~/composables/checkout/use-three-d-secure';
+import ErrorState from '~/modules/checkout/components/card/CardPaymentError.vue';
+import InvalidParamsState from '~/modules/checkout/components/card/CardPaymentInvalid.vue';
+import LoadingState from '~/modules/checkout/components/card/CardPaymentLoading.vue';
+import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
+import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
+import { useThreeDSecure } from '~/modules/checkout/composables/use-three-d-secure';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

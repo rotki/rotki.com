@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CryptoRequest from '~/components/checkout/pay/crypto/request/CryptoRequest.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import CryptoRequest from '~/modules/checkout/components/crypto/CryptoRequest.vue';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({

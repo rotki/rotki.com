@@ -2,8 +2,8 @@ import { isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { get } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { getPricingPeriod } from '~/components/pricings/utils';
-import { useCryptoPaymentApi } from '~/composables/checkout/use-crypto-payment-api';
 import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
+import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { useMainStore } from '~/store';
 import { PricingPeriod } from '~/types/tiers';
 
@@ -11,14 +11,18 @@ export default defineNuxtRouteMiddleware(async () => {
   const store = useMainStore();
   const { account, pendingSubscriptionId } = storeToRefs(store);
 
-  if (!get(account)) {
-    await store.getAccount();
-  }
-
+  // Check pendingSubscriptionId BEFORE calling getAccount() to avoid race conditions.
+  // When user cancels a pending payment and navigates back, we clear the ID in sessionStorage.
+  // If we call getAccount() first, it would re-fetch from API and potentially set it again
+  // before the backend has fully processed the cancellation, causing a redirect loop.
   const pendingSubId = get(pendingSubscriptionId);
 
   if (!pendingSubId) {
     return;
+  }
+
+  if (!get(account)) {
+    await store.getAccount();
   }
 
   const { fetchUserSubscriptions } = useFetchUserSubscriptions();
