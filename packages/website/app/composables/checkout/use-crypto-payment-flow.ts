@@ -54,8 +54,8 @@ export function useCryptoPaymentFlow(
   // Set up pausable watcher (Vue 3.5+ native)
   const { pause, resume } = watch(
     [state.selectedPlan, discountCode],
-    async ([newPlan, newDiscount]) => {
-      if (!newPlan || get(state.loading) || !isDefined(currency)) {
+    async ([newPlan, newDiscount], [oldPlan]) => {
+      if (!oldPlan || !newPlan || get(state.loading) || !isDefined(currency)) {
         return;
       }
 
