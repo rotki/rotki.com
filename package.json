@@ -2,7 +2,7 @@
   "name": "rotki.com",
   "version": "2026.1.1",
   "private": true,
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.28.1",
   "type": "module",
   "scripts": {
     "dev": "run-p dev:website dev:card",
@@ -31,23 +31,23 @@
     "release": "bumpp -r --no-push"
   },
   "devDependencies": {
-    "@commitlint/cli": "20.2.0",
-    "@commitlint/config-conventional": "20.2.0",
+    "@commitlint/cli": "20.3.1",
+    "@commitlint/config-conventional": "20.3.1",
     "@rotki/eslint-config": "4.5.0",
     "@rotki/eslint-plugin": "1.2.0",
-    "bumpp": "10.3.2",
+    "bumpp": "10.4.0",
     "cac": "6.7.14",
     "consola": "3.4.2",
-    "eslint": "9.39.1",
+    "eslint": "9.39.2",
     "eslint-plugin-nuxt": "4.0.0",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
     "npm-run-all2": "8.0.4",
     "rimraf": "6.1.2",
-    "stylelint": "16.26.1",
+    "stylelint": "17.0.0",
     "stylelint-config-recommended-vue": "1.6.1",
-    "stylelint-config-standard": "39.0.1",
-    "stylelint-order": "7.0.0"
+    "stylelint-config-standard": "40.0.0",
+    "stylelint-order": "7.0.1"
   },
   "engines": {
     "node": ">=22 <23",
@@ -62,7 +62,9 @@
       "@parcel/watcher",
       "@reown/appkit",
       "better-sqlite3",
+      "bufferutil",
       "esbuild",
+      "utf-8-validate",
       "vue-demi"
     ]
   },

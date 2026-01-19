@@ -25,7 +25,7 @@ ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=4000
 
 RUN --mount=type=cache,target=/root/.npm/_cacache/ \
-    npm install -g pm2@6.0.11
+    npm install -g pm2@6.0.14
 
 COPY --from=builder /build/.output/ ./
 COPY --from=builder /build/docker/ecosystem.config.cjs ./
