@@ -323,7 +323,6 @@ export default defineNuxtConfig({
       },
     },
     '/checkout/pay': {
-      prerender: true,
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(
