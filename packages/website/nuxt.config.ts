@@ -287,8 +287,10 @@ export default defineNuxtConfig({
       tasks: true,
     },
     scheduledTasks: {
-      // Run `ntf:cache` task every 5 minutes
+      // Run `nft:cache` task every 5 minutes
       '*/5 * * * *': ['nft:cache'],
+      // Run `releases:cache` task every 8 minutes (before 10 min L2 TTL expires)
+      '*/8 * * * *': ['releases:cache'],
     },
   },
 

@@ -4,7 +4,14 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 // Set up globals BEFORE any imports of the handler module
 const mockCache = {
   getItem: vi.fn(),
+  removeItem: vi.fn(),
   setItem: vi.fn(),
+};
+
+const mockMemoryCache = {
+  delete: vi.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
 };
 
 const mockFetchRaw = vi.fn();
@@ -22,6 +29,17 @@ vi.stubGlobal('$fetch', Object.assign(vi.fn(), { raw: mockFetchRaw }));
 // Mock the cache service module
 vi.mock('~~/server/utils/cache-service', () => ({
   getCacheService: () => mockCache,
+}));
+
+// Mock the memory cache module
+vi.mock('~~/server/utils/memory-cache', () => ({
+  memoryCache: mockMemoryCache,
+}));
+
+// Mock the redis lock module - always acquire lock successfully
+vi.mock('~~/server/utils/redis-lock', () => ({
+  acquireLock: vi.fn().mockResolvedValue(true),
+  releaseLock: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Types for testing
@@ -74,6 +92,9 @@ describe('releases API handler', () => {
     vi.clearAllMocks();
     mockCache.getItem.mockReset();
     mockCache.setItem.mockReset();
+    mockCache.removeItem.mockReset();
+    mockMemoryCache.get.mockReset();
+    mockMemoryCache.set.mockReset();
     mockFetchRaw.mockReset();
   });
 
@@ -192,22 +213,36 @@ describe('releases API handler', () => {
   });
 
   describe('handler caching behavior', () => {
-    it('returns cached data when cache hit', async () => {
+    it('returns L1 cached data when L1 cache hit', async () => {
       const cachedRelease = { tag_name: 'v1.35.0', assets: [] };
-      mockCache.getItem.mockResolvedValueOnce(cachedRelease);
+      mockMemoryCache.get.mockReturnValueOnce(cachedRelease);
 
       const result = await handler(createMockEvent());
 
       expect(result).toEqual(cachedRelease);
+      expect(mockCache.getItem).not.toHaveBeenCalled();
       expect(mockFetchRaw).not.toHaveBeenCalled();
     });
 
-    it('fetches from GitHub when cache miss and caches the result', async () => {
+    it('returns L2 cached data when L1 miss but L2 hit', async () => {
+      const cachedRelease = { tag_name: 'v1.35.0', assets: [] };
+      mockMemoryCache.get.mockReturnValueOnce(undefined); // L1 miss
+      mockCache.getItem.mockResolvedValueOnce(cachedRelease); // L2 hit
+
+      const result = await handler(createMockEvent());
+
+      expect(result).toEqual(cachedRelease);
+      expect(mockMemoryCache.set).toHaveBeenCalled(); // Should populate L1
+      expect(mockFetchRaw).not.toHaveBeenCalled();
+    });
+
+    it('fetches from GitHub when both caches miss and caches the result', async () => {
       const githubResponse = createMockGithubResponse('v1.35.0', [
         { name: 'rotki-linux.AppImage', url: 'https://linux-url' },
       ]);
 
-      mockCache.getItem.mockResolvedValue(null);
+      mockMemoryCache.get.mockReturnValue(undefined); // L1 miss
+      mockCache.getItem.mockResolvedValue(null); // L2 miss
       mockFetchRaw.mockResolvedValueOnce({
         _data: githubResponse,
         status: 200,
@@ -219,12 +254,14 @@ describe('releases API handler', () => {
       expect(result.tag_name).toBe('v1.35.0');
       expect(result.assets).toHaveLength(1);
       expect(mockCache.setItem).toHaveBeenCalled();
+      expect(mockMemoryCache.set).toHaveBeenCalled();
     });
 
     it('uses stored ETag for conditional requests', async () => {
       const storedEtag = '"stored-etag-123"';
+      mockMemoryCache.get.mockReturnValue(undefined); // L1 miss
       mockCache.getItem
-        .mockResolvedValueOnce(null) // Primary cache miss
+        .mockResolvedValueOnce(null) // L2 cache miss
         .mockResolvedValueOnce(storedEtag); // Return stored ETag
 
       mockFetchRaw.mockResolvedValueOnce({
@@ -249,8 +286,9 @@ describe('releases API handler', () => {
       const staleRelease = { tag_name: 'v1.35.0', assets: [{ name: 'test.AppImage', browser_download_url: 'https://test' }] };
       const storedEtag = '"etag-unchanged"';
 
+      mockMemoryCache.get.mockReturnValue(undefined); // L1 miss
       mockCache.getItem
-        .mockResolvedValueOnce(null) // Primary cache miss
+        .mockResolvedValueOnce(null) // L2 cache miss
         .mockResolvedValueOnce(storedEtag) // Return stored ETag
         .mockResolvedValueOnce(staleRelease); // Return stale data for 304 handling
 
@@ -277,8 +315,9 @@ describe('releases API handler', () => {
     it('returns stale data when GitHub API fails', async () => {
       const staleRelease = { tag_name: 'v1.34.0', assets: [] };
 
+      mockMemoryCache.get.mockReturnValue(undefined); // L1 miss
       mockCache.getItem
-        .mockResolvedValueOnce(null) // Primary cache miss
+        .mockResolvedValueOnce(null) // L2 cache miss
         .mockResolvedValueOnce(null) // No ETag
         .mockResolvedValueOnce(staleRelease); // Stale cache hit
 
@@ -290,7 +329,8 @@ describe('releases API handler', () => {
     });
 
     it('throws error when GitHub fails and no stale data available', async () => {
-      mockCache.getItem.mockResolvedValue(null);
+      mockMemoryCache.get.mockReturnValue(undefined); // L1 miss
+      mockCache.getItem.mockResolvedValue(null); // All cache misses
       mockFetchRaw.mockRejectedValueOnce(new Error('GitHub API error'));
 
       await expect(handler(createMockEvent())).rejects.toThrow();
