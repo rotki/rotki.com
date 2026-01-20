@@ -108,7 +108,10 @@ function useAvailablePlansInternal(): UseAvailablePlansReturn {
     };
   }
 
-  onMounted(execute);
+  // Execute immediately - server: false option already prevents SSR execution.
+  // Using direct call instead of onMounted because createSharedComposable
+  // may be initialized outside component context.
+  execute().catch(() => {});
 
   return {
     availablePlans,

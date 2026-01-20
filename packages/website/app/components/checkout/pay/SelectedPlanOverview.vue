@@ -1,34 +1,29 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
-import { computed } from 'vue';
 import ChangePlanDialog from '~/components/checkout/plan/ChangePlanDialog.vue';
-import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
-import { logger } from '~/utils/use-logger';
 
 interface VatOverview { vat: string; basePrice: string; vatAmount: string }
 
-const breakdown = defineModel<PaymentBreakdownResponse | undefined>('breakdown', { required: false });
-
 const props = withDefaults(defineProps<{
   plan: SelectedPlan;
+  breakdown?: PaymentBreakdownResponse;
   crypto?: boolean;
   warning?: boolean;
   disabled?: boolean;
   loading?: boolean;
   internalMode?: boolean;
   upgrade?: boolean;
-  discountCode?: string;
 }>(), {
+  breakdown: undefined,
   crypto: false,
   warning: false,
   internalMode: false,
   disabled: false,
   loading: false,
   upgrade: false,
-  discountCode: undefined,
 });
 
 const emit = defineEmits<{
@@ -38,11 +33,8 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 const router = useRouter();
 
-const { plan, internalMode, crypto, upgrade, discountCode } = toRefs(props);
-const isLoadingBreakdown = ref<boolean>(false);
+const { plan, breakdown, internalMode, crypto, upgrade } = toRefs(props);
 const selection = ref<boolean>(false);
-
-const { fetchPaymentBreakdown } = useTiersApi();
 
 const name = computed<string>(() => getPlanNameFor(t, get(plan)));
 
@@ -89,25 +81,6 @@ const vatOverview = computed<VatOverview | undefined>(() => {
   };
 });
 
-async function loadPaymentBreakdown(): Promise<void> {
-  set(isLoadingBreakdown, true);
-  try {
-    const code = get(discountCode);
-    const response = await fetchPaymentBreakdown({
-      newPlanId: get(plan).planId,
-      isCryptoPayment: get(crypto),
-      ...(code ? { discountCode: code } : {}),
-    });
-    set(breakdown, response);
-  }
-  catch (error) {
-    logger.error('Failed to fetch payment breakdown:', error);
-  }
-  finally {
-    set(isLoadingBreakdown, false);
-  }
-}
-
 function select(): void {
   set(selection, true);
 }
@@ -131,21 +104,6 @@ function switchTo(selectedPlan: SelectedPlan): void {
     });
   }
 }
-
-watch(plan, (newPlan, oldPlan) => {
-  if (newPlan.planId !== oldPlan?.planId) {
-    loadPaymentBreakdown();
-  }
-});
-
-// Refresh breakdown when discount code changes
-watch(discountCode, () => {
-  loadPaymentBreakdown();
-});
-
-onMounted(() => {
-  loadPaymentBreakdown();
-});
 </script>
 
 <template>

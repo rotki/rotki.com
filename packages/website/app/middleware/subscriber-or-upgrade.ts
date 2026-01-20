@@ -5,10 +5,12 @@ import { useMainStore } from '~/store';
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const store = useMainStore();
-  const { canBuy } = storeToRefs(store);
+  const { account, canBuy } = storeToRefs(store);
 
-  // Ensure account data is loaded
-  await store.getAccount();
+  // Only fetch account if not already loaded
+  if (!get(account)) {
+    await store.getAccount();
+  }
 
   const upgradeSubId = to.query.upgradeSubId;
 

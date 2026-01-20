@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import type { CryptoPayment } from '~/types';
-import { get, toRefs } from '@vueuse/core';
+import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { get } from '@vueuse/shared';
 import DiscountCodeInput from '~/components/checkout/pay/DiscountCodeInput.vue';
 import PaymentGrandTotal from '~/components/checkout/pay/PaymentGrandTotal.vue';
 import SelectedPlanOverview from '~/components/checkout/pay/SelectedPlanOverview.vue';
+import { useCheckout } from '~/composables/checkout/use-checkout';
 
 interface VatBreakdown {
   basePrice: string;
@@ -13,28 +13,13 @@ interface VatBreakdown {
   fullAmount: string;
 }
 
-const discountCode = defineModel<string>('discountCode', { required: true });
-
 const props = withDefaults(
   defineProps<{
-    plan: SelectedPlan;
-    upgradeSubId?: string;
-    nextPayment?: number;
-    checkoutData?: CryptoPayment | PaymentBreakdownResponse | null;
-    crypto?: boolean;
-    disabled?: boolean;
-    loading?: boolean;
     internalMode?: boolean;
     warning?: boolean;
     compact?: boolean;
   }>(),
   {
-    upgradeSubId: undefined,
-    nextPayment: undefined,
-    checkoutData: undefined,
-    crypto: false,
-    disabled: false,
-    loading: false,
     internalMode: false,
     warning: false,
     compact: false,
@@ -47,21 +32,26 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
+const { compact, internalMode, warning } = toRefs(props);
+
+// Use shared checkout state
 const {
-  plan,
+  effectiveSelectedPlan,
+  breakdown,
   upgradeSubId,
-  checkoutData,
-  crypto,
-  disabled,
-  loading,
-  internalMode,
-  warning,
-  compact,
-} = toRefs(props);
+  breakdownLoading,
+  isCrypto,
+  discountCodeInput,
+  applyDiscount,
+  planSwitchLoading,
+  web3ProcessingLoading,
+} = useCheckout();
 
-// Breakdown from SelectedPlanOverview via v-model
-const breakdown = ref<PaymentBreakdownResponse>();
+// Computed loading state
+const loading = computed<boolean>(() => get(planSwitchLoading) || get(breakdownLoading));
+const disabled = computed<boolean>(() => get(planSwitchLoading) || get(web3ProcessingLoading));
 
+// Spacing classes based on compact mode
 const spacingClass = computed<string>(() => (get(compact) ? 'my-4' : 'my-6'));
 const titleSpacingClass = computed<string>(() => (get(compact) ? 'mb-4' : 'mb-6'));
 const discountSpacingClass = computed<string>(() => (get(compact) ? 'mb-4' : 'mb-6'));
@@ -99,20 +89,14 @@ const vatBreakdown = computed<VatBreakdown | undefined>(() => {
 
 const grandTotal = computed<number>(() => {
   const currentBreakdown = get(breakdown);
-  const currentCheckoutData = get(checkoutData);
 
-  // Use breakdown if available
   if (currentBreakdown) {
     return parseFloat(currentBreakdown.finalAmount);
   }
 
-  // Fallback to checkoutData for crypto payments
-  if (currentCheckoutData && 'finalPriceInEur' in currentCheckoutData) {
-    return currentCheckoutData.finalPriceInEur;
-  }
-
   // Fallback to plan price
-  return get(plan).price;
+  const plan = get(effectiveSelectedPlan);
+  return plan?.price ?? 0;
 });
 
 function handlePlanChange(newPlan: SelectedPlan): void {
@@ -121,7 +105,7 @@ function handlePlanChange(newPlan: SelectedPlan): void {
 </script>
 
 <template>
-  <RuiCard>
+  <RuiCard v-if="effectiveSelectedPlan">
     <div
       class="text-lg font-medium"
       :class="titleSpacingClass"
@@ -130,35 +114,35 @@ function handlePlanChange(newPlan: SelectedPlan): void {
     </div>
 
     <SelectedPlanOverview
-      v-model:breakdown="breakdown"
-      :plan="plan"
+      :plan="effectiveSelectedPlan"
+      :breakdown="breakdown"
       :upgrade="!!upgradeSubId"
-      :crypto="crypto"
+      :crypto="isCrypto"
       :disabled="disabled"
       :loading="loading"
       :internal-mode="internalMode"
       :warning="warning"
-      :discount-code="discountCode"
       @plan-change="handlePlanChange($event)"
     />
 
     <RuiDivider :class="spacingClass" />
 
     <DiscountCodeInput
-      v-model="discountCode"
-      :plan="plan"
-      :crypto="crypto"
+      v-model="discountCodeInput"
+      :plan="effectiveSelectedPlan"
+      :crypto="isCrypto"
       :disabled="disabled"
       :discount-info="discountInfo"
       :class="discountSpacingClass"
+      @apply="applyDiscount()"
     />
 
     <PaymentGrandTotal
-      :plan="plan"
+      :plan="effectiveSelectedPlan"
       :grand-total="grandTotal"
       :loading="loading"
       :discount-info="discountInfo"
-      :crypto="crypto"
+      :crypto="isCrypto"
       :vat-breakdown="vatBreakdown"
     />
   </RuiCard>

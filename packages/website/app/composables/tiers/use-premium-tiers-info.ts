@@ -13,7 +13,7 @@ const defaultTiersInfo: PremiumTiersInfo = [];
 function usePremiumTiersInfoInternal(): UsePremiumTiersInfoReturn {
   const { fetchPremiumTiersInfo } = useTiersApi();
 
-  const { data: tiersInformation, pending, execute } = useLazyAsyncData(
+  const { data: tiersInformation, pending } = useLazyAsyncData(
     'premium-tiers-info',
     fetchPremiumTiersInfo,
     {
@@ -22,8 +22,6 @@ function usePremiumTiersInfoInternal(): UsePremiumTiersInfoReturn {
       server: false,
     },
   );
-
-  onMounted(execute);
 
   return {
     pending,

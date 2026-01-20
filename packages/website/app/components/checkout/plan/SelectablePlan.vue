@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/core';
-import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
-import { type PremiumTierInfoDescription, PricingPeriod } from '~/types/tiers';
+import { type PremiumTierInfoDescription, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 import { formatCurrency, toTitleCase } from '~/utils/text';
 
 const props = withDefaults(defineProps<{
   plan: AvailablePlan;
+  tiersInfo: PremiumTiersInfo;
   selected?: boolean;
   period: PricingPeriod;
   readonly?: boolean;
   disabled?: boolean;
+  current?: boolean;
 }>(), {
   selected: false,
 });
@@ -24,11 +25,11 @@ const MAX_VISIBLE_FEATURES = 3;
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { tiersInformation } = usePremiumTiersInfo();
-
-const { plan, period, selected } = toRefs(props);
+const { plan, tiersInfo, period, selected, current } = toRefs(props);
 
 const showAllFeatures = ref<boolean>(false);
+
+const isDisabled = computed<boolean>(() => props.disabled || get(current));
 
 const price = computed<string | undefined>(() => {
   const { monthlyPlan, yearlyPlan } = get(plan);
@@ -73,7 +74,7 @@ const discountInfo = computed<{
 });
 
 const planFeatures = computed<PremiumTierInfoDescription[]>(() => {
-  const tiers = get(tiersInformation);
+  const tiers = get(tiersInfo);
   const tierInfo = tiers.find(tier => tier.name === props.plan.tierName);
   return tierInfo?.description ?? [];
 });
@@ -103,16 +104,27 @@ watch(price, (price) => {
 <template>
   <div
     v-if="price"
-    class="rounded-md flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-6 border border-solid rounded-lg cursor-pointer bg-white hover:bg-rui-primary/[0.01] border-black/[0.12] relative"
+    class="rounded-md flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-6 border border-solid rounded-lg bg-white border-black/[0.12] relative"
     :class="{
-      '!border-rui-primary': selected && !disabled,
-      '!bg-rui-grey-100': disabled,
+      'cursor-pointer hover:bg-rui-primary/[0.01]': !isDisabled,
+      '!border-rui-primary': selected && !isDisabled,
+      '!bg-rui-grey-100': isDisabled,
+      '!border-rui-primary/50': current,
     }"
-    @click="emit('click')"
+    @click="!isDisabled && emit('click')"
   >
     <div class="flex items-center h-0 justify-center relative w-full">
       <RuiChip
-        v-if="plan.isMostPopular"
+        v-if="current"
+        class="-top-[2.25rem] absolute"
+        color="primary"
+        variant="outlined"
+        size="sm"
+      >
+        {{ t('pricing.current_plan') }}
+      </RuiChip>
+      <RuiChip
+        v-else-if="plan.isMostPopular"
         class="-top-[2.25rem] absolute"
         color="primary"
         size="sm"
@@ -194,9 +206,10 @@ watch(price, (price) => {
     </div>
 
     <RuiButton
-      :color="selected ? 'primary' : undefined"
+      :color="selected || current ? 'primary' : undefined"
+      :variant="current ? 'outlined' : undefined"
       class="w-full"
-      :disabled="disabled"
+      :disabled="isDisabled"
     >
       <template
         v-if="selected"
@@ -210,7 +223,16 @@ watch(price, (price) => {
           />
         </div>
       </template>
-      {{ selected ? t('home.plans.plan_selected') : t('home.plans.choose') }}
+      <template
+        v-else-if="current"
+        #prepend
+      >
+        <RuiIcon
+          name="lu-check"
+          size="16"
+        />
+      </template>
+      {{ current ? t('pricing.current_plan') : selected ? t('home.plans.plan_selected') : t('home.plans.choose') }}
     </RuiButton>
   </div>
 </template>

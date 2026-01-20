@@ -1,22 +1,19 @@
 <script setup lang="ts">
-import type { DiscountInfo } from '@rotki/card-payment-common/schemas/discount';
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { WatchHandle } from 'vue';
 import type { CryptoPayment } from '~/types';
-import { get, set } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import OrderSummaryCard from '~/components/checkout/common/OrderSummaryCard.vue';
 import ChangeCryptoPayment from '~/components/checkout/pay/crypto/ChangeCryptoPayment.vue';
 import CryptoPaymentDetails from '~/components/checkout/pay/crypto/payment/CryptoPaymentDetails.vue';
 import CryptoPaymentQr from '~/components/checkout/pay/crypto/payment/CryptoPaymentQr.vue';
 import CryptoWalletActions from '~/components/checkout/pay/crypto/payment/CryptoWalletActions.vue';
+import { useCheckout } from '~/composables/checkout/use-checkout';
 import { useWeb3Payment } from '~/composables/checkout/use-crypto-payment';
-import { useCryptoPaymentNavigation } from '~/composables/checkout/use-crypto-payment-navigation';
-import { useCryptoPaymentState } from '~/composables/checkout/use-crypto-payment-state';
 
 const props = defineProps<{
   data: CryptoPayment;
   plan: SelectedPlan;
-  discountCode?: string;
 }>();
 
 const emit = defineEmits<{
@@ -24,21 +21,33 @@ const emit = defineEmits<{
   'plan-change': [plan: SelectedPlan];
 }>();
 
-const { data, plan, discountCode } = toRefs(props);
+const { data } = toRefs(props);
 
 const showChangePaymentDialog = ref<boolean>(false);
-const discountCodeModel = ref<string>('');
-const discountInfo = ref<DiscountInfo>();
 
 let stopWatcher: WatchHandle;
 
 const { t } = useI18n({ useScope: 'global' });
-const router = useRouter();
-const navigation = useCryptoPaymentNavigation();
-const { upgradeSubId } = navigation;
 
-// Use shared state for error and payment state management
-const { errorMessage, paymentState, planSwitchLoading, web3ProcessingLoading } = useCryptoPaymentState();
+// Use shared checkout state
+const {
+  upgradeSubId,
+  step,
+  error,
+  planSwitchLoading,
+  web3ProcessingLoading,
+  setError,
+} = useCheckout();
+
+// Error message ref for Web3 payment
+const errorMessage = computed({
+  get: () => get(error)?.message ?? '',
+  set: (message: string) => {
+    if (message) {
+      setError(t('subscription.error.payment_failure'), message);
+    }
+  },
+});
 
 // Get Web3 payment functionality
 const {
@@ -49,46 +58,28 @@ const {
   open,
   isExpectedChain,
   switchNetwork,
-} = useWeb3Payment(data, paymentState, errorMessage);
+} = useWeb3Payment(data, step, errorMessage);
 
 // Computed properties
 const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
 
 // Success redirect handler
 function redirect(): void {
-  navigation.navigateToSuccess();
+  navigateToSuccess();
   stopWatcher?.();
+}
+
+async function navigateToSuccess(): Promise<void> {
+  sessionStorage.setItem('payment-completed', 'true');
+  await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
 }
 
 // Watch for success and redirect
 stopWatcher = watchEffect(() => {
-  const currentState = get(paymentState);
+  const currentState = get(step);
   if (currentState === 'success') {
     redirect();
   }
-});
-
-// Discount code handling
-watchImmediate(discountCode, (discountCode) => {
-  if (discountCode) {
-    set(discountCodeModel, discountCode);
-  }
-});
-
-watch(discountCodeModel, (curr, prev) => {
-  if (curr === prev || curr === get(discountCode)) {
-    return;
-  }
-
-  const currentRoute = get(router.currentRoute);
-
-  navigateTo({
-    path: currentRoute.path,
-    query: {
-      ...currentRoute.query,
-      discountCode: curr,
-    },
-  });
 });
 
 // Handle internal plan changes (emit to parent instead of route navigation)
@@ -141,14 +132,6 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
       <!-- Sidebar (Right Column) -->
       <aside class="w-full xl:sticky xl:top-8 xl:self-start">
         <OrderSummaryCard
-          v-model:discount-code="discountCodeModel"
-          v-model:discount-info="discountInfo"
-          :plan="plan"
-          :upgrade-sub-id="upgradeSubId"
-          :checkout-data="data"
-          :disabled="planSwitchLoading || web3ProcessingLoading"
-          :loading="planSwitchLoading"
-          crypto
           internal-mode
           warning
           @plan-change="handleInternalPlanChange($event)"

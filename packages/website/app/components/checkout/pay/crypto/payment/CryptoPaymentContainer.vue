@@ -2,93 +2,90 @@
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/shared';
 import CheckoutDescription from '~/components/checkout/common/CheckoutDescription.vue';
-import PaymentFrame from '~/components/checkout/common/PaymentFrame.vue';
+import PaymentLayout from '~/components/checkout/common/PaymentLayout.vue';
 import CryptoPaymentActions from '~/components/checkout/pay/crypto/payment/CryptoPaymentActions.vue';
 import CryptoPaymentForm from '~/components/checkout/pay/crypto/payment/CryptoPaymentForm.vue';
 import CryptoPaymentStatus from '~/components/checkout/pay/crypto/payment/CryptoPaymentStatus.vue';
-import { useCryptoPaymentFlow } from '~/composables/checkout/use-crypto-payment-flow';
-import { useCryptoPaymentNavigation } from '~/composables/checkout/use-crypto-payment-navigation';
-import { useCryptoPaymentState } from '~/composables/checkout/use-crypto-payment-state';
-import { useCurrencyParams, useDiscountCodeParams } from '~/composables/checkout/use-plan-params';
+import { useCheckout } from '~/composables/checkout/use-checkout';
+import { useCryptoCheckoutFlow } from '~/composables/checkout/use-crypto-checkout-flow';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const {
   loading,
   cryptoPaymentData,
-  selectedPlan,
+  effectiveSelectedPlan,
   paymentStep,
-  setError,
-  errorMessage,
-} = useCryptoPaymentState();
+  error,
+  setCryptoMode,
+} = useCheckout();
 
-const navigation = useCryptoPaymentNavigation();
-
-const { currency } = useCurrencyParams();
-const { discountCode } = useDiscountCodeParams();
-
-const flow = useCryptoPaymentFlow(currency, navigation.usedSubscriptionId, discountCode);
+const { initialize, switchPlan, cancelAndGoBack } = useCryptoCheckoutFlow();
 
 /**
  * Handle payment method change
  */
 async function handlePaymentMethodChange(): Promise<void> {
-  const success = await flow.handlePaymentMethodChange();
-  if (success) {
-    await navigation.navigateBack(get(discountCode));
-  }
+  await cancelAndGoBack();
 }
 
 /**
  * Handle internal plan change without route navigation
  */
 async function handleInternalPlanChange(newPlan: SelectedPlan): Promise<void> {
-  await flow.switchToNewPlan(newPlan);
+  await switchPlan(newPlan);
+}
+
+/**
+ * Navigate to products page
+ */
+async function navigateToProducts(): Promise<void> {
+  await navigateTo('/products');
 }
 
 /**
  * Initialize crypto payment on mount
  */
 onMounted(async () => {
-  const success = await flow.initialize();
+  // Set crypto mode for proper pricing display
+  setCryptoMode(true);
 
-  if (!success) {
-    await navigation.navigateToProducts();
+  const success = await initialize();
+
+  if (!success && !get(cryptoPaymentData)) {
+    await navigateToProducts();
   }
+});
+
+// Clean up on unmount
+onUnmounted(() => {
+  setCryptoMode(false);
 });
 </script>
 
 <template>
-  <PaymentFrame
-    v-model:step="paymentStep"
-    :loading="loading"
-    wide
-    @clear-errors="setError('')"
-  >
+  <PaymentLayout hide-sidebar>
     <template #description>
       <CheckoutDescription>
         {{ t('home.plans.tiers.step_3.subtitle') }}
       </CheckoutDescription>
     </template>
 
-    <template #default="{ status }">
-      <CryptoPaymentStatus :status="status" />
+    <CryptoPaymentStatus :status="paymentStep" />
 
-      <CryptoPaymentForm
-        v-if="cryptoPaymentData && selectedPlan"
-        :data="cryptoPaymentData"
-        :plan="selectedPlan"
-        :discount-code="discountCode"
-        @change="handlePaymentMethodChange()"
-        @plan-change="handleInternalPlanChange($event)"
-      />
+    <CryptoPaymentForm
+      v-if="cryptoPaymentData && effectiveSelectedPlan"
+      :data="cryptoPaymentData"
+      :plan="effectiveSelectedPlan"
+      @change="handlePaymentMethodChange()"
+      @plan-change="handleInternalPlanChange($event)"
+    />
 
-      <CryptoPaymentActions
-        v-else
-        :loading="loading"
-        :error="errorMessage"
-        @back="navigation.navigateBack()"
-      />
-    </template>
-  </PaymentFrame>
+    <CryptoPaymentActions
+      v-else
+      :loading="loading"
+      :error="error?.message"
+      @back="cancelAndGoBack()"
+    />
+  </PaymentLayout>
 </template>

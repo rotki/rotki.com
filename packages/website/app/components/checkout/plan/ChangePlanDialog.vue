@@ -5,6 +5,7 @@ import SelectablePlan from '~/components/checkout/plan/SelectablePlan.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { usePlanIdParam } from '~/composables/checkout/use-plan-params';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
+import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 import { PricingPeriod } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';
 
@@ -24,14 +25,26 @@ const { visible, warning } = toRefs(props);
 const { t } = useI18n({ useScope: 'global' });
 
 const { availablePlans, getPlanDetailsFromId } = useAvailablePlans();
+const { tiersInformation } = usePremiumTiersInfo();
 
 const confirmed = ref<boolean>(false);
 const selectedPlanPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
 
-const currentPlanDetails = computed(() => {
+const currentPlanDetails = computed<ReturnType<typeof getPlanDetailsFromId>>(() => {
   const currentPlanId = get(planId);
   return currentPlanId ? getPlanDetailsFromId(currentPlanId) : undefined;
 });
+
+function isCurrentPlan(plan: AvailablePlan): boolean {
+  const currentPlanId = get(planId);
+  if (!currentPlanId)
+    return false;
+
+  const period = get(selectedPlanPeriod);
+  const targetPlan = period === PricingPeriod.MONTHLY ? plan.monthlyPlan : plan.yearlyPlan;
+
+  return targetPlan?.planId === currentPlanId;
+}
 
 function select(plan: AvailablePlan): void {
   if (get(warning) && !get(confirmed)) {
@@ -114,8 +127,10 @@ onBeforeMount(() => {
             :key="plan.tierName"
             class="hover:bg-rui-grey-100 transition-all"
             :plan="plan"
+            :tiers-info="tiersInformation"
             readonly
             :disabled="warning && !confirmed"
+            :current="isCurrentPlan(plan)"
             :period="selectedPlanPeriod"
             @click="select(plan)"
           />

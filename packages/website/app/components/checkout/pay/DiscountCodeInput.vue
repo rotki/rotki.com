@@ -12,6 +12,10 @@ const props = defineProps<{
   discountInfo?: PaymentBreakdownDiscount;
 }>();
 
+const emit = defineEmits<{
+  apply: [];
+}>();
+
 const { disabled, discountInfo } = toRefs(props);
 
 const value = ref<string>('');
@@ -39,13 +43,14 @@ watchImmediate(model, (modelValue: string) => {
 });
 
 function apply(): void {
-  // Set model to trigger parent to refetch breakdown with discount code
   set(model, get(value));
+  emit('apply');
 }
 
 function reset(): void {
   set(value, '');
   set(model, '');
+  emit('apply');
 }
 </script>
 
