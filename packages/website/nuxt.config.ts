@@ -127,6 +127,16 @@ export default defineNuxtConfig({
         { content: '#00aba9', name: 'msapplication-TileColor' },
         { content: '#ffffff', name: 'theme-color' },
       ],
+      // Only load on production (rotki.com)
+      script: process.env.NUXT_PUBLIC_BASE_URL === 'https://rotki.com'
+        ? [
+            {
+              'src': 'https://sigil.rotki.com/s.js',
+              'defer': true,
+              'data-website-id': 'd49a6a25-cdf7-468e-bfc2-2059867b54e0',
+            },
+          ]
+        : [],
       title: 'rotki.com',
       titleTemplate: '%s | rotki',
     },

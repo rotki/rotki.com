@@ -14,6 +14,7 @@ export const baseCSP: ContentSecurityPolicyValue = {
     'api.github.com',
     'raw.githubusercontent.com/rotki/data/',
     'raw.githubusercontent.com/rotki/rotki.com/',
+    'sigil.rotki.com',
   ],
   'default-src': ['\'self\''],
   'font-src': ['\'self\'', 'data:', 'fonts.gstatic.com'],
@@ -29,8 +30,8 @@ export const baseCSP: ContentSecurityPolicyValue = {
   'object-src': ['\'none\''],
   'report-uri': ['/api/csp/violation'],
   // Use nonce placeholders - nuxt-security will replace with actual nonces
-  'script-src': ['\'self\'', '\'unsafe-eval\'', '\'nonce-{{nonce}}\''], // nonce for inline scripts
-  'script-src-elem': ['\'self\'', '\'nonce-{{nonce}}\''], // nonce for script elements
+  'script-src': ['\'self\'', '\'unsafe-eval\'', '\'nonce-{{nonce}}\'', 'sigil.rotki.com'], // nonce for inline scripts
+  'script-src-elem': ['\'self\'', '\'nonce-{{nonce}}\'', 'sigil.rotki.com'], // nonce for script elements
   'style-src': ['\'self\'', '\'unsafe-inline\'', 'fonts.googleapis.com'], // Keep for styles
   'worker-src': ['\'self\''],
 };
