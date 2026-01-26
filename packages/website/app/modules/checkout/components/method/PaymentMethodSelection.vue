@@ -2,6 +2,7 @@
 import type { RuiIcons } from '@rotki/ui-library';
 import { get, isDefined, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
 import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
 import PaymentMethodItem from '~/modules/checkout/components/method/PaymentMethodItem.vue';
@@ -39,6 +40,7 @@ const processing = ref<boolean>(false);
 
 const store = useMainStore();
 const { authenticated } = storeToRefs(store);
+const { chronicle } = useSigilEvents();
 
 const paymentMethods: readonly PaymentMethodEntry[] = Object.freeze([{
   id: PaymentMethod.BLOCKCHAIN,
@@ -130,6 +132,12 @@ async function handleBack(): Promise<void> {
 async function handleContinue(): Promise<void> {
   const selected = get(selectedPaymentMethod);
   assert(selected, 'No payment method selected');
+
+  // Track payment method selection
+  chronicle('checkout_method_selected', {
+    method: get(selectedMethod),
+    plan_id: get(planId),
+  });
 
   set(processing, true);
 

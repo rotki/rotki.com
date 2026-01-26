@@ -2,6 +2,7 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { CryptoPayment } from '~/types';
 import { get } from '@vueuse/shared';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import ChangeCryptoPayment from '~/modules/checkout/components/crypto/ChangeCryptoPayment.vue';
 import CryptoPaymentDetails from '~/modules/checkout/components/crypto/CryptoPaymentDetails.vue';
@@ -33,7 +34,27 @@ const showChangePaymentDialog = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 
+const { chronicle } = useSigilEvents();
+
 async function navigateToSuccess(): Promise<void> {
+  const planData = get(plan);
+  const breakdownData = get(breakdown);
+  const discountInfo = breakdownData?.discount;
+  const discountType = discountInfo?.isValid === true
+    ? (discountInfo.isReferral ? 'referral' : 'discount')
+    : undefined;
+
+  chronicle('purchase_success', {
+    payment_method: 'crypto',
+    plan_id: planData.planId,
+    plan_name: planData.name,
+    plan_duration: planData.durationInMonths === 1 ? 'monthly' : 'yearly',
+    revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
+    currency: 'EUR',
+    is_upgrade: !!get(upgradeSubId),
+    discount: discountType,
+  });
+
   sessionStorage.setItem('payment-completed', 'true');
   await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
 }

@@ -8,6 +8,9 @@ import {
   type ThreeDSecureState,
 } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get, set } from '@vueuse/core';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
+import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { useLogger } from '~/utils/use-logger';
@@ -213,6 +216,9 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     // These composables need to be inside the function since they can only be used at component level
     const paymentApi = usePaymentApi();
     const { requestRefresh } = useAccountRefresh();
+    const { chronicle } = useSigilEvents();
+    const { getSelectedPlanFromId } = useAvailablePlans();
+    const { fetchPaymentBreakdown } = useTiersApi();
 
     // Initialize Braintree
     await initialize(params);
@@ -231,6 +237,30 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     if (result.isError) {
       throw new Error(result.error.message);
     }
+
+    // Fetch breakdown to get discount type for tracking
+    const breakdown = await fetchPaymentBreakdown({
+      newPlanId: params.planId,
+      isCryptoPayment: false,
+      discountCode: params.discountCode,
+    });
+    const discountInfo = breakdown?.discount;
+    const discountType = discountInfo?.isValid === true
+      ? (discountInfo.isReferral ? 'referral' : 'discount')
+      : undefined;
+
+    // Track purchase success
+    const plan = getSelectedPlanFromId(params.planId);
+    chronicle('purchase_success', {
+      payment_method: 'card',
+      plan_id: params.planId,
+      plan_name: plan?.name,
+      plan_duration: params.durationInMonths === 1 ? 'monthly' : 'yearly',
+      revenue: Number.parseFloat(params.finalAmount),
+      currency: 'EUR',
+      is_upgrade: !!params.upgradeSubId,
+      discount: discountType,
+    });
 
     // Request account refresh and prepare for success navigation
     requestRefresh();

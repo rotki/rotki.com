@@ -1,6 +1,7 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
 import { get, set } from '@vueuse/shared';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { logger } from '~/utils/use-logger';
@@ -15,6 +16,7 @@ export function useCheckout() {
   const { t } = useI18n({ useScope: 'global' });
   const { fetchPaymentBreakdown } = useTiersApi();
   const { getSelectedPlanFromId, availablePlans, pending: plansPending, refresh: refreshAvailablePlans, execute: ensureAvailablePlans } = useAvailablePlans();
+  const { chronicle } = useSigilEvents();
 
   function getCurrentRoute(): RouteLocationNormalizedLoaded {
     return router.currentRoute.value;
@@ -145,6 +147,14 @@ export function useCheckout() {
   }
 
   function setError(title: string, message: string): void {
+    // Track checkout error event
+    if (import.meta.client) {
+      chronicle('checkout_error', {
+        error_title: title,
+        plan_id: get(planId),
+      });
+    }
+
     set(error, { title, message });
   }
 

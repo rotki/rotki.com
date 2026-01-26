@@ -7,6 +7,7 @@ import PricingHeading from '~/components/pricings/PricingHeading.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import PricingTierComparison from '~/components/pricings/PricingTierComparison.vue';
 import PricingTierComparisonSkeleton from '~/components/pricings/PricingTierComparisonSkeleton.vue';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 import { useCountries } from '~/composables/use-countries';
@@ -59,6 +60,15 @@ const planNotes = computed<string[]>(() => {
     t('home.plans.tiers.step_1.notes.line_3'),
     t('home.plans.tiers.step_1.notes.line_4'),
   ];
+});
+
+// Track pricing page view
+const { chronicle } = useSigilEvents();
+
+onMounted(() => {
+  chronicle('pricing_view', {
+    period: get(selectedPricingPeriod),
+  });
 });
 </script>
 

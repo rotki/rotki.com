@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { get, set } from '@vueuse/shared';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import AcceptRefundPolicy from '~/modules/checkout/components/common/AcceptRefundPolicy.vue';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
@@ -44,6 +45,7 @@ const {
 
 const { upgradeSubId } = useSubscriptionIdParam();
 const { referralCode } = useReferralCodeParam();
+const { chronicle } = useSigilEvents();
 
 const processing = computed<boolean>(() => get(paying) || get(checkoutLoading) || get(planSwitchLoading));
 
@@ -104,6 +106,23 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
     });
 
     if (result.success) {
+      const breakdownData = get(breakdown);
+      const discountInfo = breakdownData?.discount;
+      const discountType = discountInfo?.isValid === true
+        ? (discountInfo.isReferral ? 'referral' : 'discount')
+        : undefined;
+
+      chronicle('purchase_success', {
+        payment_method: 'paypal',
+        plan_id: plan.planId,
+        plan_name: plan.name,
+        plan_duration: plan.durationInMonths === 1 ? 'monthly' : 'yearly',
+        revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
+        currency: 'EUR',
+        is_upgrade: !!get(upgradeSubId),
+        discount: discountType,
+      });
+
       sessionStorage.setItem('payment-completed', 'true');
       await navigateTo('/checkout/success');
     }
