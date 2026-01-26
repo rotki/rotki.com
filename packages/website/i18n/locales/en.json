@@ -197,7 +197,7 @@
       "customer_information": "Customer Information",
       "devices": "Devices List",
       "subscription": "Subscription",
-      "payment_methods": "Payment Methods"
+      "payment_methods": "Saved Cards"
     },
     "unverified_email": {
       "message": {
@@ -486,8 +486,8 @@
         "no_cards": "No saved cards",
         "no_cards_description": "Add a payment card to make future purchases easier",
         "reauthorize": "Re-authorize",
-        "subtitle": "Manage your saved payment cards",
-        "title": "Payment Methods"
+        "subtitle": "Manage cards for payments and auto-renewal",
+        "title": "Saved Cards"
       }
     },
     "advantages": {

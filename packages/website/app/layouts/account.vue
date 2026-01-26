@@ -55,7 +55,7 @@ const tabs = computed<TabItem[]>(() => [{
 }, {
   label: t('account.tabs.payment_methods'),
   icon: 'lu-credit-card',
-  to: '/home/payment-methods',
+  to: '/home/saved-cards',
   reload: true,
 }, {
   label: t('account.tabs.devices'),
