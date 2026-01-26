@@ -318,7 +318,7 @@ export default defineNuxtConfig({
           },
         }
       : {}),
-    '/home/payment-methods': {
+    '/home/saved-cards': {
       security: {
         headers: {
           contentSecurityPolicy: mergeCSP(
