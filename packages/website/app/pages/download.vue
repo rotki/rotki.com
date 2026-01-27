@@ -4,6 +4,7 @@ import { get } from '@vueuse/core';
 import DownloadDocs from '~/components/download/DownloadDocs.vue';
 import DownloadHeading from '~/components/download/DownloadHeading.vue';
 import DownloadPreview from '~/components/download/DownloadPreview.vue';
+import DownloadUpgradeNudge from '~/components/download/DownloadUpgradeNudge.vue';
 import { useAppDownload } from '~/composables/use-app-download';
 import { commonAttrs, getMetadata } from '~/utils/metadata';
 
@@ -43,6 +44,7 @@ definePageMeta({
 </script>
 
 <template>
+  <DownloadUpgradeNudge />
   <DownloadHeading
     :links="links"
     :version="version"
