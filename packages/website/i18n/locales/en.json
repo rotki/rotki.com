@@ -459,6 +459,15 @@
   },
   "download": {
     "action": "Download",
+    "upgrade_nudge": {
+      "title": "When should you upgrade?",
+      "bullet_1": "You track multiple wallets/exchanges and want higher limits",
+      "bullet_2": "You want detailed staking insights and reward tracking",
+      "bullet_3": "You want advanced analytics and deeper historical insights",
+      "see_plans": "See plans",
+      "what_do_i_get": "What do I get?",
+      "tagline": "Start free anytime, upgrade when you hit these needs."
+    },
     "documentation": {
       "action": "View all documentation",
       "description": "On our documentation page you have a user guide that will help you introduce yourself and clarify any doubts that may arise during the process.",

@@ -67,7 +67,7 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
 </script>
 
 <template>
-  <div class="py-10 lg:py-20">
+  <div class="pt-6 pb-10 lg:pt-10 lg:pb-20">
     <div class="container flex flex-col">
       <div class="flex flex-col items-start gap-y-4">
         <h6 class="text-rui-light-primary text-h6 font-medium">
