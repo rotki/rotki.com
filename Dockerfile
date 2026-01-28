@@ -32,7 +32,8 @@ COPY --from=builder /build/docker/ecosystem.config.cjs ./
 COPY --from=builder /build/packages/website/package.json ./
 COPY --from=builder /build/docker/health.sh ./
 
-RUN chmod +x health.sh
+RUN chmod +x health.sh && \
+    mkdir -p /app/cache/ipx
 
 EXPOSE ${NITRO_PORT}
 
