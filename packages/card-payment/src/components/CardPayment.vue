@@ -212,6 +212,7 @@ async function processPayment(): Promise<void> {
 
     // Store data for 3D Secure if needed
     const plan = get(selectedPlan);
+    const currentDiscountInfo = get(discountInfo);
     const threeDSecureParams: ThreeDSecureParams = {
       token: planData.braintreeClientToken,
       planId: selectedPlan.planId,
@@ -223,6 +224,10 @@ async function processPayment(): Promise<void> {
       discountCode: get(discountCode) || undefined,
       upgradeSubId: get(upgradeSubId) || undefined,
       durationInMonths: plan.durationInMonths,
+      planName: plan.name,
+      discountTrackingInfo: currentDiscountInfo?.isValid === true
+        ? { isReferral: currentDiscountInfo.isReferral, discountType: currentDiscountInfo.discountType }
+        : undefined,
     };
 
     sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
