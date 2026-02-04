@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+export const DiscountTrackingInfoSchema = z.object({
+  isReferral: z.boolean(),
+  discountType: z.string(),
+});
+
+export type DiscountTrackingInfo = z.infer<typeof DiscountTrackingInfoSchema>;
+
 /**
  * 3D Secure verification parameters schema
  */
@@ -15,6 +22,8 @@ export const ThreeDSecureParamsSchema = z.object({
   discountCode: z.string().optional(),
   upgradeSubId: z.string().optional(),
   durationInMonths: z.number().int().positive('duration must be positive'),
+  planName: z.string().optional(),
+  discountTrackingInfo: DiscountTrackingInfoSchema.optional(),
 });
 
 export type ThreeDSecureParams = z.infer<typeof ThreeDSecureParamsSchema>;
