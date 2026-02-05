@@ -1,6 +1,6 @@
 {
   "name": "rotki.com",
-  "version": "2026.1.5",
+  "version": "2026.2.0",
   "private": true,
   "packageManager": "pnpm@10.28.1",
   "type": "module",
