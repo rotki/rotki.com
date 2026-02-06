@@ -194,6 +194,14 @@ export default defineNuxtConfig({
     'nuxt-security',
   ],
 
+  image: {
+    domains: ['raw.githubusercontent.com'],
+    alias: {
+      // Abstract the GitHub URL - can change source without updating data
+      integrations: 'https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols',
+    },
+  },
+
   vite: {
     build: {
       // Disable Vite's automatic modulepreload link injection
@@ -299,6 +307,13 @@ export default defineNuxtConfig({
       '*/5 * * * *': ['nft:cache'],
       // Run `releases:cache` task every 8 minutes (before 10 min L2 TTL expires)
       '*/8 * * * *': ['releases:cache'],
+    },
+    storage: {
+      // Filesystem cache for Nuxt Image ipx (Docker volume: /app/cache/ipx)
+      'cache:ipx': {
+        base: '/app/cache/ipx',
+        driver: 'fs',
+      },
     },
   },
 
