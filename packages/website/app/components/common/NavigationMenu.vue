@@ -33,19 +33,9 @@ const baseMenus: (Menu | MenuParent)[] = [
     highlightExactActive: true,
   },
   {
-    label: t('navigation_menu.product_and_services'),
-    children: [
-      {
-        label: t('navigation_menu.rotki_premium'),
-        to: '/products',
-        highlightActive: true,
-      },
-      {
-        label: t('navigation_menu.accounting_service'),
-        to: '/bespoke',
-        highlightActive: true,
-      },
-    ],
+    label: t('navigation_menu.rotki_premium'),
+    to: '/products',
+    highlightActive: true,
   },
   {
     label: t('navigation_menu.pricing'),
