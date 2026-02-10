@@ -31,11 +31,6 @@ const menus: MenuGroup[] = [
         highlightActive: true,
       },
       {
-        label: t('navigation_menu.accounting_service'),
-        to: '/bespoke',
-        highlightActive: true,
-      },
-      {
         label: t('navigation_menu.integration.title'),
         to: '/integrations',
         highlightActive: true,
