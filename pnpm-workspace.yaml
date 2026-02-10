@@ -5,24 +5,24 @@ packages:
 
 catalog:
   '@fontsource/roboto': 5.2.9
-  '@rotki/ui-library': 2.11.0
+  '@rotki/ui-library': 2.12.2
   '@types/braintree-web': 3.96.17
   '@types/node': 24.3.0
   '@tsconfig/node24': 24.0.0
-  '@unhead/vue': 2.1.2
-  '@vitejs/plugin-vue': 6.0.3
+  '@unhead/vue': 2.1.4
+  '@vitejs/plugin-vue': 6.0.4
   '@vue/tsconfig': 0.7.0
-  '@vueuse/core': 14.1.0
-  '@vueuse/math': 14.1.0
-  '@vueuse/nuxt': 14.1.0
-  '@vueuse/shared': 14.1.0
-  autoprefixer: 10.4.23
-  braintree-web: 3.134.0
+  '@vueuse/core': 14.2.1
+  '@vueuse/math': 14.2.1
+  '@vueuse/nuxt': 14.2.1
+  '@vueuse/shared': 14.2.1
+  autoprefixer: 10.4.24
+  braintree-web: 3.135.0
   postcss: 8.5.6
-  tailwindcss: 3.4.18
+  tailwindcss: 3.4.19
   typescript: 5.9.3
   vite: 7.3.1
-  vite-ssg: 28.2.2
-  vue: 3.5.27
-  vue-tsc: 3.2.2
+  vite-ssg: 28.3.0
+  vue: 3.5.28
+  vue-tsc: 3.2.4
   zod: 3.25.76
