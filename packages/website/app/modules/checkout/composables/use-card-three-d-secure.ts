@@ -29,8 +29,8 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { setDefaultCard } = usePaymentCards();
 
-  const threeDSecureInstance = ref<ThreeDSecure>();
-  const btClient = ref<Client>();
+  const threeDSecureInstance = shallowRef<ThreeDSecure>();
+  const btClient = shallowRef<Client>();
 
   async function createBraintreeClient(braintreeToken: string): Promise<Client> {
     logger.debug('Initializing Braintree client with token');

@@ -22,7 +22,7 @@ interface UseBraintreeClientReturn {
  * Handles fetching client token and initializing Braintree client
  */
 export function useBraintreeClient(): UseBraintreeClientReturn {
-  const client = ref<Client>();
+  const client = shallowRef<Client>();
   const clientError = ref<string>();
   const clientInitializing = ref<boolean>(false);
 

@@ -35,8 +35,8 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
   const state = ref<ThreeDSecureState>('initializing');
   const error = ref<string>('');
   const challengeVisible = ref<boolean>(false);
-  const btClient = ref<Client>();
-  const btThreeDSecure = ref<ThreeDSecure>();
+  const btClient = shallowRef<Client>();
+  const btThreeDSecure = shallowRef<ThreeDSecure>();
   const paymentInfo = ref<PaymentInfo>();
 
   const isProcessing = computed<boolean>(() => {
