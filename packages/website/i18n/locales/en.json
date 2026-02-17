@@ -370,6 +370,7 @@
         "invalid": "VAT ID is invalid. Please enter your correct VAT ID.",
         "not_verified": "VAT ID not verified. Please verify your VAT ID before updating your customer information",
         "timer": "VAT ID verification cooldown in progress. Please try again in {time}",
+        "vat_invalid_checkout_warning": "No VAT Reverse charge applied. Your VAT ID could not be verified. Update it in {link}.",
         "verified": "Your VAT ID is successfully verified!",
         "verify": "Verify"
       }

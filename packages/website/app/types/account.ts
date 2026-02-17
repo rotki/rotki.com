@@ -1,6 +1,8 @@
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { z } from 'zod';
 
+export { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
+
 export interface PasswordChangePayload {
   readonly currentPassword: string;
   readonly newPassword: string;
@@ -21,13 +23,6 @@ export interface ProfilePayload {
 
 export interface DeleteAccountPayload {
   username: string;
-}
-
-export enum VatIdStatus {
-  NOT_CHECKED = 'Not checked',
-  VALID = 'Valid',
-  NOT_VALID = 'Not valid',
-  NON_EU_ID = 'ID outside the EU',
 }
 
 export const UserDevice = z.object({

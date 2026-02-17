@@ -5,6 +5,13 @@ import { z } from 'zod';
  * These schemas represent the common data structures used across both applications
  */
 
+export enum VatIdStatus {
+  NOT_CHECKED = 'Not checked',
+  VALID = 'Valid',
+  NOT_VALID = 'Not valid',
+  NON_EU_ID = 'ID outside the EU',
+}
+
 // Comprehensive address schema that supports both package needs
 export const AddressSchema = z.object({
   address1: z.string(),

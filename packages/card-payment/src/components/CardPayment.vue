@@ -2,10 +2,12 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
+import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { paths } from '@/config/paths';
 import { addCard, createCardNonce } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
@@ -20,11 +22,13 @@ import TermsAcceptance from './TermsAcceptance.vue';
 const error = defineModel<string>('error', { required: true });
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
 
-const { planData, selectedPlan, upgradeSubId, cards } = defineProps<{
+const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country } = defineProps<{
   planData: PaymentBreakdownResponse;
   selectedPlan: SelectedPlan;
   upgradeSubId: string | null;
   cards: SavedCard[];
+  vatIdStatus?: string;
+  country?: string;
 }>();
 
 const emit = defineEmits<{
@@ -86,6 +90,8 @@ const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
   const currentBreakdown = get(breakdown);
   return currentBreakdown?.discount ?? undefined;
 });
+
+const showVatWarning = computed<boolean>(() => vatIdStatus === VatIdStatus.NOT_VALID && country !== 'DE');
 
 const isFormValid = computed<boolean>(() => {
   const card = get(selectedCard);
@@ -358,6 +364,20 @@ onUnmounted(async () => {
             :discount-info="discountInfo"
             class="mb-4"
           />
+
+          <!-- VAT Warning -->
+          <div
+            v-if="showVatWarning"
+            class="mb-4 rounded border border-rui-warning p-3 text-sm text-rui-warning-darker text-shade-[.6]"
+          >
+            No VAT Reverse charge applied. Your VAT ID could not be verified. Update it in
+            <a
+              :href="`${paths.hostUrlBase}/home/customer-information`"
+              class="font-medium underline"
+            >
+              Customer Information
+            </a>.
+          </div>
 
           <!-- Payment Grand Total -->
           <PaymentGrandTotal
