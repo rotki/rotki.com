@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { useHead } from '@unhead/vue';
@@ -70,6 +71,7 @@ const selectedPlan = ref<SelectedPlan>();
 const selectedCard = ref<SavedCard>();
 
 const cards = ref<SavedCard[]>([]);
+const accountData = ref<Account>();
 
 const steps = [{
   title: 'Plan Selection',
@@ -117,11 +119,12 @@ async function load() {
     // Check user authentication
     set(loadingMessage, 'Checking authentication...');
 
-    const canBuy = await canBuyNewSubscription();
+    const { canBuy, account } = await canBuyNewSubscription();
     const upgradeId = getUrlParam('upgradeSubId');
     const refParam = getUrlParam('ref');
     set(upgradeSubId, upgradeId);
     set(referralCode, refParam);
+    set(accountData, account);
 
     if (!canBuy && !upgradeId) {
       navigation.goToSubscription();
@@ -224,6 +227,8 @@ onMounted(async () => {
         :plan-data="planData"
         :selected-plan="selectedPlan"
         :upgrade-sub-id="upgradeSubId"
+        :vat-id-status="accountData?.vatIdStatus"
+        :country="accountData?.address.country"
         @payment-success="navigation.goTo3DSecure(upgradeSubId)"
         @go-back="back()"
         @refresh-card="refreshCard()"
