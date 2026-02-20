@@ -2,6 +2,7 @@ import type { AppKit } from '@reown/appkit';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import type { Signer } from 'ethers';
 import { get, set } from '@vueuse/core';
+import { useSharedWeb3State } from '~/composables/web3/use-shared-web3-state';
 import { useLogger } from '~/utils/use-logger';
 
 // Lazy-loaded module cache
@@ -106,16 +107,18 @@ async function initializeAppKit(options: {
 export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   const { chainId, onAccountChange, onError, canSwitchNetwork = false } = config;
 
-  const connected = ref<boolean>(false);
-  const isOpen = ref<boolean>(false);
-  const connectedChainId = ref<bigint>();
-  const errorMessage = ref<string>('');
-  const address = ref<string>();
-  const initialized = ref<boolean>(false);
-  const initializing = ref<boolean>(false);
+  const { address, connected, connectedChainId, initialized, initializing, isOpen } = useSharedWeb3State();
+  const errorMessage = shallowRef<string>('');
 
   const logger = useLogger('web3-connection');
   const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
+
+  // Notify per-instance callbacks when account state changes
+  if (onAccountChange) {
+    watch(() => get(connected), (isConnected) => {
+      onAccountChange(isConnected);
+    });
+  }
 
   /**
    * Ensure AppKit is initialized before use
@@ -137,10 +140,10 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     try {
       const appKit = await initializeAppKit({
         baseUrl,
-        testing,
-        projectId,
         canSwitchNetwork,
         defaultChainId: get(chainId),
+        projectId,
+        testing,
       });
 
       // Initialize state from current appKit connection
@@ -157,7 +160,6 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
 
       // Subscribe to account changes
       appKit.subscribeAccount((account) => {
-        set(errorMessage, '');
         set(connected, account.isConnected);
 
         if (account.isConnected && account.address) {
@@ -166,7 +168,6 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
         else {
           set(address, undefined);
           set(connectedChainId, undefined);
-          onAccountChange?.(false);
         }
       });
 
@@ -186,7 +187,6 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   async function handleAccountConnected(accountAddress: string): Promise<void> {
     const { getAddress } = await import('ethers/address');
     set(address, getAddress(accountAddress));
-    onAccountChange?.(true);
 
     const browserProvider = await getBrowserProvider();
     const network = await browserProvider.getNetwork();
