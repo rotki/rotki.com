@@ -9,7 +9,7 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n({ useScope: 'global' });
 const { connected: isConnected, address, open } = useWeb3Connection();
-const { isSessionValid, isAuthenticating, authenticate } = useSiweAuth();
+const { isSessionValid, isAuthenticating, authenticate, authError } = useSiweAuth();
 
 const logger = useLogger();
 
@@ -29,8 +29,14 @@ async function connectWallet(): Promise<void> {
 
 async function handleSignMessage(): Promise<void> {
   const addressVal = get(address);
-  if (addressVal) {
+  if (!addressVal)
+    return;
+
+  try {
     await authenticate(addressVal);
+  }
+  catch (error) {
+    logger.error('Failed to sign message:', error);
   }
 }
 </script>
@@ -89,24 +95,35 @@ async function handleSignMessage(): Promise<void> {
         {{ t('sponsor.submit_name.view_submissions') }}
       </RuiButton>
 
-      <RuiButton
+      <div
         v-else
-        color="primary"
-        class="w-full"
-        :loading="isAuthenticating"
-        @click="handleSignMessage()"
+        class="flex flex-col gap-2"
       >
-        <template #prepend>
-          <img
-            class="size-4 brightness-[75%] invert"
-            alt="ethereum"
-            src="/img/chains/ethereum.svg"
-            width="16"
-            height="16"
-          />
-        </template>
-        {{ t('sponsor.submit_name.sign_to_continue') }}
-      </RuiButton>
+        <RuiAlert
+          v-if="authError"
+          type="error"
+        >
+          {{ authError }}
+        </RuiAlert>
+
+        <RuiButton
+          color="primary"
+          class="w-full"
+          :loading="isAuthenticating"
+          @click="handleSignMessage()"
+        >
+          <template #prepend>
+            <img
+              class="size-4 brightness-[75%] invert"
+              alt="ethereum"
+              src="/img/chains/ethereum.svg"
+              width="16"
+              height="16"
+            />
+          </template>
+          {{ t('sponsor.submit_name.sign_to_continue') }}
+        </RuiButton>
+      </div>
     </div>
   </RuiCard>
 </template>
