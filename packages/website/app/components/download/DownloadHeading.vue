@@ -10,29 +10,23 @@ const showAll = ref(false);
 
 const sponsors = [
   {
-    name: 'Tay',
-    image: '/img/sponsorship-profiles/1.41.0_tay.png',
+    name: 'jespow.eth',
+    image: '/img/sponsorship-profiles/1.42.0_jespow.eth_1.png',
     gold: true,
   },
   {
-    name: 'milady',
-    image: '/img/sponsorship-profiles/1.41.0_milady.png',
+    name: 'jespow.eth',
+    image: '/img/sponsorship-profiles/1.42.0_jespow.eth_2.png',
+    gold: true,
   },
   {
-    name: 'Slyde.eth',
-    image: '/img/sponsorship-profiles/1.41.0_Slyde.eth.png',
+    name: '我喜歡□□.eth',
+    tooltip: '0x31a1aAb023739d5ca68c49cE0E695c744B79260C',
+    image: '/img/sponsorship-profiles/1.42.0_我喜歡大奶.eth.jpeg',
   },
   {
-    name: 'soxpert.eth',
-    image: '/img/sponsorship-profiles/1.41.0_soxpert.eth.png',
-  },
-  {
-    name: 'floar.eth',
-    image: '/img/sponsorship-profiles/1.41.0_floar.eth.png',
-  },
-  {
-    name: 'dsheets.eth',
-    image: '/img/sponsorship-profiles/1.41.0_dsheets.eth.svg',
+    name: 'mem.eth',
+    image: '/img/sponsorship-profiles/1.42.0_mem.eth.jpg',
   },
 ];
 
@@ -169,7 +163,7 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
             class="flex flex-col gap-3"
           >
             <img
-              class="size-12 min-w-12 rounded-md overflow-hidden mx-auto"
+              class="size-12 min-w-12 rounded-md overflow-hidden mx-auto !object-cover"
               :class="{ 'size-20 min-w-20': sponsor.gold }"
               :src="sponsor.image"
               :alt="sponsor.name"
@@ -184,16 +178,25 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
                 alt="Gold sponsor ribbon"
                 format="webp"
                 width="192"
-                height="48"
+                height="42"
+                fit="cover"
                 loading="lazy"
-                class="w-full h-[125%] absolute top-0 left-0 object-fill"
+                class="w-full h-[125%] absolute top-0 left-0"
               />
-              <div
-                class="text-sm font-bold text-left text-rui-text-secondary relative"
-                :class="{ 'text-yellow-900 max-w-[80%] px-0.5 text-center leading-8': sponsor.gold }"
+              <RuiTooltip
+                :disabled="!sponsor.tooltip"
+                :popper="{ placement: 'bottom' }"
               >
-                {{ sponsor.name }}
-              </div>
+                <template #activator>
+                  <div
+                    class="text-sm font-bold text-left text-rui-text-secondary relative"
+                    :class="{ 'text-yellow-900 max-w-[80%] px-0.5 text-center leading-8': sponsor.gold }"
+                  >
+                    {{ sponsor.name }}
+                  </div>
+                </template>
+                {{ sponsor.tooltip }}
+              </RuiTooltip>
             </div>
           </div>
         </div>
