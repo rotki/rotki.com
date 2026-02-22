@@ -66,9 +66,8 @@ const currentTierContent = computed<TierContent | undefined>(() => props.tierCon
             :key="index"
             :src="imageUrl"
             :alt="`Sponsor example ${index + 1}`"
-            class="w-full rounded-md object-cover"
-            width="400"
-            height="400"
+            class="w-full h-auto rounded-md object-cover"
+            sizes="100vw md:800px"
             loading="lazy"
           />
         </div>
