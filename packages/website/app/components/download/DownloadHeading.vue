@@ -63,16 +63,16 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
 <template>
   <div class="pt-6 pb-10 lg:pt-10 lg:pb-20">
     <div class="container flex flex-col">
-      <div class="flex flex-col items-start gap-y-4">
+      <div class="flex flex-col items-center gap-y-4 text-center mb-4">
         <h6 class="text-rui-light-primary text-h6 font-medium">
           {{ t('download.heading.download_rotki') }}
         </h6>
         <h3 class="text-rui-text text-h4">
           {{ t('download.heading.description') }}
         </h3>
-        <div class="flex flex-col items-start gap-3 pt-2">
+        <div class="flex flex-col items-center gap-3 pt-2">
           <ClientOnly>
-            <div class="flex gap-2 flex-wrap">
+            <div class="flex gap-2 flex-wrap justify-center">
               <ButtonLink
                 v-for="item in highlightedDownloadItem"
                 :key="item.url"
@@ -139,7 +139,7 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
         </RuiAccordion>
       </RuiAccordions>
 
-      <div class="flex items-center mt-6 gap-12">
+      <div class="flex items-center justify-center mt-6 gap-12">
         <div class="flex flex-col mb-4 w-[150px]">
           <img
             src="/img/laurel.svg"
@@ -156,7 +156,7 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
             </div>
           </div>
         </div>
-        <div class="flex-1 grid items-center md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 gap-y-8">
+        <div class="flex-1 grid items-center md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 gap-y-8">
           <div
             v-for="(sponsor, index) in sponsors"
             :key="index"
