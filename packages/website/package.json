@@ -39,7 +39,7 @@
     "ethers": "6.16.0",
     "pinia": "3.0.4",
     "qrcode": "1.5.4",
-    "swiper": "11.2.10",
+    "swiper": "12.1.2",
     "vue": "catalog:",
     "vue-router": "4.6.4",
     "zod": "catalog:"
