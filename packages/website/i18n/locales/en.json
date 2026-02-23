@@ -1091,7 +1091,11 @@
     "error": {
       "init_error": "Initialization Error",
       "payment_failure": "Payment Failure",
-      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address."
+      "unverified_email": "You cannot currently buy a premium subscription. You need to first verify your e-mail address.",
+      "server_error_warning": "Something went wrong while processing your payment. Your subscription may have been activated. Please check your subscription status before trying again to avoid duplicate charges.",
+      "check_subscription": "Check Subscription Status",
+      "server_error_title": "Unexpected Server Error",
+      "server_error_description": "Something went wrong while processing your payment. Your subscription may have already been activated. Please check your subscription status before attempting another payment to avoid duplicate charges."
     },
     "payment": {
       "failure": {

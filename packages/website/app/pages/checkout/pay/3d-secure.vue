@@ -6,6 +6,7 @@ import InvalidParamsState from '~/modules/checkout/components/card/CardPaymentIn
 import LoadingState from '~/modules/checkout/components/card/CardPaymentLoading.vue';
 import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
 import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
+import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import { useThreeDSecure } from '~/modules/checkout/composables/use-three-d-secure';
 import { commonAttrs, noIndex } from '~/utils/metadata';
 
@@ -37,6 +38,7 @@ const {
   error,
   challengeVisible,
   isProcessing,
+  serverError,
   paymentInfo,
   initializeProcess,
   cleanup,
@@ -130,4 +132,6 @@ onBeforeRouteLeave((to, from, next) => {
       @back-to-selection="handleBack()"
     />
   </div>
+
+  <ServerErrorOverlay :visible="serverError" />
 </template>

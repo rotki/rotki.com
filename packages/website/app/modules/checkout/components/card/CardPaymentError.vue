@@ -11,7 +11,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-function handleBack() {
+function handleBack(): void {
   emit('back');
 }
 </script>
@@ -43,7 +43,6 @@ function handleBack() {
       </RuiAlert>
     </div>
 
-    <!-- Action buttons -->
     <div class="flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto">
       <RuiButton
         class="w-full"
@@ -54,7 +53,6 @@ function handleBack() {
       </RuiButton>
     </div>
 
-    <!-- Help text -->
     <div class="mt-8 text-sm text-rui-text-secondary">
       <p>{{ t('subscription.3d_secure.error_help') }}</p>
     </div>
