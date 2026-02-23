@@ -5,6 +5,7 @@ import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import AcceptRefundPolicy from '~/modules/checkout/components/common/AcceptRefundPolicy.vue';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
+import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useReferralCodeParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
@@ -15,6 +16,7 @@ const { t } = useI18n({ useScope: 'global' });
 const accepted = ref<boolean>(false);
 const initializing = ref<boolean>(false);
 const submittingPayment = ref<boolean>(false);
+const blocked = ref<boolean>(false);
 
 const checkout = useCheckout();
 const {
@@ -47,7 +49,7 @@ const { upgradeSubId } = useSubscriptionIdParam();
 const { referralCode } = useReferralCodeParam();
 const { chronicle } = useSigilEvents();
 
-const processing = computed<boolean>(() => get(paying) || get(checkoutLoading) || get(planSwitchLoading));
+const processing = computed<boolean>(() => get(paying) || get(checkoutLoading) || get(planSwitchLoading) || get(blocked));
 
 async function initialize(): Promise<boolean> {
   const hasPlans = await ensureInitialized();
@@ -125,6 +127,13 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
 
       sessionStorage.setItem('payment-completed', 'true');
       await navigateTo('/checkout/success');
+    }
+    else if (result.blocked) {
+      set(blocked, true);
+      setError(
+        t('subscription.error.payment_failure'),
+        t('subscription.error.server_error_warning'),
+      );
     }
     else {
       setError(t('subscription.error.payment_failure'), result.error || 'Payment failed');
@@ -266,4 +275,6 @@ onMounted(async () => {
       </div>
     </Transition>
   </Teleport>
+
+  <ServerErrorOverlay :visible="blocked" />
 </template>

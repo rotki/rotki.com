@@ -64,6 +64,10 @@ export function handlePaymentError<T>(originalError: any): Result<T, PaymentErro
       error = '';
       code = PaymentError.UNVERIFIED;
     }
+    else {
+      code = PaymentError.SERVER_ERROR;
+      error = new Error(originalError.message || 'An unexpected error occurred');
+    }
   }
 
   return {

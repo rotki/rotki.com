@@ -21,6 +21,7 @@ export interface PaypalPaymentParams {
 export interface PaypalSubmitResult {
   success: boolean;
   error?: string;
+  blocked?: boolean;
 }
 
 interface PaypalButtonActions {
@@ -221,6 +222,7 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
     }
     catch (error_: any) {
       let errorMessage = error_.message || 'Payment failed';
+      let blocked = false;
 
       if (error_ instanceof FetchError) {
         if (error_.status === 400) {
@@ -232,10 +234,14 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
         else if (error_.status === 403) {
           errorMessage = 'Payment failed';
         }
+        else {
+          requestRefresh();
+          blocked = true;
+        }
       }
 
       logger.error('Payment submission failed:', error_);
-      return { success: false, error: errorMessage };
+      return { success: false, error: errorMessage, blocked };
     }
     finally {
       set(paying, false);

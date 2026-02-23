@@ -11,6 +11,7 @@ import { get, set } from '@vueuse/core';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
+import { PaymentError } from '~/types/codes';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_KEY = 'threeDSecureData';
@@ -22,6 +23,7 @@ interface UseThreeDSecureReturn {
   challengeVisible: Readonly<Ref<boolean>>;
   error: Readonly<Ref<string>>;
   isProcessing: ComputedRef<boolean>;
+  serverError: Readonly<Ref<boolean>>;
   state: Readonly<Ref<ThreeDSecureState>>;
   paymentInfo: Readonly<Ref<PaymentInfo | undefined>>;
 }
@@ -35,6 +37,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
   const state = ref<ThreeDSecureState>('initializing');
   const error = ref<string>('');
   const challengeVisible = ref<boolean>(false);
+  const serverError = ref<boolean>(false);
   const btClient = shallowRef<Client>();
   const btThreeDSecure = shallowRef<ThreeDSecure>();
   const paymentInfo = ref<PaymentInfo>();
@@ -223,14 +226,21 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     const payEvent = await verify(params);
 
     // Finalize payment with API call
-    const result = await paymentApi.pay({
+    const paymentPayload = {
       planId: payEvent.planId,
       paymentMethodNonce: payEvent.paymentMethodNonce,
       discountCode: payEvent.discountCode,
-      upgradeSubId: payEvent.upgradeSubId,
-    });
+    };
+
+    const result = payEvent.upgradeSubId
+      ? await paymentApi.upgrade(paymentPayload, payEvent.upgradeSubId)
+      : await paymentApi.pay(paymentPayload);
 
     if (result.isError) {
+      if (result.code === PaymentError.SERVER_ERROR) {
+        requestRefresh();
+        set(serverError, true);
+      }
       throw new Error(result.error.message);
     }
 
@@ -310,6 +320,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     challengeVisible: readonly(challengeVisible),
     error: readonly(error),
     isProcessing,
+    serverError: readonly(serverError),
     state: readonly(state),
     paymentInfo: readonly(paymentInfo),
   };

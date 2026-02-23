@@ -18,34 +18,43 @@ export function usePaymentApi() {
   const { fetchWithCsrf } = useFetchWithCsrf();
 
   /**
-   * Process card payment
+   * Upgrade an existing subscription
    */
-  const pay = async ({ upgradeSubId, ...payload }: CardPaymentRequest): Promise<Result<true, PaymentError>> => {
+  async function upgrade(payload: Omit<CardPaymentRequest, 'upgradeSubId'>, subscriptionId: string): Promise<Result<true, PaymentError>> {
     try {
-      if (upgradeSubId) {
-        const response = await fetchWithCsrf<ActionResultResponse>(
-          '/webapi/2/braintree/upgrade',
-          {
-            body: {
-              ...payload,
-              subscriptionId: upgradeSubId,
-            },
-            method: 'POST',
+      const response = await fetchWithCsrf<ActionResultResponse>(
+        '/webapi/2/braintree/upgrade',
+        {
+          body: {
+            ...payload,
+            subscriptionId,
           },
-        );
+          method: 'POST',
+        },
+      );
 
-        if (response.result) {
-          return {
-            isError: false,
-            result: true,
-          };
-        }
+      if (response.result) {
         return {
-          isError: true,
-          error: new Error(response.message || 'Failed to upgrade payment'),
+          isError: false,
+          result: true,
         };
       }
+      return {
+        isError: true,
+        error: new Error(response.message || 'Failed to upgrade payment'),
+      };
+    }
+    catch (error: any) {
+      logger.error('Upgrade failed:', error);
+      return handlePaymentError(error);
+    }
+  }
 
+  /**
+   * Process a new card payment
+   */
+  async function pay(payload: Omit<CardPaymentRequest, 'upgradeSubId'>): Promise<Result<true, PaymentError>> {
+    try {
       const response = await fetchWithCsrf<CardPaymentRequest>(
         '/webapi/2/braintree/payments',
         {
@@ -74,9 +83,10 @@ export function usePaymentApi() {
       logger.error('Payment failed:', error);
       return handlePaymentError(error);
     }
-  };
+  }
 
   return {
     pay,
+    upgrade,
   };
 }
