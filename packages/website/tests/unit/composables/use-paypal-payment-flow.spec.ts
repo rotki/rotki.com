@@ -1,5 +1,5 @@
-import { FetchError } from 'ofetch';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createFetchError } from '../../utils';
 
 const mockFetchWithCsrf = vi.fn();
 const mockRequestRefresh = vi.fn();
@@ -34,14 +34,6 @@ vi.mock('~/modules/checkout/composables/use-paypal-api', () => ({
     fetchPaypalAccount: vi.fn(),
   }),
 }));
-
-function createFetchError(status: number, data?: any): FetchError {
-  const error = new FetchError(`Request failed with status ${status}`);
-  error.status = status;
-  error.statusCode = status;
-  error.data = data;
-  return error;
-}
 
 describe('usePaypalPaymentFlow', () => {
   afterEach(() => {

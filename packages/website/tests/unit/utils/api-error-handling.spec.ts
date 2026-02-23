@@ -1,15 +1,9 @@
-import { FetchError } from 'ofetch';
 import { describe, expect, it } from 'vitest';
+
 import { PaymentError } from '~/types/codes';
 import { handlePaymentError } from '~/utils/api-error-handling';
 
-function createFetchError(status: number, data?: any): FetchError {
-  const error = new FetchError(`Request failed with status ${status}`);
-  error.status = status;
-  error.statusCode = status;
-  error.data = data;
-  return error;
-}
+import { createFetchError } from '../../utils';
 
 describe('handlePaymentError', () => {
   it('should return error with parsed message for 400 status', () => {
