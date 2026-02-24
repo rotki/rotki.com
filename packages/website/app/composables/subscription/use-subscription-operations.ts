@@ -1,4 +1,5 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { CancellationFeedbackPayload } from '~/composables/subscription/use-cancellation-feedback';
 import { set } from '@vueuse/shared';
 import { SubscriptionAction, type SubscriptionActionType } from '~/components/account/home/subscription-table/types';
 import { useSubscription } from '~/composables/subscription/use-subscription';
@@ -12,7 +13,7 @@ interface UseSubscriptionOperationsOptions {
 interface UseSubscriptionOperationsReturn {
   clearActiveState: (activeAction?: Ref<SubscriptionActionType | undefined>, activeSubscription?: Ref<UserSubscription | undefined>) => void;
   resumeSubscription: (subscription: UserSubscription, activeAction?: Ref<SubscriptionActionType | undefined>, activeSubscription?: Ref<UserSubscription | undefined>) => Promise<void>;
-  cancelSubscription: (subscription: UserSubscription, activeAction?: Ref<SubscriptionActionType | undefined>, activeSubscription?: Ref<UserSubscription | undefined>) => Promise<void>;
+  cancelSubscription: (subscription: UserSubscription, activeAction?: Ref<SubscriptionActionType | undefined>, activeSubscription?: Ref<UserSubscription | undefined>, feedback?: CancellationFeedbackPayload) => Promise<void>;
   cancelUpgrade: (subscriptionId: string, activeAction?: Ref<SubscriptionActionType | undefined>, activeSubscription?: Ref<UserSubscription | undefined>) => Promise<void>;
 }
 
@@ -21,7 +22,7 @@ interface UseSubscriptionOperationsReturn {
  * Centralizes the common logic used by ActiveSubscriptionCard and SubscriptionTable
  */
 export function useSubscriptionOperations(options?: UseSubscriptionOperationsOptions): UseSubscriptionOperationsReturn {
-  const { cancelUserSubscription, resumeUserSubscription } = useSubscription();
+  const { cancelUserSubscription, resumeUserSubscription, submitCancellationFeedback } = useSubscription();
   const paymentApi = useCryptoPaymentApi();
 
   const subscriptionOpsStore = useSubscriptionOperationsStore();
@@ -66,8 +67,13 @@ export function useSubscriptionOperations(options?: UseSubscriptionOperationsOpt
     subscription: UserSubscription,
     activeAction?: Ref<SubscriptionActionType | undefined>,
     activeSubscription?: Ref<UserSubscription | undefined>,
+    feedback?: CancellationFeedbackPayload,
   ): Promise<void> {
     startOperation(SubscriptionAction.CANCEL);
+
+    if (feedback) {
+      submitCancellationFeedback(feedback).catch(() => {});
+    }
 
     await cancelUserSubscription(subscription, (statusMessage: string) => {
       setStatus(statusMessage);

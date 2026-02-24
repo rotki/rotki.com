@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { CancelSubscriptionConfirmEvent } from '~/components/account/home/CancelSubscription.vue';
 import type {
   CryptoPaymentState,
   OperationState,
@@ -24,11 +25,9 @@ import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { formatDate } from '~/utils/date';
 
-interface Props {
+const { subscription } = defineProps<{
   subscription: UserSubscription;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   refresh: [];
@@ -39,7 +38,7 @@ const { actionsClasses } = useSubscriptionDisplay();
 const { canUpgradeSubscription } = useSubscriptionActions();
 
 // Subscription status display and styling
-const subscriptionRef = toRef(props, 'subscription');
+const subscriptionRef = toRef(() => subscription);
 const { statusDisplayText, statusCardClass } = useSubscriptionStatus(subscriptionRef);
 
 // Plan information and limits
@@ -72,7 +71,7 @@ const activeActionSubscription = ref<UserSubscription>();
 
 // Computed for renewableSubscriptions
 const renewableSubscriptions = computed<UserSubscription[]>(() =>
-  props.subscription.actions.includes('renew') ? [props.subscription] : [],
+  subscription.actions.includes('renew') ? [subscription] : [],
 );
 
 // Crypto payment composable
@@ -99,26 +98,26 @@ const cryptoPaymentState = computed<CryptoPaymentState>(() => ({
 
 // Relative date calculations using VueUse
 const createdRelative = useTimeAgo(
-  computed<Date>(() => new Date(props.subscription.createdDate)),
+  computed<Date>(() => new Date(subscription.createdDate)),
 );
 
 const nextActionRelative = useTimeAgo(
-  computed<Date>(() => new Date(props.subscription.nextActionDate)),
+  computed<Date>(() => new Date(subscription.nextActionDate)),
 );
 
 // Check if upgrade is pending
-const isUpgradePending = computed<boolean>(() => isSubRequestingUpgrade(props.subscription));
+const isUpgradePending = computed<boolean>(() => isSubRequestingUpgrade(subscription));
 
 // Check if upgrade is available (only if not already pending)
-const isUpgradeAvailable = computed<boolean>(() => !get(isUpgradePending) && canUpgradeSubscription(props.subscription, get(availablePlans)));
+const isUpgradeAvailable = computed<boolean>(() => !get(isUpgradePending) && canUpgradeSubscription(subscription, get(availablePlans)));
 
 // Action handlers using centralized composable
 async function resumeSubscription(subscription: UserSubscription): Promise<void> {
   await performResumeSubscription(subscription, activeAction, activeActionSubscription);
 }
 
-async function cancelSubscription(subscription: UserSubscription): Promise<void> {
-  await performCancelSubscription(subscription, activeAction, activeActionSubscription);
+async function cancelSubscription({ subscription, feedback }: CancelSubscriptionConfirmEvent): Promise<void> {
+  await performCancelSubscription(subscription, activeAction, activeActionSubscription, feedback);
 }
 
 async function cancelUpgrade(subscriptionId: string): Promise<void> {

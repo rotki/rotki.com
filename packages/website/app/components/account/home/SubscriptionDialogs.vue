@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import CancelSubscription from '~/components/account/home/CancelSubscription.vue';
+import CancelSubscription, { type CancelSubscriptionConfirmEvent } from '~/components/account/home/CancelSubscription.vue';
 import CancelUpgradeDialog from '~/components/account/home/CancelUpgradeDialog.vue';
 import ResumeSubscriptionDialog from '~/components/account/home/ResumeSubscriptionDialog.vue';
 import {
@@ -9,25 +9,19 @@ import {
 } from '~/components/account/home/subscription-table/types';
 import UpgradePlanDialog from '~/components/account/home/UpgradePlanDialog.vue';
 
-interface Props {
+const activeSubscription = defineModel<UserSubscription>();
+
+const { activeAction, inProgress, operationType } = defineProps<{
   activeAction?: SubscriptionActionType;
   inProgress: boolean;
   operationType?: SubscriptionActionType;
-}
-
-const activeSubscription = defineModel<UserSubscription>();
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
-  'cancel-subscription': [subscription: UserSubscription];
+  'cancel-subscription': [payload: CancelSubscriptionConfirmEvent];
   'resume-subscription': [subscription: UserSubscription];
   'cancel-upgrade': [subscriptionId: string];
 }>();
-
-function handleCancelSubscription(subscription: UserSubscription): void {
-  emit('cancel-subscription', subscription);
-}
 
 function handleResumeSubscription(subscription: UserSubscription): void {
   emit('resume-subscription', subscription);
@@ -44,7 +38,7 @@ function handleCancelUpgrade(subscriptionId: string): void {
       v-if="activeAction === SubscriptionAction.CANCEL && activeSubscription"
       v-model="activeSubscription"
       :loading="operationType === SubscriptionAction.CANCEL && inProgress"
-      @confirm="handleCancelSubscription($event)"
+      @confirm="emit('cancel-subscription', $event)"
     />
 
     <ResumeSubscriptionDialog

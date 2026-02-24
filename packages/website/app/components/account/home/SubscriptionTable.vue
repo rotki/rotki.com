@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { DataTableColumn, DataTableSortColumn, TablePaginationData } from '@rotki/ui-library';
+import type { CancelSubscriptionConfirmEvent } from '~/components/account/home/CancelSubscription.vue';
 import type {
   CryptoPaymentState,
   OperationState,
@@ -103,8 +104,8 @@ async function resumeSubscription(subscription: UserSubscription): Promise<void>
   await performResumeSubscription(subscription, activeAction, activeSubscription);
 }
 
-async function cancelSubscription(subscription: UserSubscription): Promise<void> {
-  await performCancelSubscription(subscription, activeAction, activeSubscription);
+async function cancelSubscription({ subscription, feedback }: CancelSubscriptionConfirmEvent): Promise<void> {
+  await performCancelSubscription(subscription, activeAction, activeSubscription, feedback);
 }
 
 async function cancelUpgrade(subscriptionId: string): Promise<void> {
