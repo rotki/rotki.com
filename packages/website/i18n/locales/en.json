@@ -135,7 +135,23 @@
           "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all rotki premium features.",
           "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."
         },
-        "title": "Canceling Your rotki Subscription"
+        "title": "Canceling Your rotki Subscription",
+        "feedback": {
+          "title": "Help us improve",
+          "description": "Please let us know why you're cancelling:",
+          "reason_label": "Reason for cancelling",
+          "comment_label": "Additional comments (optional)",
+          "comment_required": "Please tell us more about your reason",
+          "reasons": {
+            "1": "Not using it anymore",
+            "2": "Price too high",
+            "3": "Missing features",
+            "4": "Technical issues",
+            "5": "Switched to alternative",
+            "6": "Incorrect results",
+            "7": "Other"
+          }
+        }
       },
       "cancelled_but_still_active": {
         "description": "You canceled this subscription, but it will remain active until {date}",

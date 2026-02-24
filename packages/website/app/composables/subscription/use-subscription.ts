@@ -1,4 +1,5 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { CancellationFeedbackPayload } from '~/composables/subscription/use-cancellation-feedback';
 import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { FetchError } from 'ofetch';
 import { useAccountRefresh } from '~/composables/use-app-events';
@@ -33,6 +34,7 @@ function getErrorMessage(error: unknown): string {
 interface UseSubscriptionReturn {
   cancelUserSubscription: (subscription: UserSubscription, onProgress?: (status: string) => void) => Promise<void>;
   resumeUserSubscription: (identifier: UserSubscription, onProgress?: (status: string) => void) => Promise<void>;
+  submitCancellationFeedback: (payload: CancellationFeedbackPayload) => Promise<void>;
 }
 
 export function useSubscription(): UseSubscriptionReturn {
@@ -97,8 +99,21 @@ export function useSubscription(): UseSubscriptionReturn {
     );
   };
 
+  async function submitCancellationFeedback(payload: CancellationFeedbackPayload): Promise<void> {
+    try {
+      await fetchWithCsrf('/webapi/2/subscriptions/cancellation-feedback', {
+        method: 'POST',
+        body: payload,
+      });
+    }
+    catch (error: unknown) {
+      logger.error('Failed to submit cancellation feedback:', error);
+    }
+  }
+
   return {
     cancelUserSubscription,
     resumeUserSubscription,
+    submitCancellationFeedback,
   };
 }
