@@ -47,10 +47,16 @@ export interface DownloadSeePlansClickData {
   source: 'download_page_nudge';
 }
 
+export interface DownloadClickData {
+  platform: string;
+  version?: string;
+}
+
 export interface SigilEventMap {
   checkout_error: CheckoutErrorData;
   checkout_method_selected: CheckoutMethodSelectedData;
   checkout_start: CheckoutStartData;
+  download_click: DownloadClickData;
   download_see_plans_click: DownloadSeePlansClickData;
   pricing_view: PricingViewData;
   purchase_success: PurchaseSuccessData;

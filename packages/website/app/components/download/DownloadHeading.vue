@@ -2,9 +2,18 @@
 import type { DownloadItemSingle, DownloadItem as DownloadItemType } from '~/types/download';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import DownloadItem from '~/components/download/DownloadItem.vue';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 
 const props = defineProps<{ version: string; links: DownloadItemType[] }>();
 const { t } = useI18n({ useScope: 'global' });
+const { chronicle } = useSigilEvents();
+
+function onDownloadClick(platform: string): void {
+  chronicle('download_click', {
+    platform,
+    version: props.version || undefined,
+  });
+}
 
 const showAll = ref(false);
 
@@ -82,6 +91,7 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
                 variant="default"
                 size="lg"
                 data-cy="main-download-button"
+                @click="onDownloadClick(item.platform)"
               >
                 <template #prepend>
                   <RuiIcon
