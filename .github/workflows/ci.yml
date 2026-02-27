@@ -141,6 +141,14 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "VERSION=dev" >> "$GITHUB_OUTPUT"
+          fi
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build docker image
@@ -148,3 +156,7 @@ jobs:
         with:
           push: false
           tags: rotki/frontend:latest
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            VERSION=${{ steps.version.outputs.VERSION }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}

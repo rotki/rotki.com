@@ -18,9 +18,22 @@ RUN --mount=type=cache,target=/root/.npm/_cacache/ \
 
 FROM node:24-alpine AS production
 
-WORKDIR /app
 ARG GIT_SHA
-ENV GIT_SHA=${GIT_SHA}
+ARG VERSION
+ARG BUILD_DATE
+
+LABEL org.opencontainers.image.title="rotki.com"
+LABEL org.opencontainers.image.description="rotki.com website"
+LABEL org.opencontainers.image.source="https://github.com/rotki/rotki.com"
+LABEL org.opencontainers.image.url="https://rotki.com"
+LABEL org.opencontainers.image.vendor="Rotki Solutions GmbH"
+LABEL org.opencontainers.image.licenses="AGPL-3.0"
+LABEL org.opencontainers.image.version="${VERSION}"
+LABEL org.opencontainers.image.revision="${GIT_SHA}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+
+WORKDIR /app
+
 ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=4000
 
