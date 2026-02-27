@@ -3,7 +3,7 @@ import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
 export interface CancellationReasonChoice {
-  key: number;
+  value: number;
   label: string;
 }
 
@@ -21,6 +21,8 @@ interface UseCancellationFeedbackReturn {
   loading: Ref<boolean>;
   selectedReason: Ref<number | undefined>;
   comment: Ref<string>;
+  isOtherReason: (reason: CancellationReasonChoice) => boolean;
+  isOtherSelected: ComputedRef<boolean>;
   isValid: ComputedRef<boolean>;
   fetchReasons: () => Promise<void>;
   submitFeedback: (payload: CancellationFeedbackPayload) => Promise<void>;
@@ -36,17 +38,26 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
   const selectedReason = ref<number>();
   const comment = ref<string>('');
 
-  const OTHER_REASON = 7;
+  const OTHER_LABEL = 'Other';
+
+  function isOtherReason(reason: CancellationReasonChoice): boolean {
+    return reason.label === OTHER_LABEL;
+  }
+
+  const isOtherSelected = computed<boolean>(() => {
+    const reason = get(selectedReason);
+    if (!reason)
+      return false;
+
+    return get(reasons).some(r => r.value === reason && isOtherReason(r));
+  });
 
   const isValid = computed<boolean>(() => {
     const reason = get(selectedReason);
     if (!reason)
       return false;
 
-    if (reason === OTHER_REASON && get(comment).trim().length === 0)
-      return false;
-
-    return true;
+    return !(get(isOtherSelected) && get(comment).trim().length === 0);
   });
 
   async function fetchReasons(): Promise<void> {
@@ -85,6 +96,8 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
   return {
     comment,
     fetchReasons,
+    isOtherReason,
+    isOtherSelected,
     isValid,
     loading,
     reasons,

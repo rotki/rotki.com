@@ -27,28 +27,14 @@ const {
   loading: reasonsLoading,
   selectedReason,
   comment,
+  isOtherReason,
+  isOtherSelected,
   isValid,
   fetchReasons,
   reset,
 } = useCancellationFeedback();
 
 const isPending = computed<boolean>(() => get(modelValue)?.status === 'Pending');
-
-const OTHER_REASON = 7;
-
-const isOtherSelected = computed<boolean>(() => get(selectedReason) === OTHER_REASON);
-
-const fallbackReasons = computed<Array<{ key: number; label: string }>>(() =>
-  Array.from({ length: 7 }, (_, i) => ({
-    key: i + 1,
-    label: t(`account.subscriptions.cancellation.feedback.reasons.${i + 1}`),
-  })),
-);
-
-const displayReasons = computed<Array<{ key: number; label: string }>>(() => {
-  const fetched = get(reasons);
-  return fetched.length > 0 ? fetched : get(fallbackReasons);
-});
 
 watch(modelValue, (val) => {
   if (val) {
@@ -57,10 +43,10 @@ watch(modelValue, (val) => {
   else {
     reset();
   }
-});
+}, { immediate: true });
 
-function selectReason(key: number): void {
-  set(selectedReason, key);
+function selectReason(value: number): void {
+  set(selectedReason, value);
 }
 
 function cancelSubscription(): void {
@@ -182,22 +168,22 @@ function cancelSubscription(): void {
         <template v-else>
           <div class="grid grid-cols-2 gap-1.5">
             <div
-              v-for="reason in displayReasons"
-              :key="reason.key"
+              v-for="reason in reasons"
+              :key="reason.value"
               class="flex items-center rounded-md border px-2.5 py-1.5 cursor-pointer transition-colors"
               :class="[
-                selectedReason === reason.key
+                selectedReason === reason.value
                   ? 'border-rui-primary bg-rui-primary/5'
                   : 'border-rui-grey-300 hover:border-rui-grey-400',
-                reason.key === OTHER_REASON && displayReasons.length % 2 !== 0
+                isOtherReason(reason) && reasons.length % 2 !== 0
                   ? 'col-span-2'
                   : '',
               ]"
-              @click="selectReason(reason.key)"
+              @click="selectReason(reason.value)"
             >
               <RuiRadio
                 :model-value="selectedReason"
-                :value="reason.key"
+                :value="reason.value"
                 :label="reason.label"
                 color="primary"
                 :hide-details="true"

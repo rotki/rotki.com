@@ -139,18 +139,8 @@
         "feedback": {
           "title": "Help us improve",
           "description": "Please let us know why you're cancelling:",
-          "reason_label": "Reason for cancelling",
           "comment_label": "Additional comments (optional)",
-          "comment_required": "Please tell us more about your reason",
-          "reasons": {
-            "1": "Not using it anymore",
-            "2": "Price too high",
-            "3": "Missing features",
-            "4": "Technical issues",
-            "5": "Switched to alternative",
-            "6": "Incorrect results",
-            "7": "Other"
-          }
+          "comment_required": "Please tell us more about your reason"
         }
       },
       "cancelled_but_still_active": {
