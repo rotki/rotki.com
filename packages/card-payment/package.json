@@ -23,7 +23,7 @@
     "@rotki/ui-library": "catalog:",
     "@tsconfig/node24": "catalog:",
     "@types/braintree-web": "catalog:",
-    "@types/jsdom": "27.0.0",
+    "@types/jsdom": "28.0.0",
     "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
@@ -33,7 +33,7 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-vue-devtools": "8.0.6",
+    "vite-plugin-vue-devtools": "8.0.7",
     "vite-ssg": "catalog:",
     "vue-tsc": "catalog:"
   }
