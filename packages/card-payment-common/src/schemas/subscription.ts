@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export enum PaymentProvider {
   BRAINTREE = 'braintree',
+  BANK = 'bank',
   CRYPTO = 'crypto',
   NONE = 'none',
 }
