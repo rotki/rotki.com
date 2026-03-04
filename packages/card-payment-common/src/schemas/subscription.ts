@@ -11,6 +11,7 @@ export enum PaymentMethod {
   PAYPAL = 'paypal',
   CARD = 'card',
   CRYPTO = 'crypto',
+  BANK_TRANSFER = 'bank_transfer',
   FREE = 'free',
 }
 
