@@ -101,7 +101,11 @@ async function submitUpgrade() {
   }
 
   const paymentMethod = sub.paymentMethod;
-  if (!paymentMethod || paymentMethod === PaymentMethod.FREE) {
+  if (
+    !paymentMethod
+    || paymentMethod === PaymentMethod.FREE
+    || paymentMethod === PaymentMethod.BANK_TRANSFER
+  ) {
     alert.show = true;
     alert.message = t('upgrade_plan.error.payment_method_unknown');
     return;
@@ -119,6 +123,12 @@ async function submitUpgrade() {
     [PaymentMethod.CARD]: '/checkout/pay/card',
     [PaymentMethod.PAYPAL]: '/checkout/pay/paypal',
   }[paymentMethod];
+
+  if (!routeName) {
+    alert.show = true;
+    alert.message = t('upgrade_plan.error.payment_method_unknown');
+    return;
+  }
 
   set(loading, true);
 
