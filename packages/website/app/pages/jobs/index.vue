@@ -92,9 +92,21 @@ definePageMeta({
         </div>
         <div
           v-else
-          class="text-rui-grey-800 text-justify mt-4 text-sm sm:text-base md:text-lg"
+          class="flex flex-col items-center text-center py-12"
         >
-          {{ t('jobs.no_open_roles') }}
+          <div class="bg-rui-grey-200 rounded-full p-4 mb-4">
+            <RuiIcon
+              name="lu-briefcase"
+              size="32"
+              class="text-rui-grey-500"
+            />
+          </div>
+          <h3 class="text-h6 font-medium mb-2">
+            {{ t('jobs.no_open_roles_title') }}
+          </h3>
+          <p class="text-rui-text-secondary max-w-md">
+            {{ t('jobs.no_open_roles') }}
+          </p>
         </div>
       </div>
     </div>

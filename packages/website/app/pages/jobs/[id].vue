@@ -47,23 +47,6 @@ definePageMeta({
     <template #title>
       {{ job.title }}
     </template>
-    <JobDetail
-      v-if="job.open"
-      :data="job"
-    />
-    <div
-      v-else
-      class="py-8 lg:py-20"
-    >
-      <div class="container flex flex-col lg:flex-row">
-        <div>
-          <div class="text-h5 font-medium mb-4">
-            {{ t("jobs.role_unavailable.title") }}
-          </div>
-
-          {{ t("jobs.role_unavailable.description", { title: job.title }) }}
-        </div>
-      </div>
-    </div>
+    <JobDetail :data="job" />
   </NuxtLayout>
 </template>
