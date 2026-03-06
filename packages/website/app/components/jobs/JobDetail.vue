@@ -44,18 +44,17 @@ const { t } = useI18n({ useScope: 'global' });
           :value="mainColumn"
         />
       </div>
-      <div
-        v-if="sideColumn"
-        class="mt-8 lg:mt-0 lg:pl-16 xl:pl-24"
-      >
-        <div class="bg-rui-primary/[.04] p-6 lg:w-[384px]">
+      <div class="mt-8 lg:mt-0 lg:pl-16 xl:pl-24">
+        <div
+          v-if="data.open && sideColumn"
+          class="bg-rui-primary/[.04] p-6 lg:w-[384px]"
+        >
           <div class="flex">
             <div class="bg-white rounded-lg p-3 text-rui-primary">
               <RuiIcon name="lu-lightbulb" />
             </div>
           </div>
           <ContentRenderer
-            v-if="sideColumn"
             :value="sideColumn"
           />
           <ButtonLink
@@ -66,6 +65,22 @@ const { t } = useI18n({ useScope: 'global' });
           >
             {{ t('actions.apply') }}
           </ButtonLink>
+        </div>
+        <div
+          v-if="!data.open"
+          class="bg-rui-warning/[.04] p-6 lg:w-[384px]"
+        >
+          <div class="flex">
+            <div class="bg-white rounded-lg p-3 text-rui-warning">
+              <RuiIcon name="lu-info" />
+            </div>
+          </div>
+          <div class="text-h6 font-medium mt-4 mb-2">
+            {{ t('jobs.role_unavailable.title') }}
+          </div>
+          <p class="text-rui-text-secondary text-sm">
+            {{ t('jobs.role_unavailable.description', { title: data.title }) }}
+          </p>
         </div>
       </div>
     </div>

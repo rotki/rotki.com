@@ -711,11 +711,12 @@
   "jobs": {
     "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
     "header": "We’re looking for talented people",
-    "no_open_roles": "There are no open roles.",
+    "no_open_roles_title": "No open positions",
+    "no_open_roles": "There are no open positions at the moment. Check back later for new opportunities.",
     "title": "Careers at rotki",
     "role_unavailable": {
-      "title": "Role unavailable",
-      "description": "Thank you for your interest in the {title} role. This position is no longer available and we are not looking for new candidates for this role."
+      "title": "Not currently hiring",
+      "description": "We're not actively hiring for the {title} role right now. Check back later for new opportunities."
     }
   },
   "logout": "Logout",
