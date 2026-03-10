@@ -4,6 +4,7 @@ import type { NftSubmission } from '~/types/sponsor';
 import { useVuelidate } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import ImageUploadPreview from '~/components/sponsor/ImageUploadPreview.vue';
 import { useNftMetadata } from '~/composables/rotki-sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-payment';
@@ -150,14 +151,7 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, { displayName, imageFile, tokenId, email, atLeastOne: true }, { $autoDirty: true });
 
-function handleImageChange(event: Event): void {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-
-  if (!file) {
-    return;
-  }
-
+function handleImageSelected(file: File): void {
   set(imageFile, file);
 
   // If we're replacing an existing image, we don't need to delete it
@@ -169,8 +163,6 @@ function handleImageChange(event: Event): void {
     set(imagePreview, reader.result as string);
   };
   reader.readAsDataURL(file);
-
-  // Image changed, will need to re-authenticate if needed
 }
 
 function removeImage(): void {
@@ -568,74 +560,14 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           <span class="text-rui-text-secondary">({{ t('sponsor.submit_name.optional') }})</span>
         </label>
 
-        <div
-          v-if="!imagePreview"
-          class="relative mt-3"
-        >
-          <input
-            id="image-upload"
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            class="hidden"
-            :disabled="shouldDisableFields"
-            @change="handleImageChange($event)"
-          />
-          <label
-            for="image-upload"
-            class="flex flex-col items-center justify-center w-full h-32 border border-dashed border-rui-grey-300 dark:border-rui-grey-600 rounded-lg cursor-pointer hover:border-rui-primary transition-colors"
-          >
-            <RuiIcon
-              name="lu-upload"
-              size="24"
-              class="mb-2 text-rui-text-secondary"
-            />
-            <span class="text-sm text-rui-text-secondary">{{ t('sponsor.submit_name.upload_image') }}</span>
-            <span class="text-xs text-rui-text-disabled mt-1">{{ t('sponsor.submit_name.image_requirements') }}</span>
-          </label>
-        </div>
-        <div
-          v-else
-          class="relative flex items-start"
-        >
-          <NuxtImg
-            :src="imagePreview"
-            alt="Profile preview"
-            class="w-32 h-32 object-cover rounded-lg mt-3"
-            width="128"
-            height="128"
-          />
-          <RuiButton
-            icon
-            size="sm"
-            color="error"
-            class="-ml-3"
-            :disabled="shouldDisableFields"
-            @click="removeImage()"
-          >
-            <RuiIcon
-              name="lu-x"
-              size="16"
-            />
-          </RuiButton>
-        </div>
-
-        <div
-          v-if="toMessages(v$.imageFile).length > 0"
-          class="pt-1 px-3 text-rui-error text-sm text-caption"
-        >
-          <p
-            v-for="errorMsg in toMessages(v$.imageFile)"
-            :key="errorMsg"
-          >
-            {{ errorMsg }}
-          </p>
-        </div>
-        <div
-          v-else
-          class="pt-1 px-3 text-rui-text-secondary text-sm text-caption"
-        >
-          {{ nftTier === 'silver' ? t('sponsor.submit_name.image_hint_silver') : t('sponsor.submit_name.image_hint_gold') }}
-        </div>
+        <ImageUploadPreview
+          :image-preview="imagePreview"
+          :disabled="shouldDisableFields"
+          :error-messages="toMessages(v$.imageFile)"
+          :hint="nftTier === 'silver' ? t('sponsor.submit_name.image_hint_silver') : t('sponsor.submit_name.image_hint_gold')"
+          @file-selected="handleImageSelected($event)"
+          @remove="removeImage()"
+        />
       </div>
 
       <RuiTextField

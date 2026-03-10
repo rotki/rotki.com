@@ -24,7 +24,8 @@ const currentReleaseName = computed(() => get(sponsorshipData)?.releaseName);
     <div class="flex items-start justify-between">
       <div class="flex-1">
         <NftSubmissionItemChips :submission="submission" />
-        <NuxtImg
+        <!-- Plain <img> instead of <NuxtImg> because the src is a backend API URL that the image provider cannot process -->
+        <img
           v-if="submission.imageUrl"
           :src="submission.imageUrl"
           alt="Submission image"
