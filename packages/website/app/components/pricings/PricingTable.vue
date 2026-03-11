@@ -19,7 +19,7 @@ const { t } = useI18n({ useScope: 'global' });
   <div
     class="grid relative"
     :style="{
-      gridTemplateColumns: `minmax(195px, 250px) repeat(${plans.length}, minmax(195px, 1fr))`,
+      gridTemplateColumns: `minmax(170px, 230px) repeat(${plans.length}, minmax(160px, 1fr))`,
     }"
   >
     <div />
@@ -48,8 +48,8 @@ const { t } = useI18n({ useScope: 'global' });
             {{ plan.displayedName }}
           </div>
           <template v-if="!isCustomPlan(plan)">
-            <div class="flex flex-wrap items-end gap-x-1">
-              <div class="text-h5 xl:text-h4 font-bold">
+            <div class="flex items-end gap-x-1">
+              <div class="text-h5 xl:text-h4 font-bold whitespace-nowrap">
                 {{ plan.mainPriceDisplay }}
               </div>
               <div
