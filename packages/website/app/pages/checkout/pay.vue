@@ -63,6 +63,8 @@ const step = computed<number>(() => {
   return index + 1;
 });
 
+const isFirstStep = computed<boolean>(() => get(step) === 1);
+
 const { removeStoredRedirectUrl } = useRedirectUrl();
 
 onBeforeMount(() => {
@@ -72,7 +74,7 @@ onBeforeMount(() => {
 
 <template>
   <div class="container flex flex-col lg:flex-row h-full grow py-4 lg:py-8 gap-6 lg:gap-8">
-    <div class="flex grow overflow-hidden min-w-0">
+    <div class="flex grow overflow-x-auto min-w-0">
       <form
         class="flex flex-col justify-between w-full"
         @submit.prevent
@@ -89,7 +91,10 @@ onBeforeMount(() => {
       </form>
     </div>
 
-    <div class="hidden lg:block w-56 shrink-0 sticky top-8 self-start">
+    <div
+      v-if="!isFirstStep"
+      class="hidden lg:block w-48 shrink-0 sticky top-8 self-start"
+    >
       <RuiStepper
         :step="step"
         :steps="steps"
