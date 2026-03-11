@@ -7,7 +7,5 @@ if (import.meta.dev) {
 }
 
 export function useLogger(tag?: string, options: Partial<ConsolaOptions> = {}): typeof logger {
-  const instanceId = import.meta.server ? (process.env.pm_id ?? process.env.NODE_APP_INSTANCE) : undefined;
-  const fullTag = instanceId && tag ? `${instanceId}:${tag}` : tag;
-  return fullTag ? logger.create(options).withTag(fullTag) : logger;
+  return tag ? logger.create(options).withTag(tag) : logger;
 }

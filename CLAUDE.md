@@ -458,11 +458,18 @@ PROXY_INSECURE=true     # for http proxy in development
 
 ## Testing Strategy
 
-### Unit Tests (Vitest)
+### Frontend Unit Tests (Vitest)
 
 - Test utilities and composables
 - Component testing with Vue Test Utils
 - API mocking with MSW
+
+### Go Backend Tests
+
+- Standard `go test` with `httptest` for HTTP handlers
+- Table-driven tests for validation and configuration
+- Mock servers for external API testing (OAuth, GitHub)
+- Run with `cd backend && make test` or `make test-race`
 
 ### E2E Tests (Cypress)
 
@@ -506,20 +513,50 @@ PROXY_INSECURE=true     # for http proxy in development
 - Namespace translations by feature
 - Include translation keys in component props for reusability
 
+## Go Backend
+
+The `backend/` directory contains a Go server that replaces the Node.js SSR layer. See `backend/README.md` for full documentation.
+
+### Architecture
+
+- Serves Nuxt-generated static files (`nuxt generate`) with SPA fallback
+- Handles API routes: OAuth token exchange, CSP reports, releases, ENS avatars, NFT sponsorship
+- Reverse-proxies `/webapi` and `/media` to the Python backend
+- Background scheduler for cache warming (NFT images, releases)
+- No Node.js runtime in production — single Go binary + static files
+
+### Go Development
+
+```bash
+cd backend
+make check       # vet + lint + test
+make build       # Build production binary
+make run         # Development server
+make coverage    # Test coverage report
+```
+
+### Key Go Patterns
+
+- Go 1.26, minimal dependencies (stdlib `net/http`, go-redis)
+- L1 (memory) + L2 (Redis) caching with graceful fallback
+- Filesystem-based image cache with zero-copy serving via `http.ServeContent`
+- Input validation via `internal/validate` package
+- golangci-lint v2 with 23 linters, 0 issues required
+
 ## Deployment
 
 ### Build Process
 
-- **SSR (Server-Side Rendering)** with `pnpm build` for production
-- **Universal rendering** for optimal SEO and performance
+- **Static Site Generation** with `pnpm generate` for the frontend
+- Go backend binary serves static files and API routes
 - Proper asset optimization and code splitting
-- Environment-specific configuration handling
+- Environment-specific configuration via env vars
 
 ### Docker Support
 
-- Dockerfile included for containerized deployment
-- PM2 ecosystem configuration for process management
-- SSR-enabled Node.js server for production
+- Alpine-based container with Go binary + static files
+- No Node.js runtime required in production
+- Single process — no PM2 or process manager needed
 
 ## Common Development Tasks
 

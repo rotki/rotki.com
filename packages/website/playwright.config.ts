@@ -2,6 +2,7 @@ import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 
 const port = process.env.PORT || '48123';
+const nuxtPort = '3001'; // hardcoded in package.json dev script
 const mockApiPort = '9999';
 const baseURL = process.env.BASE_URL || `http://localhost:${port}`;
 
@@ -14,7 +15,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 4,
   timeout: 60000,
   expect: {
     timeout: 10000,
@@ -44,7 +45,7 @@ export default defineConfig({
     },
   ],
   webServer: [
-    // Mock API server - starts first
+    // Mock API server — starts first
     {
       command: 'pnpm --filter e2e-mock-api dev',
       env: {
@@ -54,21 +55,32 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 60000,
     },
-    // Main Nuxt app - uses mock API server as backend
+    // Nuxt dev server — frontend only (port hardcoded in package.json dev script)
     {
       command: 'pnpm dev',
       env: {
-        NUXT_PORT: port,
-        PORT: port,
         TEST: 'true',
         NUXT_PUBLIC_BASE_URL: `http://localhost:${port}`,
-        // Configure devProxy to use mock server (http, not https)
-        PROXY_DOMAIN: `localhost:${mockApiPort}`,
-        PROXY_INSECURE: 'true',
       },
-      url: baseURL,
+      url: `http://localhost:${nuxtPort}`,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
+    },
+    // Go backend — proxies pages to Nuxt, /webapi to mock API
+    {
+      command: 'make -C ../../backend run',
+      env: {
+        DEV_MODE: 'true',
+        PORT: port,
+        NUXT_DEV_URL: `http://localhost:${nuxtPort}`,
+        PROXY_DOMAIN: `localhost:${mockApiPort}`,
+        PROXY_INSECURE: 'true',
+        BASE_URL: `http://localhost:${port}`,
+        LOG_LEVEL: 'warn',
+      },
+      url: `http://localhost:${port}/health`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 30000,
     },
   ],
 });
