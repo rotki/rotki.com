@@ -64,8 +64,8 @@ watch(() => ensName, () => {
       class="w-full h-full"
     />
 
-    <!-- ENS Avatar image -->
-    <NuxtImg
+    <!-- ENS Avatar image (plain img — already proxied/cached by Go backend) -->
+    <img
       v-else-if="avatarUrl && !hasError && ensName"
       :src="avatarUrl"
       :alt="`${ensName} avatar`"

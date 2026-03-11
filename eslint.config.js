@@ -56,6 +56,11 @@ export default rotki({
     '@rotki/consistent-ref-type-annotation': 'off',
   },
 }, {
+  files: ['**/*.yml', '**/*.yaml'],
+  rules: {
+    '@stylistic/spaced-comment': 'off',
+  },
+}, {
   ignores: [
     '**/dist/**',
     '**/node_modules/**',

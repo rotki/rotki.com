@@ -2,7 +2,7 @@ import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { isCancelledButActive, isSubActive, isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { type Subscription as UserSubscription, type UserSubscriptions, UserSubscriptionsSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { get, set } from '@vueuse/shared';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useAuthHintCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
 interface UseUserSubscriptionsReturn {
@@ -21,6 +21,7 @@ interface UseUserSubscriptionsReturn {
 export function useUserSubscriptions(): UseUserSubscriptionsReturn {
   const logger = useLogger('subscriptions');
   const { fetchWithCsrf } = useFetchWithCsrf();
+  const authHint = useAuthHintCookie();
 
   const initialLoading = ref<boolean>(true);
 
@@ -32,6 +33,10 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
   } = useAsyncData<UserSubscription[]>(
     'user-subscriptions',
     async () => {
+      if (!get(authHint)) {
+        return [];
+      }
+
       try {
         const response = await fetchWithCsrf<ApiResponse<UserSubscriptions>>(
           '/webapi/2/history/subscriptions',

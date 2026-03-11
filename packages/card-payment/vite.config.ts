@@ -1,3 +1,4 @@
+/// <reference types="vite-ssg" />
 import process from 'node:process';
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
@@ -61,7 +62,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: 3001,
+    port: 3002,
     proxy: {
       '/webapi': {
         changeOrigin: true,
@@ -71,7 +72,7 @@ export default defineConfig({
     },
   },
   ssgOptions: {
-    crittersOptions: {
+    beastiesOptions: {
       reduceInlineStyles: false,
     },
     formatting: 'minify',

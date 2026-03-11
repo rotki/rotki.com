@@ -120,8 +120,8 @@ export function useSponsorshipData() {
       tierSupply: get(ssr.tierSupply),
     };
   }, {
-    // Only watch on client side to avoid multiple SSR calls
-    watch: import.meta.client ? [() => route.path] : [],
+    server: false, // /api/nft/* routes are on the Go server, not available during SSR/SSG
+    watch: [() => route.path],
     dedupe: 'defer',
   });
 
