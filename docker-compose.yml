@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        GIT_SHA: ${GIT_SHA:-dev}
+        VERSION: ${VERSION:-dev}
+        BUILD_DATE: ${BUILD_DATE:-}
+        # Nuxt public config (baked into static output)
+        NUXT_PUBLIC_BASE_URL: ${NUXT_PUBLIC_BASE_URL:-}
+        NUXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NUXT_PUBLIC_RECAPTCHA_SITE_KEY:-}
+        NUXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: ${NUXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:-}
+        NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${NUXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        NUXT_PUBLIC_MONERIUM_AUTH_BASE_URL: ${NUXT_PUBLIC_MONERIUM_AUTH_BASE_URL:-}
+        NUXT_PUBLIC_MONERIUM_AUTHORIZATION_CODE_FLOW_CLIENT_ID: ${NUXT_PUBLIC_MONERIUM_AUTHORIZATION_CODE_FLOW_CLIENT_ID:-}
+        NUXT_PUBLIC_SPONSORSHIP_ENABLED: ${NUXT_PUBLIC_SPONSORSHIP_ENABLED:-}
+    ports:
+      - '4000:3000'
+    env_file:
+      - ./packages/website/.env
+      - ./backend/.env
+    environment:
+      - STATIC_DIR=/dist

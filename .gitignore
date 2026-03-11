@@ -104,10 +104,15 @@ playwright-repor
 
 .data/content
 
+backend/image-cache/
+backend/coverage.out
+backend/server
+
 planning/
 
 # Claude AI assistant cache
 .claude/
 
 .tmp/
+
 
