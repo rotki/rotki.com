@@ -11,12 +11,9 @@ import ServerErrorOverlay from '~/modules/checkout/components/common/ServerError
 import { useThreeDSecure } from '~/modules/checkout/composables/use-three-d-secure';
 
 definePageMeta({
-  middleware: [
-    'maintenance',
-    'authentication',
-    'unverified',
-    'subscriber-or-upgrade',
-  ],
+  auth: true,
+  requiresSubscriber: true,
+  requiresVerified: true,
 });
 
 const { t } = useI18n({ useScope: 'global' });

@@ -3,7 +3,7 @@ import LoginPage from '~/components/account/login/LoginPage.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: ['maintenance', 'authenticated'],
+  guestOnly: true,
 });
 
 usePageSeoNoIndex('login');

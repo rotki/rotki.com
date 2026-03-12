@@ -3,7 +3,7 @@ import PasswordReset from '~/components/account/password/PasswordReset.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: 'maintenance',
+  backendRequired: true,
 });
 
 usePageSeoNoIndex('password reset');

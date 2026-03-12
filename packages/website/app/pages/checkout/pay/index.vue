@@ -45,8 +45,8 @@ useHead({
 });
 
 definePageMeta({
+  backendRequired: true,
   landing: true,
-  middleware: ['maintenance'],
 });
 
 const { t } = useI18n({ useScope: 'global' });

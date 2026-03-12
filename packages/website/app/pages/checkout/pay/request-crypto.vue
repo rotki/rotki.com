@@ -4,14 +4,10 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import CryptoRequest from '~/modules/checkout/components/crypto/CryptoRequest.vue';
 
 definePageMeta({
-  middleware: [
-    'maintenance',
-    'authentication',
-    'unverified',
-    'subscriber-or-upgrade',
-    'pending-payment',
-    'valid-plan-id',
-  ],
+  auth: true,
+  middleware: ['pending-payment', 'valid-plan-id'],
+  requiresSubscriber: true,
+  requiresVerified: true,
 });
 
 usePageSeoNoIndex('pay with crypto');

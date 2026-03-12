@@ -3,7 +3,7 @@ import PasswordLinkSend from '~/components/account/password/PasswordLinkSend.vue
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: 'maintenance',
+  backendRequired: true,
 });
 
 usePageSeoNoIndex('recovery e-mail send');

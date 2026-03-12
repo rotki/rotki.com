@@ -3,7 +3,7 @@ import SignupForm from '~/components/account/signup/SignupForm.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: 'maintenance',
+  backendRequired: true,
 });
 
 usePageSeoNoIndex('signup');

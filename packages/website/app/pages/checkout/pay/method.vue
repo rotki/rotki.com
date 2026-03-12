@@ -7,13 +7,10 @@ import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
 
 definePageMeta({
-  middleware: [
-    'maintenance',
-    'unverified',
-    'pending-payment',
-    'subscriber',
-    'valid-plan-id',
-  ],
+  auth: true,
+  middleware: ['pending-payment', 'valid-plan-id'],
+  requiresSubscriber: true,
+  requiresVerified: true,
 });
 
 usePageSeoNoIndex('select payment method');

@@ -3,7 +3,7 @@ import PasswordForm from '~/components/account/password/PasswordForm.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: 'maintenance',
+  backendRequired: true,
 });
 
 usePageSeoNoIndex('password recovery');

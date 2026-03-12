@@ -11,6 +11,7 @@ vi.mock('~/composables/use-fetch-with-csrf', () => ({
     fetchWithCsrf: mockFetchWithCsrf,
     setHooks: vi.fn(),
   }),
+  useAuthHintCookie: () => ({ value: undefined }),
   useSessionIdCookie: () => ({ value: undefined }),
 }));
 

@@ -4,13 +4,10 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import PaypalPayment from '~/modules/checkout/components/paypal/PaypalPayment.vue';
 
 definePageMeta({
-  middleware: [
-    'maintenance',
-    'authentication',
-    'unverified',
-    'subscriber-or-upgrade',
-    'valid-plan-id',
-  ],
+  auth: true,
+  middleware: ['valid-plan-id'],
+  requiresSubscriber: true,
+  requiresVerified: true,
 });
 
 usePageSeoNoIndex('pay with paypal');

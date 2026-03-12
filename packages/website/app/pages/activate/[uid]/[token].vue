@@ -3,7 +3,7 @@ import AccountActivate from '~/components/account/activation/AccountActivate.vue
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: 'maintenance',
+  backendRequired: true,
 });
 
 usePageSeoNoIndex('activate account');

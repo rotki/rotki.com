@@ -5,8 +5,8 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 usePageSeoNoIndex('Devices');
 
 definePageMeta({
+  auth: true,
   layout: 'account',
-  middleware: ['maintenance', 'authentication'],
 });
 </script>
 

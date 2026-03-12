@@ -1,6 +1,6 @@
 import { get } from '@vueuse/core';
 import { useUtmTracking } from '~/composables/chronicling/use-utm-tracking';
-import { useSessionIdCookie } from '~/composables/use-fetch-with-csrf';
+import { useAuthHintCookie } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 
@@ -16,11 +16,11 @@ export default defineNuxtPlugin(async () => {
     captureUtmParams();
   }
 
-  const sessionId = useSessionIdCookie();
-  const session = get(sessionId);
+  const authHint = useAuthHintCookie();
+  const hint = get(authHint);
 
-  if (session) {
-    logger.debug(`fetching account for session id: ${session}`);
+  if (hint) {
+    logger.debug('auth hint found, fetching account');
     const { getAccount } = useMainStore();
     return getAccount();
   }

@@ -3,7 +3,7 @@ import PasswordChanged from '~/components/account/password/PasswordChanged.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
-  middleware: 'maintenance',
+  backendRequired: true,
 });
 
 usePageSeoNoIndex('password changed');
