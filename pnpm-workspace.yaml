@@ -9,7 +9,7 @@ catalog:
   '@types/braintree-web': 3.96.17
   '@types/node': 24.12.0
   '@tsconfig/node24': 24.0.4
-  '@unhead/vue': 2.1.10
+  '@unhead/vue': 2.1.12
   '@vitejs/plugin-vue': 6.0.4
   '@vue/tsconfig': 0.7.0
   '@vueuse/core': 14.2.1
@@ -17,12 +17,12 @@ catalog:
   '@vueuse/nuxt': 14.2.1
   '@vueuse/shared': 14.2.1
   autoprefixer: 10.4.27
-  braintree-web: 3.137.0
+  braintree-web: 3.138.0
   postcss: 8.5.8
   tailwindcss: 3.4.19
   typescript: 5.9.3
   vite: 7.3.1
   vite-ssg: 28.3.0
-  vue: 3.5.29
+  vue: 3.5.30
   vue-tsc: 3.2.5
   zod: 3.25.76

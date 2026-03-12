@@ -73,7 +73,7 @@
   "devDependencies": {
     "@tsconfig/node24": "catalog:",
     "@types/node": "catalog:",
-    "tsdown": "0.20.3",
+    "tsdown": "0.21.2",
     "typescript": "catalog:",
     "vitest": "4.0.18"
   }
