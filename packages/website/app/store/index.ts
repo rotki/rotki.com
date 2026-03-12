@@ -7,7 +7,7 @@ import { useAccountApi } from '~/composables/account/use-account-api';
 import { useAuthApi } from '~/composables/account/use-auth-api';
 import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
 import { isUnauthorizedError } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
@@ -21,6 +21,7 @@ export const useMainStore = defineStore('main', () => {
 
   const logger = useLogger('store');
   const { setHooks } = useFetchWithCsrf();
+  const emailConfirmedCookie = useEmailConfirmedCookie();
   const { pendingSubscriptionId, setPendingSubscriptionId, clearPendingSubscriptionId } = usePendingSubscriptionId();
 
   // API composables
@@ -78,6 +79,7 @@ export const useMainStore = defineStore('main', () => {
     if (accountData) {
       set(authenticated, true);
       set(account, accountData);
+      set(emailConfirmedCookie, accountData.emailConfirmed);
       // Update canBuy after account is set
       await updateCanBuy();
     }
@@ -120,6 +122,7 @@ export const useMainStore = defineStore('main', () => {
     }
     set(authenticated, false);
     set(account, null);
+    set(emailConfirmedCookie, undefined);
     set(canBuy, true); // Reset to default
     clearPendingSubscriptionId();
   }

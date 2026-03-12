@@ -5,6 +5,8 @@ import { useLogger } from '~/utils/use-logger';
 
 export const useSessionIdCookie = () => useCookie('sessionid');
 
+export const useEmailConfirmedCookie = () => useCookie<boolean>('email_confirmed');
+
 export const useFetchWithCsrf = createSharedComposable(() => {
   const CSRF_HEADER = 'X-CSRFToken';
   const CSRF_COOKIE = 'csrftoken';

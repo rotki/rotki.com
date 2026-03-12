@@ -8,6 +8,7 @@ import AccountPaymentCard from '~/components/account/home/payment-methods/Paymen
 import PaymentCardSkeleton from '~/components/account/home/payment-methods/PaymentCardSkeleton.vue';
 import ThreeDSecureModal, { type ThreeDSecureVerificationData } from '~/components/account/home/payment-methods/ThreeDSecureModal.vue';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
+import { useEmailConfirmedCookie } from '~/composables/use-fetch-with-csrf';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
@@ -38,6 +39,7 @@ const verificationData = ref<ThreeDSecureVerificationData>();
 const error = ref<{ title: string; message: string }>();
 
 const { account } = storeToRefs(useMainStore());
+const emailConfirmed = useEmailConfirmedCookie();
 
 const { cards, loading: cardsLoading, refresh: refreshCards } = usePaymentCards();
 const { activeSubscription, loading: subscriptionsLoading, refresh: refreshSubscriptions } = useUserSubscriptions();
@@ -175,6 +177,7 @@ function getCardTooltip(card: SavedCard): string | undefined {
       <div>
         <RuiButton
           color="primary"
+          :disabled="!emailConfirmed"
           @click="showAddCardDialog = true"
         >
           <template #prepend>
@@ -185,7 +188,7 @@ function getCardTooltip(card: SavedCard): string | undefined {
       </div>
     </div>
 
-    <div v-if="loading && !hasCards">
+    <div v-if="cardsLoading && !hasCards">
       <div class="flex flex-col gap-2 mb-6">
         <PaymentCardSkeleton />
       </div>
@@ -227,7 +230,7 @@ function getCardTooltip(card: SavedCard): string | undefined {
           :key="card.token"
           :card="card"
           :loading="isCardLoading(card)"
-          :disabled="!!cardOperation || deletingCard || hasActiveCryptoSubscription"
+          :disabled="!emailConfirmed || !!cardOperation || deletingCard || hasActiveCryptoSubscription"
           :deleting="isCardDeleting(card)"
           :delete-disabled="card.linked"
           :delete-tooltip="getCardTooltip(card)"

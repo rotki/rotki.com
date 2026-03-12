@@ -9,7 +9,8 @@ import {
   SavedCardResponseSchema,
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { get } from '@vueuse/shared';
+import { useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
 interface UsePaymentCardsReturn {
@@ -25,10 +26,15 @@ interface UsePaymentCardsReturn {
 export function usePaymentCards(): UsePaymentCardsReturn {
   const logger = useLogger('card-payment');
   const { fetchWithCsrf } = useFetchWithCsrf();
+  const emailConfirmed = useEmailConfirmedCookie();
 
   const { data, pending, refresh } = useAsyncData<SavedCard[]>(
     'payment-cards',
     async () => {
+      if (!get(emailConfirmed)) {
+        return [];
+      }
+
       try {
         const response = await fetchWithCsrf<SavedCardResponse>(
           '/webapi/payment/btr/cards/',
