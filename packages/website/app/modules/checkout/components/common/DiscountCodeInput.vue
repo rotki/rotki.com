@@ -65,12 +65,22 @@ function reset(): void {
       variant="outlined"
       :label="t('home.plans.tiers.step_3.discount.label')"
       :error-messages="errorMessage"
-      :hint="t('home.plans.tiers.step_3.discount.hint')"
+      :hint="errorMessage ? undefined : t('home.plans.tiers.step_3.discount.hint')"
       :disabled="disabled"
       prepend-icon="lu-tag"
     >
       <template #append>
         <RuiButton
+          v-if="errorMessage"
+          icon
+          variant="text"
+          type="button"
+          @click="reset()"
+        >
+          <RuiIcon name="lu-x" />
+        </RuiButton>
+        <RuiButton
+          v-else
           type="submit"
           color="primary"
           :disabled="!value || disabled"

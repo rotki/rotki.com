@@ -31,7 +31,7 @@ const {
   discountCodeInput,
   planSwitchLoading,
   braintreeToken,
-  appliedDiscountCode,
+  validDiscountCode,
   applyDiscount,
   ensureInitialized,
   switchPlan: checkoutSwitchPlan,
@@ -103,7 +103,7 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
   try {
     const result = await submitPayment(nonce, {
       planId: plan.planId,
-      discountCode: get(appliedDiscountCode) || undefined,
+      discountCode: get(validDiscountCode),
       upgradeSubId: get(upgradeSubId),
     });
 

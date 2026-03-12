@@ -1,5 +1,6 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
+import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
@@ -92,6 +93,11 @@ export function useCheckout() {
   // Breakdown data (persists across navigations via useState)
   // ===================
   const breakdown = useState<PaymentBreakdownResponse | undefined>('checkout-breakdown');
+
+  // Validated discount code - only returns the code if the breakdown confirms it's valid
+  const validDiscountCode = computed<string | undefined>(() =>
+    getValidDiscountCode(get(breakdown)?.discount, get(appliedDiscountCode) || undefined),
+  );
   const breakdownLoading = ref<boolean>(false);
   const breakdownFetched = ref<boolean>(false);
 
@@ -106,10 +112,11 @@ export function useCheckout() {
 
     set(breakdownLoading, true);
     try {
+      const code = get(appliedDiscountCode) || undefined;
       const response = await fetchPaymentBreakdown({
         newPlanId: id,
         isCryptoPayment: get(isCrypto),
-        discountCode: get(appliedDiscountCode) || undefined,
+        discountCode: code,
       });
       set(breakdown, response);
       set(breakdownFetched, true);
@@ -313,6 +320,7 @@ export function useCheckout() {
     // Discount
     discountCodeInput,
     appliedDiscountCode,
+    validDiscountCode,
     applyDiscount,
 
     // UI State

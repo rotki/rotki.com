@@ -20,7 +20,7 @@ const {
   subscriptionId,
   currency,
   discountCodeInput,
-  appliedDiscountCode,
+  validDiscountCode,
   planSwitchLoading,
   planId,
   clearError,
@@ -63,7 +63,7 @@ async function initialize(): Promise<boolean> {
   const result = await createPayment({
     planId: plan.planId,
     currency: currencyValue,
-    discountCode: get(appliedDiscountCode) || undefined,
+    discountCode: get(validDiscountCode),
     subscriptionId: get(subscriptionId),
     upgradeSubId: get(upgradeSubId),
   });
@@ -99,7 +99,7 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
   const result = await flowSwitchPlan({
     planId: newPlan.planId,
     currency: currencyValue,
-    discountCode: get(appliedDiscountCode) || undefined,
+    discountCode: get(validDiscountCode),
     subscriptionId: get(subscriptionId),
     upgradeSubId: get(upgradeSubId),
   });
@@ -134,7 +134,7 @@ async function handleCancelAndGoBack(): Promise<void> {
       query: {
         planId: get(planId),
         id: get(subscriptionId),
-        discountCode: get(appliedDiscountCode) || undefined,
+        discountCode: get(validDiscountCode),
       },
     });
   }

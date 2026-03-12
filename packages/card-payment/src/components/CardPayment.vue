@@ -3,6 +3,7 @@ import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
+import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
@@ -227,7 +228,7 @@ async function processPayment(): Promise<void> {
       renewingPrice: get(renewingPrice).toString(),
       nonce: paymentNonce,
       bin: paymentBin,
-      discountCode: get(discountCode) || undefined,
+      discountCode: getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined),
       upgradeSubId: get(upgradeSubId) || undefined,
       durationInMonths: plan.durationInMonths,
       planName: plan.name,
@@ -257,6 +258,13 @@ function handleCardAdded(token: string): void {
 function handleSelectCard(card: SavedCard): void {
   set(selectedCard, card);
 }
+
+// Clear discount code only when a previously valid discount becomes invalid (e.g., plan switch)
+watch(breakdown, (newBreakdown, oldBreakdown) => {
+  if (get(discountCode) && oldBreakdown?.discount?.isValid && !getValidDiscountCode(newBreakdown?.discount, get(discountCode))) {
+    set(discountCode, '');
+  }
+});
 
 // Watch for cards changes to select newly added card
 watch(() => cards, (newCards) => {

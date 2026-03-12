@@ -129,7 +129,32 @@ watch(value, (newValue) => {
             </legend>
           </fieldset>
         </div>
+        <!-- Clear button (shown when discount code is invalid) -->
         <button
+          v-if="hasError"
+          type="button"
+          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all z-10"
+          aria-label="Clear discount code"
+          @click="reset()"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        <!-- Apply button -->
+        <button
+          v-else
           type="submit"
           :disabled="!value || loading"
           class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-sm font-medium rounded transition-colors z-10"
