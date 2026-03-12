@@ -41,7 +41,7 @@
     "qrcode": "1.5.4",
     "swiper": "12.1.2",
     "vue": "catalog:",
-    "vue-router": "4.6.4",
+    "vue-router": "5.0.3",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -62,7 +62,7 @@
     "autoprefixer": "catalog:",
     "happy-dom": "20.8.3",
     "msw": "2.12.10",
-    "nuxt": "4.3.1",
+    "nuxt": "4.4.2",
     "nuxt-security": "2.5.1",
     "postcss": "catalog:",
     "postcss-html": "1.8.1",
