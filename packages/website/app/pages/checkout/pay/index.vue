@@ -23,7 +23,7 @@ const ROUTES = {
 
 const { public: { baseUrl } } = useRuntimeConfig();
 
-usePageSeo('rotki pricing', 'Pricing page for rotki subscription', '/checkout/pay');
+usePageSeo('Pricing', 'Pricing page for rotki subscription', '/checkout/pay');
 
 useHead({
   script: [{

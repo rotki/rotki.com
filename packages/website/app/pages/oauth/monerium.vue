@@ -7,10 +7,13 @@ import { get, set } from '@vueuse/shared';
 import OAuthPage from '~/components/oauth/OAuthPage.vue';
 import { useOAuth } from '~/composables/account/use-oauth';
 import { usePkce } from '~/composables/account/use-pkce';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { removeTrailingSlash } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
 const { t } = useI18n({ useScope: 'global' });
+
+usePageSeoNoIndex(t('oauth_monerium.title'));
 
 const {
   loading,
@@ -27,10 +30,6 @@ const {
   handleDockerModeCompletion,
   isValidMode,
 } = useOAuth('monerium');
-
-useHead({
-  title: t('oauth_monerium.title'),
-});
 
 const {
   public: {

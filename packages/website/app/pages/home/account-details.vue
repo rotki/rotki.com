@@ -2,6 +2,9 @@
 import AccountDetails from '~/components/account/home/AccountDetails.vue';
 import ChangePassword from '~/components/account/home/ChangePassword.vue';
 import DangerZone from '~/components/account/home/DangerZone.vue';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
+
+usePageSeoNoIndex('Account Details');
 
 definePageMeta({
   layout: 'account',

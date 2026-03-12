@@ -9,9 +9,12 @@ import PaymentCardSkeleton from '~/components/account/home/payment-methods/Payme
 import ThreeDSecureModal, { type ThreeDSecureVerificationData } from '~/components/account/home/payment-methods/ThreeDSecureModal.vue';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useEmailConfirmedCookie } from '~/composables/use-fetch-with-csrf';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
+
+usePageSeoNoIndex('Saved Cards');
 
 interface CardOperation {
   mode: 'default' | 'reauthorize';

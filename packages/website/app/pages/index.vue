@@ -15,6 +15,7 @@ const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`;
 
 usePageSeo('rotki', description, '', { keywords });
+useHead({ titleTemplate: '' });
 
 const { fetchMessages, activeDashboardMessages } = useDynamicMessages();
 

@@ -15,8 +15,11 @@ import UnverifiedEmailWarning from '~/components/account/home/UnverifiedEmailWar
 import { useUserPayments } from '~/composables/account/use-user-payments';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useMainStore } from '~/store';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
+
+usePageSeoNoIndex('Subscription');
 
 definePageMeta({
   layout: 'account',

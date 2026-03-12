@@ -3,9 +3,12 @@ import type { OAuthTokenResponse } from '~/types/oauth';
 import { get, set } from '@vueuse/shared';
 import OAuthPage from '~/components/oauth/OAuthPage.vue';
 import { useOAuth } from '~/composables/account/use-oauth';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useLogger } from '~/utils/use-logger';
 
 const { t } = useI18n({ useScope: 'global' });
+
+usePageSeoNoIndex(t('oauth.title'));
 
 const {
   loading,
@@ -21,11 +24,6 @@ const {
   handleDockerModeCompletion,
   isValidMode,
 } = useOAuth('google');
-
-// Set page metadata
-useHead({
-  title: t('oauth.title'),
-});
 
 const {
   public: {

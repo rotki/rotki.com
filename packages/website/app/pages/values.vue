@@ -5,7 +5,7 @@ import ValueHeading from '~/components/values/ValueHeading.vue';
 import ValueVision from '~/components/values/ValueVision.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 
-usePageSeo('rotki', 'Values of rotki', '/values');
+usePageSeo('Our Values', 'Values of rotki', '/values');
 
 definePageMeta({
   landing: true,

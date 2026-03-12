@@ -9,7 +9,7 @@ import ProductsTimeframe from '~/components/products/ProductsTimeframe.vue';
 import ProductsUnlockNudge from '~/components/products/ProductsUnlockNudge.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 
-usePageSeo('premium subscription', 'Features included with a premium rotki subscription', '/products/');
+usePageSeo('Premium Subscription', 'Features included with a premium rotki subscription', '/products/');
 
 definePageMeta({
   landing: true,

@@ -8,7 +8,7 @@ import DownloadUpgradeNudge from '~/components/download/DownloadUpgradeNudge.vue
 import { useAppDownload } from '~/composables/use-app-download';
 import { usePageSeo } from '~/composables/use-page-seo';
 
-usePageSeo('rotki', 'Download rotki', '/download');
+usePageSeo('Download', 'Download rotki', '/download');
 
 const {
   version,
