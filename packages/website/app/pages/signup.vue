@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import SignupForm from '~/components/account/signup/SignupForm.vue';
-import { commonAttrs } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   middleware: 'maintenance',
 });
 
-useHead({
-  title: 'signup',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'Create a new rotki premium account',
-    },
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('signup');
 </script>
 
 <template>

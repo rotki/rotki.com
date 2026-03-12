@@ -3,13 +3,9 @@ import ValueBody from '~/components/values/ValueBody.vue';
 import ValueContact from '~/components/values/ValueContact.vue';
 import ValueHeading from '~/components/values/ValueHeading.vue';
 import ValueVision from '~/components/values/ValueVision.vue';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { usePageSeo } from '~/composables/use-page-seo';
 
-useHead({
-  title: 'values',
-  meta: getMetadata('rotki', 'Values of rotki', '/values'),
-  ...commonAttrs(),
-});
+usePageSeo('rotki', 'Values of rotki', '/values');
 
 definePageMeta({
   layout: 'landing',

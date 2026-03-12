@@ -5,8 +5,8 @@ import { z } from 'zod';
 import AddressAvatar from '~/components/common/AddressAvatar.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { usePageSeo } from '~/composables/use-page-seo';
 import { formatDate } from '~/utils/date';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { getTierMedal } from '~/utils/nft-tiers';
 import { truncateAddress } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
@@ -54,15 +54,7 @@ const LeaderboardMetadata = z.object({
 
 type LeaderboardMetadata = z.infer<typeof LeaderboardMetadata>;
 
-const description = 'rotki\'s sponsor leaderboard';
-
-useHead({
-  title: 'Leaderboard | rotki',
-  meta: [
-    ...getMetadata('Leaderboard | rotki', description, '/sponsor/leaderboard'),
-  ],
-  ...commonAttrs(),
-});
+usePageSeo('Leaderboard | rotki', 'rotki\'s sponsor leaderboard', '/sponsor/leaderboard');
 
 definePageMeta({
   layout: 'sponsor',

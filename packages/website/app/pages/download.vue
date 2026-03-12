@@ -6,13 +6,9 @@ import DownloadHeading from '~/components/download/DownloadHeading.vue';
 import DownloadPreview from '~/components/download/DownloadPreview.vue';
 import DownloadUpgradeNudge from '~/components/download/DownloadUpgradeNudge.vue';
 import { useAppDownload } from '~/composables/use-app-download';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { usePageSeo } from '~/composables/use-page-seo';
 
-useHead({
-  title: 'download',
-  meta: getMetadata('rotki', 'Download rotki', '/download'),
-  ...commonAttrs(),
-});
+usePageSeo('rotki', 'Download rotki', '/download');
 
 const {
   version,

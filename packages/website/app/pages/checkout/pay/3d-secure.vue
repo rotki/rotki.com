@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get, set } from '@vueuse/core';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import ErrorState from '~/modules/checkout/components/card/CardPaymentError.vue';
 import InvalidParamsState from '~/modules/checkout/components/card/CardPaymentInvalid.vue';
 import LoadingState from '~/modules/checkout/components/card/CardPaymentLoading.vue';
@@ -8,7 +9,6 @@ import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDe
 import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
 import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import { useThreeDSecure } from '~/modules/checkout/composables/use-three-d-secure';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: [
@@ -21,17 +21,7 @@ definePageMeta({
 
 const { t } = useI18n({ useScope: 'global' });
 
-useHead({
-  title: '3D Secure Verification',
-  meta: [
-    {
-      name: 'description',
-      content: '3D Secure verification for secure credit card payment processing',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('3D Secure Verification');
 
 const {
   state,

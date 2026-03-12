@@ -11,23 +11,37 @@ import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 import { useCountries } from '~/composables/use-countries';
+import { usePageSeo } from '~/composables/use-page-seo';
 import { useMainStore } from '~/store';
 import { PricingPeriod } from '~/types/tiers';
 import { getCountryName } from '~/utils/countries';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 // Route constants
 const ROUTES = {
   LOGIN: '/login',
 } as const;
 
-const title = 'rotki pricing';
-const description = 'Pricing page for rotki subscription';
+const { public: { baseUrl } } = useRuntimeConfig();
+
+usePageSeo('rotki pricing', 'Pricing page for rotki subscription', '/checkout/pay');
 
 useHead({
-  title,
-  meta: getMetadata(title, description, '/checkout/pay'),
-  ...commonAttrs(),
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      'name': 'rotki',
+      'applicationCategory': 'FinanceApplication',
+      'operatingSystem': 'Windows, macOS, Linux',
+      'url': `${baseUrl}/checkout/pay`,
+      'offers': {
+        '@type': 'AggregateOffer',
+        'priceCurrency': 'EUR',
+        'availability': 'https://schema.org/InStock',
+      },
+    }),
+  }],
 });
 
 definePageMeta({

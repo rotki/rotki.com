@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import AccountDeletedPage from '~/components/account/delete/AccountDeletedPage.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
-useHead({
-  title: 'account deleted',
-  meta: [
-    {
-      name: 'description',
-      content: 'Your account has been successfully deleted',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('account deleted');
 </script>
 
 <template>

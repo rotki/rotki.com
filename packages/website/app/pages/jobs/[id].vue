@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { get, isDefined } from '@vueuse/core';
 import JobDetail from '~/components/jobs/JobDetail.vue';
+import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const { path } = useRoute();
 const { fallbackToLocalOnError } = useRemoteOrLocal();
@@ -24,14 +24,7 @@ else {
     description: open ? description : t('jobs.role_unavailable.description', { title }),
   };
 
-  useHead({
-    meta: getMetadata(
-      meta.title,
-      meta.description,
-      path,
-    ),
-    ...commonAttrs(),
-  });
+  usePageSeo(meta.title, meta.description, path);
 }
 
 definePageMeta({

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import PaymentMethodSelection from '~/modules/checkout/components/method/PaymentMethodSelection.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: [
@@ -16,17 +16,7 @@ definePageMeta({
   ],
 });
 
-useHead({
-  title: 'select payment method',
-  meta: [
-    {
-      name: 'description',
-      content: 'Select how to pay for your rotki premium subscription',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('select payment method');
 
 const { subscriptionId } = useSubscriptionIdParam();
 

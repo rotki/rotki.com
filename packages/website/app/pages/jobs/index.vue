@@ -2,8 +2,8 @@
 import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/core';
 import JobDescription from '~/components/jobs/JobDescription.vue';
+import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 type JobsCollectionItem = JobsLocalCollectionItem | JobsRemoteCollectionItem;
 
@@ -20,11 +20,7 @@ const title = t('jobs.title');
 const header = t('jobs.header');
 const subheader = t('jobs.description');
 
-useHead({
-  title,
-  meta: getMetadata(title, header, '/jobs'),
-  ...commonAttrs(),
-});
+usePageSeo(title, header, '/jobs');
 
 const grouped = computed<Record<string, JobsCollectionItem[]>>(() => {
   const group: Record<string, JobsCollectionItem[]> = {};

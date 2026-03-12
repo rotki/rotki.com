@@ -6,7 +6,7 @@ import PremiumFeatures from '~/components/home/PremiumFeatures.vue';
 import Testimonials from '~/components/home/testimonials/Testimonials.vue';
 import PricingSection from '~/components/pricings/PricingSection.vue';
 import { useDynamicMessages } from '~/composables/use-dynamic-messages';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { usePageSeo } from '~/composables/use-page-seo';
 
 const description
   = 'rotki is an open source portfolio tracker, accounting and analytics tool that protects your privacy.';
@@ -14,17 +14,7 @@ const description
 const keywords = `portfolio,portfolio-tracking,cryptocurrency-portfolio-tracker,cryptocurrency,bitcoin,ethereum,
 privacy,opensource,accounting,asset-management,taxes,tax-reporting`;
 
-useHead({
-  title: 'rotki',
-  meta: [
-    {
-      name: 'keywords',
-      content: keywords,
-    },
-    ...getMetadata('rotki', description, ''),
-  ],
-  ...commonAttrs(),
-});
+usePageSeo('rotki', description, '', { keywords });
 
 const { fetchMessages, activeDashboardMessages } = useDynamicMessages();
 

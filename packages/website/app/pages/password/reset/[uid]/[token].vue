@@ -1,23 +1,12 @@
 <script setup lang="ts">
 import PasswordReset from '~/components/account/password/PasswordReset.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   middleware: 'maintenance',
 });
 
-useHead({
-  title: 'reset password',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'Reset your rotki password',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('reset password');
 </script>
 
 <template>

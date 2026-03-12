@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/core';
+import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 
 const props = defineProps<{ path: string }>();
 
@@ -16,14 +16,11 @@ if (!document) {
   showError({ message: `Page not found: ${props.path}`, statusCode: 404 });
 }
 else {
-  useHead({
-    meta: getMetadata(
-      get(document)?.title ?? '',
-      get(document)?.description ?? '',
-      props.path,
-    ),
-    ...commonAttrs(),
-  });
+  usePageSeo(
+    get(document)?.title ?? '',
+    get(document)?.description ?? '',
+    props.path,
+  );
 }
 </script>
 

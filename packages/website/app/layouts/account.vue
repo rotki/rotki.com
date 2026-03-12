@@ -2,9 +2,9 @@
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 interface TabItem {
   icon: string;
@@ -13,17 +13,7 @@ interface TabItem {
   reload?: boolean;
 }
 
-useHead({
-  title: 'account',
-  meta: [
-    {
-      name: 'description',
-      content: 'Manage your rotki premium account',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('account');
 
 const { t } = useI18n({ useScope: 'global' });
 useAutoLogout();

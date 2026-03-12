@@ -1,17 +1,10 @@
 <script setup lang="ts">
 import IntegrationDetails from '~/components/integration/IntegrationDetails.vue';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { usePageSeo } from '~/composables/use-page-seo';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const title = 'integrations';
-const description = 'Supported blockchains, exchanges, and protocols in rotki';
-
-useHead({
-  title,
-  meta: getMetadata(title, description, '/integrations/'),
-  ...commonAttrs(),
-});
+usePageSeo('integrations', 'Supported blockchains, exchanges, and protocols in rotki', '/integrations/');
 
 definePageMeta({
   layout: 'landing',

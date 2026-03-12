@@ -1,20 +1,10 @@
 <script setup lang="ts">
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import Default from '~/layouts/default.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 const { t } = useI18n({ useScope: 'global' });
 
-useHead({
-  title: 'sponsor',
-  meta: [
-    {
-      name: 'sponsor',
-      content: 'Sponsor rotki\'s next release',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('sponsor');
 
 const tabModelValue = ref();
 

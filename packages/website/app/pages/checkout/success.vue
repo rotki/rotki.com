@@ -3,24 +3,14 @@ import { navigateTo } from '#app';
 import PageContainer from '~/components/common/PageContainer.vue';
 import PageContent from '~/components/common/PageContent.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: ['payment-success'],
 });
 
-useHead({
-  title: 'payment success',
-  meta: [
-    {
-      name: 'description',
-      content: 'Payment for rotki premium subscription completed',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('payment success');
 
 const { t } = useI18n({ useScope: 'global' });
 

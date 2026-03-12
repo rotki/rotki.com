@@ -13,20 +13,12 @@ import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-
 import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
 import { useLogger } from '~/utils/use-logger';
 
-const description = 'Sponsor rotki\'s next release';
-
-useHead({
-  title: 'Sponsor | rotki',
-  meta: [
-    ...getMetadata('Sponsor | rotki', description, '/sponsor/mint', 'mint.png'),
-  ],
-  ...commonAttrs(),
-});
+usePageSeo('Sponsor | rotki', 'Sponsor rotki\'s next release', '/sponsor/mint', { ogImage: 'mint.png' });
 
 definePageMeta({
   layout: 'sponsor',

@@ -2,7 +2,7 @@
 import { get } from '@vueuse/core';
 import GenericError from '~/components/error/GenericError.vue';
 import NotFoundError from '~/components/error/NotFoundError.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 defineOptions({
   inheritAttrs: false,
@@ -19,11 +19,7 @@ const isClientError = computed<boolean>(() => {
   return code >= 404 && code < 500;
 });
 
-useHead(() => ({
-  title,
-  meta: [noIndex()],
-  ...commonAttrs(),
-}));
+usePageSeoNoIndex(title);
 
 function handleError() {
   return clearError({ redirect: '/' });

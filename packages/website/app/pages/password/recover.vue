@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import PasswordForm from '~/components/account/password/PasswordForm.vue';
-import { commonAttrs } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   middleware: 'maintenance',
 });
 
-useHead({
-  title: 'password recovery',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'Recover your rotki.com account password',
-    },
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('password recovery');
 </script>
 
 <template>

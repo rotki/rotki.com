@@ -1,19 +1,8 @@
 <script setup lang="ts">
 import PendingActivation from '~/components/account/activation/PendingActivation.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
-useHead({
-  title: 'account activation',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: '',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('account activation');
 </script>
 
 <template>

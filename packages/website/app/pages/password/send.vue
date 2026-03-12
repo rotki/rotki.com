@@ -1,23 +1,12 @@
 <script setup lang="ts">
 import PasswordLinkSend from '~/components/account/password/PasswordLinkSend.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   middleware: 'maintenance',
 });
 
-useHead({
-  title: 'recovery e-mail send',
-  meta: [
-    {
-      key: 'description',
-      name: 'description',
-      content: 'The password recovery link has been sent to your address',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('recovery e-mail send');
 </script>
 
 <template>

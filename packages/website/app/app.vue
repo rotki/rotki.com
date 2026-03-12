@@ -14,6 +14,20 @@ useHead(() => ({
     { property: 'og:image', content: ogImageUrl },
     { property: 'twitter:image', content: ogImageUrl },
   ],
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      'name': 'rotki',
+      'url': baseUrl,
+      'logo': `${baseUrl}/android-chrome-512x512.png`,
+      'sameAs': [
+        'https://twitter.com/rotkiapp',
+        'https://github.com/rotki',
+      ],
+    }),
+  }],
   ...commonAttrs(),
 }));
 </script>

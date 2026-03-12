@@ -1,17 +1,7 @@
 <script setup lang="ts">
-import { commonAttrs, noIndex } from '~/utils/metadata';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
-useHead({
-  title: 'maintenance',
-  meta: [
-    {
-      name: 'description',
-      content: 'rotki is currently undergoing maintenance please come back later',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('maintenance');
 
 definePageMeta({
   layout: 'landing',

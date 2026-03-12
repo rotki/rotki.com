@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import CryptoRequest from '~/modules/checkout/components/crypto/CryptoRequest.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: [
@@ -14,18 +14,7 @@ definePageMeta({
   ],
 });
 
-useHead({
-  title: 'pay with crypto',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'Create a request to pay with Crypto for your rotki premium subscription',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('pay with crypto');
 useAutoLogout();
 </script>
 

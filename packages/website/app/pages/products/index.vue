@@ -7,16 +7,9 @@ import ProductsLimits from '~/components/products/ProductsLimits.vue';
 import ProductsMoneriumAndSync from '~/components/products/ProductsMoneriumAndSync.vue';
 import ProductsTimeframe from '~/components/products/ProductsTimeframe.vue';
 import ProductsUnlockNudge from '~/components/products/ProductsUnlockNudge.vue';
-import { commonAttrs, getMetadata } from '~/utils/metadata';
+import { usePageSeo } from '~/composables/use-page-seo';
 
-const title = 'premium subscription';
-const description = 'Features included with a premium rotki subscription';
-
-useHead({
-  title,
-  meta: getMetadata(title, description, '/products/'),
-  ...commonAttrs(),
-});
+usePageSeo('premium subscription', 'Features included with a premium rotki subscription', '/products/');
 
 definePageMeta({
   layout: 'landing',

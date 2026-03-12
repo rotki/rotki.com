@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import PaypalPayment from '~/modules/checkout/components/paypal/PaypalPayment.vue';
-import { commonAttrs, noIndex } from '~/utils/metadata';
 
 definePageMeta({
   middleware: [
@@ -13,17 +13,7 @@ definePageMeta({
   ],
 });
 
-useHead({
-  title: 'pay with paypal',
-  meta: [
-    {
-      name: 'description',
-      content: 'Pay with Paypal for your rotki premium subscription',
-    },
-    noIndex(),
-  ],
-  ...commonAttrs(),
-});
+usePageSeoNoIndex('pay with paypal');
 
 useAutoLogout();
 
