@@ -150,9 +150,9 @@ jobs:
             echo "VERSION=dev" >> "$GITHUB_OUTPUT"
           fi
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: Build docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: false
           tags: rotki/frontend:latest
