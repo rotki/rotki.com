@@ -13,7 +13,7 @@ import { toMessages } from '~/utils/validation';
 const modelValue = defineModel<SignupAddressPayload>({ required: true });
 const captchaId = defineModel<number | undefined>('captchaId');
 
-const props = defineProps<{
+const { externalResults, loading } = defineProps<{
   externalResults: ValidationErrors;
   loading: boolean;
 }>();
@@ -28,7 +28,10 @@ const emit = defineEmits<{
   ];
 }>();
 
-const { externalResults } = toRefs(props);
+const terms = ref<boolean>(false);
+const $externalResults = ref<Record<string, string[]>>({});
+
+const { t } = useI18n({ useScope: 'global' });
 
 const rules = {
   address1: { required },
@@ -46,8 +49,6 @@ const rules = {
   terms: { checked: (value: boolean) => value },
 };
 
-const terms = ref<boolean>(false);
-
 const {
   recaptchaPassed,
   onError,
@@ -55,8 +56,6 @@ const {
   onExpired,
   recaptchaToken,
 } = useRecaptcha();
-
-const $externalResults = ref<Record<string, string[]>>({});
 
 const v$ = useVuelidate(
   rules,
@@ -69,16 +68,6 @@ const v$ = useVuelidate(
     $autoDirty: true,
     $externalResults,
   },
-);
-
-watch(
-  externalResults,
-  (errors) => {
-    set($externalResults, errors);
-    if (Object.values(errors).some(i => !!i))
-      get(v$).$validate();
-  },
-  { immediate: true },
 );
 
 function updateValue(field: string, value: any): void {
@@ -99,7 +88,11 @@ function finish(): void {
   });
 }
 
-const { t } = useI18n({ useScope: 'global' });
+watch(() => externalResults, (errors) => {
+  set($externalResults, errors);
+  if (Object.values(errors).some(i => !!i))
+    get(v$).$validate();
+}, { immediate: true });
 </script>
 
 <template>

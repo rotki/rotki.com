@@ -2,45 +2,42 @@
 import type { ContextColorsType } from '@rotki/ui-library';
 import { get, isDefined } from '@vueuse/core';
 
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-    closeable?: boolean;
-    timeout?: number;
-    type?: ContextColorsType;
-  }>(),
-  {
-    closeable: false,
-    type: 'error',
-    timeout: undefined,
-  },
-);
+const { visible, closeable = false, timeout, type = 'error' } = defineProps<{
+  visible: boolean;
+  closeable?: boolean;
+  timeout?: number;
+  type?: ContextColorsType;
+}>();
 
 const emit = defineEmits<{
   dismiss: [];
 }>();
 
-const { timeout, visible } = toRefs(props);
+defineSlots<{
+  title: () => void;
+  default: () => void;
+}>();
 
 const { stop, start, isPending } = useTimeoutFn(
   () => emit('dismiss'),
-  () => get(timeout) ?? 0,
+  () => timeout ?? 0,
 );
 
-function dismiss() {
+function dismiss(): void {
   emit('dismiss');
   if (get(isPending)) {
     stop();
   }
 }
 
-watch(visible, (show) => {
-  if (isDefined(get(timeout)) && show) {
-    if (get(isPending)) {
-      stop();
-    }
-    start();
+watch(() => visible, (show) => {
+  if (!(isDefined(timeout) && show)) {
+    return;
   }
+  if (get(isPending)) {
+    stop();
+  }
+  start();
 });
 </script>
 

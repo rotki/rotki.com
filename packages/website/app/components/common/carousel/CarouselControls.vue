@@ -5,16 +5,11 @@ import 'swiper/css';
 
 const swiper = defineModel<Swiper>('swiper');
 
-withDefaults(
-  defineProps<{
-    activeIndex: number;
-    pages: number;
-    arrowButtons?: boolean;
-  }>(),
-  {
-    arrowButtons: false,
-  },
-);
+defineProps<{
+  activeIndex: number;
+  pages: number;
+  arrowButtons?: boolean;
+}>();
 
 function onNavigate(index: number): void {
   const s = get(swiper);

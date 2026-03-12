@@ -1,29 +1,21 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/modules/checkout/components/crypto/CryptoChainIcon.vue';
 import { toTitleCase, truncateAddress } from '~/utils/text';
 
-const props = defineProps<{
+const { data, loading } = defineProps<{
   data: CryptoPayment;
   loading?: boolean;
 }>();
 
-const { data, loading } = toRefs(props);
 const { t } = useI18n({ useScope: 'global' });
 
-const currencyName = computed<string>(() => {
-  const { cryptocurrency } = get(data);
-  return cryptocurrency.split(':')[1] ?? '';
-});
+const currencyName = computed<string>(() => data.cryptocurrency.split(':')[1] ?? '');
 
-const paymentAmount = computed<string>(() => {
-  const { finalPriceInCrypto } = get(data);
-  const currency = get(currencyName);
-  return `${finalPriceInCrypto} ${currency}`;
-});
+const paymentAmount = computed<string>(() => `${data.finalPriceInCrypto} ${get(currencyName)}`);
 </script>
 
 <template>

@@ -1,3 +1,9 @@
+<script setup lang="ts">
+defineSlots<{
+  default: () => void;
+}>();
+</script>
+
 <template>
   <div class="flex gap-2 items-start text-sm">
     <RuiIcon

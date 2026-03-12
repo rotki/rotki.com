@@ -86,23 +86,28 @@ interface Props {
   layout?: 'vertical' | 'horizontal';
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  layout: 'vertical',
-});
+const {
+  subscription,
+  actionsClasses,
+  availablePlans,
+  operationState,
+  cryptoPaymentState,
+  layout = 'vertical',
+} = defineProps<Props>();
 
 const emit = defineEmits<{
   action: [event: SubscriptionActionEvent];
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
-
 const upgradePlanId = ref<number>();
+
+const { t } = useI18n({ useScope: 'global' });
 
 const { hasAction, displayActions } = useSubscriptionActions();
 const { checkCryptoUpgradePayment } = useCryptoPaymentApi();
 const { isCryptoPaymentPending, shouldShowPaymentDetail, getBlockExplorerLink, pendingPaymentCurrency } = useSubscriptionCryptoPayment({
   renewableSubscriptions: computed<UserSubscription[]>(() =>
-    isCryptoPendingOrRenewal(props.subscription) ? [props.subscription] : [],
+    isCryptoPendingOrRenewal(subscription) ? [subscription] : [],
   ),
 });
 
@@ -117,7 +122,7 @@ function buildUpgradeAction(context: ActionContext): ActionConfig<BaseActionProp
 
   return {
     props: context.baseProps,
-    visible: hasAction(context.subscription, SubscriptionAction.UPGRADE, props.availablePlans) && !isCancelLoading,
+    visible: hasAction(context.subscription, SubscriptionAction.UPGRADE, availablePlans) && !isCancelLoading,
   };
 }
 
@@ -220,10 +225,10 @@ function buildResumeAction(context: ActionContext): ActionConfig<ResumeActionPro
 
 const actionState = computed<ActionState>(() => {
   const context: ActionContext = {
-    baseProps: { actionsClasses: props.actionsClasses },
-    cryptoPaymentState: props.cryptoPaymentState,
-    operationState: props.operationState,
-    subscription: props.subscription,
+    baseProps: { actionsClasses },
+    cryptoPaymentState,
+    operationState,
+    subscription,
   };
 
   return {
@@ -233,13 +238,13 @@ const actionState = computed<ActionState>(() => {
     paymentDetail: buildPaymentDetailAction(context),
     renew: buildRenewAction(context),
     resume: buildResumeAction(context),
-    shouldDisplay: displayActions(props.subscription, props.availablePlans),
+    shouldDisplay: displayActions(subscription, availablePlans),
     upgrade: buildUpgradeAction(context),
   };
 });
 
 const layoutClasses = computed<string>(() => {
-  if (props.layout === 'horizontal') {
+  if (layout === 'horizontal') {
     return 'flex flex-wrap items-center gap-2';
   }
   return 'flex flex-col items-start gap-1';
@@ -252,16 +257,16 @@ function isCryptoPendingOrRenewal(subscription: UserSubscription): boolean {
 }
 
 function handleAction(action: SubscriptionActionType): void {
-  emit('action', { action, subscription: props.subscription });
+  emit('action', { action, subscription });
 }
 
-watchImmediate(() => props.subscription, async (subscription) => {
-  if (!isSubRequestingUpgrade(subscription)) {
+watchImmediate(() => subscription, async (sub) => {
+  if (!isSubRequestingUpgrade(sub)) {
     set(upgradePlanId, undefined);
     return;
   }
 
-  const upgradePaymentResponse = await checkCryptoUpgradePayment(subscription.id);
+  const upgradePaymentResponse = await checkCryptoUpgradePayment(sub.id);
   if (!upgradePaymentResponse.isError) {
     const { toPlan: { id } } = upgradePaymentResponse.result;
     set(upgradePlanId, id);

@@ -14,9 +14,7 @@ interface Props {
   currentStep?: number;
 }
 
-withDefaults(defineProps<Props>(), {
-  currentStep: 3,
-});
+defineProps<Props>();
 </script>
 
 <template>

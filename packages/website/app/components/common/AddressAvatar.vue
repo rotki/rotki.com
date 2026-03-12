@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
+import { set } from '@vueuse/core';
 import { useBlockie } from '~/composables/web3/use-blockie';
 
-interface Props {
+const { ensName, address } = defineProps<{
   ensName?: string | null;
   address: string;
-}
-
-const props = defineProps<Props>();
-
-const { address, ensName } = toRefs(props);
+}>();
 
 const avatarUrl = ref<string>();
 const loading = ref<boolean>(false);
@@ -18,11 +14,10 @@ const hasError = ref<boolean>(false);
 const { getBlockie } = useBlockie();
 
 // Get blockie for the address
-const blockieUrl = computed(() => getBlockie(get(address)));
+const blockieUrl = computed(() => getBlockie(address));
 
 async function fetchAvatar() {
-  const ens = get(ensName);
-  if (!ens) {
+  if (!ensName) {
     return;
   }
 
@@ -30,7 +25,7 @@ async function fetchAvatar() {
     set(loading, true);
     set(hasError, false);
 
-    const url = `/api/ens/avatar?name=${encodeURIComponent(ens)}`;
+    const url = `/api/ens/avatar?name=${encodeURIComponent(ensName)}`;
     // Use our cached ENS avatar endpoint
     const response = await fetch(url);
 
@@ -55,7 +50,7 @@ onMounted(() => {
 });
 
 // Re-fetch if ENS name changes
-watch(ensName, () => {
+watch(() => ensName, () => {
   fetchAvatar();
 });
 </script>

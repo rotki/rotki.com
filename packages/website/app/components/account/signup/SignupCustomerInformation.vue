@@ -8,7 +8,7 @@ import { toMessages } from '~/utils/validation';
 
 const modelValue = defineModel<SignupCustomerInformationPayload>({ required: true });
 
-const props = defineProps<{
+const { externalResults } = defineProps<{
   externalResults: ValidationErrors;
 }>();
 
@@ -17,14 +17,14 @@ const emit = defineEmits<{
   next: [];
 }>();
 
-const { externalResults } = toRefs(props);
-
 const rules = {
   firstName: { required },
   lastName: { required },
   companyName: {},
   vatId: {},
 };
+
+const { t } = useI18n({ useScope: 'global' });
 
 const $externalResults = ref<Record<string, string[]>>({});
 
@@ -33,16 +33,6 @@ const v$ = useVuelidate(rules, modelValue, {
   $externalResults,
 });
 
-watch(
-  externalResults,
-  (errors) => {
-    set($externalResults, errors);
-    if (Object.values(errors).some(i => !!i))
-      get(v$).$validate();
-  },
-  { immediate: true },
-);
-
 function updateValue(field: string, value: any): void {
   set(modelValue, {
     ...get(modelValue),
@@ -50,7 +40,11 @@ function updateValue(field: string, value: any): void {
   });
 }
 
-const { t } = useI18n({ useScope: 'global' });
+watch(() => externalResults, (errors) => {
+  set($externalResults, errors);
+  if (Object.values(errors).some(i => !!i))
+    get(v$).$validate();
+}, { immediate: true });
 </script>
 
 <template>

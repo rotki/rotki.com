@@ -13,6 +13,10 @@ interface TabItem {
   reload?: boolean;
 }
 
+defineSlots<{
+  default: () => void;
+}>();
+
 usePageSeoNoIndex('account');
 
 const { t } = useI18n({ useScope: 'global' });

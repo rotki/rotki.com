@@ -11,6 +11,10 @@ defineProps<{
   hideThumbnail?: boolean;
 }>();
 
+defineSlots<{
+  default: () => void;
+}>();
+
 const swiperInstance = ref<Swiper>();
 const swiperReady = ref<boolean>(false);
 const activeIndex = ref<number>(1);

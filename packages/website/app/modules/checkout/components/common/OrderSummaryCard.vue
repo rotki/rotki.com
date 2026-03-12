@@ -16,28 +16,25 @@ interface VatBreakdown {
 
 const discountCodeInput = defineModel<string>('discountCode', { default: '' });
 
-const props = withDefaults(
-  defineProps<{
-    selectedPlan?: SelectedPlan;
-    breakdown?: PaymentBreakdownResponse;
-    upgradeSubId?: string;
-    isCrypto?: boolean;
-    warning?: boolean;
-    compact?: boolean;
-    loading?: boolean;
-    disabled?: boolean;
-  }>(),
-  {
-    selectedPlan: undefined,
-    breakdown: undefined,
-    upgradeSubId: undefined,
-    isCrypto: false,
-    warning: false,
-    compact: false,
-    loading: false,
-    disabled: false,
-  },
-);
+const {
+  selectedPlan,
+  breakdown,
+  upgradeSubId,
+  isCrypto = false,
+  warning = false,
+  compact = false,
+  loading = false,
+  disabled = false,
+} = defineProps<{
+  selectedPlan?: SelectedPlan;
+  breakdown?: PaymentBreakdownResponse;
+  upgradeSubId?: string;
+  isCrypto?: boolean;
+  warning?: boolean;
+  compact?: boolean;
+  loading?: boolean;
+  disabled?: boolean;
+}>();
 
 const emit = defineEmits<{
   'plan-change': [plan: SelectedPlan];
@@ -46,57 +43,48 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { selectedPlan, breakdown, upgradeSubId, isCrypto, compact, warning, loading, disabled } = toRefs(props);
+const { account } = storeToRefs(useMainStore());
 
 // Spacing classes based on compact mode
-const spacingClass = computed<string>(() => (get(compact) ? 'my-4' : 'my-6'));
-const titleSpacingClass = computed<string>(() => (get(compact) ? 'mb-4' : 'mb-6'));
-const discountSpacingClass = computed<string>(() => (get(compact) ? 'mb-4' : 'mb-6'));
+const spacingClass = computed<string>(() => (compact ? 'my-4' : 'my-6'));
+const titleSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'));
+const discountSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'));
 
 // Derive discountInfo from breakdown
-const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.discount ?? undefined;
-});
+const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => breakdown?.discount ?? undefined);
 
 // Derive vatBreakdown from breakdown
 const vatBreakdown = computed<VatBreakdown | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  if (!currentBreakdown) {
+  if (!breakdown) {
     return undefined;
   }
 
-  const floatRate = parseFloat(currentBreakdown.vatRate);
+  const floatRate = parseFloat(breakdown.vatRate);
   if (isFinite(floatRate) && floatRate <= 0) {
     return undefined;
   }
 
-  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
-  const finalAmount = parseFloat(currentBreakdown.finalAmount);
-  const vatAmount = parseFloat(currentBreakdown.vatAmount);
+  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : breakdown.vatRate;
+  const finalAmount = parseFloat(breakdown.finalAmount);
+  const vatAmount = parseFloat(breakdown.vatAmount);
   const basePrice = (finalAmount - vatAmount).toFixed(2);
 
   return {
     basePrice,
     vatAmount: vatAmount.toFixed(2),
     vatRate,
-    fullAmount: currentBreakdown.fullAmount,
+    fullAmount: breakdown.fullAmount,
   };
 });
 
 const grandTotal = computed<number>(() => {
-  const currentBreakdown = get(breakdown);
-
-  if (currentBreakdown) {
-    return parseFloat(currentBreakdown.finalAmount);
+  if (breakdown) {
+    return parseFloat(breakdown.finalAmount);
   }
 
   // Fallback to plan price
-  const plan = get(selectedPlan);
-  return plan?.price ?? 0;
+  return selectedPlan?.price ?? 0;
 });
-
-const { account } = storeToRefs(useMainStore());
 
 const showVatWarning = computed<boolean>(() => {
   const acc = get(account);

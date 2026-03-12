@@ -12,17 +12,16 @@ const emit = defineEmits<{
   success: [];
 }>();
 
+const isProcessing = ref<boolean>(false);
+const cardFormValid = ref<boolean>(false);
+const error = ref<{ title: string; message: string }>();
+const cardForm = useTemplateRef<InstanceType<typeof CardForm>>('cardForm');
+
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('add-card-dialog');
 
 const { addCard } = usePaymentCards();
 const { client, clientError, initializeClient, teardownClient } = useBraintreeClient();
-
-const isProcessing = ref<boolean>(false);
-const cardFormValid = ref<boolean>(false);
-const error = ref<{ title: string; message: string }>();
-
-const cardForm = ref<InstanceType<typeof CardForm>>();
 
 const isFormValid = logicAnd(cardFormValid, logicNot(isProcessing));
 

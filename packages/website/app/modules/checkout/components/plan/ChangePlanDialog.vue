@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { get, set, toRefs } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
@@ -9,26 +9,24 @@ import { usePlanIdParam } from '~/modules/checkout/composables/use-plan-params';
 import { PricingPeriod } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';
 
-const props = withDefaults(defineProps<{
+const { visible, warning = false } = defineProps<{
   visible: boolean;
   warning?: boolean;
-}>(), {
-  warning: false,
-});
+}>();
+
 const emit = defineEmits<{
   cancel: [];
   select: [plan: SelectedPlan];
 }>();
-const { planId } = usePlanIdParam();
-const { visible, warning } = toRefs(props);
-
-const { t } = useI18n({ useScope: 'global' });
-
-const { availablePlans, getPlanDetailsFromId } = useAvailablePlans();
-const { tiersInformation } = usePremiumTiersInfo();
 
 const confirmed = ref<boolean>(false);
 const selectedPlanPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
+
+const { t } = useI18n({ useScope: 'global' });
+
+const { planId } = usePlanIdParam();
+const { availablePlans, getPlanDetailsFromId } = useAvailablePlans();
+const { tiersInformation } = usePremiumTiersInfo();
 
 const currentPlanDetails = computed<ReturnType<typeof getPlanDetailsFromId>>(() => {
   const currentPlanId = get(planId);
@@ -47,7 +45,7 @@ function isCurrentPlan(plan: AvailablePlan): boolean {
 }
 
 function select(plan: AvailablePlan): void {
-  if (get(warning) && !get(confirmed)) {
+  if (warning && !get(confirmed)) {
     return;
   }
 
@@ -69,7 +67,7 @@ function select(plan: AvailablePlan): void {
   emit('select', selectedPlan);
 }
 
-watch(visible, (visible) => {
+watch(() => visible, (visible) => {
   if (!visible) {
     set(confirmed, false);
   }

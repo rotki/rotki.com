@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import type { ContextColorsType } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
-import { get } from '@vueuse/core';
 
 defineOptions({
   inheritAttrs: false,
 });
 
-const props = withDefaults(defineProps<{
+const {
+  to,
+  external = false,
+  inline = false,
+  highlightActive = false,
+  highlightExactActive = false,
+  color,
+  icon,
+  disabled,
+} = defineProps<{
   to: RouteLocationRaw;
   external?: boolean;
   inline?: boolean;
@@ -16,17 +24,13 @@ const props = withDefaults(defineProps<{
   color?: ContextColorsType;
   icon?: boolean;
   disabled?: boolean;
-}>(), {
-  external: false,
-  inline: false,
-  highlightActive: false,
-  highlightExactActive: false,
-  color: undefined,
-  icon: undefined,
-  disabled: undefined,
-});
+}>();
 
-const { highlightActive, highlightExactActive, to } = toRefs(props);
+defineSlots<{
+  prepend: () => void;
+  default: () => void;
+  append: () => void;
+}>();
 
 // Routes that require hard reloads due to special CSP configurations
 const SPECIAL_CSP_ROUTES = [
@@ -43,6 +47,24 @@ const SPECIAL_CSP_ROUTES = [
   // Sponsor routes
   '/sponsor',
 ] as const;
+
+/**
+ * Determine if this link should be treated as external (forcing hard reload)
+ */
+const isExternalLink = computed<boolean>(() =>
+  external || requiresHardReload(to),
+);
+
+/**
+ * Determine target attribute - only open new tab for truly external links
+ */
+const linkTarget = computed<string>(() => {
+  // Only open new tab for explicitly external links (not CSP hard reload routes)
+  if (external && !requiresHardReload(to)) {
+    return '_blank';
+  }
+  return '_self';
+});
 
 /**
  * Check if a route requires hard reload due to special CSP configuration
@@ -63,26 +85,8 @@ function requiresHardReload(route: RouteLocationRaw): boolean {
   return false;
 }
 
-/**
- * Determine if this link should be treated as external (forcing hard reload)
- */
-const isExternalLink = computed<boolean>(() =>
-  get(props.external) || requiresHardReload(get(to)),
-);
-
-/**
- * Determine target attribute - only open new tab for truly external links
- */
-const linkTarget = computed<string>(() => {
-  // Only open new tab for explicitly external links (not CSP hard reload routes)
-  if (get(props.external) && !requiresHardReload(get(to))) {
-    return '_blank';
-  }
-  return '_self';
-});
-
-function getColor(active: boolean, exact: boolean) {
-  if ((get(highlightActive) && active) || (get(highlightExactActive) && exact)) {
+function getColor(active: boolean, exact: boolean): ContextColorsType | undefined {
+  if ((highlightActive && active) || (highlightExactActive && exact)) {
     return 'primary';
   }
 

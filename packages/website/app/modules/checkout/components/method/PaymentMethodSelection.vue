@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { RuiIcons } from '@rotki/ui-library';
-import { get, isDefined, set } from '@vueuse/core';
+import { get, set } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
@@ -26,38 +26,40 @@ interface RouteMap {
   [key: string]: string;
 }
 
-const props = defineProps<{
+const { identifier } = defineProps<{
   identifier?: string;
 }>();
-const { planId } = usePlanIdParam();
-const { referralCode } = useReferralCodeParam();
-const { t } = useI18n({ useScope: 'global' });
-const router = useRouter();
 
-const { identifier } = toRefs(props);
+const { t } = useI18n({ useScope: 'global' });
+
 const selectedMethod = ref<PaymentMethod>();
 const processing = ref<boolean>(false);
 
 const store = useMainStore();
 const { authenticated } = storeToRefs(store);
+
+const router = useRouter();
+const { planId } = usePlanIdParam();
+const { referralCode } = useReferralCodeParam();
+
 const { chronicle } = useSigilEvents();
 
 const paymentMethods: readonly PaymentMethodEntry[] = Object.freeze([{
   id: PaymentMethod.BLOCKCHAIN,
   label: 'Blockchain',
-  icon: 'lu-blockchain' as RuiIcons,
+  icon: 'lu-blockchain' as const,
   name: 'checkout-pay-request-crypto',
   class: 'sm:col-start-1',
 }, {
   id: PaymentMethod.CARD,
   label: 'Card',
-  icon: 'lu-credit-card' as RuiIcons,
+  icon: 'lu-credit-card' as const,
   name: 'checkout-pay-card',
   class: 'sm:col-start-2',
 }, {
   id: PaymentMethod.PAYPAL,
   label: 'Paypal',
-  icon: 'lu-paypal' as RuiIcons,
+  icon: 'lu-paypal' as const,
   name: 'checkout-pay-paypal',
   class: 'sm:col-start-2',
 }]);
@@ -86,8 +88,8 @@ const queryParams = computed<Record<string, string>>(() => {
     result.planId = String(selectedPlanId);
   }
 
-  if (isDefined(identifier)) {
-    result.id = get(identifier)!;
+  if (identifier !== undefined) {
+    result.id = identifier;
   }
 
   if (ref) {

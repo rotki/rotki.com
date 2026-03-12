@@ -3,15 +3,19 @@ import { get } from '@vueuse/core';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import PageHeader from '~/components/header/PageHeader.vue';
 
+defineSlots<{
+  default: () => void;
+}>();
+
 const route = useRoute();
 
-const isLanding = computed<boolean>(() => !!route.meta.landing);
-
-const headerRef = ref<HTMLDivElement>();
-const footerRef = ref<HTMLDivElement>();
+const headerRef = useTemplateRef<HTMLDivElement>('headerRef');
+const footerRef = useTemplateRef<HTMLDivElement>('footerRef');
 
 const { height: topHeight } = useElementBounding(headerRef);
 const { height: bottomHeight } = useElementBounding(footerRef);
+
+const isLanding = computed<boolean>(() => !!route.meta.landing);
 
 const otherHeight = computed<number>(
   () => get(topHeight) + get(bottomHeight) || 219,

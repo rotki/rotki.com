@@ -8,6 +8,10 @@ interface TabItem {
   to: string;
 }
 
+defineSlots<{
+  default: () => void;
+}>();
+
 const { t } = useI18n({ useScope: 'global' });
 
 usePageSeo('Sponsor', 'Sponsor rotki\'s development and support independent, local-first, privacy-preserving open-source software.', '/sponsor/mint');

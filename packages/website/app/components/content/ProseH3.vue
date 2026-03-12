@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { useHeadings } from '~/composables/use-headings';
 
-const props = withDefaults(
-  defineProps<{
-    id?: string;
-  }>(),
-  {
-    id: undefined,
-  },
-);
+const { id } = defineProps<{
+  id?: string;
+}>();
 
-const { id } = toRefs(props);
+defineSlots<{
+  default: () => void;
+}>();
 
-const { generate } = useHeadings(id, 'h3');
+const { generate } = useHeadings(() => id, 'h3');
 </script>
 
 <template>

@@ -7,15 +7,12 @@ import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';
 
-withDefaults(
-  defineProps<{
-    color?: ContextColorsType;
-    onlyPremium?: boolean;
-  }>(),
-  {
-    onlyPremium: false,
-  },
-);
+defineProps<{
+  color?: ContextColorsType;
+  onlyPremium?: boolean;
+}>();
+
+const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
@@ -40,8 +37,6 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
   }
   return '/checkout/pay';
 });
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

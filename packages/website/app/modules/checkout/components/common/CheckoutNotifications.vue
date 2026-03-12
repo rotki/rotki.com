@@ -1,26 +1,17 @@
 <script setup lang="ts">
 import type { CheckoutError } from '~/modules/checkout/composables/use-checkout';
-import { get } from '@vueuse/shared';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 
-const props = withDefaults(
-  defineProps<{
-    error?: CheckoutError;
-    loading?: boolean;
-  }>(),
-  {
-    error: undefined,
-    loading: false,
-  },
-);
+const { error, loading = false } = defineProps<{
+  error?: CheckoutError;
+  loading?: boolean;
+}>();
 
 const emit = defineEmits<{
   'clear-error': [];
 }>();
 
-const { error, loading } = toRefs(props);
-
-const hasError = computed<boolean>(() => !!get(error));
+const hasError = computed<boolean>(() => !!error);
 </script>
 
 <template>

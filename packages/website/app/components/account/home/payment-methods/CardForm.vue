@@ -2,25 +2,7 @@
 import type { Client } from 'braintree-web/client';
 import type { HostedFields } from 'braintree-web/hosted-fields';
 import { get, set } from '@vueuse/core';
-import { computed, onMounted, onUnmounted, reactive, ref, toRefs, watch } from 'vue';
-
-interface Props {
-  client: Client;
-  disabled?: boolean;
-}
-
-const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  'validation-change': [isValid: boolean];
-  'error': [message: string];
-}>();
-
-const { client, disabled } = toRefs(props);
-
-const hostedFields = ref<HostedFields>();
-const hostedFieldsInitializing = ref<boolean>(false);
-const focusedField = ref<string>('');
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 
 interface FieldState {
   valid: boolean;
@@ -28,18 +10,25 @@ interface FieldState {
   hasContent: boolean;
 }
 
+const { client, disabled } = defineProps<{
+  client: Client;
+  disabled?: boolean;
+}>();
+
+const emit = defineEmits<{
+  'validation-change': [isValid: boolean];
+  'error': [message: string];
+}>();
+
+const hostedFields = ref<HostedFields>();
+const hostedFieldsInitializing = ref<boolean>(false);
+const focusedField = ref<string>('');
+
 const fieldStates = reactive(new Map<string, FieldState>([
   ['number', { valid: false, touched: false, hasContent: false }],
   ['expirationDate', { valid: false, touched: false, hasContent: false }],
   ['cvv', { valid: false, touched: false, hasContent: false }],
 ]));
-
-function updateFieldState(field: string, updates: Partial<FieldState>): void {
-  const current = fieldStates.get(field);
-  if (current) {
-    fieldStates.set(field, { ...current, ...updates });
-  }
-}
 
 const fieldErrors = computed(() => ({
   number: fieldStates.get('number')?.touched && !fieldStates.get('number')?.valid,
@@ -70,7 +59,7 @@ async function initializeHostedFields(): Promise<void> {
   try {
     const { create: createHostedFields } = await import('braintree-web/hosted-fields');
     const fieldsInstance = await createHostedFields({
-      client: get(client),
+      client,
       styles: {
         'body': {
           'font-size': '16px',
@@ -116,6 +105,13 @@ async function initializeHostedFields(): Promise<void> {
   }
 }
 
+function updateFieldState(field: string, updates: Partial<FieldState>): void {
+  const current = fieldStates.get(field);
+  if (current) {
+    fieldStates.set(field, { ...current, ...updates });
+  }
+}
+
 function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
   fieldsInstance.on('focus', (event) => {
     const field = event.emittedBy;
@@ -143,7 +139,7 @@ function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
     updateFieldState(event.emittedBy, { hasContent: true });
   });
 
-  watch(disabled, (isDisabled) => {
+  watch(() => disabled, (isDisabled) => {
     const fields = ['number', 'expirationDate', 'cvv'] as const;
 
     fields.forEach((field) => {

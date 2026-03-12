@@ -13,6 +13,10 @@ defineOptions({
 const modelValue = defineModel<string>({ required: true });
 
 const props = defineProps<Props>();
+
+defineSlots<{
+  prepend: () => void;
+}>();
 </script>
 
 <template>

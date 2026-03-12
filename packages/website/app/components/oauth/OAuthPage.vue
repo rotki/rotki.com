@@ -23,6 +23,11 @@ const emit = defineEmits<{
   'auth-click': [];
 }>();
 
+defineSlots<{
+  'expires-in': (props: { expiresIn: number }) => void;
+  'button-prepend': () => void;
+}>();
+
 const { t } = useI18n({ useScope: 'global' });
 const otherHeight = inject('otherHeight', 0);
 

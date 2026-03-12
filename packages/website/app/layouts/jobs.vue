@@ -3,6 +3,12 @@ import ButtonLink from '~/components/common/ButtonLink.vue';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import Default from '~/layouts/default.vue';
 
+defineSlots<{
+  title: () => void;
+  description: () => void;
+  default: () => void;
+}>();
+
 const { t } = useI18n({ useScope: 'global' });
 </script>
 

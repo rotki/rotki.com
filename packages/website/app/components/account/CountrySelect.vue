@@ -3,14 +3,9 @@ import { useCountries } from '~/composables/use-countries';
 
 const modelValue = defineModel<string>({ required: true });
 
-withDefaults(
-  defineProps<{
-    disabled?: boolean;
-  }>(),
-  {
-    disabled: false,
-  },
-);
+defineProps<{
+  disabled?: boolean;
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 

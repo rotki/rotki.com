@@ -2,6 +2,12 @@
 defineProps<{
   number?: string | number;
 }>();
+
+defineSlots<{
+  number: () => void;
+  title: () => void;
+  values: () => void;
+}>();
 </script>
 
 <template>

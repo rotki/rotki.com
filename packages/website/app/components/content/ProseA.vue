@@ -1,16 +1,13 @@
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    href?: string;
-    target?: string;
-    rel?: string;
-  }>(),
-  {
-    href: '#',
-    target: '_self',
-    rel: undefined,
-  },
-);
+const { href = '#', target = '_self' } = defineProps<{
+  href?: string;
+  target?: string;
+  rel?: string;
+}>();
+
+defineSlots<{
+  default: () => void;
+}>();
 </script>
 
 <template>

@@ -1,17 +1,10 @@
 <script setup lang="ts">
-const props = withDefaults(
-  defineProps<{
-    theme?: 'light' | 'dark';
-    size?: 'compact' | 'normal';
-    invalid?: boolean;
-    useRecaptchaNet?: boolean;
-  }>(),
-  {
-    theme: 'light',
-    size: 'normal',
-    useRecaptchaNet: false,
-  },
-);
+const { theme = 'light', size = 'normal', invalid = false, useRecaptchaNet = false } = defineProps<{
+  theme?: 'light' | 'dark';
+  size?: 'compact' | 'normal';
+  invalid?: boolean;
+  useRecaptchaNet?: boolean;
+}>();
 
 const emit = defineEmits<{
   'error': [];
@@ -26,12 +19,12 @@ const {
   },
 } = useRuntimeConfig();
 
-const recaptchaEl = ref<HTMLElement>();
-const rendered = ref(false);
+const rendered = ref<boolean>(false);
+const recaptchaEl = useTemplateRef<HTMLElement>('recaptchaEl');
 
+const { t } = useI18n({ useScope: 'global' });
 // this will be populated once the deferred captcha script is loaded
 const grecaptcha = toRef(window, 'grecaptcha');
-const { t } = useI18n({ useScope: 'global' });
 
 /**
  * Renders the captcha if not rendered and required fields are available
@@ -45,8 +38,8 @@ function renderCaptcha() {
     'callback': (token: string) => emit('success', token),
     'expired-callback': () => emit('expired'),
     'error-callback': () => emit('error'),
-    'theme': props.theme,
-    'size': props.size,
+    'theme': theme,
+    'size': size,
   });
 
   emit('captcha-id', id);
@@ -61,7 +54,7 @@ onMounted(() => {
       script: [
         {
           src: `${
-            props.useRecaptchaNet
+            useRecaptchaNet
               ? 'https://www.recaptcha.net/recaptcha'
               : 'https://www.google.com/recaptcha'
           }/api.js?onload=onRecaptchaLoaded&render=explicit`,

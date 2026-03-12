@@ -2,6 +2,11 @@
 defineProps<{ selected: boolean }>();
 
 const emit = defineEmits<{ click: [] }>();
+
+defineSlots<{
+  default: () => void;
+  label: () => void;
+}>();
 </script>
 
 <template>

@@ -10,7 +10,7 @@ interface TestimonialProps {
   url?: string;
 }
 
-withDefaults(defineProps<TestimonialProps>(), { avatar: undefined, url: undefined });
+defineProps<TestimonialProps>();
 </script>
 
 <template>

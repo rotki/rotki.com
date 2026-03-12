@@ -4,18 +4,11 @@ import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDe
 import CheckoutNotifications from '~/modules/checkout/components/common/CheckoutNotifications.vue';
 import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
 
-withDefaults(
-  defineProps<{
-    hideHeader?: boolean;
-    error?: CheckoutError;
-    loading?: boolean;
-  }>(),
-  {
-    hideHeader: false,
-    error: undefined,
-    loading: false,
-  },
-);
+defineProps<{
+  hideHeader?: boolean;
+  error?: CheckoutError;
+  loading?: boolean;
+}>();
 
 const emit = defineEmits<{
   'clear-error': [];

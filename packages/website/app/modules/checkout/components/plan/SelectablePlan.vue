@@ -4,7 +4,14 @@ import { get, set } from '@vueuse/core';
 import { type PremiumTierInfoDescription, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 import { formatCurrency, toTitleCase } from '~/utils/text';
 
-const props = withDefaults(defineProps<{
+const {
+  plan,
+  tiersInfo,
+  selected = false,
+  period,
+  disabled,
+  current,
+} = defineProps<{
   plan: AvailablePlan;
   tiersInfo: PremiumTiersInfo;
   selected?: boolean;
@@ -12,9 +19,7 @@ const props = withDefaults(defineProps<{
   readonly?: boolean;
   disabled?: boolean;
   current?: boolean;
-}>(), {
-  selected: false,
-});
+}>();
 
 const emit = defineEmits<{
   click: [];
@@ -23,19 +28,16 @@ const emit = defineEmits<{
 
 const MAX_VISIBLE_FEATURES = 3;
 
-const { t } = useI18n({ useScope: 'global' });
-
-const { plan, tiersInfo, period, selected, current } = toRefs(props);
-
 const showAllFeatures = ref<boolean>(false);
 
-const isDisabled = computed<boolean>(() => props.disabled || get(current));
+const { t } = useI18n({ useScope: 'global' });
+
+const isDisabled = computed<boolean>(() => disabled || current);
 
 const price = computed<string | undefined>(() => {
-  const { monthlyPlan, yearlyPlan } = get(plan);
-  const periodVal = get(period);
+  const { monthlyPlan, yearlyPlan } = plan;
 
-  const targetPlan = periodVal === PricingPeriod.YEARLY ? yearlyPlan : monthlyPlan;
+  const targetPlan = period === PricingPeriod.YEARLY ? yearlyPlan : monthlyPlan;
   if (!targetPlan)
     return undefined;
   return formatCurrency(parseFloat(targetPlan.price));
@@ -47,11 +49,10 @@ const discountInfo = computed<{
   originalPrice: string;
   monthlyPrice: string;
 } | undefined>(() => {
-  const { monthlyPlan, yearlyPlan } = get(plan);
-  const periodVal = get(period);
+  const { monthlyPlan, yearlyPlan } = plan;
 
   // Only calculate discount for yearly plans
-  if (periodVal !== PricingPeriod.YEARLY || !monthlyPlan || !yearlyPlan)
+  if (period !== PricingPeriod.YEARLY || !monthlyPlan || !yearlyPlan)
     return undefined;
 
   const monthlyPrice = parseFloat(monthlyPlan.price);
@@ -74,8 +75,7 @@ const discountInfo = computed<{
 });
 
 const planFeatures = computed<PremiumTierInfoDescription[]>(() => {
-  const tiers = get(tiersInfo);
-  const tierInfo = tiers.find(tier => tier.name === props.plan.tierName);
+  const tierInfo = tiersInfo.find(tier => tier.name === plan.tierName);
   return tierInfo?.description ?? [];
 });
 
@@ -94,8 +94,8 @@ function toggleFeatures(event: MouseEvent): void {
   set(showAllFeatures, !get(showAllFeatures));
 }
 
-watch(price, (price) => {
-  if (!price && get(selected)) {
+watch(price, (newPrice) => {
+  if (!newPrice && selected) {
     emit('clear');
   }
 });

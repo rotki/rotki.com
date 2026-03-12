@@ -8,20 +8,17 @@ interface Props {
   error?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  isLoading: false,
-  error: false,
-});
+const { selectedTier, nftImages, isLoading = false, error = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   retry: [];
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
-
 const imageLoading = ref<boolean>(true);
 
-const tierLabel = computed<string | undefined>(() => findTierByKey(props.selectedTier)?.label);
+const { t } = useI18n({ useScope: 'global' });
+
+const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)?.label);
 </script>
 
 <template>

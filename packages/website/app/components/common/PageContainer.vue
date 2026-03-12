@@ -1,13 +1,19 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
+const {
+  wide = false,
+  centerVertically = true,
+  centerHorizontally = true,
+} = defineProps<{
   wide?: boolean;
   centerVertically?: boolean;
   centerHorizontally?: boolean;
-}>(), {
-  wide: false,
-  centerHorizontally: true,
-  centerVertically: true,
-});
+}>();
+
+defineSlots<{
+  title: () => void;
+  default: () => void;
+  hint: () => void;
+}>();
 </script>
 
 <template>

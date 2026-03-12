@@ -3,11 +3,19 @@ import type { CryptoPayment } from '~/types';
 import { get, set, useClipboard } from '@vueuse/core';
 import { useLogger } from '~/utils/use-logger';
 
-const props = defineProps<{
+const { data, isWalletOpen, loading } = defineProps<{
   data: CryptoPayment;
   isWalletOpen: boolean;
   loading?: boolean;
 }>();
+
+const { t } = useI18n({ useScope: 'global' });
+
+const qrText = ref<string>('');
+const canvas = useTemplateRef('canvas');
+
+const logger = useLogger('crypto-payment-qr');
+const { copy: copyToClipboard } = useClipboard({ source: qrText });
 
 // Lazy load qrcode library
 async function getToCanvas(): Promise<typeof import('qrcode').toCanvas> {
@@ -20,15 +28,6 @@ async function getParseUnits(): Promise<typeof import('ethers/utils').parseUnits
   const { parseUnits } = await import('ethers/utils');
   return parseUnits;
 }
-
-const { data, isWalletOpen, loading } = toRefs(props);
-
-const canvas = useTemplateRef('canvas');
-const qrText = ref<string>('');
-
-const logger = useLogger('crypto-payment-qr');
-const { copy: copyToClipboard } = useClipboard({ source: qrText });
-const { t } = useI18n({ useScope: 'global' });
 
 /**
  * Generate QR code for crypto payment
@@ -79,7 +78,7 @@ watch(canvas, async (canvas) => {
   if (!canvas)
     return;
 
-  set(qrText, await createPaymentQR(get(data), canvas));
+  set(qrText, await createPaymentQR(data, canvas));
 });
 </script>
 

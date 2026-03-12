@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { set } from '@vueuse/core';
 
-const props = defineProps<{ modelValue: string; disabled?: boolean }>();
+const { modelValue, disabled } = defineProps<{ modelValue: string; disabled?: boolean }>();
 
-const { modelValue } = toRefs(props);
-const copied = ref(false);
+const copied = ref<boolean>(false);
 
 const { start, stop } = useTimeoutFn(() => set(copied, false), 4000);
-const { copy } = useClipboard({ source: modelValue });
+const { copy } = useClipboard({ source: () => modelValue });
 const { t } = useI18n({ useScope: 'global' });
 
 function copyToClipboard() {

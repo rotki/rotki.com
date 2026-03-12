@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { RuiIcon } from '@rotki/ui-library';
+
+defineSlots<{
+  default: () => void;
+}>();
 </script>
 
 <template>

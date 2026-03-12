@@ -5,7 +5,10 @@ import { get, set } from '@vueuse/core';
 
 const model = defineModel<string>({ required: true });
 
-const props = defineProps<{
+const {
+  disabled,
+  discountInfo,
+} = defineProps<{
   plan: SelectedPlan;
   crypto?: boolean;
   disabled?: boolean;
@@ -16,30 +19,19 @@ const emit = defineEmits<{
   apply: [];
 }>();
 
-const { disabled, discountInfo } = toRefs(props);
-
 const value = ref<string>('');
 
 const { t } = useI18n({ useScope: 'global' });
 
 // Check if discount is applied and valid
-const isApplied = computed<boolean>(() => {
-  const info = get(discountInfo);
-  return !!info && info.isValid;
-});
+const isApplied = computed<boolean>(() => !!discountInfo && discountInfo.isValid);
 
 // Get error message if discount is invalid
 const errorMessage = computed<string | undefined>(() => {
-  const info = get(discountInfo);
-  if (info && !info.isValid) {
-    return info.error;
+  if (discountInfo && !discountInfo.isValid) {
+    return discountInfo.error;
   }
   return undefined;
-});
-
-// Sync internal value with model
-watchImmediate(model, (modelValue: string) => {
-  set(value, modelValue);
 });
 
 function apply(): void {
@@ -52,6 +44,11 @@ function reset(): void {
   set(model, '');
   emit('apply');
 }
+
+// Sync internal value with model
+watchImmediate(model, (modelValue: string) => {
+  set(value, modelValue);
+});
 </script>
 
 <template>

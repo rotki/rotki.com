@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Client } from 'braintree-web/client';
 import { get, set } from '@vueuse/core';
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import { addCard } from '@/utils/card-api';
 import BaseButton from './BaseButton.vue';
 import BaseDialog from './BaseDialog.vue';
@@ -18,9 +18,9 @@ const emit = defineEmits<{
   'error': [message: string];
 }>();
 
-const addCardForm = ref<InstanceType<typeof NewCardForm>>();
 const addCardFormValid = ref<boolean>(false);
 const isAddingCard = ref<boolean>(false);
+const addCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('addCardForm');
 
 async function handleAddCard(): Promise<void> {
   if (!get(addCardFormValid)) {

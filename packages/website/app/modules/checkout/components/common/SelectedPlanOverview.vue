@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { get, set } from '@vueuse/core';
+import { set } from '@vueuse/core';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
 
 interface VatOverview { vat: string; basePrice: string; vatAmount: string }
 
-const props = withDefaults(defineProps<{
+const {
+  plan,
+  breakdown,
+  crypto = false,
+  warning = false,
+  disabled = false,
+  loading = false,
+  upgrade = false,
+} = defineProps<{
   plan: SelectedPlan;
   breakdown?: PaymentBreakdownResponse;
   crypto?: boolean;
@@ -15,60 +23,49 @@ const props = withDefaults(defineProps<{
   disabled?: boolean;
   loading?: boolean;
   upgrade?: boolean;
-}>(), {
-  breakdown: undefined,
-  crypto: false,
-  warning: false,
-  disabled: false,
-  loading: false,
-  upgrade: false,
-});
+}>();
 
 const emit = defineEmits<{
   'plan-change': [plan: SelectedPlan];
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
-
-const { plan, breakdown, crypto, upgrade } = toRefs(props);
 const selection = ref<boolean>(false);
 
-const name = computed<string>(() => getPlanNameFor(t, get(plan)));
+const { t } = useI18n({ useScope: 'global' });
+
+const name = computed<string>(() => getPlanNameFor(t, plan));
 
 const date = computed<string>(() => formatDate(new Date()));
 
 const displayPrice = computed<string>(() => {
-  const currentBreakdown = get(breakdown);
-  if (currentBreakdown && !get(upgrade)) {
-    return currentBreakdown.fullAmount;
+  if (breakdown && !upgrade) {
+    return breakdown.fullAmount;
   }
-  return get(plan).price.toString();
+  return plan.price.toString();
 });
 
 const proratedPrice = computed<string | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  if (!currentBreakdown || !get(upgrade)) {
+  if (!breakdown || !upgrade) {
     return undefined;
   }
-  return currentBreakdown.fullAmount;
+  return breakdown.fullAmount;
 });
 
 const vatOverview = computed<VatOverview | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  if (!currentBreakdown) {
+  if (!breakdown) {
     return undefined;
   }
 
-  const floatRate = parseFloat(currentBreakdown.vatRate);
+  const floatRate = parseFloat(breakdown.vatRate);
   if (isFinite(floatRate) && floatRate <= 0) {
     return undefined;
   }
 
-  const vat = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
+  const vat = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : breakdown.vatRate;
 
   // Calculate base price from finalAmount - vatAmount for prorated VAT display
-  const finalAmount = parseFloat(currentBreakdown.finalAmount);
-  const vatAmount = parseFloat(currentBreakdown.vatAmount);
+  const finalAmount = parseFloat(breakdown.finalAmount);
+  const vatAmount = parseFloat(breakdown.vatAmount);
   const basePrice = (finalAmount - vatAmount).toFixed(2);
 
   return {

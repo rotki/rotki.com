@@ -7,7 +7,7 @@ import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout'
 import { get, set } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { paths } from '@/config/paths';
 import { addCard, createCardNonce } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
@@ -19,6 +19,14 @@ import PaymentGrandTotal from './PaymentGrandTotal.vue';
 import PlanSummary from './PlanSummary.vue';
 import SavedCardDisplay from './SavedCardDisplay.vue';
 import TermsAcceptance from './TermsAcceptance.vue';
+
+// VAT breakdown state
+interface VatBreakdown {
+  basePrice: string;
+  vatAmount: string;
+  vatRate: string;
+  fullAmount: string;
+}
 
 const error = defineModel<string>('error', { required: true });
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
@@ -38,28 +46,18 @@ const emit = defineEmits<{
   'refresh-card': [];
 }>();
 
-const client = ref<Client>();
-const newCardForm = ref<InstanceType<typeof NewCardForm>>();
+const client = shallowRef<Client>();
 const isProcessing = ref<boolean>(false);
 const acceptedTerms = ref<boolean>(false);
 const newCardFormValid = ref<boolean>(false);
 const showCardSelectionDialog = ref<boolean>(false);
 const showAddCardDialog = ref<boolean>(false);
 const pendingCardToken = ref<string>();
-
 // Discount state
 const discountCode = ref<string>('');
-
 // Breakdown from PlanSummary via v-model
 const breakdown = ref<PaymentBreakdownResponse>();
-
-// VAT breakdown state
-interface VatBreakdown {
-  basePrice: string;
-  vatAmount: string;
-  vatRate: string;
-  fullAmount: string;
-}
+const newCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('newCardForm');
 
 // Derive vatBreakdown from breakdown
 const vatBreakdown = computed<VatBreakdown | undefined>(() => {
@@ -112,10 +110,16 @@ const isFormValid = computed<boolean>(() => {
 
 // Initialize Braintree client
 async function initializeBraintreeClient(): Promise<void> {
+  const authorization = planData.braintreeClientToken;
+  if (!authorization) {
+    throw new Error('Braintree client token not available');
+  }
+
   try {
-    client.value = await create({
-      authorization: planData.braintreeClientToken,
+    const clientInstance = await create({
+      authorization,
     });
+    set(client, clientInstance);
   }
   catch (error_: any) {
     set(error, `Failed to initialize payment client: ${error_.message}`);
@@ -164,7 +168,7 @@ const grandTotal = computed<number>(() => {
     return parseFloat(currentBreakdown.finalAmount);
   }
 
-  return get(selectedPlan).price;
+  return selectedPlan.price;
 });
 
 const renewingPrice = computed<number>(() => {
@@ -175,7 +179,7 @@ const renewingPrice = computed<number>(() => {
     return parseFloat(currentBreakdown.renewingPrice);
   }
 
-  return get(selectedPlan).price;
+  return selectedPlan.price;
 });
 
 async function processPayment(): Promise<void> {
@@ -185,6 +189,11 @@ async function processPayment(): Promise<void> {
 
   set(isProcessing, true);
   set(error, '');
+
+  const clientToken = planData.braintreeClientToken;
+  if (!clientToken) {
+    throw new Error('Braintree client token not available');
+  }
 
   try {
     const card = get(selectedCard);
@@ -218,20 +227,19 @@ async function processPayment(): Promise<void> {
     });
 
     // Store data for 3D Secure if needed
-    const plan = get(selectedPlan);
     const currentDiscountInfo = get(discountInfo);
     const threeDSecureParams: ThreeDSecureParams = {
-      token: planData.braintreeClientToken,
+      token: clientToken,
       planId: selectedPlan.planId,
-      amount: plan.price.toString(),
+      amount: selectedPlan.price.toString(),
       finalAmount: get(grandTotal).toString(),
       renewingPrice: get(renewingPrice).toString(),
       nonce: paymentNonce,
       bin: paymentBin,
       discountCode: getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined),
-      upgradeSubId: get(upgradeSubId) || undefined,
-      durationInMonths: plan.durationInMonths,
-      planName: plan.name,
+      upgradeSubId: upgradeSubId || undefined,
+      durationInMonths: selectedPlan.durationInMonths,
+      planName: selectedPlan.name,
       discountTrackingInfo: currentDiscountInfo?.isValid === true
         ? { isReferral: currentDiscountInfo.isReferral, discountType: currentDiscountInfo.discountType }
         : undefined,

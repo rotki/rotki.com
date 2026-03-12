@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 
+defineSlots<{
+  default: () => void;
+}>();
+
 const { t } = useI18n({ useScope: 'global' });
 
 const year = new Date().getFullYear().toString();

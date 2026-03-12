@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { CryptoPayment } from '~/types';
-import { get } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import ChangeCryptoPayment from '~/modules/checkout/components/crypto/ChangeCryptoPayment.vue';
@@ -10,7 +9,15 @@ import CryptoPaymentQr from '~/modules/checkout/components/crypto/CryptoPaymentQ
 import CryptoWalletActions from '~/modules/checkout/components/crypto/CryptoWalletActions.vue';
 import { useWeb3Payment } from '~/modules/checkout/composables/use-crypto-payment';
 
-const props = defineProps<{
+const {
+  data,
+  plan,
+  planSwitchLoading,
+  web3ProcessingLoading,
+  upgradeSubId,
+  breakdown,
+  discountCode,
+} = defineProps<{
   data: CryptoPayment;
   plan: SelectedPlan;
   planSwitchLoading: boolean;
@@ -28,8 +35,6 @@ const emit = defineEmits<{
   'error': [message: string];
 }>();
 
-const { data, planSwitchLoading, web3ProcessingLoading, upgradeSubId, plan, breakdown, discountCode } = toRefs(props);
-
 const showChangePaymentDialog = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
@@ -37,21 +42,19 @@ const { t } = useI18n({ useScope: 'global' });
 const { chronicle } = useSigilEvents();
 
 async function navigateToSuccess(): Promise<void> {
-  const planData = get(plan);
-  const breakdownData = get(breakdown);
-  const discountInfo = breakdownData?.discount;
+  const discountInfo = breakdown?.discount;
   const discountType = discountInfo?.isValid === true
     ? (discountInfo.isReferral ? 'referral' : 'discount')
     : undefined;
 
   chronicle('purchase_success', {
     payment_method: 'crypto',
-    plan_id: planData.planId,
-    plan_name: planData.name,
-    plan_duration: planData.durationInMonths === 1 ? 'monthly' : 'yearly',
-    revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
+    plan_id: plan.planId,
+    plan_name: plan.name,
+    plan_duration: plan.durationInMonths === 1 ? 'monthly' : 'yearly',
+    revenue: breakdown?.finalAmount ? Number.parseFloat(breakdown.finalAmount) : undefined,
     currency: 'EUR',
-    is_upgrade: !!get(upgradeSubId),
+    is_upgrade: !!upgradeSubId,
     discount: discountType,
   });
 
@@ -68,12 +71,12 @@ const {
   open,
   isExpectedChain,
   switchNetwork,
-} = useWeb3Payment(data, {
+} = useWeb3Payment(() => data, {
   onSuccess: navigateToSuccess,
   onError: (message: string) => emit('error', message),
 });
 
-const isBtc = computed<boolean>(() => get(data).chainName === 'bitcoin');
+const isBtc = computed<boolean>(() => data.chainName === 'bitcoin');
 
 function handleInternalPlanChange(newPlan: SelectedPlan): void {
   emit('plan-change', newPlan);
@@ -123,7 +126,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
     <!-- Sidebar (Right Column) -->
     <aside class="w-full lg:sticky lg:top-8 lg:self-start lg:max-w-sm">
       <OrderSummaryCard
-        v-model:discount-code="discountCode"
+        :discount-code="discountCode"
         warning
         :selected-plan="plan"
         :breakdown="breakdown"
@@ -131,9 +134,9 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
         :is-crypto="true"
         :loading="planSwitchLoading"
         :disabled="planSwitchLoading || web3ProcessingLoading || processing"
+        @update:discount-code="emit('update:discountCode', $event)"
         @plan-change="handleInternalPlanChange($event)"
         @apply-discount="emit('apply-discount')"
-        @update:discount-code="emit('update:discountCode', $event)"
       />
     </aside>
   </div>

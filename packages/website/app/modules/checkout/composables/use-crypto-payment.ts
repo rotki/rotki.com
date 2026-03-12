@@ -1,5 +1,5 @@
 import type { Signer, TransactionResponse } from 'ethers';
-import type { ComputedRef, DeepReadonly, Ref } from 'vue';
+import type { ComputedRef, DeepReadonly, MaybeRefOrGetter, Ref } from 'vue';
 import type { CryptoPayment } from '~/types';
 import { get, set, useTimeoutFn } from '@vueuse/core';
 import { useAccountRefresh } from '~/composables/use-app-events';
@@ -57,7 +57,7 @@ interface UseWeb3PaymentReturn {
   switchNetwork: () => Promise<void>;
 }
 
-export function useWeb3Payment(data: Ref<CryptoPayment>, options: UseWeb3PaymentOptions = {}): UseWeb3PaymentReturn {
+export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: UseWeb3PaymentOptions = {}): UseWeb3PaymentReturn {
   const paymentApi = useCryptoPaymentApi();
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('web3-payment');
@@ -77,7 +77,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, options: UseWeb3Payment
   }, 5000, { immediate: false });
 
   const connection = useWeb3Connection({
-    chainId: get(data).chainId,
+    chainId: toValue(data).chainId,
     onAccountChange: () => {
       set(processing, false);
     },
@@ -157,7 +157,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, options: UseWeb3Payment
         return;
       }
 
-      const payment = get(data);
+      const payment = toValue(data);
       assert(payment);
 
       const { chainId, chainName } = payment;
@@ -195,7 +195,7 @@ export function useWeb3Payment(data: Ref<CryptoPayment>, options: UseWeb3Payment
   };
 
   async function switchNetwork(): Promise<void> {
-    await connection.switchNetwork(get(data).chainId);
+    await connection.switchNetwork(toValue(data).chainId);
   }
 
   return {

@@ -1,19 +1,21 @@
 <script lang="ts" setup>
-import type { SwiperOptions } from 'swiper/types';
+import type { AutoplayOptions, SwiperOptions } from 'swiper/types';
 import { Autoplay, Keyboard } from 'swiper/modules';
 import { Swiper } from 'swiper/vue';
 import 'swiper/css';
 
-withDefaults(defineProps<SwiperOptions>(), {
-  effect: 'slide',
-  direction: 'horizontal',
-  autoHeight: false,
-  enabled: true,
-  slidesPerView: 1,
-  spaceBetween: 30,
-  centeredSlides: false,
-  modules: () => [],
-});
+const { autoplay, autoHeight = false, breakpoints } = defineProps<{
+  autoplay?: AutoplayOptions | boolean;
+  autoHeight?: boolean;
+  breakpoints?: {
+    [width: number]: SwiperOptions;
+    [ratio: string]: SwiperOptions;
+  };
+}>();
+
+defineSlots<{
+  default: () => void;
+}>();
 </script>
 
 <template>
@@ -21,19 +23,12 @@ withDefaults(defineProps<SwiperOptions>(), {
     :auto-height="autoHeight"
     :autoplay="autoplay"
     :breakpoints="breakpoints"
-    :centered-slides="centeredSlides"
     class="w-full"
-    :coverflow-effect="coverflowEffect"
-    :direction="direction"
-    :effect="effect"
-    :enabled="enabled"
-    :loop="loop"
-    :modules="[Autoplay, Keyboard, ...modules]"
-    :navigation="navigation"
-    :pagination="pagination"
-    :slides-per-view="slidesPerView"
-    :space-between="spaceBetween"
-    :zoom="zoom"
+    direction="horizontal"
+    effect="slide"
+    :modules="[Autoplay, Keyboard]"
+    :slides-per-view="1"
+    :space-between="30"
     :keyboard="true"
   >
     <slot />

@@ -1,22 +1,18 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
-import { get } from '@vueuse/core';
 
-const props = defineProps<{
+const { tag } = defineProps<{
   tag: string;
 }>();
 
-const { tag } = toRefs(props);
-
 const icon = computed<RuiIcons | undefined>(() => {
-  const value = get(tag);
   const map: Record<string, RuiIcons> = {
     'full-time': 'lu-timer',
     'part-time': 'lu-timer',
     'remote': 'lu-map-pin',
   };
 
-  return map[value] ?? undefined;
+  return map[tag] ?? undefined;
 });
 </script>
 

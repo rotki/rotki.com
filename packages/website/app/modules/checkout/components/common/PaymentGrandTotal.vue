@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { get } from '@vueuse/core';
 import { formatDate } from '~/utils/date';
 
 interface VatBreakdown {
@@ -10,7 +9,14 @@ interface VatBreakdown {
   fullAmount: string;
 }
 
-const props = defineProps<{
+const {
+  plan,
+  grandTotal,
+  loading,
+  discountInfo,
+  crypto,
+  vatBreakdown,
+} = defineProps<{
   plan: SelectedPlan;
   grandTotal: number;
   loading?: boolean;
@@ -19,44 +25,33 @@ const props = defineProps<{
   vatBreakdown?: VatBreakdown;
 }>();
 
-const { discountInfo, plan, crypto, vatBreakdown } = toRefs(props);
-
 const { t } = useI18n({ useScope: 'global' });
 
-const hasDiscount = computed<boolean>(() => {
-  const info = get(discountInfo);
-  return info?.isValid ?? false;
-});
+const hasDiscount = computed<boolean>(() => discountInfo?.isValid ?? false);
 
 // Parse the string discount amount from breakdown response
-const discountAmount = computed<number>(() => {
-  const info = get(discountInfo);
-  return info && info.isValid ? parseFloat(info.discountedAmount) : 0;
-});
+const discountAmount = computed<number>(() =>
+  discountInfo && discountInfo.isValid ? parseFloat(discountInfo.discountedAmount) : 0,
+);
 
 const durationLabel = computed<string>(() => {
-  const currentPlan = get(plan);
-  if (currentPlan.durationInMonths === 12)
+  if (plan.durationInMonths === 12)
     return t('selected_plan_overview.year');
   return t('selected_plan_overview.month');
 });
 
 const renewalDate = computed<string>(() => {
-  const currentPlan = get(plan);
   const today = new Date();
   const renewal = new Date(today);
-  renewal.setMonth(renewal.getMonth() + currentPlan.durationInMonths);
+  renewal.setMonth(renewal.getMonth() + plan.durationInMonths);
   return formatDate(renewal);
 });
 
-const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: string }>(() => {
-  const breakdown = get(vatBreakdown);
-  return {
-    subtotal: breakdown?.basePrice ?? props.grandTotal.toFixed(2),
-    vatRate: breakdown?.vatRate ?? '0',
-    vatAmount: breakdown?.vatAmount ?? '0',
-  };
-});
+const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: string }>(() => ({
+  subtotal: vatBreakdown?.basePrice ?? grandTotal.toFixed(2),
+  vatRate: vatBreakdown?.vatRate ?? '0',
+  vatAmount: vatBreakdown?.vatAmount ?? '0',
+}));
 </script>
 
 <template>

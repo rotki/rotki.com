@@ -5,20 +5,21 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const props = withDefaults(defineProps<{
+const { text = false, size } = defineProps<{
   text?: boolean;
   size?: string | number;
-}>(), {
-  text: false,
-  size: undefined,
-});
+}>();
+
+const name = 'rotki';
+const { isStaging } = useStagingBranding();
+const branch = useRuntimeConfig().public.testing ? 'develop' : 'main';
 
 /**
  * Converts size prop to pixel value for image dimensions
  * Default size is 3rem = 48px (assuming 16px base)
  */
 function getSizeInPixels(): number {
-  const sizeValue = props.size;
+  const sizeValue = size;
   if (!sizeValue)
     return 48; // 3rem default
 
@@ -33,10 +34,6 @@ function getSizeInPixels(): number {
     return num;
   return num * 16; // Default to rem conversion
 }
-
-const { isStaging } = useStagingBranding();
-const branch = useRuntimeConfig().public.testing ? 'develop' : 'main';
-const name = 'rotki';
 </script>
 
 <template>
