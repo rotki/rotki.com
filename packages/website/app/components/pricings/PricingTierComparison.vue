@@ -132,28 +132,40 @@ const displayedFeaturesLabel = computed<string[]>(() => {
 });
 
 function isFeatureFlag(label: string, descriptionMap: FeatureDescriptionMap): boolean {
+  let hasBoolean = false;
   for (const [_planName, features] of descriptionMap) {
     const featureValue = features.get(label);
-    if (typeof featureValue === 'boolean') {
-      return true;
+    if (featureValue === undefined) {
+      continue;
     }
+    if (typeof featureValue !== 'boolean') {
+      return false;
+    }
+    hasBoolean = true;
   }
-  return false;
+  return hasBoolean;
 }
 
 function getFeatureValue(plan: PlanBase, label: string, descriptionMap: FeatureDescriptionMap): FeatureValue {
   if (isFreePlan(plan)) {
     // Use shared free plan features
     const feature = freePlanFeatures.find(f => f.label === label);
-    return feature?.value;
+    if (feature) {
+      return feature.value;
+    }
+    // Boolean features show as false (dash) for the free plan
+    if (isFeatureFlag(label, descriptionMap)) {
+      return false;
+    }
+    return undefined;
   }
 
   if (isCustomPlan(plan)) {
-    if (label.toLowerCase().includes('support')) {
-      return t('pricing.custom_plan_bespoke_support');
-    }
     if (isFeatureFlag(label, descriptionMap)) {
       return true;
+    }
+    if (label.toLowerCase().includes('support')) {
+      return t('pricing.custom_plan_bespoke_support');
     }
 
     return t('pricing.custom_plan_negotiable');
