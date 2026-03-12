@@ -47,6 +47,7 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(props.selecte
       >
         <img
           :key="nftImages[selectedTier]"
+          data-id="nft-image"
           :src="nftImages[selectedTier]"
           :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: tierLabel })"
           class="w-full h-full object-cover rounded-lg z-[2]"

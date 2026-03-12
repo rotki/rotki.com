@@ -9,7 +9,6 @@ import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 
 definePageMeta({
   layout: 'sponsor',
-  middleware: 'sponsorship',
 });
 
 const { t } = useI18n({ useScope: 'global' });

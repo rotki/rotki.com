@@ -10,20 +10,22 @@ interface Token {
 
 interface Props {
   availableTokens: Token[];
+  disabled?: boolean;
   isLoading?: boolean;
 }
 
 const selectedCurrency = defineModel<string>({ required: true });
 
-withDefaults(defineProps<Props>(), {
-  isLoading: false,
-});
+const { disabled = false, isLoading = false } = defineProps<Props>();
 
 const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div
+    class="space-y-4"
+    :class="{ 'opacity-50 pointer-events-none': disabled }"
+  >
     <h6 class="font-bold">
       {{ t('sponsor.sponsor_page.payment_currency') }}
     </h6>

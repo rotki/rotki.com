@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { usePageSeoNoIndex } from '~/composables/use-page-seo';
+import { usePageSeo } from '~/composables/use-page-seo';
 import Default from '~/layouts/default.vue';
+
+interface TabItem {
+  label: string;
+  icon: string;
+  to: string;
+}
 
 const { t } = useI18n({ useScope: 'global' });
 
-usePageSeoNoIndex('sponsor');
+usePageSeo('Sponsor', 'Sponsor rotki\'s development and support independent, local-first, privacy-preserving open-source software.', '/sponsor/mint');
 
-const tabModelValue = ref();
+const tabModelValue = ref<string>();
 
-const tabs = [
+const tabs = computed<TabItem[]>(() => [
   {
     label: t('sponsor.tabs.sponsor'),
     icon: 'lu-handshake',
@@ -24,7 +30,7 @@ const tabs = [
     icon: 'lu-user-plus',
     to: '/sponsor/submit-name',
   },
-];
+]);
 </script>
 
 <template>

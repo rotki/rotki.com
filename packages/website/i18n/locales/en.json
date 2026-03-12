@@ -1070,6 +1070,7 @@
         "tier_sponsorship": "{tier} tier sponsorship for rotki release {releaseName}.",
         "see_examples": "See how it looks like"
       },
+      "minting_unavailable": "Minting is currently unavailable. You can still browse the tiers and leaderboard.",
       "error": {
         "minting_failed": "Minting Failed",
         "unavailable": "Something went wrong while loading the NFT sponsorship page. \nIf it persists, please contact {email}"

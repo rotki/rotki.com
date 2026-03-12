@@ -20,7 +20,8 @@
     "test:watch": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "og:mint": "npx tsx scripts/generate-og-mint.ts"
   },
   "dependencies": {
     "@nuxtjs/robots": "5.7.1",

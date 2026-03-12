@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import type { ButtonProps } from '@rotki/ui-library';
-import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-sponsorship-feature';
 
 const { t } = useI18n({ useScope: 'global' });
-const { isEnabled: isSponsorshipEnabled } = useSponsorshipFeature();
 
 interface Menu {
   label: string;
@@ -72,23 +69,18 @@ const baseMenus: (Menu | MenuParent)[] = [
   },
 ];
 
-const sponsorMenu: Menu = {
-  label: t('navigation_menu.sponsor'),
-  to: '/sponsor/mint',
-  highlightExactActive: true,
-  buttonProps: {
-    color: 'primary',
-    variant: 'outlined',
+const menus: (Menu | MenuParent)[] = [
+  ...baseMenus,
+  {
+    label: t('navigation_menu.sponsor'),
+    to: '/sponsor/mint',
+    highlightExactActive: true,
+    buttonProps: {
+      color: 'primary',
+      variant: 'outlined',
+    },
   },
-};
-
-const menus = computed<(Menu | MenuParent)[]>(() => {
-  const allMenus = [...baseMenus];
-  if (get(isSponsorshipEnabled)) {
-    allMenus.push(sponsorMenu);
-  }
-  return allMenus;
-});
+];
 
 const { isMdAndDown } = useBreakpoint();
 </script>

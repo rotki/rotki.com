@@ -54,11 +54,12 @@ const LeaderboardMetadata = z.object({
 
 type LeaderboardMetadata = z.infer<typeof LeaderboardMetadata>;
 
-usePageSeo('Leaderboard | rotki', 'rotki\'s sponsor leaderboard', '/sponsor/leaderboard');
+usePageSeo('Sponsor Leaderboard', 'See the top supporters of rotki, an independent open-source privacy-preserving portfolio tracker. Join the leaderboard by sponsoring a release.', '/sponsor/leaderboard', {
+  keywords: 'open source sponsorship, open source funding, privacy software, local-first software, rotki sponsor',
+});
 
 definePageMeta({
   layout: 'sponsor',
-  middleware: 'sponsorship',
 });
 
 const logger = useLogger();

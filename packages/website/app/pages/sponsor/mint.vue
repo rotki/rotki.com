@@ -11,6 +11,7 @@ import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
 import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-payment';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
+import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-sponsorship-feature';
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePageSeo } from '~/composables/use-page-seo';
@@ -18,11 +19,13 @@ import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 import { useLogger } from '~/utils/use-logger';
 
-usePageSeo('Sponsor | rotki', 'Sponsor rotki\'s next release', '/sponsor/mint', { ogImage: 'mint.png' });
+usePageSeo('Sponsor rotki — Support Open-Source Privacy Software', 'Support rotki\'s development. Fund independent, local-first, privacy-preserving portfolio management software.', '/sponsor/mint', {
+  ogImage: 'mint.png',
+  keywords: 'open source sponsorship, open source funding, privacy software, local-first software, crypto sponsorship, NFT sponsorship, rotki sponsor',
+});
 
 definePageMeta({
   layout: 'sponsor',
-  middleware: 'sponsorship',
 });
 
 const {
@@ -36,6 +39,7 @@ const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
 type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
 
 const logger = useLogger();
+const { isEnabled: isMintingEnabled } = useSponsorshipFeature();
 
 const selectedTier = ref<TierKey>('bronze');
 const isApproving = ref<boolean>(false);
@@ -266,7 +270,9 @@ const buttonAction = computed(() => {
   return handleMint;
 });
 
-const isButtonDisabled = computed(() => {
+const isButtonDisabled = computed<boolean>(() => {
+  if (!get(isMintingEnabled))
+    return true;
   const selectedTierKey = get(selectedTier);
   const visible = get(visibleTiers);
   return visible.length === 0 || get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
@@ -437,10 +443,19 @@ onBeforeMount(async () => {
             </p>
           </div>
 
+          <!-- Minting Unavailable Warning -->
+          <RuiAlert
+            v-if="!isMintingEnabled"
+            type="warning"
+          >
+            {{ t('sponsor.sponsor_page.minting_unavailable') }}
+          </RuiAlert>
+
           <!-- Currency Selection -->
           <MintCurrencySelection
             v-model="selectedCurrency"
             :available-tokens="availableTokens"
+            :disabled="!isMintingEnabled"
             :is-loading="isLoadingPaymentTokens"
           />
 
@@ -448,6 +463,7 @@ onBeforeMount(async () => {
           <MintTierSelection
             v-if="availableTokens.length > 0"
             v-model="selectedTier"
+            :disabled="!isMintingEnabled"
             :tier-supply="tierSupply"
             :tier-price-display="tierPriceDisplay"
             :visible-tiers="visibleTiers"

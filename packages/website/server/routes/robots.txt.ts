@@ -4,11 +4,10 @@ export default defineEventHandler((event: H3Event) => {
   const {
     public: {
       baseUrl,
-      sponsorshipEnabled,
     },
   } = useRuntimeConfig(event);
 
-  let disallowPaths = [
+  const disallowPaths = [
     '/account',
     '/account/**',
     '/purchase',
@@ -23,10 +22,6 @@ export default defineEventHandler((event: H3Event) => {
     '/auth',
     '/auth/**',
   ];
-
-  if (!sponsorshipEnabled) {
-    disallowPaths = [...disallowPaths, '/sponsor', '/sponsor/**'];
-  }
 
   const robotsContent = `User-agent: *
 ${disallowPaths.map(path => `Disallow: ${path}`).join('\n')}

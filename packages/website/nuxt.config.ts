@@ -13,15 +13,8 @@ import {
   walletConnectCSP,
 } from './csp-config';
 
-const sponsorshipEnabled = process.env.NUXT_PUBLIC_SPONSORSHIP_ENABLED === 'true';
-
 // Build identifier for unique chunk names per deployment
 const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
-
-const sponsorRoutes = [
-  '/sponsor',
-  '/sponsor/**',
-];
 
 const nonIndexed = [
   '/activation',
@@ -47,7 +40,6 @@ const nonIndexed = [
   '/_nuxt/**',
   '/testimonials/**',
   '/oauth/**',
-  ...(!sponsorshipEnabled ? sponsorRoutes : []),
 ];
 
 const domain = process.env.PROXY_DOMAIN ?? 'localhost';
@@ -518,6 +510,7 @@ export default defineNuxtConfig({
         '../content.config.ts',
         '../csp-config.ts',
         '../tests/**/*.ts',
+        '../scripts/**/*.ts',
       ],
     },
   },
