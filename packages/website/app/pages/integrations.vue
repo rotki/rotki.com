@@ -7,7 +7,7 @@ const { t } = useI18n({ useScope: 'global' });
 usePageSeo('integrations', 'Supported blockchains, exchanges, and protocols in rotki', '/integrations/');
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 </script>
 

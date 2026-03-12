@@ -23,7 +23,7 @@ onBeforeMount(() => {
 });
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 </script>
 

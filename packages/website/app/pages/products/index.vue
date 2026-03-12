@@ -12,7 +12,7 @@ import { usePageSeo } from '~/composables/use-page-seo';
 usePageSeo('premium subscription', 'Features included with a premium rotki subscription', '/products/');
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 </script>
 

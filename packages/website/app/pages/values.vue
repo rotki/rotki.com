@@ -8,7 +8,7 @@ import { usePageSeo } from '~/composables/use-page-seo';
 usePageSeo('rotki', 'Values of rotki', '/values');
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 </script>
 

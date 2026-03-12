@@ -3,6 +3,10 @@ import { get } from '@vueuse/core';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import PageHeader from '~/components/header/PageHeader.vue';
 
+const route = useRoute();
+
+const isLanding = computed<boolean>(() => !!route.meta.landing);
+
 const headerRef = ref<HTMLDivElement>();
 const footerRef = ref<HTMLDivElement>();
 
@@ -31,8 +35,6 @@ provide('otherHeight', otherHeight);
     <slot />
   </div>
   <div ref="footerRef">
-    <slot name="footer">
-      <PageFooter />
-    </slot>
+    <PageFooter :landing="isLanding" />
   </div>
 </template>

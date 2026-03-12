@@ -4,7 +4,7 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 usePageSeoNoIndex('maintenance');
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 
 const { public: { maintenance, contact: { emailMailto, email } } } = useRuntimeConfig();

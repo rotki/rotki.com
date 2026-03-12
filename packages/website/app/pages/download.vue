@@ -35,7 +35,7 @@ const links = computed<DownloadItem[]>(() => [
 onBeforeMount(async () => await fetchLatestRelease());
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 </script>
 

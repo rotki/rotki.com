@@ -45,7 +45,7 @@ useHead({
 });
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
   middleware: ['maintenance'],
 });
 

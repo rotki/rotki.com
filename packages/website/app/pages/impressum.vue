@@ -2,7 +2,7 @@
 import MarkdownContent from '~/components/documents/MarkdownContent.vue';
 
 definePageMeta({
-  layout: 'landing',
+  landing: true,
 });
 </script>
 

@@ -27,7 +27,7 @@ function handleError() {
 </script>
 
 <template>
-  <NuxtLayout name="landing">
+  <NuxtLayout>
     <div
       v-if="error"
       class="container text-center"
