@@ -13,9 +13,13 @@ export function useNftMetadata() {
       if (result && result.tierName) {
         const { releaseId, releaseName } = result;
 
-        const usedReleaseName = releaseName
-          ? (releaseName.startsWith('v') ? releaseName : `v${releaseName}`)
-          : `v${releaseId}`;
+        let usedReleaseName: string;
+        if (releaseName) {
+          usedReleaseName = releaseName.startsWith('v') ? releaseName : `v${releaseName}`;
+        }
+        else {
+          usedReleaseName = `v${releaseId}`;
+        }
 
         return {
           owner: result.owner,

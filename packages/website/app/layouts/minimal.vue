@@ -34,12 +34,18 @@ const copyright = `© Rotki Solutions GmbH 2018-${year}.`;
           <!-- Buttons on the right -->
           <div class="flex items-center gap-3">
             <NuxtLink to="/">
-              <button class="px-4 py-2 text-rui-primary hover:bg-rui-primary/10 text-sm transition-colors">
+              <button
+                type="button"
+                class="px-4 py-2 text-rui-primary hover:bg-rui-primary/10 text-sm transition-colors"
+              >
                 {{ t('navigation_menu.home') }}
               </button>
             </NuxtLink>
             <NuxtLink to="/home/subscription">
-              <button class="px-4 py-2 bg-rui-primary text-white rounded-full hover:bg-rui-primary-darker transition-colors text-sm font-medium shadow-sm">
+              <button
+                type="button"
+                class="px-4 py-2 bg-rui-primary text-white rounded-full hover:bg-rui-primary-darker transition-colors text-sm font-medium shadow-sm"
+              >
                 {{ t('page_header.manage_premium') }}
               </button>
             </NuxtLink>

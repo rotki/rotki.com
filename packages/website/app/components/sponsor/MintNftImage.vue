@@ -32,6 +32,7 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
           {{ t('sponsor.sponsor_page.nft_image.failed_to_load') }}
         </div>
         <button
+          type="button"
           class="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
           @click="emit('retry')"
         >

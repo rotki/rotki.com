@@ -110,9 +110,10 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
     if (result.success) {
       const breakdownData = get(breakdown);
       const discountInfo = breakdownData?.discount;
-      const discountType = discountInfo?.isValid === true
-        ? (discountInfo.isReferral ? 'referral' : 'discount')
-        : undefined;
+      let discountType: 'discount' | 'referral' | undefined;
+      if (discountInfo?.isValid === true) {
+        discountType = discountInfo.isReferral ? 'referral' : 'discount';
+      }
 
       chronicle('purchase_success', {
         payment_method: 'paypal',

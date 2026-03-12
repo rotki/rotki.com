@@ -38,6 +38,7 @@ defineEmits<Emits>();
       </p>
       <button
         v-if="buttonText"
+        type="button"
         class="px-6 py-2 bg-rui-primary text-white rounded-full hover:bg-rui-primary-darker transition-colors"
         @click="$emit('button-click')"
       >

@@ -25,9 +25,10 @@ onMounted(() => {
   const plan = get(checkout.selectedPlan);
   const breakdownData = get(checkout.breakdown);
   const discountInfo = breakdownData?.discount;
-  const discountType = discountInfo?.isValid === true
-    ? (discountInfo.isReferral ? 'referral' : 'discount')
-    : undefined;
+  let discountType: 'discount' | 'referral' | undefined;
+  if (discountInfo?.isValid === true) {
+    discountType = discountInfo.isReferral ? 'referral' : 'discount';
+  }
 
   chronicle('checkout_start', {
     plan_id: get(checkout.planId),

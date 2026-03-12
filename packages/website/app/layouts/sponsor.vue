@@ -16,7 +16,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 usePageSeo('Sponsor', 'Sponsor rotki\'s development and support independent, local-first, privacy-preserving open-source software.', '/sponsor/mint');
 
-const tabModelValue = ref<string>();
+const tabModelValue = ref<string>('');
 
 const tabs = computed<TabItem[]>(() => [
   {

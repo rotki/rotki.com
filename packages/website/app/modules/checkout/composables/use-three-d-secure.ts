@@ -246,9 +246,10 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
     // Use discount tracking info passed from card payment page via session storage
     const discountTrackingInfo = params.discountTrackingInfo;
-    const discountType = discountTrackingInfo
-      ? (discountTrackingInfo.isReferral ? 'referral' : 'discount')
-      : undefined;
+    let discountType: 'discount' | 'referral' | undefined;
+    if (discountTrackingInfo) {
+      discountType = discountTrackingInfo.isReferral ? 'referral' : 'discount';
+    }
 
     // Track purchase success
     chronicle('purchase_success', {

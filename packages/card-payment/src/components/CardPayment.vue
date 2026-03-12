@@ -336,6 +336,7 @@ onUnmounted(async () => {
             <!-- Button to change card -->
             <div class="flex justify-end mt-4">
               <button
+                type="button"
                 :disabled="isProcessing"
                 class="text-sm text-neutral-500 hover:bg-neutral-100 px-1.5 py-0.5 rounded-md hover:underline"
                 @click="showCardSelectionDialog = true"
