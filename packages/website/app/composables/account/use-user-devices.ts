@@ -30,8 +30,9 @@ export function useUserDevices(): UseUserDevicesReturn {
       return UserDevices.parse(response);
     },
     {
+      dedupe: 'defer',
       default: () => [] satisfies UserDevice[],
-      immediate: false,
+      server: false,
     },
   );
 
@@ -73,8 +74,6 @@ export function useUserDevices(): UseUserDevicesReturn {
       logger.error('Failed to fetch devices:', newError);
     }
   });
-
-  onBeforeMount(refresh);
 
   return {
     deleteDevice,
