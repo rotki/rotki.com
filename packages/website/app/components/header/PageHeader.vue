@@ -39,6 +39,7 @@ watch(
             icon
             variant="text"
             color="primary"
+            aria-label="Open menu"
             @click="menuOpened = true"
           >
             <RuiIcon name="lu-menu" />
@@ -50,7 +51,10 @@ watch(
         :class="{ 'invisible opacity-0': !menuOpened }"
         @click="menuOpened = false"
       >
-        <RuiButton icon>
+        <RuiButton
+          icon
+          aria-label="Close menu"
+        >
           <RuiIcon
             name="lu-x"
             color="primary"
@@ -82,7 +86,7 @@ watch(
           </NuxtLink>
           <RuiButton
             v-if="authenticated"
-            title="Logout"
+            aria-label="Logout"
             color="primary"
             variant="text"
             icon

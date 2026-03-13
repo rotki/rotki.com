@@ -59,7 +59,6 @@ function onSwiperUpdate(s: Swiper) {
       }"
       :breakpoints="breakpoints"
       class="mb-12"
-      auto-height
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
     >

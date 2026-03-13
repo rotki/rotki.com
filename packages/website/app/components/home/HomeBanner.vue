@@ -27,14 +27,14 @@ const data: { icon: RuiIcons; text: string; tooltip: string }[] = [
 <template>
   <div class="container pt-16 md:pt-20">
     <div class="text-center flex flex-col gap-6 items-center">
-      <h3 class="text-h4 md:text-h3 !font-bold max-w-[800px]">
+      <h1 class="text-h4 md:text-h3 !font-bold max-w-[800px]">
         {{ t('home.hero.title') }}
-      </h3>
-      <h5
+      </h1>
+      <h2
         class="text-h6 md:text-h5 text-rui-text-secondary !font-normal max-w-[630px]"
       >
         {{ t('home.hero.motto') }}
-      </h5>
+      </h2>
       <ButtonLink
         to="/download"
         size="lg"

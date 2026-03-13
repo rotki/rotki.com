@@ -29,7 +29,7 @@ const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingC
 </script>
 
 <template>
-  <ClientOnly>
+  <div class="min-h-[520px] md:min-h-[560px] xl:min-h-[570px]">
     <PricingTable
       v-if="isXlAndUp"
       :plans="plans"
@@ -58,5 +58,5 @@ const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingC
         }}
       </RuiButton>
     </div>
-  </ClientOnly>
+  </div>
 </template>

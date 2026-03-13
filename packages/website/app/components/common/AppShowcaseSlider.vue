@@ -19,14 +19,34 @@ const swiperInstance = ref<Swiper>();
 const swiperReady = ref<boolean>(false);
 const activeIndex = ref<number>(1);
 
-const images = ref<string[]>([]);
+interface ScreenshotImage {
+  src: string;
+  alt: string;
+}
+
+const screenshotAltTexts: Record<string, string> = {
+  '1-sc-dashboard': 'rotki dashboard showing portfolio overview',
+  '2-sc-history-events': 'rotki history events and transaction tracking',
+  '3-sc-statistics1': 'rotki statistics and portfolio analytics',
+  '4-sc-statistics2': 'rotki detailed statistical charts',
+  '5-sc-eth-staking': 'rotki Ethereum staking overview',
+  '6-sc-gnosis-pay': 'rotki Gnosis Pay integration',
+  '7-sc-onchain-send': 'rotki on-chain transaction sending',
+};
+
+function getAltText(path: string): string {
+  const filename = path.split('/').pop()?.replace(/\.\w+$/, '') ?? '';
+  return screenshotAltTexts[filename] ?? 'rotki application screenshot';
+}
+
+const images = ref<ScreenshotImage[]>([]);
 
 function scanImages(): void {
   const assetContext = import.meta.glob(
     '~~/public/img/screenshots/*.(png|jpe?g|webp)',
   );
   const assetPaths = Object.keys(assetContext);
-  set(images, assetPaths);
+  set(images, assetPaths.map(src => ({ src, alt: getAltText(src) })));
 }
 
 function onSwiperUpdate(s: Swiper): void {
@@ -60,7 +80,6 @@ scanImages();
         disableOnInteraction: false,
         pauseOnMouseEnter: true,
       }"
-      auto-height
       class="rounded-lg md:rounded-2xl lg:rounded-3xl border border-black/[0.12]"
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
@@ -72,9 +91,11 @@ scanImages();
         class="relative pt-[56.2%] bg-rui-grey-100"
       >
         <NuxtImg
-          :src="image"
-          alt=" "
+          :src="image.src"
+          :alt="image.alt"
           format="webp"
+          width="1440"
+          height="810"
           :loading="getLoadingStrategy(i)"
           :fetchpriority="getFetchPriority(i)"
           sizes="sm:100vw md:80vw lg:900px"

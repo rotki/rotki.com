@@ -57,9 +57,9 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
           'opacity-60': active,
         }"
       />
-      <h6 class="text-h6 mt-1">
+      <h5 class="text-h6 mt-1">
         {{ title }}
-      </h6>
+      </h5>
       <div class="text-body-1 opacity-70 hidden lg:block">
         {{ subtitle }}
       </div>
@@ -92,7 +92,10 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
           />
         </div>
       </div>
-      <RuiTabItems v-model="model">
+      <RuiTabItems
+        v-model="model"
+        class="min-h-[674px] sm:min-h-[344px] lg:min-h-[333px] xl:min-h-[429px]"
+      >
         <RuiTabItem eager>
           <AppDashboard />
         </RuiTabItem>

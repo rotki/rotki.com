@@ -29,7 +29,7 @@ ${disallowPaths.map(path => `Disallow: ${path}`).join('\n')}
 User-agent: *
 Allow: /
 
-Sitemap: ${baseUrl}/sitemap.xml`;
+Sitemap: ${baseUrl || 'https://rotki.com'}/sitemap.xml`;
 
   event.node.res.setHeader('Content-Type', 'text/plain');
   return robotsContent;

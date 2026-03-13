@@ -113,6 +113,10 @@ export default defineNuxtConfig({
           href: '/safari-pinned-tab.svg',
           rel: 'mask-icon',
         },
+        {
+          href: 'https://raw.githubusercontent.com',
+          rel: 'preconnect',
+        },
       ],
       meta: [
         { charset: 'utf-8' },

@@ -32,12 +32,12 @@ provide('otherHeight', otherHeight);
   <div ref="headerRef">
     <PageHeader />
   </div>
-  <div
+  <main
     class="flex flex-col"
     :style="bodyStyle"
   >
     <slot />
-  </div>
+  </main>
   <div ref="footerRef">
     <PageFooter :landing="isLanding" />
   </div>

@@ -1,4 +1,5 @@
 @import '@rotki/ui-library/style.css';
+@import 'swiper/css';
 
 @tailwind base;
 @tailwind components;
