@@ -51,6 +51,11 @@ export default rotki({
     'node/prefer-global/process': 'off',
   },
 }, {
+  files: ['**/*.yml', '**/*.yaml'],
+  rules: {
+    '@stylistic/spaced-comment': 'off',
+  },
+}, {
   ignores: [
     '**/dist/**',
     '**/node_modules/**',
