@@ -81,7 +81,8 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        lang: 'en',
+        'data-theme': 'light',
+        'lang': 'en',
       },
       link: [
         {
@@ -143,10 +144,6 @@ export default defineNuxtConfig({
   components: false,
 
   css: [
-    '@fontsource/roboto/latin-400.css',
-    '@fontsource/roboto/latin-500.css',
-    '@fontsource/roboto/latin-600.css',
-    '@fontsource/roboto/latin-700.css',
     '~/assets/css/tailwind.css',
   ],
 
@@ -174,6 +171,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/devtools',
+    '@nuxt/fonts',
     '@nuxtjs/sitemap',
     '@nuxt/content',
     '@nuxtjs/i18n',
@@ -495,6 +493,22 @@ export default defineNuxtConfig({
 
   site: {
     url: 'https://rotki.com',
+  },
+
+  fonts: {
+    families: [
+      {
+        name: 'Roboto',
+        provider: 'fontsource',
+        weights: [400, 500, 600, 700],
+        subsets: ['latin'],
+      },
+    ],
+    defaults: {
+      fallbacks: {
+        'sans-serif': ['Arial', 'Helvetica Neue', 'sans-serif'],
+      },
+    },
   },
 
   sitemap: {
