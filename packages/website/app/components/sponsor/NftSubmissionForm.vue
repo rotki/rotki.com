@@ -37,7 +37,7 @@ const displayName = ref<string>('');
 const isSubmitting = ref<boolean>(false);
 const error = ref<string>('');
 const success = ref<boolean>(false);
-const imageFile = ref<File | null>(null);
+const imageFile = ref<File>();
 const imagePreview = ref<string>('');
 const deleteImage = ref<boolean>(false);
 const hasExistingImage = ref<boolean>(false);
@@ -51,7 +51,7 @@ const nftReleaseName = ref<string>('');
 const nftOwner = ref<string>('');
 const isNftOwnerValid = ref<boolean>(false);
 const hasCheckedNft = ref<boolean>(false);
-const existingSubmission = ref<NftSubmission | null>(null);
+const existingSubmission = ref<NftSubmission>();
 const isCheckingExistingSubmission = ref<boolean>(false);
 
 const { currentAddressNfts } = useRotkiSponsorshipPayment();
@@ -123,7 +123,7 @@ const validImageType = helpers.withMessage(
 
 const atLeastOneRequired = helpers.withMessage(
   () => t('sponsor.submit_name.error.at_least_one_required'),
-  () => get(displayName).trim().length > 0 || get(imageFile) !== null || get(email).trim().length > 0,
+  () => get(displayName).trim().length > 0 || get(imageFile) !== undefined || get(email).trim().length > 0,
 );
 
 // Validation rules
@@ -166,7 +166,7 @@ function handleImageSelected(file: File): void {
 }
 
 function removeImage(): void {
-  set(imageFile, null);
+  set(imageFile, undefined);
   set(imagePreview, '');
 
   // If we had an existing image, mark it for deletion
@@ -235,7 +235,7 @@ async function handleSubmit(): Promise<void> {
     set(displayName, '');
     set(tokenId, '');
     set(email, '');
-    set(imageFile, null);
+    set(imageFile, undefined);
     set(imagePreview, '');
     set(deleteImage, false);
     set(hasExistingImage, false);
@@ -283,7 +283,7 @@ async function checkExistingSubmission(nftId: number): Promise<void> {
       }
 
       // Reset file and delete flag
-      set(imageFile, null);
+      set(imageFile, undefined);
       set(deleteImage, false);
 
       // Store the existing submission for tracking
@@ -323,7 +323,7 @@ async function checkNftMetadata(): Promise<void> {
     set(nftReleaseName, '');
     set(nftOwner, '');
     set(isNftOwnerValid, false);
-    set(existingSubmission, null);
+    set(existingSubmission, undefined);
 
     // Use the composable to fetch NFT metadata
     const metadata = await fetchNftMetadata(tokenIdValue);
@@ -372,13 +372,13 @@ async function checkNftMetadata(): Promise<void> {
 }
 
 function clearFormForNewSubmission(): void {
-  set(existingSubmission, null);
+  set(existingSubmission, undefined);
   set(displayName, '');
   set(email, '');
   set(imagePreview, '');
   set(hasExistingImage, false);
   set(deleteImage, false);
-  set(imageFile, null);
+  set(imageFile, undefined);
 }
 
 const shouldDisableFields = computed(() => get(isSubmitting) || !get(isAuthenticated));
@@ -433,7 +433,7 @@ watch(() => props.editingSubmission, (submission) => {
     }
 
     // Reset file and delete flag
-    set(imageFile, null);
+    set(imageFile, undefined);
     set(deleteImage, false);
 
     // When editing, assume NFT ownership is valid (they already submitted it)

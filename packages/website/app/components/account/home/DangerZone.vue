@@ -6,9 +6,9 @@ import FloatingNotification from '~/components/account/home/FloatingNotification
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useMainStore } from '~/store';
 
-const confirm = ref(false);
-const usernameConfirmation = ref('');
-const error = ref('');
+const confirm = ref<boolean>(false);
+const usernameConfirmation = ref<string>('');
+const error = ref<string>('');
 
 const store = useMainStore();
 const accountApi = useAccountApi();

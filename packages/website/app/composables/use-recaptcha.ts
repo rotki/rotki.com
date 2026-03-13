@@ -1,8 +1,8 @@
 import { set } from '@vueuse/core';
 
 export function useRecaptcha() {
-  const recaptchaPassed = ref(false);
-  const recaptchaToken = ref('');
+  const recaptchaPassed = ref<boolean>(false);
+  const recaptchaToken = ref<string>('');
   const captchaId = ref<number>();
 
   const onSuccess = (token: string): void => {

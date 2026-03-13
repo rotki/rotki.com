@@ -15,7 +15,7 @@ function onDownloadClick(platform: string): void {
   });
 }
 
-const showAll = ref(false);
+const showAll = ref<boolean>(false);
 
 const sponsors = [
   {

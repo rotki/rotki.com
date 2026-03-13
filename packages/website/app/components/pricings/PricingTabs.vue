@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const tab = ref(props.plans[0]?.name ?? '');
+const tab = ref<string>(props.plans[0]?.name ?? '');
 </script>
 
 <template>

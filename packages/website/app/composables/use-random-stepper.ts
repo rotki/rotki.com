@@ -1,7 +1,7 @@
 import { get, set } from '@vueuse/core';
 
 export function useRandomStepper(steps: number, interval: number = 10000) {
-  const step = ref(1);
+  const step = ref<number>(1);
 
   function setRandomStep() {
     let newStep = get(step);

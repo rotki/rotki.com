@@ -7,7 +7,7 @@ const emit = defineEmits<{
   change: [];
 }>();
 
-const confirmed = ref(false);
+const confirmed = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 

@@ -68,7 +68,7 @@ const loading = ref<boolean>(false);
 const leaderboardData = ref<LeaderboardResponse>();
 
 // Clipboard functionality
-const clipboardSource = ref('');
+const clipboardSource = ref<string>('');
 const { copy } = useClipboard({ source: clipboardSource });
 
 // i18n

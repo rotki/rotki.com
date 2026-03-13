@@ -3,8 +3,8 @@ const props = defineProps<{
   chain: string;
 }>();
 
-const pending = ref(true);
-const error = ref(false);
+const pending = ref<boolean>(true);
+const error = ref<boolean>(false);
 
 const { public: { testing } } = useRuntimeConfig();
 

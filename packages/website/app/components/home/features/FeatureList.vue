@@ -5,7 +5,7 @@ import HistoryEvents from '~/components/home/features/details/HistoryEvents.vue'
 import ProfitLossReport from '~/components/home/features/details/ProfitLossReport.vue';
 import SupportedExchangeDetails from '~/components/home/features/details/SupportedExchangeDetails.vue';
 
-const model = ref(0);
+const model = ref<number>(0);
 
 const { t } = useI18n({ useScope: 'global' });
 

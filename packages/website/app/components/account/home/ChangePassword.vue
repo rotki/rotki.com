@@ -7,8 +7,8 @@ import FloatingNotification from '~/components/account/home/FloatingNotification
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { toMessages } from '~/utils/validation';
 
-const loading = ref(false);
-const success = ref(false);
+const loading = ref<boolean>(false);
+const success = ref<boolean>(false);
 
 const accountApi = useAccountApi();
 
@@ -28,7 +28,7 @@ const rules = {
     sameAsPassword: sameAs(newPassword, 'new password'),
   },
 };
-const $externalResults = ref({});
+const $externalResults = ref<Record<string, string[]>>({});
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
   $externalResults,

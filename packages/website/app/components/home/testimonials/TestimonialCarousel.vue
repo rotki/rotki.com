@@ -12,8 +12,8 @@ defineProps<{
 }>();
 
 const swiperInstance = ref<Swiper>();
-const pages = ref(get(swiperInstance)?.snapGrid.length ?? 1);
-const activeIndex = ref((get(swiperInstance)?.activeIndex ?? 0) + 1);
+const pages = ref<number>(get(swiperInstance)?.snapGrid.length ?? 1);
+const activeIndex = ref<number>((get(swiperInstance)?.activeIndex ?? 0) + 1);
 const breakpoints: Record<number, SwiperOptions> = {
   // when window width is >= 320px
   320: {

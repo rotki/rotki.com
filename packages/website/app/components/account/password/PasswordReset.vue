@@ -68,9 +68,9 @@ function setupFormValidation(
   return { v$, valid };
 }
 
-const password = ref('');
-const passwordConfirmation = ref('');
-const $externalResults = ref({});
+const password = ref<string>('');
+const passwordConfirmation = ref<string>('');
+const $externalResults = ref<Record<string, string[]>>({});
 
 const route = useRoute();
 const { uid, token } = route.params;

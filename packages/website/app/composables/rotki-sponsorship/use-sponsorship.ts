@@ -101,7 +101,7 @@ function useRotkiSponsorshipSSR() {
  */
 export function useSponsorshipData() {
   const ssr = useRotkiSponsorshipSSR();
-  const forceRefresh = ref(false);
+  const forceRefresh = ref<boolean>(false);
   const route = useRoute();
 
   // Use a stable key for SSR deduplication

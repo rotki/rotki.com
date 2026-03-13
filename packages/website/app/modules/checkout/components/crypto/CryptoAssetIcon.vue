@@ -4,8 +4,8 @@ defineProps<{
   name: string;
 }>();
 
-const pending = ref(false);
-const error = ref(false);
+const pending = ref<boolean>(false);
+const error = ref<boolean>(false);
 </script>
 
 <template>

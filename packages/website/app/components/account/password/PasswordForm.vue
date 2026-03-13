@@ -10,7 +10,7 @@ import { useLogger } from '~/utils/use-logger';
 
 const emailAddress = ref<string>('');
 const loading = ref<boolean>(false);
-const $externalResults = ref({});
+const $externalResults = ref<Record<string, string[]>>({});
 
 const {
   onError,

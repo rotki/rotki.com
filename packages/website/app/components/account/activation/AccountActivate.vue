@@ -16,7 +16,7 @@ const token = route.params.token as string;
 
 const validating = ref<boolean>(true);
 const isValid = ref<boolean>(false);
-const error = ref<string | null>(null);
+const error = ref<string>();
 
 const mainStore = useMainStore();
 const { requestRefresh } = useAccountRefresh();
@@ -43,7 +43,7 @@ async function validateActivationToken(): Promise<void> {
   try {
     await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`);
     set(isValid, true);
-    set(error, null);
+    set(error, undefined);
     logger.debug('Account activation successful');
   }
   catch (activationError: any) {
