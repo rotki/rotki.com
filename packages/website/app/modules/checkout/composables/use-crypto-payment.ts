@@ -1,7 +1,8 @@
 import type { Signer, TransactionResponse } from 'ethers';
 import type { ComputedRef, DeepReadonly, MaybeRefOrGetter, Ref } from 'vue';
 import type { CryptoPayment } from '~/types';
-import { get, set, useTimeoutFn } from '@vueuse/core';
+import { useTimeoutFn } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';

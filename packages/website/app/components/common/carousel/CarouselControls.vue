@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Swiper } from 'swiper/types';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import 'swiper/css';
 
 const swiper = defineModel<Swiper>('swiper');

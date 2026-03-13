@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 

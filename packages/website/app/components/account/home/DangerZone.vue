@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';

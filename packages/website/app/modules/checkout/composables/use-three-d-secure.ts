@@ -7,10 +7,11 @@ import {
   ThreeDSecureParamsSchema,
   type ThreeDSecureState,
 } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
+import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { PaymentError } from '~/types/codes';
 import { useLogger } from '~/utils/use-logger';
 
@@ -265,7 +266,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
     // Request account refresh and prepare for success navigation
     requestRefresh();
-    sessionStorage.setItem('payment-completed', 'true');
+    sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
     clearStoredData();
   }
 

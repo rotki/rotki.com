@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TierKey } from '~/composables/rotki-sponsorship/types';
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import { truncateAddress } from '~/utils/text';
 
 defineProps<Props>();

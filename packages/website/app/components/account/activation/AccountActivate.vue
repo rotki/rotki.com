@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useAccountRefresh } from '~/composables/use-app-events';

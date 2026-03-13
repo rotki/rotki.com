@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useLogger } from '~/utils/use-logger';
 

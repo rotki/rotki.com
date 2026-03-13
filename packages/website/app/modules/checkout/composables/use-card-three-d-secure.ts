@@ -1,6 +1,6 @@
 import type { Client } from 'braintree-web/client';
 import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useLogger } from '~/utils/use-logger';

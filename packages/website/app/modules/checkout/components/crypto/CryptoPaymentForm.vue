@@ -8,6 +8,7 @@ import CryptoPaymentDetails from '~/modules/checkout/components/crypto/CryptoPay
 import CryptoPaymentQr from '~/modules/checkout/components/crypto/CryptoPaymentQr.vue';
 import CryptoWalletActions from '~/modules/checkout/components/crypto/CryptoWalletActions.vue';
 import { useWeb3Payment } from '~/modules/checkout/composables/use-crypto-payment';
+import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 
 const {
   data,
@@ -58,7 +59,7 @@ async function navigateToSuccess(): Promise<void> {
     discount: discountType,
   });
 
-  sessionStorage.setItem('payment-completed', 'true');
+  sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
   await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
 }
 

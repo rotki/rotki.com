@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/modules/checkout/components/crypto/CryptoChainIcon.vue';
 import { usePaymentAssets } from '~/modules/checkout/composables/use-payment-assets';

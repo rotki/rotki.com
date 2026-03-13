@@ -1,4 +1,4 @@
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { type ReferralCodeResponse, ReferralCodeResponse as ReferralCodeResponseSchema } from '~/types';
 import { logParseFailure } from '~/utils/api-error-handling';

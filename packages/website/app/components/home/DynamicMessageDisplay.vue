@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DashboardMessage } from '@/types/dynamic-messages';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useRandomStepper } from '~/composables/use-random-stepper';
 

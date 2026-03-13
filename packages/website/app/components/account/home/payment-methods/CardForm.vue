@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Client } from 'braintree-web/client';
 import type { HostedFields } from 'braintree-web/hosted-fields';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 
 interface FieldState {

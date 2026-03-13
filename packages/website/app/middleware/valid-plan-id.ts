@@ -1,4 +1,4 @@
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 
 export default defineNuxtRouteMiddleware(async (to) => {

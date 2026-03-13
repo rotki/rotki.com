@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';

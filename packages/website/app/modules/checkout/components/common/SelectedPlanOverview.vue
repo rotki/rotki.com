@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';

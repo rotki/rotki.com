@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { get, isDefined } from '@vueuse/core';
+import { isDefined } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import JobDetail from '~/components/jobs/JobDetail.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';

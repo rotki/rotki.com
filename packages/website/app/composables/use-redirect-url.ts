@@ -1,4 +1,4 @@
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 
 interface StoredUrl {
   username: string;

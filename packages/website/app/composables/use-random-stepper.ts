@@ -1,4 +1,4 @@
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 
 export function useRandomStepper(steps: number, interval: number = 10000) {
   const step = ref<number>(1);

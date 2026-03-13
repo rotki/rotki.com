@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
-import { get, objectPick, set } from '@vueuse/core';
+import { objectPick } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
 import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCardDialog.vue';
 import AccountPaymentCard from '~/components/account/home/payment-methods/PaymentCard.vue';

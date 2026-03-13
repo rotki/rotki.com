@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { type PremiumTierInfoDescription, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 import { formatCurrency, toTitleCase } from '~/utils/text';
 

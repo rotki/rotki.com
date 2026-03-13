@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';

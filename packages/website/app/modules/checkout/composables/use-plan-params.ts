@@ -1,4 +1,4 @@
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 
 type CurrencyParam = string | null;
 

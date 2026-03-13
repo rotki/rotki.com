@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 

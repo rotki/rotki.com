@@ -2,7 +2,7 @@
 import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import ErrorState from '~/modules/checkout/components/card/CardPaymentError.vue';
 import InvalidParamsState from '~/modules/checkout/components/card/CardPaymentInvalid.vue';

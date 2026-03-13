@@ -1,6 +1,7 @@
 import type { AvailablePlan, AvailablePlans, AvailablePlansResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ComputedRef, Ref } from 'vue';
-import { get, set, until } from '@vueuse/core';
+import { until } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { PricingPeriod } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';

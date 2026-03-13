@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PaymentInfo } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 
 interface Props {
   paymentInfo: PaymentInfo;

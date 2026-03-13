@@ -1,7 +1,7 @@
 import type { AppKit } from '@reown/appkit';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import type { Signer } from 'ethers';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useSharedWeb3State } from '~/composables/web3/use-shared-web3-state';
 import { useLogger } from '~/utils/use-logger';
 

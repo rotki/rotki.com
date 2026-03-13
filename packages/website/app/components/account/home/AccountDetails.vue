@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';

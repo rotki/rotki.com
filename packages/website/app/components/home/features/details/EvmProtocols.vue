@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { IntegrationItem } from '~/types/integrations';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
 
 const { t } = useI18n({ useScope: 'global' });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import { useBlockie } from '~/composables/web3/use-blockie';
 
 const { ensName, address } = defineProps<{

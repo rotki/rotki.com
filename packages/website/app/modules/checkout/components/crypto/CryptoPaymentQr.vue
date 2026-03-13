@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
-import { get, set, useClipboard } from '@vueuse/core';
+import { useClipboard } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useLogger } from '~/utils/use-logger';
 
 const { data, isWalletOpen, loading } = defineProps<{

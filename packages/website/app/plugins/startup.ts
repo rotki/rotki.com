@@ -1,4 +1,4 @@
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { useUtmTracking } from '~/composables/chronicling/use-utm-tracking';
 import { useAuthHintCookie } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';

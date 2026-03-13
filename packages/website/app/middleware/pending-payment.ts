@@ -1,5 +1,5 @@
 import { isSubRequestingUpgrade } from '@rotki/card-payment-common';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { getPricingPeriod } from '~/components/pricings/utils';
 import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';

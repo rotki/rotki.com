@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 
@@ -11,14 +11,16 @@ const accountApi = useAccountApi();
 const success = ref<boolean>(false);
 const error = ref<string>('');
 
-let pendingTimeout: any;
-
-function reset() {
+function reset(): void {
   set(success, false);
   set(error, '');
 }
 
-async function resend() {
+const { start: startResetTimeout, stop: stopResetTimeout } = useTimeoutFn(() => {
+  reset();
+}, 4000, { immediate: false });
+
+async function resend(): Promise<void> {
   reset();
   const result: ActionResult = await accountApi.resendVerificationCode(t);
 
@@ -27,14 +29,8 @@ async function resend() {
   else
     set(error, result.message);
 
-  if (pendingTimeout) {
-    clearTimeout(pendingTimeout);
-    pendingTimeout = undefined;
-  }
-
-  pendingTimeout = setTimeout(() => {
-    reset();
-  }, 4000);
+  stopResetTimeout();
+  startResetTimeout();
 }
 </script>
 

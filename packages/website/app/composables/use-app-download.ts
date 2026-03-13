@@ -1,5 +1,5 @@
 import type { GithubRelease } from '~/types/github';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useLogger } from '~/utils/use-logger';
 
 export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/releases/latest') {

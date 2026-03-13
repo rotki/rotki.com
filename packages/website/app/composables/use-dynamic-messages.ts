@@ -1,5 +1,5 @@
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import {
   DashboardSchema,
   type VisibilityPeriod,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';

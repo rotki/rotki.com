@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 
 const modelValue = defineModel<boolean>({ required: true });
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import AddressAvatar from '~/components/common/AddressAvatar.vue';

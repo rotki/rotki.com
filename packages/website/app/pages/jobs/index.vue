@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import JobDescription from '~/components/jobs/JobDescription.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';

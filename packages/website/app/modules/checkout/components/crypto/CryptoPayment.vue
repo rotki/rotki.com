@@ -7,6 +7,7 @@ import CryptoPaymentActions from '~/modules/checkout/components/crypto/CryptoPay
 import CryptoPaymentForm from '~/modules/checkout/components/crypto/CryptoPaymentForm.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-payment-flow';
+import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -79,7 +80,7 @@ async function initialize(): Promise<boolean> {
   }
 
   if (result.alreadyStarted) {
-    sessionStorage.setItem('payment-completed', 'true');
+    sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
     await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
     return true;
   }

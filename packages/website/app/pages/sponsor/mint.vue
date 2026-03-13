@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import MintBenefitsInfo from '~/components/sponsor/MintBenefitsInfo.vue';
 import MintButton from '~/components/sponsor/MintButton.vue';

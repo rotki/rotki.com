@@ -1,4 +1,4 @@
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 
 export function useRecaptcha() {
   const recaptchaPassed = ref<boolean>(false);

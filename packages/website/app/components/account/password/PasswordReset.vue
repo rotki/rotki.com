@@ -2,7 +2,7 @@
 import type { Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';

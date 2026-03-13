@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { DownloadItem } from '~/types/download';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import DownloadDocs from '~/components/download/DownloadDocs.vue';
 import DownloadHeading from '~/components/download/DownloadHeading.vue';
 import DownloadPreview from '~/components/download/DownloadPreview.vue';
