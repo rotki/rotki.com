@@ -12,7 +12,6 @@ import ReferralCode from '~/components/account/home/ReferralCode.vue';
 import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
 import SubscriptionTable from '~/components/account/home/SubscriptionTable.vue';
 import UnverifiedEmailWarning from '~/components/account/home/UnverifiedEmailWarning.vue';
-import { useUserPayments } from '~/composables/account/use-user-payments';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
@@ -31,7 +30,6 @@ const { t } = useI18n({ useScope: 'global' });
 const store = useMainStore();
 const { account } = storeToRefs(store);
 const { userSubscriptions, activeOrPendingSubscription, refresh: refreshSubscriptions, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
-const { refresh: refreshPayments } = useUserPayments();
 const { requestRefresh } = useAccountRefresh();
 
 const subscriptionOpsStore = useSubscriptionOperationsStore();
@@ -60,9 +58,8 @@ function dismissSubscriptionError(): void {
   setError('');
 }
 
-onBeforeMount(async () => {
+onBeforeMount(() => {
   requestRefresh();
-  await Promise.all([refreshSubscriptions(), refreshPayments()]);
 });
 </script>
 

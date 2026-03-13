@@ -15,7 +15,6 @@ export function useUserPayments(): UseUserPaymentsReturn {
   const {
     data: userPayments,
     error,
-    execute,
     pending: loading,
     refresh,
   } = useLazyAsyncData<UserPayment[]>(
@@ -30,8 +29,9 @@ export function useUserPayments(): UseUserPaymentsReturn {
       return UserPayments.parse(response.result);
     },
     {
+      dedupe: 'defer',
       default: () => [] satisfies UserPayment[],
-      immediate: false,
+      server: false,
     },
   );
 
@@ -40,8 +40,6 @@ export function useUserPayments(): UseUserPaymentsReturn {
       logger.error('Failed to fetch payments:', newError);
     }
   });
-
-  onBeforeMount(execute);
 
   return {
     loading: readonly(loading),

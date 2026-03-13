@@ -5,7 +5,7 @@ import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useAuthApi } from '~/composables/account/use-auth-api';
-import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
+import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useAuthHintCookie, useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
@@ -28,7 +28,7 @@ export const useMainStore = defineStore('main', () => {
   // API composables
   const accountApi = useAccountApi();
   const authApi = useAuthApi();
-  const { fetchUserSubscriptions } = useFetchUserSubscriptions();
+  const { userSubscriptions, refresh: refreshSubscriptions } = useUserSubscriptions();
   const { onRefresh } = useAccountRefresh();
 
   const updateCanBuy = async (): Promise<void> => {
@@ -49,7 +49,9 @@ export const useMainStore = defineStore('main', () => {
         return;
       }
 
-      const subscriptions = await fetchUserSubscriptions();
+      // Refresh subscriptions via useAsyncData (deduped with other consumers)
+      await refreshSubscriptions();
+      const subscriptions = get(userSubscriptions);
       if (subscriptions.length === 0) {
         set(canBuy, true);
         clearPendingSubscriptionId();

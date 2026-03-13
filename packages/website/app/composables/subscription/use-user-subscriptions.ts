@@ -47,6 +47,7 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
       }
     },
     {
+      dedupe: 'defer',
       default: () => [] satisfies UserSubscription[],
       lazy: false,
       server: false,
