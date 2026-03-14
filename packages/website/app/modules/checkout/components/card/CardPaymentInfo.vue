@@ -2,11 +2,9 @@
 import type { PaymentInfo } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { get } from '@vueuse/shared';
 
-interface Props {
+const { paymentInfo } = defineProps<{
   paymentInfo: PaymentInfo;
-}
-
-const { paymentInfo } = defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -18,7 +16,7 @@ const isYearlyPayment = computed<boolean>(() => {
 });
 
 const billingPeriod = computed<string>(() =>
-  isYearlyPayment.value
+  get(isYearlyPayment)
     ? t('subscription.3d_secure.payment_info.per_year')
     : t('subscription.3d_secure.payment_info.per_month'),
 );

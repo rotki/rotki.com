@@ -35,8 +35,8 @@ async function performLogin() {
   set(
     error,
     await login({
-      username: username.value,
-      password: password.value,
+      username: get(username),
+      password: get(password),
     }),
   );
   set(loading, false);

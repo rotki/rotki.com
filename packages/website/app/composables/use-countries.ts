@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
+import { set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 export interface Country {
@@ -14,10 +15,10 @@ export function useCountries() {
   const loadCountries = async () => {
     try {
       const response = await fetchWithCsrf<ApiResponse<Country[]>>('/webapi/countries/');
-      countries.value = response.result ?? [];
+      set(countries, response.result ?? []);
     }
     catch (error: any) {
-      countriesLoadError.value = error.message;
+      set(countriesLoadError, error.message);
     }
   };
   onMounted(loadCountries);
