@@ -3,23 +3,23 @@ import { get } from '@vueuse/shared';
 import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 
-const props = defineProps<{ path: string }>();
+const { path } = defineProps<{ path: string }>();
 
 const { fallbackToLocalOnError } = useRemoteOrLocal();
 
-const { data: document } = await useAsyncData(props.path, async () => fallbackToLocalOnError(
-  async () => queryCollection('documentsRemote').path(props.path).first(),
-  async () => await queryCollection('documentsLocal').path(props.path).first(),
+const { data: document } = await useAsyncData(path, async () => fallbackToLocalOnError(
+  async () => queryCollection('documentsRemote').path(path).first(),
+  async () => await queryCollection('documentsLocal').path(path).first(),
 ));
 
 if (!document) {
-  showError({ message: `Page not found: ${props.path}`, statusCode: 404 });
+  showError({ message: `Page not found: ${path}`, statusCode: 404 });
 }
 else {
   usePageSeo(
     get(document)?.title ?? '',
     get(document)?.description ?? '',
-    props.path,
+    path,
   );
 }
 </script>

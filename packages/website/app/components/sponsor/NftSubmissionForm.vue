@@ -16,13 +16,11 @@ import { getTierClasses } from '~/utils/nft-tiers';
 import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 
-interface Props {
+const { address, isConnected, editingSubmission } = defineProps<{
   address: string | undefined;
   isConnected: boolean;
   editingSubmission?: NftSubmission;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   'submission-success': [];
@@ -31,7 +29,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-const { fetchNftMetadata } = useNftMetadata();
+const route = useRoute();
 
 const displayName = ref<string>('');
 const isSubmitting = ref<boolean>(false);
@@ -61,8 +59,9 @@ const { checkSubmissionByNftId } = useNftSubmissions();
 const { data: sponsorshipData } = await useSponsorshipData();
 
 const logger = useLogger();
+const { fetchNftMetadata } = useNftMetadata();
 
-const isAuthenticated = computed<boolean>(() => props.isConnected && !!props.address && isSessionValid(props.address));
+const isAuthenticated = computed<boolean>(() => isConnected && !!address && isSessionValid(address));
 
 // Compute NFT options including the editing NFT ID if not in the list
 const nftIdOptions = computed<StoredNft[]>(() => {
@@ -75,11 +74,11 @@ const nftIdOptions = computed<StoredNft[]>(() => {
   }
 
   // If editing and the NFT ID is not in the list, add it
-  if (props.editingSubmission) {
-    const editingId = props.editingSubmission.nftId;
+  if (editingSubmission) {
+    const editingId = editingSubmission.nftId;
     if (!nfts.some(nft => nft.id === editingId)) {
       nfts.push({
-        address: props.address?.toLowerCase() || '',
+        address: address?.toLowerCase() || '',
         id: editingId,
         releaseId: currentReleaseId || 1,
         tier: -1, // Unknown tier for external NFTs
@@ -151,6 +150,8 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, { displayName, imageFile, tokenId, email, atLeastOne: true }, { $autoDirty: true });
 
+const shouldDisableFields = computed<boolean>(() => get(isSubmitting) || !get(isAuthenticated));
+
 function handleImageSelected(file: File): void {
   set(imageFile, file);
 
@@ -200,7 +201,7 @@ async function handleSubmit(): Promise<void> {
 
     // Use FormData to send both text data and file
     const formData = new FormData();
-    formData.append('evm_address', props.address || '');
+    formData.append('evm_address', address || '');
     formData.append('display_name', get(displayName).trim());
 
     const tokenIdVal = get(tokenId);
@@ -219,7 +220,7 @@ async function handleSubmit(): Promise<void> {
     }
 
     // Add deleteImage flag if editing and user wants to delete the image
-    if (props.editingSubmission && get(deleteImage)) {
+    if (editingSubmission && get(deleteImage)) {
       formData.append('delete_image', 'true');
     }
 
@@ -229,7 +230,7 @@ async function handleSubmit(): Promise<void> {
       body: formData,
     });
 
-    await authenticatedRequest(props.address || '', submitFormData);
+    await authenticatedRequest(address || '', submitFormData);
 
     // Reset form
     set(displayName, '');
@@ -260,12 +261,12 @@ async function handleSubmit(): Promise<void> {
 }
 
 async function checkExistingSubmission(nftId: number): Promise<void> {
-  if (!props.address)
+  if (!address)
     return;
 
   try {
     set(isCheckingExistingSubmission, true);
-    const submission = await checkSubmissionByNftId(props.address, nftId);
+    const submission = await checkSubmissionByNftId(address, nftId);
 
     if (submission) {
       // Directly populate the form fields with existing submission data
@@ -345,8 +346,8 @@ async function checkNftMetadata(): Promise<void> {
       }
 
       // Check if the NFT is owned by the connected address
-      if (metadata.owner && props.address) {
-        const isOwner = metadata.owner.toLowerCase() === props.address.toLowerCase();
+      if (metadata.owner && address) {
+        const isOwner = metadata.owner.toLowerCase() === address.toLowerCase();
         set(isNftOwnerValid, isOwner);
 
         if (!isOwner) {
@@ -381,8 +382,6 @@ function clearFormForNewSubmission(): void {
   set(imageFile, undefined);
 }
 
-const shouldDisableFields = computed(() => get(isSubmitting) || !get(isAuthenticated));
-
 // Watch for changes to clear success message
 watch([displayName, imageFile, email], () => {
   // Clear success message when user starts editing
@@ -410,13 +409,13 @@ watch(tokenId, async (newTokenId, oldTokenId) => {
     emit('cancel-edit');
   }
   // Automatically check NFT metadata when a valid token ID is selected
-  else if (newTokenId !== oldTokenId && Number.isInteger(Number(newTokenId)) && props.isConnected) {
+  else if (newTokenId !== oldTokenId && Number.isInteger(Number(newTokenId)) && isConnected) {
     await checkNftMetadata();
   }
 });
 
 // Load editing submission data
-watch(() => props.editingSubmission, (submission) => {
+watch(() => editingSubmission, (submission) => {
   if (submission && get(tokenId) !== submission.nftId.toString()) {
     set(tokenId, submission.nftId.toString());
     set(displayName, submission.displayName || '');
@@ -443,11 +442,9 @@ watch(() => props.editingSubmission, (submission) => {
   }
 }, { immediate: true });
 
-const route = useRoute();
-
 onMounted(() => {
   const tokenIdParam = route.query.tokenId as string;
-  if (tokenIdParam && !props.editingSubmission) {
+  if (tokenIdParam && !editingSubmission) {
     set(tokenId, tokenIdParam);
     checkNftMetadata();
   }

@@ -4,13 +4,13 @@ import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useRandomStepper } from '~/composables/use-random-stepper';
 
-const props = defineProps<{
+const { messages } = defineProps<{
   messages: DashboardMessage[];
 }>();
 
-const { step, steps, onNavigate, onPause, onResume } = useRandomStepper(props.messages.length);
+const { step, steps, onNavigate, onPause, onResume } = useRandomStepper(messages.length);
 
-const activeItem = computed(() => props.messages[get(step) - 1]);
+const activeItem = computed<DashboardMessage | undefined>(() => messages[get(step) - 1]);
 </script>
 
 <template>

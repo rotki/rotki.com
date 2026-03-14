@@ -12,7 +12,7 @@ defineOptions({
 
 const modelValue = defineModel<string>({ required: true });
 
-const props = defineProps<Props>();
+const { copyValue, disabled } = defineProps<Props>();
 
 defineSlots<{
   prepend: () => void;
@@ -21,7 +21,7 @@ defineSlots<{
 
 <template>
   <RuiTextField
-    v-bind="props"
+    v-bind="$props"
     v-model="modelValue"
     color="primary"
     variant="outlined"

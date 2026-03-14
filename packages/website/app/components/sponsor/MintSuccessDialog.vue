@@ -4,20 +4,18 @@ import Confetti from '~/components/common/Confetti.vue';
 import { findTierByKey } from '~/composables/rotki-sponsorship/utils';
 import { getTierClasses } from '~/utils/nft-tiers';
 
-interface Props {
+const showDialog = defineModel<boolean>({ required: true });
+
+const { selectedTier, tokenId, releaseName, transactionUrl } = defineProps<{
   selectedTier: string;
   tokenId?: string;
   releaseName?: string;
   transactionUrl?: string;
-}
-
-const showDialog = defineModel<boolean>({ required: true });
-
-const props = defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const tierLabel = computed<string | undefined>(() => findTierByKey(props.selectedTier)?.label);
+const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)?.label);
 </script>
 
 <template>

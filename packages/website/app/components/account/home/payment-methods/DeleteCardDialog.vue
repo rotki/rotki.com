@@ -1,23 +1,19 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import { get, set } from '@vueuse/shared';
+import { set } from '@vueuse/shared';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useLogger } from '~/utils/use-logger';
-
-interface Props {
-  card: SavedCard | undefined;
-}
-
-interface Emits {
-  success: [];
-  error: [error: { title: string; message: string }];
-}
 
 const showDialog = defineModel<boolean>({ required: true });
 const deleting = defineModel<boolean>('deleting', { default: false });
 
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+const { card } = defineProps<{
+  card: SavedCard | undefined;
+}>();
+const emit = defineEmits<{
+  success: [];
+  error: [error: { title: string; message: string }];
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('delete-card-dialog');
@@ -25,7 +21,6 @@ const logger = useLogger('delete-card-dialog');
 const { deleteCard } = usePaymentCards();
 
 async function handleDeleteCard(): Promise<void> {
-  const card = get(props).card;
   if (!card) {
     return;
   }

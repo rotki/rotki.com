@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+const { chain } = defineProps<{
   chain: string;
 }>();
 
@@ -24,7 +24,7 @@ const CHAIN_NAME_MAP: Record<string, string> = {
 };
 
 const chainName = computed<string>(() => {
-  const name = props.chain;
+  const name = chain;
 
   // Check if there's a mapping for this chain name
   if (name in CHAIN_NAME_MAP) {

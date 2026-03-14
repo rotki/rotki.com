@@ -3,13 +3,14 @@ import type { JobsLocalCollectionItem, JobsRemoteCollectionItem, MinimarkTree } 
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { assert } from '~/utils/assert';
 
-const props = defineProps<{
+const { data } = defineProps<{
   data: JobsLocalCollectionItem | JobsRemoteCollectionItem;
 }>();
 
+const { t } = useI18n({ useScope: 'global' });
+
 function filterBy(filterMethod: (tag: string) => boolean) {
   return computed(() => {
-    const data = props.data;
     const body = data.body as any as MinimarkTree;
     assert(body.type === 'minimark');
 
@@ -31,8 +32,6 @@ function filterBy(filterMethod: (tag: string) => boolean) {
 
 const mainColumn = filterBy(tag => tag !== 'blockquote');
 const sideColumn = filterBy(tag => tag === 'blockquote');
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>

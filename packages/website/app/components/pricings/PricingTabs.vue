@@ -5,7 +5,7 @@ import PricingTableButton from '~/components/pricings/PricingTableButton.vue';
 import PricingTableCell from '~/components/pricings/PricingTableCell.vue';
 import { isCustomPlan, isFreePlan, isMostPopularPlan } from '~/components/pricings/utils';
 
-const props = defineProps<{
+const { plans, featuresLabel } = defineProps<{
   plans: MappedPlan[];
   selectedPeriod: PricingPeriod;
   compact?: boolean;
@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const tab = ref<string>(props.plans[0]?.name ?? '');
+const tab = ref<string>(plans[0]?.name ?? '');
 </script>
 
 <template>

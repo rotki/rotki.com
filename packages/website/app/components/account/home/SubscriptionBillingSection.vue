@@ -2,17 +2,15 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive } from '@rotki/card-payment-common';
 
-interface Props {
+const { subscription, formattedDate, relativeTime } = defineProps<{
   subscription: UserSubscription;
   formattedDate: string;
   relativeTime: string;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const isCancelled = computed<boolean>(() => isCancelledButActive(props.subscription));
+const isCancelled = computed<boolean>(() => isCancelledButActive(subscription));
 </script>
 
 <template>

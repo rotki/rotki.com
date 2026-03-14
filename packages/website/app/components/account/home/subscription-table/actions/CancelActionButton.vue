@@ -1,13 +1,11 @@
 <script setup lang="ts">
-interface Props {
+const { actionsClasses, loading, disabled, cancellationStatus } = defineProps<{
   actionsClasses?: string;
   loading?: boolean;
   disabled?: boolean;
   subscriptionId?: string;
   cancellationStatus?: string;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   click: [];
@@ -15,7 +13,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const showTooltip = computed<boolean>(() => props.disabled);
+const showTooltip = computed<boolean>(() => !!disabled);
 </script>
 
 <template>

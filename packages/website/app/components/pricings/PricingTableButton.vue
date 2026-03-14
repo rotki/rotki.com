@@ -9,10 +9,12 @@ import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-pa
 import { buildQueryParams } from '~/utils/query';
 import { toTitleCase } from '~/utils/text';
 
-const props = defineProps<{
+const { plan } = defineProps<{
   plan: MappedPlan;
   selectedPeriod: PricingPeriod;
 }>();
+
+const { t } = useI18n({ useScope: 'global' });
 
 const {
   public: {
@@ -22,11 +24,9 @@ const {
 
 const { referralCode } = useReferralCodeParam();
 
-const { t } = useI18n({ useScope: 'global' });
-
 const checkoutLink = computed<RouteLocationRaw>(() => {
   const query = buildQueryParams({
-    planId: props.plan.id,
+    planId: plan.id,
     ref: get(referralCode),
   });
 

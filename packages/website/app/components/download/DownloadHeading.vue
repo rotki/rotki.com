@@ -4,16 +4,9 @@ import ButtonLink from '~/components/common/ButtonLink.vue';
 import DownloadItem from '~/components/download/DownloadItem.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 
-const props = defineProps<{ version: string; links: DownloadItemType[] }>();
+const { version, links } = defineProps<{ version: string; links: DownloadItemType[] }>();
 const { t } = useI18n({ useScope: 'global' });
 const { chronicle } = useSigilEvents();
-
-function onDownloadClick(platform: string): void {
-  chronicle('download_click', {
-    platform,
-    version: props.version || undefined,
-  });
-}
 
 const showAll = ref<boolean>(false);
 
@@ -39,7 +32,7 @@ const sponsors = [
   },
 ];
 
-function getOS() {
+function getOS(): string {
   const userAgent = navigator.userAgent.toLowerCase();
 
   if (userAgent.includes('win'))
@@ -53,7 +46,7 @@ function getOS() {
 }
 
 const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
-  const found = props.links.find(item => item.platform === getOS());
+  const found = links.find(item => item.platform === getOS());
   if (!found)
     return [];
 
@@ -67,6 +60,13 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
 
   return [found];
 });
+
+function onDownloadClick(platform: string): void {
+  chronicle('download_click', {
+    platform,
+    version: version || undefined,
+  });
+}
 </script>
 
 <template>
