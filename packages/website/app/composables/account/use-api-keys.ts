@@ -1,4 +1,4 @@
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useMainStore } from '~/store';

@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useMainStore } from '~/store';
 
-const confirm = ref(false);
-const usernameConfirmation = ref('');
-const error = ref('');
+const confirm = ref<boolean>(false);
+const usernameConfirmation = ref<string>('');
+const error = ref<string>('');
 
 const store = useMainStore();
 const accountApi = useAccountApi();
 const { account } = storeToRefs(store);
 
-const username = computed(() => get(account)?.username);
-const isSubscriber = computed(
+const username = computed<string | undefined>(() => get(account)?.username);
+const isSubscriber = computed<boolean>(
   () => get(account)?.hasActiveSubscription ?? false,
 );
 

@@ -1,8 +1,8 @@
-import { set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 
 export function useRecaptcha() {
-  const recaptchaPassed = ref(false);
-  const recaptchaToken = ref('');
+  const recaptchaPassed = ref<boolean>(false);
+  const recaptchaToken = ref<string>('');
   const captchaId = ref<number>();
 
   const onSuccess = (token: string): void => {
@@ -21,7 +21,7 @@ export function useRecaptcha() {
 
   const resetCaptcha = (): void => {
     onExpired();
-    window.grecaptcha?.reset(captchaId.value);
+    window.grecaptcha?.reset(get(captchaId));
   };
 
   return {

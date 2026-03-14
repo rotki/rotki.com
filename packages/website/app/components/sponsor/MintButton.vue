@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import type { TierKey } from '~/composables/rotki-sponsorship/types';
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import { truncateAddress } from '~/utils/text';
 
-defineProps<Props>();
-const emit = defineEmits<{
-  approve: [type: ApprovalType];
-}>();
-const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
+type ApprovalType = 'unlimited' | 'exact';
 
-type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
-
-interface Props {
+defineProps<{
   connected: boolean;
   address?: string;
   isExpectedChain: boolean;
@@ -25,7 +19,13 @@ interface Props {
   sponsorshipStatus: 'idle' | 'pending' | 'success' | 'error';
   getPriceForTier: (currency: string, tier: TierKey) => string | undefined;
   open: () => void;
-}
+}>();
+
+const emit = defineEmits<{
+  approve: [type: ApprovalType];
+}>();
+
+const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
 
 const { t } = useI18n({ useScope: 'global' });
 

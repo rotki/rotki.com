@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import { useBlockie } from '~/composables/web3/use-blockie';
 
 const { ensName, address } = defineProps<{
@@ -14,7 +14,7 @@ const hasError = ref<boolean>(false);
 const { getBlockie } = useBlockie();
 
 // Get blockie for the address
-const blockieUrl = computed(() => getBlockie(address));
+const blockieUrl = computed<string>(() => getBlockie(address));
 
 async function fetchAvatar() {
   if (!ensName) {

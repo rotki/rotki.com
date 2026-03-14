@@ -2,7 +2,7 @@
 import type { Ref } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
@@ -64,13 +64,13 @@ function setupFormValidation(
     },
   );
 
-  const valid = computed(() => !get(v$).$invalid);
+  const valid = computed<boolean>(() => !get(v$).$invalid);
   return { v$, valid };
 }
 
-const password = ref('');
-const passwordConfirmation = ref('');
-const $externalResults = ref({});
+const password = ref<string>('');
+const passwordConfirmation = ref<string>('');
+const $externalResults = ref<Record<string, string[]>>({});
 
 const route = useRoute();
 const { uid, token } = route.params;

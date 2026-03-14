@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { get, isDefined } from '@vueuse/core';
+import { isDefined } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import JobDetail from '~/components/jobs/JobDetail.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
@@ -11,7 +12,7 @@ const { t } = useI18n({ useScope: 'global' });
 const { data: job } = await useAsyncData(path, () => fallbackToLocalOnError(
   async () => await queryCollection('jobsRemote').path(path).first(),
   async () => await queryCollection('jobsLocal').path(path).first(),
-));
+), { dedupe: 'defer' });
 
 if (!isDefined(job)) {
   showError({ message: `Page not found: ${path}`, statusCode: 404 });

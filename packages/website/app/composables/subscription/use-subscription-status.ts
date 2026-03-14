@@ -1,6 +1,6 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive } from '@rotki/card-payment-common';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { formatDate } from '~/utils/date';
 
 export function useSubscriptionStatus(subscription: Ref<UserSubscription>) {

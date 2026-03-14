@@ -5,7 +5,7 @@ import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submi
 import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useLogger } from '~/utils/use-logger';
 
-const props = defineProps<{
+const { address, isConnected } = defineProps<{
   address: string | undefined;
   isConnected: boolean;
 }>();
@@ -16,16 +16,17 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
 const { submissions, isLoading: isLoadingSubmissions, error: submissionsError, fetchSubmissions } = useNftSubmissions();
 const { open: openWalletConnect } = useWeb3Connection();
 
 const logger = useLogger();
 
 async function loadSubmissions(): Promise<void> {
-  if (!props.isConnected || !props.address) {
+  if (!isConnected || !address) {
     return;
   }
-  await fetchSubmissions(props.address);
+  await fetchSubmissions(address);
 }
 
 async function connectWallet(): Promise<void> {

@@ -16,7 +16,7 @@ defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 
 const { data: sponsorshipData } = await useSponsorshipData();
-const currentReleaseName = computed(() => get(sponsorshipData)?.releaseName);
+const currentReleaseName = computed<string | undefined>(() => get(sponsorshipData)?.releaseName);
 </script>
 
 <template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { get, set } from '@vueuse/shared';
+
 const { theme = 'light', size = 'normal', invalid = false, useRecaptchaNet = false } = defineProps<{
   theme?: 'light' | 'dark';
   size?: 'compact' | 'normal';
@@ -29,11 +31,11 @@ const grecaptcha = toRef(window, 'grecaptcha');
 /**
  * Renders the captcha if not rendered and required fields are available
  */
-function renderCaptcha() {
-  if (rendered.value || !(grecaptcha.value && recaptchaEl.value))
+function renderCaptcha(): void {
+  if (get(rendered) || !(get(grecaptcha) && get(recaptchaEl)))
     return;
 
-  const id = grecaptcha.value.render(recaptchaEl.value, {
+  const id = get(grecaptcha)!.render(get(recaptchaEl)!, {
     'sitekey': siteKey,
     'callback': (token: string) => emit('success', token),
     'expired-callback': () => emit('expired'),
@@ -43,13 +45,13 @@ function renderCaptcha() {
   });
 
   emit('captcha-id', id);
-  rendered.value = true;
+  set(rendered, true);
 }
 
 window.onRecaptchaLoaded = renderCaptcha;
 
 onMounted(() => {
-  if (!grecaptcha.value) {
+  if (!get(grecaptcha)) {
     useHead({
       script: [
         {

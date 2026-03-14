@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 
 const { modelValue, disabled } = defineProps<{ modelValue: string; disabled?: boolean }>();
 
@@ -27,6 +27,7 @@ function copyToClipboard() {
         type="button"
         class="!p-2"
         icon
+        :aria-label="t('copy_button.copy')"
         @click="copyToClipboard()"
       >
         <RuiIcon

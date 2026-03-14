@@ -2,13 +2,13 @@
 import type { ActionResult } from '~/types/common';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { toMessages } from '~/utils/validation';
 
-const loading = ref(false);
-const success = ref(false);
+const loading = ref<boolean>(false);
+const success = ref<boolean>(false);
 
 const accountApi = useAccountApi();
 
@@ -28,15 +28,17 @@ const rules = {
     sameAsPassword: sameAs(newPassword, 'new password'),
   },
 };
-const $externalResults = ref({});
+const $externalResults = ref<Record<string, string[]>>({});
 const v$ = useVuelidate(rules, state, {
   $autoDirty: true,
   $externalResults,
 });
 
-let pendingTimeout: any;
+const { start: startSuccessTimeout, stop: stopSuccessTimeout } = useTimeoutFn(() => {
+  set(success, false);
+}, 4000, { immediate: false });
 
-async function changePassword() {
+async function changePassword(): Promise<void> {
   set(loading, true);
   const result: ActionResult = await accountApi.changePassword(state);
   set(loading, false);
@@ -45,13 +47,8 @@ async function changePassword() {
 
   if (result.success) {
     set(success, true);
-    if (pendingTimeout) {
-      clearTimeout(pendingTimeout);
-      pendingTimeout = undefined;
-    }
-    pendingTimeout = setTimeout(() => {
-      set(success, false);
-    }, 4000);
+    stopSuccessTimeout();
+    startSuccessTimeout();
     reset();
   }
 }

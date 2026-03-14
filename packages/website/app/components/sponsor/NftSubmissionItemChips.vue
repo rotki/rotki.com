@@ -5,14 +5,14 @@ import { get, isDefined } from '@vueuse/shared';
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { getTierClasses, getTierMedal } from '~/utils/nft-tiers';
 
-const props = defineProps<{
+const { submission } = defineProps<{
   submission: NftSubmission;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const tier = computed<SponsorshipTier | undefined>(() => {
-  const tierId = props.submission.tierId;
+  const tierId = submission.tierId;
   if (!isDefined(tierId))
     return undefined;
   return findTierById(tierId);

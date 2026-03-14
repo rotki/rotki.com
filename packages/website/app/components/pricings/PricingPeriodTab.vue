@@ -3,16 +3,18 @@ import { PricingPeriod } from '~/types/tiers';
 
 const model = defineModel<PricingPeriod>({ required: true });
 
-const props = defineProps<{
+const { data } = defineProps<{
   data: { monthlyPlan: { price: string } | null; yearlyPlan: { price: string } | null }[];
 }>();
 
-const maxSavedAnnually = computed(() => {
-  if (props.data.length === 0)
+const { t } = useI18n({ useScope: 'global' });
+
+const maxSavedAnnually = computed<number>(() => {
+  if (data.length === 0)
     return 0;
 
   return Math.max(
-    ...props.data.map((item) => {
+    ...data.map((item) => {
       if (!item.monthlyPlan || !item.yearlyPlan) {
         return 0;
       }
@@ -30,8 +32,6 @@ const maxSavedAnnually = computed(() => {
     }),
   );
 });
-
-const { t } = useI18n({ useScope: 'global' });
 
 const tabs = [
   { value: PricingPeriod.MONTHLY, label: t('home.plans.names.monthly_billing') },

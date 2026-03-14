@@ -1,9 +1,7 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   loading?: boolean;
-}
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   refresh: [];

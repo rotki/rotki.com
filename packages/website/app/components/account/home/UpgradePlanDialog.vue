@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { PaymentMethod, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';

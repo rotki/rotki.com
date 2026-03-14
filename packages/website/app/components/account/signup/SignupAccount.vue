@@ -3,7 +3,7 @@ import type { ValidationErrors } from '~/types/common';
 import type { SignupAccountPayload } from '~/types/signup';
 import { useVuelidate } from '@vuelidate/core';
 import { email, minLength, required, sameAs } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { toMessages } from '~/utils/validation';
 
 const modelValue = defineModel<SignupAccountPayload>({ required: true });

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { DownloadItem } from '~/types/download';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import DownloadDocs from '~/components/download/DownloadDocs.vue';
 import DownloadHeading from '~/components/download/DownloadHeading.vue';
 import DownloadPreview from '~/components/download/DownloadPreview.vue';
@@ -16,7 +16,7 @@ const {
   macOSUrl,
   macOSArmUrl,
   windowsUrl,
-  fetchLatestRelease,
+  loading,
 } = useAppDownload();
 
 const links = computed<DownloadItem[]>(() => [
@@ -32,8 +32,6 @@ const links = computed<DownloadItem[]>(() => [
   { platform: 'DOCKER', image: '/img/docker.svg', url: 'https://docs.rotki.com/requirement-and-installation/packaged-binaries.html#docker', command: 'docker pull rotki/rotki' },
 ]);
 
-onBeforeMount(async () => await fetchLatestRelease());
-
 definePageMeta({
   landing: true,
 });
@@ -44,6 +42,7 @@ definePageMeta({
   <DownloadHeading
     :links="links"
     :version="version"
+    :loading="loading"
   />
   <DownloadDocs />
   <DownloadPreview />

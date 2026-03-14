@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import MintBenefitsInfo from '~/components/sponsor/MintBenefitsInfo.vue';
 import MintButton from '~/components/sponsor/MintButton.vue';
@@ -8,7 +8,7 @@ import MintNftImage from '~/components/sponsor/MintNftImage.vue';
 import MintSuccessDialog from '~/components/sponsor/MintSuccessDialog.vue';
 import MintTierSelection from '~/components/sponsor/MintTierSelection.vue';
 import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
-import { SPONSORSHIP_TIERS, type TierKey } from '~/composables/rotki-sponsorship/types';
+import { type PaymentToken, SPONSORSHIP_TIERS, type TierKey, type TierSupply } from '~/composables/rotki-sponsorship/types';
 import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-payment';
 import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
 import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-sponsorship-feature';
@@ -61,10 +61,10 @@ const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { data: sponsorshipTiers } = await useAsyncData('sponsorship-tiers', () => fallbackToLocalOnError(
   async () => await queryCollection('sponsorshipTiersRemote').all(),
   async () => await queryCollection('sponsorshipTiersLocal').all(),
-));
+), { dedupe: 'defer' });
 
 // Convert array to object keyed by tier
-const tierContent = computed(() => {
+const tierContent = computed<Record<string, { benefits: string; example: string[] }>>(() => {
   const tiers = get(sponsorshipTiers);
   if (!tiers)
     return {};
@@ -100,11 +100,11 @@ const {
 
 const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData, error: dataError } = useSponsorshipData();
 
-const nftImages = computed(() => get(sponsorshipData)?.nftImages || {});
-const tierSupply = computed(() => get(sponsorshipData)?.tierSupply || {});
-const releaseId = computed(() => get(sponsorshipData)?.releaseId);
-const releaseName = computed(() => get(sponsorshipData)?.releaseName || '');
-const error = computed(() => get(sponsorshipData)?.error);
+const nftImages = computed<Record<string, string>>(() => get(sponsorshipData)?.nftImages || {});
+const tierSupply = computed<Record<string, TierSupply>>(() => get(sponsorshipData)?.tierSupply || {});
+const releaseId = computed<number | undefined>(() => get(sponsorshipData)?.releaseId);
+const releaseName = computed<string>(() => get(sponsorshipData)?.releaseName || '');
+const error = computed<string | undefined>(() => get(sponsorshipData)?.error);
 
 async function handleApprove(selectedApprovalType: ApprovalType) {
   set(approvalType, selectedApprovalType);
@@ -159,7 +159,7 @@ async function handleMint() {
   }
 }
 
-const availableTokens = computed(() =>
+const availableTokens = computed<PaymentToken[]>(() =>
   // Filter out tokens that have all zero prices for all tiers
   get(paymentTokens).filter((token) => {
     if (!token.prices)
@@ -193,7 +193,7 @@ const tierPriceDisplay = computed<Record<string, string>>(() => {
   return result;
 });
 
-const visibleTiers = computed(() => {
+const visibleTiers = computed<typeof SPONSORSHIP_TIERS>(() => {
   const currency = get(selectedCurrency);
   const priceGetter = get(getPriceForTier);
 
@@ -228,7 +228,7 @@ const needsApproval = computed<boolean>(() => {
   return !!(price && parseFloat(allowance) < parseFloat(price) && parseFloat(allowance) < maxAllowance);
 });
 
-const buttonText = computed(() => {
+const buttonText = computed<string>(() => {
   const selectedTierKey = get(selectedTier);
   const tier = findTierByKey(selectedTierKey);
   const currency = get(selectedCurrency);
@@ -253,7 +253,7 @@ const buttonText = computed(() => {
   return t('sponsor.sponsor_page.buttons.mint', { tier: tier.label });
 });
 
-const buttonAction = computed(() => {
+const buttonAction = computed<() => void | Promise<void>>(() => {
   const selectedTierKey = get(selectedTier);
   const visible = get(visibleTiers);
 
@@ -321,7 +321,7 @@ async function checkAllowanceIfNeeded() {
   }
 }
 
-watch([selectedCurrency, connected, isExpectedChain], checkAllowanceIfNeeded);
+watchDebounced([selectedCurrency, connected, isExpectedChain], checkAllowanceIfNeeded, { debounce: 300 });
 
 // Function to call after successful minting
 async function onMintingSuccess(txHash: string) {

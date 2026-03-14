@@ -1,14 +1,12 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   actionsClasses?: string;
   loading?: boolean;
   disabled?: boolean;
   subscriptionId?: string;
   resumeStatus?: string;
   nextActionDate?: string;
-}
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   click: [];

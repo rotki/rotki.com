@@ -1,5 +1,5 @@
 import type { PaymentToken, TierKey } from '~/composables/rotki-sponsorship/types';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
 import { useLogger } from '~/utils/use-logger';
 

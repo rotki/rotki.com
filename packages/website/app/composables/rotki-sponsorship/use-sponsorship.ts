@@ -101,7 +101,7 @@ function useRotkiSponsorshipSSR() {
  */
 export function useSponsorshipData() {
   const ssr = useRotkiSponsorshipSSR();
-  const forceRefresh = ref(false);
+  const forceRefresh = ref<boolean>(false);
   const route = useRoute();
 
   // Use a stable key for SSR deduplication
@@ -122,6 +122,7 @@ export function useSponsorshipData() {
   }, {
     // Only watch on client side to avoid multiple SSR calls
     watch: import.meta.client ? [() => route.path] : [],
+    dedupe: 'defer',
   });
 
   // Create a custom refresh function that forces cache bypass

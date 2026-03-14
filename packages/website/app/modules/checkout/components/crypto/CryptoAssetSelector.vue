@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/modules/checkout/components/crypto/CryptoChainIcon.vue';
 import { usePaymentAssets } from '~/modules/checkout/composables/use-payment-assets';
@@ -48,7 +48,7 @@ const tokenItems = computed<Item[]>(() => {
 
 const { t } = useI18n({ useScope: 'global' });
 
-const selectedToken = computed({
+const selectedToken = computed<Item | null>({
   get() {
     return get(tokenItems).find(({ id }) => id === get(modelValue)) || null;
   },
@@ -57,7 +57,7 @@ const selectedToken = computed({
   },
 });
 
-const hint = computed(() => {
+const hint = computed<string>(() => {
   const chain = get(selectedChain);
   if (!chain)
     return '';

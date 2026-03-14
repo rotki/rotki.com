@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import AddressAvatar from '~/components/common/AddressAvatar.vue';
@@ -68,7 +68,7 @@ const loading = ref<boolean>(false);
 const leaderboardData = ref<LeaderboardResponse>();
 
 // Clipboard functionality
-const clipboardSource = ref('');
+const clipboardSource = ref<string>('');
 const { copy } = useClipboard({ source: clipboardSource });
 
 // i18n
@@ -133,29 +133,36 @@ async function fetchLeaderboardMetadata(): Promise<void> {
   }
 }
 
-function formatAddressDisplay(holder: LeaderboardEntry): {
+interface AddressDisplay {
   primary: string;
-  secondary: undefined;
   showTooltip: boolean;
   isEns: boolean;
-} {
-  const shouldShorten = get(isMdAndDown);
-
-  if (holder.ensName) {
-    return {
-      primary: `${holder.ensName} - ${truncateAddress(holder.address)}`,
-      secondary: undefined,
-      showTooltip: true,
-      isEns: true,
-    };
-  }
-  return {
-    primary: shouldShorten ? truncateAddress(holder.address) : holder.address,
-    secondary: undefined,
-    showTooltip: shouldShorten,
-    isEns: false,
-  };
 }
+
+const addressDisplayMap = computed<Record<string, AddressDisplay>>(() => {
+  const shouldShorten = get(isMdAndDown);
+  const entries = get(currentLeaderboard);
+  const result: Record<string, AddressDisplay> = {};
+
+  for (const holder of entries) {
+    if (holder.ensName) {
+      result[holder.address] = {
+        primary: `${holder.ensName} - ${truncateAddress(holder.address)}`,
+        showTooltip: true,
+        isEns: true,
+      };
+    }
+    else {
+      result[holder.address] = {
+        primary: shouldShorten ? truncateAddress(holder.address) : holder.address,
+        showTooltip: shouldShorten,
+        isEns: false,
+      };
+    }
+  }
+
+  return result;
+});
 
 function copyToClipboard(text: string) {
   set(clipboardSource, text);
@@ -227,7 +234,7 @@ onMounted(async () => {
                 <div class="flex-1">
                   <div class="space-y-1">
                     <RuiTooltip
-                      v-if="formatAddressDisplay(user).showTooltip"
+                      v-if="addressDisplayMap[user.address]?.showTooltip"
                       :open-delay="400"
                     >
                       <template #activator>
@@ -235,7 +242,7 @@ onMounted(async () => {
                           class="text-sm font-bold cursor-pointer hover:opacity-75 transition-opacity text-primary"
                           @click="copyToClipboard(user.address)"
                         >
-                          {{ formatAddressDisplay(user).primary }}
+                          {{ addressDisplayMap[user.address]?.primary }}
                         </h5>
                       </template>
                       <div class="text-center">
@@ -252,7 +259,7 @@ onMounted(async () => {
                       class="text-sm font-bold font-mono cursor-pointer hover:opacity-75 transition-opacity"
                       @click="copyToClipboard(user.address)"
                     >
-                      {{ formatAddressDisplay(user).primary }}
+                      {{ addressDisplayMap[user.address]?.primary }}
                     </h5>
                   </div>
                   <div class="text-rui-text-secondary text-sm space-y-1">

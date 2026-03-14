@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 
-interface Props {
+defineProps<{
   card: SavedCard;
   loading?: boolean;
   disabled?: boolean;
@@ -13,9 +13,7 @@ interface Props {
   deleteTooltip?: string;
   isLinked?: boolean;
   showLinkButton?: boolean;
-}
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   'set-default': [];

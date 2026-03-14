@@ -2,17 +2,19 @@
 import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { buildQueryParams } from '~/utils/query';
 import { toTitleCase } from '~/utils/text';
 
-const props = defineProps<{
+const { plan } = defineProps<{
   plan: MappedPlan;
   selectedPeriod: PricingPeriod;
 }>();
+
+const { t } = useI18n({ useScope: 'global' });
 
 const {
   public: {
@@ -22,11 +24,9 @@ const {
 
 const { referralCode } = useReferralCodeParam();
 
-const { t } = useI18n({ useScope: 'global' });
-
 const checkoutLink = computed<RouteLocationRaw>(() => {
   const query = buildQueryParams({
-    planId: props.plan.id,
+    planId: plan.id,
     ref: get(referralCode),
   });
 

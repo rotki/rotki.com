@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';
 
@@ -35,8 +35,8 @@ async function performLogin() {
   set(
     error,
     await login({
-      username: username.value,
-      password: password.value,
+      username: get(username),
+      password: get(password),
     }),
   );
   set(loading, false);

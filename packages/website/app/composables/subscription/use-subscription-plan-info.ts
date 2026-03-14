@@ -13,7 +13,7 @@ export function useSubscriptionPlanInfo(subscription: Ref<UserSubscription>) {
    */
   const tierInfo = computed<PremiumTierInfo | undefined>(() => {
     const tiers = get(tiersInformation);
-    const sub = subscription.value;
+    const sub = get(subscription);
     return tiers.find(tier => tier.name.toLowerCase() === sub.planName.toLowerCase());
   });
 
@@ -32,7 +32,7 @@ export function useSubscriptionPlanInfo(subscription: Ref<UserSubscription>) {
   /**
    * Returns the formatted display name for the plan
    */
-  const planDisplayName = computed<string>(() => getPlanDisplayName(subscription.value));
+  const planDisplayName = computed<string>(() => getPlanDisplayName(get(subscription)));
 
   return {
     tierInfo,

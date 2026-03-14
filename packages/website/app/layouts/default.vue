@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import PageHeader from '~/components/header/PageHeader.vue';
 

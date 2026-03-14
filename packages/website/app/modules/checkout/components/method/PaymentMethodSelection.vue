@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { RuiIcons } from '@rotki/ui-library';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';

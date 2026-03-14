@@ -10,7 +10,7 @@ export default rotki({
   formatters: true,
   rotki: {
     overrides: {
-      '@rotki/consistent-ref-type-annotation': ['warn', { allowInference: true }],
+      '@rotki/consistent-ref-type-annotation': ['error'],
     },
   },
 }, {
@@ -49,6 +49,11 @@ export default rotki({
   ],
   rules: {
     'node/prefer-global/process': 'off',
+  },
+}, {
+  files: ['**/*.md/**'],
+  rules: {
+    '@rotki/consistent-ref-type-annotation': 'off',
   },
 }, {
   ignores: [

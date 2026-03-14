@@ -7,7 +7,7 @@ import type {
   SignupCustomerInformationPayload,
   SignupPayload,
 } from '~/types/signup';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import SignupAccount from '~/components/account/signup/SignupAccount.vue';
 import SignupAddress from '~/components/account/signup/SignupAddress.vue';

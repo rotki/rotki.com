@@ -14,7 +14,7 @@ import { discountAmount } from '~/utils/money';
 import { getPlanNameFor } from '~/utils/plans';
 import { toTitleCase } from '~/utils/text';
 
-const props = defineProps<{
+const { pending } = defineProps<{
   pending: UserSubscription[];
 }>();
 
@@ -58,7 +58,7 @@ const headers: DataTableColumn<UserPayment>[] = [{
   class: 'capitalize',
 }];
 
-watch(() => props.pending, (pendingIs, pendingWas) => {
+watch(() => pending, (pendingIs, pendingWas) => {
   if (pendingIs.length === 0 && pendingWas.length > 0) {
     refresh();
   }

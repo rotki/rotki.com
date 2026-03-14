@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 
 const { t } = useI18n({ useScope: 'global' });
 

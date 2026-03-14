@@ -6,19 +6,17 @@ interface TierContent {
   example: string[];
 }
 
-interface Props {
+const { selectedTier, tierContent, releaseName } = defineProps<{
   selectedTier: string;
   tierContent: Record<string, TierContent>;
   releaseName?: string;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const showExampleSponsors = ref<boolean>(false);
 
-const currentTierContent = computed<TierContent | undefined>(() => props.tierContent[props.selectedTier]);
+const currentTierContent = computed<TierContent | undefined>(() => tierContent[selectedTier]);
 </script>
 
 <template>

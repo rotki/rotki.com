@@ -3,7 +3,7 @@ import type { ValidationErrors } from '~/types/common';
 import type { SignupAddressPayload } from '~/types/signup';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';

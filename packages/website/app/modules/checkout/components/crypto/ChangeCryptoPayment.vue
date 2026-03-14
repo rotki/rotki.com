@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 
 const modelValue = defineModel<boolean>({ required: true });
 
@@ -7,7 +7,7 @@ const emit = defineEmits<{
   change: [];
 }>();
 
-const confirmed = ref(false);
+const confirmed = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 

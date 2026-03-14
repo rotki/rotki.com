@@ -2,18 +2,15 @@
 import type { PremiumTierInfoDescription } from '~/types/tiers';
 import { get } from '@vueuse/shared';
 
-interface Props {
+const { limits } = defineProps<{
   limits: PremiumTierInfoDescription[];
-}
-
-const props = defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const showAllLimits = ref<boolean>(false);
 
 const displayedLimits = computed<PremiumTierInfoDescription[]>(() => {
-  const limits = props.limits;
   const showAll = get(showAllLimits);
 
   if (showAll || limits.length <= 4) {
@@ -23,7 +20,7 @@ const displayedLimits = computed<PremiumTierInfoDescription[]>(() => {
   return limits.slice(0, 4);
 });
 
-const hasMoreLimits = computed<boolean>(() => props.limits.length > 4);
+const hasMoreLimits = computed<boolean>(() => limits.length > 4);
 
 function formatLimitValue(value: string | number | boolean): string {
   if (typeof value === 'boolean') {

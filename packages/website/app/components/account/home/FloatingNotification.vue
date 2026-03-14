@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { ContextColorsType } from '@rotki/ui-library';
-import { get, isDefined } from '@vueuse/core';
+import { isDefined } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 
 const { visible, closeable = false, timeout, type = 'error' } = defineProps<{
   visible: boolean;

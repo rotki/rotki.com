@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Swiper } from 'swiper/types';
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import { SwiperSlide } from 'swiper/vue';
 import Carousel from '~/components/common/carousel/Carousel.vue';
 import CarouselControls from '~/components/common/carousel/CarouselControls.vue';

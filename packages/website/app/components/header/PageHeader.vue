@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import AppLogo from '~/components/common/AppLogo.vue';
 import NavigationMenu from '~/components/common/NavigationMenu.vue';

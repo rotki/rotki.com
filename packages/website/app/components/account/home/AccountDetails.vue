@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
+import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';
@@ -13,12 +13,12 @@ const {
   },
 } = useRuntimeConfig();
 
-const email = computed(() => {
+const email = computed<string>(() => {
   const userAccount = get(account);
   return !userAccount ? '' : userAccount.email;
 });
 
-const username = computed(() => {
+const username = computed<string>(() => {
   const userAccount = get(account);
   return !userAccount ? '' : userAccount.username;
 });

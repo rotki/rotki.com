@@ -1,9 +1,7 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   error: string;
-}
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   back: [];

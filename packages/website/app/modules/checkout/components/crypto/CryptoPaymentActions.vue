@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { set } from '@vueuse/core';
+import { set } from '@vueuse/shared';
 
-const props = defineProps<{
+const { loading, showRetry, error } = defineProps<{
   loading?: boolean;
   showRetry?: boolean;
   error?: string;
@@ -12,16 +12,16 @@ const emit = defineEmits<{
   retry: [];
 }>();
 
-const showError = ref<boolean>(false);
-
 const { t } = useI18n({ useScope: 'global' });
+
+const showError = ref<boolean>(false);
 
 function handleRetry(): void {
   set(showError, false);
   emit('retry');
 }
 
-watch(() => props.error, (newError, oldError) => {
+watch(() => error, (newError, oldError) => {
   if (!oldError && newError) {
     set(showError, true);
   }

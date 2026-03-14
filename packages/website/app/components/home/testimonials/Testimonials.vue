@@ -6,7 +6,7 @@ const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { data: testimonials } = await useAsyncData('testimonials', () => fallbackToLocalOnError(
   async () => await queryCollection('testimonialsRemote').all(),
   async () => await queryCollection('testimonialsLocal').all(),
-));
+), { dedupe: 'defer' });
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

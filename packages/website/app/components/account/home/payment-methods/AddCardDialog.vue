@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { ref } from 'vue';
 import CardForm from '~/components/account/home/payment-methods/CardForm.vue';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';

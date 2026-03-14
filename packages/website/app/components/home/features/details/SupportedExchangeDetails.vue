@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { get } from '@vueuse/core';
+import type { IntegrationData } from '~/types/integrations';
+import { get } from '@vueuse/shared';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
 
 const { t } = useI18n({ useScope: 'global' });
 const { data: integrationData } = useIntegrationsData();
 
-const exchangesWithKeys = computed(() => get(integrationData).exchanges.filter(item => item.isExchangeWithKey));
+const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integrationData).exchanges.filter(item => item.isExchangeWithKey));
 </script>
 
 <template>

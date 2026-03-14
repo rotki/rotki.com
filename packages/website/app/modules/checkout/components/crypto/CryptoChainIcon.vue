@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const props = defineProps<{
+const { chain } = defineProps<{
   chain: string;
 }>();
 
-const pending = ref(true);
-const error = ref(false);
+const pending = ref<boolean>(true);
+const error = ref<boolean>(false);
 
 const { public: { testing } } = useRuntimeConfig();
 
@@ -24,7 +24,7 @@ const CHAIN_NAME_MAP: Record<string, string> = {
 };
 
 const chainName = computed<string>(() => {
-  const name = props.chain;
+  const name = chain;
 
   // Check if there's a mapping for this chain name
   if (name in CHAIN_NAME_MAP) {

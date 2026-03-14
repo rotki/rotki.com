@@ -1,7 +1,8 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { LoginCredentials } from '~/types/login';
 import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
-import { get, isClient, set, useTimeoutFn } from '@vueuse/core';
+import { isClient, useTimeoutFn } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useAuthApi } from '~/composables/account/use-auth-api';
@@ -148,11 +149,11 @@ export const useMainStore = defineStore('main', () => {
   return {
     account,
     authenticated,
-    canBuy: computed(() => get(canBuy)),
+    canBuy: computed<boolean>(() => get(canBuy)),
     getAccount,
     login,
     logout,
-    pendingSubscriptionId: computed(() => get(pendingSubscriptionId)),
+    pendingSubscriptionId: computed<string | null | undefined>(() => get(pendingSubscriptionId)),
     refreshSession,
   };
 });

@@ -1,4 +1,5 @@
-import { get, set, useLocalStorage } from '@vueuse/core';
+import { useLocalStorage } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import {
   type SponsorshipState,
   StoredNft,

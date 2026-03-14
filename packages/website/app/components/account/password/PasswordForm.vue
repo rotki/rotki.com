@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { email, required } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
@@ -10,7 +10,7 @@ import { useLogger } from '~/utils/use-logger';
 
 const emailAddress = ref<string>('');
 const loading = ref<boolean>(false);
-const $externalResults = ref({});
+const $externalResults = ref<Record<string, string[]>>({});
 
 const {
   onError,

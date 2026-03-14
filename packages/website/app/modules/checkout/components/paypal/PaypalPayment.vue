@@ -9,6 +9,7 @@ import ServerErrorOverlay from '~/modules/checkout/components/common/ServerError
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useReferralCodeParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
+import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { buildQueryParams } from '~/utils/query';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -126,7 +127,7 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
         discount: discountType,
       });
 
-      sessionStorage.setItem('payment-completed', 'true');
+      sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
       await navigateTo('/checkout/success');
     }
     else if (result.blocked) {

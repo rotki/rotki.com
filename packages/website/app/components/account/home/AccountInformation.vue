@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { requiredUnless } from '@vuelidate/validators';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useProfileUpdate } from '~/composables/account/use-profile-update';

@@ -1,5 +1,5 @@
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import {
   DashboardSchema,
   type VisibilityPeriod,
@@ -20,7 +20,7 @@ export const useDynamicMessages = createSharedComposable(() => {
     return messages.filter(x => x.period.start <= now && x.period.end > now);
   };
 
-  const activeDashboardMessages = computed(() => {
+  const activeDashboardMessages = computed<DashboardSchema>(() => {
     if (!isDefined(dashboardMessages))
       return [];
 

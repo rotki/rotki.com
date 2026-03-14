@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
-import { get, set } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { useCardThreeDSecure } from '~/modules/checkout/composables/use-card-three-d-secure';
 import { formatDate } from '~/utils/date';
 import { formatCurrency } from '~/utils/text';
@@ -10,31 +10,28 @@ export interface ThreeDSecureVerificationData {
   subscriptionData: Pick<Subscription, 'nextBillingAmount' | 'nextActionDate' | 'durationInMonths'>;
 }
 
-interface Props {
-  verificationData: ThreeDSecureVerificationData;
-  isReauthorization?: boolean;
-}
-
-interface Emits {
-  success: [];
-  error: [error: Error];
-}
-
 const model = defineModel<boolean>({ required: true });
 
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+const { verificationData, isReauthorization } = defineProps<{
+  verificationData: ThreeDSecureVerificationData;
+  isReauthorization?: boolean;
+}>();
+
+const emit = defineEmits<{
+  success: [];
+  error: [error: Error];
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
-
-const { verifyAndSetDefaultCard, teardown } = useCardThreeDSecure();
 
 const verifying = ref<boolean>(false);
 const challengeShown = ref<boolean>(false);
 const errorMessage = ref<string>();
 
+const { verifyAndSetDefaultCard, teardown } = useCardThreeDSecure();
+
 const billingPeriod = computed<string>(() => {
-  const { durationInMonths } = props.verificationData.subscriptionData;
+  const { durationInMonths } = verificationData.subscriptionData;
   return durationInMonths === 12
     ? t('common.yearly')
     : t('common.monthly');
@@ -67,7 +64,7 @@ async function startVerification(): Promise<void> {
   set(errorMessage, undefined);
 
   try {
-    const { cardToken, subscriptionData: { nextBillingAmount } } = props.verificationData;
+    const { cardToken, subscriptionData: { nextBillingAmount } } = verificationData;
     await verifyAndSetDefaultCard(
       cardToken,
       nextBillingAmount,
