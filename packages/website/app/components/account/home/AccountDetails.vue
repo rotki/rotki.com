@@ -13,12 +13,12 @@ const {
   },
 } = useRuntimeConfig();
 
-const email = computed(() => {
+const email = computed<string>(() => {
   const userAccount = get(account);
   return !userAccount ? '' : userAccount.email;
 });
 
-const username = computed(() => {
+const username = computed<string>(() => {
   const userAccount = get(account);
   return !userAccount ? '' : userAccount.username;
 });

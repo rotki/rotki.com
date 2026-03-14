@@ -14,8 +14,8 @@ const store = useMainStore();
 const accountApi = useAccountApi();
 const { account } = storeToRefs(store);
 
-const username = computed(() => get(account)?.username);
-const isSubscriber = computed(
+const username = computed<string | undefined>(() => get(account)?.username);
+const isSubscriber = computed<boolean>(
   () => get(account)?.hasActiveSubscription ?? false,
 );
 

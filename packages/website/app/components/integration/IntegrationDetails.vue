@@ -26,7 +26,7 @@ onMounted(() => {
   }
 });
 
-const tabCategoriesLabel = computed(() => ({
+const tabCategoriesLabel = computed<Record<TabCategory, string>>(() => ({
   [TabCategory.ALL]: t('integration.tabs.all'),
   [TabCategory.BLOCKCHAINS]: t('integration.blockchains.title'),
   [TabCategory.EXCHANGES]: t('integration.exchanges.title'),
@@ -39,7 +39,7 @@ function cleanString(text: string) {
 
 const { data: integrationData, filterDuplicateData } = useIntegrationsData();
 
-const data = computed(() => {
+const data = computed<Record<string, { title: string; description: string; data: { label: string; image: string }[] }>>(() => {
   const searchVal = get(searchDebounced);
 
   const filter = (data: { label: string; image: string }[]) => data.filter(item => cleanString(item.label).includes(cleanString(searchVal)));

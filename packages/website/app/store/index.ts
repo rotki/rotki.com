@@ -149,11 +149,11 @@ export const useMainStore = defineStore('main', () => {
   return {
     account,
     authenticated,
-    canBuy: computed(() => get(canBuy)),
+    canBuy: computed<boolean>(() => get(canBuy)),
     getAccount,
     login,
     logout,
-    pendingSubscriptionId: computed(() => get(pendingSubscriptionId)),
+    pendingSubscriptionId: computed<string | null | undefined>(() => get(pendingSubscriptionId)),
     refreshSession,
   };
 });

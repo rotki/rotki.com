@@ -30,13 +30,13 @@ const fieldStates = reactive(new Map<string, FieldState>([
   ['cvv', { valid: false, touched: false, hasContent: false }],
 ]));
 
-const fieldErrors = computed(() => ({
+const fieldErrors = computed<Record<string, boolean | undefined>>(() => ({
   number: fieldStates.get('number')?.touched && !fieldStates.get('number')?.valid,
   expirationDate: fieldStates.get('expirationDate')?.touched && !fieldStates.get('expirationDate')?.valid,
   cvv: fieldStates.get('cvv')?.touched && !fieldStates.get('cvv')?.valid,
 }));
 
-const fieldContent = computed(() => ({
+const fieldContent = computed<Record<string, boolean>>(() => ({
   number: fieldStates.get('number')?.hasContent ?? false,
   expirationDate: fieldStates.get('expirationDate')?.hasContent ?? false,
   cvv: fieldStates.get('cvv')?.hasContent ?? false,

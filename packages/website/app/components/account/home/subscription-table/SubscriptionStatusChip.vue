@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { ContextColorsType } from '@rotki/ui-library';
 import type { PendingTx } from '~/types';
 import { isCancelledButActive } from '@rotki/card-payment-common';
 import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
@@ -21,7 +22,7 @@ const { isCryptoPaymentPending } = useSubscriptionCryptoPayment({
   ),
 });
 
-const chipColor = computed(() => getChipStatusColor(subscription.status));
+const chipColor = computed<ContextColorsType | undefined>(() => getChipStatusColor(subscription.status));
 const isCancelled = computed<boolean>(() => isCancelledButActive(subscription));
 const isPendingCrypto = computed<boolean>(() => isCryptoPaymentPending(subscription));
 </script>

@@ -6,7 +6,7 @@ type DiscountCodeParam = string | undefined;
 
 export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
   const route = useRoute();
-  const planId = computed(() => {
+  const planId = computed<number | undefined>(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
     const { planId } = route.query;
@@ -66,14 +66,14 @@ export function useReferralCodeParam() {
 
 export function useSubscriptionIdParam() {
   const route = useRoute();
-  const subscriptionId = computed(() => {
+  const subscriptionId = computed<string | undefined>(() => {
     // NB: this param name is also used in backend email links,
     // if changed, kindly sync with backend team to update email links as well.
     const query = get(route).query;
     return typeof query.id === 'string' ? query.id : undefined;
   });
 
-  const upgradeSubId = computed(() => {
+  const upgradeSubId = computed<string | undefined>(() => {
     const query = get(route).query;
     return typeof query.upgradeSubId === 'string' ? query.upgradeSubId : undefined;
   });

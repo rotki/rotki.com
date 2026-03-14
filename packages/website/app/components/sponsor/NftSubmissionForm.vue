@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { StoredNft, TierKey } from '~/composables/rotki-sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
-import { useVuelidate } from '@vuelidate/core';
+import { useVuelidate, type ValidationArgs } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import ImageUploadPreview from '~/components/sponsor/ImageUploadPreview.vue';
@@ -126,7 +126,7 @@ const atLeastOneRequired = helpers.withMessage(
 );
 
 // Validation rules
-const rules = computed(() => ({
+const rules = computed<ValidationArgs>(() => ({
   displayName: {
     minLength: get(displayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_short'), minLength(3)) : {},
     maxLength: get(displayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_long'), maxLength(30)) : {},

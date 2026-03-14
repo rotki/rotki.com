@@ -64,7 +64,7 @@ function setupFormValidation(
     },
   );
 
-  const valid = computed(() => !get(v$).$invalid);
+  const valid = computed<boolean>(() => !get(v$).$invalid);
   return { v$, valid };
 }
 

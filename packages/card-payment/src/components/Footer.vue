@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-const year = computed(() => new Date().getFullYear().toString());
-const copyright = computed(() => `© Rotki Solutions GmbH 2018-${year.value}.`);
+const year = computed<string>(() => new Date().getFullYear().toString());
+const copyright = computed<string>(() => `© Rotki Solutions GmbH 2018-${year.value}.`);
 </script>
 
 <template>

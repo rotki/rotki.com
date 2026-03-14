@@ -14,7 +14,7 @@ const hasError = ref<boolean>(false);
 const { getBlockie } = useBlockie();
 
 // Get blockie for the address
-const blockieUrl = computed(() => getBlockie(address));
+const blockieUrl = computed<string>(() => getBlockie(address));
 
 async function fetchAvatar() {
   if (!ensName) {

@@ -9,7 +9,7 @@ const model = ref<number>(0);
 
 const { t } = useI18n({ useScope: 'global' });
 
-const data = computed(() => [
+const data = computed<{ title: string; subtitle: string }[]>(() => [
   {
     title: t('home.dashboard.title'),
     subtitle: t('home.dashboard.subtitle'),
