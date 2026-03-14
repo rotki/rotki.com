@@ -4,7 +4,7 @@ import ButtonLink from '~/components/common/ButtonLink.vue';
 import DownloadItem from '~/components/download/DownloadItem.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 
-const { version, links } = defineProps<{ version: string; links: DownloadItemType[] }>();
+const { version, links, loading } = defineProps<{ version: string; links: DownloadItemType[]; loading?: boolean }>();
 const { t } = useI18n({ useScope: 'global' });
 const { chronicle } = useSigilEvents();
 
@@ -79,9 +79,20 @@ function onDownloadClick(platform: string): void {
         <h3 class="text-rui-text text-h4">
           {{ t('download.heading.description') }}
         </h3>
-        <div class="flex flex-col items-center gap-3 pt-2">
-          <ClientOnly>
-            <div class="flex gap-2 flex-wrap justify-center">
+        <div class="flex flex-col items-center gap-3 pt-2 min-h-[106px]">
+          <div class="flex gap-2 flex-wrap justify-center h-[42px] items-center">
+            <RuiButton
+              v-if="loading"
+              rounded
+              color="primary"
+              variant="default"
+              size="lg"
+              disabled
+              loading
+            >
+              {{ t('download.download_for', { platform: '...' }) }}
+            </RuiButton>
+            <template v-else>
               <ButtonLink
                 v-for="item in highlightedDownloadItem"
                 :key="item.url"
@@ -111,11 +122,8 @@ function onDownloadClick(platform: string): void {
                 </template>
                 {{ t('download.download_for', { platform: item.platform }) }}
               </ButtonLink>
-            </div>
-            <template #fallback>
-              <div class="h-[42px]" />
             </template>
-          </ClientOnly>
+          </div>
 
           <div class="pl-1">
             <RuiButton
@@ -130,7 +138,14 @@ function onDownloadClick(platform: string): void {
             </RuiButton>
 
             <p class="text-sm text-rui-text-secondary">
-              {{ t('download.latest_release') }}: {{ version }}
+              {{ t('download.latest_release') }}:
+              <span
+                v-if="loading"
+                class="inline-block w-16 h-4 bg-rui-grey-200 rounded animate-pulse align-middle"
+              />
+              <template v-else>
+                {{ version }}
+              </template>
             </p>
           </div>
         </div>

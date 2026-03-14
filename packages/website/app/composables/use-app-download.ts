@@ -1,49 +1,26 @@
-import type { GithubRelease } from '~/types/github';
-import { get, set } from '@vueuse/shared';
-import { useLogger } from '~/utils/use-logger';
+import type { GithubRelease, GithubReleaseAsset } from '~/types/github';
+import { get } from '@vueuse/shared';
 
 export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/releases/latest') {
-  const version = ref<string>('');
-  const linuxUrl = ref<string>(fallbackUrl);
-  const macOSUrl = ref<string>(fallbackUrl);
-  const macOSArmUrl = ref<string>(fallbackUrl);
-  const windowsUrl = ref<string>(fallbackUrl);
+  const { data, status } = useFetch<GithubRelease>('/api/releases/latest', {
+    server: false,
+    dedupe: 'defer',
+  });
 
-  const logger = useLogger('download');
+  function findAssetUrl(match: (asset: GithubReleaseAsset) => boolean): string {
+    return get(data)?.assets.find(match)?.browser_download_url ?? fallbackUrl;
+  }
 
-  const fetchLatestRelease = async (): Promise<void> => {
-    try {
-      const { data, refresh } = await useFetch<GithubRelease>(
-        '/api/releases/latest',
-      );
-
-      if (!get(data))
-        await refresh();
-
-      const latestRelease = get(data);
-      if (latestRelease) {
-        set(version, latestRelease.tag_name);
-        // Server pre-filters to only downloadable assets (exe, AppImage, dmg)
-        for (const { name, browser_download_url: url } of latestRelease.assets) {
-          if (name.endsWith('.exe'))
-            set(windowsUrl, url);
-          else if (name.endsWith('.AppImage'))
-            set(linuxUrl, url);
-          else if (name.includes('arm64'))
-            set(macOSArmUrl, url);
-          else if (name.endsWith('.dmg'))
-            set(macOSUrl, url);
-        }
-      }
-    }
-    catch (error) {
-      logger.error(error);
-    }
-  };
+  const version = computed<string>(() => get(data)?.tag_name ?? '');
+  const linuxUrl = computed<string>(() => findAssetUrl(a => a.name.endsWith('.AppImage')));
+  const windowsUrl = computed<string>(() => findAssetUrl(a => a.name.endsWith('.exe')));
+  const macOSUrl = computed<string>(() => findAssetUrl(a => a.name.endsWith('.dmg') && !a.name.includes('arm64')));
+  const macOSArmUrl = computed<string>(() => findAssetUrl(a => a.name.includes('arm64')));
+  const loading = computed<boolean>(() => get(status) !== 'success' && get(status) !== 'error');
 
   return {
-    fetchLatestRelease,
     linuxUrl,
+    loading,
     macOSArmUrl,
     macOSUrl,
     version,
