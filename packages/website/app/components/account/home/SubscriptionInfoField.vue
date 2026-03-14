@@ -1,13 +1,11 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   icon: string;
   label: string;
   value?: string;
   subtitle?: string;
   valueClass?: string;
-}
-
-defineProps<Props>();
+}>();
 
 const slots = defineSlots<{
   default?: () => any;

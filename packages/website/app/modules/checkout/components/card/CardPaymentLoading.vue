@@ -2,13 +2,11 @@
 import type { PaymentInfo, ThreeDSecureState } from '@rotki/card-payment-common/schemas/three-d-secure';
 import PaymentInfoCard from '~/modules/checkout/components/card/CardPaymentInfo.vue';
 
-interface Props {
+const { state, challengeVisible, paymentInfo } = defineProps<{
   state: ThreeDSecureState;
   challengeVisible: boolean;
   paymentInfo: PaymentInfo | undefined;
-}
-
-const { state, challengeVisible, paymentInfo } = defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 

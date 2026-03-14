@@ -1,9 +1,7 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   visible: boolean;
-}
-
-defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

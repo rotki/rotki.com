@@ -1,10 +1,8 @@
 <script setup lang="ts">
-interface Props {
+defineProps<{
   actionsClasses?: string;
   loading?: boolean;
-}
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   click: [];

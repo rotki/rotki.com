@@ -2,12 +2,10 @@
 import type { RouteLocationRaw } from 'vue-router';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
-interface Props {
+defineProps<{
   actionsClasses?: string;
   to: RouteLocationRaw;
-}
-
-defineProps<Props>();
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

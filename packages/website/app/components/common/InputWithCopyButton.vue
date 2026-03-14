@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import type { TextFieldProps } from '@rotki/ui-library/components';
+import type { ContextColorsType } from '@rotki/ui-library';
 import CopyButton from '~/components/common/CopyButton.vue';
-
-type Props = TextFieldProps & {
-  copyValue: string;
-};
 
 defineOptions({
   inheritAttrs: false,
@@ -12,7 +8,22 @@ defineOptions({
 
 const modelValue = defineModel<string>({ required: true });
 
-const { copyValue, disabled } = defineProps<Props>();
+const {
+  copyValue,
+  disabled,
+  color = 'primary',
+  variant = 'outlined',
+  hideDetails = true,
+} = defineProps<{
+  copyValue: string;
+  disabled?: boolean;
+  label?: string;
+  color?: ContextColorsType;
+  variant?: 'default' | 'filled' | 'outlined';
+  dense?: boolean;
+  readonly?: boolean;
+  hideDetails?: boolean;
+}>();
 
 defineSlots<{
   prepend: () => void;
@@ -21,11 +32,15 @@ defineSlots<{
 
 <template>
   <RuiTextField
-    v-bind="$props"
+    v-bind="$attrs"
     v-model="modelValue"
-    color="primary"
-    variant="outlined"
-    hide-details
+    :label="label"
+    :color="color"
+    :variant="variant"
+    :hide-details="hideDetails"
+    :disabled="disabled"
+    :dense="dense"
+    :readonly="readonly"
   >
     <template
       v-if="$slots.prepend"

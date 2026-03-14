@@ -2,7 +2,7 @@
 import type { OAuthMode } from '~/types/oauth';
 import CopyButton from '~/components/common/CopyButton.vue';
 
-interface Props {
+defineProps<{
   title: string;
   description: string;
   buttonText: string;
@@ -15,9 +15,7 @@ interface Props {
   mode?: OAuthMode;
   currentMode?: OAuthMode;
   showExpiresIn?: boolean;
-}
-
-defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   'auth-click': [];
