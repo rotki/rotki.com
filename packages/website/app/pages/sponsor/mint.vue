@@ -321,7 +321,7 @@ async function checkAllowanceIfNeeded() {
   }
 }
 
-watch([selectedCurrency, connected, isExpectedChain], checkAllowanceIfNeeded);
+watchDebounced([selectedCurrency, connected, isExpectedChain], checkAllowanceIfNeeded, { debounce: 300 });
 
 // Function to call after successful minting
 async function onMintingSuccess(txHash: string) {
