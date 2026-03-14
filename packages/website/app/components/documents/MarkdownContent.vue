@@ -10,7 +10,7 @@ const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { data: document } = await useAsyncData(path, async () => fallbackToLocalOnError(
   async () => queryCollection('documentsRemote').path(path).first(),
   async () => await queryCollection('documentsLocal').path(path).first(),
-));
+), { dedupe: 'defer' });
 
 if (!document) {
   showError({ message: `Page not found: ${path}`, statusCode: 404 });

@@ -12,7 +12,7 @@ const { t } = useI18n({ useScope: 'global' });
 const { data: job } = await useAsyncData(path, () => fallbackToLocalOnError(
   async () => await queryCollection('jobsRemote').path(path).first(),
   async () => await queryCollection('jobsLocal').path(path).first(),
-));
+), { dedupe: 'defer' });
 
 if (!isDefined(job)) {
   showError({ message: `Page not found: ${path}`, statusCode: 404 });

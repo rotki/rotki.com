@@ -122,6 +122,7 @@ export function useSponsorshipData() {
   }, {
     // Only watch on client side to avoid multiple SSR calls
     watch: import.meta.client ? [() => route.path] : [],
+    dedupe: 'defer',
   });
 
   // Create a custom refresh function that forces cache bypass

@@ -61,7 +61,7 @@ const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { data: sponsorshipTiers } = await useAsyncData('sponsorship-tiers', () => fallbackToLocalOnError(
   async () => await queryCollection('sponsorshipTiersRemote').all(),
   async () => await queryCollection('sponsorshipTiersLocal').all(),
-));
+), { dedupe: 'defer' });
 
 // Convert array to object keyed by tier
 const tierContent = computed<Record<string, { benefits: string; example: string[] }>>(() => {

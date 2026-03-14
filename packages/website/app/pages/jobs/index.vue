@@ -12,7 +12,7 @@ const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { data: jobs } = await useAsyncData('jobs', () => fallbackToLocalOnError(
   async () => await queryCollection('jobsRemote').all(),
   async () => await queryCollection('jobsLocal').all(),
-));
+), { dedupe: 'defer' });
 
 const { t } = useI18n({ useScope: 'global' });
 
