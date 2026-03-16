@@ -1,4 +1,6 @@
-import { defineNuxtRouteMiddleware, navigateTo, useRuntimeConfig } from '#imports';
+import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
+import { get } from '@vueuse/shared';
+import { useAppConfig } from '~/composables/use-app-config';
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path === '/maintenance' || to.path === '/health')
@@ -9,7 +11,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!auth && !guestOnly && !backendRequired)
     return;
 
-  const config = useRuntimeConfig();
-  if (config.public.maintenance)
+  const { isMaintenance } = useAppConfig();
+  if (get(isMaintenance))
     return navigateTo('/maintenance');
 });

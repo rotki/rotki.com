@@ -1,13 +1,16 @@
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { get } from '@vueuse/shared';
 import LocalIntegrationData from '~~/public/integrations/all.json';
+import { useAppConfig } from '~/composables/use-app-config';
 import { IntegrationData, type IntegrationItem } from '~/types/integrations';
 import { logger } from '~/utils/use-logger';
 
 export const useIntegrationsData = createSharedComposable(() => {
-  const { public: { isDev, testing } } = useRuntimeConfig();
+  const { public: { isDev } } = useRuntimeConfig();
+  const { contentBranch } = useAppConfig();
 
   const getRemoteIntegrationData = async (): Promise<IntegrationData | null> => {
-    const branch = testing ? 'develop' : 'main';
+    const branch = get(contentBranch);
     try {
       const response = await $fetch<IntegrationData>(
         `https://raw.githubusercontent.com/rotki/rotki.com/${branch}/packages/website/public/integrations/all.json`,

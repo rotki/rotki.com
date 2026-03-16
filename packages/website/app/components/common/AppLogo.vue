@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppConfig } from '~/composables/use-app-config';
 import { useStagingBranding } from '~/composables/use-staging-branding';
 
 defineOptions({
@@ -11,7 +12,7 @@ const { text = false, size } = defineProps<{
 }>();
 
 const { isStaging } = useStagingBranding();
-const branch = useRuntimeConfig().public.testing ? 'develop' : 'main';
+const { contentBranch: branch } = useAppConfig();
 </script>
 
 <template>

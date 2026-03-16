@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { get } from '@vueuse/shared';
+import { useAppConfig } from '~/composables/use-app-config';
+
 const { chain } = defineProps<{
   chain: string;
 }>();
@@ -6,7 +9,7 @@ const { chain } = defineProps<{
 const pending = ref<boolean>(true);
 const error = ref<boolean>(false);
 
-const { public: { testing } } = useRuntimeConfig();
+const { isTesting } = useAppConfig();
 
 // Map network names to icon filenames
 const CHAIN_NAME_MAP: Record<string, string> = {
@@ -32,7 +35,7 @@ const chainName = computed<string>(() => {
   }
 
   // Fallback: remove 'sepolia' and trim for testnet chains
-  if (!testing) {
+  if (!get(isTesting)) {
     return name.toLowerCase();
   }
 

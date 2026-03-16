@@ -43,6 +43,8 @@ type Config struct {
 
 	// Feature flags
 	SponsorshipEnabled bool
+	Maintenance        bool
+	Testing            bool
 }
 
 // Load reads configuration from environment variables with sensible defaults.
@@ -85,6 +87,8 @@ func Load() (*Config, error) {
 
 		LogLevel:           envLogLevel("LOG_LEVEL", slog.LevelInfo),
 		SponsorshipEnabled: envBool("SPONSORSHIP_ENABLED", false),
+		Maintenance:        envBool("MAINTENANCE", false),
+		Testing:            envBool("TESTING", false),
 	}
 
 	if err := cfg.validate(); err != nil {

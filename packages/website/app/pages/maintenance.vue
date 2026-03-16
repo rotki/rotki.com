@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { get } from '@vueuse/shared';
+import { useAppConfig } from '~/composables/use-app-config';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 usePageSeoNoIndex('maintenance');
@@ -7,10 +9,11 @@ definePageMeta({
   landing: true,
 });
 
-const { public: { maintenance, contact: { emailMailto, email } } } = useRuntimeConfig();
+const { public: { contact: { emailMailto, email } } } = useRuntimeConfig();
 const { t } = useI18n({ useScope: 'global' });
+const { isMaintenance } = useAppConfig();
 
-if (!maintenance)
+if (!get(isMaintenance))
   navigateTo('/');
 
 const otherHeight = inject('otherHeight', 0);

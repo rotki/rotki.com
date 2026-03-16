@@ -2,6 +2,7 @@ import type { AppKit } from '@reown/appkit';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import type { Signer } from 'ethers';
 import { get, set } from '@vueuse/shared';
+import { useAppConfig } from '~/composables/use-app-config';
 import { useSharedWeb3State } from '~/composables/web3/use-shared-web3-state';
 import { useLogger } from '~/utils/use-logger';
 
@@ -111,7 +112,8 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   const errorMessage = shallowRef<string>('');
 
   const logger = useLogger('web3-connection');
-  const { public: { baseUrl, testing, walletConnect: { projectId } } } = useRuntimeConfig();
+  const { public: { baseUrl, walletConnect: { projectId } } } = useRuntimeConfig();
+  const { isTesting } = useAppConfig();
 
   // Notify per-instance callbacks when account state changes
   if (onAccountChange) {
@@ -143,7 +145,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
         canSwitchNetwork,
         defaultChainId: get(chainId),
         projectId,
-        testing,
+        testing: get(isTesting),
       });
 
       // Initialize state from current appKit connection
@@ -203,7 +205,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   function getNetwork(networkChainId?: number): AppKitNetwork | undefined {
     if (!networkConfig)
       return undefined;
-    const networks = testing ? networkConfig.testNetworks : networkConfig.productionNetworks;
+    const networks = get(isTesting) ? networkConfig.testNetworks : networkConfig.productionNetworks;
     return networks.find(network => network.id === networkChainId) ?? networks[0];
   }
 

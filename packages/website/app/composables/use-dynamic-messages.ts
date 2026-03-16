@@ -4,13 +4,12 @@ import {
   DashboardSchema,
   type VisibilityPeriod,
 } from '@/types/dynamic-messages';
+import { useAppConfig } from '~/composables/use-app-config';
 import { logger } from '~/utils/use-logger';
 
 export const useDynamicMessages = createSharedComposable(() => {
-  const { public: { testing } } = useRuntimeConfig();
-
-  const branch = testing ? 'develop' : 'main';
   const dashboardMessages = ref<DashboardSchema>([]);
+  const { contentBranch: branch } = useAppConfig();
 
   const getValidMessages = <T extends { period: VisibilityPeriod }>(
     messages: T[],
@@ -30,7 +29,7 @@ export const useDynamicMessages = createSharedComposable(() => {
   const getDashboardData = async (): Promise<DashboardSchema | null> => {
     try {
       const response = await $fetch<DashboardSchema>(
-        `https://raw.githubusercontent.com/rotki/data/${branch}/messages/dashboard.json`,
+        `https://raw.githubusercontent.com/rotki/data/${get(branch)}/messages/dashboard.json`,
         {
           parseResponse(responseText: string) {
             return convertKeys(JSON.parse(responseText), true, false);
