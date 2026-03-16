@@ -4,7 +4,7 @@ import ButtonLink from '~/components/common/ButtonLink.vue';
 
 const {
   public: {
-    contact: { emailMailto, twitter, discord, github },
+    contact: { emailMailto, twitter, discord, github, reddit },
   },
 } = useRuntimeConfig();
 
@@ -26,6 +26,12 @@ const menus: { title: string; showText: boolean; href: string; icon: RuiIcons }[
     showText: false,
     href: discord,
     icon: 'lu-discord',
+  },
+  {
+    title: 'Reddit',
+    showText: false,
+    href: reddit,
+    icon: 'lu-reddit',
   },
   {
     title: 'Contact',

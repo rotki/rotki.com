@@ -25,6 +25,7 @@ useHead(() => ({
       'sameAs': [
         'https://twitter.com/rotkiapp',
         'https://github.com/rotki',
+        'https://www.reddit.com/r/rotki',
       ],
     }),
   }],

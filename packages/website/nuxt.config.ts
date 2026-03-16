@@ -457,6 +457,7 @@ export default defineNuxtConfig({
         email: 'info@rotki.com',
         emailMailto: 'mailto:info@rotki.com',
         github: 'https://github.com/rotki',
+        reddit: 'https://www.reddit.com/r/rotki',
         supportEmail: 'support@rotki.com',
         supportEmailMailto: 'mailto:support@rotki.com',
         twitter: 'https://twitter.com/rotkiapp',
