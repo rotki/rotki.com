@@ -16,9 +16,9 @@ import SignupIntroduction from '~/components/account/signup/SignupIntroduction.v
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRecaptcha } from '~/composables/use-recaptcha';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
+import { getSafeRedirectUrl } from '~/utils/redirect';
 
 const { t } = useI18n({ useScope: 'global' });
-const { captchaId, resetCaptcha } = useRecaptcha();
 
 const accountForm = ref<SignupAccountPayload>({
   username: '',
@@ -44,8 +44,29 @@ const addressForm = ref<SignupAddressPayload>({
 
 const loading = ref<boolean>(false);
 const externalResults = ref<ValidationErrors>({});
+const step = ref<number>(1);
+
+const steps = computed<{ title: string; description: string }[]>(() => [
+  {
+    title: t('auth.signup.steps.step_1.title'),
+    description: t('auth.signup.steps.step_1.description'),
+  },
+  {
+    title: t('auth.signup.steps.step_2.title'),
+    description: t('auth.signup.steps.step_2.description'),
+  },
+  {
+    title: t('auth.signup.steps.step_3.title'),
+    description: t('auth.signup.steps.step_3.description'),
+  },
+  {
+    title: t('auth.signup.steps.step_4.title'),
+    description: t('auth.signup.steps.step_4.description'),
+  },
+]);
 
 const route = useRoute();
+const { captchaId, resetCaptcha } = useRecaptcha();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { saveRedirectUrl } = useRedirectUrl();
 
@@ -75,8 +96,11 @@ async function signup({
     });
     if (result) {
       const { redirectUrl } = route.query;
-      if (redirectUrl)
-        saveRedirectUrl(payload.username, decodeURIComponent(redirectUrl as string));
+      if (redirectUrl) {
+        const safeUrl = getSafeRedirectUrl(redirectUrl as string);
+        if (safeUrl !== '/home/subscription')
+          saveRedirectUrl(payload.username, safeUrl);
+      }
 
       await navigateTo({ path: '/activation' });
     }
@@ -99,32 +123,12 @@ async function signup({
   set(loading, false);
 }
 
-const step = ref<number>(1);
-const steps = [
-  {
-    title: t('auth.signup.steps.step_1.title'),
-    description: t('auth.signup.steps.step_1.description'),
-  },
-  {
-    title: t('auth.signup.steps.step_2.title'),
-    description: t('auth.signup.steps.step_2.description'),
-  },
-  {
-    title: t('auth.signup.steps.step_3.title'),
-    description: t('auth.signup.steps.step_3.description'),
-  },
-  {
-    title: t('auth.signup.steps.step_4.title'),
-    description: t('auth.signup.steps.step_4.description'),
-  },
-];
-
 function back() {
   set(step, Math.max(get(step) - 1, 1));
 }
 
 function next() {
-  set(step, Math.min(get(step) + 1, steps.length));
+  set(step, Math.min(get(step) + 1, steps.value.length));
 }
 
 function haveIntersectionKeys(obj1: object, obj2: object) {

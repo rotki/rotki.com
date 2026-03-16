@@ -6,6 +6,7 @@ import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { useMainStore } from '~/store';
+import { getSafeRedirectUrl } from '~/utils/redirect';
 import { useLogger } from '~/utils/use-logger';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -46,7 +47,7 @@ async function validateActivationToken(): Promise<void> {
     set(error, undefined);
     logger.debug('Account activation successful');
   }
-  catch (activationError: any) {
+  catch (activationError: unknown) {
     if (activationError instanceof FetchError && activationError.status === 404) {
       set(error, 'Invalid or expired activation link');
     }
@@ -64,7 +65,7 @@ async function validateActivationToken(): Promise<void> {
 function handlePaymentRedirect(): void {
   const paymentLink = get(lastPaymentLink);
   if (paymentLink) {
-    window.location.href = paymentLink;
+    window.location.href = getSafeRedirectUrl(paymentLink);
   }
 }
 

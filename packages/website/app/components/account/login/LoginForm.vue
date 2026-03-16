@@ -4,12 +4,15 @@ import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';
+import { getSafeRedirectUrl } from '~/utils/redirect';
 
 const username = ref<string>('');
 const password = ref<string>('');
 const loading = ref<boolean>(false);
 const error = ref<string>('');
 const hadError = ref<boolean>(false);
+
+const { t } = useI18n({ useScope: 'global' });
 
 const rules = {
   username: { required },
@@ -44,15 +47,13 @@ async function performLogin() {
   if (!get(error)) {
     const { redirectUrl } = route.query;
     if (redirectUrl)
-      window.location.href = decodeURIComponent(redirectUrl as string);
+      window.location.href = getSafeRedirectUrl(redirectUrl as string);
     else
       await navigateTo('/home/subscription');
   }
 
   else { set(hadError, true); }
 }
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
