@@ -109,10 +109,15 @@ var ChainConfigs = map[string]ChainConfig{
 		"https://ethereum-rpc.publicnode.com",
 		"https://eth.drpc.org",
 		"https://rpc.ankr.com/eth",
+		"https://1rpc.io/eth",
+		"https://eth.llamarpc.com",
 	}},
 	"sepolia": {ChainID: 11155111, RPCURLs: []string{
 		"https://ethereum-sepolia-rpc.publicnode.com",
-		"https://rpc.sepolia.org",
+		"https://1rpc.io/sepolia",
+		"https://eth-sepolia.public.blastapi.io",
+		"https://sepolia.drpc.org",
+		"https://rpc.ankr.com/eth_sepolia",
 	}},
 }
 
