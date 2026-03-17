@@ -4,18 +4,11 @@ defineProps<{ statusCode: number }>();
 const emit = defineEmits<{ 'handle-error': [] }>();
 
 const { t } = useI18n({ useScope: 'global' });
-
-const otherHeight = inject('otherHeight', 0);
-
-const wrapperStyle = computed<{ minHeight: string }>(() => ({
-  minHeight: `calc(100vh - ${otherHeight}px)`,
-}));
 </script>
 
 <template>
   <div
-    class="w-full flex flex-col-reverse lg:flex-row gap-8 lg:gap-20 items-center justify-center lg:justify-between text-center lg:text-left px-2 lg:px-4 py-4"
-    :style="wrapperStyle"
+    class="w-full flex flex-1 flex-col-reverse lg:flex-row gap-8 lg:gap-20 items-center justify-center lg:justify-between text-center lg:text-left px-2 lg:px-4 py-4"
   >
     <div class="flex flex-col gap-4">
       <h6 class="text-h6 text-rui-primary">

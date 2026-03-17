@@ -92,6 +92,54 @@ export function resolveFeatureValue(
   return descriptions.get(plan.name)?.get(label);
 }
 
+const PLACEHOLDER_FEATURE_COUNT = 8;
+
+function createPlaceholderPlans(): MappedPlan[] {
+  const emptyFeatures = Array.from<FeatureValue>({ length: PLACEHOLDER_FEATURE_COUNT }).fill('');
+  return [
+    {
+      name: TIER_NAMES.FREE,
+      displayedName: '',
+      mainPriceDisplay: '',
+      type: 'free',
+      isMostPopular: false,
+      hidden: false,
+      loading: true,
+      features: [...emptyFeatures],
+    },
+    {
+      name: 'plan-1',
+      displayedName: '',
+      mainPriceDisplay: '',
+      type: 'regular',
+      isMostPopular: false,
+      hidden: false,
+      loading: true,
+      features: [...emptyFeatures],
+    },
+    {
+      name: 'plan-2',
+      displayedName: '',
+      mainPriceDisplay: '',
+      type: 'regular',
+      isMostPopular: true,
+      hidden: false,
+      loading: true,
+      features: [...emptyFeatures],
+    },
+    {
+      name: TIER_NAMES.CUSTOM,
+      displayedName: '',
+      mainPriceDisplay: '',
+      type: 'custom',
+      isMostPopular: false,
+      hidden: false,
+      loading: true,
+      features: [...emptyFeatures],
+    },
+  ];
+}
+
 interface UsePricingComparisonOptions {
   availablePlans: MaybeRefOrGetter<AvailablePlans>;
   tiersData: MaybeRefOrGetter<PremiumTiersInfo>;
@@ -147,6 +195,13 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
   });
 
   const plans = computed<MappedPlan[]>(() => {
+    const availPlans = toValue(options.availablePlans);
+    const tiers = toValue(options.tiersData);
+
+    if (availPlans.length === 0 && tiers.length === 0) {
+      return createPlaceholderPlans();
+    }
+
     const { labels, descriptions, featureFlags } = get(tiersInfo);
     const freeFeatures = get(freePlanFeaturesMap);
     const customPlanLabels = {
@@ -186,6 +241,9 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
 
   const displayedFeaturesLabel = computed<string[]>(() => {
     const { labels } = get(tiersInfo);
+    if (labels.length === 0) {
+      return Array.from<string>({ length: PLACEHOLDER_FEATURE_COUNT }).fill('');
+    }
     if (get(compactView)) {
       const firstLabel = labels[0];
       return firstLabel ? [firstLabel] : [];

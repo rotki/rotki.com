@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { get } from '@vueuse/shared';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import PageHeader from '~/components/header/PageHeader.vue';
 
@@ -9,36 +8,17 @@ defineSlots<{
 
 const route = useRoute();
 
-const headerRef = useTemplateRef<HTMLDivElement>('headerRef');
-const footerRef = useTemplateRef<HTMLDivElement>('footerRef');
-
-const { height: topHeight } = useElementBounding(headerRef);
-const { height: bottomHeight } = useElementBounding(footerRef);
-
 const isLanding = computed<boolean>(() => !!route.meta.landing);
-
-const otherHeight = computed<number>(
-  () => get(topHeight) + get(bottomHeight) || 219,
-);
-
-const bodyStyle = computed<{ minHeight: string }>(() => ({
-  minHeight: `calc(100vh - ${get(otherHeight)}px)`,
-}));
-
-provide('otherHeight', otherHeight);
 </script>
 
 <template>
-  <div ref="headerRef">
+  <div>
     <PageHeader />
   </div>
-  <main
-    class="flex flex-col"
-    :style="bodyStyle"
-  >
+  <main class="flex flex-col grow">
     <slot />
   </main>
-  <div ref="footerRef">
+  <div>
     <PageFooter :landing="isLanding" />
   </div>
 </template>

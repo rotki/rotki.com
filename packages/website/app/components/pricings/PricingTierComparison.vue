@@ -18,7 +18,6 @@ const {
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-const { isXlAndUp } = useBreakpoint();
 
 const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingComparison({
   availablePlans: () => availablePlans,
@@ -30,20 +29,22 @@ const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingC
 
 <template>
   <div class="min-h-[520px] md:min-h-[560px] xl:min-h-[570px]">
-    <PricingTable
-      v-if="isXlAndUp"
-      :plans="plans"
-      :compact="compactView"
-      :selected-period="selectedPeriod"
-      :features-label="displayedFeaturesLabel"
-    />
-    <PricingTabs
-      v-else
-      :plans="plans"
-      :compact="compactView"
-      :selected-period="selectedPeriod"
-      :features-label="displayedFeaturesLabel"
-    />
+    <div class="hidden xl:block">
+      <PricingTable
+        :plans="plans"
+        :compact="compactView"
+        :selected-period="selectedPeriod"
+        :features-label="displayedFeaturesLabel"
+      />
+    </div>
+    <div class="block xl:hidden">
+      <PricingTabs
+        :plans="plans"
+        :compact="compactView"
+        :selected-period="selectedPeriod"
+        :features-label="displayedFeaturesLabel"
+      />
+    </div>
     <div class="flex justify-center">
       <RuiButton
         v-if="allowCompact"

@@ -15,18 +15,11 @@ const { isMaintenance } = useAppConfig();
 
 if (!get(isMaintenance))
   navigateTo('/');
-
-const otherHeight = inject('otherHeight', 0);
-
-const wrapperStyle = computed<{ minHeight: string }>(() => ({
-  minHeight: `calc(100vh - ${otherHeight}px)`,
-}));
 </script>
 
 <template>
   <div
-    class="container w-full flex flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center text-center lg:text-left py-4"
-    :style="wrapperStyle"
+    class="container w-full flex flex-1 flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center text-center lg:text-left py-4"
   >
     <img
       class="w-1/3 lg:w-1/2 max-w-[40rem]"

@@ -6,7 +6,6 @@ import PricingFeatureItem from '~/components/pricings/PricingFeatureItem.vue';
 import PricingHeading from '~/components/pricings/PricingHeading.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import PricingTierComparison from '~/components/pricings/PricingTierComparison.vue';
-import PricingTierComparisonSkeleton from '~/components/pricings/PricingTierComparisonSkeleton.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
@@ -55,7 +54,7 @@ const selectedPricingPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
 
 const mainStore = useMainStore();
 const { account } = storeToRefs(mainStore);
-const { availablePlans, country } = useAvailablePlans();
+const { availablePlans, country, pending: plansPending } = useAvailablePlans();
 const { tiersInformation } = usePremiumTiersInfo();
 const { countries } = useCountries();
 
@@ -97,9 +96,7 @@ onMounted(() => {
         :data="availablePlans"
       />
 
-      <PricingTierComparisonSkeleton v-if="availablePlans.length === 0" />
       <PricingTierComparison
-        v-else
         :selected-period="selectedPricingPeriod"
         :available-plans="availablePlans"
         :tiers-data="tiersInformation"
@@ -116,7 +113,7 @@ onMounted(() => {
         </div>
 
         <div
-          v-if="!account"
+          v-if="!account && !plansPending && availablePlans.length > 0"
           class="flex flex-col gap-2"
         >
           <div class="text-sm text-rui-text-secondary">

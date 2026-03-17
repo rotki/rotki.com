@@ -33,7 +33,12 @@ const { t } = useI18n({ useScope: 'global' });
         v-if="isMostPopularPlan(plan)"
         class="rounded-t-xl bg-rui-primary text-white text-center font-medium text-sm py-2"
       >
-        {{ t('pricing.most_popular_plan') }}
+        <template v-if="plan.loading">
+          <RuiSkeletonLoader class="w-28 h-5 mx-auto opacity-30" />
+        </template>
+        <template v-else>
+          {{ t('pricing.most_popular_plan') }}
+        </template>
       </div>
       <div
         v-else
@@ -44,38 +49,49 @@ const { t } = useI18n({ useScope: 'global' });
         :class="{ 'border-x-2 border-rui-primary': isMostPopularPlan(plan) }"
       >
         <div class="flex flex-col gap-4 mb-6 bg-white">
-          <div class="text-h6 text-rui-primary whitespace-nowrap">
-            {{ plan.displayedName }}
-          </div>
-          <template v-if="!isCustomPlan(plan)">
+          <template v-if="plan.loading">
+            <RuiSkeletonLoader class="w-28 h-8" />
             <div class="flex items-end gap-x-1">
-              <div class="text-h5 xl:text-h4 font-bold whitespace-nowrap">
-                {{ plan.mainPriceDisplay }}
+              <RuiSkeletonLoader class="w-24 h-[42px]" />
+              <RuiSkeletonLoader class="w-10 h-6" />
+            </div>
+            <RuiSkeletonLoader class="w-32 h-6" />
+          </template>
+          <template v-else>
+            <div class="text-h6 text-rui-primary whitespace-nowrap">
+              {{ plan.displayedName }}
+            </div>
+            <template v-if="!isCustomPlan(plan)">
+              <div class="flex items-end gap-x-1">
+                <div class="text-h5 xl:text-h4 font-bold whitespace-nowrap">
+                  {{ plan.mainPriceDisplay }}
+                </div>
+                <div
+                  v-if="!isFreePlan(plan)"
+                  class="text-lg font-medium"
+                >
+                  /{{ t('pricing.per_month') }}
+                </div>
               </div>
               <div
                 v-if="!isFreePlan(plan)"
-                class="text-lg font-medium"
+                class="text-rui-text-secondary"
               >
-                /{{ t('pricing.per_month') }}
+                {{ plan.secondaryPriceDisplay }}
               </div>
-            </div>
+            </template>
             <div
-              v-if="!isFreePlan(plan)"
+              v-else
               class="text-rui-text-secondary"
             >
-              {{ plan.secondaryPriceDisplay }}
+              {{ t('pricing.custom_plan_info') }}
             </div>
           </template>
-          <div
-            v-else
-            class="text-rui-text-secondary"
-          >
-            {{ t('pricing.custom_plan_info') }}
-          </div>
         </div>
         <PricingTableButton
           :selected-period="selectedPeriod"
           :plan="plan"
+          :loading="plan.loading"
         />
       </div>
     </div>
@@ -86,9 +102,15 @@ const { t } = useI18n({ useScope: 'global' });
     >
       <div
         :class="{ 'bg-gray-50': mainIndex % 2 === 0 }"
-        class="px-2 py-2 font-medium"
+        class="px-2 py-2 font-medium flex items-center"
       >
-        {{ featureLabel }}
+        <template v-if="featureLabel">
+          {{ featureLabel }}
+        </template>
+        <RuiSkeletonLoader
+          v-else
+          class="w-36 h-6"
+        />
       </div>
       <template
         v-for="plan in plans"
@@ -96,6 +118,7 @@ const { t } = useI18n({ useScope: 'global' });
       >
         <PricingTableCell
           :value="plan.features[mainIndex]"
+          :loading="plan.loading"
           :class="{
             'bg-gray-50': mainIndex % 2 === 0,
             'border-x-2 border-rui-primary': isMostPopularPlan(plan),

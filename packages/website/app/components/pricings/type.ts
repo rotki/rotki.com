@@ -14,6 +14,7 @@ export interface MappedPlan {
   type: PlanType;
   isMostPopular: boolean;
   hidden: boolean;
+  loading?: boolean;
   secondaryPriceDisplay?: string;
   features: FeatureValue[];
 }

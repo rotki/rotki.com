@@ -5,6 +5,16 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  overflow-y: scroll;
+}
+
+[id='__nuxt'] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .container {
   @apply px-4 md:px-12 xl:px-16;
 }

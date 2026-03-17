@@ -9,9 +9,10 @@ import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-pa
 import { buildQueryParams } from '~/utils/query';
 import { toTitleCase } from '~/utils/text';
 
-const { plan } = defineProps<{
+const { plan, loading = false } = defineProps<{
   plan: MappedPlan;
   selectedPeriod: PricingPeriod;
+  loading?: boolean;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -38,8 +39,14 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
 </script>
 
 <template>
+  <RuiSkeletonLoader
+    v-if="loading"
+    class="w-full h-10"
+    rounded="md"
+  />
+
   <ButtonLink
-    v-if="isFreePlan(plan)"
+    v-else-if="isFreePlan(plan)"
     class="w-full py-2 xl:text-[1rem]"
     to="/download"
     color="primary"
