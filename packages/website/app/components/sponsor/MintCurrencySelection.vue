@@ -31,12 +31,13 @@ const { t } = useI18n({ useScope: 'global' });
     </h6>
     <div
       v-if="isLoading"
-      class="flex gap-2"
+      class="flex flex-wrap gap-2 max-w-full"
     >
       <RuiSkeletonLoader
         v-for="i in 2"
         :key="i"
-        class="w-20 h-8"
+        class="w-[88px] h-[32px]"
+        rounded="md"
       />
     </div>
     <div

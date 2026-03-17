@@ -39,7 +39,7 @@ const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
 type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
 
 const logger = useLogger();
-const { isEnabled: isMintingEnabled } = useSponsorshipFeature();
+const { isEnabled: isMintingEnabled, configReady } = useSponsorshipFeature();
 
 const selectedTier = ref<TierKey>('bronze');
 const isApproving = ref<boolean>(false);
@@ -445,7 +445,7 @@ onBeforeMount(async () => {
 
           <!-- Minting Unavailable Warning -->
           <RuiAlert
-            v-if="!isMintingEnabled"
+            v-if="configReady && !isMintingEnabled"
             type="warning"
           >
             {{ t('sponsor.sponsor_page.minting_unavailable') }}
@@ -461,9 +461,9 @@ onBeforeMount(async () => {
 
           <!-- Tier Selection -->
           <MintTierSelection
-            v-if="availableTokens.length > 0"
             v-model="selectedTier"
             :disabled="!isMintingEnabled"
+            :is-loading="isLoadingPaymentTokens"
             :tier-supply="tierSupply"
             :tier-price-display="tierPriceDisplay"
             :visible-tiers="visibleTiers"

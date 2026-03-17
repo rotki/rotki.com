@@ -20,7 +20,7 @@ const defaultConfig: AppConfig = {
 };
 
 export function useAppConfig() {
-  const { data } = useFetch('/api/config', {
+  const { data, status } = useFetch('/api/config', {
     dedupe: 'defer',
     default: (): AppConfig => ({ ...defaultConfig }),
     server: false,
@@ -29,10 +29,12 @@ export function useAppConfig() {
 
   const isMaintenance = computed<boolean>(() => get(data).maintenance);
   const isTesting = computed<boolean>(() => get(data).testing);
+  const configReady = computed<boolean>(() => get(status) === 'success');
   const contentBranch = computed<string>(() => get(isTesting) ? 'develop' : 'main');
 
   return {
     config: readonly(data),
+    configReady: readonly(configReady),
     contentBranch: readonly(contentBranch),
     isMaintenance: readonly(isMaintenance),
     isTesting: readonly(isTesting),

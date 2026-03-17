@@ -85,12 +85,13 @@ watch(
             </RuiButton>
           </NuxtLink>
           <RuiButton
-            v-if="authenticated"
             aria-label="Logout"
             color="primary"
             variant="text"
             icon
             class="!p-2"
+            :class="{ invisible: !authenticated }"
+            :tabindex="authenticated ? 0 : -1"
             @click="logout()"
           >
             <span class="flex items-center">

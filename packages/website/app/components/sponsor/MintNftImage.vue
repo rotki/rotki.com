@@ -51,6 +51,7 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
           class="w-full h-full object-cover rounded-lg z-[2]"
           width="448"
           height="448"
+          fetchpriority="high"
           @loadstart="imageLoading = true"
           @load="imageLoading = false"
           @error="imageLoading = false"
@@ -61,23 +62,9 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
         />
       </div>
       <RuiSkeletonLoader
-        v-else-if="isLoading"
+        v-else-if="isLoading || Object.keys(nftImages).length === 0"
         class="w-full h-full"
       />
-      <div
-        v-else
-        class="text-rui-text-secondary text-center"
-      >
-        <div class="text-4xl mb-2">
-          🎨
-        </div>
-        <div class="text-lg font-medium">
-          {{ t('sponsor.sponsor_page.nft_image.not_available', { tier: tierLabel }) }}
-        </div>
-        <div class="text-sm text-rui-text-secondary mt-1">
-          {{ t('sponsor.sponsor_page.nft_image.image_not_available') }}
-        </div>
-      </div>
     </div>
   </div>
 </template>
