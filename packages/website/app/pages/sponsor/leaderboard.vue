@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { get, set } from '@vueuse/shared';
-import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import AddressAvatar from '~/components/common/AddressAvatar.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
@@ -9,7 +8,6 @@ import { usePageSeo } from '~/composables/use-page-seo';
 import { formatDate } from '~/utils/date';
 import { getTierMedal } from '~/utils/nft-tiers';
 import { truncateAddress } from '~/utils/text';
-import { useLogger } from '~/utils/use-logger';
 
 interface PaginationData {
   page: number;
@@ -17,14 +15,6 @@ interface PaginationData {
   limit: number;
   limits?: number[];
 }
-
-// Pagination state
-const paginationData = ref<PaginationData>({
-  page: 1,
-  total: 0,
-  limit: 10,
-  limits: [10, 25, 50, 100],
-});
 
 const LeaderboardEntry = z.object({
   rank: z.number().nullable(),
@@ -52,8 +42,6 @@ const LeaderboardMetadata = z.object({
   lastUpdated: z.string().nullable(),
 });
 
-type LeaderboardMetadata = z.infer<typeof LeaderboardMetadata>;
-
 usePageSeo('Sponsor Leaderboard', 'See the top supporters of rotki, an independent open-source privacy-preserving portfolio tracker. Join the leaderboard by sponsoring a release.', '/sponsor/leaderboard', {
   keywords: 'open source sponsorship, open source funding, privacy software, local-first software, rotki sponsor',
 });
@@ -62,76 +50,84 @@ definePageMeta({
   layout: 'sponsor',
 });
 
-const logger = useLogger();
-
-const loading = ref<boolean>(false);
-const leaderboardData = ref<LeaderboardResponse>();
+// Pagination state
+const paginationData = ref<PaginationData>({
+  page: 1,
+  total: 0,
+  limit: 10,
+  limits: [10, 25, 50, 100],
+});
 
 // Clipboard functionality
 const clipboardSource = ref<string>('');
 const { copy } = useClipboard({ source: clipboardSource });
 
-// i18n
 const { t } = useI18n({ useScope: 'global' });
 const { fetchWithCsrf } = useFetchWithCsrf();
-
-const lastUpdated = ref<string>('');
 
 // Breakpoint detection
 const { isMdAndDown } = useBreakpoint();
 
-const currentLeaderboard = computed<LeaderboardEntry[]>(() => {
-  const data = get(leaderboardData);
-  if (!data || !data.results)
-    return [];
-
-  return data.results;
-});
-
-async function fetchLeaderboard(): Promise<void> {
-  try {
-    set(loading, true);
+// Leaderboard data
+const { data: leaderboardData, pending: loading, refresh: refreshLeaderboard } = useAsyncData<LeaderboardResponse>(
+  'leaderboard',
+  async () => {
     const { page, limit } = get(paginationData);
     const offset = (page - 1) * limit;
-    const response = await fetchWithCsrf(`/webapi/nfts/leaderboard/`, {
+    const response = await fetchWithCsrf('/webapi/nfts/leaderboard/', {
       method: 'GET',
-      query: {
-        offset,
-        limit,
-      },
+      query: { offset, limit },
     });
-    const validatedResponse = LeaderboardResponse.parse(response);
-    set(leaderboardData, validatedResponse);
+    return LeaderboardResponse.parse(response);
+  },
+  {
+    default: (): LeaderboardResponse => ({ count: 0, next: null, previous: null, results: [] }),
+    lazy: true,
+    server: false,
+  },
+);
 
-    // Update total count in pagination
+// Metadata
+const { data: lastUpdated } = useAsyncData<string>(
+  'leaderboard-metadata',
+  async () => {
+    const response = await fetchWithCsrf<z.infer<typeof LeaderboardMetadata>>('/webapi/nfts/leaderboard/metadata', {
+      method: 'GET',
+    });
+    return LeaderboardMetadata.parse(response).lastUpdated ?? '';
+  },
+  {
+    default: () => '',
+    lazy: true,
+    server: false,
+  },
+);
+
+const currentLeaderboard = computed<LeaderboardEntry[]>(() => get(leaderboardData)?.results ?? []);
+
+// Placeholder entries shown during initial load to reserve layout space
+const placeholderEntries = computed<LeaderboardEntry[]>(() =>
+  Array.from({ length: 5 }, (_, i) => ({
+    rank: i + 1,
+    address: '',
+    bronzeCount: 0,
+    silverCount: 0,
+    goldCount: 0,
+    totalCount: 0,
+    points: 0,
+    ensName: null,
+  })),
+);
+
+// Sync total from response into pagination state
+watch(leaderboardData, (data) => {
+  if (data) {
     set(paginationData, {
       ...get(paginationData),
-      total: validatedResponse.count,
+      total: data.count,
     });
   }
-  catch (error_) {
-    logger.error('Error fetching leaderboard:', error_);
-  }
-  finally {
-    set(loading, false);
-  }
-}
-
-async function fetchLeaderboardMetadata(): Promise<void> {
-  try {
-    set(loading, true);
-    const response = await fetchWithCsrf<LeaderboardMetadata>(`/webapi/nfts/leaderboard/metadata`, {
-      method: 'GET',
-    });
-    set(lastUpdated, LeaderboardMetadata.parse(response).lastUpdated);
-  }
-  catch (error_) {
-    logger.error('Error fetching leaderboard metadata:', error_);
-  }
-  finally {
-    set(loading, false);
-  }
-}
+});
 
 interface AddressDisplay {
   primary: string;
@@ -164,22 +160,15 @@ const addressDisplayMap = computed<Record<string, AddressDisplay>>(() => {
   return result;
 });
 
-function copyToClipboard(text: string) {
+function copyToClipboard(text: string): void {
   set(clipboardSource, text);
   copy();
 }
 
 async function handlePaginationChange(newPagination: PaginationData): Promise<void> {
   set(paginationData, newPagination);
-  await fetchLeaderboard();
+  await refreshLeaderboard();
 }
-
-onMounted(async () => {
-  await Promise.all([
-    fetchLeaderboard(),
-    fetchLeaderboardMetadata(),
-  ]);
-});
 </script>
 
 <template>
@@ -195,119 +184,129 @@ onMounted(async () => {
       </div>
 
       <div class="max-w-2xl mx-auto">
-        <RuiCard>
-          <div
-            v-if="loading"
-            class="text-center py-12"
-          >
-            <RuiProgress
-              circular
-              color="primary"
-              variant="indeterminate"
-              size="38"
-              class="my-5"
-            />
-            <p class="text-rui-text-secondary">
-              {{ t('sponsor.leaderboard.loading') }}
-            </p>
-          </div>
+        <RuiCard content-class="min-h-[480px]">
+          <div class="relative flex flex-col">
+            <!-- Loading overlay for pagination -->
+            <div
+              v-if="loading && currentLeaderboard.length > 0"
+              class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg"
+            >
+              <RuiProgress
+                variant="indeterminate"
+                size="48"
+                circular
+                color="primary"
+              />
+            </div>
 
-          <div
-            v-else-if="currentLeaderboard.length > 0"
-            class="flex flex-col"
-          >
             <template
-              v-for="(user, index) in currentLeaderboard"
-              :key="user.rank"
+              v-for="(entry, index) in (currentLeaderboard.length > 0 ? currentLeaderboard : placeholderEntries)"
+              :key="currentLeaderboard.length > 0 ? entry.rank : index"
             >
               <RuiDivider
                 v-if="index > 0"
                 class="mt-4 pt-2 w-full"
               />
-              <div class="flex items-center space-x-4 flex-1">
-                <!-- Avatar (ENS or Blockie) -->
-                <AddressAvatar
-                  :ens-name="user.ensName"
-                  :address="user.address"
-                />
+              <div class="flex items-center space-x-4 flex-1 min-h-[74px]">
+                <template v-if="currentLeaderboard.length > 0">
+                  <!-- Avatar (ENS or Blockie) -->
+                  <AddressAvatar
+                    :ens-name="entry.ensName"
+                    :address="entry.address"
+                  />
 
-                <div class="flex-1">
-                  <div class="space-y-1">
-                    <RuiTooltip
-                      v-if="addressDisplayMap[user.address]?.showTooltip"
-                      :open-delay="400"
-                    >
-                      <template #activator>
-                        <h5
-                          class="text-sm font-bold cursor-pointer hover:opacity-75 transition-opacity text-primary"
-                          @click="copyToClipboard(user.address)"
-                        >
-                          {{ addressDisplayMap[user.address]?.primary }}
-                        </h5>
-                      </template>
-                      <div class="text-center">
-                        <div class="font-mono text-xs">
-                          {{ user.address }}
-                        </div>
-                        <div class="text-xs text-rui-dark-text-secondary mt-1">
-                          {{ t('sponsor.leaderboard.tooltip.copy_address') }}
-                        </div>
-                      </div>
-                    </RuiTooltip>
-                    <h5
-                      v-else
-                      class="text-sm font-bold font-mono cursor-pointer hover:opacity-75 transition-opacity"
-                      @click="copyToClipboard(user.address)"
-                    >
-                      {{ addressDisplayMap[user.address]?.primary }}
-                    </h5>
-                  </div>
-                  <div class="text-rui-text-secondary text-sm space-y-1">
-                    <div class="flex gap-4">
-                      <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('gold'), count: user.goldCount }) }}</span>
-                      <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('silver'), count: user.silverCount }) }}</span>
-                      <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('bronze'), count: user.bronzeCount }) }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <RuiTooltip :open-delay="400">
+                  <div class="flex-1">
+                    <div class="space-y-1">
+                      <RuiTooltip
+                        v-if="addressDisplayMap[entry.address]?.showTooltip"
+                        :open-delay="400"
+                      >
                         <template #activator>
-                          <RuiChip
-                            color="primary"
-                            size="sm"
+                          <h5
+                            class="text-sm font-bold cursor-pointer hover:opacity-75 transition-opacity text-primary"
+                            @click="copyToClipboard(entry.address)"
                           >
-                            {{ t('sponsor.leaderboard.points', { points: user.points }) }}
-                          </RuiChip>
+                            {{ addressDisplayMap[entry.address]?.primary }}
+                          </h5>
                         </template>
-                        <div>
-                          <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.gold') }}</div>
-                          <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.silver') }}</div>
-                          <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.bronze') }}</div>
+                        <div class="text-center">
+                          <div class="font-mono text-xs">
+                            {{ entry.address }}
+                          </div>
+                          <div class="text-xs text-rui-dark-text-secondary mt-1">
+                            {{ t('sponsor.leaderboard.tooltip.copy_address') }}
+                          </div>
                         </div>
                       </RuiTooltip>
+                      <h5
+                        v-else
+                        class="text-sm font-bold font-mono cursor-pointer hover:opacity-75 transition-opacity"
+                        @click="copyToClipboard(entry.address)"
+                      >
+                        {{ addressDisplayMap[entry.address]?.primary }}
+                      </h5>
+                    </div>
+                    <div class="text-rui-text-secondary text-sm space-y-1">
+                      <div class="flex gap-4">
+                        <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('gold'), count: entry.goldCount }) }}</span>
+                        <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('silver'), count: entry.silverCount }) }}</span>
+                        <span>{{ t('sponsor.leaderboard.nft_counts', { medal: getTierMedal('bronze'), count: entry.bronzeCount }) }}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <RuiTooltip :open-delay="400">
+                          <template #activator>
+                            <RuiChip
+                              color="primary"
+                              size="sm"
+                            >
+                              {{ t('sponsor.leaderboard.points', { points: entry.points }) }}
+                            </RuiChip>
+                          </template>
+                          <div>
+                            <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.gold') }}</div>
+                            <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.silver') }}</div>
+                            <div>{{ t('sponsor.leaderboard.tooltip.points_breakdown.bronze') }}</div>
+                          </div>
+                        </RuiTooltip>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="text-2xl font-bold"
-                    :class="[
-                      paginationData.page === 1 && index <= 2 ? {
-                        'text-yellow-400': index === 0,
-                        'text-gray-300': index === 1,
-                        'text-amber-500': index === 2,
-                      } : 'text-rui-text-secondary',
-                    ]"
-                  >
-                    #{{ user.rank || (index + 1 + (paginationData.page - 1) * paginationData.limit) }}
+                  <div class="text-right">
+                    <div
+                      class="text-2xl font-bold"
+                      :class="[
+                        paginationData.page === 1 && index <= 2 ? {
+                          'text-yellow-400': index === 0,
+                          'text-gray-300': index === 1,
+                          'text-amber-500': index === 2,
+                        } : 'text-rui-text-secondary',
+                      ]"
+                    >
+                      #{{ entry.rank || (index + 1 + (paginationData.page - 1) * paginationData.limit) }}
+                    </div>
                   </div>
-                </div>
+                </template>
+
+                <!-- Skeleton placeholder row -->
+                <template v-else>
+                  <RuiSkeletonLoader
+                    class="w-10 h-10 shrink-0"
+                    rounded="full"
+                  />
+                  <div class="flex-1 space-y-2">
+                    <RuiSkeletonLoader class="w-48 h-4" />
+                    <RuiSkeletonLoader class="w-32 h-3" />
+                    <RuiSkeletonLoader class="w-16 h-5" />
+                  </div>
+                  <RuiSkeletonLoader class="w-8 h-7" />
+                </template>
               </div>
             </template>
           </div>
 
-          <!-- Empty State -->
+          <!-- Empty State (only when loaded and truly empty) -->
           <div
-            v-else
+            v-if="!loading && currentLeaderboard.length === 0 && leaderboardData?.count === 0"
             class="text-center py-12"
           >
             <img
