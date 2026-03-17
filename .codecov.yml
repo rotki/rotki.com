@@ -1,0 +1,32 @@
+codecov:
+  require_ci_to_pass: true
+  notify:
+    wait_for_ci: true
+
+coverage:
+  status:
+    project: off
+    patch: off
+
+flags:
+  frontend:
+    paths:
+      - packages/website/
+    carryforward: true
+  e2e:
+    paths:
+      - packages/website/
+    carryforward: true
+  backend:
+    paths:
+      - backend/
+    carryforward: true
+
+ignore:
+  - '**/*.test.ts'
+  - '**/*.spec.ts'
+  - '**/*_test.go'
+  - '**/tests/**'
+  - '**/node_modules/**'
+  - '**/.nuxt/**'
+  - '**/dist/**'

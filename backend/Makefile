@@ -45,9 +45,8 @@ test-race:
 
 ## coverage: Run tests with coverage report
 coverage:
-	go test ./... -coverprofile=coverage.out -count=1
+	go test ./... -coverprofile=coverage.out -covermode=atomic -count=1
 	go tool cover -func=coverage.out
-	@rm -f coverage.out
 
 ## lint: Run golangci-lint
 lint:

@@ -113,8 +113,15 @@ jobs:
       - name: Build 🚧
         run: pnpm run build
 
-      - name: Run tests ✅
-        run: pnpm run test
+      - name: Run tests with coverage ✅
+        run: pnpm run coverage
+
+      - name: Upload frontend coverage
+        uses: codecov/codecov-action@v5
+        with:
+          directory: packages/website/coverage
+          flags: frontend
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Set .env
         run: cp .env.test .env
@@ -159,8 +166,15 @@ jobs:
       - name: Build
         run: go build ./...
 
-      - name: Run tests
-        run: go test ./... -race -count=1
+      - name: Run tests with coverage
+        run: make coverage
+
+      - name: Upload backend coverage
+        uses: codecov/codecov-action@v5
+        with:
+          files: backend/coverage.out
+          flags: backend
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v7
