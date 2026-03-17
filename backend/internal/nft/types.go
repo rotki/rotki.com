@@ -2,10 +2,11 @@ package nft
 
 // Config holds the NFT contract configuration fetched from the backend API.
 type Config struct {
-	ChainID            int    `json:"chain_id"`
-	ContractAddress    string `json:"contract_address"`
-	ReleaseID          int    `json:"release_id"`
-	HasContractChanged bool   `json:"has_contract_changed"`
+	ChainID            int      `json:"chain_id"`
+	ContractAddress    string   `json:"contract_address"`
+	ReleaseID          int      `json:"release_id"`
+	HasContractChanged bool     `json:"has_contract_changed"`
+	RPCURLs            []string `json:"-"` // populated from ChainConfigs lookup, not serialized
 }
 
 // TierInfo holds raw blockchain tier data.

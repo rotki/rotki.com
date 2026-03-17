@@ -100,5 +100,6 @@ func (s *ConfigService) Fetch(ctx context.Context) (*Config, error) {
 		ContractAddress:    raw.ContractAddress,
 		ReleaseID:          raw.ReleaseID,
 		HasContractChanged: hasChanged,
+		RPCURLs:            chainCfg.RPCURLs,
 	}, nil
 }

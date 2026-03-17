@@ -20,6 +20,11 @@ func NewBlockchainService(rpc *RPCClient, logger *slog.Logger) *BlockchainServic
 	}
 }
 
+// UpdateRPCURLs updates the underlying RPC client's URL list.
+func (s *BlockchainService) UpdateRPCURLs(urls []string) {
+	s.rpc.UpdateURLs(urls)
+}
+
 // GetCurrentReleaseID fetches the current release ID from the contract.
 func (s *BlockchainService) GetCurrentReleaseID(ctx context.Context, cfg *Config) (int, error) {
 	// Try multicall first

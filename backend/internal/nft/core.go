@@ -94,6 +94,11 @@ func (s *CoreService) GetConfig(ctx context.Context) (*Config, error) {
 		return nil, err
 	}
 
+	// Update RPC URLs to match the chain from the config API
+	if len(cfg.RPCURLs) > 0 {
+		s.blockchain.UpdateRPCURLs(cfg.RPCURLs)
+	}
+
 	s.mu.Lock()
 	s.cachedConfig = cfg
 	s.configFetchedAt = time.Now()

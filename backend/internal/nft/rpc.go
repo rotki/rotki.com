@@ -45,6 +45,14 @@ func NewRPCClient(urls []string, logger *slog.Logger) *RPCClient {
 
 const circuitBreakerCooldown = 60 * time.Second
 
+// UpdateURLs replaces the RPC URL list and resets the circuit breaker state.
+func (c *RPCClient) UpdateURLs(urls []string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.urls = urls
+	c.failures = make(map[string]time.Time)
+}
+
 // isAvailable checks if an RPC URL is not in circuit breaker cooldown.
 func (c *RPCClient) isAvailable(url string) bool {
 	c.mu.RLock()
