@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get } from '@vueuse/shared';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
@@ -23,10 +23,9 @@ const { t } = useI18n({ useScope: 'global' });
 useAutoLogout();
 
 const tabModelValue = ref<string>();
+const hydrated = ref<boolean>(false);
 
 const { account } = storeToRefs(useMainStore());
-
-useAutoLogout();
 
 const name = computed<string>(() => {
   const userAccount = get(account);
@@ -68,64 +67,81 @@ const tabs = computed<TabItem[]>(() => [{
   icon: 'lu-map-pin',
   to: '/home/address',
 }]);
+
+onMounted(() => {
+  set(hydrated, true);
+});
 </script>
 
 <template>
   <Default>
     <div class="py-10 lg:py-16">
       <div class="container">
-        <div class="text-h4 mb-6">
-          {{ t('account.welcome') }} {{ name }}
-        </div>
-        <div class="flex flex-col lg:flex-row gap-6">
-          <div class="hidden lg:block w-[270px] shrink-0">
-            <RuiTabs
-              v-model="tabModelValue"
-              vertical
-              align="start"
-              color="primary"
-            >
-              <RuiTab
-                v-for="tab in tabs"
-                :key="tab.to"
-                link
-                :to="tab.to"
-                :target="tab.reload ? '_top' : undefined"
-              >
-                <template #prepend>
-                  <RuiIcon :name="tab.icon" />
-                </template>
-                {{ tab.label }}
-              </RuiTab>
-            </RuiTabs>
+        <template v-if="hydrated">
+          <div class="text-h4 mb-6">
+            {{ t('account.welcome') }} {{ name }}
           </div>
-          <div class="lg:hidden">
-            <RuiTabs
-              v-model="tabModelValue"
-              grow
-              color="primary"
-            >
-              <RuiTab
-                v-for="tab in tabs"
-                :key="tab.to"
-                link
-                :to="tab.to"
-                :target="tab.reload ? '_top' : undefined"
+          <div class="flex flex-col lg:flex-row gap-6">
+            <div class="hidden lg:block w-[270px] shrink-0">
+              <RuiTabs
+                v-model="tabModelValue"
+                vertical
+                align="start"
+                color="primary"
               >
-                <template #prepend>
-                  <RuiIcon
-                    class="shrink-0"
-                    :name="tab.icon"
-                  />
-                </template>
-                {{ tab.label }}
-              </RuiTab>
-            </RuiTabs>
-          </div>
+                <RuiTab
+                  v-for="tab in tabs"
+                  :key="tab.to"
+                  link
+                  :to="tab.to"
+                  :target="tab.reload ? '_top' : undefined"
+                >
+                  <template #prepend>
+                    <RuiIcon :name="tab.icon" />
+                  </template>
+                  {{ tab.label }}
+                </RuiTab>
+              </RuiTabs>
+            </div>
+            <div class="lg:hidden">
+              <RuiTabs
+                v-model="tabModelValue"
+                grow
+                color="primary"
+              >
+                <RuiTab
+                  v-for="tab in tabs"
+                  :key="tab.to"
+                  link
+                  :to="tab.to"
+                  :target="tab.reload ? '_top' : undefined"
+                >
+                  <template #prepend>
+                    <RuiIcon
+                      class="shrink-0"
+                      :name="tab.icon"
+                    />
+                  </template>
+                  {{ tab.label }}
+                </RuiTab>
+              </RuiTabs>
+            </div>
 
-          <div class="flex-1 overflow-x-auto">
-            <slot />
+            <div class="flex-1 overflow-x-auto">
+              <slot />
+            </div>
           </div>
+        </template>
+        <div
+          v-else
+          class="flex items-center justify-center py-24"
+        >
+          <RuiProgress
+            variant="indeterminate"
+            size="48"
+            circular
+            color="primary"
+          />
         </div>
       </div>
     </div>

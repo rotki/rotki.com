@@ -52,7 +52,7 @@ export function usePaymentCards(): UsePaymentCardsReturn {
     },
     {
       default: () => [],
-      lazy: false,
+      lazy: true,
       server: false,
     },
   );
