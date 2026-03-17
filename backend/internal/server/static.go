@@ -82,7 +82,7 @@ func (s *staticHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *staticHandler) serveFile(w http.ResponseWriter, r *http.Request, filePath string, urlPath string) {
 	// Set cache headers based on path
-	if strings.HasPrefix(urlPath, "/_nuxt/") {
+	if strings.HasPrefix(urlPath, "/_nuxt/") || strings.HasPrefix(urlPath, "/_fonts/") {
 		// Hashed assets — cache for 1 year
 		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 	} else if strings.HasSuffix(filePath, ".html") {
