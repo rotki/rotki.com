@@ -14,6 +14,9 @@ func TestConfigServiceFetch_SepoliaChain(t *testing.T) {
 		if r.URL.Path != "/webapi/nfts/release/current/" {
 			t.Errorf("unexpected path: %s", r.URL.Path)
 		}
+		if accept := r.Header.Get("Accept"); accept != "application/json" {
+			t.Errorf("expected Accept: application/json, got %q", accept)
+		}
 		resp := map[string]any{
 			"chain":            "sepolia",
 			"contract_address": "0x9C4Ac51128b3B29c8c4C76c960a07c17b8290557",

@@ -50,6 +50,7 @@ func (s *ConfigService) Fetch(ctx context.Context) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
+	req.Header.Set("Accept", "application/json")
 
 	resp, err := s.httpClient.Do(req) //nolint:gosec // G704: URL is from validated config (BaseURL), not user input
 	if err != nil {
