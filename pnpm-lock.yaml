@@ -10,8 +10,8 @@ catalogs:
       specifier: 5.2.10
       version: 5.2.10
     '@rotki/ui-library':
-      specifier: 2.14.1
-      version: 2.14.1
+      specifier: 2.15.0
+      version: 2.15.0
     '@tsconfig/node24':
       specifier: 24.0.4
       version: 24.0.4
@@ -152,7 +152,7 @@ importers:
     devDependencies:
       '@rotki/ui-library':
         specifier: 'catalog:'
-        version: 2.14.1(@vueuse/core@14.2.1(vue@3.5.30(typescript@5.9.3)))(@vueuse/shared@14.2.1(vue@3.5.30(typescript@5.9.3)))(dayjs@1.11.13)(vue@3.5.30(typescript@5.9.3))
+        version: 2.15.0(dayjs@1.11.13)(vue@3.5.30(typescript@5.9.3))
       '@tsconfig/node24':
         specifier: 'catalog:'
         version: 24.0.4
@@ -310,7 +310,7 @@ importers:
         version: 1.58.2
       '@rotki/ui-library':
         specifier: 'catalog:'
-        version: 2.14.1(@vueuse/core@14.2.1(vue@3.5.30(typescript@5.9.3)))(@vueuse/shared@14.2.1(vue@3.5.30(typescript@5.9.3)))(dayjs@1.11.13)(vue@3.5.30(typescript@5.9.3))
+        version: 2.15.0(dayjs@1.11.13)(vue@3.5.30(typescript@5.9.3))
       '@types/braintree-web':
         specifier: 'catalog:'
         version: 3.96.17
@@ -2944,12 +2944,10 @@ packages:
     peerDependencies:
       eslint: ^9.20.0
 
-  '@rotki/ui-library@2.14.1':
-    resolution: {integrity: sha512-eBAtDw5mun2Xi4J1cMg/WBZznONU1Q7NJC5V/N8sSOe5kn3OXvTp8eH794+NQzt40/bGEhd9WZ2XrEztZNmaGg==}
+  '@rotki/ui-library@2.15.0':
+    resolution: {integrity: sha512-pRuTCsIB6hT4jiU3AZgZ8+VI8Z8C0WrpuAji8ESe6hT/X51CNdM4TpZtOG+lFKLFTi4/DL/w9qzAH35GWypCPw==}
     engines: {node: '>=24 <25', pnpm: '>=10 <11'}
     peerDependencies:
-      '@vueuse/core': '>13.0.0'
-      '@vueuse/shared': '>13.0.0'
       dayjs: '>=1.11.13 <12'
       vue: '>=3.5.0'
 
@@ -12197,7 +12195,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@rotki/ui-library@2.14.1(@vueuse/core@14.2.1(vue@3.5.30(typescript@5.9.3)))(@vueuse/shared@14.2.1(vue@3.5.30(typescript@5.9.3)))(dayjs@1.11.13)(vue@3.5.30(typescript@5.9.3))':
+  '@rotki/ui-library@2.15.0(dayjs@1.11.13)(vue@3.5.30(typescript@5.9.3))':
     dependencies:
       '@popperjs/core': 2.11.8
       '@vueuse/core': 14.2.1(vue@3.5.30(typescript@5.9.3))
