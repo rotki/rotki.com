@@ -5,10 +5,10 @@ import NftSubmissionForm from '~/components/sponsor/NftSubmissionForm.vue';
 import NftSubmissionsList from '~/components/sponsor/NftSubmissionsList.vue';
 import SponsorWalletConnectionCard from '~/components/sponsor/SponsorWalletConnectionCard.vue';
 import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
-import { usePageSeo } from '~/composables/use-page-seo';
+import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 
-usePageSeo('Submit Sponsor Name', 'Submit your name or logo to display in rotki as a sponsor. Connect your wallet and manage your NFT submissions.', '/sponsor/submit-name');
+usePageSeoNoIndex('Submit Sponsor Name');
 
 definePageMeta({
   layout: 'sponsor',

@@ -17,6 +17,19 @@ privacy,opensource,accounting,asset-management,taxes,tax-reporting`;
 usePageSeo('rotki', description, '', { keywords });
 useHead({ titleTemplate: '' });
 
+const { public: { baseUrl } } = useRuntimeConfig();
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      'name': 'rotki',
+      'url': baseUrl,
+    }),
+  }],
+});
+
 const { fetchMessages, activeDashboardMessages } = useDynamicMessages();
 
 onBeforeMount(() => {

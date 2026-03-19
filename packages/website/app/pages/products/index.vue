@@ -9,7 +9,11 @@ import ProductsTimeframe from '~/components/products/ProductsTimeframe.vue';
 import ProductsUnlockNudge from '~/components/products/ProductsUnlockNudge.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 
-usePageSeo('Premium Subscription', 'Features included with a premium rotki subscription', '/products/');
+usePageSeo(
+  'Premium Subscription',
+  'Discover rotki premium features — encrypted data backups, multi-device sync, ETH staking tracking, detailed graphs, and more.',
+  '/products',
+);
 
 definePageMeta({
   landing: true,

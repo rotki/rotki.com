@@ -1,20 +1,10 @@
 <script lang="ts" setup>
-import { get } from '@vueuse/shared';
-import { usePageSeo } from '~/composables/use-page-seo';
-
 const { path } = defineProps<{ path: string }>();
 
 const { data: document } = await useAsyncData(path, () => queryCollection('documents').path(path).first(), { dedupe: 'defer' });
 
 if (!document) {
   showError({ message: `Page not found: ${path}`, status: 404 });
-}
-else {
-  usePageSeo(
-    get(document)?.title ?? '',
-    get(document)?.description ?? '',
-    path,
-  );
 }
 </script>
 

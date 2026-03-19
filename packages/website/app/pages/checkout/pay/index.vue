@@ -22,7 +22,11 @@ const ROUTES = {
 
 const { public: { baseUrl } } = useRuntimeConfig();
 
-usePageSeo('Pricing', 'Pricing page for rotki subscription', '/checkout/pay');
+usePageSeo(
+  'Pricing',
+  'Compare rotki premium plans — encrypted backups, multi-device sync, ETH staking tracking, detailed graphs, and more. Starting free.',
+  '/checkout/pay',
+);
 
 useHead({
   script: [{

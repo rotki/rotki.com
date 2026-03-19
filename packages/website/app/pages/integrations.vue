@@ -4,7 +4,11 @@ import { usePageSeo } from '~/composables/use-page-seo';
 
 const { t } = useI18n({ useScope: 'global' });
 
-usePageSeo('Integrations', 'Supported blockchains, exchanges, and protocols in rotki', '/integrations/');
+usePageSeo(
+  'Integrations',
+  'Explore the blockchains, exchanges, and DeFi protocols supported by rotki for seamless crypto portfolio tracking.',
+  '/integrations',
+);
 
 definePageMeta({
   landing: true,

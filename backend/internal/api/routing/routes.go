@@ -101,19 +101,26 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 // robotsTxtHandler returns a handler that serves a pre-built robots.txt.
 func robotsTxtHandler(cfg *config.Config) http.HandlerFunc {
 	disallowPaths := []string{
-		"/account",
-		"/account/**",
-		"/purchase",
-		"/purchase/**",
-		"/checkout",
-		"/checkout/**",
-		"/activate",
+		"/home/",
+		"/checkout/pay/method",
+		"/checkout/pay/card",
+		"/checkout/pay/crypto",
+		"/checkout/pay/paypal",
+		"/checkout/pay/3d-secure",
+		"/checkout/pay/request-crypto",
+		"/checkout/success",
 		"/login",
 		"/logout",
-		"/login/**",
-		"/logout/**",
-		"/auth",
-		"/auth/**",
+		"/signup",
+		"/activate/",
+		"/activation",
+		"/auth/",
+		"/oauth/",
+		"/password/",
+		"/health",
+		"/maintenance",
+		"/account-deleted",
+		"/sponsor/submit-name",
 	}
 
 	var b strings.Builder

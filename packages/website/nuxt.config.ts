@@ -6,14 +6,14 @@ const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
 
 const nonIndexed = [
   '/activation',
-  '/home',
-  '/blank',
+  '/home/**',
   '/maintenance',
   '/health',
-  '/password/changed',
-  '/password/send',
-  '/password/reset',
-  '/checkout/pay',
+  '/login',
+  '/logout',
+  '/signup',
+  '/activate/**',
+  '/password/**',
   '/checkout/pay/method',
   '/checkout/pay/card',
   '/checkout/pay/3d-secure',
@@ -22,12 +22,14 @@ const nonIndexed = [
   '/checkout/pay/request-crypto',
   '/checkout/success',
   '/account-deleted',
+  '/sponsor/submit-name',
   '/md/',
   '/documents/',
   '/api/**',
   '/_nuxt/**',
   '/testimonials/**',
   '/oauth/**',
+  '/auth/**',
 ];
 
 export default defineNuxtConfig({

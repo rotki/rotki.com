@@ -8,7 +8,31 @@ import DownloadUpgradeNudge from '~/components/download/DownloadUpgradeNudge.vue
 import { useAppDownload } from '~/composables/use-app-download';
 import { usePageSeo } from '~/composables/use-page-seo';
 
-usePageSeo('Download', 'Download rotki', '/download');
+usePageSeo(
+  'Download',
+  'Download rotki for Linux, macOS, or Windows. Free, open-source portfolio tracking and accounting software that protects your privacy.',
+  '/download',
+);
+
+const { public: { baseUrl } } = useRuntimeConfig();
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      'name': 'rotki',
+      'applicationCategory': 'FinanceApplication',
+      'operatingSystem': 'Windows, macOS, Linux',
+      'url': `${baseUrl}/download`,
+      'offers': {
+        '@type': 'Offer',
+        'price': '0',
+        'priceCurrency': 'EUR',
+      },
+    }),
+  }],
+});
 
 const {
   version,

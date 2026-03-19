@@ -41,7 +41,7 @@ func TestRobotsTxt(t *testing.T) {
 	}
 
 	body := w.Body.String()
-	for _, s := range []string{"Disallow: /checkout", "Sitemap:"} {
+	for _, s := range []string{"Disallow: /checkout/pay/method", "Disallow: /login", "Disallow: /health", "Sitemap:"} {
 		if !strings.Contains(body, s) {
 			t.Errorf("expected body to contain %q, got:\n%s", s, body)
 		}

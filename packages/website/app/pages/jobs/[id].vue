@@ -21,6 +21,26 @@ else {
   };
 
   usePageSeo(meta.title, meta.description, path);
+
+  if (open) {
+    useHead({
+      script: [{
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'JobPosting',
+          'title': title,
+          'description': description,
+          'hiringOrganization': {
+            '@type': 'Organization',
+            'name': 'Rotki Solutions GmbH',
+            'sameAs': 'https://rotki.com',
+          },
+          'jobLocationType': 'TELECOMMUTE',
+        }),
+      }],
+    });
+  }
 }
 
 definePageMeta({

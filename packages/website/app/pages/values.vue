@@ -5,7 +5,11 @@ import ValueHeading from '~/components/values/ValueHeading.vue';
 import ValueVision from '~/components/values/ValueVision.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 
-usePageSeo('Our Values', 'Values of rotki', '/values');
+usePageSeo(
+  'Our Values',
+  'The core values behind rotki — privacy, transparency, open source, and putting users first in crypto portfolio management.',
+  '/values',
+);
 
 definePageMeta({
   landing: true,
