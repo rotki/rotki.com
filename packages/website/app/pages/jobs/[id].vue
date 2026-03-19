@@ -3,19 +3,14 @@ import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import JobDetail from '~/components/jobs/JobDetail.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
-import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 
 const { path } = useRoute();
-const { fallbackToLocalOnError } = useRemoteOrLocal();
 const { t } = useI18n({ useScope: 'global' });
 
-const { data: job } = await useAsyncData(path, () => fallbackToLocalOnError(
-  async () => await queryCollection('jobsRemote').path(path).first(),
-  async () => await queryCollection('jobsLocal').path(path).first(),
-), { dedupe: 'defer' });
+const { data: job } = await useAsyncData(path, () => queryCollection('jobs').path(path).first(), { dedupe: 'defer' });
 
 if (!isDefined(job)) {
-  showError({ message: `Page not found: ${path}`, statusCode: 404 });
+  showError({ message: `Page not found: ${path}`, status: 404 });
 }
 else {
   const { title, description, open } = get(job);

@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import TestimonialCarousel from '~/components/home/testimonials/TestimonialCarousel.vue';
-import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 
-const { fallbackToLocalOnError } = useRemoteOrLocal();
-const { data: testimonials } = await useAsyncData('testimonials', () => fallbackToLocalOnError(
-  async () => await queryCollection('testimonialsRemote').all(),
-  async () => await queryCollection('testimonialsLocal').all(),
-), { dedupe: 'defer' });
+const { data: testimonials } = await useAsyncData('testimonials', () => queryCollection('testimonials').all(), { dedupe: 'defer' });
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

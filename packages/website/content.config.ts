@@ -1,4 +1,4 @@
-import { type CollectionSource, defineCollection, defineContentConfig, type DefinedCollection, z } from '@nuxt/content';
+import { defineCollection, defineContentConfig, z } from '@nuxt/content';
 import { asRobotsCollection } from '@nuxtjs/robots/content';
 import { asSitemapCollection } from '@nuxtjs/sitemap/content';
 
@@ -6,23 +6,6 @@ const DOCUMENTS = 'content/documents/*.md';
 const JOBS = 'content/jobs/*.md';
 const TESTIMONIALS = 'content/testimonials/*.md';
 const SPONSORSHIP_TIERS = 'content/sponsorship-tiers/*.md';
-
-function getSource(path: string, dataOrigin: 'remote' | 'local'): CollectionSource {
-  if (dataOrigin === 'remote') {
-    return {
-      include: path,
-      prefix: path.split('/')[1],
-      repository: 'https://github.com/rotki/rotki.com',
-    };
-  }
-  else {
-    return {
-      cwd: '~~/',
-      include: path,
-      prefix: path.split('/')[1],
-    };
-  }
-}
 
 const documentSchema = z.object({
   address: z.string().optional(),
@@ -53,47 +36,43 @@ const sponsorshipTierSchema = z.object({
   tier: z.enum(['bronze', 'silver', 'gold']),
 });
 
-function getDocumentsCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
-  return defineCollection({
-    schema: documentSchema,
-    source: getSource(DOCUMENTS, dataOrigin),
-    type: 'page',
-  });
-}
-
-function getJobsCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
-  return defineCollection(asSitemapCollection({
-    schema: jobSchema,
-    source: getSource(JOBS, dataOrigin),
-    type: 'page',
-  }));
-}
-
-function getTestimonialsCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
-  return defineCollection(asRobotsCollection({
-    schema: testimonialSchema,
-    source: getSource(TESTIMONIALS, dataOrigin),
-    type: 'page',
-  }));
-}
-
-function getSponsorshipTiersCollection(dataOrigin: 'remote' | 'local'): DefinedCollection {
-  return defineCollection(asRobotsCollection({
-    schema: sponsorshipTierSchema,
-    source: getSource(SPONSORSHIP_TIERS, dataOrigin),
-    type: 'data',
-  }));
-}
-
 export default defineContentConfig({
   collections: {
-    documentsLocal: getDocumentsCollection('local'),
-    documentsRemote: getDocumentsCollection('remote'),
-    jobsLocal: getJobsCollection('local'),
-    jobsRemote: getJobsCollection('remote'),
-    sponsorshipTiersLocal: getSponsorshipTiersCollection('local'),
-    sponsorshipTiersRemote: getSponsorshipTiersCollection('remote'),
-    testimonialsLocal: getTestimonialsCollection('local'),
-    testimonialsRemote: getTestimonialsCollection('remote'),
+    documents: defineCollection({
+      schema: documentSchema,
+      source: {
+        cwd: '~~/',
+        include: DOCUMENTS,
+        prefix: 'documents',
+      },
+      type: 'page',
+    }),
+    jobs: defineCollection(asSitemapCollection({
+      schema: jobSchema,
+      source: {
+        cwd: '~~/',
+        include: JOBS,
+        prefix: 'jobs',
+      },
+      type: 'page',
+    })),
+    sponsorshipTiers: defineCollection(asRobotsCollection({
+      schema: sponsorshipTierSchema,
+      source: {
+        cwd: '~~/',
+        include: SPONSORSHIP_TIERS,
+        prefix: 'sponsorship-tiers',
+      },
+      type: 'data',
+    })),
+    testimonials: defineCollection(asRobotsCollection({
+      schema: testimonialSchema,
+      source: {
+        cwd: '~~/',
+        include: TESTIMONIALS,
+        prefix: 'testimonials',
+      },
+      type: 'page',
+    })),
   },
 });

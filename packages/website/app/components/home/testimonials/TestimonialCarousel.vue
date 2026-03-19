@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TestimonialsLocalCollectionItem, TestimonialsRemoteCollectionItem } from '@nuxt/content';
+import type { TestimonialsCollectionItem } from '@nuxt/content';
 import type { Swiper, SwiperOptions } from 'swiper/types';
 import { get, set } from '@vueuse/shared';
 import { SwiperSlide } from 'swiper/vue';
@@ -8,7 +8,7 @@ import CarouselControls from '~/components/common/carousel/CarouselControls.vue'
 import Testimonial from '~/components/home/testimonials/Testimonial.vue';
 
 defineProps<{
-  testimonials: TestimonialsLocalCollectionItem[] | TestimonialsRemoteCollectionItem[];
+  testimonials: TestimonialsCollectionItem[];
 }>();
 
 const swiperInstance = ref<Swiper>();

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { TestimonialsLocalCollectionItem, TestimonialsRemoteCollectionItem } from '@nuxt/content';
+import type { TestimonialsCollectionItem } from '@nuxt/content';
 
-type TestimonialBody = TestimonialsLocalCollectionItem['body'] | TestimonialsRemoteCollectionItem['body'];
+type TestimonialBody = TestimonialsCollectionItem['body'];
 
 interface TestimonialProps {
   avatar?: string;

@@ -15,7 +15,6 @@ import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-spons
 import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePageSeo } from '~/composables/use-page-seo';
-import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 import { useLogger } from '~/utils/use-logger';
 
@@ -56,12 +55,7 @@ const { error: metadataError } = storeToRefs(sponsorshipMetadataStore);
 const { fetchMetadata } = sponsorshipMetadataStore;
 
 // Fetch sponsorship tier content
-const { fallbackToLocalOnError } = useRemoteOrLocal();
-
-const { data: sponsorshipTiers } = await useAsyncData('sponsorship-tiers', () => fallbackToLocalOnError(
-  async () => await queryCollection('sponsorshipTiersRemote').all(),
-  async () => await queryCollection('sponsorshipTiersLocal').all(),
-), { dedupe: 'defer' });
+const { data: sponsorshipTiers } = await useAsyncData('sponsorship-tiers', () => queryCollection('sponsorshipTiers').all(), { dedupe: 'defer' });
 
 // Convert array to object keyed by tier
 const tierContent = computed<Record<string, { benefits: string; example: string[] }>>(() => {

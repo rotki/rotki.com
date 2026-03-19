@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { JobsLocalCollectionItem, JobsRemoteCollectionItem, MinimarkTree } from '@nuxt/content';
+import type { JobsCollectionItem, MinimarkTree } from '@nuxt/content';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { assert } from '~/utils/assert';
 
 const { data } = defineProps<{
-  data: JobsLocalCollectionItem | JobsRemoteCollectionItem;
+  data: JobsCollectionItem;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });

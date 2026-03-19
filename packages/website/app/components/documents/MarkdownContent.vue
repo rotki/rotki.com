@@ -1,19 +1,13 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/shared';
 import { usePageSeo } from '~/composables/use-page-seo';
-import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 
 const { path } = defineProps<{ path: string }>();
 
-const { fallbackToLocalOnError } = useRemoteOrLocal();
-
-const { data: document } = await useAsyncData(path, async () => fallbackToLocalOnError(
-  async () => queryCollection('documentsRemote').path(path).first(),
-  async () => await queryCollection('documentsLocal').path(path).first(),
-), { dedupe: 'defer' });
+const { data: document } = await useAsyncData(path, () => queryCollection('documents').path(path).first(), { dedupe: 'defer' });
 
 if (!document) {
-  showError({ message: `Page not found: ${path}`, statusCode: 404 });
+  showError({ message: `Page not found: ${path}`, status: 404 });
 }
 else {
   usePageSeo(

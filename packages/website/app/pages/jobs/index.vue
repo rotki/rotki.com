@@ -1,18 +1,10 @@
 <script lang="ts" setup>
-import type { JobsLocalCollectionItem, JobsRemoteCollectionItem } from '@nuxt/content';
+import type { JobsCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/shared';
 import JobDescription from '~/components/jobs/JobDescription.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
-import { useRemoteOrLocal } from '~/composables/use-remote-or-local';
 
-type JobsCollectionItem = JobsLocalCollectionItem | JobsRemoteCollectionItem;
-
-const { fallbackToLocalOnError } = useRemoteOrLocal();
-
-const { data: jobs } = await useAsyncData('jobs', () => fallbackToLocalOnError(
-  async () => await queryCollection('jobsRemote').all(),
-  async () => await queryCollection('jobsLocal').all(),
-), { dedupe: 'defer' });
+const { data: jobs } = await useAsyncData('jobs', () => queryCollection('jobs').all(), { dedupe: 'defer' });
 
 const { t } = useI18n({ useScope: 'global' });
 
