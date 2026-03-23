@@ -67,7 +67,6 @@
     "postcss": "catalog:",
     "postcss-html": "1.8.1",
     "postcss-import": "16.1.1",
-    "postcss-url": "10.1.3",
     "rollup": "4.59.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
