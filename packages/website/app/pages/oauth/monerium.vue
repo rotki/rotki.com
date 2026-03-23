@@ -125,15 +125,6 @@ async function exchangeCodeForToken(code: string, redirectUri: string, codeVerif
 }
 
 async function handleOAuthCallback() {
-  if (!import.meta.client)
-    return;
-
-  const search = window.location.search;
-  logger.debug('OAuth callback triggered', {
-    hasSearch: !!search,
-    paramCount: new URLSearchParams(search).size,
-  });
-
   const params = extractAndValidateParams();
   if (!params) {
     logger.debug('OAuth callback: no valid params found');

@@ -2,10 +2,20 @@ import { consola } from 'consola';
 
 export default defineNuxtPlugin({
   hooks: {
-    // You can directly register Nuxt app runtime hooks here
     'app:created': function () {
       const nuxtApp = useNuxtApp();
-      consola.level = nuxtApp.$config.public.loglevel;
+      let level: number = nuxtApp.$config.public.loglevel;
+
+      if (import.meta.client) {
+        const stored = localStorage.getItem('consola_level');
+        if (stored) {
+          const parsed = Number.parseInt(stored, 10);
+          if (!Number.isNaN(parsed))
+            level = parsed;
+        }
+      }
+
+      consola.level = level;
     },
   },
 });

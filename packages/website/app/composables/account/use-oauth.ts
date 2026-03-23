@@ -27,6 +27,10 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
   const logger = useLogger();
   const route = useRoute();
 
+  // Capture the query string at setup time, before Nuxt SSG hydration
+  // replaces the route (stripping query params from window.location).
+  const initialSearch = import.meta.client ? window.location.search : '';
+
   // State managed by composable
   const loading = ref<boolean>(false);
   const error = ref<string>();
@@ -41,7 +45,7 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
    * Extract and validate OAuth callback parameters from URL
    */
   function extractAndValidateParams(): OAuthCallbackParams | undefined {
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(initialSearch);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
     const errorParam = urlParams.get('error');
