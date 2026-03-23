@@ -38,6 +38,7 @@ const {
   },
 } = useRuntimeConfig();
 
+const route = useRoute();
 const logger = useLogger();
 
 const {
@@ -170,7 +171,13 @@ async function handleOAuthCallback() {
   }
 }
 
-onMounted(handleOAuthCallback);
+// Watch for route query params — Nuxt SSG hydration temporarily strips
+// query params via router.replace before restoring them, so onMounted
+// fires too early. Watch code and error to handle both success and denial.
+watch(() => route.query.code ?? route.query.error, (value) => {
+  if (value)
+    handleOAuthCallback();
+}, { immediate: true });
 </script>
 
 <template>

@@ -1,7 +1,19 @@
+import type { LocationQueryValue } from 'vue-router';
 import type { OAuthCallbackParams, OAuthMode, OAuthService, OAuthTokenResponse } from '~/types/oauth';
 import { set } from '@vueuse/shared';
 import { OAUTH_CALLBACK_FAILURE, OAUTH_CALLBACK_SUCCESS, OAUTH_DEFAULT_TOKEN_TYPE, OAUTH_REDIRECT_DELAY } from '~/constants/oauth';
 import { useLogger } from '~/utils/use-logger';
+
+const OAUTH_MODES: OAuthMode[] = ['app', 'docker'];
+
+function getQueryString(value: LocationQueryValue | LocationQueryValue[] | undefined): string | undefined {
+  const v = Array.isArray(value) ? value[0] : value;
+  return v ?? undefined;
+}
+
+function isOAuthMode(value: string): value is OAuthMode {
+  return Array.prototype.includes.call(OAUTH_MODES, value);
+}
 
 interface UseOAuthReturn {
   loading: Ref<boolean>;
@@ -11,7 +23,7 @@ interface UseOAuthReturn {
   refreshToken: Ref<string>;
   expiresIn: Ref<number | undefined>;
   currentMode: Ref<OAuthMode | undefined>;
-  mode: ComputedRef<OAuthMode>;
+  mode: ComputedRef<OAuthMode | undefined>;
   extractAndValidateParams: () => (OAuthCallbackParams | undefined);
   handleAppModeCompletion: (tokenResponse: OAuthTokenResponse, clientId: (string | undefined)) => void;
   handleAppModeFailure: (errorMessage: (string | undefined)) => void;
@@ -27,10 +39,6 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
   const logger = useLogger();
   const route = useRoute();
 
-  // Capture the query string at setup time, before Nuxt SSG hydration
-  // replaces the route (stripping query params from window.location).
-  const initialSearch = import.meta.client ? window.location.search : '';
-
   // State managed by composable
   const loading = ref<boolean>(false);
   const error = ref<string>();
@@ -39,16 +47,21 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
   const refreshToken = ref<string>('');
   const expiresIn = ref<number>();
   const currentMode = ref<OAuthMode>();
-  const mode = computed<OAuthMode>(() => route.query.mode as OAuthMode);
+  const mode = computed<OAuthMode | undefined>(() => {
+    const value = getQueryString(route.query.mode);
+    return value && isOAuthMode(value) ? value : undefined;
+  });
 
   /**
-   * Extract and validate OAuth callback parameters from URL
+   * Extract and validate OAuth callback parameters from route query.
+   * Uses route.query instead of window.location.search because Nuxt SSG
+   * hydration temporarily strips query params via router.replace before
+   * restoring them — route.query reflects the final resolved state.
    */
   function extractAndValidateParams(): OAuthCallbackParams | undefined {
-    const urlParams = new URLSearchParams(initialSearch);
-    const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    const errorParam = urlParams.get('error');
+    const code = getQueryString(route.query.code);
+    const state = getQueryString(route.query.state);
+    const errorParam = getQueryString(route.query.error);
 
     if (errorParam) {
       const errorMessage = t('oauth.errors.oauth_error', { error: errorParam });
@@ -135,7 +148,7 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
    * Validate OAuth mode
    */
   function isValidMode(mode: OAuthMode | undefined): mode is OAuthMode {
-    return !!mode && ['app', 'docker'].includes(mode);
+    return !!mode && isOAuthMode(mode);
   }
 
   return {
