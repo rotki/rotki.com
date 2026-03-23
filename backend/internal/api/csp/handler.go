@@ -2,6 +2,9 @@
 package csp
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"regexp"
@@ -51,10 +54,13 @@ func NewHandler(logger *slog.Logger) *Handler {
 	}
 }
 
-// cspReport mirrors the W3C CSP Level 3 report format.
+// cspReport mirrors the W3C CSP Level 2/3 report-uri format.
+// Unknown fields are silently ignored so that browser-specific extras
+// (e.g. Safari's "document-url") do not cause parse failures.
 type cspReport struct {
 	BlockedURI         string `json:"blocked-uri"`
 	ColumnNumber       int    `json:"column-number"`
+	Disposition        string `json:"disposition"`
 	DocumentURI        string `json:"document-uri"`
 	EffectiveDirective string `json:"effective-directive"`
 	LineNumber         int    `json:"line-number"`
@@ -90,7 +96,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var wrapper cspReportWrapper
-	if err := validate.ReadJSONBody(r, &wrapper, maxReportSize); err != nil {
+	if err := readCSPReport(r, &wrapper); err != nil {
 		h.logger.Error("invalid CSP report format", "error", err)
 		validate.WriteJSON(w, http.StatusBadRequest, cspResponse{
 			Message: "Invalid CSP violation report format",
@@ -193,6 +199,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.logger.Error("CSP violation detected",
 		"blocked_uri", sanitize(report.BlockedURI, 500),
 		"column_number", report.ColumnNumber,
+		"disposition", sanitize(report.Disposition, 20),
 		"document_uri", sanitize(report.DocumentURI, 500),
 		"effective_directive", sanitize(report.EffectiveDirective, 100),
 		"ip", clientIP,
@@ -226,6 +233,30 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Message: "CSP violation report received and logged",
 		Success: true,
 	})
+}
+
+// readCSPReport decodes a CSP violation report from the request body.
+// Unlike validate.ReadJSONBody, it does NOT reject unknown fields because
+// browsers may send non-standard or newer spec fields (e.g. "disposition",
+// "document-url") that are not in our struct. Rejecting them would cause
+// legitimate reports to fail with 400.
+func readCSPReport(r *http.Request, dst *cspReportWrapper) error {
+	r.Body = http.MaxBytesReader(nil, r.Body, maxReportSize)
+
+	dec := json.NewDecoder(r.Body)
+	if err := dec.Decode(dst); err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			return fmt.Errorf("request body too large (max %d bytes)", maxReportSize)
+		}
+		return errors.New("invalid request body")
+	}
+
+	if dec.More() {
+		return errors.New("request body must contain a single JSON object")
+	}
+
+	return nil
 }
 
 // sanitize removes control characters and truncates to maxLen (rune-safe).

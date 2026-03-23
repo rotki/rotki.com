@@ -179,6 +179,37 @@ func TestCSPHandler_FiltersLocalhostDev(t *testing.T) {
 	}
 }
 
+func TestCSPHandler_AcceptsUnknownFields(t *testing.T) {
+	h := newTestHandler()
+	// Simulate a browser sending extra fields not in our struct
+	body := `{"csp-report": {
+		"blocked-uri": "https://evil.com/script.js",
+		"document-uri": "https://rotki.com/",
+		"violated-directive": "script-src",
+		"original-policy": "default-src 'self'",
+		"disposition": "enforce",
+		"document-url": "https://rotki.com/",
+		"some-future-field": "value"
+	}}`
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/csp-report")
+	w := httptest.NewRecorder()
+
+	h.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp cspResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	if !resp.Success {
+		t.Fatal("expected success=true")
+	}
+}
+
 func TestCSPHandler_FiltersBotTraffic(t *testing.T) {
 	h := newTestHandler()
 	body := makeReport("https://evil.com/script.js", "https://rotki.com/", "script-src")
