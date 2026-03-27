@@ -57,6 +57,9 @@ type Handler struct {
 
 	mu             sync.Mutex
 	lastInvalidate time.Time
+
+	// onInvalidated is called after async invalidation completes (testing only).
+	onInvalidated func()
 }
 
 // NewHandler creates a new GitHub webhook handler.
@@ -71,8 +74,6 @@ func NewHandler(secret string, releasesHandler *releases.Handler, nftCore *nft.C
 
 // ServeHTTP handles POST /api/webhooks/github.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	// 1. Read body with size limit
 	body, err := io.ReadAll(io.LimitReader(r.Body, maxBodySize+1))
 	if err != nil {
@@ -127,17 +128,20 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 7. Classify and invalidate
+	// 7. Classify, respond immediately, and invalidate in background
 	releaseType := ClassifyRelease(tag)
-	resp := h.invalidate(ctx, tag, releaseType)
-
+	resp := h.buildResponse(tag, releaseType)
 	validate.WriteJSON(w, http.StatusOK, resp)
+
+	// Cache invalidation + re-warm runs after the response is sent.
+	// Use a detached context so it isn't cancelled when the request ends.
+	go h.invalidateAsync(tag, releaseType)
 }
 
-// invalidate performs cache invalidation based on the release type.
-func (h *Handler) invalidate(ctx context.Context, tag string, releaseType ReleaseType) webhookResponse {
+// buildResponse constructs the webhook response without performing any I/O.
+func (h *Handler) buildResponse(tag string, releaseType ReleaseType) webhookResponse {
 	resp := webhookResponse{
-		Status: "ok",
+		Status: "accepted",
 		Tag:    tag,
 	}
 
@@ -147,12 +151,26 @@ func (h *Handler) invalidate(ctx context.Context, tag string, releaseType Releas
 		resp.ReleaseType = "patch"
 	}
 
+	return resp
+}
+
+// invalidateAsync performs cache invalidation in a background goroutine.
+// Uses a detached context with a timeout since the request context is already done.
+func (h *Handler) invalidateAsync(tag string, releaseType ReleaseType) {
+	defer func() {
+		if h.onInvalidated != nil {
+			h.onInvalidated()
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
 	// Always invalidate release cache
 	release, err := h.releases.InvalidateCache(ctx)
 	if err != nil {
-		h.logger.Error("failed to invalidate release cache", "error", err)
+		h.logger.Error("failed to invalidate release cache", "tag", tag, "error", err)
 	} else {
-		resp.ReleaseCacheCleared = true
 		h.logger.Info("release cache invalidated", "tag", release.TagName)
 	}
 
@@ -160,14 +178,11 @@ func (h *Handler) invalidate(ctx context.Context, tag string, releaseType Releas
 	if releaseType == ReleaseMinorOrMajor && h.nftCore != nil {
 		deleted, err := h.nftCore.InvalidateAll(ctx)
 		if err != nil {
-			h.logger.Error("failed to invalidate NFT cache", "error", err)
+			h.logger.Error("failed to invalidate NFT cache", "tag", tag, "error", err)
 		} else {
-			resp.NFTCacheCleared = true
-			h.logger.Info("NFT cache invalidated", "keys_deleted", deleted)
+			h.logger.Info("NFT cache invalidated", "tag", tag, "keys_deleted", deleted)
 		}
 	}
-
-	return resp
 }
 
 // tryRateLimit returns true if enough time has passed since the last invalidation.

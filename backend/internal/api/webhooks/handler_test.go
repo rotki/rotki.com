@@ -178,8 +178,8 @@ func TestHandler_PublishedRelease(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
 		t.Fatalf("decode: %v", err)
 	}
-	if resp.Status != "ok" {
-		t.Errorf("expected status 'ok', got %q", resp.Status)
+	if resp.Status != "accepted" {
+		t.Errorf("expected status 'accepted', got %q", resp.Status)
 	}
 	if resp.Tag != "v1.35.1" {
 		t.Errorf("expected tag 'v1.35.1', got %q", resp.Tag)
@@ -201,8 +201,8 @@ func TestHandler_RateLimit(t *testing.T) {
 
 	var first webhookResponse
 	_ = json.NewDecoder(w.Body).Decode(&first)
-	if first.Status != "ok" {
-		t.Fatalf("first request: expected 'ok', got %q", first.Status)
+	if first.Status != "accepted" {
+		t.Fatalf("first request: expected 'accepted', got %q", first.Status)
 	}
 
 	// Second request within rate limit window should be rate-limited
@@ -264,6 +264,43 @@ func TestHandler_DeletedAction(t *testing.T) {
 	}
 	if resp.Tag != "" {
 		t.Errorf("expected empty tag for ignored action, got %q", resp.Tag)
+	}
+}
+
+func TestHandler_AsyncInvalidation(t *testing.T) {
+	h := newTestHandler(t)
+
+	// Set up a channel to observe when the async invalidation completes
+	done := make(chan struct{})
+	h.onInvalidated = func() { close(done) }
+
+	body := releasePayload(t, "published", "v1.36.0")
+	req := makeRequest(t, body, "release")
+
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	// Response should be immediate with "accepted"
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", w.Code)
+	}
+	var resp webhookResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if resp.Status != "accepted" {
+		t.Errorf("expected 'accepted', got %q", resp.Status)
+	}
+	if resp.ReleaseType != "minor_or_major" {
+		t.Errorf("expected 'minor_or_major', got %q", resp.ReleaseType)
+	}
+
+	// Wait for async invalidation to complete (with timeout)
+	select {
+	case <-done:
+		// Success — async goroutine completed
+	case <-time.After(5 * time.Second):
+		t.Fatal("async invalidation did not complete within timeout")
 	}
 }
 
