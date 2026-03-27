@@ -37,7 +37,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -78,7 +78,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -117,7 +117,7 @@ jobs:
         run: pnpm run coverage
 
       - name: Upload frontend coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: packages/website/coverage
           flags: frontend
@@ -170,14 +170,14 @@ jobs:
         run: make coverage
 
       - name: Upload backend coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: backend/coverage.out
           flags: backend
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
           version: v2.11.4
           working-directory: backend
