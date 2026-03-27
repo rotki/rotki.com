@@ -41,6 +41,9 @@ type Config struct {
 	// Logging
 	LogLevel slog.Level
 
+	// Webhooks
+	GitHubWebhookSecret string
+
 	// Feature flags
 	SponsorshipEnabled bool
 	Maintenance        bool
@@ -84,6 +87,8 @@ func Load() (*Config, error) {
 		ProxyInsecure: envBool("PROXY_INSECURE", false),
 
 		TLSSkipVerify: envBool("TLS_SKIP_VERIFY", false),
+
+		GitHubWebhookSecret: envStr("GITHUB_WEBHOOK_SECRET", ""),
 
 		LogLevel:           envLogLevel("LOG_LEVEL", slog.LevelInfo),
 		SponsorshipEnabled: envBool("SPONSORSHIP_ENABLED", false),

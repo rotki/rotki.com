@@ -112,3 +112,22 @@ func (m *CacheManager) SetTokenData(ctx context.Context, tokenID int, data *Toke
 	_ = m.redis.Set(ctx, key, data, TokenDataCacheTTL)
 	m.logger.Debug("token cached", "token_id", tokenID, "ttl", TokenDataCacheTTL)
 }
+
+// InvalidateAll deletes all NFT-related keys from Redis using SCAN.
+// Returns the total number of keys deleted.
+func (m *CacheManager) InvalidateAll(ctx context.Context) (int, error) {
+	patterns := []string{"tier:*", "metadata:*", "token:*", "image:*"}
+	total := 0
+
+	for _, pattern := range patterns {
+		n, err := m.redis.ScanDelete(ctx, pattern)
+		if err != nil {
+			m.logger.Error("failed to scan-delete NFT keys", "pattern", pattern, "error", err)
+			return total, err
+		}
+		total += n
+	}
+
+	m.logger.Info("invalidated all NFT caches", "keys_deleted", total)
+	return total, nil
+}

@@ -56,7 +56,10 @@ PORT=3000 \
 | `PROXY_INSECURE`         | `false`                    |                         | Use HTTP instead of HTTPS for proxy                                        |
 | `TLS_SKIP_VERIFY`        | `false`                    |                         | Skip TLS certificate verification for backend API calls (NFT config)       |
 | `LOG_LEVEL`              | `info`                     |                         | Log level: `debug`, `info`, `warn`, `error`                                |
+| `GITHUB_WEBHOOK_SECRET`  | _(empty)_                  |                         | Shared secret for GitHub webhook signature verification                    |
 | `SPONSORSHIP_ENABLED`    | `false`                    |                         | Expose sponsorship as enabled via `/api/config` (frontend feature flag)    |
+| `MAINTENANCE`            | `false`                    |                         | Expose maintenance mode via `/api/config` (frontend feature flag)          |
+| `TESTING`                | `false`                    |                         | Expose testing mode via `/api/config` (frontend feature flag)              |
 
 ## Architecture
 
@@ -74,6 +77,7 @@ internal/
     nft/                     NFT tier-info, token metadata, image proxy
     oauth/                   OAuth token exchange (Google, Monerium)
     releases/                GitHub releases with multi-level caching
+    webhooks/                GitHub webhook handler (release cache invalidation)
   cache/                     L1 (memory) + L2 (Redis) cache with distributed locking
   csp/                       CSP middleware (nonce injection into HTML responses)
   images/                    Image proxy with filesystem cache, dedup, conditional requests
@@ -87,20 +91,21 @@ internal/
 
 ## API Routes
 
-| Method | Path                        | Description                          |
-| ------ | --------------------------- | ------------------------------------ |
-| `GET`  | `/health`                   | Health check (JSON)                  |
-| `GET`  | `/api/config`               | Runtime app config (feature flags)   |
-| `POST` | `/api/oauth/google/token`   | Google OAuth token exchange          |
-| `POST` | `/api/oauth/monerium/token` | Monerium OAuth token exchange (PKCE) |
-| `POST` | `/api/csp-report`           | CSP violation report collector       |
-| `GET`  | `/api/releases`             | GitHub releases (cached)             |
-| `GET`  | `/api/ens/avatar`           | ENS avatar image proxy               |
-| `GET`  | `/api/nft/tier-info`        | NFT tier information                 |
-| `GET`  | `/api/nft/{id}`             | NFT token metadata                   |
-| `GET`  | `/api/nft/image`            | NFT image proxy (IPFS)               |
-| `*`    | `/webapi/**`                | Reverse proxy to Python backend      |
-| `*`    | `/media/**`                 | Reverse proxy to Python backend      |
+| Method | Path                        | Description                                       |
+| ------ | --------------------------- | ------------------------------------------------- |
+| `GET`  | `/health`                   | Health check (JSON)                               |
+| `GET`  | `/api/config`               | Runtime app config (feature flags)                |
+| `POST` | `/api/oauth/google/token`   | Google OAuth token exchange                       |
+| `POST` | `/api/oauth/monerium/token` | Monerium OAuth token exchange (PKCE)              |
+| `POST` | `/api/csp/violation`        | CSP violation report collector                    |
+| `GET`  | `/api/releases/latest`      | GitHub releases (cached)                          |
+| `GET`  | `/api/ens/avatar`           | ENS avatar image proxy                            |
+| `GET`  | `/api/nft/tier-info`        | NFT tier information                              |
+| `GET`  | `/api/nft/{id}`             | NFT token metadata                                |
+| `GET`  | `/api/nft/image`            | NFT image proxy (IPFS)                            |
+| `POST` | `/api/webhooks/github`      | GitHub webhook for release/NFT cache invalidation |
+| `*`    | `/webapi/**`                | Reverse proxy to Python backend                   |
+| `*`    | `/media/**`                 | Reverse proxy to Python backend                   |
 
 ## Development
 
@@ -138,6 +143,81 @@ All dev-only flags (`NUXT_DEV_URL`, `PROXY_DOMAIN`, `PROXY_INSECURE`) are reject
 - **Redis (L2)**: Shared cache across instances (optional, degrades gracefully)
 - **Filesystem**: Image cache stored on disk with SHA-256 hashed filenames, served via zero-copy `http.ServeContent`
 - **Background warming**: Scheduler pre-warms NFT image and release caches on configurable intervals
+
+## GitHub Webhook
+
+The `POST /api/webhooks/github` endpoint receives GitHub release events and invalidates caches immediately instead of waiting for the 2-hour scheduler cycle.
+
+### Cache invalidation by release type
+
+| Release type    | Example   | Caches invalidated |
+| --------------- | --------- | ------------------ |
+| **Patch**       | `v1.35.1` | Release only       |
+| **Minor/Major** | `v1.35.0` | Release + NFT      |
+
+Classification is convention-based: patch segment > 0 means patch release. Unparseable tags default to minor/major (invalidate more, not less).
+
+### Security
+
+- HMAC-SHA256 signature verification (`X-Hub-Signature-256` header)
+- Body size limit (64 KB)
+- Rate limiting (1 invalidation per minute)
+- Only `release` events with `action: published` trigger invalidation
+
+### Testing locally
+
+```bash
+# 1. Start the server with a test secret
+GITHUB_WEBHOOK_SECRET=mysecret DEV_MODE=true make dev
+
+# 2. Compute the HMAC signature for a test payload
+PAYLOAD='{"action":"published","release":{"tag_name":"v1.36.0"}}'
+SIG=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "mysecret" | awk '{print "sha256="$2}')
+
+# 3. Send a test webhook
+curl -X POST http://localhost:3000/api/webhooks/github \
+  -H "Content-Type: application/json" \
+  -H "X-Hub-Signature-256: $SIG" \
+  -H "X-GitHub-Event: release" \
+  -H "X-GitHub-Delivery: test-$(uuidgen)" \
+  -d "$PAYLOAD"
+
+# 4. Test a ping event
+PING='{"zen":"Keep it logically awesome."}'
+PING_SIG=$(echo -n "$PING" | openssl dgst -sha256 -hmac "mysecret" | awk '{print "sha256="$2}')
+curl -X POST http://localhost:3000/api/webhooks/github \
+  -H "Content-Type: application/json" \
+  -H "X-Hub-Signature-256: $PING_SIG" \
+  -H "X-GitHub-Event: ping" \
+  -d "$PING"
+
+# 5. Verify signature rejection (should return 403)
+curl -X POST http://localhost:3000/api/webhooks/github \
+  -H "Content-Type: application/json" \
+  -H "X-Hub-Signature-256: sha256=invalid" \
+  -H "X-GitHub-Event: release" \
+  -d "$PAYLOAD"
+```
+
+### Generating a secret
+
+```bash
+# Option 1: openssl (recommended)
+openssl rand -hex 32
+
+# Option 2: /dev/urandom
+head -c 32 /dev/urandom | xxd -p -c 64
+```
+
+Use the same value for both the `GITHUB_WEBHOOK_SECRET` env var and the GitHub webhook configuration.
+
+### GitHub setup
+
+1. Repo Settings → Webhooks → Add webhook
+2. Payload URL: `https://rotki.com/api/webhooks/github`
+3. Content type: `application/json`
+4. Secret: value of `GITHUB_WEBHOOK_SECRET`
+5. Events: select only **Releases**
 
 ## Static File Serving
 

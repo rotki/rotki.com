@@ -137,6 +137,41 @@ func (r *Redis) Delete(ctx context.Context, key string) error {
 	return r.client.Del(ctx, r.prefix+key).Err()
 }
 
+// ScanDelete deletes all keys matching a pattern using SCAN (non-blocking).
+// The pattern is prefixed automatically (e.g. "tier:*" becomes "cache:tier:*").
+// Returns the number of keys deleted.
+func (r *Redis) ScanDelete(ctx context.Context, pattern string) (int, error) {
+	if r.client == nil {
+		return 0, nil
+	}
+
+	var deleted int
+	var cursor uint64
+	fullPattern := r.prefix + pattern
+
+	for {
+		keys, next, err := r.client.Scan(ctx, cursor, fullPattern, 100).Result()
+		if err != nil {
+			return deleted, fmt.Errorf("scan: %w", err)
+		}
+
+		if len(keys) > 0 {
+			n, err := r.client.Del(ctx, keys...).Result()
+			if err != nil {
+				r.logger.Error("Redis DEL error during scan-delete", "pattern", pattern, "error", err)
+			}
+			deleted += int(n)
+		}
+
+		cursor = next
+		if cursor == 0 {
+			break
+		}
+	}
+
+	return deleted, nil
+}
+
 // Close closes the Redis connection.
 func (r *Redis) Close() error {
 	if r.client == nil {

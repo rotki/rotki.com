@@ -13,6 +13,7 @@ import (
 	nftapi "github.com/rotki/rotki.com/backend/internal/api/nft"
 	"github.com/rotki/rotki.com/backend/internal/api/oauth"
 	"github.com/rotki/rotki.com/backend/internal/api/releases"
+	"github.com/rotki/rotki.com/backend/internal/api/webhooks"
 	"github.com/rotki/rotki.com/backend/internal/cache"
 	"github.com/rotki/rotki.com/backend/internal/config"
 	"github.com/rotki/rotki.com/backend/internal/images"
@@ -25,6 +26,7 @@ type Services struct {
 	Releases *releases.Handler
 	NFTCore  *nft.CoreService // nil when BaseURL is not configured
 	ImageSvc *images.Service
+	Webhook  *webhooks.Handler // nil when GITHUB_WEBHOOK_SECRET is not configured
 }
 
 // Register adds all API routes to the given mux and returns the created services.
@@ -60,6 +62,14 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 		ImageSvc: imgSvc,
 	}
 
+	// GitHub webhook (registered early; NFTCore is set below if sponsorship is enabled)
+	if cfg.GitHubWebhookSecret != "" {
+		whHandler := webhooks.NewHandler(cfg.GitHubWebhookSecret, releasesHandler, nil, logger)
+		svcs.Webhook = whHandler
+		mux.Handle("POST /api/webhooks/github", whHandler)
+		logger.Info("GitHub webhook endpoint registered")
+	}
+
 	// NFT sponsorship endpoints
 	if cfg.BaseURL != "" {
 		// Build NFT service stack
@@ -78,6 +88,11 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 		nftHandler.RegisterRoutes(mux)
 
 		svcs.NFTCore = coreSvc
+
+		// Inject NFT core into webhook handler for minor/major release invalidation
+		if svcs.Webhook != nil {
+			svcs.Webhook.SetNFTCore(coreSvc)
+		}
 	}
 
 	// In dev mode, Nuxt handles robots.txt

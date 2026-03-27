@@ -43,7 +43,7 @@ pnpm release      # Bump version and generate changelog
 
 ### Tech Stack
 
-- **Framework**: Nuxt 3.17.5 with Vue 3.5.17 and TypeScript
+- **Framework**: Nuxt 4.4.2 with Vue 3.5.30 and TypeScript
 - **UI Library**: @rotki/ui-library (custom component library)
 - **Styling**: TailwindCSS (preferred) + SCSS
 - **State Management**: Pinia with composition API
@@ -520,7 +520,7 @@ The `backend/` directory contains a Go server that replaces the Node.js SSR laye
 ### Architecture
 
 - Serves Nuxt-generated static files (`nuxt generate`) with SPA fallback
-- Handles API routes: OAuth token exchange, CSP reports, releases, ENS avatars, NFT sponsorship
+- Handles API routes: OAuth token exchange, CSP reports, releases, ENS avatars, NFT sponsorship, GitHub webhooks
 - Reverse-proxies `/webapi` and `/media` to the Python backend
 - Background scheduler for cache warming (NFT images, releases)
 - No Node.js runtime in production — single Go binary + static files
@@ -554,7 +554,7 @@ make coverage    # Test coverage report
 
 ### Docker Support
 
-- Alpine-based container with Go binary + static files
+- Scratch-based container with Go binary + static files (no OS, no shell)
 - No Node.js runtime required in production
 - Single process — no PM2 or process manager needed
 

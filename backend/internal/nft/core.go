@@ -111,6 +111,21 @@ func (s *CoreService) GetConfig(ctx context.Context) (*Config, error) {
 	return cfg, nil
 }
 
+// ClearConfig clears the cached NFT config, forcing a re-fetch on next access.
+func (s *CoreService) ClearConfig() {
+	s.mu.Lock()
+	s.cachedConfig = nil
+	s.configFetchedAt = time.Time{}
+	s.mu.Unlock()
+	s.logger.Info("cleared cached NFT config")
+}
+
+// InvalidateAll clears all NFT caches (Redis keys + in-memory config).
+func (s *CoreService) InvalidateAll(ctx context.Context) (int, error) {
+	s.ClearConfig()
+	return s.cache.InvalidateAll(ctx)
+}
+
 // UpdateCachedReleaseID updates the cached release ID.
 func (s *CoreService) UpdateCachedReleaseID(releaseID int) {
 	s.mu.Lock()

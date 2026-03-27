@@ -239,6 +239,16 @@ func (h *Handler) cacheRelease(ctx context.Context, release *Release) {
 	_ = h.redis.Set(ctx, staleCacheKey, release, staleCacheTTL)
 }
 
+// InvalidateCache clears all cache levels and re-fetches from GitHub.
+func (h *Handler) InvalidateCache(ctx context.Context) (*Release, error) {
+	h.memory.Delete(cacheKey)
+	_ = h.redis.Delete(ctx, cacheKey)
+	_ = h.redis.Delete(ctx, staleCacheKey)
+	_ = h.redis.Delete(ctx, etagCacheKey)
+
+	return h.FetchFromGitHub(ctx)
+}
+
 // updateL1 sets the release in the in-memory L1 cache.
 func (h *Handler) updateL1(release *Release) {
 	h.memory.Set(cacheKey, release, l1CacheTTL)
