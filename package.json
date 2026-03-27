@@ -32,23 +32,23 @@
     "release": "bumpp -r --no-push"
   },
   "devDependencies": {
-    "@commitlint/cli": "20.4.4",
-    "@commitlint/config-conventional": "20.4.4",
+    "@commitlint/cli": "20.5.0",
+    "@commitlint/config-conventional": "20.5.0",
     "@rotki/eslint-config": "4.5.0",
-    "@rotki/eslint-plugin": "1.2.0",
+    "@rotki/eslint-plugin": "1.3.2",
     "bumpp": "10.4.1",
     "cac": "7.0.0",
     "consola": "3.4.2",
-    "eslint": "9.39.3",
+    "eslint": "9.39.4",
     "eslint-plugin-nuxt": "4.0.0",
     "husky": "9.1.7",
-    "lint-staged": "16.3.3",
+    "lint-staged": "16.4.0",
     "npm-run-all2": "8.0.4",
     "rimraf": "6.1.3",
-    "stylelint": "17.4.0",
+    "stylelint": "17.6.0",
     "stylelint-config-recommended-vue": "1.6.1",
     "stylelint-config-standard": "40.0.0",
-    "stylelint-order": "8.0.0"
+    "stylelint-order": "8.1.1"
   },
   "engines": {
     "node": ">=24 <25",
