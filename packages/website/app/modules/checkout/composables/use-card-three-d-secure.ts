@@ -3,6 +3,7 @@ import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOpti
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
+import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useLogger } from '~/utils/use-logger';
 
 interface AuthenticationIframeEvent {
@@ -27,6 +28,7 @@ interface UseCardThreeDSecureReturn {
 export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   const logger = useLogger('card-three-d-secure');
   const { fetchWithCsrf } = useFetchWithCsrf();
+  const { logPaymentEvent } = usePaymentLogger();
   const { setDefaultCard } = usePaymentCards();
 
   const threeDSecureInstance = shallowRef<ThreeDSecure>();
@@ -189,6 +191,12 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     }
     catch (error: unknown) {
       logger.error('3DS verification failed:', error);
+      logPaymentEvent({
+        payment_method: PaymentMethods.CARD,
+        event: PaymentEvents.THREE_DS_VERIFICATION_FAILED,
+        error_message: error instanceof Error ? error.message : String(error),
+        step: CheckoutSteps.VERIFY,
+      });
       throw error;
     }
   }

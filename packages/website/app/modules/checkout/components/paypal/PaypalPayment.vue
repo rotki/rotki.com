@@ -7,6 +7,7 @@ import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryC
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
 import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
+import { PaymentMethods } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useReferralCodeParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
@@ -55,13 +56,13 @@ const processing = computed<boolean>(() => get(paying) || get(checkoutLoading) |
 async function initialize(): Promise<boolean> {
   const hasPlans = await ensureInitialized();
   if (!hasPlans) {
-    setError(t('subscription.error.init_error'), t('subscription.error.no_plan_selected'));
+    setError(t('subscription.error.init_error'), t('subscription.error.no_plan_selected'), PaymentMethods.PAYPAL);
     return false;
   }
 
   const token = get(braintreeToken);
   if (!token) {
-    setError(t('subscription.error.init_error'), t('subscription.error.payment_init_failed'));
+    setError(t('subscription.error.init_error'), t('subscription.error.payment_init_failed'), PaymentMethods.PAYPAL);
     return false;
   }
 
@@ -71,7 +72,7 @@ async function initialize(): Promise<boolean> {
 
   const result = await initializeSdk(token, amount);
   if (!result.success) {
-    setError(t('subscription.error.init_error'), result.error || t('subscription.error.payment_init_failed'));
+    setError(t('subscription.error.init_error'), result.error || t('subscription.error.payment_init_failed'), PaymentMethods.PAYPAL);
     return false;
   }
 
@@ -82,7 +83,7 @@ async function initialize(): Promise<boolean> {
         await handleSubmitPayment(nonce);
       },
       onPaymentError: (errorMsg) => {
-        setError(t('subscription.error.payment_failure'), errorMsg);
+        setError(t('subscription.error.payment_failure'), errorMsg, PaymentMethods.PAYPAL);
       },
       onPaymentCancel: () => {},
     },
@@ -96,7 +97,7 @@ async function initialize(): Promise<boolean> {
 async function handleSubmitPayment(nonce: string): Promise<void> {
   const plan = get(selectedPlan);
   if (!plan) {
-    setError(t('subscription.error.payment_failure'), 'No plan selected');
+    setError(t('subscription.error.payment_failure'), 'No plan selected', PaymentMethods.PAYPAL);
     return;
   }
 
@@ -135,10 +136,11 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
       setError(
         t('subscription.error.payment_failure'),
         t('subscription.error.server_error_warning'),
+        'paypal',
       );
     }
     else {
-      setError(t('subscription.error.payment_failure'), result.error || 'Payment failed');
+      setError(t('subscription.error.payment_failure'), result.error || 'Payment failed', PaymentMethods.PAYPAL);
     }
   }
   finally {

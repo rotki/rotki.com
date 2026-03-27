@@ -5,6 +5,7 @@ import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
+import { PaymentEvents, type PaymentMethod, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { logger } from '~/utils/use-logger';
 
 export interface CheckoutError {
@@ -18,6 +19,7 @@ export function useCheckout() {
   const { fetchPaymentBreakdown } = useTiersApi();
   const { getSelectedPlanFromId, availablePlans, pending: plansPending, refresh: refreshAvailablePlans, execute: ensureAvailablePlans } = useAvailablePlans();
   const { chronicle } = useSigilEvents();
+  const { logPaymentEvent } = usePaymentLogger();
 
   function getCurrentRoute(): RouteLocationNormalizedLoaded {
     return router.currentRoute.value;
@@ -153,11 +155,17 @@ export function useCheckout() {
     set(loading, value);
   }
 
-  function setError(title: string, message: string): void {
+  function setError(title: string, message: string, paymentMethod?: PaymentMethod): void {
     // Track checkout error event
     if (import.meta.client) {
       chronicle('checkout_error', {
         error_title: title,
+        plan_id: get(planId),
+      });
+      logPaymentEvent({
+        payment_method: paymentMethod ?? PaymentMethods.CARD,
+        event: PaymentEvents.CHECKOUT_ERROR,
+        error_message: message,
         plan_id: get(planId),
       });
     }

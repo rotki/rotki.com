@@ -11,6 +11,7 @@ import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
+import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { PaymentError } from '~/types/codes';
 import { useLogger } from '~/utils/use-logger';
@@ -34,6 +35,7 @@ interface UseThreeDSecureReturn {
  */
 export function useThreeDSecure(): UseThreeDSecureReturn {
   const logger = useLogger('three-d-secure');
+  const { logPaymentEvent } = usePaymentLogger();
 
   const state = ref<ThreeDSecureState>('initializing');
   const error = ref<string>('');
@@ -110,6 +112,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       set(error, errorMsg);
       set(state, 'error');
       logger.error(errorMsg, initError);
+      logPaymentEvent({ payment_method: PaymentMethods.CARD, event: PaymentEvents.THREE_DS_VERIFICATION_FAILED, error_message: initError.message || 'unknown', step: CheckoutSteps.INIT });
       throw initError;
     }
   }
@@ -193,6 +196,12 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         set(error, errorMsg);
         set(state, 'error');
         logger.error('3D Secure verification failed:', errorMsg);
+        logPaymentEvent({
+          payment_method: PaymentMethods.CARD,
+          event: PaymentEvents.THREE_DS_LIABILITY_SHIFT_FAILED,
+          error_message: errorMsg,
+          step: CheckoutSteps.VERIFY,
+        });
         throw new Error(errorMsg);
       }
     }
@@ -203,6 +212,12 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
       set(error, errorMsg);
       logger.error('3D Secure verification error:', verifyError);
+      logPaymentEvent({
+        payment_method: PaymentMethods.CARD,
+        event: PaymentEvents.THREE_DS_VERIFICATION_FAILED,
+        error_message: errorMsg,
+        step: CheckoutSteps.VERIFY,
+      });
       throw verifyError;
     }
     finally {
@@ -254,7 +269,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
     // Track purchase success
     chronicle('purchase_success', {
-      payment_method: 'card',
+      payment_method: PaymentMethods.CARD,
       plan_id: params.planId,
       plan_name: params.planName,
       plan_duration: params.durationInMonths === 1 ? 'monthly' : 'yearly',

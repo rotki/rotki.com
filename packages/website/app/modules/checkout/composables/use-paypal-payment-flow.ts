@@ -8,6 +8,7 @@ import { FetchError } from 'ofetch';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
+import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalApi } from '~/modules/checkout/composables/use-paypal-api';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -65,6 +66,7 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('paypal-payment-flow');
+  const { logPaymentEvent } = usePaymentLogger();
 
   const paying = ref<boolean>(false);
   const initialized = ref<boolean>(false);
@@ -113,6 +115,7 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
     }
     catch (error: any) {
       logger.error('Failed to initialize PayPal SDK:', error);
+      logPaymentEvent({ payment_method: PaymentMethods.PAYPAL, event: PaymentEvents.PAYPAL_SDK_INIT_FAILED, error_message: error.message || 'unknown', step: CheckoutSteps.INIT });
       return { success: false, error: error.message };
     }
   }
@@ -149,12 +152,14 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
         }
         catch (error: any) {
           callbacks.onPaymentError(error?.message ?? String(error));
+          logPaymentEvent({ payment_method: PaymentMethods.PAYPAL, event: PaymentEvents.PAYPAL_PAYMENT_ERROR, error_message: error?.message ?? String(error), step: CheckoutSteps.CALLBACK });
           set(paying, false);
           return undefined;
         }
       },
       onError: (error: any) => {
         set(paying, false);
+        logPaymentEvent({ payment_method: PaymentMethods.PAYPAL, event: PaymentEvents.PAYPAL_PAYMENT_ERROR, error_message: error?.message ?? 'Payment failed', step: CheckoutSteps.CALLBACK });
         callbacks.onPaymentError(error?.message ?? 'Payment failed');
       },
       onCancel: () => {
@@ -241,6 +246,13 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
       }
 
       logger.error('Payment submission failed:', error_);
+      logPaymentEvent({
+        payment_method: PaymentMethods.PAYPAL,
+        event: PaymentEvents.PAYPAL_SUBMIT_ERROR,
+        error_message: errorMessage,
+        error_code: String(error_?.status ?? ''),
+        step: CheckoutSteps.SUBMIT,
+      });
       return { success: false, error: errorMessage, blocked };
     }
     finally {

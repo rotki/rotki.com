@@ -6,6 +6,7 @@ import {
   CardPaymentResponseSchema,
 } from '@rotki/card-payment-common/schemas/payment';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { handlePaymentError } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
 
@@ -16,6 +17,7 @@ import { useLogger } from '~/utils/use-logger';
 export function usePaymentApi() {
   const logger = useLogger('payment-api');
   const { fetchWithCsrf } = useFetchWithCsrf();
+  const { logPaymentEvent } = usePaymentLogger();
 
   /**
    * Upgrade an existing subscription
@@ -46,6 +48,13 @@ export function usePaymentApi() {
     }
     catch (error: any) {
       logger.error('Upgrade failed:', error);
+      logPaymentEvent({
+        payment_method: PaymentMethods.CARD,
+        event: PaymentEvents.CARD_PAYMENT_API_ERROR,
+        error_message: error.message || 'unknown',
+        error_code: String(error.statusCode ?? ''),
+        step: CheckoutSteps.SUBMIT,
+      });
       return handlePaymentError(error);
     }
   }
@@ -81,6 +90,13 @@ export function usePaymentApi() {
     }
     catch (error: any) {
       logger.error('Payment failed:', error);
+      logPaymentEvent({
+        payment_method: PaymentMethods.CARD,
+        event: PaymentEvents.CARD_PAYMENT_API_ERROR,
+        error_message: error.message || 'unknown',
+        error_code: String(error.statusCode ?? ''),
+        step: CheckoutSteps.SUBMIT,
+      });
       return handlePaymentError(error);
     }
   }

@@ -2,6 +2,7 @@ import type { PaymentError } from '~/types/codes';
 import { type ActionResultResponse, ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import {
   type CryptoPayment,
   CryptoPaymentResponse,
@@ -54,6 +55,7 @@ interface UseCryptoPaymentApiReturn {
 export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
   const logger = useLogger('crypto-payment-api');
   const { fetchWithCsrf } = useFetchWithCsrf();
+  const { logPaymentEvent } = usePaymentLogger();
 
   /**
    * Create crypto payment request
@@ -88,6 +90,7 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
     }
     catch (error: any) {
       logger.error('Crypto payment failed:', error);
+      logPaymentEvent({ payment_method: PaymentMethods.CRYPTO, event: PaymentEvents.CRYPTO_PAYMENT_API_ERROR, error_message: error.message || 'unknown', error_code: String(error.statusCode ?? ''), step: CheckoutSteps.SUBMIT });
       return handlePaymentError(error);
     }
   };
@@ -117,6 +120,13 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
     }
     catch (error: any) {
       logger.error('Crypto payment failed:', error);
+      logPaymentEvent({
+        payment_method: PaymentMethods.CRYPTO,
+        event: PaymentEvents.CRYPTO_PAYMENT_API_ERROR,
+        error_message: error.message || 'unknown',
+        error_code: String(error.statusCode ?? ''),
+        step: CheckoutSteps.SUBMIT,
+      });
       return handlePaymentError(error);
     }
   };

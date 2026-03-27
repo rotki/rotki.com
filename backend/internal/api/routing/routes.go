@@ -12,6 +12,7 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/api/ens"
 	nftapi "github.com/rotki/rotki.com/backend/internal/api/nft"
 	"github.com/rotki/rotki.com/backend/internal/api/oauth"
+	"github.com/rotki/rotki.com/backend/internal/api/paymentlog"
 	"github.com/rotki/rotki.com/backend/internal/api/releases"
 	"github.com/rotki/rotki.com/backend/internal/api/webhooks"
 	"github.com/rotki/rotki.com/backend/internal/cache"
@@ -44,6 +45,9 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 
 	// CSP violation reporting
 	mux.Handle("POST /api/csp/violation", csp.NewHandler(logger))
+
+	// Payment error logging (frontend observability, no PII)
+	mux.Handle("POST /api/logging/payment", paymentlog.NewHandler(logger))
 
 	// GitHub releases
 	releasesHandler := releases.NewHandler(mem, red, lck, logger)

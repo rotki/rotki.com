@@ -7,6 +7,7 @@ import CryptoPaymentActions from '~/modules/checkout/components/crypto/CryptoPay
 import CryptoPaymentForm from '~/modules/checkout/components/crypto/CryptoPaymentForm.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-payment-flow';
+import { PaymentMethods } from '~/modules/checkout/composables/use-payment-logger';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -43,7 +44,7 @@ const {
 const loading = computed<boolean>(() => get(checkoutLoading) || get(flowLoading));
 
 function handleWeb3Error(message: string): void {
-  setError(t('subscription.error.payment_failure'), message);
+  setError(t('subscription.error.payment_failure'), message, PaymentMethods.CRYPTO);
 }
 
 async function initialize(): Promise<boolean> {
@@ -75,7 +76,7 @@ async function initialize(): Promise<boolean> {
     const errorMsg = result.isUnverified
       ? t('subscription.error.unverified_email')
       : result.error || t('subscription.error.payment_failure');
-    setError(t('subscription.error.payment_failure'), errorMsg);
+    setError(t('subscription.error.payment_failure'), errorMsg, PaymentMethods.CRYPTO);
     return false;
   }
 
@@ -106,7 +107,7 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
   });
 
   if (!result.success) {
-    setError(t('subscription.error.payment_failure'), result.error || 'Failed to switch plan');
+    setError(t('subscription.error.payment_failure'), result.error || 'Failed to switch plan', PaymentMethods.CRYPTO);
   }
 }
 
@@ -121,7 +122,7 @@ async function handleCancelAndGoBack(): Promise<void> {
   setLoading(false);
 
   if (!result.success) {
-    setError(t('subscription.error.cancel_failed'), result.error || 'Failed to cancel');
+    setError(t('subscription.error.cancel_failed'), result.error || 'Failed to cancel', PaymentMethods.CRYPTO);
     return;
   }
 

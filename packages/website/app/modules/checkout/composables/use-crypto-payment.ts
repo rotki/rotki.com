@@ -6,6 +6,7 @@ import { get, set } from '@vueuse/shared';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
+import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -62,6 +63,7 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
   const paymentApi = useCryptoPaymentApi();
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('web3-payment');
+  const { logPaymentEvent } = usePaymentLogger();
   const { t } = useI18n({ useScope: 'global' });
   const pendingTx = usePendingTx();
 
@@ -168,7 +170,14 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
       const network = await provider.getNetwork();
 
       if (network.chainId !== BigInt(chainId)) {
-        setError(t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName }));
+        const msg = t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName });
+        setError(msg);
+        logPaymentEvent({
+          payment_method: PaymentMethods.CRYPTO,
+          event: PaymentEvents.CRYPTO_WRONG_CHAIN,
+          error_message: msg,
+          step: CheckoutSteps.VERIFY,
+        });
         set(processing, false);
         return;
       }
@@ -187,6 +196,13 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
     catch (error: any) {
       logger.error(error);
       set(processing, false);
+      const errorMsg = 'shortMessage' in error ? error.shortMessage : error.message;
+      logPaymentEvent({
+        payment_method: PaymentMethods.CRYPTO,
+        event: PaymentEvents.CRYPTO_TX_FAILED,
+        error_message: errorMsg || 'unknown',
+        step: CheckoutSteps.SUBMIT,
+      });
 
       if ('shortMessage' in error)
         setError(error.shortMessage);
