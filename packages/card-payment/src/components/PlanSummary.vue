@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { formatCreditedAmount } from '@rotki/card-payment-common/utils/checkout';
 import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { computed, onMounted, ref, toRefs, watch } from 'vue';
@@ -45,6 +46,8 @@ const proratedPrice = computed<string | undefined>(() => {
   }
   return currentBreakdown.fullAmount;
 });
+
+const creditedAmount = computed<string | undefined>(() => formatCreditedAmount(get(breakdown)?.credit));
 
 function toTitleCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -170,6 +173,14 @@ onMounted(() => {
           </span>
         </span>
         <span class="font-medium text-rui-primary">{{ proratedPrice }} €</span>
+      </div>
+
+      <div
+        v-if="creditedAmount"
+        class="flex justify-between items-center"
+      >
+        <span class="text-gray-600">Credit applied:</span>
+        <span class="font-medium text-green-600">-{{ creditedAmount }} €</span>
       </div>
 
       <!-- Starting date -->

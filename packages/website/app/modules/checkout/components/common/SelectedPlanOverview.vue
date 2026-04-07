@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { formatCreditedAmount } from '@rotki/card-payment-common/utils/checkout';
 import { set } from '@vueuse/shared';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
 import { formatDate } from '~/utils/date';
@@ -50,6 +51,8 @@ const proratedPrice = computed<string | undefined>(() => {
   }
   return breakdown.fullAmount;
 });
+
+const creditedAmount = computed<string | undefined>(() => formatCreditedAmount(breakdown?.credit));
 
 const vatOverview = computed<VatOverview | undefined>(() => {
   if (!breakdown) {
@@ -162,6 +165,14 @@ function switchTo(selectedPlan: SelectedPlan): void {
           </RuiTooltip>
         </span>
         <span class="font-medium text-rui-primary">{{ proratedPrice }} €</span>
+      </div>
+
+      <div
+        v-if="creditedAmount"
+        class="flex justify-between items-center"
+      >
+        <span class="text-gray-600">{{ t('payment_grand_total.credit_applied') }}</span>
+        <span class="font-medium text-green-600">-{{ creditedAmount }} €</span>
       </div>
 
       <!-- Starting date -->
