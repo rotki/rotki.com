@@ -5,6 +5,8 @@
     ":dependencyDashboard",
     ":dependencyDashboardApproval"
   ],
+  "rangeStrategy": "pin",
+  "minimumReleaseAge": "7 days",
   "packageRules": [
     {
       "allowedVersions": "/^(24)\\./",

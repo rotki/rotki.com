@@ -1,3 +1,21 @@
+saveExact: true
+shellEmulator: true
+minimumReleaseAge: 10080
+blockExoticSubdeps: true
+strictDepBuilds: true
+trustPolicy: no-downgrade
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@reown/appkit': false
+  better-sqlite3: true
+  bufferutil: true
+  esbuild: true
+  msw: false
+  sharp: false
+  utf-8-validate: true
+  vue-demi: false
+
 packages:
   - .
   - packages/*
