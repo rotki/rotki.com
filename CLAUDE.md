@@ -11,8 +11,9 @@ This is the **rotki.com** website - a Nuxt 3 website for a cryptocurrency portfo
 ### Core Development
 
 ```bash
-pnpm dev          # Start development server
-pnpm build        # Production build with type checking
+make dev          # Start Go backend + Nuxt dev server in parallel
+make dev-go       # Go backend only (port 3000, proxies to Nuxt on 3001)
+make dev-web      # Nuxt dev server only (accepts self-signed certs)
 pnpm preview      # Preview production build
 ```
 
@@ -469,7 +470,7 @@ PROXY_INSECURE=true     # for http proxy in development
 - Standard `go test` with `httptest` for HTTP handlers
 - Table-driven tests for validation and configuration
 - Mock servers for external API testing (OAuth, GitHub)
-- Run with `cd backend && make test` or `make test-race`
+- Run with `make test-go` or `make test-race`
 
 ### E2E Tests (Cypress)
 
@@ -528,11 +529,10 @@ The `backend/` directory contains a Go server that replaces the Node.js SSR laye
 ### Go Development
 
 ```bash
-cd backend
-make check       # vet + lint + test
-make build       # Build production binary
-make run         # Development server
+make build-go    # Build production binary
+make test-go     # Run Go tests
 make coverage    # Test coverage report
+make check       # vet + lint + test (Go + frontend)
 ```
 
 ### Key Go Patterns

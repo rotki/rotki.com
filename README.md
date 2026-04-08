@@ -7,7 +7,10 @@
 $ pnpm install
 
 # serve with hot reload at localhost:3000
-$ pnpm run dev
+$ make dev-web
+
+# or start both Go backend + Nuxt dev server
+$ make dev
 
 # build for production and launch server
 $ pnpm run build
@@ -71,7 +74,14 @@ PROXY_INSECURE=true
 Run with the development server with the following command:
 
 ```bash
-$ pnpm run dev
+# Both Go backend + Nuxt dev server (recommended)
+$ make dev
+
+# Nuxt dev server only (accepts self-signed certs)
+$ make dev-web
+
+# Go backend only (dev mode)
+$ make dev-go
 ```
 
 ## Testing Production Build Locally

@@ -5,12 +5,15 @@ A lightweight Go server that serves the static Nuxt-generated site, handles API 
 ## Quick Start
 
 ```bash
-# Development (two terminals)
+# Development (recommended — runs both in parallel from repo root)
+make dev
+
+# Or manually in two terminals:
 # Terminal 1: Start Nuxt dev server on port 3001
-pnpm dev:website
+make dev-web
 
 # Terminal 2: Start Go backend on port 3000, proxying to Nuxt
-cd backend && make dev
+make dev-go
 
 # Open http://localhost:3000 — Go handles API routes, proxies pages/assets to Nuxt
 
@@ -109,25 +112,35 @@ internal/
 
 ## Development
 
+All commands can be run from the **repo root** via the root Makefile:
+
 ```bash
-make dev         # Run in dev mode (port 3000, proxies to Nuxt on 3001)
-make run         # Run the server (requires static files)
-make build       # Build production binary
-make help        # Show all available targets
-make check       # Run vet + lint + tests
-make test        # Run tests
-make test-race   # Run tests with race detector
+make dev         # Run Go backend + Nuxt dev server in parallel
+make dev-go      # Go backend only (port 3000, proxies to Nuxt on 3001)
+make dev-web     # Nuxt dev server only (accepts self-signed certs)
+make build-go    # Build production binary
+make test-go     # Run Go tests
+make test-race   # Run Go tests with race detector
 make coverage    # Generate coverage report
-make lint        # Run golangci-lint
-make lint-fix    # Auto-fix lint issues
-make fmt         # Format with gofumpt
-make tidy        # Tidy go.mod
+make lint-go     # Run golangci-lint
+make lint        # Run all linters (Go + frontend)
+make check       # Run all checks (vet, lint, test)
+make help        # Show all available targets
+```
+
+The backend Makefile (`backend/Makefile`) can still be used directly for Go-only targets:
+
+```bash
+cd backend
+make dev         # Run in dev mode
+make build       # Build production binary
+make check       # Run vet + lint + tests
 make clean       # Remove build artifacts
 ```
 
 ## Dev Mode
 
-`make dev` sets `DEV_MODE=true` which changes defaults for local development:
+`make dev-go` (or `cd backend && make dev`) sets `DEV_MODE=true` which changes defaults for local development:
 
 - **Port 3000** instead of 4000 (matches the URL you use in the browser)
 - **Nuxt proxy** enabled automatically (`NUXT_DEV_URL=http://localhost:3001`) — all non-API requests are forwarded to the Nuxt dev server, including WebSocket for HMR
@@ -168,7 +181,7 @@ Classification is convention-based: patch segment > 0 means patch release. Unpar
 
 ```bash
 # 1. Start the server with a test secret
-GITHUB_WEBHOOK_SECRET=mysecret DEV_MODE=true make dev
+cd backend && GITHUB_WEBHOOK_SECRET=mysecret DEV_MODE=true make dev
 
 # 2. Compute the HMAC signature for a test payload
 PAYLOAD='{"action":"published","release":{"tag_name":"v1.36.0"}}'
