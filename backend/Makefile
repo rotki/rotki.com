@@ -29,7 +29,7 @@ run:
 
 ## dev: Run in dev mode (port 3000, proxies to Nuxt on 3001)
 dev:
-	-DEV_MODE=true go run ./cmd/server $(ARGS)
+	-DEV_MODE=true TLS_SKIP_VERIFY=true go run ./cmd/server $(ARGS)
 
 ## test: Run all tests
 test:
