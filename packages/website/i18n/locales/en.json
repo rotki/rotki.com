@@ -15,6 +15,21 @@
       "not_generated": "You haven't generated an API key",
       "title": "API Credentials"
     },
+    "credit": {
+      "balance": "Available Credit",
+      "balance_eur": "{amount} €",
+      "empty_history": "No credit history yet",
+      "history": {
+        "amount": "Amount",
+        "balance_after": "Balance After",
+        "date": "Date",
+        "notes": "Notes",
+        "title": "Credit history",
+        "type": "Type"
+      },
+      "title": "Account Credit",
+      "description": "Credit is earned through referrals and other rewards. It is applied automatically to your renewals and upgrades."
+    },
     "referral_code": {
       "code": "Referral Code",
       "description": "Generate a unique referral code to share with friends and earn rewards when they subscribe to rotki premium.",
@@ -26,8 +41,7 @@
       "share_description": "Share this referral code with friends to help them save on their rotki premium subscription.",
       "share_message": "Join me on rotki premium and save {discount} with my referral code: {code}!",
       "share_via": "Share via:",
-      "title": "Referral Code",
-      "coming_soon_hint": "Referral tracking and exclusive benefits are on the way, stay tuned."
+      "title": "Referral Code"
     },
     "change_password": {
       "current_password": {
@@ -87,6 +101,8 @@
         "paid_amount": "Paid Amount",
         "paid_at": "Paid at"
       },
+      "credit_applied": "Credit applied: {amount} €",
+      "method_with_credit": "{method} + Credit",
       "no_payments_found": "No payments found",
       "paid": "Paid",
       "price_before_discount": "Price before discount €{amount}",
@@ -1237,6 +1253,7 @@
     }
   },
   "payment_grand_total": {
+    "credit_applied": "Credit applied:",
     "discount_savings": "Discount savings:",
     "original_price": "Original price:",
     "subtotal": "Subtotal:",

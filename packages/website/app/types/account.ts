@@ -47,7 +47,7 @@ export const UserPayment = z.object({
     type: z.nativeEnum(DiscountType),
   }).optional(),
   durationInMonths: z.number().int().positive(),
-  eurAmount: z.number().positive(),
+  eurAmount: z.number().nonnegative(),
   identifier: z.string().min(1),
   isRefund: z.boolean().default(false),
   isUpgrade: z.boolean().default(false),
@@ -57,7 +57,25 @@ export const UserPayment = z.object({
   paidUsing: z.string(),
   plan: z.string(),
   priceBeforeDiscount: z.number().positive().optional(),
+  referralCreditAppliedEur: z.number().default(0),
 });
+
+export const CreditEntry = z.object({
+  amountEur: z.string(),
+  balanceAfterEur: z.string(),
+  createdAt: z.string().min(1),
+  entryType: z.string(),
+  notes: z.string(),
+});
+
+export type CreditEntry = z.infer<typeof CreditEntry>;
+
+export const CreditBalance = z.object({
+  balanceEur: z.string(),
+  history: z.array(CreditEntry),
+});
+
+export type CreditBalance = z.infer<typeof CreditBalance>;
 
 export type UserPayment = z.infer<typeof UserPayment>;
 

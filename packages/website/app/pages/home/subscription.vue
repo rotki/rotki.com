@@ -2,6 +2,7 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import AccountCredit from '~/components/account/home/AccountCredit.vue';
 import ActiveSubscriptionCard from '~/components/account/home/ActiveSubscriptionCard.vue';
 import ActiveSubscriptionCardSkeleton from '~/components/account/home/ActiveSubscriptionCardSkeleton.vue';
 import ApiKeys from '~/components/account/home/ApiKeys.vue';
@@ -80,6 +81,7 @@ onBeforeMount(() => {
 
     <ApiKeys v-if="premium" />
     <ReferralCode v-if="emailConfirmed && premium" />
+    <AccountCredit v-if="emailConfirmed && premium" />
     <SubscriptionTable v-if="emailConfirmed" />
     <PaymentsTable :pending="pending" />
 

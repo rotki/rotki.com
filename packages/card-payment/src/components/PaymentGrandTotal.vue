@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { get } from '@vueuse/core';
 import { computed } from 'vue';
 import { formatDate } from '@/utils/date';
@@ -15,12 +15,14 @@ const {
   vatBreakdown,
   grandTotal,
   discountInfo,
+  creditInfo,
   nextPayment,
   durationInMonths,
 } = defineProps<{
   grandTotal: number;
   vatBreakdown?: VatBreakdown;
   discountInfo?: PaymentBreakdownDiscount;
+  creditInfo?: PaymentBreakdownCredit;
   nextPayment?: number;
   durationInMonths?: number;
 }>();
@@ -36,6 +38,8 @@ function isValidDiscount(info: PaymentBreakdownDiscount | undefined): info is Va
 }
 
 const hasDiscount = computed<boolean>(() => isValidDiscount(get(discountInfo)));
+const hasCredit = computed<boolean>(() => !!(creditInfo && parseFloat(creditInfo.creditedAmount) > 0));
+const hasAdjustments = computed<boolean>(() => get(hasDiscount) || get(hasCredit));
 
 const nextPaymentDate = computed<string | undefined>(() => {
   const payment = get(nextPayment);
@@ -59,12 +63,12 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
   <div class="pt-4">
     <!-- Discount section -->
     <div
-      v-if="hasDiscount"
+      v-if="hasAdjustments"
       class="space-y-2 pb-3"
     >
       <!-- Original price before discount -->
       <div
-        v-if="vatBreakdown"
+        v-if="hasDiscount && vatBreakdown"
         class="flex justify-between text-sm text-gray-500"
       >
         <span>Original price:</span>
@@ -79,11 +83,19 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
         <span>Discount savings:</span>
         <span>-{{ discountInfo.discountedAmount }} €</span>
       </div>
+
+      <div
+        v-if="hasCredit && creditInfo"
+        class="flex justify-between text-sm font-medium text-green-600"
+      >
+        <span>Credit applied:</span>
+        <span>-{{ parseFloat(creditInfo.creditedAmount).toFixed(2) }} €</span>
+      </div>
     </div>
 
     <!-- Divider between discount and breakdown -->
     <div
-      v-if="hasDiscount && vatBreakdown"
+      v-if="hasAdjustments"
       class="border-t border-dashed border-gray-200 my-3"
     />
 
