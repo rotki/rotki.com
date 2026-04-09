@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
 import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
@@ -88,6 +88,11 @@ const vatBreakdown = computed<VatBreakdown | undefined>(() => {
 const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
   const currentBreakdown = get(breakdown);
   return currentBreakdown?.discount ?? undefined;
+});
+
+const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  return currentBreakdown?.credit ?? undefined;
 });
 
 const showVatWarning = computed<boolean>(() => vatIdStatus === VatIdStatus.NOT_VALID && country !== 'DE');
@@ -400,6 +405,7 @@ onUnmounted(async () => {
           <PaymentGrandTotal
             :vat-breakdown="vatBreakdown"
             :discount-info="discountInfo"
+            :credit-info="creditInfo"
             :grand-total="grandTotal"
             :next-payment="planData.nextPayment"
             :duration-in-months="selectedPlan.durationInMonths"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { formatDate } from '~/utils/date';
 
 interface VatBreakdown {
@@ -14,6 +14,7 @@ const {
   grandTotal,
   loading,
   discountInfo,
+  creditInfo,
   crypto,
   vatBreakdown,
 } = defineProps<{
@@ -21,6 +22,7 @@ const {
   grandTotal: number;
   loading?: boolean;
   discountInfo?: PaymentBreakdownDiscount;
+  creditInfo?: PaymentBreakdownCredit;
   crypto?: boolean;
   vatBreakdown?: VatBreakdown;
 }>();
@@ -33,6 +35,17 @@ const hasDiscount = computed<boolean>(() => discountInfo?.isValid ?? false);
 const discountAmount = computed<number>(() =>
   discountInfo && discountInfo.isValid ? parseFloat(discountInfo.discountedAmount) : 0,
 );
+
+const hasCredit = computed<boolean>(() => !!(creditInfo && parseFloat(creditInfo.creditedAmount) > 0));
+
+const creditedAmount = computed<number>(() => {
+  if (!creditInfo) {
+    return 0;
+  }
+  return parseFloat(creditInfo.creditedAmount);
+});
+
+const hasAdjustments = computed<boolean>(() => hasDiscount.value || hasCredit.value);
 
 const durationLabel = computed<string>(() => {
   if (plan.durationInMonths === 12)
@@ -58,12 +71,12 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
   <div class="pt-4">
     <!-- Discount section -->
     <div
-      v-if="hasDiscount"
+      v-if="hasAdjustments"
       class="space-y-2 pb-3"
     >
       <!-- Original price before discount -->
       <div
-        v-if="vatBreakdown"
+        v-if="hasDiscount && vatBreakdown"
         class="flex justify-between text-sm text-gray-500"
       >
         <span>{{ t('payment_grand_total.original_price') }}</span>
@@ -79,7 +92,10 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
       </div>
 
       <!-- Discount savings -->
-      <div class="flex justify-between text-sm font-medium text-green-600">
+      <div
+        v-if="hasDiscount"
+        class="flex justify-between text-sm font-medium text-green-600"
+      >
         <span>{{ t('payment_grand_total.discount_savings') }}</span>
         <span>
           <RuiSkeletonLoader
@@ -91,11 +107,27 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
           </template>
         </span>
       </div>
+
+      <div
+        v-if="hasCredit"
+        class="flex justify-between text-sm font-medium text-green-600"
+      >
+        <span>{{ t('payment_grand_total.credit_applied') }}</span>
+        <span>
+          <RuiSkeletonLoader
+            v-if="loading"
+            class="w-16 h-5"
+          />
+          <template v-else>
+            -{{ creditedAmount.toFixed(2) }} €
+          </template>
+        </span>
+      </div>
     </div>
 
     <!-- Divider between discount and total -->
     <div
-      v-if="hasDiscount"
+      v-if="hasAdjustments"
       class="border-t border-dashed border-gray-200 my-3"
     />
 
