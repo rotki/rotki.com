@@ -55,6 +55,10 @@ onMounted(load);
           {{ t('account.credit.description') }}
         </div>
 
+        <div class="text-caption text-rui-text-disabled italic">
+          {{ t('account.credit.disclaimer') }}
+        </div>
+
         <div class="flex items-center gap-3">
           <span class="text-rui-text-secondary text-body-2">{{ t('account.credit.balance') }}:</span>
           <span class="text-h6 font-bold text-rui-primary">

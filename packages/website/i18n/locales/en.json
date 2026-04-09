@@ -19,6 +19,7 @@
     "credit": {
       "balance": "Available Credit",
       "balance_eur": "{amount} €",
+      "disclaimer": "Account credit can only be applied to rotki subscription purchases and renewals. It cannot be redeemed for cash, refunded, or transferred to another account.",
       "empty_history": "No credit history yet",
       "history": {
         "amount": "Amount",

@@ -29,7 +29,7 @@ export const ApiKeys = z.object({
 export type ApiKeys = z.infer<typeof ApiKeys>;
 
 const ReferralDiscountSchema = z.object({
-  amount: z.number(),
+  amount: z.string(),
   discountType: z.nativeEnum(DiscountType),
   usesLeft: z.number(),
   validUntil: z.string(),
