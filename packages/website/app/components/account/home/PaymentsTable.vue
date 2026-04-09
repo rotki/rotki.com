@@ -151,11 +151,45 @@ watch(() => pending, (pendingIs, pendingWas) => {
               </template>
             </i18n-t>
           </RuiTooltip>
+          <RuiTooltip
+            v-if="!row.legacy && row.referralCreditAppliedEur > 0"
+            :open-delay="200"
+          >
+            <template #activator>
+              <RuiIcon
+                name="lu-coins"
+                class="text-rui-success"
+                size="18"
+              />
+            </template>
+            {{ t('account.payments.credit_applied', { amount: row.referralCreditAppliedEur }) }}
+          </RuiTooltip>
           {{ row.eurAmount }} €
         </div>
       </template>
       <template #item.paidUsing="{ row }">
-        {{ toTitleCase(row.paidUsing) }}
+        <div class="inline-flex items-center gap-1">
+          <span>
+            {{
+              row.referralCreditAppliedEur > 0
+                ? t('account.payments.method_with_credit', { method: toTitleCase(row.paidUsing) })
+                : toTitleCase(row.paidUsing)
+            }}
+          </span>
+          <RuiTooltip
+            v-if="row.referralCreditAppliedEur > 0"
+            :open-delay="200"
+          >
+            <template #activator>
+              <RuiIcon
+                name="lu-coins"
+                class="text-rui-success"
+                size="14"
+              />
+            </template>
+            {{ t('account.payments.credit_applied', { amount: row.referralCreditAppliedEur }) }}
+          </RuiTooltip>
+        </div>
       </template>
       <template #item.status="{ row }">
         <RuiChip

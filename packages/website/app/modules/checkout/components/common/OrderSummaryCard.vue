@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
 import { get } from '@vueuse/shared';
 import DiscountCodeInput from '~/modules/checkout/components/common/DiscountCodeInput.vue';
@@ -52,6 +52,11 @@ const discountSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'))
 
 // Derive discountInfo from breakdown
 const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => breakdown?.discount ?? undefined);
+
+const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
+  const currentBreakdown = get(breakdown);
+  return currentBreakdown?.credit ?? undefined;
+});
 
 // Derive vatBreakdown from breakdown
 const vatBreakdown = computed<VatBreakdown | undefined>(() => {
@@ -154,6 +159,7 @@ function handlePlanChange(newPlan: SelectedPlan): void {
       :grand-total="grandTotal"
       :loading="loading"
       :discount-info="discountInfo"
+      :credit-info="creditInfo"
       :crypto="isCrypto"
       :vat-breakdown="vatBreakdown"
     />
