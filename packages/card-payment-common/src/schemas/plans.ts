@@ -62,6 +62,11 @@ export const PaymentBreakdownDiscountSchema = z.discriminatedUnion('isValid', [
   InvalidPaymentBreakdownDiscountSchema,
 ]);
 
+export const PaymentBreakdownCreditSchema = z.object({
+  availableAmount: z.string(),
+  creditedAmount: z.string(),
+});
+
 // New unified payment breakdown response schema (POST /payment/breakdown)
 export const PaymentBreakdownResponseSchema = z.object({
   fullAmount: z.string(),
@@ -72,6 +77,7 @@ export const PaymentBreakdownResponseSchema = z.object({
   braintreeClientToken: z.string().optional(), // Only for non-crypto payments
   nextPayment: z.number().default(0), // Next payment timestamp (for upgrades)
   discount: PaymentBreakdownDiscountSchema.nullable(),
+  credit: PaymentBreakdownCreditSchema.nullable().optional(),
 });
 
 // Request schema for type safety
@@ -97,6 +103,8 @@ export type ValidPaymentBreakdownDiscount = z.infer<typeof ValidPaymentBreakdown
 export type InvalidPaymentBreakdownDiscount = z.infer<typeof InvalidPaymentBreakdownDiscountSchema>;
 
 export type PaymentBreakdownDiscount = z.infer<typeof PaymentBreakdownDiscountSchema>;
+
+export type PaymentBreakdownCredit = z.infer<typeof PaymentBreakdownCreditSchema>;
 
 export type PaymentBreakdownResponse = z.infer<typeof PaymentBreakdownResponseSchema>;
 
