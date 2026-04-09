@@ -80,9 +80,11 @@ onBeforeMount(() => {
     </template>
 
     <ApiKeys v-if="premium" />
-    <ReferralCode v-if="emailConfirmed && premium" />
-    <AccountCredit v-if="emailConfirmed && premium" />
-    <SubscriptionTable v-if="emailConfirmed" />
+    <template v-if="emailConfirmed">
+      <ReferralCode />
+      <AccountCredit />
+      <SubscriptionTable />
+    </template>
     <PaymentsTable :pending="pending" />
 
     <!-- Unified subscription error notification -->
