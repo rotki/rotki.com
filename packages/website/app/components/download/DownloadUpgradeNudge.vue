@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import { SigilEvents } from '@rotki/sigil';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 
 const { t } = useI18n({ useScope: 'global' });
 const { chronicle } = useSigilEvents();
+
+function trackSeePlansClick(): void {
+  chronicle(SigilEvents.DOWNLOAD_SEE_PLANS_CLICK, { source: 'download_page_nudge' });
+}
 </script>
 
 <template>
@@ -37,7 +42,7 @@ const { chronicle } = useSigilEvents();
               color="primary"
               variant="default"
               data-cy="see-plans-button"
-              @click="chronicle('download_see_plans_click', { source: 'download_page_nudge' })"
+              @click="trackSeePlansClick()"
             >
               {{ t('download.upgrade_nudge.see_plans') }}
             </ButtonLink>

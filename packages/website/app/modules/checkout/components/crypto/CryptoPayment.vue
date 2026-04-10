@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { CheckoutPaymentMethods } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
@@ -7,7 +8,6 @@ import CryptoPaymentActions from '~/modules/checkout/components/crypto/CryptoPay
 import CryptoPaymentForm from '~/modules/checkout/components/crypto/CryptoPaymentForm.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-payment-flow';
-import { PaymentMethods } from '~/modules/checkout/composables/use-payment-logger';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -44,7 +44,7 @@ const {
 const loading = computed<boolean>(() => get(checkoutLoading) || get(flowLoading));
 
 function handleWeb3Error(message: string): void {
-  setError(t('subscription.error.payment_failure'), message, PaymentMethods.CRYPTO);
+  setError(t('subscription.error.payment_failure'), message, CheckoutPaymentMethods.CRYPTO);
 }
 
 async function initialize(): Promise<boolean> {
@@ -76,7 +76,7 @@ async function initialize(): Promise<boolean> {
     const errorMsg = result.isUnverified
       ? t('subscription.error.unverified_email')
       : result.error || t('subscription.error.payment_failure');
-    setError(t('subscription.error.payment_failure'), errorMsg, PaymentMethods.CRYPTO);
+    setError(t('subscription.error.payment_failure'), errorMsg, CheckoutPaymentMethods.CRYPTO);
     return false;
   }
 
@@ -107,7 +107,7 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
   });
 
   if (!result.success) {
-    setError(t('subscription.error.payment_failure'), result.error || 'Failed to switch plan', PaymentMethods.CRYPTO);
+    setError(t('subscription.error.payment_failure'), result.error || 'Failed to switch plan', CheckoutPaymentMethods.CRYPTO);
   }
 }
 
@@ -122,7 +122,7 @@ async function handleCancelAndGoBack(): Promise<void> {
   setLoading(false);
 
   if (!result.success) {
-    setError(t('subscription.error.cancel_failed'), result.error || 'Failed to cancel', PaymentMethods.CRYPTO);
+    setError(t('subscription.error.cancel_failed'), result.error || 'Failed to cancel', CheckoutPaymentMethods.CRYPTO);
     return;
   }
 

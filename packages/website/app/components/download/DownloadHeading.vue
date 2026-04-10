@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { DownloadItemSingle, DownloadItem as DownloadItemType } from '~/types/download';
+import { SigilEvents } from '@rotki/sigil';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import DownloadItem from '~/components/download/DownloadItem.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
@@ -62,7 +63,7 @@ const highlightedDownloadItem = computed<DownloadItemSingle[]>(() => {
 });
 
 function onDownloadClick(platform: string): void {
-  chronicle('download_click', {
+  chronicle(SigilEvents.DOWNLOAD_CLICK, {
     platform,
     version: version || undefined,
   });

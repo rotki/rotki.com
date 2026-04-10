@@ -7,12 +7,14 @@ import type {
   SignupCustomerInformationPayload,
   SignupPayload,
 } from '~/types/signup';
+import { SigilEvents, SignupFailedReasons } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import SignupAccount from '~/components/account/signup/SignupAccount.vue';
 import SignupAddress from '~/components/account/signup/SignupAddress.vue';
 import SignupCustomerInformation from '~/components/account/signup/SignupCustomerInformation.vue';
 import SignupIntroduction from '~/components/account/signup/SignupIntroduction.vue';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRecaptcha } from '~/composables/use-recaptcha';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
@@ -69,6 +71,11 @@ const route = useRoute();
 const { captchaId, resetCaptcha } = useRecaptcha();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { saveRedirectUrl } = useRedirectUrl();
+const { chronicle } = useSigilEvents();
+
+onMounted(() => {
+  chronicle(SigilEvents.SIGNUP_STARTED, {});
+});
 
 async function signup({
   recaptchaToken,
@@ -95,6 +102,7 @@ async function signup({
       },
     });
     if (result) {
+      chronicle(SigilEvents.SIGNUP_COMPLETED, {});
       const { redirectUrl } = route.query;
       if (redirectUrl) {
         const safeUrl = getSafeRedirectUrl(redirectUrl as string);
@@ -105,6 +113,7 @@ async function signup({
       await navigateTo({ path: '/activation' });
     }
     else if (typeof message === 'object') {
+      chronicle(SigilEvents.SIGNUP_FAILED, { reason: SignupFailedReasons.VALIDATION });
       resetCaptcha();
       setErrors(message);
     }
@@ -116,8 +125,12 @@ async function signup({
       && error.data
       && typeof error.data.message === 'object'
     ) {
+      chronicle(SigilEvents.SIGNUP_FAILED, { reason: SignupFailedReasons.VALIDATION });
       resetCaptcha();
       setErrors(error.data.message);
+    }
+    else {
+      chronicle(SigilEvents.SIGNUP_FAILED, { reason: SignupFailedReasons.SERVER_ERROR });
     }
   }
   set(loading, false);

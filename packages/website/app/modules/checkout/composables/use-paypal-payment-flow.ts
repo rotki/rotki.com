@@ -3,12 +3,13 @@ import type { PayPalCheckout } from 'braintree-web';
 import type { DeepReadonly, Ref } from 'vue';
 import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
-import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalApi } from '~/modules/checkout/composables/use-paypal-api';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -43,6 +44,15 @@ interface RenderButtonOptions {
   loading: Ref<boolean>;
 }
 
+export interface PaypalTrackingContext {
+  planId?: number;
+  isUpgrade: boolean;
+}
+
+interface UsePaypalPaymentFlowOptions {
+  getTrackingContext?: () => PaypalTrackingContext;
+}
+
 interface UsePaypalPaymentFlowReturn {
   // State
   paying: DeepReadonly<Ref<boolean>>;
@@ -60,13 +70,17 @@ interface UsePaypalPaymentFlowReturn {
  * Pure PayPal payment flow - handles only PayPal SDK and API calls.
  * Orchestration (loading plans, error handling, navigation) happens outside.
  */
-export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
+export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}): UsePaypalPaymentFlowReturn {
   const { addPaypalAccount, createPaypalNonce } = usePaypalApi();
   const { client, initializeClientWithToken } = useBraintreeClient();
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('paypal-payment-flow');
   const { logPaymentEvent } = usePaymentLogger();
+
+  function getContext(): PaypalTrackingContext {
+    return options.getTrackingContext?.() ?? { isUpgrade: false };
+  }
 
   const paying = ref<boolean>(false);
   const initialized = ref<boolean>(false);
@@ -115,7 +129,15 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
     }
     catch (error: any) {
       logger.error('Failed to initialize PayPal SDK:', error);
-      logPaymentEvent({ payment_method: PaymentMethods.PAYPAL, event: PaymentEvents.PAYPAL_SDK_INIT_FAILED, error_message: error.message || 'unknown', step: CheckoutSteps.INIT });
+      const ctx = getContext();
+      logPaymentEvent({
+        paymentMethod: CheckoutPaymentMethods.PAYPAL,
+        event: PaymentServerEvents.PAYPAL_SDK_INIT_FAILED,
+        errorMessage: error.message || 'unknown',
+        step: CheckoutSteps.INIT,
+        planId: ctx.planId,
+        isUpgrade: ctx.isUpgrade,
+      });
       return { success: false, error: error.message };
     }
   }
@@ -152,14 +174,30 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
         }
         catch (error: any) {
           callbacks.onPaymentError(error?.message ?? String(error));
-          logPaymentEvent({ payment_method: PaymentMethods.PAYPAL, event: PaymentEvents.PAYPAL_PAYMENT_ERROR, error_message: error?.message ?? String(error), step: CheckoutSteps.CALLBACK });
+          const ctx = getContext();
+          logPaymentEvent({
+            paymentMethod: CheckoutPaymentMethods.PAYPAL,
+            event: PaymentServerEvents.PAYPAL_PAYMENT_ERROR,
+            errorMessage: error?.message ?? String(error),
+            step: CheckoutSteps.CALLBACK,
+            planId: ctx.planId,
+            isUpgrade: ctx.isUpgrade,
+          });
           set(paying, false);
           return undefined;
         }
       },
       onError: (error: any) => {
         set(paying, false);
-        logPaymentEvent({ payment_method: PaymentMethods.PAYPAL, event: PaymentEvents.PAYPAL_PAYMENT_ERROR, error_message: error?.message ?? 'Payment failed', step: CheckoutSteps.CALLBACK });
+        const ctx = getContext();
+        logPaymentEvent({
+          paymentMethod: CheckoutPaymentMethods.PAYPAL,
+          event: PaymentServerEvents.PAYPAL_PAYMENT_ERROR,
+          errorMessage: error?.message ?? 'Payment failed',
+          step: CheckoutSteps.CALLBACK,
+          planId: ctx.planId,
+          isUpgrade: ctx.isUpgrade,
+        });
         callbacks.onPaymentError(error?.message ?? 'Payment failed');
       },
       onCancel: () => {
@@ -247,11 +285,13 @@ export function usePaypalPaymentFlow(): UsePaypalPaymentFlowReturn {
 
       logger.error('Payment submission failed:', error_);
       logPaymentEvent({
-        payment_method: PaymentMethods.PAYPAL,
-        event: PaymentEvents.PAYPAL_SUBMIT_ERROR,
-        error_message: errorMessage,
-        error_code: String(error_?.status ?? ''),
+        paymentMethod: CheckoutPaymentMethods.PAYPAL,
+        event: PaymentServerEvents.PAYPAL_SUBMIT_ERROR,
+        errorMessage,
+        errorCode: String(error_?.status ?? ''),
         step: CheckoutSteps.SUBMIT,
+        planId,
+        isUpgrade: !!upgradeSubId,
       });
       return { success: false, error: errorMessage, blocked };
     }

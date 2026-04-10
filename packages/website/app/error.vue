@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import GenericError from '~/components/error/GenericError.vue';
 import NotFoundError from '~/components/error/NotFoundError.vue';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 defineOptions({
@@ -20,6 +22,15 @@ const isClientError = computed<boolean>(() => {
 });
 
 usePageSeoNoIndex(title);
+
+const { chronicle } = useSigilEvents();
+const route = useRoute();
+
+if (get(statusCode) === 404) {
+  chronicle(SigilEvents.PAGE_NOT_FOUND, {
+    path: route.fullPath,
+  });
+}
 
 function handleError() {
   return clearError({ redirect: '/' });

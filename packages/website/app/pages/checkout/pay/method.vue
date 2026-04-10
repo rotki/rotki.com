@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { monthsToPlanDuration, SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
@@ -30,12 +31,12 @@ onMounted(() => {
     discountType = discountInfo.isReferral ? 'referral' : 'discount';
   }
 
-  chronicle('checkout_start', {
-    plan_id: get(checkout.planId),
-    plan_name: plan?.name,
-    plan_duration: plan?.durationInMonths === 1 ? 'monthly' : 'yearly',
+  chronicle(SigilEvents.CHECKOUT_START, {
+    planId: get(checkout.planId),
+    planName: plan?.name,
+    planDuration: monthsToPlanDuration(plan?.durationInMonths),
     amount: breakdownData?.finalAmount,
-    is_upgrade: get(checkout.isUpgrade),
+    isUpgrade: get(checkout.isUpgrade),
     discount: discountType,
   });
 });

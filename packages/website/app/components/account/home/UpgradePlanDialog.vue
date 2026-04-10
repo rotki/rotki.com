@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { PaymentMethod, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
+import { SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 import SelectablePlan from '~/modules/checkout/components/plan/SelectablePlan.vue';
@@ -16,6 +18,7 @@ const { t } = useI18n({ useScope: 'global' });
 const { availablePlans } = useAvailablePlans();
 const { tiersInformation } = usePremiumTiersInfo();
 const router = useRouter();
+const { chronicle } = useSigilEvents();
 
 const selectedPlan = ref<AvailablePlan>();
 const loading = ref<boolean>(false);
@@ -131,6 +134,14 @@ async function submitUpgrade() {
   }
 
   set(loading, true);
+
+  chronicle(SigilEvents.UPGRADE_STARTED, {
+    fromPlanId: sub.planId,
+    fromPlanName: sub.planName,
+    toPlanId: planId,
+    toPlanDuration: period === PricingPeriod.YEARLY ? 'yearly' : 'monthly',
+    source: 'account_home',
+  });
 
   const { href } = router.resolve({
     path: routeName,

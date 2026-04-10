@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { RuiIcons } from '@rotki/ui-library';
+import { type CheckoutPaymentMethod, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
@@ -9,7 +10,6 @@ import PaymentMethodItem from '~/modules/checkout/components/method/PaymentMetho
 import { usePlanIdParam, useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
-
 import { assert } from '~/utils/assert';
 import { navigateToWithCSPSupport } from '~/utils/navigation';
 import { buildQueryParams } from '~/utils/query';
@@ -131,14 +131,21 @@ async function handleBack(): Promise<void> {
   });
 }
 
+const PAYMENT_METHOD_TO_CHECKOUT: Record<PaymentMethod, CheckoutPaymentMethod> = {
+  [PaymentMethod.BLOCKCHAIN]: 'crypto',
+  [PaymentMethod.CARD]: 'card',
+  [PaymentMethod.PAYPAL]: 'paypal',
+};
+
 async function handleContinue(): Promise<void> {
   const selected = get(selectedPaymentMethod);
   assert(selected, 'No payment method selected');
 
   // Track payment method selection
-  chronicle('checkout_method_selected', {
-    method: get(selectedMethod),
-    plan_id: get(planId),
+  const selectedId = get(selectedMethod);
+  chronicle(SigilEvents.CHECKOUT_METHOD_SELECTED, {
+    method: selectedId !== undefined ? PAYMENT_METHOD_TO_CHECKOUT[selectedId] : undefined,
+    planId: get(planId),
   });
 
   set(processing, true);

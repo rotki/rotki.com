@@ -125,6 +125,9 @@ importers:
       '@rotki/card-payment-common':
         specifier: workspace:*
         version: link:../card-payment-common
+      '@rotki/sigil':
+        specifier: workspace:*
+        version: link:../sigil
       '@vueuse/core':
         specifier: 'catalog:'
         version: 14.2.1(vue@3.5.31(typescript@5.9.3))
@@ -209,6 +212,24 @@ importers:
         specifier: 4.1.2
         version: 4.1.2(@types/node@24.12.0)(happy-dom@20.8.9(bufferutil@4.1.0)(utf-8-validate@6.0.6))(jsdom@28.1.0(@noble/hashes@1.8.0))(msw@2.12.14(@types/node@24.12.0)(typescript@5.9.3))(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.0)(yaml@2.8.3))
 
+  packages/sigil:
+    devDependencies:
+      '@tsconfig/node24':
+        specifier: 'catalog:'
+        version: 24.0.4
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.0
+      tsdown:
+        specifier: 0.21.7
+        version: 0.21.7(synckit@0.11.12)(typescript@5.9.3)(vue-tsc@3.2.6(typescript@5.9.3))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.2
+        version: 4.1.2(@types/node@24.12.0)(happy-dom@20.8.9(bufferutil@4.1.0)(utf-8-validate@6.0.6))(jsdom@28.1.0(@noble/hashes@1.8.0))(msw@2.12.14(@types/node@24.12.0)(typescript@5.9.3))(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.0)(yaml@2.8.3))
+
   packages/website:
     dependencies:
       '@nuxtjs/robots':
@@ -226,6 +247,9 @@ importers:
       '@reown/appkit-adapter-ethers':
         specifier: 1.8.19
         version: 1.8.19(@ethersproject/sha2@5.8.0)(@types/react@19.2.14)(bufferutil@4.1.0)(db0@0.3.4(better-sqlite3@12.8.0))(ethers@6.16.0(bufferutil@4.1.0)(utf-8-validate@6.0.6))(ioredis@5.10.0)(typescript@5.9.3)(utf-8-validate@6.0.6)(zod@3.25.76)
+      '@rotki/sigil':
+        specifier: workspace:*
+        version: link:../sigil
       '@vuelidate/core':
         specifier: 2.0.3
         version: 2.0.3(vue@3.5.31(typescript@5.9.3))
@@ -482,11 +506,6 @@ packages:
   '@babel/helpers@7.29.2':
     resolution: {integrity: sha512-HoGuUs4sCZNezVEKdVcwqmZN8GoHirLUcLaYVNBK2J0DadGtdcqgr3BCbvH8+XUo4NGjNl3VOtSjEKNzqfFgKw==}
     engines: {node: '>=6.9.0'}
-
-  '@babel/parser@7.29.0':
-    resolution: {integrity: sha512-IyDgFV5GeDUVX4YdF/3CPULtVGSXXMLh1xVIgdCgxApktqnQV0r7/8Nqthg+8YLGaAtdyIlo2qIdZrbCv4+7ww==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
 
   '@babel/parser@7.29.2':
     resolution: {integrity: sha512-4GgRzy/+fsBa72/RZVJmGKPmZu9Byn8o4MoLpmNe1m8ZfYnz5emHLQz3U4gLud6Zwl0RZIcgiLD7Uq7ySFuDLA==}
@@ -3565,9 +3584,6 @@ packages:
   '@types/node@24.12.0':
     resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
 
-  '@types/node@25.3.5':
-    resolution: {integrity: sha512-oX8xrhvpiyRCQkG1MFchB09f+cXftgIXb3a7UUa4Y3wpmZPw5tyZGTLWhlESOLq1Rq6oDlc8npVU2/9xiCuXMA==}
-
   '@types/node@25.5.0':
     resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
 
@@ -5741,9 +5757,6 @@ packages:
   get-stream@8.0.1:
     resolution: {integrity: sha512-VaUJspBffn/LMCJVoMvSAdmscJyS1auj5Zulnn5UoYcY531UWmdwhRWkcGKnGU93m5HSXP9LP2usOryrBtQowA==}
     engines: {node: '>=16'}
-
-  get-tsconfig@4.13.6:
-    resolution: {integrity: sha512-shZT/QMiSHc/YBLxxOkMtgSid5HFoauqCE3/exfsEcwg1WkeqjG+V40yBbBrsD+jW2HDXcs28xOfcbm2jI8Ddw==}
 
   get-tsconfig@4.13.7:
     resolution: {integrity: sha512-7tN6rFgBlMgpBML5j8typ92BKFi2sFQvIdpAqLA2beia5avZDrMs0FLZiM5etShWq5irVyGcGMEA1jcDaK7A/Q==}
@@ -9504,7 +9517,7 @@ snapshots:
   '@antfu/install-pkg@1.1.0':
     dependencies:
       package-manager-detector: 1.6.0
-      tinyexec: 1.0.2
+      tinyexec: 1.0.4
 
   '@apidevtools/json-schema-ref-parser@11.9.3':
     dependencies:
@@ -9660,10 +9673,6 @@ snapshots:
   '@babel/helpers@7.29.2':
     dependencies:
       '@babel/template': 7.28.6
-      '@babel/types': 7.29.0
-
-  '@babel/parser@7.29.0':
-    dependencies:
       '@babel/types': 7.29.0
 
   '@babel/parser@7.29.2':
@@ -13087,7 +13096,7 @@ snapshots:
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
       estraverse: 5.3.0
-      picomatch: 4.0.3
+      picomatch: 4.0.4
 
   '@swc/helpers@0.5.19':
     dependencies:
@@ -13162,10 +13171,6 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/node@25.3.5':
-    dependencies:
-      undici-types: 7.18.2
-
   '@types/node@25.5.0':
     dependencies:
       undici-types: 7.18.2
@@ -13178,7 +13183,7 @@ snapshots:
 
   '@types/qrcode@1.5.6':
     dependencies:
-      '@types/node': 25.3.5
+      '@types/node': 25.5.0
 
   '@types/react@19.2.14':
     dependencies:
@@ -13670,7 +13675,7 @@ snapshots:
 
   '@vue/compiler-core@3.5.30':
     dependencies:
-      '@babel/parser': 7.29.0
+      '@babel/parser': 7.29.2
       '@vue/shared': 3.5.30
       entities: 7.0.1
       estree-walker: 2.0.2
@@ -13758,7 +13763,7 @@ snapshots:
       alien-signals: 3.1.2
       muggle-string: 0.4.1
       path-browserify: 1.0.1
-      picomatch: 4.0.3
+      picomatch: 4.0.4
 
   '@vue/language-core@3.2.6':
     dependencies:
@@ -15366,7 +15371,7 @@ snapshots:
       enhanced-resolve: 5.20.0
       eslint: 9.39.4(jiti@2.6.1)
       eslint-plugin-es-x: 7.8.0(eslint@9.39.4(jiti@2.6.1))
-      get-tsconfig: 4.13.6
+      get-tsconfig: 4.13.7
       globals: 15.15.0
       globrex: 0.1.2
       ignore: 5.3.2
@@ -15911,10 +15916,6 @@ snapshots:
       es-object-atoms: 1.1.1
 
   get-stream@8.0.1: {}
-
-  get-tsconfig@4.13.6:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
 
   get-tsconfig@4.13.7:
     dependencies:
@@ -17875,7 +17876,7 @@ snapshots:
     dependencies:
       citty: 0.2.1
       pathe: 2.0.3
-      tinyexec: 1.0.2
+      tinyexec: 1.0.4
 
   object-assign@4.1.1: {}
 
@@ -19676,7 +19677,7 @@ snapshots:
 
   ts-declaration-location@1.0.7(typescript@5.9.3):
     dependencies:
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       typescript: 5.9.3
 
   ts-interface-checker@0.1.13: {}
@@ -19839,7 +19840,7 @@ snapshots:
       magic-string: 0.30.21
       mlly: 1.8.1
       pathe: 2.0.3
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       pkg-types: 2.3.0
       scule: 1.3.0
       strip-literal: 3.1.0
@@ -19890,13 +19891,13 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.16.0
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
   unplugin@3.0.0:
     dependencies:
       '@jridgewell/remapping': 2.3.5
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
   unrouting@0.1.5:
@@ -20098,7 +20099,7 @@ snapshots:
       chokidar: 4.0.3
       npm-run-path: 6.0.0
       picocolors: 1.1.1
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       tiny-invariant: 1.3.3
       tinyglobby: 0.2.15
       vite: 7.3.1(@types/node@25.5.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.0)(yaml@2.8.3)

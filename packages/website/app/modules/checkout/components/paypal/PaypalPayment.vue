@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { CheckoutPaymentMethods, monthsToPlanDuration, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import AcceptRefundPolicy from '~/modules/checkout/components/common/AcceptRefundPolicy.vue';
@@ -7,7 +8,6 @@ import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryC
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
 import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
-import { PaymentMethods } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useReferralCodeParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
@@ -39,30 +39,35 @@ const {
   switchPlan: checkoutSwitchPlan,
 } = checkout;
 
+const { upgradeSubId } = useSubscriptionIdParam();
+const { referralCode } = useReferralCodeParam();
+const { chronicle } = useSigilEvents();
+
 const {
   paying,
   initializeSdk,
   renderButton,
   updateAmount,
   submitPayment,
-} = usePaypalPaymentFlow();
-
-const { upgradeSubId } = useSubscriptionIdParam();
-const { referralCode } = useReferralCodeParam();
-const { chronicle } = useSigilEvents();
+} = usePaypalPaymentFlow({
+  getTrackingContext: () => ({
+    planId: get(planId),
+    isUpgrade: !!get(upgradeSubId),
+  }),
+});
 
 const processing = computed<boolean>(() => get(paying) || get(checkoutLoading) || get(planSwitchLoading) || get(blocked));
 
 async function initialize(): Promise<boolean> {
   const hasPlans = await ensureInitialized();
   if (!hasPlans) {
-    setError(t('subscription.error.init_error'), t('subscription.error.no_plan_selected'), PaymentMethods.PAYPAL);
+    setError(t('subscription.error.init_error'), t('subscription.error.no_plan_selected'), CheckoutPaymentMethods.PAYPAL);
     return false;
   }
 
   const token = get(braintreeToken);
   if (!token) {
-    setError(t('subscription.error.init_error'), t('subscription.error.payment_init_failed'), PaymentMethods.PAYPAL);
+    setError(t('subscription.error.init_error'), t('subscription.error.payment_init_failed'), CheckoutPaymentMethods.PAYPAL);
     return false;
   }
 
@@ -72,7 +77,7 @@ async function initialize(): Promise<boolean> {
 
   const result = await initializeSdk(token, amount);
   if (!result.success) {
-    setError(t('subscription.error.init_error'), result.error || t('subscription.error.payment_init_failed'), PaymentMethods.PAYPAL);
+    setError(t('subscription.error.init_error'), result.error || t('subscription.error.payment_init_failed'), CheckoutPaymentMethods.PAYPAL);
     return false;
   }
 
@@ -83,7 +88,7 @@ async function initialize(): Promise<boolean> {
         await handleSubmitPayment(nonce);
       },
       onPaymentError: (errorMsg) => {
-        setError(t('subscription.error.payment_failure'), errorMsg, PaymentMethods.PAYPAL);
+        setError(t('subscription.error.payment_failure'), errorMsg, CheckoutPaymentMethods.PAYPAL);
       },
       onPaymentCancel: () => {},
     },
@@ -97,9 +102,17 @@ async function initialize(): Promise<boolean> {
 async function handleSubmitPayment(nonce: string): Promise<void> {
   const plan = get(selectedPlan);
   if (!plan) {
-    setError(t('subscription.error.payment_failure'), 'No plan selected', PaymentMethods.PAYPAL);
+    setError(t('subscription.error.payment_failure'), 'No plan selected', CheckoutPaymentMethods.PAYPAL);
     return;
   }
+
+  chronicle(SigilEvents.PAYMENT_SUBMITTED, {
+    paymentMethod: 'paypal',
+    planId: plan.planId,
+    planDuration: monthsToPlanDuration(plan.durationInMonths),
+    isUpgrade: !!get(upgradeSubId),
+    discountApplied: get(breakdown)?.discount?.isValid === true,
+  });
 
   set(submittingPayment, true);
   try {
@@ -117,14 +130,14 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
         discountType = discountInfo.isReferral ? 'referral' : 'discount';
       }
 
-      chronicle('purchase_success', {
-        payment_method: 'paypal',
-        plan_id: plan.planId,
-        plan_name: plan.name,
-        plan_duration: plan.durationInMonths === 1 ? 'monthly' : 'yearly',
+      chronicle(SigilEvents.PURCHASE_SUCCESS, {
+        paymentMethod: 'paypal',
+        planId: plan.planId,
+        planName: plan.name,
+        planDuration: monthsToPlanDuration(plan.durationInMonths),
         revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
         currency: 'EUR',
-        is_upgrade: !!get(upgradeSubId),
+        isUpgrade: !!get(upgradeSubId),
         discount: discountType,
       });
 
@@ -140,7 +153,7 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
       );
     }
     else {
-      setError(t('subscription.error.payment_failure'), result.error || 'Payment failed', PaymentMethods.PAYPAL);
+      setError(t('subscription.error.payment_failure'), result.error || 'Payment failed', CheckoutPaymentMethods.PAYPAL);
     }
   }
   finally {

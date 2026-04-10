@@ -7,6 +7,18 @@
     <title>Pay with Card - rotki</title>
     <meta name="title" content="Pay with Card - rotki" />
     <meta name="description" content="Complete your rotki premium subscription payment" />
+    <!--
+      Sigil tracker. Static HTML can't import from @rotki/sigil, so the script
+      URL and website id are hardcoded here. The canonical values live in
+      packages/sigil/src/index.ts (SIGIL_SCRIPT_URL, SIGIL_WEBSITE_ID,
+      SIGIL_TRACKED_DOMAIN) — keep these in sync.
+    -->
+    <script
+      defer
+      src="https://sigil.rotki.com/s.js"
+      data-website-id="d49a6a25-cdf7-468e-bfc2-2059867b54e0"
+      data-domains="rotki.com"
+    ></script>
   </head>
   <body>
     <div id="app"></div>

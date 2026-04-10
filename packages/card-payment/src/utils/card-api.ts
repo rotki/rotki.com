@@ -7,8 +7,72 @@ import {
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { type CardType, type CheckoutStep, monthsToPlanDuration, type PaymentFailureKey, PaymentFailures, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
 import { paths } from '@/config/paths';
 import { fetchWithCSRF } from './api';
+
+interface CardSubmittedInput {
+  planId: number;
+  durationInMonths: number;
+  isUpgrade: boolean;
+  cardType: CardType;
+  discountApplied: boolean;
+}
+
+interface CardFailureInput {
+  failure: PaymentFailureKey;
+  errorMessage: string;
+  planId?: number;
+  isUpgrade: boolean;
+  step: CheckoutStep;
+  errorCode?: string;
+  cardType?: CardType;
+  discountApplied?: boolean;
+}
+
+export function trackCardPaymentSubmitted({ planId, durationInMonths, isUpgrade, cardType, discountApplied }: CardSubmittedInput): void {
+  sigilTrack(SigilEvents.PAYMENT_SUBMITTED, toSnakeCaseKeys({
+    paymentMethod: 'card',
+    planId,
+    planDuration: monthsToPlanDuration(durationInMonths),
+    isUpgrade,
+    cardType,
+    discountApplied,
+  }));
+}
+
+/**
+ * Fire-and-forget card payment failure logger.
+ * Posts to the backend for observability and mirrors a coarse category into
+ * Sigil so the funnel shows alongside the rest of the rotki.com site. The
+ * server event name and Sigil reason are both sourced from the shared
+ * `@rotki/sigil` catalog so the two destinations can never drift.
+ */
+export function trackCardPaymentFailure({ failure, errorMessage, planId, isUpgrade, step, errorCode, cardType, discountApplied }: CardFailureInput): void {
+  const entry = PaymentFailures[failure];
+
+  postPaymentLog({
+    paymentMethod: 'card',
+    event: entry.serverEvent,
+    errorMessage,
+    errorCode,
+    planId,
+    step,
+    isUpgrade,
+    cardType,
+    discountApplied,
+  });
+
+  sigilTrack(SigilEvents.PAYMENT_FAILED, toSnakeCaseKeys({
+    paymentMethod: 'card',
+    reason: entry.reason,
+    planId,
+    isUpgrade,
+    step,
+    cardType,
+    discountApplied,
+  }));
+}
 
 function extractErrorMessage(errorText: string): string {
   try {

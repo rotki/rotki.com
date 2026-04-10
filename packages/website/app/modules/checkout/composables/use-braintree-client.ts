@@ -1,7 +1,8 @@
 import type { Client } from 'braintree-web/client';
+import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useLogger } from '~/utils/use-logger';
 
 interface BraintreeClientTokenResponse {
@@ -63,9 +64,9 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
     catch (error: any) {
       logger.error('Failed to initialize Braintree client with token:', error);
       logPaymentEvent({
-        payment_method: PaymentMethods.CARD,
-        event: PaymentEvents.BRAINTREE_INIT_FAILED,
-        error_message: error.message || 'unknown',
+        paymentMethod: CheckoutPaymentMethods.CARD,
+        event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
+        errorMessage: error.message || 'unknown',
         step: CheckoutSteps.INIT,
       });
       set(clientError, error.message || t('subscription.error.init_error'));
@@ -108,9 +109,9 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
     catch (error: any) {
       logger.error('Failed to initialize Braintree client:', error);
       logPaymentEvent({
-        payment_method: PaymentMethods.CARD,
-        event: PaymentEvents.BRAINTREE_INIT_FAILED,
-        error_message: error.message || 'unknown',
+        paymentMethod: CheckoutPaymentMethods.CARD,
+        event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
+        errorMessage: error.message || 'unknown',
         step: CheckoutSteps.INIT,
       });
       set(clientError, error.message || t('subscription.error.init_error'));

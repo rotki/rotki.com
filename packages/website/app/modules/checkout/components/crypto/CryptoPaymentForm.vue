@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { CryptoPayment } from '~/types';
+import { monthsToPlanDuration, SigilEvents } from '@rotki/sigil';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import ChangeCryptoPayment from '~/modules/checkout/components/crypto/ChangeCryptoPayment.vue';
@@ -48,14 +49,14 @@ async function navigateToSuccess(): Promise<void> {
     ? (discountInfo.isReferral ? 'referral' : 'discount')
     : undefined;
 
-  chronicle('purchase_success', {
-    payment_method: 'crypto',
-    plan_id: plan.planId,
-    plan_name: plan.name,
-    plan_duration: plan.durationInMonths === 1 ? 'monthly' : 'yearly',
+  chronicle(SigilEvents.PURCHASE_SUCCESS, {
+    paymentMethod: 'crypto',
+    planId: plan.planId,
+    planName: plan.name,
+    planDuration: monthsToPlanDuration(plan.durationInMonths),
     revenue: breakdown?.finalAmount ? Number.parseFloat(breakdown.finalAmount) : undefined,
     currency: 'EUR',
-    is_upgrade: !!upgradeSubId,
+    isUpgrade: !!upgradeSubId,
     discount: discountType,
   });
 

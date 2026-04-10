@@ -1,3 +1,4 @@
+import { setSigilDebug } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import { useUtmTracking } from '~/composables/chronicling/use-utm-tracking';
 import { useAuthHintCookie } from '~/composables/use-fetch-with-csrf';
@@ -12,6 +13,11 @@ export default defineNuxtPlugin(async () => {
 
   // Capture UTM params on first visit (client-side only)
   if (import.meta.client) {
+    const { sigilDebug } = useRuntimeConfig().public;
+    if (sigilDebug) {
+      setSigilDebug(true);
+    }
+
     const { captureUtmParams } = useUtmTracking();
     captureUtmParams();
   }

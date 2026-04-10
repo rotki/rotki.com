@@ -7,11 +7,12 @@ import {
   ThreeDSecureParamsSchema,
   type ThreeDSecureState,
 } from '@rotki/card-payment-common/schemas/three-d-secure';
+import { CheckoutPaymentMethods, CheckoutSteps, monthsToPlanDuration, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
-import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { PaymentError } from '~/types/codes';
 import { useLogger } from '~/utils/use-logger';
@@ -36,6 +37,7 @@ interface UseThreeDSecureReturn {
 export function useThreeDSecure(): UseThreeDSecureReturn {
   const logger = useLogger('three-d-secure');
   const { logPaymentEvent } = usePaymentLogger();
+  const { chronicle } = useSigilEvents();
 
   const state = ref<ThreeDSecureState>('initializing');
   const error = ref<string>('');
@@ -112,7 +114,14 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       set(error, errorMsg);
       set(state, 'error');
       logger.error(errorMsg, initError);
-      logPaymentEvent({ payment_method: PaymentMethods.CARD, event: PaymentEvents.THREE_DS_VERIFICATION_FAILED, error_message: initError.message || 'unknown', step: CheckoutSteps.INIT });
+      logPaymentEvent({
+        paymentMethod: CheckoutPaymentMethods.CARD,
+        event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
+        errorMessage: initError.message || 'unknown',
+        step: CheckoutSteps.INIT,
+        planId: params.planId,
+        isUpgrade: !!params.upgradeSubId,
+      });
       throw initError;
     }
   }
@@ -152,6 +161,10 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         set(challengeVisible, true);
         set(state, 'challenge-active');
         logger.info('3D Secure challenge active');
+        chronicle(SigilEvents.CARD_3DS_CHALLENGE_SHOWN, {
+          planId: params.planId,
+          isUpgrade: !!params.upgradeSubId,
+        });
       }
       else {
         logger.error('3D Secure iframe container not found');
@@ -197,10 +210,13 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         set(state, 'error');
         logger.error('3D Secure verification failed:', errorMsg);
         logPaymentEvent({
-          payment_method: PaymentMethods.CARD,
-          event: PaymentEvents.THREE_DS_LIABILITY_SHIFT_FAILED,
-          error_message: errorMsg,
+          paymentMethod: CheckoutPaymentMethods.CARD,
+          event: PaymentServerEvents.THREE_DS_LIABILITY_SHIFT_FAILED,
+          errorMessage: errorMsg,
           step: CheckoutSteps.VERIFY,
+          planId: params.planId,
+          isUpgrade: !!params.upgradeSubId,
+          discountApplied: params.discountTrackingInfo !== undefined,
         });
         throw new Error(errorMsg);
       }
@@ -213,10 +229,13 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       set(error, errorMsg);
       logger.error('3D Secure verification error:', verifyError);
       logPaymentEvent({
-        payment_method: PaymentMethods.CARD,
-        event: PaymentEvents.THREE_DS_VERIFICATION_FAILED,
-        error_message: errorMsg,
+        paymentMethod: CheckoutPaymentMethods.CARD,
+        event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
+        errorMessage: errorMsg,
         step: CheckoutSteps.VERIFY,
+        planId: params.planId,
+        isUpgrade: !!params.upgradeSubId,
+        discountApplied: params.discountTrackingInfo !== undefined,
       });
       throw verifyError;
     }
@@ -233,7 +252,6 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     // These composables need to be inside the function since they can only be used at component level
     const paymentApi = usePaymentApi();
     const { requestRefresh } = useAccountRefresh();
-    const { chronicle } = useSigilEvents();
 
     // Initialize Braintree
     await initialize(params);
@@ -268,14 +286,14 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     }
 
     // Track purchase success
-    chronicle('purchase_success', {
-      payment_method: PaymentMethods.CARD,
-      plan_id: params.planId,
-      plan_name: params.planName,
-      plan_duration: params.durationInMonths === 1 ? 'monthly' : 'yearly',
+    chronicle(SigilEvents.PURCHASE_SUCCESS, {
+      paymentMethod: CheckoutPaymentMethods.CARD,
+      planId: params.planId,
+      planName: params.planName,
+      planDuration: monthsToPlanDuration(params.durationInMonths),
       revenue: Number.parseFloat(params.finalAmount),
       currency: 'EUR',
-      is_upgrade: !!params.upgradeSubId,
+      isUpgrade: !!params.upgradeSubId,
       discount: discountType,
     });
 

@@ -29,6 +29,7 @@
     "@pinia/nuxt": "0.11.3",
     "@reown/appkit": "1.8.19",
     "@reown/appkit-adapter-ethers": "1.8.19",
+    "@rotki/sigil": "workspace:*",
     "@vuelidate/core": "2.0.3",
     "@vuelidate/validators": "2.0.4",
     "@vueuse/core": "catalog:",

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import ButtonLink from '~/components/common/ButtonLink.vue';
@@ -83,7 +84,7 @@ const planNotes = computed<string[]>(() => {
 const { chronicle } = useSigilEvents();
 
 onMounted(() => {
-  chronicle('pricing_view', {
+  chronicle(SigilEvents.PRICING_VIEW, {
     period: get(selectedPricingPeriod),
   });
 });

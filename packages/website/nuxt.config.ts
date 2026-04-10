@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
 import rotkiTheme from '@rotki/ui-library/theme';
 
 // Build identifier for unique chunk names per deployment
@@ -98,10 +99,10 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          'src': 'https://sigil.rotki.com/s.js',
+          'src': SIGIL_SCRIPT_URL,
           'defer': true,
-          'data-website-id': 'd49a6a25-cdf7-468e-bfc2-2059867b54e0',
-          'data-domains': 'rotki.com',
+          'data-website-id': SIGIL_WEBSITE_ID,
+          'data-domains': SIGIL_TRACKED_DOMAIN,
         },
       ],
       title: 'rotki.com',
@@ -280,6 +281,7 @@ export default defineNuxtConfig({
       googleClientId: '',
       isDev: process.env.NODE_ENV === 'development',
       loglevel: 3, // Setting info loglevel as the default.
+      sigilDebug: false,
       moneriumAuthBaseUrl: 'https://api.monerium.dev',
       moneriumAuthorizationCodeFlowClientId: '',
       recaptcha: {

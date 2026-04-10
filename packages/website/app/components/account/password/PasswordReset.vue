@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
+import { SigilEvents } from '@rotki/sigil';
 import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 
 const logger = useLogger();
 const { fetchWithCsrf } = useFetchWithCsrf();
+const { chronicle } = useSigilEvents();
 
 function setupTokenValidation() {
   const route = useRoute();
@@ -88,6 +91,7 @@ async function submit() {
         password_confirmation: get(passwordConfirmation),
       },
     });
+    chronicle(SigilEvents.PASSWORD_RESET_COMPLETED, {});
     await navigateTo({
       path: '/password/changed',
     });

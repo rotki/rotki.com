@@ -1,11 +1,12 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
 import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import { type CheckoutPaymentMethod, CheckoutPaymentMethods, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
-import { PaymentEvents, type PaymentMethod, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { logger } from '~/utils/use-logger';
 
 export interface CheckoutError {
@@ -143,6 +144,21 @@ export function useCheckout() {
       },
     });
     await fetchBreakdown();
+
+    if (import.meta.client && code) {
+      const isValid = !!get(validDiscountCode);
+      if (isValid) {
+        chronicle(SigilEvents.DISCOUNT_CODE_APPLIED, {
+          planId: get(planId),
+        });
+      }
+      else {
+        chronicle(SigilEvents.DISCOUNT_CODE_REJECTED, {
+          planId: get(planId),
+          reason: 'invalid',
+        });
+      }
+    }
   }
 
   // ===================
@@ -155,18 +171,14 @@ export function useCheckout() {
     set(loading, value);
   }
 
-  function setError(title: string, message: string, paymentMethod?: PaymentMethod): void {
-    // Track checkout error event
+  function setError(title: string, message: string, paymentMethod?: CheckoutPaymentMethod): void {
     if (import.meta.client) {
-      chronicle('checkout_error', {
-        error_title: title,
-        plan_id: get(planId),
-      });
       logPaymentEvent({
-        payment_method: paymentMethod ?? PaymentMethods.CARD,
-        event: PaymentEvents.CHECKOUT_ERROR,
-        error_message: message,
-        plan_id: get(planId),
+        paymentMethod: paymentMethod ?? CheckoutPaymentMethods.CARD,
+        event: PaymentServerEvents.CHECKOUT_ERROR,
+        errorMessage: message,
+        planId: get(planId),
+        isUpgrade: get(isUpgrade),
       });
     }
 

@@ -9,7 +9,7 @@ import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { paths } from '@/config/paths';
-import { addCard, createCardNonce } from '@/utils/card-api';
+import { addCard, createCardNonce, trackCardPaymentFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
 import DiscountCodeInput from './DiscountCodeInput.vue';
@@ -124,6 +124,13 @@ async function initializeBraintreeClient(): Promise<void> {
   catch (error_: any) {
     set(error, `Failed to initialize payment client: ${error_.message}`);
     console.error(error_);
+    trackCardPaymentFailure({
+      failure: 'BRAINTREE_INIT_FAILED',
+      errorMessage: error_?.message ?? String(error_),
+      planId: selectedPlan.planId,
+      isUpgrade: !!upgradeSubId,
+      step: 'init',
+    });
   }
 }
 
@@ -190,14 +197,25 @@ async function processPayment(): Promise<void> {
   set(isProcessing, true);
   set(error, '');
 
+  const card = get(selectedCard);
+  const cardType = card ? 'saved' as const : 'new' as const;
+  const currentDiscountInfo = get(discountInfo);
+  const discountApplied = currentDiscountInfo?.isValid === true;
+
+  trackCardPaymentSubmitted({
+    planId: selectedPlan.planId,
+    durationInMonths: selectedPlan.durationInMonths,
+    isUpgrade: !!upgradeSubId,
+    cardType,
+    discountApplied,
+  });
+
   const clientToken = planData.braintreeClientToken;
   if (!clientToken) {
     throw new Error('Braintree client token not available');
   }
 
   try {
-    const card = get(selectedCard);
-
     let paymentToken: string;
     let paymentBin: string;
 
@@ -227,7 +245,6 @@ async function processPayment(): Promise<void> {
     });
 
     // Store data for 3D Secure if needed
-    const currentDiscountInfo = get(discountInfo);
     const threeDSecureParams: ThreeDSecureParams = {
       token: clientToken,
       planId: selectedPlan.planId,
@@ -251,6 +268,16 @@ async function processPayment(): Promise<void> {
   catch (error_: any) {
     set(error, error_.message || 'Payment failed. Please try again.');
     set(isProcessing, false);
+    trackCardPaymentFailure({
+      failure: 'CARD_PAYMENT_API_ERROR',
+      errorMessage: error_?.message ?? String(error_),
+      errorCode: error_?.code ? String(error_.code) : undefined,
+      planId: selectedPlan.planId,
+      isUpgrade: !!upgradeSubId,
+      step: 'submit',
+      cardType,
+      discountApplied,
+    });
   }
 }
 

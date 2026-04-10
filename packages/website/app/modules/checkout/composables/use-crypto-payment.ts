@@ -1,12 +1,14 @@
 import type { Signer, TransactionResponse } from 'ethers';
 import type { ComputedRef, DeepReadonly, MaybeRefOrGetter, Ref } from 'vue';
 import type { CryptoPayment } from '~/types';
+import { CheckoutPaymentMethods, CheckoutSteps, classifyCryptoTxError, monthsToPlanDuration, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
-import { CheckoutSteps, PaymentEvents, PaymentMethods, usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
@@ -64,6 +66,7 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('web3-payment');
   const { logPaymentEvent } = usePaymentLogger();
+  const { chronicle } = useSigilEvents();
   const { t } = useI18n({ useScope: 'global' });
   const pendingTx = usePendingTx();
 
@@ -135,6 +138,11 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
 
     logger.info(`transaction is pending: ${tx.hash}`);
 
+    chronicle(SigilEvents.CRYPTO_TX_SUBMITTED, {
+      chainId: payment.chainId,
+      asset: cryptocurrency,
+    });
+
     set(pendingTx, {
       blockExplorerUrl,
       chainId: payment.chainId,
@@ -153,14 +161,27 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
 
     set(processing, true);
 
+    const payment = toValue(data);
+    chronicle(SigilEvents.PAYMENT_SUBMITTED, {
+      paymentMethod: 'crypto',
+      planDuration: monthsToPlanDuration(payment.durationInMonths),
+      isUpgrade,
+    });
+
     try {
       if (!get(connected)) {
         setError(t('subscription.crypto_payment.not_connected'));
+        logPaymentEvent({
+          paymentMethod: CheckoutPaymentMethods.CRYPTO,
+          event: PaymentServerEvents.CRYPTO_WALLET_NOT_CONNECTED,
+          errorMessage: 'wallet not connected',
+          step: CheckoutSteps.INIT,
+          isUpgrade,
+        });
         set(processing, false);
         return;
       }
 
-      const payment = toValue(data);
       assert(payment);
 
       const { chainId, chainName } = payment;
@@ -173,10 +194,11 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
         const msg = t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName });
         setError(msg);
         logPaymentEvent({
-          payment_method: PaymentMethods.CRYPTO,
-          event: PaymentEvents.CRYPTO_WRONG_CHAIN,
-          error_message: msg,
+          paymentMethod: CheckoutPaymentMethods.CRYPTO,
+          event: PaymentServerEvents.CRYPTO_WRONG_CHAIN,
+          errorMessage: msg,
           step: CheckoutSteps.VERIFY,
+          isUpgrade,
         });
         set(processing, false);
         return;
@@ -198,10 +220,11 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
       set(processing, false);
       const errorMsg = 'shortMessage' in error ? error.shortMessage : error.message;
       logPaymentEvent({
-        payment_method: PaymentMethods.CRYPTO,
-        event: PaymentEvents.CRYPTO_TX_FAILED,
-        error_message: errorMsg || 'unknown',
+        paymentMethod: CheckoutPaymentMethods.CRYPTO,
+        event: PaymentServerEvents[classifyCryptoTxError(error)],
+        errorMessage: errorMsg || 'unknown',
         step: CheckoutSteps.SUBMIT,
+        isUpgrade,
       });
 
       if ('shortMessage' in error)

@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { LoginFailedReasons, SigilEvents } from '@rotki/sigil';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useMainStore } from '~/store';
 import { getSafeRedirectUrl } from '~/utils/redirect';
 
@@ -32,6 +34,11 @@ const v$ = useVuelidate(
 
 const { login } = useMainStore();
 const route = useRoute();
+const { chronicle } = useSigilEvents();
+
+onMounted(() => {
+  chronicle(SigilEvents.LOGIN_STARTED, {});
+});
 
 async function performLogin() {
   set(loading, true);
@@ -45,14 +52,17 @@ async function performLogin() {
   set(loading, false);
 
   if (!get(error)) {
+    chronicle(SigilEvents.LOGIN_COMPLETED, {});
     const { redirectUrl } = route.query;
     if (redirectUrl)
       window.location.href = getSafeRedirectUrl(redirectUrl as string);
     else
       await navigateTo('/home/subscription');
   }
-
-  else { set(hadError, true); }
+  else {
+    chronicle(SigilEvents.LOGIN_FAILED, { reason: LoginFailedReasons.INVALID_CREDENTIALS });
+    set(hadError, true);
+  }
 }
 </script>
 

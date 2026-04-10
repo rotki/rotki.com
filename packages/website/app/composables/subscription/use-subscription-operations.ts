@@ -1,7 +1,9 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { CancellationFeedbackPayload } from '~/composables/subscription/use-cancellation-feedback';
+import { SigilEvents } from '@rotki/sigil';
 import { set } from '@vueuse/shared';
 import { SubscriptionAction, type SubscriptionActionType } from '~/components/account/home/subscription-table/types';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useSubscription } from '~/composables/subscription/use-subscription';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
@@ -24,6 +26,7 @@ interface UseSubscriptionOperationsReturn {
 export function useSubscriptionOperations(options?: UseSubscriptionOperationsOptions): UseSubscriptionOperationsReturn {
   const { cancelUserSubscription, resumeUserSubscription, submitCancellationFeedback } = useSubscription();
   const paymentApi = useCryptoPaymentApi();
+  const { chronicle } = useSigilEvents();
 
   const subscriptionOpsStore = useSubscriptionOperationsStore();
   const {
@@ -56,6 +59,11 @@ export function useSubscriptionOperations(options?: UseSubscriptionOperationsOpt
       setStatus(statusMessage);
     });
 
+    chronicle(SigilEvents.SUBSCRIPTION_RESUMED, {
+      planName: subscription.planName,
+      durationInMonths: subscription.durationInMonths,
+    });
+
     if (options?.onActionComplete) {
       await options.onActionComplete();
     }
@@ -77,6 +85,11 @@ export function useSubscriptionOperations(options?: UseSubscriptionOperationsOpt
 
     await cancelUserSubscription(subscription, (statusMessage: string) => {
       setStatus(statusMessage);
+    });
+
+    chronicle(SigilEvents.SUBSCRIPTION_CANCELLED, {
+      planName: subscription.planName,
+      durationInMonths: subscription.durationInMonths,
     });
 
     if (options?.onActionComplete) {

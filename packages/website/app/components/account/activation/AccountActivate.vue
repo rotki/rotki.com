@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ActivationFailedReasons, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import ButtonLink from '~/components/common/ButtonLink.vue';
+import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
@@ -25,6 +27,7 @@ const { account } = storeToRefs(mainStore);
 const { getLastRedirectUrl } = useRedirectUrl();
 const logger = useLogger('account-activation');
 const { fetchWithCsrf } = useFetchWithCsrf();
+const { chronicle } = useSigilEvents();
 
 const lastPaymentLink = computed<string | undefined>(() => {
   const accountVal = get(account);
@@ -45,14 +48,17 @@ async function validateActivationToken(): Promise<void> {
     await fetchWithCsrf(`/webapi/activate/${uid}/${token}/`);
     set(isValid, true);
     set(error, undefined);
+    chronicle(SigilEvents.ACTIVATION_COMPLETED, {});
     logger.debug('Account activation successful');
   }
   catch (activationError: unknown) {
     if (activationError instanceof FetchError && activationError.status === 404) {
       set(error, 'Invalid or expired activation link');
+      chronicle(SigilEvents.ACTIVATION_FAILED, { reason: ActivationFailedReasons.INVALID_TOKEN });
     }
     else {
       set(error, 'Activation failed. Please try again.');
+      chronicle(SigilEvents.ACTIVATION_FAILED, { reason: ActivationFailedReasons.SERVER_ERROR });
       logger.error('Activation error:', activationError);
     }
     set(isValid, false);
