@@ -59,13 +59,12 @@ const currentTierContent = computed<TierContent | undefined>(() => tierContent[s
           v-if="showExampleSponsors"
           class="flex flex-wrap gap-2 mt-2"
         >
-          <NuxtImg
+          <img
             v-for="(imageUrl, index) in currentTierContent.example"
             :key="index"
             :src="imageUrl"
             :alt="`Sponsor example ${index + 1}`"
             class="w-full h-auto rounded-md object-cover"
-            sizes="100vw md:800px"
             loading="lazy"
           />
         </div>
