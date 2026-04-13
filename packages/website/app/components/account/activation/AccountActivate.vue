@@ -132,7 +132,6 @@ onBeforeMount(async () => {
             {{ t('auth.activation.success.continue_payment') }}
           </span>
           <RuiButton
-            :to="lastPaymentLink"
             color="primary"
             class="inline-flex py-0 !px-1 !text-[1em]"
             variant="text"

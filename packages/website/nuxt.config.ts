@@ -315,7 +315,7 @@ export default defineNuxtConfig({
   sitemap: {
     exclude: nonIndexed,
   },
-  ssr: true,
+  ssr: false,
 
   typescript: {
     tsConfig: {
