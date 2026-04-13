@@ -36,7 +36,8 @@ useHead({
 
 const {
   version,
-  linuxUrl,
+  linuxAppImageUrl,
+  linuxDebUrl,
   macOSUrl,
   macOSArmUrl,
   windowsUrl,
@@ -44,7 +45,13 @@ const {
 } = useAppDownload();
 
 const links = computed<DownloadItem[]>(() => [
-  { platform: 'LINUX', image: '/img/linux.svg', url: get(linuxUrl) },
+  { platform: 'LINUX', image: '/img/linux.svg', group: true, items: [{
+    name: 'LINUX AppImage',
+    url: get(linuxAppImageUrl),
+  }, {
+    name: 'LINUX deb',
+    url: get(linuxDebUrl),
+  }] },
   { platform: 'MAC', icon: 'lu-os-apple', group: true, items: [{
     name: 'MAC Apple Silicon',
     url: get(macOSArmUrl),

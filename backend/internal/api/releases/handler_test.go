@@ -28,7 +28,10 @@ func TestIsDownloadableApp(t *testing.T) {
 		{"rotki-darwin_electron-1.35.1-x64.dmg", true},
 		{"rotki-1.35.1.tar.gz", false},
 		{"checksums.txt", false},
-		{"rotki-linux-1.35.1.deb", false},
+		{"rotki-linux_amd64-1.35.1.deb", true},
+		{"rotki-linux-1.35.1.deb", true},
+		{"rotki-linux_amd64-1.35.1.deb.sha512", false},
+		{"random-app.deb", false},
 		{"random-app.exe", false},
 		{"rotki-darwin_electron-1.35.1.dmg", false}, // no arm64/x64
 	}
@@ -50,6 +53,7 @@ func TestMinimizePayload(t *testing.T) {
 			{Name: "checksums.txt", BrowserDownloadURL: "https://example.com/checksums.txt"},
 			{Name: "rotki-linux_electron-1.35.1.AppImage", BrowserDownloadURL: "https://example.com/linux.AppImage"},
 			{Name: "rotki-darwin_electron-1.35.1-arm64.dmg", BrowserDownloadURL: "https://example.com/mac-arm.dmg"},
+			{Name: "rotki-linux_amd64-1.35.1.deb", BrowserDownloadURL: "https://example.com/linux.deb"},
 		},
 	}
 
@@ -58,8 +62,8 @@ func TestMinimizePayload(t *testing.T) {
 	if result.TagName != "v1.35.1" {
 		t.Errorf("expected tag v1.35.1, got %s", result.TagName)
 	}
-	if len(result.Assets) != 3 {
-		t.Fatalf("expected 3 assets, got %d", len(result.Assets))
+	if len(result.Assets) != 4 {
+		t.Fatalf("expected 4 assets, got %d", len(result.Assets))
 	}
 	// checksums.txt should be filtered out
 	for _, a := range result.Assets {

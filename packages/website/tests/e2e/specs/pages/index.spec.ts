@@ -6,6 +6,7 @@ const mockRelease = {
     { name: 'rotki-darwin_arm64-v1.41.1.dmg', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_arm64-v1.41.1.dmg' },
     { name: 'rotki-darwin_x64-v1.41.1.dmg', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-darwin_x64-v1.41.1.dmg' },
     { name: 'rotki-linux_x86_64-v1.41.1.AppImage', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage' },
+    { name: 'rotki-linux_amd64-v1.41.1.deb', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_amd64-v1.41.1.deb' },
     { name: 'rotki-win32_x64-v1.41.1.exe', browser_download_url: 'https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-win32_x64-v1.41.1.exe' },
   ],
 };
@@ -147,12 +148,17 @@ test.describe('download page', () => {
       waitUntil: 'networkidle',
     });
 
-    const linuxButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX' });
-    await expect(linuxButton).toBeVisible();
+    const linuxAppImageButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX AppImage' });
+    const linuxDebButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX deb' });
+    await expect(linuxAppImageButton).toBeVisible();
+    await expect(linuxDebButton).toBeVisible();
 
-    // Verify href value
-    const linuxHref = await linuxButton.locator('..').getAttribute('href');
-    expect(linuxHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage');
+    // Verify href values
+    const appImageHref = await linuxAppImageButton.locator('..').getAttribute('href');
+    expect(appImageHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_x86_64-v1.41.1.AppImage');
+
+    const debHref = await linuxDebButton.locator('..').getAttribute('href');
+    expect(debHref).toBe('https://github.com/rotki/rotki/releases/download/v1.41.1/rotki-linux_amd64-v1.41.1.deb');
 
     await context.close();
   });
@@ -196,7 +202,7 @@ test.describe('download page', () => {
     await expect(windowsLink).toBeVisible();
     await expect(page.locator('p').filter({ hasText: 'Latest Release: v' }).first()).toBeVisible();
 
-    // Linux download button
+    // Linux download button (opens menu)
     const linuxButton = linuxLink
       .locator('..')
       .locator('..')
@@ -204,11 +210,24 @@ test.describe('download page', () => {
       .filter({ hasText: 'Download' });
 
     await expect(linuxButton).toBeVisible();
-    await expect(linuxButton).toBeEnabled();
+    await linuxButton.click();
 
-    const linuxHref = await linuxButton.locator('..').getAttribute('href');
-    expect(linuxHref).toContain('rotki-linux');
-    expect(linuxHref).toContain('.AppImage');
+    const linuxMenu = page.locator('[role=menu-content]');
+    await expect(linuxMenu).toBeVisible();
+
+    const linuxAppImageLink = page.getByRole('link', { name: 'LINUX AppImage' });
+    const linuxDebLink = page.getByRole('link', { name: 'LINUX deb' });
+
+    const appImageHref = await linuxAppImageLink.getAttribute('href');
+    expect(appImageHref).toContain('rotki-linux');
+    expect(appImageHref).toContain('.AppImage');
+
+    const debHref = await linuxDebLink.getAttribute('href');
+    expect(debHref).toContain('rotki-linux');
+    expect(debHref).toContain('.deb');
+
+    // Close the menu before proceeding
+    await page.keyboard.press('Escape');
 
     // Windows download button
     const windowsButton = windowsLink

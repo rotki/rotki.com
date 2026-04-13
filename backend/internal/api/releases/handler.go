@@ -281,9 +281,10 @@ func (h *Handler) tryStaleOrRetry(ctx context.Context) *Release {
 // isDownloadableApp checks if an asset is a downloadable app.
 func isDownloadableApp(name string) bool {
 	isWindows := strings.HasSuffix(name, ".exe") && strings.HasPrefix(name, "rotki-win32")
-	isLinux := strings.HasSuffix(name, ".AppImage")
+	isLinuxAppImage := strings.HasSuffix(name, ".AppImage")
+	isLinuxDeb := strings.HasSuffix(name, ".deb") && strings.HasPrefix(name, "rotki-linux")
 	isMacOS := strings.HasSuffix(name, ".dmg") && (strings.Contains(name, "arm64") || strings.Contains(name, "x64"))
-	return isWindows || isLinux || isMacOS
+	return isWindows || isLinuxAppImage || isLinuxDeb || isMacOS
 }
 
 // minimizePayload extracts only needed fields and filters to downloadable assets.
