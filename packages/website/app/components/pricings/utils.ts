@@ -6,6 +6,10 @@ export function isMostPopularPlan(plan: MappedPlan): boolean {
   return plan.isMostPopular;
 }
 
+export function isEntryTierPlan(plan: MappedPlan): boolean {
+  return plan.isEntryTier;
+}
+
 export function isFreePlan(plan: PlanBase): boolean {
   return plan.type === 'free';
 }

@@ -6,15 +6,15 @@ import { parseTiersInfo, resolveFeatureValue } from '~/composables/use-pricing-c
 const CUSTOM_LABELS = { support: 'Bespoke support', negotiable: 'Negotiable' };
 
 function freePlan(): PlanBase {
-  return { name: 'starter', displayedName: 'Starter', mainPriceDisplay: 'Free', type: 'free', hidden: false, isMostPopular: false };
+  return { name: 'starter', displayedName: 'Starter', mainPriceDisplay: 'Free', type: 'free', hidden: false, isMostPopular: false, isEntryTier: false };
 }
 
 function customPlan(): PlanBase {
-  return { name: 'custom', displayedName: 'Custom', mainPriceDisplay: 'Contact us', type: 'custom', hidden: false, isMostPopular: false };
+  return { name: 'custom', displayedName: 'Custom', mainPriceDisplay: 'Contact us', type: 'custom', hidden: false, isMostPopular: false, isEntryTier: false };
 }
 
 function regularPlan(name = 'pro'): PlanBase {
-  return { name, displayedName: 'Pro', mainPriceDisplay: '10€', type: 'regular', hidden: false, isMostPopular: false };
+  return { name, displayedName: 'Pro', mainPriceDisplay: '10€', type: 'regular', hidden: false, isMostPopular: false, isEntryTier: false };
 }
 
 describe('parseTiersInfo', () => {

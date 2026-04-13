@@ -13,6 +13,7 @@ export interface MappedPlan {
   mainPriceDisplay: string;
   type: PlanType;
   isMostPopular: boolean;
+  isEntryTier: boolean;
   hidden: boolean;
   loading?: boolean;
   secondaryPriceDisplay?: string;
