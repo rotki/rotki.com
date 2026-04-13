@@ -4,7 +4,7 @@ import type { MappedPlan } from '~/components/pricings/type';
 import type { PricingPeriod } from '~/types/tiers';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
+import { isCustomPlan, isEntryTierPlan, isFreePlan } from '~/components/pricings/utils';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { buildQueryParams } from '~/utils/query';
 import { toTitleCase } from '~/utils/text';
@@ -68,7 +68,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
   <ButtonLink
     v-else
     class="w-full py-2 xl:text-[1rem]"
-    variant="default"
+    :variant="isEntryTierPlan(plan) ? 'outlined' : 'default'"
     color="primary"
     :to="checkoutLink"
   >

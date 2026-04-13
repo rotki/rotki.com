@@ -103,6 +103,7 @@ function createPlaceholderPlans(): MappedPlan[] {
       mainPriceDisplay: '',
       type: 'free',
       isMostPopular: false,
+      isEntryTier: false,
       hidden: false,
       loading: true,
       features: [...emptyFeatures],
@@ -113,6 +114,7 @@ function createPlaceholderPlans(): MappedPlan[] {
       mainPriceDisplay: '',
       type: 'regular',
       isMostPopular: false,
+      isEntryTier: false,
       hidden: false,
       loading: true,
       features: [...emptyFeatures],
@@ -123,6 +125,7 @@ function createPlaceholderPlans(): MappedPlan[] {
       mainPriceDisplay: '',
       type: 'regular',
       isMostPopular: true,
+      isEntryTier: false,
       hidden: false,
       loading: true,
       features: [...emptyFeatures],
@@ -133,6 +136,7 @@ function createPlaceholderPlans(): MappedPlan[] {
       mainPriceDisplay: '',
       type: 'custom',
       isMostPopular: false,
+      isEntryTier: false,
       hidden: false,
       loading: true,
       features: [...emptyFeatures],
@@ -168,6 +172,9 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
   const regularPlans = computed<PlanBase[]>(() => {
     const yearly = get(isYearly);
     const plans: PlanBase[] = [];
+    let minPrice = Number.POSITIVE_INFINITY;
+    let minPriceIndex = -1;
+
     for (const availablePlan of toValue(options.availablePlans)) {
       const targetPlan = yearly ? availablePlan.yearlyPlan : availablePlan.monthlyPlan;
       if (!targetPlan) {
@@ -176,6 +183,11 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
 
       const price = Number.parseFloat(targetPlan.price);
       const formattedPrice = formatCurrency(price);
+
+      if (price < minPrice && !availablePlan.isCustom) {
+        minPrice = price;
+        minPriceIndex = plans.length;
+      }
 
       plans.push({
         id: targetPlan.planId,
@@ -188,7 +200,14 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
         type: 'regular',
         hidden: availablePlan.isCustom || false,
         isMostPopular: availablePlan.isMostPopular || false,
+        isEntryTier: false,
       });
+    }
+
+    // Mark the cheapest non-custom plan as entry tier
+    const entryPlan = minPriceIndex >= 0 && plans.length > 1 ? plans[minPriceIndex] : undefined;
+    if (entryPlan) {
+      entryPlan.isEntryTier = true;
     }
 
     return plans;
@@ -217,6 +236,7 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
         type: 'free',
         hidden: false,
         isMostPopular: false,
+        isEntryTier: false,
       },
       ...get(regularPlans).filter(x => !x.hidden),
       {
@@ -226,6 +246,7 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
         type: 'custom',
         hidden: false,
         isMostPopular: false,
+        isEntryTier: false,
       },
     ];
 
