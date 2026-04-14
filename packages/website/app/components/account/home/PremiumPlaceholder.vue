@@ -9,11 +9,34 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { tiersInformation, pending: isLoading } = usePremiumTiersInfo();
 
-const basicTier = computed<PremiumTierInfo | undefined>(() => get(tiersInformation)[0]);
+function findEntryTierName(tiers: PremiumTierInfo[]): string | undefined {
+  let minPrice = Number.POSITIVE_INFINITY;
+  let entryName: string | undefined;
 
-const monthlyPrice = computed<string | undefined>(() => get(basicTier)?.monthlyPlan?.price);
+  for (const tier of tiers) {
+    const price = Number.parseFloat(tier.monthlyPlan?.price ?? '0');
+    if (price > 0 && price < minPrice) {
+      minPrice = price;
+      entryName = tier.name;
+    }
+  }
 
-const features = computed<PremiumTierInfoDescription[]>(() => get(basicTier)?.description.slice(0, 4) || []);
+  return entryName;
+}
+
+const suggestedTier = computed<PremiumTierInfo | undefined>(() => {
+  const tiers = get(tiersInformation);
+  if (tiers.length <= 1) {
+    return tiers[0];
+  }
+
+  const entryName = findEntryTierName(tiers);
+  return tiers.find(tier => tier.name !== entryName) ?? tiers[0];
+});
+
+const monthlyPrice = computed<string | undefined>(() => get(suggestedTier)?.monthlyPlan?.price);
+
+const features = computed<PremiumTierInfoDescription[]>(() => get(suggestedTier)?.description.slice(0, 4) || []);
 
 const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate();
 </script>
