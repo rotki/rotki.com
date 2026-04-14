@@ -101,10 +101,26 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
                 size="16"
                 class="text-rui-success mt-0.5 shrink-0"
               />
-              <div class="flex items-baseline gap-1.5">
-                <span>{{ feature.label }}:</span>
-                <span class="font-medium">{{ feature.value }}</span>
-              </div>
+              <span>{{ feature.label }}{{ typeof feature.value !== 'boolean' ? ':' : '' }}</span>
+              <RuiIcon
+                v-if="typeof feature.value === 'boolean' && feature.value"
+                name="lu-circle-check"
+                size="16"
+                color="success"
+                class="shrink-0"
+              />
+              <RuiIcon
+                v-else-if="typeof feature.value === 'boolean' && !feature.value"
+                name="lu-minus"
+                size="16"
+                class="text-rui-text-disabled shrink-0"
+              />
+              <span
+                v-else
+                class="font-medium"
+              >
+                {{ feature.value }}
+              </span>
             </div>
           </div>
           <template #fallback>
