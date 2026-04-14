@@ -12,6 +12,7 @@
     "api_keys": {
       "api_key": "API Key",
       "api_secret": "API Secret",
+      "docs_hint": "Learn how to use your API credentials in the rotki app",
       "not_generated": "You haven't generated an API key",
       "title": "API Credentials"
     },

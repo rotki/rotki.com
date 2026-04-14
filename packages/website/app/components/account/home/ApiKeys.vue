@@ -14,8 +14,24 @@ const { t } = useI18n({ useScope: 'global' });
 <template>
   <div>
     <div class="mb-6 flex justify-between items-center">
-      <div class="text-h6">
+      <div class="text-h6 flex items-center gap-2">
         {{ t('account.api_keys.title') }}
+        <RuiTooltip :open-delay="200">
+          <template #activator>
+            <a
+              href="https://docs.rotki.com/premium/api-keys.html#using-api-credentials-in-the-app"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-rui-text-secondary hover:text-rui-primary"
+            >
+              <RuiIcon
+                name="lu-info"
+                size="18"
+              />
+            </a>
+          </template>
+          {{ t('account.api_keys.docs_hint') }}
+        </RuiTooltip>
       </div>
       <div>
         <RuiButton
