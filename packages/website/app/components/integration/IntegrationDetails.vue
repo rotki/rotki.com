@@ -135,12 +135,12 @@ const { isMdAndUp } = useBreakpoint();
             class="flex flex-col gap-10"
           >
             <div class="flex flex-col gap-4">
-              <div class="text-h4">
+              <h2 class="text-h4">
                 {{ datum.title }}
-              </div>
-              <div class="text-rui-text-secondary text-body-1">
+              </h2>
+              <p class="text-rui-text-secondary text-body-1">
                 {{ datum.description }}
-              </div>
+              </p>
             </div>
             <ReuseNotFound
               v-if="datum.data.length === 0"
@@ -156,26 +156,25 @@ const { isMdAndUp } = useBreakpoint();
               leave-to-class="opacity-0"
               class="flex flex-wrap gap-4"
             >
-              <template
+              <div
                 v-for="item in datum.data"
                 :key="item.label"
+                class="flex flex-col items-center gap-1.5 w-[4.5rem]"
               >
-                <RuiTooltip :open-delay="200">
-                  <template #activator>
-                    <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
-                      <img
-                        class="w-full h-full object-contain"
-                        :src="item.image"
-                        :alt="item.label"
-                        width="36"
-                        height="36"
-                        loading="lazy"
-                      />
-                    </div>
-                  </template>
+                <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
+                  <img
+                    class="w-full h-full object-contain"
+                    :src="item.image"
+                    :alt="item.label"
+                    width="36"
+                    height="36"
+                    loading="lazy"
+                  />
+                </div>
+                <span class="text-xs text-rui-text-secondary text-center leading-tight line-clamp-2">
                   {{ item.label }}
-                </RuiTooltip>
-              </template>
+                </span>
+              </div>
             </TransitionGroup>
           </div>
         </template>

@@ -689,18 +689,18 @@
   },
   "integration": {
     "blockchains": {
-      "description": "Connect your blockchain addresses.",
+      "description": "Add your blockchain addresses to track balances, view transaction history, monitor staking rewards, and generate PnL reports. All data stays on your machine, your privacy is always protected.",
       "title": "Blockchains"
     },
     "description": "We support different blockchains, exchanges, and protocols to help you track, account for, and analyze your finances while protecting your privacy.",
     "exchanges": {
-      "description": "Connect to a big number of centralized exchanges.",
+      "description": "Connect to centralized exchanges via API keys to automatically import your balances, trades, deposits, and withdrawals. All data is processed locally, your API keys never leave your machine.",
       "title": "Exchanges"
     },
     "header": "Integrations",
     "no_data_found": "No data found with keyword \"{keyword}\"",
     "protocols": {
-      "description": "More than {number}+ DeFi protocols are supported.",
+      "description": "More than {number}+ DeFi protocols are automatically detected and decoded. Track your liquidity positions, lending, borrowing, staking, and other on-chain activities with full profit/loss accounting.",
       "title": "Protocols"
     },
     "search": "Search",
