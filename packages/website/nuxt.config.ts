@@ -156,7 +156,6 @@ export default defineNuxtConfig({
     ['@pinia/nuxt', { disableVuex: true }],
     '@nuxt/test-utils/module',
     './modules/ui-library/module.ts',
-    '@nuxt/image',
   ],
 
   vite: {

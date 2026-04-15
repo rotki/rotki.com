@@ -55,7 +55,7 @@ function handleImageChange(event: Event): void {
       v-else
       class="relative flex items-start"
     >
-      <!-- Plain <img> instead of <NuxtImg> because the src can be a data URL from FileReader, which NuxtImg's image provider cannot process -->
+      <!-- Plain <img> instead of <img> because the src can be a data URL from FileReader, which NuxtImg's image provider cannot process -->
       <img
         :src="imagePreview"
         alt="Profile preview"

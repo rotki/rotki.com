@@ -30,11 +30,10 @@ definePageMeta({
         </div>
       </div>
       <div class="flex justify-center lg:justify-end">
-        <NuxtImg
+        <img
           class="max-w-[384px] overflow-hidden h-full object-contain"
           :alt="t('home.exchanges.title')"
           src="/img/exchanges.png"
-          format="webp"
           loading="lazy"
           width="384"
           height="207"

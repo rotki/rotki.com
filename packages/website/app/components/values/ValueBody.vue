@@ -6,10 +6,9 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div class="flex flex-col items-center justify-center">
-    <NuxtImg
+    <img
       src="/img/scenery.webp"
       alt="Rotki values"
-      format="webp"
       loading="lazy"
       width="1500"
       height="500"

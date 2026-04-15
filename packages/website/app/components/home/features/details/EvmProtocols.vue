@@ -108,7 +108,7 @@ const features = [
           <div
             class="w-full h-full bg-white rounded-lg p-1 min-[400px]:p-2 flex items-center justify-center border border-rui-grey-300 aspect-square"
           >
-            <NuxtImg
+            <img
               :src="item.image"
               :alt="item.label"
               width="48"

@@ -197,11 +197,10 @@ function onDownloadClick(platform: string): void {
               loading="lazy"
             />
             <div class="flex flex-col items-center justify-between relative w-[12rem] max-w-full mx-auto">
-              <NuxtImg
+              <img
                 v-if="sponsor.gold"
                 src="/img/ribbon.png"
                 alt="Gold sponsor ribbon"
-                format="webp"
                 width="192"
                 height="42"
                 fit="cover"

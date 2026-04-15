@@ -32,13 +32,12 @@ const features = [
         ]"
       >
         <div class="flex-1 flex justify-center">
-          <NuxtImg
+          <img
             class="h-full w-full md:w-auto"
             :src="feature.img"
             :alt="feature.title"
             :width="feature.width"
             :height="feature.height"
-            format="webp"
             loading="lazy"
           />
         </div>

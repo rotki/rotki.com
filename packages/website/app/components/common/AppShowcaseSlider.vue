@@ -46,7 +46,10 @@ function scanImages(): void {
     '~~/public/img/screenshots/*.(png|jpe?g|webp)',
   );
   const assetPaths = Object.keys(assetContext);
-  set(images, assetPaths.map(src => ({ src, alt: getAltText(src) })));
+  set(images, assetPaths.map((src) => {
+    const publicSrc = src.replace(/.*\/public\//, '/');
+    return { src: publicSrc, alt: getAltText(src) };
+  }));
 }
 
 function onSwiperUpdate(s: Swiper): void {
@@ -90,15 +93,13 @@ scanImages();
         :key="i"
         class="relative pt-[56.2%] bg-rui-grey-100"
       >
-        <NuxtImg
+        <img
           :src="image.src"
           :alt="image.alt"
-          format="webp"
           width="1440"
           height="810"
           :loading="getLoadingStrategy(i)"
           :fetchpriority="getFetchPriority(i)"
-          sizes="sm:100vw md:80vw lg:900px"
           class="w-full absolute h-full top-0 left-0"
         />
       </SwiperSlide>

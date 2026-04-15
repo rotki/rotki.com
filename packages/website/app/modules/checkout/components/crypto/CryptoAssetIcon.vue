@@ -16,7 +16,7 @@ const error = ref<boolean>(false);
     >
       {{ name[0] }}
     </div>
-    <NuxtImg
+    <img
       v-if="iconUrl"
       class="w-full h-full"
       :class="{ hidden: pending || error }"

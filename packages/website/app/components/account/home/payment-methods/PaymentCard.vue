@@ -49,7 +49,7 @@ const { t } = useI18n();
 
         <!-- Card Image -->
         <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center">
-          <NuxtImg
+          <img
             :src="card.imageUrl"
             :alt="t('common.card')"
             class="w-full h-full object-contain object-center"

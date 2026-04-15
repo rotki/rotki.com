@@ -44,10 +44,9 @@ const values: { icon: RuiIcons; label: string }[] = [
         <div
           class="shrink-0 w-[240px] h-[240px] md:w-[360px] md:h-[360px] lg:w-[400px] lg:h-[400px]"
         >
-          <NuxtImg
+          <img
             src="/img/rotki-values.webp"
             alt="Rotki values"
-            format="webp"
             loading="lazy"
             width="400"
             height="400"

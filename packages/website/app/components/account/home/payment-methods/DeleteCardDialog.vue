@@ -65,7 +65,7 @@ function handleCancel(): void {
         class="mt-4 p-3 bg-rui-grey-50 rounded-md flex items-center gap-3"
       >
         <div class="rounded bg-white h-8 w-12 flex items-center justify-center">
-          <NuxtImg
+          <img
             :src="card.imageUrl"
             :alt="t('common.card')"
             class="w-full h-full object-contain object-center"

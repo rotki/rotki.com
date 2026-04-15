@@ -49,7 +49,6 @@
     "@nuxt/content": "3.12.0",
     "@nuxt/devtools": "3.2.4",
     "@nuxt/fonts": "^0.14.0",
-    "@nuxt/image": "2.0.0",
     "@nuxt/test-utils": "4.0.0",
     "@nuxtjs/i18n": "10.2.4",
     "@nuxtjs/sitemap": "7.6.0",

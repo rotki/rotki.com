@@ -36,12 +36,11 @@ const data = [
           :key="item.title"
           class="flex flex-col gap-8"
         >
-          <NuxtImg
+          <img
             :src="item.img"
             :alt="item.title"
             :width="item.width"
             :height="item.height"
-            format="webp"
             loading="lazy"
             class="rounded-xl w-full border border-rui-grey-400"
           />

@@ -76,7 +76,7 @@ watch(() => ensName, () => {
     />
 
     <!-- Fallback to blockie -->
-    <NuxtImg
+    <img
       v-else-if="blockieUrl"
       :src="blockieUrl"
       :alt="`Blockie for ${address}`"

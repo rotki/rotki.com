@@ -31,7 +31,7 @@ const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integ
             class="flex items-center gap-3 text-subtitle-1 font-bold"
           >
             <div class="w-8 h-8 rounded-full overflow-hidden">
-              <NuxtImg
+              <img
                 :src="item.image"
                 :alt="item.label"
                 width="32"
@@ -47,11 +47,10 @@ const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integ
     </div>
 
     <div class="flex-1">
-      <NuxtImg
+      <img
         class="overflow-hidden"
         :alt="t('home.exchanges.title')"
         src="/img/exchanges.png"
-        format="webp"
         loading="lazy"
         width="795"
         height="428"

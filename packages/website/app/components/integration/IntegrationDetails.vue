@@ -163,7 +163,7 @@ const { isMdAndUp } = useBreakpoint();
                 <RuiTooltip :open-delay="200">
                   <template #activator>
                     <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
-                      <NuxtImg
+                      <img
                         class="w-full h-full object-contain"
                         :src="item.image"
                         :alt="item.label"

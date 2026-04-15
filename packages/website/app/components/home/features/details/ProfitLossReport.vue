@@ -5,11 +5,10 @@ const { t } = useI18n({ useScope: 'global' });
 <template>
   <div class="flex flex-col sm:flex-row items-center gap-10 md:gap-20">
     <div class="sm:w-2/5">
-      <NuxtImg
+      <img
         class="rounded-xl overflow-hidden"
         :alt="t('home.profit_loss_report.title')"
         src="/img/profit_loss_report.webp"
-        format="webp"
         loading="lazy"
         width="654"
         height="523"

@@ -31,23 +31,21 @@ defineProps<TestimonialProps>();
           :href="url"
           target="_blank"
         >
-          <NuxtImg
+          <img
             :src="avatar"
             :alt="username"
             width="32"
             height="32"
-            format="webp"
             loading="lazy"
             class="object-cover"
           />
         </a>
-        <NuxtImg
+        <img
           v-else
           :src="avatar"
           :alt="username"
           width="32"
           height="32"
-          format="webp"
           loading="lazy"
           class="object-cover"
         />
