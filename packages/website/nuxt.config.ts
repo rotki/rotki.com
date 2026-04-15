@@ -156,6 +156,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
     '@nuxt/test-utils/module',
+    './modules/integration-images/module.ts',
     './modules/ui-library/module.ts',
   ],
 
