@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/wholesomecrypto.jpg"
 username: "@wholesomecrypto"
 url: "https://twitter.com/wholesomecrypto/status/1636647449744883712"
+order: 3
 visible: true
 ---
 

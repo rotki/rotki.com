@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/stoicaxyz.jpg"
 username: "@stoicaxyz"
 url: "https://x.com/stoicaxyz/status/1904271552692244506"
+order: 11
 visible: true
 ---
 

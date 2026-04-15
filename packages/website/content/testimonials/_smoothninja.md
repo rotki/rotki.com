@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/_smoothninja.jpg"
 username: "@_smoothninja"
 url: "https://twitter.com/_smoothninja/status/1734592335202189514"
+order: 0
 visible: true
 ---
 

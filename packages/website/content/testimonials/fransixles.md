@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/fransixles.jpg"
 username: "@fransixles"
 url: "https://twitter.com/fransixles/status/1364993955151171586"
+order: 6
 visible: true
 ---
 

@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/nonsens3.jpg"
 username: "@nonsens3"
 url: "https://twitter.com/nonsens3/status/1731803551251247483"
+order: 1
 visible: true
 ---
 

@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/_DanielSinclair.webp"
 username: "@_DanielSinclair"
 url: "https://x.com/_DanielSinclair/status/2044099437371207789"
+order: 13
 visible: true
 ---
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TestimonialCarousel from '~/components/home/testimonials/TestimonialCarousel.vue';
 
-const { data: testimonials } = await useAsyncData('testimonials', () => queryCollection('testimonials').all(), { dedupe: 'defer' });
+const { data: testimonials } = await useAsyncData('testimonials', () => queryCollection('testimonials').order('order', 'DESC').all(), { dedupe: 'defer' });
 
 const { t } = useI18n({ useScope: 'global' });
 </script>

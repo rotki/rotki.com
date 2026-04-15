@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/richatlarge.jpg"
 username: "@richatlarge"
 url: "https://twitter.com/richatlarge/status/1362104819595415554"
+order: 2
 visible: true
 ---
 

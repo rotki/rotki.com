@@ -24,6 +24,7 @@ const jobSchema = z.object({
 
 const testimonialSchema = z.object({
   avatar: z.string().optional(),
+  order: z.number(),
   url: z.string().optional(),
   username: z.string(),
   visible: z.boolean(),

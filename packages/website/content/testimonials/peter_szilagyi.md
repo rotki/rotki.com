@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/peter_szilagyi.jpeg"
 username: "@peter_szilagyi"
 url: "https://twitter.com/peter_szilagyi/status/1549797521899282432"
+order: 9
 visible: true
 ---
 

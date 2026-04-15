@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/pray_eth.jpg"
 username: "@pray_eth"
 url: "https://x.com/pray_eth/status/1904179117341233580"
+order: 12
 visible: true
 ---
 

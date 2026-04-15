@@ -2,6 +2,7 @@
 avatar: "/img/testimonials/lex_node.jpg"
 username: "@lex_node"
 url: "https://twitter.com/lex_node/status/1344658596408283141"
+order: 8
 visible: true
 ---
 
