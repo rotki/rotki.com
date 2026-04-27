@@ -36,7 +36,7 @@ catalog:
   '@vueuse/shared': 14.2.1
   autoprefixer: 10.4.27
   braintree-web: 3.138.0
-  postcss: 8.5.8
+  postcss: 8.5.10
   tailwindcss: 3.4.19
   typescript: 5.9.3
   vite: 7.3.1
@@ -44,3 +44,6 @@ catalog:
   vue: 3.5.31
   vue-tsc: 3.2.6
   zod: 3.25.76
+minimumReleaseAgeExclude:
+  # Renovate security update: postcss@8.5.10
+  - postcss@8.5.10
