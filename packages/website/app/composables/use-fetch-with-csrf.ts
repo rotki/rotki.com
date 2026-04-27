@@ -150,6 +150,10 @@ export const useFetchWithCsrf = createSharedComposable(() => {
     },
     retry: FETCH_CONFIG.RETRIES,
     retryDelay: FETCH_CONFIG.RETRY_DELAY_MS,
+    // ofetch's default retryStatusCodes includes 429, but retrying a rate-limited
+    // request just burns the user's budget and (because Django rotates the CSRF
+    // cookie between requests) often comes back as a confusing 403 HTML page.
+    retryStatusCodes: [408, 409, 425, 500, 502, 503, 504],
     timeout: FETCH_CONFIG.TIMEOUT_MS,
   });
 

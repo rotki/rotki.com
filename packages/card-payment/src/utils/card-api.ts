@@ -93,7 +93,8 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${extractErrorMessage(errorText)}`);
+      const message = extractErrorMessage(errorText);
+      throw new Error(response.status === 429 ? message : `HTTP ${response.status}: ${message}`);
     }
 
     const data = await response.json();

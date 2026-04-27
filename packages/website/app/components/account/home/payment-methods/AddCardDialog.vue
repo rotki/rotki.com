@@ -54,11 +54,11 @@ async function handleAddCard() {
     // Reset form state
     set(error, undefined);
   }
-  catch (error: any) {
-    logger.error('Failed to add card:', error);
+  catch (caughtError: any) {
+    logger.error('Failed to add card:', caughtError);
     set(error, {
       title: t('common.error'),
-      message: error.message || t('common.error_occurred'),
+      message: caughtError.message || t('common.error_occurred'),
     });
   }
   finally {
@@ -114,7 +114,7 @@ onUnmounted(async () => {
         type="error"
         class="mb-4"
         :title="error.title"
-        :text="error.message"
+        :description="error.message"
         closeable
         @close="error = undefined"
       />
