@@ -1,6 +1,6 @@
 {
   "name": "@rotki/sigil",
-  "version": "2026.4.4",
+  "version": "2026.4.5",
   "description": "Shared analytics catalog and helpers for rotki.com Umami (Sigil) tracking",
   "type": "module",
   "files": [
