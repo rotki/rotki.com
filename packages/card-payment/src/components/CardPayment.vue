@@ -28,7 +28,6 @@ interface VatBreakdown {
   fullAmount: string;
 }
 
-const error = defineModel<string>('error', { required: true });
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
 
 const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country } = defineProps<{
@@ -44,7 +43,16 @@ const emit = defineEmits<{
   'go-back': [];
   'payment-success': [];
   'refresh-card': [];
+  // Fatal errors that make the whole payment view unusable (e.g. Braintree client
+  // failed to initialize). The parent should show a full-screen ErrorState. Per-
+  // transaction errors (card decline, payment failure) stay inline.
+  'fatal-error': [message: string];
 }>();
+
+// Per-transaction error (card decline, tokenization failure, payment failure). Kept
+// local so a recoverable problem doesn't escalate to App.vue's full-screen ErrorState,
+// which is reserved for genuinely fatal init failures (e.g. plan/Braintree client load).
+const transactionError = ref<string>();
 
 const client = shallowRef<Client>();
 const isProcessing = ref<boolean>(false);
@@ -122,7 +130,7 @@ async function initializeBraintreeClient(): Promise<void> {
     set(client, clientInstance);
   }
   catch (error_: any) {
-    set(error, `Failed to initialize payment client: ${error_.message}`);
+    emit('fatal-error', `Failed to initialize payment client: ${error_.message}`);
     console.error(error_);
     trackCardPaymentFailure({
       failure: 'BRAINTREE_INIT_FAILED',
@@ -195,7 +203,7 @@ async function processPayment(): Promise<void> {
   }
 
   set(isProcessing, true);
-  set(error, '');
+  set(transactionError, '');
 
   const card = get(selectedCard);
   const cardType = card ? 'saved' as const : 'new' as const;
@@ -226,7 +234,7 @@ async function processPayment(): Promise<void> {
     else {
       const form = get(newCardForm);
       if (!form) {
-        set(error, 'New card form not available');
+        set(transactionError, 'New card form not available');
         set(isProcessing, false);
         return;
       }
@@ -266,7 +274,7 @@ async function processPayment(): Promise<void> {
     emit('payment-success');
   }
   catch (error_: any) {
-    set(error, error_.message || 'Payment failed. Please try again.');
+    set(transactionError, error_.message || 'Payment failed. Please try again.');
     set(isProcessing, false);
     trackCardPaymentFailure({
       failure: 'CARD_PAYMENT_API_ERROR',
@@ -349,6 +357,48 @@ onUnmounted(async () => {
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_1fr] xl:gap-8 xl:items-start">
       <!-- Left Column: Payment Form -->
       <div class="flex flex-col gap-6 min-w-0">
+        <!-- Inline transaction error (card decline, payment failure, etc.) -->
+        <div
+          v-if="transactionError"
+          class="flex items-start gap-3 rounded-md border border-rui-error/30 bg-rui-error/10 p-4 text-sm text-rui-error"
+          role="alert"
+        >
+          <svg
+            class="h-5 w-5 shrink-0 mt-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <span class="flex-1">{{ transactionError }}</span>
+          <button
+            type="button"
+            class="shrink-0 text-rui-error hover:opacity-70"
+            aria-label="Dismiss"
+            @click="transactionError = undefined"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
         <!-- Card Input Section -->
         <div class="bg-white rounded-lg border border-rui-grey-300 p-6">
           <!-- Saved Card Display -->
@@ -357,7 +407,7 @@ onUnmounted(async () => {
               :card="selectedCard"
               :disabled="isProcessing"
               @card-deleted="handleCardDeleted()"
-              @error="error = $event"
+              @error="transactionError = $event"
             />
 
             <!-- Button to change card -->
@@ -380,7 +430,7 @@ onUnmounted(async () => {
             :client="client"
             :disabled="isProcessing"
             @validation-change="newCardFormValid = $event"
-            @error="error = $event"
+            @error="transactionError = $event"
           />
         </div>
       </div>
@@ -495,7 +545,6 @@ onUnmounted(async () => {
       v-model:open="showAddCardDialog"
       :client="client"
       @card-added="handleCardAdded($event)"
-      @error="error = $event"
     />
   </div>
 </template>

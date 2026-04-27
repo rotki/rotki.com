@@ -93,8 +93,22 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      const message = extractErrorMessage(errorText);
-      throw new Error(response.status === 429 ? message : `HTTP ${response.status}: ${message}`);
+      const backendMessage = extractErrorMessage(errorText);
+      // 400s on this endpoint are either schema/JSON-decode errors (programmer-side) or
+      // raw Braintree gateway dumps ("Do Not Honor" etc.) — replace with a friendly
+      // message; raw cause is kept in the console.error below for debugging.
+      // 429 surfaces the backend's already-user-friendly rate-limit message verbatim.
+      let message: string;
+      if (response.status === 400) {
+        message = 'We couldn\'t add this card. Please double-check the details or try a different card.';
+      }
+      else if (response.status === 429) {
+        message = backendMessage;
+      }
+      else {
+        message = `HTTP ${response.status}: ${backendMessage}`;
+      }
+      throw new Error(message);
     }
 
     const data = await response.json();

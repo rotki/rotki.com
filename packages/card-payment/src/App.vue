@@ -221,7 +221,6 @@ onMounted(async () => {
       :current-step="3"
     >
       <CardPayment
-        v-model:error="errorMessage"
         v-model:selected-card="selectedCard"
         :cards="cards"
         :plan-data="planData"
@@ -232,6 +231,7 @@ onMounted(async () => {
         @payment-success="navigation.goTo3DSecure(upgradeSubId)"
         @go-back="back()"
         @refresh-card="refreshCard()"
+        @fatal-error="errorMessage = $event"
       />
     </CheckoutLayout>
   </DefaultLayout>
