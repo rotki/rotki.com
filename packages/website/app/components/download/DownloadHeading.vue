@@ -11,25 +11,15 @@ const { chronicle } = useSigilEvents();
 
 const showAll = ref<boolean>(false);
 
-const sponsors = [
+const sponsors: { name: string; image: string; gold?: boolean; tooltip?: string }[] = [
   {
-    name: 'jespow.eth',
-    image: '/img/sponsorship-profiles/1.42.0_jespow.eth_1.png',
+    name: 'pcaversaccio',
+    image: '/img/sponsorship-profiles/1.43.0_pcaversaccio.jpg',
     gold: true,
   },
   {
-    name: 'jespow.eth',
-    image: '/img/sponsorship-profiles/1.42.0_jespow.eth_2.png',
-    gold: true,
-  },
-  {
-    name: '我喜歡□□.eth',
-    tooltip: '0x31a1aAb023739d5ca68c49cE0E695c744B79260C',
-    image: '/img/sponsorship-profiles/1.42.0_我喜歡大奶.eth.jpeg',
-  },
-  {
-    name: 'mem.eth',
-    image: '/img/sponsorship-profiles/1.42.0_mem.eth.jpg',
+    name: 'respired.eth',
+    image: '/img/sponsorship-profiles/1.43.0_respired.eth.jpg',
   },
 ];
 
