@@ -5,6 +5,7 @@ declare module '#app' {
     guestOnly?: boolean;
     requiresVerified?: boolean;
     requiresSubscriber?: boolean;
+    requiresCardCustomer?: boolean;
     backendRequired?: boolean;
   }
 }

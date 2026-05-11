@@ -4,6 +4,7 @@ import {
   type AuthState,
   ensureAuthenticated,
   ensureCanBuy,
+  ensureCardCustomer,
   ensureVerified,
   handleGuestOnly,
   type StateGetter,
@@ -15,6 +16,7 @@ function createState(overrides: Partial<AuthState> = {}): AuthState {
     authHint: undefined,
     canBuy: true,
     emailConfirmed: undefined,
+    hasCardPayment: false,
     ...overrides,
   };
 }
@@ -233,6 +235,24 @@ describe('ensureCanBuy', () => {
     const getState = () => createState({ canBuy: false });
 
     const result = await ensureCanBuy(getState, actions, undefined);
+
+    expect(result).toEqual({ redirect: '/home/subscription' });
+  });
+});
+
+describe('ensureCardCustomer', () => {
+  it('should allow users with a prior card payment', () => {
+    const getState = () => createState({ hasCardPayment: true });
+
+    const result = ensureCardCustomer(getState);
+
+    expect(result).toEqual({ allow: true });
+  });
+
+  it('should redirect users without any card payment', () => {
+    const getState = () => createState({ hasCardPayment: false });
+
+    const result = ensureCardCustomer(getState);
 
     expect(result).toEqual({ redirect: '/home/subscription' });
   });

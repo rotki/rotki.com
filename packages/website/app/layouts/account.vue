@@ -25,7 +25,7 @@ useAutoLogout();
 const tabModelValue = ref<string>();
 const hydrated = ref<boolean>(false);
 
-const { account } = storeToRefs(useMainStore());
+const { account, hasCardPayment } = storeToRefs(useMainStore());
 
 const name = computed<string>(() => {
   const userAccount = get(account);
@@ -41,32 +41,38 @@ const name = computed<string>(() => {
   return `${firstName} ${lastName}`;
 });
 
-const tabs = computed<TabItem[]>(() => [{
-  label: t('account.tabs.subscription'),
-  icon: 'lu-crown',
-  to: '/home/subscription',
-}, {
-  label: t('account.tabs.payment_methods'),
-  icon: 'lu-credit-card',
-  to: '/home/saved-cards',
-  reload: true,
-}, {
-  label: t('account.tabs.devices'),
-  icon: 'lu-laptop-minimal',
-  to: '/home/devices',
-}, {
-  label: t('account.tabs.account_details'),
-  icon: 'lu-circle-user-round',
-  to: '/home/account-details',
-}, {
-  label: t('account.tabs.customer_information'),
-  icon: 'lu-info',
-  to: '/home/customer-information',
-}, {
-  label: t('account.tabs.address'),
-  icon: 'lu-map-pin',
-  to: '/home/address',
-}]);
+const tabs = computed<TabItem[]>(() => {
+  const all: TabItem[] = [{
+    label: t('account.tabs.subscription'),
+    icon: 'lu-crown',
+    to: '/home/subscription',
+  }, {
+    label: t('account.tabs.payment_methods'),
+    icon: 'lu-credit-card',
+    to: '/home/saved-cards',
+    reload: true,
+  }, {
+    label: t('account.tabs.devices'),
+    icon: 'lu-laptop-minimal',
+    to: '/home/devices',
+  }, {
+    label: t('account.tabs.account_details'),
+    icon: 'lu-circle-user-round',
+    to: '/home/account-details',
+  }, {
+    label: t('account.tabs.customer_information'),
+    icon: 'lu-info',
+    to: '/home/customer-information',
+  }, {
+    label: t('account.tabs.address'),
+    icon: 'lu-map-pin',
+    to: '/home/address',
+  }];
+
+  return get(hasCardPayment)
+    ? all
+    : all.filter(tab => tab.to !== '/home/saved-cards');
+});
 
 onMounted(() => {
   set(hydrated, true);

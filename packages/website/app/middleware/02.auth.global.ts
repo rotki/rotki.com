@@ -8,6 +8,7 @@ import {
   type AuthState,
   ensureAuthenticated,
   ensureCanBuy,
+  ensureCardCustomer,
   ensureVerified,
   handleGuestOnly,
   type NavigationResult,
@@ -19,13 +20,13 @@ function applyResult(result: NavigationResult): ReturnType<typeof navigateTo> | 
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { auth, guestOnly, requiresSubscriber, requiresVerified } = to.meta;
+  const { auth, guestOnly, requiresCardCustomer, requiresSubscriber, requiresVerified } = to.meta;
 
   if (!auth && !guestOnly)
     return;
 
   const store = useMainStore();
-  const { account, authenticated, canBuy } = storeToRefs(store);
+  const { account, authenticated, canBuy, hasCardPayment } = storeToRefs(store);
   const authHint = useAuthHintCookie();
 
   function getState(): AuthState {
@@ -34,6 +35,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
       authHint: get(authHint) ?? undefined,
       canBuy: get(canBuy),
       emailConfirmed: get(account)?.emailConfirmed,
+      hasCardPayment: get(hasCardPayment),
     };
   }
 
@@ -61,6 +63,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (requiresSubscriber) {
     const upgradeSubId = typeof to.query.upgradeSubId === 'string' ? to.query.upgradeSubId : undefined;
     const result = await ensureCanBuy(getState, actions, upgradeSubId);
+    if ('redirect' in result)
+      return applyResult(result);
+  }
+
+  if (requiresCardCustomer) {
+    const result = ensureCardCustomer(getState);
     if ('redirect' in result)
       return applyResult(result);
   }

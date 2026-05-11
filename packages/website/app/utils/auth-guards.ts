@@ -5,6 +5,7 @@ export interface AuthState {
   authHint: string | undefined;
   emailConfirmed: boolean | undefined;
   canBuy: boolean;
+  hasCardPayment: boolean;
 }
 
 export type StateGetter = () => AuthState;
@@ -109,6 +110,18 @@ export async function ensureCanBuy(
   }
 
   if (!getState().canBuy && !upgradeSubId)
+    return { redirect: SUBSCRIPTION_PATH };
+
+  return { allow: true };
+}
+
+/**
+ * Ensures the user has at least one historical card payment.
+ * Gates the saved-cards management UI so fresh accounts cannot abuse
+ * the add-card endpoint as a card-tester.
+ */
+export function ensureCardCustomer(getState: StateGetter): NavigationResult {
+  if (!getState().hasCardPayment)
     return { redirect: SUBSCRIPTION_PATH };
 
   return { allow: true };

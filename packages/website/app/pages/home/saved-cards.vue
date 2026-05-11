@@ -25,6 +25,7 @@ interface CardOperation {
 definePageMeta({
   auth: true,
   layout: 'account',
+  requiresCardCustomer: true,
 });
 
 const { t } = useI18n({ useScope: 'global' });

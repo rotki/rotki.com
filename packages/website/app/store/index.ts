@@ -1,6 +1,8 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
+import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import type { LoginCredentials } from '~/types/login';
 import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
+import { PaymentMethod, PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
 import { isClient, useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { acceptHMRUpdate, defineStore } from 'pinia';
@@ -10,6 +12,7 @@ import { useUserSubscriptions } from '~/composables/subscription/use-user-subscr
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useAuthHintCookie, useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
+import { UserPayments } from '~/types/account';
 import { isUnauthorizedError } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
 
@@ -19,9 +22,10 @@ export const useMainStore = defineStore('main', () => {
   const authenticated = ref<boolean>(false);
   const account = ref<Account>();
   const canBuy = ref<boolean>(true);
+  const hasCardPayment = ref<boolean>(false);
 
   const logger = useLogger('store');
-  const { setHooks } = useFetchWithCsrf();
+  const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
   const authHintCookie = useAuthHintCookie();
   const emailConfirmedCookie = useEmailConfirmedCookie();
   const { pendingSubscriptionId, setPendingSubscriptionId, clearPendingSubscriptionId } = usePendingSubscriptionId();
@@ -78,6 +82,36 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  const fetchHasCardPayment = async (): Promise<void> => {
+    // Check already-loaded subscriptions first — refreshed immediately after a
+    // card purchase, so the flag flips without waiting on the payments-history
+    // endpoint (which may lag right after checkout).
+    const subs = get(userSubscriptions);
+    const cardSub = subs.some(s =>
+      s.paymentMethod === PaymentMethod.CARD
+      || s.paymentProvider === PaymentProvider.BRAINTREE,
+    );
+    if (cardSub) {
+      set(hasCardPayment, true);
+      return;
+    }
+
+    try {
+      const response = await fetchWithCsrf<ApiResponse<unknown>>(
+        '/webapi/2/history/payments/',
+        { method: 'GET' },
+      );
+      const payments = UserPayments.parse(response.result);
+      set(hasCardPayment, payments.some(p => p.paidUsing === 'card' && !p.isRefund));
+    }
+    catch (error) {
+      if (!isUnauthorizedError(error)) {
+        logger.error('Failed to fetch payment history:', error);
+      }
+      set(hasCardPayment, false);
+    }
+  };
+
   const getAccount = async (): Promise<void> => {
     const accountData = await accountApi.getAccount();
     if (accountData) {
@@ -87,6 +121,7 @@ export const useMainStore = defineStore('main', () => {
       set(emailConfirmedCookie, accountData.emailConfirmed);
       // Update canBuy after account is set
       await updateCanBuy();
+      await fetchHasCardPayment();
     }
   };
 
@@ -130,6 +165,7 @@ export const useMainStore = defineStore('main', () => {
     set(authHintCookie, undefined);
     set(emailConfirmedCookie, undefined);
     set(canBuy, true); // Reset to default
+    set(hasCardPayment, false);
     clearPendingSubscriptionId();
   }
 
@@ -151,6 +187,7 @@ export const useMainStore = defineStore('main', () => {
     authenticated,
     canBuy: computed<boolean>(() => get(canBuy)),
     getAccount,
+    hasCardPayment: computed<boolean>(() => get(hasCardPayment)),
     login,
     logout,
     pendingSubscriptionId: computed<string | null | undefined>(() => get(pendingSubscriptionId)),
