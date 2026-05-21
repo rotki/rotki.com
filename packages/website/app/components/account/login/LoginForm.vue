@@ -84,7 +84,7 @@ async function performLogin() {
           dense
           variant="outlined"
           :disabled="loading"
-          :label="t('auth.common.username')"
+          :label="t('auth.login.email_or_username')"
           autocomplete="username"
           hide-details
           color="primary"

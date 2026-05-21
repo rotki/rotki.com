@@ -283,6 +283,7 @@
     },
     "login": {
       "alert_error": "If you are writing your username and password from the app, we remind you that they are independent accounts.",
+      "email_or_username": "Email or username",
       "first_time_premium": "First time premium?",
       "forgot_password": "Forgot password?",
       "message": " Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
