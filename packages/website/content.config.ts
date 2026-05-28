@@ -6,6 +6,7 @@ const DOCUMENTS = 'content/documents/*.md';
 const JOBS = 'content/jobs/*.md';
 const TESTIMONIALS = 'content/testimonials/*.md';
 const SPONSORSHIP_TIERS = 'content/sponsorship-tiers/*.md';
+const INTEGRATIONS = 'content/integrations/*.md';
 
 const documentSchema = z.object({
   address: z.string().optional(),
@@ -35,6 +36,29 @@ const sponsorshipTierSchema = z.object({
   description: z.string(),
   example: z.array(z.string()).optional(),
   tier: z.enum(['bronze', 'silver', 'gold']),
+});
+
+const integrationSchema = z.object({
+  slug: z.string(),
+  label: z.string(),
+  type: z.enum(['exchange', 'blockchain', 'protocol']),
+  image: z.string(),
+  tagline: z.string().optional(),
+  intro: z.string(),
+  features: z.array(z.string()).default([]),
+  limitations: z.array(z.string()).default([]),
+  setup: z.array(z.string()).default([]),
+  screenshots: z.array(z.object({
+    src: z.string(),
+    alt: z.string(),
+  })).default([]),
+  faq: z.array(z.object({
+    q: z.string(),
+    a: z.string(),
+  })).default([]),
+  keywords: z.string().optional(),
+  ctaPlan: z.enum(['free', 'basic', 'advanced']).default('free'),
+  isExchangeWithKey: z.boolean().optional(),
 });
 
 export default defineContentConfig({
@@ -72,6 +96,15 @@ export default defineContentConfig({
         cwd: '~~/',
         include: TESTIMONIALS,
         prefix: 'testimonials',
+      },
+      type: 'page',
+    }),
+    integrations: defineCollection({
+      schema: integrationSchema.extend({ sitemap: defineSitemapSchema() }),
+      source: {
+        cwd: '~~/',
+        include: INTEGRATIONS,
+        prefix: 'integrations',
       },
       type: 'page',
     }),
