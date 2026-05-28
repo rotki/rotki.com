@@ -1,6 +1,6 @@
 import { defineCollection, defineContentConfig, z } from '@nuxt/content';
-import { asRobotsCollection } from '@nuxtjs/robots/content';
-import { asSitemapCollection } from '@nuxtjs/sitemap/content';
+import { defineRobotsSchema } from '@nuxtjs/robots/content';
+import { defineSitemapSchema } from '@nuxtjs/sitemap/content';
 
 const DOCUMENTS = 'content/documents/*.md';
 const JOBS = 'content/jobs/*.md';
@@ -48,32 +48,32 @@ export default defineContentConfig({
       },
       type: 'page',
     }),
-    jobs: defineCollection(asSitemapCollection({
-      schema: jobSchema,
+    jobs: defineCollection({
+      schema: jobSchema.extend({ sitemap: defineSitemapSchema() }),
       source: {
         cwd: '~~/',
         include: JOBS,
         prefix: 'jobs',
       },
       type: 'page',
-    })),
-    sponsorshipTiers: defineCollection(asRobotsCollection({
-      schema: sponsorshipTierSchema,
+    }),
+    sponsorshipTiers: defineCollection({
+      schema: sponsorshipTierSchema.extend({ robots: defineRobotsSchema() }),
       source: {
         cwd: '~~/',
         include: SPONSORSHIP_TIERS,
         prefix: 'sponsorship-tiers',
       },
       type: 'data',
-    })),
-    testimonials: defineCollection(asRobotsCollection({
-      schema: testimonialSchema,
+    }),
+    testimonials: defineCollection({
+      schema: testimonialSchema.extend({ robots: defineRobotsSchema() }),
       source: {
         cwd: '~~/',
         include: TESTIMONIALS,
         prefix: 'testimonials',
       },
       type: 'page',
-    })),
+    }),
   },
 });
