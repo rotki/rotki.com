@@ -1,9 +1,23 @@
 saveExact: true
+shamefullyHoist: true
 shellEmulator: true
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - '@rotki/ui-library'
 blockExoticSubdeps: true
 strictDepBuilds: true
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - chokidar@4.0.3
+  - semver@6.3.1
+  - undici-types@6.19.8
+  - '@noble/curves@1.8.0'
+  - '@noble/hashes@1.7.0'
+  - slow-redact@0.3.2
+  - synckit@0.9.3
+
+overrides:
+  chokidar: 5.0.0
 
 allowBuilds:
   '@parcel/watcher': true
