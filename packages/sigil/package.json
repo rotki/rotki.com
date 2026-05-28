@@ -29,6 +29,6 @@
     "@types/node": "catalog:",
     "tsdown": "0.21.7",
     "typescript": "catalog:",
-    "vitest": "4.1.2"
+    "vitest": "4.1.7"
   }
 }
