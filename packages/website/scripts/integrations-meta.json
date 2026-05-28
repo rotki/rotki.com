@@ -1,0 +1,602 @@
+{
+  "$comment": "Maps each integration slug under content/integrations/<slug>.md to the rotki source paths that back it. Used by scripts/integrations-changed.ts to figure out which integration pages need re-verification after a new rotki release. Globs are POSIX, evaluated against the rotki repo root.",
+  "lastVerifiedRotkiTag": "v1.43.1",
+  "premiumPaths": [
+    "rotkehlchen/premium/premium.py",
+    "rotkehlchen/constants/limits.py"
+  ],
+  "slugs": {
+    "0x": [
+      "rotkehlchen/chain/*/modules/zerox/**",
+      "rotkehlchen/chain/evm/decoding/zerox/**"
+    ],
+    "1inch": [
+      "rotkehlchen/chain/*/modules/oneinch/**",
+      "rotkehlchen/chain/evm/decoding/oneinch/**"
+    ],
+    "aave": [
+      "rotkehlchen/chain/*/modules/aave/**",
+      "rotkehlchen/chain/evm/decoding/aave/**"
+    ],
+    "account-delegation": [
+      "rotkehlchen/chain/evm/decoding/decoder.py",
+      "rotkehlchen/chain/evm/constants.py",
+      "rotkehlchen/chain/evm/decoding/constants.py"
+    ],
+    "aerodrome-finance": [
+      "rotkehlchen/chain/*/modules/aerodrome/**",
+      "rotkehlchen/chain/evm/decoding/velodrome/**"
+    ],
+    "arbitrum-one": [
+      "rotkehlchen/chain/arbitrum_one/**"
+    ],
+    "aura-finance": [
+      "rotkehlchen/chain/*/modules/aura_finance/**",
+      "rotkehlchen/chain/evm/decoding/aura_finance/**"
+    ],
+    "avalanche": [
+      "rotkehlchen/chain/avalanche/**"
+    ],
+    "badger": [
+      "rotkehlchen/chain/ethereum/modules/airdrops/**"
+    ],
+    "balancer": [
+      "rotkehlchen/chain/*/modules/balancer/**",
+      "rotkehlchen/chain/evm/decoding/balancer/**"
+    ],
+    "base": [
+      "rotkehlchen/chain/base/**"
+    ],
+    "basenames": [
+      "rotkehlchen/chain/base/modules/basenames/**"
+    ],
+    "beefy-finance": [
+      "rotkehlchen/chain/evm/decoding/beefy_finance/**"
+    ],
+    "binance": [
+      "rotkehlchen/exchanges/binance.py",
+      "rotkehlchen/data_import/importers/binance.py"
+    ],
+    "binance-smart-chain": [
+      "rotkehlchen/chain/binance_sc/**"
+    ],
+    "binance-us": [
+      "rotkehlchen/exchanges/binance.py"
+    ],
+    "bisq": [
+      "rotkehlchen/data_import/importers/bisq_trades.py"
+    ],
+    "bitcoin": [
+      "rotkehlchen/chain/bitcoin/btc/**"
+    ],
+    "bitcoin-cash": [
+      "rotkehlchen/chain/bitcoin/bch/**"
+    ],
+    "bitcoin-de": [
+      "rotkehlchen/exchanges/bitcoinde.py"
+    ],
+    "bitfinex": [
+      "rotkehlchen/exchanges/bitfinex.py"
+    ],
+    "bitmex": [
+      "rotkehlchen/exchanges/bitmex.py",
+      "rotkehlchen/data_import/importers/bitmex.py"
+    ],
+    "bitpanda": [
+      "rotkehlchen/exchanges/bitpanda.py"
+    ],
+    "bitstamp": [
+      "rotkehlchen/exchanges/bitstamp.py",
+      "rotkehlchen/data_import/importers/bitstamp.py"
+    ],
+    "bittrex": [
+      "rotkehlchen/data_import/importers/bittrex.py"
+    ],
+    "blockfi": [
+      "rotkehlchen/data_import/importers/blockfi_trades.py",
+      "rotkehlchen/data_import/importers/blockfi_transactions.py"
+    ],
+    "blur": [
+      "rotkehlchen/chain/ethereum/modules/blur/**"
+    ],
+    "bybit": [
+      "rotkehlchen/exchanges/bybit.py"
+    ],
+    "circle-cctp": [
+      "rotkehlchen/chain/*/modules/cctp/**",
+      "rotkehlchen/chain/evm/decoding/cctp/**"
+    ],
+    "clrfund": [
+      "rotkehlchen/chain/*/modules/clrfund/**"
+    ],
+    "coinbase": [
+      "rotkehlchen/exchanges/coinbase.py"
+    ],
+    "coinbase-prime": [
+      "rotkehlchen/exchanges/coinbaseprime.py"
+    ],
+    "coinbase-pro": [
+      "rotkehlchen/data_import/importers/coinbasepro.py"
+    ],
+    "compound": [
+      "rotkehlchen/chain/*/modules/compound/**",
+      "rotkehlchen/chain/evm/decoding/compound/**"
+    ],
+    "convex": [
+      "rotkehlchen/chain/ethereum/modules/convex/**"
+    ],
+    "cowswap": [
+      "rotkehlchen/chain/*/modules/cowswap/**",
+      "rotkehlchen/chain/evm/decoding/cowswap/**"
+    ],
+    "crosscurve": [
+      "rotkehlchen/chain/*/modules/crosscurve/**",
+      "rotkehlchen/chain/evm/decoding/crosscurve/**"
+    ],
+    "cryptocom": [
+      "rotkehlchen/exchanges/cryptocom.py",
+      "rotkehlchen/data_import/importers/cryptocom.py"
+    ],
+    "curve-fi": [
+      "rotkehlchen/chain/*/modules/curve/**",
+      "rotkehlchen/chain/evm/decoding/curve/**"
+    ],
+    "defisaver": [
+      "rotkehlchen/chain/ethereum/modules/defisaver/**"
+    ],
+    "degen": [
+      "rotkehlchen/chain/base/modules/degen/**"
+    ],
+    "digixdao": [
+      "rotkehlchen/chain/ethereum/modules/digixdao/**"
+    ],
+    "diva": [
+      "rotkehlchen/chain/ethereum/modules/diva/**"
+    ],
+    "drips": [
+      "rotkehlchen/chain/ethereum/modules/drips/**"
+    ],
+    "dxdao": [
+      "rotkehlchen/chain/ethereum/modules/dxdaomesa/**"
+    ],
+    "echo": [
+      "rotkehlchen/chain/base/modules/echo/**"
+    ],
+    "efp": [
+      "rotkehlchen/chain/*/modules/efp/**"
+    ],
+    "eigenlayer": [
+      "rotkehlchen/chain/ethereum/modules/eigenlayer/**"
+    ],
+    "element-finance": [],
+    "ens": [
+      "rotkehlchen/chain/ethereum/modules/ens/**"
+    ],
+    "eth2": [
+      "rotkehlchen/chain/ethereum/modules/eth2/**"
+    ],
+    "ethereum": [
+      "rotkehlchen/chain/ethereum/**"
+    ],
+    "ethereum-attestation-service": [
+      "rotkehlchen/chain/*/modules/eas/**"
+    ],
+    "extrafi": [
+      "rotkehlchen/chain/*/modules/extrafi/**"
+    ],
+    "farcaster": [
+      "rotkehlchen/chain/base/modules/farcaster/**"
+    ],
+    "firebird-finance": [
+      "rotkehlchen/chain/*/modules/firebird_finance/**"
+    ],
+    "fluence": [
+      "rotkehlchen/chain/ethereum/modules/fluence/**"
+    ],
+    "frax": [
+      "rotkehlchen/chain/ethereum/modules/airdrops/**",
+      "rotkehlchen/chain/ethereum/modules/curve/constants.py"
+    ],
+    "ftx": [],
+    "ftx-us": [],
+    "gearbox": [
+      "rotkehlchen/chain/*/modules/gearbox/**"
+    ],
+    "gemini": [
+      "rotkehlchen/exchanges/gemini.py"
+    ],
+    "gho": [
+      "rotkehlchen/chain/ethereum/modules/aave/gho/**"
+    ],
+    "gitcoin": [
+      "rotkehlchen/chain/*/modules/gitcoin/**",
+      "rotkehlchen/chain/*/modules/gitcoinv2/**"
+    ],
+    "giveth": [
+      "rotkehlchen/chain/*/modules/giveth/**"
+    ],
+    "gmx": [
+      "rotkehlchen/chain/arbitrum_one/modules/gmx/**"
+    ],
+    "gnosis": [
+      "rotkehlchen/chain/gnosis/**"
+    ],
+    "gnosis-chain": [
+      "rotkehlchen/chain/gnosis/**"
+    ],
+    "golem": [
+      "rotkehlchen/chain/ethereum/modules/golem/**"
+    ],
+    "harvest-finance": [
+      "rotkehlchen/chain/ethereum/modules/harvest_finance/**"
+    ],
+    "hedgey": [
+      "rotkehlchen/chain/*/modules/hedgey/**"
+    ],
+    "hop-protocol": [
+      "rotkehlchen/chain/*/modules/hop/**"
+    ],
+    "htx": [
+      "rotkehlchen/exchanges/htx.py"
+    ],
+    "hyperliquid": [
+      "rotkehlchen/chain/hyperliquid/**",
+      "rotkehlchen/chain/arbitrum_one/modules/hyperliquid/**"
+    ],
+    "iconomi": [
+      "rotkehlchen/exchanges/iconomi.py"
+    ],
+    "independent-reserve": [
+      "rotkehlchen/exchanges/independentreserve.py"
+    ],
+    "jito": [
+      "rotkehlchen/chain/solana/**"
+    ],
+    "juicebox": [
+      "rotkehlchen/chain/ethereum/modules/juicebox/**"
+    ],
+    "jupiter": [
+      "rotkehlchen/chain/solana/**"
+    ],
+    "kraken": [
+      "rotkehlchen/exchanges/kraken.py"
+    ],
+    "kucoin": [
+      "rotkehlchen/exchanges/kucoin.py",
+      "rotkehlchen/data_import/importers/kucoin.py"
+    ],
+    "kusama": [
+      "rotkehlchen/chain/substrate/**"
+    ],
+    "kyber": [
+      "rotkehlchen/chain/*/modules/kyber/**"
+    ],
+    "lido-eth": [
+      "rotkehlchen/chain/ethereum/modules/lido/**",
+      "rotkehlchen/chain/ethereum/modules/lido_csm/**"
+    ],
+    "liquity": [
+      "rotkehlchen/chain/ethereum/modules/liquity/**"
+    ],
+    "llamazip": [
+      "rotkehlchen/chain/optimism/modules/llamazip/**"
+    ],
+    "locked-gno": [
+      "rotkehlchen/chain/ethereum/modules/lockedgno/**"
+    ],
+    "magpie": [
+      "rotkehlchen/chain/*/modules/magpie/**"
+    ],
+    "makerdao": [
+      "rotkehlchen/chain/ethereum/modules/makerdao/**"
+    ],
+    "merkl": [
+      "rotkehlchen/chain/evm/decoding/merkl/**"
+    ],
+    "metamask-swaps": [
+      "rotkehlchen/chain/*/modules/metamask/**"
+    ],
+    "mintclub": [
+      "rotkehlchen/chain/base/modules/mintclub/**"
+    ],
+    "monad": [
+      "rotkehlchen/chain/monad/**"
+    ],
+    "monerium": [
+      "rotkehlchen/chain/*/modules/monerium/**"
+    ],
+    "morpho": [
+      "rotkehlchen/chain/*/modules/morpho/**",
+      "rotkehlchen/chain/*/modules/morpho_blue/**",
+      "rotkehlchen/chain/evm/decoding/morpho/**"
+    ],
+    "nexo": [
+      "rotkehlchen/data_import/importers/nexo.py"
+    ],
+    "octant": [
+      "rotkehlchen/chain/ethereum/modules/octant/**"
+    ],
+    "odos": [
+      "rotkehlchen/chain/*/modules/odos/**"
+    ],
+    "okx": [
+      "rotkehlchen/exchanges/okx.py"
+    ],
+    "omni": [
+      "rotkehlchen/chain/ethereum/modules/omni/**",
+      "rotkehlchen/chain/ethereum/modules/omnibridge/**"
+    ],
+    "openocean": [
+      "rotkehlchen/chain/*/modules/open_ocean/**"
+    ],
+    "optimism": [
+      "rotkehlchen/chain/optimism/**"
+    ],
+    "paladin": [
+      "rotkehlchen/chain/ethereum/modules/paladin/**"
+    ],
+    "paraswap": [
+      "rotkehlchen/chain/*/modules/paraswap/**"
+    ],
+    "pendle-finance": [
+      "rotkehlchen/chain/ethereum/modules/pendle/**"
+    ],
+    "pickle-finance": [
+      "rotkehlchen/chain/ethereum/modules/pickle_finance/**"
+    ],
+    "polkadot": [
+      "rotkehlchen/chain/substrate/**"
+    ],
+    "poloniex": [],
+    "polygon": [
+      "rotkehlchen/chain/ethereum/modules/polygon/**",
+      "rotkehlchen/chain/*/modules/polygon_pos_bridge/**"
+    ],
+    "polygon-pos": [
+      "rotkehlchen/chain/polygon_pos/**"
+    ],
+    "puffer": [
+      "rotkehlchen/chain/ethereum/modules/puffer/**"
+    ],
+    "pump-fun": [
+      "rotkehlchen/chain/solana/**"
+    ],
+    "quickswap": [
+      "rotkehlchen/chain/polygon_pos/modules/quickswap/**",
+      "rotkehlchen/chain/base/modules/quickswap/**"
+    ],
+    "rainbow-swaps": [],
+    "rotki": [
+      "rotkehlchen/chain/ethereum/modules/rotki/**"
+    ],
+    "runmoney": [
+      "rotkehlchen/chain/base/modules/runmoney/**"
+    ],
+    "safe": [
+      "rotkehlchen/chain/*/modules/safe/**"
+    ],
+    "scroll": [
+      "rotkehlchen/chain/scroll/**"
+    ],
+    "shapeshift": [],
+    "shutter": [
+      "rotkehlchen/chain/ethereum/modules/shutter/**"
+    ],
+    "sky": [
+      "rotkehlchen/chain/ethereum/modules/sky/**"
+    ],
+    "socket": [],
+    "solana": [
+      "rotkehlchen/chain/solana/**"
+    ],
+    "spark": [
+      "rotkehlchen/chain/*/modules/spark/**"
+    ],
+    "stakedao": [
+      "rotkehlchen/chain/*/modules/stakedao/**"
+    ],
+    "summer-fi": [
+      "rotkehlchen/chain/*/modules/summer_fi/**"
+    ],
+    "superfluid": [
+      "rotkehlchen/chain/evm/decoding/superfluid/**"
+    ],
+    "sushiswap": [
+      "rotkehlchen/chain/*/modules/sushiswap/**"
+    ],
+    "the-graph": [
+      "rotkehlchen/chain/*/modules/thegraph/**",
+      "rotkehlchen/chain/evm/decoding/thegraph/**"
+    ],
+    "umami": [
+      "rotkehlchen/chain/arbitrum_one/modules/umami/**"
+    ],
+    "uniswap": [
+      "rotkehlchen/chain/*/modules/uniswap/**",
+      "rotkehlchen/chain/evm/decoding/uniswap/**"
+    ],
+    "uphold": [
+      "rotkehlchen/data_import/importers/uphold_transactions.py"
+    ],
+    "velodrome-finance": [
+      "rotkehlchen/chain/optimism/modules/velodrome/**",
+      "rotkehlchen/chain/evm/decoding/velodrome/**"
+    ],
+    "votium": [
+      "rotkehlchen/chain/ethereum/modules/votium/**"
+    ],
+    "walletconnect": [
+      "rotkehlchen/chain/*/modules/walletconnect/**"
+    ],
+    "weth": [
+      "rotkehlchen/chain/*/modules/weth/**"
+    ],
+    "wmatic": [
+      "rotkehlchen/chain/polygon_pos/modules/wmatic/**"
+    ],
+    "wmon": [
+      "rotkehlchen/chain/monad/modules/wmon/**"
+    ],
+    "woo": [
+      "rotkehlchen/exchanges/woo.py",
+      "rotkehlchen/chain/*/modules/woo_fi/**"
+    ],
+    "wxdai": [
+      "rotkehlchen/chain/gnosis/modules/wxdai/**"
+    ],
+    "yearn": [
+      "rotkehlchen/chain/*/modules/yearn/**"
+    ],
+    "zksync": [
+      "rotkehlchen/chain/*/modules/zksync/**"
+    ],
+    "zksync-lite": [
+      "rotkehlchen/chain/zksync_lite/**"
+    ]
+  },
+  "reviewedSlugs": [
+    "0x",
+    "1inch",
+    "aave",
+    "account-delegation",
+    "aerodrome-finance",
+    "arbitrum-one",
+    "aura-finance",
+    "avalanche",
+    "badger",
+    "balancer",
+    "base",
+    "basenames",
+    "beefy-finance",
+    "binance",
+    "binance-smart-chain",
+    "binance-us",
+    "bisq",
+    "bitcoin",
+    "bitcoin-cash",
+    "bitcoin-de",
+    "bitfinex",
+    "bitmex",
+    "bitpanda",
+    "bitstamp",
+    "bittrex",
+    "blockfi",
+    "blur",
+    "bybit",
+    "circle-cctp",
+    "clrfund",
+    "coinbase",
+    "coinbase-prime",
+    "coinbase-pro",
+    "compound",
+    "convex",
+    "cowswap",
+    "crosscurve",
+    "cryptocom",
+    "curve-fi",
+    "defisaver",
+    "degen",
+    "digixdao",
+    "diva",
+    "drips",
+    "dxdao",
+    "echo",
+    "efp",
+    "eigenlayer",
+    "element-finance",
+    "ens",
+    "eth2",
+    "ethereum",
+    "ethereum-attestation-service",
+    "extrafi",
+    "farcaster",
+    "firebird-finance",
+    "fluence",
+    "frax",
+    "ftx",
+    "ftx-us",
+    "gearbox",
+    "gemini",
+    "gho",
+    "gitcoin",
+    "giveth",
+    "gmx",
+    "gnosis",
+    "gnosis-chain",
+    "golem",
+    "harvest-finance",
+    "hedgey",
+    "hop-protocol",
+    "htx",
+    "hyperliquid",
+    "iconomi",
+    "independent-reserve",
+    "jito",
+    "juicebox",
+    "jupiter",
+    "kraken",
+    "kucoin",
+    "kusama",
+    "kyber",
+    "lido-eth",
+    "liquity",
+    "llamazip",
+    "magpie",
+    "makerdao",
+    "merkl",
+    "metamask-swaps",
+    "mintclub",
+    "monad",
+    "locked-gno",
+    "morpho",
+    "nexo",
+    "octant",
+    "odos",
+    "okx",
+    "omni",
+    "monerium",
+    "openocean",
+    "optimism",
+    "paladin",
+    "paraswap",
+    "pendle-finance",
+    "pickle-finance",
+    "polkadot",
+    "poloniex",
+    "polygon-pos",
+    "polygon",
+    "puffer",
+    "pump-fun",
+    "quickswap",
+    "rainbow-swaps",
+    "rotki",
+    "runmoney",
+    "safe",
+    "scroll",
+    "shapeshift",
+    "shutter",
+    "sky",
+    "socket",
+    "solana",
+    "spark",
+    "stakedao",
+    "summer-fi",
+    "superfluid",
+    "sushiswap",
+    "the-graph",
+    "umami",
+    "uniswap",
+    "uphold",
+    "velodrome-finance",
+    "votium",
+    "walletconnect",
+    "weth",
+    "wmatic",
+    "wmon",
+    "woo",
+    "wxdai",
+    "yearn",
+    "zksync-lite",
+    "zksync"
+  ]
+}

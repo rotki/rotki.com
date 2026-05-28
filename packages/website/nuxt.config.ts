@@ -1,6 +1,30 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import process from 'node:process';
 import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
 import rotkiTheme from '@rotki/ui-library/theme';
+import { z } from 'zod';
+import { integrationSlug } from './app/utils/integration-slug';
+
+const integrationItem = z.object({ label: z.string() });
+const integrationFileSchema = z.object({
+  blockchains: z.array(integrationItem),
+  exchanges: z.array(integrationItem),
+  protocols: z.array(integrationItem),
+});
+
+function integrationPrerenderRoutes(): string[] {
+  const file = path.resolve(import.meta.dirname, 'public/integrations/all.json');
+  const data = integrationFileSchema.parse(JSON.parse(readFileSync(file, 'utf8')));
+  const all = [...data.blockchains, ...data.exchanges, ...data.protocols];
+  const slugs = new Set<string>();
+  for (const item of all) {
+    const slug = integrationSlug(item.label);
+    if (slug)
+      slugs.add(slug);
+  }
+  return Array.from(slugs, slug => `/integrations/${slug}`);
+}
 
 // Build identifier for unique chunk names per deployment
 const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
@@ -244,6 +268,7 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       failOnError: false,
+      routes: integrationPrerenderRoutes(),
     },
   },
 
