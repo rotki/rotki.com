@@ -3,9 +3,11 @@
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
-    ":dependencyDashboardApproval"
+    ":dependencyDashboardApproval",
+    ":pinAllExceptPeerDependencies",
+    "helpers:pinGitHubActionDigests"
   ],
-  "rangeStrategy": "pin",
+  "dependencyDashboardAutoclose": false,
   "minimumReleaseAge": "7 days",
   "packageRules": [
     {
