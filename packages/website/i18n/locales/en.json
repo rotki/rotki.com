@@ -704,6 +704,19 @@
       "title": "Exchanges"
     },
     "header": "Integrations",
+    "detail": {
+      "features": "Supported features",
+      "limitations": "Limitations",
+      "setup": "Setup",
+      "screenshots": "Screenshots",
+      "faq": "Frequently asked questions",
+      "cta": {
+        "title": "Start tracking {label} with rotki",
+        "description": "Download rotki for free. Your keys and data never leave your machine.",
+        "download": "Download",
+        "all": "All integrations"
+      }
+    },
     "no_data_found": "No data found with keyword \"{keyword}\"",
     "protocols": {
       "description": "More than {number}+ DeFi protocols are automatically detected and decoded. Track your liquidity positions, lending, borrowing, staking, and other on-chain activities with full profit/loss accounting.",
