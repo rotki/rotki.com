@@ -1,6 +1,6 @@
 module github.com/rotki/rotki.com/backend
 
-go 1.26
+go 1.26.3
 
 require (
 	github.com/redis/go-redis/v9 v9.19.0

@@ -1,5 +1,5 @@
 # Stage 1: Build static site (SSG)
-FROM node:24-alpine AS frontend
+FROM node:24.16.0-alpine AS frontend
 
 COPY ./ /build/
 WORKDIR /build
