@@ -1,5 +1,5 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index cba32bb19d053c847fe180477cf16984130d24fd..e73da76b8db78993d0a62d4f4476b167cdb71165 100644
+index cba32bb19d053c847fe180477cf16984130d24fd..106a1e35fcb57e11a1f714703d6ca2dff03aa8db 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -522,8 +522,15 @@ function sendError(socket, id, error) {
@@ -20,3 +20,14 @@ index cba32bb19d053c847fe180477cf16984130d24fd..e73da76b8db78993d0a62d4f4476b167
  const CSS_URL_RE = /url\((\/[^)]+)\)/g;
  const CSS_URL_SINGLE_RE = /url\(\/[^)]+\)/;
  const RENDER_CHUNK_RE = /(?<= = )['"`]/;
+@@ -553,7 +560,9 @@ const PublicDirsPlugin = (options) => {
+ 			order: "pre",
+ 			filter: { id: PREFIX_RE },
+ 			handler(id) {
+-				return `import { publicAssetsURL } from '#internal/nuxt/paths';export default publicAssetsURL(${JSON.stringify(decodeURIComponent(id.slice(15)))})`;
++				// slice(16) (not 15): the added null byte makes the prefix one char
++				// longer, so the old hardcoded offset left a stray "?" on the path.
++				return `import { publicAssetsURL } from '#internal/nuxt/paths';export default publicAssetsURL(${JSON.stringify(decodeURIComponent(id.slice(16)))})`;
+ 			}
+ 		},
+ 		resolveId: {

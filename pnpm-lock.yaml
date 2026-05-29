@@ -65,7 +65,7 @@ overrides:
   chokidar: 5.0.0
 
 patchedDependencies:
-  '@nuxt/vite-builder@4.4.6': 350f482b22d8e5e03bfdfd79ed88cb961c950cda2c2d93a9d66ce5b33ee580e0
+  '@nuxt/vite-builder@4.4.6': b60bc93bc57e827f2abb6a1345d2a46fddba4150e7e283e3bc55250a721f7f8b
 
 importers:
 
@@ -11725,7 +11725,7 @@ snapshots:
       - typescript
       - vite
 
-  '@nuxt/vite-builder@4.4.6(patch_hash=350f482b22d8e5e03bfdfd79ed88cb961c950cda2c2d93a9d66ce5b33ee580e0)(267f9276b852f2f39cdc35cfd8d4b371)':
+  '@nuxt/vite-builder@4.4.6(patch_hash=b60bc93bc57e827f2abb6a1345d2a46fddba4150e7e283e3bc55250a721f7f8b)(267f9276b852f2f39cdc35cfd8d4b371)':
     dependencies:
       '@nuxt/kit': 4.4.6(magicast@0.5.2)
       '@rollup/plugin-replace': 6.0.3(rollup@4.60.4)
@@ -18420,7 +18420,7 @@ snapshots:
       '@nuxt/nitro-server': 4.4.6(a89497934179389563b9cf698aeb2c7d)
       '@nuxt/schema': 4.4.6
       '@nuxt/telemetry': 2.8.0(@nuxt/kit@4.4.6(magicast@0.5.2))
-      '@nuxt/vite-builder': 4.4.6(patch_hash=350f482b22d8e5e03bfdfd79ed88cb961c950cda2c2d93a9d66ce5b33ee580e0)(267f9276b852f2f39cdc35cfd8d4b371)
+      '@nuxt/vite-builder': 4.4.6(patch_hash=b60bc93bc57e827f2abb6a1345d2a46fddba4150e7e283e3bc55250a721f7f8b)(267f9276b852f2f39cdc35cfd8d4b371)
       '@unhead/vue': 2.1.15(vue@3.5.34(typescript@5.9.3))
       '@vue/shared': 3.5.34
       chokidar: 5.0.0
