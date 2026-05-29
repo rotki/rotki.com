@@ -27,14 +27,14 @@
     "@types/jsdom": "28.0.3",
     "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
-    "@vitejs/plugin-vue": "6.0.5",
+    "@vitejs/plugin-vue": "6.0.7",
     "@vue/tsconfig": "0.9.1",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-vue-devtools": "8.1.1",
+    "vite-plugin-vue-devtools": "8.1.2",
     "vite-ssg": "catalog:",
     "vue-tsc": "3.3.1"
   }
