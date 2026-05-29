@@ -43,7 +43,7 @@ const tabs = [
   <div class="flex relative">
     <RuiTabs
       v-model="model"
-      class="border border-rui-gray-200 bg-rui-grey-200 rounded-md [&>div]:p-1"
+      class="border border-rui-gray-200 bg-rui-grey-200 rounded-md [&>div]:p-1 [&>div]:!h-auto"
     >
       <RuiTab
         v-for="tab in tabs"

@@ -161,6 +161,41 @@ export default defineNuxtConfig({
   ],
 
   vite: {
+    // Pre-bundle deps Vite's startup scan misses (subpath/deep imports), so the
+    // dev server doesn't discover them mid-session and trigger a full reload.
+    // Dev-only: has no effect on the production build. Covers heavy
+    // route-specific libs (web3/payments) too, at the cost of a slower dev
+    // cold-start.
+    optimizeDeps: {
+      include: [
+        '@rotki/ui-library',
+        '@rotki/ui-library/components',
+        '@rotki/ui-library/composables',
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        '@vuelidate/core',
+        '@vuelidate/validators',
+        'zod',
+        'swiper/vue',
+        'swiper/modules',
+        'qrcode',
+        'ethers',
+        'ethers/address',
+        'ethers/constants',
+        'ethers/contract',
+        'ethers/providers',
+        'ethers/utils',
+        '@reown/appkit',
+        '@reown/appkit/vue',
+        '@reown/appkit/networks',
+        '@reown/appkit-adapter-ethers',
+        '@reown/appkit-controllers',
+        'braintree-web',
+        'braintree-web/client',
+        'braintree-web/hosted-fields',
+        'braintree-web/three-d-secure',
+      ],
+    },
     build: {
       // Disable Vite's automatic modulepreload link injection
       // Dynamic imports will still work, but won't preload dependencies
