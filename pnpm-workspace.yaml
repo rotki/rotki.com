@@ -15,6 +15,7 @@ trustPolicyExclude:
   - '@noble/hashes@1.7.0'
   - slow-redact@0.3.2
   - synckit@0.9.3
+  - tailwind-merge@2.6.1
 
 overrides:
   chokidar: 5.0.0
@@ -37,7 +38,7 @@ packages:
 
 catalog:
   '@fontsource/roboto': 5.2.10
-  '@rotki/ui-library': 2.15.0
+  '@rotki/ui-library': 2.21.0
   '@types/braintree-web': 3.96.17
   '@types/node': 24.12.4
   '@tsconfig/node24': 24.0.4
