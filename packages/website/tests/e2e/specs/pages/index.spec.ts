@@ -212,7 +212,9 @@ test.describe('download page', () => {
     await expect(linuxButton).toBeVisible();
     await linuxButton.click();
 
-    const linuxMenu = page.locator('[role=menu-content]');
+    // scope to this menu's content: closed menus stay in the DOM, so a bare
+    // [role=menu] matches multiple elements
+    const linuxMenu = page.locator('[role=menu]').filter({ hasText: 'LINUX' });
     await expect(linuxMenu).toBeVisible();
 
     const linuxAppImageLink = page.getByRole('link', { name: 'LINUX AppImage' });
@@ -253,7 +255,7 @@ test.describe('download page', () => {
     await expect(appleButton).toBeVisible();
     await appleButton.click();
 
-    const appleMenu = page.locator('[role=menu-content]');
+    const appleMenu = page.locator('[role=menu]').filter({ hasText: 'MAC' });
     await expect(appleMenu).toBeVisible();
 
     const appleSiliconLink = page.getByRole('link', { name: 'MAC Apple Silicon' });
