@@ -102,14 +102,18 @@ watch(value, (newValue) => {
             @blur="focused = false"
           />
           <label
-            class="left-0 text-base leading-[3.5] text-rui-text-secondary pointer-events-none absolute flex h-full w-full select-none transition-all border-0 border-transparent pl-12"
+            class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
             :class="{
-              'leading-tight text-xs -top-5': value || focused,
-              'top-0': !value && !focused,
+              // Float by transform only (translate up to the notch + scale down).
+              // height and font-size stay constant across states so transition-all
+              // animates smoothly with no jump. Resting/floated are mutually
+              // exclusive so they never compete in the cascade (the conflict was
+              // order-dependent and broke when the ui-library stylesheet reordered).
+              'pl-4 -translate-y-7 scale-75': value || focused,
+              'pl-12': !value && !focused,
               'text-rui-error': hasError,
               'text-rui-primary': focused && !hasError,
               'text-rui-success': !hasError && value && !focused,
-              '!pl-4': value || focused,
             }"
           >
             Discount/Referral Code

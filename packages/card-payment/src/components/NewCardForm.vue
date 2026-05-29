@@ -228,13 +228,12 @@ defineExpose({
           class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
         />
         <label
-          class="left-0 text-base leading-[3.5] text-rui-text-secondary pointer-events-none absolute flex h-full w-full select-none transition-all border-0 border-transparent pl-12"
+          class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
           :class="{
-            'leading-tight text-xs -top-5': focusedField === 'number' || fieldContent.number,
-            'top-0': focusedField !== 'number' && !fieldContent.number,
+            'pl-4 -translate-y-7 scale-75': focusedField === 'number' || fieldContent.number,
+            'pl-12': focusedField !== 'number' && !fieldContent.number,
             'text-rui-error': fieldErrors.number,
             'text-rui-success': focusedField === 'number' && !fieldErrors.number,
-            '!pl-4': focusedField === 'number' || fieldContent.number,
           }"
         >
           Card Number
@@ -265,10 +264,10 @@ defineExpose({
           class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
         />
         <label
-          class="left-0 text-base leading-[3.5] text-rui-text-secondary pointer-events-none absolute flex h-full w-full select-none transition-all border-0 border-transparent pl-3"
+          class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
           :class="{
-            'leading-tight text-xs -top-5 pl-4': focusedField === 'expirationDate' || fieldContent.expirationDate,
-            'top-0': focusedField !== 'expirationDate' && !fieldContent.expirationDate,
+            'pl-4 -translate-y-7 scale-75': focusedField === 'expirationDate' || fieldContent.expirationDate,
+            'pl-3': focusedField !== 'expirationDate' && !fieldContent.expirationDate,
             'text-rui-error': fieldErrors.expirationDate,
             'text-rui-success': focusedField === 'expirationDate' && !fieldErrors.expirationDate,
           }"
@@ -301,10 +300,10 @@ defineExpose({
           class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
         />
         <label
-          class="left-0 text-base leading-[3.5] text-rui-text-secondary pointer-events-none absolute flex h-full w-full select-none transition-all border-0 border-transparent pl-3"
+          class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
           :class="{
-            'leading-tight text-xs -top-5 pl-4': focusedField === 'cvv' || fieldContent.cvv,
-            'top-0': focusedField !== 'cvv' && !fieldContent.cvv,
+            'pl-4 -translate-y-7 scale-75': focusedField === 'cvv' || fieldContent.cvv,
+            'pl-3': focusedField !== 'cvv' && !fieldContent.cvv,
             'text-rui-error': fieldErrors.cvv,
             'text-rui-success': focusedField === 'cvv' && !fieldErrors.cvv,
           }"
