@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
 import rotkiTheme from '@rotki/ui-library/theme';
+import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
 
 // Build identifier for unique chunk names per deployment
 const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
@@ -157,6 +158,7 @@ export default defineNuxtConfig({
     ['@pinia/nuxt', { disableVuex: true }],
     '@nuxt/test-utils/module',
     './modules/integration-images/module.ts',
+    './modules/integration-seo/module.ts',
     './modules/ui-library/module.ts',
   ],
 
@@ -279,6 +281,7 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       failOnError: false,
+      routes: integrationPrerenderRoutes(),
     },
   },
 

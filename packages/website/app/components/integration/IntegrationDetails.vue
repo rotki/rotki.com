@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
+import { integrationSlug } from '~/utils/integration-slug';
 
 enum TabCategory {
   ALL = 'all',
@@ -156,10 +157,11 @@ const { isMdAndUp } = useBreakpoint();
               leave-to-class="opacity-0"
               class="flex flex-wrap gap-4"
             >
-              <div
+              <NuxtLink
                 v-for="item in datum.data"
                 :key="item.label"
-                class="flex flex-col items-center gap-1.5 w-[4.5rem]"
+                :to="`/integrations/${integrationSlug(item.label)}`"
+                class="flex flex-col items-center gap-1.5 w-[4.5rem] hover:opacity-80 transition-opacity"
               >
                 <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
                   <img
@@ -174,7 +176,7 @@ const { isMdAndUp } = useBreakpoint();
                 <span class="text-xs text-rui-text-secondary text-center leading-tight line-clamp-2">
                   {{ item.label }}
                 </span>
-              </div>
+              </NuxtLink>
             </TransitionGroup>
           </div>
         </template>

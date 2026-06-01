@@ -1,5 +1,6 @@
 import LocalIntegrationData from '~~/public/integrations/all.json';
 import { IntegrationData, type IntegrationItem } from '~/types/integrations';
+import { consolidateSlug, INTEGRATION_CONSOLIDATIONS, integrationSlug } from '~/utils/integration-slug';
 
 const GITHUB_PREFIX = 'https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/';
 const LOCAL_PREFIX = '/img/integrations/';
@@ -24,25 +25,24 @@ export function useIntegrationsData() {
   const { public: { isDev } } = useRuntimeConfig();
 
   const filterDuplicateData = (data: IntegrationData): IntegrationData => {
-    const uniqueProtocols: Record<string, IntegrationItem> = {};
+    // Fold rotki's granular catalog entries into one card per consolidated page using the
+    // explicit whitelist (e.g. the four "Makerdao *" entries -> a single "MakerDAO" card).
+    // Everything else keeps its own card, so unrelated entries that share a first word
+    // (Coinbase / Coinbase Pro, FTX / FTX US, Gnosis Pay / Gnosis Chain) are never merged.
+    const byCanonical: Record<string, IntegrationItem> = {};
 
     data.protocols.forEach((protocol) => {
-      const firstWord = protocol.label.split(' ')[0];
-      if (!firstWord)
+      const canonical = consolidateSlug(integrationSlug(protocol.label));
+      if (byCanonical[canonical])
         return;
 
-      const existing = uniqueProtocols[firstWord];
-      if (!existing || existing.image !== protocol.image) {
-        uniqueProtocols[firstWord] = { ...protocol };
-      }
-      else {
-        existing.label = firstWord;
-      }
+      const group = INTEGRATION_CONSOLIDATIONS[canonical];
+      byCanonical[canonical] = group ? { ...protocol, label: group.label } : { ...protocol };
     });
 
     return {
       ...data,
-      protocols: Object.values(uniqueProtocols),
+      protocols: Object.values(byCanonical),
     };
   };
 
