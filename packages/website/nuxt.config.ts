@@ -280,7 +280,8 @@ export default defineNuxtConfig({
     preset: 'static',
     prerender: {
       crawlLinks: true,
-      failOnError: false,
+      // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
+      failOnError: true,
       routes: integrationPrerenderRoutes(),
     },
   },
@@ -288,20 +289,26 @@ export default defineNuxtConfig({
   routeRules: {
     // Redirect /pricing to /checkout/pay
     '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
-    // Auth-gated routes — must not be pre-rendered (SSG has no session,
-    // so middleware bakes in a meta-refresh redirect to /login).
-    // Go serves the SPA fallback for these paths instead.
-    '/home/**': { prerender: false },
-    '/checkout/pay/method': { prerender: false },
-    '/checkout/pay/paypal': { prerender: false },
-    '/checkout/pay/crypto': { prerender: false },
-    '/checkout/pay/request-crypto': { prerender: false },
-    '/checkout/pay/3d-secure': { prerender: false },
-    // Guest-only route — same problem (bakes in redirect for authenticated users)
-    '/login': { prerender: false },
-    // Dynamic routes — can't be pre-rendered (uid/token are dynamic)
-    '/activate/**': { prerender: false },
-    '/password/reset/**': { prerender: false },
+    // Client-only routes: `ssr: false` keeps them SPA in BOTH dev and build (so
+    // dev matches the production 200.html SPA fallback — no session/redirect is
+    // ever server-rendered). Reasons: auth, guest-only, tokens, OAuth, payment.
+    '/home/**': { ssr: false, prerender: false },
+    '/checkout/pay/method': { ssr: false, prerender: false },
+    '/checkout/pay/paypal': { ssr: false, prerender: false },
+    '/checkout/pay/crypto': { ssr: false, prerender: false },
+    '/checkout/pay/request-crypto': { ssr: false, prerender: false },
+    '/checkout/pay/3d-secure': { ssr: false, prerender: false },
+    // Payment confirmation — gated on a sessionStorage flag.
+    '/checkout/success': { ssr: false, prerender: false },
+    // Guest-only route (bakes in a redirect for authenticated users otherwise).
+    '/login': { ssr: false, prerender: false },
+    // OAuth callbacks — read window.location and sessionStorage (PKCE) at setup.
+    '/oauth/**': { ssr: false, prerender: false },
+    // Dynamic token routes + recover/send/changed forms (runtime backend state).
+    '/activate/**': { ssr: false, prerender: false },
+    '/password/**': { ssr: false, prerender: false },
+    // Web3-wallet utility page, noindex — no SEO value, so keep it client-only.
+    '/sponsor/submit-name': { ssr: false, prerender: false },
   },
 
   runtimeConfig: {
@@ -355,7 +362,10 @@ export default defineNuxtConfig({
   sitemap: {
     exclude: nonIndexed,
   },
-  ssr: false,
+  // SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
+  // for crawlers and JS-less social/LLM scrapers. No runtime server (static
+  // preset). Client-only routes opt out via `routeRules` `ssr: false`.
+  ssr: true,
 
   typescript: {
     tsConfig: {

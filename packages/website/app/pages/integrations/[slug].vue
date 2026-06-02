@@ -18,8 +18,11 @@ if (!isDefined(integration)) {
 }
 else {
   const item = get(integration);
+  const slug = path.replace(/\/+$/, '').split('/').pop() ?? '';
   const title = `${item.label} integration with rotki - ${item.tagline ?? item.label}`;
-  usePageSeo(title, item.intro, path, { keywords: item.keywords });
+  // OG image is generated per-slug at build time by the integration-seo module
+  // (with a share.png fallback written to the same path), so this URL always resolves.
+  usePageSeo(title, item.intro, path, { keywords: item.keywords, ogImage: `integrations/${slug}.png` });
 
   const url = `${baseUrl}${path}`;
 
@@ -59,7 +62,12 @@ else {
   }
 
   useHead({
-    script: ldBlocks.map(innerHTML => ({ type: 'application/ld+json', innerHTML })),
+    // Escape the angle bracket so a closing-script sequence inside the JSON-LD
+    // (e.g. from FAQ content) cannot break out of the server-rendered script tag.
+    script: ldBlocks.map(block => ({
+      type: 'application/ld+json',
+      innerHTML: block.replaceAll('<', '\\u003c'),
+    })),
   });
 }
 
