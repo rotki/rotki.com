@@ -1,5 +1,6 @@
 import { setSigilDebug } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
+import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 import { useUtmTracking } from '~/composables/chronicling/use-utm-tracking';
 import { useAuthHintCookie } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
@@ -20,6 +21,9 @@ export default defineNuxtPlugin(async () => {
 
     const { captureUtmParams } = useUtmTracking();
     captureUtmParams();
+
+    const { captureReferralCode } = useReferralTracking();
+    captureReferralCode();
   }
 
   const authHint = useAuthHintCookie();

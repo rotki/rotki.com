@@ -3,6 +3,7 @@ import { navigateTo } from '#app';
 import PageContainer from '~/components/common/PageContainer.vue';
 import PageContent from '~/components/common/PageContent.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
+import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 
@@ -19,6 +20,11 @@ useAutoLogout();
 // Clear checkout state after successful payment
 const { reset } = useCheckout();
 reset();
+
+// Consume the referral attribution: a purchase reaching this page was sent to the
+// backend with the persisted ref, so clear the cookie to avoid re-applying it to
+// the user's future purchases.
+useReferralTracking().clearReferralCode();
 
 const route = useRoute();
 const crypto = computed<boolean>(() => !!route.query.crypto);

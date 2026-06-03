@@ -7,6 +7,7 @@ import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { logger } from '~/utils/use-logger';
 
 export interface CheckoutError {
@@ -49,10 +50,9 @@ export function useCheckout() {
     return id && typeof id === 'string' ? id : undefined;
   });
 
-  const referralCode = computed<string | undefined>(() => {
-    const ref = getCurrentRoute().query.ref;
-    return ref && typeof ref === 'string' ? ref : undefined;
-  });
+  // Prefers the live ?ref query and falls back to the persisted cookie (see
+  // useReferralCodeParam) so the code survives navigation that stripped the param.
+  const { referralCode } = useReferralCodeParam();
 
   // ===================
   // Derived flags

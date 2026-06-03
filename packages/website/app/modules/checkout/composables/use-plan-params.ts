@@ -1,4 +1,5 @@
 import { get } from '@vueuse/shared';
+import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 
 type CurrencyParam = string | null;
 
@@ -53,12 +54,15 @@ type ReferralCodeParam = string | undefined;
 
 export function useReferralCodeParam() {
   const route = useRoute();
+  const { referralCode: storedReferralCode } = useReferralTracking();
   const referralCode = computed<ReferralCodeParam>(() => {
     const { ref } = route.query;
-    if (typeof ref !== 'string' || !ref)
-      return undefined;
+    if (typeof ref === 'string' && ref)
+      return ref;
 
-    return ref;
+    // Fall back to the persisted cookie when the query param was stripped by
+    // navigation (top nav, logo, footer, valid-plan-id redirect).
+    return get(storedReferralCode) || undefined;
   });
 
   return { referralCode };
