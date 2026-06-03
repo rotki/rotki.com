@@ -2,6 +2,7 @@ import process from 'node:process';
 import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
 import rotkiTheme from '@rotki/ui-library/theme';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
+import { llms } from './app/utils/llms-config';
 
 // Build identifier for unique chunk names per deployment
 const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
@@ -152,6 +153,7 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxtjs/sitemap',
     '@nuxt/content',
+    'nuxt-llms',
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
@@ -339,9 +341,7 @@ export default defineNuxtConfig({
     },
   },
 
-  site: {
-    url: 'https://rotki.com',
-  },
+  site: { url: 'https://rotki.com' },
 
   fonts: {
     families: [
@@ -359,9 +359,9 @@ export default defineNuxtConfig({
     },
   },
 
-  sitemap: {
-    exclude: nonIndexed,
-  },
+  sitemap: { exclude: nonIndexed },
+  // llms.txt / llms-full.txt / raw markdown endpoint for AI crawlers (see llms.config.ts).
+  llms,
   // SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
   // for crawlers and JS-less social/LLM scrapers. No runtime server (static
   // preset). Client-only routes opt out via `routeRules` `ssr: false`.

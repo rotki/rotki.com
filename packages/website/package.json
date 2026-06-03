@@ -41,6 +41,7 @@
     "better-sqlite3": "12.10.0",
     "braintree-web": "catalog:",
     "ethers": "6.16.0",
+    "nuxt-llms": "0.2.0",
     "pinia": "3.0.4",
     "qrcode": "1.5.4",
     "swiper": "12.1.4",
