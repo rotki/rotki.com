@@ -86,11 +86,27 @@ export function useCheckout() {
   // ===================
   // Discount code handling
   // ===================
-  // Input value (for text field binding)
-  const discountCodeInput = ref<string>(String(getCurrentRoute().query.discountCode || getCurrentRoute().query.ref || ''));
+  // Tracks whether the user dismissed the auto-applied referral discount. Persisted via
+  // useState so it survives client-side navigation through the checkout (the URL cannot
+  // carry it - buildQueryParams strips empty values), and resets on a full reload.
+  const referralDismissed = useState<boolean>('checkout-referral-dismissed', () => false);
 
-  // Applied value (from URL - source of truth)
-  const appliedDiscountCode = computed<string>(() => String(getCurrentRoute().query.discountCode || ''));
+  // Applied value (source of truth). An explicit discountCode in the URL wins; otherwise
+  // the referral code is auto-applied as a discount (mirroring the card flow) unless the
+  // user dismissed it.
+  const appliedDiscountCode = computed<string>(() => {
+    const code = getCurrentRoute().query.discountCode;
+    if (typeof code === 'string' && code)
+      return code;
+
+    if (get(referralDismissed))
+      return '';
+
+    return get(referralCode) ?? '';
+  });
+
+  // Input value (for text field binding), seeded from the applied value.
+  const discountCodeInput = ref<string>(get(appliedDiscountCode));
 
   // ===================
   // Breakdown data (persists across navigations via useState)
@@ -135,6 +151,9 @@ export function useCheckout() {
 
   async function applyDiscount(): Promise<void> {
     const code = get(discountCodeInput);
+    // An empty input clears the discount; remember the dismissal so an auto-applied
+    // referral code is not immediately re-applied (see appliedDiscountCode).
+    set(referralDismissed, !code);
     const currentRoute = getCurrentRoute();
     await navigateTo({
       path: currentRoute.path,
@@ -211,6 +230,7 @@ export function useCheckout() {
     set(planSwitchLoading, false);
     set(loading, false);
     set(error, undefined);
+    set(referralDismissed, false);
   }
 
   // ===================
