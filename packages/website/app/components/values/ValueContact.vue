@@ -6,7 +6,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 const {
   public: {
-    contact: { emailMailto, email, twitter, discord, github },
+    contact: { emailMailto, email, twitter, discord, github, reddit },
   },
 } = useRuntimeConfig();
 
@@ -30,6 +30,12 @@ const contacts: { title: string; description: string; href: string; icon: RuiIco
     description: t('values.contact_section.discord.description'),
     href: discord,
     icon: 'lu-discord',
+  },
+  {
+    title: 'Reddit',
+    description: t('values.contact_section.reddit.description'),
+    href: reddit,
+    icon: 'lu-reddit',
   },
   {
     title: 'Github',

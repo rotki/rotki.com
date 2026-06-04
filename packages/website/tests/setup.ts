@@ -18,6 +18,7 @@ mockNuxtImport('useRuntimeConfig', () => () => {
         email: 'info@rotki.com',
         emailMailto: 'mailto:info@rotki.com',
         github: 'https://github.com/rotki',
+        reddit: 'https://www.reddit.com/r/rotki',
         twitter: 'https://twitter.com/rotkiapp',
       },
       i18n: {

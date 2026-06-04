@@ -1221,6 +1221,9 @@
         "description": "Contribute code/issues."
       },
       "header": "Get in touch",
+      "reddit": {
+        "description": "Join the discussion."
+      },
       "subtitle": "For media inquiries or additional information about rotki, please reach out to:",
       "title": "Contact us",
       "twitter": {
