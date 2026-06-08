@@ -9,7 +9,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 const historyOpen = ref<number[]>([]);
 
-const { balance, hasHistory, history, load, loading } = useCredit();
+const { balance, hasHistory, history, initialLoading, load, loading } = useCredit();
 
 const cols = computed<DataTableColumn<CreditEntry>[]>(() => [
   { key: 'entryType', label: t('account.credit.history.type') },
@@ -24,6 +24,25 @@ function formatCreditAmount(value: string): string {
   return Number.isFinite(parsed) ? formatCurrency(parsed) : value;
 }
 
+function formatEur(value: string): string {
+  return t('account.credit.balance_eur', { amount: formatCreditAmount(value) });
+}
+
+function isCredit(value: string): boolean {
+  return Number.parseFloat(value) >= 0;
+}
+
+function formatSignedAmount(value: string): string {
+  const formatted = formatEur(value);
+  return isCredit(value) ? `+${formatted}` : formatted;
+}
+
+function formatEntryType(value: string): string {
+  return value
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+
 onMounted(load);
 </script>
 
@@ -36,6 +55,7 @@ onMounted(load);
         color="primary"
         icon
         :loading="loading"
+        :disabled="initialLoading"
         class="!p-2"
         @click="load()"
       >
@@ -50,60 +70,103 @@ onMounted(load);
       variant="flat"
       class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
     >
-      <div class="space-y-4">
+      <div
+        v-if="initialLoading"
+        class="space-y-4"
+      >
+        <RuiSkeletonLoader class="h-4 w-full max-w-xl" />
+        <RuiSkeletonLoader class="h-6 w-48" />
+        <RuiSkeletonLoader class="h-16 w-full" />
+      </div>
+
+      <div
+        v-else
+        class="space-y-4"
+      >
         <div class="text-body-2 text-rui-text-secondary">
           {{ t('account.credit.description') }}
         </div>
 
-        <div class="text-caption text-rui-text-disabled italic">
-          {{ t('account.credit.disclaimer') }}
-        </div>
-
         <div class="flex items-center gap-3">
+          <RuiIcon
+            name="lu-coins"
+            size="20"
+            class="text-rui-primary"
+          />
           <span class="text-rui-text-secondary text-body-2">{{ t('account.credit.balance') }}:</span>
           <span class="text-h6 font-bold text-rui-primary">
-            {{ t('account.credit.balance_eur', { amount: formatCreditAmount(balance) }) }}
+            {{ formatEur(balance) }}
           </span>
         </div>
 
-        <RuiAccordions v-model="historyOpen">
+        <RuiAlert
+          type="info"
+          icon="lu-info"
+          class="border border-rui-info/[0.5]"
+        >
+          {{ t('account.credit.disclaimer') }}
+        </RuiAlert>
+
+        <RuiAccordions
+          v-if="hasHistory"
+          v-model="historyOpen"
+        >
           <RuiAccordion>
             <template #header>
               <span class="text-body-2 font-medium">{{ t('account.credit.history.title') }}</span>
             </template>
 
-            <div
-              v-if="!hasHistory"
-              class="text-body-2 text-rui-text-secondary py-2"
-            >
-              {{ t('account.credit.empty_history') }}
+            <div class="pt-3">
+              <RuiDataTable
+                :cols="cols"
+                :rows="history"
+                row-attr="createdAt"
+                outlined
+                dense
+                hide-default-footer
+              >
+                <template #item.entryType="{ row }">
+                  <RuiChip
+                    size="sm"
+                    :color="isCredit(row.amountEur) ? 'success' : 'grey'"
+                    variant="outlined"
+                  >
+                    {{ formatEntryType(row.entryType) }}
+                  </RuiChip>
+                </template>
+                <template #item.amountEur="{ row }">
+                  <span
+                    class="font-medium"
+                    :class="isCredit(row.amountEur) ? 'text-rui-success' : 'text-rui-error'"
+                  >
+                    {{ formatSignedAmount(row.amountEur) }}
+                  </span>
+                </template>
+                <template #item.balanceAfterEur="{ row }">
+                  {{ formatEur(row.balanceAfterEur) }}
+                </template>
+                <template #item.createdAt="{ row }">
+                  {{ formatDate(row.createdAt) }}
+                </template>
+                <template #item.notes="{ row }">
+                  <span class="text-rui-text-secondary">{{ row.notes || '–' }}</span>
+                </template>
+              </RuiDataTable>
             </div>
-
-            <RuiDataTable
-              v-else
-              :cols="cols"
-              :rows="history"
-              row-attr="createdAt"
-              outlined
-              dense
-            >
-              <template #item.amountEur="{ row }">
-                <span :class="Number.parseFloat(row.amountEur) >= 0 ? 'text-rui-success' : 'text-rui-error'">
-                  {{ formatCreditAmount(row.amountEur) }} €
-                </span>
-              </template>
-              <template #item.balanceAfterEur="{ row }">
-                {{ formatCreditAmount(row.balanceAfterEur) }} €
-              </template>
-              <template #item.createdAt="{ row }">
-                {{ formatDate(row.createdAt) }}
-              </template>
-              <template #item.notes="{ row }">
-                <span class="text-rui-text-secondary">{{ row.notes }}</span>
-              </template>
-            </RuiDataTable>
           </RuiAccordion>
         </RuiAccordions>
+
+        <div
+          v-else
+          class="flex items-center gap-2 text-body-2 text-rui-text-secondary"
+        >
+          <RuiIcon
+            name="lu-clock"
+            size="16"
+            class="text-rui-text-disabled"
+          />
+          {{ t('account.credit.empty_history') }}
+        </div>
       </div>
     </RuiCard>
   </div>

@@ -9,12 +9,14 @@ interface UseCreditReturn {
   balance: Readonly<Ref<string>>;
   hasHistory: Readonly<Ref<boolean>>;
   history: DeepReadonly<Ref<CreditEntry[]>>;
+  initialLoading: Readonly<Ref<boolean>>;
   load: () => Promise<void>;
   loading: Readonly<Ref<boolean>>;
 }
 
 export function useCredit(): UseCreditReturn {
   const loading = ref<boolean>(false);
+  const initialLoading = ref<boolean>(true);
   const balance = ref<string>('0');
   const history = ref<CreditEntry[]>([]);
 
@@ -52,6 +54,7 @@ export function useCredit(): UseCreditReturn {
     }
     finally {
       set(loading, false);
+      set(initialLoading, false);
     }
   }
 
@@ -59,6 +62,7 @@ export function useCredit(): UseCreditReturn {
     balance: readonly(balance),
     hasHistory: readonly(hasHistory),
     history: readonly(history),
+    initialLoading: readonly(initialLoading),
     load,
     loading: readonly(loading),
   };
