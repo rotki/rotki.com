@@ -71,17 +71,27 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       // Check if the body is FormData
       const isFormData = options.body instanceof FormData;
 
-      let headers: any = {
-        accept: 'application/json',
-        // Only set content-type for non-FormData requests
-        // FormData will set its own boundary parameter for multipart/form-data
-        ...(!isFormData && { 'content-type': 'application/json' }),
-        ...(token && { [CSRF_HEADER]: token }),
-      };
+      // Build the outgoing headers via the Headers API so names are normalised
+      // and set() overwrites (instead of appends). ofetch reuses the same
+      // `options` object across retries and re-runs this hook over the previous
+      // attempt's headers; a plain-object merge would mix `X-CSRFToken` with the
+      // lowercased `x-csrftoken` and the Headers constructor would then collapse
+      // them into a duplicated "abcd, abcd" value.
+      const headers = new Headers();
+      headers.set('accept', 'application/json');
+      // Only set content-type for non-FormData requests; FormData sets its own
+      // boundary parameter for multipart/form-data.
+      if (!isFormData)
+        headers.set('content-type', 'application/json');
 
-      for (const [key, value] of options.headers) {
-        headers[key] = value;
-      }
+      // Merge any caller-provided headers, normalising case via the Headers API.
+      for (const [key, value] of new Headers(options.headers))
+        headers.set(key, value);
+
+      // Set the CSRF token last so the freshly resolved token always wins, even
+      // when this hook re-runs over a retried request's existing headers.
+      if (token)
+        headers.set(CSRF_HEADER, token);
 
       if (import.meta.server || import.meta.env.NODE_ENV === 'test') {
         let cookieString = event?.headers.get('cookie');
@@ -106,14 +116,12 @@ export const useFetchWithCsrf = createSharedComposable(() => {
           }
         }
 
-        headers = {
-          ...headers,
-          ...(cookieString && { cookie: cookieString }),
-          referer: baseUrl,
-        };
+        if (cookieString)
+          headers.set('cookie', cookieString);
+        headers.set('referer', baseUrl);
       }
 
-      options.headers = new Headers(headers);
+      options.headers = headers;
       options.baseURL = baseUrl;
       // Only convert keys for non-FormData bodies
       if (!isFormData) {
