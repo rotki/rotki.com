@@ -282,6 +282,89 @@ func TestHandler_UnknownFieldsRejected(t *testing.T) {
 	}
 }
 
+// TestHandler_CryptoCheckoutErrorWithIsUpgrade reproduces the exact frontend
+// wire payload that previously 400'd: the crypto checkout_error log carries an
+// `is_upgrade` field, which the handler must accept (regression for the
+// DisallowUnknownFields contract drift).
+func TestHandler_CryptoCheckoutErrorWithIsUpgrade(t *testing.T) {
+	h := NewHandler(testLogger())
+
+	ev := map[string]any{
+		"payment_method": "crypto",
+		"event":          "checkout_error",
+		"error_message":  "('In crypto subscription flow: Querying cryptocompare returned 401 return code', True)",
+		"plan_id":        3,
+		"is_upgrade":     false,
+		"timestamp":      time.Now().UnixMilli(),
+	}
+	data, _ := json.Marshal(ev)
+
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/logging/payment", bytes.NewReader(data))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Errorf("expected 204, got %d: %s", w.Code, w.Body.String())
+	}
+}
+
+func TestHandler_AllOptionalFields(t *testing.T) {
+	h := NewHandler(testLogger())
+	planID := 3
+	isUpgrade := true
+	discountApplied := true
+	ev := validEvent()
+	ev.ErrorCode = "401"
+	ev.PlanID = &planID
+	ev.Step = "submit"
+	ev.IsUpgrade = &isUpgrade
+	ev.CardType = "saved"
+	ev.DiscountApplied = &discountApplied
+
+	req := makeRequest(t, ev)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Errorf("expected 204, got %d: %s", w.Code, w.Body.String())
+	}
+}
+
+func TestHandler_AllCardTypes(t *testing.T) {
+	h := NewHandler(testLogger())
+
+	for cardType := range allowedCardTypes {
+		t.Run(cardType, func(t *testing.T) {
+			ev := validEvent()
+			ev.CardType = cardType
+
+			req := makeRequest(t, ev)
+			w := httptest.NewRecorder()
+			h.ServeHTTP(w, req)
+
+			if w.Code != http.StatusNoContent {
+				t.Errorf("expected 204 for card type %s, got %d", cardType, w.Code)
+			}
+		})
+	}
+}
+
+func TestHandler_UnknownCardType(t *testing.T) {
+	h := NewHandler(testLogger())
+	ev := validEvent()
+	ev.CardType = "amex"
+
+	req := makeRequest(t, ev)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("expected 400, got %d", w.Code)
+	}
+}
+
 func TestHandler_ErrorMessageSanitized(t *testing.T) {
 	// This test verifies the handler doesn't crash with control characters.
 	// Actual sanitization is tested in validate package.

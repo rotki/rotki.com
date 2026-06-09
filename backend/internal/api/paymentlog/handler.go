@@ -44,15 +44,24 @@ var allowedSteps = map[string]bool{
 	"callback": true,
 }
 
+// Allowed card types.
+var allowedCardTypes = map[string]bool{
+	"saved": true,
+	"new":   true,
+}
+
 // event is the request body for a payment error event.
 type event struct {
-	PaymentMethod string `json:"payment_method"`
-	Event         string `json:"event"`
-	ErrorMessage  string `json:"error_message"`
-	ErrorCode     string `json:"error_code,omitempty"`
-	PlanID        *int   `json:"plan_id,omitempty"`
-	Step          string `json:"step,omitempty"`
-	Timestamp     int64  `json:"timestamp"`
+	PaymentMethod   string `json:"payment_method"`
+	Event           string `json:"event"`
+	ErrorMessage    string `json:"error_message"`
+	ErrorCode       string `json:"error_code,omitempty"`
+	PlanID          *int   `json:"plan_id,omitempty"`
+	Step            string `json:"step,omitempty"`
+	IsUpgrade       *bool  `json:"is_upgrade,omitempty"`
+	CardType        string `json:"card_type,omitempty"`
+	DiscountApplied *bool  `json:"discount_applied,omitempty"`
+	Timestamp       int64  `json:"timestamp"`
 }
 
 // Handler logs frontend payment error events.
@@ -109,6 +118,15 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if ev.Step != "" {
 		attrs = append(attrs, "step", ev.Step)
 	}
+	if ev.IsUpgrade != nil {
+		attrs = append(attrs, "is_upgrade", *ev.IsUpgrade)
+	}
+	if ev.CardType != "" {
+		attrs = append(attrs, "card_type", ev.CardType)
+	}
+	if ev.DiscountApplied != nil {
+		attrs = append(attrs, "discount_applied", *ev.DiscountApplied)
+	}
 
 	h.logger.Info("payment_event", attrs...)
 
@@ -127,6 +145,9 @@ func (h *Handler) isValid(ev *event) bool {
 		return false
 	}
 	if ev.Step != "" && !allowedSteps[ev.Step] {
+		return false
+	}
+	if ev.CardType != "" && !allowedCardTypes[ev.CardType] {
 		return false
 	}
 	if ev.Timestamp == 0 {
