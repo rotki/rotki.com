@@ -33,8 +33,16 @@ export const llms: ContentLlmsOptions = {
   sections: [
     {
       title: 'Integrations',
-      description: 'Exchanges, blockchains, and DeFi protocols supported by rotki. rotki runs locally and queries each source directly using your own API keys and RPC endpoints — nothing passes through rotki-operated servers.',
+      description: 'Exchanges, blockchains, and DeFi protocols supported by rotki. rotki runs locally and queries each source directly using your own API keys and RPC endpoints, so nothing passes through rotki-operated servers.',
       contentCollection: 'integrations',
+      contentFilters: [
+        { field: 'extension', operator: '=', value: 'md' },
+      ],
+    },
+    {
+      title: 'Comparisons',
+      description: 'Side-by-side comparisons of rotki against popular cloud crypto tax tools. rotki is the open-source, local-first alternative: your data stays encrypted on your own machine instead of being uploaded to a vendor cloud.',
+      contentCollection: 'comparisons',
       contentFilters: [
         { field: 'extension', operator: '=', value: 'md' },
       ],

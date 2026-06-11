@@ -35,6 +35,11 @@ const menus: MenuGroup[] = [
         to: '/integrations',
         highlightActive: true,
       },
+      {
+        label: t('navigation_menu.compare.title'),
+        to: '/compare',
+        highlightActive: true,
+      },
     ],
   },
   {

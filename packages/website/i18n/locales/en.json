@@ -749,6 +749,53 @@
     },
     "title": "Connect your blockchains, connect your exchanges"
   },
+  "compare": {
+    "header": "Compare",
+    "title": "rotki vs the cloud crypto tax tools",
+    "description": "rotki is the open-source, local-first alternative to cloud crypto tax tools. Your transaction data stays encrypted on your own machine, never uploaded.",
+    "hub": {
+      "takeaways_title": "Key takeaways",
+      "summary_title": "At a glance",
+      "col_tool": "Tool",
+      "col_storage": "Data storage",
+      "col_open_source": "Open source",
+      "col_custody": "Self-custody",
+      "col_deployment": "Deployment",
+      "rotki_storage": "Local, on your machine",
+      "rotki_open_source": "Yes",
+      "rotki_custody": "Yes",
+      "rotki_deployment": "Desktop app or self-hosted",
+      "competitor_storage": "Vendor cloud",
+      "competitor_open_source": "No",
+      "competitor_custody": "No",
+      "competitor_deployment": "Hosted web app",
+      "list_title": "Head-to-head comparisons",
+      "why_title": "Why rotki is the privacy-first choice for crypto tax software",
+      "faq_title": "Frequently asked questions"
+    },
+    "detail": {
+      "updated": "Updated {date}",
+      "takeaways_title": "Key takeaways",
+      "verdict": "The verdict",
+      "table_title": "rotki vs {competitor}: side by side",
+      "advantages_title": "What sets rotki apart",
+      "tradeoffs_title": "Trade-offs",
+      "tradeoffs_subtitle": "Running locally comes with real trade-offs. Here is what to know, and why we think it is worth it.",
+      "who_title": "Who rotki is for",
+      "who_rotki": "Choose rotki if",
+      "related_title": "Related rotki integrations",
+      "related_subtitle": "rotki integrates with 180+ exchanges, blockchains, and DeFi protocols. A few that are relevant here:",
+      "deepdive_title": "rotki vs {competitor} in depth",
+      "faq_title": "Frequently asked questions",
+      "visit_competitor": "Visit {competitor}",
+      "cta": {
+        "title": "Try the private, open-source alternative",
+        "description": "Download rotki for free. Your keys and data never leave your machine.",
+        "download": "Download rotki",
+        "all": "All comparisons"
+      }
+    }
+  },
   "jobs": {
     "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
     "header": "We’re looking for talented people",
@@ -775,6 +822,10 @@
       "title": "Blog"
     },
     "company": "Company",
+    "compare": {
+      "description": "How rotki compares to cloud crypto tax tools",
+      "title": "Compare"
+    },
     "documentation": {
       "description": "Everything you need to know about the app",
       "title": "Documentation"

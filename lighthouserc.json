@@ -5,7 +5,8 @@
       "url": [
         "http://localhost/index.html",
         "http://localhost/products/index.html",
-        "http://localhost/integrations/aave/index.html"
+        "http://localhost/integrations/aave/index.html",
+        "http://localhost/compare/koinly/index.html"
       ],
       "numberOfRuns": 5,
       "settings": { "chromeFlags": "--no-sandbox" }

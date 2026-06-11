@@ -26,12 +26,19 @@ export default defineNuxtPlugin(async () => {
     captureReferralCode();
   }
 
-  const authHint = useAuthHintCookie();
-  const hint = get(authHint);
-
-  if (hint) {
-    logger.debug('auth hint found, fetching account');
-    const { getAccount } = useMainStore();
-    return getAccount();
+  // Account recovery is a client-only concern. Landing pages are statically
+  // prerendered with no user context and every auth-gated route is `ssr: false`,
+  // so fetching the account during SSR gains us nothing. It is also unsafe: in a
+  // Nuxt-only dev server (`make dev-web`) `/webapi` has no proxy, so a server-side
+  // request to `/webapi/account/` falls through to the SPA renderer, which re-runs
+  // this plugin and recurses until the render worker runs out of memory. Guarding
+  // to the client both avoids that loop and matches where auth state actually lives.
+  if (import.meta.client) {
+    const authHint = useAuthHintCookie();
+    if (get(authHint)) {
+      logger.debug('auth hint found, fetching account');
+      const { getAccount } = useMainStore();
+      await getAccount();
+    }
   }
 });

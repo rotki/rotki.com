@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
 import rotkiTheme from '@rotki/ui-library/theme';
+import { comparisonPrerenderRoutes } from './app/utils/comparison-prerender';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
 import { llms } from './app/utils/llms-config';
 
@@ -161,6 +162,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     './modules/integration-images/module.ts',
     './modules/integration-seo/module.ts',
+    './modules/comparison-seo/module.ts',
     './modules/ui-library/module.ts',
   ],
 
@@ -284,7 +286,7 @@ export default defineNuxtConfig({
       crawlLinks: true,
       // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
       failOnError: true,
-      routes: integrationPrerenderRoutes(),
+      routes: [...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes()],
     },
   },
 
@@ -391,9 +393,7 @@ export default defineNuxtConfig({
       mode: 'jit',
       plugins: [rotkiTheme],
       theme: {
-        container: {
-          center: true,
-        },
+        container: { center: true },
       },
     },
   },
