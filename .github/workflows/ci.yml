@@ -271,32 +271,34 @@ jobs:
             process.exit(0);
           }
           const runs = JSON.parse(fs.readFileSync(path, 'utf8'));
-          const run = runs.find(r => r.isRepresentativeRun) || runs[0];
-          const s = run.summary;
+          // One representative (median) run per sampled URL.
+          const reps = runs.filter(r => r.isRepresentativeRun);
+          const perUrl = reps.length || 1;
+          const runsPerUrl = Math.round(runs.length / perUrl);
           const pct = v => `${Math.round(v * 100)}`;
-          // Pull metric values + CPU benchmark from the representative run's report.
-          let metrics = '';
-          try {
-            const lhr = JSON.parse(fs.readFileSync(run.jsonPath, 'utf8'));
-            const a = lhr.audits;
-            const sec = id => `${(a[id].numericValue / 1000).toFixed(2)} s`;
-            const bi = Math.round(lhr.environment.benchmarkIndex);
-            metrics =
-              `| LCP | ${sec('largest-contentful-paint')} |\n` +
-              `| TBT | ${Math.round(a['total-blocking-time'].numericValue)} ms |\n` +
-              `| CLS | ${a['cumulative-layout-shift'].numericValue.toFixed(3)} |\n` +
-              `\n_CPU benchmarkIndex: ${bi} — higher is a faster/less-contended runner; ` +
-              `low values (≈2000) mean the run was slow and scores read pessimistically._`;
-          } catch {}
+          let bench;
+          const rows = reps.map((r) => {
+            const s = r.summary;
+            let lcp = '-', tbt = '-', cls = '-';
+            try {
+              const lhr = JSON.parse(fs.readFileSync(r.jsonPath, 'utf8'));
+              const a = lhr.audits;
+              lcp = `${(a['largest-contentful-paint'].numericValue / 1000).toFixed(2)} s`;
+              tbt = `${Math.round(a['total-blocking-time'].numericValue)} ms`;
+              cls = a['cumulative-layout-shift'].numericValue.toFixed(3);
+              bench = bench ?? Math.round(lhr.environment.benchmarkIndex);
+            } catch {}
+            let page = r.url;
+            try { page = new URL(r.url).pathname; } catch {}
+            return `| \`${page}\` | ${pct(s.performance)} | ${pct(s.accessibility)} | ${pct(s['best-practices'])} | ${pct(s.seo)} | ${lcp} | ${tbt} | ${cls} |`;
+          });
           console.log('## 🔦 Lighthouse (report-only)\n');
-          console.log('| Metric | Value |');
-          console.log('| --- | --- |');
-          console.log(`| Performance | ${pct(s.performance)} |`);
-          console.log(`| Accessibility | ${pct(s.accessibility)} |`);
-          console.log(`| Best Practices | ${pct(s['best-practices'])} |`);
-          console.log(`| SEO | ${pct(s.seo)} |`);
-          console.log(metrics);
-          console.log(`\nURL: \`${run.url}\` · median of ${runs.length} run(s)`);
+          console.log('| Page | Perf | A11y | BP | SEO | LCP | TBT | CLS |');
+          console.log('| --- | --- | --- | --- | --- | --- | --- | --- |');
+          rows.forEach(r => console.log(r));
+          if (bench !== undefined)
+            console.log(`\n_CPU benchmarkIndex: ${bench} — higher is a faster/less-contended runner; low values (≈2000) mean the run was slow and scores read pessimistically._`);
+          console.log(`\n_Median of ${runsPerUrl} run(s) per page._`);
           EOF
 
       - name: Upload Lighthouse reports
