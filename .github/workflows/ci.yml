@@ -258,7 +258,7 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          node <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          node <<'EOF' | tee -a "$GITHUB_STEP_SUMMARY"
           const fs = require('node:fs');
           const path = '.lighthouseci/manifest.json';
           if (!fs.existsSync(path)) {
@@ -286,6 +286,7 @@ jobs:
           name: lighthouse-report
           path: .lighthouseci/
           retention-days: 7
+          if-no-files-found: ignore
 
   build-docker:
     runs-on: ubuntu-latest
