@@ -2,8 +2,12 @@
   "ci": {
     "collect": {
       "staticDistDir": "packages/website/.output/public",
-      "url": ["http://localhost/index.html"],
-      "numberOfRuns": 3,
+      "url": [
+        "http://localhost/index.html",
+        "http://localhost/products/index.html",
+        "http://localhost/integrations/aave/index.html"
+      ],
+      "numberOfRuns": 5,
       "settings": { "chromeFlags": "--no-sandbox" }
     },
     "assert": {

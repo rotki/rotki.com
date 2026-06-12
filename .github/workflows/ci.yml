@@ -235,19 +235,24 @@ jobs:
         run: pnpm --filter @rotki/website generate
 
       # Guard 1: pre-render / SEO integrity (deterministic, never flakes)
+      # Keep PAGES in sync with the "url" list in lighthouserc.json.
       - name: Assert pre-rendered HTML
         continue-on-error: true
         run: |
           set -euo pipefail
           dir=packages/website/.output/public
+          pages="index.html products/index.html integrations/aave/index.html"
           fail=0
-          check() { grep -q "$2" "$dir/$1" || { echo "⚠️ $1: missing $2" >> "$GITHUB_STEP_SUMMARY"; fail=1; }; }
-          if grep -qE '<div id="__nuxt"></div>' "$dir/index.html"; then
-            echo "⚠️ index.html: empty __nuxt shell (prerender broke)" >> "$GITHUB_STEP_SUMMARY"; fail=1
-          fi
-          check index.html '<title>'
-          check index.html 'name="description"'
-          [ "$fail" = 0 ] && echo "✅ pre-render/SEO checks passed" >> "$GITHUB_STEP_SUMMARY" || true
+          for p in $pages; do
+            f="$dir/$p"
+            if [ ! -f "$f" ]; then
+              echo "⚠️ $p: file not generated" >> "$GITHUB_STEP_SUMMARY"; fail=1; continue
+            fi
+            grep -qE '<div id="__nuxt"></div>' "$f" && { echo "⚠️ $p: empty __nuxt shell (prerender broke)" >> "$GITHUB_STEP_SUMMARY"; fail=1; }
+            grep -q '<title>' "$f" || { echo "⚠️ $p: missing <title>" >> "$GITHUB_STEP_SUMMARY"; fail=1; }
+            grep -q 'name="description"' "$f" || { echo "⚠️ $p: missing meta description" >> "$GITHUB_STEP_SUMMARY"; fail=1; }
+          done
+          [ "$fail" = 0 ] && echo "✅ pre-render/SEO checks passed ($pages)" >> "$GITHUB_STEP_SUMMARY" || true
 
       # Guard 2: Lighthouse (report-only — serves the generated files itself)
       - name: Run Lighthouse CI
@@ -269,13 +274,28 @@ jobs:
           const run = runs.find(r => r.isRepresentativeRun) || runs[0];
           const s = run.summary;
           const pct = v => `${Math.round(v * 100)}`;
+          // Pull metric values + CPU benchmark from the representative run's report.
+          let metrics = '';
+          try {
+            const lhr = JSON.parse(fs.readFileSync(run.jsonPath, 'utf8'));
+            const a = lhr.audits;
+            const sec = id => `${(a[id].numericValue / 1000).toFixed(2)} s`;
+            const bi = Math.round(lhr.environment.benchmarkIndex);
+            metrics =
+              `| LCP | ${sec('largest-contentful-paint')} |\n` +
+              `| TBT | ${Math.round(a['total-blocking-time'].numericValue)} ms |\n` +
+              `| CLS | ${a['cumulative-layout-shift'].numericValue.toFixed(3)} |\n` +
+              `\n_CPU benchmarkIndex: ${bi} — higher is a faster/less-contended runner; ` +
+              `low values (≈2000) mean the run was slow and scores read pessimistically._`;
+          } catch {}
           console.log('## 🔦 Lighthouse (report-only)\n');
-          console.log('| Category | Score |');
+          console.log('| Metric | Value |');
           console.log('| --- | --- |');
           console.log(`| Performance | ${pct(s.performance)} |`);
           console.log(`| Accessibility | ${pct(s.accessibility)} |`);
           console.log(`| Best Practices | ${pct(s['best-practices'])} |`);
           console.log(`| SEO | ${pct(s.seo)} |`);
+          console.log(metrics);
           console.log(`\nURL: \`${run.url}\` · median of ${runs.length} run(s)`);
           EOF
 

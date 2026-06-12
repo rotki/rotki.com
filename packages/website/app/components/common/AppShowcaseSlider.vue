@@ -72,6 +72,26 @@ function getFetchPriority(index: number): 'high' | 'auto' {
   return index === 0 ? 'high' : 'auto';
 }
 
+/**
+ * Responsive srcset for the first image only (the LCP element). Pre-generated
+ * width variants live in a `responsive/` subfolder (kept out of the slide glob
+ * above); the original webp is the 2880w source. Mobile pulls a ~14-40KB variant
+ * instead of the 78KB source.
+ */
+function getSrcset(image: ScreenshotImage, index: number): string | undefined {
+  if (index !== 0)
+    return undefined;
+  // /img/screenshots/1-sc-dashboard.webp -> /img/screenshots/responsive/1-sc-dashboard
+  const base = image.src.replace(/\/([^/]+)\.webp$/, '/responsive/$1');
+  return `${base}-640w.webp 640w, ${base}-960w.webp 960w, ${base}-1440w.webp 1440w, ${image.src} 2880w`;
+}
+
+const firstImageSizes = '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px';
+
+function getSizes(index: number): string | undefined {
+  return index === 0 ? firstImageSizes : undefined;
+}
+
 scanImages();
 </script>
 
@@ -95,6 +115,8 @@ scanImages();
       >
         <img
           :src="image.src"
+          :srcset="getSrcset(image, i)"
+          :sizes="getSizes(i)"
           :alt="image.alt"
           width="1440"
           height="810"
