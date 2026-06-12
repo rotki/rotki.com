@@ -95,7 +95,7 @@ function anchorHref(attrs: string): string | undefined {
 function nonCrawlableAnchors(html: string): number {
   let count = 0;
   for (const match of html.matchAll(/<a\b([^>]*)>/gi)) {
-    const href = anchorHref(match[1]);
+    const href = anchorHref(match[1] ?? '');
     if (href === undefined || href === '' || href === '#' || /^javascript:/i.test(href))
       count++;
   }
@@ -106,7 +106,7 @@ function auditPage(html: string, route: string): PageReport {
   const issues: Issue[] = [];
 
   const robots = /<meta[^>]+name=["']robots["'][^>]*content=["']([^"']*)["']/i.exec(html);
-  const noindex: boolean = !!robots && /noindex/i.test(robots[1]);
+  const noindex: boolean = !!robots && /noindex/i.test(robots[1] ?? '');
 
   // noindex pages are intentionally excluded from the index — skip indexing checks.
   if (!noindex) {
@@ -119,7 +119,7 @@ function auditPage(html: string, route: string): PageReport {
       issues.push({ type: 'multiple-canonical', detail: `${canonicals.length} tags` });
     }
     else {
-      const href = /href=["']([^"']*)["']/i.exec(canonicals[0][0])?.[1] ?? '';
+      const href = /href=["']([^"']*)["']/i.exec(canonicals[0]?.[0] ?? '')?.[1] ?? '';
       if (!/^https?:\/\//i.test(href))
         issues.push({ type: 'relative-canonical', detail: href || '(empty)' });
       else if (href !== expected)
