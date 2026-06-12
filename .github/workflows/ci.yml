@@ -232,6 +232,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate static site 🏗
+        # Build against the production base URL so canonical/og:url are absolute
+        # and SEO scores reflect the deployed site (not a baseUrl='' artifact).
+        env:
+          NUXT_PUBLIC_BASE_URL: https://rotki.com
         run: pnpm --filter @rotki/website generate
 
       # Guard 1: pre-render / SEO integrity (deterministic, never flakes)
@@ -253,6 +257,12 @@ jobs:
             grep -q 'name="description"' "$f" || { echo "⚠️ $p: missing meta description" >> "$GITHUB_STEP_SUMMARY"; fail=1; }
           done
           [ "$fail" = 0 ] && echo "✅ pre-render/SEO checks passed ($pages)" >> "$GITHUB_STEP_SUMMARY" || true
+
+      # Guard 1b: comprehensive SEO audit over ALL generated pages (deterministic).
+      # Writes a per-issue table to the job summary. Report-only (no --strict).
+      - name: SEO audit (all pages)
+        continue-on-error: true
+        run: pnpm --filter @rotki/website seo:audit
 
       # Guard 2: Lighthouse (report-only — serves the generated files itself)
       - name: Run Lighthouse CI
