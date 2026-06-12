@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 
 const { path } = useRoute();
@@ -297,32 +298,19 @@ definePageMeta({
           </p>
         </div>
         <div class="flex gap-3">
-          <NuxtLink
-            #default="{ navigate }"
+          <ButtonLink
             to="/download"
-            custom
+            color="primary"
+            variant="default"
           >
-            <RuiButton
-              color="primary"
-              tag="a"
-              @click="navigate()"
-            >
-              {{ t('integration.detail.cta.download') }}
-            </RuiButton>
-          </NuxtLink>
-          <NuxtLink
-            #default="{ navigate }"
+            {{ t('integration.detail.cta.download') }}
+          </ButtonLink>
+          <ButtonLink
             to="/integrations"
-            custom
+            variant="outlined"
           >
-            <RuiButton
-              variant="outlined"
-              tag="a"
-              @click="navigate()"
-            >
-              {{ t('integration.detail.cta.all') }}
-            </RuiButton>
-          </NuxtLink>
+            {{ t('integration.detail.cta.all') }}
+          </ButtonLink>
         </div>
       </div>
     </section>
