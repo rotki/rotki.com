@@ -111,6 +111,30 @@ export function parseUtmFromQuery(
   };
 }
 
+/**
+ * Generate a v4 UUID for use as an analytics session id, safe to call outside
+ * secure contexts.
+ *
+ * `crypto.randomUUID()` is only defined in secure contexts (HTTPS or
+ * `localhost`/`127.0.0.1`). When the app is reached over a plain-http,
+ * non-localhost origin (a LAN IP, container host name, `0.0.0.0`, a tunnel,
+ * etc.) the method is `undefined` and calling it throws, which would abort
+ * app initialization. `crypto.getRandomValues` carries no such restriction —
+ * it is available in insecure contexts too — so we use it to build a v4 UUID
+ * by hand when `randomUUID` is missing.
+ */
+export function randomSessionId(): string {
+  if (crypto.randomUUID)
+    return crypto.randomUUID();
+
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  // Per RFC 4122 §4.4: set version (4) and variant (10xx) bits.
+  bytes[6] = ((bytes[6] ?? 0) & 0x0F) | 0x40;
+  bytes[8] = ((bytes[8] ?? 0) & 0x3F) | 0x80;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0'));
+  return `${hex.slice(0, 4).join('')}-${hex.slice(4, 6).join('')}-${hex.slice(6, 8).join('')}-${hex.slice(8, 10).join('')}-${hex.slice(10, 16).join('')}`;
+}
+
 interface CreateTrackingSessionInput {
   utm?: Pick<UtmParams, 'utmSource' | 'utmMedium' | 'utmCampaign' | 'utmContent' | 'utmTerm'>;
   referrer?: string;
@@ -125,7 +149,7 @@ interface CreateTrackingSessionInput {
  */
 export function createTrackingSession(input: CreateTrackingSessionInput): TrackingSession {
   return {
-    sessionId: crypto.randomUUID(),
+    sessionId: randomSessionId(),
     utm: {
       ...input.utm,
       referrer: input.referrer || undefined,

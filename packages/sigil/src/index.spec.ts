@@ -11,6 +11,7 @@ import {
   PaymentFailures,
   PaymentServerEvents,
   postPaymentLog,
+  randomSessionId,
   reasonForServerEvent,
   type SigilEventPayloadMap,
   SigilEvents,
@@ -164,6 +165,48 @@ describe('parseUtmFromQuery', () => {
   it('handles array-valued query parameters', () => {
     const result = parseUtmFromQuery({ utm_source: ['twitter', 'facebook'] });
     expect(result.utmSource).toBe('twitter');
+  });
+});
+
+describe('randomSessionId', () => {
+  const UUID_V4 = /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
+  const realCrypto = globalThis.crypto;
+
+  afterEach(() => {
+    Object.defineProperty(globalThis, 'crypto', { configurable: true, value: realCrypto });
+  });
+
+  it('uses crypto.randomUUID when available', () => {
+    const randomUUID = vi.fn(() => '11111111-1111-4111-8111-111111111111');
+    Object.defineProperty(globalThis, 'crypto', { configurable: true, value: { randomUUID } });
+    expect(randomSessionId()).toBe('11111111-1111-4111-8111-111111111111');
+    expect(randomUUID).toHaveBeenCalledOnce();
+  });
+
+  it('falls back to getRandomValues in an insecure context (no randomUUID)', () => {
+    const getRandomValues = vi.fn((array: Uint8Array) => {
+      array.fill(0xAB);
+      return array;
+    });
+    Object.defineProperty(globalThis, 'crypto', { configurable: true, value: { getRandomValues } });
+    const id = randomSessionId();
+    expect(getRandomValues).toHaveBeenCalledOnce();
+    // version (4) and variant (10xx) bits are forced regardless of input bytes
+    expect(id).toMatch(UUID_V4);
+  });
+
+  it('produces unique ids across the getRandomValues path', () => {
+    // Deterministic counter so different fills produce different ids without
+    // relying on a PRNG.
+    let counter = 0;
+    const getRandomValues = vi.fn((array: Uint8Array) => {
+      for (let i = 0; i < array.length; i++)
+        array[i] = (counter + i) & 0xFF;
+      counter += array.length;
+      return array;
+    });
+    Object.defineProperty(globalThis, 'crypto', { configurable: true, value: { getRandomValues } });
+    expect(randomSessionId()).not.toBe(randomSessionId());
   });
 });
 
