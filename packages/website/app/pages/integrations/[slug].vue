@@ -20,7 +20,9 @@ if (!isDefined(integration)) {
 else {
   const item = get(integration);
   const slug = path.replace(/\/+$/, '').split('/').pop() ?? '';
-  const title = `${item.label} integration with rotki - ${item.tagline ?? item.label}`;
+  // Keep the SERP title short (<60 chars); titleTemplate appends " | rotki".
+  // The descriptive tagline still lives in the <h1> and meta description.
+  const title = `${item.label} support`;
   // OG image is generated per-slug at build time by the integration-seo module
   // (with a share.png fallback written to the same path), so this URL always resolves.
   usePageSeo(title, item.intro, path, { keywords: item.keywords, ogImage: `integrations/${slug}.png` });
