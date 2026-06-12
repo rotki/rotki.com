@@ -287,6 +287,7 @@ jobs:
           path: .lighthouseci/
           retention-days: 7
           if-no-files-found: ignore
+          include-hidden-files: true
 
   build-docker:
     runs-on: ubuntu-latest
