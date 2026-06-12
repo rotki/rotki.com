@@ -252,7 +252,7 @@ jobs:
       # Guard 2: Lighthouse (report-only — serves the generated files itself)
       - name: Run Lighthouse CI
         continue-on-error: true
-        run: pnpm dlx @lhci/cli@0.15.x autorun --config=./lighthouserc.json
+        run: npx -y @lhci/cli@0.15.1 autorun --config=./lighthouserc.json
 
       - name: Summarize Lighthouse scores
         if: always()
