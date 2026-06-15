@@ -64,6 +64,7 @@ interface Issue {
 interface PageReport {
   route: string;
   noindex: boolean;
+  redirect: boolean;
   issues: Issue[];
 }
 
@@ -108,8 +109,14 @@ function auditPage(html: string, route: string): PageReport {
   const robots = /<meta[^>]+name=["']robots["'][^>]*content=["']([^"']*)["']/i.exec(html);
   const noindex: boolean = !!robots && /noindex/i.test(robots[1] ?? '');
 
-  // noindex pages are intentionally excluded from the index — skip indexing checks.
-  if (!noindex) {
+  // `nuxi generate` emits a `<meta http-equiv="refresh">` stub for routes that
+  // are real 301 redirects in production (e.g. /pricing -> /checkout/pay). These
+  // stubs have no title/canonical/lang/og by design and must not be audited as
+  // indexable pages — they redirect, just like noindex pages aren't indexed.
+  const redirect: boolean = /<meta[^>]+http-equiv=["']refresh["']/i.test(html);
+
+  // noindex and redirect pages are intentionally out of the index — skip checks.
+  if (!noindex && !redirect) {
     const canonicals = [...html.matchAll(/<link[^>]+rel=["']canonical["'][^>]*>/gi)];
     const expected = route === '/' ? BASE : `${BASE}${route}`;
     if (canonicals.length === 0) {
@@ -154,7 +161,7 @@ function auditPage(html: string, route: string): PageReport {
   if (!/<html[^>]+\blang=/i.test(html))
     issues.push({ type: 'missing-lang' });
 
-  return { route, noindex, issues };
+  return { route, noindex, redirect, issues };
 }
 
 function collectPages(distDir: string): string[] {
@@ -169,7 +176,9 @@ function main(): void {
     return auditPage(html, routeFor(file));
   });
 
-  const indexable = reports.filter(r => !r.noindex);
+  const indexable = reports.filter(r => !r.noindex && !r.redirect);
+  const skipped = reports.length - indexable.length;
+  const redirects = reports.filter(r => r.redirect).length;
   const pagesWithErrors = indexable.filter(r => r.issues.some(i => severityOf(i.type) === 'error'));
 
   // Tally pages affected per issue type, with one example route each.
@@ -190,7 +199,7 @@ function main(): void {
   const lines: string[] = [];
   lines.push('## 🔍 SEO audit (report-only)\n');
   lines.push(`Base: \`${BASE}\` · audited **${indexable.length}** indexable pages `
-    + `(${reports.length - indexable.length} noindex skipped).\n`);
+    + `(${skipped} skipped: ${skipped - redirects} noindex, ${redirects} redirects).\n`);
   lines.push(`**${pagesWithErrors.length}** pages with errors · `
     + `**${indexable.length - pagesWithErrors.length}** without errors · `
     + `**${errorRows.length}** error type(s).\n`);
