@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/votium.png"
 tagline: "Votium bribe claims, decoded locally"
 intro: "rotki decodes Votium bribe claims (the rewards vlCVX holders earn for delegating votes) as income events. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Votium bribe claims (the rewards vlCVX holders earn for delegating votes) as income events."
 keywords: "votium portfolio tracker, vlcvx bribes, convex vote bribes, votium claim tax"
 features:
   - "Votium bribe claims decoded as income events with the Votium counterparty."

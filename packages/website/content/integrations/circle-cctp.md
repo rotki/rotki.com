@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/cctp.svg"
 tagline: "Native USDC bridging decoded as bridge events, not taxable disposals"
 intro: "rotki decodes Circle's Cross-Chain Transfer Protocol (CCTP v1 and v2) on both source and destination chains, tagging the USDC burn and mint as bridge events so they don't flow through your PnL as ordinary spends and receives."
+metaDescription: "rotki decodes Circle's Cross-Chain Transfer Protocol (CCTP v1 and v2) on both source and destination chains, tagging the USDC burn and mint as bridge events so"
 keywords: "circle cctp tracker, native usdc bridge, cctp usdc tracker, cross chain usdc"
 features:
   - "CCTP v1 burn-and-mint events decoded on both sides of the bridge."

@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/uphold.svg"
 tagline: "Uphold multi-asset trades from CSV, processed locally"
 intro: "Import your Uphold transaction history into rotki via CSV: trades, deposits, withdrawals, and BAT reward payouts. CSV files are processed entirely on your computer."
+metaDescription: "Import your Uphold transaction history into rotki via CSV: trades, deposits, withdrawals, and BAT reward payouts."
 keywords: "uphold portfolio tracker, uphold tax report, uphold cost basis, uphold csv import, brave bat tracker"
 features:
   - "CSV import of Uphold transaction history exports, including multi-asset trades."

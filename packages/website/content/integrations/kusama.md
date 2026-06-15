@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/kusama.svg"
 tagline: "Kusama KSM balances, locally tracked"
 intro: "Add your Kusama addresses to rotki to track your KSM balances. rotki queries the Kusama RPC endpoint you configure."
+metaDescription: "Add your Kusama addresses to rotki to track your KSM balances. rotki queries the Kusama RPC endpoint you configure."
 keywords: "kusama portfolio tracker, ksm wallet tracker, kusama tax report, substrate tracker"
 features:
   - "KSM address balances (free and reserved) read directly from the Substrate node you connect to."

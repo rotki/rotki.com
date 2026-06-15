@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/badger.png"
 tagline: "Badger DAO airdrop tracker - BADGER claim, decoded"
 intro: "rotki decodes the BADGER airdrop (BadgerHunt) claim on Ethereum as an income event for tax reporting."
+metaDescription: "rotki decodes the BADGER airdrop (BadgerHunt) claim on Ethereum as an income event for tax reporting."
 keywords: "badger dao portfolio tracker, badger airdrop tracker, badgerhunt claim"
 features:
   - "BADGER airdrop (BadgerHunt) claim on Ethereum decoded as an income event."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/liquity.svg"
 tagline: "Liquity troves, stability pool, and LQTY staking, decoded locally"
 intro: "rotki tracks Liquity v1 troves and Liquity v2 transactions, the Stability Pool, LQTY staking, and DSProxy-managed troves (including ones created via DefiSaver). Debts appear as liabilities in your dashboard so your net worth stays accurate."
+metaDescription: "rotki tracks Liquity v1 troves and Liquity v2 transactions, the Stability Pool, LQTY staking, and DSProxy-managed troves (including ones created via DefiSaver)."
 keywords: "liquity portfolio tracker, liquity v2 tracker, lusd trove tracker, lqty staking, liquity stability pool, defisaver liquity"
 features:
   - "Trove collateral, debt, borrowing fees, and liquidation events decoded for v1."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/kyber.svg"
 tagline: "KyberSwap aggregator swaps with refunds, decoded locally"
 intro: "rotki decodes KyberSwap aggregator trades, including swaps with refunds, where the refund is deducted from the original swap amount for a clean result. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes KyberSwap aggregator trades, including swaps with refunds, where the refund is deducted from the original swap amount for a clean result."
 keywords: "kyber portfolio tracker, kyberswap tracker, kyber aggregator, kyber defi tax"
 features:
   - "KyberSwap aggregator trades decoded as swap events."

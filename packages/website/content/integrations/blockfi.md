@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/blockfi.svg"
 tagline: "BlockFi historical records for tax and bankruptcy claims"
 intro: "BlockFi filed for bankruptcy in November 2022 and ceased operations. If you held assets there, rotki can ingest your historical BlockFi trades, interest, deposits, and withdrawals from CSV exports so they appear in your portfolio history and tax reports."
+metaDescription: "BlockFi filed for bankruptcy in November 2022 and ceased operations."
 keywords: "blockfi historical records, blockfi tax report, blockfi interest income, blockfi bankruptcy records"
 features:
   - "CSV import for BlockFi trading activity (trades export)."

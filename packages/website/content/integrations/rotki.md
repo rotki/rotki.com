@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/rotki.svg"
 tagline: "rotki Sponsorship NFT, decoded locally"
 intro: "rotki recognises the purchase and mint of a rotki Sponsorship NFT so your sponsorship appears in your event history, with its tier, alongside the rest of your portfolio. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki recognises the purchase and mint of a rotki Sponsorship NFT so your sponsorship appears in your event history, with its tier, alongside the rest of your"
 keywords: "rotki sponsorship nft, rotki nft tracker, rotki tier nft"
 features:
   - "rotki Sponsorship NFT purchase and mint decoded as protocol events."

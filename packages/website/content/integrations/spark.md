@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/spark.svg"
 tagline: "Spark lending, savings, and SPK, decoded locally"
 intro: "rotki decodes your Spark Protocol activity: Spark Lend supplies and borrows, Spark Savings (sDAI / sUSDS) deposits and withdrawals, the SPK airdrop claim and staking, and Spark proxy-account balances. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes your Spark Protocol activity: Spark Lend supplies and borrows, Spark Savings (sDAI / sUSDS) deposits and withdrawals, the SPK airdrop claim"
 keywords: "spark portfolio tracker, spark protocol tracker, sdai tracker, susds tracker, spk airdrop claim, spark savings tracker"
 features:
   - "Spark Lend supplies, withdrawals, borrows, and repayments decoded."

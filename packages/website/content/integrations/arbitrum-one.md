@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/arbitrum_one.svg"
 tagline: "Arbitrum One portfolio tracker - L2 activity, decoded on your machine"
 intro: "Add your Arbitrum One addresses to rotki to track ARB and token balances, decoded transactions, bridge events, and DeFi activity."
+metaDescription: "Add your Arbitrum One addresses to rotki to track ARB and token balances, decoded transactions, bridge events, and DeFi activity."
 keywords: "arbitrum portfolio tracker, arb wallet tracker, arbitrum one tax report, arbitrum defi tracker"
 features:
   - "Address balances - ARB, ETH, and ERC-20 tokens on Arbitrum One."

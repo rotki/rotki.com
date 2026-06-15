@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/juicebox.svg"
 tagline: "Juicebox project payments on Ethereum, decoded locally"
 intro: "rotki decodes the payments you make to Juicebox projects on Ethereum and recognises the reward NFT you receive in return. Processing is local; you choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes the payments you make to Juicebox projects on Ethereum and recognises the reward NFT you receive in return."
 keywords: "juicebox portfolio tracker, juicebox treasury, juicebox payments, dao funding tracker"
 features:
   - "Payments to Juicebox projects decoded as outgoing ETH events with the Juicebox counterparty."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/pump-fun.png"
 tagline: "Pump.fun trades and fees on Solana, decoded locally"
 intro: "rotki decodes your Pump.fun buys and sells on Solana as trade events and recognises the Pump.fun protocol and coin-creator fees, so your memecoin activity has a clear cost basis. You choose which Solana RPC endpoint handles the queries."
+metaDescription: "rotki decodes your Pump.fun buys and sells on Solana as trade events and recognises the Pump.fun protocol and coin-creator fees, so your memecoin activity has"
 keywords: "pump.fun portfolio tracker, solana memecoin tracker, pumpfun trade history, solana defi tax"
 features:
   - "Pump.fun buys and sells decoded as trade events on Solana."

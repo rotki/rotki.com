@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/binance.svg"
 tagline: "Binance portfolio tracker - read-only, runs on your machine"
 intro: "Connect your Binance account to rotki and import spot trades, deposits and withdrawals, Convert swaps, margin and futures positions, and Simple Earn interest. Use a read-only API key or import Binance's CSV exports."
+metaDescription: "Connect your Binance account to rotki and import spot trades, deposits and withdrawals, Convert swaps, margin and futures positions, and Simple Earn interest."
 keywords: "binance portfolio tracker, binance tax report, binance cost basis, binance csv import, binance futures tracker, binance earn tracker"
 features:
   - "Spot trades - full trade history once you select your market pairs."

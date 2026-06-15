@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/matic.svg"
 tagline: "WPOL wraps and unwraps on Polygon, decoded locally"
 intro: "rotki decodes WMATIC / WPOL deposit (wrap) and withdraw (unwrap) events so POL and WPOL movements appear as their underlying native-token transfer. You choose which Polygon RPC endpoint handles the queries."
+metaDescription: "rotki decodes WMATIC / WPOL deposit (wrap) and withdraw (unwrap) events so POL and WPOL movements appear as their underlying native-token transfer."
 keywords: "wmatic tracker, wpol tracker, wrapped pol, wrapped matic, polygon weth"
 features:
   - "Wrap and unwrap events decoded into the underlying POL movement."

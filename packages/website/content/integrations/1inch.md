@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/1inch.svg"
 tagline: "1inch portfolio tracker - aggregator swaps, including pool-routed"
 intro: "rotki decodes 1inch aggregator swaps (v4, v5, and v6, including Fusion-routed) across Ethereum, Arbitrum, Optimism, Polygon, and Gnosis, including swaps that settle through a Balancer pool."
+metaDescription: "rotki decodes 1inch aggregator swaps (v4, v5, and v6, including Fusion-routed) across Ethereum, Arbitrum, Optimism, Polygon, and Gnosis, including swaps that"
 keywords: "1inch portfolio tracker, 1inch aggregator tracker, 1inch defi tax, 1inch swap history"
 features:
   - "1inch v4, v5, and v6 aggregator swaps decoded as clean swap events."

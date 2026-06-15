@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/llamazip.png"
 tagline: "LlamaZip calldata-optimised swaps, decoded locally"
 intro: "rotki decodes LlamaZip swaps, DefiLlama's calldata-optimised swap router built for L2 cost savings. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes LlamaZip swaps, DefiLlama's calldata-optimised swap router built for L2 cost savings. You choose which RPC endpoint handles the queries."
 keywords: "llamazip portfolio tracker, llamazip defi tax, defillama swap"
 features:
   - "LlamaZip swaps decoded as swap events."

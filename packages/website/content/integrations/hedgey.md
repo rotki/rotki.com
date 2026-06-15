@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/hedgey_light.svg"
 tagline: "Hedgey voting token lockups and plan redemptions on Ethereum, decoded"
 intro: "rotki decodes the Hedgey voting-token-lockups flow on Ethereum: when you create a voting vault for a lockup, when you (re)delegate the locked voting power, and when you redeem unlocked tokens out of a plan. Outstanding Hedgey lockup balances are also queried so they show up in your portfolio."
+metaDescription: "rotki decodes the Hedgey voting-token-lockups flow on Ethereum: when you create a voting vault for a lockup, when you (re)delegate the locked voting power"
 keywords: "hedgey portfolio tracker, hedgey vesting, hedgey voting lockup, hedgey plan redemption"
 features:
   - "Voting Vault creation: when a lockup creates its voting vault, the matching delegate-changed event is decoded as a governance-subtype event against the Hedgey counterparty, with the plan ID in the notes."

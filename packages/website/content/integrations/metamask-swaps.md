@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/metamask.svg"
 tagline: "MetaMask in-wallet swaps, decoded locally"
 intro: "rotki decodes swaps executed through MetaMask's built-in swap feature. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes swaps executed through MetaMask's built-in swap feature. You choose which RPC endpoint handles the queries."
 keywords: "metamask swaps tracker, metamask defi tax, metamask swap history"
 features:
   - "MetaMask in-wallet swaps decoded as swap events, with the MetaMask swap fee recognised."

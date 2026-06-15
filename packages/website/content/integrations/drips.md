@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/drips.png"
 tagline: "Drips v1 streaming payments, decoded"
 intro: "rotki decodes Drips v1 activity on Ethereum and Polygon PoS: outgoing gifts (Give) and ongoing streams (Drip) you send, splits you configure, and funds you collect from incoming drips."
+metaDescription: "rotki decodes Drips v1 activity on Ethereum and Polygon PoS: outgoing gifts (Give) and ongoing streams (Drip) you send, splits you configure, and funds you"
 keywords: "drips portfolio tracker, drips network, streaming payments tracker, drips splits"
 features:
   - "Outgoing Give calls labelled as donations against the Drips counterparty."

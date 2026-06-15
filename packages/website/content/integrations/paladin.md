@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/paladin.svg"
 tagline: "Paladin Quest bribe claims, decoded locally"
 intro: "rotki decodes the reward claims you make from Paladin Quest veCRV bribe markets. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes the reward claims you make from Paladin Quest veCRV bribe markets. You choose which Ethereum RPC endpoint handles the queries."
 keywords: "paladin portfolio tracker, paladin quest, vecrv bribes, paladin rewards"
 features:
   - "Paladin Quest veCRV bribe reward claims decoded as income events, labelled with the bribe period."

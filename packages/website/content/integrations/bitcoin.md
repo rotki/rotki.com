@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/bitcoin.svg"
 tagline: "Bitcoin portfolio tracker - xpub, taproot, and single addresses"
 intro: "Track multiple Bitcoin addresses or whole wallets via xpub/ypub/zpub keys, including Taproot."
+metaDescription: "Track multiple Bitcoin addresses or whole wallets via xpub/ypub/zpub keys, including Taproot."
 keywords: "bitcoin portfolio tracker, btc wallet tracker, xpub tracker, taproot tracker, bitcoin tax report, btc cost basis"
 features:
   - "Single addresses: legacy (P2PKH), SegWit (P2WPKH/Bech32), and Taproot (Bech32m/P2TR)."

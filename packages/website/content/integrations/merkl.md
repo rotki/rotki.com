@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/merkl_light.svg"
 tagline: "Merkl incentive reward claims, decoded locally"
 intro: "rotki decodes the reward claims you make from the Merkl distributor, including rewards routed through Merkl by other protocols such as Morpho. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes the reward claims you make from the Merkl distributor, including rewards routed through Merkl by other protocols such as Morpho."
 keywords: "merkl portfolio tracker, merkl rewards, angle merkl, morpho merkl rewards, defi incentive rewards"
 features:
   - "Merkl reward claims decoded as income events with the Merkl counterparty."

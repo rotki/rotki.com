@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bitpanda.svg"
 tagline: "Bitpanda portfolio tracker - local, private, complete"
 intro: "Connect Bitpanda to rotki to import trades, deposits, withdrawals, and balances."
+metaDescription: "Connect Bitpanda to rotki to import trades, deposits, withdrawals, and balances."
 keywords: "bitpanda portfolio tracker, bitpanda tax report, bitpanda cost basis"
 features:
   - "Spot trades imported as swap events with fees."

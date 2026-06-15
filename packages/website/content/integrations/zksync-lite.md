@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/zksync_lite.svg"
 tagline: "ZKSync Lite balances and transactions, locally tracked"
 intro: "Add your ZKSync Lite addresses to rotki to track balances and decoded transaction history on the original ZKSync rollup. You choose which ZKSync Lite endpoint handles the queries."
+metaDescription: "Add your ZKSync Lite addresses to rotki to track balances and decoded transaction history on the original ZKSync rollup."
 keywords: "zksync lite portfolio tracker, zksync 1 tracker, zksync rollup tracker, zksync tax report"
 features:
   - "Balances tracked for your ZKSync Lite addresses."

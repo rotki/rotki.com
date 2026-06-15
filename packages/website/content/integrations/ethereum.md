@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/ethereum.svg"
 tagline: "Ethereum portfolio tracker that never asks for your keys"
 intro: "Add your Ethereum addresses (or ENS names, or read-only watch addresses) to rotki and you get balances, full transaction history, ERC-20 holdings, NFTs, and decoded DeFi activity for every protocol rotki ships a decoder for - all queried directly from the RPC endpoint you choose."
+metaDescription: "Add your Ethereum addresses (or ENS names, or read-only watch addresses) to rotki and you get balances, full transaction history, ERC-20 holdings, NFTs"
 keywords: "ethereum portfolio tracker, eth wallet tracker, ethereum tax report, eth cost basis, defi pnl tracker, erc20 tracker, ens portfolio"
 features:
   - "ETH and ERC-20 balances queried per tracked address against the RPC you configure."

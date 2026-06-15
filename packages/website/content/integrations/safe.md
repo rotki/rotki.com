@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/safemultisig.svg"
 tagline: "Safe multisig tracking, read-only and local"
 intro: "Track Safe multisig accounts in rotki: balances, transactions, decoded DeFi activity, and multisig management events for treasuries, DAOs, and personal multisigs. You choose which RPC endpoint handles the queries."
+metaDescription: "Track Safe multisig accounts in rotki: balances, transactions, decoded DeFi activity, and multisig management events for treasuries, DAOs, and personal"
 keywords: "safe multisig tracker, gnosis safe tracker, treasury tracker, dao multisig accounting"
 features:
   - "Add any Safe address as a read-only watch address - no Safe owner keys needed."

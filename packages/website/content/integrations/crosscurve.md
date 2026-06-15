@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/crosscurve.svg"
 tagline: "Cross-chain swaps decoded as paired bridge events, source and destination linked"
 intro: "CrossCurve lets you send a token on one chain and receive a (potentially different) token on another, often by routing through Curve stableswap pools and CrossCurve's own messaging layer. rotki decodes both legs of that flow so a cross-chain swap shows up as a single bridge movement instead of an unrelated spend and receive."
+metaDescription: "CrossCurve lets you send a token on one chain and receive a (potentially different) token on another, often by routing through Curve stableswap pools"
 keywords: "CrossCurve portfolio tracker, CrossCurve bridge tracker, CrossCurve tax, curve cross-chain"
 features:
   - "Source chain: the token you send through CrossCurve is labelled as a CrossCurve bridge deposit against your address."

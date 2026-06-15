@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/hyperliquid.svg"
 tagline: "Hyperliquid (HyperEVM) wallet tracking and decoded DeFi activity"
 intro: "rotki tracks Hyperliquid (HyperEVM) addresses as an EVM chain: HYPE and ERC-20 balances per address, transaction decoding, and counterparty-tagged DeFi events for the protocols rotki ships with on Hyperliquid."
+metaDescription: "rotki tracks Hyperliquid (HyperEVM) addresses as an EVM chain: HYPE and ERC-20 balances per address, transaction decoding, and counterparty-tagged DeFi events"
 keywords: "hyperliquid portfolio tracker, hyperevm wallet tracker, hyperliquid defi, hype tracker"
 features:
   - "HYPE (native gas) and ERC-20 token balances per tracked Hyperliquid address."

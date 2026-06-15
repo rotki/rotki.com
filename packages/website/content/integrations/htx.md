@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/htx.svg"
 tagline: "HTX (formerly Huobi) spot trades, transfers, and balances, locally signed"
 intro: "Connect HTX (formerly Huobi) to rotki to import spot trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect HTX (formerly Huobi) to rotki to import spot trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
 keywords: "htx portfolio tracker, huobi portfolio tracker, htx tax report, htx cost basis"
 features:
   - "Spot trades imported as swap events from the HTX match-results endpoint."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/eas.png"
 tagline: "EAS attestations on Ethereum, Arbitrum, Optimism, and Base, decoded with a link to easscan"
 intro: "rotki decodes Ethereum Attestation Service (EAS) Attested events as informational attest events tied to your address, with a direct link to the attestation page on easscan for the chain it was made on."
+metaDescription: "rotki decodes Ethereum Attestation Service (EAS) Attested events as informational attest events tied to your address, with a direct link to the attestation"
 keywords: "ethereum attestation service tracker, eas tracker, easscan, on-chain attestation"
 features:
   - "Attested events from the EAS attestation service contract are decoded as informational attest events against the EAS counterparty."

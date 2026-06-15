@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/aerodrome.png"
 tagline: "Aerodrome portfolio tracker - Base's ve(3,3) DEX, decoded"
 intro: "rotki decodes Aerodrome swaps, LP positions, gauge rewards, and veAERO voting on Base, including fee claims via Aerodrome's fee addresses."
+metaDescription: "rotki decodes Aerodrome swaps, LP positions, gauge rewards, and veAERO voting on Base, including fee claims via Aerodrome's fee addresses."
 keywords: "aerodrome portfolio tracker, aero defi tracker, base dex tracker, aerodrome lp, veaero tracker"
 features:
   - "Swaps and LP positions on Base."

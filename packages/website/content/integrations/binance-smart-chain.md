@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/binance_sc.svg"
 tagline: "BNB Smart Chain portfolio tracker - BSC balances and decoded activity"
 intro: "Add your BNB Smart Chain (BSC) addresses to rotki to track BNB and BEP-20 balances, decoded transactions, and DeFi activity."
+metaDescription: "Add your BNB Smart Chain (BSC) addresses to rotki to track BNB and BEP-20 balances, decoded transactions, and DeFi activity."
 keywords: "bsc portfolio tracker, bnb chain tracker, binance smart chain tax report, bep20 tracker, bsc defi tracker"
 features:
   - "Address balances - BNB and BEP-20 tokens on BNB Smart Chain."

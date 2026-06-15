@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/velodrome.png"
 tagline: "Velodrome swaps, LP, gauges, and veVELO, decoded locally"
 intro: "rotki decodes Velodrome swaps, liquidity-pool positions, gauge reward claims, and veVELO locking on Optimism. You choose which Optimism RPC endpoint handles the queries."
+metaDescription: "rotki decodes Velodrome swaps, liquidity-pool positions, gauge reward claims, and veVELO locking on Optimism."
 keywords: "velodrome portfolio tracker, velo defi tracker, velodrome lp, ve velo tracker, optimism dex tracker"
 features:
   - "Velodrome swaps decoded as swap events."

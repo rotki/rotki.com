@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/account_delegation.svg"
 tagline: "Account Delegation tracker - EIP-7702 set-code activity, decoded"
 intro: "rotki decodes EIP-7702 account-delegation events - when an EOA delegates its code to a smart-contract implementation - so your wallet's set-code state and its consequences are visible in your event history. Processing is local; your addresses and delegations stay on your computer."
+metaDescription: "rotki decodes EIP-7702 account-delegation events - when an EOA delegates its code to a smart-contract implementation - so your wallet's set-code state and its"
 keywords: "eip-7702 tracker, account delegation tracker, set code authorization, smart eoa tracker"
 features:
   - "EIP-7702 set-code (delegation) events decoded as protocol events."

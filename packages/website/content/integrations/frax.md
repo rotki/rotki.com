@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/frax.png"
 tagline: "FPIS airdrop claim, decoded"
 intro: "rotki tags the FPIS (Frax Price Index Share) airdrop claim against the Frax counterparty on Ethereum so the claim shows up as a Frax-attributed receive in your history."
+metaDescription: "rotki tags the FPIS (Frax Price Index Share) airdrop claim against the Frax counterparty on Ethereum so the claim shows up as a Frax-attributed receive in your"
 keywords: "frax portfolio tracker, fpis airdrop, frax airdrop claim"
 features:
   - "FPIS airdrop claim is decoded as an airdrop receive event tagged against the Frax counterparty."

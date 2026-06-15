@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/giveth.jpg"
 tagline: "Giveth donations, GIVpower locks, and GIV reward claims, decoded"
 intro: "rotki decodes Giveth activity across the chains Giveth is deployed on: donations you send (split per recipient for multi-donations), donations you receive as a project, GIV locks into GIVpower rounds, and GIV reward claims from the distributor."
+metaDescription: "rotki decodes Giveth activity across the chains Giveth is deployed on: donations you send (split per recipient for multi-donations), donations you receive as a"
 keywords: "giveth portfolio tracker, giv token tracker, giveth donations tax, givpower tracker, givreward"
 features:
   - "Outgoing donations through Giveth tagged as donate-subtype spends against the Giveth counterparty. Native-token multi-donations to several recipients in one transaction are split into per-recipient donation events instead of collapsing into one aggregate spend."

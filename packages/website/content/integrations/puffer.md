@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/puffer.svg"
 tagline: "Puffer Finance airdrop claims, decoded locally"
 intro: "rotki decodes Puffer Finance airdrop claims (Puffer S1 and PufferXEigen S2) as airdrop income, and tracks pufETH like any other token balance. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Puffer Finance airdrop claims (Puffer S1 and PufferXEigen S2) as airdrop income, and tracks pufETH like any other token balance."
 keywords: "puffer finance portfolio tracker, pufeth tracker, puffer airdrop, puffer restaking"
 features:
   - "Puffer S1 and PufferXEigen S2 airdrop claims decoded as airdrop income events."

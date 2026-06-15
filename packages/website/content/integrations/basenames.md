@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/base.svg"
 tagline: "Basenames portfolio tracker - Base's name service, decoded"
 intro: "rotki decodes Basenames registrations and name transfers on Base, and resolves Basenames alongside ENS so your addresses display with human-readable names."
+metaDescription: "rotki decodes Basenames registrations and name transfers on Base, and resolves Basenames alongside ENS so your addresses display with human-readable names."
 keywords: "basenames portfolio tracker, base name service, basenames registration, base ens"
 features:
   - "Basenames registration events decoded."

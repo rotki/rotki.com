@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/superfluid.svg"
 tagline: "Superfluid streams and super tokens, decoded locally"
 intro: "rotki decodes Superfluid money streams and super-token wrapping on rotki's supported EVM chains. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Superfluid money streams and super-token wrapping on rotki's supported EVM chains. You choose which RPC endpoint handles the queries."
 keywords: "superfluid portfolio tracker, superfluid streaming, super token tracker, superfluid defi tax"
 features:
   - "Superfluid streams decoded: start and stop events labelled with the monthly flow rate, sender, and receiver."

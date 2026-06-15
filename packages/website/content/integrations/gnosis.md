@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/gnosis.svg"
 tagline: "Gnosis Chain portfolio tracker that never asks for your keys"
 intro: "Add your Gnosis Chain addresses to rotki and get balances, decoded transactions, and counterparty-tagged DeFi activity. rotki is a local application that talks directly to the Gnosis RPC endpoint you configure, with no rotki-operated server in the middle."
+metaDescription: "Add your Gnosis Chain addresses to rotki and get balances, decoded transactions, and counterparty-tagged DeFi activity."
 keywords: "gnosis chain portfolio tracker, xdai tracker, gno wallet tracker, gnosis chain tax report"
 features:
   - "xDAI (native gas), GNO, and ERC-20 token balances per tracked address."

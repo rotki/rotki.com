@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/coinbasepro.svg"
 tagline: "Coinbase Pro historical records via CSV import"
 intro: "Coinbase Pro was retired by Coinbase in late 2022. If you traded there, rotki can ingest your historical trades and transfers from the Coinbase Pro CSV export and feed them into your portfolio history and tax reports."
+metaDescription: "Coinbase Pro was retired by Coinbase in late 2022. If you traded there, rotki can ingest your historical trades and transfers from the Coinbase Pro CSV export"
 keywords: "coinbase pro portfolio tracker, coinbase pro tax report, coinbase pro historical data, coinbase pro csv"
 features:
   - "CSV import of Coinbase Pro account statements: trades, deposits, and withdrawals."

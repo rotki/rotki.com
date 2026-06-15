@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/runmoney.png"
 tagline: "Runmoney club membership and staking on Base, decoded locally"
 intro: "rotki decodes Runmoney club activity on Base: the membership join (fee and NFT) and USDC staking and unstaking. You choose which Base RPC endpoint handles the queries."
+metaDescription: "rotki decodes Runmoney club activity on Base: the membership join (fee and NFT) and USDC staking and unstaking."
 keywords: "runmoney portfolio tracker, runmoney club, runmoney staking, base defi tracker"
 features:
   - "Runmoney club join decoded, including the ETH membership fee and the membership NFT received."

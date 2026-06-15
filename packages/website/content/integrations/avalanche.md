@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/avalanche.svg"
 tagline: "Avalanche C-Chain tracker - AVAX balances, locally"
 intro: "Add your Avalanche C-Chain addresses to rotki to track your AVAX balances locally."
+metaDescription: "Add your Avalanche C-Chain addresses to rotki to track your AVAX balances locally."
 keywords: "avalanche portfolio tracker, avax wallet tracker, avalanche c-chain tracker, avax balance tracker"
 features:
   - "AVAX native balance tracking on Avalanche C-Chain."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/degen.svg"
 tagline: "DEGEN airdrop claims on Base, decoded"
 intro: "rotki decodes DEGEN airdrop claims on Base so each season's claim shows up against the Degen counterparty in your history."
+metaDescription: "rotki decodes DEGEN airdrop claims on Base so each season's claim shows up against the Degen counterparty in your history."
 keywords: "degen token tracker, degen base tracker, degen airdrop, farcaster degen"
 features:
   - "Degen airdrop 1 claims decoded as airdrop receive events against the Degen counterparty."

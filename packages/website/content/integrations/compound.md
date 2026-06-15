@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/compound.svg"
 tagline: "Compound v2 and v3 lending, decoded"
 intro: "rotki decodes your Compound v2 activity on Ethereum and your Compound v3 (Comet) activity on Ethereum, Arbitrum, Optimism, Base, Polygon PoS, and Scroll: supplies, withdrawals, borrows, repayments, and COMP claims."
+metaDescription: "rotki decodes your Compound v2 activity on Ethereum and your Compound v3 (Comet) activity on Ethereum, Arbitrum, Optimism, Base, Polygon PoS, and Scroll"
 keywords: "compound portfolio tracker, compound v3 tracker, comet tracker, compound defi tax, comp rewards tracker"
 features:
   - "Compound v2 on Ethereum: cToken mint/redeem and borrow/repay events are decoded against the Compound counterparty."

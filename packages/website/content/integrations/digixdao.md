@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/digixdao.jpg"
 tagline: "DGD-for-ETH refund events from the 2020 DigixDAO wind-down, decoded"
 intro: "DigixDAO voted to dissolve in 2020 and refunded its treasury to DGD holders. rotki decodes the DGD burn and the paired ETH refund from the dissolution contract so the wind-down shows up cleanly in your history."
+metaDescription: "DigixDAO voted to dissolve in 2020 and refunded its treasury to DGD holders."
 keywords: "digixdao historical records, dgd refund, digixdao dissolution, dgd tax"
 features:
   - "DGD sent to the DigixDAO refund contract is tagged as a burn against the DigixDAO counterparty."

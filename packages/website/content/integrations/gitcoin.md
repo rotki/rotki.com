@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gitcoin.svg"
 tagline: "Gitcoin Grants donations, votes, and matching payouts, decoded"
 intro: "rotki decodes Gitcoin Grants activity for both the legacy bulk-checkout flow and the Allo Protocol v2 rounds: donations you send (as a donate-subtype spend) and donations you receive (matched payouts, direct grants, retro funding) all flow into your history tagged against the Gitcoin counterparty."
+metaDescription: "rotki decodes Gitcoin Grants activity for both the legacy bulk-checkout flow and the Allo Protocol v2 rounds: donations you send (as a donate-subtype spend)"
 keywords: "gitcoin portfolio tracker, gitcoin grants tracker, gitcoin donation tax, gitcoin rounds, gitcoin allo, gitcoin retro funding"
 features:
   - "Gitcoin v1 (bulk checkout) donations decoded on Ethereum, Arbitrum One, Optimism, and Polygon PoS."

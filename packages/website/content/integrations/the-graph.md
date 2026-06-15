@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/thegraph.svg"
 tagline: "The Graph GRT delegations and rewards, decoded locally"
 intro: "rotki decodes The Graph GRT delegations and undelegations, indexer reward distributions, and delegation transfers from Ethereum to Arbitrum. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes The Graph GRT delegations and undelegations, indexer reward distributions, and delegation transfers from Ethereum to Arbitrum."
 keywords: "the graph portfolio tracker, grt staking tracker, graph delegation, indexer rewards"
 features:
   - "GRT delegations and undelegations decoded as protocol events."

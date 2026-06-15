@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/echo.png"
 tagline: "Echo group-led deals on Base, decoded"
 intro: "Echo is the on-chain investment platform where members follow a group lead into individual deals, with everyone's USDC commitment pooled into a single on-chain entity that invests in the target project. rotki decodes the on-chain side of that flow on Base: your commitment into a deal pool, Echo's platform fee, and full refunds if you're deregistered before the pool closes."
+metaDescription: "Echo is the on-chain investment platform where members follow a group lead into individual deals, with everyone's USDC commitment pooled into a single on-chain"
 keywords: "echo portfolio tracker, echo fundraising, echo deal tracker, echo cobie, echo base"
 features:
   - "Deal commitment: the USDC (or other deal-currency token) you send to follow a group lead into a deal is tagged as a deposit-to-protocol event against the Echo counterparty, with the deal pool address recorded in the notes."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/summer_fi.svg"
 tagline: "Summer.fi vaults and proxy accounts, decoded locally"
 intro: "rotki decodes Summer.fi (formerly Oasis) vault interactions and detects token balances held on Summer.fi proxy accounts. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Summer.fi (formerly Oasis) vault interactions and detects token balances held on Summer.fi proxy accounts."
 keywords: "summer.fi portfolio tracker, oasis defi tracker, summer fi proxy, dsproxy tracker"
 features:
   - "Summer.fi vault deposits and withdrawals decoded as protocol events."

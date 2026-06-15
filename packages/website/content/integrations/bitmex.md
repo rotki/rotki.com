@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bitmex.svg"
 tagline: "BitMEX portfolio tracker - derivatives and margin, locally tracked"
 intro: "Connect BitMEX to rotki to import your margin trading history, deposits, withdrawals, and balances."
+metaDescription: "Connect BitMEX to rotki to import your margin trading history, deposits, withdrawals, and balances."
 keywords: "bitmex portfolio tracker, bitmex tax report, bitmex margin tracker, bitmex perpetual swap tracker"
 features:
   - "Margin trades imported as margin position records with realised P/L and fees."

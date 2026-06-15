@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/convex.jpeg"
 tagline: "Curve LP boosting, vlCVX, and rewards decoded"
 intro: "rotki decodes your Convex Finance activity on Ethereum: Curve LP deposits and withdrawals, vlCVX locks and unlocks, and CRV/CVX/extra reward claims."
+metaDescription: "rotki decodes your Convex Finance activity on Ethereum: Curve LP deposits and withdrawals, vlCVX locks and unlocks, and CRV/CVX/extra reward claims."
 keywords: "convex portfolio tracker, cvx tracker, vlcvx tracker, convex curve boost, convex rewards"
 features:
   - "Convex deposits and withdrawals of Curve LP tokens against the matching Convex pool."

@@ -12,6 +12,30 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { integrationSlug } from '../app/utils/integration-slug';
 
+const META_DESCRIPTION_MAX = 160;
+
+/**
+ * Derives a <=160-char SERP meta description from a longer `intro`: the whole
+ * intro if it already fits, else a clean first sentence, else a word-boundary
+ * trim with trailing junk stripped. Kept separate from `intro` so the visible
+ * paragraph can stay long while the meta description stays within budget.
+ */
+function deriveMetaDescription(intro: string): string {
+  const text = intro.trim().replace(/\s+/g, ' ');
+  if (text.length <= META_DESCRIPTION_MAX)
+    return text;
+
+  const sentence = /^(.*?[!.?])(?:\s|$)/.exec(text)?.[1];
+  if (sentence && sentence.length >= 60 && sentence.length <= META_DESCRIPTION_MAX)
+    return sentence;
+
+  return text
+    .slice(0, META_DESCRIPTION_MAX)
+    .replace(/\s+\S*$/, '')
+    .replace(/[\s,.:;–—-]+(?:and|or|with|including)?$/i, '')
+    .trim();
+}
+
 interface RawItem {
   image: string;
   label: string;
@@ -89,6 +113,7 @@ function renderFrontmatter(item: RawItem, type: IntegrationType, slug: string): 
     `image: ${JSON.stringify(image)}`,
     `tagline: ${JSON.stringify(tagline)}`,
     `intro: ${JSON.stringify(intro)}`,
+    `metaDescription: ${JSON.stringify(deriveMetaDescription(intro))}`,
     `keywords: ${JSON.stringify(keywords)}`,
     'features: []',
     'limitations: []',

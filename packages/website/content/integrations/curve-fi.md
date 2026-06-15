@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/curve.png"
 tagline: "Pools, gauges, veCRV, crvUSD, and Llama Lend, decoded"
 intro: "rotki decodes your Curve activity across the EVM chains where Curve is deployed: pool swaps, deposits and withdrawals, gauge interactions, voting bribes, and the newer crvUSD and Llama Lend submodules. Locked CRV in the veCRV contract is shown in your balances."
+metaDescription: "rotki decodes your Curve activity across the EVM chains where Curve is deployed: pool swaps, deposits and withdrawals, gauge interactions, voting bribes"
 keywords: "curve portfolio tracker, curve fi tracker, curve gauge rewards, vecrv tracker, crv lock tracker, crvusd tracker, llama lend tracker"
 features:
   - "Pool swaps (including routes via the Curve router) decoded as swap events."

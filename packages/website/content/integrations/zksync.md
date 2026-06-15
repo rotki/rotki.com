@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/zksync.jpg"
 tagline: "ZKSync bridge transfers, decoded locally"
 intro: "rotki decodes ZKSync bridge deposits and ZKSync Lite batch withdrawals on the Ethereum side. For ZKSync Lite balances see the [ZKSync Lite](/integrations/zksync-lite) blockchain integration. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes ZKSync bridge deposits and ZKSync Lite batch withdrawals on the Ethereum side."
 keywords: "zksync bridge tracker, zksync lite withdrawal, l1 l2 zksync transfer"
 features:
   - "ZKSync bridge deposits decoded on the Ethereum side."

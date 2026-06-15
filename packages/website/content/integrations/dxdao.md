@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/dxdao.svg"
 tagline: "DXdao Mesa exchange (Gnosis Protocol v1) activity, decoded"
 intro: "rotki decodes interactions with the DXdao Mesa exchange contract on Ethereum: deposits, withdrawals, withdraw requests, and order placements from the batch-auction era."
+metaDescription: "rotki decodes interactions with the DXdao Mesa exchange contract on Ethereum: deposits, withdrawals, withdraw requests, and order placements from the"
 keywords: "DXdao historical records, DXdao Mesa, Gnosis Protocol v1, DXdao exchange"
 features:
   - "Deposits into the DXdao Mesa exchange contract tagged as deposit-to-protocol events against the DXdao counterparty."

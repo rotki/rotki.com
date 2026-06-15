@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/wxdai.png"
 tagline: "WXDAI wraps and unwraps on Gnosis Chain, decoded locally"
 intro: "rotki decodes WXDAI deposit (wrap) and withdraw (unwrap) events so xDAI and WXDAI movements appear as their underlying native-token transfer. You choose which Gnosis RPC endpoint handles the queries."
+metaDescription: "rotki decodes WXDAI deposit (wrap) and withdraw (unwrap) events so xDAI and WXDAI movements appear as their underlying native-token transfer."
 keywords: "wxdai tracker, wrapped xdai, gnosis chain weth equivalent"
 features:
   - "Wrap and unwrap events decoded into the underlying xDAI movement."

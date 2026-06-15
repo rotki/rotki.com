@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/bitcoin-cash.svg"
 tagline: "Bitcoin Cash portfolio tracker - xpub-aware, locally tracked"
 intro: "Track Bitcoin Cash addresses or whole wallets via xpub keys."
+metaDescription: "Track Bitcoin Cash addresses or whole wallets via xpub keys."
 keywords: "bitcoin cash portfolio tracker, bch wallet tracker, bch xpub tracker, bitcoin cash tax report, cashaddr tracker"
 features:
   - "Single BCH addresses (CashAddr or legacy format) or whole wallets via xpub keys."

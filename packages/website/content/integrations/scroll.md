@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/scroll.svg"
 tagline: "Scroll zkEVM balances, transactions, and DeFi, locally tracked"
 intro: "Add your Scroll addresses to rotki to track ETH and ERC-20 balances, decoded transactions, bridge transfers, and DeFi activity on the Scroll zkEVM. You choose which Scroll RPC endpoint handles the queries."
+metaDescription: "Add your Scroll addresses to rotki to track ETH and ERC-20 balances, decoded transactions, bridge transfers, and DeFi activity on the Scroll zkEVM."
 keywords: "scroll portfolio tracker, scroll zkevm tracker, scroll tax report, scroll defi tracker"
 features:
   - "ETH and ERC-20 token balances tracked for your Scroll addresses."

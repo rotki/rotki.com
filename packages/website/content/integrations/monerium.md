@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/monerium.svg"
 tagline: "Monerium regulated e-money (EURe, GBPe), decoded locally"
 intro: "rotki decodes the mints and burns of Monerium's regulated e-money tokens (EURe, GBPe, USDe, ISKe) on the chains where you hold them, and tracks their balances. Connecting your Monerium account enriches those events with bank-transfer, bridge, memo, and IBAN details and is a Basic (or higher) feature. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes the mints and burns of Monerium's regulated e-money tokens (EURe, GBPe, USDe, ISKe) on the chains where you hold them, and tracks their balances."
 keywords: "monerium portfolio tracker, eure tracker, gbpe tracker, regulated stablecoin tracker, sepa stablecoin"
 features:
   - "Monerium mints (issuance) and burns (redemption) of EURe, GBPe, USDe, and ISKe decoded as protocol events on the free tier."

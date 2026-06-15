@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/iconomi.svg"
 tagline: "ICONOMI strategy trades and balances, locally signed"
 intro: "Connect ICONOMI to rotki to import your strategy trades and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect ICONOMI to rotki to import your strategy trades and balances. rotki uses a read-only API key signed from your machine."
 keywords: "iconomi portfolio tracker, iconomi tax report, iconomi cost basis"
 features:
   - "Strategy buys and sells imported as swap events from your ICONOMI activity."

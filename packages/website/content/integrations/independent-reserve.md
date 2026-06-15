@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/independentreserve.svg"
 tagline: "Independent Reserve trades, transfers, and balances, locally signed"
 intro: "Connect Independent Reserve, Australia's longest-running regulated crypto exchange, to rotki to import trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect Independent Reserve, Australia's longest-running regulated crypto exchange, to rotki to import trades, deposits, withdrawals, and balances."
 keywords: "independent reserve portfolio tracker, independent reserve tax report, australia crypto accounting, new zealand crypto accounting"
 features:
   - "Spot trades imported as swap events with matched spend and receive sides."

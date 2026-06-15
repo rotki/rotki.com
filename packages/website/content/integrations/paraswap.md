@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/paraswap.svg"
 tagline: "ParaSwap aggregator swaps, decoded locally"
 intro: "rotki decodes ParaSwap aggregator trades across several EVM chains. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes ParaSwap aggregator trades across several EVM chains. You choose which RPC endpoint handles the queries."
 keywords: "paraswap portfolio tracker, paraswap aggregator, paraswap defi tax, paraswap swap history"
 features:
   - "ParaSwap aggregator swaps decoded as swap events."

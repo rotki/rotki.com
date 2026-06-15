@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gnosis_pay.png"
 tagline: "Gnosis Pay spends, refunds, and cashback, decoded locally"
 intro: "rotki decodes your Gnosis Pay activity on Gnosis Chain - card spends, refunds, cashback, and referral rewards - through your Safe. Connecting your Gnosis Pay account to enrich spends with merchant details is a Basic (or higher) feature. You choose which Gnosis RPC endpoint handles the queries."
+metaDescription: "rotki decodes your Gnosis Pay activity on Gnosis Chain - card spends, refunds, cashback, and referral rewards - through your Safe."
 keywords: "gnosis pay tracker, gnosis pay card, gnosis pay cashback, gnosis chain card spending, gnosis pay accounting"
 features:
   - "Card spends decoded as payment events on the free tier."

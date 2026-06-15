@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/monad.svg"
 tagline: "Monad balances and transactions, decoded locally"
 intro: "Add your Monad addresses to rotki to track balances and decode on-chain activity. You choose which Monad RPC endpoint handles the queries."
+metaDescription: "Add your Monad addresses to rotki to track balances and decode on-chain activity. You choose which Monad RPC endpoint handles the queries."
 keywords: "monad portfolio tracker, monad wallet tracker, monad accounting, monad defi tax"
 features:
   - "Native and token balances tracked for your Monad addresses."

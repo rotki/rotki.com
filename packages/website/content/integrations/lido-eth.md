@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/lido.svg"
 tagline: "Lido stETH, wstETH, and CSM bonds, decoded locally"
 intro: "rotki decodes Lido staking (ETH submitted for stETH) and stETH/wstETH wrapping, tracks your stETH and wstETH balances, and reads Lido CSM (Community Staking Module) node-operator bond balances. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Lido staking (ETH submitted for stETH) and stETH/wstETH wrapping, tracks your stETH and wstETH balances, and reads Lido CSM (Community Staking"
 keywords: "lido portfolio tracker, steth tracker, wsteth tracker, lido csm tracker, lido staking, eth liquid staking tracker"
 features:
   - "ETH submitted to Lido decoded as a staking deposit, with the stETH received recognised."

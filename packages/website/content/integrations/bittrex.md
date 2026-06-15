@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bittrex.svg"
 tagline: "Bittrex historical records for tax and audit"
 intro: "Bittrex US wound down in 2023 and Bittrex Global ceased operations later that year. If you traded there, rotki can ingest your historical Bittrex trades and transfers from CSV exports so they appear in your portfolio history and tax reports."
+metaDescription: "Bittrex US wound down in 2023 and Bittrex Global ceased operations later that year."
 keywords: "bittrex historical records, bittrex tax report, bittrex csv import"
 features:
   - "CSV import of Bittrex trade history and deposit/withdrawal exports."

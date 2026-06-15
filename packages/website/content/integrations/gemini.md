@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/gemini.svg"
 tagline: "Gemini portfolio tracker including Gemini Earn balances"
 intro: "Connect Gemini to rotki to import spot trades, transfers, and balances - including Gemini Earn balances added on top of your spot wallet. rotki uses a read-only (Auditor) API key signed from your computer."
+metaDescription: "Connect Gemini to rotki to import spot trades, transfers, and balances - including Gemini Earn balances added on top of your spot wallet."
 keywords: "gemini portfolio tracker, gemini tax report, gemini cost basis, gemini earn tracker"
 features:
   - "Spot trades imported from the mytrades endpoint as swap events with fees."

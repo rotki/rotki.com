@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/ens.svg"
 tagline: "ENS registrations, renewals, resolver changes, and ENS airdrop, decoded"
 intro: "rotki decodes the full lifecycle of an ENS name on Ethereum: registration and renewal (with the ETH cost), .eth name transfers, resolver and owner changes, addr/content-hash/text-record updates on the public resolver, and the original ENS governance-token airdrop claim. Tracked addresses also display their primary ENS name across the app, and ENS expirations show up as reminders in rotki's calendar."
+metaDescription: "rotki decodes the full lifecycle of an ENS name on Ethereum: registration and renewal (with the ETH cost), .eth name transfers, resolver and owner changes"
 keywords: "ens portfolio tracker, ethereum name service tracker, ens registration tracker, ens renewal tracker, ens airdrop claim, ens calendar reminder"
 features:
   - "Name registration: the NameRegistered event is decoded with the ETH paid, and the ETH spend is linked to the ENS counterparty."

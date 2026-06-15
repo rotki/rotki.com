@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/btcde.svg"
 tagline: "Bitcoin.de portfolio tracker - German P2P exchange, local data"
 intro: "Connect Bitcoin.de, Germany's peer-to-peer Bitcoin marketplace, to rotki to import your trades and account history with a read-only API key."
+metaDescription: "Connect Bitcoin.de, Germany's peer-to-peer Bitcoin marketplace, to rotki to import your trades and account history with a read-only API key."
 keywords: "bitcoin.de portfolio tracker, bitcoin.de tax report, bitcoin.de cost basis, deutschland crypto accounting"
 features:
   - "Bitcoin.de marketplace trades imported as swap events."

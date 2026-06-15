@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/socket.png"
 tagline: "Socket (Bungee) cross-chain bridge, decoded locally"
 intro: "rotki decodes Socket (Bungee) cross-chain bridge transactions. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Socket (Bungee) cross-chain bridge transactions. You choose which RPC endpoint handles the queries."
 keywords: "socket bridge tracker, bungee bridge tracker, socket protocol portfolio, cross chain bridge tracker"
 features:
   - "Socket (Bungee) bridge transactions decoded as protocol events on rotki's supported EVM chains."

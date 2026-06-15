@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/kucoin.svg"
 tagline: "KuCoin trades, transfers, and balances, locally signed"
 intro: "Connect your KuCoin account to rotki to import spot trades (current and v1 legacy formats), deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect your KuCoin account to rotki to import spot trades (current and v1 legacy formats), deposits, withdrawals, and balances."
 keywords: "kucoin portfolio tracker, kucoin tax report, kucoin cost basis, kucoin csv import"
 features:
   - "Spot trades imported as swap events; both the current API responses and the older v1 trade format are handled."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/shutter.png"
 tagline: "Shutter SHU airdrop and delegation, decoded locally"
 intro: "rotki decodes Shutter Network SHU airdrop claims into the vesting contract, vested SHU redemptions, and SHU delegation changes. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Shutter Network SHU airdrop claims into the vesting contract, vested SHU redemptions, and SHU delegation changes."
 keywords: "shutter portfolio tracker, shu airdrop, shutter network, shu vesting"
 features:
   - "SHU airdrop claims into the vesting contract decoded as airdrop income."

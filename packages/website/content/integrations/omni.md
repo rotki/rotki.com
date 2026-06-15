@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/omni.svg"
 tagline: "Omni genesis airdrop and staking, decoded locally"
 intro: "rotki decodes your Omni genesis airdrop claim and OMNI staking on Ethereum. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes your Omni genesis airdrop claim and OMNI staking on Ethereum. You choose which Ethereum RPC endpoint handles the queries."
 keywords: "omni network tracker, omni airdrop, omni staking, omni token tracker"
 features:
   - "Omni genesis airdrop claims decoded, including the ETH paid as a claim fee."

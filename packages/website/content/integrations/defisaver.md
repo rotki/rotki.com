@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/defisaver.jpeg"
 tagline: "DeFi Saver automation subscriptions, decoded"
 intro: "rotki recognises DeFi Saver automation subscription events on Ethereum, so subscribing to or deactivating an automation strategy shows up as a DeFi Saver event in your history."
+metaDescription: "rotki recognises DeFi Saver automation subscription events on Ethereum, so subscribing to or deactivating an automation strategy shows up as a DeFi Saver event"
 keywords: "defisaver portfolio tracker, defisaver automation, defi leverage tracker"
 features:
   - "Subscribe-to-automation events on the DeFi Saver SubStorage contract decoded as informational DeFi Saver events with the subscription ID and proxy address noted."

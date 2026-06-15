@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/rainbow.svg"
 tagline: "Rainbow Wallet swaps, decoded locally"
 intro: "rotki decodes swaps executed through the Rainbow Wallet swap router, including the Rainbow fee. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes swaps executed through the Rainbow Wallet swap router, including the Rainbow fee. You choose which RPC endpoint handles the queries."
 keywords: "rainbow swaps tracker, rainbow wallet swap, rainbow defi tax"
 features:
   - "Rainbow Wallet swaps decoded as swap events, with the Rainbow fee recognised."

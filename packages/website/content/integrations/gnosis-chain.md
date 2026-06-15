@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gnosis.svg"
 tagline: "xDai bridge and Omnibridge transfers between Ethereum and Gnosis Chain, decoded"
 intro: "rotki decodes both official Gnosis bridges between Ethereum and Gnosis Chain: the xDai bridge (for DAI ↔ xDAI, Gnosis Chain's native gas token) and the Omnibridge (for ERC-20s). Both legs of each transfer are tagged as bridge events so the same asset isn't double-counted as a spend and an unrelated receive. For Gnosis Chain balances and account activity see the [Gnosis](/integrations/gnosis) blockchain integration."
+metaDescription: "rotki decodes both official Gnosis bridges between Ethereum and Gnosis Chain: the xDai bridge (for DAI ↔ xDAI, Gnosis Chain's native gas token) and the"
 keywords: "gnosis omnibridge tracker, gnosis chain bridge, xdai bridge tracker"
 features:
   - "xDai bridge: deposits of DAI on Ethereum and the matching xDAI receive on Gnosis Chain are tagged as bridge events against the bridge counterparty, so the cross-chain transfer reads as one operation rather than a DAI spend plus an xDAI receive."

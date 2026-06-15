@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/harvest.svg"
 tagline: "GRAIN hack-compensation airdrop claim, decoded"
 intro: "rotki decodes the GRAIN airdrop on Ethereum (the post-incident compensation distribution from the October 2020 Harvest exploit) as an airdrop receive against the Harvest Finance counterparty."
+metaDescription: "rotki decodes the GRAIN airdrop on Ethereum (the post-incident compensation distribution from the October 2020 Harvest exploit) as an airdrop receive against"
 keywords: "harvest finance, grain airdrop, harvest hack compensation, farm token"
 features:
   - "GRAIN airdrop claims from the Harvest Merkle distributor are tagged as airdrop-subtype receives against the Harvest Finance counterparty."

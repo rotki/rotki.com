@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/clrfund.png"
 tagline: "Quadratic funding rounds on Arbitrum, decoded"
 intro: "rotki decodes clr.fund quadratic-funding activity on Arbitrum One so contributors, voters, and grant recipients have clean records. Donations, votes, project applications, and matching-pool claims are all recognised."
+metaDescription: "rotki decodes clr.fund quadratic-funding activity on Arbitrum One so contributors, voters, and grant recipients have clean records."
 keywords: "clr fund portfolio tracker, quadratic funding tracker, clrfund donations, clrfund arbitrum"
 features:
   - "Contributions to a clr.fund round are tagged as donations against the clr.fund counterparty."

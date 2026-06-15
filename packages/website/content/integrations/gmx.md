@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gmx.svg"
 tagline: "GMX v1 swaps, perp positions, and staking on Arbitrum, decoded"
 intro: "rotki decodes GMX v1 activity on Arbitrum One: swaps through the GMX vault, long/short position increases and decreases (with the GMX execution fee captured separately), GMX staking, and the staked GMX + GLP + esGMX balances that follow from it."
+metaDescription: "rotki decodes GMX v1 activity on Arbitrum One: swaps through the GMX vault, long/short position increases and decreases (with the GMX execution fee captured"
 keywords: "gmx portfolio tracker, gmx perps tracker, glp tracker, gmx staking, esgmx tracker"
 features:
   - "GMX vault swaps decoded as trade events (spend/receive) tagged against the GMX counterparty."

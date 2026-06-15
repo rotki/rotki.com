@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/element_finance.png"
 tagline: "ELFI airdrop claim, decoded"
 intro: "rotki decodes ELFI airdrop claims on Ethereum: when you claim and delegate your ELFI through Element's Council vote/locking flow, the receive is tagged as an airdrop against the Element Finance counterparty."
+metaDescription: "rotki decodes ELFI airdrop claims on Ethereum: when you claim and delegate your ELFI through Element's Council vote/locking flow, the receive is tagged as an"
 keywords: "element finance airdrop, elfi airdrop, element council airdrop"
 features:
   - "ELFI airdrop claims via the Element Council vote/locking contract are decoded as airdrop receive events against the Element Finance counterparty."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/makerdao.svg"
 tagline: "MakerDAO vaults, DSR, and the Sky migration, decoded locally"
 intro: "rotki decodes MakerDAO vaults (CDPs), DAI Savings Rate (DSR) deposits, and the MKR-to-SKY and DAI-to-USDS migrations into the Sky protocol. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes MakerDAO vaults (CDPs), DAI Savings Rate (DSR) deposits, and the MKR-to-SKY and DAI-to-USDS migrations into the Sky protocol."
 keywords: "makerdao portfolio tracker, dai vault tracker, maker cdp tracker, dsr tracker, sky migration tracker, mkr to sky"
 features:
   - "Vault (CDP) collateral deposits, withdrawals, and debt payback decoded as protocol events."

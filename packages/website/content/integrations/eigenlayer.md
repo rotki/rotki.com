@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/eigenlayer.png"
 tagline: "LST and native restaking, AVS rewards, and EIGEN airdrops, decoded"
 intro: "rotki decodes your EigenLayer activity on Ethereum: LST deposits into strategies, operator delegation, queued and completed withdrawals, native restaking via EigenPods, AVS reward claims, and EIGEN airdrop claims."
+metaDescription: "rotki decodes your EigenLayer activity on Ethereum: LST deposits into strategies, operator delegation, queued and completed withdrawals, native restaking via"
 keywords: "eigenlayer portfolio tracker, eigenlayer restaking tracker, eigen airdrop, avs rewards, eigenpod tracker, native restaking"
 features:
   - "LST deposits into EigenLayer strategies tagged against the EigenLayer counterparty."

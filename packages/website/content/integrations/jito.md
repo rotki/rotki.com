@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/jito_light.png"
 tagline: "Jito MEV tips on Solana, decoded locally"
 intro: "rotki recognises the Jito tips you pay on Solana and labels them as fee events, alongside the rest of your portfolio. Processing is local; you choose which Solana RPC endpoint handles the queries."
+metaDescription: "rotki recognises the Jito tips you pay on Solana and labels them as fee events, alongside the rest of your portfolio."
 keywords: "Jito portfolio tracker, Jito accounting, Jito tax, Jito tips, solana mev"
 features:
   - "Jito tip payments on Solana recognised as fee events with the Jito counterparty."

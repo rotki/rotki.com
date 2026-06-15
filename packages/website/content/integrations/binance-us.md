@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/binance.svg"
 tagline: "Binance.US portfolio tracker - local-first, read-only"
 intro: "Connect Binance.US to rotki to import spot trades, deposits, and withdrawals via the API, with CSV import to fill the gaps Binance.US doesn't expose."
+metaDescription: "Connect Binance.US to rotki to import spot trades, deposits, and withdrawals via the API, with CSV import to fill the gaps Binance.US doesn't expose."
 keywords: "binance us portfolio tracker, binance.us tax report, binance us cost basis, binance us csv import"
 features:
   - "Spot trades - full Binance.US trade history once you select your market pairs."

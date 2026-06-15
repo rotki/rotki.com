@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/coinbase.svg"
 tagline: "Coinbase portfolio tracker - your data stays local"
 intro: "Connect your Coinbase account to rotki and import trades, conversions, deposits, withdrawals, and staking rewards. rotki talks to Coinbase directly from your computer with a read-only API key."
+metaDescription: "Connect your Coinbase account to rotki and import trades, conversions, deposits, withdrawals, and staking rewards."
 keywords: "coinbase portfolio tracker, coinbase tax report, coinbase cost basis, coinbase staking tracker, coinbase advanced trade tracker"
 features:
   - "Simple buys and sells imported as swap events."

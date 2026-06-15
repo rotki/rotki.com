@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/aave.svg"
 tagline: "Aave portfolio tracker - supply, borrow, and rewards, decoded"
 intro: "rotki decodes your Aave v1, v2, and v3 activity - supplies, borrows, repayments, liquidations, GHO, and AAVE rewards - across Ethereum, Arbitrum, Optimism, Polygon, Base, Gnosis, Scroll, and BNB Chain."
+metaDescription: "rotki decodes your Aave v1, v2, and v3 activity - supplies, borrows, repayments, liquidations, GHO, and AAVE rewards - across Ethereum, Arbitrum, Optimism"
 keywords: "aave portfolio tracker, aave defi tracker, aave tax report, aave v3 tracker, aave liquidation tracker, gho tracker"
 features:
   - "Supplies and withdrawals - including v3 ETH gateway and native+wrapped-token same-transaction flows."

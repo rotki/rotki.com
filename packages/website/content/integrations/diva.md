@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/diva.svg"
 tagline: "DIVA airdrop claims, delegation, and governance events, decoded"
 intro: "rotki decodes activity around the DIVA governance token on Ethereum: airdrop claims, delegate changes, and votes on the Diva Governor contract."
+metaDescription: "rotki decodes activity around the DIVA governance token on Ethereum: airdrop claims, delegate changes, and votes on the Diva Governor contract."
 keywords: "diva token tracker, diva airdrop, diva governance, diva delegation"
 features:
   - "DIVA airdrop claims (Merkle distributor) decoded as airdrop receive events against the Diva counterparty."

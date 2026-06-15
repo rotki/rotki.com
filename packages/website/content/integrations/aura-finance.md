@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/aura-finance.png"
 tagline: "Aura Finance portfolio tracker - Balancer LP boosting, decoded"
 intro: "rotki decodes Aura Finance deposits, gauge withdrawals, AURA/BAL reward claims, vlAURA locking, and auraBAL vault activity across Ethereum, Arbitrum, Optimism, Polygon, Base, and Gnosis."
+metaDescription: "rotki decodes Aura Finance deposits, gauge withdrawals, AURA/BAL reward claims, vlAURA locking, and auraBAL vault activity across Ethereum, Arbitrum, Optimism"
 keywords: "aura finance portfolio tracker, aura tracker, aurabal tracker, vlaura tracker, aura balancer boost, aura defi tax"
 features:
   - "Booster deposits and gauge withdrawals decoded as paired position events without double-counting the underlying BPT."

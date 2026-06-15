@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/nexo.svg"
 tagline: "Nexo interest, loans, and trades from CSV, processed locally"
 intro: "Import your Nexo history into rotki via CSV: interest accruals, deposits, withdrawals, conversions, and loan events. CSV files are processed entirely on your computer."
+metaDescription: "Import your Nexo history into rotki via CSV: interest accruals, deposits, withdrawals, conversions, and loan events."
 keywords: "nexo portfolio tracker, nexo tax report, nexo interest income, nexo csv import, nexo loan tracker"
 features:
   - "CSV import of Nexo's transaction history export."

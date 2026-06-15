@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/openocean.png"
 tagline: "OpenOcean aggregator swaps, decoded locally"
 intro: "rotki decodes OpenOcean aggregator trades on rotki's supported EVM chains. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes OpenOcean aggregator trades on rotki's supported EVM chains. You choose which RPC endpoint handles the queries."
 keywords: "openocean portfolio tracker, openocean aggregator, openocean defi tax"
 features:
   - "OpenOcean aggregator swaps decoded as swap events with the OpenOcean counterparty."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/polygon_pos.svg"
 tagline: "Polygon PoS bridge and MATIC-to-POL migration, decoded locally"
 intro: "rotki decodes Polygon PoS bridge deposits and withdrawals between Ethereum and Polygon, and the MATIC-to-POL token migration. Source and destination legs are linked so bridged assets are not double-counted. For Polygon PoS chain balances see the [Polygon PoS](/integrations/polygon-pos) integration. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Polygon PoS bridge deposits and withdrawals between Ethereum and Polygon, and the MATIC-to-POL token migration."
 keywords: "polygon bridge tracker, polygon pos bridge, ethereum to polygon transfer, matic to pol migration"
 features:
   - "Polygon PoS bridge deposits and withdrawals decoded as protocol events, including the Exit NFT used to complete a withdrawal."

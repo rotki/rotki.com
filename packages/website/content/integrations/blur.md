@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/blur.png"
 tagline: "Track BLUR staking and airdrop claims"
 intro: "rotki decodes Blur staking and airdrop claims on Ethereum, and reports your staked BLUR balance alongside the rest of your portfolio."
+metaDescription: "rotki decodes Blur staking and airdrop claims on Ethereum, and reports your staked BLUR balance alongside the rest of your portfolio."
 keywords: "blur portfolio tracker, blur staking, blur airdrop"
 features:
   - "Stake and unstake of BLUR in the Blur staking contract decoded as staking events."

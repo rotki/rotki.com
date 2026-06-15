@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/walletconnect.svg"
 tagline: "WalletConnect (WCT) airdrop, staking, and rewards, decoded locally"
 intro: "rotki decodes WalletConnect (WCT) activity on Optimism: airdrop claims, staking deposits, stake-weight changes, and reward claims, and detects WCT staked balances. rotki also lets you connect a wallet via WalletConnect to switch chains from the on-chain page. You choose which Optimism RPC endpoint handles the queries."
+metaDescription: "rotki decodes WalletConnect (WCT) activity on Optimism: airdrop claims, staking deposits, stake-weight changes, and reward claims, and detects WCT staked"
 keywords: "walletconnect portfolio tracker, wct airdrop, wct staking tracker, wct rewards, reown wct tracker"
 features:
   - "WCT airdrop claims decoded as airdrop income on Optimism."

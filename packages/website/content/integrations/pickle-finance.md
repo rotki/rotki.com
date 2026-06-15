@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/pickle.svg"
 tagline: "Pickle Finance jar deposits and withdrawals, decoded locally"
 intro: "rotki decodes Pickle Finance jar deposits and withdrawals, and recognises the Cornichon hack-compensation airdrop claim. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Pickle Finance jar deposits and withdrawals, and recognises the Cornichon hack-compensation airdrop claim."
 keywords: "pickle finance portfolio tracker, pickle jar tracker, pickle defi tax"
 features:
   - "Pickle jar deposits and withdrawals decoded as protocol events."

@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/base.svg"
 tagline: "Base portfolio tracker - Coinbase's L2, locally tracked"
 intro: "Add your Base addresses to rotki to track ETH and ERC-20 balances, decoded transactions, bridge events, and DeFi activity on Coinbase's L2."
+metaDescription: "Add your Base addresses to rotki to track ETH and ERC-20 balances, decoded transactions, bridge events, and DeFi activity on Coinbase's L2."
 keywords: "base portfolio tracker, base l2 tracker, base tax report, base defi tracker, basename tracker"
 features:
   - "Address balances - ETH and ERC-20 tokens on Base."

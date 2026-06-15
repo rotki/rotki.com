@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bitstamp.svg"
 tagline: "Bitstamp portfolio tracker - local, private, and complete"
 intro: "Connect Bitstamp to rotki to import trades, deposits, and withdrawals. Authenticate with a read-only API key, or import Bitstamp's transaction CSV export. Everything is processed on your machine."
+metaDescription: "Connect Bitstamp to rotki to import trades, deposits, and withdrawals."
 keywords: "bitstamp portfolio tracker, bitstamp tax report, bitstamp cost basis, bitstamp csv import"
 features:
   - "Spot trades imported as swap events with fees in the settlement currency."

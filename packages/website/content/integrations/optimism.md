@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/optimism.svg"
 tagline: "Optimism L2 transactions, decoded locally"
 intro: "Add your Optimism addresses to rotki to track OP and token balances, decoded transaction history, and DeFi activity. You choose which Optimism RPC endpoint handles the queries."
+metaDescription: "Add your Optimism addresses to rotki to track OP and token balances, decoded transaction history, and DeFi activity."
 keywords: "optimism portfolio tracker, op wallet tracker, optimism tax report, optimism defi tracker, l2 portfolio tracker"
 features:
   - "Native, ETH, and ERC-20 token balances tracked for your Optimism addresses."

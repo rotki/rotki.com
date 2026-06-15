@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/cowswap.jpg"
 tagline: "Batch-auction swaps and vCOW claims, decoded"
 intro: "rotki decodes CoW Swap trades on Ethereum and Gnosis Chain, including native-ETH orders via the ethflow contracts and vCOW claim/vesting flows."
+metaDescription: "rotki decodes CoW Swap trades on Ethereum and Gnosis Chain, including native-ETH orders via the ethflow contracts and vCOW claim/vesting flows."
 keywords: "cowswap portfolio tracker, cow protocol tracker, cowswap defi tax, cow swap history"
 features:
   - "GPv2 settlement trades decoded as swap events (spend/receive) with fees attributed to CoW Swap."

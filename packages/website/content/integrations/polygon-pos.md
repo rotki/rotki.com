@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/polygon_pos.svg"
 tagline: "Polygon PoS balances, transactions, and DeFi, locally tracked"
 intro: "Add your Polygon PoS addresses to rotki to track POL (formerly MATIC) and token balances, decoded transactions, and DeFi activity. You choose which Polygon RPC endpoint handles the queries."
+metaDescription: "Add your Polygon PoS addresses to rotki to track POL (formerly MATIC) and token balances, decoded transactions, and DeFi activity."
 keywords: "polygon portfolio tracker, matic wallet tracker, pol tracker, polygon tax report, polygon defi tracker"
 features:
   - "POL (MATIC) and ERC-20 token balances tracked for your Polygon PoS addresses."

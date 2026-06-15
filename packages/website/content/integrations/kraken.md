@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/kraken.svg"
 tagline: "Kraken trades, ledger, staking, and balances, locally signed"
 intro: "Connect Kraken to rotki to import spot trades, ledger entries, staking rewards, margin events, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect Kraken to rotki to import spot trades, ledger entries, staking rewards, margin events, and balances."
 keywords: "kraken portfolio tracker, kraken tax report, kraken cost basis, kraken staking tracker, kraken futures tracker"
 features:
   - "Spot trades imported as swap events, including instant-buy and convert orders."

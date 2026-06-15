@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/jupiter.svg"
 tagline: "Jupiter swaps and Lend on Solana, decoded locally"
 intro: "rotki decodes Jupiter aggregator swaps and Jupiter Lend activity on Solana. Processing is local; you choose which Solana RPC endpoint handles the queries."
+metaDescription: "rotki decodes Jupiter aggregator swaps and Jupiter Lend activity on Solana. Processing is local; you choose which Solana RPC endpoint handles the queries."
 keywords: "jupiter swap tracker, solana dex aggregator, jupiter lend, jup token tracker, solana defi tax"
 features:
   - "Jupiter aggregator swaps, including RFQ fills, decoded as swap events on Solana."

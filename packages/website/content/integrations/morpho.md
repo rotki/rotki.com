@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/morpho.svg"
 tagline: "Morpho Blue, vaults, and Merkl rewards, decoded locally"
 intro: "rotki decodes Morpho Blue lending positions, Morpho vault (MetaMorpho) positions, and Merkl-distributed Morpho rewards. Bundled Morpho transactions that perform several actions in one call are unpacked into separate events."
+metaDescription: "rotki decodes Morpho Blue lending positions, Morpho vault (MetaMorpho) positions, and Merkl-distributed Morpho rewards."
 keywords: "morpho portfolio tracker, morpho blue tracker, morpho vault tracker, morpho merkl rewards, morpho defi tax"
 features:
   - "Morpho Blue deposits, withdrawals, and borrow liabilities decoded."

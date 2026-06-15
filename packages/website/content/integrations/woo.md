@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/woo.svg"
 tagline: "WOO X trades, transfers, and balances, locally signed"
 intro: "Connect WOO X to rotki to import spot trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect WOO X to rotki to import spot trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
 keywords: "woo portfolio tracker, woo x portfolio tracker, woo tax report, woo cost basis"
 features:
   - "Spot trades imported as swap events from your WOO X account."

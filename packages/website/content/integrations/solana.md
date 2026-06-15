@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/solana.svg"
 tagline: "Solana SOL, SPL tokens, and staking, locally tracked"
 intro: "Add your Solana addresses to rotki to track SOL, staked SOL, and SPL token balances with decoded transaction history. Jupiter swaps, Jito tips, and Jupiter Lend activity are recognised automatically. You choose which Solana RPC endpoint handles the queries."
+metaDescription: "Add your Solana addresses to rotki to track SOL, staked SOL, and SPL token balances with decoded transaction history."
 keywords: "solana portfolio tracker, sol wallet tracker, solana tax report, sol staking tracker, jupiter swap tracker, spl token tracker"
 features:
   - "SOL, staked SOL, and SPL token balances tracked for your Solana addresses."

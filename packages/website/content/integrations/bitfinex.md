@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bitfinex.svg"
 tagline: "Bitfinex portfolio tracker - across exchange, margin, and funding wallets"
 intro: "Connect Bitfinex to rotki to import trades, deposits, and withdrawals, with balances tracked separately across exchange, margin, and funding wallets. Authenticate with a read-only API key; rotki processes everything locally on your machine."
+metaDescription: "Connect Bitfinex to rotki to import trades, deposits, and withdrawals, with balances tracked separately across exchange, margin, and funding wallets."
 keywords: "bitfinex portfolio tracker, bitfinex tax report, bitfinex cost basis, bitfinex spot tracker"
 features:
   - "Spot trades: full trade history including legacy pairs."

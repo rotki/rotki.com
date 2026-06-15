@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/firebird-finance.png"
 tagline: "Firebird aggregator swaps across five EVM chains, decoded"
 intro: "rotki decodes Firebird Finance aggregator swaps by re-tagging the spend and receive transfers around the Firebird router as a clean trade pair against the Firebird counterparty."
+metaDescription: "rotki decodes Firebird Finance aggregator swaps by re-tagging the spend and receive transfers around the Firebird router as a clean trade pair against the"
 keywords: "firebird finance portfolio tracker, firebird aggregator, firebird defi tax"
 features:
   - "Swap-out and swap-in legs through the Firebird router are paired into a single trade event so the input and output of each swap are linked."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/yearn_vaults.svg"
 tagline: "Yearn v2 and v3 vaults, decoded locally"
 intro: "rotki decodes Yearn vault deposits and withdrawals (v2 and v3), staking transactions, and reward claims across several EVM chains. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Yearn vault deposits and withdrawals (v2 and v3), staking transactions, and reward claims across several EVM chains."
 keywords: "yearn portfolio tracker, yearn vault tracker, yvault, yearn defi tax, yearn v3 tracker"
 features:
   - "Yearn v2 and v3 vault deposits and withdrawals decoded."

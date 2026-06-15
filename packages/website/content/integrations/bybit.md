@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bybit.svg"
 tagline: "Bybit portfolio tracker - read-only, runs on your computer"
 intro: "Connect Bybit to rotki to pull spot trades, deposits, withdrawals, and balances."
+metaDescription: "Connect Bybit to rotki to pull spot trades, deposits, withdrawals, and balances."
 keywords: "bybit portfolio tracker, bybit tax report, bybit cost basis"
 features:
   - "Spot trades imported from Bybit's order history."

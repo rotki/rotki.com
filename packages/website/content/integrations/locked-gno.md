@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gnosis.svg"
 tagline: "Locked GNO deposits and unlocks on Ethereum, decoded locally"
 intro: "rotki decodes the GNO you deposit into the Ethereum locking contract used to run Gnosis Chain validators, plus the GNO you receive back when you unlock. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes the GNO you deposit into the Ethereum locking contract used to run Gnosis Chain validators, plus the GNO you receive back when you unlock."
 keywords: "locked gno tracker, gno validator deposit, gnosis chain staking, gno locking"
 features:
   - "GNO deposits into the locking contract decoded as protocol events."

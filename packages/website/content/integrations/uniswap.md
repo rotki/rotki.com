@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/uniswap.svg"
 tagline: "Uniswap v2, v3, and v4 swaps and LP, decoded locally"
 intro: "rotki decodes Uniswap v2, v3, and v4 swaps and liquidity-provider positions across the EVM chains where Uniswap is deployed. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Uniswap v2, v3, and v4 swaps and liquidity-provider positions across the EVM chains where Uniswap is deployed."
 keywords: "uniswap portfolio tracker, uniswap v4 tracker, uniswap v3 lp tracker, uniswap defi tax, uniswap swap history"
 features:
   - "Uniswap v2 swaps and LP positions decoded across supported EVM chains."

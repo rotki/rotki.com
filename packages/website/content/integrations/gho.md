@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gho.svg"
 tagline: "stkGHO staking, cooldown, and unstake events, decoded"
 intro: "rotki decodes the GHO safety-module (stkGHO) staking flow on Ethereum: staking GHO, activating the unstaking cooldown, and redeeming stkGHO back to GHO. The paired events are linked into a stake/wrap-and-unstake/unwrap pair against the GHO counterparty."
+metaDescription: "rotki decodes the GHO safety-module (stkGHO) staking flow on Ethereum: staking GHO, activating the unstaking cooldown, and redeeming stkGHO back to GHO."
 keywords: "gho portfolio tracker, stkgho tracker, gho staking, aave gho safety module"
 features:
   - "Stake GHO: the GHO spend is tagged as a staking deposit and the matching stkGHO receive is tagged as a receive-wrapped event, both against the GHO counterparty."

@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/okx.svg"
 tagline: "OKX trades, conversions, and balances, locally signed"
 intro: "Connect OKX to rotki to import spot trades, conversions, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect OKX to rotki to import spot trades, conversions, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
 keywords: "okx portfolio tracker, okx tax report, okx cost basis"
 features:
   - "Spot trades imported as swap events from your OKX account."

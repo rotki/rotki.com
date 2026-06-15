@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/octant.svg"
 tagline: "Octant GLM locking and epoch rewards, decoded locally"
 intro: "rotki decodes Octant GLM locking and unlocking, and your Octant epoch reward claims. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Octant GLM locking and unlocking, and your Octant epoch reward claims. You choose which Ethereum RPC endpoint handles the queries."
 keywords: "octant portfolio tracker, glm staking tracker, octant epoch rewards, public goods funding"
 features:
   - "GLM locking and unlocking in Octant decoded as protocol events."

@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/coinbaseprime.svg"
 tagline: "Coinbase Prime portfolio tracker - institutional accounts, local data"
 intro: "Connect Coinbase Prime to rotki to import institutional trades, conversions, deposits, withdrawals, and rewards. Authenticate with a read-only API key; rotki processes everything on your own machine."
+metaDescription: "Connect Coinbase Prime to rotki to import institutional trades, conversions, deposits, withdrawals, and rewards."
 keywords: "coinbase prime portfolio tracker, coinbase prime tax report, coinbase prime staking, institutional crypto accounting"
 features:
   - "Coinbase Prime orders (FILLED status) imported as swap events with commission as the trade fee."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/extrafi.svg"
 tagline: "Leveraged-yield farms and lending pools on Optimism and Base, decoded"
 intro: "rotki decodes Extrafi activity on Optimism and Base: lending pool deposits and withdrawals, pool reward claims, and leveraged farm positions (where Extrafi borrows on your behalf to amplify the LP)."
+metaDescription: "rotki decodes Extrafi activity on Optimism and Base: lending pool deposits and withdrawals, pool reward claims, and leveraged farm positions (where Extrafi"
 keywords: "extrafi portfolio tracker, extrafi vault tracker, leveraged yield optimism, leveraged yield base, extrafi farm tracker"
 features:
   - "Lending pool deposits and withdrawals tagged against the Extrafi counterparty with the pool surfaced in the notes."

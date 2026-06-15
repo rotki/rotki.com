@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/hop_protocol.png"
 tagline: "Hop bridge, AMM, liquidity, staking, and HOP rewards, decoded"
 intro: "rotki decodes the full Hop Protocol lifecycle across Ethereum and the L2s Hop runs on: bridge sends and receives (with bridge fees split out), AMM swaps via Hop pools, liquidity adds/removes, staking and unstaking of LP positions, ongoing HOP reward claims, and Merkle HOP airdrop claims."
+metaDescription: "rotki decodes the full Hop Protocol lifecycle across Ethereum and the L2s Hop runs on: bridge sends and receives (with bridge fees split out), AMM swaps via"
 keywords: "hop protocol bridge tracker, hop l2 bridge, hop lp tracker, hop staking, hop airdrop"
 features:
   - "Bridge sends are tagged as bridge deposits, with the bonder/relayer fee split out as a separate fee-subtype event so the bridged amount stays clean."

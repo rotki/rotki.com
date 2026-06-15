@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/farcaster.png"
 tagline: "Farcaster Pro subscription payments on Base, decoded"
 intro: "rotki decodes Farcaster Pro tier purchases on Base, tagging the USDC payment as a Farcaster subscription so the spend shows up in your history with the tier and duration in the notes."
+metaDescription: "rotki decodes Farcaster Pro tier purchases on Base, tagging the USDC payment as a Farcaster subscription so the spend shows up in your history with the tier"
 keywords: "farcaster portfolio tracker, farcaster pro subscription, farcaster pro tracker, farcaster base payment"
 features:
   - "Farcaster Pro tier purchases on Base are decoded: the USDC spend is tagged as a payment-subtype event against the Farcaster counterparty."

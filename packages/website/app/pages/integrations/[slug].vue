@@ -21,11 +21,12 @@ else {
   const item = get(integration);
   const slug = path.replace(/\/+$/, '').split('/').pop() ?? '';
   // Keep the SERP title short (<60 chars); titleTemplate appends " | rotki".
-  // The descriptive tagline still lives in the <h1> and meta description.
+  // The full descriptive tagline still lives in the visible <h1>/intro; the meta
+  // description uses the shorter `metaDescription` field to stay under 160 chars.
   const title = `${item.label} support`;
   // OG image is generated per-slug at build time by the integration-seo module
   // (with a share.png fallback written to the same path), so this URL always resolves.
-  usePageSeo(title, item.intro, path, { keywords: item.keywords, ogImage: `integrations/${slug}.png` });
+  usePageSeo(title, item.metaDescription, path, { keywords: item.keywords, ogImage: `integrations/${slug}.png` });
 
   const url = `${baseUrl}${path}`;
 

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/balancer.svg"
 tagline: "Balancer portfolio tracker - v1, v2, and v3 pools, decoded"
 intro: "rotki decodes Balancer v1, v2, and v3 swaps, LP positions, and v3 gauge rewards across Ethereum, Arbitrum, Optimism, Polygon, Base, and Gnosis."
+metaDescription: "rotki decodes Balancer v1, v2, and v3 swaps, LP positions, and v3 gauge rewards across Ethereum, Arbitrum, Optimism, Polygon, Base, and Gnosis."
 keywords: "balancer portfolio tracker, balancer v3 tracker, balancer lp tracker, balancer gauge rewards"
 features:
   - "Balancer v1 - pool swaps on Ethereum decoded as trades."

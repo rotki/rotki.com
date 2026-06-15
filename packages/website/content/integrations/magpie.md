@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/magpie.png"
 tagline: "Magpie aggregator swaps, decoded locally"
 intro: "rotki decodes Magpie aggregator trades across several EVM chains. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes Magpie aggregator trades across several EVM chains. You choose which RPC endpoint handles the queries."
 keywords: "magpie portfolio tracker, magpie aggregator, magpie defi tax"
 features:
   - "Magpie aggregator swaps decoded as swap events."

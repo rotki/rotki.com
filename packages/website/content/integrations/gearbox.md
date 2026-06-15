@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/gearbox.svg"
 tagline: "Gearbox passive pools and rewards on Ethereum, Arbitrum, and Optimism"
 intro: "rotki decodes the passive side of Gearbox: pool deposits and withdrawals (with the matching pool/farming token recognised as the wrapped position) and Gearbox reward claims."
+metaDescription: "rotki decodes the passive side of Gearbox: pool deposits and withdrawals (with the matching pool/farming token recognised as the wrapped position) and Gearbox"
 keywords: "gearbox portfolio tracker, gearbox passive pool, gearbox rewards, gearbox arbitrum, gearbox optimism"
 features:
   - "Pool deposits decoded as deposit-for-wrapped events with the matching pool LP or farming token tagged as the received wrapped position."

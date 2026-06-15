@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/fluence.png"
 tagline: "Fluence FLT-DROP and FLT claim flow, decoded"
 intro: "rotki decodes the Fluence developer rewards flow on Ethereum: claiming FLT-DROP from the distributor, and the second step where FLT-DROP is burned to mint real FLT."
+metaDescription: "rotki decodes the Fluence developer rewards flow on Ethereum: claiming FLT-DROP from the distributor, and the second step where FLT-DROP is burned to mint real"
 keywords: "fluence portfolio tracker, flt token, flt-drop, fluence airdrop, fluence dev rewards"
 features:
   - "FLT-DROP claims from the Fluence dev rewards distributor are tagged against the Fluence counterparty with the claimed amount in the notes."

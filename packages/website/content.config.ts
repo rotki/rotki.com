@@ -47,6 +47,9 @@ const integrationSchema = z.object({
   image: z.string(),
   tagline: z.string().optional(),
   intro: z.string(),
+  // SERP/meta description (<160 chars). Kept separate from `intro` so the
+  // visible intro paragraph can stay longer than the meta description allows.
+  metaDescription: z.string(),
   features: z.array(z.string()).default([]),
   limitations: z.array(z.string()).default([]),
   setup: z.array(z.string()).default([]),

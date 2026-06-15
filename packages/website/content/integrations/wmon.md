@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/wmon.svg"
 tagline: "Wrapped MON wraps and unwraps on Monad, decoded locally"
 intro: "rotki decodes WMON deposit (wrap) and withdraw (unwrap) events on Monad so MON and WMON movements appear as their underlying native-token transfer. You choose which Monad RPC endpoint handles the queries."
+metaDescription: "rotki decodes WMON deposit (wrap) and withdraw (unwrap) events on Monad so MON and WMON movements appear as their underlying native-token transfer."
 keywords: "wmon portfolio tracker, wrapped mon, monad weth, wmon tracker"
 features:
   - "Wrap and unwrap events decoded into the underlying MON movement."

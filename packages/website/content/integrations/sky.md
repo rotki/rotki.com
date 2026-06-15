@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/sky_money.svg"
 tagline: "Sky USDS, sUSDS, PSM, and migrations, decoded locally"
 intro: "rotki decodes activity on Sky (the rebrand of MakerDAO): Sky PSM direct swaps and the migrations from MKR and DAI, and tracks your USDS and sUSDS balances. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes activity on Sky (the rebrand of MakerDAO): Sky PSM direct swaps and the migrations from MKR and DAI, and tracks your USDS and sUSDS balances."
 keywords: "sky money tracker, usds tracker, susds savings tracker, sky psm tracker, makerdao sky rebrand"
 features:
   - "USDS and sUSDS tracked as token balances alongside the rest of your portfolio."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/umami.svg"
 tagline: "Umami Arbitrum vaults, decoded locally"
 intro: "rotki decodes Umami vault deposits and withdrawals on Arbitrum, with protocol fees shown as separate entries. You choose which Arbitrum RPC endpoint handles the queries."
+metaDescription: "rotki decodes Umami vault deposits and withdrawals on Arbitrum, with protocol fees shown as separate entries."
 keywords: "umami portfolio tracker, umami arbitrum vault, umami defi tax"
 features:
   - "Umami deposits and withdrawals on Arbitrum decoded as protocol events."

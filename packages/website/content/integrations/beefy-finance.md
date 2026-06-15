@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/beefy_finance_light.svg"
 tagline: "Beefy Finance portfolio tracker - multi-chain yield vaults, decoded"
 intro: "rotki decodes Beefy Finance vault deposits and withdrawals, reward-pool staking, harvest rewards, and legacy boost exits across Ethereum, Arbitrum, Optimism, Polygon, Base, Gnosis, Scroll, and BNB Chain."
+metaDescription: "rotki decodes Beefy Finance vault deposits and withdrawals, reward-pool staking, harvest rewards, and legacy boost exits across Ethereum, Arbitrum, Optimism"
 keywords: "beefy finance portfolio tracker, beefy vault tracker, beefy moo tracker, beefy defi tax"
 features:
   - "Vault deposits and withdrawals decoded as deposit/withdraw events with the underlying token resolved."

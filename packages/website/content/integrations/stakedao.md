@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/stakedao.png"
 tagline: "StakeDAO Curve strategies and bribe claims, decoded locally"
 intro: "rotki decodes StakeDAO V2 Curve strategy transactions, detects vault balances, and decodes votemarket bribe and bounty claims. You choose which Ethereum RPC endpoint handles the queries."
+metaDescription: "rotki decodes StakeDAO V2 Curve strategy transactions, detects vault balances, and decodes votemarket bribe and bounty claims."
 keywords: "stakedao portfolio tracker, sdt tracker, votemarket tracker, stakedao bribes, stakedao curve strategy"
 features:
   - "StakeDAO V2 Curve strategy transactions decoded, with vault balances detected."

@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/bisq.svg"
 tagline: "Bisq portfolio tracker - peer-to-peer trades, locally tracked"
 intro: "Bisq is a decentralised, peer-to-peer Bitcoin exchange that runs on your machine, a natural fit for rotki's local-first approach. Import your Bisq trade history via CSV; everything is processed on your computer."
+metaDescription: "Bisq is a decentralised, peer-to-peer Bitcoin exchange that runs on your machine, a natural fit for rotki's local-first approach."
 keywords: "bisq portfolio tracker, bisq tax report, p2p bitcoin tracker, decentralised exchange tracker"
 features:
   - "CSV import for Bisq trade history exports."

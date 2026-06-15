@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/sushiswap.svg"
 tagline: "SushiSwap swaps and LP positions, decoded locally"
 intro: "rotki decodes SushiSwap swaps and tracks liquidity-provider balances, including swaps routed through the RedSnwapper and Route Processor routers. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes SushiSwap swaps and tracks liquidity-provider balances, including swaps routed through the RedSnwapper and Route Processor routers."
 keywords: "sushiswap portfolio tracker, sushi defi tracker, sushi lp tracker, sushiswap swap history"
 features:
   - "SushiSwap swaps decoded as swap events."

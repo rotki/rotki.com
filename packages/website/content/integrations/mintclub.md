@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/mintclub.svg"
 tagline: "MintClub distribution claims on Base, decoded locally"
 intro: "rotki decodes the token claims you make from MintClub distributions on Base. You choose which Base RPC endpoint handles the queries."
+metaDescription: "rotki decodes the token claims you make from MintClub distributions on Base. You choose which Base RPC endpoint handles the queries."
 keywords: "mintclub portfolio tracker, mintclub accounting, mintclub tax, mintclub claim"
 features:
   - "MintClub distribution claims decoded as income events with the MintClub counterparty."

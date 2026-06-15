@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/quickswap.png"
 tagline: "QuickSwap swaps and LP, decoded locally"
 intro: "rotki decodes QuickSwap swaps, including native-token swaps (ETH, POL), and tracks your QuickSwap LP balances. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes QuickSwap swaps, including native-token swaps (ETH, POL), and tracks your QuickSwap LP balances."
 keywords: "quickswap portfolio tracker, polygon dex tracker, quickswap lp, quickswap defi tax"
 features:
   - "QuickSwap swaps decoded as swap events, including native-token (ETH, POL) swaps."

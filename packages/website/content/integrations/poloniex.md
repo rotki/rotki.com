@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/poloniex.svg"
 tagline: "Poloniex trades, transfers, and balances, locally signed"
 intro: "Connect Poloniex to rotki to import spot trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
+metaDescription: "Connect Poloniex to rotki to import spot trades, deposits, withdrawals, and balances. rotki uses a read-only API key signed from your machine."
 keywords: "poloniex portfolio tracker, poloniex tax report, poloniex cost basis"
 features:
   - "Spot trades imported as swap events with matched spend and receive sides."

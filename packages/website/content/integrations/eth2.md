@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/ethereum.svg"
 tagline: "Beacon chain validators, consensus rewards, MEV, and withdrawals - tracked locally"
 intro: "rotki tracks your Ethereum validators directly against the beacon chain and execution layer: balances over time, consensus PnL, withdrawals to your execution address, and execution-layer rewards split between block proposal payments and MEV. Validator data is queried from the beacon endpoint you configure; withdrawals are reconstructed from Etherscan with a Blockscout fallback."
+metaDescription: "rotki tracks your Ethereum validators directly against the beacon chain and execution layer: balances over time, consensus PnL, withdrawals to your execution"
 keywords: "ethereum validator tracker, beacon chain tracker, eth2 staking tracker, validator rewards, eth withdrawal tracker, validator mev tracker"
 features:
   - "Add validators by index or public key; balance and status are queried from the beacon endpoint."

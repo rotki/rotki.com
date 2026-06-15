@@ -5,6 +5,7 @@ type: blockchain
 image: "/img/integrations/polkadot.svg"
 tagline: "Polkadot DOT balances, locally tracked"
 intro: "Add your Polkadot addresses to rotki to track your DOT balances. rotki queries the Polkadot RPC endpoint you configure."
+metaDescription: "Add your Polkadot addresses to rotki to track your DOT balances. rotki queries the Polkadot RPC endpoint you configure."
 keywords: "polkadot portfolio tracker, dot wallet tracker, polkadot tax report, substrate tracker"
 features:
   - "DOT address balances (free and reserved) read directly from the Substrate node you connect to."

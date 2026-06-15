@@ -5,6 +5,7 @@ type: exchange
 image: "/img/integrations/crypto_com.svg"
 tagline: "Crypto.com Exchange API and mobile-app CSV, both supported"
 intro: "Connect Crypto.com to rotki to import trades, deposits, and withdrawals from the Crypto.com Exchange API, and bring in your mobile-app history (recurring buys, swaps, supercharger, earn, and rewards) via CSV import."
+metaDescription: "Connect Crypto.com to rotki to import trades, deposits, and withdrawals from the Crypto.com Exchange API, and bring in your mobile-app history (recurring buys"
 keywords: "crypto.com portfolio tracker, crypto.com tax report, crypto.com cost basis, crypto.com csv import, crypto.com mobile app tracker"
 features:
   - "Crypto.com Exchange API: spot trades imported as swap events with fees."

@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/weth.svg"
 tagline: "WETH wraps and unwraps, decoded locally"
 intro: "rotki decodes WETH deposit (wrap) and withdraw (unwrap) events so ETH and WETH movements appear as their underlying ETH transfer rather than confusing wrap/unwrap noise. You choose which RPC endpoint handles the queries."
+metaDescription: "rotki decodes WETH deposit (wrap) and withdraw (unwrap) events so ETH and WETH movements appear as their underlying ETH transfer rather than confusing"
 keywords: "weth tracker, wrapped ether, eth weth wrap, weth balance tracker"
 features:
   - "WETH deposit (wrap) and withdraw (unwrap) events decoded into the underlying ETH movement."

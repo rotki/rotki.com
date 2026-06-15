@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/golem.svg"
 tagline: "GNT to GLM token migration, decoded"
 intro: "rotki decodes the legacy Golem GNT → GLM migration on Ethereum. The migration contract doesn't emit a GNT transfer event, so rotki synthesises the GNT spend, links it to the GLM receive, and tags both as a single migrate pair against the Golem counterparty."
+metaDescription: "rotki decodes the legacy Golem GNT → GLM migration on Ethereum."
 keywords: "golem portfolio tracker, glm token, gnt to glm migration, golem network"
 features:
   - "GNT → GLM migrations are decoded into a paired event: the synthesised GNT spend (event type MIGRATE/SPEND) and the matching GLM receive (event type MIGRATE/RECEIVE), both tagged against the Golem counterparty."

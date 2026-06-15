@@ -5,6 +5,7 @@ type: protocol
 image: "/img/integrations/efp.svg"
 tagline: "EFP follow, unfollow, and tag events, decoded"
 intro: "rotki decodes Ethereum Follow Protocol (EFP) list operations - follow, unfollow, tag, and untag - on Ethereum, Optimism, and Base, so your on-chain social activity appears in your history with the target address (and tag) recorded."
+metaDescription: "rotki decodes Ethereum Follow Protocol (EFP) list operations - follow, unfollow, tag, and untag - on Ethereum, Optimism, and Base, so your on-chain social"
 keywords: "ethereum follow protocol tracker, efp tracker, on-chain social tracker"
 features:
   - "Follow operations: a List Op against your EFP list is decoded as an informational EFP event noting the address you followed."
