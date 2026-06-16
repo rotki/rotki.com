@@ -9,6 +9,8 @@ const SPONSORSHIP_TIERS = 'content/sponsorship-tiers/*.md';
 const INTEGRATIONS = 'content/integrations/*.md';
 const COMPARISONS = 'content/comparisons/*.md';
 const COMPARISON_HUB = 'content/comparison-hub/*.md';
+const FEATURES = 'content/features/*.md';
+const FEATURE_HUB = 'content/feature-hub/*.md';
 
 const documentSchema = z.object({
   address: z.string().optional(),
@@ -120,6 +122,70 @@ const comparisonHubSchema = z.object({
   })).default([]),
 });
 
+// Feature pages are concept/use-case landing pages (e.g. "CSV import",
+// "local-first crypto accounting"). Modeled on `comparisonSchema` but reshaped
+// for use-case intent: no competitor/dimensions, plus capabilities/setup/troubleshooting.
+const featureSchema = z.object({
+  slug: z.string(),
+  // Short label used in nav/cards/breadcrumb, e.g. "CSV import".
+  label: z.string(),
+  // Optional icon in public/img/features (svg). Index cards fall back to a glyph when absent.
+  icon: z.string().optional(),
+  tagline: z.string(),
+  intro: z.string(),
+  // SERP/meta description (<160 chars). Kept separate from `intro` so the visible
+  // intro paragraph can stay longer than the meta description allows.
+  metaDescription: z.string(),
+  keywords: z.string().optional(),
+  // Scannable "why rotki for X" bullets shown near the top.
+  keyTakeaways: z.array(z.string()).default([]),
+  // What rotki actually does for this use-case.
+  capabilities: z.array(z.string()).default([]),
+  // Honest limits / what rotki does NOT do — avoid overclaiming.
+  limitations: z.array(z.string()).default([]),
+  // Ordered setup steps.
+  setup: z.array(z.string()).default([]),
+  // Common problems and their fixes.
+  troubleshooting: z.array(z.object({
+    problem: z.string(),
+    fix: z.string(),
+  })).default([]),
+  // Cross-links to /integrations/<slug>.
+  relatedIntegrations: z.array(z.object({
+    slug: z.string(),
+    label: z.string(),
+  })).default([]),
+  // Cross-links to /compare/<slug>.
+  relatedComparisons: z.array(z.object({
+    slug: z.string(),
+    label: z.string(),
+  })).default([]),
+  // Cross-links to other /features/<slug> pages.
+  relatedFeatures: z.array(z.object({
+    slug: z.string(),
+    label: z.string(),
+  })).default([]),
+  faq: z.array(z.object({
+    q: z.string(),
+    a: z.string(),
+  })).default([]),
+  // Freshness stamp shown on the page (e.g. "June 2026").
+  updatedAt: z.string(),
+  ctaPlan: z.enum(['free', 'basic', 'advanced']).default('free'),
+});
+
+// Hub content (intro, takeaways, shared rotki highlights, FAQ) lives in markdown so it
+// is editable alongside the feature pages rather than in i18n. Mirrors comparisonHubSchema.
+const featureHubSchema = z.object({
+  intro: z.string(),
+  keyTakeaways: z.array(z.string()).default([]),
+  rotkiHighlights: z.array(z.string()).default([]),
+  faq: z.array(z.object({
+    q: z.string(),
+    a: z.string(),
+  })).default([]),
+});
+
 export default defineContentConfig({
   collections: {
     documents: defineCollection({
@@ -184,6 +250,26 @@ export default defineContentConfig({
         cwd: '~~/',
         include: COMPARISON_HUB,
         prefix: 'comparison-hub',
+      },
+      type: 'page',
+    }),
+    features: defineCollection({
+      schema: featureSchema.extend({ sitemap: defineSitemapSchema() }),
+      source: {
+        cwd: '~~/',
+        include: FEATURES,
+        // Prefix matches the page route (`/features/<slug>`) so
+        // `queryCollection('features').path(...)` in features/[slug].vue resolves.
+        prefix: 'features',
+      },
+      type: 'page',
+    }),
+    featureHub: defineCollection({
+      schema: featureHubSchema,
+      source: {
+        cwd: '~~/',
+        include: FEATURE_HUB,
+        prefix: 'feature-hub',
       },
       type: 'page',
     }),

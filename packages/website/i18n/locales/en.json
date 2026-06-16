@@ -796,6 +796,40 @@
       }
     }
   },
+  "features": {
+    "header": "Features",
+    "title": "What rotki does, by use case",
+    "description": "Use-case guides for rotki: CSV import, local-first accounting, privacy-first tracking, DeFi, and open-source crypto tax — all running locally on your machine.",
+    "hub": {
+      "takeaways_title": "Key takeaways",
+      "list_title": "Browse features",
+      "why_title": "Why rotki",
+      "faq_title": "Frequently asked questions"
+    },
+    "detail": {
+      "updated": "Updated {date}",
+      "takeaways_title": "Key takeaways",
+      "capabilities_title": "What rotki supports",
+      "setup_title": "How to set it up",
+      "limitations_title": "Good to know",
+      "deepdive_title": "{label} in rotki",
+      "troubleshooting_title": "Common problems and fixes",
+      "related_integrations": "Related integrations",
+      "related_comparisons": "Related comparisons",
+      "related_features": "Related features",
+      "faq_title": "Frequently asked questions",
+      "tier": {
+        "basic": "Basic plan",
+        "advanced": "Advanced plan"
+      },
+      "cta": {
+        "title": "Try rotki for free",
+        "description": "Download rotki and track everything locally. Your keys and data never leave your machine.",
+        "download": "Download rotki",
+        "all": "All features"
+      }
+    }
+  },
   "jobs": {
     "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
     "header": "We’re looking for talented people",
@@ -825,6 +859,10 @@
     "compare": {
       "description": "How rotki compares to cloud crypto tax tools",
       "title": "Compare"
+    },
+    "features": {
+      "description": "What rotki does, by use case",
+      "title": "Features"
     },
     "documentation": {
       "description": "Everything you need to know about the app",

@@ -40,6 +40,11 @@ const menus: MenuGroup[] = [
         to: '/compare',
         highlightActive: true,
       },
+      {
+        label: t('navigation_menu.features.title'),
+        to: '/features',
+        highlightActive: true,
+      },
     ],
   },
   {
