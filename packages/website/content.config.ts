@@ -169,6 +169,9 @@ const featureSchema = z.object({
     q: z.string(),
     a: z.string(),
   })).default([]),
+  // Optional deep link into the user docs (docs.rotki.com) for this use-case.
+  // Rendered as a "read the documentation" link in the deep-dive section.
+  docsUrl: z.string().url().optional(),
   // Freshness stamp shown on the page (e.g. "June 2026").
   updatedAt: z.string(),
   ctaPlan: z.enum(['free', 'basic', 'advanced']).default('free'),

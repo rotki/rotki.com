@@ -6,6 +6,7 @@ intro: "rotki is open-source crypto tax and accounting software. The entire appl
 metaDescription: "rotki is open-source crypto tax software you can audit on GitHub and run locally. Produce cost-basis tax reports on your own machine, not in a cloud."
 keywords: "open source crypto tax software, open source crypto tax, auditable crypto tax tool, self-hosted crypto tax, crypto tax report local"
 updatedAt: "June 2026"
+docsUrl: "https://docs.rotki.com/usage-guides/history/pnl.html"
 ctaPlan: free
 keyTakeaways:
   - "rotki's source code is public and auditable on GitHub, so you can verify how it calculates your taxes."

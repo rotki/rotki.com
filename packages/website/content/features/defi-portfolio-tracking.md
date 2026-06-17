@@ -6,6 +6,7 @@ intro: "rotki tracks your DeFi portfolio by reading your on-chain activity and d
 metaDescription: "rotki is a local-first DeFi portfolio tracker. It decodes on-chain swaps, LP, staking and rewards into readable events with PnL across multiple chains."
 keywords: "defi portfolio tracker, defi portfolio tracking, track defi positions, on-chain portfolio tracker, defi pnl tracker, multi-chain defi tracker"
 updatedAt: "June 2026"
+docsUrl: "https://docs.rotki.com/usage-guides/history/events.html"
 ctaPlan: free
 keyTakeaways:
   - "rotki decodes raw on-chain transactions into readable events instead of leaving you with hashes."

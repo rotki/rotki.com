@@ -255,6 +255,19 @@ definePageMeta({
         <div class="max-w-[820px]">
           <ContentRenderer :value="feature" />
         </div>
+        <a
+          v-if="feature.docsUrl"
+          :href="feature.docsUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 mt-6 text-body-1 font-medium text-rui-primary hover:underline"
+        >
+          {{ t('features.detail.docs_link') }}
+          <RuiIcon
+            name="lu-external-link"
+            size="18"
+          />
+        </a>
       </div>
     </section>
 

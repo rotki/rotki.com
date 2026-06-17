@@ -6,6 +6,7 @@ intro: "rotki can import your crypto history from CSV files, so activity from ex
 metaDescription: "Import crypto history into rotki from CSV files. Bring in exchange and wallet data that has no API connection, processed locally on your own machine."
 keywords: "crypto csv import, import csv crypto tax, exchange csv import, rotki csv import, import transactions csv crypto"
 updatedAt: "June 2026"
+docsUrl: "https://docs.rotki.com/usage-guides/history/import-data.html"
 ctaPlan: free
 keyTakeaways:
   - "rotki imports transaction history from CSV files for sources without a live API connection."
