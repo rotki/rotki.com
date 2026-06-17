@@ -4,6 +4,8 @@ shellEmulator: true
 minimumReleaseAge: 10080
 minimumReleaseAgeExclude:
   - '@rotki/ui-library'
+  # Renovate security update: nuxt@4.4.7
+  - nuxt@4.4.7
 blockExoticSubdeps: true
 strictDepBuilds: true
 trustPolicy: no-downgrade
