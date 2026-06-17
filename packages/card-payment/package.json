@@ -1,6 +1,6 @@
 {
   "name": "@rotki/card-payment",
-  "version": "2026.6.3",
+  "version": "2026.6.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
