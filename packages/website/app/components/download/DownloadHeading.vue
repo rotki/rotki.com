@@ -71,7 +71,7 @@ function onDownloadClick(platform: string): void {
           {{ t('download.heading.description') }}
         </h3>
         <div class="flex flex-col items-center gap-3 pt-2 min-h-[106px]">
-          <div class="flex gap-2 flex-wrap justify-center h-[42px] items-center">
+          <div class="flex gap-2 flex-wrap justify-center min-h-[42px] items-center">
             <RuiButton
               v-if="loading"
               rounded
