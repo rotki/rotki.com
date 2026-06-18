@@ -13,6 +13,7 @@ import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsors
 import { findTierById } from '~/composables/rotki-sponsorship/utils';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { getTierClasses } from '~/utils/nft-tiers';
+import { getSingleRouteParam } from '~/utils/query';
 import { useLogger } from '~/utils/use-logger';
 import { toMessages } from '~/utils/validation';
 
@@ -161,7 +162,8 @@ function handleImageSelected(file: File): void {
   // Create preview
   const reader = new FileReader();
   reader.onloadend = () => {
-    set(imagePreview, reader.result as string);
+    if (typeof reader.result === 'string')
+      set(imagePreview, reader.result);
   };
   reader.readAsDataURL(file);
 }
@@ -443,7 +445,7 @@ watch(() => editingSubmission, (submission) => {
 }, { immediate: true });
 
 onMounted(() => {
-  const tokenIdParam = route.query.tokenId as string;
+  const tokenIdParam = getSingleRouteParam(route.query.tokenId);
   if (tokenIdParam && !editingSubmission) {
     set(tokenId, tokenIdParam);
     checkNftMetadata();

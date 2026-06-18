@@ -29,16 +29,32 @@ export type PaymentFailedReason = EnumValueOf<typeof PaymentFailures>['reason'];
 
 export type PaymentServerEvent = EnumValueOf<typeof PaymentFailures>['serverEvent'];
 
-// Convenience: key → serverEvent string, preserving literal types.
-export const PaymentServerEvents = Object.fromEntries(
-  (Object.entries(PaymentFailures) as [PaymentFailureKey, (typeof PaymentFailures)[PaymentFailureKey]][])
-    .map(([k, v]) => [k, v.serverEvent]),
-) as { [K in PaymentFailureKey]: (typeof PaymentFailures)[K]['serverEvent'] };
+// Convenience: key → serverEvent string, preserving literal types. Built as an
+// explicit literal (values derived from PaymentFailures, so no string duplication)
+// so the precise per-key type is inferred with no assertion. `satisfies` enforces
+// that every PaymentFailureKey is present — adding an entry above without adding it
+// here is a compile error.
+export const PaymentServerEvents = {
+  BRAINTREE_INIT_FAILED: PaymentFailures.BRAINTREE_INIT_FAILED.serverEvent,
+  THREE_DS_VERIFICATION_FAILED: PaymentFailures.THREE_DS_VERIFICATION_FAILED.serverEvent,
+  THREE_DS_LIABILITY_SHIFT_FAILED: PaymentFailures.THREE_DS_LIABILITY_SHIFT_FAILED.serverEvent,
+  CARD_PAYMENT_API_ERROR: PaymentFailures.CARD_PAYMENT_API_ERROR.serverEvent,
+  PAYPAL_SDK_INIT_FAILED: PaymentFailures.PAYPAL_SDK_INIT_FAILED.serverEvent,
+  PAYPAL_PAYMENT_ERROR: PaymentFailures.PAYPAL_PAYMENT_ERROR.serverEvent,
+  PAYPAL_SUBMIT_ERROR: PaymentFailures.PAYPAL_SUBMIT_ERROR.serverEvent,
+  CRYPTO_WALLET_NOT_CONNECTED: PaymentFailures.CRYPTO_WALLET_NOT_CONNECTED.serverEvent,
+  CRYPTO_WRONG_CHAIN: PaymentFailures.CRYPTO_WRONG_CHAIN.serverEvent,
+  CRYPTO_INSUFFICIENT_FUNDS: PaymentFailures.CRYPTO_INSUFFICIENT_FUNDS.serverEvent,
+  CRYPTO_USER_REJECTED: PaymentFailures.CRYPTO_USER_REJECTED.serverEvent,
+  CRYPTO_TX_FAILED: PaymentFailures.CRYPTO_TX_FAILED.serverEvent,
+  CRYPTO_PAYMENT_API_ERROR: PaymentFailures.CRYPTO_PAYMENT_API_ERROR.serverEvent,
+  CHECKOUT_ERROR: PaymentFailures.CHECKOUT_ERROR.serverEvent,
+} satisfies Record<PaymentFailureKey, PaymentServerEvent>;
 
 const SERVER_EVENT_TO_REASON: Readonly<Record<string, PaymentFailedReason>> = Object.freeze(
   Object.fromEntries(
-    Object.values(PaymentFailures).map(entry => [entry.serverEvent, entry.reason]),
-  ) as Record<string, PaymentFailedReason>,
+    Object.values(PaymentFailures).map((entry): [string, PaymentFailedReason] => [entry.serverEvent, entry.reason]),
+  ),
 );
 
 /**
@@ -63,7 +79,7 @@ interface CryptoErrorShape {
  * the function only duck-types the error.
  */
 export function classifyCryptoTxError(error: unknown): PaymentFailureKey {
-  const err = (error ?? {}) as CryptoErrorShape;
+  const err: CryptoErrorShape = typeof error === 'object' && error !== null ? error : {};
   const code = err.code;
 
   if (code === 'ACTION_REJECTED' || code === 4001)

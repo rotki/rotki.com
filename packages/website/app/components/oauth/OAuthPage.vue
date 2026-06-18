@@ -27,6 +27,11 @@ defineSlots<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
+function selectText(event: MouseEvent): void {
+  if (event.target instanceof HTMLTextAreaElement)
+    event.target.select();
+}
 </script>
 
 <template>
@@ -73,7 +78,7 @@ const { t } = useI18n({ useScope: 'global' });
             variant="outlined"
             color="primary"
             rows="4"
-            @click="($event.target as HTMLTextAreaElement).select()"
+            @click="selectText($event)"
           >
             <template #append>
               <CopyButton :model-value="accessToken" />
@@ -87,7 +92,7 @@ const { t } = useI18n({ useScope: 'global' });
             variant="outlined"
             color="primary"
             rows="4"
-            @click="($event.target as HTMLTextAreaElement).select()"
+            @click="selectText($event)"
           >
             <template #append>
               <CopyButton :model-value="refreshToken" />

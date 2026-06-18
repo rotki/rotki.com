@@ -203,7 +203,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         return payEvent;
       }
       else {
-        const status = (threeDSecureInfo as any)?.status as string | undefined;
+        const { status } = threeDSecureInfo;
         const errorMsg = `Authentication failed${status ? `: ${status.replaceAll('_', ' ')}` : ''}`;
 
         set(error, errorMsg);

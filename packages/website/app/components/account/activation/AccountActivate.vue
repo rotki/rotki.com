@@ -8,14 +8,15 @@ import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { useMainStore } from '~/store';
+import { getSingleRouteParam } from '~/utils/query';
 import { getSafeRedirectUrl } from '~/utils/redirect';
 import { useLogger } from '~/utils/use-logger';
 
 const { t } = useI18n({ useScope: 'global' });
 const route = useRoute();
 
-const uid = route.params.uid as string;
-const token = route.params.token as string;
+const uid = getSingleRouteParam(route.params.uid);
+const token = getSingleRouteParam(route.params.token);
 
 const validating = ref<boolean>(true);
 const isValid = ref<boolean>(false);

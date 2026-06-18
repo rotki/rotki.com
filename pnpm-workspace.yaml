@@ -59,3 +59,6 @@ catalog:
   vue: 3.5.34
   vue-tsc: 3.3.1
   zod: 3.25.76
+
+patchedDependencies:
+  '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch

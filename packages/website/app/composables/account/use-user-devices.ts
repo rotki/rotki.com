@@ -80,6 +80,6 @@ export function useUserDevices(): UseUserDevicesReturn {
     loading: readonly(loading),
     refresh,
     renameDevice,
-    userDevices: readonly(userDevices) as Readonly<Ref<UserDevice[]>>,
+    userDevices: shallowReadonly(userDevices),
   };
 }

@@ -16,7 +16,10 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 
 function handleImageChange(event: Event): void {
-  const target = event.target as HTMLInputElement;
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement))
+    return;
+
   const file = target.files?.[0];
   if (file) {
     emit('file-selected', file);

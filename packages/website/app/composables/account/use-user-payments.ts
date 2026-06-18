@@ -44,6 +44,6 @@ export function useUserPayments(): UseUserPaymentsReturn {
   return {
     loading: readonly(loading),
     refresh,
-    userPayments: readonly(userPayments) as Readonly<Ref<UserPayment[]>>,
+    userPayments: shallowReadonly(userPayments),
   };
 }

@@ -64,6 +64,9 @@ catalogs:
 overrides:
   chokidar: 5.0.0
 
+patchedDependencies:
+  '@types/paypal-checkout-components@4.0.8': 7290bc3f5f016af7404be82d90a79de3311c93c0a8e1506159921421273367ee
+
 importers:
 
   .:
@@ -334,7 +337,7 @@ importers:
         version: 3.96.17
       '@types/paypal-checkout-components':
         specifier: 4.0.8
-        version: 4.0.8
+        version: 4.0.8(patch_hash=7290bc3f5f016af7404be82d90a79de3311c93c0a8e1506159921421273367ee)
       '@types/qrcode':
         specifier: 1.5.6
         version: 1.5.6
@@ -13472,7 +13475,7 @@ snapshots:
   '@types/braintree-web@3.96.17':
     dependencies:
       '@types/googlepay': 0.7.10
-      '@types/paypal-checkout-components': 4.0.8
+      '@types/paypal-checkout-components': 4.0.8(patch_hash=7290bc3f5f016af7404be82d90a79de3311c93c0a8e1506159921421273367ee)
 
   '@types/chai@5.2.3':
     dependencies:
@@ -13530,7 +13533,7 @@ snapshots:
     dependencies:
       parse-path: 7.1.0
 
-  '@types/paypal-checkout-components@4.0.8': {}
+  '@types/paypal-checkout-components@4.0.8(patch_hash=7290bc3f5f016af7404be82d90a79de3311c93c0a8e1506159921421273367ee)': {}
 
   '@types/qrcode@1.5.6':
     dependencies:

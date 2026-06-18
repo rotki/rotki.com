@@ -1,9 +1,12 @@
+import type { ParsedContentFile } from '@nuxt/content';
 import type { Buffer } from 'node:buffer';
+import type { z } from 'zod';
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineNuxtModule, useLogger } from '@nuxt/kit';
 import { parse as parseYaml } from 'yaml';
+import { featureSchema } from '../../shared/content-schemas';
 import { type OgFonts, renderOgImage } from '../integration-seo/og-image';
 
 const moduleDir = dirname(fileURLToPath(import.meta.url));
@@ -23,10 +26,11 @@ const moduleDir = dirname(fileURLToPath(import.meta.url));
  *    endpoint expose real content. This does not affect the rendered page.
  */
 
-interface FeatureFrontmatter {
-  label?: string;
-  tagline?: string;
-}
+// Only label/tagline are needed for OG cards; pick them off the canonical
+// collection schema (made optional, since this runs before content validation).
+const FeatureFrontmatterSchema = featureSchema.pick({ label: true, tagline: true }).partial();
+
+type FeatureFrontmatter = z.infer<typeof FeatureFrontmatterSchema>;
 
 // minimark AST node: [tag, props, ...children].
 type MinimarkNode = [string, Record<string, unknown>, ...unknown[]];
@@ -42,6 +46,18 @@ interface FeatureDoc {
   troubleshooting?: Array<{ problem: string; fix: string }>;
   faq?: Array<{ q: string; a: string }>;
   body?: { value?: unknown[] };
+}
+
+// Narrow the generic parsed-content shape to this collection's view via a runtime
+// guard (no cast). Requires the two fields the hook actually reads — `intro` and a
+// `body.value` array — so the body-synthesis branch can run; the rest of `FeatureDoc`
+// is the asserted frontmatter view.
+function isFeatureDoc(
+  content: ParsedContentFile,
+): content is ParsedContentFile & FeatureDoc & { intro: string; body: { value: unknown[] } } {
+  return typeof content.intro === 'string' && content.intro.length > 0
+    && typeof content.body === 'object' && content.body !== null
+    && 'value' in content.body && Array.isArray(content.body.value);
 }
 
 function listSection(heading: string, items: string[] | undefined): MinimarkNode[] {
@@ -88,7 +104,8 @@ function readFrontmatter(file: string): FeatureFrontmatter | undefined {
   if (!match?.[1])
     return undefined;
 
-  return parseYaml(match[1]) as FeatureFrontmatter;
+  const parsed = FeatureFrontmatterSchema.safeParse(parseYaml(match[1]));
+  return parsed.success ? parsed.data : undefined;
 }
 
 function buildFrontmatterMap(contentDir: string): Map<string, FeatureFrontmatter> {
@@ -123,10 +140,14 @@ export default defineNuxtModule({
     // Synthesise a markdown body from frontmatter so nuxt-llms (llms-full.txt + /raw)
     // emits real content instead of empty docs.
     nuxt.hook('content:file:afterParse', (ctx) => {
-      const { collection, content: doc } = ctx as unknown as { collection?: string | { name?: string }; content?: FeatureDoc };
-      const name = typeof collection === 'string' ? collection : collection?.name;
-      if (name !== 'features' || !doc?.intro || !Array.isArray(doc.body?.value))
+      if (ctx.collection.name !== 'features')
         return;
+
+      if (!isFeatureDoc(ctx.content))
+        return;
+
+      // Mutations below write back through the same reference.
+      const doc = ctx.content;
 
       if (doc.label)
         doc.title = doc.label;

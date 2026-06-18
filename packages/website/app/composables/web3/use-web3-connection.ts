@@ -1,9 +1,10 @@
 import type { AppKit } from '@reown/appkit';
 import type { AppKitNetwork } from '@reown/appkit/networks';
-import type { Signer } from 'ethers';
+import type { Eip1193Provider, Signer } from 'ethers';
 import { get, set } from '@vueuse/shared';
 import { useAppConfig } from '~/composables/use-app-config';
 import { useSharedWeb3State } from '~/composables/web3/use-shared-web3-state';
+import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
 // Lazy-loaded module cache
@@ -198,8 +199,9 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
   async function getBrowserProvider(): Promise<InstanceType<typeof import('ethers/providers').BrowserProvider>> {
     const appKit = await ensureInitialized();
     const { BrowserProvider } = await import('ethers/providers');
-    const walletProvider = appKit.getProvider('eip155');
-    return new BrowserProvider(walletProvider as any);
+    const walletProvider = appKit.getProvider<Eip1193Provider>('eip155');
+    assert(walletProvider, 'No EIP-1193 wallet provider available');
+    return new BrowserProvider(walletProvider);
   }
 
   function getNetwork(networkChainId?: number): AppKitNetwork | undefined {

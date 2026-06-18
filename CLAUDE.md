@@ -212,6 +212,21 @@ Follow this order in `<script setup>`:
 
 - If you have to create a ref where there is a possibility for it to be empty, always use `const name = ref<string>()` instead of `const name = ref<string | null>(null)`.
 
+#### Exposing readonly refs — use `shallowReadonly`, not a cast
+
+- When a composable exposes internal state as `Readonly<Ref<T>>`, use `shallowReadonly(ref)`, **not** `readonly(ref) as Readonly<Ref<T>>`.
+- `readonly()` returns `DeepReadonly<UnwrapNestedRefs<T>>`, which does not match `Readonly<Ref<T>>` (it also deep-freezes array/object elements, breaking consumers that assign to a mutable `T[]`). That mismatch is what forces the `as` cast.
+- `shallowReadonly<T>(target): Readonly<T>` returns the plain TS `Readonly<T>` — so `shallowReadonly(ref)` is exactly `Readonly<Ref<T>>` with no cast and no deep-freezing.
+- Do **not** wrap in `computed(() => get(ref))` just to get the readonly shape — `ComputedRef` carries extra internal brand and adds caching overhead for no benefit here.
+
+  ```typescript
+  // ✅ Correct
+  return { items: shallowReadonly(items) };
+
+  // ❌ Incorrect — cast hides the DeepReadonly mismatch (and can silently strip `| null`)
+  return { items: readonly(items) as Readonly<Ref<Item[]>> };
+  ```
+
 #### Correct Examples:
 
 ```typescript

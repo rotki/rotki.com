@@ -143,7 +143,7 @@ describe('parseTiersInfo', () => {
         monthlyPlan: null,
         yearlyPlan: null,
       },
-    ] as PremiumTiersInfo;
+    ] satisfies PremiumTiersInfo;
 
     const result = parseTiersInfo(tiersData);
 

@@ -18,6 +18,7 @@ import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRecaptcha } from '~/composables/use-recaptcha';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
+import { getSingleRouteParam } from '~/utils/query';
 import { getSafeRedirectUrl } from '~/utils/redirect';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -103,9 +104,9 @@ async function signup({
     });
     if (result) {
       chronicle(SigilEvents.SIGNUP_COMPLETED, {});
-      const { redirectUrl } = route.query;
+      const redirectUrl = getSingleRouteParam(route.query.redirectUrl);
       if (redirectUrl) {
-        const safeUrl = getSafeRedirectUrl(redirectUrl as string);
+        const safeUrl = getSafeRedirectUrl(redirectUrl);
         if (safeUrl !== '/home/subscription')
           saveRedirectUrl(payload.username, safeUrl);
       }

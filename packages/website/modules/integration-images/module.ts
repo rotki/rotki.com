@@ -3,16 +3,19 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
 import { defineNuxtModule } from '@nuxt/kit';
+import { z } from 'zod';
 
 const CONCURRENCY = 20;
 const MANIFEST_FILE = '.manifest.json';
 
-interface ManifestEntry {
-  etag: string;
-  filename: string;
-}
+const ManifestEntrySchema = z.object({
+  etag: z.string(),
+  filename: z.string(),
+});
 
-type Manifest = Record<string, ManifestEntry>;
+const ManifestSchema = z.record(z.string(), ManifestEntrySchema);
+
+type Manifest = z.infer<typeof ManifestSchema>;
 
 interface DownloadTask {
   url: string;
@@ -32,7 +35,9 @@ async function readManifest(manifestPath: string): Promise<Manifest> {
     return {};
 
   const raw = await readFile(manifestPath, 'utf-8');
-  return JSON.parse(raw) as Manifest;
+  // A corrupt/outdated manifest should just trigger a re-download, not crash the build.
+  const parsed = ManifestSchema.safeParse(JSON.parse(raw));
+  return parsed.success ? parsed.data : {};
 }
 
 async function writeManifest(manifestPath: string, manifest: Manifest): Promise<void> {

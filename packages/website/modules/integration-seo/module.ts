@@ -1,9 +1,12 @@
+import type { ParsedContentFile } from '@nuxt/content';
 import type { Buffer } from 'node:buffer';
+import type { z } from 'zod';
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineNuxtModule, useLogger } from '@nuxt/kit';
 import { parse as parseYaml } from 'yaml';
+import { integrationSchema } from '../../shared/content-schemas';
 import { type OgFonts, renderOgImage } from './og-image';
 
 const moduleDir = dirname(fileURLToPath(import.meta.url));
@@ -24,11 +27,11 @@ const moduleDir = dirname(fileURLToPath(import.meta.url));
  *    rendered page, which reads the frontmatter fields directly.
  */
 
-interface IntegrationFrontmatter {
-  label?: string;
-  type?: 'exchange' | 'blockchain' | 'protocol';
-  tagline?: string;
-}
+// Only label/type/tagline are needed for OG cards; pick them off the canonical
+// collection schema (made optional, since this runs before content validation).
+const IntegrationFrontmatterSchema = integrationSchema.pick({ label: true, type: true, tagline: true }).partial();
+
+type IntegrationFrontmatter = z.infer<typeof IntegrationFrontmatterSchema>;
 
 // minimark AST node: [tag, props, ...children]. Children are loosely typed as
 // `unknown` because a recursive tuple-rest alias isn't allowed in TypeScript.
@@ -45,6 +48,18 @@ interface IntegrationDoc {
   setup?: string[];
   faq?: Array<{ q: string; a: string }>;
   body?: { value?: unknown[] };
+}
+
+// Narrow the generic parsed-content shape to this collection's view via a runtime
+// guard (no cast). Requires the two fields the hook actually reads — `intro` and a
+// `body.value` array — so the body-synthesis branch can run; the rest of
+// `IntegrationDoc` is the asserted frontmatter view.
+function isIntegrationDoc(
+  content: ParsedContentFile,
+): content is ParsedContentFile & IntegrationDoc & { intro: string; body: { value: unknown[] } } {
+  return typeof content.intro === 'string' && content.intro.length > 0
+    && typeof content.body === 'object' && content.body !== null
+    && 'value' in content.body && Array.isArray(content.body.value);
 }
 
 function listSection(heading: string, items: string[] | undefined, tag: 'ul' | 'ol'): MinimarkNode[] {
@@ -89,7 +104,8 @@ function readFrontmatter(file: string): IntegrationFrontmatter | undefined {
   if (!match?.[1])
     return undefined;
 
-  return parseYaml(match[1]) as IntegrationFrontmatter;
+  const parsed = IntegrationFrontmatterSchema.safeParse(parseYaml(match[1]));
+  return parsed.success ? parsed.data : undefined;
 }
 
 function buildFrontmatterMap(contentDir: string): Map<string, IntegrationFrontmatter> {
@@ -124,10 +140,14 @@ export default defineNuxtModule({
     // Synthesise a markdown body from frontmatter so nuxt-llms (llms-full.txt + /raw)
     // emits real content instead of empty docs.
     nuxt.hook('content:file:afterParse', (ctx) => {
-      const { collection, content: doc } = ctx as unknown as { collection?: string | { name?: string }; content?: IntegrationDoc };
-      const name = typeof collection === 'string' ? collection : collection?.name;
-      if (name !== 'integrations' || !doc?.intro || !Array.isArray(doc.body?.value))
+      if (ctx.collection.name !== 'integrations')
         return;
+
+      if (!isIntegrationDoc(ctx.content))
+        return;
+
+      // Mutations below write back through the same reference.
+      const doc = ctx.content;
 
       // Content auto-derives the title as PascalCase of the filename ("Binance Us");
       // prefer the proper label. `description` is unused by integrations — fill it from

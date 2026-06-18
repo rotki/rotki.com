@@ -1,0 +1,34 @@
+diff --git a/modules/callback-data.d.ts b/modules/callback-data.d.ts
+index ef7ba6eb4ba3b6ba28c08b9e69ee9ad193e822a6..87c3fedba4979ffd7e0d74cb29ded8cfd097b2b6 100644
+--- a/modules/callback-data.d.ts
++++ b/modules/callback-data.d.ts
+@@ -219,17 +219,18 @@ export interface AuthorizationResponse {
+     details: AuthorizationResponseDetails;
+ }
+ 
+-export enum FlowType {
+-    /**
+-     * Used to store the payment method for future use, ie subscriptions
+-     */
+-    Vault = "vault",
+-
+-    /**
+-     * Used for one-time checkout
+-     */
+-    Checkout = "checkout",
+-}
++/**
++ * `FlowType` is declared as a string union rather than an `enum` (patched).
++ *
++ * Upstream `@types/paypal-checkout-components` declares this as an `enum`, but
++ * the package ships no runtime JS, so `FlowType.Vault` is `undefined` at
++ * runtime. A union lets callers pass the literal `"vault"`/`"checkout"` the SDK
++ * actually expects without an `as` cast and without a phantom runtime value.
++ *
++ * - "vault": store the payment method for future use, ie subscriptions
++ * - "checkout": one-time checkout
++ */
++export type FlowType = "vault" | "checkout";
+ 
+ export enum Intent {
+     /**

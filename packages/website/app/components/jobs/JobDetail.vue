@@ -9,10 +9,14 @@ const { data } = defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 
+function isMinimarkTree(value: unknown): value is MinimarkTree {
+  return typeof value === 'object' && value !== null && 'type' in value && value.type === 'minimark';
+}
+
 function filterBy(filterMethod: (tag: string) => boolean) {
   return computed(() => {
-    const body = data.body as any as MinimarkTree;
-    assert(body.type === 'minimark');
+    const { body } = data;
+    assert(isMinimarkTree(body));
 
     const elements = body.value.filter(node => filterMethod(node[0]));
 

@@ -6,6 +6,7 @@ import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useMainStore } from '~/store';
+import { getSingleRouteParam } from '~/utils/query';
 import { getSafeRedirectUrl } from '~/utils/redirect';
 
 const username = ref<string>('');
@@ -53,9 +54,9 @@ async function performLogin() {
 
   if (!get(error)) {
     chronicle(SigilEvents.LOGIN_COMPLETED, {});
-    const { redirectUrl } = route.query;
+    const redirectUrl = getSingleRouteParam(route.query.redirectUrl);
     if (redirectUrl)
-      window.location.href = getSafeRedirectUrl(redirectUrl as string);
+      window.location.href = getSafeRedirectUrl(redirectUrl);
     else
       await navigateTo('/home/subscription');
   }

@@ -94,6 +94,6 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
     initialLoading: readonly(initialLoading),
     loading: readonly(loading),
     refresh,
-    userSubscriptions: readonly(userSubscriptions) as Readonly<Ref<UserSubscription[]>>,
+    userSubscriptions: shallowReadonly(userSubscriptions),
   };
 }

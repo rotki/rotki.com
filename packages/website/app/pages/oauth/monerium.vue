@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import type {
-  OAuthStateWithStorage,
-  OAuthTokenResponse,
-} from '~/types/oauth';
 import { get, set } from '@vueuse/shared';
 import OAuthPage from '~/components/oauth/OAuthPage.vue';
 import { useOAuth } from '~/composables/account/use-oauth';
 import { usePkce } from '~/composables/account/use-pkce';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
+import {
+  type OAuthStateWithStorage,
+  OAuthStateWithStorageSchema,
+  type OAuthTokenResponse,
+} from '~/types/oauth';
 import { removeTrailingSlash } from '~/utils/text';
 import { useLogger } from '~/utils/use-logger';
 
@@ -107,7 +108,7 @@ async function handleMoneriumAuth() {
 }
 
 function parseState(stateString: string): OAuthStateWithStorage {
-  return JSON.parse(atob(stateString)) as OAuthStateWithStorage;
+  return OAuthStateWithStorageSchema.parse(JSON.parse(atob(stateString)));
 }
 
 async function exchangeCodeForToken(code: string, redirectUri: string, codeVerifier: string): Promise<OAuthTokenResponse> {

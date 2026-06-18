@@ -227,7 +227,7 @@ export function useRotkiSponsorshipPayment() {
           try {
             const parsedLog = contract.interface.parseLog({
               data: log.data,
-              topics: log.topics as string[],
+              topics: [...log.topics],
             });
 
             if (parsedLog?.name === 'NFTMinted' && parsedLog.args.minter.toLowerCase() === get(address)?.toLowerCase()) {

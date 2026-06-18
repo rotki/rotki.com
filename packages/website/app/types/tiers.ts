@@ -13,7 +13,10 @@ export const PremiumTierInfoDescription = z.object({
 export type PremiumTierInfoDescription = z.infer<typeof PremiumTierInfoDescription>;
 
 export const PremiumTierInfo = z.object({
-  description: z.array(PremiumTierInfoDescription),
+  // Optional: the backend may omit `description` for a tier. Keeping it required
+  // made `PremiumTiersInfoSchema.safeParse` reject the whole response (falling back
+  // to defaults) whenever any tier lacked one — `parseTiersInfo` already skips such tiers.
+  description: z.array(PremiumTierInfoDescription).optional(),
   limits: z.record(z.string(), z.union([z.boolean(), z.number()])),
   monthlyPlan: PremiumTierPlan,
   name: z.string(),

@@ -50,7 +50,7 @@ describe('usePaymentCards', () => {
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('home.account.payment_methods.errors.rate_limited_failures');
     });
@@ -63,7 +63,7 @@ describe('usePaymentCards', () => {
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('home.account.payment_methods.errors.rate_limited');
     });
@@ -75,7 +75,7 @@ describe('usePaymentCards', () => {
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('home.account.payment_methods.errors.rate_limited');
     });
@@ -93,7 +93,7 @@ describe('usePaymentCards', () => {
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('home.account.payment_methods.errors.card_declined');
     });
@@ -106,7 +106,7 @@ describe('usePaymentCards', () => {
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('home.account.payment_methods.errors.card_declined');
     });
@@ -121,7 +121,7 @@ describe('usePaymentCards', () => {
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('Internal failure');
     });
@@ -129,13 +129,13 @@ describe('usePaymentCards', () => {
     it('falls back to common.error_occurred when no message is available', async () => {
       const error = createFetchError(500, undefined);
       // simulate a totally opaque error object
-      delete (error as any).message;
+      Reflect.deleteProperty(error, 'message');
       mockFetchWithCsrf.mockRejectedValueOnce(error);
 
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
       const { addCard } = usePaymentCards();
 
-      await expect(addCard({ paymentMethodNonce: 'nonce' } as any))
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
         .toThrow('common.error_occurred');
     });

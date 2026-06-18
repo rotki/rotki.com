@@ -133,7 +133,10 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
       const transfer = contract.transfer;
       if (!transfer)
         throw new Error('Token contract does not support transfer');
-      tx = await (transfer(to, value) as Promise<TransactionResponse>);
+      // `.send()` is the typed entrypoint for a state-changing method: it returns
+      // `Promise<ContractTransactionResponse>` (a `TransactionResponse`), whereas calling
+      // the method proxy directly is typed `Promise<any>` and forces a cast.
+      tx = await transfer.send(to, value);
     }
 
     logger.info(`transaction is pending: ${tx.hash}`);

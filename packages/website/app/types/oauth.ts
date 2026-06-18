@@ -1,4 +1,8 @@
-export type OAuthMode = 'app' | 'docker';
+import { z } from 'zod';
+
+const OAuthModeSchema = z.enum(['app', 'docker']);
+
+export type OAuthMode = z.infer<typeof OAuthModeSchema>;
 
 export interface OAuthTokenResponse {
   access_token: string;
@@ -7,14 +11,18 @@ export interface OAuthTokenResponse {
   token_type?: string;
 }
 
-interface OAuthState {
-  mode: OAuthMode;
-  timestamp: number;
-}
+/**
+ * Shape of the OAuth `state` payload we round-trip through the provider. It is
+ * attacker-controllable by the time it comes back, so it must be validated at
+ * the boundary rather than cast — see `parseState` in the monerium page.
+ */
+export const OAuthStateWithStorageSchema = z.object({
+  mode: OAuthModeSchema,
+  timestamp: z.number(),
+  storageKey: z.string(),
+});
 
-export interface OAuthStateWithStorage extends OAuthState {
-  storageKey: string;
-}
+export type OAuthStateWithStorage = z.infer<typeof OAuthStateWithStorageSchema>;
 
 export interface OAuthCallbackParams {
   code: string;

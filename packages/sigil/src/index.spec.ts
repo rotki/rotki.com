@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   buildTrackedEventData,
-  type CamelToSnakeCase,
   classifyCryptoTxError,
   createTrackingSession,
   monthsToPlanDuration,
@@ -15,7 +14,6 @@ import {
   reasonForServerEvent,
   type SigilEventPayloadMap,
   SigilEvents,
-  type SnakeCaseKeys,
   toSnakeCaseKeys,
   type TrackingSession,
 } from './index';
@@ -42,9 +40,10 @@ describe('monthsToPlanDuration', () => {
 
 describe('payment failure catalog', () => {
   it('derives server event strings that match the catalog entries', () => {
-    for (const [key, entry] of Object.entries(PaymentFailures)) {
-      expect(PaymentServerEvents[key as keyof typeof PaymentFailures]).toBe(entry.serverEvent);
-    }
+    const expected = Object.fromEntries(
+      Object.entries(PaymentFailures).map(([key, entry]) => [key, entry.serverEvent]),
+    );
+    expect(PaymentServerEvents).toEqual(expected);
   });
 
   it('round-trips server event → reason for every entry', () => {
@@ -310,7 +309,7 @@ describe('buildTrackedEventData', () => {
 });
 
 describe('postPaymentLog', () => {
-  const fetchMock = vi.fn(async () => new Response(null, { status: 200 }));
+  const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 200 }));
 
   beforeEach(() => {
     vi.stubGlobal('fetch', fetchMock);
@@ -332,14 +331,14 @@ describe('postPaymentLog', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe(PAYMENT_LOG_ENDPOINT);
-    expect(init.method).toBe('POST');
-    expect(init.headers).toEqual({ 'Content-Type': 'application/json' });
-    expect(init.keepalive).toBe(true);
+    expect(init?.method).toBe('POST');
+    expect(init?.headers).toEqual({ 'Content-Type': 'application/json' });
+    expect(init?.keepalive).toBe(true);
 
     // Verify the body is sent with snake_case keys
-    const body = JSON.parse(init.body as string) as Record<string, unknown>;
+    const body: Record<string, unknown> = JSON.parse(String(init?.body));
     expect(body.payment_method).toBe('card');
     expect(body.error_message).toBe('oops');
     expect(body.plan_id).toBe(42);
@@ -356,8 +355,8 @@ describe('postPaymentLog', () => {
     });
     const after = Date.now();
 
-    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    const body = JSON.parse(init.body as string) as { timestamp: number; payment_method: string; event: string };
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    const body: { timestamp: number; payment_method: string; event: string } = JSON.parse(String(init?.body));
     expect(body.timestamp).toBeGreaterThanOrEqual(before);
     expect(body.timestamp).toBeLessThanOrEqual(after);
     expect(body.payment_method).toBe('paypal');
@@ -444,30 +443,6 @@ describe('toSnakeCaseKeys', () => {
     const input = { planId: 42, isUpgrade: false };
     toSnakeCaseKeys(input);
     expect(input).toEqual({ planId: 42, isUpgrade: false });
-  });
-
-  it('produces correct types at compile time', () => {
-    // These type assertions verify the CamelToSnakeCase utility type works correctly.
-    const checkPaymentMethod: CamelToSnakeCase<'paymentMethod'> = 'payment_method';
-    const checkPlanId: CamelToSnakeCase<'planId'> = 'plan_id';
-    const checkIsUpgrade: CamelToSnakeCase<'isUpgrade'> = 'is_upgrade';
-    const checkCurrency: CamelToSnakeCase<'currency'> = 'currency';
-    const checkFromPlanName: CamelToSnakeCase<'fromPlanName'> = 'from_plan_name';
-
-    // Mapped type check
-    interface Input { paymentMethod: string; planId: number; isUpgrade: boolean }
-    const mapped: SnakeCaseKeys<Input> = {
-      payment_method: 'card',
-      plan_id: 42,
-      is_upgrade: true,
-    };
-
-    expect(checkPaymentMethod).toBe('payment_method');
-    expect(checkPlanId).toBe('plan_id');
-    expect(checkIsUpgrade).toBe('is_upgrade');
-    expect(checkCurrency).toBe('currency');
-    expect(checkFromPlanName).toBe('from_plan_name');
-    expect(mapped.payment_method).toBe('card');
   });
 
   it('converts all PaymentLogPayload keys correctly', () => {

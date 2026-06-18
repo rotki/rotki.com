@@ -15,7 +15,7 @@ export function useUtmTracking() {
       return;
 
     const route = useRoute();
-    const utm = parseUtmFromQuery(route.query as Record<string, unknown>);
+    const utm = parseUtmFromQuery(route.query);
     const hasUtm = Object.values(utm).some(v => !!v);
 
     set(utmCookie, createTrackingSession({

@@ -36,7 +36,7 @@ const suggestedTier = computed<PremiumTierInfo | undefined>(() => {
 
 const monthlyPrice = computed<string | undefined>(() => get(suggestedTier)?.monthlyPlan?.price);
 
-const features = computed<PremiumTierInfoDescription[]>(() => get(suggestedTier)?.description.slice(0, 4) || []);
+const features = computed<PremiumTierInfoDescription[]>(() => get(suggestedTier)?.description?.slice(0, 4) || []);
 
 const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate();
 </script>

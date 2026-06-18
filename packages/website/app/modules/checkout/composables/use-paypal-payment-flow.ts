@@ -31,6 +31,13 @@ interface PaypalButtonActions {
   disable: () => void;
 }
 
+// The PayPal SDK types the `onInit` `actions` argument as a bare `object`, so narrow
+// it to the enable/disable shape we use via a guard instead of asserting.
+function isPaypalButtonActions(value: object): value is PaypalButtonActions {
+  return 'enable' in value && typeof value.enable === 'function'
+    && 'disable' in value && typeof value.disable === 'function';
+}
+
 interface PaypalButtonCallbacks {
   onPaymentStart: () => void;
   onPaymentSuccess: (nonce: string) => void;
@@ -158,7 +165,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
         set(paying, true);
         callbacks.onPaymentStart();
         return btPayPalCheckoutInstance!.createPayment({
-          flow: 'vault' as any,
+          flow: 'vault',
           amount: get(currentAmount),
           currency: 'EUR',
         });
@@ -205,8 +212,11 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
         callbacks.onPaymentCancel();
       },
       onInit: (_, actions) => {
-        set(paypalActions, actions as PaypalButtonActions);
-        (actions as PaypalButtonActions).disable();
+        if (!isPaypalButtonActions(actions))
+          return;
+
+        set(paypalActions, actions);
+        actions.disable();
       },
     }).render('#paypal-button');
 

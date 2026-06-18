@@ -1,5 +1,7 @@
 import { get } from '@vueuse/shared';
+import { z } from 'zod';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
+import { parseRouteParam } from '~/utils/query';
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const { availablePlans, execute } = useAvailablePlans();
@@ -14,7 +16,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   // Get planId from the route query directly
-  const currentPlanId = to.query.planId ? Number.parseInt(to.query.planId as string) : undefined;
+  const currentPlanId = parseRouteParam(to.query.planId, z.coerce.number().int().positive());
 
   // If planId doesn't exist in route params, redirect to checkout
   if (!currentPlanId) {

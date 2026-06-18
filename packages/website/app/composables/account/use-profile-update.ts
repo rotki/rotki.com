@@ -45,7 +45,7 @@ export function useProfileUpdate() {
         ...state,
       },
       omitFields,
-    ) as ProfilePayload;
+    );
 
     const result = await accountApi.updateProfile(payload);
 

@@ -161,7 +161,7 @@ const availableTokens = computed<PaymentToken[]>(() =>
 
     // Check if at least one tier has a non-zero price
     return SPONSORSHIP_TIERS.some((tier) => {
-      const price = token.prices[tier.key as TierKey];
+      const price = token.prices[tier.key];
       return price && parseFloat(price) > 0;
     });
   }),
@@ -213,7 +213,7 @@ const needsApproval = computed<boolean>(() => {
   if (!token || token.address === ETH_ADDRESS)
     return false;
 
-  const price = token.prices[selectedTierKey as TierKey];
+  const price = token.prices[selectedTierKey];
   const allowance = get(tokenAllowance);
 
   // Check if allowance is less than required price

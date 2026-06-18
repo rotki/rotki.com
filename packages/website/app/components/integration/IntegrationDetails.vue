@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
 import { integrationSlug } from '~/utils/integration-slug';
+import { parseRouteParam } from '~/utils/query';
 
 enum TabCategory {
   ALL = 'all',
@@ -20,8 +22,8 @@ const route = useRoute();
 
 // Set initial tab based on URL hash
 onMounted(() => {
-  const hash = get(route).hash?.replace('#', '') as TabCategory;
-  if (hash && Object.values(TabCategory).includes(hash)) {
+  const hash = parseRouteParam(get(route).hash?.replace('#', ''), z.nativeEnum(TabCategory));
+  if (hash) {
     set(tab, hash);
     router.replace({ hash: '' });
   }
