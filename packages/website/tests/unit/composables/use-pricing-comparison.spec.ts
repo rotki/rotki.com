@@ -1,7 +1,23 @@
+import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import type { FeatureDescriptionMap, FeatureValue, PlanBase } from '~/components/pricings/type';
 import type { PremiumTiersInfo } from '~/types/tiers';
 import { describe, expect, it } from 'vitest';
-import { parseTiersInfo, resolveFeatureValue } from '~/composables/use-pricing-comparison';
+import { buildRegularPlans, parseTiersInfo, resolveFeatureValue } from '~/composables/use-pricing-comparison';
+import { formatCurrency } from '~/utils/text';
+
+// Translation stub returns the key so tests can assert which key was chosen.
+const tStub = (key: string): string => key;
+
+function availablePlan(overrides: Partial<AvailablePlan> = {}): AvailablePlan {
+  return {
+    tierName: 'pro',
+    isCustom: false,
+    isMostPopular: false,
+    monthlyPlan: { planId: 1, price: '10' },
+    yearlyPlan: { planId: 2, price: '96' },
+    ...overrides,
+  };
+}
 
 const CUSTOM_LABELS = { support: 'Bespoke support', negotiable: 'Negotiable' };
 
@@ -295,5 +311,60 @@ describe('resolveFeatureValue', () => {
 
       expect(result).toBeUndefined();
     });
+  });
+});
+
+describe('buildRegularPlans', () => {
+  it('uses the monthly plan and monthly billing label for the monthly period', () => {
+    const [plan] = buildRegularPlans([availablePlan()], false, tStub);
+    expect(plan?.id).toBe(1);
+    expect(plan?.type).toBe('regular');
+    expect(plan?.mainPriceDisplay).toBe(`${formatCurrency(10)}€`);
+    expect(plan?.secondaryPriceDisplay).toBe('pricing.billed_monthly');
+  });
+
+  it('uses the yearly plan, divides by 12, and uses the annual billing label for the yearly period', () => {
+    const [plan] = buildRegularPlans([availablePlan()], true, tStub);
+    expect(plan?.id).toBe(2);
+    expect(plan?.mainPriceDisplay).toBe(`${formatCurrency(96 / 12)}€`);
+    expect(plan?.secondaryPriceDisplay).toBe('pricing.billed_annually');
+  });
+
+  it('marks the cheapest non-custom plan as the entry tier', () => {
+    const pricey = availablePlan({ tierName: 'pricey', monthlyPlan: { planId: 2, price: '20' } });
+    const cheap = availablePlan({ tierName: 'cheap', monthlyPlan: { planId: 1, price: '10' } });
+
+    const result = buildRegularPlans([pricey, cheap], false, tStub);
+
+    expect(result.find(p => p.name === 'cheap')?.isEntryTier).toBe(true);
+    expect(result.find(p => p.name === 'pricey')?.isEntryTier).toBe(false);
+  });
+
+  it('does not mark an entry tier when there is only one plan', () => {
+    const [plan] = buildRegularPlans([availablePlan()], false, tStub);
+    expect(plan?.isEntryTier).toBe(false);
+  });
+
+  it('excludes custom plans from the entry-tier calculation and hides them', () => {
+    const custom = availablePlan({ tierName: 'custom', isCustom: true, monthlyPlan: { planId: 9, price: '1' } });
+    const regular = availablePlan({ tierName: 'pro', monthlyPlan: { planId: 1, price: '10' } });
+
+    const result = buildRegularPlans([custom, regular], false, tStub);
+
+    expect(result.find(p => p.name === 'custom')?.hidden).toBe(true);
+    expect(result.find(p => p.name === 'custom')?.isEntryTier).toBe(false);
+    expect(result.find(p => p.name === 'pro')?.isEntryTier).toBe(true);
+  });
+
+  it('skips plans without a plan for the selected period', () => {
+    const noMonthly = availablePlan({ tierName: 'no-monthly', monthlyPlan: null });
+    const result = buildRegularPlans([noMonthly, availablePlan()], false, tStub);
+    expect(result).toHaveLength(1);
+    expect(result[0]?.name).toBe('pro');
+  });
+
+  it('passes through the most-popular flag', () => {
+    const [plan] = buildRegularPlans([availablePlan({ isMostPopular: true })], false, tStub);
+    expect(plan?.isMostPopular).toBe(true);
   });
 });

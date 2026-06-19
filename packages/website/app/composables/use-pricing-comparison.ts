@@ -1,4 +1,4 @@
-import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
+import type { AvailablePlan, AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import type { MaybeRefOrGetter } from 'vue';
 import type { FeatureDescriptionMap, FeatureValue, MappedPlan, PlanBase } from '~/components/pricings/type';
 import { get, set } from '@vueuse/shared';
@@ -155,6 +155,65 @@ interface UsePricingComparisonOptions {
   compact: MaybeRefOrGetter<boolean | undefined>;
 }
 
+type TranslateFn = (key: string, named?: Record<string, unknown>) => string;
+
+function toRegularPlan(
+  availablePlan: AvailablePlan,
+  targetPlan: NonNullable<AvailablePlan['monthlyPlan']>,
+  yearly: boolean,
+  price: number,
+  t: TranslateFn,
+): PlanBase {
+  const formattedPrice = formatCurrency(price);
+  return {
+    id: targetPlan.planId,
+    name: availablePlan.tierName,
+    displayedName: t('pricing.plans.plan', { plan: toTitleCase(availablePlan.tierName) }),
+    mainPriceDisplay: yearly ? `${formatCurrency(price / 12)}€` : `${formattedPrice}€`,
+    secondaryPriceDisplay: yearly
+      ? t('pricing.billed_annually', { price: formattedPrice })
+      : t('pricing.billed_monthly'),
+    type: 'regular',
+    hidden: availablePlan.isCustom || false,
+    isMostPopular: availablePlan.isMostPopular || false,
+    isEntryTier: false,
+  };
+}
+
+/**
+ * Builds the regular (non-free, non-custom) plan rows for the selected billing
+ * period, skipping plans without a matching plan for that period, and marks the
+ * cheapest non-custom plan as the entry tier.
+ */
+export function buildRegularPlans(availablePlans: AvailablePlans, yearly: boolean, t: TranslateFn): PlanBase[] {
+  const plans: PlanBase[] = [];
+  let minPrice = Number.POSITIVE_INFINITY;
+  let minPriceIndex = -1;
+
+  for (const availablePlan of availablePlans) {
+    const targetPlan = yearly ? availablePlan.yearlyPlan : availablePlan.monthlyPlan;
+    if (!targetPlan) {
+      continue;
+    }
+
+    const price = Number.parseFloat(targetPlan.price);
+    if (price < minPrice && !availablePlan.isCustom) {
+      minPrice = price;
+      minPriceIndex = plans.length;
+    }
+
+    plans.push(toRegularPlan(availablePlan, targetPlan, yearly, price, t));
+  }
+
+  // Mark the cheapest non-custom plan as entry tier
+  const entryPlan = minPriceIndex >= 0 && plans.length > 1 ? plans[minPriceIndex] : undefined;
+  if (entryPlan) {
+    entryPlan.isEntryTier = true;
+  }
+
+  return plans;
+}
+
 export function usePricingComparison(options: UsePricingComparisonOptions) {
   const { t } = useI18n({ useScope: 'global' });
   const rawFreePlanFeatures = useFreePlanFeatures();
@@ -173,49 +232,7 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
 
   const tiersInfo = computed<TiersInfo>(() => parseTiersInfo(toValue(options.tiersData)));
 
-  const regularPlans = computed<PlanBase[]>(() => {
-    const yearly = get(isYearly);
-    const plans: PlanBase[] = [];
-    let minPrice = Number.POSITIVE_INFINITY;
-    let minPriceIndex = -1;
-
-    for (const availablePlan of toValue(options.availablePlans)) {
-      const targetPlan = yearly ? availablePlan.yearlyPlan : availablePlan.monthlyPlan;
-      if (!targetPlan) {
-        continue;
-      }
-
-      const price = Number.parseFloat(targetPlan.price);
-      const formattedPrice = formatCurrency(price);
-
-      if (price < minPrice && !availablePlan.isCustom) {
-        minPrice = price;
-        minPriceIndex = plans.length;
-      }
-
-      plans.push({
-        id: targetPlan.planId,
-        name: availablePlan.tierName,
-        displayedName: t('pricing.plans.plan', { plan: toTitleCase(availablePlan.tierName) }),
-        mainPriceDisplay: yearly ? `${formatCurrency(price / 12)}€` : `${formattedPrice}€`,
-        secondaryPriceDisplay: yearly
-          ? t('pricing.billed_annually', { price: formattedPrice })
-          : t('pricing.billed_monthly'),
-        type: 'regular',
-        hidden: availablePlan.isCustom || false,
-        isMostPopular: availablePlan.isMostPopular || false,
-        isEntryTier: false,
-      });
-    }
-
-    // Mark the cheapest non-custom plan as entry tier
-    const entryPlan = minPriceIndex >= 0 && plans.length > 1 ? plans[minPriceIndex] : undefined;
-    if (entryPlan) {
-      entryPlan.isEntryTier = true;
-    }
-
-    return plans;
-  });
+  const regularPlans = computed<PlanBase[]>(() => buildRegularPlans(toValue(options.availablePlans), get(isYearly), t));
 
   const plans = computed<MappedPlan[]>(() => {
     const availPlans = toValue(options.availablePlans);
