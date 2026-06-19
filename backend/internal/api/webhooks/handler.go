@@ -27,7 +27,7 @@ const (
 )
 
 const (
-	maxBodySize    = 64 << 10 // 64 KB
+	maxBodySize    = 1 << 20 // 1 MB — GitHub release payloads (full changelog + assets) can exceed 64 KB
 	rateLimitDelay = time.Minute
 )
 

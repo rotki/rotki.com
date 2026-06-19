@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -189,6 +191,75 @@ func TestHandler_PublishedRelease(t *testing.T) {
 	}
 }
 
+// largeReleasePayload builds a payload shaped like a real GitHub release event:
+// a full release object with a long changelog body and many assets. The result
+// is well over the old 64 KB limit (rotki's real release payload is ~110 KB),
+// which is exactly what triggered the 413 in production.
+func largeReleasePayload(t *testing.T, tagName string, assetCount int) []byte {
+	t.Helper()
+	assets := make([]map[string]any, assetCount)
+	for i := range assets {
+		assets[i] = map[string]any{
+			"name":                 "rotki-linux-installer-" + strconv.Itoa(i) + ".AppImage",
+			"browser_download_url": "https://github.com/rotki/rotki/releases/download/" + tagName + "/asset-" + strconv.Itoa(i),
+			"content_type":         "application/octet-stream",
+			"size":                 123456789,
+			"download_count":       i,
+			"created_at":           "2026-06-18T16:00:00Z",
+			"updated_at":           "2026-06-18T16:00:00Z",
+			"uploader":             map[string]any{"login": "rotkibot", "id": 123456, "type": "User"},
+		}
+	}
+	payload := map[string]any{
+		"action": "published",
+		"release": map[string]any{
+			"tag_name": tagName,
+			"body":     strings.Repeat("- Fixed a bug and added a feature.\n", 2000), // ~70 KB changelog
+			"assets":   assets,
+		},
+		"repository": map[string]any{"full_name": "rotki/rotki", "id": 987654},
+		"sender":     map[string]any{"login": "rotkibot", "id": 123456},
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatalf("marshal payload: %v", err)
+	}
+	return data
+}
+
+func TestHandler_LargeReleasePayloadAccepted(t *testing.T) {
+	h := newTestHandler(t)
+
+	// 32 assets mirrors rotki's real release; the resulting payload exceeds the
+	// previous 64 KB limit, so this guards against regressing maxBodySize.
+	body := largeReleasePayload(t, "v1.35.1", 32)
+	if len(body) <= 64<<10 {
+		t.Fatalf("test payload should exceed the old 64 KB limit, got %d bytes", len(body))
+	}
+	if len(body) > maxBodySize {
+		t.Fatalf("test payload should fit within maxBodySize (%d), got %d bytes", maxBodySize, len(body))
+	}
+
+	req := makeRequest(t, body, "release")
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp webhookResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if resp.Status != "accepted" {
+		t.Errorf("expected status 'accepted', got %q", resp.Status)
+	}
+	if resp.Tag != "v1.35.1" {
+		t.Errorf("expected tag 'v1.35.1', got %q", resp.Tag)
+	}
+}
+
 func TestHandler_RateLimit(t *testing.T) {
 	h := newTestHandler(t)
 
@@ -220,7 +291,7 @@ func TestHandler_RateLimit(t *testing.T) {
 func TestHandler_BodyTooLarge(t *testing.T) {
 	h := newTestHandler(t)
 
-	// Create a body larger than maxBodySize (64 KB)
+	// Create a body larger than maxBodySize (1 MB)
 	largeBody := make([]byte, maxBodySize+100)
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/webhooks/github", bytes.NewReader(largeBody))
 	req.Header.Set("X-Hub-Signature-256", computeSignature(largeBody, testSecret))
