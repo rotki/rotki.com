@@ -153,10 +153,10 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
   async function renderButton({ callbacks, accepted, loading }: RenderButtonOptions): Promise<void> {
     assert(btPayPalCheckoutInstance, 'PayPal checkout instance not initialized');
 
-    const paypal = window.paypal;
+    const paypal = typeof window === 'undefined' ? undefined : window.paypal;
     assert(paypal, 'PayPal SDK not loaded');
 
-    const buttonContainer = document.getElementById('paypal-button');
+    const buttonContainer = typeof document === 'undefined' ? null : document.getElementById('paypal-button');
     if (buttonContainer) {
       buttonContainer.innerHTML = '';
     }

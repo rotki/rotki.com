@@ -21,7 +21,8 @@ export function useRecaptcha() {
 
   const resetCaptcha = (): void => {
     onExpired();
-    window.grecaptcha?.reset(get(captchaId));
+    if (typeof window !== 'undefined')
+      window.grecaptcha?.reset(get(captchaId));
   };
 
   return {

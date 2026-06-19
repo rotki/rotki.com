@@ -30,8 +30,10 @@ function useConfetti() {
       return;
     }
     set(ctx, canvas.getContext('2d'));
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    if (typeof window !== 'undefined') {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
   }
 
   // Create particles

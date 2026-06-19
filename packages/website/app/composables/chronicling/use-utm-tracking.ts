@@ -17,10 +17,11 @@ export function useUtmTracking() {
     const route = useRoute();
     const utm = parseUtmFromQuery(route.query);
     const hasUtm = Object.values(utm).some(v => !!v);
+    const referrer = typeof document === 'undefined' ? '' : document.referrer;
 
     set(utmCookie, createTrackingSession({
       utm: hasUtm ? utm : undefined,
-      referrer: document.referrer,
+      referrer,
       landingPath: route.fullPath,
     }));
   }

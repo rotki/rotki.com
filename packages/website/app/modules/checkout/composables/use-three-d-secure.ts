@@ -154,7 +154,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       iframe.style.minHeight = '400px';
       iframe.style.border = 'none';
       iframe.style.borderRadius = '8px';
-      const container = document.getElementById('threeds-iframe-container');
+      const container = typeof document === 'undefined' ? null : document.getElementById('threeds-iframe-container');
       if (container) {
         container.innerHTML = '';
         container.appendChild(iframe);

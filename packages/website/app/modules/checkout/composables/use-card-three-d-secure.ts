@@ -82,7 +82,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
       iframe.style.border = 'none';
       iframe.style.borderRadius = '8px';
 
-      const container = document.getElementById('threeds-iframe-container');
+      const container = typeof document === 'undefined' ? null : document.getElementById('threeds-iframe-container');
       if (container) {
         logger.debug('3DS iframe container found, appending iframe');
         container.innerHTML = '';

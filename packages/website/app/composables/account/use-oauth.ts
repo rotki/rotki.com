@@ -114,7 +114,8 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
 
     useTimeoutFn(() => {
       logger.info(`Redirecting to: ${callbackUrl}`);
-      window.location.href = callbackUrl.toString();
+      if (typeof window !== 'undefined')
+        window.location.href = callbackUrl.toString();
     }, OAUTH_REDIRECT_DELAY);
   }
 
@@ -130,7 +131,8 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
 
     useTimeoutFn(() => {
       logger.info(`Redirecting to failure: ${callbackUrl}`);
-      window.location.href = callbackUrl.toString();
+      if (typeof window !== 'undefined')
+        window.location.href = callbackUrl.toString();
     }, OAUTH_REDIRECT_DELAY);
   }
 
