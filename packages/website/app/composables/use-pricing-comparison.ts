@@ -145,9 +145,13 @@ function createPlaceholderPlans(): MappedPlan[] {
 }
 
 interface UsePricingComparisonOptions {
+  /** Plans available for purchase, used to build the comparison rows. */
   availablePlans: MaybeRefOrGetter<AvailablePlans>;
+  /** Premium tier metadata describing the features of each tier. */
   tiersData: MaybeRefOrGetter<PremiumTiersInfo>;
+  /** Currently selected billing period (monthly/yearly). */
   selectedPeriod: MaybeRefOrGetter<PricingPeriod>;
+  /** Whether to render the comparison in a compact layout. */
   compact: MaybeRefOrGetter<boolean | undefined>;
 }
 

@@ -9,8 +9,11 @@ interface UseSubscriptionPollingReturn {
 }
 
 interface UseSubscriptionPollingOptions {
+  /** Subscriptions in a pending state that should be polled until resolved. */
   pendingSubscriptions: Ref<UserSubscription[]>;
+  /** Called on each poll tick to refresh subscription data. */
   refreshCallback: () => Promise<void>;
+  /** Polling interval in milliseconds. */
   intervalMs?: number;
 }
 

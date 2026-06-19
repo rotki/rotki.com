@@ -9,6 +9,7 @@ import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-p
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 
 interface UseSubscriptionOperationsOptions {
+  /** Invoked after an operation (cancel/resume) completes, typically to refresh data. */
   onActionComplete: () => Promise<void>;
 }
 

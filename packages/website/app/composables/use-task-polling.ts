@@ -3,8 +3,11 @@ import { TaskStatusResponse } from '~/types';
 import { logger } from '~/utils/use-logger';
 
 interface UseTaskPollingOptions {
+  /** Maximum number of poll attempts before giving up. */
   maxAttempts?: number;
+  /** Delay between poll attempts in milliseconds. */
   pollInterval?: number;
+  /** Called on each tick with the latest task status. */
   onProgress?: (status: string) => void;
 }
 

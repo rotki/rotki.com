@@ -46,7 +46,9 @@ interface ExecutePaymentParams {
 }
 
 interface UseWeb3PaymentOptions {
+  /** Called when the payment completes successfully. */
   onSuccess?: () => void;
+  /** Called when the payment fails, with a user-facing error message. */
   onError?: (message: string) => void;
 }
 

@@ -57,6 +57,7 @@ export interface PaypalTrackingContext {
 }
 
 interface UsePaypalPaymentFlowOptions {
+  /** Supplies analytics tracking context captured at payment time. */
   getTrackingContext?: () => PaypalTrackingContext;
 }
 

@@ -12,6 +12,7 @@ import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
 import { useLogger } from '~/utils/use-logger';
 
 interface UseSubscriptionCryptoPaymentOptions {
+  /** Subscriptions eligible for crypto renewal, used to resolve the active payment. */
   renewableSubscriptions: Ref<UserSubscription[]>;
 }
 
