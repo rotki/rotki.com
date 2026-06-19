@@ -46,7 +46,7 @@ describe('usePaypalPaymentFlow', () => {
       mockFetchWithCsrf.mockResolvedValueOnce({ result: true });
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 
@@ -61,7 +61,7 @@ describe('usePaypalPaymentFlow', () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(500));
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 
@@ -76,7 +76,7 @@ describe('usePaypalPaymentFlow', () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(502));
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 
@@ -93,7 +93,7 @@ describe('usePaypalPaymentFlow', () => {
       );
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 
@@ -109,7 +109,7 @@ describe('usePaypalPaymentFlow', () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(403));
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 
@@ -124,7 +124,7 @@ describe('usePaypalPaymentFlow', () => {
       mockFetchWithCsrf.mockRejectedValueOnce(new Error('Network error'));
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 
@@ -139,7 +139,7 @@ describe('usePaypalPaymentFlow', () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(500));
 
       const { usePaypalPaymentFlow } = await import(
-        '~/modules/checkout/composables/use-paypal-payment-flow'
+        '~/modules/checkout/composables/use-paypal-payment-flow',
       );
       const { submitPayment } = usePaypalPaymentFlow();
 

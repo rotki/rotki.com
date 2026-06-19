@@ -191,9 +191,12 @@ function main(): void {
     }
   }
 
-  const rows = [...byType.entries()]
-    .map(([type, info]) => ({ type, severity: severityOf(type), ...info }))
-    .sort((a, b) => (a.severity === b.severity ? b.pages - a.pages : a.severity === 'error' ? -1 : 1));
+  const rows = Array.from(byType.entries(), ([type, info]) => ({ type, severity: severityOf(type), ...info }))
+    .sort((a, b) => {
+      if (a.severity === b.severity)
+        return b.pages - a.pages;
+      return a.severity === 'error' ? -1 : 1;
+    });
   const errorRows = rows.filter(r => r.severity === 'error');
 
   const lines: string[] = [];

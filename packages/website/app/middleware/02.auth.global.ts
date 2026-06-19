@@ -1,6 +1,6 @@
-import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
 import { useAuthHintCookie } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
 import {

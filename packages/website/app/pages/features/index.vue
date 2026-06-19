@@ -66,7 +66,7 @@ const jsonLd = computed<string[]>(() => {
 });
 
 useHead({
-  script: jsonLd.value.map(block => ({
+  script: () => get(jsonLd).map(block => ({
     type: 'application/ld+json',
     innerHTML: block.replaceAll('<', '\\u003c'),
   })),

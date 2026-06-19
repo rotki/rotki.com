@@ -1,5 +1,5 @@
+import pluginNuxt from '@nuxt/eslint-plugin';
 import rotki from '@rotki/eslint-config';
-import pluginNuxt from 'eslint-plugin-nuxt';
 
 export default rotki({
   vue: true,
@@ -19,8 +19,20 @@ export default rotki({
     nuxt: pluginNuxt,
   },
   rules: {
-    ...pluginNuxt.configs.base.rules,
-    ...pluginNuxt.configs.recommended.rules,
+    // Disallow runtime context (composables, `this`, `await`) inside the build-time
+    // `definePageMeta` chunk, which runs before component setup.
+    'nuxt/no-page-meta-runtime-values': 'error',
+    // Prefer `import.meta.client/server/...` over the legacy `process.*` flags.
+    'nuxt/prefer-import-meta': 'error',
+  },
+}, {
+  files: ['packages/website/nuxt.config.ts'],
+  plugins: {
+    nuxt: pluginNuxt,
+  },
+  rules: {
+    'nuxt/no-nuxt-config-test-key': 'error',
+    'nuxt/nuxt-config-keys-order': 'error',
   },
 }, {
   files: [
@@ -41,6 +53,15 @@ export default rotki({
   ],
   rules: {
     'unicorn/filename-case': 'off',
+  },
+}, {
+  // Content docs (legal pages, job posts) are rendered inside layouts that already
+  // provide the page <h1>, so they intentionally start at h2/h5 and skip levels.
+  files: [
+    'packages/website/content/**/*.md',
+  ],
+  rules: {
+    'markdown/heading-increment': 'off',
   },
 }, {
   files: [

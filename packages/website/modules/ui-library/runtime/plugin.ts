@@ -1,6 +1,6 @@
-import { defineNuxtPlugin } from '#app';
 import { createRui } from '@rotki/ui-library';
 import icons from 'virtual:rotki-icons';
+import { defineNuxtPlugin } from '#app';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const RuiPlugin = createRui({

@@ -215,6 +215,7 @@ watch(value, (newValue) => {
 
         <!-- Remove button -->
         <button
+          type="button"
           class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all"
           aria-label="Remove discount"
           @click="reset()"

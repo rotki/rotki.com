@@ -130,7 +130,7 @@ export default defineNuxtModule({
     const manifest = await readManifest(manifestPath);
 
     const expectedFiles = new Set<string>();
-    const tasks: DownloadTask[] = [...urls].map((url) => {
+    const tasks: DownloadTask[] = Array.from(urls, (url) => {
       const filename = basename(new URL(url).pathname);
       expectedFiles.add(filename);
       return {

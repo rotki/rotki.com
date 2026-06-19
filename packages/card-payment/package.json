@@ -17,25 +17,25 @@
     "@rotki/sigil": "workspace:*",
     "@vueuse/core": "catalog:",
     "braintree-web": "catalog:",
-    "vue": "3.5.34",
+    "vue": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@rotki/ui-library": "catalog:",
     "@tsconfig/node24": "catalog:",
     "@types/braintree-web": "catalog:",
-    "@types/jsdom": "28.0.3",
+    "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
-    "@vitejs/plugin-vue": "6.0.7",
-    "@vue/tsconfig": "0.9.1",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/tsconfig": "catalog:",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-vue-devtools": "8.1.2",
+    "vite-plugin-vue-devtools": "catalog:",
     "vite-ssg": "catalog:",
-    "vue-tsc": "3.3.1"
+    "vue-tsc": "catalog:"
   }
 }

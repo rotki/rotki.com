@@ -38,21 +38,39 @@ const nonIndexed = [
 ];
 
 export default defineNuxtConfig({
-  hooks: {
-    'build:manifest': (manifest) => {
-      // Disable prefetch and modulepreload for all chunks except fonts
-      // This prevents unnecessary network requests on initial page load
-      // while allowing critical fonts to preload for better CLS
-      for (const [key, item] of Object.entries(manifest)) {
-        const isFont = key.endsWith('.woff2') || key.endsWith('.woff') || key.endsWith('.ttf');
-        if (!isFont) {
-          item.prefetch = false;
-          item.preload = false;
-          item.dynamicImports = [];
-          item.imports = [];
-        }
-      }
-    },
+
+  modules: [
+    '@nuxt/devtools',
+    '@nuxt/fonts',
+    '@nuxtjs/sitemap',
+    '@nuxt/content',
+    'nuxt-llms',
+    '@nuxtjs/i18n',
+    '@nuxtjs/tailwindcss',
+    '@vueuse/nuxt',
+    ['@pinia/nuxt', { disableVuex: true }],
+    '@nuxt/test-utils/module',
+    './modules/integration-images/module.ts',
+    './modules/integration-seo/module.ts',
+    './modules/comparison-seo/module.ts',
+    './modules/feature-seo/module.ts',
+    './modules/ui-library/module.ts',
+  ],
+  // SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
+  // for crawlers and JS-less social/LLM scrapers. No runtime server (static
+  // preset). Client-only routes opt out via `routeRules` `ssr: false`.
+  ssr: true,
+
+  // Disable auto-import for application components - they should be imported explicitly
+  // Nuxt's built-in components (NuxtLink, NuxtPage, etc.) remain available
+  components: false,
+
+  imports: {
+    scan: false,
+  },
+
+  devtools: {
+    enabled: process.env.NODE_ENV === 'development' && !(!!process.env.CI || !!process.env.TEST),
   },
 
   app: {
@@ -114,22 +132,65 @@ export default defineNuxtConfig({
     },
   },
 
-  compatibilityDate: '2025-03-01',
-
-  future: {
-    compatibilityVersion: 4,
-  },
-
-  // Disable auto-import for application components - they should be imported explicitly
-  // Nuxt's built-in components (NuxtLink, NuxtPage, etc.) remain available
-  components: false,
-
   css: [
     '~/assets/css/tailwind.css',
   ],
 
-  devtools: {
-    enabled: process.env.NODE_ENV === 'development' && !(!!process.env.CI || !!process.env.TEST),
+  site: { url: 'https://rotki.com' },
+  runtimeConfig: {
+    public: {
+      baseUrl: '',
+      contact: {
+        discord: 'https://discord.rotki.com',
+        email: 'info@rotki.com',
+        emailMailto: 'mailto:info@rotki.com',
+        github: 'https://github.com/rotki',
+        reddit: 'https://www.reddit.com/r/rotki',
+        supportEmail: 'support@rotki.com',
+        supportEmailMailto: 'mailto:support@rotki.com',
+        twitter: 'https://twitter.com/rotkiapp',
+      },
+      googleClientId: '',
+      isDev: process.env.NODE_ENV === 'development',
+      loglevel: 3, // Setting info loglevel as the default.
+      sigilDebug: false,
+      moneriumAuthBaseUrl: 'https://api.monerium.dev',
+      moneriumAuthorizationCodeFlowClientId: '',
+      recaptcha: {
+        siteKey: '',
+      },
+      walletConnect: {
+        projectId: '',
+      },
+    },
+  },
+  routeRules: {
+    // Redirect /pricing to /checkout/pay
+    '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
+    // Client-only routes: `ssr: false` keeps them SPA in BOTH dev and build (so
+    // dev matches the production 200.html SPA fallback — no session/redirect is
+    // ever server-rendered). Reasons: auth, guest-only, tokens, OAuth, payment.
+    '/home/**': { ssr: false, prerender: false },
+    '/checkout/pay/method': { ssr: false, prerender: false },
+    '/checkout/pay/paypal': { ssr: false, prerender: false },
+    '/checkout/pay/crypto': { ssr: false, prerender: false },
+    '/checkout/pay/request-crypto': { ssr: false, prerender: false },
+    '/checkout/pay/3d-secure': { ssr: false, prerender: false },
+    // Payment confirmation — gated on a sessionStorage flag.
+    '/checkout/success': { ssr: false, prerender: false },
+    // Guest-only route (bakes in a redirect for authenticated users otherwise).
+    '/login': { ssr: false, prerender: false },
+    // OAuth callbacks — read window.location and sessionStorage (PKCE) at setup.
+    '/oauth/**': { ssr: false, prerender: false },
+    // Dynamic token routes + recover/send/changed forms (runtime backend state).
+    '/activate/**': { ssr: false, prerender: false },
+    '/password/**': { ssr: false, prerender: false },
+    // Web3-wallet utility page, noindex — no SEO value, so keep it client-only.
+    '/sponsor/submit-name': { ssr: false, prerender: false },
+  },
+
+  future: {
+    compatibilityVersion: 4,
   },
 
   experimental: {
@@ -140,33 +201,25 @@ export default defineNuxtConfig({
     },
   },
 
-  i18n: {
-    defaultLocale: 'en-US',
-    locales: [{ code: 'en-US', file: 'en.json', language: 'en-US' }],
-    strategy: 'no_prefix',
-  },
+  compatibilityDate: '2025-03-01',
 
-  imports: {
-    scan: false,
+  nitro: {
+    devProxy: {
+      '/checkout/pay/card': {
+        changeOrigin: true,
+        target: 'http://localhost:3002/checkout/pay/card',
+        ws: true,
+      },
+    },
+    // SSG: pre-render all discoverable routes
+    preset: 'static',
+    prerender: {
+      crawlLinks: true,
+      // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
+      failOnError: true,
+      routes: [...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes()],
+    },
   },
-
-  modules: [
-    '@nuxt/devtools',
-    '@nuxt/fonts',
-    '@nuxtjs/sitemap',
-    '@nuxt/content',
-    'nuxt-llms',
-    '@nuxtjs/i18n',
-    '@nuxtjs/tailwindcss',
-    '@vueuse/nuxt',
-    ['@pinia/nuxt', { disableVuex: true }],
-    '@nuxt/test-utils/module',
-    './modules/integration-images/module.ts',
-    './modules/integration-seo/module.ts',
-    './modules/comparison-seo/module.ts',
-    './modules/feature-seo/module.ts',
-    './modules/ui-library/module.ts',
-  ],
 
   vite: {
     // Pre-bundle deps Vite's startup scan misses (subpath/deep imports), so the
@@ -274,76 +327,33 @@ export default defineNuxtConfig({
     },
   },
 
-  nitro: {
-    devProxy: {
-      '/checkout/pay/card': {
-        changeOrigin: true,
-        target: 'http://localhost:3002/checkout/pay/card',
-        ws: true,
-      },
-    },
-    // SSG: pre-render all discoverable routes
-    preset: 'static',
-    prerender: {
-      crawlLinks: true,
-      // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
-      failOnError: true,
-      routes: [...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes()],
+  typescript: {
+    tsConfig: {
+      include: [
+        '../vitest.config.ts',
+        '../playwright.config.ts',
+        '../content.config.ts',
+        '../tests/**/*.ts',
+        '../scripts/**/*.ts',
+      ],
     },
   },
-  routeRules: {
-    // Redirect /pricing to /checkout/pay
-    '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
-    // Client-only routes: `ssr: false` keeps them SPA in BOTH dev and build (so
-    // dev matches the production 200.html SPA fallback — no session/redirect is
-    // ever server-rendered). Reasons: auth, guest-only, tokens, OAuth, payment.
-    '/home/**': { ssr: false, prerender: false },
-    '/checkout/pay/method': { ssr: false, prerender: false },
-    '/checkout/pay/paypal': { ssr: false, prerender: false },
-    '/checkout/pay/crypto': { ssr: false, prerender: false },
-    '/checkout/pay/request-crypto': { ssr: false, prerender: false },
-    '/checkout/pay/3d-secure': { ssr: false, prerender: false },
-    // Payment confirmation — gated on a sessionStorage flag.
-    '/checkout/success': { ssr: false, prerender: false },
-    // Guest-only route (bakes in a redirect for authenticated users otherwise).
-    '/login': { ssr: false, prerender: false },
-    // OAuth callbacks — read window.location and sessionStorage (PKCE) at setup.
-    '/oauth/**': { ssr: false, prerender: false },
-    // Dynamic token routes + recover/send/changed forms (runtime backend state).
-    '/activate/**': { ssr: false, prerender: false },
-    '/password/**': { ssr: false, prerender: false },
-    // Web3-wallet utility page, noindex — no SEO value, so keep it client-only.
-    '/sponsor/submit-name': { ssr: false, prerender: false },
-  },
-  runtimeConfig: {
-    public: {
-      baseUrl: '',
-      contact: {
-        discord: 'https://discord.rotki.com',
-        email: 'info@rotki.com',
-        emailMailto: 'mailto:info@rotki.com',
-        github: 'https://github.com/rotki',
-        reddit: 'https://www.reddit.com/r/rotki',
-        supportEmail: 'support@rotki.com',
-        supportEmailMailto: 'mailto:support@rotki.com',
-        twitter: 'https://twitter.com/rotkiapp',
-      },
-      googleClientId: '',
-      isDev: process.env.NODE_ENV === 'development',
-      loglevel: 3, // Setting info loglevel as the default.
-      sigilDebug: false,
-      moneriumAuthBaseUrl: 'https://api.monerium.dev',
-      moneriumAuthorizationCodeFlowClientId: '',
-      recaptcha: {
-        siteKey: '',
-      },
-      walletConnect: {
-        projectId: '',
-      },
+  hooks: {
+    'build:manifest': (manifest) => {
+      // Disable prefetch and modulepreload for all chunks except fonts
+      // This prevents unnecessary network requests on initial page load
+      // while allowing critical fonts to preload for better CLS
+      for (const [key, item] of Object.entries(manifest)) {
+        const isFont = key.endsWith('.woff2') || key.endsWith('.woff') || key.endsWith('.ttf');
+        if (!isFont) {
+          item.prefetch = false;
+          item.preload = false;
+          item.dynamicImports = [];
+          item.imports = [];
+        }
+      }
     },
   },
-
-  site: { url: 'https://rotki.com' },
 
   fonts: {
     families: [
@@ -361,25 +371,15 @@ export default defineNuxtConfig({
     },
   },
 
-  sitemap: { exclude: nonIndexed },
+  i18n: {
+    defaultLocale: 'en-US',
+    locales: [{ code: 'en-US', file: 'en.json', language: 'en-US' }],
+    strategy: 'no_prefix',
+  },
   // llms.txt / llms-full.txt / raw markdown endpoint for AI crawlers (see llms.config.ts).
   llms,
-  // SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
-  // for crawlers and JS-less social/LLM scrapers. No runtime server (static
-  // preset). Client-only routes opt out via `routeRules` `ssr: false`.
-  ssr: true,
 
-  typescript: {
-    tsConfig: {
-      include: [
-        '../vitest.config.ts',
-        '../playwright.config.ts',
-        '../content.config.ts',
-        '../tests/**/*.ts',
-        '../scripts/**/*.ts',
-      ],
-    },
-  },
+  sitemap: { exclude: nonIndexed },
 
   tailwindcss: {
     config: {

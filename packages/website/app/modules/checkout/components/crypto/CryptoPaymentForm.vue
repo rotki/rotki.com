@@ -33,7 +33,7 @@ const emit = defineEmits<{
   'change': [];
   'plan-change': [plan: SelectedPlan];
   'apply-discount': [];
-  'update:discountCode': [value: string];
+  'update:discount-code': [value: string];
   'error': [message: string];
 }>();
 
@@ -45,9 +45,9 @@ const { chronicle } = useSigilEvents();
 
 async function navigateToSuccess(): Promise<void> {
   const discountInfo = breakdown?.discount;
-  const discountType = discountInfo?.isValid === true
-    ? (discountInfo.isReferral ? 'referral' : 'discount')
-    : undefined;
+  let discountType: 'referral' | 'discount' | undefined;
+  if (discountInfo?.isValid === true)
+    discountType = discountInfo.isReferral ? 'referral' : 'discount';
 
   chronicle(SigilEvents.PURCHASE_SUCCESS, {
     paymentMethod: 'crypto',
@@ -136,7 +136,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
         :is-crypto="true"
         :loading="planSwitchLoading"
         :disabled="planSwitchLoading || web3ProcessingLoading || processing"
-        @update:discount-code="emit('update:discountCode', $event)"
+        @update:discount-code="emit('update:discount-code', $event)"
         @plan-change="handleInternalPlanChange($event)"
         @apply-discount="emit('apply-discount')"
       />

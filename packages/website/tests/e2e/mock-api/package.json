@@ -7,6 +7,6 @@
     "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
-    "nitropack": "2.13.4"
+    "nitropack": "catalog:"
   }
 }
