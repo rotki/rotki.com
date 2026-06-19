@@ -4,7 +4,7 @@ import { get } from '@vueuse/shared';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 
-export function useSubscriptionPlanInfo(subscription: Ref<UserSubscription>) {
+export function useSubscriptionPlanInfo(subscription: MaybeRefOrGetter<UserSubscription>) {
   const { getPlanDisplayName } = useSubscriptionDisplay();
   const { tiersInformation } = usePremiumTiersInfo();
 
@@ -13,7 +13,7 @@ export function useSubscriptionPlanInfo(subscription: Ref<UserSubscription>) {
    */
   const tierInfo = computed<PremiumTierInfo | undefined>(() => {
     const tiers = get(tiersInformation);
-    const sub = get(subscription);
+    const sub = toValue(subscription);
     return tiers.find(tier => tier.name.toLowerCase() === sub.planName.toLowerCase());
   });
 
@@ -32,7 +32,7 @@ export function useSubscriptionPlanInfo(subscription: Ref<UserSubscription>) {
   /**
    * Returns the formatted display name for the plan
    */
-  const planDisplayName = computed<string>(() => getPlanDisplayName(get(subscription)));
+  const planDisplayName = computed<string>(() => getPlanDisplayName(toValue(subscription)));
 
   return {
     tierInfo,
