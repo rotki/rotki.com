@@ -3,7 +3,7 @@ import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment
 import { formatCreditedAmount } from '@rotki/card-payment-common/utils/checkout';
 import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
-import { computed, onMounted, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { getPaymentBreakdown } from '@/utils/api';
 import { formatDate } from '@/utils/date';
 
@@ -15,33 +15,31 @@ interface Props {
 
 const breakdown = defineModel<PaymentBreakdownResponse | undefined>('breakdown', { required: false });
 
-const props = defineProps<Props>();
-
-const { upgrade, selectedPlan, discountCode } = toRefs(props);
+const { upgrade, selectedPlan, discountCode } = defineProps<Props>();
 
 const isLoadingBreakdown = ref<boolean>(false);
 
-const name = computed<string>(() => getPlanNameFor(get(selectedPlan)));
+const name = computed<string>(() => getPlanNameFor(selectedPlan));
 
 const date = computed<string>(() => formatDate(new Date()));
 
 const durationDescription = computed<string>(() => {
-  if (get(selectedPlan).durationInMonths === 12)
+  if (selectedPlan.durationInMonths === 12)
     return '1 year (12 months) recurring subscription';
   return '1 month recurring subscription';
 });
 
 const displayPrice = computed<string>(() => {
   const currentBreakdown = get(breakdown);
-  if (currentBreakdown && !get(upgrade)) {
+  if (currentBreakdown && !upgrade) {
     return currentBreakdown.fullAmount;
   }
-  return get(selectedPlan).price.toString();
+  return selectedPlan.price.toString();
 });
 
 const proratedPrice = computed<string | undefined>(() => {
   const currentBreakdown = get(breakdown);
-  if (!currentBreakdown || !get(upgrade)) {
+  if (!currentBreakdown || !upgrade) {
     return undefined;
   }
   return currentBreakdown.fullAmount;
@@ -67,9 +65,9 @@ function getPlanNameFor(plan: SelectedPlan): string {
 async function loadPaymentBreakdown(): Promise<void> {
   set(isLoadingBreakdown, true);
   try {
-    const code = get(discountCode);
+    const code = discountCode;
     const response = await getPaymentBreakdown({
-      newPlanId: get(selectedPlan).planId,
+      newPlanId: selectedPlan.planId,
       isCryptoPayment: false,
       ...(code ? { discountCode: code } : {}),
     });
@@ -83,14 +81,14 @@ async function loadPaymentBreakdown(): Promise<void> {
   }
 }
 
-watchImmediate(selectedPlan, (newPlan, oldPlan) => {
+watchImmediate(() => selectedPlan, (newPlan, oldPlan) => {
   if (newPlan && newPlan.planId !== oldPlan?.planId) {
     loadPaymentBreakdown();
   }
 });
 
 // Refresh breakdown when discount code changes
-watch(discountCode, () => {
+watch(() => discountCode, () => {
   loadPaymentBreakdown();
 });
 

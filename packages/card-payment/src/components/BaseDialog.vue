@@ -8,6 +8,11 @@ const { title, maxWidth = 'md' } = defineProps<{
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
 }>();
 
+defineSlots<{
+  default: () => any;
+  actions: () => any;
+}>();
+
 const maxWidthClass = computed<string>(() => {
   const widths = {
     sm: 'max-w-sm',

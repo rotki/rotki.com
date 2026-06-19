@@ -218,7 +218,6 @@ onMounted(async () => {
     <CheckoutLayout
       v-else-if="planData && selectedPlan"
       :steps="steps"
-      :current-step="3"
     >
       <CardPayment
         v-model:selected-card="selectedCard"

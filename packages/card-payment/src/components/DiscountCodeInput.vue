@@ -6,7 +6,7 @@ import { computed, ref, watch } from 'vue';
 
 const model = defineModel<string>({ required: true });
 
-const props = defineProps<{
+const { discountInfo } = defineProps<{
   discountInfo?: PaymentBreakdownDiscount;
   loading?: boolean;
 }>();
@@ -23,17 +23,17 @@ function isInvalidDiscount(info: PaymentBreakdownDiscount | undefined): info is 
   return !!(info && !info.isValid);
 }
 
-const isApplied = computed<boolean>(() => isValidDiscount(props.discountInfo));
+const isApplied = computed<boolean>(() => isValidDiscount(discountInfo));
 
-const hasError = computed<boolean>(() => isInvalidDiscount(props.discountInfo));
+const hasError = computed<boolean>(() => isInvalidDiscount(discountInfo));
 
 const errorMessage = computed<string>(() => {
-  const info = props.discountInfo;
+  const info = discountInfo;
   return isInvalidDiscount(info) ? info.error : '';
 });
 
 const appliedDiscountAmount = computed<string>(() => {
-  const info = props.discountInfo;
+  const info = discountInfo;
   return isValidDiscount(info) && info.discountType === DiscountType.PERCENTAGE && info.discountAmount
     ? `${info.discountAmount}% off`
     : '';

@@ -2,21 +2,19 @@
 import type { Client } from 'braintree-web/client';
 import { get, set } from '@vueuse/core';
 import { create as createHostedFields, type HostedFields } from 'braintree-web/hosted-fields';
-import { computed, onMounted, onUnmounted, reactive, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 
 interface Props {
   client: Client;
   disabled?: boolean;
 }
 
-const props = defineProps<Props>();
+const { client, disabled } = defineProps<Props>();
 
 const emit = defineEmits<{
   'validation-change': [isValid: boolean];
   'error': [message: string];
 }>();
-
-const { client, disabled } = toRefs(props);
 
 const hostedFields = ref<HostedFields>();
 const hostedFieldsInitializing = ref<boolean>(false);
@@ -69,7 +67,7 @@ async function initializeHostedFields(): Promise<void> {
 
   try {
     const fieldsInstance = await createHostedFields({
-      client: get(client),
+      client,
       styles: {
         'body': {
           'font-size': '16px',
@@ -142,7 +140,7 @@ function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
     updateFieldState(event.emittedBy, { hasContent: true });
   });
 
-  watch(disabled, (isDisabled) => {
+  watch(() => disabled, (isDisabled) => {
     const fields = ['number', 'expirationDate', 'cvv'] as const;
 
     fields.forEach((field) => {

@@ -11,10 +11,13 @@ interface Step {
 
 interface Props {
   steps: Step[];
-  currentStep?: number;
 }
 
 defineProps<Props>();
+
+defineSlots<{
+  default: () => any;
+}>();
 </script>
 
 <template>

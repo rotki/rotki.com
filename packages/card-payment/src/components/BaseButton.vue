@@ -22,6 +22,10 @@ const emit = defineEmits<{
   click: [];
 }>();
 
+defineSlots<{
+  default: () => any;
+}>();
+
 const buttonClasses = computed<string>(() => {
   const baseClasses = 'relative flex items-center justify-center gap-2 font-medium outline-1 outline-offset-[-1px] outline-transparent rounded border-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed';
 
