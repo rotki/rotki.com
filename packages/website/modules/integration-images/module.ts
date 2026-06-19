@@ -95,6 +95,51 @@ async function downloadBatch(tasks: DownloadTask[]): Promise<DownloadResult[]> {
   return results;
 }
 
+function collectImageUrls(data: any): Set<string> {
+  const urls = new Set<string>();
+  for (const category of ['blockchains', 'exchanges', 'protocols']) {
+    for (const item of data[category] ?? []) {
+      if (typeof item.image === 'string' && item.image.startsWith('http'))
+        urls.add(item.image);
+    }
+  }
+  return urls;
+}
+
+function summarizeResults(results: DownloadResult[]): { manifest: Manifest; downloaded: number; cached: number } {
+  const manifest: Manifest = {};
+  let downloaded = 0;
+  let cached = 0;
+  for (const result of results) {
+    manifest[result.url] = {
+      etag: result.etag ?? '',
+      filename: result.filename,
+    };
+    if (result.skipped)
+      cached++;
+    else
+      downloaded++;
+  }
+  return { manifest, downloaded, cached };
+}
+
+async function removeOrphanFiles(manifest: Manifest, urls: Set<string>, outputDir: string): Promise<number> {
+  const orphanManifestUrls = Object.keys(manifest).filter(url => !urls.has(url));
+  let removed = 0;
+  for (const url of orphanManifestUrls) {
+    const entry = manifest[url];
+    if (!entry)
+      continue;
+
+    const filePath = resolve(outputDir, entry.filename);
+    if (existsSync(filePath)) {
+      await unlink(filePath);
+      removed++;
+    }
+  }
+  return removed;
+}
+
 export default defineNuxtModule({
   meta: { name: 'integration-images' },
   async setup(_options, nuxt) {
@@ -113,13 +158,7 @@ export default defineNuxtModule({
     const raw = await readFile(jsonPath, 'utf-8');
     const data = JSON.parse(raw);
 
-    const urls = new Set<string>();
-    for (const category of ['blockchains', 'exchanges', 'protocols']) {
-      for (const item of data[category] ?? []) {
-        if (typeof item.image === 'string' && item.image.startsWith('http'))
-          urls.add(item.image);
-      }
-    }
+    const urls = collectImageUrls(data);
 
     if (urls.size === 0)
       return;
@@ -144,40 +183,12 @@ export default defineNuxtModule({
 
     const results = await downloadBatch(tasks);
 
-    const newManifest: Manifest = {};
-    let downloaded = 0;
-    let cached = 0;
-
-    for (const result of results) {
-      newManifest[result.url] = {
-        etag: result.etag ?? '',
-        filename: result.filename,
-      };
-
-      if (result.skipped) {
-        cached++;
-      }
-      else {
-        downloaded++;
-      }
-    }
+    const { manifest: newManifest, downloaded, cached } = summarizeResults(results);
 
     await writeManifest(manifestPath, newManifest);
 
     // Remove orphan files that are no longer in the URL set
-    const orphanManifestUrls = Object.keys(manifest).filter(url => !urls.has(url));
-    let removed = 0;
-    for (const url of orphanManifestUrls) {
-      const entry = manifest[url];
-      if (!entry)
-        continue;
-
-      const filePath = resolve(outputDir, entry.filename);
-      if (existsSync(filePath)) {
-        await unlink(filePath);
-        removed++;
-      }
-    }
+    const removed = await removeOrphanFiles(manifest, urls, outputDir);
 
     console.warn(`[integration-images] Done: ${downloaded} downloaded, ${cached} cached (304), ${removed} removed`);
   },

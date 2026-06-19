@@ -182,6 +182,25 @@ export default defineNuxtModule({
         }
       };
 
+      // Render the bespoke OG card for a slug, falling back to share.png on failure.
+      const renderAndWrite = async (slug: string, fm: IntegrationFrontmatter, relPath: string, ogFonts: OgFonts): Promise<void> => {
+        try {
+          const png = await renderOgImage({
+            label: fm.label ?? slug,
+            tagline: fm.tagline ?? '',
+            typeLabel: TYPE_LABELS[fm.type ?? ''] ?? 'Integration',
+            fonts: ogFonts,
+          });
+          mkdirSync(resolve(publicDir, dirname(relPath)), { recursive: true });
+          writeFileSync(resolve(publicDir, relPath), png);
+          ogGenerated += 1;
+        }
+        catch (error) {
+          logger.warn(`OG image generation failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`);
+          writeFallback(relPath);
+        }
+      };
+
       nitro.hooks.hook('prerender:generate', async (route) => {
         const slug = route.route.match(/^\/integrations\/([^/]+)\/?$/)?.[1];
         if (!slug)
@@ -200,21 +219,7 @@ export default defineNuxtModule({
           return;
         }
 
-        try {
-          const png = await renderOgImage({
-            label: fm.label ?? slug,
-            tagline: fm.tagline ?? '',
-            typeLabel: TYPE_LABELS[fm.type ?? ''] ?? 'Integration',
-            fonts,
-          });
-          mkdirSync(resolve(publicDir, dirname(relPath)), { recursive: true });
-          writeFileSync(resolve(publicDir, relPath), png);
-          ogGenerated += 1;
-        }
-        catch (error) {
-          logger.warn(`OG image generation failed for ${slug}: ${error instanceof Error ? error.message : String(error)}`);
-          writeFallback(relPath);
-        }
+        await renderAndWrite(slug, fm, relPath, fonts);
       });
 
       nitro.hooks.hook('close', () => {

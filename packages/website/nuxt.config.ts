@@ -9,6 +9,36 @@ import { llms } from './app/utils/llms-config';
 // Build identifier for unique chunk names per deployment
 const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
 
+// Ordered manual-chunk rules — first matching predicate wins. Heavy libraries are
+// listed before the core framework so Vue isn't pulled into the heavy chunks.
+const manualChunkRules: [test: (id: string) => boolean, chunk: string][] = [
+  // Vite preload helper - a separate small chunk that other chunks import, so the
+  // heavy web3-appkit isn't loaded just for the preload function.
+  [id => id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill'), 'vite-helpers'],
+  // Rollup commonjs interop helpers (virtual module \0commonjsHelpers.js), shared widely.
+  [id => id.includes('\0commonjsHelpers'), 'commonjs-helpers'],
+  // Web3/Wallet connection - keep @reown packages together.
+  [id => id.includes('@reown/appkit'), 'web3-appkit'],
+  [id => id.includes('node_modules/ethers'), 'ethers'],
+  // Braintree payment SDK - split by submodule.
+  [id => id.includes('braintree-web') && id.includes('/client'), 'braintree-client'],
+  [id => id.includes('braintree-web') && id.includes('/three-d-secure'), 'braintree-3ds'],
+  [id => id.includes('braintree-web') && id.includes('/paypal-checkout'), 'braintree-paypal'],
+  [id => id.includes('braintree-web') && id.includes('/hosted-fields'), 'braintree-hosted-fields'],
+  [id => id.includes('braintree-web') && id.includes('/vault-manager'), 'braintree-vault'],
+  [id => id.includes('braintree-web'), 'braintree-core'],
+  // Swiper carousel - only needed on pages with carousels.
+  [id => id.includes('swiper'), 'swiper'],
+  // QR code generation - only needed for crypto payments.
+  [id => id.includes('qrcode'), 'qrcode'],
+  // Common utilities - keep separate from heavy chunks.
+  [id => id.includes('node_modules/destr'), 'utils'],
+  [id => id.includes('node_modules/dayjs'), 'dayjs'],
+  // Core framework - checked last so they don't end up in heavy chunks. Vue/VueUse/Pinia
+  // are kept together to avoid circular deps.
+  [id => id.includes('node_modules/vue') || id.includes('node_modules/@vue') || id.includes('node_modules/pinia') || id.includes('node_modules/@vueuse'), 'vue-core'],
+];
+
 const nonIndexed = [
   '/activation',
   '/home/**',
@@ -268,58 +298,9 @@ export default defineNuxtConfig({
           chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           entryFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           manualChunks(id) {
-            // Vite preload helper - must be in a separate small chunk that other chunks import
-            // This prevents the heavy web3-appkit from being loaded just for the preload function
-            if (id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill')) {
-              return 'vite-helpers';
-            }
-            // Rollup commonjs interop helpers (virtual module \0commonjsHelpers.js)
-            // These are shared across many chunks - keep them separate from heavy libs
-            if (id.includes('\0commonjsHelpers')) {
-              return 'commonjs-helpers';
-            }
-            // Heavy libraries first - order matters to prevent Vue being pulled in
-            // Web3/Wallet connection - keep @reown packages together
-            if (id.includes('@reown/appkit')) {
-              return 'web3-appkit';
-            }
-            // Ethers library
-            if (id.includes('node_modules/ethers')) {
-              return 'ethers';
-            }
-            // Braintree payment SDK - split by submodule
-            if (id.includes('braintree-web')) {
-              if (id.includes('/client'))
-                return 'braintree-client';
-              if (id.includes('/three-d-secure'))
-                return 'braintree-3ds';
-              if (id.includes('/paypal-checkout'))
-                return 'braintree-paypal';
-              if (id.includes('/hosted-fields'))
-                return 'braintree-hosted-fields';
-              if (id.includes('/vault-manager'))
-                return 'braintree-vault';
-              return 'braintree-core';
-            }
-            // Swiper carousel - only needed on pages with carousels
-            if (id.includes('swiper')) {
-              return 'swiper';
-            }
-            // QR code generation - only needed for crypto payments
-            if (id.includes('qrcode')) {
-              return 'qrcode';
-            }
-            // Common utilities - keep separate from heavy chunks
-            if (id.includes('node_modules/destr')) {
-              return 'utils';
-            }
-            if (id.includes('node_modules/dayjs')) {
-              return 'dayjs';
-            }
-            // Core framework - checked last so they don't end up in heavy chunks
-            // Vue/VueUse/Pinia - keep together to avoid circular deps
-            if (id.includes('node_modules/vue') || id.includes('node_modules/@vue') || id.includes('node_modules/pinia') || id.includes('node_modules/@vueuse')) {
-              return 'vue-core';
+            for (const [test, chunk] of manualChunkRules) {
+              if (test(id))
+                return chunk;
             }
           },
         },

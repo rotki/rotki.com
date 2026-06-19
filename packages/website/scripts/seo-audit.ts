@@ -103,6 +103,54 @@ function nonCrawlableAnchors(html: string): number {
   return count;
 }
 
+function checkCanonicalHref(canonical: string, expected: string): Issue[] {
+  const href = /href=["']([^"']*)["']/i.exec(canonical)?.[1] ?? '';
+  if (!/^https?:\/\//i.test(href))
+    return [{ type: 'relative-canonical', detail: href || '(empty)' }];
+  if (href !== expected)
+    return [{ type: 'wrong-canonical', detail: `${href} != ${expected}` }];
+  return [];
+}
+
+function checkCanonical(html: string, route: string): Issue[] {
+  const canonicals = [...html.matchAll(/<link[^>]+rel=["']canonical["'][^>]*>/gi)];
+  if (canonicals.length === 0)
+    return [{ type: 'missing-canonical' }];
+  if (canonicals.length > 1)
+    return [{ type: 'multiple-canonical', detail: `${canonicals.length} tags` }];
+
+  const expected = route === '/' ? BASE : `${BASE}${route}`;
+  return checkCanonicalHref(canonicals[0]?.[0] ?? '', expected);
+}
+
+function checkTitle(html: string): Issue[] {
+  const title = /<title[^>]*>([^<]*)<\/title>/i.exec(html)?.[1]?.trim();
+  if (!title)
+    return [{ type: 'missing-title' }];
+  if (title.length > TITLE_MAX)
+    return [{ type: 'long-title', detail: `${title.length} chars` }];
+  return [];
+}
+
+function checkDescription(html: string): Issue[] {
+  const description = /<meta[^>]+name=["']description["'][^>]*content=["']([^"']*)["']/i.exec(html)?.[1];
+  if (!description)
+    return [{ type: 'missing-description' }];
+  if (description.length > DESCRIPTION_MAX)
+    return [{ type: 'long-description', detail: `${description.length} chars` }];
+  return [];
+}
+
+function checkOg(html: string): Issue[] {
+  return OG_REQUIRED
+    .filter(og => !new RegExp(`property=["']${og}["']`, 'i').test(html))
+    .map(og => ({ type: 'missing-og', detail: og }));
+}
+
+function checkH1(html: string): Issue[] {
+  return /<h1[\s>]/i.test(html) ? [] : [{ type: 'missing-h1' }];
+}
+
 function auditPage(html: string, route: string): PageReport {
   const issues: Issue[] = [];
 
@@ -117,41 +165,13 @@ function auditPage(html: string, route: string): PageReport {
 
   // noindex and redirect pages are intentionally out of the index — skip checks.
   if (!noindex && !redirect) {
-    const canonicals = [...html.matchAll(/<link[^>]+rel=["']canonical["'][^>]*>/gi)];
-    const expected = route === '/' ? BASE : `${BASE}${route}`;
-    if (canonicals.length === 0) {
-      issues.push({ type: 'missing-canonical' });
-    }
-    else if (canonicals.length > 1) {
-      issues.push({ type: 'multiple-canonical', detail: `${canonicals.length} tags` });
-    }
-    else {
-      const href = /href=["']([^"']*)["']/i.exec(canonicals[0]?.[0] ?? '')?.[1] ?? '';
-      if (!/^https?:\/\//i.test(href))
-        issues.push({ type: 'relative-canonical', detail: href || '(empty)' });
-      else if (href !== expected)
-        issues.push({ type: 'wrong-canonical', detail: `${href} != ${expected}` });
-    }
-
-    const title = /<title[^>]*>([^<]*)<\/title>/i.exec(html)?.[1]?.trim();
-    if (!title)
-      issues.push({ type: 'missing-title' });
-    else if (title.length > TITLE_MAX)
-      issues.push({ type: 'long-title', detail: `${title.length} chars` });
-
-    const description = /<meta[^>]+name=["']description["'][^>]*content=["']([^"']*)["']/i.exec(html)?.[1];
-    if (!description)
-      issues.push({ type: 'missing-description' });
-    else if (description.length > DESCRIPTION_MAX)
-      issues.push({ type: 'long-description', detail: `${description.length} chars` });
-
-    for (const og of OG_REQUIRED) {
-      if (!new RegExp(`property=["']${og}["']`, 'i').test(html))
-        issues.push({ type: 'missing-og', detail: og });
-    }
-
-    if (!/<h1[\s>]/i.test(html))
-      issues.push({ type: 'missing-h1' });
+    issues.push(
+      ...checkCanonical(html, route),
+      ...checkTitle(html),
+      ...checkDescription(html),
+      ...checkOg(html),
+      ...checkH1(html),
+    );
   }
 
   const anchors = nonCrawlableAnchors(html);
@@ -169,6 +189,34 @@ function collectPages(distDir: string): string[] {
     .filter(file => file.split(path.sep).join('/').endsWith('index.html'));
 }
 
+interface IssueRow {
+  type: string;
+  severity: Severity;
+  pages: number;
+  example: string;
+  sample: string | undefined;
+}
+
+// Tally pages affected per issue type (with one example route each), sorted
+// errors-first then by page count.
+function summarizeIssues(indexable: PageReport[]): IssueRow[] {
+  const byType = new Map<string, { pages: number; example: string; sample: string | undefined }>();
+  for (const r of indexable) {
+    for (const issue of r.issues) {
+      const entry = byType.get(issue.type) ?? { pages: 0, example: r.route, sample: issue.detail };
+      entry.pages++;
+      byType.set(issue.type, entry);
+    }
+  }
+
+  return Array.from(byType.entries(), ([type, info]) => ({ type, severity: severityOf(type), ...info }))
+    .sort((a, b) => {
+      if (a.severity === b.severity)
+        return b.pages - a.pages;
+      return a.severity === 'error' ? -1 : 1;
+    });
+}
+
 function main(): void {
   const files = collectPages(DIST);
   const reports: PageReport[] = files.map((file) => {
@@ -181,22 +229,7 @@ function main(): void {
   const redirects = reports.filter(r => r.redirect).length;
   const pagesWithErrors = indexable.filter(r => r.issues.some(i => severityOf(i.type) === 'error'));
 
-  // Tally pages affected per issue type, with one example route each.
-  const byType = new Map<string, { pages: number; example: string; sample: string | undefined }>();
-  for (const r of indexable) {
-    for (const issue of r.issues) {
-      const entry = byType.get(issue.type) ?? { pages: 0, example: r.route, sample: issue.detail };
-      entry.pages++;
-      byType.set(issue.type, entry);
-    }
-  }
-
-  const rows = Array.from(byType.entries(), ([type, info]) => ({ type, severity: severityOf(type), ...info }))
-    .sort((a, b) => {
-      if (a.severity === b.severity)
-        return b.pages - a.pages;
-      return a.severity === 'error' ? -1 : 1;
-    });
+  const rows = summarizeIssues(indexable);
   const errorRows = rows.filter(r => r.severity === 'error');
 
   const lines: string[] = [];
