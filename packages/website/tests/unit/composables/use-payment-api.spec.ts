@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, assert, describe, expect, it, vi } from 'vitest';
 
 import { PaymentError } from '~/types/codes';
 
@@ -53,10 +53,8 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      expect(result.isError).toBe(true);
-      if (result.isError) {
-        expect(result.code).toBe(PaymentError.SERVER_ERROR);
-      }
+      assert(result.isError);
+      expect(result.code).toBe(PaymentError.SERVER_ERROR);
     });
 
     it('should return no special code on 400 response', async () => {
@@ -72,12 +70,10 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      expect(result.isError).toBe(true);
-      if (result.isError) {
-        expect(result.code).toBeUndefined();
-        expect(result.error).toBeInstanceOf(Error);
-        expect((result.error).message).toBe('Invalid nonce');
-      }
+      assert(result.isError);
+      expect(result.code).toBeUndefined();
+      expect(result.error).toBeInstanceOf(Error);
+      expect((result.error).message).toBe('Invalid nonce');
     });
 
     it('should return UNVERIFIED code on 403 response', async () => {
@@ -91,10 +87,8 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      expect(result.isError).toBe(true);
-      if (result.isError) {
-        expect(result.code).toBe(PaymentError.UNVERIFIED);
-      }
+      assert(result.isError);
+      expect(result.code).toBe(PaymentError.UNVERIFIED);
     });
   });
 
@@ -137,10 +131,8 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      expect(result.isError).toBe(true);
-      if (result.isError) {
-        expect(result.error.message).toBe('Upgrade not allowed');
-      }
+      assert(result.isError);
+      expect(result.error.message).toBe('Upgrade not allowed');
     });
 
     it('should return SERVER_ERROR code on 502 response', async () => {
@@ -154,10 +146,8 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      expect(result.isError).toBe(true);
-      if (result.isError) {
-        expect(result.code).toBe(PaymentError.SERVER_ERROR);
-      }
+      assert(result.isError);
+      expect(result.code).toBe(PaymentError.SERVER_ERROR);
     });
 
     it('should return UNVERIFIED code on 403 response', async () => {
@@ -171,10 +161,8 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      expect(result.isError).toBe(true);
-      if (result.isError) {
-        expect(result.code).toBe(PaymentError.UNVERIFIED);
-      }
+      assert(result.isError);
+      expect(result.code).toBe(PaymentError.UNVERIFIED);
     });
   });
 });

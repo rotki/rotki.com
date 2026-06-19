@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 
 import { PaymentError } from '~/types/codes';
 import { handlePaymentError } from '~/utils/api-error-handling';
@@ -14,12 +14,10 @@ describe('handlePaymentError', () => {
 
     const result = handlePaymentError(fetchError);
 
-    expect(result.isError).toBe(true);
-    if (result.isError) {
-      expect(result.error).toBeInstanceOf(Error);
-      expect((result.error).message).toBe('Invalid discount code');
-      expect(result.code).toBeUndefined();
-    }
+    assert(result.isError);
+    expect(result.error).toBeInstanceOf(Error);
+    expect((result.error).message).toBe('Invalid discount code');
+    expect(result.code).toBeUndefined();
   });
 
   it('should return UNVERIFIED code for 403 status', () => {
@@ -27,10 +25,8 @@ describe('handlePaymentError', () => {
 
     const result = handlePaymentError(fetchError);
 
-    expect(result.isError).toBe(true);
-    if (result.isError) {
-      expect(result.code).toBe(PaymentError.UNVERIFIED);
-    }
+    assert(result.isError);
+    expect(result.code).toBe(PaymentError.UNVERIFIED);
   });
 
   it('should return SERVER_ERROR code for 500 status', () => {
@@ -38,11 +34,9 @@ describe('handlePaymentError', () => {
 
     const result = handlePaymentError(fetchError);
 
-    expect(result.isError).toBe(true);
-    if (result.isError) {
-      expect(result.code).toBe(PaymentError.SERVER_ERROR);
-      expect(result.error).toBeInstanceOf(Error);
-    }
+    assert(result.isError);
+    expect(result.code).toBe(PaymentError.SERVER_ERROR);
+    expect(result.error).toBeInstanceOf(Error);
   });
 
   it('should return SERVER_ERROR code for 502 status', () => {
@@ -50,10 +44,8 @@ describe('handlePaymentError', () => {
 
     const result = handlePaymentError(fetchError);
 
-    expect(result.isError).toBe(true);
-    if (result.isError) {
-      expect(result.code).toBe(PaymentError.SERVER_ERROR);
-    }
+    assert(result.isError);
+    expect(result.code).toBe(PaymentError.SERVER_ERROR);
   });
 
   it('should return SERVER_ERROR code for 503 status', () => {
@@ -61,10 +53,8 @@ describe('handlePaymentError', () => {
 
     const result = handlePaymentError(fetchError);
 
-    expect(result.isError).toBe(true);
-    if (result.isError) {
-      expect(result.code).toBe(PaymentError.SERVER_ERROR);
-    }
+    assert(result.isError);
+    expect(result.code).toBe(PaymentError.SERVER_ERROR);
   });
 
   it('should return no code for non-FetchError', () => {
@@ -72,10 +62,8 @@ describe('handlePaymentError', () => {
 
     const result = handlePaymentError(error);
 
-    expect(result.isError).toBe(true);
-    if (result.isError) {
-      expect(result.code).toBeUndefined();
-      expect(result.error).toBe(error);
-    }
+    assert(result.isError);
+    expect(result.code).toBeUndefined();
+    expect(result.error).toBe(error);
   });
 });
