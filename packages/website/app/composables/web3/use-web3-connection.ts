@@ -1,7 +1,7 @@
 import type { AppKit } from '@reown/appkit';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import type { Eip1193Provider, Signer } from 'ethers';
-import { get, set } from '@vueuse/shared';
+import { get, promiseTimeout, set } from '@vueuse/shared';
 import { useAppConfig } from '~/composables/use-app-config';
 import { useSharedWeb3State } from '~/composables/web3/use-shared-web3-state';
 import { assert } from '~/utils/assert';
@@ -133,7 +133,7 @@ export function useWeb3Connection(config: Web3ConnectionConfig = {}) {
     if (get(initializing)) {
       // Wait for existing initialization
       while (get(initializing)) {
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await promiseTimeout(50);
       }
       return appKitInstance!;
     }

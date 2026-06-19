@@ -1,5 +1,6 @@
 import type { LocationQueryValue } from 'vue-router';
 import type { OAuthCallbackParams, OAuthMode, OAuthService, OAuthTokenResponse } from '~/types/oauth';
+import { useTimeoutFn } from '@vueuse/core';
 import { set } from '@vueuse/shared';
 import { OAUTH_CALLBACK_FAILURE, OAUTH_CALLBACK_SUCCESS, OAUTH_DEFAULT_TOKEN_TYPE, OAUTH_REDIRECT_DELAY } from '~/constants/oauth';
 import { useLogger } from '~/utils/use-logger';
@@ -111,7 +112,7 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
     set(completed, true);
     set(loading, false);
 
-    setTimeout(() => {
+    useTimeoutFn(() => {
       logger.info(`Redirecting to: ${callbackUrl}`);
       window.location.href = callbackUrl.toString();
     }, OAUTH_REDIRECT_DELAY);
@@ -127,7 +128,7 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
     if (errorMessage)
       callbackUrl.searchParams.set('error', errorMessage);
 
-    setTimeout(() => {
+    useTimeoutFn(() => {
       logger.info(`Redirecting to failure: ${callbackUrl}`);
       window.location.href = callbackUrl.toString();
     }, OAUTH_REDIRECT_DELAY);

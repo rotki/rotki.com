@@ -1,3 +1,4 @@
+import { promiseTimeout } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { TaskStatusResponse } from '~/types';
 import { logger } from '~/utils/use-logger';
@@ -69,7 +70,7 @@ export function useTaskPolling(): UseTaskPollingReturn {
 
       // Continue polling if still pending or in progress
       if (status.status === 'pending' || status.status === 'in_progress') {
-        await new Promise(resolve => setTimeout(resolve, pollInterval));
+        await promiseTimeout(pollInterval);
         return pollStatus();
       }
 
