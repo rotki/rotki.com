@@ -1090,7 +1090,7 @@
       "subtitle": "Recognizing those funding privacy-first, local software",
       "loading": "Loading leaderboard...",
       "empty_state": "Leaderboard data is empty",
-      "nft_counts": "{medal} {count} NFTs",
+      "nft_counts": "{medal} {count} NFT | {medal} {count} NFTs",
       "points": "{points} points",
       "tooltip": {
         "copy_address": "Click to copy full address",
