@@ -17,13 +17,13 @@ function isOAuthMode(value: string): value is OAuthMode {
 }
 
 interface UseOAuthReturn {
-  loading: Ref<boolean>;
-  error: Ref<string | undefined>;
-  completed: Ref<boolean>;
-  accessToken: Ref<string>;
-  refreshToken: Ref<string>;
-  expiresIn: Ref<number | undefined>;
-  currentMode: Ref<OAuthMode | undefined>;
+  loading: Readonly<Ref<boolean>>;
+  error: Readonly<Ref<string | undefined>>;
+  completed: Readonly<Ref<boolean>>;
+  accessToken: Readonly<Ref<string>>;
+  refreshToken: Readonly<Ref<string>>;
+  expiresIn: Readonly<Ref<number | undefined>>;
+  currentMode: Readonly<Ref<OAuthMode | undefined>>;
   mode: ComputedRef<OAuthMode | undefined>;
   extractAndValidateParams: () => (OAuthCallbackParams | undefined);
   handleAppModeCompletion: (tokenResponse: OAuthTokenResponse, clientId: (string | undefined)) => void;
@@ -156,13 +156,13 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
 
   return {
     // State
-    loading,
-    error,
-    completed,
-    accessToken,
-    refreshToken,
-    expiresIn,
-    currentMode,
+    loading: readonly(loading),
+    error: readonly(error),
+    completed: readonly(completed),
+    accessToken: readonly(accessToken),
+    refreshToken: readonly(refreshToken),
+    expiresIn: readonly(expiresIn),
+    currentMode: readonly(currentMode),
     mode,
 
     // Methods

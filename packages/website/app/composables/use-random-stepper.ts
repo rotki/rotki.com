@@ -30,7 +30,7 @@ export function useRandomStepper(steps: number, interval: number = 10000) {
     onNavigate,
     onPause: pause,
     onResume: resume,
-    step,
+    step: readonly(step),
     steps,
   };
 }

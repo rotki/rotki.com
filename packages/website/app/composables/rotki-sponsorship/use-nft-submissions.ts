@@ -80,10 +80,10 @@ export function useNftSubmissions() {
 
   return {
     checkSubmissionByNftId,
-    error,
+    error: readonly(error),
     fetchSubmissions,
     isAuthenticating,
-    isLoading,
-    submissions,
+    isLoading: readonly(isLoading),
+    submissions: shallowReadonly(submissions),
   };
 }

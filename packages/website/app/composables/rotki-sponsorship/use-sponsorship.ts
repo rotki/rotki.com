@@ -136,7 +136,7 @@ export function useSponsorshipData() {
   // Return the data with the correct loading state from useAsyncData
   return {
     data,
-    error,
+    error: readonly(error),
     pending,
     refresh,
   };

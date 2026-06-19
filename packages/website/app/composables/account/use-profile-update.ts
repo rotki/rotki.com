@@ -65,9 +65,9 @@ export function useProfileUpdate() {
   };
 
   return {
-    $externalResults,
+    $externalResults: shallowReadonly($externalResults),
     account: readonly(account),
-    done,
+    done: readonly(done),
     loading: readonly(loading),
     movedOffline,
     updateProfile,

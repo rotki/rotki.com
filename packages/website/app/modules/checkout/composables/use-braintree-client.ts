@@ -10,9 +10,9 @@ interface BraintreeClientTokenResponse {
 }
 
 interface UseBraintreeClientReturn {
-  client: Ref<Client | undefined>;
-  clientError: Ref<string | undefined>;
-  clientInitializing: Ref<boolean>;
+  client: Readonly<Ref<Client | undefined>>;
+  clientError: Readonly<Ref<string | undefined>>;
+  clientInitializing: Readonly<Ref<boolean>>;
   initializeClient: () => Promise<boolean>;
   initializeClientWithToken: (token: string) => Promise<boolean>;
   teardownClient: () => Promise<void>;
@@ -152,9 +152,9 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
   }
 
   return {
-    client,
-    clientError,
-    clientInitializing,
+    client: shallowReadonly(client),
+    clientError: readonly(clientError),
+    clientInitializing: readonly(clientInitializing),
     initializeClient,
     initializeClientWithToken,
     reset,

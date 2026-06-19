@@ -23,7 +23,7 @@ export function useCountries() {
   };
   onMounted(loadCountries);
   return {
-    countries,
-    countriesLoadError,
+    countries: shallowReadonly(countries),
+    countriesLoadError: readonly(countriesLoadError),
   };
 }

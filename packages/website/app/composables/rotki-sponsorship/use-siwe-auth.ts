@@ -162,9 +162,9 @@ export function useSiweAuth() {
   return {
     authenticate,
     authenticatedRequest,
-    authError,
+    authError: readonly(authError),
     clearSession,
-    isAuthenticating,
+    isAuthenticating: readonly(isAuthenticating),
     isSessionValid,
   };
 }

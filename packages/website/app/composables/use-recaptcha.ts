@@ -30,8 +30,8 @@ export function useRecaptcha() {
     onError,
     onExpired,
     onSuccess,
-    recaptchaPassed,
-    recaptchaToken,
+    recaptchaPassed: readonly(recaptchaPassed),
+    recaptchaToken: readonly(recaptchaToken),
     resetCaptcha,
   };
 }

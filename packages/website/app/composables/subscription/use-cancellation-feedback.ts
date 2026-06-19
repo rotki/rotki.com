@@ -17,8 +17,8 @@ interface CancellationFeedbackResponse {
 }
 
 interface UseCancellationFeedbackReturn {
-  reasons: Ref<CancellationReasonChoice[]>;
-  loading: Ref<boolean>;
+  reasons: Readonly<Ref<CancellationReasonChoice[]>>;
+  loading: Readonly<Ref<boolean>>;
   selectedReason: Ref<number | undefined>;
   comment: Ref<string>;
   isOtherReason: (reason: CancellationReasonChoice) => boolean;
@@ -99,8 +99,8 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
     isOtherReason,
     isOtherSelected,
     isValid,
-    loading,
-    reasons,
+    loading: readonly(loading),
+    reasons: shallowReadonly(reasons),
     reset,
     selectedReason,
     submitFeedback,
