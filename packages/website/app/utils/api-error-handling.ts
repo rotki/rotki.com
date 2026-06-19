@@ -14,19 +14,24 @@ export function isUnauthorizedError(error: unknown): boolean {
 }
 
 /**
+ * Extract the message from a 400 response body, preferring the parsed
+ * ActionResult message and falling back to the raw payload/error message.
+ */
+function extractBadRequestMessage(error: FetchError): string {
+  const parsed = ActionResultResponseSchema.safeParse(error.data);
+  if (parsed.success)
+    return parsed.data.message || 'Unknown error';
+
+  return error.data?.message || error.message || 'Unknown error';
+}
+
+/**
  * Extract error message from various error types
  */
 export function getErrorMessage(error: any): string {
-  if (error instanceof FetchError) {
-    const status = error?.status || -1;
-    if (status === 400 && error.response) {
-      const parsed = ActionResultResponseSchema.safeParse(error.data);
-      if (parsed.success) {
-        return parsed.data.message || 'Unknown error';
-      }
-      return error.data?.message || error.message || 'Unknown error';
-    }
-  }
+  if (error instanceof FetchError && (error.status || -1) === 400 && error.response)
+    return extractBadRequestMessage(error);
+
   return error.message || 'An unknown error occurred';
 }
 
