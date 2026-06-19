@@ -29,21 +29,25 @@ export function usePaymentCards(): UsePaymentCardsReturn {
   const emailConfirmed = useEmailConfirmedCookie();
   const { t } = useI18n();
 
+  function rateLimitMessage(backendMessage: string): string {
+    return backendMessage.toLowerCase().includes('failed')
+      ? t('home.account.payment_methods.errors.rate_limited_failures')
+      : t('home.account.payment_methods.errors.rate_limited');
+  }
+
   function buildAddCardError(error: any): Error {
-    if (error?.statusCode === 429) {
-      const backendMessage: string = error?.data?.message ?? '';
-      const message = backendMessage.toLowerCase().includes('failed')
-        ? t('home.account.payment_methods.errors.rate_limited_failures')
-        : t('home.account.payment_methods.errors.rate_limited');
-      return new Error(message);
-    }
+    const { statusCode, data, message } = error ?? {};
+
+    if (statusCode === 429)
+      return new Error(rateLimitMessage(data?.message ?? ''));
+
     // 400s on this endpoint are either schema/JSON-decode errors (frontend bugs the user
     // can't act on) or Braintree gateway errors (raw "Do Not Honor"-style dumps that read
     // like a stack trace). Substitute a friendly message; raw cause is kept in the logs.
-    if (error?.statusCode === 400) {
+    if (statusCode === 400)
       return new Error(t('home.account.payment_methods.errors.card_declined'));
-    }
-    return new Error(error?.data?.message || error?.message || t('common.error_occurred'));
+
+    return new Error(data?.message || message || t('common.error_occurred'));
   }
 
   const { data, pending, refresh } = useAsyncData<SavedCard[]>(
