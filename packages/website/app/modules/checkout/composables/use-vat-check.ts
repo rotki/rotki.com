@@ -20,12 +20,12 @@ interface VATCheckRateLimited {
   readonly seconds: number;
 }
 
-interface UseVATCheckReturn {
+interface UseVatCheckReturn {
   checkVAT: () => Promise<VATCheckResult | VATCheckRateLimited>;
   refreshVATCheckStatus: () => Promise<void>;
 }
 
-export function useVatCheck(): UseVATCheckReturn {
+export function useVatCheck(): UseVatCheckReturn {
   const { account } = storeToRefs(useMainStore());
   const { fetchWithCsrf } = useFetchWithCsrf();
 
