@@ -72,7 +72,7 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
   const { t } = useI18n({ useScope: 'global' });
   const pendingTx = usePendingTx();
 
-  const processing = ref<boolean>(false);
+  const processing = shallowRef<boolean>(false);
 
   function setError(message: string): void {
     options.onError?.(message);

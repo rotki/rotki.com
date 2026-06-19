@@ -6,8 +6,8 @@ import { useLogger } from '~/utils/use-logger';
 
 export function useNftSubmissions() {
   const submissions = ref<NftSubmissions>([]);
-  const isLoading = ref<boolean>(false);
-  const error = ref<string>('');
+  const isLoading = shallowRef<boolean>(false);
+  const error = shallowRef<string>('');
 
   const logger = useLogger();
   const { fetchWithCsrf } = useFetchWithCsrf();

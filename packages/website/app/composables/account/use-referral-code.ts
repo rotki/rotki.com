@@ -8,8 +8,8 @@ export function useReferralCode() {
   const logger = useLogger('referral-code');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  const loading = ref<boolean>(false);
-  const initialLoading = ref<boolean>(true);
+  const loading = shallowRef<boolean>(false);
+  const initialLoading = shallowRef<boolean>(true);
   const referralData = ref<ReferralCodeResponse>();
 
   const hasReferralCode = computed<boolean>(() => {

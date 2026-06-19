@@ -11,9 +11,9 @@ function useRotkiSponsorshipSSR() {
   const tierSupply = ref<Record<string, TierSupply>>({});
   const tierBenefits = ref<Record<string, TierBenefits>>({});
   const nftImages = ref<Record<string, string>>({});
-  const releaseName = ref<string>('');
+  const releaseName = shallowRef<string>('');
   const releaseId = ref<number>();
-  const isLoading = ref<boolean>(false);
+  const isLoading = shallowRef<boolean>(false);
   const error = ref<string>();
 
   const logger = useLogger('rotki-sponsorship-ssr');
@@ -101,7 +101,7 @@ function useRotkiSponsorshipSSR() {
  */
 export function useSponsorshipData() {
   const ssr = useRotkiSponsorshipSSR();
-  const forceRefresh = ref<boolean>(false);
+  const forceRefresh = shallowRef<boolean>(false);
   const route = useRoute();
 
   // Use a stable key for SSR deduplication

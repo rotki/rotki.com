@@ -39,10 +39,10 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
   const { logPaymentEvent } = usePaymentLogger();
   const { chronicle } = useSigilEvents();
 
-  const state = ref<ThreeDSecureState>('initializing');
-  const error = ref<string>('');
-  const challengeVisible = ref<boolean>(false);
-  const serverError = ref<boolean>(false);
+  const state = shallowRef<ThreeDSecureState>('initializing');
+  const error = shallowRef<string>('');
+  const challengeVisible = shallowRef<boolean>(false);
+  const serverError = shallowRef<boolean>(false);
   const btClient = shallowRef<Client>();
   const btThreeDSecure = shallowRef<ThreeDSecure>();
   const paymentInfo = ref<PaymentInfo>();

@@ -34,9 +34,9 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
   const logger = useLogger('cancellation-feedback');
 
   const reasons = ref<CancellationReasonChoice[]>([]);
-  const loading = ref<boolean>(false);
+  const loading = shallowRef<boolean>(false);
   const selectedReason = ref<number>();
-  const comment = ref<string>('');
+  const comment = shallowRef<string>('');
 
   const OTHER_LABEL = 'Other';
 

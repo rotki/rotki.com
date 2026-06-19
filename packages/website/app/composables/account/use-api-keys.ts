@@ -9,7 +9,7 @@ export function useApiKeys() {
   const { account } = storeToRefs(store);
   const accountApi = useAccountApi();
 
-  const loading = ref<boolean>(false);
+  const loading = shallowRef<boolean>(false);
 
   const apiKey = computed<string>(() => get(account)?.apiKey ?? '');
   const apiSecret = computed<string>(() => get(account)?.apiSecret ?? '');

@@ -9,7 +9,7 @@ export interface Country {
 
 export function useCountries() {
   const countries = ref<Country[]>([]);
-  const countriesLoadError = ref<string>('');
+  const countriesLoadError = shallowRef<string>('');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
   const loadCountries = async () => {

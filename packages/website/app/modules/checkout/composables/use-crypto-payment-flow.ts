@@ -47,7 +47,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
   const logger = useLogger('crypto-payment-flow');
 
   const paymentData = ref<CryptoPayment>();
-  const loading = ref<boolean>(false);
+  const loading = shallowRef<boolean>(false);
 
   function reset(): void {
     set(paymentData, undefined);

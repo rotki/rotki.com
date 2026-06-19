@@ -90,9 +90,9 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
     return options.getTrackingContext?.() ?? { isUpgrade: false };
   }
 
-  const paying = ref<boolean>(false);
-  const initialized = ref<boolean>(false);
-  const currentAmount = ref<number>(0);
+  const paying = shallowRef<boolean>(false);
+  const initialized = shallowRef<boolean>(false);
+  const currentAmount = shallowRef<number>(0);
   const paypalActions = ref<PaypalButtonActions>();
 
   let btPayPalCheckoutInstance: PayPalCheckout | undefined;

@@ -41,11 +41,11 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
   const route = useRoute();
 
   // State managed by composable
-  const loading = ref<boolean>(false);
+  const loading = shallowRef<boolean>(false);
   const error = ref<string>();
-  const completed = ref<boolean>(false);
-  const accessToken = ref<string>('');
-  const refreshToken = ref<string>('');
+  const completed = shallowRef<boolean>(false);
+  const accessToken = shallowRef<string>('');
+  const refreshToken = shallowRef<string>('');
   const expiresIn = ref<number>();
   const currentMode = ref<OAuthMode>();
   const mode = computed<OAuthMode | undefined>(() => {

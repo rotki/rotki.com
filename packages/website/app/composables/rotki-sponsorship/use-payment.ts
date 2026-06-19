@@ -24,8 +24,8 @@ const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 export function useRotkiSponsorshipPayment() {
   const sponsorshipState = ref<SponsorshipState>({ status: 'idle' });
-  const selectedCurrency = ref<string>('ETH');
-  const isLoadingPaymentTokens = ref<boolean>(true);
+  const selectedCurrency = shallowRef<string>('ETH');
+  const isLoadingPaymentTokens = shallowRef<boolean>(true);
   const error = ref<string>();
 
   const logger = useLogger('rotki-sponsorship');

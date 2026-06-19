@@ -159,7 +159,7 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
   const { t } = useI18n({ useScope: 'global' });
   const rawFreePlanFeatures = useFreePlanFeatures();
 
-  const compactView = ref<boolean>(false);
+  const compactView = shallowRef<boolean>(false);
 
   const freePlanFeaturesMap = computed<Map<string, FeatureValue>>(() => {
     const map = new Map<string, FeatureValue>();

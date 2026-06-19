@@ -5,7 +5,7 @@ import { useLogger } from '~/utils/use-logger';
 
 export function usePaymentTokens() {
   const paymentTokens = ref<PaymentToken[]>([]);
-  const isLoading = ref<boolean>(false);
+  const isLoading = shallowRef<boolean>(false);
   const error = ref<string>();
 
   const logger = useLogger('payment-tokens');

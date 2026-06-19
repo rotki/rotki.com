@@ -117,8 +117,8 @@ export function useCheckout() {
   const validDiscountCode = computed<string | undefined>(() =>
     getValidDiscountCode(get(breakdown)?.discount, get(appliedDiscountCode) || undefined),
   );
-  const breakdownLoading = ref<boolean>(false);
-  const breakdownFetched = ref<boolean>(false);
+  const breakdownLoading = shallowRef<boolean>(false);
+  const breakdownFetched = shallowRef<boolean>(false);
 
   const braintreeToken = computed<string | undefined>(() => get(breakdown)?.braintreeClientToken);
 
@@ -183,7 +183,7 @@ export function useCheckout() {
   // ===================
   // UI State (error persists across navigations via useState)
   // ===================
-  const loading = ref<boolean>(false);
+  const loading = shallowRef<boolean>(false);
   const error = useState<CheckoutError | undefined>('checkout-error');
 
   function setLoading(value: boolean): void {
@@ -212,12 +212,12 @@ export function useCheckout() {
   // Initialization state (shared by all payment flows)
   // ===================
   let initPromise: Promise<boolean> | null = null;
-  const initialized = ref<boolean>(false);
+  const initialized = shallowRef<boolean>(false);
 
   // ===================
   // Plan switching state (shared by all payment flows)
   // ===================
-  const planSwitchLoading = ref<boolean>(false);
+  const planSwitchLoading = shallowRef<boolean>(false);
 
   // ===================
   // Reset (clears useState persisted state)

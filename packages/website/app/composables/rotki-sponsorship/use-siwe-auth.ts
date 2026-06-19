@@ -26,8 +26,8 @@ export function useSiweAuth() {
     },
   });
 
-  const isAuthenticating = ref<boolean>(false);
-  const authError = ref<string>('');
+  const isAuthenticating = shallowRef<boolean>(false);
+  const authError = shallowRef<string>('');
 
   function isSessionValid(address: string): boolean {
     const session = get(sessionStorage);

@@ -15,8 +15,8 @@ export function useProfileUpdate() {
   const accountApi = useAccountApi();
   const { requestRefresh } = useAccountRefresh();
 
-  const loading = ref<boolean>(false);
-  const done = ref<boolean>(false);
+  const loading = shallowRef<boolean>(false);
+  const done = shallowRef<boolean>(false);
   const $externalResults = ref<Record<string, string[]>>({});
 
   const movedOffline = computed<boolean>(() => get(account)?.address.movedOffline ?? false);

@@ -15,9 +15,9 @@ interface UseCreditReturn {
 }
 
 export function useCredit(): UseCreditReturn {
-  const loading = ref<boolean>(false);
-  const initialLoading = ref<boolean>(true);
-  const balance = ref<string>('0');
+  const loading = shallowRef<boolean>(false);
+  const initialLoading = shallowRef<boolean>(true);
+  const balance = shallowRef<string>('0');
   const history = ref<CreditEntry[]>([]);
 
   const logger = useLogger('credit');

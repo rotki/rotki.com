@@ -23,7 +23,7 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const authHint = useAuthHintCookie();
 
-  const initialLoading = ref<boolean>(true);
+  const initialLoading = shallowRef<boolean>(true);
 
   const {
     data: userSubscriptions,

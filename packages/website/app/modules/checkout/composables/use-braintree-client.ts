@@ -26,7 +26,7 @@ interface UseBraintreeClientReturn {
 export function useBraintreeClient(): UseBraintreeClientReturn {
   const client = shallowRef<Client>();
   const clientError = ref<string>();
-  const clientInitializing = ref<boolean>(false);
+  const clientInitializing = shallowRef<boolean>(false);
 
   const logger = useLogger('braintree-client');
   const { fetchWithCsrf } = useFetchWithCsrf();
