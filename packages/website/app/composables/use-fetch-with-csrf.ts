@@ -9,10 +9,43 @@ export const useAuthHintCookie = () => useCookie('auth_hint');
 
 export const useEmailConfirmedCookie = () => useCookie<boolean>('email_confirmed');
 
-export const useFetchWithCsrf = createSharedComposable(() => {
-  const CSRF_HEADER = 'X-CSRFToken';
-  const CSRF_COOKIE = 'csrftoken';
+const CSRF_HEADER = 'X-CSRFToken';
+const CSRF_COOKIE = 'csrftoken';
 
+const MUTATION_METHODS = ['post', 'delete', 'put', 'patch'];
+
+// CSRF is only refreshed for state-changing verbs.
+export function isMutationMethod(method: string | undefined): boolean {
+  return MUTATION_METHODS.includes(method?.toLowerCase() ?? '');
+}
+
+/**
+ * Builds normalised outgoing headers via the Headers API so names are
+ * canonicalised and set() overwrites instead of appends. ofetch reuses the same
+ * `options` object across retries and re-runs the request hook over the previous
+ * attempt's headers; a plain-object merge would mix `X-CSRFToken` with the
+ * lowercased `x-csrftoken` and collapse them into a duplicated "abcd, abcd" value.
+ */
+export function buildRequestHeaders(callerHeaders: HeadersInit | undefined, token: string | null | undefined, isFormData: boolean): Headers {
+  const headers = new Headers();
+  headers.set('accept', 'application/json');
+  // FormData sets its own multipart boundary, so don't force a JSON content-type.
+  if (!isFormData)
+    headers.set('content-type', 'application/json');
+
+  // Merge any caller-provided headers, normalising case via the Headers API.
+  for (const [key, value] of new Headers(callerHeaders))
+    headers.set(key, value);
+
+  // Set the CSRF token last so the freshly resolved token always wins, even
+  // when this hook re-runs over a retried request's existing headers.
+  if (token)
+    headers.set(CSRF_HEADER, token);
+
+  return headers;
+}
+
+export const useFetchWithCsrf = createSharedComposable(() => {
   const FETCH_CONFIG = {
     RETRIES: 1,
     RETRY_DELAY_MS: 500,
@@ -56,6 +89,34 @@ export const useFetchWithCsrf = createSharedComposable(() => {
     return get(csrfToken) ?? undefined;
   }
 
+  // On the server (and in tests) requests carry the user's cookies/referer
+  // explicitly, since there's no browser to attach them.
+  function applyServerHeaders(headers: Headers, event: ReturnType<typeof useEvent> | null, token: string | null | undefined): void {
+    let cookieString = event?.headers.get('cookie') ?? undefined;
+
+    // Only try useRequestHeaders if we have a valid Nuxt context
+    const nuxtApp = tryUseNuxtApp();
+    if (nuxtApp) {
+      try {
+        cookieString = useRequestHeaders(['cookie']).cookie;
+      }
+      catch (error: any) {
+        logger.error(error);
+      }
+    }
+
+    // Fallback to session cookie if no cookie string from request headers
+    if (!cookieString) {
+      const session = get(sessionId);
+      if (session && token)
+        cookieString = `${CSRF_COOKIE}=${token}; sessionid=${session}`;
+    }
+
+    if (cookieString)
+      headers.set('cookie', cookieString);
+    headers.set('referer', baseUrl);
+  }
+
   const fetchWithCsrf = $fetch.create({
     credentials: 'include',
     async onRequest({ options }): Promise<void> {
@@ -65,61 +126,14 @@ export const useFetchWithCsrf = createSharedComposable(() => {
         ? parseCookies(event)[CSRF_COOKIE]
         : get(csrfToken);
 
-      if (import.meta.client && ['post', 'delete', 'put', 'patch'].includes(options?.method?.toLowerCase() ?? ''))
+      if (import.meta.client && isMutationMethod(options?.method))
         token = await initCsrf();
 
-      // Check if the body is FormData
       const isFormData = options.body instanceof FormData;
+      const headers = buildRequestHeaders(options.headers, token, isFormData);
 
-      // Build the outgoing headers via the Headers API so names are normalised
-      // and set() overwrites (instead of appends). ofetch reuses the same
-      // `options` object across retries and re-runs this hook over the previous
-      // attempt's headers; a plain-object merge would mix `X-CSRFToken` with the
-      // lowercased `x-csrftoken` and the Headers constructor would then collapse
-      // them into a duplicated "abcd, abcd" value.
-      const headers = new Headers();
-      headers.set('accept', 'application/json');
-      // Only set content-type for non-FormData requests; FormData sets its own
-      // boundary parameter for multipart/form-data.
-      if (!isFormData)
-        headers.set('content-type', 'application/json');
-
-      // Merge any caller-provided headers, normalising case via the Headers API.
-      for (const [key, value] of new Headers(options.headers))
-        headers.set(key, value);
-
-      // Set the CSRF token last so the freshly resolved token always wins, even
-      // when this hook re-runs over a retried request's existing headers.
-      if (token)
-        headers.set(CSRF_HEADER, token);
-
-      if (import.meta.server || import.meta.env.NODE_ENV === 'test') {
-        let cookieString = event?.headers.get('cookie');
-
-        // Only try useRequestHeaders if we have a valid Nuxt context
-        const nuxtApp = tryUseNuxtApp();
-        if (nuxtApp) {
-          try {
-            const requestHeaders = useRequestHeaders(['cookie']);
-            cookieString = requestHeaders.cookie;
-          }
-          catch (error: any) {
-            logger.error(error);
-          }
-        }
-
-        // Fallback to session cookie if no cookie string from request headers
-        if (!cookieString) {
-          const session = get(sessionId);
-          if (session && token) {
-            cookieString = `${CSRF_COOKIE}=${token}; sessionid=${session}`;
-          }
-        }
-
-        if (cookieString)
-          headers.set('cookie', cookieString);
-        headers.set('referer', baseUrl);
-      }
+      if (import.meta.server || import.meta.env.NODE_ENV === 'test')
+        applyServerHeaders(headers, event, token);
 
       options.headers = headers;
       options.baseURL = baseUrl;
