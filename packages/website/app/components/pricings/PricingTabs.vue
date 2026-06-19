@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { MappedPlan } from '~/components/pricings/type';
-import type { PricingPeriod } from '~/types/tiers';
 import { get, set } from '@vueuse/shared';
 import PricingTableButton from '~/components/pricings/PricingTableButton.vue';
 import PricingTableCell from '~/components/pricings/PricingTableCell.vue';
@@ -8,8 +7,6 @@ import { isCustomPlan, isFreePlan, isMostPopularPlan } from '~/components/pricin
 
 const { plans, featuresLabel } = defineProps<{
   plans: MappedPlan[];
-  selectedPeriod: PricingPeriod;
-  compact?: boolean;
   featuresLabel: string[];
 }>();
 
@@ -109,7 +106,6 @@ watch(() => plans, (newPlans) => {
             </div>
 
             <PricingTableButton
-              :selected-period="selectedPeriod"
               :plan="plan"
               :loading="plan.loading"
             />

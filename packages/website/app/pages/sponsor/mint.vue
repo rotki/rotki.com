@@ -481,7 +481,6 @@ onBeforeMount(async () => {
           <MintButton
             :connected="connected"
             :address="address"
-            :is-expected-chain="isExpectedChain"
             :needs-approval="needsApproval"
             :is-approving="isApproving"
             :is-button-disabled="isButtonDisabled"

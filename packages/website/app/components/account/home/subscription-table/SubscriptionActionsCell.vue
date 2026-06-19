@@ -41,14 +41,12 @@ interface DisableableNavigationActionProps extends NavigationActionProps {
 }
 
 interface CancelActionProps extends BaseActionProps {
-  subscriptionId: string;
   disabled: boolean;
   loading: boolean;
   cancellationStatus?: string;
 }
 
 interface ResumeActionProps extends BaseActionProps {
-  subscriptionId: string;
   disabled: boolean;
   loading: boolean;
   nextActionDate: string;
@@ -129,7 +127,6 @@ function buildUpgradeAction(context: ActionContext): ActionConfig<BaseActionProp
 function buildCancelAction(context: ActionContext): ActionConfig<CancelActionProps> {
   const { inProgress, status } = context.operationState;
   const isCancelLoading = isActionLoading(context, SubscriptionAction.CANCEL);
-  const subId = context.subscription.id;
 
   return {
     props: {
@@ -137,7 +134,6 @@ function buildCancelAction(context: ActionContext): ActionConfig<CancelActionPro
       cancellationStatus: isCancelLoading && status ? status : undefined,
       disabled: inProgress,
       loading: isCancelLoading,
-      subscriptionId: subId,
     },
     visible: hasAction(context.subscription, SubscriptionAction.CANCEL),
   };
@@ -208,7 +204,6 @@ function buildCancelUpgradeAction(context: ActionContext): ActionConfig<CancelUp
 function buildResumeAction(context: ActionContext): ActionConfig<ResumeActionProps> {
   const { inProgress, status } = context.operationState;
   const isResumeLoading = isActionLoading(context, SubscriptionAction.RESUME);
-  const subId = context.subscription.id;
 
   return {
     props: {
@@ -217,7 +212,6 @@ function buildResumeAction(context: ActionContext): ActionConfig<ResumeActionPro
       loading: isResumeLoading,
       nextActionDate: context.subscription.nextActionDate,
       resumeStatus: isResumeLoading && status ? status : undefined,
-      subscriptionId: subId,
     },
     visible: context.subscription.isSoftCanceled,
   };

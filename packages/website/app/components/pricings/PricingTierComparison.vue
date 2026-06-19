@@ -33,15 +33,12 @@ const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingC
       <PricingTable
         :plans="plans"
         :compact="compactView"
-        :selected-period="selectedPeriod"
         :features-label="displayedFeaturesLabel"
       />
     </div>
     <div class="block xl:hidden">
       <PricingTabs
         :plans="plans"
-        :compact="compactView"
-        :selected-period="selectedPeriod"
         :features-label="displayedFeaturesLabel"
       />
     </div>

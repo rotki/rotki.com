@@ -8,7 +8,6 @@ type ApprovalType = 'unlimited' | 'exact';
 defineProps<{
   connected: boolean;
   address?: string;
-  isExpectedChain: boolean;
   needsApproval: boolean;
   isApproving: boolean;
   isButtonDisabled: boolean;

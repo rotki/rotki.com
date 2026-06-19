@@ -125,8 +125,6 @@ function handlePlanChange(newPlan: SelectedPlan): void {
 
     <DiscountCodeInput
       v-model="discountCodeInput"
-      :plan="selectedPlan"
-      :crypto="isCrypto"
       :disabled="disabled"
       :discount-info="discountInfo"
       :class="discountSpacingClass"

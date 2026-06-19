@@ -3,7 +3,6 @@ const { actionsClasses, loading, disabled, cancellationStatus } = defineProps<{
   actionsClasses?: string;
   loading?: boolean;
   disabled?: boolean;
-  subscriptionId?: string;
   cancellationStatus?: string;
 }>();
 

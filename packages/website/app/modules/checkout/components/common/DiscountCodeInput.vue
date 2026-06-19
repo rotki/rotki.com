@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { DiscountType } from '@rotki/card-payment-common';
 import { get, set } from '@vueuse/shared';
 
@@ -9,8 +9,6 @@ const {
   disabled,
   discountInfo,
 } = defineProps<{
-  plan: SelectedPlan;
-  crypto?: boolean;
   disabled?: boolean;
   discountInfo?: PaymentBreakdownDiscount;
 }>();

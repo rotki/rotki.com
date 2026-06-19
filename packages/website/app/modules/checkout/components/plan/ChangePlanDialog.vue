@@ -126,7 +126,6 @@ onBeforeMount(() => {
             class="hover:bg-rui-grey-100 transition-all"
             :plan="plan"
             :tiers-info="tiersInformation"
-            readonly
             :disabled="warning && !confirmed"
             :current="isCurrentPlan(plan)"
             :period="selectedPlanPeriod"

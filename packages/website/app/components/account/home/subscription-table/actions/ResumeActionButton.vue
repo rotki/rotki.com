@@ -3,7 +3,6 @@ defineProps<{
   actionsClasses?: string;
   loading?: boolean;
   disabled?: boolean;
-  subscriptionId?: string;
   resumeStatus?: string;
   nextActionDate?: string;
 }>();

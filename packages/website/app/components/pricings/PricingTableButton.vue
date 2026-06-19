@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
-import type { PricingPeriod } from '~/types/tiers';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { isCustomPlan, isEntryTierPlan, isFreePlan } from '~/components/pricings/utils';
@@ -11,7 +10,6 @@ import { toTitleCase } from '~/utils/text';
 
 const { plan, loading = false } = defineProps<{
   plan: MappedPlan;
-  selectedPeriod: PricingPeriod;
   loading?: boolean;
 }>();
 

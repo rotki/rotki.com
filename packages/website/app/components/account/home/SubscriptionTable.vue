@@ -152,7 +152,6 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
       <template #item.status="{ row }">
         <SubscriptionStatusChip
           :subscription="row"
-          :pending-tx="pendingTx"
         />
       </template>
 

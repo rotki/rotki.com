@@ -16,7 +16,6 @@ const {
   tiersInfo: PremiumTiersInfo;
   selected?: boolean;
   period: PricingPeriod;
-  readonly?: boolean;
   disabled?: boolean;
   current?: boolean;
 }>();
