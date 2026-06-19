@@ -69,7 +69,7 @@ const steps = computed<{ title: string; description: string }[]>(() => [
 ]);
 
 const route = useRoute();
-const { captchaId, resetCaptcha } = useRecaptcha();
+const { modelCaptchaId, resetCaptcha } = useRecaptcha();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { saveRedirectUrl } = useRedirectUrl();
 const { chronicle } = useSigilEvents();
@@ -196,7 +196,7 @@ function setErrors(errors: ValidationErrors) {
         <SignupAddress
           v-if="step === 4"
           v-model="addressForm"
-          v-model:captcha-id="captchaId"
+          v-model:captcha-id="modelCaptchaId"
           :loading="loading"
           :external-results="externalResults"
           @back="back()"

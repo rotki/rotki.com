@@ -79,7 +79,7 @@ const {
   isExpectedChain,
   sponsorshipState,
   transactionUrl,
-  selectedCurrency,
+  modelCurrency,
   paymentTokens,
   getPriceForTier,
   open,
@@ -111,7 +111,7 @@ async function handleApprove(selectedApprovalType: ApprovalType) {
     if (!tier)
       return;
 
-    const currency = get(selectedCurrency);
+    const currency = get(modelCurrency);
     const token = get(paymentTokens).find(t => t.symbol === currency);
     if (!token || !token.prices)
       return;
@@ -145,7 +145,7 @@ async function handleMint() {
     if (!tier)
       return;
 
-    await mintSponsorshipNFT(tier.tierId, get(selectedCurrency), get(releaseId));
+    await mintSponsorshipNFT(tier.tierId, get(modelCurrency), get(releaseId));
   }
   catch (error) {
     logger.error('Minting failed:', error);
@@ -169,7 +169,7 @@ const availableTokens = computed<PaymentToken[]>(() =>
 
 const tierPriceDisplay = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
-  const currency = get(selectedCurrency);
+  const currency = get(modelCurrency);
 
   if (get(isLoadingPaymentTokens)) {
     SPONSORSHIP_TIERS.forEach((tier) => {
@@ -188,7 +188,7 @@ const tierPriceDisplay = computed<Record<string, string>>(() => {
 });
 
 const visibleTiers = computed<typeof SPONSORSHIP_TIERS>(() => {
-  const currency = get(selectedCurrency);
+  const currency = get(modelCurrency);
   const priceGetter = get(getPriceForTier);
 
   if (get(isLoadingPaymentTokens)) {
@@ -206,7 +206,7 @@ const needsApproval = computed<boolean>(() => {
   if (!get(isExpectedChain))
     return false;
 
-  const currency = get(selectedCurrency);
+  const currency = get(modelCurrency);
   const token = get(paymentTokens).find(t => t.symbol === currency);
   const selectedTierKey = get(selectedTier);
 
@@ -225,7 +225,7 @@ const needsApproval = computed<boolean>(() => {
 const buttonText = computed<string>(() => {
   const selectedTierKey = get(selectedTier);
   const tier = findTierByKey(selectedTierKey);
-  const currency = get(selectedCurrency);
+  const currency = get(modelCurrency);
   const visible = get(visibleTiers);
 
   if (!get(connected))
@@ -287,12 +287,12 @@ watchEffect(() => {
 // Auto-select first available token if current selection is not available
 watchEffect(() => {
   const available = get(availableTokens);
-  const current = get(selectedCurrency);
+  const current = get(modelCurrency);
 
   const firstAvailable = available[0];
   if (firstAvailable &&
     !available.some(token => token.symbol === current)) {
-    set(selectedCurrency, firstAvailable.symbol);
+    set(modelCurrency, firstAvailable.symbol);
   }
 });
 
@@ -301,7 +301,7 @@ async function checkAllowanceIfNeeded() {
     return;
   }
 
-  const currency = get(selectedCurrency);
+  const currency = get(modelCurrency);
   const token = get(paymentTokens).find(t => t.symbol === currency);
 
   if (token && token.address !== ETH_ADDRESS && get(connected)) {
@@ -315,7 +315,7 @@ async function checkAllowanceIfNeeded() {
   }
 }
 
-watchDebounced([selectedCurrency, connected, isExpectedChain], checkAllowanceIfNeeded, { debounce: 300 });
+watchDebounced([modelCurrency, connected, isExpectedChain], checkAllowanceIfNeeded, { debounce: 300 });
 
 // Function to call after successful minting
 async function onMintingSuccess(txHash: string) {
@@ -447,7 +447,7 @@ onBeforeMount(async () => {
 
           <!-- Currency Selection -->
           <MintCurrencySelection
-            v-model="selectedCurrency"
+            v-model="modelCurrency"
             :available-tokens="availableTokens"
             :disabled="!isMintingEnabled"
             :is-loading="isLoadingPaymentTokens"
@@ -486,7 +486,7 @@ onBeforeMount(async () => {
             :is-button-disabled="isButtonDisabled"
             :button-text="buttonText"
             :button-action="buttonAction"
-            :selected-currency="selectedCurrency"
+            :selected-currency="modelCurrency"
             :selected-tier="selectedTier"
             :sponsorship-status="sponsorshipState.status"
             :get-price-for-tier="getPriceForTier"

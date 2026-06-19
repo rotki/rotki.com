@@ -159,7 +159,7 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
   const { t } = useI18n({ useScope: 'global' });
   const rawFreePlanFeatures = useFreePlanFeatures();
 
-  const compactView = shallowRef<boolean>(false);
+  const modelCompact = shallowRef<boolean>(false);
 
   const freePlanFeaturesMap = computed<Map<string, FeatureValue>>(() => {
     const map = new Map<string, FeatureValue>();
@@ -269,7 +269,7 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
     if (labels.length === 0) {
       return Array.from<string>({ length: PLACEHOLDER_FEATURE_COUNT }).fill('');
     }
-    if (get(compactView)) {
+    if (get(modelCompact)) {
       const firstLabel = labels[0];
       return firstLabel ? [firstLabel] : [];
     }
@@ -277,12 +277,12 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
   });
 
   watch(allowCompact, (value) => {
-    set(compactView, value);
+    set(modelCompact, value);
   }, { immediate: true });
 
   return {
     allowCompact,
-    compactView,
+    modelCompact,
     displayedFeaturesLabel,
     plans,
   };

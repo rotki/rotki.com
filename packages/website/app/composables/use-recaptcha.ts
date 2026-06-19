@@ -3,7 +3,7 @@ import { get, set } from '@vueuse/shared';
 export function useRecaptcha() {
   const recaptchaPassed = shallowRef<boolean>(false);
   const recaptchaToken = shallowRef<string>('');
-  const captchaId = ref<number>();
+  const modelCaptchaId = ref<number>();
 
   const onSuccess = (token: string): void => {
     set(recaptchaToken, token);
@@ -22,11 +22,11 @@ export function useRecaptcha() {
   const resetCaptcha = (): void => {
     onExpired();
     if (typeof window !== 'undefined')
-      window.grecaptcha?.reset(get(captchaId));
+      window.grecaptcha?.reset(get(modelCaptchaId));
   };
 
   return {
-    captchaId,
+    modelCaptchaId,
     onError,
     onExpired,
     onSuccess,

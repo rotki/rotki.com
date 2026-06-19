@@ -106,7 +106,7 @@ export function useCheckout() {
   });
 
   // Input value (for text field binding), seeded from the applied value.
-  const discountCodeInput = ref<string>(get(appliedDiscountCode));
+  const modelDiscountCode = ref<string>(get(appliedDiscountCode));
 
   // ===================
   // Breakdown data (persists across navigations via useState)
@@ -150,7 +150,7 @@ export function useCheckout() {
   }
 
   async function applyDiscount(): Promise<void> {
-    const code = get(discountCodeInput);
+    const code = get(modelDiscountCode);
     // An empty input clears the discount; remember the dismissal so an auto-applied
     // referral code is not immediately re-applied (see appliedDiscountCode).
     set(referralDismissed, !code);
@@ -321,7 +321,7 @@ export function useCheckout() {
   }
 
   watch(appliedDiscountCode, (code) => {
-    set(discountCodeInput, code);
+    set(modelDiscountCode, code);
   });
 
   return {
@@ -358,7 +358,7 @@ export function useCheckout() {
     fetchBreakdown,
 
     // Discount
-    discountCodeInput,
+    modelDiscountCode,
     appliedDiscountCode,
     validDiscountCode,
     applyDiscount,

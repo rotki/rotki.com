@@ -19,7 +19,7 @@ const {
 
 const { t } = useI18n({ useScope: 'global' });
 
-const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingComparison({
+const { plans, displayedFeaturesLabel, modelCompact, allowCompact } = usePricingComparison({
   availablePlans: () => availablePlans,
   tiersData: () => tiersData,
   selectedPeriod: () => selectedPeriod,
@@ -32,7 +32,7 @@ const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingC
     <div class="hidden xl:block">
       <PricingTable
         :plans="plans"
-        :compact="compactView"
+        :compact="modelCompact"
         :features-label="displayedFeaturesLabel"
       />
     </div>
@@ -47,10 +47,10 @@ const { plans, displayedFeaturesLabel, compactView, allowCompact } = usePricingC
         v-if="allowCompact"
         color="primary"
         size="lg"
-        @click="compactView = !compactView"
+        @click="modelCompact = !modelCompact"
       >
         {{
-          compactView
+          modelCompact
             ? t('pricing.see_all_features')
             : t('pricing.see_less_features')
         }}

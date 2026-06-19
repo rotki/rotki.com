@@ -30,7 +30,7 @@ const {
   selectedPlan,
   breakdown,
   isCrypto,
-  discountCodeInput,
+  modelDiscountCode,
   planSwitchLoading,
   braintreeToken,
   validDiscountCode,
@@ -227,7 +227,7 @@ onMounted(async () => {
       <!-- Sidebar (Right Column) -->
       <aside class="w-full lg:sticky lg:top-8 lg:self-start lg:max-w-sm">
         <OrderSummaryCard
-          v-model:discount-code="discountCodeInput"
+          v-model:discount-code="modelDiscountCode"
           :selected-plan="selectedPlan"
           :breakdown="breakdown"
           :upgrade-sub-id="upgradeSubId"

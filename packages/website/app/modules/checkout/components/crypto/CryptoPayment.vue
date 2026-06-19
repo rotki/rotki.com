@@ -21,7 +21,7 @@ const {
   upgradeSubId,
   subscriptionId,
   currency,
-  discountCodeInput,
+  modelDiscountCode,
   validDiscountCode,
   planSwitchLoading,
   planId,
@@ -172,7 +172,7 @@ onMounted(async () => {
 
     <CryptoPaymentForm
       v-if="paymentData && selectedPlan"
-      v-model:discount-code="discountCodeInput"
+      v-model:discount-code="modelDiscountCode"
       :data="paymentData"
       :plan="selectedPlan"
       :plan-switch-loading="planSwitchLoading"

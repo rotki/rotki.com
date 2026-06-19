@@ -19,8 +19,8 @@ interface CancellationFeedbackResponse {
 interface UseCancellationFeedbackReturn {
   reasons: Readonly<Ref<CancellationReasonChoice[]>>;
   loading: Readonly<Ref<boolean>>;
-  selectedReason: Ref<number | undefined>;
-  comment: Ref<string>;
+  modelReason: Ref<number | undefined>;
+  modelComment: Ref<string>;
   isOtherReason: (reason: CancellationReasonChoice) => boolean;
   isOtherSelected: ComputedRef<boolean>;
   isValid: ComputedRef<boolean>;
@@ -35,8 +35,8 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
 
   const reasons = ref<CancellationReasonChoice[]>([]);
   const loading = shallowRef<boolean>(false);
-  const selectedReason = ref<number>();
-  const comment = shallowRef<string>('');
+  const modelReason = ref<number>();
+  const modelComment = shallowRef<string>('');
 
   const OTHER_LABEL = 'Other';
 
@@ -45,7 +45,7 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
   }
 
   const isOtherSelected = computed<boolean>(() => {
-    const reason = get(selectedReason);
+    const reason = get(modelReason);
     if (!reason)
       return false;
 
@@ -53,11 +53,11 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
   });
 
   const isValid = computed<boolean>(() => {
-    const reason = get(selectedReason);
+    const reason = get(modelReason);
     if (!reason)
       return false;
 
-    return !(get(isOtherSelected) && get(comment).trim().length === 0);
+    return !(get(isOtherSelected) && get(modelComment).trim().length === 0);
   });
 
   async function fetchReasons(): Promise<void> {
@@ -89,12 +89,12 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
   }
 
   function reset(): void {
-    set(selectedReason, undefined);
-    set(comment, '');
+    set(modelReason, undefined);
+    set(modelComment, '');
   }
 
   return {
-    comment,
+    modelComment,
     fetchReasons,
     isOtherReason,
     isOtherSelected,
@@ -102,7 +102,7 @@ export function useCancellationFeedback(): UseCancellationFeedbackReturn {
     loading: readonly(loading),
     reasons: shallowReadonly(reasons),
     reset,
-    selectedReason,
+    modelReason,
     submitFeedback,
   };
 }

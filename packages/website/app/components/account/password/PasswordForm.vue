@@ -17,7 +17,7 @@ const {
   onSuccess,
   onExpired,
   recaptchaToken,
-  captchaId,
+  modelCaptchaId,
   resetCaptcha,
 } = useRecaptcha();
 
@@ -37,7 +37,7 @@ const logger = useLogger('password-form');
 const { fetchWithCsrf } = useFetchWithCsrf();
 
 function setCaptchaId(id: number) {
-  set(captchaId, id);
+  set(modelCaptchaId, id);
 }
 
 async function reset() {

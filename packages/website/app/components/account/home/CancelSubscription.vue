@@ -25,8 +25,8 @@ const { t } = useI18n({ useScope: 'global' });
 const {
   reasons,
   loading: reasonsLoading,
-  selectedReason,
-  comment,
+  modelReason,
+  modelComment,
   isOtherReason,
   isOtherSelected,
   isValid,
@@ -46,7 +46,7 @@ watch(modelValue, (val) => {
 }, { immediate: true });
 
 function selectReason(value: number): void {
-  set(selectedReason, value);
+  set(modelReason, value);
 }
 
 function cancelSubscription(): void {
@@ -56,8 +56,8 @@ function cancelSubscription(): void {
   emit('confirm', {
     subscription: get(modelValue),
     feedback: {
-      reason: get(selectedReason)!,
-      feedback: get(comment),
+      reason: get(modelReason)!,
+      feedback: get(modelComment),
     },
   });
 }
@@ -172,7 +172,7 @@ function cancelSubscription(): void {
               :key="reason.value"
               class="flex items-center rounded-md border px-2.5 py-1.5 cursor-pointer transition-colors"
               :class="[
-                selectedReason === reason.value
+                modelReason === reason.value
                   ? 'border-rui-primary bg-rui-primary/5'
                   : 'border-rui-grey-300 hover:border-rui-grey-400',
                 isOtherReason(reason) && reasons.length % 2 !== 0
@@ -182,7 +182,7 @@ function cancelSubscription(): void {
               @click="selectReason(reason.value)"
             >
               <RuiRadio
-                :model-value="selectedReason"
+                :model-value="modelReason"
                 :value="reason.value"
                 :label="reason.label"
                 color="primary"
@@ -194,15 +194,15 @@ function cancelSubscription(): void {
 
           <Transition name="fade">
             <RuiTextArea
-              v-if="selectedReason"
-              v-model="comment"
+              v-if="modelReason"
+              v-model="modelComment"
               :label="isOtherSelected
                 ? t('account.subscriptions.cancellation.feedback.comment_required')
                 : t('account.subscriptions.cancellation.feedback.comment_label')"
               variant="outlined"
               color="primary"
               :rows="2"
-              :error-messages="isOtherSelected && comment.trim().length === 0
+              :error-messages="isOtherSelected && modelComment.trim().length === 0
                 ? [t('account.subscriptions.cancellation.feedback.comment_required')]
                 : undefined"
             />

@@ -24,7 +24,7 @@ const TRANSACTION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 export function useRotkiSponsorshipPayment() {
   const sponsorshipState = ref<SponsorshipState>({ status: 'idle' });
-  const selectedCurrency = shallowRef<string>('ETH');
+  const modelCurrency = shallowRef<string>('ETH');
   const isLoadingPaymentTokens = shallowRef<boolean>(true);
   const error = ref<string>();
 
@@ -97,10 +97,10 @@ export function useRotkiSponsorshipPayment() {
       logger.info(`Loaded ${tokens.length} payment tokens`);
 
       // If selected currency is not available, switch to ETH
-      const selectedToken = get(getTokenBySymbol)(get(selectedCurrency));
+      const selectedToken = get(getTokenBySymbol)(get(modelCurrency));
       const firstToken = tokens[0];
       if (!selectedToken && firstToken) {
-        set(selectedCurrency, firstToken.symbol);
+        set(modelCurrency, firstToken.symbol);
       }
     }
     catch (error_) {
@@ -330,7 +330,7 @@ export function useRotkiSponsorshipPayment() {
     mintSponsorshipNFT,
     paymentTokens,
     resetSponsorshipState,
-    selectedCurrency,
+    modelCurrency,
     sponsorshipState: readonly(sponsorshipState),
     storedNftIds: readonly(storedNftIds),
     transactionUrl,
