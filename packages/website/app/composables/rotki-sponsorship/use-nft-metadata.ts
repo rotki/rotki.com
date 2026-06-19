@@ -11,7 +11,7 @@ export function useNftMetadata() {
       const result = TokenMetadata.parse(response);
 
       if (result && result.tierName) {
-        const { releaseId, releaseName } = result;
+        const { owner, releaseId, releaseName, tierName } = result;
 
         let usedReleaseName: string;
         if (releaseName) {
@@ -22,10 +22,10 @@ export function useNftMetadata() {
         }
 
         return {
-          owner: result.owner,
-          releaseId: result.releaseId,
+          owner,
+          releaseId,
           releaseName: usedReleaseName,
-          tier: result.tierName,
+          tier: tierName,
         };
       }
     }

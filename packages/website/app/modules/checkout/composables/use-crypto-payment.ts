@@ -106,10 +106,12 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
   async function executePayment({ blockExplorerUrl, isUpgrade, payment, signer }: ExecutePaymentParams): Promise<void> {
     stop();
     const {
+      chainId,
       cryptoAddress: to,
       cryptocurrency,
       decimals,
       finalPriceInCrypto,
+      subscriptionId,
       tokenAddress,
     } = payment;
 
@@ -142,16 +144,16 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
     logger.info(`transaction is pending: ${tx.hash}`);
 
     chronicle(SigilEvents.CRYPTO_TX_SUBMITTED, {
-      chainId: payment.chainId,
+      chainId,
       asset: cryptocurrency,
     });
 
     set(pendingTx, {
       blockExplorerUrl,
-      chainId: payment.chainId,
+      chainId,
       hash: tx.hash,
       isUpgrade,
-      subscriptionId: payment.subscriptionId.toString(),
+      subscriptionId: subscriptionId.toString(),
     });
     paymentApi.markTransactionStarted(isUpgrade).catch(error => logger.error('Failed to mark transaction as started:', error));
     requestRefresh();
