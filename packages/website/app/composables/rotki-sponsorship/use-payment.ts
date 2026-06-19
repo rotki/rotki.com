@@ -321,7 +321,7 @@ export function useRotkiSponsorshipPayment() {
     approveToken,
     checkTokenAllowance,
     connected,
-    currentAddressNfts: readonly(currentAddressNfts),
+    currentAddressNfts,
     error: readonly(error),
     getPriceForTier,
     isExpectedChain,

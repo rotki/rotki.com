@@ -34,9 +34,9 @@ export function useAppConfig() {
 
   return {
     config: readonly(data),
-    configReady: readonly(configReady),
-    contentBranch: readonly(contentBranch),
-    isMaintenance: readonly(isMaintenance),
-    isTesting: readonly(isTesting),
+    configReady,
+    contentBranch,
+    isMaintenance,
+    isTesting,
   };
 }

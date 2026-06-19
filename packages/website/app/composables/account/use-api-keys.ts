@@ -34,9 +34,9 @@ export function useApiKeys() {
   };
 
   return {
-    apiKey: readonly(apiKey),
-    apiSecret: readonly(apiSecret),
-    hasApiKeys: readonly(hasApiKeys),
+    apiKey,
+    apiSecret,
+    hasApiKeys,
     loading: readonly(loading),
     updateKeys,
   };

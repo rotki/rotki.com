@@ -8,6 +8,6 @@ export function useSponsorshipFeature() {
 
   return {
     configReady,
-    isEnabled: readonly(isEnabled),
+    isEnabled,
   };
 }

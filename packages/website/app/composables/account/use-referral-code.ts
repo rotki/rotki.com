@@ -97,11 +97,11 @@ export function useReferralCode() {
 
   return {
     createCode,
-    hasReferralCode: readonly(hasReferralCode),
+    hasReferralCode,
     initialLoading: readonly(initialLoading),
     loadReferralCode,
     loading: readonly(loading),
-    referralCode: readonly(referralCode),
+    referralCode,
     referralData: readonly(referralData),
   };
 }

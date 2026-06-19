@@ -60,7 +60,7 @@ export function useCredit(): UseCreditReturn {
 
   return {
     balance: readonly(balance),
-    hasHistory: readonly(hasHistory),
+    hasHistory,
     history: readonly(history),
     initialLoading: readonly(initialLoading),
     load,

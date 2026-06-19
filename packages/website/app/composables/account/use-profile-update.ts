@@ -69,7 +69,7 @@ export function useProfileUpdate() {
     account: readonly(account),
     done,
     loading: readonly(loading),
-    movedOffline: readonly(movedOffline),
+    movedOffline,
     updateProfile,
   };
 }
