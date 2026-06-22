@@ -76,14 +76,55 @@ var WalletConnectCSP = Policy{
 		"https://echo.walletconnect.org",
 		"https://push.walletconnect.com",
 		"https://push.walletconnect.org",
+		// Verify API attestation fetched during connect() (also framed via frame-src);
+		// without these the fetch is CSP-blocked and the dApp-verification step fails.
+		"https://verify.walletconnect.com",
+		"https://verify.walletconnect.org",
+		// Coinbase Wallet SDK: WalletLink relay handshake, RPC proxy and metrics.
 		"wss://www.walletlink.org",
+		"https://www.walletlink.org",
 		"https://chain-proxy.wallet.coinbase.com",
+		"https://cca-lite.coinbase.com",
+		// Direct JSON-RPC endpoints hit by viem transports after the AppKit→viem
+		// migration: reads (balances / allowance / tier supplies) and receipt
+		// polling now go straight to these public RPCs instead of via AppKit.
+		// MUST stay in sync with the rpcUrls in app/modules/web3/core/chains.ts —
+		// a host missing here is blocked by CSP and the read silently returns empty.
+		// Production: Ethereum
+		"https://eth.merkle.io",
+		"https://eth.llamarpc.com",
+		"https://ethereum-rpc.publicnode.com",
+		"https://rpc.mevblocker.io",
+		// Production: Arbitrum One
+		"https://arbitrum-one-rpc.publicnode.com",
+		"https://arbitrum.llamarpc.com",
+		// Production: Base
+		"https://base-rpc.publicnode.com",
+		"https://base.llamarpc.com",
+		// Production: OP Mainnet
+		"https://optimism-rpc.publicnode.com",
+		"https://optimism.llamarpc.com",
+		// Production: Gnosis
+		"https://gnosis-rpc.publicnode.com",
+		"https://rpc.gnosischain.com",
+		// Testnets: Ethereum / Arbitrum / Base / Optimism Sepolia
+		"https://sepolia.gateway.tenderly.co",
+		"https://sepolia.drpc.org",
+		"https://ethereum-sepolia-rpc.publicnode.com",
+		"https://arbitrum-sepolia-rpc.publicnode.com",
+		"https://sepolia-rollup.arbitrum.io",
+		"https://base-sepolia-rpc.publicnode.com",
+		"https://sepolia.base.org",
+		"https://optimism-sepolia-rpc.publicnode.com",
+		"https://sepolia.optimism.io",
 	},
 	"frame-src": {
 		"https://verify.walletconnect.com",
 		"https://verify.walletconnect.org",
 		"https://secure.walletconnect.com",
 		"https://secure.walletconnect.org",
+		// Coinbase WalletLink relay iframe (mobile pairing).
+		"https://www.walletlink.org",
 	},
 	"img-src": {
 		"'unsafe-inline'",

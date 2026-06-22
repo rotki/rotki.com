@@ -1,66 +1,43 @@
-import type { Signer, TransactionResponse } from 'ethers';
-import type { ComputedRef, DeepReadonly, MaybeRefOrGetter, Ref } from 'vue';
+import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue';
 import type { CryptoPayment } from '~/types';
 import { CheckoutPaymentMethods, CheckoutSteps, classifyCryptoTxError, monthsToPlanDuration, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { err, getOr, ok, type Result } from 'plainfp/result';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
-import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
+import { getWeb3Client } from '~/modules/web3/client';
+import { useTokenBalance } from '~/modules/web3/composables/use-token-balance';
+import { useWallet } from '~/modules/web3/composables/use-wallet';
+import { useWalletPicker } from '~/modules/web3/composables/use-wallet-picker';
+import { blockExplorerTxUrl } from '~/modules/web3/core/chains';
+import { isNativeToken } from '~/modules/web3/core/erc20';
+import { notConnected, type Web3Error, wrongChain } from '~/modules/web3/core/errors';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
-interface EthersUtils {
-  Contract: typeof import('ethers/contract').Contract;
-  parseUnits: typeof import('ethers/utils').parseUnits;
-}
-
-async function getEthersUtils(): Promise<EthersUtils> {
-  const [{ Contract }, { parseUnits }] = await Promise.all([
-    import('ethers/contract'),
-    import('ethers/utils'),
-  ]);
-  return { Contract, parseUnits };
-}
-
-const abi = [
-  // Some details about the token
-  'function name() view returns (string)',
-  'function symbol() view returns (string)',
-  // Get the account balance
-  'function balanceOf(address) view returns (uint)',
-  // Send some of your tokens to someone else
-  'function transfer(address to, uint amount)',
-  // An event triggered whenever anyone transfers to someone else
-  'event Transfer(address indexed from, address indexed to, uint amount)',
-];
-
-interface ExecutePaymentParams {
-  signer: Signer;
-  payment: CryptoPayment;
-  blockExplorerUrl: string;
-  isUpgrade: boolean;
-}
-
 interface UseWeb3PaymentOptions {
-  /** Called when the payment completes successfully. */
+  /** Called when the payment completes successfully (after the confirmation grace period). */
   onSuccess?: () => void;
-  /** Called when the payment fails, with a user-facing error message. */
-  onError?: (message: string) => void;
 }
 
 interface UseWeb3PaymentReturn {
   address: Readonly<Ref<string | undefined>>;
-  connected: Readonly<Ref<boolean>>;
+  connected: ComputedRef<boolean>;
   isExpectedChain: ComputedRef<boolean>;
-  isOpen: Ref<boolean>;
+  isOpen: Readonly<Ref<boolean>>;
   open: () => Promise<void>;
-  pay: (isUpgrade: boolean) => Promise<void>;
-  processing: DeepReadonly<Ref<boolean>>;
-  switchNetwork: () => Promise<void>;
+  pay: (isUpgrade: boolean) => Promise<Result<void, Web3Error>>;
+  processing: Readonly<Ref<boolean>>;
+  switchNetwork: () => Promise<Result<void, Web3Error>>;
+  /** Connected wallet's balance of the payment token (human-readable); empty when unknown. */
+  balance: Readonly<Ref<string>>;
+  /** True while the balance is being (re)read — e.g. right after connecting/switching. */
+  balanceLoading: Readonly<Ref<boolean>>;
+  fundsStatus: ReturnType<typeof useTokenBalance>['fundsStatus'];
 }
 
 export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: UseWeb3PaymentOptions = {}): UseWeb3PaymentReturn {
@@ -69,14 +46,13 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
   const logger = useLogger('web3-payment');
   const { logPaymentEvent } = usePaymentLogger();
   const { chronicle } = useSigilEvents();
-  const { t } = useI18n({ useScope: 'global' });
   const pendingTx = usePendingTx();
 
-  const processing = shallowRef<boolean>(false);
+  const wallet = useWallet();
+  const picker = useWalletPicker();
+  const { address, connected, connectedChainId, ensureInitialized, restoreIfPersisted } = wallet;
 
-  function setError(message: string): void {
-    options.onError?.(message);
-  }
+  const processing = shallowRef<boolean>(false);
 
   const { start, stop } = useTimeoutFn(() => {
     logger.info('Payment completed, triggering success');
@@ -84,175 +60,132 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
     options.onSuccess?.();
   }, 5000, { immediate: false });
 
-  const connection = useWeb3Connection({
-    chainId: toValue(data).chainId,
-    onAccountChange: () => {
+  // Reset the in-flight flag if the wallet disconnects mid-payment.
+  watch(connected, (isConnected) => {
+    if (!isConnected)
       set(processing, false);
-    },
-    onError: (error) => {
-      setError(error);
-    },
   });
 
-  const {
-    address,
-    connected,
-    getBrowserProvider,
-    getNetwork,
-    getSigner,
-    isExpectedChain,
-    isOpen,
-    ...connectionMethods
-  } = connection;
+  // Reflect a persisted wallet session on load (no-op without one, and no web3
+  // chunk for sessionless / Bitcoin checkouts).
+  onMounted(async () => {
+    await restoreIfPersisted();
+  });
 
-  async function executePayment({ blockExplorerUrl, isUpgrade, payment, signer }: ExecutePaymentParams): Promise<void> {
-    stop();
-    const {
-      chainId,
-      cryptoAddress: to,
-      cryptocurrency,
-      decimals,
-      finalPriceInCrypto,
-      subscriptionId,
-      tokenAddress,
-    } = payment;
+  const isExpectedChain = computed<boolean>(() => wallet.isExpectedChain(toValue(data).chainId));
 
-    // Lazy load ethers utilities
-    const { Contract, parseUnits } = await getEthersUtils();
+  // Live balance + funds check for the payment token (skipped for Bitcoin, which
+  // never connects a web3 wallet, so `active` stays false there).
+  const { fundsStatus, loading: balanceLoading, tokenBalance } = useTokenBalance({
+    active: computed<boolean>(() => get(connected) && get(isExpectedChain)),
+    chainId: () => toValue(data).chainId,
+    estimateGas: async (): Promise<string> => {
+      const owner = get(address);
+      const payment = toValue(data);
+      const { chainId } = payment;
+      if (!owner || chainId === undefined)
+        return '';
 
-    const currency = cryptocurrency.split(':')[1];
-    const value = parseUnits(finalPriceInCrypto.toString(), decimals);
+      const client = await getWeb3Client(ensureInitialized);
+      const amount = payment.finalPriceInCrypto.toString();
+      const tokenDecimals = payment.decimals ?? 18;
+      const result = isNativeToken(payment.tokenAddress)
+        ? await client.estimateNativeTransferFee({ account: owner, amount, chainId, decimals: tokenDecimals, to: payment.cryptoAddress })
+        : await client.estimateErc20TransferFee({ account: owner, amount, chainId, decimals: tokenDecimals, to: payment.cryptoAddress, token: payment.tokenAddress! });
+      return getOr(result, '');
+    },
+    price: () => toValue(data).finalPriceInCrypto.toString(),
+    token: () => ({ address: toValue(data).tokenAddress ?? '', decimals: toValue(data).decimals ?? 18 }),
+  });
 
-    let tx: TransactionResponse;
+  function fail(error: Web3Error, event: keyof typeof PaymentServerEvents, step: (typeof CheckoutSteps)[keyof typeof CheckoutSteps], isUpgrade: boolean): Result<void, Web3Error> {
+    logPaymentEvent({
+      errorMessage: error.message || 'unknown',
+      event: PaymentServerEvents[event],
+      isUpgrade,
+      paymentMethod: CheckoutPaymentMethods.CRYPTO,
+      step,
+    });
+    set(processing, false);
+    return err(error);
+  }
 
-    logger.info(`preparing to send ${value} ${currency} to ${to}`);
+  const pay = async (isUpgrade: boolean): Promise<Result<void, Web3Error>> => {
+    if (get(processing))
+      return ok(undefined);
 
-    // Pay with native token
-    if (!tokenAddress) {
-      tx = await signer.sendTransaction({ to, value });
-    }
-    // Pay with non-native token
-    else {
-      const contract = new Contract(tokenAddress, abi, signer);
-      const transfer = contract.transfer;
-      if (!transfer)
-        throw new Error('Token contract does not support transfer');
-      // `.send()` is the typed entrypoint for a state-changing method: it returns
-      // `Promise<ContractTransactionResponse>` (a `TransactionResponse`), whereas calling
-      // the method proxy directly is typed `Promise<any>` and forces a cast.
-      tx = await transfer.send(to, value);
-    }
+    set(processing, true);
 
-    logger.info(`transaction is pending: ${tx.hash}`);
-
-    chronicle(SigilEvents.CRYPTO_TX_SUBMITTED, {
-      chainId,
-      asset: cryptocurrency,
+    const payment = toValue(data);
+    chronicle(SigilEvents.PAYMENT_SUBMITTED, {
+      isUpgrade,
+      paymentMethod: 'crypto',
+      planDuration: monthsToPlanDuration(payment.durationInMonths),
     });
 
+    if (!get(connected))
+      return fail(notConnected(), 'CRYPTO_WALLET_NOT_CONNECTED', CheckoutSteps.INIT, isUpgrade);
+
+    assert(payment);
+    const { chainId, cryptoAddress, decimals, finalPriceInCrypto, subscriptionId, tokenAddress } = payment;
+    assert(chainId);
+
+    if (get(connectedChainId) !== chainId)
+      return fail(wrongChain(chainId, get(connectedChainId)), 'CRYPTO_WRONG_CHAIN', CheckoutSteps.VERIFY, isUpgrade);
+
+    stop();
+    const amount = finalPriceInCrypto.toString();
+    const tokenDecimals = decimals ?? 18;
+    logger.info(`preparing to send ${amount} ${payment.cryptocurrency} to ${cryptoAddress}`);
+
+    const client = await getWeb3Client(ensureInitialized);
+
+    const result = isNativeToken(tokenAddress)
+      ? await client.sendNativeTransfer({ amount, chainId, decimals: tokenDecimals, to: cryptoAddress })
+      : await client.sendErc20Transfer({ amount, chainId, decimals: tokenDecimals, to: cryptoAddress, token: tokenAddress! });
+
+    if (!result.ok) {
+      logger.error(result.error.cause ?? result.error);
+      return fail(result.error, classifyCryptoTxError(result.error.cause), CheckoutSteps.SUBMIT, isUpgrade);
+    }
+
+    const hash = result.value;
+    logger.info(`transaction is pending: ${hash}`);
+
+    chronicle(SigilEvents.CRYPTO_TX_SUBMITTED, { asset: payment.cryptocurrency, chainId });
+
     set(pendingTx, {
-      blockExplorerUrl,
+      // Full, correctly-formed explorer URL (single source of truth in chains.ts).
+      blockExplorerUrl: blockExplorerTxUrl(chainId, hash) ?? '',
       chainId,
-      hash: tx.hash,
+      hash,
       isUpgrade,
       subscriptionId: subscriptionId.toString(),
     });
     paymentApi.markTransactionStarted(isUpgrade).catch(error => logger.error('Failed to mark transaction as started:', error));
     requestRefresh();
     start();
-  }
-
-  const pay = async (isUpgrade: boolean): Promise<void> => {
-    if (get(processing))
-      return;
-
-    set(processing, true);
-
-    const payment = toValue(data);
-    chronicle(SigilEvents.PAYMENT_SUBMITTED, {
-      paymentMethod: 'crypto',
-      planDuration: monthsToPlanDuration(payment.durationInMonths),
-      isUpgrade,
-    });
-
-    try {
-      if (!get(connected)) {
-        setError(t('subscription.crypto_payment.not_connected'));
-        logPaymentEvent({
-          paymentMethod: CheckoutPaymentMethods.CRYPTO,
-          event: PaymentServerEvents.CRYPTO_WALLET_NOT_CONNECTED,
-          errorMessage: 'wallet not connected',
-          step: CheckoutSteps.INIT,
-          isUpgrade,
-        });
-        set(processing, false);
-        return;
-      }
-
-      assert(payment);
-
-      const { chainId, chainName } = payment;
-      assert(chainId);
-
-      const provider = await getBrowserProvider();
-      const network = await provider.getNetwork();
-
-      if (network.chainId !== BigInt(chainId)) {
-        const msg = t('subscription.crypto_payment.invalid_chain', { actualName: network.name, chainName });
-        setError(msg);
-        logPaymentEvent({
-          paymentMethod: CheckoutPaymentMethods.CRYPTO,
-          event: PaymentServerEvents.CRYPTO_WRONG_CHAIN,
-          errorMessage: msg,
-          step: CheckoutSteps.VERIFY,
-          isUpgrade,
-        });
-        set(processing, false);
-        return;
-      }
-
-      const appKitNetwork = getNetwork(chainId);
-      const signer = await getSigner();
-
-      const url = appKitNetwork?.blockExplorers?.default.url;
-      await executePayment({
-        blockExplorerUrl: url ? `${url}/tx/` : '',
-        payment,
-        signer,
-        isUpgrade,
-      });
-    }
-    catch (error: any) {
-      logger.error(error);
-      set(processing, false);
-      const errorMsg = 'shortMessage' in error ? error.shortMessage : error.message;
-      logPaymentEvent({
-        paymentMethod: CheckoutPaymentMethods.CRYPTO,
-        event: PaymentServerEvents[classifyCryptoTxError(error)],
-        errorMessage: errorMsg || 'unknown',
-        step: CheckoutSteps.SUBMIT,
-        isUpgrade,
-      });
-
-      if ('shortMessage' in error)
-        setError(error.shortMessage);
-      else
-        setError(error.message);
-    }
+    return ok(undefined);
   };
 
-  async function switchNetwork(): Promise<void> {
-    await connection.switchNetwork(toValue(data).chainId);
+  async function switchNetwork(): Promise<Result<void, Web3Error>> {
+    const chainId = toValue(data).chainId;
+    if (chainId === undefined)
+      return ok(undefined);
+    return wallet.switchChain(chainId);
   }
 
   return {
     address,
+    balance: tokenBalance,
+    balanceLoading,
     connected,
+    fundsStatus,
     isExpectedChain,
-    isOpen,
-    open: connectionMethods.open,
+    isOpen: picker.isOpen,
+    open: picker.open,
     pay,
-    processing: readonly(processing),
+    processing: shallowReadonly(processing),
     switchNetwork,
   };
 }

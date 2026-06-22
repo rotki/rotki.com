@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import MintBenefitsInfo from '~/components/sponsor/MintBenefitsInfo.vue';
-import MintButton from '~/components/sponsor/MintButton.vue';
-import MintCurrencySelection from '~/components/sponsor/MintCurrencySelection.vue';
-import MintNftImage from '~/components/sponsor/MintNftImage.vue';
-import MintSuccessDialog from '~/components/sponsor/MintSuccessDialog.vue';
-import MintTierSelection from '~/components/sponsor/MintTierSelection.vue';
-import { ETH_ADDRESS } from '~/composables/rotki-sponsorship/constants';
-import { type PaymentToken, SPONSORSHIP_TIERS, type TierKey, type TierSupply } from '~/composables/rotki-sponsorship/types';
-import { useRotkiSponsorshipPayment } from '~/composables/rotki-sponsorship/use-payment';
-import { useSponsorshipData } from '~/composables/rotki-sponsorship/use-sponsorship';
-import { useSponsorshipFeature } from '~/composables/rotki-sponsorship/use-sponsorship-feature';
-import { findTierByKey, isTierAvailable } from '~/composables/rotki-sponsorship/utils';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePageSeo } from '~/composables/use-page-seo';
-import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
-import { useLogger } from '~/utils/use-logger';
+import WalletPickerDialog from '~/modules/web3/components/WalletPickerDialog.vue';
+import MintBenefitsInfo from '~/modules/web3/sponsorship/components/mint/MintBenefitsInfo.vue';
+import MintButton from '~/modules/web3/sponsorship/components/mint/MintButton.vue';
+import MintCurrencySelection from '~/modules/web3/sponsorship/components/mint/MintCurrencySelection.vue';
+import MintNftImage from '~/modules/web3/sponsorship/components/mint/MintNftImage.vue';
+import MintSuccessDialog from '~/modules/web3/sponsorship/components/mint/MintSuccessDialog.vue';
+import MintTierSelection from '~/modules/web3/sponsorship/components/mint/MintTierSelection.vue';
+import { useMintFlow } from '~/modules/web3/sponsorship/use-mint-flow';
 
 usePageSeo('Sponsor rotki — Support Open-Source Privacy Software', 'Support rotki\'s development. Fund independent, local-first, privacy-preserving portfolio management software.', '/sponsor/mint', {
   ogImage: 'mint.png',
@@ -33,335 +25,43 @@ const {
   },
 } = useRuntimeConfig();
 
-const APPROVAL_TYPE = { UNLIMITED: 'unlimited', EXACT: 'exact' } as const;
-
-type ApprovalType = typeof APPROVAL_TYPE[keyof typeof APPROVAL_TYPE];
-
-const logger = useLogger();
-const { isEnabled: isMintingEnabled, configReady } = useSponsorshipFeature();
-
-const selectedTier = ref<TierKey>('bronze');
-const isApproving = ref<boolean>(false);
-const tokenAllowance = ref<string>('0');
-const approvalType = ref<ApprovalType>(APPROVAL_TYPE.UNLIMITED);
-const showSuccessDialog = ref<boolean>(false);
-
 const { t } = useI18n({ useScope: 'global' });
-const { fetchWithCsrf } = useFetchWithCsrf();
-
-// Fetch leaderboard metadata on mount to ensure config is available
-const sponsorshipMetadataStore = useSponsorshipMetadataStore();
-const { error: metadataError } = storeToRefs(sponsorshipMetadataStore);
-const { fetchMetadata } = sponsorshipMetadataStore;
-
-// Fetch sponsorship tier content
-const { data: sponsorshipTiers } = await useAsyncData('sponsorship-tiers', () => queryCollection('sponsorshipTiers').all(), { dedupe: 'defer' });
-
-// Convert array to object keyed by tier
-const tierContent = computed<Record<string, { benefits: string; example: string[] }>>(() => {
-  const tiers = get(sponsorshipTiers);
-  if (!tiers)
-    return {};
-
-  const result: Record<string, { benefits: string; example: string[] }> = {};
-  for (const item of tiers) {
-    result[item.tier] = {
-      benefits: item.benefits,
-      example: item.example || [],
-    };
-  }
-  return result;
-});
 
 const {
-  connected,
   address,
-  isExpectedChain,
-  sponsorshipState,
-  transactionUrl,
-  modelCurrency,
-  paymentTokens,
+  availableTokens,
+  buttonAction,
+  buttonText,
+  configReady,
+  connected,
+  dataError,
+  error,
+  fundsStatus,
   getPriceForTier,
-  open,
-  switchNetwork,
-  loadPaymentTokens,
-  mintSponsorshipNFT,
-  approveToken,
-  checkTokenAllowance,
+  handleApprove,
+  isApproving,
+  isButtonDisabled,
+  isLoading,
+  isLoadingBalance,
   isLoadingPaymentTokens,
+  isMintingEnabled,
+  metadataError,
+  modelCurrency,
+  needsApproval,
+  nftImages,
+  selectedTokenBalance,
+  open,
+  releaseName,
   resetSponsorshipState,
-} = useRotkiSponsorshipPayment();
-
-const { data: sponsorshipData, pending: isLoading, refresh: refreshSponsorshipData, error: dataError } = useSponsorshipData();
-
-const nftImages = computed<Record<string, string>>(() => get(sponsorshipData)?.nftImages || {});
-const tierSupply = computed<Record<string, TierSupply>>(() => get(sponsorshipData)?.tierSupply || {});
-const releaseId = computed<number | undefined>(() => get(sponsorshipData)?.releaseId);
-const releaseName = computed<string>(() => get(sponsorshipData)?.releaseName || '');
-const error = computed<string | undefined>(() => get(sponsorshipData)?.error);
-
-async function handleApprove(selectedApprovalType: ApprovalType) {
-  set(approvalType, selectedApprovalType);
-  try {
-    set(isApproving, true);
-    const tierKey = get(selectedTier);
-    if (!tierKey)
-      return;
-    const tier = findTierByKey(tierKey);
-    if (!tier)
-      return;
-
-    const currency = get(modelCurrency);
-    const token = get(paymentTokens).find(t => t.symbol === currency);
-    if (!token || !token.prices)
-      return;
-
-    const price = token.prices[tier.key];
-    if (!price)
-      return;
-
-    const isUnlimited = get(approvalType) === APPROVAL_TYPE.UNLIMITED;
-    const tx = await approveToken(currency, price, isUnlimited);
-    await tx.wait();
-
-    // Refresh allowance after approval
-    const newAllowance = await checkTokenAllowance(currency);
-    set(tokenAllowance, newAllowance);
-  }
-  catch (error) {
-    logger.error('Approval failed:', error);
-  }
-  finally {
-    set(isApproving, false);
-  }
-}
-
-async function handleMint() {
-  try {
-    const tierKey = get(selectedTier);
-    if (!tierKey)
-      return;
-    const tier = findTierByKey(tierKey);
-    if (!tier)
-      return;
-
-    await mintSponsorshipNFT(tier.tierId, get(modelCurrency), get(releaseId));
-  }
-  catch (error) {
-    logger.error('Minting failed:', error);
-    await refreshSponsorshipData();
-  }
-}
-
-const availableTokens = computed<PaymentToken[]>(() =>
-  // Filter out tokens that have all zero prices for all tiers
-  get(paymentTokens).filter((token) => {
-    if (!token.prices)
-      return false;
-
-    // Check if at least one tier has a non-zero price
-    return SPONSORSHIP_TIERS.some((tier) => {
-      const price = token.prices[tier.key];
-      return price && parseFloat(price) > 0;
-    });
-  }),
-);
-
-const tierPriceDisplay = computed<Record<string, string>>(() => {
-  const result: Record<string, string> = {};
-  const currency = get(modelCurrency);
-
-  if (get(isLoadingPaymentTokens)) {
-    SPONSORSHIP_TIERS.forEach((tier) => {
-      result[tier.key] = t('sponsor.sponsor_page.pricing.loading');
-    });
-    return result;
-  }
-
-  const priceGetter = get(getPriceForTier);
-  SPONSORSHIP_TIERS.forEach((tier) => {
-    const price = priceGetter(currency, tier.key);
-    result[tier.key] = price ? `${price} ${currency}` : '0';
-  });
-
-  return result;
-});
-
-const visibleTiers = computed<typeof SPONSORSHIP_TIERS>(() => {
-  const currency = get(modelCurrency);
-  const priceGetter = get(getPriceForTier);
-
-  if (get(isLoadingPaymentTokens)) {
-    return SPONSORSHIP_TIERS;
-  }
-
-  return SPONSORSHIP_TIERS.filter((tier) => {
-    const price = priceGetter(currency, tier.key);
-    return price && parseFloat(price) > 0;
-  });
-});
-
-const needsApproval = computed<boolean>(() => {
-  // Don't show approval if not on the expected chain
-  if (!get(isExpectedChain))
-    return false;
-
-  const currency = get(modelCurrency);
-  const token = get(paymentTokens).find(t => t.symbol === currency);
-  const selectedTierKey = get(selectedTier);
-
-  if (!token || token.address === ETH_ADDRESS)
-    return false;
-
-  const price = token.prices[selectedTierKey];
-  const allowance = get(tokenAllowance);
-
-  // Check if allowance is less than required price
-  // Also check if it's not already set to max (unlimited)
-  const maxAllowance = Number.MAX_SAFE_INTEGER; // Very large number to represent unlimited
-  return !!(price && parseFloat(allowance) < parseFloat(price) && parseFloat(allowance) < maxAllowance);
-});
-
-const buttonText = computed<string>(() => {
-  const selectedTierKey = get(selectedTier);
-  const tier = findTierByKey(selectedTierKey);
-  const currency = get(modelCurrency);
-  const visible = get(visibleTiers);
-
-  if (!get(connected))
-    return t('sponsor.sponsor_page.buttons.connect_wallet');
-  if (!get(isExpectedChain))
-    return t('sponsor.sponsor_page.buttons.switch_network');
-  if (visible.length === 0)
-    return t('sponsor.sponsor_page.buttons.no_tiers_available');
-  if (!tier)
-    return t('sponsor.sponsor_page.buttons.select_tier');
-  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
-    return t('sponsor.sponsor_page.buttons.sold_out', { tier: tier.label });
-  if (get(isApproving))
-    return t('sponsor.sponsor_page.buttons.approving');
-  if (get(needsApproval))
-    return t('sponsor.sponsor_page.buttons.approve', { currency });
-  if (get(sponsorshipState).status === 'pending')
-    return t('sponsor.sponsor_page.buttons.minting');
-  return t('sponsor.sponsor_page.buttons.mint', { tier: tier.label });
-});
-
-const buttonAction = computed<() => void | Promise<void>>(() => {
-  const selectedTierKey = get(selectedTier);
-  const visible = get(visibleTiers);
-
-  if (!get(connected))
-    return open;
-  if (!get(isExpectedChain))
-    return () => switchNetwork();
-  if (visible.length === 0)
-    return () => {};
-  if (!isTierAvailable(selectedTierKey, get(tierSupply)))
-    return () => {};
-  if (get(needsApproval))
-    return () => {}; // No-op, the menu handles it
-  return handleMint;
-});
-
-const isButtonDisabled = computed<boolean>(() => {
-  if (!get(isMintingEnabled))
-    return true;
-  const selectedTierKey = get(selectedTier);
-  const visible = get(visibleTiers);
-  return visible.length === 0 || get(sponsorshipState).status === 'pending' || get(isApproving) || !isTierAvailable(selectedTierKey, get(tierSupply));
-});
-
-// Auto-select first visible tier if current selection is not visible
-watchEffect(() => {
-  const visible = get(visibleTiers);
-  const current = get(selectedTier);
-
-  const firstVisible = visible[0];
-  if (firstVisible && // If current tier is not in the visible list, select the first visible one
-    !visible.some(tier => tier.key === current)) {
-    set(selectedTier, firstVisible.key);
-  }
-});
-
-// Auto-select first available token if current selection is not available
-watchEffect(() => {
-  const available = get(availableTokens);
-  const current = get(modelCurrency);
-
-  const firstAvailable = available[0];
-  if (firstAvailable &&
-    !available.some(token => token.symbol === current)) {
-    set(modelCurrency, firstAvailable.symbol);
-  }
-});
-
-async function checkAllowanceIfNeeded() {
-  if (!get(isExpectedChain)) {
-    return;
-  }
-
-  const currency = get(modelCurrency);
-  const token = get(paymentTokens).find(t => t.symbol === currency);
-
-  if (token && token.address !== ETH_ADDRESS && get(connected)) {
-    try {
-      const allowance = await checkTokenAllowance(currency);
-      set(tokenAllowance, allowance);
-    }
-    catch (error) {
-      logger.error('Failed to check token allowance:', error);
-    }
-  }
-}
-
-watchDebounced([modelCurrency, connected, isExpectedChain], checkAllowanceIfNeeded, { debounce: 300 });
-
-// Function to call after successful minting
-async function onMintingSuccess(txHash: string) {
-  try {
-    // Call the endpoint to monitor the transaction
-    await fetchWithCsrf('/webapi/nfts/monitor-tx/', {
-      method: 'POST',
-      body: {
-        txHash,
-      },
-    });
-
-    logger.info(`Transaction monitoring started for: ${txHash}`);
-  }
-  catch (error) {
-    logger.error('Failed to start transaction monitoring:', error);
-  }
-}
-
-// Show success dialog when minting is successful
-watch(() => get(sponsorshipState).status, async (newStatus) => {
-  if (newStatus === 'success' && get(transactionUrl)) {
-    set(showSuccessDialog, true);
-
-    // Call the success callback function
-    const state = get(sponsorshipState);
-    if (state.txHash) {
-      await onMintingSuccess(state.txHash);
-    }
-
-    // Refresh sponsorship data after successful minting
-    await refreshSponsorshipData();
-  }
-});
-
-onBeforeMount(async () => {
-  // Fetch metadata to ensure config is available
-  await fetchMetadata();
-
-  // Only continue if metadata fetch was successful
-  if (!get(metadataError)) {
-    // Only load currencies and check allowance on client-side
-    await loadPaymentTokens();
-    await checkAllowanceIfNeeded();
-  }
-});
+  modelSelectedTier,
+  modelShowSuccessDialog,
+  sponsorshipState,
+  tierContent,
+  tierPriceDisplay,
+  tierSupply,
+  transactionUrl,
+  visibleTiers,
+} = useMintFlow();
 </script>
 
 <template>
@@ -409,7 +109,7 @@ onBeforeMount(async () => {
       <!-- NFT Image Section -->
       <div class="lg:w-1/2 flex justify-center">
         <MintNftImage
-          :selected-tier="selectedTier"
+          :selected-tier="modelSelectedTier"
           :nft-images="nftImages"
           :is-loading="isLoading"
           :error="!!error"
@@ -449,13 +149,15 @@ onBeforeMount(async () => {
           <MintCurrencySelection
             v-model="modelCurrency"
             :available-tokens="availableTokens"
+            :balance="selectedTokenBalance"
+            :balance-loading="connected && isLoadingBalance"
             :disabled="!isMintingEnabled"
             :is-loading="isLoadingPaymentTokens"
           />
 
           <!-- Tier Selection -->
           <MintTierSelection
-            v-model="selectedTier"
+            v-model="modelSelectedTier"
             :disabled="!isMintingEnabled"
             :is-loading="isLoadingPaymentTokens"
             :tier-supply="tierSupply"
@@ -477,6 +179,14 @@ onBeforeMount(async () => {
             {{ sponsorshipState.error }}
           </RuiAlert>
 
+          <!-- Soft warning: enough to pay, but maybe not enough to cover gas -->
+          <RuiAlert
+            v-if="connected && fundsStatus.gasShortfall"
+            type="warning"
+          >
+            {{ t('sponsor.sponsor_page.insufficient_gas') }}
+          </RuiAlert>
+
           <!-- Mint/Approval Button -->
           <MintButton
             :connected="connected"
@@ -487,7 +197,7 @@ onBeforeMount(async () => {
             :button-text="buttonText"
             :button-action="buttonAction"
             :selected-currency="modelCurrency"
-            :selected-tier="selectedTier"
+            :selected-tier="modelSelectedTier"
             :sponsorship-status="sponsorshipState.status"
             :get-price-for-tier="getPriceForTier"
             :open="open"
@@ -496,7 +206,7 @@ onBeforeMount(async () => {
 
           <!-- Benefits Info -->
           <MintBenefitsInfo
-            :selected-tier="selectedTier"
+            :selected-tier="modelSelectedTier"
             :tier-content="tierContent"
             :release-name="releaseName"
           />
@@ -506,11 +216,13 @@ onBeforeMount(async () => {
 
     <!-- Success Dialog -->
     <MintSuccessDialog
-      v-model="showSuccessDialog"
-      :selected-tier="selectedTier"
+      v-model="modelShowSuccessDialog"
+      :selected-tier="modelSelectedTier"
       :token-id="sponsorshipState.tokenId"
       :release-name="releaseName"
       :transaction-url="transactionUrl"
     />
+
+    <WalletPickerDialog />
   </div>
 </template>

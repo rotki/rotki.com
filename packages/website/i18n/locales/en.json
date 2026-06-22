@@ -406,6 +406,29 @@
     "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
     "title": "Change Plan"
   },
+  "wallet_picker": {
+    "title": "Connect a wallet",
+    "subtitle": "Choose how you'd like to connect",
+    "scan_qr": "Scan with your wallet app",
+    "back": "Back",
+    "connected": "Connected",
+    "disconnect": "Disconnect",
+    "restoring": "Restoring session…",
+    "no_wallets": "No wallets detected. Install a browser wallet or use WalletConnect."
+  },
+  "web3_errors": {
+    "NoWallet": "No wallet available. Install a browser wallet or use WalletConnect.",
+    "NotConnected": "Wallet not connected.",
+    "UserRejected": "Request rejected. Please try again.",
+    "WrongChain": "Wrong network. Please switch to the correct chain.",
+    "InsufficientFunds": "Insufficient funds for this transaction.",
+    "ConnectFailed": "Failed to connect the wallet. Please try again.",
+    "SignFailed": "Failed to sign the message. Please try again.",
+    "SwitchChainFailed": "Failed to switch network. Please switch it in your wallet.",
+    "TxFailed": "The transaction failed. Please try again.",
+    "Timeout": "The transaction timed out. Check your wallet for its status.",
+    "Validation": "{message}"
+  },
   "common": {
     "actions": "actions",
     "amount": "Amount",
@@ -651,6 +674,7 @@
           },
           "wallet": {
             "connect_wallet": "Connect wallet",
+            "connected": "Wallet connected",
             "notice": "You can pay directly via your wallet or manually send the exact amount to the following address above. Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
             "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed.",
@@ -1083,6 +1107,12 @@
       "leaderboard": "Leaderboard",
       "submit_name": "Submit Name"
     },
+    "connected_account": {
+      "label": "Connected wallet",
+      "copy_address": "Copy address",
+      "copied": "Copied!",
+      "change": "Change"
+    },
     "leaderboard": {
       "be_the_first": "Be the first to {mint}",
       "mint": "mint rotki sponsorship NFT",
@@ -1173,6 +1203,8 @@
       },
       "no_payment_tokens_available": "No payment tokens available",
       "payment_currency": "Payment Currency",
+      "wallet_balance": "Balance: {balance} {currency}",
+      "insufficient_gas": "Your balance may not be enough to cover the network fee (gas). The transaction could fail.",
       "select_tier": "Select Tier",
       "pricing": {
         "loading": "Loading...",
@@ -1192,7 +1224,8 @@
         "approve": "Approve {currency}",
         "minting": "Minting...",
         "mint": "Mint {tier} sponsorship NFT",
-        "no_tiers_available": "No tiers available"
+        "no_tiers_available": "No tiers available",
+        "insufficient_funds": "Insufficient {currency} balance"
       },
       "connected_to": "Connected to: {address}",
       "benefits": {
@@ -1221,7 +1254,10 @@
   "subscription": {
     "crypto_payment": {
       "invalid_chain": "We are expecting payments on {chainName} but found ${actualName}. Change the network and try again.",
-      "not_connected": "No account is connected"
+      "not_connected": "No account is connected",
+      "wallet_balance": "Balance: {balance} {currency}",
+      "insufficient_funds": "Your {currency} balance is not enough to cover this payment.",
+      "insufficient_gas": "Your balance may not be enough to cover the network fee (gas). The transaction could fail."
     },
     "crypto_success": {
       "message": "Once minted, please wait up to 7 minutes for our system to process your payment. You will receive an e-mail confirming the activation of your subscription.",

@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { truncateAddress } from '~/utils/text';
-
 defineProps<{
   connected: boolean;
-  address?: string;
   isExpectedChain: boolean;
   processing: boolean;
+  /** Hard-disable the pay button (e.g. insufficient balance for the price). */
+  payDisabled?: boolean;
 }>();
 
 defineEmits<{
   'connect': [];
   'pay': [];
   'switch-network': [];
-  'open-wallet': [];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -37,7 +35,7 @@ const { t } = useI18n({ useScope: 'global' });
         <RuiButton
           v-if="isExpectedChain"
           :loading="processing"
-          :disabled="processing"
+          :disabled="processing || payDisabled"
           color="primary"
           size="lg"
           class="w-full"
@@ -55,26 +53,7 @@ const { t } = useI18n({ useScope: 'global' });
         >
           {{ t('home.plans.tiers.step_3.wallet.switch_network') }}
         </RuiButton>
-
-        <RuiButton
-          size="lg"
-          color="secondary"
-          class="!px-3"
-          @click="$emit('open-wallet')"
-        >
-          <RuiIcon
-            name="lu-wallet"
-            size="20"
-          />
-        </RuiButton>
       </template>
-    </div>
-
-    <div
-      v-if="connected && address"
-      class="text-sm text-rui-text-secondary mt-2"
-    >
-      {{ t('sponsor.sponsor_page.connected_to', { address: truncateAddress(address) }) }}
     </div>
   </div>
 </template>

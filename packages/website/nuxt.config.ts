@@ -13,13 +13,15 @@ const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
 // listed before the core framework so Vue isn't pulled into the heavy chunks.
 const manualChunkRules: [test: (id: string) => boolean, chunk: string][] = [
   // Vite preload helper - a separate small chunk that other chunks import, so the
-  // heavy web3-appkit isn't loaded just for the preload function.
+  // heavy web3 stack isn't loaded just for the preload function.
   [id => id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill'), 'vite-helpers'],
   // Rollup commonjs interop helpers (virtual module \0commonjsHelpers.js), shared widely.
   [id => id.includes('\0commonjsHelpers'), 'commonjs-helpers'],
-  // Web3/Wallet connection - keep @reown packages together.
-  [id => id.includes('@reown/appkit'), 'web3-appkit'],
-  [id => id.includes('node_modules/ethers'), 'ethers'],
+  // Web3/Wallet stack - split so it only loads when a crypto/sponsor flow needs it.
+  [id => id.includes('node_modules/viem'), 'viem'],
+  [id => id.includes('@wagmi/'), 'wagmi'],
+  [id => id.includes('@walletconnect/'), 'walletconnect'],
+  [id => id.includes('@coinbase/wallet-sdk'), 'coinbase-wallet'],
   // Braintree payment SDK - split by submodule.
   [id => id.includes('braintree-web') && id.includes('/client'), 'braintree-client'],
   [id => id.includes('braintree-web') && id.includes('/three-d-secure'), 'braintree-3ds'],
@@ -270,17 +272,12 @@ export default defineNuxtConfig({
         'swiper/vue',
         'swiper/modules',
         'qrcode',
-        'ethers',
-        'ethers/address',
-        'ethers/constants',
-        'ethers/contract',
-        'ethers/providers',
-        'ethers/utils',
-        '@reown/appkit',
-        '@reown/appkit/vue',
-        '@reown/appkit/networks',
-        '@reown/appkit-adapter-ethers',
-        '@reown/appkit-controllers',
+        'viem',
+        'viem/chains',
+        '@wagmi/core',
+        '@wagmi/connectors',
+        '@walletconnect/universal-provider',
+        '@coinbase/wallet-sdk',
         'braintree-web',
         'braintree-web/client',
         'braintree-web/hosted-fields',

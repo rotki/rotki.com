@@ -7,7 +7,7 @@ import {
   getDisplayRank,
   getRankClass,
 } from '~/modules/sponsor/leaderboard/utils';
-import { truncateAddress } from '~/utils/text';
+import { truncateAddress } from '~/modules/web3/core/format';
 
 const ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
 

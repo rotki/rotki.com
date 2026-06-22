@@ -1,14 +1,14 @@
 import { get, set } from '@vueuse/shared';
 import { defineStore } from 'pinia';
-import { CHAIN_CONFIGS } from '~/composables/rotki-sponsorship/constants';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { SponsorshipMetadata } from '~/types/sponsor';
 import { useLogger } from '~/utils/use-logger';
 
-interface ChainConfig {
-  chainId: number;
-  rpcUrls: readonly string[];
-}
+// Backend chain name → numeric chain id (RPC config lives in modules/web3/core/chains).
+const CHAIN_ID_BY_NAME: Record<'ethereum' | 'sepolia', number> = {
+  ethereum: 1,
+  sepolia: 11155111,
+};
 
 export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', () => {
   // State
@@ -20,14 +20,10 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
   const contractAddress = computed<string | undefined>(() => get(metadata)?.contractAddress);
   const chain = computed<'sepolia' | 'ethereum' | undefined>(() => get(metadata)?.chain);
 
-  const chainConfig = computed<ChainConfig | undefined>(() => {
+  const chainId = computed<number | undefined>(() => {
     const chainName = get(chain);
-    if (!chainName)
-      return undefined;
-    return CHAIN_CONFIGS[chainName];
+    return chainName ? CHAIN_ID_BY_NAME[chainName] : undefined;
   });
-
-  const chainId = computed<number | undefined>(() => get(chainConfig)?.chainId);
 
   const logger = useLogger('leaderboard-metadata-store');
   const { fetchWithCsrf } = useFetchWithCsrf();
@@ -55,15 +51,16 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
   }
 
   return {
-    // State
-    chain: readonly(chain),
-    chainConfig: readonly(chainConfig),
-    chainId: readonly(chainId),
-    contractAddress: readonly(contractAddress),
-    error: readonly(error),
+    // Getters (computed — already read-only by nature)
+    chain,
+    chainId,
+    contractAddress,
+    // State (Pinia owns these refs; wrapping them in readonly() breaks its
+    // $state sync/hydration and emits "target is readonly" warnings)
+    error,
     // Actions
     fetchMetadata,
-    loading: readonly(loading),
-    metadata: readonly(metadata),
+    loading,
+    metadata,
   };
 });

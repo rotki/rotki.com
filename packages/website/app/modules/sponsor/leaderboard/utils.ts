@@ -1,5 +1,5 @@
 import type { AddressDisplay, LeaderboardEntry } from '~/modules/sponsor/leaderboard/types';
-import { truncateAddress } from '~/utils/text';
+import { truncateAddress } from '~/modules/web3/core/format';
 
 const PLACEHOLDER_ENTRY_COUNT = 5;
 

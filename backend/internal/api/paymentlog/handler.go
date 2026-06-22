@@ -21,19 +21,25 @@ var allowedMethods = map[string]bool{
 	"crypto": true,
 }
 
-// Allowed event names.
+// Allowed event names. MUST stay in sync with the PaymentServerEvent catalog in
+// @rotki/sigil (src/failures.ts) — that package owns the contract shared by the
+// website and the card-payment SPA. A serverEvent missing here is rejected with
+// a 400, silently dropping the log (e.g. crypto_user_rejected did exactly that).
 var allowedEvents = map[string]bool{
-	"braintree_init_failed":      true,
-	"3ds_verification_failed":    true,
-	"3ds_liability_shift_failed": true,
-	"card_payment_api_error":     true,
-	"paypal_sdk_init_failed":     true,
-	"paypal_payment_error":       true,
-	"paypal_submit_error":        true,
-	"crypto_wrong_chain":         true,
-	"crypto_tx_failed":           true,
-	"crypto_payment_api_error":   true,
-	"checkout_error":             true,
+	"braintree_init_failed":       true,
+	"3ds_verification_failed":     true,
+	"3ds_liability_shift_failed":  true,
+	"card_payment_api_error":      true,
+	"paypal_sdk_init_failed":      true,
+	"paypal_payment_error":        true,
+	"paypal_submit_error":         true,
+	"crypto_wallet_not_connected": true,
+	"crypto_wrong_chain":          true,
+	"crypto_insufficient_funds":   true,
+	"crypto_user_rejected":        true,
+	"crypto_tx_failed":            true,
+	"crypto_payment_api_error":    true,
+	"checkout_error":              true,
 }
 
 // Allowed step values.

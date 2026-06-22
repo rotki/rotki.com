@@ -25,24 +25,17 @@ vi.mock('~/composables/use-fetch-with-csrf', () => ({
   }),
 }));
 
-vi.mock('~/composables/web3/use-shared-web3-state', () => ({
-  useSharedWeb3State: () => ({
-    address: ref<string>('0x1234567890abcdef1234567890abcdef12345678'),
-    connected: ref<boolean>(true),
-    connectedChainId: ref<bigint>(),
-    initialized: ref<boolean>(false),
-    initializing: ref<boolean>(false),
-    isOpen: ref<boolean>(false),
-  }),
-}));
-
-vi.mock('~/composables/web3/use-web3-connection', () => ({
-  useWeb3Connection: () => ({
+vi.mock('~/modules/web3/composables/use-wallet', () => ({
+  useWallet: () => ({
     address: ref<string>('0x1234567890abcdef1234567890abcdef12345678'),
     connected: ref<boolean>(true),
     signMessage: mockSignMessage,
   }),
 }));
+
+// signMessage now returns a plain-fp Result, not a raw string / thrown error.
+const okResult = (value: string) => ({ ok: true, value });
+const errResult = (tag: string, message: string) => ({ error: { _tag: tag, message }, ok: false });
 
 const TEST_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
 const TEST_NONCE = 'test-nonce-123';
@@ -62,14 +55,14 @@ describe('useSiweAuth', () => {
         expiresAt: Math.floor(Date.now() / 1000) + 3600,
         ok: true,
       });
-    mockSignMessage.mockResolvedValueOnce(TEST_SIGNATURE);
+    mockSignMessage.mockResolvedValueOnce(okResult(TEST_SIGNATURE));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, isSessionValid } = useSiweAuth();
 
     const result = await authenticate(TEST_ADDRESS);
 
-    expect(result).toBe(true);
+    expect(result.ok).toBe(true);
     expect(isSessionValid(TEST_ADDRESS)).toBe(true);
 
     expect(mockFetchWithCsrf).toHaveBeenCalledTimes(2);
@@ -80,39 +73,39 @@ describe('useSiweAuth', () => {
 
   it('should set authError when signature is rejected', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({ nonce: TEST_NONCE });
-    mockSignMessage.mockRejectedValueOnce({ code: 4001, message: 'User rejected' });
+    mockSignMessage.mockResolvedValueOnce(errResult('UserRejected', 'User rejected'));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, authError } = useSiweAuth();
 
     const result = await authenticate(TEST_ADDRESS);
 
-    expect(result).toBe(false);
+    expect(result.ok).toBe(false);
     expect(get(authError)).toBe('Signature rejected. Please try again.');
   });
 
   it('should set authError when sign message fails', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({ nonce: TEST_NONCE });
-    mockSignMessage.mockRejectedValueOnce(new Error('Unknown signing error'));
+    mockSignMessage.mockResolvedValueOnce(errResult('SignFailed', 'Unknown signing error'));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, authError } = useSiweAuth();
 
     const result = await authenticate(TEST_ADDRESS);
 
-    expect(result).toBe(false);
+    expect(result.ok).toBe(false);
     expect(get(authError)).toBe('Failed to sign message. Please try again.');
   });
 
   it('should set authError when nonce fetch fails', async () => {
     mockFetchWithCsrf.mockRejectedValueOnce(new Error('Network error'));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, authError } = useSiweAuth();
 
     const result = await authenticate(TEST_ADDRESS);
 
-    expect(result).toBe(false);
+    expect(result.ok).toBe(false);
     expect(get(authError)).toBeTruthy();
   });
 
@@ -120,14 +113,14 @@ describe('useSiweAuth', () => {
     mockFetchWithCsrf
       .mockResolvedValueOnce({ nonce: TEST_NONCE })
       .mockResolvedValueOnce({ ok: false });
-    mockSignMessage.mockResolvedValueOnce(TEST_SIGNATURE);
+    mockSignMessage.mockResolvedValueOnce(okResult(TEST_SIGNATURE));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, authError } = useSiweAuth();
 
     const result = await authenticate(TEST_ADDRESS);
 
-    expect(result).toBe(false);
+    expect(result.ok).toBe(false);
     expect(get(authError)).toBe('Authentication failed');
   });
 
@@ -139,9 +132,9 @@ describe('useSiweAuth', () => {
         expiresAt: Math.floor(Date.now() / 1000) + 3600,
         ok: true,
       });
-    mockSignMessage.mockResolvedValueOnce(TEST_SIGNATURE);
+    mockSignMessage.mockResolvedValueOnce(okResult(TEST_SIGNATURE));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, isAuthenticating } = useSiweAuth();
 
     expect(get(isAuthenticating)).toBe(false);
@@ -156,7 +149,7 @@ describe('useSiweAuth', () => {
   it('should reset isAuthenticating after failure', async () => {
     mockFetchWithCsrf.mockRejectedValueOnce(new Error('fail'));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate, isAuthenticating } = useSiweAuth();
 
     await authenticate(TEST_ADDRESS);
@@ -171,12 +164,12 @@ describe('useSiweAuth', () => {
     };
     localStorage.setItem('siwe_session', JSON.stringify(session));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { authenticate } = useSiweAuth();
 
     const result = await authenticate(TEST_ADDRESS);
 
-    expect(result).toBe(true);
+    expect(result.ok).toBe(true);
     expect(mockFetchWithCsrf).not.toHaveBeenCalled();
     expect(mockSignMessage).not.toHaveBeenCalled();
   });
@@ -188,7 +181,7 @@ describe('useSiweAuth', () => {
     };
     localStorage.setItem('siwe_session', JSON.stringify(session));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { isSessionValid } = useSiweAuth();
 
     expect(isSessionValid(TEST_ADDRESS)).toBe(false);
@@ -201,7 +194,7 @@ describe('useSiweAuth', () => {
     };
     localStorage.setItem('siwe_session', JSON.stringify(session));
 
-    const { useSiweAuth } = await import('~/composables/rotki-sponsorship/use-siwe-auth');
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const { isSessionValid } = useSiweAuth();
 
     expect(isSessionValid(TEST_ADDRESS)).toBe(false);

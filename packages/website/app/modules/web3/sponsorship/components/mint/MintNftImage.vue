@@ -1,0 +1,70 @@
+<script setup lang="ts">
+import { findTierByKey } from '~/modules/web3/sponsorship/utils';
+
+interface Props {
+  selectedTier: string;
+  nftImages: Record<string, string>;
+  isLoading?: boolean;
+  error?: boolean;
+}
+
+const { selectedTier, nftImages, isLoading = false, error = false } = defineProps<Props>();
+
+const emit = defineEmits<{
+  retry: [];
+}>();
+
+const imageLoading = ref<boolean>(true);
+
+const { t } = useI18n({ useScope: 'global' });
+
+const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)?.label);
+</script>
+
+<template>
+  <div class="nft-image-container w-full flex justify-center lg:block">
+    <div class="aspect-square w-full max-w-md md:max-w-full bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
+      <div
+        v-if="error"
+        class="text-rui-error text-center"
+      >
+        <div class="text-lg font-medium">
+          {{ t('sponsor.sponsor_page.nft_image.failed_to_load') }}
+        </div>
+        <button
+          type="button"
+          class="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
+          @click="emit('retry')"
+        >
+          {{ t('sponsor.sponsor_page.nft_image.retry') }}
+        </button>
+      </div>
+      <div
+        v-else-if="nftImages[selectedTier]"
+        class="w-full h-full bg-rui-grey-50 relative"
+      >
+        <img
+          :key="nftImages[selectedTier]"
+          data-id="nft-image"
+          :src="nftImages[selectedTier]"
+          :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: tierLabel })"
+          class="w-full h-full object-cover rounded-lg z-[2]"
+          width="448"
+          height="448"
+          fetchpriority="high"
+          @loadstart="imageLoading = true"
+          @load="imageLoading = false"
+          @error="imageLoading = false"
+        />
+        <RuiSkeletonLoader
+          v-if="imageLoading"
+          class="absolute top-0 left-0 z-[0] w-full h-full"
+        />
+      </div>
+      <RuiSkeletonLoader
+        v-else-if="isLoading || Object.keys(nftImages).length === 0"
+        class="w-full h-full"
+      />
+    </div>
+  </div>
+</template>

@@ -4,7 +4,8 @@ import { get } from '@vueuse/shared';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/modules/checkout/components/crypto/CryptoChainIcon.vue';
-import { toTitleCase, truncateAddress } from '~/utils/text';
+import { truncateAddress } from '~/modules/web3/core/format';
+import { toTitleCase } from '~/utils/text';
 
 const { data, loading } = defineProps<{
   data: CryptoPayment;

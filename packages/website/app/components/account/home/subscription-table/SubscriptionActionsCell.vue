@@ -156,7 +156,7 @@ function buildRenewAction(context: ActionContext): ActionConfig<DisableableNavig
 function buildBlockExplorerAction(context: ActionContext): ActionConfig<NavigationActionProps> {
   const { pendingTx } = context.cryptoPaymentState;
   const isPendingCrypto = isCryptoPaymentPending(context.subscription);
-  const blockExplorerLink = pendingTx ? getBlockExplorerLink(pendingTx) : { path: '' };
+  const blockExplorerLink = pendingTx ? getBlockExplorerLink(pendingTx) : '';
 
   return {
     props: {

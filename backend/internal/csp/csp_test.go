@@ -96,6 +96,38 @@ func TestPolicyStringUpgradeInsecureRequests(t *testing.T) {
 	}
 }
 
+func TestWalletConnectCSPHasViemRPCEndpoints(t *testing.T) {
+	connectSrc := WalletConnectCSP["connect-src"]
+	// viem hits these public RPCs directly (reads + receipt polling) after the
+	// AppKit→viem migration; without them sponsorship/checkout reads break.
+	required := []string{
+		"https://sepolia.gateway.tenderly.co",
+		"https://ethereum-sepolia-rpc.publicnode.com",
+		"https://eth.merkle.io",
+	}
+	for _, host := range required {
+		if !slices.Contains(connectSrc, host) {
+			t.Fatalf("WalletConnect connect-src missing viem RPC host %q: %v", host, connectSrc)
+		}
+	}
+}
+
+func TestWalletConnectCSPHasCoinbaseSDKEndpoints(t *testing.T) {
+	connectSrc := WalletConnectCSP["connect-src"]
+	for _, host := range []string{"https://cca-lite.coinbase.com", "https://www.walletlink.org"} {
+		if !slices.Contains(connectSrc, host) {
+			t.Fatalf("WalletConnect connect-src missing Coinbase SDK host %q: %v", host, connectSrc)
+		}
+	}
+}
+
+func TestSponsorCSPIncludesViemRPC(t *testing.T) {
+	// The sponsor route policy must carry the RPC endpoints (it merges WalletConnectCSP).
+	if !slices.Contains(SponsorCSP["connect-src"], "https://sepolia.gateway.tenderly.co") {
+		t.Fatalf("SponsorCSP connect-src missing sepolia RPC: %v", SponsorCSP["connect-src"])
+	}
+}
+
 func TestCardPaymentMergedNotEmpty(t *testing.T) {
 	if len(CardPaymentMerged) == 0 {
 		t.Fatal("CardPaymentMerged should not be empty")

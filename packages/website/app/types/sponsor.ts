@@ -1,4 +1,4 @@
-import type { TierKey } from '~/composables/rotki-sponsorship/types';
+import type { TierKey } from '~/modules/web3/sponsorship/types';
 
 import { z } from 'zod';
 

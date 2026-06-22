@@ -2,6 +2,7 @@
 import type { CryptoPayment } from '~/types';
 import { useClipboard } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { buildPaymentUri } from '~/modules/web3/core/payment-uri';
 import { useLogger } from '~/utils/use-logger';
 
 const { data, isWalletOpen, loading } = defineProps<{
@@ -24,40 +25,11 @@ async function getToCanvas(): Promise<typeof import('qrcode').toCanvas> {
   return toCanvas;
 }
 
-// Lazy load ethers utilities
-async function getParseUnits(): Promise<typeof import('ethers/utils').parseUnits> {
-  const { parseUnits } = await import('ethers/utils');
-  return parseUnits;
-}
-
 /**
  * Generate QR code for crypto payment
  */
 async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement): Promise<string> {
-  let qrText: string;
-  const {
-    cryptoAddress,
-    chainName,
-    finalPriceInCrypto,
-    tokenAddress,
-    decimals,
-  } = payment;
-
-  if (chainName === 'bitcoin') {
-    qrText = `bitcoin:${cryptoAddress}?amount=${finalPriceInCrypto}&label=Rotki`;
-  }
-  else {
-    const chainId = payment.chainId;
-    // Lazy load parseUnits from ethers
-    const parseUnits = await getParseUnits();
-    const tokenAmount = parseUnits(finalPriceInCrypto.toString(), decimals);
-
-    if (!tokenAddress)
-      qrText = `ethereum:${cryptoAddress}@${chainId}?value=${tokenAmount}`;
-    else
-      qrText = `ethereum:${tokenAddress}@${chainId}/transfer?address=${cryptoAddress}&uint256=${tokenAmount}`;
-  }
-
+  const qrText = await buildPaymentUri(payment);
   logger.info(qrText);
   const toCanvas = await getToCanvas();
   await toCanvas(canvas, qrText);

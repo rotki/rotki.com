@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { NftSubmission } from '~/types/sponsor';
-import { get, set } from '@vueuse/shared';
-import NftSubmissionForm from '~/components/sponsor/NftSubmissionForm.vue';
-import NftSubmissionsList from '~/components/sponsor/NftSubmissionsList.vue';
-import SponsorWalletConnectionCard from '~/components/sponsor/SponsorWalletConnectionCard.vue';
-import { useNftSubmissions } from '~/composables/rotki-sponsorship/use-nft-submissions';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
-import { useWeb3Connection } from '~/composables/web3/use-web3-connection';
+import WalletPickerDialog from '~/modules/web3/components/WalletPickerDialog.vue';
+import SponsorWalletConnectionCard from '~/modules/web3/sponsorship/components/common/SponsorWalletConnectionCard.vue';
+import NftSubmissionForm from '~/modules/web3/sponsorship/components/submission/NftSubmissionForm.vue';
+import NftSubmissionsList from '~/modules/web3/sponsorship/components/submission/NftSubmissionsList.vue';
+import { useSubmissionFlow } from '~/modules/web3/sponsorship/use-submission-flow';
 
 usePageSeoNoIndex('Submit Sponsor Name');
 
@@ -15,49 +13,18 @@ definePageMeta({
 });
 
 const { t } = useI18n({ useScope: 'global' });
-const { connected: isConnected, address } = useWeb3Connection();
-const { fetchSubmissions } = useNftSubmissions();
 
-const showSubmissionsList = ref<boolean>(false);
-const editingSubmission = ref<NftSubmission | undefined>();
-
-async function loadSubmissions(): Promise<void> {
-  set(showSubmissionsList, true);
-}
-
-function handleEditSubmission(submission: NftSubmission): void {
-  set(editingSubmission, submission);
-  set(showSubmissionsList, false);
-}
-
-function handleCancelEdit(): void {
-  set(editingSubmission, undefined);
-}
-
-async function handleSubmissionSuccess(): Promise<void> {
-  set(editingSubmission, undefined);
-  // Refresh submissions list if shown
-  const addressVal = get(address);
-  if (get(showSubmissionsList) && addressVal) {
-    await fetchSubmissions(addressVal);
-  }
-}
-
-function handleCloseList(): void {
-  set(showSubmissionsList, false);
-}
-
-watch(isConnected, (connected) => {
-  if (!connected) {
-    set(showSubmissionsList, false);
-    set(editingSubmission, undefined);
-  }
-});
-
-watch(address, () => {
-  set(showSubmissionsList, false);
-  set(editingSubmission, undefined);
-});
+const {
+  address,
+  editingSubmission,
+  handleCancelEdit,
+  handleCloseList,
+  handleEditSubmission,
+  handleSubmissionSuccess,
+  isConnected,
+  loadSubmissions,
+  showSubmissionsList,
+} = useSubmissionFlow();
 </script>
 
 <template>
@@ -99,5 +66,7 @@ watch(address, () => {
         {{ t('sponsor.submit_name.terms_note') }}
       </div>
     </div>
+
+    <WalletPickerDialog />
   </section>
 </template>

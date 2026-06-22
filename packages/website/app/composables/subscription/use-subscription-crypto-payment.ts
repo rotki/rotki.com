@@ -9,6 +9,7 @@ import {
 import { get, set } from '@vueuse/shared';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
+import { blockExplorerTxUrl } from '~/modules/web3/core/chains';
 import { useLogger } from '~/utils/use-logger';
 
 interface UseSubscriptionCryptoPaymentOptions {
@@ -132,12 +133,13 @@ export function useSubscriptionCryptoPayment({
   }
 
   /**
-   * Get the block explorer link for a pending transaction
+   * Full external block-explorer URL for a pending transaction. Returned as a
+   * plain string (an *external* href for ButtonLink), built from the chain id +
+   * hash so it's a single source of truth and immune to the old `/tx//` double
+   * slash. Empty string when the chain is unknown.
    */
   function getBlockExplorerLink(pending: PendingTx): RouteLocationRaw {
-    return {
-      path: `${pending.blockExplorerUrl}/${pending.hash}`,
-    };
+    return blockExplorerTxUrl(pending.chainId, pending.hash) ?? '';
   }
 
   // Watch for subscription changes and fetch on the client only

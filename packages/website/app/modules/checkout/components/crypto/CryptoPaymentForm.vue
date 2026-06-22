@@ -10,6 +10,10 @@ import CryptoPaymentQr from '~/modules/checkout/components/crypto/CryptoPaymentQ
 import CryptoWalletActions from '~/modules/checkout/components/crypto/CryptoWalletActions.vue';
 import { useWeb3Payment } from '~/modules/checkout/composables/use-crypto-payment';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
+import WalletAccountSummary from '~/modules/web3/components/WalletAccountSummary.vue';
+import WalletPickerDialog from '~/modules/web3/components/WalletPickerDialog.vue';
+import { web3ErrorKey } from '~/modules/web3/core/errors';
+import { formatTokenBalance } from '~/modules/web3/core/format';
 
 const {
   data,
@@ -67,6 +71,9 @@ async function navigateToSuccess(): Promise<void> {
 const {
   connected,
   address,
+  balance,
+  balanceLoading,
+  fundsStatus,
   pay,
   processing,
   isOpen,
@@ -75,10 +82,24 @@ const {
   switchNetwork,
 } = useWeb3Payment(() => data, {
   onSuccess: navigateToSuccess,
-  onError: (message: string) => emit('error', message),
 });
 
+async function handlePay(isUpgrade: boolean): Promise<void> {
+  const result = await pay(isUpgrade);
+  if (!result.ok)
+    emit('error', t(web3ErrorKey(result.error), { message: result.error.message }));
+}
+
+async function handleSwitchNetwork(): Promise<void> {
+  const result = await switchNetwork();
+  if (!result.ok)
+    emit('error', t(web3ErrorKey(result.error), { message: result.error.message }));
+}
+
 const isBtc = computed<boolean>(() => data.chainName === 'bitcoin');
+
+// `cryptocurrency` is a full asset id (e.g. "ethereum sepolia:ETH"); show only the symbol.
+const currencyName = computed<string>(() => data.cryptocurrency.split(':')[1] ?? data.cryptocurrency);
 
 function handleInternalPlanChange(newPlan: SelectedPlan): void {
   emit('plan-change', newPlan);
@@ -126,7 +147,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
     </div>
 
     <!-- Sidebar (Right Column) -->
-    <aside class="w-full lg:sticky lg:top-8 lg:self-start lg:max-w-sm">
+    <aside class="w-full lg:sticky lg:top-8 lg:self-start lg:max-w-sm flex flex-col gap-4">
       <OrderSummaryCard
         :discount-code="discountCode"
         warning
@@ -140,6 +161,31 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
         @plan-change="handleInternalPlanChange($event)"
         @apply-discount="emit('apply-discount')"
       />
+
+      <!-- Connected wallet (kept in the sticky sidebar so it stays above the fold). -->
+      <div
+        v-if="!isBtc && connected && address"
+        class="flex flex-col gap-2"
+      >
+        <WalletAccountSummary
+          :address="address"
+          :open="open"
+        />
+
+        <!-- Reserve a line so the balance never shifts the card height. -->
+        <div
+          v-if="isExpectedChain"
+          class="flex items-center gap-1.5 text-sm text-rui-text-secondary px-1 h-5"
+        >
+          <RuiSkeletonLoader
+            v-if="balanceLoading"
+            class="w-36 h-4"
+          />
+          <template v-else-if="balance">
+            {{ t('subscription.crypto_payment.wallet_balance', { balance: formatTokenBalance(balance), currency: currencyName }) }}
+          </template>
+        </div>
+      </div>
     </aside>
   </div>
 
@@ -163,14 +209,31 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
     >
       <CryptoWalletActions
         :connected="connected"
-        :address="address"
         :is-expected-chain="isExpectedChain"
+        :pay-disabled="fundsStatus.tokenShortfall"
         :processing="web3ProcessingLoading || planSwitchLoading || processing"
         @connect="open()"
-        @pay="pay(!!upgradeSubId)"
-        @switch-network="switchNetwork()"
-        @open-wallet="open()"
+        @pay="handlePay(!!upgradeSubId)"
+        @switch-network="handleSwitchNetwork()"
       />
+
+      <!-- Hard block: balance below the amount due -->
+      <RuiAlert
+        v-if="connected && isExpectedChain && fundsStatus.tokenShortfall"
+        type="error"
+        class="mt-3"
+      >
+        {{ t('subscription.crypto_payment.insufficient_funds', { currency: data.cryptocurrency }) }}
+      </RuiAlert>
+
+      <!-- Soft warning: enough for the amount, maybe not for gas -->
+      <RuiAlert
+        v-else-if="connected && isExpectedChain && fundsStatus.gasShortfall"
+        type="warning"
+        class="mt-3"
+      >
+        {{ t('subscription.crypto_payment.insufficient_gas') }}
+      </RuiAlert>
     </div>
   </div>
 
@@ -212,4 +275,6 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
       </div>
     </Transition>
   </Teleport>
+
+  <WalletPickerDialog />
 </template>
