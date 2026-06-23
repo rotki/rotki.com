@@ -73,6 +73,28 @@ export function isSubmitBlockedByOwnership(params: { hasCheckedNft: boolean; isN
   return params.hasCheckedNft && !params.isNftOwnerValid && !params.isEditing;
 }
 
+/**
+ * Normalize a release tag for comparison: trim, lowercase and drop a leading
+ * `v` when it precedes a digit (so `v0.9.0` and `0.9.0` match). The `v` is only
+ * stripped before a digit to avoid mangling word-like names.
+ */
+function normalizeReleaseTag(value: string | undefined): string {
+  return (value ?? '').trim().toLowerCase().replace(/^v(?=\d)/, '');
+}
+
+/**
+ * Whether a submission belongs to the current release and may therefore be
+ * edited. The current release name (Go tier-info endpoint) and the submission's
+ * release version (Python submissions endpoint) come from different backends and
+ * can differ in casing or `v`-prefix, so both are normalized. A missing/unknown
+ * value on either side never counts as the current release — editing stays
+ * disabled rather than being wrongly enabled for an old submission.
+ */
+export function isCurrentReleaseSubmission(currentReleaseName: string | undefined, submissionReleaseVersion: string | undefined): boolean {
+  const current = normalizeReleaseTag(currentReleaseName);
+  return current.length > 0 && current === normalizeReleaseTag(submissionReleaseVersion);
+}
+
 export type NftMetadataStatus = 'ok' | 'not_owner' | 'wrong_release' | 'not_found' | 'unverified';
 
 export interface NftMetadataEvaluation {

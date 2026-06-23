@@ -1,7 +1,7 @@
 import type { SimpleTokenMetadata, StoredNft } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
 import { describe, expect, it } from 'vitest';
-import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isSubmitBlockedByOwnership } from '~/modules/web3/sponsorship/submission-state';
+import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isCurrentReleaseSubmission, isSubmitBlockedByOwnership } from '~/modules/web3/sponsorship/submission-state';
 
 function storedNft(partial: Partial<StoredNft> & Pick<StoredNft, 'id'>): StoredNft {
   return { address: '0xowner', releaseId: 1, tier: 0, ...partial };
@@ -159,5 +159,35 @@ describe('isSubmitBlockedByOwnership', () => {
     // wrong_release (isNftOwnerValid=false), which previously left the update
     // button disabled until the user re-selected the NFT.
     expect(isSubmitBlockedByOwnership({ hasCheckedNft: true, isNftOwnerValid: false, isEditing: true })).toBe(false);
+  });
+});
+
+describe('isCurrentReleaseSubmission', () => {
+  it('matches identical release tags', () => {
+    expect(isCurrentReleaseSubmission('v1.40.0', 'v1.40.0')).toBe(true);
+  });
+
+  it('tolerates a v-prefix mismatch between the two backends', () => {
+    expect(isCurrentReleaseSubmission('1.40.0', 'v1.40.0')).toBe(true);
+    expect(isCurrentReleaseSubmission('v1.40.0', '1.40.0')).toBe(true);
+  });
+
+  it('ignores surrounding whitespace and casing', () => {
+    expect(isCurrentReleaseSubmission('  V1.40.0 ', 'v1.40.0')).toBe(true);
+  });
+
+  it('does not match a different (older) release', () => {
+    expect(isCurrentReleaseSubmission('v1.40.0', 'v1.39.0')).toBe(false);
+  });
+
+  it('never treats a missing release on either side as current', () => {
+    expect(isCurrentReleaseSubmission(undefined, 'v1.40.0')).toBe(false);
+    expect(isCurrentReleaseSubmission('v1.40.0', undefined)).toBe(false);
+    expect(isCurrentReleaseSubmission('', '')).toBe(false);
+  });
+
+  it('only strips a leading v when it precedes a digit', () => {
+    // Guards against mangling word-like names into a false match.
+    expect(isCurrentReleaseSubmission('version', 'ersion')).toBe(false);
   });
 });

@@ -2,10 +2,11 @@
 import type { NftSubmission } from '~/types/sponsor';
 import { get } from '@vueuse/shared';
 import NftSubmissionItemChips from '~/modules/web3/sponsorship/components/submission/NftSubmissionItemChips.vue';
+import { isCurrentReleaseSubmission } from '~/modules/web3/sponsorship/submission-state';
 import { useSponsorshipData } from '~/modules/web3/sponsorship/use-sponsorship';
 import { formatDate } from '~/utils/date';
 
-defineProps<{
+const { submission } = defineProps<{
   submission: NftSubmission;
 }>();
 
@@ -16,7 +17,7 @@ defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 
 const { data: sponsorshipData } = await useSponsorshipData();
-const currentReleaseName = computed<string | undefined>(() => get(sponsorshipData)?.releaseName);
+const isEditable = computed<boolean>(() => isCurrentReleaseSubmission(get(sponsorshipData)?.releaseName, submission.releaseVersion));
 </script>
 
 <template>
@@ -51,7 +52,7 @@ const currentReleaseName = computed<string | undefined>(() => get(sponsorshipDat
       </div>
       <div class="flex items-center gap-2">
         <RuiButton
-          v-if="currentReleaseName === submission.releaseVersion"
+          v-if="isEditable"
           variant="outlined"
           size="sm"
           color="primary"
