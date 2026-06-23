@@ -152,7 +152,11 @@ async function navigateToProducts(): Promise<void> {
 // Initialize on mount
 onMounted(async () => {
   const success = await initialize();
-  if (!success && !get(paymentData)) {
+  // Only bounce back to products when there is genuinely nothing to show.
+  // If initialize() set an error (e.g. the crypto payment API returned 400),
+  // stay on the page so the user can read what went wrong instead of being
+  // silently redirected.
+  if (!success && !get(paymentData) && !get(error)) {
     await navigateToProducts();
   }
 });
