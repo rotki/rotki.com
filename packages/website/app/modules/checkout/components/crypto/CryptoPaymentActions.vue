@@ -29,7 +29,7 @@ watch(() => error, (newError, oldError) => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 justify-center w-full mt-auto pt-8">
+  <div class="flex flex-col gap-4 justify-center w-full grow pt-8">
     <!-- Loading state -->
     <div
       v-if="loading"

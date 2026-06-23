@@ -2,6 +2,7 @@ import type { PaymentError } from '~/types/codes';
 import { type ActionResultResponse, ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
+import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import {
@@ -247,6 +248,16 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
       };
     }
     catch (error: any) {
+      // A 409 means there is no pending payment to delete. The desired end state
+      // (nothing pending) is already true, so treat the cancellation as a success
+      // rather than blocking the user — e.g. the Back button after a failed
+      // payment creation, where no pending payment was ever recorded.
+      if (error instanceof FetchError && error.statusCode === 409) {
+        return {
+          isError: false,
+          result: true,
+        };
+      }
       logger.error('Failed to delete pending payment:', error);
       return createSimpleErrorResult(error);
     }
