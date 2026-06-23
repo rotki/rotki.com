@@ -5,7 +5,7 @@ import { useVuelidate, type ValidationArgs } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata } from '~/modules/web3/sponsorship/submission-state';
+import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isSubmitBlockedByOwnership } from '~/modules/web3/sponsorship/submission-state';
 import { useNftMetadata } from '~/modules/web3/sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/modules/web3/sponsorship/use-nft-submissions';
 import { useRotkiSponsorshipPayment } from '~/modules/web3/sponsorship/use-payment';
@@ -131,6 +131,13 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
   const v$ = useVuelidate(rules, { atLeastOne: true, displayName: modelDisplayName, email: modelEmail, imageFile, tokenId: modelTokenId }, { $autoDirty: true });
 
   const shouldDisableFields = computed<boolean>(() => get(isSubmitting) || !get(isAuthenticated));
+
+  // Editing an existing submission is never gated by the live ownership re-check.
+  const ownershipBlocksSubmit = computed<boolean>(() => isSubmitBlockedByOwnership({
+    hasCheckedNft: get(hasCheckedNft),
+    isEditing: !!toValue(editingSubmission),
+    isNftOwnerValid: get(isNftOwnerValid),
+  }));
 
   function handleImageSelected(file: File): void {
     set(imageFile, file);
@@ -349,8 +356,10 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     if (submission && get(modelTokenId) !== submission.nftId.toString()) {
       set(modelTokenId, submission.nftId.toString());
       prefillFromSubmission(submission);
-      // When editing, ownership was already proven by the prior submission.
-      set(isNftOwnerValid, true);
+      // Ownership was already proven when this submission was first accepted, so
+      // editing is not re-gated on the live owner/release check — see
+      // `ownershipBlocksSubmit`. (Setting modelTokenId above still refreshes the
+      // tier/release info via the modelTokenId watcher.)
     }
   }, { immediate: true });
 
@@ -381,6 +390,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     nftIdOptions,
     nftReleaseName: shallowReadonly(nftReleaseName),
     nftTier: shallowReadonly(nftTier),
+    ownershipBlocksSubmit,
     removeImage,
     shouldDisableFields,
     sponsorshipData,
