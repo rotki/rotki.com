@@ -34,7 +34,12 @@ export interface ChainMeta {
 // here MUST also be listed in the backend CSP `connect-src`
 // (backend/internal/csp/policies.go) or the browser blocks the read and balances
 // silently come back empty. Keep the two in sync.
-const ETHEREUM_RPCS = [
+//
+// `ETHEREUM_RPCS` is exported because reverse-ENS resolution (`core/ens.ts`) runs
+// on mainnet via a standalone viem client and reuses these same already-allowed
+// hosts — ENS is mainnet-only, so it can't rely on the wagmi config, which omits
+// mainnet in testnet mode.
+export const ETHEREUM_RPCS = [
   'https://eth.merkle.io',
   'https://eth.llamarpc.com',
   'https://ethereum-rpc.publicnode.com',

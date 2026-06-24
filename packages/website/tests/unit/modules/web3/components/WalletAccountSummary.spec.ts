@@ -18,6 +18,11 @@ vi.mock('@vueuse/core', async () => {
   };
 });
 
+// Stub reverse-ENS resolution so the component never hits the network.
+vi.mock('~/modules/web3/composables/use-ens-name', () => ({
+  useEnsName: () => ({ ensName: ref<string>(), loading: ref<boolean>(false) }),
+}));
+
 async function mountSummary(props: Record<string, unknown> = {}) {
   return mountSuspended(WalletAccountSummary, {
     props: { address: ADDRESS, open: vi.fn(), ...props },

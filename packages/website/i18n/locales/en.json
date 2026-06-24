@@ -1111,7 +1111,8 @@
       "label": "Connected wallet",
       "copy_address": "Copy address",
       "copied": "Copied!",
-      "change": "Change"
+      "change": "Change",
+      "resolving_ens": "Resolving ENS name"
     },
     "leaderboard": {
       "be_the_first": "Be the first to {mint}",
