@@ -121,9 +121,9 @@ const {
       <div class="lg:w-1/2">
         <div class="space-y-6">
           <div>
-            <h5 class="text-h4 font-bold mb-2">
+            <h1 class="text-h4 font-bold mb-2">
               {{ t('sponsor.sponsor_page.title') }}
-            </h5>
+            </h1>
             <p class="text-rui-text-secondary mb-6">
               {{ t('sponsor.sponsor_page.description').replace('{leaderboard_link}', '') }}<ButtonLink
                 to="/sponsor/leaderboard"

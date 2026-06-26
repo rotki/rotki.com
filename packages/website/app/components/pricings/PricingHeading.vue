@@ -7,7 +7,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div class="mb-6">
-    <CheckoutTitle>
+    <CheckoutTitle as="h1">
       {{ t('home.plans.tiers.step_1.title') }}
     </CheckoutTitle>
     <CheckoutDescription>

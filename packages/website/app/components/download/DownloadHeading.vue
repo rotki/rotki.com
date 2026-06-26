@@ -67,9 +67,9 @@ function onDownloadClick(platform: string): void {
         <h6 class="text-rui-light-primary text-h6 font-medium">
           {{ t('download.heading.download_rotki') }}
         </h6>
-        <h3 class="text-rui-text text-h4">
+        <h1 class="text-rui-text text-h4">
           {{ t('download.heading.description') }}
-        </h3>
+        </h1>
         <div class="flex flex-col items-center gap-3 pt-2 min-h-[106px]">
           <div class="flex gap-2 flex-wrap justify-center min-h-[42px] items-center">
             <RuiButton

@@ -1,11 +1,18 @@
 <script setup lang="ts">
+const { as = 'h4' } = defineProps<{
+  as?: 'h1' | 'h4';
+}>();
+
 defineSlots<{
   default: () => void;
 }>();
 </script>
 
 <template>
-  <h4 class="font-bold text-h4 text-rui-text mb-3">
+  <component
+    :is="as"
+    class="font-bold text-h4 text-rui-text mb-3"
+  >
     <slot />
-  </h4>
+  </component>
 </template>

@@ -18,17 +18,17 @@ if (!document) {
         >
           {{ document.title }}
         </div>
-        <div
+        <h1
           v-if="document?.subtitle"
           class="text-h4"
         >
           {{ document.subtitle }}
-        </div>
+        </h1>
       </div>
       <div v-else-if="document?.title">
-        <div class="text-h4">
+        <h1 class="text-h4">
           {{ document.title }}
-        </div>
+        </h1>
       </div>
       <div
         v-if="document?.address"

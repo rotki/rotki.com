@@ -11,9 +11,9 @@ const { t } = useI18n({ useScope: 'global' });
         <div class="text-rui-light-primary text-h6 font-medium">
           {{ t('products.heading') }}
         </div>
-        <h4 class="text-h4 !font-bold">
+        <h1 class="text-h4 !font-bold">
           {{ t('products.title') }}
-        </h4>
+        </h1>
         <div class="max-w-[768px] text-body-1 text-rui-text-secondary">
           {{ t('products.description') }}
         </div>
