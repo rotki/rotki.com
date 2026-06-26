@@ -98,7 +98,7 @@ test.describe('download page', () => {
 
     await expect(
       page
-        .locator('h3')
+        .locator('h1')
         .filter({
           hasText:
             'Download now and start using across all major Operating Systems',
