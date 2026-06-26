@@ -12,12 +12,16 @@ const { plans, featuresLabel } = defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const tab = ref<string>(plans[0]?.name ?? '');
+function defaultTab(list: MappedPlan[]): string {
+  return list.find(isMostPopularPlan)?.name ?? list[0]?.name ?? '';
+}
+
+const tab = ref<string>(defaultTab(plans));
 
 watch(() => plans, (newPlans) => {
   const names = new Set(newPlans.map(p => p.name));
   if (!names.has(get(tab))) {
-    set(tab, newPlans[0]?.name ?? '');
+    set(tab, defaultTab(newPlans));
   }
 });
 </script>
@@ -26,7 +30,7 @@ watch(() => plans, (newPlans) => {
   <div>
     <RuiTabs
       v-model="tab"
-      class="w-full border-b border-default [&>div.no-scrollbar]:pt-9 h-auto items-end"
+      class="w-full border-b border-default [&>div.no-scrollbar]:pt-9 [&>div.no-scrollbar]:!h-auto h-auto items-end"
       color="primary"
       grow
     >
@@ -51,7 +55,7 @@ watch(() => plans, (newPlans) => {
             <RuiSkeletonLoader class="w-20 h-5 mx-auto opacity-30" />
           </template>
           <template v-else>
-            {{ t('pricing.most_popular_plan') }}
+            {{ t('pricing.suggested_plan') }}
           </template>
         </div>
       </RuiTab>

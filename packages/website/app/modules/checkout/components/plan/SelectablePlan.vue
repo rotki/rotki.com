@@ -128,7 +128,7 @@ watch(price, (newPrice) => {
         color="primary"
         size="sm"
       >
-        {{ t('pricing.most_popular_plan') }}
+        {{ t('pricing.suggested_plan') }}
       </RuiChip>
     </div>
 

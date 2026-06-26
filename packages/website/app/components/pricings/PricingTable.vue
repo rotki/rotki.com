@@ -35,7 +35,7 @@ const { t } = useI18n({ useScope: 'global' });
           <RuiSkeletonLoader class="w-28 h-5 mx-auto opacity-30" />
         </template>
         <template v-else>
-          {{ t('pricing.most_popular_plan') }}
+          {{ t('pricing.suggested_plan') }}
         </template>
       </div>
       <div

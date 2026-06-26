@@ -3,6 +3,7 @@ import type { ComputedRef, Ref } from 'vue';
 import { until } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
+import { TIER_NAMES } from '~/types/pricing';
 import { PricingPeriod } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';
 
@@ -73,22 +74,11 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
     if (plans.length === 0)
       return plans;
 
-    // Find the plan with the highest price to mark as most popular
-    let maxPrice = 0;
-    let mostPopularTierName: string | undefined;
-
-    plans.forEach((plan) => {
-      const price = Number.parseFloat(plan.monthlyPlan?.price || plan.yearlyPlan?.price || '0');
-      if (price > maxPrice) {
-        maxPrice = price;
-        mostPopularTierName = plan.tierName;
-      }
-    });
-
-    // Return plans with isMostPopular flag set
+    // Highlight the Basic plan as the suggested tier. `isMostPopular` is the
+    // existing highlight channel; here it means "the suggested/Basic plan".
     return plans.map(plan => ({
       ...plan,
-      isMostPopular: plan.tierName === mostPopularTierName,
+      isMostPopular: plan.tierName.toLowerCase() === TIER_NAMES.BASIC,
     }));
   });
 
