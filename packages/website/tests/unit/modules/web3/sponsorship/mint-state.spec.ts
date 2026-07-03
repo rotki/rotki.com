@@ -77,6 +77,24 @@ describe('buildTierPriceDisplay', () => {
     const result = buildTierPriceDisplay('USDC', priceGetterFor(tokens), false, 'Loading…');
     expect(result).toEqual({ bronze: '10 USDC', gold: '0', silver: '20 USDC' });
   });
+
+  it('drops shared trailing zeros when every tier is a whole number', () => {
+    const tokens = [token({ prices: { bronze: '200.000000000', gold: '250.0', silver: '300.000000000' }, symbol: 'EURe' })];
+    const result = buildTierPriceDisplay('EURe', priceGetterFor(tokens), false, 'Loading…');
+    expect(result).toEqual({ bronze: '200 EURe', gold: '250 EURe', silver: '300 EURe' });
+  });
+
+  it('aligns every tier to the decimals of the most precise one', () => {
+    const tokens = [token({ prices: { bronze: '200.000000', gold: '250', silver: '300.1' }, symbol: 'EURe' })];
+    const result = buildTierPriceDisplay('EURe', priceGetterFor(tokens), false, 'Loading…');
+    expect(result).toEqual({ bronze: '200.0 EURe', gold: '250.0 EURe', silver: '300.1 EURe' });
+  });
+
+  it('ignores unpriced tiers when computing the shared decimals', () => {
+    const tokens = [token({ prices: { bronze: '200.000000', gold: '', silver: '300.000000' }, symbol: 'EURe' })];
+    const result = buildTierPriceDisplay('EURe', priceGetterFor(tokens), false, 'Loading…');
+    expect(result).toEqual({ bronze: '200 EURe', gold: '0', silver: '300 EURe' });
+  });
 });
 
 describe('computeNeedsApproval', () => {

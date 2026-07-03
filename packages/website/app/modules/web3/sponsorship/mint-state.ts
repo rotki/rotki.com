@@ -1,5 +1,6 @@
 import { flatMap, fromNullable, map, type Result } from 'plainfp/result';
 import { isNativeToken } from '~/modules/web3/core/erc20';
+import { alignmentDecimals, toFixedDecimals } from '~/modules/web3/core/format';
 import { type PaymentToken, SPONSORSHIP_TIERS, type SponsorshipTier, type TierKey } from '~/modules/web3/sponsorship/types';
 
 /** Reads the price of a tier for a given currency (mirrors `usePaymentTokens().getPriceForTier`). */
@@ -51,6 +52,10 @@ export function filterVisibleTiers(currency: string, getPriceForTier: PriceGette
 /**
  * Per-tier price label for the selected currency. While loading every tier gets
  * `loadingLabel`; otherwise `"<price> <currency>"` or `"0"` when unpriced.
+ *
+ * Priced tiers are aligned to a common number of decimals: shared trailing zeros
+ * are dropped, but as soon as one tier needs a decimal every tier shows it, so the
+ * column lines up (e.g. `200`/`300`, or `200.0`/`300.1`).
  */
 export function buildTierPriceDisplay(currency: string, getPriceForTier: PriceGetter, isLoading: boolean, loadingLabel: string): Record<string, string> {
   const result: Record<string, string> = {};
@@ -61,9 +66,12 @@ export function buildTierPriceDisplay(currency: string, getPriceForTier: PriceGe
     return result;
   }
 
-  for (const tier of SPONSORSHIP_TIERS) {
-    const price = getPriceForTier(currency, tier.key);
-    result[tier.key] = price ? `${price} ${currency}` : '0';
+  const prices = SPONSORSHIP_TIERS.map(tier => getPriceForTier(currency, tier.key));
+  const decimals = alignmentDecimals(prices.filter((price): price is string => !!price));
+
+  for (const [index, tier] of SPONSORSHIP_TIERS.entries()) {
+    const price = prices[index];
+    result[tier.key] = price ? `${toFixedDecimals(price, decimals)} ${currency}` : '0';
   }
   return result;
 }
