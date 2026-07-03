@@ -1,6 +1,6 @@
 {
   "name": "@rotki/card-payment-common",
-  "version": "2026.6.6",
+  "version": "2026.7.0",
   "description": "Shared types and schemas for rotki card payment applications",
   "type": "module",
   "files": [
