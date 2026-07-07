@@ -4,6 +4,8 @@ import { pipe } from 'plainfp/pipe';
 import { flatMap, fromThrowable, getOr, map, mapError, ok, type Result } from 'plainfp/result';
 import * as RA from 'plainfp/result-async';
 import { tag, type Tagged } from 'plainfp/tagged';
+import { getAddress } from 'viem';
+import { createSiweMessage } from 'viem/siwe';
 import { z } from 'zod';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useWallet } from '~/modules/web3/composables/use-wallet';
@@ -47,7 +49,7 @@ function isSiweCookieError(error: unknown): boolean {
 
 export function useSiweAuth() {
   const { fetchWithCsrf } = useFetchWithCsrf();
-  const { address, connected, signMessage: signMessageWeb3 } = useWallet();
+  const { address, connected, connectedChainId, signMessage: signMessageWeb3 } = useWallet();
   const logger = useLogger();
 
   const sessionStorage = useLocalStorage<SiweSession | undefined>('siwe_session', undefined, {
@@ -87,20 +89,39 @@ export function useSiweAuth() {
     );
   }
 
-  /** Step 2 — sign the ownership message, translating wallet errors to {@link AuthError}. */
-  async function signNonce(address: string, nonce: string): Promise<Result<string, AuthError>> {
-    const message = `I am the owner of address ${address}. Nonce: ${nonce}`;
-    return mapError(await signMessageWeb3(message), (error): AuthError => error._tag === 'UserRejected'
-      ? tag('UserRejected')({ message: 'Signature rejected. Please try again.' })
-      : tag('SignFailed')({ message: 'Failed to sign message. Please try again.' }));
+  /** Build an EIP-4361 (Sign-In With Ethereum) message bound to this origin + nonce. */
+  function buildSiweMessage(address: string, nonce: string): string {
+    // Only ever called client-side (behind a user-triggered wallet signature).
+    const host = typeof window !== 'undefined' ? window.location.host : '';
+    const uri = typeof window !== 'undefined' ? window.location.origin : '';
+    return createSiweMessage({
+      address: getAddress(address),
+      chainId: get(connectedChainId) ?? 1,
+      domain: host,
+      nonce,
+      statement: 'Sign in with Ethereum to rotki.',
+      uri,
+      version: '1',
+    });
   }
 
-  /** Step 3 — verify the signature with the backend, yielding the persisted session. */
-  async function verifySignature(address: string, nonce: string, signature: string): RA.ResultAsync<SiweSession, AuthError> {
+  /** Step 2 — build + sign the EIP-4361 message, translating wallet errors to {@link AuthError}. */
+  async function signSiweMessage(address: string, nonce: string): Promise<Result<{ message: string; signature: string }, AuthError>> {
+    const message = buildSiweMessage(address, nonce);
+    return map(
+      mapError(await signMessageWeb3(message), (error): AuthError => error._tag === 'UserRejected'
+        ? tag('UserRejected')({ message: 'Signature rejected. Please try again.' })
+        : tag('SignFailed')({ message: 'Failed to sign message. Please try again.' })),
+      (signature): { message: string; signature: string } => ({ message, signature }),
+    );
+  }
+
+  /** Step 3 — verify the signed message with the backend, yielding the persisted session. */
+  async function verifySignature(message: string, signature: string): RA.ResultAsync<SiweSession, AuthError> {
     return pipe(
       RA.fromPromise(
         fetchWithCsrf<SiweSession & { ok: boolean }>('/webapi/nfts/siwe/verify', {
-          body: { evmAddress: address, nonce, signature },
+          body: { message, signature },
           method: 'POST',
         }),
         (cause): AuthError => tag('VerifyFailed')({ cause, message: messageOf(cause) }),
@@ -121,8 +142,8 @@ export function useSiweAuth() {
       const outcome = await pipe(
         fetchNonce(),
         RA.flatMap(async nonce => pipe(
-          signNonce(address, nonce),
-          RA.flatMap(async signature => verifySignature(address, nonce, signature)),
+          signSiweMessage(address, nonce),
+          RA.flatMap(async ({ message, signature }) => verifySignature(message, signature)),
         )),
         RA.tap((session) => { set(sessionStorage, session); }),
       );

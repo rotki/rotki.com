@@ -29,6 +29,7 @@ vi.mock('~/modules/web3/composables/use-wallet', () => ({
   useWallet: () => ({
     address: ref<string>('0x1234567890abcdef1234567890abcdef12345678'),
     connected: ref<boolean>(true),
+    connectedChainId: ref<number>(1),
     signMessage: mockSignMessage,
   }),
 }));
@@ -38,7 +39,8 @@ const okResult = (value: string) => ({ ok: true, value });
 const errResult = (tag: string, message: string) => ({ error: { _tag: tag, message }, ok: false });
 
 const TEST_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
-const TEST_NONCE = 'test-nonce-123';
+// EIP-4361 requires an alphanumeric nonce of at least 8 characters.
+const TEST_NONCE = 'testnonce123';
 const TEST_SIGNATURE = '0xsignature';
 
 describe('useSiweAuth', () => {
@@ -66,9 +68,17 @@ describe('useSiweAuth', () => {
     expect(isSessionValid(TEST_ADDRESS)).toBe(true);
 
     expect(mockFetchWithCsrf).toHaveBeenCalledTimes(2);
-    expect(mockSignMessage).toHaveBeenCalledWith(
-      `I am the owner of address ${TEST_ADDRESS}. Nonce: ${TEST_NONCE}`,
-    );
+    // Signs a proper EIP-4361 message that embeds the nonce.
+    expect(mockSignMessage).toHaveBeenCalledTimes(1);
+    const signedMessage = String(mockSignMessage.mock.calls[0]?.[0] ?? '');
+    expect(signedMessage).toContain('wants you to sign in with your Ethereum account:');
+    expect(signedMessage).toContain(`Nonce: ${TEST_NONCE}`);
+
+    // Verify is posted with the message + signature (not the legacy fields).
+    expect(mockFetchWithCsrf).toHaveBeenLastCalledWith('/webapi/nfts/siwe/verify', {
+      body: { message: signedMessage, signature: TEST_SIGNATURE },
+      method: 'POST',
+    });
   });
 
   it('should set authError when signature is rejected', async () => {
