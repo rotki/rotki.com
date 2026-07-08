@@ -1,6 +1,7 @@
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { get } from '@vueuse/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { type EffectScope, effectScope } from 'vue';
 
 const mockFetchWithCsrf = vi.fn();
 const mockSignMessage = vi.fn();
@@ -44,7 +45,19 @@ const TEST_NONCE = 'testnonce123';
 const TEST_SIGNATURE = '0xsignature';
 
 describe('useSiweAuth', () => {
+  // useSiweAuth is a createSharedComposable, so it memoizes one instance. Running
+  // each call inside its own effectScope and stopping it here drops the subscriber
+  // count to 0, disposing the shared state so the next test starts fresh.
+  const scopes: EffectScope[] = [];
+
+  function useInScope<T>(factory: () => T): T {
+    const scope = effectScope();
+    scopes.push(scope);
+    return scope.run(factory)!;
+  }
+
   afterEach(() => {
+    scopes.splice(0).forEach(scope => scope.stop());
     vi.clearAllMocks();
     localStorage.clear();
   });
@@ -60,7 +73,7 @@ describe('useSiweAuth', () => {
     mockSignMessage.mockResolvedValueOnce(okResult(TEST_SIGNATURE));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, isSessionValid } = useSiweAuth();
+    const { authenticate, isSessionValid } = useInScope(() => useSiweAuth());
 
     const result = await authenticate(TEST_ADDRESS);
 
@@ -86,7 +99,7 @@ describe('useSiweAuth', () => {
     mockSignMessage.mockResolvedValueOnce(errResult('UserRejected', 'User rejected'));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, authError } = useSiweAuth();
+    const { authenticate, authError } = useInScope(() => useSiweAuth());
 
     const result = await authenticate(TEST_ADDRESS);
 
@@ -99,7 +112,7 @@ describe('useSiweAuth', () => {
     mockSignMessage.mockResolvedValueOnce(errResult('SignFailed', 'Unknown signing error'));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, authError } = useSiweAuth();
+    const { authenticate, authError } = useInScope(() => useSiweAuth());
 
     const result = await authenticate(TEST_ADDRESS);
 
@@ -111,7 +124,7 @@ describe('useSiweAuth', () => {
     mockFetchWithCsrf.mockRejectedValueOnce(new Error('Network error'));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, authError } = useSiweAuth();
+    const { authenticate, authError } = useInScope(() => useSiweAuth());
 
     const result = await authenticate(TEST_ADDRESS);
 
@@ -126,7 +139,7 @@ describe('useSiweAuth', () => {
     mockSignMessage.mockResolvedValueOnce(okResult(TEST_SIGNATURE));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, authError } = useSiweAuth();
+    const { authenticate, authError } = useInScope(() => useSiweAuth());
 
     const result = await authenticate(TEST_ADDRESS);
 
@@ -145,7 +158,7 @@ describe('useSiweAuth', () => {
     mockSignMessage.mockResolvedValueOnce(okResult(TEST_SIGNATURE));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, isAuthenticating } = useSiweAuth();
+    const { authenticate, isAuthenticating } = useInScope(() => useSiweAuth());
 
     expect(get(isAuthenticating)).toBe(false);
 
@@ -160,7 +173,7 @@ describe('useSiweAuth', () => {
     mockFetchWithCsrf.mockRejectedValueOnce(new Error('fail'));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate, isAuthenticating } = useSiweAuth();
+    const { authenticate, isAuthenticating } = useInScope(() => useSiweAuth());
 
     await authenticate(TEST_ADDRESS);
 
@@ -175,7 +188,7 @@ describe('useSiweAuth', () => {
     localStorage.setItem('siwe_session', JSON.stringify(session));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { authenticate } = useSiweAuth();
+    const { authenticate } = useInScope(() => useSiweAuth());
 
     const result = await authenticate(TEST_ADDRESS);
 
@@ -192,7 +205,7 @@ describe('useSiweAuth', () => {
     localStorage.setItem('siwe_session', JSON.stringify(session));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { isSessionValid } = useSiweAuth();
+    const { isSessionValid } = useInScope(() => useSiweAuth());
 
     expect(isSessionValid(TEST_ADDRESS)).toBe(false);
   });
@@ -205,8 +218,24 @@ describe('useSiweAuth', () => {
     localStorage.setItem('siwe_session', JSON.stringify(session));
 
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
-    const { isSessionValid } = useSiweAuth();
+    const { isSessionValid } = useInScope(() => useSiweAuth());
 
     expect(isSessionValid(TEST_ADDRESS)).toBe(false);
+  });
+
+  it('shares one instance across consumers so sign-in state is not siloed', async () => {
+    // Regression: the wallet card and the submission form each call useSiweAuth.
+    // As a createSharedComposable they must get the SAME reactive refs, so signing
+    // in via the card flips the form's auth state in the same tick. Separate
+    // instances left the form disabled after signing in on first load. (Instance
+    // identity is the reliable check: happy-dom syncs localStorage across separate
+    // instances in-document, which real browsers do not, so a behavioural session
+    // assertion can't distinguish the two here.)
+    const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
+    const card = useInScope(() => useSiweAuth());
+    const form = useInScope(() => useSiweAuth());
+
+    expect(form.isAuthenticating).toBe(card.isAuthenticating);
+    expect(form.authError).toBe(card.authError);
   });
 });

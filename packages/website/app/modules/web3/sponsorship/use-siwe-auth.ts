@@ -1,3 +1,4 @@
+import { createSharedComposable } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { fromZod } from 'plainfp/interop/zod';
 import { pipe } from 'plainfp/pipe';
@@ -47,7 +48,17 @@ function isSiweCookieError(error: unknown): boolean {
   return statusCode === 403 && typeof detail === 'string' && SIWE_ERROR_KEYS.some(item => detail.includes(item));
 }
 
-export function useSiweAuth() {
+/**
+ * Shared so every consumer (wallet card, submission form, submissions list) reads
+ * one `siwe_session` ref: signing in from the card must flip `isSessionValid` for
+ * the form in the same tick. Separate instances relied on cross-instance storage
+ * events that don't fire same-document, leaving the form disabled after sign-in.
+ * Safe as a shared composable (unlike `useLazyAsyncData`): it only wraps
+ * `useLocalStorage` + a `watch`, so a dispose/re-init just re-reads localStorage.
+ */
+export const useSiweAuth = createSharedComposable(useSiweAuthInternal);
+
+function useSiweAuthInternal() {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { address, connected, connectedChainId, signMessage: signMessageWeb3 } = useWallet();
   const logger = useLogger();
