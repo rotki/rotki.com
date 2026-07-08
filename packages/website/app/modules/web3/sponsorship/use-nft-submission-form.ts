@@ -208,9 +208,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     }
   }
 
-  // `checkExisting` prefills/switches to editing when the NFT already has a
-  // submission; the submit flow passes false so re-verifying ownership at submit
-  // never mutates the form the user is filling.
+  // `checkExisting` runs the existing-submission prefill (authenticated only); submit passes false.
   async function checkNftMetadata({ checkExisting = true }: { checkExisting?: boolean } = {}): Promise<NftMetadataStatus | undefined> {
     const tokenIdValue = get(modelTokenId);
     if (!tokenIdValue || !Number.isInteger(Number(tokenIdValue))) {
@@ -249,7 +247,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
           break;
         case 'ok':
           set(isNftOwnerValid, true);
-          if (checkExisting)
+          if (checkExisting && get(isAuthenticated))
             await checkExistingSubmission(Number(tokenIdValue));
           break;
         case 'unverified':
@@ -268,10 +266,8 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     }
   }
 
-  // Submit behind a valid SIWE session. authenticatedRequest ensures the session and,
-  // if the backend cookie has expired, transparently re-signs and retries once — so
-  // the flow stays auth-agnostic and just calls this. The inner const isolates
-  // fetchWithCsrf's route-typed inference (inlining it overflows the TS route matcher).
+  // Submit behind a valid SIWE session; authenticatedRequest re-signs + retries once if
+  // the backend cookie expired. Inner const isolates fetchWithCsrf's route-typed inference.
   async function submitHolderSubmission(payload: FormData): Promise<void> {
     const postSubmission = async () => fetchWithCsrf('/webapi/nfts/holder-submission/', { body: payload, method: 'POST' });
     await authenticatedRequest(toValue(address) || '', postSubmission);
@@ -355,12 +351,18 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     if (submission && get(modelTokenId) !== submission.nftId.toString()) {
       set(modelTokenId, submission.nftId.toString());
       prefillFromSubmission(submission);
-      // Ownership was already proven when this submission was first accepted, so
-      // editing is not re-gated on the live owner/release check — see
-      // `ownershipBlocksSubmit`. (Setting modelTokenId above still refreshes the
-      // tier/release info via the modelTokenId watcher.)
+      // Editing is never re-gated on the live owner/release check (the submit flow skips
+      // ownership when editing). Setting modelTokenId refreshes tier/release via the watcher.
     }
   }, { immediate: true });
+
+  // checkNftMetadata defers the existing-submission lookup until authenticated; re-run it on
+  // sign-in so a prior submission loads to edit (e.g. a ?tokenId deep-link resolved pre-auth).
+  watch(isAuthenticated, async (authed) => {
+    const tokenId = get(modelTokenId);
+    if (authed && tokenId && Number.isInteger(Number(tokenId)) && !get(existingSubmission) && !toValue(editingSubmission))
+      await checkExistingSubmission(Number(tokenId));
+  });
 
   onMounted(async () => {
     const tokenIdParam = getSingleRouteParam(route.query.tokenId);

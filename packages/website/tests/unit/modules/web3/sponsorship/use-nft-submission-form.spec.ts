@@ -13,6 +13,9 @@ const CURRENT_RELEASE_ID = 1;
 // controllable per-test so we can hold `checkExistingSubmission` open and drive
 // the race where the user types while it is still pending.
 const mockMetadata = ref<SimpleTokenMetadata | undefined>();
+// Drives isAuthenticated (isConnected && address && isSessionValid) so tests can
+// select a token while signed out and then sign in.
+const authValid = ref<boolean>(true);
 let existingSubmission: NftSubmission | undefined;
 let deferredCheck: { promise: Promise<NftSubmission | undefined>; resolve: () => void };
 
@@ -40,7 +43,7 @@ vi.mock('~/modules/web3/sponsorship/use-siwe-auth', () => ({
   useSiweAuth: () => ({
     authenticatedRequest: vi.fn(),
     isAuthenticating: ref(false),
-    isSessionValid: () => true,
+    isSessionValid: () => get(authValid),
   }),
 }));
 vi.mock('~/modules/web3/sponsorship/use-sponsorship', () => ({
@@ -90,6 +93,7 @@ async function flushMicrotasks(): Promise<void> {
 describe('useNftSubmissionForm submit-button gating', () => {
   beforeEach(() => {
     set(mockMetadata, undefined);
+    set(authValid, true);
     existingSubmission = undefined;
     deferCheck();
   });
@@ -184,5 +188,34 @@ describe('useNftSubmissionForm submit-button gating', () => {
     // Editing is never gated on the live ownership re-check: submit stays enabled
     // for a past-release NFT (the submit flow skips ownership when editing).
     expect(submitDisabled(form)).toBe(false);
+  });
+
+  it('prefills an existing submission after signing in when the token was selected while signed out', async () => {
+    // A ?tokenId deep-link resolves the NFT before sign-in. The lookup is auth-gated,
+    // so nothing prefills until the user signs in, then the isAuthenticated watcher
+    // loads the prior submission for editing instead of leaving a blank form.
+    set(authValid, false);
+    existingSubmission = {
+      createdAt: '2026-01-01',
+      displayName: 'Prior Name',
+      email: null,
+      imageUrl: null,
+      nftId: 5,
+      updatedAt: '2026-01-01',
+    };
+    set(mockMetadata, metadata('gold'));
+    const form = await setupForm();
+
+    set(form.modelTokenId, '5');
+    deferredCheck.resolve();
+    await flushMicrotasks();
+    // Signed out: ownership/tier resolved, but the submission is not loaded yet.
+    expect(get(form.isAuthenticated)).toBe(false);
+    expect(get(form.modelDisplayName)).toBe('');
+
+    set(authValid, true);
+    await flushMicrotasks();
+    expect(get(form.isAuthenticated)).toBe(true);
+    expect(get(form.modelDisplayName)).toBe('Prior Name');
   });
 });
