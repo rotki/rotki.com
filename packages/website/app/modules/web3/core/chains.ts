@@ -40,30 +40,33 @@ export interface ChainMeta {
 // hosts — ENS is mainnet-only, so it can't rely on the wagmi config, which omits
 // mainnet in testnet mode.
 export const ETHEREUM_RPCS = [
-  'https://eth.merkle.io',
-  'https://eth.llamarpc.com',
   'https://ethereum-rpc.publicnode.com',
   'https://rpc.mevblocker.io',
+  'https://eth.drpc.org',
 ];
 
 const ARBITRUM_RPCS = [
   'https://arbitrum-one-rpc.publicnode.com',
-  'https://arbitrum.llamarpc.com',
+  'https://arb1.arbitrum.io/rpc',
+  'https://arbitrum.drpc.org',
 ];
 
 const BASE_RPCS = [
   'https://base-rpc.publicnode.com',
-  'https://base.llamarpc.com',
+  'https://mainnet.base.org',
+  'https://base.drpc.org',
 ];
 
 const OPTIMISM_RPCS = [
   'https://optimism-rpc.publicnode.com',
-  'https://optimism.llamarpc.com',
+  'https://mainnet.optimism.io',
+  'https://optimism.drpc.org',
 ];
 
 const GNOSIS_RPCS = [
   'https://gnosis-rpc.publicnode.com',
   'https://rpc.gnosischain.com',
+  'https://gnosis.drpc.org',
 ];
 
 const SEPOLIA_RPCS = [
@@ -74,17 +77,19 @@ const SEPOLIA_RPCS = [
 
 const ARBITRUM_SEPOLIA_RPCS = [
   'https://arbitrum-sepolia-rpc.publicnode.com',
-  'https://sepolia-rollup.arbitrum.io',
+  'https://arbitrum-sepolia.drpc.org',
 ];
 
 const BASE_SEPOLIA_RPCS = [
   'https://base-sepolia-rpc.publicnode.com',
   'https://sepolia.base.org',
+  'https://base-sepolia.drpc.org',
 ];
 
 const OPTIMISM_SEPOLIA_RPCS = [
   'https://optimism-sepolia-rpc.publicnode.com',
   'https://sepolia.optimism.io',
+  'https://optimism-sepolia.drpc.org',
 ];
 
 const PRODUCTION_CHAINS: readonly ChainMeta[] = [

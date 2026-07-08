@@ -91,32 +91,37 @@ var WalletConnectCSP = Policy{
 		// MUST stay in sync with the rpcUrls in app/modules/web3/core/chains.ts —
 		// a host missing here is blocked by CSP and the read silently returns empty.
 		// Production: Ethereum
-		"https://eth.merkle.io",
-		"https://eth.llamarpc.com",
 		"https://ethereum-rpc.publicnode.com",
 		"https://rpc.mevblocker.io",
+		"https://eth.drpc.org",
 		// Production: Arbitrum One
 		"https://arbitrum-one-rpc.publicnode.com",
-		"https://arbitrum.llamarpc.com",
+		"https://arb1.arbitrum.io/rpc",
+		"https://arbitrum.drpc.org",
 		// Production: Base
 		"https://base-rpc.publicnode.com",
-		"https://base.llamarpc.com",
+		"https://mainnet.base.org",
+		"https://base.drpc.org",
 		// Production: OP Mainnet
 		"https://optimism-rpc.publicnode.com",
-		"https://optimism.llamarpc.com",
+		"https://mainnet.optimism.io",
+		"https://optimism.drpc.org",
 		// Production: Gnosis
 		"https://gnosis-rpc.publicnode.com",
 		"https://rpc.gnosischain.com",
+		"https://gnosis.drpc.org",
 		// Testnets: Ethereum / Arbitrum / Base / Optimism Sepolia
 		"https://sepolia.gateway.tenderly.co",
 		"https://sepolia.drpc.org",
 		"https://ethereum-sepolia-rpc.publicnode.com",
 		"https://arbitrum-sepolia-rpc.publicnode.com",
-		"https://sepolia-rollup.arbitrum.io",
+		"https://arbitrum-sepolia.drpc.org",
 		"https://base-sepolia-rpc.publicnode.com",
 		"https://sepolia.base.org",
+		"https://base-sepolia.drpc.org",
 		"https://optimism-sepolia-rpc.publicnode.com",
 		"https://sepolia.optimism.io",
+		"https://optimism-sepolia.drpc.org",
 	},
 	"frame-src": {
 		"https://verify.walletconnect.com",

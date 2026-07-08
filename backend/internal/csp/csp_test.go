@@ -103,7 +103,7 @@ func TestWalletConnectCSPHasViemRPCEndpoints(t *testing.T) {
 	required := []string{
 		"https://sepolia.gateway.tenderly.co",
 		"https://ethereum-sepolia-rpc.publicnode.com",
-		"https://eth.merkle.io",
+		"https://ethereum-rpc.publicnode.com",
 	}
 	for _, host := range required {
 		if !slices.Contains(connectSrc, host) {
