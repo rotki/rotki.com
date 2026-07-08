@@ -74,6 +74,20 @@ export function isSubmitBlockedByOwnership(params: { hasCheckedNft: boolean; isN
 }
 
 /**
+ * Whether selecting `tokenId` should reset the form up front, before the async
+ * NFT/existing-submission checks run. Every selection is a fresh start except
+ * re-selecting the submission currently being edited (whose prefill must survive).
+ *
+ * Clearing synchronously here is what stops the deferred existing-submission check
+ * from wiping the name/image a user types once the fields appear: the image field
+ * only shows after the tier resolves mid-check, so silver/gold users routinely
+ * typed into that window and lost their input, leaving submit stuck disabled.
+ */
+export function shouldResetFormForToken(editingSubmission: NftSubmission | undefined, tokenId: string): boolean {
+  return !editingSubmission || editingSubmission.nftId.toString() !== tokenId;
+}
+
+/**
  * Normalize a release tag for comparison: trim, lowercase and drop a leading
  * `v` when it precedes a digit (so `v0.9.0` and `0.9.0` match). The `v` is only
  * stripped before a digit to avoid mangling word-like names.

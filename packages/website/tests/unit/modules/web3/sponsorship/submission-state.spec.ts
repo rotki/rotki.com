@@ -1,7 +1,7 @@
 import type { SimpleTokenMetadata, StoredNft } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
 import { describe, expect, it } from 'vitest';
-import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isCurrentReleaseSubmission, isSubmitBlockedByOwnership } from '~/modules/web3/sponsorship/submission-state';
+import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isCurrentReleaseSubmission, isSubmitBlockedByOwnership, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
 
 function storedNft(partial: Partial<StoredNft> & Pick<StoredNft, 'id'>): StoredNft {
   return { address: '0xowner', releaseId: 1, tier: 0, ...partial };
@@ -159,6 +159,22 @@ describe('isSubmitBlockedByOwnership', () => {
     // wrong_release (isNftOwnerValid=false), which previously left the update
     // button disabled until the user re-selected the NFT.
     expect(isSubmitBlockedByOwnership({ hasCheckedNft: true, isNftOwnerValid: false, isEditing: true })).toBe(false);
+  });
+});
+
+describe('shouldResetFormForToken', () => {
+  const editing = submission({ nftId: 5 });
+
+  it('resets for a fresh selection when not editing', () => {
+    expect(shouldResetFormForToken(undefined, '9')).toBe(true);
+  });
+
+  it('does not reset when re-selecting the submission being edited', () => {
+    expect(shouldResetFormForToken(editing, '5')).toBe(false);
+  });
+
+  it('resets when editing but switching to a different token', () => {
+    expect(shouldResetFormForToken(editing, '9')).toBe(true);
   });
 });
 

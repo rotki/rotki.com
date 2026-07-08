@@ -5,7 +5,7 @@ import { useVuelidate, type ValidationArgs } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isSubmitBlockedByOwnership } from '~/modules/web3/sponsorship/submission-state';
+import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isSubmitBlockedByOwnership, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
 import { useNftMetadata } from '~/modules/web3/sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/modules/web3/sponsorship/use-nft-submissions';
 import { useRotkiSponsorshipPayment } from '~/modules/web3/sponsorship/use-payment';
@@ -202,9 +202,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
         // Switch the page into editing mode for this submission.
         emit('edit-submission', submission);
       }
-      else {
-        clearFormForNewSubmission();
-      }
+      // No else-clear: the form is reset synchronously on token change (modelTokenId watcher).
     }
     catch (error_: any) {
       // Auth failures surface later on submit; ignore them here.
@@ -348,6 +346,8 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
       emit('cancel-edit');
     }
     else if (newTokenId !== oldTokenId && Number.isInteger(Number(newTokenId)) && toValue(isConnected)) {
+      if (shouldResetFormForToken(toValue(editingSubmission), newTokenId))
+        clearFormForNewSubmission();
       await checkNftMetadata();
     }
   });
