@@ -5,7 +5,8 @@ import { useVuelidate, type ValidationArgs } from '@vuelidate/core';
 import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isSubmitBlockedByOwnership, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
+import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, type NftMetadataStatus, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
+import { runSubmitFlow, submitErrorMessage } from '~/modules/web3/sponsorship/submission-submit-flow';
 import { useNftMetadata } from '~/modules/web3/sponsorship/use-nft-metadata';
 import { useNftSubmissions } from '~/modules/web3/sponsorship/use-nft-submissions';
 import { useRotkiSponsorshipPayment } from '~/modules/web3/sponsorship/use-payment';
@@ -132,13 +133,6 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
 
   const shouldDisableFields = computed<boolean>(() => get(isSubmitting) || !get(isAuthenticated));
 
-  // Editing an existing submission is never gated by the live ownership re-check.
-  const ownershipBlocksSubmit = computed<boolean>(() => isSubmitBlockedByOwnership({
-    hasCheckedNft: get(hasCheckedNft),
-    isEditing: !!toValue(editingSubmission),
-    isNftOwnerValid: get(isNftOwnerValid),
-  }));
-
   function handleImageSelected(file: File): void {
     set(imageFile, file);
     // Replacing an existing image means we no longer want to delete it.
@@ -214,11 +208,14 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     }
   }
 
-  async function checkNftMetadata(): Promise<void> {
+  // `checkExisting` prefills/switches to editing when the NFT already has a
+  // submission; the submit flow passes false so re-verifying ownership at submit
+  // never mutates the form the user is filling.
+  async function checkNftMetadata({ checkExisting = true }: { checkExisting?: boolean } = {}): Promise<NftMetadataStatus | undefined> {
     const tokenIdValue = get(modelTokenId);
     if (!tokenIdValue || !Number.isInteger(Number(tokenIdValue))) {
       set(nftCheckError, t('sponsor.submit_name.error.invalid_token_id'));
-      return;
+      return undefined;
     }
 
     try {
@@ -252,14 +249,18 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
           break;
         case 'ok':
           set(isNftOwnerValid, true);
-          await checkExistingSubmission(Number(tokenIdValue));
+          if (checkExisting)
+            await checkExistingSubmission(Number(tokenIdValue));
           break;
         case 'unverified':
           break;
       }
+
+      return evaluation.status;
     }
     catch (error_: any) {
       set(nftCheckError, error_.data?.message || t('sponsor.submit_name.error.check_failed'));
+      return undefined;
     }
     finally {
       set(isCheckingNft, false);
@@ -267,36 +268,40 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     }
   }
 
+  // Submit behind a valid SIWE session. authenticatedRequest ensures the session and,
+  // if the backend cookie has expired, transparently re-signs and retries once — so
+  // the flow stays auth-agnostic and just calls this. The inner const isolates
+  // fetchWithCsrf's route-typed inference (inlining it overflows the TS route matcher).
+  async function submitHolderSubmission(payload: FormData): Promise<void> {
+    const postSubmission = async () => fetchWithCsrf('/webapi/nfts/holder-submission/', { body: payload, method: 'POST' });
+    await authenticatedRequest(toValue(address) || '', postSubmission);
+  }
+
   async function handleSubmit(): Promise<void> {
-    const isValid = await get(v$).$validate();
-    if (!isValid)
-      return;
-
+    set(error, '');
+    set(isSubmitting, true);
     try {
-      set(error, '');
-      set(isSubmitting, true);
-
-      // Verify NFT ownership before the first submit attempt.
-      if (!get(hasCheckedNft)) {
-        await checkNftMetadata();
-        if (!get(isNftOwnerValid)) {
-          set(isSubmitting, false);
-          return;
-        }
-      }
-
-      const formData = buildSubmissionFormData({
-        address: toValue(address),
-        deleteImage: get(deleteImage),
-        displayName: get(modelDisplayName),
-        email: get(modelEmail),
-        imageFile: get(imageFile),
+      const outcome = await runSubmitFlow({
+        buildPayload: () => buildSubmissionFormData({
+          address: toValue(address),
+          deleteImage: get(deleteImage),
+          displayName: get(modelDisplayName),
+          email: get(modelEmail),
+          imageFile: get(imageFile),
+          isEditing: !!toValue(editingSubmission),
+          tokenId: get(modelTokenId),
+        }),
+        // Re-verify ownership in-order at submit; skip the existing-submission prefill.
+        checkOwnership: async () => checkNftMetadata({ checkExisting: false }),
         isEditing: !!toValue(editingSubmission),
-        tokenId: get(modelTokenId),
+        submit: submitHolderSubmission,
+        validate: async () => get(v$).$validate(),
       });
 
-      const submitFormData = async () => fetchWithCsrf('/webapi/nfts/holder-submission/', { body: formData, method: 'POST' });
-      await authenticatedRequest(toValue(address) || '', submitFormData);
+      if (!outcome.ok) {
+        set(error, submitErrorMessage(outcome.error, t));
+        return;
+      }
 
       set(modelDisplayName, '');
       set(modelTokenId, '');
@@ -311,12 +316,6 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
         get(v$).$reset();
       });
       emit('submission-success');
-    }
-    catch (error_: any) {
-      if (error_.message?.includes('Authentication required'))
-        set(error, t('sponsor.submit_name.error.sign_failed'));
-      else
-        set(error, error_.data?.message || t('sponsor.submit_name.error.submit_failed'));
     }
     finally {
       set(isSubmitting, false);
@@ -390,7 +389,6 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     nftIdOptions,
     nftReleaseName: shallowReadonly(nftReleaseName),
     nftTier: shallowReadonly(nftTier),
-    ownershipBlocksSubmit,
     removeImage,
     shouldDisableFields,
     sponsorshipData,

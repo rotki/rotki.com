@@ -38,7 +38,6 @@ const {
   nftIdOptions,
   nftReleaseName,
   nftTier,
-  ownershipBlocksSubmit,
   removeImage,
   shouldDisableFields,
   sponsorshipData,
@@ -186,7 +185,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           size="lg"
           class="w-full"
           :loading="isSubmitting || isAuthenticating"
-          :disabled="!isAuthenticated || v$.$invalid || ownershipBlocksSubmit"
+          :disabled="!isAuthenticated || v$.$invalid"
         >
           {{ editingSubmission || existingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>

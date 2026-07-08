@@ -77,7 +77,7 @@ function metadata(tier: TierKey, releaseId = CURRENT_RELEASE_ID): SimpleTokenMet
 }
 
 function submitDisabled(form: Form): boolean {
-  return !get(form.isAuthenticated) || get(form.v$).$invalid || get(form.ownershipBlocksSubmit);
+  return !get(form.isAuthenticated) || get(form.v$).$invalid;
 }
 
 // Let the token-change watcher run fetchNftMetadata and reach (but not resolve)
@@ -181,7 +181,8 @@ describe('useNftSubmissionForm submit-button gating', () => {
 
     expect(get(form.modelTokenId)).toBe('42');
     expect(get(form.modelDisplayName)).toBe('Edited Name');
-    // Editing is never gated on the live ownership re-check.
-    expect(get(form.ownershipBlocksSubmit)).toBe(false);
+    // Editing is never gated on the live ownership re-check: submit stays enabled
+    // for a past-release NFT (the submit flow skips ownership when editing).
+    expect(submitDisabled(form)).toBe(false);
   });
 });

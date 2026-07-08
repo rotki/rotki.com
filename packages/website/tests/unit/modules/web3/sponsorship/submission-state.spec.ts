@@ -1,7 +1,7 @@
 import type { SimpleTokenMetadata, StoredNft } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
 import { describe, expect, it } from 'vitest';
-import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isCurrentReleaseSubmission, isSubmitBlockedByOwnership, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
+import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, isCurrentReleaseSubmission, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
 
 function storedNft(partial: Partial<StoredNft> & Pick<StoredNft, 'id'>): StoredNft {
   return { address: '0xowner', releaseId: 1, tier: 0, ...partial };
@@ -138,27 +138,6 @@ describe('evaluateNftMetadata', () => {
 
   it('skips the release check when no current release is known', () => {
     expect(evaluateNftMetadata(metadata({ releaseId: 99 }), '0xowner', undefined)).toMatchObject({ status: 'ok' });
-  });
-});
-
-describe('isSubmitBlockedByOwnership', () => {
-  it('does not block before the NFT has been checked', () => {
-    expect(isSubmitBlockedByOwnership({ hasCheckedNft: false, isNftOwnerValid: false, isEditing: false })).toBe(false);
-  });
-
-  it('does not block once ownership is confirmed', () => {
-    expect(isSubmitBlockedByOwnership({ hasCheckedNft: true, isNftOwnerValid: true, isEditing: false })).toBe(false);
-  });
-
-  it('blocks a new submission when the ownership check failed', () => {
-    expect(isSubmitBlockedByOwnership({ hasCheckedNft: true, isNftOwnerValid: false, isEditing: false })).toBe(true);
-  });
-
-  it('never blocks editing an existing submission, even when the re-check fails', () => {
-    // Regression: editing an NFT from a previous release re-evaluates to
-    // wrong_release (isNftOwnerValid=false), which previously left the update
-    // button disabled until the user re-selected the NFT.
-    expect(isSubmitBlockedByOwnership({ hasCheckedNft: true, isNftOwnerValid: false, isEditing: true })).toBe(false);
   });
 });
 

@@ -61,19 +61,6 @@ export function buildSubmissionFormData(input: SubmissionFormInput): FormData {
 }
 
 /**
- * Whether the live on-chain NFT ownership re-check should block submitting.
- *
- * A brand-new submission must pass the owner/release check. Editing an existing
- * submission must NOT: ownership was already proven when it was first accepted,
- * the NFT may now belong to a past release, and the backend re-verifies on
- * submit. Without this carve-out the update button stays disabled for any
- * non-`ok` re-check (e.g. `wrong_release`) until the user re-selects the NFT.
- */
-export function isSubmitBlockedByOwnership(params: { hasCheckedNft: boolean; isNftOwnerValid: boolean; isEditing: boolean }): boolean {
-  return params.hasCheckedNft && !params.isNftOwnerValid && !params.isEditing;
-}
-
-/**
  * Whether selecting `tokenId` should reset the form up front, before the async
  * NFT/existing-submission checks run. Every selection is a fresh start except
  * re-selecting the submission currently being edited (whose prefill must survive).
