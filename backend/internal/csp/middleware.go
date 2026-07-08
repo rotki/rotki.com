@@ -63,9 +63,14 @@ func Middleware(next http.Handler, devConnectSrc ...string) http.Handler {
 			extraHeaders = override.Headers
 		}
 
-		// In dev mode, add extra connect-src sources (e.g. Vite HMR WebSocket)
+		// In dev mode (signalled by dev connect-src being supplied), relax the CSP for
+		// local tooling: Vite HMR sockets (connect-src) plus the Nuxt DevTools iframe,
+		// which frames same-origin URLs like /__nuxt_devtools__/ (frame-src 'self').
 		if len(devConnectSrc) > 0 {
-			policy = Merge(policy, Policy{"connect-src": devConnectSrc})
+			policy = Merge(policy, Policy{
+				"connect-src": devConnectSrc,
+				"frame-src":   {"'self'"},
+			})
 		}
 
 		// Set CSP header with the nonce
