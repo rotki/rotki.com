@@ -1152,6 +1152,8 @@
       "connect_to_view_submissions": "Connect your wallet to view your NFT submissions",
       "sign_to_continue": "Sign in with Ethereum",
       "sign_required": "Please sign the message to verify your wallet ownership",
+      "gate_connect": "Connect your wallet above, then sign in to set your sponsor display name and image.",
+      "gate_sign": "Sign in above to set your sponsor display name and image.",
       "submit": "Submit Data",
       "update": "Update Submission",
       "success": "Your data has been submitted successfully!",
