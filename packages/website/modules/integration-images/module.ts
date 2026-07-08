@@ -143,7 +143,9 @@ async function removeOrphanFiles(manifest: Manifest, urls: Set<string>, outputDi
 export default defineNuxtModule({
   meta: { name: 'integration-images' },
   async setup(_options, nuxt) {
-    if (nuxt.options.dev)
+    // Skip in dev and under test: the module fetches ~138 remote images on init,
+    // which is pointless (and rate-limited/flaky) when booting Nuxt for Vitest.
+    if (nuxt.options.dev || nuxt.options.test)
       return;
 
     const rootDir = nuxt.options.rootDir;
