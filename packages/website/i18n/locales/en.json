@@ -348,6 +348,7 @@
           "address_line_2": "Address line 2",
           "city": "City",
           "country": "Country",
+          "newsletter_consent": "I would like to receive product updates and news from rotki.",
           "postal_code": "Postal code",
           "tos": "I have read and agreed to the {tos} and the {privacy_policy}"
         }

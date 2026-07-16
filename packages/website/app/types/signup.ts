@@ -18,6 +18,7 @@ export interface SignupAddressPayload {
   readonly city: string;
   readonly postcode: string;
   readonly country: string;
+  readonly newsletterConsent: boolean;
 }
 
 export interface SignupPayload
