@@ -105,6 +105,7 @@ test.describe('signup test', () => {
     const countryInput = page.locator('#country input').first();
     const captcha = page.locator('div#signup-captcha').first();
     const tosInput = page.locator('input#tos').first();
+    const newsletterConsentInput = page.locator('input#newsletter-consent').first();
     const submitButton = page.locator('button[data-cy=submit-button]').first();
 
     await expect(address1Input).toBeVisible();
@@ -114,6 +115,8 @@ test.describe('signup test', () => {
     await expect(countryInput).toBeVisible();
     await expect(captcha).toBeVisible();
     await expect(tosInput).toBeVisible();
+    await expect(newsletterConsentInput).toBeVisible();
+    await expect(newsletterConsentInput).not.toBeChecked();
     await expect(submitButton).toBeDisabled();
 
     await address1Input.fill('Address first line');

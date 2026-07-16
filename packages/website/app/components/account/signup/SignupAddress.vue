@@ -5,7 +5,6 @@ import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import CountrySelect from '~/components/account/CountrySelect.vue';
-import ButtonLink from '~/components/common/ButtonLink.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useRecaptcha } from '~/composables/use-recaptcha';
 import { toMessages } from '~/utils/validation';
@@ -45,6 +44,7 @@ const rules = {
     ),
   },
   country: { required },
+  newsletterConsent: {},
   captcha: { required },
   terms: { checked: (value: boolean) => value },
 };
@@ -175,37 +175,49 @@ watch(() => externalResults, (errors) => {
         @update:captcha-id="setCaptchaId($event)"
       />
 
-      <RuiCheckbox
-        id="tos"
-        v-model="terms"
-        color="primary"
-      >
-        <i18n-t
-          keypath="auth.signup.address.form.tos"
-          scope="global"
+      <div class="space-y-2 text-pretty">
+        <RuiCheckbox
+          id="tos"
+          v-model="terms"
+          color="primary"
+          hide-details
         >
-          <template #tos>
-            <ButtonLink
-              to="/tos"
-              inline
-              color="primary"
-              external
-            >
-              {{ t('navigation_menu.tos') }}
-            </ButtonLink>
-          </template>
-          <template #privacy_policy>
-            <ButtonLink
-              to="/privacy-policy"
-              inline
-              color="primary"
-              external
-            >
-              {{ t('navigation_menu.privacy_policy') }}
-            </ButtonLink>
-          </template>
-        </i18n-t>
-      </RuiCheckbox>
+          <i18n-t
+            keypath="auth.signup.address.form.tos"
+            scope="global"
+          >
+            <template #tos>
+              <NuxtLink
+                to="/tos"
+                external
+                target="_blank"
+                class="text-rui-primary hover:underline"
+              >
+                {{ t('navigation_menu.tos') }}
+              </NuxtLink>
+            </template>
+            <template #privacy_policy>
+              <NuxtLink
+                to="/privacy-policy"
+                external
+                target="_blank"
+                class="text-rui-primary hover:underline"
+              >
+                {{ t('navigation_menu.privacy_policy') }}
+              </NuxtLink>
+            </template>
+          </i18n-t>
+        </RuiCheckbox>
+        <RuiCheckbox
+          id="newsletter-consent"
+          :model-value="modelValue.newsletterConsent"
+          color="primary"
+          hide-details
+          @update:model-value="updateValue('newsletterConsent', $event)"
+        >
+          {{ t('auth.signup.address.form.newsletter_consent') }}
+        </RuiCheckbox>
+      </div>
     </div>
   </div>
   <div class="mt-16 grid md:grid-cols-2 gap-4">
