@@ -43,6 +43,7 @@ const addressForm = ref<SignupAddressPayload>({
   city: '',
   postcode: '',
   country: '',
+  newsletterConsent: false,
 });
 
 const loading = ref<boolean>(false);
