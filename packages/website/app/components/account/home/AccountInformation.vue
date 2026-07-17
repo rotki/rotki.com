@@ -12,7 +12,14 @@ import { toMessages } from '~/utils/validation';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const state = reactive({
+interface ProfileFormState {
+  companyName: string;
+  firstName: string;
+  lastName: string;
+  vatId: string;
+}
+
+const state = reactive<ProfileFormState>({
   firstName: '',
   lastName: '',
   companyName: '',
@@ -94,7 +101,7 @@ const vatStatusErrorMessage = computed<string>(() => {
   return '';
 });
 
-function reset() {
+function reset(): void {
   const userAccount = get(account);
 
   if (!userAccount)
@@ -114,7 +121,7 @@ function reset() {
   get(v$).$reset();
 }
 
-async function update() {
+async function update(): Promise<void> {
   await updateProfile(v$, state);
 }
 
@@ -265,6 +272,7 @@ onMounted(() => {
         {{ t('actions.reset') }}
       </RuiButton>
       <RuiButton
+        data-cy="update-profile"
         :disabled="v$.$invalid"
         size="lg"
         :loading="loading"

@@ -1,8 +1,12 @@
-import type { ApiError } from '~/types/index';
+import type { ApiError, UpdateProfile } from '~/types/index';
 
 export interface ActionResult {
   readonly success: boolean;
   readonly message?: ApiError;
+}
+
+export interface ProfileUpdateResult extends ActionResult {
+  readonly profile?: UpdateProfile;
 }
 
 export interface PayEvent {

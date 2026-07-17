@@ -18,6 +18,7 @@ const mockAuthenticatedAccount = {
     email: 'test@example.com',
     email_confirmed: true,
     has_active_subscription: false,
+    newsletter_consent: false,
     can_use_premium: false,
     api_key: '',
     api_secret: '',

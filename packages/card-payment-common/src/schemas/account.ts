@@ -38,6 +38,7 @@ export const AccountSchema = z.object({
   email: z.string().min(1),
   emailConfirmed: z.boolean(),
   hasActiveSubscription: z.boolean(),
+  newsletterConsent: z.boolean(),
   username: z.string().min(1),
   vat: z.number(),
   vatIdStatus: z.string(),
