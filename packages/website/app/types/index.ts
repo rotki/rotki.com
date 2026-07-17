@@ -61,7 +61,10 @@ export type ChangePasswordResponse = z.infer<typeof ChangePasswordResponse>;
 
 const UpdateProfile = z.object({
   address: AddressSchema,
+  newsletterConsent: z.boolean(),
 });
+
+export type UpdateProfile = z.infer<typeof UpdateProfile>;
 
 export const UpdateProfileResponse = z.object({
   message: ApiError.optional(),

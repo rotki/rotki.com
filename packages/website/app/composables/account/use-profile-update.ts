@@ -1,4 +1,3 @@
-import type { Validation } from '@vuelidate/core';
 import type { ProfilePayload } from '~/types/account';
 import { objectOmit } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
@@ -8,6 +7,10 @@ import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';
 
 type ProfileOmitFields = 'movedOffline';
+
+interface ProfileValidation {
+  $validate: () => Promise<boolean>;
+}
 
 export function useProfileUpdate() {
   const store = useMainStore();
@@ -25,7 +28,7 @@ export function useProfileUpdate() {
    * Update user profile with validated form data
    */
   const updateProfile = async <T extends Partial<ProfilePayload>>(
-    v$: Ref<Validation>,
+    v$: Ref<ProfileValidation>,
     state: T,
     omitFields: ProfileOmitFields[] = ['movedOffline'],
   ): Promise<boolean> => {
@@ -49,7 +52,12 @@ export function useProfileUpdate() {
 
     const result = await accountApi.updateProfile(payload);
 
-    if (result.success) {
+    if (result.success && result.profile) {
+      set(account, {
+        ...userAccount,
+        address: result.profile.address,
+        newsletterConsent: result.profile.newsletterConsent,
+      });
       requestRefresh();
     }
 

@@ -1,6 +1,6 @@
 import type { ComposerTranslation } from 'vue-i18n';
 import type { DeleteAccountPayload, PasswordChangePayload, ProfilePayload } from '~/types/account';
-import type { ActionResult } from '~/types/common';
+import type { ActionResult, ProfileUpdateResult } from '~/types/common';
 import { type Account, AccountSchema } from '@rotki/card-payment-common/schemas/account';
 import {
   type ActionResultResponse,
@@ -55,7 +55,7 @@ export function useAccountApi() {
   /**
    * Update user profile information
    */
-  const updateProfile = async (payload: ProfilePayload): Promise<ActionResult> => {
+  const updateProfile = async (payload: ProfilePayload): Promise<ProfileUpdateResult> => {
     try {
       const response = await fetchWithCsrf<UpdateProfileResponse>(
         '/webapi/account/',
@@ -74,7 +74,10 @@ export function useAccountApi() {
       }
       const { result } = parsed.data;
       if (result) {
-        return createSuccessResult();
+        return {
+          ...createSuccessResult(),
+          profile: result,
+        };
       }
 
       return {

@@ -220,6 +220,7 @@
       "address": "Address",
       "customer_information": "Customer Information",
       "devices": "Devices List",
+      "email_preferences": "Email Preferences",
       "subscription": "Subscription",
       "payment_methods": "Saved Cards"
     },
@@ -241,6 +242,11 @@
   "account_details": {
     "check_email": "To change your email, please contact our support tem via",
     "title": "Details"
+  },
+  "email_preferences": {
+    "description": "Choose whether you receive optional emails from rotki.",
+    "newsletter": "Send me product updates and news from rotki.",
+    "title": "Email Preferences"
   },
   "actions": {
     "add_card": "Add card",

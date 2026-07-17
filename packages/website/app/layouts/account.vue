@@ -54,6 +54,10 @@ const tabs = computed<PageTabItem[]>(() => {
     icon: 'lu-circle-user-round',
     to: '/home/account-details',
   }, {
+    label: t('account.tabs.email_preferences'),
+    icon: 'lu-mail',
+    to: '/home/email-preferences',
+  }, {
     label: t('account.tabs.customer_information'),
     icon: 'lu-info',
     to: '/home/customer-information',
