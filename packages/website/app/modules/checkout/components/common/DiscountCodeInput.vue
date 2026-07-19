@@ -2,6 +2,7 @@
 import type { PaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { DiscountType } from '@rotki/card-payment-common';
 import { get, set } from '@vueuse/shared';
+import { useAppConfig } from '~/composables/use-app-config';
 
 const model = defineModel<string>({ required: true });
 
@@ -32,6 +33,20 @@ const errorMessage = computed<string | undefined>(() => {
   return undefined;
 });
 
+const { activeCampaign } = useAppConfig();
+
+// Campaign-aware hint: advertise the sitewide code while a campaign is running.
+const hint = computed<string>(() => {
+  const campaign = get(activeCampaign);
+  if (campaign) {
+    return t('home.plans.tiers.step_3.discount.campaign_hint', {
+      code: campaign.code,
+      percent: campaign.percent,
+    });
+  }
+  return t('home.plans.tiers.step_3.discount.hint');
+});
+
 function apply(): void {
   set(model, get(value));
   emit('apply');
@@ -60,7 +75,7 @@ watchImmediate(model, (modelValue: string) => {
       variant="outlined"
       :label="t('home.plans.tiers.step_3.discount.label')"
       :error-messages="errorMessage"
-      :hint="errorMessage ? undefined : t('home.plans.tiers.step_3.discount.hint')"
+      :hint="errorMessage ? undefined : hint"
       :disabled="disabled"
       prepend-icon="lu-tag"
     >

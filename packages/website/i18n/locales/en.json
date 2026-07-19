@@ -401,6 +401,10 @@
       }
     }
   },
+  "campaign": {
+    "ribbon": "Limited-time offer: {percent}% off your first payment with code {code}",
+    "ribbon_until": "- valid until {date}"
+  },
   "change_plan": {
     "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to switch the plan",
     "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
@@ -611,6 +615,8 @@
         "step_1": {
           "description": "Select the premium plan that best fits your needs",
           "notes": {
+            "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
+            "integrations_link": "Integrations page",
             "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
@@ -635,6 +641,7 @@
             "applied": "Discount code applied:",
             "referral_applied": "Referral code applied:",
             "apply_code": "Apply code",
+            "campaign_hint": "Campaign code {code} ({percent}% off) is applied automatically. You can enter a different code instead.",
             "first_payment_only": "* Applies to first payment only",
             "hint": "Optional: Enter a discount code to apply savings to your purchase.",
             "you_save": "You save {amount}€",
@@ -1055,7 +1062,9 @@
       }
     },
     "footer": {
-      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor."
+      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor.",
+      "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
+      "integrations_link": "Integrations page"
     },
     "heading": "Unlock the Full Potential of rotki with Premium Features",
     "title": "Upgrade rotki today",

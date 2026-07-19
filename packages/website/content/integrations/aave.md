@@ -15,6 +15,8 @@ features:
   - "GHO - Aave's stablecoin decoded with its own dedicated handling."
   - "Multi-chain - Aave v3 across Ethereum, Arbitrum, Optimism, Polygon, Base, Gnosis, Scroll, and BNB Chain."
   - "v2 → v3 migrations - transactions routed through Aave's migration helper on Ethereum and Polygon are decoded as migrations rather than separate v2 exits and v3 entries."
+limitations:
+  - "Aave v4 is not yet supported. rotki currently decodes v1, v2, and v3 activity."
 setup:
   - "In rotki, add your address under the chain where your Aave position lives (Blockchain & Accounts → Ethereum / Arbitrum / etc.)."
   - "rotki will detect your Aave positions automatically; no Aave-specific configuration needed."
@@ -24,6 +26,8 @@ faq:
     a: "No. rotki reads your activity from the RPC nodes you configure directly from your computer."
   - q: "Does rotki support both Aave v2 and v3?"
     a: "Yes. Both versions are decoded, including the v2 → v3 migration flows."
+  - q: "Is Aave v4 supported?"
+    a: "No, Aave v4 is not yet supported. rotki currently decodes Aave v1, v2, and v3 activity."
   - q: "Are Aave liquidations handled for tax purposes?"
     a: "Yes. The debt repayment and collateral seizure are decoded as paired liquidation events, so realised PnL flows into your tax report."
 screenshots: []
