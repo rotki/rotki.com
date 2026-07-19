@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/ipfs"
 )
@@ -53,6 +54,14 @@ type Config struct {
 	SponsorshipEnabled bool
 	Maintenance        bool
 	Testing            bool
+
+	// Sitewide discount campaign, exposed via /api/config while within its period.
+	// A campaign is configured when CampaignCode is non-empty; the start/end bounds
+	// are optional (zero value = unbounded).
+	CampaignCode    string
+	CampaignPercent int
+	CampaignStart   time.Time
+	CampaignEnd     time.Time
 }
 
 // Load reads configuration from environment variables with sensible defaults.
@@ -75,6 +84,21 @@ func Load() (*Config, error) {
 	ipfsGateways, err := ipfs.ParseGateways(envStr("IPFS_GATEWAYS", ""))
 	if err != nil {
 		return nil, fmt.Errorf("invalid IPFS_GATEWAYS: %w", err)
+	}
+
+	campaignPercent, err := envInt("CAMPAIGN_PERCENT", 0)
+	if err != nil {
+		return nil, fmt.Errorf("invalid CAMPAIGN_PERCENT: %w", err)
+	}
+
+	campaignStart, err := envTime("CAMPAIGN_START")
+	if err != nil {
+		return nil, fmt.Errorf("invalid CAMPAIGN_START: %w", err)
+	}
+
+	campaignEnd, err := envTime("CAMPAIGN_END")
+	if err != nil {
+		return nil, fmt.Errorf("invalid CAMPAIGN_END: %w", err)
 	}
 
 	cfg := &Config{
@@ -105,6 +129,11 @@ func Load() (*Config, error) {
 		SponsorshipEnabled: envBool("SPONSORSHIP_ENABLED", false),
 		Maintenance:        envBool("MAINTENANCE", false),
 		Testing:            envBool("TESTING", false),
+
+		CampaignCode:    envStr("CAMPAIGN_CODE", ""),
+		CampaignPercent: campaignPercent,
+		CampaignStart:   campaignStart,
+		CampaignEnd:     campaignEnd,
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -135,6 +164,15 @@ func (c *Config) validate() error {
 		return errors.New("NUXT_DEV_URL and STATIC_DIR are mutually exclusive in dev mode")
 	}
 
+	if c.CampaignCode != "" {
+		if c.CampaignPercent < 1 || c.CampaignPercent > 100 {
+			return fmt.Errorf("CAMPAIGN_PERCENT must be between 1 and 100 when CAMPAIGN_CODE is set, got %d", c.CampaignPercent)
+		}
+		if !c.CampaignStart.IsZero() && !c.CampaignEnd.IsZero() && c.CampaignEnd.Before(c.CampaignStart) {
+			return errors.New("CAMPAIGN_END must be after CAMPAIGN_START")
+		}
+	}
+
 	return nil
 }
 
@@ -151,6 +189,16 @@ func envStrOrDefault(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// envTime parses an RFC 3339 timestamp from the environment. An unset or empty
+// variable yields the zero time.
+func envTime(key string) (time.Time, error) {
+	v := os.Getenv(key)
+	if v == "" {
+		return time.Time{}, nil
+	}
+	return time.Parse(time.RFC3339, v)
 }
 
 func envInt(key string, fallback int) (int, error) {

@@ -4,10 +4,11 @@ import { type CheckoutPaymentMethod, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
+import { useAppConfig } from '~/composables/use-app-config';
 import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
 import CheckoutTitle from '~/modules/checkout/components/common/CheckoutTitle.vue';
 import PaymentMethodItem from '~/modules/checkout/components/method/PaymentMethodItem.vue';
-import { usePlanIdParam, useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
+import { useDiscountCodeParams, usePlanIdParam, useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';
 import { PaymentMethod } from '~/types/payment';
 import { assert } from '~/utils/assert';
@@ -41,6 +42,8 @@ const { authenticated } = storeToRefs(store);
 const router = useRouter();
 const { planId } = usePlanIdParam();
 const { referralCode } = useReferralCodeParam();
+const { discountCode } = useDiscountCodeParams();
+const { activeCampaign } = useAppConfig();
 
 const { chronicle } = useSigilEvents();
 
@@ -83,6 +86,8 @@ const queryParams = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
   const selectedPlanId = get(planId);
   const referral = get(referralCode);
+  // URL code wins over the campaign; forwarded so it survives the hop to the card SPA.
+  const code = get(discountCode) ?? get(activeCampaign)?.code;
 
   if (selectedPlanId) {
     result.planId = String(selectedPlanId);
@@ -94,6 +99,10 @@ const queryParams = computed<Record<string, string>>(() => {
 
   if (referral) {
     result.ref = referral;
+  }
+
+  if (code) {
+    result.discountCode = code;
   }
 
   return result;
@@ -121,6 +130,7 @@ function buildNavigationUrl(routeName: string): string {
 
 async function handleBack(): Promise<void> {
   const query = buildQueryParams({
+    discountCode: get(discountCode),
     planId: get(planId),
     ref: get(referralCode),
   });

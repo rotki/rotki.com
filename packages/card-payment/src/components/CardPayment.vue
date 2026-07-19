@@ -315,10 +315,15 @@ async function processPayment(): Promise<void> {
 }
 
 /** Prefill the discount code from the `ref` query param, unless one is already entered. */
-function prefillReferralDiscountCode(): void {
-  const referralCodeParam = new URLSearchParams(window.location.search).get('ref');
-  if (referralCodeParam && !get(discountCode)) {
-    set(discountCode, referralCodeParam);
+/**
+ * Prefills the explicit discountCode query param (forwarded by the website checkout, e.g.
+ * for sitewide campaigns), falling back to the referral code.
+ */
+function prefillDiscountCode(): void {
+  const params = new URLSearchParams(window.location.search);
+  const codeParam = params.get('discountCode') ?? params.get('ref');
+  if (codeParam && !get(discountCode)) {
+    set(discountCode, codeParam);
   }
 }
 
@@ -355,7 +360,7 @@ watch(() => cards, (newCards) => {
 });
 
 onMounted(async () => {
-  prefillReferralDiscountCode();
+  prefillDiscountCode();
   await initializeBraintreeClient();
 });
 

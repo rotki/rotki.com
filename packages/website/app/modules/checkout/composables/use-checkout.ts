@@ -6,6 +6,7 @@ import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
+import { useAppConfig } from '~/composables/use-app-config';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { logger } from '~/utils/use-logger';
@@ -50,6 +51,9 @@ export function useCheckout() {
   // Live ?ref query first, then the persisted cookie, so the code survives stripped navigation.
   const { referralCode } = useReferralCodeParam();
 
+  // Sitewide campaign discount served by /api/config, auto-applied as a fallback.
+  const { activeCampaign } = useAppConfig();
+
   // Crypto mode is derived from route (crypto pages) or currency in URL
   const isCrypto = computed<boolean>(() => {
     const routeName = getCurrentRoute().name?.toString() ?? '';
@@ -75,26 +79,26 @@ export function useCheckout() {
   }, { immediate: true });
 
   /**
-   * Whether the user dismissed the auto-applied referral discount. Kept in useState so it
-   * survives client-side navigation through checkout (the URL cannot carry it, since
-   * buildQueryParams strips empty values) and resets on a full reload.
+   * Whether the user dismissed an auto-applied discount (referral or campaign). Kept in
+   * useState so it survives client-side navigation through checkout (the URL cannot carry
+   * it, since buildQueryParams strips empty values) and resets on a full reload.
    */
-  const referralDismissed = useState<boolean>('checkout-referral-dismissed', () => false);
+  const autoDiscountDismissed = useState<boolean>('checkout-auto-discount-dismissed', () => false);
 
   /**
    * Applied discount code (source of truth). An explicit discountCode in the URL wins;
-   * otherwise the referral code is auto-applied as a discount (mirroring the card flow)
-   * unless the user dismissed it.
+   * otherwise the referral code (mirroring the card flow) and then the sitewide campaign
+   * code are auto-applied as a discount, unless the user dismissed the auto-apply.
    */
   const appliedDiscountCode = computed<string>(() => {
     const code = getCurrentRoute().query.discountCode;
     if (typeof code === 'string' && code)
       return code;
 
-    if (get(referralDismissed))
+    if (get(autoDiscountDismissed))
       return '';
 
-    return get(referralCode) ?? '';
+    return get(referralCode) ?? get(activeCampaign)?.code ?? '';
   });
 
   // Input value (for text field binding), seeded from the applied value.
@@ -141,8 +145,8 @@ export function useCheckout() {
 
   async function applyDiscount(): Promise<void> {
     const code = get(modelDiscountCode);
-    // An empty input clears the discount; remember it so the referral code isn't re-applied.
-    set(referralDismissed, !code);
+    // An empty input clears the discount; remember it so an auto-applied code isn't re-applied.
+    set(autoDiscountDismissed, !code);
     const currentRoute = getCurrentRoute();
     await navigateTo({
       path: currentRoute.path,
@@ -209,7 +213,7 @@ export function useCheckout() {
     set(planSwitchLoading, false);
     set(loading, false);
     set(error, undefined);
-    set(referralDismissed, false);
+    set(autoDiscountDismissed, false);
   }
 
   /**
