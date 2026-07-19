@@ -611,6 +611,8 @@
         "step_1": {
           "description": "Select the premium plan that best fits your needs",
           "notes": {
+            "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
+            "integrations_link": "Integrations page",
             "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
             "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
@@ -1055,7 +1057,9 @@
       }
     },
     "footer": {
-      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor."
+      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor.",
+      "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
+      "integrations_link": "Integrations page"
     },
     "heading": "Unlock the Full Potential of rotki with Premium Features",
     "title": "Upgrade rotki today",

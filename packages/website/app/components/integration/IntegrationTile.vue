@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { integrationSlug } from '~/utils/integration-slug';
+import { integrationQualifier, integrationSlug } from '~/utils/integration-slug';
 
 defineProps<{
   item: { label: string; image: string };
@@ -23,6 +23,12 @@ defineProps<{
     </div>
     <span class="text-xs text-rui-text-secondary text-center leading-tight line-clamp-2">
       {{ item.label }}
+    </span>
+    <span
+      v-if="integrationQualifier(item.label)"
+      class="text-[0.625rem] text-rui-text-disabled text-center leading-tight"
+    >
+      {{ integrationQualifier(item.label) }}
     </span>
   </NuxtLink>
 </template>

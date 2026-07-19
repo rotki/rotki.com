@@ -115,6 +115,22 @@ onMounted(() => {
           >
             {{ line }}
           </PricingFeatureItem>
+          <PricingFeatureItem>
+            <i18n-t
+              keypath="home.plans.tiers.step_1.notes.integrations"
+              scope="global"
+            >
+              <template #integrations>
+                <ButtonLink
+                  to="/integrations"
+                  inline
+                  color="primary"
+                >
+                  {{ t('home.plans.tiers.step_1.notes.integrations_link') }}
+                </ButtonLink>
+              </template>
+            </i18n-t>
+          </PricingFeatureItem>
         </div>
 
         <div
