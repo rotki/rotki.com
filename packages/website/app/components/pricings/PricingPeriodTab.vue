@@ -57,8 +57,8 @@ const tabs = [
     </RuiTabs>
 
     <div
+      v-if="maxSavedAnnually > 0"
       class="flex items-start gap-2 text-rui-primary font-medium whitespace-nowrap -mt-8 -ml-4 relative z-1"
-      :class="{ invisible: !maxSavedAnnually }"
     >
       <img
         :alt="t('pricing.max_saved_annually', { months: maxSavedAnnually })"
