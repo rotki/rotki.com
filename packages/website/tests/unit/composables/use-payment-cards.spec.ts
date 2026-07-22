@@ -82,6 +82,21 @@ describe('usePaymentCards', () => {
   });
 
   describe('addCard 400 handling', () => {
+    it('reports a payment-method failure when the card was added but payment processing failed', async () => {
+      mockFetchWithCsrf.mockRejectedValueOnce(
+        createFetchError(400, {
+          message: 'There was a problem while processing your payment. Please try again later or contact support.',
+        }),
+      );
+
+      const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
+      const { addCard } = usePaymentCards();
+
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
+        .rejects
+        .toThrow('home.account.payment_methods.errors.payment_method_failed');
+    });
+
     it('replaces the raw Braintree gateway dump with the friendly card-declined string', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(
         createFetchError(400, {

@@ -30,6 +30,16 @@ interface CardFailureInput {
   discountApplied?: boolean;
 }
 
+const PAYMENT_PROCESSING_ERROR = 'There was a problem while processing your payment. Please try again later or contact support.';
+const PAYMENT_METHOD_FAILED_MESSAGE = 'We couldn\'t process this payment method. Please try a different card or contact us at support@rotki.com if the problem continues.';
+
+export class CardAddedPaymentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CardAddedPaymentError';
+  }
+}
+
 export function trackCardPaymentSubmitted({ planId, durationInMonths, isUpgrade, cardType, discountApplied }: CardSubmittedInput): void {
   sigilTrack(SigilEvents.PAYMENT_SUBMITTED, toSnakeCaseKeys({
     paymentMethod: 'card',
@@ -94,12 +104,16 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       const backendMessage = extractErrorMessage(errorText);
-      // 400s on this endpoint are either schema/JSON-decode errors (programmer-side) or
-      // raw Braintree gateway dumps ("Do Not Honor" etc.) — replace with a friendly
-      // message; raw cause is kept in the console.error below for debugging.
+      // The generic payment-processing 400 is returned after Braintree has vaulted the
+      // card, so preserve that distinction for callers that need to refresh their cards.
+      // Other 400s are schema/JSON-decode errors or raw Braintree gateway dumps and use
+      // the existing friendly card-declined message.
       // 429 surfaces the backend's already-user-friendly rate-limit message verbatim.
       let message: string;
-      if (response.status === 400) {
+      if (response.status === 400 && backendMessage === PAYMENT_PROCESSING_ERROR) {
+        throw new CardAddedPaymentError(PAYMENT_METHOD_FAILED_MESSAGE);
+      }
+      else if (response.status === 400) {
         message = 'We couldn\'t add this card. Please double-check the details or try a different card.';
       }
       else if (response.status === 429) {
@@ -126,6 +140,9 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
   }
   catch (error: any) {
     console.error('Failed to add card:', error);
+    if (error instanceof CardAddedPaymentError) {
+      throw error;
+    }
     throw new Error(error.message || 'Failed to add card');
   }
 }

@@ -23,6 +23,8 @@ interface UsePaymentCardsReturn {
   setDefaultCard: (token: string) => Promise<void>;
 }
 
+const PAYMENT_PROCESSING_ERROR = 'There was a problem while processing your payment. Please try again later or contact support.';
+
 export function usePaymentCards(): UsePaymentCardsReturn {
   const logger = useLogger('card-payment');
   const { fetchWithCsrf } = useFetchWithCsrf();
@@ -35,11 +37,18 @@ export function usePaymentCards(): UsePaymentCardsReturn {
       : t('home.account.payment_methods.errors.rate_limited');
   }
 
+  function isCardAddedPaymentError(error: any): boolean {
+    return error?.statusCode === 400 && error?.data?.message === PAYMENT_PROCESSING_ERROR;
+  }
+
   function buildAddCardError(error: any): Error {
     const { statusCode, data, message } = error ?? {};
 
     if (statusCode === 429)
       return new Error(rateLimitMessage(data?.message ?? ''));
+
+    if (isCardAddedPaymentError(error))
+      return new Error(t('home.account.payment_methods.errors.payment_method_failed'));
 
     // 400s on this endpoint are either schema/JSON-decode errors (frontend bugs the user
     // can't act on) or Braintree gateway errors (raw "Do Not Honor"-style dumps that read
@@ -97,6 +106,9 @@ export function usePaymentCards(): UsePaymentCardsReturn {
     }
     catch (error: any) {
       logger.error(error);
+      if (isCardAddedPaymentError(error)) {
+        await refresh();
+      }
       throw buildAddCardError(error);
     }
   };
