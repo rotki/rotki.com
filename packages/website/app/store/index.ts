@@ -18,11 +18,17 @@ import { useLogger } from '~/utils/use-logger';
 
 const SESSION_TIMEOUT = 3600000;
 
+interface BraintreePaymentAvailabilityResponse {
+  enabled: boolean;
+}
+
 export const useMainStore = defineStore('main', () => {
   const authenticated = ref<boolean>(false);
   const account = ref<Account>();
+  const braintreePaymentEnabled = ref<boolean>(true);
   const canBuy = ref<boolean>(true);
   const hasCardPayment = ref<boolean>(false);
+  let braintreePaymentAvailabilityRequest: Promise<void> | undefined;
 
   const logger = useLogger('store');
   const { fetchWithCsrf, setHooks } = useFetchWithCsrf();
@@ -35,6 +41,34 @@ export const useMainStore = defineStore('main', () => {
   const authApi = useAuthApi();
   const { userSubscriptions, refresh: refreshSubscriptions } = useUserSubscriptions();
   const { onRefresh } = useAccountRefresh();
+
+  async function fetchBraintreePaymentAvailability(): Promise<void> {
+    if (braintreePaymentAvailabilityRequest) {
+      await braintreePaymentAvailabilityRequest;
+      return;
+    }
+
+    braintreePaymentAvailabilityRequest = (async (): Promise<void> => {
+      try {
+        const response = await fetchWithCsrf<BraintreePaymentAvailabilityResponse>(
+          '/webapi/2/braintree/payment/enabled',
+          { method: 'GET' },
+        );
+        set(braintreePaymentEnabled, response.enabled);
+      }
+      catch (error) {
+        logger.error('Failed to fetch Braintree payment availability:', error);
+        set(braintreePaymentEnabled, true);
+      }
+    })();
+
+    try {
+      await braintreePaymentAvailabilityRequest;
+    }
+    finally {
+      braintreePaymentAvailabilityRequest = undefined;
+    }
+  }
 
   const updateCanBuy = async (): Promise<void> => {
     const accountVal = get(account);
@@ -185,7 +219,9 @@ export const useMainStore = defineStore('main', () => {
   return {
     account,
     authenticated,
+    braintreePaymentEnabled: computed<boolean>(() => get(braintreePaymentEnabled)),
     canBuy: computed<boolean>(() => get(canBuy)),
+    fetchBraintreePaymentAvailability,
     getAccount,
     hasCardPayment: computed<boolean>(() => get(hasCardPayment)),
     login,

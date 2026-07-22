@@ -6,6 +6,7 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import PaymentMethodSelection from '~/modules/checkout/components/method/PaymentMethodSelection.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
+import { useMainStore } from '~/store';
 
 definePageMeta({
   auth: true,
@@ -17,6 +18,9 @@ definePageMeta({
 usePageSeoNoIndex('select payment method');
 
 const { subscriptionId } = useSubscriptionIdParam();
+const { fetchBraintreePaymentAvailability } = useMainStore();
+
+await fetchBraintreePaymentAvailability();
 
 // Track checkout start
 const { chronicle } = useSigilEvents();

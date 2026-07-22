@@ -623,7 +623,8 @@
         "step_2": {
           "description": "Select one of the different methods",
           "subtitle": "Please select one of the following payment methods.",
-          "title": "Payment Methods"
+          "title": "Payment Methods",
+          "unavailable": "Not available right now"
         },
         "step_3": {
           "change_payment": {

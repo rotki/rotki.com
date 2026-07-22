@@ -36,7 +36,7 @@ const selectedMethod = ref<PaymentMethod>();
 const processing = ref<boolean>(false);
 
 const store = useMainStore();
-const { authenticated } = storeToRefs(store);
+const { authenticated, braintreePaymentEnabled } = storeToRefs(store);
 
 const router = useRouter();
 const { planId } = usePlanIdParam();
@@ -79,6 +79,11 @@ const isMethodSelected = computed<(method: PaymentMethod) => boolean>(
   () => (method: PaymentMethod) => get(selectedMethod) === method,
 );
 
+const isMethodDisabled = computed<(method: PaymentMethod) => boolean>(
+  () => (method: PaymentMethod) =>
+    !get(braintreePaymentEnabled) && [PaymentMethod.CARD, PaymentMethod.PAYPAL].includes(method),
+);
+
 const queryParams = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
   const selectedPlanId = get(planId);
@@ -100,6 +105,9 @@ const queryParams = computed<Record<string, string>>(() => {
 });
 
 function selectPaymentMethod(method: PaymentMethod): void {
+  if (get(isMethodDisabled)(method))
+    return;
+
   set(selectedMethod, method);
 }
 
@@ -172,6 +180,12 @@ async function handleContinue(): Promise<void> {
     set(processing, false);
   }
 }
+
+watch(braintreePaymentEnabled, (enabled) => {
+  const method = get(selectedMethod);
+  if (!enabled && method !== undefined && get(isMethodDisabled)(method))
+    set(selectedMethod, undefined);
+});
 </script>
 
 <template>
@@ -185,6 +199,8 @@ async function handleContinue(): Promise<void> {
         <PaymentMethodItem
           v-for="item in paymentMethods"
           :key="item.id"
+          :disabled="isMethodDisabled(item.id)"
+          :disabled-label="t('home.plans.tiers.step_2.unavailable')"
           :selected="isMethodSelected(item.id)"
           :class="item.class"
           @click="selectPaymentMethod(item.id)"

@@ -34,10 +34,14 @@ export default defineNuxtPlugin(async () => {
   // this plugin and recurses until the render worker runs out of memory. Guarding
   // to the client both avoids that loop and matches where auth state actually lives.
   if (import.meta.client) {
+    const { fetchBraintreePaymentAvailability, getAccount } = useMainStore();
+    fetchBraintreePaymentAvailability().catch(error =>
+      logger.error('Failed to prefetch Braintree payment availability:', error),
+    );
+
     const authHint = useAuthHintCookie();
     if (get(authHint)) {
       logger.debug('auth hint found, fetching account');
-      const { getAccount } = useMainStore();
       await getAccount();
     }
   }
