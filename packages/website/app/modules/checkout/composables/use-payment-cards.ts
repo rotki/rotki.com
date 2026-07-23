@@ -23,7 +23,7 @@ interface UsePaymentCardsReturn {
   setDefaultCard: (token: string) => Promise<void>;
 }
 
-const PAYMENT_PROCESSING_ERROR = 'There was a problem while processing your payment. Please try again later or contact support.';
+const CARD_ADD_FAILED_CODE = 'card_add_failed';
 
 export function usePaymentCards(): UsePaymentCardsReturn {
   const logger = useLogger('card-payment');
@@ -38,7 +38,7 @@ export function usePaymentCards(): UsePaymentCardsReturn {
   }
 
   function isCardAddedPaymentError(error: any): boolean {
-    return error?.statusCode === 400 && error?.data?.message === PAYMENT_PROCESSING_ERROR;
+    return error?.statusCode === 400 && error?.data?.code === CARD_ADD_FAILED_CODE;
   }
 
   function buildAddCardError(error: any): Error {

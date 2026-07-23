@@ -75,14 +75,14 @@ const selectedPaymentMethod = computed<PaymentMethodEntry | undefined>(() =>
   paymentMethods.find(({ id }) => get(selectedMethod) === id),
 );
 
-const isMethodSelected = computed<(method: PaymentMethod) => boolean>(
-  () => (method: PaymentMethod) => get(selectedMethod) === method,
-);
+function isMethodSelected(method: PaymentMethod): boolean {
+  return get(selectedMethod) === method;
+}
 
-const isMethodDisabled = computed<(method: PaymentMethod) => boolean>(
-  () => (method: PaymentMethod) =>
-    !get(braintreePaymentEnabled) && [PaymentMethod.CARD, PaymentMethod.PAYPAL].includes(method),
-);
+function isMethodDisabled(method: PaymentMethod): boolean {
+  return !get(braintreePaymentEnabled)
+    && [PaymentMethod.CARD, PaymentMethod.PAYPAL].includes(method);
+}
 
 const queryParams = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
@@ -105,7 +105,7 @@ const queryParams = computed<Record<string, string>>(() => {
 });
 
 function selectPaymentMethod(method: PaymentMethod): void {
-  if (get(isMethodDisabled)(method))
+  if (isMethodDisabled(method))
     return;
 
   set(selectedMethod, method);
@@ -183,7 +183,7 @@ async function handleContinue(): Promise<void> {
 
 watch(braintreePaymentEnabled, (enabled) => {
   const method = get(selectedMethod);
-  if (!enabled && method !== undefined && get(isMethodDisabled)(method))
+  if (!enabled && method !== undefined && isMethodDisabled(method))
     set(selectedMethod, undefined);
 });
 </script>
