@@ -8,6 +8,7 @@ import {
 } from '@rotki/card-payment-common/schemas/payment';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { type CardType, type CheckoutStep, monthsToPlanDuration, type PaymentFailureKey, PaymentFailures, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { z } from 'zod';
 import { paths } from '@/config/paths';
 import { fetchWithCSRF } from './api';
 
@@ -28,6 +29,22 @@ interface CardFailureInput {
   errorCode?: string;
   cardType?: CardType;
   discountApplied?: boolean;
+}
+
+const BackendErrorSchema = z.object({
+  code: z.string().optional(),
+  message: z.string(),
+});
+const CARD_ADD_FAILED_CODE = 'card_add_failed';
+const PAYMENT_METHOD_FAILED_MESSAGE = 'We couldn\'t process this payment method. Please try a different card or contact us at support@rotki.com if the problem continues.';
+
+type BackendError = z.infer<typeof BackendErrorSchema>;
+
+export class CardAddedPaymentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CardAddedPaymentError';
+  }
 }
 
 export function trackCardPaymentSubmitted({ planId, durationInMonths, isUpgrade, cardType, discountApplied }: CardSubmittedInput): void {
@@ -74,14 +91,15 @@ export function trackCardPaymentFailure({ failure, errorMessage, planId, isUpgra
   }));
 }
 
-function extractErrorMessage(errorText: string): string {
+function extractBackendError(errorText: string): BackendError {
   try {
-    const parsed = JSON.parse(errorText);
-    if (parsed && typeof parsed.message === 'string')
-      return parsed.message;
+    const parsed: unknown = JSON.parse(errorText);
+    const result = BackendErrorSchema.safeParse(parsed);
+    if (result.success)
+      return result.data;
   }
   catch { /* JSON parse failed */ }
-  return errorText;
+  return { message: errorText };
 }
 
 export async function addCard(payload: AddCardPayload): Promise<string> {
@@ -93,20 +111,24 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      const backendMessage = extractErrorMessage(errorText);
-      // 400s on this endpoint are either schema/JSON-decode errors (programmer-side) or
-      // raw Braintree gateway dumps ("Do Not Honor" etc.) — replace with a friendly
-      // message; raw cause is kept in the console.error below for debugging.
+      const { code, message: backendMessage } = extractBackendError(errorText);
+      // The card_add_failed 400 is returned after Braintree has vaulted the
+      // card, so preserve that distinction for callers that need to refresh their cards.
+      // Other 400s are schema/JSON-decode errors or raw Braintree gateway dumps and use
+      // the existing friendly card-declined message.
       // 429 surfaces the backend's already-user-friendly rate-limit message verbatim.
       let message: string;
-      if (response.status === 400) {
+      if (response.status === 400 && code === CARD_ADD_FAILED_CODE) {
+        throw new CardAddedPaymentError(PAYMENT_METHOD_FAILED_MESSAGE);
+      }
+      else if (response.status === 400) {
         message = 'We couldn\'t add this card. Please double-check the details or try a different card.';
       }
       else if (response.status === 429) {
         message = backendMessage;
       }
       else {
-        message = `HTTP ${response.status}: ${backendMessage}`;
+        message = backendMessage;
       }
       throw new Error(message);
     }
@@ -126,6 +148,9 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
   }
   catch (error: any) {
     console.error('Failed to add card:', error);
+    if (error instanceof CardAddedPaymentError) {
+      throw error;
+    }
     throw new Error(error.message || 'Failed to add card');
   }
 }
@@ -139,7 +164,7 @@ export async function createCardNonce(payload: CreateCardNoncePayload): Promise<
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${extractErrorMessage(errorText)}`);
+      throw new Error(extractBackendError(errorText).message);
     }
 
     const data = await response.json();
@@ -170,7 +195,7 @@ export async function deleteCard(token: string): Promise<void> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${extractErrorMessage(errorText)}`);
+      throw new Error(extractBackendError(errorText).message);
     }
   }
   catch (error: any) {
@@ -190,7 +215,7 @@ export async function getSavedCard(): Promise<SavedCard[]> {
         return [];
       }
       const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${extractErrorMessage(errorText)}`);
+      throw new Error(extractBackendError(errorText).message);
     }
 
     const data = await response.json();

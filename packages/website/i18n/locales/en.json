@@ -488,6 +488,7 @@
         "crypto_subscription_no_card_operations": "Card operations are not available for cryptocurrency subscriptions",
         "errors": {
           "card_declined": "We couldn't add this card. Please double-check the details or try a different card.",
+          "payment_method_failed": "We couldn't process this payment method. Please try a different card or contact us at support{'@'}rotki.com if the problem continues.",
           "rate_limited": "Too many add-card attempts. Please wait a while before trying again.",
           "rate_limited_failures": "Too many failed card attempts. For your security, please wait a while before trying again."
         },
@@ -622,7 +623,8 @@
         "step_2": {
           "description": "Select one of the different methods",
           "subtitle": "Please select one of the following payment methods.",
-          "title": "Payment Methods"
+          "title": "Payment Methods",
+          "unavailable": "Not available right now"
         },
         "step_3": {
           "change_payment": {

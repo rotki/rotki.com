@@ -82,6 +82,37 @@ describe('usePaymentCards', () => {
   });
 
   describe('addCard 400 handling', () => {
+    it('reports a payment-method failure when the card was added but payment processing failed', async () => {
+      mockFetchWithCsrf.mockRejectedValueOnce(
+        createFetchError(400, {
+          code: 'card_add_failed',
+          message: 'Backend message wording can change without affecting error classification.',
+        }),
+      );
+
+      const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
+      const { addCard } = usePaymentCards();
+
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
+        .rejects
+        .toThrow('home.account.payment_methods.errors.payment_method_failed');
+    });
+
+    it('does not classify a failure from the backend message without the error code', async () => {
+      mockFetchWithCsrf.mockRejectedValueOnce(
+        createFetchError(400, {
+          message: 'There was a problem while processing your payment. Please try again later or contact support.',
+        }),
+      );
+
+      const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
+      const { addCard } = usePaymentCards();
+
+      await expect(addCard({ paymentMethodNonce: 'nonce' }))
+        .rejects
+        .toThrow('home.account.payment_methods.errors.card_declined');
+    });
+
     it('replaces the raw Braintree gateway dump with the friendly card-declined string', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(
         createFetchError(400, {

@@ -9,7 +9,7 @@ import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { paths } from '@/config/paths';
-import { addCard, createCardNonce, trackCardPaymentFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
+import { addCard, CardAddedPaymentError, createCardNonce, trackCardPaymentFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
 import DiscountCodeInput from './DiscountCodeInput.vue';
@@ -279,6 +279,9 @@ async function processPayment(): Promise<void> {
     emit('payment-success');
   }
   catch (error_: any) {
+    if (error_ instanceof CardAddedPaymentError) {
+      emit('refresh-card');
+    }
     set(transactionError, error_.message || 'Payment failed. Please try again.');
     set(isProcessing, false);
     trackCardPaymentFailure({
@@ -551,6 +554,7 @@ onUnmounted(async () => {
       v-model:open="showAddCardDialog"
       :client="client"
       @card-added="handleCardAdded($event)"
+      @refresh-card="emit('refresh-card')"
     />
   </div>
 </template>
