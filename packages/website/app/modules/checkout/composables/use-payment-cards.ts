@@ -24,6 +24,8 @@ interface UsePaymentCardsReturn {
   setDefaultCard: (token: string) => Promise<void>;
 }
 
+const CARD_ADD_FAILED_CODE = 'card_add_failed';
+
 export function usePaymentCards(): UsePaymentCardsReturn {
   const logger = useLogger('card-payment');
   const { fetchWithCsrf } = useFetchWithCsrf();
@@ -36,11 +38,18 @@ export function usePaymentCards(): UsePaymentCardsReturn {
       : t('home.account.payment_methods.errors.rate_limited');
   }
 
+  function isCardAddedPaymentError(error: any): boolean {
+    return error?.statusCode === 400 && error?.data?.code === CARD_ADD_FAILED_CODE;
+  }
+
   function buildAddCardError(error: any): Error {
     const { statusCode, data, message } = error ?? {};
 
     if (statusCode === 429)
       return new Error(rateLimitMessage(data?.message ?? ''));
+
+    if (isCardAddedPaymentError(error))
+      return new Error(t('home.account.payment_methods.errors.payment_method_failed'));
 
     /* 400s here are schema errors the user can't act on or raw Braintree gateway dumps
        ("Do Not Honor"), so show a friendly message; the raw cause stays in the logs. */
@@ -98,6 +107,9 @@ export function usePaymentCards(): UsePaymentCardsReturn {
     }
     catch (error: any) {
       logger.error(error);
+      if (isCardAddedPaymentError(error)) {
+        await refresh();
+      }
       throw buildAddCardError(error);
     }
   };
