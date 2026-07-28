@@ -1,5 +1,10 @@
 <script setup lang="ts">
-defineProps<{ statusCode: number }>();
+import ButtonLink from '~/components/common/ButtonLink.vue';
+
+// `linkHome` renders the call to action as a real anchor instead of a
+// click-handler button, so it still works on the statically served 404 body
+// where no JavaScript runs (see app/pages/not-found.vue).
+const { linkHome = false } = defineProps<{ statusCode: number; linkHome?: boolean }>();
 
 const emit = defineEmits<{ 'handle-error': [] }>();
 
@@ -24,7 +29,19 @@ const { t } = useI18n({ useScope: 'global' });
         {{ t('not_found.description.line_two') }}
       </p>
 
+      <ButtonLink
+        v-if="linkHome"
+        class="self-center lg:self-start"
+        to="/"
+        variant="default"
+        size="lg"
+        filled
+        color="primary"
+      >
+        {{ t('actions.go_back_home') }}
+      </ButtonLink>
       <RuiButton
+        v-else
         class="self-center lg:self-start"
         variant="default"
         size="lg"

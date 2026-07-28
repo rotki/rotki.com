@@ -26,6 +26,7 @@
     "test:e2e": "pnpm --filter @rotki/website test:e2e",
     "test:e2e:ui": "pnpm --filter @rotki/website test:e2e:ui",
     "coverage": "pnpm --filter @rotki/website coverage",
+    "check:routes": "node scripts/check-routes.mjs",
     "i18n:check": "node scripts/check-i18n.mjs",
     "i18n:clean": "node scripts/check-i18n.mjs --delete",
     "prepare": "husky",

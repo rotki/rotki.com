@@ -27,7 +27,7 @@ type Deps struct {
 }
 
 // New creates and configures the HTTP server with all routes and middleware.
-func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps) {
+func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps, error) {
 	// Create shared cache infrastructure
 	mem := cache.NewMemory()
 	red := cache.NewRedis(cfg.RedisHost, cfg.RedisPassword, logger)
@@ -73,7 +73,10 @@ func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps) {
 		mux.Handle("/", dev)
 		logger.Info("dev mode: proxying to Nuxt dev server", "url", cfg.NuxtDevURL)
 	} else {
-		static := newStaticHandler(cfg.StaticDir)
+		static, err := newStaticHandler(cfg.StaticDir)
+		if err != nil {
+			return nil, nil, fmt.Errorf("static handler: %w", err)
+		}
 		mux.Handle("/", static)
 	}
 
@@ -96,7 +99,7 @@ func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps) {
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      60 * time.Second,
 		IdleTimeout:       120 * time.Second,
-	}, deps
+	}, deps, nil
 }
 
 // handleHealth returns a JSON health check response with version info.

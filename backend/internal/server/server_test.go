@@ -234,12 +234,51 @@ func setupStaticDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 
+	// not-found/index.html (prerendered 404 body; a nested path, matching what
+	// the real manifest points at)
+	notFoundDir := filepath.Join(dir, "not-found")
+	if err := os.MkdirAll(notFoundDir, 0o755); err != nil { //nolint:gosec // G301: test temp dir, 0755 is fine
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(notFoundDir, "index.html"), []byte("<html>not-found</html>"), 0o644); err != nil { //nolint:gosec // G306: test fixture, 0644 is fine
+		t.Fatal(err)
+	}
+
+	// checkout/pay/card/index.html (nested standalone SPA)
+	cardDir := filepath.Join(dir, "checkout", "pay", "card")
+	if err := os.MkdirAll(cardDir, 0o755); err != nil { //nolint:gosec // G301: test temp dir, 0755 is fine
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(cardDir, "index.html"), []byte("<html>card-app</html>"), 0o644); err != nil { //nolint:gosec // G306: test fixture, 0644 is fine
+		t.Fatal(err)
+	}
+
+	// spa-routes.json, mirroring what the Nuxt build hook emits.
+	manifest := `{
+  "spaShell": "200.html",
+  "notFound": "not-found/index.html",
+  "spaRoutes": ["/home/**", "/login", "/oauth/**", "/activate/**", "/checkout/success"],
+  "nestedApps": [{"prefix": "/checkout/pay/card", "index": "checkout/pay/card/index.html"}]
+}`
+	if err := os.WriteFile(filepath.Join(dir, spaManifestFile), []byte(manifest), 0o644); err != nil { //nolint:gosec // G306: test fixture, 0644 is fine
+		t.Fatal(err)
+	}
+
 	return dir
+}
+
+func newTestStaticHandler(t *testing.T, dir string) *staticHandler {
+	t.Helper()
+	h, err := newStaticHandler(dir)
+	if err != nil {
+		t.Fatalf("newStaticHandler: %v", err)
+	}
+	return h
 }
 
 func TestStaticHandler_ServeRootIndex(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
@@ -255,7 +294,7 @@ func TestStaticHandler_ServeRootIndex(t *testing.T) {
 
 func TestStaticHandler_ServeHashedAsset(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/_nuxt/app.abc123.js", nil)
 	rec := httptest.NewRecorder()
@@ -272,7 +311,7 @@ func TestStaticHandler_ServeHashedAsset(t *testing.T) {
 
 func TestStaticHandler_SPAFallback(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	// /activate/uid123/token456 should fall back to 200.html (SPA shell)
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/activate/uid123/token456", nil)
@@ -287,26 +326,155 @@ func TestStaticHandler_SPAFallback(t *testing.T) {
 	}
 }
 
-func TestStaticHandler_RootFallback(t *testing.T) {
+// Unmatched extensionless paths must be a hard 404, not the SPA shell with 200.
+// A soft-404 is an SEO penalty and makes status-code-only vulnerability scanners
+// report phantom findings (e.g. CVE-1999-0610 against /webcart/).
+func TestStaticHandler_UnmatchedRouteHard404(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
-	// /unknown-page should fall back to 200.html (SPA shell)
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/unknown-page", nil)
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("expected 200 from SPA fallback, got %d", rec.Code)
+	paths := []string{
+		"/unknown-page",
+		"/webcart/",
+		"/webcart/orders/",
+		"/webcart/config/",
+		"/cgi-bin/",
+		"/scripts/",
+		"/cgi-bin/wsisa.dll/WService=wsbroker1/",
+		"/zzz-nonexistent/deeply/nested",
 	}
-	if body := rec.Body.String(); body != "<html>spa-shell</html>" {
-		t.Errorf("expected 200.html SPA shell content, got %q", body)
+
+	for _, p := range paths {
+		t.Run(p, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, p, nil)
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusNotFound {
+				t.Errorf("expected 404, got %d", rec.Code)
+			}
+			if body := rec.Body.String(); body != "<html>not-found</html>" {
+				t.Errorf("expected 404.html content, got %q", body)
+			}
+			if ct := rec.Header().Get("Content-Type"); !strings.HasPrefix(ct, "text/html") {
+				t.Errorf("Content-Type = %q, want text/html", ct)
+			}
+		})
+	}
+}
+
+// Routes Nuxt deliberately leaves unrendered still need the SPA shell at 200,
+// otherwise auth, OAuth callbacks and checkout break.
+func TestStaticHandler_ManifestRoutesServeShell(t *testing.T) {
+	dir := setupStaticDir(t)
+	h := newTestStaticHandler(t, dir)
+
+	paths := []string{
+		"/home/subscription",
+		"/home",
+		"/login",
+		"/oauth/callback",
+		"/checkout/success",
+	}
+
+	for _, p := range paths {
+		t.Run(p, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, p, nil)
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Errorf("expected 200, got %d", rec.Code)
+			}
+			if body := rec.Body.String(); body != "<html>spa-shell</html>" {
+				t.Errorf("expected SPA shell, got %q", body)
+			}
+		})
+	}
+}
+
+// The card-payment app owns its subtree, so deep links inside it must get that
+// app's own index.html rather than the Nuxt shell.
+func TestStaticHandler_NestedAppFallback(t *testing.T) {
+	dir := setupStaticDir(t)
+	h := newTestStaticHandler(t, dir)
+
+	for _, p := range []string{"/checkout/pay/card", "/checkout/pay/card/confirm"} {
+		t.Run(p, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, p, nil)
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Errorf("expected 200, got %d", rec.Code)
+			}
+			if body := rec.Body.String(); body != "<html>card-app</html>" {
+				t.Errorf("expected card app index, got %q", body)
+			}
+		})
+	}
+}
+
+// A missing or malformed manifest must fail startup. Falling back to
+// "serve the shell for everything" would silently restore the soft-404.
+func TestNewStaticHandler_ManifestRequired(t *testing.T) {
+	t.Run("missing", func(t *testing.T) {
+		dir := t.TempDir()
+		if _, err := newStaticHandler(dir); err == nil {
+			t.Fatal("expected error when spa-routes.json is absent")
+		}
+	})
+
+	t.Run("malformed", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, spaManifestFile), []byte("{not json"), 0o644); err != nil { //nolint:gosec // G306: test fixture, 0644 is fine
+			t.Fatal(err)
+		}
+		if _, err := newStaticHandler(dir); err == nil {
+			t.Fatal("expected error for malformed manifest")
+		}
+	})
+
+	t.Run("missing required fields", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, spaManifestFile), []byte(`{"spaRoutes":[]}`), 0o644); err != nil { //nolint:gosec // G306: test fixture, 0644 is fine
+			t.Fatal(err)
+		}
+		if _, err := newStaticHandler(dir); err == nil {
+			t.Fatal("expected error when spaShell/notFound are absent")
+		}
+	})
+}
+
+func TestMatchesRoute(t *testing.T) {
+	tests := []struct {
+		pattern string
+		path    string
+		want    bool
+	}{
+		{"/login", "/login", true},
+		{"/login", "/login/extra", false},
+		{"/login", "/logins", false},
+		{"/home/**", "/home", true},
+		{"/home/**", "/home/subscription", true},
+		{"/home/**", "/home/a/b/c", true},
+		{"/home/**", "/homepage", false},
+		{"/oauth/**", "/oauth/callback", true},
+		{"/oauth/**", "/webcart/", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.pattern+" vs "+tt.path, func(t *testing.T) {
+			if got := matchesRoute(tt.pattern, tt.path); got != tt.want {
+				t.Errorf("matchesRoute(%q, %q) = %v, want %v", tt.pattern, tt.path, got, tt.want)
+			}
+		})
 	}
 }
 
 func TestStaticHandler_MissingAsset404(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/missing.css", nil)
 	rec := httptest.NewRecorder()
@@ -317,9 +485,76 @@ func TestStaticHandler_MissingAsset404(t *testing.T) {
 	}
 }
 
+// Missing assets must NOT get the full 404 document. After a deploy, clients
+// re-request stale /_nuxt/<hash>.js chunks, and the HTML page is ~50 KB of
+// content they cannot parse.
+func TestStaticHandler_MissingAssetGetsBareBody(t *testing.T) {
+	dir := setupStaticDir(t)
+	h := newTestStaticHandler(t, dir)
+
+	for _, p := range []string{"/missing.css", "/_nuxt/stale.abc123.js", "/gone.txt"} {
+		t.Run(p, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, p, nil)
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusNotFound {
+				t.Errorf("expected 404, got %d", rec.Code)
+			}
+			if strings.Contains(rec.Body.String(), "not-found") {
+				t.Errorf("asset 404 served the full HTML page (%d bytes); want the bare body", rec.Body.Len())
+			}
+		})
+	}
+}
+
+// A manifest naming files that are not on disk must fail startup, otherwise
+// every client-only route silently hard-404s in production.
+func TestNewStaticHandler_ReferencedFilesMustExist(t *testing.T) {
+	write := func(t *testing.T, dir, name, content string) {
+		t.Helper()
+		full := filepath.Join(dir, name)
+		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec // G301: test temp dir, 0755 is fine
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(full, []byte(content), 0o644); err != nil { //nolint:gosec // G306: test fixture, 0644 is fine
+			t.Fatal(err)
+		}
+	}
+
+	manifest := `{
+  "spaShell": "200.html",
+  "notFound": "not-found/index.html",
+  "spaRoutes": ["/login"],
+  "nestedApps": [{"prefix": "/checkout/pay/card", "index": "checkout/pay/card/index.html"}]
+}`
+
+	tests := []struct {
+		name    string
+		present []string
+	}{
+		{"missing spaShell", []string{"not-found/index.html", "checkout/pay/card/index.html"}},
+		{"missing notFound", []string{"200.html", "checkout/pay/card/index.html"}},
+		{"missing nested app index", []string{"200.html", "not-found/index.html"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir := t.TempDir()
+			write(t, dir, spaManifestFile, manifest)
+			for _, f := range tt.present {
+				write(t, dir, f, "<html></html>")
+			}
+			if _, err := newStaticHandler(dir); err == nil {
+				t.Fatal("expected startup to fail when a manifest-referenced file is absent")
+			}
+		})
+	}
+}
+
 func TestStaticHandler_PathTraversalBlocked(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	// path.Clean normalizes /../ to /, so traversal via URL path is blocked
 	// by Go's http library. Verify that even if someone crafts a URL.Path
@@ -343,7 +578,7 @@ func TestStaticHandler_PathTraversalBlocked(t *testing.T) {
 
 func TestStaticHandler_MethodNotAllowed(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	for _, method := range []string{http.MethodPost, http.MethodPut, http.MethodDelete} {
 		req := httptest.NewRequestWithContext(context.Background(), method, "/", nil)
@@ -358,7 +593,7 @@ func TestStaticHandler_MethodNotAllowed(t *testing.T) {
 
 func TestStaticHandler_HeadMethod(t *testing.T) {
 	dir := setupStaticDir(t)
-	h := newStaticHandler(dir)
+	h := newTestStaticHandler(t, dir)
 
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodHead, "/", nil)
 	rec := httptest.NewRecorder()

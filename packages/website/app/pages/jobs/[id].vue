@@ -20,7 +20,10 @@ else {
     description: open ? description : t('jobs.role_unavailable.description', { title }),
   };
 
-  usePageSeo(meta.title, meta.description, path);
+  // Closed roles are prerendered so their URLs resolve (the static handler hard
+  // 404s anything not built), but they must not be indexed: surfacing a job
+  // page for a role nobody can apply to is worse than no result.
+  usePageSeo(meta.title, meta.description, path, { noIndex: !open });
 
   if (open) {
     useHead({

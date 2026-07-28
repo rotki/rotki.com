@@ -64,7 +64,11 @@ func main() {
 		"git_sha", version.GitSHA,
 	)
 
-	srv, deps := server.New(cfg, logger)
+	srv, deps, srvErr := server.New(cfg, logger)
+	if srvErr != nil {
+		logger.Error("failed to create server", "error", srvErr)
+		os.Exit(1)
+	}
 
 	// Start scheduled tasks
 	deps.Scheduler.Start(5 * time.Second)

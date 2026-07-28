@@ -4,7 +4,9 @@ import rotkiTheme from '@rotki/ui-library/theme';
 import { comparisonPrerenderRoutes } from './app/utils/comparison-prerender';
 import { featurePrerenderRoutes } from './app/utils/feature-prerender';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
+import { closedJobRoutes, jobsPrerenderRoutes } from './app/utils/jobs-prerender';
 import { llms } from './app/utils/llms-config';
+import { clientOnlyRouteRules, writeSpaManifest } from './app/utils/spa-routes';
 
 // Build identifier for unique chunk names per deployment
 const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
@@ -59,6 +61,7 @@ const nonIndexed = [
   '/checkout/pay/request-crypto',
   '/checkout/success',
   '/account-deleted',
+  '/not-found',
   '/sponsor/submit-name',
   '/md/',
   '/documents/',
@@ -199,26 +202,13 @@ export default defineNuxtConfig({
   routeRules: {
     // Redirect /pricing to /checkout/pay
     '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
-    // Client-only routes: `ssr: false` keeps them SPA in BOTH dev and build (so
-    // dev matches the production 200.html SPA fallback — no session/redirect is
-    // ever server-rendered). Reasons: auth, guest-only, tokens, OAuth, payment.
-    '/home/**': { ssr: false, prerender: false },
-    '/checkout/pay/method': { ssr: false, prerender: false },
-    '/checkout/pay/paypal': { ssr: false, prerender: false },
-    '/checkout/pay/crypto': { ssr: false, prerender: false },
-    '/checkout/pay/request-crypto': { ssr: false, prerender: false },
-    '/checkout/pay/3d-secure': { ssr: false, prerender: false },
-    // Payment confirmation — gated on a sessionStorage flag.
-    '/checkout/success': { ssr: false, prerender: false },
-    // Guest-only route (bakes in a redirect for authenticated users otherwise).
-    '/login': { ssr: false, prerender: false },
-    // OAuth callbacks — read window.location and sessionStorage (PKCE) at setup.
-    '/oauth/**': { ssr: false, prerender: false },
-    // Dynamic token routes + recover/send/changed forms (runtime backend state).
-    '/activate/**': { ssr: false, prerender: false },
-    '/password/**': { ssr: false, prerender: false },
-    // Web3-wallet utility page, noindex — no SEO value, so keep it client-only.
-    '/sponsor/submit-name': { ssr: false, prerender: false },
+    // The 404 body is served at whatever URL the visitor requested, so the Nuxt
+    // runtime must not boot on it: it would hydrate against a payload for
+    // /not-found, logging a mismatch and rewriting the address bar so the
+    // visitor loses the URL they asked for. `noScripts` omits the runtime at
+    // render time, which is why this page is prerendered but inert.
+    '/not-found': { noScripts: true },
+    ...clientOnlyRouteRules(),
   },
 
   future: {
@@ -249,7 +239,10 @@ export default defineNuxtConfig({
       crawlLinks: true,
       // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
       failOnError: true,
-      routes: [...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes()],
+      // `/not-found` is the statically rendered 404 body the Go handler serves.
+      // (`/200.html` and `/404.html` are added automatically by Nuxt's
+      // nitro-server for static presets, and are un-hydrated SPA shells.)
+      routes: ['/not-found', ...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes(), ...jobsPrerenderRoutes()],
     },
   },
 
@@ -317,6 +310,18 @@ export default defineNuxtConfig({
     },
   },
   hooks: {
+    // Emit the SPA fallback manifest the Go static handler reads at startup.
+    // Derived from `clientOnlyRoutes` so the backend can never drift from the
+    // routes Nuxt actually leaves unrendered. Without this file the handler
+    // refuses to start rather than silently serving 200 for every path.
+    //
+    // Hooked on `prerender:done` so the manifest is written against the
+    // finished output rather than at `rollup:before`, when nothing exists yet.
+    'nitro:init': (nitro) => {
+      nitro.hooks.hook('prerender:done', () => {
+        writeSpaManifest(nitro.options.output.publicDir);
+      });
+    },
     'build:manifest': (manifest) => {
       // Disable prefetch and modulepreload for all chunks except fonts
       // This prevents unnecessary network requests on initial page load
@@ -357,7 +362,9 @@ export default defineNuxtConfig({
   // llms.txt / llms-full.txt / raw markdown endpoint for AI crawlers (see llms.config.ts).
   llms,
 
-  sitemap: { exclude: nonIndexed },
+  // Closed roles are prerendered so their URLs resolve, but must not be
+  // advertised in the sitemap (they also carry noindex).
+  sitemap: { exclude: [...nonIndexed, ...closedJobRoutes()] },
 
   tailwindcss: {
     config: {

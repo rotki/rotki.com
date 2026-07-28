@@ -125,6 +125,12 @@ jobs:
       - name: Build 🚧
         run: pnpm run build
 
+      # The Go static handler hard-404s anything not prerendered or listed in
+      # spa-routes.json, so a route missing from the build is a user-visible 404
+      # rather than a silent client-side render. Must run after the build.
+      - name: Check every router route resolves 🧭
+        run: pnpm run check:routes
+
       - name: Run tests with coverage ✅
         run: pnpm run coverage
 
