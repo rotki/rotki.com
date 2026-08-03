@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/config"
+	"github.com/rotki/rotki.com/backend/internal/memlimit"
 	"github.com/rotki/rotki.com/backend/internal/server"
 	"github.com/rotki/rotki.com/backend/internal/version"
 )
@@ -63,6 +64,10 @@ func main() {
 		"version", version.Version,
 		"git_sha", version.GitSHA,
 	)
+
+	// Must run before the server starts taking traffic: the Go runtime does not
+	// derive a memory limit from the cgroup on its own.
+	memlimit.Apply(logger)
 
 	srv, deps, srvErr := server.New(cfg, logger)
 	if srvErr != nil {

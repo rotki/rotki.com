@@ -98,7 +98,13 @@ func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps, error) {
 		ReadHeaderTimeout: 10 * time.Second,
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      60 * time.Second,
-		IdleTimeout:       120 * time.Second,
+		// Every idle keep-alive connection holds a goroutine and its read and
+		// write buffers. Traffic that opens many short-lived connections would
+		// pin that state for two full minutes past its last request, which is
+		// far longer than any client here reuses a connection for. 30s still
+		// covers ordinary browsing, where a page and its assets arrive within
+		// a few seconds of each other.
+		IdleTimeout: 30 * time.Second,
 	}, deps, nil
 }
 
