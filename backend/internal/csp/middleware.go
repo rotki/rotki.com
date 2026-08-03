@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"net/http"
 	stdpath "path"
+	"strconv"
 	"strings"
+	"sync"
 )
 
 // maxBufferSize is the maximum HTML response size that will be buffered for
@@ -31,10 +33,16 @@ func Middleware(next http.Handler, devConnectSrc ...string) http.Handler {
 		}
 
 		// Buffer the response to inspect content-type and modify HTML
+		capture := getBuf()
+		defer putBuf(capture)
+
 		bw := &bufferedWriter{
 			ResponseWriter: w,
-			buf:            &bytes.Buffer{},
+			buf:            capture,
 			header:         w.Header().Clone(),
+			// A handler that writes nothing never reaches Write or WriteHeader,
+			// and WriteHeader(0) further down would be invalid.
+			statusCode: http.StatusOK,
 		}
 		next.ServeHTTP(bw, r)
 
@@ -52,7 +60,10 @@ func Middleware(next http.Handler, devConnectSrc ...string) http.Handler {
 
 		// Generate nonce and inject into HTML
 		nonce := GenerateNonce()
-		modified := injectNonce(body, nonce)
+
+		out := getBuf()
+		defer putBuf(out)
+		injectNonceTo(out, body, nonce)
 
 		// Determine CSP policy for this route
 		policy := DefaultCSP
@@ -91,7 +102,7 @@ func Middleware(next http.Handler, devConnectSrc ...string) http.Handler {
 		// Fix content-length for modified body
 		w.Header().Del("Content-Length")
 		w.WriteHeader(bw.statusCode)
-		_, _ = w.Write(modified)
+		_, _ = w.Write(out.Bytes())
 	})
 }
 
@@ -116,97 +127,106 @@ func shouldInjectCSP(path string) bool {
 	return true
 }
 
-// injectNonce adds nonce="..." attributes to <script> and
-// <link rel="modulepreload"> tags in the HTML body.
-func injectNonce(html []byte, nonce string) []byte {
-	nonceAttr := []byte(` nonce="` + nonce + `"`)
+var (
+	scriptTag       = []byte("<script")
+	linkTag         = []byte("<link")
+	modulePreload   = []byte("modulepreload")
+	nonceAttrMarker = []byte("nonce=")
+)
 
-	// Inject nonce into <script> tags (but not those that already have a nonce)
-	html = injectAttr(html, []byte("<script"), nonceAttr)
+// injectNonceTo writes html into dst, adding nonce="..." to every <script> and
+// every <link rel="modulepreload"> that does not already carry one.
+//
+// One pass. The previous implementation scanned and copied the whole document
+// twice, once per tag type, allocating a full-size buffer for each. On the ~47 KB
+// 404 page that was two redundant copies on every request.
+func injectNonceTo(dst *bytes.Buffer, html []byte, nonce string) {
+	dst.Grow(len(html) + 256)
 
-	// Inject nonce into <link rel="modulepreload"> tags
-	html = injectAttrFiltered(html, []byte("<link"), []byte("modulepreload"), nonceAttr)
-
-	return html
-}
-
-// injectAttr adds attrBytes after every occurrence of tagOpen in html,
-// unless the tag already contains "nonce=".
-func injectAttr(html, tagOpen, attrBytes []byte) []byte {
-	result := make([]byte, 0, len(html)+256)
-	remaining := html
+	nonceAttr := ` nonce="` + nonce + `"`
+	rest := html
 
 	for {
-		idx := bytes.Index(remaining, tagOpen)
+		idx := bytes.IndexByte(rest, '<')
 		if idx == -1 {
-			result = append(result, remaining...)
-			break
+			dst.Write(rest)
+			return
 		}
 
-		// Find end of opening tag
-		tagEnd := bytes.IndexByte(remaining[idx:], '>')
-		if tagEnd == -1 {
-			result = append(result, remaining...)
-			break
-		}
-		tagEnd += idx
+		tail := rest[idx:]
 
-		tag := remaining[idx : tagEnd+1]
+		var tagLen int
+		var requireModulePreload bool
 
-		// Skip if already has nonce
-		if bytes.Contains(tag, []byte("nonce=")) {
-			result = append(result, remaining[:tagEnd+1]...)
-			remaining = remaining[tagEnd+1:]
+		switch {
+		case bytes.HasPrefix(tail, scriptTag):
+			tagLen = len(scriptTag)
+		case bytes.HasPrefix(tail, linkTag):
+			tagLen = len(linkTag)
+			requireModulePreload = true
+		default:
+			// Not a tag we touch. Copy through this '<' and keep scanning.
+			dst.Write(rest[:idx+1])
+			rest = rest[idx+1:]
 			continue
 		}
 
-		// Insert nonce attribute right after the tag name
-		insertPos := idx + len(tagOpen)
-		result = append(result, remaining[:insertPos]...)
-		result = append(result, attrBytes...)
-		result = append(result, remaining[insertPos:tagEnd+1]...)
-		remaining = remaining[tagEnd+1:]
-	}
+		end := bytes.IndexByte(tail, '>')
+		if end == -1 {
+			// Unterminated tag: copy the remainder verbatim rather than guess.
+			dst.Write(rest)
+			return
+		}
 
-	return result
+		tag := tail[:end+1]
+		inject := !bytes.Contains(tag, nonceAttrMarker) &&
+			(!requireModulePreload || bytes.Contains(tag, modulePreload))
+
+		if inject {
+			dst.Write(rest[:idx+tagLen])
+			dst.WriteString(nonceAttr)
+			dst.Write(tail[tagLen : end+1])
+		} else {
+			dst.Write(rest[:idx+end+1])
+		}
+
+		rest = rest[idx+end+1:]
+	}
 }
 
-// injectAttrFiltered adds attrBytes after tagOpen occurrences that also
-// contain filterBytes in the tag body (e.g., <link ... modulepreload ...>).
-func injectAttrFiltered(html, tagOpen, filterBytes, attrBytes []byte) []byte {
-	result := make([]byte, 0, len(html)+256)
-	remaining := html
+// injectNonce is the allocating form, kept for tests. The middleware uses
+// injectNonceTo with a pooled buffer.
+func injectNonce(html []byte, nonce string) []byte {
+	var buf bytes.Buffer
+	injectNonceTo(&buf, html, nonce)
 
-	for {
-		idx := bytes.Index(remaining, tagOpen)
-		if idx == -1 {
-			result = append(result, remaining...)
-			break
-		}
+	return buf.Bytes()
+}
 
-		tagEnd := bytes.IndexByte(remaining[idx:], '>')
-		if tagEnd == -1 {
-			result = append(result, remaining...)
-			break
-		}
-		tagEnd += idx
+// bufPool reuses response buffers across requests. Capturing a ~47 KB page into
+// a zero-capacity bytes.Buffer grows it by doubling through roughly eleven
+// reallocations, which dominated the allocation cost of serving any HTML.
+var bufPool = sync.Pool{
+	New: func() any { return new(bytes.Buffer) },
+}
 
-		tag := remaining[idx : tagEnd+1]
-
-		// Only inject if filter matches and no existing nonce
-		if bytes.Contains(tag, filterBytes) && !bytes.Contains(tag, []byte("nonce=")) {
-			insertPos := idx + len(tagOpen)
-			result = append(result, remaining[:insertPos]...)
-			result = append(result, attrBytes...)
-			result = append(result, remaining[insertPos:tagEnd+1]...)
-		} else {
-			result = append(result, remaining[:tagEnd+1]...)
-		}
-
-		remaining = remaining[tagEnd+1:]
+func getBuf() *bytes.Buffer {
+	buf, ok := bufPool.Get().(*bytes.Buffer)
+	if !ok {
+		return new(bytes.Buffer)
 	}
+	buf.Reset()
 
-	return result
+	return buf
+}
+
+// putBuf returns a buffer to the pool, dropping any that grew past what we are
+// willing to hold, so a single large response cannot pin memory indefinitely.
+func putBuf(buf *bytes.Buffer) {
+	if buf.Cap() > maxBufferSize {
+		return
+	}
+	bufPool.Put(buf)
 }
 
 // bufferedWriter captures the response body and status code.
@@ -234,6 +254,16 @@ func (bw *bufferedWriter) Write(b []byte) (int, error) {
 		bw.statusCode = http.StatusOK
 		bw.wroteCode = true
 	}
+
+	// Size the buffer from Content-Length on the first write. ServeContent sets
+	// it before writing, so a pooled buffer that is still too small grows once
+	// here rather than by doubling on the way up.
+	if bw.buf.Len() == 0 {
+		if n, err := strconv.Atoi(bw.header.Get("Content-Length")); err == nil && n > 0 && n <= maxBufferSize {
+			bw.buf.Grow(n)
+		}
+	}
+
 	return bw.buf.Write(b)
 }
 
