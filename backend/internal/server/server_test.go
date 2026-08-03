@@ -347,6 +347,9 @@ func TestStaticHandler_UnmatchedRouteHard404(t *testing.T) {
 	for _, p := range paths {
 		t.Run(p, func(t *testing.T) {
 			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, p, nil)
+			// The full HTML page goes only to clients that asked for HTML.
+			// See TestStaticHandler_NonBrowser404GetsBareBody for the rest.
+			req.Header.Set("Accept", "text/html,application/xhtml+xml,*/*;q=0.8")
 			rec := httptest.NewRecorder()
 			h.ServeHTTP(rec, req)
 

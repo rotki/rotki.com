@@ -174,10 +174,43 @@ func (s *staticHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.serveNotFound(w, r)
 }
 
+// wantsHTML reports whether the client asked for an HTML representation.
+//
+// A browser navigating to a page always lists text/html in Accept. Automated
+// clients — scanners, uptime probes, `curl`, and `fetch()` — send `*/*` or omit
+// the header entirely, and none of them render the page they get back.
+func wantsHTML(r *http.Request) bool {
+	for _, accept := range r.Header.Values("Accept") {
+		for media := range strings.SplitSeq(accept, ",") {
+			// Drop parameters (";q=0.9", ";charset=...") and compare the type.
+			mediaType, _, _ := strings.Cut(media, ";")
+			switch strings.ToLower(strings.TrimSpace(mediaType)) {
+			case "text/html", "application/xhtml+xml":
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // serveNotFound writes the pre-rendered 404 page with a real 404 status.
 // http.ServeContent cannot be used here: it always writes 200 and negotiates
 // Range/If-Modified-Since, so the body is written directly instead.
+//
+// Clients that did not ask for HTML get the bare text body instead. The
+// pre-rendered page is ~47 KB and uncacheable, and it flows through the CSP
+// middleware, which buffers and rewrites it on every request. Sweeps of
+// nonexistent paths are almost entirely non-browser traffic, so answering them
+// with the full document turns a ~100 byte request into tens of kilobytes of
+// response plus a buffer, a scan and a compression pass, for a body nothing
+// will ever display. The status code is identical either way, so crawlers and
+// SEO are unaffected.
 func (s *staticHandler) serveNotFound(w http.ResponseWriter, r *http.Request) {
+	if !wantsHTML(r) {
+		http.NotFound(w, r)
+		return
+	}
+
 	// Content-Length is left to net/http: the CSP middleware rewrites this body
 	// to inject nonces, so a length set here would be stale.
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
