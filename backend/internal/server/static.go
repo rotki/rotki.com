@@ -134,6 +134,15 @@ func (s *staticHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The SPA manifest lands in the static root because that is where the build
+	// writes it, but it is a build artefact this handler reads from disk at
+	// startup. Nothing fetches it over HTTP, so publishing the client-only
+	// route list is surface area with no purpose.
+	if urlPath == "/"+spaManifestFile {
+		http.NotFound(w, r)
+		return
+	}
+
 	// Try to serve the exact file
 	filePath := filepath.Join(s.root, filepath.FromSlash(urlPath))
 
@@ -223,12 +232,25 @@ func (s *staticHandler) serveNotFound(w http.ResponseWriter, r *http.Request) {
 
 func (s *staticHandler) serveFile(w http.ResponseWriter, r *http.Request, filePath string, urlPath string) {
 	// Set cache headers based on path
-	if strings.HasPrefix(urlPath, "/_nuxt/") || strings.HasPrefix(urlPath, "/_fonts/") {
-		// Hashed assets: cache for 1 year
+	switch {
+	case strings.HasPrefix(urlPath, "/_nuxt/"), strings.HasPrefix(urlPath, "/_fonts/"):
+		// Content-hashed filenames, so a change always arrives under a new URL.
 		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
-	} else if strings.HasSuffix(filePath, ".html") {
+
+	case strings.HasSuffix(filePath, ".html"):
 		// HTML: no cache (allows nonce injection to work properly)
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+
+	default:
+		// Everything copied verbatim from public/: /img, favicons, manifests.
+		// These carry no Cache-Control at all today, so a browser revalidates
+		// them on every navigation even though they almost never change.
+		//
+		// Their filenames are stable rather than content-hashed, so "immutable"
+		// would strand a replaced asset in caches for a year. A short fresh
+		// window plus a long stale-while-revalidate keeps navigation request
+		// free while still letting a deploy propagate within the hour.
+		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400")
 	}
 
 	f, err := os.Open(filePath) //nolint:gosec // G304: path validated by ServeHTTP (rejects ".." paths)
