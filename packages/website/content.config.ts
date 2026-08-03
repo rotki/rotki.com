@@ -1,6 +1,7 @@
-import { defineCollection, defineContentConfig, z } from '@nuxt/content';
+import { defineCollection, defineContentConfig } from '@nuxt/content';
 import { defineRobotsSchema } from '@nuxtjs/robots/content';
 import { defineSitemapSchema } from '@nuxtjs/sitemap/content';
+import { z } from 'zod';
 import { comparisonSchema, featureSchema, integrationSchema } from './shared/content-schemas';
 
 const DOCUMENTS = 'content/documents/*.md';

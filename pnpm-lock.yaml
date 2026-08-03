@@ -244,8 +244,8 @@ catalogs:
       specifier: 3.3.1
       version: 3.3.1
     zod:
-      specifier: 3.25.76
-      version: 3.25.76
+      specifier: 4.4.3
+      version: 4.4.3
 
 overrides:
   chokidar: 5.0.0
@@ -331,7 +331,7 @@ importers:
         version: 3.5.34(typescript@6.0.3)
       zod:
         specifier: 'catalog:'
-        version: 3.25.76
+        version: 4.4.3
     devDependencies:
       '@rotki/ui-library':
         specifier: 'catalog:'
@@ -386,7 +386,7 @@ importers:
     dependencies:
       zod:
         specifier: 'catalog:'
-        version: 3.25.76
+        version: 4.4.3
     devDependencies:
       '@tsconfig/node24':
         specifier: 'catalog:'
@@ -426,10 +426,10 @@ importers:
     dependencies:
       '@coinbase/wallet-sdk':
         specifier: 'catalog:'
-        version: 4.3.7(typescript@6.0.3)(zod@3.25.76)
+        version: 4.3.7(typescript@6.0.3)(zod@4.4.3)
       '@nuxtjs/robots':
         specifier: 'catalog:'
-        version: 6.0.8(11316fd9590f06be44575c808b6d5380)
+        version: 6.0.8(16b4c65e3c74d070fcc9203f7f3b3f99)
       '@nuxtjs/tailwindcss':
         specifier: 'catalog:'
         version: 6.14.0(magicast@0.5.3)(yaml@2.9.0)
@@ -459,13 +459,13 @@ importers:
         version: 14.3.0(vue@3.5.34(typescript@6.0.3))
       '@wagmi/connectors':
         specifier: 'catalog:'
-        version: 8.0.15(@coinbase/wallet-sdk@4.3.7(typescript@6.0.3)(zod@3.25.76))(@wagmi/core@3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76)))(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76))
+        version: 8.0.15(@coinbase/wallet-sdk@4.3.7(typescript@6.0.3)(zod@4.4.3))(@wagmi/core@3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3)))(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3))
       '@wagmi/core':
         specifier: 'catalog:'
-        version: 3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76))
+        version: 3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3))
       '@walletconnect/universal-provider':
         specifier: 'catalog:'
-        version: 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)
+        version: 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)
       better-sqlite3:
         specifier: 'catalog:'
         version: 12.10.0
@@ -480,7 +480,7 @@ importers:
         version: 3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3))
       plainfp:
         specifier: 'catalog:'
-        version: 0.1.0(zod@3.25.76)
+        version: 0.1.0(zod@4.4.3)
       qrcode:
         specifier: 'catalog:'
         version: 1.5.4
@@ -489,7 +489,7 @@ importers:
         version: 12.1.4
       viem:
         specifier: 'catalog:'
-        version: 2.52.2(typescript@6.0.3)(zod@3.25.76)
+        version: 2.52.2(typescript@6.0.3)(zod@4.4.3)
       vue:
         specifier: 'catalog:'
         version: 3.5.34(typescript@6.0.3)
@@ -498,7 +498,7 @@ importers:
         version: 5.0.7(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))
       zod:
         specifier: 'catalog:'
-        version: 3.25.76
+        version: 4.4.3
     devDependencies:
       '@nuxt/content':
         specifier: 'catalog:'
@@ -517,7 +517,7 @@ importers:
         version: 10.4.0(@vue/compiler-dom@3.5.38)(db0@0.3.4(better-sqlite3@12.10.0))(eslint@10.4.1(jiti@2.7.0))(idb-keyval@6.2.5)(ioredis@5.11.1)(magicast@0.5.3)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(rollup@4.60.4)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(vue@3.5.34(typescript@6.0.3))
       '@nuxtjs/sitemap':
         specifier: 'catalog:'
-        version: 8.0.15(11316fd9590f06be44575c808b6d5380)
+        version: 8.0.15(16b4c65e3c74d070fcc9203f7f3b3f99)
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.60.0
@@ -6354,6 +6354,7 @@ packages:
   git-raw-commits@5.0.1:
     resolution: {integrity: sha512-Y+csSm2GD/PCSh6Isd/WiMjNAydu0VBiG9J7EdQsNA5P9uXvLayqjmTsNlK5Gs9IhblFZqOU0yid5Il5JPoLiQ==}
     engines: {node: '>=18'}
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   git-up@8.1.1:
@@ -10046,6 +10047,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+
   zustand@5.0.0:
     resolution: {integrity: sha512-LE+VcmbartOPM+auOjCCLQOsQ05zUTp8RkgwRzefUk+2jISdMMFnxvyTjA4YNWr5ZGXYbVsEMZosttuxUBkojQ==}
     engines: {node: '>=12.20.0'}
@@ -10395,13 +10399,13 @@ snapshots:
 
   '@cloudflare/kv-asset-handler@0.4.2': {}
 
-  '@coinbase/wallet-sdk@4.3.7(typescript@6.0.3)(zod@3.25.76)':
+  '@coinbase/wallet-sdk@4.3.7(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@noble/hashes': 1.8.0
       clsx: 1.2.1
       eventemitter3: 5.0.4
       preact: 10.24.2
-      viem: 2.52.2(typescript@6.0.3)(zod@3.25.76)
+      viem: 2.52.2(typescript@6.0.3)(zod@4.4.3)
     transitivePeerDependencies:
       - bufferutil
       - typescript
@@ -11775,7 +11779,7 @@ snapshots:
       - typescript
       - vite
 
-  '@nuxt/ui@4.8.2(@internationalized/date@3.12.2)(@internationalized/number@3.6.7)(@nuxt/content@3.14.0(better-sqlite3@12.10.0)(magicast@0.5.3))(@tiptap/extensions@3.26.1(@tiptap/core@3.26.1(@tiptap/pm@3.26.1))(@tiptap/pm@3.26.1))(@tiptap/y-tiptap@3.0.5(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(change-case@5.4.4)(db0@0.3.4(better-sqlite3@12.10.0))(embla-carousel@8.6.0)(idb-keyval@6.2.5)(ioredis@5.11.1)(magicast@0.5.3)(qrcode@1.5.4)(tailwindcss@4.3.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(vue-router@5.0.7(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))(yjs@13.6.31)(zod@3.25.76)':
+  '@nuxt/ui@4.8.2(@internationalized/date@3.12.2)(@internationalized/number@3.6.7)(@nuxt/content@3.14.0(better-sqlite3@12.10.0)(magicast@0.5.3))(@tiptap/extensions@3.26.1(@tiptap/core@3.26.1(@tiptap/pm@3.26.1))(@tiptap/pm@3.26.1))(@tiptap/y-tiptap@3.0.5(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(change-case@5.4.4)(db0@0.3.4(better-sqlite3@12.10.0))(embla-carousel@8.6.0)(idb-keyval@6.2.5)(ioredis@5.11.1)(magicast@0.5.3)(qrcode@1.5.4)(tailwindcss@4.3.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(vue-router@5.0.7(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))(yjs@13.6.31)(zod@4.4.3)':
     dependencies:
       '@floating-ui/dom': 1.7.6
       '@iconify/vue': 5.0.1(vue@3.5.34(typescript@6.0.3))
@@ -11846,7 +11850,7 @@ snapshots:
       '@internationalized/number': 3.6.7
       '@nuxt/content': 3.14.0(better-sqlite3@12.10.0)(magicast@0.5.3)
       vue-router: 5.0.7(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))
-      zod: 3.25.76
+      zod: 4.4.3
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12068,20 +12072,20 @@ snapshots:
       - magicast
       - supports-color
 
-  '@nuxtjs/robots@6.0.8(11316fd9590f06be44575c808b6d5380)':
+  '@nuxtjs/robots@6.0.8(16b4c65e3c74d070fcc9203f7f3b3f99)':
     dependencies:
       '@fingerprintjs/botd': 2.0.0
       '@nuxt/kit': 4.4.8(magicast@0.5.3)
       consola: 3.4.2
       defu: 6.1.7
       h3: 1.15.11
-      nuxt-site-config: 4.1.0(11316fd9590f06be44575c808b6d5380)
-      nuxtseo-shared: 5.3.0(c7c10266a867aec39f81af0b1d17105e)
+      nuxt-site-config: 4.1.0(16b4c65e3c74d070fcc9203f7f3b3f99)
+      nuxtseo-shared: 5.3.0(7daaa8a30b33461780b8ef5e92c405cc)
       pathe: 2.0.3
       pkg-types: 2.3.1
       ufo: 1.6.4
     optionalDependencies:
-      zod: 3.25.76
+      zod: 4.4.3
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12136,14 +12140,14 @@ snapshots:
       - yjs
       - yup
 
-  '@nuxtjs/sitemap@8.0.15(11316fd9590f06be44575c808b6d5380)':
+  '@nuxtjs/sitemap@8.0.15(16b4c65e3c74d070fcc9203f7f3b3f99)':
     dependencies:
       '@nuxt/kit': 4.4.8(magicast@0.5.3)
       consola: 3.4.2
       defu: 6.1.7
       fast-xml-parser: 5.8.0
-      nuxt-site-config: 4.1.0(11316fd9590f06be44575c808b6d5380)
-      nuxtseo-shared: 5.3.0(c7c10266a867aec39f81af0b1d17105e)
+      nuxt-site-config: 4.1.0(16b4c65e3c74d070fcc9203f7f3b3f99)
+      nuxtseo-shared: 5.3.0(7daaa8a30b33461780b8ef5e92c405cc)
       ofetch: 1.5.1
       pathe: 2.0.3
       pkg-types: 2.3.1
@@ -12151,7 +12155,7 @@ snapshots:
       ufo: 1.6.4
       ultrahtml: 1.6.0
     optionalDependencies:
-      zod: 3.25.76
+      zod: 4.4.3
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -14327,19 +14331,19 @@ snapshots:
     dependencies:
       vue: 3.5.34(typescript@6.0.3)
 
-  '@wagmi/connectors@8.0.15(@coinbase/wallet-sdk@4.3.7(typescript@6.0.3)(zod@3.25.76))(@wagmi/core@3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76)))(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76))':
+  '@wagmi/connectors@8.0.15(@coinbase/wallet-sdk@4.3.7(typescript@6.0.3)(zod@4.4.3))(@wagmi/core@3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3)))(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3))':
     dependencies:
-      '@wagmi/core': 3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76))
-      viem: 2.52.2(typescript@6.0.3)(zod@3.25.76)
+      '@wagmi/core': 3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3))
+      viem: 2.52.2(typescript@6.0.3)(zod@4.4.3)
     optionalDependencies:
-      '@coinbase/wallet-sdk': 4.3.7(typescript@6.0.3)(zod@3.25.76)
+      '@coinbase/wallet-sdk': 4.3.7(typescript@6.0.3)(zod@4.4.3)
       typescript: 6.0.3
 
-  '@wagmi/core@3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@3.25.76))':
+  '@wagmi/core@3.5.0(typescript@6.0.3)(viem@2.52.2(typescript@6.0.3)(zod@4.4.3))':
     dependencies:
       eventemitter3: 5.0.1
       mipd: 0.0.7(typescript@6.0.3)
-      viem: 2.52.2(typescript@6.0.3)(zod@3.25.76)
+      viem: 2.52.2(typescript@6.0.3)(zod@4.4.3)
       zustand: 5.0.0
     optionalDependencies:
       typescript: 6.0.3
@@ -14349,7 +14353,7 @@ snapshots:
       - react
       - use-sync-external-store
 
-  '@walletconnect/core@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)':
+  '@walletconnect/core@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-provider': 1.0.14
@@ -14363,7 +14367,7 @@ snapshots:
       '@walletconnect/safe-json': 1.0.2
       '@walletconnect/time': 1.0.2
       '@walletconnect/types': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
-      '@walletconnect/utils': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)
+      '@walletconnect/utils': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)
       '@walletconnect/window-getters': 1.0.1
       es-toolkit: 1.44.0
       events: 3.3.0
@@ -14490,16 +14494,16 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/sign-client@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)':
+  '@walletconnect/sign-client@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
-      '@walletconnect/core': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)
+      '@walletconnect/core': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)
       '@walletconnect/events': 1.0.1
       '@walletconnect/heartbeat': 1.2.2
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/logger': 3.0.2
       '@walletconnect/time': 1.0.2
       '@walletconnect/types': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
-      '@walletconnect/utils': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)
+      '@walletconnect/utils': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)
       events: 3.3.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -14559,7 +14563,7 @@ snapshots:
       - ioredis
       - uploadthing
 
-  '@walletconnect/universal-provider@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)':
+  '@walletconnect/universal-provider@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@walletconnect/events': 1.0.1
       '@walletconnect/jsonrpc-http-connection': 1.0.8
@@ -14568,9 +14572,9 @@ snapshots:
       '@walletconnect/jsonrpc-utils': 1.0.8
       '@walletconnect/keyvaluestorage': 1.1.1(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
       '@walletconnect/logger': 3.0.2
-      '@walletconnect/sign-client': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)
+      '@walletconnect/sign-client': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)
       '@walletconnect/types': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)
-      '@walletconnect/utils': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)
+      '@walletconnect/utils': 2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)
       es-toolkit: 1.44.0
       events: 3.3.0
     transitivePeerDependencies:
@@ -14599,7 +14603,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@walletconnect/utils@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@3.25.76)':
+  '@walletconnect/utils@2.23.9(db0@0.3.4(better-sqlite3@12.10.0))(ioredis@5.11.1)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@msgpack/msgpack': 3.1.3
       '@noble/ciphers': 1.3.0
@@ -14618,7 +14622,7 @@ snapshots:
       '@walletconnect/window-metadata': 1.0.1
       blakejs: 1.2.1
       detect-browser: 5.3.0
-      ox: 0.9.3(typescript@6.0.3)(zod@3.25.76)
+      ox: 0.9.3(typescript@6.0.3)(zod@4.4.3)
       uint8arrays: 3.1.1
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -14658,15 +14662,15 @@ snapshots:
 
   abbrev@3.0.1: {}
 
-  abitype@1.2.3(typescript@6.0.3)(zod@3.25.76):
+  abitype@1.2.3(typescript@6.0.3)(zod@4.4.3):
     optionalDependencies:
       typescript: 6.0.3
-      zod: 3.25.76
+      zod: 4.4.3
 
-  abitype@1.2.4(typescript@6.0.3)(zod@3.25.76):
+  abitype@1.2.4(typescript@6.0.3)(zod@4.4.3):
     optionalDependencies:
       typescript: 6.0.3
-      zod: 3.25.76
+      zod: 4.4.3
 
   abort-controller@3.0.0:
     dependencies:
@@ -18037,14 +18041,14 @@ snapshots:
       - magicast
       - vue
 
-  nuxt-site-config@4.1.0(11316fd9590f06be44575c808b6d5380):
+  nuxt-site-config@4.1.0(16b4c65e3c74d070fcc9203f7f3b3f99):
     dependencies:
       '@nuxt/devalue': 2.0.2
       '@nuxt/kit': 4.4.8(magicast@0.5.3)
       h3: 1.15.11
       nuxt-site-config-kit: 4.1.0(magicast@0.5.3)(vue@3.5.34(typescript@6.0.3))
-      nuxtseo-layer-devtools: 5.3.0(f7b4c5f08325837305aeb4ad31656b91)
-      nuxtseo-shared: 5.3.0(c7c10266a867aec39f81af0b1d17105e)
+      nuxtseo-layer-devtools: 5.3.0(c91db9590440118ec789c006ec86a26d)
+      nuxtseo-shared: 5.3.0(7daaa8a30b33461780b8ef5e92c405cc)
       pathe: 2.0.3
       pkg-types: 2.3.1
       site-config-stack: 4.1.0(vue@3.5.34(typescript@6.0.3))
@@ -18232,17 +18236,17 @@ snapshots:
       - xml2js
       - yaml
 
-  nuxtseo-layer-devtools@5.3.0(f7b4c5f08325837305aeb4ad31656b91):
+  nuxtseo-layer-devtools@5.3.0(c91db9590440118ec789c006ec86a26d):
     dependencies:
       '@iconify-json/carbon': 1.2.23
       '@nuxt/devtools-kit': 4.0.0-alpha.3(magicast@0.5.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))
       '@nuxt/kit': 4.4.8(magicast@0.5.3)
-      '@nuxt/ui': 4.8.2(@internationalized/date@3.12.2)(@internationalized/number@3.6.7)(@nuxt/content@3.14.0(better-sqlite3@12.10.0)(magicast@0.5.3))(@tiptap/extensions@3.26.1(@tiptap/core@3.26.1(@tiptap/pm@3.26.1))(@tiptap/pm@3.26.1))(@tiptap/y-tiptap@3.0.5(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(change-case@5.4.4)(db0@0.3.4(better-sqlite3@12.10.0))(embla-carousel@8.6.0)(idb-keyval@6.2.5)(ioredis@5.11.1)(magicast@0.5.3)(qrcode@1.5.4)(tailwindcss@4.3.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(vue-router@5.0.7(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))(yjs@13.6.31)(zod@3.25.76)
+      '@nuxt/ui': 4.8.2(@internationalized/date@3.12.2)(@internationalized/number@3.6.7)(@nuxt/content@3.14.0(better-sqlite3@12.10.0)(magicast@0.5.3))(@tiptap/extensions@3.26.1(@tiptap/core@3.26.1(@tiptap/pm@3.26.1))(@tiptap/pm@3.26.1))(@tiptap/y-tiptap@3.0.5(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(change-case@5.4.4)(db0@0.3.4(better-sqlite3@12.10.0))(embla-carousel@8.6.0)(idb-keyval@6.2.5)(ioredis@5.11.1)(magicast@0.5.3)(qrcode@1.5.4)(tailwindcss@4.3.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(vue-router@5.0.7(@vue/compiler-sfc@3.5.38)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3)))(vue@3.5.34(typescript@6.0.3))(yjs@13.6.31)(zod@4.4.3)
       '@shikijs/langs': 4.2.0
       '@shikijs/themes': 4.2.0
       '@vueuse/core': 14.3.0(vue@3.5.34(typescript@6.0.3))
       '@vueuse/nuxt': 14.3.0(magicast@0.5.3)(nuxt@4.4.7(@babel/plugin-proposal-decorators@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@parcel/watcher@2.5.6)(@types/node@25.9.3)(@vue/compiler-sfc@3.5.38)(better-sqlite3@12.10.0)(cac@6.7.14)(db0@0.3.4(better-sqlite3@12.10.0))(eslint@10.4.1(jiti@2.7.0))(idb-keyval@6.2.5)(ioredis@5.11.1)(lightningcss@1.32.0)(magicast@0.5.3)(meow@14.1.0)(optionator@0.9.4)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)))(rolldown@1.1.1)(rollup-plugin-visualizer@7.0.1(rolldown@1.1.1)(rollup@4.60.4))(rollup@4.60.4)(stylelint@17.13.0(typescript@6.0.3))(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(vue-tsc@3.3.1(typescript@6.0.3))(yaml@2.9.0))(vue@3.5.34(typescript@6.0.3))
-      nuxtseo-shared: 5.3.0(c7c10266a867aec39f81af0b1d17105e)
+      nuxtseo-shared: 5.3.0(7daaa8a30b33461780b8ef5e92c405cc)
       ofetch: 1.5.1
       shiki: 4.2.0
       tailwindcss: 4.3.0
@@ -18303,7 +18307,7 @@ snapshots:
       - yup
       - zod
 
-  nuxtseo-shared@5.3.0(c7c10266a867aec39f81af0b1d17105e):
+  nuxtseo-shared@5.3.0(7daaa8a30b33461780b8ef5e92c405cc):
     dependencies:
       '@clack/prompts': 1.5.1
       '@nuxt/devtools-kit': 4.0.0-alpha.3(magicast@0.5.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))
@@ -18323,8 +18327,8 @@ snapshots:
       ufo: 1.6.4
       vue: 3.5.34(typescript@6.0.3)
     optionalDependencies:
-      nuxt-site-config: 4.1.0(11316fd9590f06be44575c808b6d5380)
-      zod: 3.25.76
+      nuxt-site-config: 4.1.0(16b4c65e3c74d070fcc9203f7f3b3f99)
+      zod: 4.4.3
     transitivePeerDependencies:
       - magicast
       - vite
@@ -18408,7 +18412,7 @@ snapshots:
 
   outvariant@1.4.3: {}
 
-  ox@0.14.29(typescript@6.0.3)(zod@3.25.76):
+  ox@0.14.29(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
       '@noble/ciphers': 1.3.0
@@ -18416,14 +18420,14 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.4(typescript@6.0.3)(zod@3.25.76)
+      abitype: 1.2.4(typescript@6.0.3)(zod@4.4.3)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
       - zod
 
-  ox@0.9.3(typescript@6.0.3)(zod@3.25.76):
+  ox@0.9.3(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
       '@noble/ciphers': 1.3.0
@@ -18431,7 +18435,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.4(typescript@6.0.3)(zod@3.25.76)
+      abitype: 1.2.4(typescript@6.0.3)(zod@4.4.3)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 6.0.3
@@ -18761,9 +18765,9 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
-  plainfp@0.1.0(zod@3.25.76):
+  plainfp@0.1.0(zod@4.4.3):
     optionalDependencies:
-      zod: 3.25.76
+      zod: 4.4.3
 
   playwright-core@1.60.0: {}
 
@@ -20551,15 +20555,15 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  viem@2.52.2(typescript@6.0.3)(zod@3.25.76):
+  viem@2.52.2(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@6.0.3)(zod@3.25.76)
+      abitype: 1.2.3(typescript@6.0.3)(zod@4.4.3)
       isows: 1.0.7(ws@8.20.1)
-      ox: 0.14.29(typescript@6.0.3)(zod@3.25.76)
+      ox: 0.14.29(typescript@6.0.3)(zod@4.4.3)
       ws: 8.20.1
     optionalDependencies:
       typescript: 6.0.3
@@ -21223,6 +21227,8 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zod@4.4.3: {}
 
   zustand@5.0.0: {}
 

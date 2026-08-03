@@ -17,7 +17,7 @@ export type Result<T, Code = undefined> = ResultError<Code> | ResultSuccess<T>;
 
 const StringArray = z.array(z.string());
 
-export const ApiError = z.union([z.string(), z.record(StringArray)]);
+export const ApiError = z.union([z.string(), z.record(z.string(), StringArray)]);
 
 export type ApiError = z.infer<typeof ApiError>;
 
@@ -200,7 +200,7 @@ export const PaymentAsset = z.object({
   symbol: z.string(),
 });
 
-export const PaymentAssetResponse = z.record(z.record(PaymentAsset));
+export const PaymentAssetResponse = z.record(z.string(), z.record(z.string(), PaymentAsset));
 
 export type PaymentAssetResponse = z.infer<typeof PaymentAssetResponse>;
 

@@ -1,4 +1,4 @@
-import type { SafeParseError } from 'zod';
+import type { ZodSafeParseError } from 'zod';
 import type { Result } from '~/types';
 import type { ActionResult } from '~/types/common';
 import type { useLogger } from '~/utils/use-logger';
@@ -96,7 +96,7 @@ export function createSimpleErrorResult(error: any): Result<any> {
  * Log safeParse failure and return fallback value
  */
 export function logParseFailure<T>(
-  parseResult: SafeParseError<any>,
+  parseResult: ZodSafeParseError<any>,
   logger: ReturnType<typeof useLogger>,
   context: string,
   rawData: any,
@@ -104,7 +104,7 @@ export function logParseFailure<T>(
 ): T {
   logger.error(`Failed to parse ${context}:`, {
     rawData,
-    zodErrors: parseResult.error.errors,
+    zodErrors: parseResult.error.issues,
   });
   return fallback;
 }

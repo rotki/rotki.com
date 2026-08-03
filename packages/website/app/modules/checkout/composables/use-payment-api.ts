@@ -77,7 +77,7 @@ export function usePaymentApi() {
       if (!parsed.success) {
         logger.error('Failed to parse payment response:', {
           rawData: response,
-          zodErrors: parsed.error.errors,
+          zodErrors: parsed.error.issues,
         });
         return {
           error: new Error('Invalid payment response format'),
