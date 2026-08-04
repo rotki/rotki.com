@@ -26,6 +26,11 @@ packages:
 
 overrides:
   chokidar: 5.0.0
+  # stylelint-order 8.1.1 (newest) declares `postcss: ^8.5.8`, and pnpm will not
+  # re-resolve a range that is already satisfied, so it pinned a second, vulnerable
+  # copy at 8.5.15 that kept GHSA-r28c-9q8g-f849 and GHSA-fxqj-rqcc-2cmp open.
+  # Force a single copy until stylelint-order widens or we drop it.
+  postcss: 8.5.24
 
 allowBuilds:
   '@parcel/watcher': true
@@ -65,7 +70,7 @@ catalog:
   '@types/node': 24.13.3
   '@types/paypal-checkout-components': 4.0.8
   '@types/qrcode': 1.5.6
-  '@unhead/vue': 2.1.15
+  '@unhead/vue': 2.1.16
   '@vitejs/plugin-vue': 6.0.8
   '@vitest/coverage-v8': 4.1.10
   '@vue/test-utils': 2.4.11
@@ -96,7 +101,7 @@ catalog:
   nuxt-llms: 0.2.0
   pinia: 3.0.4
   plainfp: 0.1.1
-  postcss: 8.5.23
+  postcss: 8.5.24
   postcss-html: 1.8.1
   postcss-import: 16.1.1
   qrcode: 1.5.4
