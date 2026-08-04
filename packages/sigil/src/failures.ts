@@ -110,14 +110,14 @@ export function classifyCryptoTxError(error: unknown): PaymentFailureKey {
  * See braintree-web `three-d-secure/external/frameworks/songbird.js`: `code`
  * is Cardinal's numeric `ErrorNumber`, `description` its `ErrorDescription`.
  */
-const cardinalOriginalErrorSchema = z.object({
+const CardinalOriginalErrorSchema = z.object({
   code: z.union([z.string(), z.number()]).optional().catch(undefined),
   description: z.string().optional().catch(undefined),
 });
 
 /** A nested `Error`-like rejection, e.g. the gateway request failure that
  * `_performJWTValidation` wraps into `details.originalError`. */
-const nestedErrorSchema = z.object({
+const NestedErrorSchema = z.object({
   message: z.string().optional().catch(undefined),
 });
 
@@ -127,7 +127,7 @@ const nestedErrorSchema = z.object({
  * dependency. `details.originalError` stays `unknown`: it is narrowed
  * separately, since its shape depends on which layer failed.
  */
-const braintreeErrorSchema = z.object({
+const BraintreeErrorSchema = z.object({
   code: z.string().optional().catch(undefined),
   type: z.string().optional().catch(undefined),
   message: z.string().optional().catch(undefined),
@@ -224,7 +224,7 @@ export function paymentErrorCopy({ message, code, audience }: ParsedPaymentError
  * the number here is the only thing that identifies the actual failure.
  */
 function describeCardinalError(original: unknown): string | undefined {
-  const cardinal = cardinalOriginalErrorSchema.safeParse(original);
+  const cardinal = CardinalOriginalErrorSchema.safeParse(original);
   if (!cardinal.success)
     return undefined;
 
@@ -251,7 +251,7 @@ function describeOriginalError(original: unknown): string | undefined {
   if (cardinal)
     return cardinal;
 
-  const nested = nestedErrorSchema.safeParse(original);
+  const nested = NestedErrorSchema.safeParse(original);
   return nested.success ? nested.data.message : undefined;
 }
 
@@ -273,7 +273,7 @@ export function parseBraintreeError(error: unknown): ParsedPaymentError {
     return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
   }
 
-  const parsed = braintreeErrorSchema.safeParse(error);
+  const parsed = BraintreeErrorSchema.safeParse(error);
   if (!parsed.success) {
     const message = String(error);
     return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
