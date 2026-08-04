@@ -9,7 +9,7 @@ import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { paths } from '@/config/paths';
-import { addCard, createCardNonce, trackCardPaymentFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
+import { addCard, createCardNonce, reportCardFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
 import DiscountCodeInput from './DiscountCodeInput.vue';
@@ -134,16 +134,14 @@ async function initializeBraintreeClient(): Promise<void> {
     });
     set(client, clientInstance);
   }
-  catch (error_: any) {
-    emit('fatal-error', `Failed to initialize payment client: ${error_.message}`);
+  catch (error_: unknown) {
     console.error(error_);
-    trackCardPaymentFailure({
+    emit('fatal-error', reportCardFailure(error_, {
       failure: 'BRAINTREE_INIT_FAILED',
-      errorMessage: error_?.message ?? String(error_),
       planId: selectedPlan.planId,
       isUpgrade: !!upgradeSubId,
       step: 'init',
-    });
+    }));
   }
 }
 
@@ -278,19 +276,16 @@ async function processPayment(): Promise<void> {
     sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
     emit('payment-success');
   }
-  catch (error_: any) {
-    set(transactionError, error_.message || 'Payment failed. Please try again.');
-    set(isProcessing, false);
-    trackCardPaymentFailure({
+  catch (error_: unknown) {
+    set(transactionError, reportCardFailure(error_, {
       failure: 'CARD_PAYMENT_API_ERROR',
-      errorMessage: error_?.message ?? String(error_),
-      errorCode: error_?.code ? String(error_.code) : undefined,
       planId: selectedPlan.planId,
       isUpgrade: !!upgradeSubId,
       step: 'submit',
       cardType,
       discountApplied,
-    });
+    }));
+    set(isProcessing, false);
   }
 }
 

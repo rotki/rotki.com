@@ -12,6 +12,7 @@ import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { PaymentError } from '~/types/codes';
@@ -37,6 +38,7 @@ interface UseThreeDSecureReturn {
 export function useThreeDSecure(): UseThreeDSecureReturn {
   const logger = useLogger('three-d-secure');
   const { logPaymentEvent } = usePaymentLogger();
+  const { userMessageFor } = usePaymentErrorMessage();
   const { chronicle } = useSigilEvents();
 
   const state = shallowRef<ThreeDSecureState>('initializing');
@@ -110,16 +112,15 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       logger.info('3D Secure initialized successfully');
     }
     catch (initError: unknown) {
-      const { message, logMessage, code } = parseBraintreeError(initError);
-      const errorMsg = `Initialization failed: ${message}`;
-      set(error, errorMsg);
+      const parsed = parseBraintreeError(initError);
+      set(error, userMessageFor(parsed));
       set(state, 'error');
-      logger.error(errorMsg, initError);
+      logger.error(`Initialization failed: ${parsed.message}`, initError);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
-        errorMessage: `Initialization failed: ${logMessage}`,
-        errorCode: code,
+        errorMessage: `Initialization failed: ${parsed.logMessage}`,
+        errorCode: parsed.code,
         step: CheckoutSteps.INIT,
         planId: params.planId,
         isUpgrade: !!params.upgradeSubId,
@@ -226,15 +227,15 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     catch (verifyError: unknown) {
       set(challengeVisible, false);
       set(state, 'error');
-      const { message, logMessage, code } = parseBraintreeError(verifyError);
+      const parsed = parseBraintreeError(verifyError);
 
-      set(error, message);
+      set(error, userMessageFor(parsed));
       logger.error('3D Secure verification error:', verifyError);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
-        errorMessage: logMessage,
-        errorCode: code,
+        errorMessage: parsed.logMessage,
+        errorCode: parsed.code,
         step: CheckoutSteps.VERIFY,
         planId: params.planId,
         isUpgrade: !!params.upgradeSubId,

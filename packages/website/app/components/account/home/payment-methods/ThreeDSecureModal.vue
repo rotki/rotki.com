@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
+import { parseBraintreeError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useCardThreeDSecure } from '~/modules/checkout/composables/use-card-three-d-secure';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { formatDate } from '~/utils/date';
 import { formatCurrency } from '~/utils/text';
 
@@ -29,6 +31,7 @@ const challengeShown = ref<boolean>(false);
 const errorMessage = ref<string>();
 
 const { verifyAndSetDefaultCard, teardown } = useCardThreeDSecure();
+const { userMessageFor } = usePaymentErrorMessage();
 
 const billingPeriod = computed<string>(() => {
   const { durationInMonths } = verificationData.subscriptionData;
@@ -76,8 +79,7 @@ async function startVerification(): Promise<void> {
     close();
   }
   catch (error: unknown) {
-    const message = error instanceof Error ? error.message : t('common.error_occurred');
-    set(errorMessage, message);
+    set(errorMessage, userMessageFor(parseBraintreeError(error)));
     emit('error', error instanceof Error ? error : new Error(String(error)));
   }
   finally {

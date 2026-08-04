@@ -1,9 +1,11 @@
 <script lang="ts" setup>
+import { parseBraintreeError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { ref } from 'vue';
 import CardForm from '~/components/account/home/payment-methods/CardForm.vue';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { useLogger } from '~/utils/use-logger';
 
 const showDialog = defineModel<boolean>({ required: true });
@@ -21,6 +23,7 @@ const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('add-card-dialog');
 
 const { addCard } = usePaymentCards();
+const { userMessageFor } = usePaymentErrorMessage();
 const { client, clientError, initializeClient, teardownClient } = useBraintreeClient();
 
 const isFormValid = logicAnd(cardFormValid, logicNot(isProcessing));
@@ -54,11 +57,11 @@ async function handleAddCard() {
     // Reset form state
     set(error, undefined);
   }
-  catch (caughtError: any) {
+  catch (caughtError: unknown) {
     logger.error('Failed to add card:', caughtError);
     set(error, {
       title: t('common.error'),
-      message: caughtError.message || t('common.error_occurred'),
+      message: userMessageFor(parseBraintreeError(caughtError)),
     });
   }
   finally {

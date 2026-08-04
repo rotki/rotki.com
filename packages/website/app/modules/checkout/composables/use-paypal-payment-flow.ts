@@ -9,6 +9,7 @@ import { FetchError } from 'ofetch';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalApi } from '~/modules/checkout/composables/use-paypal-api';
 import { assert } from '~/utils/assert';
@@ -85,6 +86,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('paypal-payment-flow');
   const { logPaymentEvent } = usePaymentLogger();
+  const { userMessageFor } = usePaymentErrorMessage();
 
   function getContext(): PaypalTrackingContext {
     return options.getTrackingContext?.() ?? { isUpgrade: false };
@@ -138,17 +140,17 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
     catch (error: unknown) {
       logger.error('Failed to initialize PayPal SDK:', error);
       const ctx = getContext();
-      const { message, logMessage, code } = parseBraintreeError(error);
+      const parsed = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.PAYPAL,
         event: PaymentServerEvents.PAYPAL_SDK_INIT_FAILED,
-        errorMessage: logMessage,
-        errorCode: code,
+        errorMessage: parsed.logMessage,
+        errorCode: parsed.code,
         step: CheckoutSteps.INIT,
         planId: ctx.planId,
         isUpgrade: ctx.isUpgrade,
       });
-      return { success: false, error: message };
+      return { success: false, error: userMessageFor(parsed) };
     }
   }
 
@@ -183,14 +185,14 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
           return { nonce: vaultedNonce, tokenResponse };
         }
         catch (error: unknown) {
-          const { message, logMessage, code } = parseBraintreeError(error);
-          callbacks.onPaymentError(message);
+          const parsed = parseBraintreeError(error);
+          callbacks.onPaymentError(userMessageFor(parsed));
           const ctx = getContext();
           logPaymentEvent({
             paymentMethod: CheckoutPaymentMethods.PAYPAL,
             event: PaymentServerEvents.PAYPAL_PAYMENT_ERROR,
-            errorMessage: logMessage,
-            errorCode: code,
+            errorMessage: parsed.logMessage,
+            errorCode: parsed.code,
             step: CheckoutSteps.CALLBACK,
             planId: ctx.planId,
             isUpgrade: ctx.isUpgrade,

@@ -2,6 +2,7 @@ import type { Client } from 'braintree-web/client';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useLogger } from '~/utils/use-logger';
 
@@ -31,6 +32,7 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
   const logger = useLogger('braintree-client');
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { logPaymentEvent } = usePaymentLogger();
+  const { userMessageFor } = usePaymentErrorMessage();
   const { t } = useI18n({ useScope: 'global' });
 
   /**
@@ -63,15 +65,15 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
     }
     catch (error: unknown) {
       logger.error('Failed to initialize Braintree client with token:', error);
-      const { message, logMessage, code } = parseBraintreeError(error);
+      const parsed = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
-        errorMessage: logMessage,
-        errorCode: code,
+        errorMessage: parsed.logMessage,
+        errorCode: parsed.code,
         step: CheckoutSteps.INIT,
       });
-      set(clientError, message || t('subscription.error.init_error'));
+      set(clientError, userMessageFor(parsed));
       return false;
     }
     finally {
@@ -110,15 +112,15 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
     }
     catch (error: unknown) {
       logger.error('Failed to initialize Braintree client:', error);
-      const { message, logMessage, code } = parseBraintreeError(error);
+      const parsed = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
-        errorMessage: logMessage,
-        errorCode: code,
+        errorMessage: parsed.logMessage,
+        errorCode: parsed.code,
         step: CheckoutSteps.INIT,
       });
-      set(clientError, message || t('subscription.error.init_error'));
+      set(clientError, userMessageFor(parsed));
       return false;
     }
     finally {

@@ -7,8 +7,9 @@ import {
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { type CardType, type CheckoutStep, monthsToPlanDuration, type PaymentFailureKey, PaymentFailures, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { type CardType, type CheckoutStep, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
 import { paths } from '@/config/paths';
+import { paymentMessageFor } from '@/utils/payment-error';
 import { fetchWithCSRF } from './api';
 
 interface CardSubmittedInput {
@@ -72,6 +73,30 @@ export function trackCardPaymentFailure({ failure, errorMessage, planId, isUpgra
     cardType,
     discountApplied,
   }));
+}
+
+/**
+ * Report a failed card operation and return the copy to show the buyer.
+ *
+ * The two halves belong together: the SDK's own message is what gets logged
+ * (with the Cardinal detail `parseBraintreeError` recovers), and is exactly
+ * what must not reach the buyer unless `paymentErrorCopy` says so. Deriving
+ * both from one parse keeps a caller from logging one thing and rendering
+ * another.
+ */
+export function reportCardFailure(
+  error: unknown,
+  context: Omit<CardFailureInput, 'errorMessage' | 'errorCode'>,
+): string {
+  const parsed = parseBraintreeError(error);
+
+  trackCardPaymentFailure({
+    ...context,
+    errorMessage: parsed.logMessage,
+    errorCode: parsed.code,
+  });
+
+  return paymentMessageFor(parsed);
 }
 
 function extractErrorMessage(errorText: string): string {

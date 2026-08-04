@@ -3,6 +3,7 @@ import type { Client } from 'braintree-web/client';
 import { get, set } from '@vueuse/core';
 import { ref, useTemplateRef, watch } from 'vue';
 import { addCard } from '@/utils/card-api';
+import { userPaymentMessage } from '@/utils/payment-error';
 import BaseButton from './BaseButton.vue';
 import BaseDialog from './BaseDialog.vue';
 import NewCardForm from './NewCardForm.vue';
@@ -46,8 +47,8 @@ async function handleAddCard(): Promise<void> {
     emit('card-added', newCardToken);
     set(open, false);
   }
-  catch (caughtError: any) {
-    set(addCardError, caughtError.message || 'Failed to add card');
+  catch (caughtError: unknown) {
+    set(addCardError, userPaymentMessage(caughtError));
   }
   finally {
     set(isAddingCard, false);

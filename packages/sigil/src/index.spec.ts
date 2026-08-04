@@ -8,6 +8,7 @@ import {
   parseQueryParam,
   parseUtmFromQuery,
   PAYMENT_LOG_ENDPOINT,
+  paymentErrorCopy,
   PaymentFailures,
   PaymentServerEvents,
   postPaymentLog,
@@ -563,9 +564,9 @@ describe('parseBraintreeError', () => {
     expect(parsed.code).toBeUndefined();
   });
 
-  it('stringifies a bare non-error rejection', () => {
+  it('stringifies a bare non-error rejection, and never shows it', () => {
     // The regression that produced `error_message: "26"` with nothing else.
-    expect(parseBraintreeError(26)).toEqual({ message: '26', logMessage: '26' });
+    expect(parseBraintreeError(26)).toEqual({ message: '26', logMessage: '26', audience: 'opaque' });
   });
 
   it('never returns an empty message, which the backend rejects with a 400', () => {
@@ -585,5 +586,78 @@ describe('parseBraintreeError', () => {
 
     expect(parsed.message).toBe('kept');
     expect(parsed.code).toBeUndefined();
+  });
+
+  describe('audience', () => {
+    it('marks an error we threw ourselves as our own copy', () => {
+      // No `code` and no `type`, so it did not come out of the SDK.
+      expect(parseBraintreeError(new Error('3DS liability did not shift')).audience).toBe('own');
+    });
+
+    it('trusts the SDK message only for CUSTOMER errors', () => {
+      const parsed = parseBraintreeError({
+        code: 'THREEDS_LOOKUP_VALIDATION_ERROR',
+        type: 'CUSTOMER',
+        message: 'The card number is not valid.',
+      });
+
+      expect(parsed.audience).toBe('customer');
+    });
+
+    it('separates network failures so they get retry copy', () => {
+      expect(parseBraintreeError({ code: 'CLIENT_GATEWAY_NETWORK', type: 'NETWORK' }).audience).toBe('network');
+    });
+
+    it.each(['MERCHANT', 'INTERNAL', 'UNKNOWN', 'SOMETHING_NEW'])('hides %s prose behind generic copy', (type) => {
+      expect(parseBraintreeError({ code: 'THREEDS_CARDINAL_SDK_ERROR', type, message: 'developer prose' }).audience).toBe('opaque');
+    });
+
+    it('is opaque when a code arrives with no type at all', () => {
+      expect(parseBraintreeError({ code: 'THREEDS_LOOKUP_ERROR' }).audience).toBe('opaque');
+    });
+
+    it('never trusts a bare string rejection', () => {
+      expect(parseBraintreeError('some third-party prose').audience).toBe('opaque');
+    });
+  });
+});
+
+describe('paymentErrorCopy', () => {
+  it('passes through a message we wrote ourselves', () => {
+    const copy = paymentErrorCopy(parseBraintreeError(new Error('3DS liability did not shift')));
+
+    expect(copy).toEqual({ kind: 'verbatim', message: '3DS liability did not shift' });
+  });
+
+  it('passes through a CUSTOMER message from the SDK', () => {
+    const copy = paymentErrorCopy(parseBraintreeError({
+      code: 'HOSTED_FIELDS_FIELDS_EMPTY',
+      type: 'CUSTOMER',
+      message: 'All fields are empty. Cannot tokenize empty card fields.',
+    }));
+
+    expect(copy).toEqual({ kind: 'verbatim', message: 'All fields are empty. Cannot tokenize empty card fields.' });
+  });
+
+  it('asks for connectivity copy on a network failure', () => {
+    const copy = paymentErrorCopy(parseBraintreeError({ code: 'CLIENT_GATEWAY_NETWORK', type: 'NETWORK' }));
+
+    expect(copy).toEqual({ kind: 'network' });
+  });
+
+  it('hides developer prose and offers the code as a support reference', () => {
+    const copy = paymentErrorCopy(parseBraintreeError({
+      code: 'THREEDS_CARDINAL_SDK_ERROR',
+      type: 'UNKNOWN',
+      message: 'Something went wrong.',
+      details: { originalError: { code: 26 } },
+    }));
+
+    expect(copy).toEqual({ kind: 'unexpected', code: 'THREEDS_CARDINAL_SDK_ERROR' });
+  });
+
+  it('omits the reference when there is no code to quote', () => {
+    // The `26` that started this: nothing to show, nothing to quote.
+    expect(paymentErrorCopy(parseBraintreeError(26))).toEqual({ kind: 'unexpected' });
   });
 });

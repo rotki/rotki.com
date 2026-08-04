@@ -134,13 +134,87 @@ const braintreeErrorSchema = z.object({
   details: z.object({ originalError: z.unknown() }).optional().catch(undefined),
 });
 
+/**
+ * Who a parsed error's `message` was written for, and therefore whether it can
+ * be rendered as-is. Derived from the BraintreeError `type`, which is the only
+ * signal the SDK gives about its own copy: braintree-web writes `CUSTOMER`
+ * messages for the buyer and the rest for whoever is integrating it.
+ */
+export const PaymentErrorAudiences = {
+  /** Not a BraintreeError, so we threw it and `message` is already our copy. */
+  OWN: 'own',
+  /** The buyer or their bank caused it, and can act on it. Safe to render. */
+  CUSTOMER: 'customer',
+  /** A connectivity failure. Render our own retry copy. */
+  NETWORK: 'network',
+  /** `MERCHANT`/`INTERNAL`/`UNKNOWN`, or unrecognisable: developer prose. Never render it. */
+  OPAQUE: 'opaque',
+} as const;
+
+export type PaymentErrorAudience = EnumValueOf<typeof PaymentErrorAudiences>;
+
 export interface ParsedPaymentError {
-  /** Plain message, safe to surface in the UI. */
+  /** Plain message. Render it only when `audience` allows, see `PaymentErrorAudiences`. */
   message: string;
   /** `message` plus the Cardinal original error. Log this, don't render it. */
   logMessage: string;
   /** BraintreeError `code` (e.g. `THREEDS_CARDINAL_SDK_ERROR`), when the error is one. */
   code?: string;
+  /** Whether `message` is fit to show the buyer. */
+  audience: PaymentErrorAudience;
+}
+
+/**
+ * An error with neither `code` nor `type` did not come from the SDK, so it is
+ * one of ours and its message is already user-facing copy. Everything else is
+ * classified by the BraintreeError `type`.
+ */
+function audienceFor(code: string | undefined, type: string | undefined): PaymentErrorAudience {
+  if (!code && !type)
+    return PaymentErrorAudiences.OWN;
+
+  if (type === 'CUSTOMER')
+    return PaymentErrorAudiences.CUSTOMER;
+
+  if (type === 'NETWORK')
+    return PaymentErrorAudiences.NETWORK;
+
+  return PaymentErrorAudiences.OPAQUE;
+}
+
+/**
+ * What a buyer should be told about a parsed payment error, minus the words.
+ *
+ * The words themselves cannot live here: the website translates through
+ * vue-i18n while the card-payment SPA carries literal English. What both need
+ * is the same decision about *which* of the three things to say, above all
+ * whether the SDK's own message may be rendered at all, so that lives here and
+ * each app only supplies copy.
+ */
+export type PaymentErrorCopy =
+  /** Show `message` as-is: either we wrote it, or it is a `CUSTOMER` error the buyer can act on. */
+  | { kind: 'verbatim'; message: string }
+  /** Show connectivity copy, e.g. "check your connection and try again". */
+  | { kind: 'network' }
+  /**
+   * Show generic copy. The SDK's message is developer prose and must not be
+   * rendered; `code` is a stable caps-string identifier ("THREEDS_CARDINAL_SDK_ERROR")
+   * that is safe to quote as a support reference when present.
+   */
+  | { kind: 'unexpected'; code?: string };
+
+/**
+ * Decide what to tell the buyer about a parsed error. Pair it with
+ * `parseBraintreeError`, whose `logMessage` is what you send to the logs.
+ */
+export function paymentErrorCopy({ message, code, audience }: ParsedPaymentError): PaymentErrorCopy {
+  if (audience === PaymentErrorAudiences.OWN || audience === PaymentErrorAudiences.CUSTOMER)
+    return { kind: 'verbatim', message };
+
+  if (audience === PaymentErrorAudiences.NETWORK)
+    return { kind: 'network' };
+
+  return code ? { kind: 'unexpected', code } : { kind: 'unexpected' };
 }
 
 /**
@@ -192,15 +266,17 @@ function describeOriginalError(original: unknown): string | undefined {
  * logs with nothing left to identify it).
  */
 export function parseBraintreeError(error: unknown): ParsedPaymentError {
+  // A bare string or a non-object rejection is unattributable: it may be
+  // third-party prose, or the `26` that started all this. Log it, never show it.
   if (typeof error === 'string') {
     const message = error || 'Unknown error';
-    return { message, logMessage: message };
+    return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
   }
 
   const parsed = braintreeErrorSchema.safeParse(error);
   if (!parsed.success) {
     const message = String(error);
-    return { message, logMessage: message };
+    return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
   }
 
   const { code, type, message, details } = parsed.data;
@@ -215,5 +291,6 @@ export function parseBraintreeError(error: unknown): ParsedPaymentError {
     message: base,
     logMessage: original ? `${base} (${original})` : base,
     ...(code ? { code } : {}),
+    audience: audienceFor(code, type),
   };
 }
