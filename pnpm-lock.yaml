@@ -190,8 +190,8 @@ catalogs:
       specifier: 4.62.3
       version: 4.62.3
     satori:
-      specifier: 0.26.0
-      version: 0.26.0
+      specifier: 0.29.0
+      version: 0.29.0
     stylelint:
       specifier: 17.14.1
       version: 17.14.1
@@ -570,7 +570,7 @@ importers:
         version: 4.62.3
       satori:
         specifier: 'catalog:'
-        version: 0.26.0
+        version: 0.29.0
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.19(yaml@2.9.0)
@@ -8140,8 +8140,8 @@ packages:
     resolution: {integrity: sha512-b3rppTKm9T+PsVCBEOUR46GWI7fdOs00VKZ1+9c1EWDaDMvjQc6tUwuFyIprgGgTcWoVHSKrU8H31ZHA2e0RHA==}
     engines: {node: '>=10'}
 
-  satori@0.26.0:
-    resolution: {integrity: sha512-tkMFrfIs3l2mQ2JEcyW0ADTy3zGggFRFzi6Ef8YozQSFsFKEqaSO1Y8F9wJg4//PJGQauMalHGTUEkPrFwhVPA==}
+  satori@0.29.0:
+    resolution: {integrity: sha512-fPAfrwNaIQ7EsJLhY382STEqpczN6ZEH9NsKXDQgRcxUXNNPB73iAjSshzFwTaaScT68pxV0pmG6TBzDQ4sEGw==}
     engines: {node: '>=16'}
 
   sax@1.6.0:
@@ -18495,7 +18495,7 @@ snapshots:
 
   safe-stable-stringify@2.5.0: {}
 
-  satori@0.26.0:
+  satori@0.29.0:
     dependencies:
       '@shuding/opentype.js': 1.4.0-beta.0
       css-background-parser: 0.1.0

@@ -107,7 +107,7 @@ catalog:
   qrcode: 1.5.4
   rimraf: 6.1.3
   rollup: 4.62.3
-  satori: 0.26.0
+  satori: 0.29.0
   stylelint: 17.14.1
   stylelint-config-recommended-vue: 1.6.1
   stylelint-config-standard: 40.0.0
