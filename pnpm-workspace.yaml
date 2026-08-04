@@ -92,7 +92,7 @@ catalog:
   msw: 2.15.0
   nitropack: 2.13.4
   npm-run-all2: 9.0.2
-  nuxt: 4.4.7
+  nuxt: 4.5.1
   nuxt-llms: 0.2.0
   pinia: 3.0.4
   plainfp: 0.1.1
@@ -112,8 +112,8 @@ catalog:
   tsdown: 0.22.14
   typescript: 6.0.3
   viem: 2.52.2
-  vite: 7.3.5
-  vite-plugin-vue-devtools: 8.1.2
+  vite: 8.1.5
+  vite-plugin-vue-devtools: 8.2.1
   vite-ssg: 28.3.0
   vitest: 4.1.10
   vue: 3.5.40
