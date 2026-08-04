@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
+import { parseBraintreeError } from '@rotki/sigil';
 import { objectPick } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
@@ -12,6 +13,7 @@ import { useUserSubscriptions } from '~/composables/subscription/use-user-subscr
 import { useEmailConfirmedCookie } from '~/composables/use-fetch-with-csrf';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 
@@ -30,6 +32,7 @@ definePageMeta({
 
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('payment-methods');
+const { userMessageFor } = usePaymentErrorMessage();
 
 const showAddCardDialog = ref<boolean>(false);
 const showDeleteDialog = ref<boolean>(false);
@@ -103,6 +106,7 @@ async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Prom
 
     set(verificationData, {
       cardToken: card.token,
+      cardLast4: card.last4,
       subscriptionData: objectPick(active, ['nextBillingAmount', 'nextActionDate', 'durationInMonths']),
     });
     set(showThreeDSecureModal, true);
@@ -140,7 +144,7 @@ function handleThreeDSecureError(verifyError: Error): void {
   logger.error('3DS verification failed:', verifyError);
   set(error, {
     title: t('common.error'),
-    message: verifyError.message || t('common.error_occurred'),
+    message: userMessageFor(parseBraintreeError(verifyError), 'card'),
   });
   set(showThreeDSecureModal, false);
   set(verificationData, undefined);

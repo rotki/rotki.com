@@ -9,6 +9,8 @@ import { formatCurrency } from '~/utils/text';
 
 export interface ThreeDSecureVerificationData {
   cardToken: string;
+  /** Identifies the card in the Braintree vault, which holds all of them. */
+  cardLast4: string;
   subscriptionData: Pick<Subscription, 'nextBillingAmount' | 'nextActionDate' | 'durationInMonths'>;
 }
 
@@ -67,19 +69,20 @@ async function startVerification(): Promise<void> {
   set(errorMessage, undefined);
 
   try {
-    const { cardToken, subscriptionData: { nextBillingAmount } } = verificationData;
-    await verifyAndSetDefaultCard(
+    const { cardToken, cardLast4, subscriptionData: { nextBillingAmount } } = verificationData;
+    await verifyAndSetDefaultCard({
       cardToken,
-      nextBillingAmount,
-      handleChallengeRequired,
-      handleVerificationComplete,
-    );
+      cardLast4,
+      amount: nextBillingAmount,
+      onChallengeRequired: handleChallengeRequired,
+      onVerificationComplete: handleVerificationComplete,
+    });
 
     emit('success');
     close();
   }
   catch (error: unknown) {
-    set(errorMessage, userMessageFor(parseBraintreeError(error)));
+    set(errorMessage, userMessageFor(parseBraintreeError(error), 'card'));
     emit('error', error instanceof Error ? error : new Error(String(error)));
   }
   finally {

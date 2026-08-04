@@ -24,7 +24,7 @@ const logger = useLogger('add-card-dialog');
 
 const { addCard } = usePaymentCards();
 const { userMessageFor } = usePaymentErrorMessage();
-const { client, clientError, initializeClient, teardownClient } = useBraintreeClient();
+const { client, clientError, initializeClient, teardownClient } = useBraintreeClient('card');
 
 const isFormValid = logicAnd(cardFormValid, logicNot(isProcessing));
 
@@ -61,7 +61,7 @@ async function handleAddCard() {
     logger.error('Failed to add card:', caughtError);
     set(error, {
       title: t('common.error'),
-      message: userMessageFor(parseBraintreeError(caughtError)),
+      message: userMessageFor(parseBraintreeError(caughtError), 'card'),
     });
   }
   finally {

@@ -2,7 +2,7 @@ import type { Client } from 'braintree-web/client';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
+import { type PaymentErrorContext, usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useLogger } from '~/utils/use-logger';
 
@@ -23,8 +23,11 @@ interface UseBraintreeClientReturn {
 /**
  * Braintree client composable for account management and checkout
  * Handles fetching client token and initializing Braintree client
+ *
+ * @param errorContext phrasing for `clientError`. The account pages use this
+ * client to save a card, where payment wording would be wrong.
  */
-export function useBraintreeClient(): UseBraintreeClientReturn {
+export function useBraintreeClient(errorContext: PaymentErrorContext = 'payment'): UseBraintreeClientReturn {
   const client = shallowRef<Client>();
   const clientError = ref<string>();
   const clientInitializing = shallowRef<boolean>(false);
@@ -73,7 +76,7 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
         errorCode: parsed.code,
         step: CheckoutSteps.INIT,
       });
-      set(clientError, userMessageFor(parsed));
+      set(clientError, userMessageFor(parsed, errorContext));
       return false;
     }
     finally {
@@ -120,7 +123,7 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
         errorCode: parsed.code,
         step: CheckoutSteps.INIT,
       });
-      set(clientError, userMessageFor(parsed));
+      set(clientError, userMessageFor(parsed, errorContext));
       return false;
     }
     finally {
