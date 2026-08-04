@@ -85,6 +85,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
     '@nuxt/test-utils/module',
+    './modules/app-screenshots/module.ts',
     './modules/integration-images/module.ts',
     './modules/integration-seo/module.ts',
     './modules/comparison-seo/module.ts',

@@ -2,6 +2,7 @@
 import type { Swiper } from 'swiper/types';
 import { set } from '@vueuse/shared';
 import { SwiperSlide } from 'swiper/vue';
+import screenshots from 'virtual:app-screenshots';
 import Carousel from '~/components/common/carousel/Carousel.vue';
 import CarouselControls from '~/components/common/carousel/CarouselControls.vue';
 import 'swiper/css/pagination';
@@ -39,18 +40,18 @@ function getAltText(path: string): string {
   return screenshotAltTexts[filename] ?? 'rotki application screenshot';
 }
 
-const images = ref<ScreenshotImage[]>([]);
-
-function scanImages(): void {
-  const assetContext = import.meta.glob(
-    '~~/public/img/screenshots/*.(png|jpe?g|webp)',
-  );
-  const assetPaths = Object.keys(assetContext);
-  set(images, assetPaths.map((src) => {
-    const publicSrc = src.replace(/.*\/public\//, '/');
-    return { src: publicSrc, alt: getAltText(src) };
-  }));
-}
+/**
+ * Slide list, discovered at build time by the `app-screenshots` module.
+ *
+ * This used to be an `import.meta.glob` over `public/img/screenshots`, which
+ * cannot work: Vite deliberately keeps `public/` out of the module graph. It
+ * looked fine because the dev server resolves such patterns off the filesystem,
+ * while the build compiled it down to `Object.assign({})` and the carousel
+ * rendered zero slides in production.
+ */
+const images = ref<ScreenshotImage[]>(
+  screenshots.map(src => ({ src, alt: getAltText(src) })),
+);
 
 function onSwiperUpdate(s: Swiper): void {
   set(swiperInstance, s);
@@ -74,8 +75,8 @@ function getFetchPriority(index: number): 'high' | 'auto' {
 
 /**
  * Responsive srcset for the first image only (the LCP element). Pre-generated
- * width variants live in a `responsive/` subfolder (kept out of the slide glob
- * above); the original webp is the 2880w source. Mobile pulls a ~14-40KB variant
+ * width variants live in a `responsive/` subfolder (the module only lists files
+ * directly in the screenshots folder); the original webp is the 2880w source. Mobile pulls a ~14-40KB variant
  * instead of the 78KB source.
  */
 function getSrcset(image: ScreenshotImage, index: number): string | undefined {
@@ -91,8 +92,6 @@ const firstImageSizes = '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 120
 function getSizes(index: number): string | undefined {
   return index === 0 ? firstImageSizes : undefined;
 }
-
-scanImages();
 </script>
 
 <template>
