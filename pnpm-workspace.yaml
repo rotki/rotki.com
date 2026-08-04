@@ -4,6 +4,8 @@ minimumReleaseAgeExclude:
   - '@rotki/eslint-config'
   - '@rotki/eslint-plugin'
   - '@rotki/ui-library'
+  # Renovate security update: postcss@8.5.23
+  - postcss@8.5.23
 shamefullyHoist: true
 shellEmulator: true
 blockExoticSubdeps: true
@@ -96,7 +98,7 @@ catalog:
   nuxt-llms: 0.2.0
   pinia: 3.0.4
   plainfp: 0.1.0
-  postcss: 8.5.15
+  postcss: 8.5.23
   postcss-html: 1.8.1
   postcss-import: 16.1.1
   qrcode: 1.5.4
