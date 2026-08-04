@@ -5,6 +5,7 @@
 // sync.
 
 import type { EnumValueOf } from './common';
+import { z } from 'zod';
 
 export const PaymentFailures = {
   BRAINTREE_INIT_FAILED: { serverEvent: 'braintree_init_failed', reason: 'braintree_init' },
@@ -97,4 +98,122 @@ export function classifyCryptoTxError(error: unknown): PaymentFailureKey {
     return 'CRYPTO_USER_REJECTED';
 
   return 'CRYPTO_TX_FAILED';
+}
+
+// The schemas below describe third-party error objects we do not control, so
+// every field is `.catch(undefined)`: one unexpected field type degrades that
+// field only, and never discards the rest of an otherwise usable error.
+
+/**
+ * Cardinal's original error, attached by braintree-web as
+ * `details.originalError` when Songbird reports `ActionCode: "ERROR"`.
+ * See braintree-web `three-d-secure/external/frameworks/songbird.js`: `code`
+ * is Cardinal's numeric `ErrorNumber`, `description` its `ErrorDescription`.
+ */
+const cardinalOriginalErrorSchema = z.object({
+  code: z.union([z.string(), z.number()]).optional().catch(undefined),
+  description: z.string().optional().catch(undefined),
+});
+
+/** A nested `Error`-like rejection, e.g. the gateway request failure that
+ * `_performJWTValidation` wraps into `details.originalError`. */
+const nestedErrorSchema = z.object({
+  message: z.string().optional().catch(undefined),
+});
+
+/**
+ * Shape of a `BraintreeError` (braintree-web `lib/braintree-error`). Described
+ * structurally so neither sigil nor its consumers need a braintree-web
+ * dependency. `details.originalError` stays `unknown`: it is narrowed
+ * separately, since its shape depends on which layer failed.
+ */
+const braintreeErrorSchema = z.object({
+  code: z.string().optional().catch(undefined),
+  type: z.string().optional().catch(undefined),
+  message: z.string().optional().catch(undefined),
+  details: z.object({ originalError: z.unknown() }).optional().catch(undefined),
+});
+
+export interface ParsedPaymentError {
+  /** Plain message, safe to surface in the UI. */
+  message: string;
+  /** `message` plus the Cardinal original error. Log this, don't render it. */
+  logMessage: string;
+  /** BraintreeError `code` (e.g. `THREEDS_CARDINAL_SDK_ERROR`), when the error is one. */
+  code?: string;
+}
+
+/**
+ * Describe `details.originalError`. Cardinal's `{ code, description }` is the
+ * interesting case: braintree-web collapses every unmapped Cardinal
+ * `ErrorNumber` into the single generic `THREEDS_CARDINAL_SDK_ERROR` code, so
+ * the number here is the only thing that identifies the actual failure.
+ */
+function describeCardinalError(original: unknown): string | undefined {
+  const cardinal = cardinalOriginalErrorSchema.safeParse(original);
+  if (!cardinal.success)
+    return undefined;
+
+  const { code, description } = cardinal.data;
+  const parts: string[] = [];
+
+  if (code !== undefined && code !== '')
+    parts.push(`cardinal ${code}`);
+
+  if (description)
+    parts.push(description);
+
+  return parts.length > 0 ? parts.join(': ') : undefined;
+}
+
+function describeOriginalError(original: unknown): string | undefined {
+  if (original === undefined || original === null)
+    return undefined;
+
+  if (typeof original === 'string')
+    return original || undefined;
+
+  const cardinal = describeCardinalError(original);
+  if (cardinal)
+    return cardinal;
+
+  const nested = nestedErrorSchema.safeParse(original);
+  return nested.success ? nested.data.message : undefined;
+}
+
+/**
+ * Turn an unknown rejection from the Braintree/Cardinal 3D Secure flow into a
+ * loggable message plus a stable error code.
+ *
+ * The SDK rejects with a `BraintreeError` whose `message` is prose and whose
+ * real discriminator lives on `code` and `details.originalError`. Logging only
+ * `error.message` throws that away, and a non-`Error` rejection degrades to a
+ * bare `String(error)` (this is how an `error_message` of `"26"` reaches the
+ * logs with nothing left to identify it).
+ */
+export function parseBraintreeError(error: unknown): ParsedPaymentError {
+  if (typeof error === 'string') {
+    const message = error || 'Unknown error';
+    return { message, logMessage: message };
+  }
+
+  const parsed = braintreeErrorSchema.safeParse(error);
+  if (!parsed.success) {
+    const message = String(error);
+    return { message, logMessage: message };
+  }
+
+  const { code, type, message, details } = parsed.data;
+  const original = describeOriginalError(details?.originalError);
+
+  // Fall back through code/type before the raw stringification, so an object
+  // with no `message` still logs something the backend will accept (it rejects
+  // an empty `error_message` with a 400).
+  const base = message || code || type || String(error);
+
+  return {
+    message: base,
+    logMessage: original ? `${base} (${original})` : base,
+    ...(code ? { code } : {}),
+  };
 }

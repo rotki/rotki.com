@@ -1,6 +1,6 @@
 import type { Client } from 'braintree-web/client';
 import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
+import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
@@ -192,10 +192,12 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     }
     catch (error: unknown) {
       logger.error('3DS verification failed:', error);
+      const { logMessage, code } = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
-        errorMessage: error instanceof Error ? error.message : String(error),
+        errorMessage: logMessage,
+        errorCode: code,
         step: CheckoutSteps.VERIFY,
       });
       throw error;

@@ -1,5 +1,5 @@
 import type { Client } from 'braintree-web/client';
-import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
+import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
@@ -61,15 +61,17 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
       set(client, newClient);
       return true;
     }
-    catch (error: any) {
+    catch (error: unknown) {
       logger.error('Failed to initialize Braintree client with token:', error);
+      const { message, logMessage, code } = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
-        errorMessage: error.message || 'unknown',
+        errorMessage: logMessage,
+        errorCode: code,
         step: CheckoutSteps.INIT,
       });
-      set(clientError, error.message || t('subscription.error.init_error'));
+      set(clientError, message || t('subscription.error.init_error'));
       return false;
     }
     finally {
@@ -106,15 +108,17 @@ export function useBraintreeClient(): UseBraintreeClientReturn {
       set(client, newClient);
       return true;
     }
-    catch (error: any) {
+    catch (error: unknown) {
       logger.error('Failed to initialize Braintree client:', error);
+      const { message, logMessage, code } = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
-        errorMessage: error.message || 'unknown',
+        errorMessage: logMessage,
+        errorCode: code,
         step: CheckoutSteps.INIT,
       });
-      set(clientError, error.message || t('subscription.error.init_error'));
+      set(clientError, message || t('subscription.error.init_error'));
       return false;
     }
     finally {

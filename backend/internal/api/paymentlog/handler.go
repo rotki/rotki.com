@@ -106,7 +106,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Sanitize free-text fields
 	ev.ErrorMessage = validate.SanitizeString(ev.ErrorMessage, 500)
-	ev.ErrorCode = validate.SanitizeString(ev.ErrorCode, 32)
+	// 64, not 32: the longest BraintreeError codes we forward are 35 chars
+	// (e.g. THREEDS_CARDINAL_SDK_SETUP_TIMEDOUT).
+	ev.ErrorCode = validate.SanitizeString(ev.ErrorCode, 64)
 
 	// Log as structured event
 	attrs := []any{

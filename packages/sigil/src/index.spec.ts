@@ -4,6 +4,7 @@ import {
   classifyCryptoTxError,
   createTrackingSession,
   monthsToPlanDuration,
+  parseBraintreeError,
   parseQueryParam,
   parseUtmFromQuery,
   PAYMENT_LOG_ENDPOINT,
@@ -516,5 +517,73 @@ describe('sigilEvents', () => {
     }
 
     expect(Object.keys(exhaustiveCheck)).toHaveLength(Object.keys(SigilEvents).length);
+  });
+});
+
+describe('parseBraintreeError', () => {
+  it('keeps the Cardinal original error out of the user-facing message', () => {
+    const parsed = parseBraintreeError({
+      code: 'THREEDS_CARDINAL_SDK_ERROR',
+      type: 'UNKNOWN',
+      message: 'Something went wrong.',
+      details: { originalError: { code: 26, description: 'Merchant configuration error' } },
+    });
+
+    expect(parsed.message).toBe('Something went wrong.');
+    expect(parsed.logMessage).toBe('Something went wrong. (cardinal 26: Merchant configuration error)');
+    expect(parsed.code).toBe('THREEDS_CARDINAL_SDK_ERROR');
+  });
+
+  it('surfaces a Cardinal code with no description', () => {
+    const parsed = parseBraintreeError({
+      code: 'THREEDS_CARDINAL_SDK_ERROR',
+      message: 'Something went wrong.',
+      details: { originalError: { code: 10011 } },
+    });
+
+    expect(parsed.logMessage).toBe('Something went wrong. (cardinal 10011)');
+  });
+
+  it('falls back to a nested error message when originalError is an Error', () => {
+    const parsed = parseBraintreeError({
+      code: 'THREEDS_JWT_AUTHENTICATION_FAILED',
+      message: 'Something went wrong authenticating the JWT from Cardinal',
+      details: { originalError: new Error('gateway 422') },
+    });
+
+    expect(parsed.logMessage).toBe('Something went wrong authenticating the JWT from Cardinal (gateway 422)');
+    expect(parsed.code).toBe('THREEDS_JWT_AUTHENTICATION_FAILED');
+  });
+
+  it('handles a plain Error with no braintree fields', () => {
+    const parsed = parseBraintreeError(new Error('3DS liability did not shift, please try again'));
+
+    expect(parsed.message).toBe('3DS liability did not shift, please try again');
+    expect(parsed.logMessage).toBe('3DS liability did not shift, please try again');
+    expect(parsed.code).toBeUndefined();
+  });
+
+  it('stringifies a bare non-error rejection', () => {
+    // The regression that produced `error_message: "26"` with nothing else.
+    expect(parseBraintreeError(26)).toEqual({ message: '26', logMessage: '26' });
+  });
+
+  it('never returns an empty message, which the backend rejects with a 400', () => {
+    expect(parseBraintreeError('').message).toBe('Unknown error');
+    expect(parseBraintreeError({}).message).toBe('[object Object]');
+    expect(parseBraintreeError(undefined).message).toBe('undefined');
+    expect(parseBraintreeError(null).message).toBe('null');
+  });
+
+  it('falls back to code, then type, when there is no message', () => {
+    expect(parseBraintreeError({ code: 'THREEDS_LOOKUP_ERROR' }).message).toBe('THREEDS_LOOKUP_ERROR');
+    expect(parseBraintreeError({ type: 'NETWORK' }).message).toBe('NETWORK');
+  });
+
+  it('ignores non-conforming field types rather than throwing', () => {
+    const parsed = parseBraintreeError({ code: 1234, message: 'kept' });
+
+    expect(parsed.message).toBe('kept');
+    expect(parsed.code).toBeUndefined();
   });
 });

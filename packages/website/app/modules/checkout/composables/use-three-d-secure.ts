@@ -7,7 +7,7 @@ import {
   ThreeDSecureParamsSchema,
   type ThreeDSecureState,
 } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { CheckoutPaymentMethods, CheckoutSteps, monthsToPlanDuration, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
+import { CheckoutPaymentMethods, CheckoutSteps, monthsToPlanDuration, parseBraintreeError, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
@@ -109,15 +109,17 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       set(state, 'ready');
       logger.info('3D Secure initialized successfully');
     }
-    catch (initError: any) {
-      const errorMsg = `Initialization failed: ${initError.message}`;
+    catch (initError: unknown) {
+      const { message, logMessage, code } = parseBraintreeError(initError);
+      const errorMsg = `Initialization failed: ${message}`;
       set(error, errorMsg);
       set(state, 'error');
       logger.error(errorMsg, initError);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
-        errorMessage: initError.message || 'unknown',
+        errorMessage: `Initialization failed: ${logMessage}`,
+        errorCode: code,
         step: CheckoutSteps.INIT,
         planId: params.planId,
         isUpgrade: !!params.upgradeSubId,
@@ -221,17 +223,18 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         throw new Error(errorMsg);
       }
     }
-    catch (verifyError: any) {
+    catch (verifyError: unknown) {
       set(challengeVisible, false);
       set(state, 'error');
-      const errorMsg = verifyError.message || 'Verification failed';
+      const { message, logMessage, code } = parseBraintreeError(verifyError);
 
-      set(error, errorMsg);
+      set(error, message);
       logger.error('3D Secure verification error:', verifyError);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
-        errorMessage: errorMsg,
+        errorMessage: logMessage,
+        errorCode: code,
         step: CheckoutSteps.VERIFY,
         planId: params.planId,
         isUpgrade: !!params.upgradeSubId,

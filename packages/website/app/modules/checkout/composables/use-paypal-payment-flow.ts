@@ -3,7 +3,7 @@ import type { PayPalCheckout } from 'braintree-web';
 import type { DeepReadonly, Ref } from 'vue';
 import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
+import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import { useAccountRefresh } from '~/composables/use-app-events';
@@ -135,18 +135,20 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       set(initialized, true);
       return { success: true };
     }
-    catch (error: any) {
+    catch (error: unknown) {
       logger.error('Failed to initialize PayPal SDK:', error);
       const ctx = getContext();
+      const { message, logMessage, code } = parseBraintreeError(error);
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.PAYPAL,
         event: PaymentServerEvents.PAYPAL_SDK_INIT_FAILED,
-        errorMessage: error.message || 'unknown',
+        errorMessage: logMessage,
+        errorCode: code,
         step: CheckoutSteps.INIT,
         planId: ctx.planId,
         isUpgrade: ctx.isUpgrade,
       });
-      return { success: false, error: error.message };
+      return { success: false, error: message };
     }
   }
 
@@ -180,13 +182,15 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
           callbacks.onPaymentSuccess(vaultedNonce);
           return { nonce: vaultedNonce, tokenResponse };
         }
-        catch (error: any) {
-          callbacks.onPaymentError(error?.message ?? String(error));
+        catch (error: unknown) {
+          const { message, logMessage, code } = parseBraintreeError(error);
+          callbacks.onPaymentError(message);
           const ctx = getContext();
           logPaymentEvent({
             paymentMethod: CheckoutPaymentMethods.PAYPAL,
             event: PaymentServerEvents.PAYPAL_PAYMENT_ERROR,
-            errorMessage: error?.message ?? String(error),
+            errorMessage: logMessage,
+            errorCode: code,
             step: CheckoutSteps.CALLBACK,
             planId: ctx.planId,
             isUpgrade: ctx.isUpgrade,

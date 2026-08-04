@@ -24,6 +24,12 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run"
   },
+  "peerDependencies": {
+    "zod": "^3.0.0 || ^4.0.0"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
   "devDependencies": {
     "@tsconfig/node24": "catalog:",
     "@types/node": "catalog:",
