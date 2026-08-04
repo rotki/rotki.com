@@ -1,6 +1,6 @@
 import type { Client } from 'braintree-web/client';
 import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
-import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
+import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents, PaymentUserError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
@@ -23,6 +23,8 @@ export interface CardVerificationRequest {
    * card the nonce was created from.
    */
   cardLast4: string;
+  /** Card expiry as `MM/YY`, used to separate two vault entries sharing a last four. */
+  cardExpiresAt: string;
   amount: number;
   onChallengeRequired: () => void;
   onVerificationComplete?: () => void;
@@ -32,6 +34,31 @@ interface UseCardThreeDSecureReturn {
   initialize: (request: Omit<CardVerificationRequest, 'onVerificationComplete'> & { braintreeToken: string }) => Promise<string>;
   verifyAndSetDefaultCard: (request: CardVerificationRequest) => Promise<void>;
   teardown: () => void;
+}
+
+/**
+ * Compare a vault entry's expiry against a `SavedCard.expiresAt` (`MM/YY` or
+ * `MM/YYYY`). Two-digit years are compared on their last two digits, which is
+ * all a card prints.
+ */
+function expiryMatches(details: object, expiresAt: string): boolean {
+  const parts = /^(\d{2})\/(\d{2,4})$/.exec(expiresAt);
+  if (!parts)
+    return false;
+
+  // Narrowed with `in` rather than a cast: `details` is a union of every
+  // payment-method shape braintree-web can return, and only the card ones
+  // carry an expiry.
+  if (!('expirationMonth' in details) || !('expirationYear' in details))
+    return false;
+
+  const [, month, year] = parts;
+  const { expirationMonth: vaultMonth, expirationYear: vaultYear } = details;
+
+  if (typeof vaultMonth !== 'string' || typeof vaultYear !== 'string')
+    return false;
+
+  return vaultMonth.padStart(2, '0') === month && vaultYear.slice(-2) === year!.slice(-2);
 }
 
 export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
@@ -111,13 +138,17 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   /**
    * Find the BIN of the card being verified.
    *
-   * Matching on `lastFour` rather than taking the first credit card in the
-   * vault matters once a customer has more than one saved: 3DS would otherwise
-   * look up a different card's issuer than the one the nonce came from, and
-   * both the challenge and the liability-shift decision would be made against
-   * the wrong card.
+   * Matching rather than taking the first credit card in the vault matters once
+   * a customer has more than one saved: 3DS would otherwise look up a different
+   * card's issuer than the one the nonce came from, and both the challenge and
+   * the liability-shift decision would be made against the wrong card.
+   *
+   * The vault payload carries no vault token (`FetchPaymentMethodsPayload` is
+   * nonce/type/details/description/binData), so `lastFour` is the coarsest key
+   * available and expiry is what separates two cards that share it. If both
+   * still match, it is the same card saved twice and the BIN is identical.
    */
-  async function fetchPaymentMethodBin(client: Client, cardLast4: string): Promise<string> {
+  async function fetchPaymentMethodBin(client: Client, cardLast4: string, cardExpiresAt: string): Promise<string> {
     logger.debug('Creating VaultManager instance');
     const { create: createVaultManager } = await import('braintree-web/vault-manager');
     const vmInstance = await createVaultManager({ client });
@@ -126,17 +157,24 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
       const paymentMethods = await vmInstance.fetchPaymentMethods();
       logger.debug(`Fetched ${paymentMethods.length} payment methods from vault`);
 
-      const paymentMethod = paymentMethods.find(({ type, details }) =>
+      const matches = paymentMethods.filter(({ type, details }) =>
         type === 'CreditCard' &&
         details &&
         'lastFour' in details &&
         details.lastFour === cardLast4,
       );
+
+      const paymentMethod = matches.length > 1
+        ? matches.find(({ details }) => details && expiryMatches(details, cardExpiresAt)) ?? matches[0]
+        : matches[0];
       logger.debug('Found payment method:', paymentMethod);
 
       if (!paymentMethod?.details || !('bin' in paymentMethod.details) || !paymentMethod.details.bin) {
         logger.error(`BIN not found for card ending ${cardLast4}`);
-        throw new Error('We could not find that card. Please refresh the page and try again.');
+        throw new PaymentUserError(
+          'We could not find that card. Please refresh the page and try again.',
+          { logDetail: `no vault entry for card ending ${cardLast4} among ${paymentMethods.length} methods` },
+        );
       }
 
       const bin = paymentMethod.details.bin;
@@ -178,7 +216,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     logger.debug('3DS liability shift possible:', liabilityShiftPossible);
 
     if (liabilityShiftPossible && !liabilityShifted) {
-      throw new Error('3DS liability did not shift, please try again');
+      throw new PaymentUserError('3DS liability did not shift, please try again');
     }
 
     if (!paymentMethodNonce) {
@@ -188,7 +226,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     return paymentMethodNonce;
   }
 
-  async function initialize({ cardToken, cardLast4, amount, braintreeToken, onChallengeRequired }:
+  async function initialize({ cardToken, cardLast4, cardExpiresAt, amount, braintreeToken, onChallengeRequired }:
   Omit<CardVerificationRequest, 'onVerificationComplete'> & { braintreeToken: string }): Promise<string> {
     const client = await createBraintreeClient(braintreeToken);
 
@@ -200,7 +238,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
         instance.on('lookup-complete', lookupHandler);
         instance.on('authentication-iframe-available', iframeHandler);
 
-        const bin = await fetchPaymentMethodBin(client, cardLast4);
+        const bin = await fetchPaymentMethodBin(client, cardLast4, cardExpiresAt);
         return await verifyCardWith3DS(instance, cardToken, bin, amount);
       }
       finally {
@@ -222,7 +260,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     }
   }
 
-  async function verifyAndSetDefaultCard({ cardToken, cardLast4, amount, onChallengeRequired, onVerificationComplete }: CardVerificationRequest): Promise<void> {
+  async function verifyAndSetDefaultCard({ cardToken, cardLast4, cardExpiresAt, amount, onChallengeRequired, onVerificationComplete }: CardVerificationRequest): Promise<void> {
     logger.debug('Starting complete 3DS verification and card setup flow');
 
     // Fetch Braintree client token
@@ -237,6 +275,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     const enrichedNonce = await initialize({
       cardToken,
       cardLast4,
+      cardExpiresAt,
       amount,
       braintreeToken: tokenResponse.braintreeClientToken,
       onChallengeRequired,

@@ -107,6 +107,7 @@ async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Prom
     set(verificationData, {
       cardToken: card.token,
       cardLast4: card.last4,
+      cardExpiresAt: card.expiresAt,
       subscriptionData: objectPick(active, ['nextBillingAmount', 'nextActionDate', 'durationInMonths']),
     });
     set(showThreeDSecureModal, true);

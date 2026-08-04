@@ -7,7 +7,7 @@ import {
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { type CardType, type CheckoutStep, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { type CardType, type CheckoutStep, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, PaymentUserError, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
 import { paths } from '@/config/paths';
 import { paymentMessageFor } from '@/utils/payment-error';
 import { fetchWithCSRF } from './api';
@@ -119,21 +119,24 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       const backendMessage = extractErrorMessage(errorText);
-      // 400s on this endpoint are either schema/JSON-decode errors (programmer-side) or
-      // raw Braintree gateway dumps ("Do Not Honor" etc.) — replace with a friendly
-      // message; raw cause is kept in the console.error below for debugging.
-      // 429 surfaces the backend's already-user-friendly rate-limit message verbatim.
-      let message: string;
+      // 400s on this endpoint are either schema/JSON-decode errors (programmer-side)
+      // or raw Braintree gateway dumps ("Do Not Honor" etc.), so they get friendly
+      // copy with the raw cause kept in logDetail. 429 surfaces the backend's
+      // already-user-friendly rate-limit message verbatim. Both are written for the
+      // customer, hence PaymentUserError, which is what lets them reach the screen;
+      // anything else is an HTTP dump and stays opaque.
       if (response.status === 400) {
-        message = 'We couldn\'t add this card. Please double-check the details or try a different card.';
+        throw new PaymentUserError(
+          'We couldn\'t add this card. Please double-check the details or try a different card.',
+          { logDetail: backendMessage },
+        );
       }
-      else if (response.status === 429) {
-        message = backendMessage;
+
+      if (response.status === 429) {
+        throw new PaymentUserError(backendMessage);
       }
-      else {
-        message = `HTTP ${response.status}: ${backendMessage}`;
-      }
-      throw new Error(message);
+
+      throw new Error(`HTTP ${response.status}: ${backendMessage}`);
     }
 
     const data = await response.json();
@@ -149,9 +152,13 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
     }
     return parsedCard.data.token;
   }
-  catch (error: any) {
+  catch (error: unknown) {
     console.error('Failed to add card:', error);
-    throw new Error(error.message || 'Failed to add card');
+    // Rethrow as-is: re-wrapping in a plain Error would strip the
+    // PaymentUserError marker and turn customer copy into generic copy.
+    throw error instanceof PaymentUserError
+      ? error
+      : new Error(error instanceof Error ? error.message : 'Failed to add card');
   }
 }
 

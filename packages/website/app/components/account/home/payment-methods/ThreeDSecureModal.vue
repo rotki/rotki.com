@@ -11,6 +11,8 @@ export interface ThreeDSecureVerificationData {
   cardToken: string;
   /** Identifies the card in the Braintree vault, which holds all of them. */
   cardLast4: string;
+  /** Disambiguates two vault entries that share a last four. */
+  cardExpiresAt: string;
   subscriptionData: Pick<Subscription, 'nextBillingAmount' | 'nextActionDate' | 'durationInMonths'>;
 }
 
@@ -69,10 +71,11 @@ async function startVerification(): Promise<void> {
   set(errorMessage, undefined);
 
   try {
-    const { cardToken, cardLast4, subscriptionData: { nextBillingAmount } } = verificationData;
+    const { cardToken, cardLast4, cardExpiresAt, subscriptionData: { nextBillingAmount } } = verificationData;
     await verifyAndSetDefaultCard({
       cardToken,
       cardLast4,
+      cardExpiresAt,
       amount: nextBillingAmount,
       onChallengeRequired: handleChallengeRequired,
       onVerificationComplete: handleVerificationComplete,

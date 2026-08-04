@@ -135,13 +135,44 @@ const BraintreeErrorSchema = z.object({
 });
 
 /**
+ * An error whose message we wrote for the buyer.
+ *
+ * Throw this instead of a plain `Error` when the message is meant to be read by
+ * a customer. Being told so is the only way `parseBraintreeError` can know: an
+ * ofetch `FetchError`, a `TypeError` from a bug of ours and a deliberate piece
+ * of copy are all just `Error`s with a `message`, and only one of them may be
+ * rendered.
+ *
+ * @param logDetail diagnostic to append to `logMessage` only. The message is
+ * customer copy, so it rarely says which card or plan was involved; this is
+ * where that goes.
+ */
+export class PaymentUserError extends Error {
+  /** Structural marker: survives bundling and duplicate package copies, unlike `instanceof`. */
+  readonly userFacing = true;
+  readonly logDetail?: string;
+
+  constructor(message: string, options?: { logDetail?: string }) {
+    super(message);
+    this.name = 'PaymentUserError';
+    this.logDetail = options?.logDetail;
+  }
+}
+
+const UserErrorSchema = z.object({
+  userFacing: z.literal(true).optional().catch(undefined),
+  logDetail: z.string().optional().catch(undefined),
+  message: z.string().optional().catch(undefined),
+});
+
+/**
  * Who a parsed error's `message` was written for, and therefore whether it can
  * be rendered as-is. Derived from the BraintreeError `type`, which is the only
  * signal the SDK gives about its own copy: braintree-web writes `CUSTOMER`
  * messages for the buyer and the rest for whoever is integrating it.
  */
 export const PaymentErrorAudiences = {
-  /** Not a BraintreeError, so we threw it and `message` is already our copy. */
+  /** A `PaymentUserError`, so `message` is copy we wrote for the buyer. */
   OWN: 'own',
   /** The buyer or their bank caused it, and can act on it. Safe to render. */
   CUSTOMER: 'customer',
@@ -165,14 +196,14 @@ export interface ParsedPaymentError {
 }
 
 /**
- * An error with neither `code` nor `type` did not come from the SDK, so it is
- * one of ours and its message is already user-facing copy. Everything else is
- * classified by the BraintreeError `type`.
+ * Classify by the BraintreeError `type`.
+ *
+ * Note what this deliberately does not do: infer `OWN` from the *absence* of
+ * `code` and `type`. Everything that is not a BraintreeError lacks both, so
+ * that test would hand a `FetchError`'s `[POST] "/webapi/...": 500` straight to
+ * the buyer. `OWN` is only ever granted to a `PaymentUserError`, which says so.
  */
-function audienceFor(code: string | undefined, type: string | undefined): PaymentErrorAudience {
-  if (!code && !type)
-    return PaymentErrorAudiences.OWN;
-
+function audienceFor(type: string | undefined): PaymentErrorAudience {
   if (type === 'CUSTOMER')
     return PaymentErrorAudiences.CUSTOMER;
 
@@ -256,6 +287,39 @@ function describeOriginalError(original: unknown): string | undefined {
 }
 
 /**
+ * Recognise copy we wrote, the only thing that earns `OWN`.
+ *
+ * Tried before the BraintreeError shape, because a `PaymentUserError` matches
+ * that schema too (both are objects with a `message`) and would otherwise be
+ * classified as opaque developer prose.
+ */
+function parseUserError(error: unknown): ParsedPaymentError | undefined {
+  const own = UserErrorSchema.safeParse(error);
+  if (!own.success || own.data.userFacing !== true || !own.data.message)
+    return undefined;
+
+  const { message, logDetail } = own.data;
+
+  return {
+    message,
+    logMessage: logDetail ? `${message} (${logDetail})` : message,
+    audience: PaymentErrorAudiences.OWN,
+  };
+}
+
+/**
+ * The best single line describing a BraintreeError.
+ *
+ * Falls back through `code` and `type` before the raw stringification, so an
+ * object with no `message` still logs something the backend will accept (it
+ * rejects an empty `error_message` with a 400). None of the fallbacks is a
+ * sentence anyone wrote, which is why reaching them can never mean `OWN`.
+ */
+function describeBraintreeError(error: unknown, parsed: z.infer<typeof BraintreeErrorSchema>): string {
+  return parsed.message || parsed.code || parsed.type || String(error);
+}
+
+/**
  * Turn an unknown rejection from the Braintree/Cardinal 3D Secure flow into a
  * loggable message plus a stable error code.
  *
@@ -273,24 +337,24 @@ export function parseBraintreeError(error: unknown): ParsedPaymentError {
     return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
   }
 
+  const own = parseUserError(error);
+  if (own)
+    return own;
+
   const parsed = BraintreeErrorSchema.safeParse(error);
   if (!parsed.success) {
     const message = String(error);
     return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
   }
 
-  const { code, type, message, details } = parsed.data;
+  const { code, type, details } = parsed.data;
   const original = describeOriginalError(details?.originalError);
-
-  // Fall back through code/type before the raw stringification, so an object
-  // with no `message` still logs something the backend will accept (it rejects
-  // an empty `error_message` with a 400).
-  const base = message || code || type || String(error);
+  const base = describeBraintreeError(error, parsed.data);
 
   return {
     message: base,
     logMessage: original ? `${base} (${original})` : base,
     ...(code ? { code } : {}),
-    audience: audienceFor(code, type),
+    audience: audienceFor(type),
   };
 }

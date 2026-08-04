@@ -7,7 +7,7 @@ import {
   ThreeDSecureParamsSchema,
   type ThreeDSecureState,
 } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { CheckoutPaymentMethods, CheckoutSteps, monthsToPlanDuration, parseBraintreeError, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
+import { CheckoutPaymentMethods, CheckoutSteps, monthsToPlanDuration, parseBraintreeError, PaymentServerEvents, PaymentUserError, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
@@ -140,6 +140,9 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
     set(state, 'verifying');
     set(error, '');
+    // Set once a specific failure has already been reported, so the catch does
+    // not log the same failure a second time under a generic event.
+    let failureLogged = false;
     const lookupHandler = (_data: any, next: any) => {
       logger.debug('3D Secure lookup complete');
       next();
@@ -221,7 +224,11 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
           isUpgrade: !!params.upgradeSubId,
           discountApplied: params.discountTrackingInfo !== undefined,
         });
-        throw new Error(errorMsg);
+        // Logged as a liability-shift failure right above. The catch below must
+        // not log it again as a generic verification failure, or every one of
+        // these is counted twice.
+        failureLogged = true;
+        throw new PaymentUserError(errorMsg);
       }
     }
     catch (verifyError: unknown) {
@@ -231,16 +238,18 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
       set(error, userMessageFor(parsed));
       logger.error('3D Secure verification error:', verifyError);
-      logPaymentEvent({
-        paymentMethod: CheckoutPaymentMethods.CARD,
-        event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
-        errorMessage: parsed.logMessage,
-        errorCode: parsed.code,
-        step: CheckoutSteps.VERIFY,
-        planId: params.planId,
-        isUpgrade: !!params.upgradeSubId,
-        discountApplied: params.discountTrackingInfo !== undefined,
-      });
+      if (!failureLogged) {
+        logPaymentEvent({
+          paymentMethod: CheckoutPaymentMethods.CARD,
+          event: PaymentServerEvents.THREE_DS_VERIFICATION_FAILED,
+          errorMessage: parsed.logMessage,
+          errorCode: parsed.code,
+          step: CheckoutSteps.VERIFY,
+          planId: params.planId,
+          isUpgrade: !!params.upgradeSubId,
+          discountApplied: params.discountTrackingInfo !== undefined,
+        });
+      }
       throw verifyError;
     }
     finally {
@@ -278,8 +287,13 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       if (result.code === PaymentError.SERVER_ERROR) {
         requestRefresh();
         set(serverError, true);
+        // The full-screen overlay explains this one; the raw message is a 5xx
+        // dump, so it stays opaque.
+        throw new Error(result.error.message);
       }
-      throw new Error(result.error.message);
+      // A 400 carries the backend's own `ActionResultResponse.message`, which is
+      // written for the customer ("Do Not Honor", declines, validation).
+      throw new PaymentUserError(result.error.message);
     }
 
     // Use discount tracking info passed from card payment page via session storage

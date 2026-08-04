@@ -48,7 +48,7 @@ async function handleAddCard(): Promise<void> {
     set(open, false);
   }
   catch (caughtError: unknown) {
-    set(addCardError, userPaymentMessage(caughtError));
+    set(addCardError, userPaymentMessage(caughtError, 'card'));
   }
   finally {
     set(isAddingCard, false);

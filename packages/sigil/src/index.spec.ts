@@ -11,6 +11,7 @@ import {
   paymentErrorCopy,
   PaymentFailures,
   PaymentServerEvents,
+  PaymentUserError,
   postPaymentLog,
   randomSessionId,
   reasonForServerEvent,
@@ -557,7 +558,7 @@ describe('parseBraintreeError', () => {
   });
 
   it('handles a plain Error with no braintree fields', () => {
-    const parsed = parseBraintreeError(new Error('3DS liability did not shift, please try again'));
+    const parsed = parseBraintreeError(new PaymentUserError('3DS liability did not shift, please try again'));
 
     expect(parsed.message).toBe('3DS liability did not shift, please try again');
     expect(parsed.logMessage).toBe('3DS liability did not shift, please try again');
@@ -589,9 +590,40 @@ describe('parseBraintreeError', () => {
   });
 
   describe('audience', () => {
-    it('marks an error we threw ourselves as our own copy', () => {
-      // No `code` and no `type`, so it did not come out of the SDK.
-      expect(parseBraintreeError(new Error('3DS liability did not shift')).audience).toBe('own');
+    it('marks a PaymentUserError as our own copy', () => {
+      expect(parseBraintreeError(new PaymentUserError('3DS liability did not shift')).audience).toBe('own');
+    });
+
+    it('appends a PaymentUserError logDetail to the log message only', () => {
+      const parsed = parseBraintreeError(new PaymentUserError('We could not find that card.', {
+        logDetail: 'no vault entry for card ending 4242',
+      }));
+
+      expect(parsed.message).toBe('We could not find that card.');
+      expect(parsed.logMessage).toBe('We could not find that card. (no vault entry for card ending 4242)');
+    });
+
+    it('does not trust a plain Error, which may be any failure at all', () => {
+      // The trap this replaced: inferring "ours" from the absence of braintree
+      // fields hands the buyer whatever an unrelated throw happened to say.
+      expect(parseBraintreeError(new Error('kaboom')).audience).toBe('opaque');
+    });
+
+    it('does not trust a FetchError from our own API', () => {
+      const fetchError = Object.assign(new Error('[POST] "/webapi/2/braintree/payments": 500 Internal Server Error'), {
+        statusCode: 500,
+      });
+
+      expect(parseBraintreeError(fetchError).audience).toBe('opaque');
+    });
+
+    it('does not trust the [object Object] fallback', () => {
+      // `message || code || type || String(error)` can only reach the last arm
+      // when nobody wrote a message, so it is never fit to render.
+      const parsed = parseBraintreeError({});
+
+      expect(parsed.message).toBe('[object Object]');
+      expect(parsed.audience).toBe('opaque');
     });
 
     it('trusts the SDK message only for CUSTOMER errors', () => {
@@ -624,7 +656,7 @@ describe('parseBraintreeError', () => {
 
 describe('paymentErrorCopy', () => {
   it('passes through a message we wrote ourselves', () => {
-    const copy = paymentErrorCopy(parseBraintreeError(new Error('3DS liability did not shift')));
+    const copy = paymentErrorCopy(parseBraintreeError(new PaymentUserError('3DS liability did not shift')));
 
     expect(copy).toEqual({ kind: 'verbatim', message: '3DS liability did not shift' });
   });
