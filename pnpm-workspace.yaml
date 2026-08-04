@@ -112,7 +112,7 @@ catalog:
   stylelint-config-recommended-vue: 1.6.1
   stylelint-config-standard: 40.0.0
   stylelint-order: 8.1.1
-  swiper: 12.1.4
+  swiper: 14.0.6
   tailwindcss: 3.4.19
   tsdown: 0.22.14
   typescript: 6.0.3

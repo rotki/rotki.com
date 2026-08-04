@@ -205,8 +205,8 @@ catalogs:
       specifier: 8.1.1
       version: 8.1.1
     swiper:
-      specifier: 12.1.4
-      version: 12.1.4
+      specifier: 14.0.6
+      version: 14.0.6
     tailwindcss:
       specifier: 3.4.19
       version: 3.4.19
@@ -488,7 +488,7 @@ importers:
         version: 1.5.4
       swiper:
         specifier: 'catalog:'
-        version: 12.1.4
+        version: 14.0.6
       viem:
         specifier: 'catalog:'
         version: 2.52.2(typescript@6.0.3)(zod@4.4.3)
@@ -8482,8 +8482,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  swiper@12.1.4:
-    resolution: {integrity: sha512-bihiwoKMOQwW8FfdUbo1DgkVH25E+4ZELIq0oopL1KTKBteLuaTMi/wwFjMxtlhTkk45k3XQ89D1Fvv0spSqBA==}
+  swiper@14.0.6:
+    resolution: {integrity: sha512-ArptjmcZMBvpLCbvzSKuqvQpjjITCbZdymiGOrbZQffQ3ZSjgpvMByXX0WZBUt+FV4PPIumdYfZ9ZdBbFsdH6g==}
     engines: {node: '>= 4.7.0'}
 
   symbol-tree@3.2.4:
@@ -18888,7 +18888,7 @@ snapshots:
       picocolors: 1.1.1
       sax: 1.6.0
 
-  swiper@12.1.4: {}
+  swiper@14.0.6: {}
 
   symbol-tree@3.2.4: {}
 
