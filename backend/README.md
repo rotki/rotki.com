@@ -63,6 +63,10 @@ PORT=3000 \
 | `SPONSORSHIP_ENABLED`    | `false`                    |                         | Expose sponsorship as enabled via `/api/config` (frontend feature flag)    |
 | `MAINTENANCE`            | `false`                    |                         | Expose maintenance mode via `/api/config` (frontend feature flag)          |
 | `TESTING`                | `false`                    |                         | Expose testing mode via `/api/config` (frontend feature flag)              |
+| `CAMPAIGN_CODE`          | _(empty)_                  |                         | Sitewide discount campaign code exposed via `/api/config`                  |
+| `CAMPAIGN_PERCENT`       | `0`                        |                         | Campaign percentage off (1-100, required when `CAMPAIGN_CODE` is set)      |
+| `CAMPAIGN_START`         | _(empty)_                  |                         | Campaign start (RFC 3339, e.g. `2026-07-01T00:00:00Z`; empty = unbounded)  |
+| `CAMPAIGN_END`           | _(empty)_                  |                         | Campaign end (RFC 3339; empty = unbounded)                                 |
 
 ## Architecture
 

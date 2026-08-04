@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CampaignRibbon from '~/components/common/CampaignRibbon.vue';
 import ProductsAnalytics from '~/components/products/ProductsAnalytics.vue';
 import ProductsBlocks from '~/components/products/ProductsBlocks.vue';
 import ProductsFooter from '~/components/products/ProductsFooter.vue';
@@ -21,6 +22,7 @@ definePageMeta({
 </script>
 
 <template>
+  <CampaignRibbon />
   <ProductsHeading />
   <ProductsBlocks />
   <ProductsLimits />

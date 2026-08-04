@@ -327,10 +327,12 @@ watch(() => cards, (newCards) => {
 });
 
 onMounted(async () => {
-  // Prefill discount code from referral code query param
-  const referralCodeParam = new URLSearchParams(window.location.search).get('ref');
-  if (referralCodeParam && !get(discountCode)) {
-    set(discountCode, referralCodeParam);
+  // Prefill discount code from the explicit discountCode query param (forwarded by the
+  // website checkout, e.g. for sitewide campaigns), falling back to the referral code.
+  const params = new URLSearchParams(window.location.search);
+  const codeParam = params.get('discountCode') ?? params.get('ref');
+  if (codeParam && !get(discountCode)) {
+    set(discountCode, codeParam);
   }
 
   await initializeBraintreeClient();

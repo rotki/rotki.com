@@ -2,7 +2,7 @@
 import { get, set } from '@vueuse/shared';
 import { z } from 'zod';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
-import { integrationSlug } from '~/utils/integration-slug';
+import { integrationQualifier, integrationSlug } from '~/utils/integration-slug';
 import { parseRouteParam } from '~/utils/query';
 
 enum TabCategory {
@@ -177,6 +177,12 @@ const { isMdAndUp } = useBreakpoint();
                 </div>
                 <span class="text-xs text-rui-text-secondary text-center leading-tight line-clamp-2">
                   {{ item.label }}
+                </span>
+                <span
+                  v-if="integrationQualifier(item.label)"
+                  class="text-[0.625rem] text-rui-text-disabled text-center leading-tight"
+                >
+                  {{ integrationQualifier(item.label) }}
                 </span>
               </NuxtLink>
             </TransitionGroup>

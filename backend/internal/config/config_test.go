@@ -267,3 +267,70 @@ func TestEnvLogLevel(t *testing.T) {
 		})
 	}
 }
+
+func TestLoad_Campaign(t *testing.T) {
+	t.Setenv("CAMPAIGN_CODE", "SUMMER")
+	t.Setenv("CAMPAIGN_PERCENT", "20")
+	t.Setenv("CAMPAIGN_START", "2026-07-01T00:00:00Z")
+	t.Setenv("CAMPAIGN_END", "2026-08-01T00:00:00Z")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if cfg.CampaignCode != "SUMMER" {
+		t.Errorf("expected CampaignCode SUMMER, got %s", cfg.CampaignCode)
+	}
+	if cfg.CampaignPercent != 20 {
+		t.Errorf("expected CampaignPercent 20, got %d", cfg.CampaignPercent)
+	}
+	if cfg.CampaignStart.IsZero() || cfg.CampaignEnd.IsZero() {
+		t.Error("expected campaign period bounds to be parsed")
+	}
+}
+
+func TestLoad_CampaignValidation(t *testing.T) {
+	tests := []struct {
+		name string
+		envs map[string]string
+	}{
+		{
+			name: "missing percent",
+			envs: map[string]string{"CAMPAIGN_CODE": "SUMMER"},
+		},
+		{
+			name: "percent out of range",
+			envs: map[string]string{"CAMPAIGN_CODE": "SUMMER", "CAMPAIGN_PERCENT": "150"},
+		},
+		{
+			name: "invalid percent",
+			envs: map[string]string{"CAMPAIGN_CODE": "SUMMER", "CAMPAIGN_PERCENT": "twenty"},
+		},
+		{
+			name: "invalid start",
+			envs: map[string]string{"CAMPAIGN_CODE": "SUMMER", "CAMPAIGN_PERCENT": "20", "CAMPAIGN_START": "not-a-date"},
+		},
+		{
+			name: "end before start",
+			envs: map[string]string{
+				"CAMPAIGN_CODE":    "SUMMER",
+				"CAMPAIGN_PERCENT": "20",
+				"CAMPAIGN_START":   "2026-08-01T00:00:00Z",
+				"CAMPAIGN_END":     "2026-07-01T00:00:00Z",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range tt.envs {
+				t.Setenv(k, v)
+			}
+			_, err := Load()
+			if err == nil {
+				t.Error("expected error for invalid campaign configuration")
+			}
+		})
+	}
+}

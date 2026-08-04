@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/shared';
+import CampaignRibbon from '~/components/common/CampaignRibbon.vue';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 
@@ -73,36 +74,39 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div class="container flex flex-col lg:flex-row h-full grow py-4 lg:py-8 gap-6 lg:gap-8">
-    <div class="flex grow overflow-x-auto min-w-0">
-      <form
-        class="flex flex-col justify-between w-full"
-        @submit.prevent
-      >
-        <NuxtPage />
-        <div class="block py-10 w-full lg:hidden">
-          <RuiFooterStepper
-            :model-value="step"
-            :pages="steps.length"
-            class="mx-auto max-w-7xl"
-            variant="pill"
-          />
-        </div>
-      </form>
-    </div>
+  <div class="flex flex-col h-full grow">
+    <CampaignRibbon />
+    <div class="container flex flex-col lg:flex-row grow py-4 lg:py-8 gap-6 lg:gap-8">
+      <div class="flex grow overflow-x-auto min-w-0">
+        <form
+          class="flex flex-col justify-between w-full"
+          @submit.prevent
+        >
+          <NuxtPage />
+          <div class="block py-10 w-full lg:hidden">
+            <RuiFooterStepper
+              :model-value="step"
+              :pages="steps.length"
+              class="mx-auto max-w-7xl"
+              variant="pill"
+            />
+          </div>
+        </form>
+      </div>
 
-    <div
-      v-if="!isFirstStep"
-      class="hidden lg:block w-48 shrink-0 sticky top-8 self-start"
-    >
-      <RuiStepper
-        :step="step"
-        :steps="steps"
-        custom
-        orientation="vertical"
-        subtitle-class="!text-rui-primary-lighter"
-        title-class="!text-rui-primary"
-      />
+      <div
+        v-if="!isFirstStep"
+        class="hidden lg:block w-48 shrink-0 sticky top-8 self-start"
+      >
+        <RuiStepper
+          :step="step"
+          :steps="steps"
+          custom
+          orientation="vertical"
+          subtitle-class="!text-rui-primary-lighter"
+          title-class="!text-rui-primary"
+        />
+      </div>
     </div>
   </div>
 </template>

@@ -25,6 +25,25 @@ export const INTEGRATION_CONSOLIDATIONS: Record<string, { label: string; members
 };
 
 /**
+ * Coverage qualifiers shown next to an integration's name (grid card + detail page).
+ * Keyed by canonical slug. Kept here rather than in `all.json` because the catalog
+ * is regenerated from the rotki backend and hand-added fields would be wiped, and
+ * because the label itself must stay untouched - it drives `integrationSlug()`.
+ */
+export const INTEGRATION_QUALIFIERS: Record<string, string> = {
+  aave: 'v1–v3',
+  solana: 'early support',
+  uniswap: 'v2/v3',
+};
+
+/**
+ * Returns the coverage qualifier for an integration label, if one is defined.
+ */
+export function integrationQualifier(label: string): string | undefined {
+  return INTEGRATION_QUALIFIERS[consolidateSlug(integrationSlug(label))];
+}
+
+/**
  * Maps a raw integration slug to its canonical (consolidated) slug. Returns the slug
  * unchanged when it is not part of a consolidation group.
  */

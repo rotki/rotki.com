@@ -13,6 +13,8 @@ features:
   - "Jupiter aggregator swaps decoded as trade events."
   - "Jito tips recognised as fee events."
   - "Jupiter Lend activity (deposits, withdrawals, borrows, repays) decoded as events."
+limitations:
+  - "Solana support is early: balances, staking, and a growing set of protocols (Jupiter, Jito) are covered, but decoding is not yet as extensive as on EVM chains."
 setup:
   - "In rotki, open Blockchain & Accounts → Solana → Add address."
   - "Paste your Solana address. rotki validates the format and rejects invalid addresses."
