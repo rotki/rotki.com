@@ -40,6 +40,8 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
   const { logPaymentEvent } = usePaymentLogger();
   const { userMessageFor } = usePaymentErrorMessage();
   const { chronicle } = useSigilEvents();
+  const paymentApi = usePaymentApi();
+  const { requestRefresh } = useAccountRefresh();
 
   const state = shallowRef<ThreeDSecureState>('initializing');
   const error = shallowRef<string>('');
@@ -262,10 +264,6 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
    * Complete 3D Secure verification and finalize payment
    */
   async function verifyAndFinalizePayment(params: ThreeDSecureParams): Promise<void> {
-    // These composables need to be inside the function since they can only be used at component level
-    const paymentApi = usePaymentApi();
-    const { requestRefresh } = useAccountRefresh();
-
     // Initialize Braintree
     await initialize(params);
 

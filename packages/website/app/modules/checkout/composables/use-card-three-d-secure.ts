@@ -65,7 +65,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   const logger = useLogger('card-three-d-secure');
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { logPaymentEvent } = usePaymentLogger();
-  const { setDefaultCard } = usePaymentCards();
+  const { createCardNonce, setDefaultCard } = usePaymentCards();
 
   const threeDSecureInstance = shallowRef<ThreeDSecure>();
   const btClient = shallowRef<Client>();
@@ -194,7 +194,6 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     amount: number,
   ): Promise<string> {
     logger.debug('Creating card nonce for token:', cardToken);
-    const { createCardNonce } = usePaymentCards();
     const nonce = await createCardNonce({ paymentToken: cardToken });
     logger.debug('Card nonce created:', `${nonce.substring(0, 10)}...`);
 
