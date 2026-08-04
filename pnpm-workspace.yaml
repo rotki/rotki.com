@@ -63,7 +63,7 @@ catalog:
   '@resvg/resvg-js': 2.6.2
   '@rotki/eslint-config': 6.2.0
   '@rotki/eslint-plugin': 1.5.0
-  '@rotki/ui-library': 2.21.0
+  '@rotki/ui-library': 2.23.2
   '@tsconfig/node24': 24.0.4
   '@types/braintree-web': 3.96.17
   '@types/jsdom': 28.0.3
