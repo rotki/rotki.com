@@ -33,28 +33,28 @@ export interface MintNftParams extends ContractRef {
   isNative: boolean;
 }
 
-export async function readCurrentReleaseId(config: Config, ref: ContractRef): Promise<Result<bigint, Web3Error>> {
+export async function readCurrentReleaseId(config: Config, contractRef: ContractRef): Promise<Result<bigint, Web3Error>> {
   return fromPromise(
     readContract(config, {
       abi: ROTKI_SPONSORSHIP_ABI,
-      address: getAddress(ref.contractAddress),
-      chainId: ref.chainId,
+      address: getAddress(contractRef.contractAddress),
+      chainId: contractRef.chainId,
       functionName: 'currentReleaseId',
     }),
     cause => fromCause(cause),
   );
 }
 
-export async function readTierSupplies(config: Config, ref: ContractRef, releaseId: bigint): Promise<Result<Partial<Record<TierKey, TierSupply>>, Web3Error>> {
+export async function readTierSupplies(config: Config, contractRef: ContractRef, releaseId: bigint): Promise<Result<Partial<Record<TierKey, TierSupply>>, Web3Error>> {
   return fromPromise(
     (async (): Promise<Partial<Record<TierKey, TierSupply>>> => {
       const supplies: Partial<Record<TierKey, TierSupply>> = {};
       await Promise.all(SPONSORSHIP_TIERS.map(async (tier) => {
         const [maxSupply, currentSupply, metadataURI] = await readContract(config, {
           abi: ROTKI_SPONSORSHIP_ABI,
-          address: getAddress(ref.contractAddress),
+          address: getAddress(contractRef.contractAddress),
           args: [releaseId, BigInt(tier.tierId)],
-          chainId: ref.chainId,
+          chainId: contractRef.chainId,
           functionName: 'getTierInfo',
         });
         supplies[tier.key] = { currentSupply: Number(currentSupply), maxSupply: Number(maxSupply), metadataURI };

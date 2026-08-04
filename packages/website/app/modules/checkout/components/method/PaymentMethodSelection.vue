@@ -82,7 +82,7 @@ const isMethodSelected = computed<(method: PaymentMethod) => boolean>(
 const queryParams = computed<Record<string, string>>(() => {
   const result: Record<string, string> = {};
   const selectedPlanId = get(planId);
-  const ref = get(referralCode);
+  const referral = get(referralCode);
 
   if (selectedPlanId) {
     result.planId = String(selectedPlanId);
@@ -92,8 +92,8 @@ const queryParams = computed<Record<string, string>>(() => {
     result.id = identifier;
   }
 
-  if (ref) {
-    result.ref = ref;
+  if (referral) {
+    result.ref = referral;
   }
 
   return result;

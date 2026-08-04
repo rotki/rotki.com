@@ -29,11 +29,11 @@ const allowNavigation = computed<boolean>(() => {
 });
 
 const checkoutLink = computed<RouteLocationRaw>(() => {
-  const ref = get(referralCode);
-  if (ref) {
+  const referral = get(referralCode);
+  if (referral) {
     return {
       path: '/checkout/pay',
-      query: { ref },
+      query: { ref: referral },
     };
   }
   return '/checkout/pay';

@@ -63,13 +63,13 @@ describe('web3 client adapters', () => {
       const ensureInitialized = vi.fn(async () => config);
 
       const client = await getSponsorshipClient(ensureInitialized);
-      const ref = { chainId: 1, contractAddress: '0xContract' };
+      const contractRef = { chainId: 1, contractAddress: '0xContract' };
 
-      await client.readCurrentReleaseId(ref);
-      expect(sponsorshipActions.readCurrentReleaseId).toHaveBeenCalledWith(config, ref);
+      await client.readCurrentReleaseId(contractRef);
+      expect(sponsorshipActions.readCurrentReleaseId).toHaveBeenCalledWith(config, contractRef);
 
-      await client.readTierSupplies(ref, 3n);
-      expect(sponsorshipActions.readTierSupplies).toHaveBeenCalledWith(config, ref, 3n);
+      await client.readTierSupplies(contractRef, 3n);
+      expect(sponsorshipActions.readTierSupplies).toHaveBeenCalledWith(config, contractRef, 3n);
     });
 
     it('forwards the pure decodeMintedTokenId without the config', async () => {

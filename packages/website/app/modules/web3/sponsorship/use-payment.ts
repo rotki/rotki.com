@@ -138,15 +138,15 @@ export function useRotkiSponsorshipPayment() {
    * Resolve the release id (explicit or read from the contract) and verify the
    * tier still has supply, returning the release id on success.
    */
-  async function verifyTierForMint(sponsor: SponsorshipClient, ref: ContractRef, tierKey: TierKey, explicitReleaseId: number | undefined): Promise<Result<bigint, Web3Error>> {
+  async function verifyTierForMint(sponsor: SponsorshipClient, contractRef: ContractRef, tierKey: TierKey, explicitReleaseId: number | undefined): Promise<Result<bigint, Web3Error>> {
     const releaseIdResult: Result<bigint, Web3Error> = explicitReleaseId !== undefined
       ? ok(BigInt(explicitReleaseId))
-      : await sponsor.readCurrentReleaseId(ref);
+      : await sponsor.readCurrentReleaseId(contractRef);
     if (!releaseIdResult.ok)
       return releaseIdResult;
 
     const releaseId = releaseIdResult.value;
-    const supplies = await sponsor.readTierSupplies(ref, releaseId);
+    const supplies = await sponsor.readTierSupplies(contractRef, releaseId);
     return map(flatMap(supplies, tierSupplies => ensureTierAvailable(tierSupplies, tierKey)), () => releaseId);
   }
 
@@ -191,9 +191,9 @@ export function useRotkiSponsorshipPayment() {
 
       const chainId = get(CHAIN_ID);
       const contractAddress = get(CONTRACT_ADDRESS);
-      const ref = { chainId, contractAddress };
+      const contractRef = { chainId, contractAddress };
 
-      const verified = await verifyTierForMint(sponsor, ref, tierKey, releaseId);
+      const verified = await verifyTierForMint(sponsor, contractRef, tierKey, releaseId);
       if (!verified.ok)
         return failMint(verified.error);
       const currentReleaseId = verified.value;
