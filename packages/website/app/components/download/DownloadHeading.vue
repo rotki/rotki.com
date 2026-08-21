@@ -13,13 +13,9 @@ const showAll = ref<boolean>(false);
 
 const sponsors: { name: string; image: string; gold?: boolean; tooltip?: string }[] = [
   {
-    name: 'pcaversaccio',
-    image: '/img/sponsorship-profiles/1.43.0_pcaversaccio.jpg',
+    name: 'Ambire Wallet',
+    image: '/img/sponsorship-profiles/1.44.0_ambire.png',
     gold: true,
-  },
-  {
-    name: 'respired.eth',
-    image: '/img/sponsorship-profiles/1.43.0_respired.eth.jpg',
   },
 ];
 
@@ -172,7 +168,7 @@ function onDownloadClick(platform: string): void {
             </div>
           </div>
         </div>
-        <div class="flex-1 grid items-center md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 gap-y-8">
+        <div class="flex-1 flex items-center justify-start">
           <div
             v-for="(sponsor, index) in sponsors"
             :key="index"
@@ -205,7 +201,7 @@ function onDownloadClick(platform: string): void {
                 <template #activator>
                   <div
                     class="text-sm font-bold text-left text-rui-text-secondary relative"
-                    :class="{ 'text-yellow-900 max-w-[80%] px-0.5 text-center leading-8': sponsor.gold }"
+                    :class="{ 'text-yellow-900 max-w-[80%] px-0.5 text-center leading-8 whitespace-nowrap': sponsor.gold }"
                   >
                     {{ sponsor.name }}
                   </div>
