@@ -21,7 +21,7 @@ export function integrationSlug(label: string): string {
 export const INTEGRATION_CONSOLIDATIONS: Record<string, { label: string; members: string[] }> = {
   makerdao: { label: 'MakerDAO', members: ['makerdao-dsr', 'makerdao-migration', 'makerdao-sai', 'makerdao-vault'] },
   morpho: { label: 'Morpho', members: ['morpho-blue'] },
-  yearn: { label: 'Yearn', members: ['yearn-staking', 'yearn-governance'] },
+  yearn: { label: 'Yearn', members: ['yearn-staking', 'yearn-governance', 'yearn-vesting'] },
 };
 
 /**
