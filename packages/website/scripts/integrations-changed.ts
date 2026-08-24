@@ -22,7 +22,7 @@ import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { integrationSlug } from '../app/utils/integration-slug';
+import { consolidateSlug, integrationSlug } from '../app/utils/integration-slug';
 
 interface Meta {
   lastVerifiedRotkiTag: string;
@@ -225,25 +225,25 @@ if (inAllNotInMd.length === 0) {
   console.log('    (none - run pnpm gen:integration-stubs if any appear)');
 }
 else {
-  // Filter out slug collisions: all.json labels that collide with an existing md slug
-  // by first-word match are deduped by gen:integration-stubs and won't get their own file.
-  const trulyMissing = inAllNotInMd.filter((s) => {
-    const firstSegment = s.split('-')[0];
-    assert(firstSegment, 'String.split always returns at least one element');
-    return !mdSlugs.has(firstSegment);
-  });
+  // An all.json slug without its own md file is only safe when the site folds it into a
+  // page that does exist. That folding is INTEGRATION_CONSOLIDATIONS - the same explicit
+  // whitelist /integrations builds its links from - so consolidateSlug is what decides,
+  // not a first-word match. A first-word heuristic here would call "Yearn vesting" safe
+  // because yearn.md exists, while the site still links /integrations/yearn-vesting and
+  // the prerender 404s.
+  const trulyMissing = inAllNotInMd.filter(s => !mdSlugs.has(consolidateSlug(s)));
   if (trulyMissing.length === 0) {
-    console.log('    (all collisions - deduped by gen:integration-stubs)');
+    console.log('    (all consolidated onto existing pages)');
   }
   else {
-    for (const s of trulyMissing) console.log(`    + ${s}  (run pnpm gen:integration-stubs)`);
+    for (const s of trulyMissing) {
+      console.log(`    + ${s}  (run pnpm gen:integration-stubs, or add it to INTEGRATION_CONSOLIDATIONS)`);
+    }
   }
 }
 
-const driftExit = inMetaNotInMd.length + inMdNotInMeta.length + inAllNotInMd.filter((s) => {
-  const firstSegment = s.split('-')[0]!;
-  return !mdSlugs.has(firstSegment);
-}).length;
+const driftExit = inMetaNotInMd.length + inMdNotInMeta.length
+  + inAllNotInMd.filter(s => !mdSlugs.has(consolidateSlug(s))).length;
 
 const exitCode = (affectedSlugs.size > 0 || uncoveredAdditions.length > 0 || premiumChanged.length > 0 || driftExit > 0) ? 1 : 0;
 process.exit(exitCode);
