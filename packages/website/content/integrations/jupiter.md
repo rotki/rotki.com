@@ -11,6 +11,7 @@ features:
   - "Jupiter aggregator swaps, including RFQ fills, decoded as swap events on Solana."
   - "Jupiter Lend deposits, withdrawals, borrows, and repays decoded as events."
   - "Jito tips paid in your Jupiter transactions recognised as fee events."
+  - "Jupiter Lend positions valued: rotki queries the balance of each Solana address that has decoded Jupiter activity, so supplied and borrowed amounts show in your portfolio rather than only in history."
 setup:
   - "In rotki, add your Solana address."
   - "Open History and let the initial sync run. Jupiter swaps and Lend activity are decoded automatically."
