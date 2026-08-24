@@ -4,24 +4,29 @@
  * Usage:
  *   pnpm og:mint                          # uses https://rotki.com
  *   pnpm og:mint -- --base-url http://localhost:3000
+ *   pnpm og:mint -- --executable-path /usr/bin/chromium
  *
  * Requirements:
- *   - Playwright browsers installed (`pnpm exec playwright install chromium`)
+ *   - A Chromium: either the Playwright one (`pnpm exec playwright install chromium`)
+ *     or a system install pointed at via --executable-path / CHROMIUM_PATH.
  */
 
 import { Buffer } from 'node:buffer';
 import path from 'node:path';
+import process from 'node:process';
 import { parseArgs } from 'node:util';
 import { chromium } from '@playwright/test';
 
 const { values } = parseArgs({
   options: {
     'base-url': { type: 'string', default: 'https://rotki.com' },
+    'executable-path': { type: 'string', default: process.env.CHROMIUM_PATH },
   },
   strict: false,
 });
 
 const baseUrl = values['base-url'];
+const executablePath = typeof values['executable-path'] === 'string' ? values['executable-path'] : undefined;
 const outputPath = path.resolve(import.meta.dirname, '../public/img/og/mint.png');
 
 async function fetchAsDataUri(url: string): Promise<string> {
@@ -93,7 +98,7 @@ function buildOgHtml(nftSrc: string, logoSrc: string): string {
 }
 
 async function generateOgMint(): Promise<void> {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath });
   const page = await browser.newPage();
   await page.setViewportSize({ width: 1200, height: 630 });
 
