@@ -1,6 +1,6 @@
 {
   "$comment": "Maps each integration slug under content/integrations/<slug>.md to the rotki source paths that back it. Used by scripts/integrations-changed.ts to figure out which integration pages need re-verification after a new rotki release. Globs are POSIX, evaluated against the rotki repo root.",
-  "lastVerifiedRotkiTag": "v1.43.1",
+  "lastVerifiedRotkiTag": "v1.44.0",
   "premiumPaths": [
     "rotkehlchen/premium/premium.py",
     "rotkehlchen/constants/limits.py"
