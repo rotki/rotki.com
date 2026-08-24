@@ -10,7 +10,7 @@ keywords: "gnosis chain portfolio tracker, xdai tracker, gno wallet tracker, gno
 features:
   - "xDAI (native gas), GNO, and ERC-20 token balances per tracked address."
   - "Transaction history decoded into readable events: transfers, swaps, deposits, withdrawals, protocol interactions."
-  - "Counterparty-tagged Gnosis Chain decoders include Aave, Aura Finance, Balancer, CoW Swap, CrossCurve, Curve, Giveth, Hop, Magpie, 1inch, Paraswap, Safe, Spark, Sushiswap, WXDAI, and Yearn."
+  - "Counterparty-tagged Gnosis Chain decoders include Aave, Aura Finance, Balancer, CoW Swap, CrossCurve, Curve, Frankencoin, Giveth, GnosisDAO, Hop, Magpie, 1inch, Paraswap, Safe, Spark, Sushiswap, WXDAI, and Yearn."
   - "Both official Ethereum ↔ Gnosis bridges decoded: xDai bridge (DAI ↔ xDAI) and Omnibridge (ERC-20). See the [Gnosis bridges](/integrations/gnosis-chain) page for the cross-chain decoding details."
   - "Gnosis Pay and Monerium activity on Gnosis Chain decoded against their own counterparties."
 setup:

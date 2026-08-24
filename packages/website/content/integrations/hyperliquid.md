@@ -10,7 +10,8 @@ keywords: "hyperliquid portfolio tracker, hyperevm wallet tracker, hyperliquid d
 features:
   - "HYPE (native gas) and ERC-20 token balances per tracked Hyperliquid address."
   - "Transaction history decoded into readable events using the Hyperliquid RPC you configure."
-  - "Counterparty-tagged decoders on Hyperliquid include Curve, Sushiswap, KyberSwap, Morpho, Morpho Blue, WOOFi, and Circle CCTP."
+  - "Counterparty-tagged decoders on Hyperliquid include Curve, Sushiswap, KyberSwap, Morpho, Morpho Blue, WOOFi, Circle CCTP, Kinetiq, KittenSwap, Project X, and Across."
+  - "Kinetiq liquid staking positions are valued, including HYPE queued for withdrawal, so unstaking in progress is not missing from your balances."
 limitations:
   - "Hyperliquid's perpetuals DEX and the HYPE genesis distribution are not currently decoded as Hyperliquid-counterparty events. Token movements appear as ordinary ERC-20 events."
 setup:

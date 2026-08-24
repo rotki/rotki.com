@@ -10,6 +10,7 @@ keywords: "solana portfolio tracker, sol wallet tracker, solana tax report, sol 
 features:
   - "SOL, staked SOL, and SPL token balances tracked for your Solana addresses."
   - "Staked SOL summed from your stake accounts and included in your portfolio."
+  - "Native staking activity decoded from Solana's stake program: stake accounts delegated, deactivated, split, merged, withdrawn, and re-authorized."
   - "Jupiter aggregator swaps decoded as trade events."
   - "Jito tips recognised as fee events."
   - "Jupiter Lend activity (deposits, withdrawals, borrows, repays) decoded as events."
