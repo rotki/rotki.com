@@ -45,8 +45,10 @@ function useRotkiSponsorshipSSR() {
       // Process the results
       for (const tier of SPONSORSHIP_TIERS) {
         const tierInfo = response.tiers[tier.tierId];
+        // Every tier gets an entry: the backend omits tiers whose metadata failed to load,
+        // and an empty URL lets the image component show "not available" instead of loading forever
+        images[tier.key] = tierInfo?.imageUrl ?? '';
         if (tierInfo) {
-          images[tier.key] = tierInfo.imageUrl;
           supplies[tier.key] = {
             currentSupply: tierInfo.currentSupply,
             maxSupply: tierInfo.maxSupply,

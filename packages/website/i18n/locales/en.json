@@ -1201,8 +1201,11 @@
         "failed_to_load": "Failed to load",
         "retry": "Retry",
         "alt": "{tier} NFT",
-        "not_available": "{tier} NFT",
-        "image_not_available": "Image not available"
+        "artwork_unavailable_title": "Artwork unavailable",
+        "artwork_unavailable": "The {tier} artwork isn't available right now. You can still mint this tier.",
+        "artwork_load_failed_title": "Artwork didn't load",
+        "artwork_load_failed": "Couldn't load the {tier} artwork right now. You can still mint this tier.",
+        "try_again": "Try again"
       },
       "no_payment_tokens_available": "No payment tokens available",
       "payment_currency": "Payment Currency",
