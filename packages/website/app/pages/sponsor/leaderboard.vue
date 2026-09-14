@@ -52,7 +52,7 @@ const {
 
         <template
           v-for="(entry, index) in displayedEntries"
-          :key="hasData ? entry.rank : index"
+          :key="hasData ? (entry.rank ?? undefined) : index"
         >
           <RuiDivider
             v-if="index > 0"
