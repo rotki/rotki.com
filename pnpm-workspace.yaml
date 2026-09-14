@@ -30,7 +30,7 @@ overrides:
   # re-resolve a range that is already satisfied, so it pinned a second, vulnerable
   # copy at 8.5.15 that kept GHSA-r28c-9q8g-f849 and GHSA-fxqj-rqcc-2cmp open.
   # Force a single copy until stylelint-order widens or we drop it.
-  postcss: 8.5.24
+  postcss: 8.5.28
 
 allowBuilds:
   '@parcel/watcher': true
@@ -63,9 +63,9 @@ catalog:
   '@resvg/resvg-js': 2.6.2
   '@rotki/eslint-config': 6.2.0
   '@rotki/eslint-plugin': 1.5.0
-  '@rotki/ui-library': 2.23.2
+  '@rotki/ui-library': 2.24.0
   '@tsconfig/node24': 24.0.4
-  '@types/braintree-web': 3.96.17
+  '@types/braintree-web': 3.143.0
   '@types/jsdom': 28.0.3
   '@types/node': 24.13.3
   '@types/paypal-checkout-components': 4.0.8
@@ -86,7 +86,7 @@ catalog:
   '@walletconnect/universal-provider': 2.24.0
   autoprefixer: 10.5.4
   better-sqlite3: 12.11.1
-  braintree-web: 3.144.0
+  braintree-web: 3.145.0
   bumpp: 12.0.0
   cac: 7.0.0
   consola: 3.4.2
@@ -101,18 +101,18 @@ catalog:
   nuxt-llms: 0.2.0
   pinia: 4.0.3
   plainfp: 0.1.1
-  postcss: 8.5.24
+  postcss: 8.5.28
   postcss-html: 1.8.1
   postcss-import: 16.1.1
   qrcode: 1.5.4
   rimraf: 6.1.3
   rollup: 4.63.1
-  satori: 0.29.0
+  satori: 0.29.1
   stylelint: 17.14.1
   stylelint-config-recommended-vue: 1.6.1
   stylelint-config-standard: 40.0.0
   stylelint-order: 8.1.1
-  swiper: 14.0.6
+  swiper: 14.2.0
   tailwindcss: 3.4.19
   tsdown: 0.22.14
   typescript: 6.0.3
@@ -124,4 +124,4 @@ catalog:
   vue: 3.5.42
   vue-router: 5.3.1
   vue-tsc: 3.3.11
-  zod: 4.4.3
+  zod: 4.5.4

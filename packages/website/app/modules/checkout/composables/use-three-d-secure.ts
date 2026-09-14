@@ -359,7 +359,9 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
    * Cleanup resources
    */
   function cleanup(): void {
-    get(btThreeDSecure)?.teardown();
+    get(btThreeDSecure)
+      ?.teardown()
+      .catch((error: unknown) => logger.error('Error tearing down 3D Secure instance:', error));
     set(btClient, undefined);
     set(btThreeDSecure, undefined);
   }

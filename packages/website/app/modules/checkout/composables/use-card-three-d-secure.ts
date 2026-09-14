@@ -293,14 +293,12 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   function teardown(): void {
     const instance = get(threeDSecureInstance);
     if (instance) {
-      try {
-        instance.teardown();
-        set(threeDSecureInstance, undefined);
-        logger.debug('3DS instance torn down');
-      }
-      catch (error: unknown) {
-        logger.error('Error tearing down 3DS instance:', error);
-      }
+      set(threeDSecureInstance, undefined);
+      // Without a callback teardown() returns a promise, so failures reject
+      // asynchronously instead of throwing here.
+      instance.teardown()
+        .then(() => logger.debug('3DS instance torn down'))
+        .catch((error: unknown) => logger.error('Error tearing down 3DS instance:', error));
     }
   }
 
