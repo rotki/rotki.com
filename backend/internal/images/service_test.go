@@ -338,6 +338,94 @@ func TestService_ServeImage_NoStaleCopyForConfirmed404(t *testing.T) {
 	}
 }
 
+func TestService_ServeImage_StaleCopyInsteadOf503(t *testing.T) {
+	release := make(chan struct{})
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		<-release
+		w.Header().Set("Content-Type", "image/png")
+		_, _ = w.Write(pngBytes)
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	svc.requestWait = 50 * time.Millisecond
+	url := srv.URL + "/avatar.png"
+	cm.StoreImage(context.Background(), url, pngBytes, "image/png", "", "")
+
+	rec := serve(context.Background(), svc, url)
+
+	// Let the detached fetch finish before the test's temp cache dir is removed
+	close(release)
+	waitFor(t, "the detached fetch to finish", func() bool { return inflightCount(svc) == 0 })
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected the stale copy instead of 503, got %d", rec.Code)
+	}
+	if !strings.Contains(rec.Header().Get("Cache-Control"), "max-age=300") {
+		t.Errorf("stale copy should use a short cache lifetime, got %q", rec.Header().Get("Cache-Control"))
+	}
+}
+
+func TestService_SharedFetchTimeoutClearsInflightEntry(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done() // hangs until the client gives up
+	}))
+	defer srv.Close()
+
+	svc, _ := newTestService(t, nil)
+	svc.sharedFetchTimeout = 50 * time.Millisecond
+	svc.requestWait = 2 * time.Second
+
+	rec := serve(context.Background(), svc, srv.URL+"/hung.png")
+	if rec.Code != http.StatusBadGateway {
+		t.Fatalf("expected 502 after the shared fetch timed out, got %d", rec.Code)
+	}
+	waitFor(t, "the timed-out fetch to leave the inflight map", func() bool { return inflightCount(svc) == 0 })
+}
+
+func TestService_ServeImage_UnsupportedTypeIsNotStoredOnDisk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "image/avif")
+		_, _ = w.Write([]byte("avif-bytes"))
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	url := srv.URL + "/tier.avif"
+
+	rec := serve(context.Background(), svc, url)
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for unsupported type, got %d", rec.Code)
+	}
+	// Wait for the shared fetch to finish so a stray write would have happened
+	waitFor(t, "the shared fetch to finish", func() bool { return inflightCount(svc) == 0 })
+	f, err := cm.OpenImage(hashFilename(url))
+	if f != nil {
+		_ = f.Close()
+		t.Error("unsupported image must not be written to disk, where it could be served as a stale copy")
+	}
+	if err != nil {
+		t.Errorf("unexpected error opening cache file: %v", err)
+	}
+}
+
+func TestService_ServeImage_NoStaleCopyForOversizedImage(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "image/png")
+		_, _ = w.Write(make([]byte, MaxImageSize+100))
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	url := srv.URL + "/huge.png"
+	cm.StoreImage(context.Background(), url, pngBytes, "image/png", "", "")
+
+	rec := serve(context.Background(), svc, url)
+	if rec.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("expected 413 to win over a stale copy, got %d", rec.Code)
+	}
+}
+
 func TestService_WarmCache(t *testing.T) {
 	svc, srv := testService(t)
 	defer srv.Close()

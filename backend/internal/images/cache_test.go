@@ -99,6 +99,15 @@ func TestCacheManager_DiskMetadata(t *testing.T) {
 	}
 }
 
+func TestNotFoundTTL(t *testing.T) {
+	if got := notFoundTTL("https://ipfs.io/ipfs/bafybeiimage"); got != IPFSNotFoundTTL {
+		t.Errorf("IPFS 404 TTL = %s, want %s", got, IPFSNotFoundTTL)
+	}
+	if got := notFoundTTL("https://metadata.ens.domains/mainnet/avatar/nick.eth"); got != CacheTTL {
+		t.Errorf("non-IPFS 404 TTL = %s, want %s", got, CacheTTL)
+	}
+}
+
 func TestCacheManager_OpenImage(t *testing.T) {
 	cm := testCacheManager(t)
 	ctx := context.Background()

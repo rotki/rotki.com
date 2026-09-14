@@ -19,6 +19,11 @@ func MetadataCacheKey(metadataURI string) string {
 	return "metadata:" + normalizeURL(metadataURI)
 }
 
+// MetadataMissCacheKey returns the cache key marking metadata at a URI as confirmed missing.
+func MetadataMissCacheKey(metadataURI string) string {
+	return "metadata-miss:" + normalizeURL(metadataURI)
+}
+
 // ImageCacheKey returns the cache key for a cached image.
 func ImageCacheKey(imageURL string) string {
 	return "image:" + normalizeURL(imageURL)

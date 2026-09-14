@@ -81,10 +81,23 @@ func (m *CacheManager) GetMetadata(ctx context.Context, url string) (*Metadata, 
 
 // SetMetadata stores image metadata in Redis.
 func (m *CacheManager) SetMetadata(ctx context.Context, url string, meta *Metadata) {
+	m.setMetadata(ctx, url, meta, CacheTTL)
+}
+
+func (m *CacheManager) setMetadata(ctx context.Context, url string, meta *Metadata, ttl time.Duration) {
 	key := m.metadataKey(url)
-	if err := m.redis.Set(ctx, key, meta, CacheTTL); err != nil {
+	if err := m.redis.Set(ctx, key, meta, ttl); err != nil {
 		m.logger.Error("failed to cache image metadata", "url", url, "error", err)
 	}
+}
+
+// notFoundTTL is how long a 404 is cached. IPFS content can be pinned shortly after a
+// release publishes its metadata, so an IPFS miss is only remembered briefly.
+func notFoundTTL(url string) time.Duration {
+	if isContentAddressed(url) {
+		return IPFSNotFoundTTL
+	}
+	return CacheTTL
 }
 
 // OpenImage opens a cached image file for reading.
@@ -146,8 +159,9 @@ func (m *CacheManager) Store404(ctx context.Context, url, etag, lastModified str
 		LastModified: lastModified,
 		CachedAt:     time.Now().UTC().Format(time.RFC3339),
 	}
-	m.SetMetadata(ctx, url, meta)
-	m.logger.Debug("cached 404 response", "url", url)
+	ttl := notFoundTTL(url)
+	m.setMetadata(ctx, url, meta, ttl)
+	m.logger.Debug("cached 404 response", "url", url, "ttl", ttl)
 }
 
 // DiskMetadata builds metadata for an image file that is still on disk after its Redis

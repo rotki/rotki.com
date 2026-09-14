@@ -22,6 +22,12 @@ var ErrTokenNotFound = errors.New("token not found")
 // ErrReleaseNotFound is returned when a requested release is newer than the current release.
 var ErrReleaseNotFound = errors.New("release not found")
 
+// ErrMetadataUnavailable is returned for metadata recently confirmed missing or unusable.
+var ErrMetadataUnavailable = errors.New("metadata unavailable")
+
+// metadataFetchTimeout bounds a shared metadata fetch across all gateways.
+const metadataFetchTimeout = 30 * time.Second
+
 // maxInflight is the maximum number of concurrent dedup metadata fetch entries.
 const maxInflight = 50
 
@@ -147,51 +153,75 @@ func (s *CoreService) UpdateCachedReleaseID(releaseID int) {
 }
 
 // FetchMetadata fetches metadata from IPFS with caching and deduplication.
+//
+// Concurrent callers share one fetch, which runs detached from the caller that started it
+// (bounded by metadataFetchTimeout): a client disconnecting doesn't fail the other waiters,
+// and a fetch that finishes after every caller left still fills the cache. Metadata
+// confirmed missing is remembered for MetadataMissTTL and returns ErrMetadataUnavailable.
 func (s *CoreService) FetchMetadata(ctx context.Context, metadataURI string) (*TierMetadata, error) {
 	// Check cache first
 	if cached, ok := s.cache.GetMetadata(ctx, metadataURI); ok {
 		return cached, nil
 	}
+	if s.cache.IsMetadataMissing(ctx, metadataURI) {
+		return nil, fmt.Errorf("%w: %s recently confirmed missing", ErrMetadataUnavailable, metadataURI)
+	}
 
 	// Deduplicate concurrent requests for the same URI
 	s.dedupMu.Lock()
-	if req, ok := s.inflight[metadataURI]; ok {
-		s.dedupMu.Unlock()
-		select {
-		case <-req.done:
-			return req.result, req.err
-		case <-ctx.Done():
-			return nil, ctx.Err()
+	req, ok := s.inflight[metadataURI]
+	if !ok {
+		if len(s.inflight) >= maxInflight {
+			s.dedupMu.Unlock()
+			return nil, fmt.Errorf("too many concurrent metadata fetches")
 		}
+		req = &inflightRequest{done: make(chan struct{})}
+		s.inflight[metadataURI] = req
+		go s.runMetadataFetch(context.WithoutCancel(ctx), metadataURI, req)
 	}
-
-	if len(s.inflight) >= maxInflight {
-		s.dedupMu.Unlock()
-		return nil, fmt.Errorf("too many concurrent metadata fetches")
-	}
-
-	req := &inflightRequest{done: make(chan struct{})}
-	s.inflight[metadataURI] = req
 	s.dedupMu.Unlock()
 
-	defer func() {
-		close(req.done)
-		s.dedupMu.Lock()
-		delete(s.inflight, metadataURI)
-		s.dedupMu.Unlock()
-	}()
+	select {
+	case <-req.done:
+		return req.result, req.err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
 
-	// Fetch through the IPFS gateway pool
+// runMetadataFetch performs a shared metadata fetch, caches the result (or a confirmed miss),
+// and publishes it to waiters. req's result fields are written once, before done is closed.
+func (s *CoreService) runMetadataFetch(ctx context.Context, metadataURI string, req *inflightRequest) {
+	ctx, cancel := context.WithTimeout(ctx, metadataFetchTimeout)
+	defer cancel()
+
 	metadata, err := s.fetchMetadataHTTP(ctx, metadataURI)
-	if err != nil {
-		req.err = err
-		return nil, err
+	switch {
+	case err == nil:
+		s.cache.SetMetadata(ctx, metadataURI, metadata)
+	case isPermanentMetadataError(err):
+		s.cache.SetMetadataMissing(ctx, metadataURI)
+		s.logger.Warn("metadata confirmed missing, remembering briefly",
+			"uri", metadataURI, "ttl", MetadataMissTTL, "error", err)
 	}
 
-	// Cache the result
-	s.cache.SetMetadata(ctx, metadataURI, metadata)
-	req.result = metadata
-	return metadata, nil
+	req.result, req.err = metadata, err
+	close(req.done)
+
+	s.dedupMu.Lock()
+	delete(s.inflight, metadataURI)
+	s.dedupMu.Unlock()
+}
+
+// isPermanentMetadataError reports whether a metadata fetch failed because the content is
+// missing or unusable, rather than because gateways were slow, rate limited, or down.
+// The gateway pool only wraps a 404 when every configured gateway confirmed it.
+func isPermanentMetadataError(err error) bool {
+	if errors.Is(err, ErrMetadataUnavailable) || errors.Is(err, ipfs.ErrContentRejected) {
+		return true
+	}
+	var sc ipfs.StatusCoder
+	return errors.As(err, &sc) && sc.HTTPStatus() == http.StatusNotFound
 }
 
 // fetchMetadataHTTP fetches metadata JSON. IPFS URIs go through the gateway pool
@@ -399,8 +429,10 @@ func (s *CoreService) FetchTiers(ctx context.Context, tierIDs []int) (*TiersResp
 }
 
 // FetchAllTiersForRelease fetches all tiers without checking cache — used by cache updater.
-// It also returns the IDs of tiers whose metadata could not be fetched (and had no
-// previous cached metadata to fall back on); those are not cached so they are retried.
+// It also returns the IDs of tiers whose metadata failed transiently (and had no previous
+// cached metadata to fall back on); those are not cached so they are retried. Tiers whose
+// metadata is confirmed missing are cached without artwork for TierMissTTL instead, and are
+// not reported, since retrying sooner won't help.
 func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int) (int, map[int]*TierInfoResult, []int, error) {
 	cfg, err := s.GetConfig(ctx)
 	if err != nil {
@@ -421,7 +453,7 @@ func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int
 	}
 
 	results := make(map[int]*TierInfoResult)
-	var metadataFailures []int
+	var metadataFailures, metadataMissing []int
 	for tierID, info := range tierInfos {
 		if info == nil {
 			results[tierID] = nil
@@ -442,10 +474,14 @@ func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int
 			} else {
 				s.logger.Warn("tier metadata fetch failed",
 					"tier_id", tierID, "release_id", releaseID, "uri", info.MetadataURI, "error", err)
-				// Keep the last good metadata so a transient IPFS failure doesn't wipe the image
-				if prev, ok := s.cache.GetSingleTierInfo(ctx, tierID, cfg, releaseID); ok && prev.MetadataURI == info.MetadataURI && hasMetadata(prev) {
+				prev, ok := s.cache.GetSingleTierInfo(ctx, tierID, cfg, releaseID)
+				switch {
+				case ok && prev.MetadataURI == info.MetadataURI && hasMetadata(prev):
+					// Keep the last good metadata so a failure doesn't wipe the image
 					result.ImageURL, result.Benefits, result.ReleaseName = prev.ImageURL, prev.Benefits, prev.ReleaseName
-				} else {
+				case isPermanentMetadataError(err):
+					metadataMissing = append(metadataMissing, tierID)
+				default:
 					metadataFailures = append(metadataFailures, tierID)
 				}
 			}
@@ -454,9 +490,11 @@ func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int
 		results[tierID] = result
 	}
 
-	// Don't cache tiers whose metadata failed, so they are retried instead of cached empty.
-	// Tiers without metadata or without an image are cached as-is.
-	s.cache.StoreTierInfo(ctx, withoutTiers(results, metadataFailures), cfg, releaseID)
+	// Don't cache tiers whose metadata failed transiently, so they are retried instead of
+	// cached empty. Confirmed misses are cached briefly without artwork so page loads don't
+	// repeat the chain call and gateway attempts. Everything else is cached as usual.
+	s.cache.StoreTierInfo(ctx, withoutTiers(results, slices.Concat(metadataFailures, metadataMissing)), cfg, releaseID)
+	s.cache.StoreTierInfoWithTTL(ctx, onlyTiers(results, metadataMissing), cfg, releaseID, TierMissTTL)
 
 	return releaseID, results, metadataFailures, nil
 }
@@ -471,6 +509,17 @@ func withoutTiers(tiers map[int]*TierInfoResult, skip []int) map[int]*TierInfoRe
 	filtered := make(map[int]*TierInfoResult, len(tiers))
 	for tierID, info := range tiers {
 		if !slices.Contains(skip, tierID) {
+			filtered[tierID] = info
+		}
+	}
+	return filtered
+}
+
+// onlyTiers returns the subset of tiers with the given tier IDs.
+func onlyTiers(tiers map[int]*TierInfoResult, keep []int) map[int]*TierInfoResult {
+	filtered := make(map[int]*TierInfoResult, len(keep))
+	for _, tierID := range keep {
+		if info, ok := tiers[tierID]; ok {
 			filtered[tierID] = info
 		}
 	}
@@ -540,6 +589,7 @@ func (s *CoreService) fetchAndCacheMissingTiers(ctx context.Context, tierIDs []i
 
 	results := make(map[int]TierInfoResult)
 	toCache := make(map[int]*TierInfoResult)
+	missing := make(map[int]*TierInfoResult)
 
 	for tierID, info := range tierInfos {
 		if info == nil {
@@ -556,11 +606,21 @@ func (s *CoreService) fetchAndCacheMissingTiers(ctx context.Context, tierIDs []i
 		// so it doesn't trigger a blockchain call on every request.
 		if info.MetadataURI != "" {
 			metadata, err := s.FetchMetadata(ctx, info.MetadataURI)
-			if err != nil {
+			switch {
+			case err == nil:
+				result.ImageURL, result.Benefits, result.ReleaseName = ProcessTierMetadata(metadata)
+			case isPermanentMetadataError(err):
+				// Confirmed missing: cache the tier without artwork briefly, so every request
+				// doesn't repeat the chain call and gateway attempts
+				s.logger.Warn("tier metadata missing, caching tier without artwork",
+					"tier_id", tierID, "release_id", releaseID, "ttl", TierMissTTL, "error", err)
+				results[tierID] = result
+				missing[tierID] = &result
+				continue
+			default:
 				s.logger.Error("error processing tier metadata", "tier_id", tierID, "error", err)
 				continue
 			}
-			result.ImageURL, result.Benefits, result.ReleaseName = ProcessTierMetadata(metadata)
 		}
 
 		results[tierID] = result
@@ -568,6 +628,7 @@ func (s *CoreService) fetchAndCacheMissingTiers(ctx context.Context, tierIDs []i
 	}
 
 	s.cache.StoreTierInfo(ctx, toCache, cfg, releaseID)
+	s.cache.StoreTierInfoWithTTL(ctx, missing, cfg, releaseID, TierMissTTL)
 
 	return results, nil
 }

@@ -32,6 +32,10 @@ const (
 	// upstream failed, so clients check back soon.
 	StaleMaxAge = 5 * time.Minute
 
+	// IPFSNotFoundTTL is how long a 404 for IPFS content is cached. Artwork can be pinned
+	// shortly after a release's metadata is published, so a 404 there is only kept briefly.
+	IPFSNotFoundTTL = 10 * time.Minute
+
 	// fetchPendingRetryAfter is the Retry-After (seconds) sent while a fetch is still running.
 	fetchPendingRetryAfter = 10
 

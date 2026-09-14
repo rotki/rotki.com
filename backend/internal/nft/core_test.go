@@ -3,12 +3,16 @@ package nft
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
+	"github.com/rotki/rotki.com/backend/internal/cache"
 	"github.com/rotki/rotki.com/backend/internal/ipfs"
 )
 
@@ -71,6 +75,111 @@ func TestFetchMetadataHTTP_InvalidJSONStopsWithoutFallback(t *testing.T) {
 	}
 	if otherHits != 0 {
 		t.Errorf("unparsable content should not be retried on other gateways, got %d hits", otherHits)
+	}
+}
+
+func TestOnlyTiers(t *testing.T) {
+	tiers := map[int]*TierInfoResult{
+		0: {MaxSupply: 10},
+		1: {MaxSupply: 6},
+		2: {MaxSupply: 2},
+	}
+
+	got := onlyTiers(tiers, []int{1, 2, 7})
+
+	if len(got) != 2 || got[1] == nil || got[2] == nil {
+		t.Fatalf("expected tiers 1 and 2, got %v", got)
+	}
+	if _, ok := got[0]; ok {
+		t.Error("expected tier 0 to be excluded")
+	}
+}
+
+func TestIsPermanentMetadataError(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{"recently confirmed missing", fmt.Errorf("%w: ipfs://x", ErrMetadataUnavailable), true},
+		{"unusable content", fmt.Errorf("fetch metadata: %w", fmt.Errorf("%w: parse", ipfs.ErrContentRejected)), true},
+		{"404 on every gateway", fmt.Errorf("not found on 3 gateways: %w", &ipfs.StatusError{StatusCode: http.StatusNotFound}), true},
+		{"gateway 502", fmt.Errorf("all gateways failed: %w", &ipfs.StatusError{StatusCode: http.StatusBadGateway}), false},
+		{"rate limited", &ipfs.StatusError{StatusCode: http.StatusTooManyRequests}, false},
+		{"timeout", fmt.Errorf("gateway timed out: %w", context.DeadlineExceeded), false},
+		{"404 with gateways on cooldown (not wrapped)", errors.New("ipfs content not found on 1 of 3 gateways (others on cooldown)"), false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isPermanentMetadataError(tt.err); got != tt.want {
+				t.Errorf("isPermanentMetadataError(%v) = %v, want %v", tt.err, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFetchMetadata_CallerDisconnectDoesNotFailOtherWaiters(t *testing.T) {
+	release := make(chan struct{})
+	var hits atomic.Int32
+	gateway := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		<-release
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"name":"Gold","image":"ipfs://bafybeigold"}`))
+	}))
+	defer gateway.Close()
+
+	logger := slog.New(slog.DiscardHandler)
+	s := &CoreService{
+		cache:      NewCacheManager(cache.NewRedis("", "", logger), logger),
+		gateways:   ipfs.NewPool([]string{gateway.URL + "/ipfs/"}, logger),
+		httpClient: http.DefaultClient, // test servers are on loopback, which safedialer blocks
+		inflight:   make(map[string]*inflightRequest),
+		logger:     logger,
+	}
+
+	ctxA, cancelA := context.WithCancel(context.Background())
+	errA := make(chan error, 1)
+	go func() {
+		_, err := s.FetchMetadata(ctxA, "ipfs://bafkreimeta")
+		errA <- err
+	}()
+
+	deadline := time.Now().Add(3 * time.Second)
+	for hits.Load() == 0 {
+		if time.Now().After(deadline) {
+			t.Fatal("timed out waiting for the shared fetch to reach the gateway")
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+
+	type result struct {
+		metadata *TierMetadata
+		err      error
+	}
+	resB := make(chan result, 1)
+	go func() {
+		metadata, err := s.FetchMetadata(context.Background(), "ipfs://bafkreimeta")
+		resB <- result{metadata, err}
+	}()
+	time.Sleep(50 * time.Millisecond) // let B join the shared fetch
+
+	cancelA()
+	if err := <-errA; !errors.Is(err, context.Canceled) {
+		t.Fatalf("disconnected caller: expected context.Canceled, got %v", err)
+	}
+	close(release)
+
+	b := <-resB
+	if b.err != nil {
+		t.Fatalf("waiting caller failed after the first caller disconnected: %v", b.err)
+	}
+	if b.metadata == nil || b.metadata.Image != "ipfs://bafybeigold" {
+		t.Errorf("unexpected metadata: %+v", b.metadata)
+	}
+	if got := hits.Load(); got != 1 {
+		t.Errorf("expected 1 gateway request, got %d", got)
 	}
 }
 
