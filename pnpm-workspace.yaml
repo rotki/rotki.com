@@ -4,6 +4,8 @@ minimumReleaseAgeExclude:
   - '@rotki/eslint-config'
   - '@rotki/eslint-plugin'
   - '@rotki/ui-library'
+  # Renovate security update: vitest@4.1.11
+  - vitest@4.1.11
 shamefullyHoist: true
 shellEmulator: true
 blockExoticSubdeps: true
@@ -120,7 +122,7 @@ catalog:
   vite: 8.1.5
   vite-plugin-vue-devtools: 8.2.1
   vite-ssg: 28.3.0
-  vitest: 4.1.10
+  vitest: 4.1.11
   vue: 3.5.40
   vue-router: 5.2.0
   vue-tsc: 3.3.8
