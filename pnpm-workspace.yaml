@@ -31,6 +31,10 @@ overrides:
   # copy at 8.5.15 that kept GHSA-r28c-9q8g-f849 and GHSA-fxqj-rqcc-2cmp open.
   # Force a single copy until stylelint-order widens or we drop it.
   postcss: 8.5.28
+  # jsdom 28.1.0 (a test-tooling peer) allows undici ^7.21.0, but pnpm kept the
+  # vulnerable 7.27.2 it had already resolved. Pin the 7.x line to a patched
+  # release until jsdom moves on.
+  'undici@^7': 7.29.1
 
 allowBuilds:
   '@parcel/watcher': true
