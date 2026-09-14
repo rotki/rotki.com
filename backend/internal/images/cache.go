@@ -2,13 +2,18 @@
 package images
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
@@ -143,6 +148,56 @@ func (m *CacheManager) Store404(ctx context.Context, url, etag, lastModified str
 	}
 	m.SetMetadata(ctx, url, meta)
 	m.logger.Debug("cached 404 response", "url", url)
+}
+
+// DiskMetadata builds metadata for an image file that is still on disk after its Redis
+// metadata is gone (expired, evicted, or cleared on a release). The content type is
+// sniffed from the file; files that aren't a supported image type are ignored.
+// Nothing is written: callers decide whether to store the rebuilt metadata.
+func (m *CacheManager) DiskMetadata(url string) (*Metadata, bool) {
+	filename := hashFilename(url)
+	f, err := m.OpenImage(filename)
+	if err != nil || f == nil {
+		return nil, false
+	}
+	defer func() { _ = f.Close() }()
+
+	stat, err := f.Stat()
+	if err != nil || stat.Size() == 0 {
+		return nil, false
+	}
+
+	head := make([]byte, 512)
+	n, err := io.ReadFull(f, head)
+	if err != nil && !errors.Is(err, io.ErrUnexpectedEOF) {
+		return nil, false
+	}
+
+	contentType := sniffImageType(head[:n])
+	if !isAllowedContentType(contentType) {
+		return nil, false
+	}
+
+	return &Metadata{
+		ContentType: contentType,
+		Filename:    filename,
+		Size:        int(stat.Size()),
+		CachedAt:    stat.ModTime().UTC().Format(time.RFC3339),
+	}, true
+}
+
+// sniffImageType detects an image media type from the first bytes of a file.
+// http.DetectContentType doesn't recognise SVG, so markup containing <svg is treated as SVG.
+func sniffImageType(head []byte) string {
+	detected := http.DetectContentType(head)
+	mediaType, _, _ := strings.Cut(detected, ";")
+	if strings.HasPrefix(mediaType, "image/") {
+		return mediaType
+	}
+	if bytes.Contains(bytes.ToLower(head), []byte("<svg")) {
+		return "image/svg+xml"
+	}
+	return mediaType
 }
 
 // Invalidate removes the cached file and Redis metadata for an image.

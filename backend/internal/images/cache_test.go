@@ -56,6 +56,49 @@ func TestCacheManager_StoreImage_WritesFile(t *testing.T) {
 	}
 }
 
+func TestCacheManager_DiskMetadata(t *testing.T) {
+	cm := testCacheManager(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name     string
+		data     []byte
+		wantType string
+		wantOK   bool
+	}{
+		{"png", []byte("\x89PNG\r\n\x1a\nbody"), "image/png", true},
+		{"jpeg", []byte("\xff\xd8\xff\xe0\x00\x10JFIF"), "image/jpeg", true},
+		{"svg", []byte(`<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"></svg>`), "image/svg+xml", true},
+		{"html page", []byte("<!doctype html><html><body>gateway</body></html>"), "", false},
+		{"plain text", []byte("not an image"), "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			url := "https://ipfs.io/ipfs/" + tt.name
+			cm.StoreImage(ctx, url, tt.data, "ignored/by-sniffing", "", "")
+
+			meta, ok := cm.DiskMetadata(url)
+			if ok != tt.wantOK {
+				t.Fatalf("DiskMetadata ok = %v, want %v", ok, tt.wantOK)
+			}
+			if !ok {
+				return
+			}
+			if meta.ContentType != tt.wantType {
+				t.Errorf("content type = %q, want %q", meta.ContentType, tt.wantType)
+			}
+			if meta.Size != len(tt.data) || meta.Filename != hashFilename(url) {
+				t.Errorf("unexpected metadata: %+v", meta)
+			}
+		})
+	}
+
+	if _, ok := cm.DiskMetadata("https://ipfs.io/ipfs/never-stored"); ok {
+		t.Error("expected no metadata for a file that doesn't exist")
+	}
+}
+
 func TestCacheManager_OpenImage(t *testing.T) {
 	cm := testCacheManager(t)
 	ctx := context.Background()

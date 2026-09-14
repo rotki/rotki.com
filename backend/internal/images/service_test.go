@@ -8,9 +8,13 @@ import (
 	"net/http/httptest"
 	"os"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
+	"github.com/rotki/rotki.com/backend/internal/ipfs"
+	"github.com/rotki/rotki.com/backend/internal/nft"
 )
 
 func testService(t *testing.T) (*Service, *httptest.Server) {
@@ -132,6 +136,205 @@ func TestService_WarmCache_UnsupportedTypeIsNotAFailure(t *testing.T) {
 	succeeded, failed := svc.WarmCache(context.Background(), []string{srv.URL + "/tier.avif"})
 	if succeeded != 0 || failed != 0 {
 		t.Errorf("expected unsupported image to be neither succeeded nor failed, got %d/%d", succeeded, failed)
+	}
+}
+
+// pngBytes starts with the PNG signature so content sniffing detects image/png.
+var pngBytes = []byte("\x89PNG\r\n\x1a\n-fake-png-body")
+
+func newTestService(t *testing.T, pool *ipfs.Pool) (*Service, *CacheManager) {
+	t.Helper()
+	logger := slog.New(slog.DiscardHandler)
+	cm := NewCacheManager(t.TempDir(), cache.NewRedis("", "", logger), logger)
+	return NewService(cm, newFetcher(logger, nil, pool), logger), cm
+}
+
+func serve(ctx context.Context, svc *Service, url string) *httptest.ResponseRecorder {
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/nft/image", nil)
+	svc.ServeImage(ctx, rec, req, url)
+	return rec
+}
+
+func waitFor(t *testing.T, what string, cond func() bool) {
+	t.Helper()
+	deadline := time.Now().Add(3 * time.Second)
+	for !cond() {
+		if time.Now().After(deadline) {
+			t.Fatalf("timed out waiting for %s", what)
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+}
+
+func inflightCount(svc *Service) int {
+	svc.inflightMu.Lock()
+	defer svc.inflightMu.Unlock()
+	return len(svc.inflight)
+}
+
+func TestService_ServeImage_ClientDisconnectDoesNotCancelSharedFetch(t *testing.T) {
+	release := make(chan struct{})
+	var hits atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		<-release
+		w.Header().Set("Content-Type", "image/png")
+		_, _ = w.Write(pngBytes)
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	url := srv.URL + "/avatar.png"
+
+	ctxA, cancelA := context.WithCancel(context.Background())
+	doneA := make(chan struct{})
+	go func() {
+		defer close(doneA)
+		serve(ctxA, svc, url)
+	}()
+	waitFor(t, "shared fetch to start", func() bool { return inflightCount(svc) == 1 })
+
+	doneB := make(chan *httptest.ResponseRecorder, 1)
+	go func() { doneB <- serve(context.Background(), svc, url) }()
+	time.Sleep(50 * time.Millisecond) // let B join the shared fetch
+
+	cancelA()
+	<-doneA
+	close(release)
+
+	recB := <-doneB
+	if recB.Code != http.StatusOK {
+		t.Fatalf("waiting request: expected 200 after the first client left, got %d: %s", recB.Code, recB.Body.String())
+	}
+	if recB.Body.String() != string(pngBytes) {
+		t.Errorf("unexpected body: %q", recB.Body.String())
+	}
+	if got := hits.Load(); got != 1 {
+		t.Errorf("expected 1 upstream fetch, got %d", got)
+	}
+	if _, ok := cm.DiskMetadata(url); !ok {
+		t.Error("expected the image to be stored on disk")
+	}
+}
+
+func TestService_ServeImage_SlowFetchReturns503AndStillCaches(t *testing.T) {
+	release := make(chan struct{})
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		<-release
+		w.Header().Set("Content-Type", "image/png")
+		_, _ = w.Write(pngBytes)
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	svc.requestWait = 50 * time.Millisecond
+	url := srv.URL + "/slow.png"
+
+	rec := serve(context.Background(), svc, url)
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("expected 503 while the fetch is still running, got %d", rec.Code)
+	}
+	if got := rec.Header().Get("Retry-After"); got != "10" {
+		t.Errorf("expected Retry-After 10, got %q", got)
+	}
+	if !strings.Contains(rec.Header().Get("Cache-Control"), "no-store") {
+		t.Errorf("a pending response must not be cached, got %q", rec.Header().Get("Cache-Control"))
+	}
+
+	close(release)
+	waitFor(t, "the detached fetch to cache the image", func() bool {
+		_, ok := cm.DiskMetadata(url)
+		return ok
+	})
+}
+
+func TestService_ServeImage_RecoversIPFSImageFromDisk(t *testing.T) {
+	var hits atomic.Int32
+	gateway := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		w.WriteHeader(http.StatusBadGateway)
+	}))
+	defer gateway.Close()
+
+	logger := slog.New(slog.DiscardHandler)
+	svc, cm := newTestService(t, ipfs.NewPool([]string{gateway.URL + "/ipfs/"}, logger))
+	raw := "ipfs://bafybeiimage"
+
+	// With no-op Redis only the file remains, like metadata that expired or was cleared on a release
+	cm.StoreImage(context.Background(), nft.NormalizeIPFSURL(raw), pngBytes, "image/png", "", "")
+
+	rec := serve(context.Background(), svc, raw)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 from disk, got %d", rec.Code)
+	}
+	if rec.Header().Get("Content-Type") != "image/png" {
+		t.Errorf("expected sniffed image/png, got %q", rec.Header().Get("Content-Type"))
+	}
+	if !strings.Contains(rec.Header().Get("Cache-Control"), "max-age=604800") {
+		t.Errorf("content-addressed image should keep the normal cache lifetime, got %q", rec.Header().Get("Cache-Control"))
+	}
+	if got := hits.Load(); got != 0 {
+		t.Errorf("expected no gateway requests, got %d", got)
+	}
+}
+
+func TestService_FetchAndCache_RecoversIPFSImageFromDisk(t *testing.T) {
+	var hits atomic.Int32
+	gateway := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		w.WriteHeader(http.StatusBadGateway)
+	}))
+	defer gateway.Close()
+
+	logger := slog.New(slog.DiscardHandler)
+	svc, cm := newTestService(t, ipfs.NewPool([]string{gateway.URL + "/ipfs/"}, logger))
+	raw := "ipfs://bafybeiimage"
+	cm.StoreImage(context.Background(), nft.NormalizeIPFSURL(raw), pngBytes, "image/png", "", "")
+
+	if err := svc.FetchAndCache(context.Background(), raw); err != nil {
+		t.Fatalf("expected warm to succeed from disk, got %v", err)
+	}
+	if got := hits.Load(); got != 0 {
+		t.Errorf("expected no gateway requests, got %d", got)
+	}
+}
+
+func TestService_ServeImage_ServesStaleCopyWhenUpstreamFails(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusForbidden) // not retried, keeps the test fast
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	url := srv.URL + "/avatar.png"
+	cm.StoreImage(context.Background(), url, pngBytes, "image/png", "", "")
+
+	rec := serve(context.Background(), svc, url)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected stale copy with 200, got %d", rec.Code)
+	}
+	if rec.Body.String() != string(pngBytes) {
+		t.Errorf("unexpected body: %q", rec.Body.String())
+	}
+	if !strings.Contains(rec.Header().Get("Cache-Control"), "max-age=300") {
+		t.Errorf("stale copy should use a short cache lifetime, got %q", rec.Header().Get("Cache-Control"))
+	}
+}
+
+func TestService_ServeImage_NoStaleCopyForConfirmed404(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer srv.Close()
+
+	svc, cm := newTestService(t, nil)
+	url := srv.URL + "/removed.png"
+	cm.StoreImage(context.Background(), url, pngBytes, "image/png", "", "")
+
+	rec := serve(context.Background(), svc, url)
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 to win over a stale copy, got %d", rec.Code)
 	}
 }
 

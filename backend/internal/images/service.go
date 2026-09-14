@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -17,6 +17,10 @@ import (
 // maxInflight is the maximum number of concurrent dedup fetch entries.
 const maxInflight = 100
 
+// ErrFetchPending is returned when an uncached image is still being fetched after the
+// request stopped waiting. The fetch continues in the background and fills the cache.
+var ErrFetchPending = errors.New("image fetch still in progress")
+
 // Service is the main image proxy service handling fetch, cache, and serving.
 type Service struct {
 	cache   *CacheManager
@@ -26,20 +30,30 @@ type Service struct {
 	// Request deduplication: prevents multiple concurrent fetches for the same URL.
 	inflight   map[string]*inflightEntry
 	inflightMu sync.Mutex
+
+	// Overridable in tests
+	requestWait        time.Duration
+	sharedFetchTimeout time.Duration
 }
 
+// inflightEntry is a shared upstream fetch. Its result fields are written once, before
+// done is closed, and only read after done is closed.
 type inflightEntry struct {
-	done chan struct{}
-	err  error
+	done    chan struct{}
+	data    []byte
+	headers *ResponseHeaders
+	err     error
 }
 
 // NewService creates a new image service.
 func NewService(cache *CacheManager, fetcher *Fetcher, logger *slog.Logger) *Service {
 	return &Service{
-		cache:    cache,
-		fetcher:  fetcher,
-		logger:   logger.With("component", "image-service"),
-		inflight: make(map[string]*inflightEntry),
+		cache:              cache,
+		fetcher:            fetcher,
+		logger:             logger.With("component", "image-service"),
+		inflight:           make(map[string]*inflightEntry),
+		requestWait:        RequestWaitTimeout,
+		sharedFetchTimeout: SharedFetchTimeout,
 	}
 }
 
@@ -77,12 +91,23 @@ func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWrite
 			}
 			// File missing on disk — metadata was invalidated, fall through to re-fetch
 		}
+	} else if s.recoverFromDisk(ctx, normalizedURL) {
+		if diskMeta, ok := s.cache.GetMetadata(ctx, normalizedURL); ok && s.serveCached(ctx, w, r, diskMeta, normalizedURL, maxAge) {
+			return
+		}
+		// Without Redis the restored metadata can't be read back: serve straight from disk
+		if diskMeta, ok := s.cache.DiskMetadata(normalizedURL); ok && s.serveCached(ctx, w, r, diskMeta, normalizedURL, maxAge) {
+			return
+		}
 	}
 
-	// Cache miss — fetch with deduplication
+	// Cache miss — fetch once for all concurrent requests
 	s.logger.Debug("cache miss, fetching", "url", normalizedURL)
-	data, headers, err := s.deduplicatedFetch(ctx, cacheKey, normalizedURL)
+	data, headers, err := s.fetchShared(ctx, cacheKey, normalizedURL)
 	if err != nil {
+		if s.serveStale(ctx, w, r, normalizedURL, err) {
+			return
+		}
 		s.handleFetchError(ctx, w, normalizedURL, err)
 		return
 	}
@@ -94,10 +119,7 @@ func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWrite
 		return
 	}
 
-	// Cache the image
-	s.cache.StoreImage(ctx, normalizedURL, data, headers.ContentType, headers.ETag, headers.LastModified)
-
-	// Write response
+	// The shared fetch already stored the image in the cache
 	s.writeImageResponse(w, data, headers, maxAge)
 }
 
@@ -110,7 +132,7 @@ var ErrUnsupportedContentType = errors.New("unsupported image content type")
 func (s *Service) FetchAndCache(ctx context.Context, rawURL string) error {
 	normalizedURL := nft.NormalizeIPFSURL(rawURL)
 
-	if s.isCached(ctx, normalizedURL) {
+	if s.isCached(ctx, normalizedURL) || s.recoverFromDisk(ctx, normalizedURL) {
 		return nil
 	}
 
@@ -171,55 +193,103 @@ func (s *Service) WarmCache(ctx context.Context, urls []string) (succeeded, fail
 	return succeeded, failed
 }
 
-// deduplicatedFetch ensures only one fetch is in progress per cache key.
-func (s *Service) deduplicatedFetch(ctx context.Context, cacheKey, url string) ([]byte, *ResponseHeaders, error) {
+// fetchShared returns the result of a single upstream fetch per cache key, shared by all
+// concurrent requests. The fetch runs detached from the caller's context (bounded by
+// sharedFetchTimeout), so one client disconnecting doesn't cancel it for the others, and
+// a fetch that finishes after every client left still fills the cache. The caller waits at
+// most requestWait and then gets ErrFetchPending.
+func (s *Service) fetchShared(ctx context.Context, cacheKey, url string) ([]byte, *ResponseHeaders, error) {
 	s.inflightMu.Lock()
-	if entry, ok := s.inflight[cacheKey]; ok {
-		s.inflightMu.Unlock()
-		// Wait for the in-flight request to complete
-		select {
-		case <-entry.done:
-		case <-ctx.Done():
-			return nil, nil, ctx.Err()
+	entry, ok := s.inflight[cacheKey]
+	if !ok {
+		if len(s.inflight) >= maxInflight {
+			s.inflightMu.Unlock()
+			return nil, nil, fmt.Errorf("too many concurrent image fetches")
 		}
-		if entry.err != nil {
-			return nil, nil, entry.err
-		}
-		// The first request cached it — read metadata and file from cache
-		meta, ok := s.cache.GetMetadata(ctx, url)
-		if !ok || meta.Is404() || meta.Filename == "" {
-			return nil, nil, fmt.Errorf("image not available after dedup wait")
-		}
-		data, err := s.readCachedFile(meta.Filename)
-		if err != nil {
-			return nil, nil, err
-		}
-		return data, &ResponseHeaders{
-			ContentLength: meta.Size,
-			ContentType:   meta.ContentType,
-			ETag:          meta.ETag,
-			LastModified:  meta.LastModified,
-		}, nil
+		entry = &inflightEntry{done: make(chan struct{})}
+		s.inflight[cacheKey] = entry
+		go s.runSharedFetch(context.WithoutCancel(ctx), cacheKey, url, entry)
 	}
-
-	if len(s.inflight) >= maxInflight {
-		s.inflightMu.Unlock()
-		return nil, nil, fmt.Errorf("too many concurrent image fetches")
-	}
-
-	entry := &inflightEntry{done: make(chan struct{})}
-	s.inflight[cacheKey] = entry
 	s.inflightMu.Unlock()
 
+	timer := time.NewTimer(s.requestWait)
+	defer timer.Stop()
+
+	select {
+	case <-entry.done:
+		return entry.data, entry.headers, entry.err
+	case <-ctx.Done():
+		return nil, nil, ctx.Err()
+	case <-timer.C:
+		return nil, nil, ErrFetchPending
+	}
+}
+
+// runSharedFetch performs a shared fetch, stores the result in the cache, and publishes it
+// to waiters. Storing here (not in the request) means the cache fills even if no request is
+// still waiting.
+func (s *Service) runSharedFetch(ctx context.Context, cacheKey, url string, entry *inflightEntry) {
+	ctx, cancel := context.WithTimeout(ctx, s.sharedFetchTimeout)
+	defer cancel()
+
 	data, headers, err := s.fetcher.FetchImage(ctx, url)
-	entry.err = err
+
+	var fetchErr *FetchError
+	switch {
+	case err == nil && isAllowedContentType(headers.ContentType):
+		s.cache.StoreImage(ctx, url, data, headers.ContentType, headers.ETag, headers.LastModified)
+	case errors.As(err, &fetchErr) && fetchErr.StatusCode == http.StatusNotFound:
+		s.cache.Store404(ctx, url, fetchErr.ETag, fetchErr.LastModified)
+	}
+
+	entry.data, entry.headers, entry.err = data, headers, err
 	close(entry.done)
 
 	s.inflightMu.Lock()
 	delete(s.inflight, cacheKey)
 	s.inflightMu.Unlock()
+}
 
-	return data, headers, err
+// recoverFromDisk restores Redis metadata for an IPFS image whose file is still on disk.
+// IPFS content never changes for a CID, so a file left behind after its metadata expired
+// (or was cleared on a release) is still correct and doesn't need to be fetched again.
+// Other URLs can change upstream, so their files are only used as a stale fallback.
+func (s *Service) recoverFromDisk(ctx context.Context, url string) bool {
+	if !isContentAddressed(url) {
+		return false
+	}
+	meta, ok := s.cache.DiskMetadata(url)
+	if !ok {
+		return false
+	}
+	s.cache.SetMetadata(ctx, url, meta)
+	s.logger.Debug("restored image metadata from disk", "url", url, "file", meta.Filename)
+	return true
+}
+
+// serveStale serves an image left on disk when fetching it from upstream failed, with a
+// short client cache lifetime. A confirmed 404 or an oversized image is not overridden.
+func (s *Service) serveStale(ctx context.Context, w http.ResponseWriter, r *http.Request, url string, err error) bool {
+	var fetchErr *FetchError
+	if errors.As(err, &fetchErr) &&
+		(fetchErr.StatusCode == http.StatusNotFound || fetchErr.StatusCode == http.StatusRequestEntityTooLarge) {
+		return false
+	}
+	if ctx.Err() != nil {
+		return false
+	}
+
+	meta, ok := s.cache.DiskMetadata(url)
+	if !ok {
+		return false
+	}
+	s.logger.Warn("upstream image fetch failed, serving stale copy from disk", "url", url, "error", err)
+	return s.serveCached(ctx, w, r, meta, url, StaleMaxAge)
+}
+
+// isContentAddressed reports whether a URL points at immutable IPFS content.
+func isContentAddressed(url string) bool {
+	return strings.Contains(url, "/ipfs/")
 }
 
 // isCached reports whether an image has valid metadata and its file is present on disk.
@@ -234,25 +304,6 @@ func (s *Service) isCached(ctx context.Context, url string) bool {
 	}
 	_ = f.Close()
 	return true
-}
-
-// readCachedFile reads the full contents of a cached image file.
-// Used only for dedup waiters who need data for the initial response.
-func (s *Service) readCachedFile(filename string) ([]byte, error) {
-	f, err := s.cache.OpenImage(filename)
-	if err != nil {
-		return nil, err
-	}
-	if f == nil {
-		return nil, fmt.Errorf("cached file not found: %s", filename)
-	}
-	defer func() { _ = f.Close() }()
-
-	data, err := io.ReadAll(f)
-	if err != nil {
-		return nil, fmt.Errorf("read cached file: %w", err)
-	}
-	return data, nil
 }
 
 // handleConditional checks If-None-Match and If-Modified-Since against cached metadata.
@@ -368,9 +419,20 @@ func isAllowedContentType(ct string) bool {
 	return SupportedContentTypes[mediaType]
 }
 
-// handleFetchError handles errors from image fetching, including caching 404s.
+// handleFetchError writes the response for a failed image fetch. 404s are cached by the
+// shared fetch itself, so they stay cached even when no request is waiting.
 func (s *Service) handleFetchError(ctx context.Context, w http.ResponseWriter, url string, err error) {
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+
+	if errors.Is(err, ErrFetchPending) {
+		w.Header().Set("Retry-After", strconv.Itoa(fetchPendingRetryAfter))
+		http.Error(w, "Image is still being fetched, retry shortly", http.StatusServiceUnavailable)
+		return
+	}
+	if ctx.Err() != nil {
+		// The client went away; the shared fetch continues without it
+		return
+	}
 
 	var fetchErr *FetchError
 	if !errors.As(err, &fetchErr) {
@@ -380,7 +442,6 @@ func (s *Service) handleFetchError(ctx context.Context, w http.ResponseWriter, u
 	}
 
 	if fetchErr.StatusCode == http.StatusNotFound {
-		s.cache.Store404(ctx, url, fetchErr.ETag, fetchErr.LastModified)
 		http.Error(w, "Image not found", http.StatusNotFound)
 		return
 	}

@@ -20,6 +20,21 @@ const (
 	// before falling back to the next one.
 	GatewayFetchTimeout = 15 * time.Second
 
+	// SharedFetchTimeout bounds a shared upstream image fetch. It runs detached from the
+	// request that started it, so it can outlive that request and still fill the cache.
+	SharedFetchTimeout = 60 * time.Second
+
+	// RequestWaitTimeout is how long a request waits for an uncached image before it gets
+	// a 503 with Retry-After. The shared fetch keeps running and caches the result.
+	RequestWaitTimeout = 20 * time.Second
+
+	// StaleMaxAge is the client cache lifetime for an image served from disk after its
+	// upstream failed, so clients check back soon.
+	StaleMaxAge = 5 * time.Minute
+
+	// fetchPendingRetryAfter is the Retry-After (seconds) sent while a fetch is still running.
+	fetchPendingRetryAfter = 10
+
 	// MaxConcurrency is the max number of concurrent image fetches during cache warming.
 	MaxConcurrency = 5
 
