@@ -91,12 +91,8 @@ func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWrite
 			}
 			// File missing on disk — metadata was invalidated, fall through to re-fetch
 		}
-	} else if s.recoverFromDisk(ctx, normalizedURL) {
-		if diskMeta, ok := s.cache.GetMetadata(ctx, normalizedURL); ok && s.serveCached(ctx, w, r, diskMeta, normalizedURL, maxAge) {
-			return
-		}
-		// Without Redis the restored metadata can't be read back: serve straight from disk
-		if diskMeta, ok := s.cache.DiskMetadata(normalizedURL); ok && s.serveCached(ctx, w, r, diskMeta, normalizedURL, maxAge) {
+	} else if diskMeta, ok := s.recoverFromDisk(ctx, normalizedURL); ok {
+		if s.serveCached(ctx, w, r, diskMeta, normalizedURL, maxAge) {
 			return
 		}
 	}
@@ -132,7 +128,10 @@ var ErrUnsupportedContentType = errors.New("unsupported image content type")
 func (s *Service) FetchAndCache(ctx context.Context, rawURL string) error {
 	normalizedURL := nft.NormalizeIPFSURL(rawURL)
 
-	if s.isCached(ctx, normalizedURL) || s.recoverFromDisk(ctx, normalizedURL) {
+	if s.isCached(ctx, normalizedURL) {
+		return nil
+	}
+	if _, ok := s.recoverFromDisk(ctx, normalizedURL); ok {
 		return nil
 	}
 
@@ -250,21 +249,38 @@ func (s *Service) runSharedFetch(ctx context.Context, cacheKey, url string, entr
 	s.inflightMu.Unlock()
 }
 
-// recoverFromDisk restores Redis metadata for an IPFS image whose file is still on disk.
-// IPFS content never changes for a CID, so a file left behind after its metadata expired
-// (or was cleared on a release) is still correct and doesn't need to be fetched again.
-// Other URLs can change upstream, so their files are only used as a stale fallback.
-func (s *Service) recoverFromDisk(ctx context.Context, url string) bool {
+// recoverFromDisk restores metadata for an IPFS image whose file is still on disk and
+// returns it. IPFS content never changes for a CID, so a file left behind after its
+// metadata expired (or was cleared on a release) is still correct and doesn't need to be
+// fetched again. Other URLs can change upstream, so their files are only used as a stale
+// fallback. The returned metadata is usable even when Redis is unavailable.
+func (s *Service) recoverFromDisk(ctx context.Context, url string) (*Metadata, bool) {
 	if !isContentAddressed(url) {
-		return false
+		return nil, false
 	}
 	meta, ok := s.cache.DiskMetadata(url)
 	if !ok {
-		return false
+		return nil, false
 	}
+	// The content path identifies the bytes, like the ETag gateways send, so clients
+	// can keep revalidating with If-None-Match after a recovery
+	meta.ETag = ipfsETag(url)
 	s.cache.SetMetadata(ctx, url, meta)
 	s.logger.Debug("restored image metadata from disk", "url", url, "file", meta.Filename)
-	return true
+	return meta, true
+}
+
+// ipfsETag returns a strong ETag for IPFS content, built from its immutable content path
+// ("<cid>" or "<cid>/<subpath>"). It returns "" for URLs without an IPFS path.
+func ipfsETag(url string) string {
+	_, path, ok := strings.Cut(url, "/ipfs/")
+	if i := strings.IndexAny(path, "?#"); i >= 0 {
+		path = path[:i]
+	}
+	if !ok || path == "" {
+		return ""
+	}
+	return `"` + path + `"`
 }
 
 // serveStale serves an image left on disk when fetching it from upstream failed, with a

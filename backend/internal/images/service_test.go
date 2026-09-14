@@ -277,6 +277,37 @@ func TestService_ServeImage_RecoversIPFSImageFromDisk(t *testing.T) {
 	if got := hits.Load(); got != 0 {
 		t.Errorf("expected no gateway requests, got %d", got)
 	}
+	if got := rec.Header().Get("ETag"); got != `"bafybeiimage"` {
+		t.Errorf("recovered image should keep a CID ETag, got %q", got)
+	}
+
+	// Clients revalidating with the ETag get a 304 instead of the full image
+	condRec := httptest.NewRecorder()
+	condReq := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/api/nft/image", nil)
+	condReq.Header.Set("If-None-Match", `"bafybeiimage"`)
+	svc.ServeImage(context.Background(), condRec, condReq, raw)
+	if condRec.Code != http.StatusNotModified {
+		t.Errorf("expected 304 for a matching If-None-Match, got %d", condRec.Code)
+	}
+}
+
+func TestIPFSETag(t *testing.T) {
+	tests := []struct {
+		url  string
+		want string
+	}{
+		{"https://ipfs.io/ipfs/bafybeiimage", `"bafybeiimage"`},
+		{"https://ipfs.io/ipfs/bafybeidir/art.png", `"bafybeidir/art.png"`},
+		{"https://ipfs.io/ipfs/bafybeiimage?filename=x.png", `"bafybeiimage"`},
+		{"https://ipfs.io/ipfs/", ""},
+		{"https://metadata.ens.domains/mainnet/avatar/nick.eth", ""},
+	}
+
+	for _, tt := range tests {
+		if got := ipfsETag(tt.url); got != tt.want {
+			t.Errorf("ipfsETag(%q) = %q, want %q", tt.url, got, tt.want)
+		}
+	}
 }
 
 func TestService_FetchAndCache_RecoversIPFSImageFromDisk(t *testing.T) {
