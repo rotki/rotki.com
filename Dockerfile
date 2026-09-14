@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/root/.npm/_cacache/ \
     pnpm run build
 
 # Stage 2: Build Go binary
-FROM golang:1.26-alpine AS backend
+FROM golang:1.27-alpine AS backend
 
 ARG GIT_SHA
 ARG VERSION
