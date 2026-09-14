@@ -17,6 +17,24 @@ module.exports = {
         ],
       },
     ],
+    // Tailwind at-rule preludes are not CSS grammar. Keep `media` from the
+    // stylelint-config-recommended default, since setting options replaces it.
+    'at-rule-prelude-no-invalid': [
+      true,
+      {
+        ignoreAtRules: [
+          'apply',
+          'config',
+          'layer',
+          'media',
+          'responsive',
+          'screen',
+          'tailwind',
+          'utility',
+          'variants',
+        ],
+      },
+    ],
     'function-no-unknown': [
       true,
       {

@@ -46,8 +46,8 @@ patchedDependencies:
   '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch
 catalog:
   '@coinbase/wallet-sdk': 4.3.7
-  '@commitlint/cli': 21.2.1
-  '@commitlint/config-conventional': 21.2.0
+  '@commitlint/cli': 21.2.2
+  '@commitlint/config-conventional': 21.2.2
   '@fontsource/roboto': 5.3.0
   '@nuxt/content': 3.16.0
   '@nuxt/devtools': 3.4.2
@@ -59,12 +59,12 @@ catalog:
   '@nuxtjs/sitemap': 8.5.0
   '@nuxtjs/tailwindcss': 6.14.0
   '@pinia/nuxt': 1.0.2
-  '@playwright/test': 1.62.0
+  '@playwright/test': 1.63.0
   '@resvg/resvg-js': 2.6.2
   '@rotki/eslint-config': 6.2.0
-  '@rotki/eslint-plugin': 1.5.0
+  '@rotki/eslint-plugin': 1.8.0
   '@rotki/ui-library': 2.24.0
-  '@tsconfig/node24': 24.0.4
+  '@tsconfig/node24': 24.0.5
   '@types/braintree-web': 3.143.0
   '@types/jsdom': 28.0.3
   '@types/node': 24.13.3
@@ -73,7 +73,7 @@ catalog:
   '@unhead/vue': 2.1.17
   '@vitejs/plugin-vue': 6.0.8
   '@vitest/coverage-v8': 4.1.11
-  '@vue/test-utils': 2.4.11
+  '@vue/test-utils': 2.5.0
   '@vue/tsconfig': 0.9.1
   '@vuelidate/core': 2.0.3
   '@vuelidate/validators': 2.0.4
@@ -84,31 +84,31 @@ catalog:
   '@wagmi/connectors': 8.2.0
   '@wagmi/core': 3.6.5
   '@walletconnect/universal-provider': 2.24.0
-  autoprefixer: 10.5.4
+  autoprefixer: 10.5.5
   better-sqlite3: 12.11.1
   braintree-web: 3.145.0
-  bumpp: 12.0.0
+  bumpp: 12.3.0
   cac: 7.0.0
   consola: 3.4.2
-  eslint: 10.8.0
-  happy-dom: 20.11.1
+  eslint: 10.10.0
+  happy-dom: 20.14.0
   husky: 9.1.7
-  lint-staged: 17.2.0
+  lint-staged: 17.5.0
   msw: 2.15.0
   nitropack: 2.13.4
-  npm-run-all2: 9.0.2
+  npm-run-all2: 9.0.3
   nuxt: 4.5.2
   nuxt-llms: 0.2.0
   pinia: 4.0.3
   plainfp: 0.1.1
   postcss: 8.5.28
   postcss-html: 1.8.1
-  postcss-import: 16.1.1
+  postcss-import: 16.2.0
   qrcode: 1.5.4
   rimraf: 6.1.3
   rollup: 4.63.1
   satori: 0.29.1
-  stylelint: 17.14.1
+  stylelint: 17.15.0
   stylelint-config-recommended-vue: 1.6.1
   stylelint-config-standard: 40.0.0
   stylelint-order: 8.1.1
