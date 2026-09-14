@@ -81,9 +81,9 @@ catalog:
   '@vueuse/math': 14.3.0
   '@vueuse/nuxt': 14.3.0
   '@vueuse/shared': 14.3.0
-  '@wagmi/connectors': 8.0.15
-  '@wagmi/core': 3.5.0
-  '@walletconnect/universal-provider': 2.23.9
+  '@wagmi/connectors': 8.2.0
+  '@wagmi/core': 3.6.5
+  '@walletconnect/universal-provider': 2.24.0
   autoprefixer: 10.5.4
   better-sqlite3: 12.11.1
   braintree-web: 3.144.0
@@ -116,7 +116,7 @@ catalog:
   tailwindcss: 3.4.19
   tsdown: 0.22.14
   typescript: 6.0.3
-  viem: 2.52.2
+  viem: 2.56.3
   vite: 8.2.2
   vite-plugin-vue-devtools: 8.2.1
   vite-ssg: 28.3.0
