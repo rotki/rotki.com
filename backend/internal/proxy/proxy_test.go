@@ -30,20 +30,15 @@ func TestNewReturnsHandlerWhenDomainSet(t *testing.T) {
 
 func TestProxyForwardsWebapi(t *testing.T) {
 	// Start a fake backend
+	var gotHost, gotOrigin, gotReferer string
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/webapi/2/plans" {
 			t.Errorf("unexpected path: %s", r.URL.Path)
 		}
-		// Verify rewritten headers (Host is in r.Host, not r.Header)
-		if r.Host == "" {
-			t.Error("Host should be set")
-		}
-		if origin := r.Header.Get("Origin"); origin == "" {
-			t.Error("Origin header should be set")
-		}
-		if referer := r.Header.Get("Referer"); referer == "" {
-			t.Error("Referer header should be set")
-		}
+		// Host is in r.Host, not r.Header
+		gotHost = r.Host
+		gotOrigin = r.Header.Get("Origin")
+		gotReferer = r.Header.Get("Referer")
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -59,6 +54,9 @@ func TestProxyForwardsWebapi(t *testing.T) {
 	h.RegisterRoutes(mux)
 
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/webapi/2/plans", nil)
+	req.Host = "localhost:3000"
+	req.Header.Set("Origin", "https://localhost:3000")
+	req.Header.Set("Referer", "https://localhost:3000/checkout")
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -69,6 +67,120 @@ func TestProxyForwardsWebapi(t *testing.T) {
 	body, _ := io.ReadAll(rec.Body)
 	if string(body) != `{"plans":[]}` {
 		t.Fatalf("body = %q, want plans JSON", string(body))
+	}
+
+	wantOrigin := "http://" + host
+	if gotHost != host {
+		t.Errorf("Host = %q, want %q", gotHost, host)
+	}
+	if gotOrigin != wantOrigin {
+		t.Errorf("Origin = %q, want %q", gotOrigin, wantOrigin)
+	}
+	if gotReferer != wantOrigin {
+		t.Errorf("Referer = %q, want %q", gotReferer, wantOrigin)
+	}
+}
+
+func TestProxyStripsHopByHopHeaders(t *testing.T) {
+	var got http.Header
+	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Clone()
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer backend.Close()
+
+	host := backend.Listener.Addr().String()
+	h := New(Config{Domain: host, Insecure: true}, testLogger())
+	mux := http.NewServeMux()
+	h.RegisterRoutes(mux)
+
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/webapi/2/plans", nil)
+	req.Header.Set("Connection", "X-Session-Hint")
+	req.Header.Set("X-Session-Hint", "internal")
+	req.Header.Set("Keep-Alive", "timeout=5")
+	req.Header.Set("Proxy-Authorization", "Basic c2VjcmV0")
+	req.Header.Set("Te", "trailers")
+	req.Header.Set("X-Custom", "kept")
+	rec := httptest.NewRecorder()
+	mux.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+	for _, name := range []string{"X-Session-Hint", "Keep-Alive", "Proxy-Authorization"} {
+		if v := got.Get(name); v != "" {
+			t.Errorf("%s = %q, want it stripped", name, v)
+		}
+	}
+	if v := got.Get("Te"); v != "trailers" {
+		t.Errorf("Te = %q, want %q", v, "trailers")
+	}
+	if v := got.Get("X-Custom"); v != "kept" {
+		t.Errorf("X-Custom = %q, want %q", v, "kept")
+	}
+}
+
+func TestProxyForwardedHeaders(t *testing.T) {
+	tests := []struct {
+		name      string
+		inbound   map[string]string
+		wantFor   string
+		wantHost  string
+		wantProto string
+	}{
+		{
+			name: "keeps upstream proxy values and appends client IP",
+			inbound: map[string]string{
+				"X-Forwarded-For":   "198.51.100.1",
+				"X-Forwarded-Host":  "rotki.com",
+				"X-Forwarded-Proto": "https",
+			},
+			wantFor:   "198.51.100.1, 203.0.113.7",
+			wantHost:  "rotki.com",
+			wantProto: "https",
+		},
+		{
+			name:    "sets client IP without inventing host or proto",
+			inbound: map[string]string{},
+			wantFor: "203.0.113.7",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got http.Header
+			backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				got = r.Header.Clone()
+				w.WriteHeader(http.StatusOK)
+			}))
+			defer backend.Close()
+
+			host := backend.Listener.Addr().String()
+			h := New(Config{Domain: host, Insecure: true}, testLogger())
+			mux := http.NewServeMux()
+			h.RegisterRoutes(mux)
+
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/webapi/2/plans", nil)
+			req.RemoteAddr = "203.0.113.7:4321"
+			for k, v := range tt.inbound {
+				req.Header.Set(k, v)
+			}
+			rec := httptest.NewRecorder()
+			mux.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, want 200", rec.Code)
+			}
+			if v := got.Get("X-Forwarded-For"); v != tt.wantFor {
+				t.Errorf("X-Forwarded-For = %q, want %q", v, tt.wantFor)
+			}
+			if v := got.Get("X-Forwarded-Host"); v != tt.wantHost {
+				t.Errorf("X-Forwarded-Host = %q, want %q", v, tt.wantHost)
+			}
+			if v := got.Get("X-Forwarded-Proto"); v != tt.wantProto {
+				t.Errorf("X-Forwarded-Proto = %q, want %q", v, tt.wantProto)
+			}
+		})
 	}
 }
 

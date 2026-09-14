@@ -5,9 +5,12 @@ package proxy
 
 import (
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"slices"
+	"strings"
 	"time"
 )
 
@@ -63,20 +66,19 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 func newReverseProxy(target *url.URL, host string, logger *slog.Logger) *httputil.ReverseProxy {
 	referrer := target.String()
 
-	director := func(req *http.Request) {
-		req.URL.Scheme = target.Scheme
-		req.URL.Host = target.Host
+	rewrite := func(r *httputil.ProxyRequest) {
+		r.Out.URL.Scheme = target.Scheme
+		r.Out.URL.Host = target.Host
 		// Path is preserved as-is (/webapi/... → /webapi/...)
 
 		// Rewrite headers so the backend sees the correct origin
-		req.Host = host
-		req.Header.Set("Host", host)
-		req.Header.Set("Origin", referrer)
-		req.Header.Set("Referer", referrer)
+		r.Out.Host = host
+		r.Out.Header.Set("Origin", referrer)
+		r.Out.Header.Set("Referer", referrer)
 
-		// Remove hop-by-hop headers that shouldn't be forwarded
-		req.Header.Del("Te")
-		req.Header.Del("Transfer-Encoding")
+		// Hop-by-hop headers (Te, Transfer-Encoding, ...) are already
+		// stripped by ReverseProxy before Rewrite runs.
+		keepForwardedHeaders(r)
 	}
 
 	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
@@ -89,7 +91,7 @@ func newReverseProxy(target *url.URL, host string, logger *slog.Logger) *httputi
 	}
 
 	return &httputil.ReverseProxy{
-		Director:     director,
+		Rewrite:      rewrite,
 		ErrorHandler: errorHandler,
 		Transport: &http.Transport{
 			ResponseHeaderTimeout: 30 * time.Second,
@@ -97,5 +99,26 @@ func newReverseProxy(target *url.URL, host string, logger *slog.Logger) *httputi
 			MaxIdleConns:          100,
 			MaxIdleConnsPerHost:   10,
 		},
+	}
+}
+
+// keepForwardedHeaders restores the X-Forwarded-* headers that ReverseProxy
+// strips before calling Rewrite and appends the client IP to X-Forwarded-For,
+// matching what the proxy sent upstream when it used Director. It avoids
+// ProxyRequest.SetXForwarded, which derives X-Forwarded-Proto from the local
+// connection and would report "http" behind a TLS-terminating proxy.
+func keepForwardedHeaders(r *httputil.ProxyRequest) {
+	for _, name := range []string{"X-Forwarded-Host", "X-Forwarded-Proto"} {
+		if values, ok := r.In.Header[name]; ok {
+			r.Out.Header[name] = slices.Clone(values)
+		}
+	}
+
+	forwardedFor := slices.Clone(r.In.Header["X-Forwarded-For"])
+	if ip, _, err := net.SplitHostPort(r.In.RemoteAddr); err == nil {
+		forwardedFor = append(forwardedFor, ip)
+	}
+	if len(forwardedFor) > 0 {
+		r.Out.Header.Set("X-Forwarded-For", strings.Join(forwardedFor, ", "))
 	}
 }

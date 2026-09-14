@@ -31,10 +31,11 @@ func NewDevServer(rawURL string, logger *slog.Logger) *DevServer {
 
 	devLogger := logger.With("component", "devserver")
 
-	director := func(req *http.Request) {
-		req.URL.Scheme = target.Scheme
-		req.URL.Host = target.Host
-		req.Host = target.Host
+	rewrite := func(r *httputil.ProxyRequest) {
+		r.Out.URL.Scheme = target.Scheme
+		r.Out.URL.Host = target.Host
+		r.Out.Host = target.Host
+		keepForwardedHeaders(r)
 	}
 
 	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
@@ -46,7 +47,7 @@ func NewDevServer(rawURL string, logger *slog.Logger) *DevServer {
 	}
 
 	rp := &httputil.ReverseProxy{
-		Director:     director,
+		Rewrite:      rewrite,
 		ErrorHandler: errorHandler,
 		Transport: &http.Transport{
 			ResponseHeaderTimeout: 60 * time.Second,
