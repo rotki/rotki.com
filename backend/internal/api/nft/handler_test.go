@@ -77,6 +77,57 @@ func TestHandleImage_InvalidTierID(t *testing.T) {
 	}
 }
 
+func TestHandleImage_InvalidReleaseID(t *testing.T) {
+	// Rejected before the core service is touched (nil core would panic)
+	h := NewHandler(nil, nil, testLogger())
+
+	tests := []struct {
+		name string
+		url  string
+	}{
+		{"non-numeric", "/api/nft/image?tier=0&release=abc"},
+		{"zero", "/api/nft/image?tier=0&release=0"},
+		{"negative", "/api/nft/image?tier=0&release=-3"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, tt.url, nil)
+			rec := httptest.NewRecorder()
+			h.handleImage(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Errorf("expected 400 for %s, got %d", tt.name, rec.Code)
+			}
+		})
+	}
+}
+
+func TestParseReleaseID(t *testing.T) {
+	tests := []struct {
+		raw    string
+		want   int
+		wantOK bool
+	}{
+		{"", 0, true},
+		{"1", 1, true},
+		{"42", 42, true},
+		{"0", 0, false},
+		{"-1", 0, false},
+		{"abc", 0, false},
+		{"1.5", 0, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.raw, func(t *testing.T) {
+			got, ok := parseReleaseID(tt.raw)
+			if got != tt.want || ok != tt.wantOK {
+				t.Errorf("parseReleaseID(%q) = (%d, %v), want (%d, %v)", tt.raw, got, ok, tt.want, tt.wantOK)
+			}
+		})
+	}
+}
+
 func TestHandleImage_InvalidTokenID(t *testing.T) {
 	h := NewHandler(nil, nil, testLogger())
 
@@ -188,8 +239,10 @@ func TestProxyURLFormats(t *testing.T) {
 		fn   func() string
 		want string
 	}{
-		{"tier 0", func() string { return tierImageProxyURL(0) }, "/api/nft/image?tier=0"},
-		{"tier 2", func() string { return tierImageProxyURL(2) }, "/api/nft/image?tier=2"},
+		{"tier 0 without release", func() string { return tierImageProxyURL(0, 0) }, "/api/nft/image?tier=0"},
+		{"tier 2 without release", func() string { return tierImageProxyURL(2, 0) }, "/api/nft/image?tier=2"},
+		{"tier 0 release 5", func() string { return tierImageProxyURL(0, 5) }, "/api/nft/image?tier=0&release=5"},
+		{"tier 2 release 12", func() string { return tierImageProxyURL(2, 12) }, "/api/nft/image?tier=2&release=12"},
 		{"token 123", func() string { return tokenImageProxyURL(123) }, "/api/nft/image?token=123"},
 		{"token 0", func() string { return tokenImageProxyURL(0) }, "/api/nft/image?token=0"},
 	}

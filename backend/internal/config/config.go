@@ -8,6 +8,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/rotki/rotki.com/backend/internal/ipfs"
 )
 
 // Config holds all server configuration, loaded from environment variables.
@@ -28,6 +30,9 @@ type Config struct {
 
 	// Image cache
 	ImageCacheDir string
+
+	// IPFS gateways, in fallback order (nil uses ipfs.DefaultGateways)
+	IPFSGateways []string
 
 	// Dev mode — must set DEV_MODE=true to enable dev-only features
 	DevMode       bool
@@ -67,6 +72,11 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid PORT: %w", err)
 	}
 
+	ipfsGateways, err := ipfs.ParseGateways(envStr("IPFS_GATEWAYS", ""))
+	if err != nil {
+		return nil, fmt.Errorf("invalid IPFS_GATEWAYS: %w", err)
+	}
+
 	cfg := &Config{
 		Port:      port,
 		StaticDir: envStr("STATIC_DIR", "./dist"),
@@ -80,6 +90,7 @@ func Load() (*Config, error) {
 		RedisPassword: envStr("REDIS_PASSWORD", ""),
 
 		ImageCacheDir: envStr("IMAGE_CACHE_DIR", "./image-cache"),
+		IPFSGateways:  ipfsGateways,
 
 		DevMode:       devMode,
 		NuxtDevURL:    envStrOrDefault("NUXT_DEV_URL", nuxtDevDefault),

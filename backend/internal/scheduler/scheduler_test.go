@@ -143,6 +143,64 @@ func TestStopBeforeTaskRuns(t *testing.T) {
 	}
 }
 
+func TestAddWithRetry_RetriesEarlyOnFailure(t *testing.T) {
+	s := New(testLogger())
+
+	var count atomic.Int32
+	s.AddWithRetry("retrying", time.Hour, 10*time.Millisecond, 3, func(_ context.Context) error {
+		count.Add(1)
+		return context.DeadlineExceeded // simulate error
+	})
+
+	s.Start(5 * time.Millisecond)
+	time.Sleep(150 * time.Millisecond)
+	s.Stop()
+
+	// 1 initial run + 3 early retries, then it waits the full hour
+	if got := count.Load(); got != 4 {
+		t.Fatalf("expected 4 runs (1 + 3 retries), got %d", got)
+	}
+}
+
+func TestAddWithRetry_NoRetryOnSuccess(t *testing.T) {
+	s := New(testLogger())
+
+	var count atomic.Int32
+	s.AddWithRetry("succeeding", time.Hour, 5*time.Millisecond, 3, func(_ context.Context) error {
+		count.Add(1)
+		return nil
+	})
+
+	s.Start(5 * time.Millisecond)
+	time.Sleep(60 * time.Millisecond)
+	s.Stop()
+
+	if got := count.Load(); got != 1 {
+		t.Fatalf("expected 1 run, got %d", got)
+	}
+}
+
+func TestAddWithRetry_ResumesAfterRecovery(t *testing.T) {
+	s := New(testLogger())
+
+	var count atomic.Int32
+	s.AddWithRetry("recovering", time.Hour, 5*time.Millisecond, 5, func(_ context.Context) error {
+		if count.Add(1) < 3 {
+			return context.DeadlineExceeded
+		}
+		return nil
+	})
+
+	s.Start(5 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
+	s.Stop()
+
+	// Fails twice, succeeds on the third run, then waits the full hour
+	if got := count.Load(); got != 3 {
+		t.Fatalf("expected 3 runs, got %d", got)
+	}
+}
+
 func TestTaskErrorDoesNotStopScheduler(t *testing.T) {
 	s := New(testLogger())
 

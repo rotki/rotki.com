@@ -16,6 +16,11 @@ const (
 	NFTCacheInterval      = 2 * time.Hour
 	ReleasesCacheInterval = 2 * time.Hour
 	InitialDelay          = 5 * time.Second
+
+	// NFTCacheRetryInterval reruns the NFT task sooner when tiers are missing images,
+	// so a transient IPFS/RPC failure doesn't leave the sponsor page imageless for 2h.
+	NFTCacheRetryInterval = 5 * time.Minute
+	NFTCacheMaxRetries    = 6
 )
 
 // NFTCacheTask creates the NFT tier + image cache warming task.
@@ -29,7 +34,7 @@ func NFTCacheTask(coreSvc *nft.CoreService, imgSvc *images.Service, logger *slog
 			tierIDs[i] = t.TierID
 		}
 
-		releaseID, tiers, err := coreSvc.FetchAllTiersForRelease(ctx, tierIDs)
+		releaseID, tiers, metadataFailures, err := coreSvc.FetchAllTiersForRelease(ctx, tierIDs)
 		if err != nil {
 			return fmt.Errorf("fetch tiers: %w", err)
 		}
@@ -39,6 +44,7 @@ func NFTCacheTask(coreSvc *nft.CoreService, imgSvc *images.Service, logger *slog
 		// Count successes and collect image URLs (raw IPFS URLs)
 		imageURLs := make([]string, 0, len(nft.SponsorshipTiers))
 		successCount := 0
+		missingImage := 0
 
 		for _, tier := range nft.SponsorshipTiers {
 			info := tiers[tier.TierID]
@@ -48,21 +54,36 @@ func NFTCacheTask(coreSvc *nft.CoreService, imgSvc *images.Service, logger *slog
 			}
 			successCount++
 
-			if info.ImageURL != "" {
-				imageURLs = append(imageURLs, info.ImageURL)
+			if info.ImageURL == "" {
+				missingImage++
+				taskLogger.Warn("tier has no image URL", "tier", tier.Key, "tier_id", tier.TierID, "release_id", releaseID)
+				continue
 			}
+			imageURLs = append(imageURLs, info.ImageURL)
 		}
 
 		if successCount == 0 {
 			return fmt.Errorf("no tiers returned data")
 		}
 
-		taskLogger.Info("tier caching complete", "succeeded", successCount, "total", len(nft.SponsorshipTiers))
+		taskLogger.Info("tier caching complete",
+			"succeeded", successCount, "missing_image", missingImage, "total", len(nft.SponsorshipTiers))
 
 		// Warm image cache
+		failedImages := 0
 		if len(imageURLs) > 0 {
-			succeeded, failed := imgSvc.WarmCache(ctx, imageURLs)
-			taskLogger.Info("image cache warming done", "succeeded", succeeded, "failed", failed)
+			var succeeded int
+			succeeded, failedImages = imgSvc.WarmCache(ctx, imageURLs)
+			taskLogger.Info("image cache warming done", "succeeded", succeeded, "failed", failedImages)
+		} else {
+			taskLogger.Warn("image cache warming skipped: no tier image URLs")
+		}
+
+		// Retry only transient failures. A tier without an image (e.g. not configured for the
+		// release) is logged above but doesn't fail the task, or it would retry every cycle.
+		if len(metadataFailures) > 0 || failedImages > 0 {
+			return fmt.Errorf("incomplete NFT cache: metadata failed for tiers %v, %d images failed to warm",
+				metadataFailures, failedImages)
 		}
 
 		return nil

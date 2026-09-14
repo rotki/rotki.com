@@ -18,6 +18,7 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/cache"
 	"github.com/rotki/rotki.com/backend/internal/config"
 	"github.com/rotki/rotki.com/backend/internal/images"
+	"github.com/rotki/rotki.com/backend/internal/ipfs"
 	"github.com/rotki/rotki.com/backend/internal/nft"
 )
 
@@ -53,9 +54,13 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 	releasesHandler := releases.NewHandler(mem, red, lck, logger)
 	mux.Handle("GET /api/releases/latest", releasesHandler)
 
+	// IPFS gateway pool shared by image and NFT metadata fetches, so a gateway
+	// that rate-limits one kind of request is skipped for the other too
+	gateways := ipfs.NewPool(cfg.IPFSGateways, logger)
+
 	// Shared image caching service
 	imgCache := images.NewCacheManager(cfg.ImageCacheDir, red, logger)
-	imgFetcher := images.NewFetcher(logger)
+	imgFetcher := images.NewFetcher(logger, gateways)
 	imgSvc := images.NewService(imgCache, imgFetcher, logger)
 
 	// ENS avatar proxy (with image caching)
@@ -86,7 +91,7 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 		blockchainSvc := nft.NewBlockchainService(rpcClient, logger)
 		cacheMgr := nft.NewCacheManager(red, logger)
 		configSvc := nft.NewConfigService(cfg.BaseURL, cfg.TLSSkipVerify, logger)
-		coreSvc := nft.NewCoreService(blockchainSvc, cacheMgr, configSvc, logger)
+		coreSvc := nft.NewCoreService(blockchainSvc, cacheMgr, configSvc, gateways, logger)
 
 		nftHandler := nftapi.NewHandler(coreSvc, imgSvc, logger)
 		nftHandler.RegisterRoutes(mux)

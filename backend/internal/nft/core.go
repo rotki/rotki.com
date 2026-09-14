@@ -8,17 +8,25 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"slices"
 	"sync"
 	"time"
 
+	"github.com/rotki/rotki.com/backend/internal/ipfs"
 	"github.com/rotki/rotki.com/backend/internal/safedialer"
 )
 
 // ErrTokenNotFound is returned when a token ID does not exist on-chain.
 var ErrTokenNotFound = errors.New("token not found")
 
+// ErrReleaseNotFound is returned when a requested release is newer than the current release.
+var ErrReleaseNotFound = errors.New("release not found")
+
 // maxInflight is the maximum number of concurrent dedup metadata fetch entries.
 const maxInflight = 50
+
+// metadataGatewayTimeout bounds a single metadata request to one IPFS gateway.
+const metadataGatewayTimeout = 8 * time.Second
 
 // configTTL is how long the cached NFT config is valid before re-fetching.
 // This allows contract address changes to take effect without a restart.
@@ -30,6 +38,7 @@ type CoreService struct {
 	blockchain *BlockchainService
 	cache      *CacheManager
 	configSvc  *ConfigService
+	gateways   *ipfs.Pool
 	httpClient *http.Client
 	logger     *slog.Logger
 
@@ -49,11 +58,12 @@ type inflightRequest struct {
 }
 
 // NewCoreService creates a new NFT core service.
-func NewCoreService(blockchain *BlockchainService, cache *CacheManager, configSvc *ConfigService, logger *slog.Logger) *CoreService {
+func NewCoreService(blockchain *BlockchainService, cache *CacheManager, configSvc *ConfigService, gateways *ipfs.Pool, logger *slog.Logger) *CoreService {
 	return &CoreService{
 		blockchain: blockchain,
 		cache:      cache,
 		configSvc:  configSvc,
+		gateways:   gateways,
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 			Transport: &http.Transport{
@@ -171,9 +181,8 @@ func (s *CoreService) FetchMetadata(ctx context.Context, metadataURI string) (*T
 		s.dedupMu.Unlock()
 	}()
 
-	// Fetch from IPFS gateway
-	metadataURL := NormalizeIPFSURL(metadataURI)
-	metadata, err := s.fetchMetadataHTTP(ctx, metadataURL)
+	// Fetch through the IPFS gateway pool
+	metadata, err := s.fetchMetadataHTTP(ctx, metadataURI)
 	if err != nil {
 		req.err = err
 		return nil, err
@@ -185,56 +194,63 @@ func (s *CoreService) FetchMetadata(ctx context.Context, metadataURI string) (*T
 	return metadata, nil
 }
 
-// fetchMetadataHTTP fetches metadata JSON with retry.
-func (s *CoreService) fetchMetadataHTTP(ctx context.Context, url string) (*TierMetadata, error) {
-	var lastErr error
-	for attempt := range 3 {
-		if attempt > 0 {
-			delay := time.Duration(500*(1<<attempt)) * time.Millisecond
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			case <-time.After(delay):
-			}
-		}
-
-		httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-		if err != nil {
-			return nil, fmt.Errorf("create request: %w", err)
-		}
-
-		resp, err := s.httpClient.Do(httpReq) //nolint:gosec // G704: URL is from blockchain metadata (IPFS/HTTPS), not user input
-		if err != nil {
-			lastErr = err
-			continue
-		}
-
-		body, readErr := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
-		_ = resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			lastErr = fmt.Errorf("metadata fetch returned %d", resp.StatusCode)
-			// Don't retry 4xx (except 429)
-			if resp.StatusCode >= 400 && resp.StatusCode < 500 && resp.StatusCode != http.StatusTooManyRequests {
-				return nil, lastErr
-			}
-			continue
-		}
-
-		if readErr != nil {
-			lastErr = readErr
-			continue
-		}
-
-		var metadata TierMetadata
-		if err := json.Unmarshal(body, &metadata); err != nil {
-			return nil, fmt.Errorf("parse metadata: %w", err)
-		}
-
-		return &metadata, nil
+// fetchMetadataHTTP fetches metadata JSON. IPFS URIs go through the gateway pool
+// (one attempt per gateway, with cooldowns); other URLs get a single attempt.
+func (s *CoreService) fetchMetadataHTTP(ctx context.Context, uri string) (*TierMetadata, error) {
+	if !s.gateways.IsIPFS(uri) {
+		return s.fetchMetadataOnce(ctx, uri)
 	}
 
-	return nil, fmt.Errorf("metadata fetch failed after retries: %w", lastErr)
+	var metadata *TierMetadata
+	err := s.gateways.Fetch(ctx, uri, metadataGatewayTimeout, func(ctx context.Context, url string) error {
+		m, err := s.fetchMetadataOnce(ctx, url)
+		if err != nil {
+			return err
+		}
+		metadata = m
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fetch metadata %s: %w", uri, err)
+	}
+	return metadata, nil
+}
+
+// fetchMetadataOnce performs a single metadata request and parses the JSON body.
+// A body that isn't valid metadata JSON (e.g. a gateway's HTML landing page) is an error.
+func (s *CoreService) fetchMetadataOnce(ctx context.Context, url string) (*TierMetadata, error) {
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("create request: %w", err)
+	}
+	httpReq.Header.Set("Accept", "application/json")
+	httpReq.Header.Set("User-Agent", "rotki.com/1.0")
+
+	resp, err := s.httpClient.Do(httpReq) //nolint:gosec // G704: URL is from blockchain metadata (IPFS/HTTPS), not user input
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, &ipfs.StatusError{StatusCode: resp.StatusCode, RetryAfter: resp.Header.Get("Retry-After")}
+	}
+
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return nil, fmt.Errorf("read metadata: %w", err)
+	}
+
+	var metadata TierMetadata
+	if err := json.Unmarshal(body, &metadata); err != nil {
+		// An HTML page (landing page, bot challenge) is the gateway's fault: try the next one.
+		// Anything else that fails to parse would fail on every gateway.
+		if ipfs.IsHTML(resp.Header.Get("Content-Type"), body) {
+			return nil, fmt.Errorf("gateway returned HTML instead of metadata: %w", err)
+		}
+		return nil, fmt.Errorf("%w: parse metadata: %w", ipfs.ErrContentRejected, err)
+	}
+	return &metadata, nil
 }
 
 // FetchTokenData fetches full token data from blockchain + IPFS.
@@ -383,26 +399,29 @@ func (s *CoreService) FetchTiers(ctx context.Context, tierIDs []int) (*TiersResp
 }
 
 // FetchAllTiersForRelease fetches all tiers without checking cache — used by cache updater.
-func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int) (int, map[int]*TierInfoResult, error) {
+// It also returns the IDs of tiers whose metadata could not be fetched (and had no
+// previous cached metadata to fall back on); those are not cached so they are retried.
+func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int) (int, map[int]*TierInfoResult, []int, error) {
 	cfg, err := s.GetConfig(ctx)
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	releaseID := cfg.ReleaseID
 	if releaseID == 0 {
 		releaseID, err = s.blockchain.GetCurrentReleaseID(ctx, cfg)
 		if err != nil {
-			return 0, nil, fmt.Errorf("get release ID: %w", err)
+			return 0, nil, nil, fmt.Errorf("get release ID: %w", err)
 		}
 	}
 
 	tierInfos, err := s.blockchain.FetchMultipleTierInfo(ctx, cfg, releaseID, tierIDs)
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	results := make(map[int]*TierInfoResult)
+	var metadataFailures []int
 	for tierID, info := range tierInfos {
 		if info == nil {
 			results[tierID] = nil
@@ -420,31 +439,66 @@ func (s *CoreService) FetchAllTiersForRelease(ctx context.Context, tierIDs []int
 			metadata, err := s.FetchMetadata(ctx, info.MetadataURI)
 			if err == nil {
 				result.ImageURL, result.Benefits, result.ReleaseName = ProcessTierMetadata(metadata)
+			} else {
+				s.logger.Warn("tier metadata fetch failed",
+					"tier_id", tierID, "release_id", releaseID, "uri", info.MetadataURI, "error", err)
+				// Keep the last good metadata so a transient IPFS failure doesn't wipe the image
+				if prev, ok := s.cache.GetSingleTierInfo(ctx, tierID, cfg, releaseID); ok && prev.MetadataURI == info.MetadataURI && hasMetadata(prev) {
+					result.ImageURL, result.Benefits, result.ReleaseName = prev.ImageURL, prev.Benefits, prev.ReleaseName
+				} else {
+					metadataFailures = append(metadataFailures, tierID)
+				}
 			}
 		}
 
 		results[tierID] = result
 	}
 
-	// Store in cache
-	s.cache.StoreTierInfo(ctx, results, cfg, releaseID)
+	// Don't cache tiers whose metadata failed, so they are retried instead of cached empty.
+	// Tiers without metadata or without an image are cached as-is.
+	s.cache.StoreTierInfo(ctx, withoutTiers(results, metadataFailures), cfg, releaseID)
 
-	return releaseID, results, nil
+	return releaseID, results, metadataFailures, nil
+}
+
+// hasMetadata reports whether a cached tier carries fields from successfully fetched metadata.
+func hasMetadata(info *TierInfoResult) bool {
+	return info.ImageURL != "" || info.Benefits != "" || info.ReleaseName != ""
+}
+
+// withoutTiers returns tiers minus the given tier IDs.
+func withoutTiers(tiers map[int]*TierInfoResult, skip []int) map[int]*TierInfoResult {
+	filtered := make(map[int]*TierInfoResult, len(tiers))
+	for tierID, info := range tiers {
+		if !slices.Contains(skip, tierID) {
+			filtered[tierID] = info
+		}
+	}
+	return filtered
 }
 
 // GetTierImageURL returns the raw IPFS image URL for a tier, using cache or blockchain fallback.
-func (s *CoreService) GetTierImageURL(ctx context.Context, tierID int) (string, error) {
+// A releaseID of 0 means the current release. Releases newer than the current
+// one return ErrReleaseNotFound without touching the blockchain.
+func (s *CoreService) GetTierImageURL(ctx context.Context, tierID, releaseID int) (string, error) {
 	cfg, err := s.GetConfig(ctx)
 	if err != nil {
 		return "", err
 	}
 
-	releaseID := cfg.ReleaseID
-	if releaseID == 0 {
-		releaseID, err = s.blockchain.GetCurrentReleaseID(ctx, cfg)
+	currentReleaseID := cfg.ReleaseID
+	if currentReleaseID == 0 {
+		currentReleaseID, err = s.blockchain.GetCurrentReleaseID(ctx, cfg)
 		if err != nil {
 			return "", fmt.Errorf("get release ID: %w", err)
 		}
+	}
+
+	switch {
+	case releaseID == 0:
+		releaseID = currentReleaseID
+	case releaseID > currentReleaseID:
+		return "", ErrReleaseNotFound
 	}
 
 	// Check cache
@@ -488,25 +542,27 @@ func (s *CoreService) fetchAndCacheMissingTiers(ctx context.Context, tierIDs []i
 	toCache := make(map[int]*TierInfoResult)
 
 	for tierID, info := range tierInfos {
-		if info == nil || info.MetadataURI == "" {
+		if info == nil {
 			continue
 		}
 
-		metadata, err := s.FetchMetadata(ctx, info.MetadataURI)
-		if err != nil {
-			s.logger.Error("error processing tier metadata", "tier_id", tierID, "error", err)
-			continue
-		}
-
-		imageURL, benefits, releaseName := ProcessTierMetadata(metadata)
 		result := TierInfoResult{
 			MaxSupply:     info.MaxSupply,
 			CurrentSupply: info.CurrentSupply,
 			MetadataURI:   info.MetadataURI,
-			ImageURL:      imageURL,
-			Benefits:      benefits,
-			ReleaseName:   releaseName,
 		}
+
+		// A tier without metadata (not configured for this release) is cached as-is,
+		// so it doesn't trigger a blockchain call on every request.
+		if info.MetadataURI != "" {
+			metadata, err := s.FetchMetadata(ctx, info.MetadataURI)
+			if err != nil {
+				s.logger.Error("error processing tier metadata", "tier_id", tierID, "error", err)
+				continue
+			}
+			result.ImageURL, result.Benefits, result.ReleaseName = ProcessTierMetadata(metadata)
+		}
+
 		results[tierID] = result
 		toCache[tierID] = &result
 	}

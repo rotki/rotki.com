@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rotki/rotki.com/backend/internal/ipfs"
 	"github.com/rotki/rotki.com/backend/internal/safedialer"
 )
 
@@ -24,17 +25,20 @@ type ResponseHeaders struct {
 
 // Fetcher handles HTTP image fetching with retry and validation.
 type Fetcher struct {
-	client *http.Client
-	logger *slog.Logger
+	client   *http.Client
+	gateways *ipfs.Pool
+	logger   *slog.Logger
 }
 
 // NewFetcher creates a new image fetcher with SSRF-safe dialer.
-func NewFetcher(logger *slog.Logger) *Fetcher {
-	return newFetcher(logger, safedialer.New())
+// IPFS images are fetched through gateways; other URLs are fetched directly with retry.
+func NewFetcher(logger *slog.Logger, gateways *ipfs.Pool) *Fetcher {
+	return newFetcher(logger, safedialer.New(), gateways)
 }
 
-// newFetcher creates a fetcher with a custom dial function (nil uses default).
-func newFetcher(logger *slog.Logger, dialCtx func(ctx context.Context, network, addr string) (net.Conn, error)) *Fetcher {
+// newFetcher creates a fetcher with a custom dial function (nil uses default)
+// and an optional gateway pool (nil fetches every URL directly).
+func newFetcher(logger *slog.Logger, dialCtx func(ctx context.Context, network, addr string) (net.Conn, error), gateways *ipfs.Pool) *Fetcher {
 	transport := &http.Transport{
 		MaxIdleConns:        100,
 		MaxIdleConnsPerHost: 10,
@@ -48,13 +52,48 @@ func newFetcher(logger *slog.Logger, dialCtx func(ctx context.Context, network, 
 			Timeout:   FetchTimeout,
 			Transport: transport,
 		},
-		logger: logger.With("component", "image-fetcher"),
+		gateways: gateways,
+		logger:   logger.With("component", "image-fetcher"),
 	}
 }
 
-// FetchImage fetches image data from a URL with retry logic.
+// FetchImage fetches image data from a URL.
+// IPFS URLs fall back across gateways (one attempt each); other URLs are retried on 5xx.
 // Returns the body bytes and parsed response headers.
 func (f *Fetcher) FetchImage(ctx context.Context, url string) ([]byte, *ResponseHeaders, error) {
+	if f.gateways != nil && f.gateways.IsIPFS(url) {
+		return f.fetchFromGateways(ctx, url)
+	}
+	return f.fetchWithRetry(ctx, url)
+}
+
+// fetchFromGateways fetches an IPFS image through the gateway pool. An HTML page (a
+// gateway's landing page or bot challenge) counts as a gateway failure. Any other
+// content type is returned as-is: it comes from the content, so every gateway would
+// serve the same, and the caller rejects unsupported types.
+func (f *Fetcher) fetchFromGateways(ctx context.Context, url string) ([]byte, *ResponseHeaders, error) {
+	var data []byte
+	var headers *ResponseHeaders
+
+	err := f.gateways.Fetch(ctx, url, GatewayFetchTimeout, func(ctx context.Context, gatewayURL string) error {
+		d, h, err := f.doFetch(ctx, gatewayURL)
+		if err != nil {
+			return err
+		}
+		if ipfs.IsHTML(h.ContentType, d) {
+			return fmt.Errorf("gateway returned HTML (%q) instead of an image", h.ContentType)
+		}
+		data, headers = d, h
+		return nil
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return data, headers, nil
+}
+
+// fetchWithRetry fetches a non-IPFS image URL, retrying 5xx and network errors.
+func (f *Fetcher) fetchWithRetry(ctx context.Context, url string) ([]byte, *ResponseHeaders, error) {
 	var lastErr error
 	delay := initialRetryDelay
 
@@ -73,6 +112,7 @@ func (f *Fetcher) FetchImage(ctx context.Context, url string) ([]byte, *Response
 		if err == nil {
 			return data, headers, nil
 		}
+		f.logger.Warn("image fetch attempt failed", "url", url, "attempt", attempt+1, "error", err)
 
 		// Don't retry 4xx client errors — only retry 5xx server errors
 		var fetchErr *FetchError
@@ -116,6 +156,7 @@ func (f *Fetcher) doFetch(ctx context.Context, url string) ([]byte, *ResponseHea
 		return nil, nil, &FetchError{
 			StatusCode: resp.StatusCode,
 			Message:    fmt.Sprintf("Image fetch failed: %d %s", resp.StatusCode, resp.Status),
+			RetryAfter: resp.Header.Get("Retry-After"),
 		}
 	}
 
@@ -157,8 +198,15 @@ type FetchError struct {
 	Message      string
 	ETag         string
 	LastModified string
+	RetryAfter   string
 }
 
 func (e *FetchError) Error() string {
 	return e.Message
 }
+
+// HTTPStatus implements ipfs.StatusCoder.
+func (e *FetchError) HTTPStatus() int { return e.StatusCode }
+
+// RetryAfterHeader implements ipfs.StatusCoder.
+func (e *FetchError) RetryAfterHeader() string { return e.RetryAfter }

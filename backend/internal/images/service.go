@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/nft"
 )
@@ -42,14 +43,21 @@ func NewService(cache *CacheManager, fetcher *Fetcher, logger *slog.Logger) *Ser
 	}
 }
 
-// ServeImage handles an image proxy request: checks cache, conditional headers,
-// fetches from upstream if needed, caches the result, and writes the response.
+// ServeImage handles an image proxy request with the default client cache lifetime (CacheTTL).
 func (s *Service) ServeImage(ctx context.Context, w http.ResponseWriter, r *http.Request, rawURL string) {
+	s.ServeImageWithMaxAge(ctx, w, r, rawURL, CacheTTL)
+}
+
+// ServeImageWithMaxAge handles an image proxy request: checks cache, conditional headers,
+// fetches from upstream if needed, caches the result, and writes the response.
+// maxAge controls the Cache-Control lifetime sent to clients; it does not affect
+// how long the image is kept in the server-side cache.
+func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWriter, r *http.Request, rawURL string, maxAge time.Duration) {
 	normalizedURL := nft.NormalizeIPFSURL(rawURL)
 	cacheKey := nft.ImageCacheKey(rawURL)
 
 	// Check conditional request headers against cached metadata
-	if s.handleConditional(ctx, w, r, normalizedURL) {
+	if s.handleConditional(ctx, w, r, normalizedURL, maxAge) {
 		return
 	}
 
@@ -64,7 +72,7 @@ func (s *Service) ServeImage(ctx context.Context, w http.ResponseWriter, r *http
 		}
 
 		if meta.Filename != "" && meta.Size > 0 {
-			if served := s.serveCached(ctx, w, r, meta, normalizedURL); served {
+			if served := s.serveCached(ctx, w, r, meta, normalizedURL, maxAge); served {
 				return
 			}
 			// File missing on disk — metadata was invalidated, fall through to re-fetch
@@ -90,13 +98,21 @@ func (s *Service) ServeImage(ctx context.Context, w http.ResponseWriter, r *http
 	s.cache.StoreImage(ctx, normalizedURL, data, headers.ContentType, headers.ETag, headers.LastModified)
 
 	// Write response
-	s.writeImageResponse(w, data, headers)
+	s.writeImageResponse(w, data, headers, maxAge)
 }
 
+// ErrUnsupportedContentType is returned when upstream serves a type outside SupportedContentTypes.
+var ErrUnsupportedContentType = errors.New("unsupported image content type")
+
 // FetchAndCache fetches an image and caches it without writing an HTTP response.
-// Used for cache warming.
+// Used for cache warming. Images already cached on disk are skipped, so repeated
+// warming (e.g. scheduler retries) doesn't refetch them from upstream.
 func (s *Service) FetchAndCache(ctx context.Context, rawURL string) error {
 	normalizedURL := nft.NormalizeIPFSURL(rawURL)
+
+	if s.isCached(ctx, normalizedURL) {
+		return nil
+	}
 
 	data, headers, err := s.fetcher.FetchImage(ctx, normalizedURL)
 	if err != nil {
@@ -104,7 +120,7 @@ func (s *Service) FetchAndCache(ctx context.Context, rawURL string) error {
 	}
 
 	if !isAllowedContentType(headers.ContentType) {
-		return fmt.Errorf("invalid content type: %s", headers.ContentType)
+		return fmt.Errorf("%w: %s", ErrUnsupportedContentType, headers.ContentType)
 	}
 
 	s.cache.StoreImage(ctx, normalizedURL, data, headers.ContentType, headers.ETag, headers.LastModified)
@@ -133,6 +149,11 @@ func (s *Service) WarmCache(ctx context.Context, urls []string) (succeeded, fail
 			defer func() { <-sem }()
 
 			if err := s.FetchAndCache(ctx, u); err != nil {
+				if errors.Is(err, ErrUnsupportedContentType) {
+					// Permanent content problem: retrying won't help, so it isn't counted as a failure
+					s.logger.Warn("cache warm skipped unsupported image", "url", u, "error", err)
+					return
+				}
 				s.logger.Warn("cache warm failed", "url", u, "error", err)
 				mu.Lock()
 				failed++
@@ -201,6 +222,20 @@ func (s *Service) deduplicatedFetch(ctx context.Context, cacheKey, url string) (
 	return data, headers, err
 }
 
+// isCached reports whether an image has valid metadata and its file is present on disk.
+func (s *Service) isCached(ctx context.Context, url string) bool {
+	meta, ok := s.cache.GetMetadata(ctx, url)
+	if !ok || meta.Is404() || meta.Filename == "" {
+		return false
+	}
+	f, err := s.cache.OpenImage(meta.Filename)
+	if err != nil || f == nil {
+		return false
+	}
+	_ = f.Close()
+	return true
+}
+
 // readCachedFile reads the full contents of a cached image file.
 // Used only for dedup waiters who need data for the initial response.
 func (s *Service) readCachedFile(filename string) ([]byte, error) {
@@ -222,7 +257,7 @@ func (s *Service) readCachedFile(filename string) ([]byte, error) {
 
 // handleConditional checks If-None-Match and If-Modified-Since against cached metadata.
 // Returns true if a 304 was sent.
-func (s *Service) handleConditional(ctx context.Context, w http.ResponseWriter, r *http.Request, url string) bool {
+func (s *Service) handleConditional(ctx context.Context, w http.ResponseWriter, r *http.Request, url string, maxAge time.Duration) bool {
 	meta, ok := s.cache.GetMetadata(ctx, url)
 	if !ok {
 		return false
@@ -233,7 +268,7 @@ func (s *Service) handleConditional(ctx context.Context, w http.ResponseWriter, 
 		normalizedEtag := strings.TrimPrefix(meta.ETag, "W/")
 		normalizedINM := strings.TrimPrefix(ifNoneMatch, "W/")
 		if normalizedEtag == normalizedINM {
-			s.write304(w, meta)
+			s.write304(w, meta, maxAge)
 			return true
 		}
 	}
@@ -243,7 +278,7 @@ func (s *Service) handleConditional(ctx context.Context, w http.ResponseWriter, 
 		modifiedDate, err1 := http.ParseTime(meta.LastModified)
 		ifModDate, err2 := http.ParseTime(ifModifiedSince)
 		if err1 == nil && err2 == nil && !modifiedDate.After(ifModDate) {
-			s.write304(w, meta)
+			s.write304(w, meta, maxAge)
 			return true
 		}
 	}
@@ -251,9 +286,9 @@ func (s *Service) handleConditional(ctx context.Context, w http.ResponseWriter, 
 	return false
 }
 
-func (s *Service) write304(w http.ResponseWriter, meta *Metadata) {
+func (s *Service) write304(w http.ResponseWriter, meta *Metadata, maxAge time.Duration) {
 	h := w.Header()
-	cacheTTLSec := CacheTTLSeconds
+	cacheTTLSec := int(maxAge / time.Second)
 	h.Set("Cache-Control", fmt.Sprintf("public, max-age=%d, s-maxage=%d", cacheTTLSec, cacheTTLSec))
 	if meta.ETag != "" {
 		h.Set("ETag", meta.ETag)
@@ -268,7 +303,7 @@ func (s *Service) write304(w http.ResponseWriter, meta *Metadata) {
 // for zero-copy delivery and automatic Range/conditional request handling.
 // Returns true if the response was served, false if the file is missing
 // (stale metadata is invalidated so the caller can re-fetch).
-func (s *Service) serveCached(ctx context.Context, w http.ResponseWriter, r *http.Request, meta *Metadata, url string) bool {
+func (s *Service) serveCached(ctx context.Context, w http.ResponseWriter, r *http.Request, meta *Metadata, url string, maxAge time.Duration) bool {
 	f, err := s.cache.OpenImage(meta.Filename)
 	if err != nil || f == nil {
 		s.logger.Warn("cached file missing on disk, invalidating metadata", "file", meta.Filename, "url", url, "error", err)
@@ -286,7 +321,7 @@ func (s *Service) serveCached(ctx context.Context, w http.ResponseWriter, r *htt
 	}
 
 	h := w.Header()
-	cacheTTLSec := CacheTTLSeconds
+	cacheTTLSec := int(maxAge / time.Second)
 	h.Set("Cache-Control", fmt.Sprintf("public, max-age=%d, s-maxage=%d, stale-while-revalidate=%d", cacheTTLSec, cacheTTLSec, cacheTTLSec*2))
 	h.Set("X-Content-Type-Options", "nosniff")
 	h.Set("Content-Security-Policy", "sandbox")
@@ -302,9 +337,9 @@ func (s *Service) serveCached(ctx context.Context, w http.ResponseWriter, r *htt
 	return true
 }
 
-func (s *Service) writeImageResponse(w http.ResponseWriter, data []byte, headers *ResponseHeaders) {
+func (s *Service) writeImageResponse(w http.ResponseWriter, data []byte, headers *ResponseHeaders, maxAge time.Duration) {
 	h := w.Header()
-	cacheTTLSec := CacheTTLSeconds
+	cacheTTLSec := int(maxAge / time.Second)
 	h.Set("Cache-Control", fmt.Sprintf("public, max-age=%d, s-maxage=%d, stale-while-revalidate=%d", cacheTTLSec, cacheTTLSec, cacheTTLSec*2))
 	h.Set("X-Content-Type-Options", "nosniff")
 	h.Set("Content-Security-Policy", "sandbox")

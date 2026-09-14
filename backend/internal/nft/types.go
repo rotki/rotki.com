@@ -132,5 +132,7 @@ func ChainConfigByID(chainID int) *ChainConfig {
 	return nil
 }
 
-// IPFSGateway is the IPFS gateway URL prefix.
+// IPFSGateway is the canonical gateway prefix used to build stable image cache
+// identities. Fetches do not use it directly: they go through ipfs.Pool, which
+// falls back across several gateways.
 const IPFSGateway = "https://ipfs.io/ipfs/"

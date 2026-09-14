@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/images"
 	nftpkg "github.com/rotki/rotki.com/backend/internal/nft"
@@ -62,10 +63,17 @@ func (h *Handler) handleTierInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert internal IPFS URLs to opaque proxy URLs for the client
+	releaseID := 0
+	if result.ReleaseID != nil {
+		releaseID = *result.ReleaseID
+	}
+
+	// Convert internal IPFS URLs to opaque proxy URLs for the client.
+	// The release is part of the URL so a new release gets a new image URL
+	// instead of reusing the previous release's browser/CDN-cached image.
 	for tierID, info := range result.Tiers {
 		if info.ImageURL != "" {
-			info.ImageURL = tierImageProxyURL(tierID)
+			info.ImageURL = tierImageProxyURL(tierID, releaseID)
 			result.Tiers[tierID] = info
 		}
 	}
@@ -116,9 +124,13 @@ func (h *Handler) handleTokenID(w http.ResponseWriter, r *http.Request) {
 	validate.WriteJSON(w, http.StatusOK, tokenData)
 }
 
-// handleImage handles GET /api/nft/image?tier=<id> or /api/nft/image?token=<id>
+// unversionedTierImageMaxAge is the client cache lifetime for tier images requested
+// without a release. Their content changes on every release, so keep it short.
+const unversionedTierImageMaxAge = 5 * time.Minute
+
+// handleImage handles GET /api/nft/image?tier=<id>[&release=<id>] or /api/nft/image?token=<id>
 // Resolves the IPFS URL internally and proxies the image through the caching service.
-// No user-supplied URLs are accepted — only opaque tier/token IDs.
+// No user-supplied URLs are accepted — only opaque tier/token/release IDs.
 func (h *Handler) handleImage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query()
@@ -126,6 +138,7 @@ func (h *Handler) handleImage(w http.ResponseWriter, r *http.Request) {
 	tokenStr := q.Get("token")
 
 	var imageURL string
+	maxAge := images.CacheTTL
 
 	switch {
 	case tierStr != "":
@@ -137,9 +150,24 @@ func (h *Handler) handleImage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		imageURL, err = h.core.GetTierImageURL(ctx, tierID)
+		releaseID, ok := parseReleaseID(q.Get("release"))
+		if !ok {
+			validate.WriteJSON(w, http.StatusBadRequest, map[string]string{
+				"error": "Invalid release ID",
+			})
+			return
+		}
+		if releaseID == 0 {
+			maxAge = unversionedTierImageMaxAge
+		}
+
+		imageURL, err = h.core.GetTierImageURL(ctx, tierID, releaseID)
 		if err != nil {
-			h.logger.Error("failed to resolve tier image", "tier_id", tierID, "error", err)
+			if errors.Is(err, nftpkg.ErrReleaseNotFound) {
+				http.NotFound(w, r)
+				return
+			}
+			h.logger.Error("failed to resolve tier image", "tier_id", tierID, "release_id", releaseID, "error", err)
 			http.Error(w, "Image not found for tier", http.StatusNotFound)
 			return
 		}
@@ -171,11 +199,28 @@ func (h *Handler) handleImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.imageSvc.ServeImage(ctx, w, r, imageURL)
+	h.imageSvc.ServeImageWithMaxAge(ctx, w, r, imageURL, maxAge)
+}
+
+// parseReleaseID parses the optional release query param.
+// An empty value means the current release (0). Otherwise it must be a positive integer.
+func parseReleaseID(raw string) (int, bool) {
+	if raw == "" {
+		return 0, true
+	}
+	releaseID, err := strconv.Atoi(raw)
+	if err != nil || releaseID < 1 {
+		return 0, false
+	}
+	return releaseID, true
 }
 
 // tierImageProxyURL returns the opaque proxy URL for a tier image.
-func tierImageProxyURL(tierID int) string {
+// A releaseID of 0 omits the release param (resolves to the current release).
+func tierImageProxyURL(tierID, releaseID int) string {
+	if releaseID > 0 {
+		return fmt.Sprintf("/api/nft/image?tier=%d&release=%d", tierID, releaseID)
+	}
 	return fmt.Sprintf("/api/nft/image?tier=%d", tierID)
 }
 

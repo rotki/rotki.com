@@ -7,39 +7,44 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"syscall"
 	"time"
 )
 
-// New returns a DialContext function that resolves DNS first, rejects
-// private/reserved IPs, then connects only to allowed addresses.
+// New returns a DialContext function that rejects private/reserved IPs.
+//
+// The check runs in the dialer's Control hook, i.e. on the exact address
+// being connected to after DNS resolution. This lets the standard dialer
+// walk every resolved address (falling back between IPv6 and IPv4 when one
+// family is unreachable) while still blocking internal targets, including
+// hosts whose DNS answer changes between lookup and connect.
 func New() func(ctx context.Context, network, addr string) (net.Conn, error) {
 	dialer := &net.Dialer{
-		Timeout:   30 * time.Second,
-		KeepAlive: 30 * time.Second,
+		Timeout:        30 * time.Second,
+		KeepAlive:      30 * time.Second,
+		ControlContext: control,
+	}
+	return dialer.DialContext
+}
+
+// control rejects connections to blocked IPs. address is always a resolved
+// "ip:port" pair when called by net.Dialer.
+func control(_ context.Context, _, address string, _ syscall.RawConn) error {
+	host, _, err := net.SplitHostPort(address)
+	if err != nil {
+		return fmt.Errorf("invalid address %q: %w", address, err)
 	}
 
-	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		host, port, err := net.SplitHostPort(addr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid address %q: %w", addr, err)
-		}
-
-		// Resolve DNS to get actual IPs
-		ips, err := net.DefaultResolver.LookupIPAddr(ctx, host)
-		if err != nil {
-			return nil, fmt.Errorf("DNS lookup failed for %q: %w", host, err)
-		}
-
-		// Check all resolved IPs before connecting
-		for _, ip := range ips {
-			if isBlockedIP(ip.IP) {
-				return nil, fmt.Errorf("connection to %s (%s) blocked: private/reserved IP", host, ip.IP)
-			}
-		}
-
-		// All IPs are safe — connect to the resolved address
-		return dialer.DialContext(ctx, network, net.JoinHostPort(ips[0].String(), port))
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return fmt.Errorf("connection to %q blocked: not a resolved IP", host)
 	}
+
+	if isBlockedIP(ip) {
+		return fmt.Errorf("connection to %s blocked: private/reserved IP", ip)
+	}
+
+	return nil
 }
 
 // isBlockedIP returns true if the IP is private, loopback, link-local,

@@ -17,6 +17,11 @@ type Task struct {
 	Name     string
 	Interval time.Duration
 	Fn       TaskFunc
+
+	// RetryInterval, when set, reruns a failed task after this delay instead of
+	// waiting the full Interval, up to MaxRetries consecutive times.
+	RetryInterval time.Duration
+	MaxRetries    int
 }
 
 // Scheduler runs tasks on fixed intervals using goroutines.
@@ -40,6 +45,18 @@ func (s *Scheduler) Add(name string, interval time.Duration, fn TaskFunc) {
 		Name:     name,
 		Interval: interval,
 		Fn:       fn,
+	})
+}
+
+// AddWithRetry registers a task that reruns after retryInterval when it fails,
+// up to maxRetries consecutive times before falling back to the regular interval.
+func (s *Scheduler) AddWithRetry(name string, interval, retryInterval time.Duration, maxRetries int, fn TaskFunc) {
+	s.tasks = append(s.tasks, Task{
+		Name:          name,
+		Interval:      interval,
+		Fn:            fn,
+		RetryInterval: retryInterval,
+		MaxRetries:    maxRetries,
 	})
 }
 
@@ -78,18 +95,25 @@ func (s *Scheduler) runTask(ctx context.Context, task Task, initialDelay time.Du
 	case <-time.After(initialDelay):
 	}
 
-	// Run immediately, then on interval
-	s.executeTask(ctx, task, taskLogger)
-
-	ticker := time.NewTicker(task.Interval)
-	defer ticker.Stop()
-
+	// Run immediately, then on interval (or sooner after a failure, if retries are configured)
+	retries := 0
 	for {
+		next := task.Interval
+		if err := s.executeTask(ctx, task, taskLogger); err != nil && task.RetryInterval > 0 && retries < task.MaxRetries {
+			retries++
+			next = task.RetryInterval
+			taskLogger.Warn("task scheduled for early retry",
+				"retry", retries, "max_retries", task.MaxRetries, "retry_in", next.String())
+		} else {
+			retries = 0
+		}
+
+		timer := time.NewTimer(next)
 		select {
 		case <-ctx.Done():
+			timer.Stop()
 			return
-		case <-ticker.C:
-			s.executeTask(ctx, task, taskLogger)
+		case <-timer.C:
 		}
 	}
 }
@@ -97,7 +121,7 @@ func (s *Scheduler) runTask(ctx context.Context, task Task, initialDelay time.Du
 // taskTimeout is the maximum duration a single task execution may take.
 const taskTimeout = 2 * time.Minute
 
-func (s *Scheduler) executeTask(ctx context.Context, task Task, logger *slog.Logger) {
+func (s *Scheduler) executeTask(ctx context.Context, task Task, logger *slog.Logger) error {
 	start := time.Now()
 	logger.Info("task starting")
 
@@ -106,8 +130,9 @@ func (s *Scheduler) executeTask(ctx context.Context, task Task, logger *slog.Log
 
 	if err := task.Fn(taskCtx); err != nil {
 		logger.Error("task failed", "error", err, "duration", time.Since(start).Round(time.Millisecond).String())
-		return
+		return err
 	}
 
 	logger.Info("task completed", "duration", time.Since(start).Round(time.Millisecond).String())
+	return nil
 }

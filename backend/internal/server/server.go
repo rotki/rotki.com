@@ -53,7 +53,8 @@ func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps, error) {
 
 	// NFT cache warming: every 5 minutes (when sponsorship is enabled)
 	if svcs.NFTCore != nil && cfg.SponsorshipEnabled {
-		sched.Add("nft:cache", scheduler.NFTCacheInterval,
+		sched.AddWithRetry("nft:cache", scheduler.NFTCacheInterval,
+			scheduler.NFTCacheRetryInterval, scheduler.NFTCacheMaxRetries,
 			scheduler.NFTCacheTask(svcs.NFTCore, svcs.ImageSvc, logger))
 	}
 

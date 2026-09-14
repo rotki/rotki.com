@@ -2,6 +2,7 @@ package images
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -18,7 +19,7 @@ func testService(t *testing.T) (*Service, *httptest.Server) {
 	redis := cache.NewRedis("", "", logger)
 	dir := t.TempDir()
 	cm := NewCacheManager(dir, redis, logger)
-	f := newFetcher(logger, nil)
+	f := newFetcher(logger, nil, nil)
 	svc := NewService(cm, f, logger)
 
 	// Create a test upstream server
@@ -83,7 +84,7 @@ func TestService_ServeImage_InvalidContentType(t *testing.T) {
 	redis := cache.NewRedis("", "", logger)
 	dir := t.TempDir()
 	cm := NewCacheManager(dir, redis, logger)
-	f := newFetcher(logger, nil)
+	f := newFetcher(logger, nil, nil)
 	svc := NewService(cm, f, logger)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -110,6 +111,27 @@ func TestService_FetchAndCache_Success(t *testing.T) {
 	err := svc.FetchAndCache(context.Background(), srv.URL+"/test.png")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestService_WarmCache_UnsupportedTypeIsNotAFailure(t *testing.T) {
+	logger := slog.New(slog.DiscardHandler)
+	svc := NewService(NewCacheManager(t.TempDir(), cache.NewRedis("", "", logger), logger), newFetcher(logger, nil, nil), logger)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "image/avif")
+		_, _ = w.Write([]byte("avif"))
+	}))
+	defer srv.Close()
+
+	err := svc.FetchAndCache(context.Background(), srv.URL+"/tier.avif")
+	if !errors.Is(err, ErrUnsupportedContentType) {
+		t.Fatalf("expected ErrUnsupportedContentType, got %v", err)
+	}
+
+	succeeded, failed := svc.WarmCache(context.Background(), []string{srv.URL + "/tier.avif"})
+	if succeeded != 0 || failed != 0 {
+		t.Errorf("expected unsupported image to be neither succeeded nor failed, got %d/%d", succeeded, failed)
 	}
 }
 

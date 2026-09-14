@@ -12,7 +12,7 @@ func TestLoad_Defaults(t *testing.T) {
 		"GOOGLE_CLIENT_SECRET", "MONERIUM_CLIENT_SECRET", "MONERIUM_AUTH_BASE_URL",
 		"REDIS_HOST", "REDIS_PASSWORD", "IMAGE_CACHE_DIR",
 		"DEV_MODE", "NUXT_DEV_URL", "PROXY_DOMAIN", "PROXY_INSECURE",
-		"TLS_SKIP_VERIFY", "LOG_LEVEL", "SPONSORSHIP_ENABLED",
+		"TLS_SKIP_VERIFY", "LOG_LEVEL", "SPONSORSHIP_ENABLED", "IPFS_GATEWAYS",
 	} {
 		t.Setenv(key, "")
 	}
@@ -22,6 +22,10 @@ func TestLoad_Defaults(t *testing.T) {
 	cfg, err := Load()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if cfg.IPFSGateways != nil {
+		t.Errorf("expected nil IPFSGateways by default (use built-in list), got %v", cfg.IPFSGateways)
 	}
 
 	if cfg.Port != 4000 {
@@ -53,6 +57,23 @@ func TestLoad_Defaults(t *testing.T) {
 	}
 	if cfg.SponsorshipEnabled {
 		t.Error("expected SponsorshipEnabled false by default")
+	}
+}
+
+func TestLoad_IPFSGateways(t *testing.T) {
+	t.Setenv("IPFS_GATEWAYS", "https://a.example, https://b.example/ipfs/")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	want := []string{"https://a.example/ipfs/", "https://b.example/ipfs/"}
+	if len(cfg.IPFSGateways) != 2 || cfg.IPFSGateways[0] != want[0] || cfg.IPFSGateways[1] != want[1] {
+		t.Errorf("got %v, want %v", cfg.IPFSGateways, want)
+	}
+
+	t.Setenv("IPFS_GATEWAYS", "http://insecure.example")
+	if _, err := Load(); err == nil {
+		t.Error("expected error for non-https gateway")
 	}
 }
 

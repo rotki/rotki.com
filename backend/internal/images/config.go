@@ -16,6 +16,10 @@ const (
 	// FetchTimeout is the HTTP timeout for fetching images.
 	FetchTimeout = 30 * time.Second
 
+	// GatewayFetchTimeout bounds a single IPFS image request to one gateway
+	// before falling back to the next one.
+	GatewayFetchTimeout = 15 * time.Second
+
 	// MaxConcurrency is the max number of concurrent image fetches during cache warming.
 	MaxConcurrency = 5
 

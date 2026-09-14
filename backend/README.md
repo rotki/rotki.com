@@ -53,6 +53,7 @@ PORT=3000 \
 | `REDIS_HOST`             | _(empty)_                  |                         | Redis address (e.g. `localhost:6379`)                                      |
 | `REDIS_PASSWORD`         | _(empty)_                  |                         | Redis password                                                             |
 | `IMAGE_CACHE_DIR`        | `./image-cache`            |                         | Directory for filesystem image cache                                       |
+| `IPFS_GATEWAYS`          | _(built-in list)_          |                         | Comma-separated https IPFS gateways in fallback order (`internal/ipfs`)    |
 | `DEV_MODE`               | `false`                    |                         | Enable dev-only features (changes defaults below)                          |
 | `NUXT_DEV_URL`           | _(empty)_                  | `http://localhost:3001` | Nuxt dev server URL — proxies pages/assets instead of serving static files |
 | `PROXY_DOMAIN`           | _(empty)_                  |                         | Backend domain for `/webapi` + `/media` reverse proxy                      |
