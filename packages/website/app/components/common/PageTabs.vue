@@ -15,7 +15,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="hidden lg:block w-[270px] shrink-0">
+  <div class="hidden xl:block w-[270px] shrink-0">
     <RuiTabs
       v-model="modelValue"
       vertical
@@ -36,7 +36,7 @@ defineProps<{
       </RuiTab>
     </RuiTabs>
   </div>
-  <div class="lg:hidden">
+  <div class="xl:hidden">
     <RuiTabs
       v-model="modelValue"
       grow

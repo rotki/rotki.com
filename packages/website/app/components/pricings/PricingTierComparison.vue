@@ -42,7 +42,7 @@ const { plans, displayedFeaturesLabel, modelCompact, allowCompact } = usePricing
         :features-label="displayedFeaturesLabel"
       />
     </div>
-    <div class="flex justify-center">
+    <div class="flex justify-center mt-4">
       <RuiButton
         v-if="allowCompact"
         color="primary"

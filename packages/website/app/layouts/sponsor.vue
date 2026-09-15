@@ -36,7 +36,7 @@ const tabs = computed<PageTabItem[]>(() => [
   <Default>
     <div class="py-10 lg:py-16">
       <div class="container">
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col xl:flex-row gap-6">
           <PageTabs
             v-model="tabModelValue"
             :tabs="tabs"

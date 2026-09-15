@@ -37,8 +37,8 @@ watch(() => plans, (newPlans) => {
         v-for="plan in plans"
         :key="plan.name"
         :value="plan.name"
-        class="flex-1 relative !h-10 min-w-28"
-        :class="{ '!bg-blue-50 min-w-36': isMostPopularPlan(plan) }"
+        class="flex-1 relative !h-10 !px-3 min-w-24"
+        :class="{ '!bg-blue-50 min-w-28': isMostPopularPlan(plan) }"
       >
         <template v-if="plan.loading">
           <RuiSkeletonLoader class="w-16 h-4" />

@@ -81,7 +81,7 @@ onMounted(() => {
           <div class="text-h4 mb-6">
             {{ t('account.welcome') }} {{ name }}
           </div>
-          <div class="flex flex-col lg:flex-row gap-6">
+          <div class="flex flex-col xl:flex-row gap-6">
             <PageTabs
               v-model="tabModelValue"
               :tabs="tabs"
