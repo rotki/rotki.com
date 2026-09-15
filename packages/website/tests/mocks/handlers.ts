@@ -2,9 +2,19 @@ import { http, HttpResponse } from 'msw';
 
 const { BACKEND_URL } = import.meta.env;
 
+declare global {
+  interface Window {
+    rotkiRetryAttempts?: { count: number };
+  }
+}
+
 // Counts attempts against `/webapi/retry/` so the handler can fail the first one
-// and succeed on the retry. Reset it from the test before use.
-export const retryAttempts = { count: 0 };
+// and succeed on the retry. Reset it from the test before use. It lives on `window`
+// for the same reason as the server in `server.ts`: after the module reset, the
+// listening handler and the spec would otherwise count on separate copies.
+window.rotkiRetryAttempts ??= { count: 0 };
+
+export const retryAttempts: { count: number } = window.rotkiRetryAttempts;
 
 export const handlers = [
   // Mock app manifest requests to prevent errors during test initialization

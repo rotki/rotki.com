@@ -4,7 +4,11 @@ import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
-import { APP_BASE_PATH } from './src/config/base-path';
+import { APP_BASE_PATH } from './src/config/base-path.ts';
+
+// The relative import keeps its `.ts` extension on purpose: vite 8 loads this config natively and
+// warns about extensionless relative imports. eslint.config.js turns `@rotki/no-dot-ts-imports` off
+// for config files, and tsconfig.node.json sets `allowImportingTsExtensions` for vue-tsc.
 
 // https://vite.dev/config/
 export default defineConfig({

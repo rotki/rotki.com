@@ -54,7 +54,7 @@ catalog:
   '@nuxt/eslint-plugin': 1.17.0
   '@nuxt/fonts': 0.14.0
   '@nuxt/kit': 4.5.2
-  '@nuxt/test-utils': 4.1.0
+  '@nuxt/test-utils': 4.3.2
   '@nuxtjs/i18n': 10.6.0
   '@nuxtjs/robots': 6.2.0
   '@nuxtjs/sitemap': 8.5.0
@@ -72,7 +72,7 @@ catalog:
   '@types/qrcode': 1.5.6
   '@unhead/vue': 2.1.17
   '@vitejs/plugin-vue': 6.0.8
-  '@vitest/coverage-v8': 4.1.11
+  '@vitest/coverage-v8': 5.0.0
   '@vue/test-utils': 2.5.0
   '@vue/tsconfig': 0.9.1
   '@vuelidate/core': 2.0.3
@@ -120,7 +120,7 @@ catalog:
   vite: 8.2.2
   vite-plugin-vue-devtools: 8.2.1
   vite-ssg: 28.3.0
-  vitest: 4.1.11
+  vitest: 5.0.0
   vue: 3.5.42
   vue-router: 5.3.1
   vue-tsc: 3.3.11

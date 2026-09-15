@@ -7,7 +7,7 @@ export default defineVitestConfig({
   test: {
     coverage: {
       exclude: ['.nuxt/**', 'tests/**', '**/*.test.ts', '**/*.spec.ts'],
-      include: ['app/**'],
+      include: ['app/**/*.{ts,vue}'],
       provider: 'v8',
       reporter: ['json', 'lcov'],
       reportsDirectory: 'coverage',

@@ -82,6 +82,13 @@ export default rotki({
     '@stylistic/spaced-comment': 'off',
   },
 }, {
+  // Vite 8 loads configs natively and warns on extensionless relative imports, which
+  // `@rotki/no-dot-ts-imports` would autofix straight back off. Off for config files only.
+  files: ['**/vite.config.ts', '**/vitest.config.ts'],
+  rules: {
+    '@rotki/no-dot-ts-imports': 'off',
+  },
+}, {
   ignores: [
     '**/dist/**',
     '**/node_modules/**',
