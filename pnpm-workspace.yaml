@@ -10,13 +10,10 @@ blockExoticSubdeps: true
 strictDepBuilds: true
 trustPolicy: no-downgrade
 trustPolicyExclude:
-  - chokidar@4.0.3
   - semver@6.3.1
-  - undici-types@6.19.8
   - '@noble/curves@1.8.0'
   - '@noble/hashes@1.7.0'
   - slow-redact@0.3.2
-  - synckit@0.9.3
   - tailwind-merge@2.6.1
 
 packages:
@@ -25,6 +22,8 @@ packages:
   - packages/website/tests/e2e/mock-api
 
 overrides:
+  # tailwindcss 3 still asks for chokidar ^3.6.0 while everything else is on ^5.
+  # Keep a single copy instead of a second chokidar tree for tailwind alone.
   chokidar: 5.0.0
   # stylelint-order 8.1.1 (newest) declares `postcss: ^8.5.8`, and pnpm will not
   # re-resolve a range that is already satisfied, so it pinned a second, vulnerable
@@ -34,16 +33,13 @@ overrides:
   # jsdom 28.1.0 (a test-tooling peer) allows undici ^7.21.0, but pnpm kept the
   # vulnerable 7.27.2 it had already resolved. Pin the 7.x line to a patched
   # release until jsdom moves on.
-  'undici@^7': 7.29.1
+  undici@^7: 7.29.1
 
 allowBuilds:
   '@parcel/watcher': true
   better-sqlite3: true
-  bufferutil: true
   esbuild: true
   msw: false
-  sharp: false
-  utf-8-validate: true
   vue-demi: false
 
 patchedDependencies:
@@ -57,6 +53,7 @@ catalog:
   '@nuxt/devtools': 3.4.2
   '@nuxt/eslint-plugin': 1.17.0
   '@nuxt/fonts': 0.14.0
+  '@nuxt/kit': 4.5.2
   '@nuxt/test-utils': 4.1.0
   '@nuxtjs/i18n': 10.6.0
   '@nuxtjs/robots': 6.2.0
@@ -70,7 +67,6 @@ catalog:
   '@rotki/ui-library': 2.24.0
   '@tsconfig/node24': 24.0.5
   '@types/braintree-web': 3.143.0
-  '@types/jsdom': 28.0.3
   '@types/node': 24.13.3
   '@types/paypal-checkout-components': 4.0.8
   '@types/qrcode': 1.5.6
@@ -94,6 +90,7 @@ catalog:
   bumpp: 12.3.0
   cac: 7.0.0
   consola: 3.4.2
+  defu: 6.1.7
   eslint: 10.10.0
   happy-dom: 20.14.0
   husky: 9.1.7
@@ -103,14 +100,13 @@ catalog:
   npm-run-all2: 9.0.3
   nuxt: 4.5.2
   nuxt-llms: 0.2.0
+  ofetch: 1.5.1
   pinia: 4.0.3
   plainfp: 0.1.1
   postcss: 8.5.28
   postcss-html: 1.8.1
-  postcss-import: 16.2.0
   qrcode: 1.5.4
   rimraf: 6.1.3
-  rollup: 4.63.1
   satori: 0.29.1
   stylelint: 17.15.0
   stylelint-config-recommended-vue: 1.6.1
@@ -128,4 +124,5 @@ catalog:
   vue: 3.5.42
   vue-router: 5.3.1
   vue-tsc: 3.3.11
+  yaml: 2.9.0
   zod: 4.5.4

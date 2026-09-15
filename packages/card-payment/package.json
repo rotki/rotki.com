@@ -16,6 +16,7 @@
     "@rotki/card-payment-common": "workspace:*",
     "@rotki/sigil": "workspace:*",
     "@vueuse/core": "catalog:",
+    "@vueuse/shared": "catalog:",
     "braintree-web": "catalog:",
     "vue": "catalog:",
     "zod": "catalog:"
@@ -24,7 +25,6 @@
     "@rotki/ui-library": "catalog:",
     "@tsconfig/node24": "catalog:",
     "@types/braintree-web": "catalog:",
-    "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
