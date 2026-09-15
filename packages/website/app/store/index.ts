@@ -14,6 +14,7 @@ import { useAuthHintCookie, useEmailConfirmedCookie, useFetchWithCsrf } from '~/
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
 import { UserPayments } from '~/types/account';
 import { isUnauthorizedError } from '~/utils/api-error-handling';
+import { hasCardPaymentInHistory } from '~/utils/payments';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_TIMEOUT = 3600000;
@@ -104,7 +105,7 @@ export const useMainStore = defineStore('main', () => {
         { method: 'GET' },
       );
       const payments = UserPayments.parse(response.result);
-      set(hasCardPayment, payments.some(p => p.paidUsing === 'card' && !p.isRefund));
+      set(hasCardPayment, hasCardPaymentInHistory(payments));
     }
     catch (error) {
       if (!isUnauthorizedError(error)) {
