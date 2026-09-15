@@ -6,6 +6,7 @@ import { featurePrerenderRoutes } from './app/utils/feature-prerender';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
 import { closedJobRoutes, jobsPrerenderRoutes } from './app/utils/jobs-prerender';
 import { llms } from './app/utils/llms-config';
+import { devOptimizeDeps } from './app/utils/optimize-deps';
 import { clientOnlyRouteRules, writeSpaManifest } from './app/utils/spa-routes';
 
 // Build identifier for unique chunk names per deployment
@@ -254,37 +255,8 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    /*
-     * Pre-bundle deps Vite's startup scan misses (subpath/deep imports), so the
-     * dev server doesn't discover them mid-session and trigger a full reload.
-     * Dev-only: has no effect on the production build. Covers heavy
-     * route-specific libs (web3/payments) too, at the cost of a slower dev
-     * cold-start.
-     */
     optimizeDeps: {
-      include: [
-        '@rotki/ui-library',
-        '@rotki/ui-library/components',
-        '@rotki/ui-library/composables',
-        '@vue/devtools-core',
-        '@vue/devtools-kit',
-        '@vuelidate/core',
-        '@vuelidate/validators',
-        'zod',
-        'swiper/vue',
-        'swiper/modules',
-        'qrcode',
-        'viem',
-        'viem/chains',
-        '@wagmi/core',
-        '@wagmi/connectors',
-        '@walletconnect/universal-provider',
-        '@coinbase/wallet-sdk',
-        'braintree-web',
-        'braintree-web/client',
-        'braintree-web/hosted-fields',
-        'braintree-web/three-d-secure',
-      ],
+      include: devOptimizeDeps,
     },
     build: {
       // No automatic modulepreload links; dynamic imports still work but don't preload their dependencies.
