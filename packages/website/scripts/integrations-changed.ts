@@ -73,9 +73,12 @@ function lsTree(ref: string): Set<string> {
   return new Set(out.split('\n').filter(Boolean));
 }
 
+/**
+ * Converts a POSIX glob to a RegExp. Supports `**` (any path), `*` (no slash) and
+ * `?` (one char). Double stars go through a placeholder so the single-star pass
+ * does not consume them.
+ */
 function globToRegExp(glob: string): RegExp {
-  // POSIX glob to RegExp. Supports ** (any path), * (no slash), ? (one char).
-  // We use a unique placeholder so the single-star pass doesn't eat double-stars.
   const re = glob
     .replace(/[$()+.[\\\]^{|}]/g, '\\$&')
     .replace(/\*\*/g, '__DOUBLE_STAR__')
@@ -225,12 +228,14 @@ if (inAllNotInMd.length === 0) {
   console.log('    (none - run pnpm gen:integration-stubs if any appear)');
 }
 else {
-  // An all.json slug without its own md file is only safe when the site folds it into a
-  // page that does exist. That folding is INTEGRATION_CONSOLIDATIONS - the same explicit
-  // whitelist /integrations builds its links from - so consolidateSlug is what decides,
-  // not a first-word match. A first-word heuristic here would call "Yearn vesting" safe
-  // because yearn.md exists, while the site still links /integrations/yearn-vesting and
-  // the prerender 404s.
+  /*
+   * An all.json slug without its own md file is only safe when the site folds it into a
+   * page that does exist. That folding is INTEGRATION_CONSOLIDATIONS (the same explicit
+   * whitelist /integrations builds its links from), so consolidateSlug is what decides,
+   * not a first-word match. A first-word heuristic here would call "Yearn vesting" safe
+   * because yearn.md exists, while the site still links /integrations/yearn-vesting and
+   * the prerender 404s.
+   */
   const trulyMissing = inAllNotInMd.filter(s => !mdSlugs.has(consolidateSlug(s)));
   if (trulyMissing.length === 0) {
     console.log('    (all consolidated onto existing pages)');

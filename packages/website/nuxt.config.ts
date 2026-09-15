@@ -9,13 +9,15 @@ import { llms } from './app/utils/llms-config';
 import { clientOnlyRouteRules, writeSpaManifest } from './app/utils/spa-routes';
 
 // Build identifier for unique chunk names per deployment
-const buildId = process.env.GIT_SHA?.slice(0, 8) || Date.now();
+const gitSha = process.env.GIT_SHA;
+const buildId = gitSha ? gitSha.slice(0, 8) : Date.now();
 
-// Ordered manual-chunk rules — first matching predicate wins. Heavy libraries are
-// listed before the core framework so Vue isn't pulled into the heavy chunks.
+/**
+ * Ordered manual-chunk rules; the first matching predicate wins. Heavy libraries are
+ * listed before the core framework so Vue isn't pulled into the heavy chunks.
+ */
 const manualChunkRules: [test: (id: string) => boolean, chunk: string][] = [
-  // Vite preload helper - a separate small chunk that other chunks import, so the
-  // heavy web3 stack isn't loaded just for the preload function.
+  // Vite preload helper: its own small chunk, so the web3 stack isn't loaded just for preloading.
   [id => id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill'), 'vite-helpers'],
   // Rollup commonjs interop helpers (virtual module \0commonjsHelpers.js), shared widely.
   [id => id.includes('\0commonjsHelpers'), 'commonjs-helpers'],
@@ -38,8 +40,7 @@ const manualChunkRules: [test: (id: string) => boolean, chunk: string][] = [
   // Common utilities - keep separate from heavy chunks.
   [id => id.includes('node_modules/destr'), 'utils'],
   [id => id.includes('node_modules/dayjs'), 'dayjs'],
-  // Core framework - checked last so they don't end up in heavy chunks. Vue/VueUse/Pinia
-  // are kept together to avoid circular deps.
+  // Core framework, checked last to stay out of heavy chunks; Vue/VueUse/Pinia share one to avoid circular deps.
   [id => id.includes('node_modules/vue') || id.includes('node_modules/@vue') || id.includes('node_modules/pinia') || id.includes('node_modules/@vueuse'), 'vue-core'],
 ];
 
@@ -92,13 +93,14 @@ export default defineNuxtConfig({
     './modules/feature-seo/module.ts',
     './modules/ui-library/module.ts',
   ],
-  // SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
-  // for crawlers and JS-less social/LLM scrapers. No runtime server (static
-  // preset). Client-only routes opt out via `routeRules` `ssr: false`.
+  /*
+   * SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
+   * for crawlers and JS-less social/LLM scrapers. No runtime server (static
+   * preset). Client-only routes opt out via `routeRules` `ssr: false`.
+   */
   ssr: true,
 
-  // Disable auto-import for application components - they should be imported explicitly
-  // Nuxt's built-in components (NuxtLink, NuxtPage, etc.) remain available
+  // Application components are imported explicitly; Nuxt built-ins (NuxtLink, NuxtPage) stay available.
   components: false,
 
   imports: {
@@ -203,11 +205,13 @@ export default defineNuxtConfig({
   routeRules: {
     // Redirect /pricing to /checkout/pay
     '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
-    // The 404 body is served at whatever URL the visitor requested, so the Nuxt
-    // runtime must not boot on it: it would hydrate against a payload for
-    // /not-found, logging a mismatch and rewriting the address bar so the
-    // visitor loses the URL they asked for. `noScripts` omits the runtime at
-    // render time, which is why this page is prerendered but inert.
+    /*
+     * The 404 body is served at whatever URL the visitor requested, so the Nuxt
+     * runtime must not boot on it: it would hydrate against a payload for
+     * /not-found, logging a mismatch and rewriting the address bar so the
+     * visitor loses the URL they asked for. `noScripts` omits the runtime at
+     * render time, which is why this page is prerendered but inert.
+     */
     '/not-found': { noScripts: true },
     ...clientOnlyRouteRules(),
   },
@@ -240,19 +244,23 @@ export default defineNuxtConfig({
       crawlLinks: true,
       // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
       failOnError: true,
-      // `/not-found` is the statically rendered 404 body the Go handler serves.
-      // (`/200.html` and `/404.html` are added automatically by Nuxt's
-      // nitro-server for static presets, and are un-hydrated SPA shells.)
+      /*
+       * `/not-found` is the statically rendered 404 body the Go handler serves.
+       * (`/200.html` and `/404.html` are added automatically by Nuxt's
+       * nitro-server for static presets, and are un-hydrated SPA shells.)
+       */
       routes: ['/not-found', ...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes(), ...jobsPrerenderRoutes()],
     },
   },
 
   vite: {
-    // Pre-bundle deps Vite's startup scan misses (subpath/deep imports), so the
-    // dev server doesn't discover them mid-session and trigger a full reload.
-    // Dev-only: has no effect on the production build. Covers heavy
-    // route-specific libs (web3/payments) too, at the cost of a slower dev
-    // cold-start.
+    /*
+     * Pre-bundle deps Vite's startup scan misses (subpath/deep imports), so the
+     * dev server doesn't discover them mid-session and trigger a full reload.
+     * Dev-only: has no effect on the production build. Covers heavy
+     * route-specific libs (web3/payments) too, at the cost of a slower dev
+     * cold-start.
+     */
     optimizeDeps: {
       include: [
         '@rotki/ui-library',
@@ -279,13 +287,11 @@ export default defineNuxtConfig({
       ],
     },
     build: {
-      // Disable Vite's automatic modulepreload link injection
-      // Dynamic imports will still work, but won't preload dependencies
+      // No automatic modulepreload links; dynamic imports still work but don't preload their dependencies.
       modulePreload: { polyfill: true, resolveDependencies: () => [] },
       rollupOptions: {
         output: {
-          // Include build identifier to ensure unique filenames per deployment
-          // Format: _nuxt/chunkName-buildId-contentHash.js
+          // The build id keeps filenames unique per deployment: _nuxt/<name>-<buildId>.<hash>.js
           chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           entryFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           manualChunks(id) {
@@ -311,22 +317,26 @@ export default defineNuxtConfig({
     },
   },
   hooks: {
-    // Emit the SPA fallback manifest the Go static handler reads at startup.
-    // Derived from `clientOnlyRoutes` so the backend can never drift from the
-    // routes Nuxt actually leaves unrendered. Without this file the handler
-    // refuses to start rather than silently serving 200 for every path.
-    //
-    // Hooked on `prerender:done` so the manifest is written against the
-    // finished output rather than at `rollup:before`, when nothing exists yet.
+    /**
+     * Emits the SPA fallback manifest the Go static handler reads at startup.
+     * Derived from `clientOnlyRoutes` so the backend can never drift from the
+     * routes Nuxt actually leaves unrendered. Without this file the handler
+     * refuses to start rather than silently serving 200 for every path.
+     *
+     * Hooked on `prerender:done` so the manifest is written against the
+     * finished output rather than at `rollup:before`, when nothing exists yet.
+     */
     'nitro:init': (nitro) => {
       nitro.hooks.hook('prerender:done', () => {
         writeSpaManifest(nitro.options.output.publicDir);
       });
     },
+    /**
+     * Disables prefetch and modulepreload for every chunk except fonts. This avoids
+     * unnecessary requests on the initial page load while critical fonts still
+     * preload for better CLS.
+     */
     'build:manifest': (manifest) => {
-      // Disable prefetch and modulepreload for all chunks except fonts
-      // This prevents unnecessary network requests on initial page load
-      // while allowing critical fonts to preload for better CLS
       for (const [key, item] of Object.entries(manifest)) {
         const isFont = key.endsWith('.woff2') || key.endsWith('.woff') || key.endsWith('.ttf');
         if (!isFont) {
@@ -363,8 +373,7 @@ export default defineNuxtConfig({
   // llms.txt / llms-full.txt / raw markdown endpoint for AI crawlers (see llms.config.ts).
   llms,
 
-  // Closed roles are prerendered so their URLs resolve, but must not be
-  // advertised in the sitemap (they also carry noindex).
+  // Closed roles are prerendered so their URLs resolve, but stay out of the sitemap (they carry noindex).
   sitemap: { exclude: [...nonIndexed, ...closedJobRoutes()] },
 
   tailwindcss: {

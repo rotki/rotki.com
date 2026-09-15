@@ -43,8 +43,8 @@ function el(style: OgStyle, children?: OgChild | OgChild[]): OgElement {
 }
 
 /**
- * Renders a 1200x630 Open Graph card for an integration using Satori (HTML/flexbox -> SVG)
- * and resvg (SVG -> PNG). Runs at build time inside the prerender hook.
+ * Renders a 1200x630 Open Graph card for an integration using Satori (HTML/flexbox to SVG)
+ * and resvg (SVG to PNG). Runs at build time inside the prerender hook.
  */
 export async function renderOgImage({ label, tagline, typeLabel, fonts }: OgImageOptions): Promise<Buffer> {
   const element = el(

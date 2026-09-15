@@ -44,8 +44,10 @@ const sponsorshipTierSchema = z.object({
   tier: z.enum(['bronze', 'silver', 'gold']),
 });
 
-// Hub content (intro, takeaways, shared rotki highlights, FAQ) lives in markdown so it
-// is editable alongside the comparison pages rather than in i18n. Only UI labels stay in en.json.
+/**
+ * Hub content (intro, takeaways, shared rotki highlights, FAQ) lives in markdown so it
+ * is editable alongside the comparison pages rather than in i18n. Only UI labels stay in en.json.
+ */
 const comparisonHubSchema = z.object({
   intro: z.string(),
   keyTakeaways: z.array(z.string()).default([]),
@@ -56,8 +58,10 @@ const comparisonHubSchema = z.object({
   })).default([]),
 });
 
-// Hub content (intro, takeaways, shared rotki highlights, FAQ) lives in markdown so it
-// is editable alongside the feature pages rather than in i18n. Mirrors comparisonHubSchema.
+/**
+ * Hub content (intro, takeaways, shared rotki highlights, FAQ) lives in markdown so it
+ * is editable alongside the feature pages rather than in i18n. Mirrors `comparisonHubSchema`.
+ */
 const featureHubSchema = z.object({
   intro: z.string(),
   keyTakeaways: z.array(z.string()).default([]),
@@ -120,8 +124,7 @@ export default defineContentConfig({
       source: {
         cwd: '~~/',
         include: COMPARISONS,
-        // Prefix must match the page route (`/compare/<slug>`) so `queryCollection('comparisons').path(...)`
-        // in compare/[slug].vue resolves; the collection name stays `comparisons`.
+        // Must match the page route (`/compare/<slug>`) for compare/[slug].vue's path query to resolve.
         prefix: 'compare',
       },
       type: 'page',
@@ -140,8 +143,7 @@ export default defineContentConfig({
       source: {
         cwd: '~~/',
         include: FEATURES,
-        // Prefix matches the page route (`/features/<slug>`) so
-        // `queryCollection('features').path(...)` in features/[slug].vue resolves.
+        // Must match the page route (`/features/<slug>`) for features/[slug].vue's path query to resolve.
         prefix: 'features',
       },
       type: 'page',

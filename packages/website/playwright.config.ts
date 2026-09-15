@@ -1,10 +1,16 @@
 import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 
-const port = process.env.PORT || '48123';
+/** Reads an environment variable, treating an empty value the same as an unset one. */
+function envOrDefault(name: string, fallback: string): string {
+  const value = process.env[name];
+  return value === undefined || value === '' ? fallback : value;
+}
+
+const port = envOrDefault('PORT', '48123');
 const nuxtPort = '3001'; // hardcoded in package.json dev script
 const mockApiPort = '9999';
-const baseURL = process.env.BASE_URL || `http://localhost:${port}`;
+const baseURL = envOrDefault('BASE_URL', `http://localhost:${port}`);
 
 // Use system Chromium if PLAYWRIGHT_CHROMIUM_PATH is set (e.g., on Arch Linux)
 const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;

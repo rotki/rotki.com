@@ -15,7 +15,7 @@ import { integrationSlug } from '../app/utils/integration-slug';
 const META_DESCRIPTION_MAX = 160;
 
 /**
- * Derives a <=160-char SERP meta description from a longer `intro`: the whole
+ * Derives a SERP meta description of at most 160 characters from a longer `intro`: the whole
  * intro if it already fits, else a clean first sentence, else a word-boundary
  * trim with trailing junk stripped. Kept separate from `intro` so the visible
  * paragraph can stay long while the meta description stays within budget.
@@ -64,11 +64,12 @@ function localizeImage(url: string): string {
 function dedupeProtocols(protocols: RawItem[]): RawItem[] {
   const byFirstWord: Record<string, RawItem> = {};
   for (const protocol of protocols) {
-    const firstWord = protocol.label.split(' ')[0];
+    const spaceIndex = protocol.label.indexOf(' ');
+    const firstWord = spaceIndex === -1 ? protocol.label : protocol.label.slice(0, spaceIndex);
     if (!firstWord)
       continue;
     const existing = byFirstWord[firstWord];
-    if (!existing || existing.image !== protocol.image) {
+    if (existing?.image !== protocol.image) {
       byFirstWord[firstWord] = { ...protocol };
     }
     else {

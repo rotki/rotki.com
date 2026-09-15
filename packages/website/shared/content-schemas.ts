@@ -21,8 +21,7 @@ export const integrationSchema = z.object({
   image: z.string(),
   tagline: z.string().optional(),
   intro: z.string(),
-  // SERP/meta description (<160 chars). Kept separate from `intro` so the
-  // visible intro paragraph can stay longer than the meta description allows.
+  /** SERP meta description, under 160 chars. Separate from `intro` so the visible paragraph can be longer. */
   metaDescription: z.string(),
   features: z.array(z.string()).default([]),
   limitations: z.array(z.string()).default([]),
@@ -47,16 +46,17 @@ export const comparisonSchema = z.object({
   image: z.string(),
   tagline: z.string(),
   intro: z.string(),
-  // SERP/meta description (<160 chars). Kept separate from `intro` so the
-  // visible intro paragraph can stay longer than the meta description allows.
+  /** SERP meta description, under 160 chars. Separate from `intro` so the visible paragraph can be longer. */
   metaDescription: z.string(),
   keywords: z.string().optional(),
   // Short, scannable summary bullets shown near the top of the page.
   keyTakeaways: z.array(z.string()).default([]),
   // One-paragraph summary shown near the top and reused for the verdict block.
   verdict: z.string(),
-  // Side-by-side table rows. rotki is always the left column. `highlight` emphasises
-  // the rows that are most relevant to rotki's positioning (privacy, open source, self-custody).
+  /*
+   * Side-by-side table rows. rotki is always the left column. `highlight` emphasises
+   * the rows that are most relevant to rotki's positioning (privacy, open source, self-custody).
+   */
   dimensions: z.array(z.object({
     label: z.string(),
     rotki: z.string(),
@@ -82,9 +82,11 @@ export const comparisonSchema = z.object({
   ctaPlan: z.enum(['free', 'basic', 'advanced']).default('free'),
 });
 
-// Feature pages are concept/use-case landing pages (e.g. "CSV import",
-// "local-first crypto accounting"). Modeled on `comparisonSchema` but reshaped
-// for use-case intent: no competitor/dimensions, plus capabilities/setup/troubleshooting.
+/**
+ * Feature pages are concept/use-case landing pages (e.g. "CSV import",
+ * "local-first crypto accounting"). Modeled on `comparisonSchema` but reshaped
+ * for use-case intent: no competitor/dimensions, plus capabilities/setup/troubleshooting.
+ */
 export const featureSchema = z.object({
   slug: z.string(),
   // Short label used in nav/cards/breadcrumb, e.g. "CSV import".
@@ -93,8 +95,7 @@ export const featureSchema = z.object({
   icon: z.string().optional(),
   tagline: z.string(),
   intro: z.string(),
-  // SERP/meta description (<160 chars). Kept separate from `intro` so the visible
-  // intro paragraph can stay longer than the meta description allows.
+  /** SERP meta description, under 160 chars. Separate from `intro` so the visible paragraph can be longer. */
   metaDescription: z.string(),
   keywords: z.string().optional(),
   // Scannable "why rotki for X" bullets shown near the top.
@@ -129,8 +130,7 @@ export const featureSchema = z.object({
     q: z.string(),
     a: z.string(),
   })).default([]),
-  // Optional deep link into the user docs (docs.rotki.com) for this use-case.
-  // Rendered as a "read the documentation" link in the deep-dive section.
+  // Optional docs.rotki.com deep link, rendered as "read the documentation" in the deep-dive section.
   docsUrl: z.string().url().optional(),
   // Freshness stamp shown on the page (e.g. "June 2026").
   updatedAt: z.string(),

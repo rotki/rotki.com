@@ -26,13 +26,15 @@ const moduleDir = dirname(fileURLToPath(import.meta.url));
  *    `/raw/*.md` endpoint expose real content. This does not affect the rendered page.
  */
 
-// Only competitor/tagline are needed for OG cards; pick them off the canonical
-// collection schema (made optional, since this runs before content validation).
+/**
+ * Only competitor/tagline are needed for OG cards; pick them off the canonical
+ * collection schema (made optional, since this runs before content validation).
+ */
 const ComparisonFrontmatterSchema = comparisonSchema.pick({ competitor: true, tagline: true }).partial();
 
 type ComparisonFrontmatter = z.infer<typeof ComparisonFrontmatterSchema>;
 
-// minimark AST node: [tag, props, ...children].
+/** minimark AST node: [tag, props, ...children]. */
 type MinimarkNode = [string, Record<string, unknown>, ...unknown[]];
 
 interface ComparisonDoc {
@@ -48,10 +50,12 @@ interface ComparisonDoc {
   body?: { value?: unknown[] };
 }
 
-// Narrow the generic parsed-content shape to this collection's view via a runtime
-// guard (no cast). Requires the two fields the hook actually reads — `intro` and a
-// `body.value` array — so the body-synthesis branch can run; the rest of
-// `ComparisonDoc` is the asserted frontmatter view.
+/**
+ * Narrows the generic parsed-content shape to this collection's view via a runtime
+ * guard (no cast). Requires the two fields the hook actually reads, `intro` and a
+ * `body.value` array, so the body-synthesis branch can run; the rest of
+ * `ComparisonDoc` is the asserted frontmatter view.
+ */
 function isComparisonDoc(
   content: ParsedContentFile,
 ): content is ParsedContentFile & ComparisonDoc & { intro: string; body: { value: unknown[] } } {
@@ -70,8 +74,10 @@ function listSection(heading: string, items: string[] | undefined): MinimarkNode
   ];
 }
 
-// Synthesise a markdown body AST from comparison frontmatter. Starts with an h1 so
-// nuxt-llms' full generator and the /raw endpoint render it verbatim (no double title).
+/**
+ * Synthesises a markdown body AST from comparison frontmatter. Starts with an h1 so
+ * nuxt-llms' full generator and the /raw endpoint render it verbatim (no double title).
+ */
 function buildComparisonBody(doc: ComparisonDoc): MinimarkNode[] {
   const competitor = doc.competitor ?? doc.title ?? '';
   const value: MinimarkNode[] = [['h1', {}, `rotki vs ${competitor}`]];
@@ -140,8 +146,7 @@ export default defineNuxtModule({
       logger.warn('OG fonts not found; falling back to the shared share.png');
     }
 
-    // Synthesise a markdown body from frontmatter so nuxt-llms (llms-full.txt + /raw)
-    // emits real content instead of empty docs.
+    // Synthesise a body from frontmatter so nuxt-llms (llms-full.txt, /raw) emits real content.
     nuxt.hook('content:file:afterParse', (ctx) => {
       if (ctx.collection.name !== 'comparisons')
         return;
@@ -154,7 +159,7 @@ export default defineNuxtModule({
 
       if (doc.competitor)
         doc.title = `rotki vs ${doc.competitor}`;
-      if (!doc.description)
+      if (doc.description === undefined || doc.description === '')
         doc.description = doc.intro;
       if (doc.body.value.length === 0)
         doc.body.value = buildComparisonBody(doc);

@@ -26,13 +26,15 @@ const moduleDir = dirname(fileURLToPath(import.meta.url));
  *    endpoint expose real content. This does not affect the rendered page.
  */
 
-// Only label/tagline are needed for OG cards; pick them off the canonical
-// collection schema (made optional, since this runs before content validation).
+/**
+ * Only label/tagline are needed for OG cards; pick them off the canonical
+ * collection schema (made optional, since this runs before content validation).
+ */
 const FeatureFrontmatterSchema = featureSchema.pick({ label: true, tagline: true }).partial();
 
 type FeatureFrontmatter = z.infer<typeof FeatureFrontmatterSchema>;
 
-// minimark AST node: [tag, props, ...children].
+/** minimark AST node: [tag, props, ...children]. */
 type MinimarkNode = [string, Record<string, unknown>, ...unknown[]];
 
 interface FeatureDoc {
@@ -48,10 +50,12 @@ interface FeatureDoc {
   body?: { value?: unknown[] };
 }
 
-// Narrow the generic parsed-content shape to this collection's view via a runtime
-// guard (no cast). Requires the two fields the hook actually reads — `intro` and a
-// `body.value` array — so the body-synthesis branch can run; the rest of `FeatureDoc`
-// is the asserted frontmatter view.
+/**
+ * Narrows the generic parsed-content shape to this collection's view via a runtime
+ * guard (no cast). Requires the two fields the hook actually reads, `intro` and a
+ * `body.value` array, so the body-synthesis branch can run; the rest of `FeatureDoc`
+ * is the asserted frontmatter view.
+ */
 function isFeatureDoc(
   content: ParsedContentFile,
 ): content is ParsedContentFile & FeatureDoc & { intro: string; body: { value: unknown[] } } {
@@ -70,8 +74,10 @@ function listSection(heading: string, items: string[] | undefined): MinimarkNode
   ];
 }
 
-// Synthesise a markdown body AST from feature frontmatter. Starts with an h1 so
-// nuxt-llms' full generator and the /raw endpoint render it verbatim (no double title).
+/**
+ * Synthesises a markdown body AST from feature frontmatter. Starts with an h1 so
+ * nuxt-llms' full generator and the /raw endpoint render it verbatim (no double title).
+ */
 function buildFeatureBody(doc: FeatureDoc): MinimarkNode[] {
   const label = doc.label ?? doc.title ?? '';
   const value: MinimarkNode[] = [['h1', {}, label]];
@@ -137,8 +143,7 @@ export default defineNuxtModule({
       logger.warn('OG fonts not found; falling back to the shared share.png');
     }
 
-    // Synthesise a markdown body from frontmatter so nuxt-llms (llms-full.txt + /raw)
-    // emits real content instead of empty docs.
+    // Synthesise a body from frontmatter so nuxt-llms (llms-full.txt, /raw) emits real content.
     nuxt.hook('content:file:afterParse', (ctx) => {
       if (ctx.collection.name !== 'features')
         return;
@@ -151,7 +156,7 @@ export default defineNuxtModule({
 
       if (doc.label)
         doc.title = doc.label;
-      if (!doc.description)
+      if (doc.description === undefined || doc.description === '')
         doc.description = doc.intro;
       if (doc.body.value.length === 0)
         doc.body.value = buildFeatureBody(doc);

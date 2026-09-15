@@ -70,7 +70,7 @@ interface PageReport {
 
 /**
  * Returns the route a generated `index.html` file maps to, e.g.
- * `products/index.html` -> `/products`, `index.html` -> `/`.
+ * `products/index.html` maps to `/products` and `index.html` to `/`.
  */
 function routeFor(relFile: string): string {
   const posix = relFile.split(path.sep).join('/');
@@ -157,10 +157,12 @@ function auditPage(html: string, route: string): PageReport {
   const robots = /<meta[^>]+name=["']robots["'][^>]*content=["']([^"']*)["']/i.exec(html);
   const noindex: boolean = !!robots && /noindex/i.test(robots[1] ?? '');
 
-  // `nuxi generate` emits a `<meta http-equiv="refresh">` stub for routes that
-  // are real 301 redirects in production (e.g. /pricing -> /checkout/pay). These
-  // stubs have no title/canonical/lang/og by design and must not be audited as
-  // indexable pages — they redirect, just like noindex pages aren't indexed.
+  /*
+   * `nuxi generate` emits a `<meta http-equiv="refresh">` stub for routes that
+   * are real 301 redirects in production (e.g. /pricing to /checkout/pay). These
+   * stubs have no title/canonical/lang/og by design and must not be audited as
+   * indexable pages: they redirect, just like noindex pages aren't indexed.
+   */
   const redirect: boolean = /<meta[^>]+http-equiv=["']refresh["']/i.test(html);
 
   // noindex and redirect pages are intentionally out of the index — skip checks.
@@ -197,8 +199,10 @@ interface IssueRow {
   sample: string | undefined;
 }
 
-// Tally pages affected per issue type (with one example route each), sorted
-// errors-first then by page count.
+/**
+ * Tallies pages affected per issue type (with one example route each), sorted
+ * errors-first then by page count.
+ */
 function summarizeIssues(indexable: PageReport[]): IssueRow[] {
   const byType = new Map<string, { pages: number; example: string; sample: string | undefined }>();
   for (const r of indexable) {

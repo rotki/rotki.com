@@ -27,14 +27,18 @@ const moduleDir = dirname(fileURLToPath(import.meta.url));
  *    rendered page, which reads the frontmatter fields directly.
  */
 
-// Only label/type/tagline are needed for OG cards; pick them off the canonical
-// collection schema (made optional, since this runs before content validation).
+/**
+ * Only label/type/tagline are needed for OG cards; pick them off the canonical
+ * collection schema (made optional, since this runs before content validation).
+ */
 const IntegrationFrontmatterSchema = integrationSchema.pick({ label: true, type: true, tagline: true }).partial();
 
 type IntegrationFrontmatter = z.infer<typeof IntegrationFrontmatterSchema>;
 
-// minimark AST node: [tag, props, ...children]. Children are loosely typed as
-// `unknown` because a recursive tuple-rest alias isn't allowed in TypeScript.
+/**
+ * minimark AST node: [tag, props, ...children]. Children are loosely typed as
+ * `unknown` because a recursive tuple-rest alias isn't allowed in TypeScript.
+ */
 type MinimarkNode = [string, Record<string, unknown>, ...unknown[]];
 
 interface IntegrationDoc {
@@ -50,10 +54,12 @@ interface IntegrationDoc {
   body?: { value?: unknown[] };
 }
 
-// Narrow the generic parsed-content shape to this collection's view via a runtime
-// guard (no cast). Requires the two fields the hook actually reads — `intro` and a
-// `body.value` array — so the body-synthesis branch can run; the rest of
-// `IntegrationDoc` is the asserted frontmatter view.
+/**
+ * Narrows the generic parsed-content shape to this collection's view via a runtime
+ * guard (no cast). Requires the two fields the hook actually reads, `intro` and a
+ * `body.value` array, so the body-synthesis branch can run; the rest of
+ * `IntegrationDoc` is the asserted frontmatter view.
+ */
 function isIntegrationDoc(
   content: ParsedContentFile,
 ): content is ParsedContentFile & IntegrationDoc & { intro: string; body: { value: unknown[] } } {
@@ -72,8 +78,10 @@ function listSection(heading: string, items: string[] | undefined, tag: 'ul' | '
   ];
 }
 
-// Synthesise a markdown body AST from integration frontmatter. Starts with an h1 so
-// nuxt-llms' full generator and the /raw endpoint render it verbatim (no double title).
+/**
+ * Synthesises a markdown body AST from integration frontmatter. Starts with an h1 so
+ * nuxt-llms' full generator and the /raw endpoint render it verbatim (no double title).
+ */
 function buildIntegrationBody(doc: IntegrationDoc): MinimarkNode[] {
   const value: MinimarkNode[] = [['h1', {}, doc.label ?? doc.title ?? '']];
   if (doc.intro)
@@ -137,8 +145,7 @@ export default defineNuxtModule({
       logger.warn('OG fonts not found; falling back to the shared share.png');
     }
 
-    // Synthesise a markdown body from frontmatter so nuxt-llms (llms-full.txt + /raw)
-    // emits real content instead of empty docs.
+    // Synthesise a body from frontmatter so nuxt-llms (llms-full.txt, /raw) emits real content.
     nuxt.hook('content:file:afterParse', (ctx) => {
       if (ctx.collection.name !== 'integrations')
         return;
@@ -149,12 +156,11 @@ export default defineNuxtModule({
       // Mutations below write back through the same reference.
       const doc = ctx.content;
 
-      // Content auto-derives the title as PascalCase of the filename ("Binance Us");
-      // prefer the proper label. `description` is unused by integrations — fill it from
-      // intro so llms.txt link descriptions and the /raw blockquote are populated.
+      // Content derives the title from the filename ("Binance Us"), so prefer the proper label.
       if (doc.label)
         doc.title = doc.label;
-      if (!doc.description)
+      // Integrations leave `description` unused; fill it for llms.txt link text and the /raw blockquote.
+      if (doc.description === undefined || doc.description === '')
         doc.description = doc.intro;
       if (doc.body.value.length === 0)
         doc.body.value = buildIntegrationBody(doc);
@@ -168,8 +174,10 @@ export default defineNuxtModule({
       let fallback = 0;
       const skipped = new Set<string>();
 
-      // Write the shared share.png to the per-slug path so the page's `og:image`
-      // URL always resolves, even when rendering the bespoke card fails.
+      /**
+       * Writes the shared share.png to the per-slug path so the page's `og:image`
+       * URL always resolves, even when rendering the bespoke card fails.
+       */
       const writeFallback = (relPath: string): void => {
         try {
           sharePng ??= readFileSync(resolve(publicDir, 'img/og/share.png'));
@@ -182,7 +190,7 @@ export default defineNuxtModule({
         }
       };
 
-      // Render the bespoke OG card for a slug, falling back to share.png on failure.
+      /** Renders the bespoke OG card for a slug, falling back to share.png on failure. */
       const renderAndWrite = async (slug: string, fm: IntegrationFrontmatter, relPath: string, ogFonts: OgFonts): Promise<void> => {
         try {
           const png = await renderOgImage({
