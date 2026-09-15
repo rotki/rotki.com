@@ -4,8 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ref } from 'vue';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 
-// Controllable route query + persisted referral cookie. The mock factories only
-// reference these refs when invoked (at test time), so closing over them is safe.
+// The mock factories read these refs only at test time, so closing over them is safe
 const query = ref<Record<string, unknown>>({});
 const cookie = ref<string | undefined>(undefined);
 

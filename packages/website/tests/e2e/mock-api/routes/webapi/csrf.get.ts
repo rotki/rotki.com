@@ -1,5 +1,5 @@
+/** Sets the CSRF cookie like the real backend does. */
 export default defineEventHandler((event) => {
-  // Set the CSRF cookie like the real backend does
   setCookie(event, 'csrftoken', 'mock-csrf-token-for-testing', {
     httpOnly: false,
     secure: false,

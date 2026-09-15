@@ -1,7 +1,9 @@
 import process from 'node:process';
 import { defineNitroConfig } from 'nitropack/config';
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:48123';
+const envOrigin = process.env.ALLOWED_ORIGIN;
+// An empty ALLOWED_ORIGIN still falls back to the default origin
+const allowedOrigin = envOrigin !== undefined && envOrigin !== '' ? envOrigin : 'http://localhost:48123';
 
 export default defineNitroConfig({
   compatibilityDate: '2025-01-01',

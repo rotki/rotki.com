@@ -12,10 +12,11 @@ interface CheckoutError {
 
 const SELECTED_PLAN = { planId: 1, months: 1, priceInEur: '10', price: '10' };
 
-// Shared, reactive mock state so setError/clearError actually mutate the
-// error ref the component renders — this is what the redirect logic inspects.
-// Everything referenced by the hoisted vi.mock factories must live in
-// vi.hoisted so it exists before the mocks run.
+/**
+ * Shared, reactive mock state so setError/clearError mutate the error ref the
+ * component renders, which is what the redirect logic inspects. It lives in
+ * vi.hoisted so it exists before the hoisted vi.mock factories run.
+ */
 const {
   error,
   paymentData,
@@ -112,14 +113,11 @@ describe('cryptoPayment.vue redirect on failure', () => {
 
     expect(setError).toHaveBeenCalled();
     expect(get(error)?.message).toBe('Invalid plan');
-    // Regression: previously the onMounted hook redirected to /products,
-    // wiping the error before the user could read it.
+    // Redirecting to /products would wipe the error before the user could read it
     expect(navigateTo).not.toHaveBeenCalled();
   });
 
-  it('redirects to products when initialization fails with no error to show', async () => {
-    // e.g. plans could not be loaded — nothing to display, so bouncing back
-    // to the products page is the right behavior.
+  it('redirects to products when initialization fails with no error to show (e.g. plans failed to load)', async () => {
     ensureInitialized.mockResolvedValue(false);
 
     await mountComponent();

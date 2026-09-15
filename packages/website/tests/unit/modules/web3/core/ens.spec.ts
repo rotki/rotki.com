@@ -1,5 +1,5 @@
 import { isErr, isOk } from 'plainfp/result';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { assert, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clearEnsCache, resolveEnsName } from '~/modules/web3/core/ens';
 
 // vitalik.eth — lowercased input so we can assert the call is checksummed.
@@ -8,8 +8,8 @@ const ADDRESS_CHECKSUMMED = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
 
 const getEnsName = vi.hoisted(() => vi.fn());
 
-// Replace the viem client factory so reverse resolution never hits the network.
-// `getAddress` stays real so checksumming is exercised, not stubbed away.
+/* Replace the viem client factory so reverse resolution never hits the network.
+   `getAddress` stays real so checksumming is exercised, not stubbed away. */
 vi.mock('viem', async (importOriginal) => {
   const actual = await importOriginal<typeof import('viem')>();
   return {
@@ -56,11 +56,9 @@ describe('web3 core/ens', () => {
 
       const result = await resolveEnsName(ADDRESS_LOWER);
 
-      expect(isErr(result)).toBe(true);
-      if (isErr(result)) {
-        expect(result.error._tag).toBe('TxFailed');
-        expect(result.error.message).toBe('rpc down');
-      }
+      assert(isErr(result));
+      expect(result.error._tag).toBe('TxFailed');
+      expect(result.error.message).toBe('rpc down');
     });
 
     it('serves a repeat lookup from cache without a second RPC call', async () => {

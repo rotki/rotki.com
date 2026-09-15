@@ -9,12 +9,13 @@ import { type NftSubmissionFormContext, useNftSubmissionForm } from '~/modules/w
 const TEST_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
 const CURRENT_RELEASE_ID = 1;
 
-// The two on-chain-adjacent lookups the form performs on token change. Both are
-// controllable per-test so we can hold `checkExistingSubmission` open and drive
-// the race where the user types while it is still pending.
+/**
+ * The metadata and existing-submission lookups the form performs on token change are
+ * controllable per test, so `checkExistingSubmission` can be held open to drive the
+ * race where the user types while it is still pending.
+ */
 const mockMetadata = ref<SimpleTokenMetadata | undefined>();
-// Drives isAuthenticated (isConnected && address && isSessionValid) so tests can
-// select a token while signed out and then sign in.
+/** Drives isAuthenticated (isConnected && address && isSessionValid) so tests can select a token while signed out and then sign in. */
 const authValid = ref<boolean>(true);
 let existingSubmission: NftSubmission | undefined;
 let deferredCheck: { promise: Promise<NftSubmission | undefined>; resolve: () => void };
@@ -83,8 +84,7 @@ function submitDisabled(form: Form): boolean {
   return !get(form.isAuthenticated) || get(form.v$).$invalid;
 }
 
-// Let the token-change watcher run fetchNftMetadata and reach (but not resolve)
-// checkExistingSubmission.
+/** Lets the token-change watcher run fetchNftMetadata and reach (but not resolve) checkExistingSubmission. */
 async function flushMicrotasks(): Promise<void> {
   await new Promise(resolve => setTimeout(resolve, 0));
   await nextTick();
@@ -98,10 +98,7 @@ describe('useNftSubmissionForm submit-button gating', () => {
     deferCheck();
   });
 
-  it('keeps name + image the user typed while the existing-submission check is still in flight (gold)', async () => {
-    // Regression: the image field only appears after the tier resolves, so silver/gold
-    // users fill the form while checkExistingSubmission is pending. The deferred
-    // no-submission branch used to wipe that input, leaving submit stuck disabled.
+  it('keeps name + image the user typed while the existing-submission check is still in flight (gold), so submit stays enabled after it resolves', async () => {
     set(mockMetadata, metadata('gold'));
     const form = await setupForm();
 
@@ -137,8 +134,6 @@ describe('useNftSubmissionForm submit-button gating', () => {
   });
 
   it('clears leftover prefill when switching from a submitted NFT to a fresh one', async () => {
-    // First token has a submission -> form prefills. Switching to a fresh token must
-    // drop that stale prefill instead of carrying it over.
     existingSubmission = {
       createdAt: '2026-01-01',
       displayName: 'Old Name',
@@ -167,9 +162,7 @@ describe('useNftSubmissionForm submit-button gating', () => {
     expect(get(form.modelDisplayName)).toBe('');
   });
 
-  it('preserves an edited submission prefill for a past-release NFT (no ok re-check)', async () => {
-    // Guards the earlier edit fix: editing an NFT from a previous release never reaches
-    // the ok branch, so the synchronous reset must skip the token being edited.
+  it('preserves an edited submission prefill for a past-release NFT, which never reaches the ok re-check', async () => {
     const editing: NftSubmission = {
       createdAt: '2026-01-01',
       displayName: 'Edited Name',
@@ -185,15 +178,11 @@ describe('useNftSubmissionForm submit-button gating', () => {
 
     expect(get(form.modelTokenId)).toBe('42');
     expect(get(form.modelDisplayName)).toBe('Edited Name');
-    // Editing is never gated on the live ownership re-check: submit stays enabled
-    // for a past-release NFT (the submit flow skips ownership when editing).
+    // The submit flow skips the live ownership re-check when editing
     expect(submitDisabled(form)).toBe(false);
   });
 
-  it('prefills an existing submission after signing in when the token was selected while signed out', async () => {
-    // A ?tokenId deep-link resolves the NFT before sign-in. The lookup is auth-gated,
-    // so nothing prefills until the user signs in, then the isAuthenticated watcher
-    // loads the prior submission for editing instead of leaving a blank form.
+  it('prefills an existing submission after signing in when the token was selected while signed out (?tokenId deep-link)', async () => {
     set(authValid, false);
     existingSubmission = {
       createdAt: '2026-01-01',

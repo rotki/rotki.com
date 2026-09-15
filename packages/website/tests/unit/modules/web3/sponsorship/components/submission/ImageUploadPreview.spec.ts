@@ -93,8 +93,7 @@ describe('imageUploadPreview', () => {
     const componentPath = resolve(__dirname, '../../../../../../../app/modules/web3/sponsorship/components/submission/ImageUploadPreview.vue');
     const source = readFileSync(componentPath, 'utf-8');
 
-    // Strip HTML comments, then check that NuxtImg is not used as a tag.
-    // NuxtImg cannot process data URLs from FileReader.
+    // HTML comments may mention NuxtImg, so only real tags count
     const withoutComments = source.replace(/<!--[\S\s]*?-->/g, '');
     expect(withoutComments).not.toMatch(/<NuxtImg[\s/>]/);
     expect(withoutComments).not.toMatch(/<nuxt-img[\s/>]/);

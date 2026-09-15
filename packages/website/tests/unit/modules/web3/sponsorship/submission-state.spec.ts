@@ -181,8 +181,7 @@ describe('isCurrentReleaseSubmission', () => {
     expect(isCurrentReleaseSubmission('', '')).toBe(false);
   });
 
-  it('only strips a leading v when it precedes a digit', () => {
-    // Guards against mangling word-like names into a false match.
+  it('only strips a leading v when it precedes a digit, so word-like names do not falsely match', () => {
     expect(isCurrentReleaseSubmission('version', 'ersion')).toBe(false);
   });
 });

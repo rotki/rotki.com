@@ -26,8 +26,10 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-// Mount the composable inside an effect scope so its watcher is owned/cleanable,
-// then let the 300ms debounce fire and any in-flight resolve settle.
+/**
+ * Mounts the composable inside an effect scope so its watcher is owned and can be
+ * stopped, then lets the 300ms debounce fire and any in-flight resolve settle.
+ */
 function mount(address: Parameters<typeof useEnsName>[0]) {
   const scope = effectScope();
   const result = scope.run(() => useEnsName(address))!;

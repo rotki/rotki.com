@@ -35,7 +35,7 @@ vi.mock('~/modules/web3/composables/use-wallet', () => ({
   }),
 }));
 
-// signMessage now returns a plain-fp Result, not a raw string / thrown error.
+/** signMessage returns a plainfp Result, not a raw string or a thrown error. */
 const okResult = (value: string) => ({ ok: true, value });
 const errResult = (tag: string, message: string) => ({ error: { _tag: tag, message }, ok: false });
 
@@ -45,9 +45,11 @@ const TEST_NONCE = 'testnonce123';
 const TEST_SIGNATURE = '0xsignature';
 
 describe('useSiweAuth', () => {
-  // useSiweAuth is a createSharedComposable, so it memoizes one instance. Running
-  // each call inside its own effectScope and stopping it here drops the subscriber
-  // count to 0, disposing the shared state so the next test starts fresh.
+  /**
+   * useSiweAuth is a createSharedComposable, so it memoizes one instance. Running
+   * each call inside its own effectScope and stopping it after each test drops the
+   * subscriber count to 0, disposing the shared state so the next test starts fresh.
+   */
   const scopes: EffectScope[] = [];
 
   function useInScope<T>(factory: () => T): T {
@@ -223,18 +225,13 @@ describe('useSiweAuth', () => {
     expect(isSessionValid(TEST_ADDRESS)).toBe(false);
   });
 
-  it('shares one instance across consumers so sign-in state is not siloed', async () => {
-    // Regression: the wallet card and the submission form each call useSiweAuth.
-    // As a createSharedComposable they must get the SAME reactive refs, so signing
-    // in via the card flips the form's auth state in the same tick. Separate
-    // instances left the form disabled after signing in on first load. (Instance
-    // identity is the reliable check: happy-dom syncs localStorage across separate
-    // instances in-document, which real browsers do not, so a behavioural session
-    // assertion can't distinguish the two here.)
+  it('shares one instance across consumers so signing in on the wallet card enables the submission form', async () => {
     const { useSiweAuth } = await import('~/modules/web3/sponsorship/use-siwe-auth');
     const card = useInScope(() => useSiweAuth());
     const form = useInScope(() => useSiweAuth());
 
+    /* Check ref identity, not session behaviour: happy-dom syncs localStorage across
+       separate instances in-document, which real browsers do not. */
     expect(form.isAuthenticating).toBe(card.isAuthenticating);
     expect(form.authError).toBe(card.authError);
   });

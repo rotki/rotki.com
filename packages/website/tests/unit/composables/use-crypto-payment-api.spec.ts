@@ -35,11 +35,7 @@ describe('useCryptoPaymentApi', () => {
       );
     });
 
-    it('treats a 409 (no pending payment) as success so the user is not blocked', async () => {
-      // Regression: after a failed payment creation there is no pending payment,
-      // so DELETE returns 409 "No pending payment found". This previously surfaced
-      // as a cancel error and blocked the Back button. Cancelling nothing is a
-      // success — the desired end state (no pending payment) already holds.
+    it('treats a 409 (no pending payment after a failed creation) as success so the Back button is not blocked', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(
         createFetchError(409, { message: 'No pending payment found for kelsos', result: false }),
       );

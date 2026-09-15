@@ -14,14 +14,12 @@ describe('web3 core/funds', () => {
       expect(result).toEqual({ gasShortfall: false, sufficient: false, tokenShortfall: true });
     });
 
-    it('flags only a soft gas shortfall when balance covers price but not price + gas', () => {
-      // 0.5005 covers the 0.5 price but not 0.5 + 0.001 gas.
+    it('flags only a soft gas shortfall when balance covers price but not price + gas (0.5005 vs 0.5 + 0.001)', () => {
       const result = computeFundsStatus({ ...base, nativeBalance: '0.5005' });
       expect(result).toEqual({ gasShortfall: true, sufficient: false, tokenShortfall: false });
     });
 
-    it('does not warn on gas when the price is already unaffordable', () => {
-      // A token shortfall short-circuits the gas check (no double warning).
+    it('does not warn on gas when the price is already unaffordable (no double warning)', () => {
       const result = computeFundsStatus({ ...base, nativeBalance: '0.1' });
       expect(result.tokenShortfall).toBe(true);
       expect(result.gasShortfall).toBe(false);

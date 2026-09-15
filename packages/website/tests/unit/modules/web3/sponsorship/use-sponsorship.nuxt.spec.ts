@@ -23,8 +23,7 @@ describe('useSponsorshipData', () => {
     clearNuxtData();
   });
 
-  it('gives every tier an image entry, empty when tier-info omits the tier or has no artwork', async () => {
-    // Tier 0 is omitted (its metadata failed on the backend), tier 2 has no artwork
+  it('gives every tier an image entry, empty when tier-info omits the tier (bronze, failed metadata) or has no artwork (gold)', async () => {
     server.use(http.get('*/api/nft/tier-info', () => HttpResponse.json({
       releaseId: 5,
       tiers: {

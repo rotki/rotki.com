@@ -5,8 +5,10 @@ import { getErrorMessage, handlePaymentError } from '~/utils/api-error-handling'
 
 import { createFetchError } from '../../utils';
 
-// `getErrorMessage` only inspects `error.data` for 400s when `error.response` is
-// also set, so attach a real Response to exercise that branch.
+/**
+ * `getErrorMessage` only inspects `error.data` for 400s when `error.response` is
+ * also set, so this attaches a real Response to exercise that branch.
+ */
 function fetchError400(data: unknown): ReturnType<typeof createFetchError> {
   const error = createFetchError(400, data);
   error.response = new Response(null, { status: 400 });
@@ -93,8 +95,7 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(fetchError400({ result: false }))).toBe('Unknown error');
   });
 
-  it('falls back to raw data.message when the 400 body fails schema parsing', () => {
-    // `result` is not a boolean, so the schema parse fails and the raw message is used.
+  it('falls back to raw data.message when the 400 body fails schema parsing (non-boolean result)', () => {
     expect(getErrorMessage(fetchError400({ message: 'raw message', result: 'not-a-boolean' }))).toBe('raw message');
   });
 

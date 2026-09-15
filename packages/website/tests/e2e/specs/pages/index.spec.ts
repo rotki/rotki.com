@@ -83,10 +83,8 @@ test.describe('download page', () => {
     await setupTiersMocks(page);
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/', { waitUntil: 'networkidle' });
-    // Scroll to the pricing section first to ensure it's in view
     await page.locator('[data-cy="pricing-section"]').scrollIntoViewIfNeeded();
-    // Wait for the pricing section to load (it's wrapped in ClientOnly)
-    // Click "See all features" first to expand the pricing section and avoid the gradient overlay
+    // Expand the pricing section (wrapped in ClientOnly) so the gradient overlay does not block the click
     await page.getByRole('button', { name: 'See all features' }).click({ timeout: 30000 });
     await page.getByRole('button', { name: 'Start now for free' }).first().click({ timeout: 30000 });
 
@@ -212,8 +210,7 @@ test.describe('download page', () => {
     await expect(linuxButton).toBeVisible();
     await linuxButton.click();
 
-    // scope to this menu's content: closed menus stay in the DOM, so a bare
-    // [role=menu] matches multiple elements
+    // Closed menus stay in the DOM, so a bare [role=menu] matches multiple elements
     const linuxMenu = page.locator('[role=menu]').filter({ hasText: 'LINUX' });
     await expect(linuxMenu).toBeVisible();
 

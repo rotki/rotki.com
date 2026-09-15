@@ -8,12 +8,14 @@ declare global {
   }
 }
 
-// Counts attempts against `/webapi/retry/` so the handler can fail the first one
-// and succeed on the retry. Reset it from the test before use. It lives on `window`
-// for the same reason as the server in `server.ts`: after the module reset, the
-// listening handler and the spec would otherwise count on separate copies.
 window.rotkiRetryAttempts ??= { count: 0 };
 
+/**
+ * Counts attempts against `/webapi/retry/` so the handler can fail the first one
+ * and succeed on the retry. Reset it from the test before use. It lives on `window`
+ * for the same reason as the server in `server.ts`: after the module reset, the
+ * listening handler and the spec would otherwise count on separate copies.
+ */
 export const retryAttempts: { count: number } = window.rotkiRetryAttempts;
 
 export const handlers = [
@@ -67,8 +69,8 @@ export const handlers = [
     )),
   http.post(`${BACKEND_URL}/webapi/login/`, () =>
     HttpResponse.json({ message: 'success' })),
-  // Fails the first attempt with a retryable status so ofetch retries, letting a
-  // test assert the CSRF header isn't duplicated (e.g. "abcd, abcd") on retry.
+  /* Fails the first attempt with a retryable status so ofetch retries, letting a
+     test assert the CSRF header isn't duplicated (e.g. "abcd, abcd") on retry. */
   http.post(`${BACKEND_URL}/webapi/retry/`, () => {
     retryAttempts.count += 1;
     if (retryAttempts.count === 1)

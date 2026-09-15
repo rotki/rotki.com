@@ -7,14 +7,11 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import { retryAttempts } from '../../mocks/handlers';
 
-// Provide a stable CSRF token cookie so outgoing requests carry a token, which
-// is required to exercise the retry header-dedup path.
+// Requests must carry a CSRF token to exercise the retry header-dedup path
 mockNuxtImport('useCookie', () => (name: string) =>
   ref(name === 'csrftoken' ? '1234' : undefined));
 
-// In the server/test code path the token is read from the request event's
-// cookies (a runtime global, not an auto-import); return the token here so
-// request headers carry it.
+// The server/test code path reads the token from the request event's cookies (a runtime global, not an auto-import)
 vi.stubGlobal('parseCookies', () => ({ csrftoken: '1234' }));
 
 const logout = vi.fn();
@@ -73,11 +70,11 @@ describe('useFetchWithCsrf composable', () => {
   it('fetchWithCsrf: does not duplicate the CSRF header across retries', async () => {
     retryAttempts.count = 0;
 
-    // MSW + undici drops headers when reading them off the intercepted request
-    // (mswjs/headers-polyfill#72), so assert against the headers the composable
-    // builds. The per-call response hooks run after the instance onRequest (which
-    // sets the CSRF header): the failed first attempt hits onResponseError, the
-    // retried success hits onResponse — both see the fully-built options.headers.
+    /* MSW + undici drops headers when reading them off the intercepted request
+       (mswjs/headers-polyfill#72), so assert against the headers the composable
+       builds. The per-call response hooks run after the instance onRequest (which
+       sets the CSRF header): the failed first attempt hits onResponseError, the
+       retried success hits onResponse, and both see the fully-built options.headers. */
     const csrfHeaders: (string | null)[] = [];
     const capture = ({ options }: { options: { headers?: HeadersInit } }): void => {
       csrfHeaders.push(new Headers(options.headers).get('X-CSRFToken'));
@@ -92,12 +89,10 @@ describe('useFetchWithCsrf composable', () => {
       }),
     ).resolves.toMatchObject({ message: 'success' });
 
-    // The first attempt fails with 503 and is retried, so the request is sent
-    // twice over the same (reused) options object.
+    // The 503 first attempt is retried over the same reused options object
     expect(retryAttempts.count).toBe(2);
     expect(csrfHeaders.length).toBeGreaterThanOrEqual(2);
-    // Every attempt must carry a single, un-duplicated CSRF token — not
-    // "1234, 1234" caused by appending the header on retry.
+    // Not "1234, 1234" from appending the header again on retry
     for (const header of csrfHeaders) {
       expect(header).toBe('1234');
     }

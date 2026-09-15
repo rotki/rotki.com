@@ -50,8 +50,7 @@ const firstPage: PaginationData = { page: 1, total: 0, limit: 10, limits: [10, 2
 
 describe('useLeaderboard', () => {
   afterEach(() => {
-    // useAsyncData caches by key in the shared Nuxt instance; clear it so state
-    // does not leak between tests.
+    // useAsyncData caches by key in the shared Nuxt instance, so state would leak between tests
     clearNuxtData();
     vi.clearAllMocks();
     vi.resetModules();
@@ -121,11 +120,7 @@ describe('useLeaderboard', () => {
     expect(get(isEmpty)).toBe(true);
   });
 
-  // Regression: skeleton placeholders must NOT render alongside the empty state.
-  // Previously displayedEntries fell back to 5 placeholders whenever there was
-  // no data, so a loaded-but-empty leaderboard showed skeletons *and* the empty
-  // message at the same time.
-  it('does not show skeleton placeholders once an empty response has loaded', async () => {
+  it('does not show skeleton placeholders alongside the empty state once an empty response has loaded', async () => {
     mockApi(response({ count: 0, results: [] }));
     const { useLeaderboard } = await import('~/modules/sponsor/leaderboard/composables/use-leaderboard');
 

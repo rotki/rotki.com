@@ -19,7 +19,6 @@ describe('utils/money.ts - discountAmount', () => {
   });
 
   it('normalizes negative zero to 0.00', () => {
-    // Force a case that could create -0 due to integer math symmetry (unlikely here, but test normalization)
     expect(discountAmount(0, 0)).toBe('0.00');
   });
 });

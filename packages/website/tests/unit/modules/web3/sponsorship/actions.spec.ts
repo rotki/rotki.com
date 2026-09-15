@@ -7,9 +7,12 @@ const MINTER_UPPER: Address = '0xABCDEF0000000000000000000000000000000001';
 
 const NFT_MINTED_SIGNATURE = 'NFTMinted(uint256,uint256,uint256,address)';
 
+/**
+ * Builds an NFTMinted log the way the contract emits it: topics carry the event
+ * signature and indexed args (tokenId, releaseId, tierId), and the non-indexed
+ * `minter` lives in the data field.
+ */
 function mintedLog(tokenId: bigint, minter: Address): Log {
-  // Topics carry the event signature + indexed args (tokenId, releaseId, tierId);
-  // the non-indexed `minter` lives in the data field — how the contract emits it.
   const topics: [Hex, Hex, Hex, Hex] = [
     toEventSelector(NFT_MINTED_SIGNATURE),
     numberToHex(tokenId, { size: 32 }),

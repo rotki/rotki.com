@@ -141,9 +141,7 @@ test.describe('payment redirect after signup', () => {
     const continueButton = paymentSection.locator('..').getByRole('button', { name: 'here' });
     await expect(continueButton).toBeVisible();
 
-    // Click the button and verify it navigates to the correct checkout URL.
-    // handlePaymentRedirect() uses window.location.href, so we capture the
-    // outgoing page request to verify the target URL.
+    // handlePaymentRedirect() sets window.location.href, so capture the outgoing request
     const navigationTarget = page.waitForRequest(
       request => request.url().includes('/checkout/pay/card'),
       { timeout: 15000 },

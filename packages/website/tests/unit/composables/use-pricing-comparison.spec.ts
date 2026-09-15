@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { buildRegularPlans, parseTiersInfo, resolveFeatureValue } from '~/composables/use-pricing-comparison';
 import { formatCurrency } from '~/utils/text';
 
-// Translation stub returns the key so tests can assert which key was chosen.
+/** Translation stub that returns the key, so tests can assert which key was chosen. */
 const tStub = (key: string): string => key;
 
 function availablePlan(overrides: Partial<AvailablePlan> = {}): AvailablePlan {

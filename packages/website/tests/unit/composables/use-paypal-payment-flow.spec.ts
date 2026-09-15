@@ -27,9 +27,7 @@ vi.mock('~/modules/checkout/composables/use-braintree-client', () => ({
   }),
 }));
 
-// Needs a component setup context for `useI18n`, and these tests call the
-// composable directly. The real mapping is covered by sigil's `paymentErrorCopy`
-// tests.
+// `useI18n` needs a setup context these tests lack; sigil's `paymentErrorCopy` tests cover the real mapping
 vi.mock('~/modules/checkout/composables/use-payment-error-message', () => ({
   usePaymentErrorMessage: () => ({
     userMessageFor: ({ message }: { message: string }) => message,

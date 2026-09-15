@@ -23,7 +23,7 @@ function token(partial: Partial<PaymentToken> & Pick<PaymentToken, 'symbol'>): P
   };
 }
 
-// A price getter backed by a list of tokens, mirroring usePaymentTokens().getPriceForTier.
+/** A price getter backed by a list of tokens, mirroring usePaymentTokens().getPriceForTier. */
 function priceGetterFor(tokens: PaymentToken[]): PriceGetter {
   return (currency, tier) => tokens.find(t => t.symbol === currency)?.prices[tier];
 }

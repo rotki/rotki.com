@@ -1,8 +1,7 @@
 import type { CreateConnectorFn } from '@wagmi/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-// One fake UniversalProvider per init() call. Defined via vi.hoisted so the
-// (hoisted) vi.mock factory can reference it.
+/** One fake UniversalProvider per init() call, in vi.hoisted so the hoisted vi.mock factory can reference it. */
 const wc = vi.hoisted(() => {
   interface FakeProvider {
     session: unknown;
@@ -19,8 +18,8 @@ const wc = vi.hoisted(() => {
 
   const init = vi.fn(async (): Promise<FakeProvider> => {
     const provider: FakeProvider = {
-      // Pairing resolves and (in the real provider) populates `session`; the
-      // wrapper reads accounts straight after, so set one when connect resolves.
+      /* Pairing resolves and (in the real provider) populates `session`; the
+         wrapper reads accounts straight after, so set one when connect resolves. */
       connect: vi.fn(async () => {}),
       disconnect: vi.fn(async () => {}),
       on: vi.fn(),
@@ -74,7 +73,7 @@ async function importConnector() {
     chains: [{ id: 1, rpcUrls: { default: { http: ['https://rpc.example'] } } }],
     emitter: { emit: vi.fn() },
   };
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- a minimal stub, not a full wagmi config
   return factory(config as unknown as Parameters<CreateConnectorFn>[0]);
 }
 

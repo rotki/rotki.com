@@ -6,9 +6,9 @@ import { createFetchError } from '../../utils';
 const { mockFetchWithCsrf } = vi.hoisted(() => ({ mockFetchWithCsrf: vi.fn() }));
 
 vi.mock('~/composables/use-fetch-with-csrf', () => ({
-  // ref(false) → useAsyncData('payment-cards', …) short-circuits to [] without calling
-  // fetchWithCsrf, so the mocked rejection in each test is consumed by addCard, not the
-  // auto-refresh. Must be a real Vue ref (a plain { value: false } is truthy under VueUse `get`).
+  /* ref(false) makes useAsyncData('payment-cards', ...) short-circuit to [] without calling
+     fetchWithCsrf, so the mocked rejection in each test is consumed by addCard, not the
+     auto-refresh. Must be a real Vue ref (a plain { value: false } is truthy under VueUse `get`). */
   useEmailConfirmedCookie: () => ref(false),
   useFetchWithCsrf: () => ({
     fetchWithCsrf: mockFetchWithCsrf,
@@ -69,7 +69,6 @@ describe('usePaymentCards', () => {
     });
 
     it('falls back to the generic rate-limit i18n key for upstream 429s without a JSON body (e.g. Traefik)', async () => {
-      // Traefik / reverse-proxy 429s typically have no parsed JSON body.
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(429, undefined));
 
       const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');

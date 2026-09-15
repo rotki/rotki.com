@@ -9,8 +9,10 @@ interface Behaviour {
   submit?: () => void;
 }
 
-// Each dependency records its own name in `calls`, so a test can assert the exact
-// execution order and that later steps never run once an earlier one fails.
+/**
+ * Each dependency records its own name in `calls`, so a test can assert the exact
+ * execution order and that later steps never run once an earlier one fails.
+ */
 function makeDeps(behaviour: Behaviour = {}): { deps: SubmitFlowDeps; calls: string[] } {
   const calls: string[] = [];
   const deps: SubmitFlowDeps = {
