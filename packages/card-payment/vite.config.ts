@@ -4,7 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
-import { APP_BASE_PATH } from './src/config/paths';
+import { APP_BASE_PATH } from './src/config/base-path';
 
 // https://vite.dev/config/
 export default defineConfig({

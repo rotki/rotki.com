@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite-ssg build",
+    "build": "vue-tsc --build && vite-ssg build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit",
+    "typecheck": "vue-tsc --build",
     "serve": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

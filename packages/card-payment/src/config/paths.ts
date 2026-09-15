@@ -2,9 +2,7 @@
  * Shared path configuration for the card payment application
  * Single source of truth for all URL and path constants
  */
-
-// Single constant that can be changed to update the app's base path everywhere
-export const APP_BASE_PATH = '/checkout/pay/card';
+import { APP_BASE_PATH } from '@/config/base-path';
 
 export const paths = {
   /**
