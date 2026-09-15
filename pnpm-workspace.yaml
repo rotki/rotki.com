@@ -1,13 +1,10 @@
-saveExact: true
+blockExoticSubdeps: true
 minimumReleaseAge: 10080
+minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
   - '@rotki/eslint-config'
   - '@rotki/eslint-plugin'
   - '@rotki/ui-library'
-shamefullyHoist: true
-shellEmulator: true
-blockExoticSubdeps: true
-strictDepBuilds: true
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
@@ -15,6 +12,10 @@ trustPolicyExclude:
   - '@noble/hashes@1.7.0'
   - slow-redact@0.3.2
   - tailwind-merge@2.6.1
+shamefullyHoist: true
+shellEmulator: true
+strictDepBuilds: true
+saveExact: true
 
 packages:
   - .
@@ -35,6 +36,9 @@ overrides:
   # release until jsdom moves on.
   undici@^7: 7.29.1
 
+patchedDependencies:
+  '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch
+
 allowBuilds:
   '@parcel/watcher': true
   better-sqlite3: true
@@ -42,8 +46,6 @@ allowBuilds:
   msw: false
   vue-demi: false
 
-patchedDependencies:
-  '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch
 catalog:
   '@coinbase/wallet-sdk': 4.3.7
   '@commitlint/cli': 21.2.2
@@ -62,7 +64,7 @@ catalog:
   '@pinia/nuxt': 1.0.2
   '@playwright/test': 1.63.0
   '@resvg/resvg-js': 2.6.2
-  '@rotki/eslint-config': 6.2.0
+  '@rotki/eslint-config': 8.3.0
   '@rotki/eslint-plugin': 1.8.0
   '@rotki/ui-library': 2.24.0
   '@tsconfig/node24': 24.0.5
@@ -92,6 +94,7 @@ catalog:
   consola: 3.4.2
   defu: 6.1.7
   eslint: 10.10.0
+  eslint-plugin-tsdoc: 0.5.2
   happy-dom: 20.14.0
   husky: 9.1.7
   lint-staged: 17.5.0

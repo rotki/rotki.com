@@ -125,9 +125,8 @@ function main() {
   const failures = [];
   let checks = 0;
 
-  // The manifest naming a file proves nothing on its own. `build:copy` can fail
-  // to copy the card-payment app, and no `pages/` route maps to that subtree, so
-  // nothing below would catch its absence.
+  /* A manifest entry proves nothing alone: `build:copy` can fail to copy the card-payment
+     app, and no `pages/` route maps to that subtree, so nothing below would catch it. */
   for (const rel of [manifest.spaShell, manifest.notFound, ...(manifest.nestedApps ?? []).map(a => a.index)]) {
     checks++;
     if (!existsSync(path.join(OUTPUT_DIR, rel)))

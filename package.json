@@ -42,6 +42,7 @@
     "cac": "catalog:",
     "consola": "catalog:",
     "eslint": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
     "husky": "catalog:",
     "lint-staged": "catalog:",
     "npm-run-all2": "catalog:",

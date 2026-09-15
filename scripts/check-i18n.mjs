@@ -10,7 +10,6 @@ const I18N_FILE = './packages/website/i18n/locales/en.json';
 const SEARCH_DIR = './packages/website';
 const TEMP_FILE = './.tmp/i18n-key-search.txt';
 
-// Parse command line arguments
 const cli = cac('check-i18n');
 
 cli
@@ -23,163 +22,147 @@ cli
 cli.help();
 cli.version('1.0.0');
 
-async function main(deleteMode) {
-// Flatten nested JSON to dot notation keys
-  function flattenKeys(obj, prefix = '') {
-    const keys = [];
+/** Flattens nested translation JSON into dot-notation keys. */
+function flattenKeys(obj, prefix = '') {
+  const keys = [];
 
-    for (const [key, value] of Object.entries(obj)) {
-      const newKey = prefix ? `${prefix}.${key}` : key;
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey = prefix ? `${prefix}.${key}` : key;
 
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
-        keys.push(...flattenKeys(value, newKey));
-      }
-      else {
-        keys.push(newKey);
-      }
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      keys.push(...flattenKeys(value, newKey));
     }
-
-    return keys;
+    else {
+      keys.push(newKey);
+    }
   }
 
-  // Find all template literal patterns in the codebase
-  function findTemplateLiteralPatterns() {
-    try {
-      // Use rg to list all relevant files, then read and parse them with JS
-      const filesCmd = `rg -l 't\\(' ${SEARCH_DIR} --type-add 'vue:*.vue' -t vue -t ts -t js 2>/dev/null || true`;
-      const filesList = execSync(filesCmd, { encoding: 'utf8' }).trim();
+  return keys;
+}
 
-      if (!filesList)
-        return [];
+/**
+ * Collects the static prefixes and suffixes of `t()` calls that build their key from a template
+ * literal, so keys reachable only that way are not reported as unused.
+ */
+function findTemplateLiteralPatterns() {
+  try {
+    // Use rg to list all relevant files, then read and parse them with JS
+    const filesCmd = `rg -l 't\\(' ${SEARCH_DIR} --type-add 'vue:*.vue' -t vue -t ts -t js 2>/dev/null || true`;
+    const filesList = execSync(filesCmd, { encoding: 'utf8' }).trim();
 
-      const files = filesList.split('\n').filter(Boolean);
-      const extractedPrefixes = new Set();
+    if (!filesList)
+      return [];
 
-      // Regex to match template literal t() calls with variables
-      // Matches: t(`prefix.${var}`) or t(`prefix.${var}.suffix`)
-      const templateLiteralRegex = /t\(`([^`]*\${[^}]+}[^`]*)`\)/g;
+    const files = filesList.split('\n').filter(Boolean);
+    const extractedPrefixes = new Set();
 
-      for (const file of files) {
-        try {
-          const content = readFileSync(file, 'utf8');
-          let match;
+    // Matches t(`prefix.${var}`) and t(`prefix.${var}.suffix`).
+    const templateLiteralRegex = /t\(`([^`]*\${[^}]+}[^`]*)`\)/g;
 
-          // eslint-disable-next-line no-cond-assign
-          while ((match = templateLiteralRegex.exec(content)) !== null) {
-            const fullPattern = match[1]; // e.g., "account.subscriptions.${status}"
+    for (const file of files) {
+      try {
+        const content = readFileSync(file, 'utf8');
+        let match;
 
-            // Extract prefix (before ${)
-            const prefixMatch = fullPattern.match(/^([^$]+)\${/);
-            if (prefixMatch && prefixMatch[1]) {
-              extractedPrefixes.add(prefixMatch[1]);
-            }
+        // eslint-disable-next-line no-cond-assign -- the usual loop over RegExp#exec matches
+        while ((match = templateLiteralRegex.exec(content)) !== null) {
+          const fullPattern = match[1]; // e.g., "account.subscriptions.${status}"
 
-            // Extract suffix (after })
-            const suffixMatch = fullPattern.match(/}\.([.A-Z_a-z]+)$/);
-            if (suffixMatch && suffixMatch[1]) {
-              extractedPrefixes.add(suffixMatch[1]);
-            }
+          // Extract prefix (before ${)
+          const prefixMatch = fullPattern.match(/^([^$]+)\${/);
+          if (prefixMatch && prefixMatch[1]) {
+            extractedPrefixes.add(prefixMatch[1]);
+          }
+
+          // Extract suffix (after })
+          const suffixMatch = fullPattern.match(/}\.([.A-Z_a-z]+)$/);
+          if (suffixMatch && suffixMatch[1]) {
+            extractedPrefixes.add(suffixMatch[1]);
           }
         }
-        catch {
-          // Skip files we can't read
-        }
       }
+      catch {
+        // Skip files we can't read
+      }
+    }
 
-      return [...extractedPrefixes];
-    }
-    catch {
-      return [];
-    }
+    return [...extractedPrefixes];
   }
-
-  // Check if a key matches any template literal pattern
-  function matchesTemplatePattern(key, patterns) {
-    for (const pattern of patterns) {
-    // Check if the key starts with or ends with the pattern
-      if (key.startsWith(pattern) || key.endsWith(pattern)) {
-        return true;
-      }
-    }
-    return false;
+  catch {
+    return [];
   }
+}
 
-  // Search for key usage in codebase
-  function isKeyUsed(key, templatePatterns = []) {
-    try {
-    // Ensure .tmp directory exists
-      if (!existsSync('./.tmp')) {
-        mkdirSync('./.tmp', { recursive: true });
-      }
-
-      // Write key to temp file to avoid shell escaping issues
-      writeFileSync(TEMP_FILE, key, 'utf8');
-
-      // Use rg with fixed string search (-F) and read pattern from file
-      execSync(
-        `rg -F -q "$(cat ${TEMP_FILE})" ${SEARCH_DIR} --type-add 'vue:*.vue' -t vue -t ts -t js 2>/dev/null`,
-        { stdio: 'pipe' },
-      );
-
+/** Whether `key` starts or ends with one of the template literal patterns. */
+function matchesTemplatePattern(key, patterns) {
+  for (const pattern of patterns) {
+    if (key.startsWith(pattern) || key.endsWith(pattern)) {
       return true;
     }
-    catch {
-    // rg returns exit code 1 when no matches found
-    // Check if it might be used in a template literal
-      return matchesTemplatePattern(key, templatePatterns);
+  }
+  return false;
+}
+
+/**
+ * Whether the codebase references `key`, directly or through a template literal pattern.
+ *
+ * @remarks
+ * The key goes to rg through a temp file, which avoids shell escaping issues.
+ */
+function isKeyUsed(key, templatePatterns = []) {
+  try {
+    if (!existsSync('./.tmp')) {
+      mkdirSync('./.tmp', { recursive: true });
     }
+
+    writeFileSync(TEMP_FILE, key, 'utf8');
+
+    execSync(
+      `rg -F -q "$(cat ${TEMP_FILE})" ${SEARCH_DIR} --type-add 'vue:*.vue' -t vue -t ts -t js 2>/dev/null`,
+      { stdio: 'pipe' },
+    );
+
+    return true;
+  }
+  catch {
+    // rg exits with 1 when nothing matches, so the key may still be used through a template literal.
+    return matchesTemplatePattern(key, templatePatterns);
+  }
+}
+
+/** Deletes a key from a nested object by its dot-notation path. */
+function deleteKey(obj, path) {
+  const keys = path.split('.');
+  const lastKey = keys.pop();
+  let current = obj;
+
+  for (const key of keys) {
+    if (!current[key])
+      return false;
+    current = current[key];
   }
 
-  // Delete a key from nested object by dot notation path
-  function deleteKey(obj, path) {
-    const keys = path.split('.');
-    const lastKey = keys.pop();
-    let current = obj;
-
-    for (const key of keys) {
-      if (!current[key])
-        return false;
-      current = current[key];
-    }
-
-    if (current[lastKey] !== undefined) {
-      delete current[lastKey];
-      return true;
-    }
-    return false;
+  if (current[lastKey] !== undefined) {
+    delete current[lastKey];
+    return true;
   }
+  return false;
+}
 
-  // Clean up empty objects recursively
-  function cleanEmptyObjects(obj) {
-    for (const key in obj) {
-      if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-        cleanEmptyObjects(obj[key]);
-        if (Object.keys(obj[key]).length === 0) {
-          delete obj[key];
-        }
+/** Removes objects that became empty, recursively. */
+function cleanEmptyObjects(obj) {
+  for (const key in obj) {
+    if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+      cleanEmptyObjects(obj[key]);
+      if (Object.keys(obj[key]).length === 0) {
+        delete obj[key];
       }
     }
   }
+}
 
-  consola.start(deleteMode ? 'Removing unused i18n keys...' : 'Checking for unused i18n keys...');
-
-  // Find template literal patterns
-  consola.start('Searching for template literal patterns...');
-  const templatePatterns = findTemplateLiteralPatterns();
-  if (templatePatterns.length > 0) {
-    consola.info(`Found ${templatePatterns.length} template literal pattern${templatePatterns.length === 1 ? '' : 's'}:`);
-    templatePatterns.forEach((pattern) => {
-      consola.info(`  • ${pattern}`);
-    });
-  }
-
-  // Read and parse i18n file
-  const i18nContent = JSON.parse(readFileSync(I18N_FILE, 'utf8'));
-  const allKeys = flattenKeys(i18nContent);
-
-  consola.info(`Total translation keys: ${allKeys.length}`);
-
-  // Check each key
+/** Sorts every key into directly used, used through a template literal, or unused, with progress output. */
+function classifyKeys(allKeys, templatePatterns) {
   const unusedKeys = [];
   const usedKeys = [];
   const dynamicKeys = [];
@@ -204,54 +187,49 @@ async function main(deleteMode) {
     }
   }
 
-  // Cleanup temp file
-  try {
-    unlinkSync(TEMP_FILE);
-  }
-  catch {
-  // ignore
-  }
+  return { dynamicKeys, unusedKeys, usedKeys };
+}
 
-  console.log(''); // New line after progress
+/** Deletes the unused keys from en.json, then drops any objects left empty. */
+function removeUnusedKeys(i18nContent, unusedKeys) {
+  consola.start('Removing unused keys from en.json...');
 
-  // Display dynamic keys info
-  if (dynamicKeys.length > 0) {
-    consola.info(`Found ${dynamicKeys.length} key${dynamicKeys.length === 1 ? '' : 's'} potentially used in template literals:`);
-    consola.box(dynamicKeys.sort().map(key => `  • ${key}`).join('\n'));
+  let removed = 0;
+  for (const key of unusedKeys) {
+    if (deleteKey(i18nContent, key)) {
+      removed++;
+    }
   }
 
-  // Display results
+  consola.start('Cleaning up empty objects...');
+  cleanEmptyObjects(i18nContent);
+
+  consola.start('Writing updated file...');
+  writeFileSync(I18N_FILE, `${JSON.stringify(i18nContent, null, 2)}\n`, 'utf8');
+
+  consola.success(`Removed ${removed} unused key${removed === 1 ? '' : 's'}!`);
+}
+
+/** Lists the unused keys, and removes them in delete mode. */
+function reportUnusedKeys(unusedKeys, i18nContent, deleteMode) {
   if (unusedKeys.length === 0) {
     consola.success('All translation keys are being used!');
+    return;
+  }
+
+  consola.warn(`Found ${unusedKeys.length} unused translation key${unusedKeys.length === 1 ? '' : 's'}:`);
+  consola.box(unusedKeys.sort().map(key => `  • ${key}`).join('\n'));
+
+  if (deleteMode) {
+    removeUnusedKeys(i18nContent, unusedKeys);
   }
   else {
-    consola.warn(`Found ${unusedKeys.length} unused translation key${unusedKeys.length === 1 ? '' : 's'}:`);
-    consola.box(unusedKeys.sort().map(key => `  • ${key}`).join('\n'));
-
-    if (deleteMode) {
-      consola.start('Removing unused keys from en.json...');
-
-      let removed = 0;
-      for (const key of unusedKeys) {
-        if (deleteKey(i18nContent, key)) {
-          removed++;
-        }
-      }
-
-      consola.start('Cleaning up empty objects...');
-      cleanEmptyObjects(i18nContent);
-
-      consola.start('Writing updated file...');
-      writeFileSync(I18N_FILE, `${JSON.stringify(i18nContent, null, 2)}\n`, 'utf8');
-
-      consola.success(`Removed ${removed} unused key${removed === 1 ? '' : 's'}!`);
-    }
-    else {
-      consola.info('Run with --delete or -d flag to remove these keys');
-    }
+    consola.info('Run with --delete or -d flag to remove these keys');
   }
+}
 
-  // Summary
+/** Prints how many keys fell into each group and the share still in use. */
+function printSummary({ dynamicKeys, unusedKeys, usedKeys }, totalKeys) {
   const totalUsed = usedKeys.length + dynamicKeys.length;
   consola.box({
     title: 'Summary',
@@ -259,14 +237,52 @@ async function main(deleteMode) {
       `Directly used keys: ${usedKeys.length}`,
       `Dynamic/template keys: ${dynamicKeys.length}`,
       `Unused keys: ${unusedKeys.length}`,
-      `Coverage: ${Math.round((totalUsed / allKeys.length) * 100)}%`,
+      `Coverage: ${Math.round((totalUsed / totalKeys) * 100)}%`,
     ].join('\n'),
     style: {
       borderColor: unusedKeys.length === 0 ? 'green' : 'yellow',
     },
   });
+}
 
-  if (deleteMode && unusedKeys.length > 0) {
+/** Reports the translation keys nothing references, and removes them when `deleteMode` is set. */
+async function main(deleteMode) {
+  consola.start(deleteMode ? 'Removing unused i18n keys...' : 'Checking for unused i18n keys...');
+
+  consola.start('Searching for template literal patterns...');
+  const templatePatterns = findTemplateLiteralPatterns();
+  if (templatePatterns.length > 0) {
+    consola.info(`Found ${templatePatterns.length} template literal pattern${templatePatterns.length === 1 ? '' : 's'}:`);
+    templatePatterns.forEach((pattern) => {
+      consola.info(`  • ${pattern}`);
+    });
+  }
+
+  const i18nContent = JSON.parse(readFileSync(I18N_FILE, 'utf8'));
+  const allKeys = flattenKeys(i18nContent);
+
+  consola.info(`Total translation keys: ${allKeys.length}`);
+
+  const classified = classifyKeys(allKeys, templatePatterns);
+
+  try {
+    unlinkSync(TEMP_FILE);
+  }
+  catch {
+    // ignore
+  }
+
+  console.log(''); // New line after progress
+
+  if (classified.dynamicKeys.length > 0) {
+    consola.info(`Found ${classified.dynamicKeys.length} key${classified.dynamicKeys.length === 1 ? '' : 's'} potentially used in template literals:`);
+    consola.box(classified.dynamicKeys.sort().map(key => `  • ${key}`).join('\n'));
+  }
+
+  reportUnusedKeys(classified.unusedKeys, i18nContent, deleteMode);
+  printSummary(classified, allKeys.length);
+
+  if (deleteMode && classified.unusedKeys.length > 0) {
     consola.info('Don\'t forget to run pnpm build to verify the changes!');
   }
 }

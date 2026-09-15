@@ -19,8 +19,7 @@ export default rotki({
     nuxt: pluginNuxt,
   },
   rules: {
-    // Disallow runtime context (composables, `this`, `await`) inside the build-time
-    // `definePageMeta` chunk, which runs before component setup.
+    // No runtime context (composables, `this`, `await`) in the build-time `definePageMeta` chunk.
     'nuxt/no-page-meta-runtime-values': 'error',
     // Prefer `import.meta.client/server/...` over the legacy `process.*` flags.
     'nuxt/prefer-import-meta': 'error',
@@ -55,8 +54,8 @@ export default rotki({
     'unicorn/filename-case': 'off',
   },
 }, {
-  // Content docs (legal pages, job posts) are rendered inside layouts that already
-  // provide the page <h1>, so they intentionally start at h2/h5 and skip levels.
+  /* Content docs (legal pages, job posts) render inside layouts that already provide the
+     page <h1>, so they start at h2/h5 and skip levels on purpose. */
   files: [
     'packages/website/content/**/*.md',
   ],
@@ -82,8 +81,8 @@ export default rotki({
     '@stylistic/spaced-comment': 'off',
   },
 }, {
-  // Vite 8 loads configs natively and warns on extensionless relative imports, which
-  // `@rotki/no-dot-ts-imports` would autofix straight back off. Off for config files only.
+  /* Vite 8 loads configs natively and warns on extensionless relative imports, which
+     `@rotki/no-dot-ts-imports` would autofix straight back off. Off for config files only. */
   files: ['**/vite.config.ts', '**/vitest.config.ts'],
   rules: {
     '@rotki/no-dot-ts-imports': 'off',

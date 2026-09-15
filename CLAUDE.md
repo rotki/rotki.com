@@ -313,21 +313,18 @@ async function fetchData() {
 
 #### Pinia Store Structure
 
-Follow this order in Pinia stores using `defineStore` with composition API:
+Follow this order in Pinia stores using `defineStore` with composition API: state, getters, actions, then watchers.
 
 ```typescript
 import { get, set } from '@vueuse/shared';
 
 export const useCounterStore = defineStore('counter', () => {
-  // 1. State
   const count = ref<number>(0);
   const name = ref<string>('');
 
-  // 2. Getters
   const doubleCount = computed<number>(() => get(count) * 2);
   const isEven = computed<boolean>(() => get(count) % 2 === 0);
 
-  // 3. Actions
   function increment(): void {
     set(count, get(count) + 1);
   }
@@ -336,18 +333,14 @@ export const useCounterStore = defineStore('counter', () => {
     // async logic
   }
 
-  // 4. Watchers
   watch(count, (newCount) => {
     console.log('Count changed:', newCount);
   });
 
   return {
-    // State
     count,
-    // Getters
     doubleCount,
     fetchData,
-    // Actions
     increment,
     isEven,
     name,
@@ -374,16 +367,20 @@ export const useCounterStore = defineStore('counter', () => {
 
 **Solution**: Nuxt's `useAsyncData`/`useLazyAsyncData` already deduplicates requests by key. Multiple components calling the same composable with the same key share the underlying data automatically.
 
+❌ Incorrect, do not do this:
+
 ```typescript
-// ❌ Incorrect - DO NOT do this
 function useDataInternal() {
   const { data } = useLazyAsyncData('my-key', fetchFn, { server: false });
   return { data };
 }
 
 export const useData = createSharedComposable(useDataInternal);
+```
 
-// ✅ Correct - Let Nuxt handle deduplication
+✅ Correct, let Nuxt handle deduplication:
+
+```typescript
 export function useData() {
   const { data } = useLazyAsyncData('my-key', fetchFn, {
     server: false,
