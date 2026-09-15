@@ -73,6 +73,7 @@ export function usePaymentCards(): UsePaymentCardsReturn {
       }
     },
     {
+      dedupe: 'defer',
       default: () => [],
       lazy: true,
       server: false,
