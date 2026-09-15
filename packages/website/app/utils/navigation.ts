@@ -23,7 +23,6 @@ const SPECIAL_CSP_ROUTES = [
  * Extract the base path from a route string, removing query params and hash
  */
 function extractBasePath(routePath: string): string {
-  // Remove query parameters and hash fragments
   return routePath.split(/[#?]/)[0] ?? routePath;
 }
 
@@ -59,8 +58,11 @@ export function requiresHardReload(route: RouteLocationRaw): boolean {
       routePath = resolved.path;
     }
     catch {
-      // Fallback to direct path if router is not available
-      routePath = route.path || '/';
+      // Router unavailable: use the direct path, treating an empty one as the root.
+      if (route.path)
+        routePath = route.path;
+      else
+        routePath = '/';
     }
   }
   else {

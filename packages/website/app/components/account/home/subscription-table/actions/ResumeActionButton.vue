@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const { resumeStatus } = defineProps<{
   actionsClasses?: string;
   loading?: boolean;
   disabled?: boolean;
@@ -12,6 +12,21 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
+const statusMessage = computed<string>(() => {
+  switch (resumeStatus) {
+    case 'pending':
+      return t('account.subscriptions.resume.status.pending');
+    case 'in_progress':
+      return t('account.subscriptions.resume.status.in_progress');
+    case 'completed':
+      return t('account.subscriptions.resume.status.completed');
+    case 'failed':
+      return t('account.subscriptions.resume.status.failed');
+    default:
+      return '';
+  }
+});
 </script>
 
 <template>
@@ -37,7 +52,7 @@ const { t } = useI18n({ useScope: 'global' });
       </RuiButton>
     </template>
     <span v-if="resumeStatus">
-      {{ t(`account.subscriptions.resume.status.${resumeStatus}`) }}
+      {{ statusMessage }}
     </span>
     <span v-else-if="nextActionDate">
       {{ t('account.subscriptions.resume_hint', { date: nextActionDate }) }}

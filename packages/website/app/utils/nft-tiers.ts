@@ -21,11 +21,11 @@ const TIER_CONFIG: Record<string, TierConfig> = {
 export function getTierMedal(tier: string | undefined): string {
   if (!tier)
     return '';
-  return TIER_CONFIG[tier]?.medal || '';
+  return TIER_CONFIG[tier]?.medal ?? '';
 }
 
 export function getTierClasses(tier: string | undefined): string {
   if (!tier)
     return '';
-  return TIER_CONFIG[tier]?.classes || '';
+  return TIER_CONFIG[tier]?.classes ?? '';
 }

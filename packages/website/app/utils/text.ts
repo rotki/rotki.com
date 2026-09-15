@@ -1,7 +1,7 @@
 /**
- *
- * @param {string} string - String to convert
- * @return {string} - String converted to title case
+ * Converts an underscore or space separated string to title case.
+ * @param string - String to convert
+ * @returns String converted to title case
  * @example
  * toTitleCase('this is a sentence'); // This Is A Sentence
  */

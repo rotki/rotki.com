@@ -16,6 +16,7 @@ import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payme
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { PaymentError } from '~/types/codes';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 const SESSION_KEY = 'threeDSecureData';
@@ -142,8 +143,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
     set(state, 'verifying');
     set(error, '');
-    // Set once a specific failure has already been reported, so the catch does
-    // not log the same failure a second time under a generic event.
+    // Set once a specific failure is logged, so the catch doesn't log it again as a generic event.
     let failureLogged = false;
     const lookupHandler = (_data: any, next: any) => {
       logger.debug('3D Secure lookup complete');
@@ -156,8 +156,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         logger.error('3D Secure iframe element missing');
         return;
       }
-      // Use standard 3D Secure 2.0 window size (500x600)
-      // with responsive width for mobile
+      // Standard 3D Secure 2.0 challenge window (500x600), with a responsive width for mobile.
       iframe.style.maxWidth = '100%';
       iframe.style.minHeight = '400px';
       iframe.style.border = 'none';
@@ -226,9 +225,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
           isUpgrade: !!params.upgradeSubId,
           discountApplied: params.discountTrackingInfo !== undefined,
         });
-        // Logged as a liability-shift failure right above. The catch below must
-        // not log it again as a generic verification failure, or every one of
-        // these is counted twice.
+        // Logged above as a liability-shift failure; the catch must not count it twice.
         failureLogged = true;
         throw new PaymentUserError(errorMsg);
       }
@@ -264,13 +261,10 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
    * Complete 3D Secure verification and finalize payment
    */
   async function verifyAndFinalizePayment(params: ThreeDSecureParams): Promise<void> {
-    // Initialize Braintree
     await initialize(params);
 
-    // Start verification
     const payEvent = await verify(params);
 
-    // Finalize payment with API call
     const paymentPayload = {
       planId: payEvent.planId,
       paymentMethodNonce: payEvent.paymentMethodNonce,
@@ -285,12 +279,10 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       if (result.code === PaymentError.SERVER_ERROR) {
         requestRefresh();
         set(serverError, true);
-        // The full-screen overlay explains this one; the raw message is a 5xx
-        // dump, so it stays opaque.
+        // The full-screen overlay explains this one; the raw 5xx dump stays opaque.
         throw new Error(result.error.message);
       }
-      // A 400 carries the backend's own `ActionResultResponse.message`, which is
-      // written for the customer ("Do Not Honor", declines, validation).
+      // A 400 carries the backend's customer-facing message ("Do Not Honor", declines, validation).
       throw new PaymentUserError(result.error.message);
     }
 
@@ -324,11 +316,9 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
    * Gets stored parameters and runs the complete flow
    */
   async function initializeProcess(): Promise<{ success: boolean; params?: ThreeDSecureParams }> {
-    // Get stored parameters
     const storedParams = getStoredParams();
 
     if (!storedParams) {
-      // No valid parameters found
       return { success: false };
     }
 
@@ -347,7 +337,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     }
     catch (initError: any) {
       // Error is handled by the composable state
-      const errorMessage = `3D Secure process failed:\n${initError.message || initError.toString()}`;
+      const errorMessage = `3D Secure process failed:\n${nonEmpty(initError.message) ?? initError.toString()}`;
       console.error(errorMessage);
       set(state, 'error');
       set(error, errorMessage);

@@ -7,7 +7,7 @@ import type {
   SubscriptionActionEvent,
   SubscriptionActionType,
 } from '~/components/account/home/subscription-table/types';
-import { isCancelledButActive, isSubRequestingUpgrade } from '@rotki/card-payment-common';
+import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import PlanLimitsList from '~/components/account/home/PlanLimitsList.vue';
@@ -15,7 +15,7 @@ import SubscriptionActionsCell from '~/components/account/home/subscription-tabl
 import SubscriptionBillingSection from '~/components/account/home/SubscriptionBillingSection.vue';
 import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
 import SubscriptionInfoField from '~/components/account/home/SubscriptionInfoField.vue';
-import { useSubscriptionActions } from '~/composables/subscription/use-subscription-actions';
+import SubscriptionPlanName from '~/components/account/home/SubscriptionPlanName.vue';
 import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
 import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
@@ -35,7 +35,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 const { actionsClasses } = useSubscriptionDisplay();
-const { canUpgradeSubscription } = useSubscriptionActions();
 
 // Subscription status display and styling
 const subscriptionRef = toRef(() => subscription);
@@ -105,13 +104,6 @@ const nextActionRelative = useTimeAgo(
   computed<Date>(() => new Date(subscription.nextActionDate)),
 );
 
-// Check if upgrade is pending
-const isUpgradePending = computed<boolean>(() => isSubRequestingUpgrade(subscription));
-
-// Check if upgrade is available (only if not already pending)
-const isUpgradeAvailable = computed<boolean>(() => !get(isUpgradePending) && canUpgradeSubscription(subscription, get(availablePlans)));
-
-// Action handlers using centralized composable
 async function resumeSubscription(subscription: UserSubscription): Promise<void> {
   await performResumeSubscription(subscription, activeAction, activeActionSubscription);
 }
@@ -149,35 +141,11 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
             :label="t('account.subscriptions.plan')"
             value-class="font-medium"
           >
-            <div class="flex items-center gap-2">
-              <span>{{ planDisplayName }}</span>
-              <RuiChip
-                v-if="isUpgradePending"
-                size="sm"
-                color="warning"
-              >
-                <div class="flex items-center gap-1">
-                  <RuiIcon
-                    name="lu-clock"
-                    size="14"
-                  />
-                  {{ t('account.subscriptions.upgrade_pending') }}
-                </div>
-              </RuiChip>
-              <RuiChip
-                v-else-if="isUpgradeAvailable"
-                size="sm"
-                color="primary"
-              >
-                <div class="flex items-center gap-1">
-                  <RuiIcon
-                    name="lu-sparkles"
-                    size="14"
-                  />
-                  {{ t('account.subscriptions.upgrade_available') }}
-                </div>
-              </RuiChip>
-            </div>
+            <SubscriptionPlanName
+              :subscription="subscription"
+              :plan-name="planDisplayName"
+              :available-plans="availablePlans"
+            />
           </SubscriptionInfoField>
 
           <SubscriptionInfoField

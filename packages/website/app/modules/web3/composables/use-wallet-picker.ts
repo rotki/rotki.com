@@ -30,15 +30,11 @@ export function useWalletPicker(): UseWalletPickerReturn {
   async function open(): Promise<void> {
     const wasConnected = get(connected);
     set(isOpen, true);
-    // Build the config so injected wallets self-announce (EIP-6963) and the
-    // connector list populates while the dialog is shown. This also kicks off
-    // the background reconnect + liveness probe.
+    // Building the config lets injected wallets self-announce (EIP-6963) and starts the background reconnect.
     await ensureInitialized();
     await until(reconnecting).toBe(false);
-    // Opened from a disconnected state and a live session came back → the page
-    // now reflects the connected wallet, so close instead of surfacing a
-    // redundant "Connected" row. A "manage" open (already connected) stays open
-    // so the Disconnect action remains reachable.
+    /* Opened while disconnected and a live session came back: close instead of showing a redundant
+       "Connected" row. A "manage" open (already connected) stays open so Disconnect stays reachable. */
     if (!wasConnected && get(connected))
       set(isOpen, false);
   }

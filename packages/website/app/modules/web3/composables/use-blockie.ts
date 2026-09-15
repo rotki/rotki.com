@@ -37,7 +37,7 @@ export const useBlockie = createSharedComposable((): UseBlockieReturn => {
       put(formatted, blockie);
     }
 
-    return cache.get(formatted) || '';
+    return cache.get(formatted) ?? '';
   };
 
   return {

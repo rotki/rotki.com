@@ -13,7 +13,7 @@ import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import WalletAccountSummary from '~/modules/web3/components/WalletAccountSummary.vue';
 import WalletPickerDialog from '~/modules/web3/components/WalletPickerDialog.vue';
 import { web3ErrorKey } from '~/modules/web3/core/errors';
-import { formatTokenBalance } from '~/modules/web3/core/format';
+import { formatTokenBalance, segmentAfterFirst } from '~/modules/web3/core/format';
 
 const {
   data,
@@ -99,7 +99,7 @@ async function handleSwitchNetwork(): Promise<void> {
 const isBtc = computed<boolean>(() => data.chainName === 'bitcoin');
 
 // `cryptocurrency` is a full asset id (e.g. "ethereum sepolia:ETH"); show only the symbol.
-const currencyName = computed<string>(() => data.cryptocurrency.split(':')[1] ?? data.cryptocurrency);
+const currencyName = computed<string>(() => segmentAfterFirst(data.cryptocurrency, ':') ?? data.cryptocurrency);
 
 function handleInternalPlanChange(newPlan: SelectedPlan): void {
   emit('plan-change', newPlan);
@@ -154,7 +154,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
         :selected-plan="plan"
         :breakdown="breakdown"
         :upgrade-sub-id="upgradeSubId"
-        :is-crypto="true"
+        is-crypto
         :loading="planSwitchLoading"
         :disabled="planSwitchLoading || web3ProcessingLoading || processing"
         @update:discount-code="emit('update:discount-code', $event)"

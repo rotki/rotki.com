@@ -37,7 +37,7 @@ function toggle(): void {
       <div
         v-for="(note, i) in notes"
         :key="i"
-        class="flex flex-row mt-4 gap-2"
+        class="flex mt-4 gap-2"
       >
         <div>
           <RuiChip

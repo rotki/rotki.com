@@ -21,8 +21,7 @@ export const useStagingBranding = createSharedComposable((): UseStagingBrandingR
     if (import.meta.server)
       return configHostname === STAGING_HOSTNAME;
 
-    // On the client, allow localhost only for development; otherwise
-    // only staging.rotki.com should enable staging branding.
+    // On the client, localhost counts only in development.
     const hostname = window.location.hostname;
     return hostname === STAGING_HOSTNAME || (isDev && hostname === LOCALHOST);
   });

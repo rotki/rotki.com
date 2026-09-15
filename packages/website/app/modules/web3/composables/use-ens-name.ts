@@ -64,8 +64,7 @@ export function useEnsName(address: MaybeRefOrGetter<string | undefined>): UseEn
       return;
     }
 
-    // Unknown address: blank any previous name and resolve in the background. The
-    // lookup swallows its own errors, so the returned promise never rejects.
+    // Unknown address: blank the old name and resolve in the background (lookup never rejects).
     set(ensName, undefined);
     set(loading, true);
     lookup(owner).catch(() => {});

@@ -21,8 +21,10 @@ const emit = defineEmits<{
   retry: [];
 }>();
 
-// Tier colors echo the tier badges in the sponsorship artwork. Chip colors keep white text at AA contrast.
-// Icon colors are solid: a translucent currentColor darkens where the icon's strokes overlap.
+/**
+ * Tier colors echo the tier badges in the sponsorship artwork. Chip colors keep white text at AA contrast.
+ * Icon colors are solid: a translucent currentColor darkens where the icon's strokes overlap.
+ */
 const TIER_TINTS: Record<string, TierTint> = {
   bronze: {
     chip: 'bg-[#9a5420] text-white',
@@ -81,8 +83,8 @@ function onImageError(): void {
   set(imageFailed, true);
 }
 
+/** Reloads the image, or refetches the tier data when there is no URL to reload. */
 function retryImage(): void {
-  // Without a URL there is nothing to reload locally: refetch the tier data instead
   if (!get(imageUrl)) {
     emit('retry');
     return;

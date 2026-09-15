@@ -1,11 +1,11 @@
 import type { Ref } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx } from '~/types';
-import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import {
   PaymentProvider,
   type Subscription as UserSubscription,
 } from '@rotki/card-payment-common/schemas/subscription';
+import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
 import { get, set } from '@vueuse/shared';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
@@ -26,8 +26,7 @@ interface UseSubscriptionCryptoPaymentReturn {
   getBlockExplorerLink: (pendingTx: PendingTx) => RouteLocationRaw;
 }
 
-// Module-level state to prevent duplicate API calls across component instances
-// This is NOT reactive - it's just for deduplication
+// Module-level, non-reactive flags that dedupe API calls across component instances.
 let pendingFetchSubId: string | undefined;
 let fetchInProgress = false;
 
@@ -75,10 +74,10 @@ export function useSubscriptionCryptoPayment({
   });
 
   /**
-   * Fetch pending payment currency - only if not already fetched for this subscription
+   * Fetch pending payment currency, only if not already fetched for this subscription.
+   * The dedupe check and flags run synchronously, before any await, to prevent races.
    */
   async function fetchPendingCurrency(subId: string): Promise<void> {
-    // Synchronous check to prevent race conditions
     if (pendingFetchSubId === subId || fetchInProgress) {
       return;
     }

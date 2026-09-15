@@ -2,10 +2,9 @@
 import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { parseBraintreeError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
+import ThreeDSecureBillingInfo from '~/components/account/home/payment-methods/ThreeDSecureBillingInfo.vue';
 import { useCardThreeDSecure } from '~/modules/checkout/composables/use-card-three-d-secure';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
-import { formatDate } from '~/utils/date';
-import { formatCurrency } from '~/utils/text';
 
 export interface ThreeDSecureVerificationData {
   cardToken: string;
@@ -37,19 +36,12 @@ const errorMessage = ref<string>();
 const { verifyAndSetDefaultCard, teardown } = useCardThreeDSecure();
 const { userMessageFor } = usePaymentErrorMessage();
 
-const billingPeriod = computed<string>(() => {
-  const { durationInMonths } = verificationData.subscriptionData;
-  return durationInMonths === 12
-    ? t('common.yearly')
-    : t('common.monthly');
-});
-
 function close(): void {
   set(model, false);
 }
 
+/** Closes the modal, unless verification is running and no challenge is visible yet. */
 function handleCancel(): void {
-  // Allow cancel only when challenge is visible or when not verifying
   if (get(verifying) && !get(challengeShown)) {
     return;
   }
@@ -130,29 +122,10 @@ watch(model, (isOpen) => {
           v-if="!errorMessage"
           type="warning"
         >
-          <div class="flex flex-col gap-2">
-            <div class="font-medium">
-              {{ t('payment_methods.three_d_secure.billing_info_title') }}
-            </div>
-            <div>
-              {{ t(isReauthorization ? 'payment_methods.three_d_secure.billing_info_reauth' : 'payment_methods.three_d_secure.billing_info_replace') }}
-              <i18n-t
-                keypath="payment_methods.three_d_secure.billing_info_schedule"
-                tag="span"
-                scope="global"
-              >
-                <template #date>
-                  <span class="font-medium">{{ formatDate(verificationData.subscriptionData.nextActionDate) }}</span>
-                </template>
-                <template #amount>
-                  <span class="font-medium">{{ formatCurrency(verificationData.subscriptionData.nextBillingAmount) }}</span>
-                </template>
-                <template #period>
-                  <span class="font-medium">{{ billingPeriod }}</span>
-                </template>
-              </i18n-t>
-            </div>
-          </div>
+          <ThreeDSecureBillingInfo
+            :subscription-data="verificationData.subscriptionData"
+            :is-reauthorization="isReauthorization"
+          />
         </RuiAlert>
 
         <!-- Error message -->

@@ -54,7 +54,7 @@ const { t } = useI18n({ useScope: 'global' });
             v-model="selectedTier"
             :value="tier.key"
             name="tier"
-            :hide-details="true"
+            hide-details
             class="font-bold uppercase"
             color="primary"
             :label="tier.label"

@@ -43,7 +43,6 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
   const fetched = useState<boolean>('available-plans-fetched', () => false);
 
   async function execute(): Promise<void> {
-    // Already fetched, skip
     if (get(fetched))
       return;
 
@@ -74,8 +73,7 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
     if (plans.length === 0)
       return plans;
 
-    // Highlight the Basic plan as the suggested tier. `isMostPopular` is the
-    // existing highlight channel; here it means "the suggested/Basic plan".
+    // `isMostPopular` is the existing highlight channel; here it marks the suggested Basic plan.
     return plans.map(plan => ({
       ...plan,
       isMostPopular: plan.tierName.toLowerCase() === TIER_NAMES.BASIC,

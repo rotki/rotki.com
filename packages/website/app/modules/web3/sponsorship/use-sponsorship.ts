@@ -45,8 +45,7 @@ function useRotkiSponsorshipSSR() {
       // Process the results
       for (const tier of SPONSORSHIP_TIERS) {
         const tierInfo = response.tiers[tier.tierId];
-        // Every tier gets an entry: the backend omits tiers whose metadata failed to load,
-        // and an empty URL lets the image component show "not available" instead of loading forever
+        // Every tier gets an entry, so a tier the backend omitted shows "not available" instead of loading forever.
         images[tier.key] = tierInfo?.imageUrl ?? '';
         if (tierInfo) {
           supplies[tier.key] = {
@@ -127,11 +126,9 @@ export function useSponsorshipData() {
     dedupe: 'defer',
   });
 
-  // Create a custom refresh function that forces cache bypass
+  /** Refreshes the data through useAsyncData, bypassing the cache. */
   async function refresh() {
-    // Set force refresh flag before refreshing
     set(forceRefresh, true);
-    // Force refresh the data through useAsyncData
     await refreshData();
   }
 

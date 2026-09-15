@@ -56,10 +56,10 @@ const isExternalLink = computed<boolean>(() =>
 );
 
 /**
- * Determine target attribute - only open new tab for truly external links
+ * Determine target attribute. Only explicitly external links open a new tab;
+ * CSP hard reload routes stay in the same tab.
  */
 const linkTarget = computed<string>(() => {
-  // Only open new tab for explicitly external links (not CSP hard reload routes)
   if (external && !requiresHardReload(to)) {
     return '_blank';
   }

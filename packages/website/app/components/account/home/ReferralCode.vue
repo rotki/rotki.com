@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Component } from 'vue';
-import { DiscountType } from '@rotki/card-payment-common';
+import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { get } from '@vueuse/shared';
 import ReferralCodeSkeleton from '~/components/account/home/ReferralCodeSkeleton.vue';
+import ReferralShareButtons, { type ShareButton } from '~/components/account/home/ReferralShareButtons.vue';
 import CopyButton from '~/components/common/CopyButton.vue';
 import BlueskyIcon from '~/components/icons/BlueskyIcon.vue';
 import FarcasterIcon from '~/components/icons/FarcasterIcon.vue';
@@ -15,14 +15,6 @@ const { t } = useI18n({ useScope: 'global' });
 const {
   public: { baseUrl },
 } = useRuntimeConfig();
-
-interface ShareButton {
-  icon?: string;
-  customIcon?: Component;
-  name: string;
-  url: string;
-  colorClass: string;
-}
 
 const {
   hasReferralCode,
@@ -157,37 +149,7 @@ onMounted(async () => {
             </template>
           </RuiTextField>
 
-          <div class="flex items-center gap-3">
-            <span class="text-body-2 text-rui-text-secondary">{{ t('account.referral_code.share_via') }}</span>
-            <div class="flex items-center gap-2">
-              <a
-                v-for="button in shareButtons"
-                :key="button.name"
-                :href="button.url"
-                :target="button.name !== 'Email' ? '_blank' : undefined"
-                :rel="button.name !== 'Email' ? 'noopener noreferrer' : undefined"
-              >
-                <RuiButton
-                  variant="text"
-                  size="sm"
-                  color="secondary"
-                  class="!p-2 !min-w-0"
-                >
-                  <Component
-                    :is="button.customIcon"
-                    v-if="button.customIcon"
-                    :class="button.colorClass"
-                  />
-                  <RuiIcon
-                    v-else-if="button.icon"
-                    :name="button.icon"
-                    size="18"
-                    :class="button.colorClass"
-                  />
-                </RuiButton>
-              </a>
-            </div>
-          </div>
+          <ReferralShareButtons :buttons="shareButtons" />
         </div>
 
         <RuiAlert

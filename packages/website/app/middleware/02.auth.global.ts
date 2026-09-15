@@ -1,3 +1,4 @@
+import type { RouteLocationNormalized } from 'vue-router';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
@@ -12,6 +13,7 @@ import {
   ensureVerified,
   handleGuestOnly,
   type NavigationResult,
+  type StateGetter,
 } from '~/utils/auth-guards';
 
 function applyResult(result: NavigationResult): ReturnType<typeof navigateTo> | undefined {
@@ -19,8 +21,48 @@ function applyResult(result: NavigationResult): ReturnType<typeof navigateTo> | 
     return navigateTo(result.redirect);
 }
 
+/**
+ * Runs the guards for an authenticated route in order: authentication, email
+ * verification, subscriber purchase eligibility, card customer. The first guard
+ * that redirects wins; the rest are skipped.
+ */
+async function checkRouteRequirements(
+  to: RouteLocationNormalized,
+  getState: StateGetter,
+  actions: AuthGuardActions,
+): Promise<NavigationResult> {
+  const { auth, requiresCardCustomer, requiresSubscriber, requiresVerified } = to.meta;
+
+  if (auth) {
+    const result = await ensureAuthenticated(getState, actions, to);
+    if ('redirect' in result)
+      return result;
+  }
+
+  if (requiresVerified) {
+    const result = ensureVerified(getState);
+    if ('redirect' in result)
+      return result;
+  }
+
+  if (requiresSubscriber) {
+    const upgradeSubId = typeof to.query.upgradeSubId === 'string' ? to.query.upgradeSubId : undefined;
+    const result = await ensureCanBuy(getState, actions, upgradeSubId);
+    if ('redirect' in result)
+      return result;
+  }
+
+  if (requiresCardCustomer) {
+    const result = ensureCardCustomer(getState);
+    if ('redirect' in result)
+      return result;
+  }
+
+  return { allow: true };
+}
+
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { auth, guestOnly, requiresCardCustomer, requiresSubscriber, requiresVerified } = to.meta;
+  const { auth, guestOnly } = to.meta;
 
   if (!auth && !guestOnly)
     return;
@@ -48,28 +90,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return applyResult(result);
   }
 
-  if (auth) {
-    const result = await ensureAuthenticated(getState, actions, to);
-    if ('redirect' in result)
-      return applyResult(result);
-  }
-
-  if (requiresVerified) {
-    const result = ensureVerified(getState);
-    if ('redirect' in result)
-      return applyResult(result);
-  }
-
-  if (requiresSubscriber) {
-    const upgradeSubId = typeof to.query.upgradeSubId === 'string' ? to.query.upgradeSubId : undefined;
-    const result = await ensureCanBuy(getState, actions, upgradeSubId);
-    if ('redirect' in result)
-      return applyResult(result);
-  }
-
-  if (requiresCardCustomer) {
-    const result = ensureCardCustomer(getState);
-    if ('redirect' in result)
-      return applyResult(result);
-  }
+  return applyResult(await checkRouteRequirements(to, getState, actions));
 });

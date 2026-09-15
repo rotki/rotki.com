@@ -5,6 +5,7 @@ import type { useLogger } from '~/utils/use-logger';
 import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { FetchError } from 'ofetch';
 import { PaymentError } from '~/types/codes';
+import { nonEmpty } from '~/utils/non-empty';
 
 /**
  * Check if error is a 401 Unauthorized response
@@ -20,19 +21,19 @@ export function isUnauthorizedError(error: unknown): boolean {
 function extractBadRequestMessage(error: FetchError): string {
   const parsed = ActionResultResponseSchema.safeParse(error.data);
   if (parsed.success)
-    return parsed.data.message || 'Unknown error';
+    return nonEmpty(parsed.data.message) ?? 'Unknown error';
 
-  return error.data?.message || error.message || 'Unknown error';
+  return nonEmpty(error.data?.message) ?? nonEmpty(error.message) ?? 'Unknown error';
 }
 
 /**
  * Extract error message from various error types
  */
 export function getErrorMessage(error: any): string {
-  if (error instanceof FetchError && (error.status || -1) === 400 && error.response)
+  if (error instanceof FetchError && error.status === 400 && error.response)
     return extractBadRequestMessage(error);
 
-  return error.message || 'An unknown error occurred';
+  return nonEmpty(error.message) ?? 'An unknown error occurred';
 }
 
 /**

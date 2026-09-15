@@ -85,14 +85,14 @@ export function useMintFlow() {
 
     const result: Record<string, TierContent> = {};
     for (const item of tiers)
-      result[item.tier] = { benefits: item.benefits, example: item.example || [] };
+      result[item.tier] = { benefits: item.benefits, example: item.example ?? [] };
     return result;
   });
 
-  const nftImages = computed<Record<string, string>>(() => get(sponsorshipData)?.nftImages || {});
-  const tierSupply = computed<Record<string, TierSupply>>(() => get(sponsorshipData)?.tierSupply || {});
+  const nftImages = computed<Record<string, string>>(() => get(sponsorshipData)?.nftImages ?? {});
+  const tierSupply = computed<Record<string, TierSupply>>(() => get(sponsorshipData)?.tierSupply ?? {});
   const releaseId = computed<number | undefined>(() => get(sponsorshipData)?.releaseId);
-  const releaseName = computed<string>(() => get(sponsorshipData)?.releaseName || '');
+  const releaseName = computed<string>(() => get(sponsorshipData)?.releaseName ?? '');
   const error = computed<string | undefined>(() => get(sponsorshipData)?.error);
 
   const availableTokens = computed<PaymentToken[]>(() => filterAvailableTokens(get(paymentTokens)));
@@ -175,8 +175,7 @@ export function useMintFlow() {
       if (!result.ok)
         logger.error('Approval failed:', result.error);
 
-      // Always re-read the allowance: even a timed-out approval may have confirmed
-      // on-chain, so refresh rather than leaving the UI showing "approve needed".
+      // Always re-read: even a timed-out approval may have confirmed on-chain.
       set(tokenAllowance, await checkTokenAllowance(currency));
     }
     finally {
@@ -212,7 +211,7 @@ export function useMintFlow() {
     }
   }
 
-  // Notify the backend to monitor the mint transaction (best-effort).
+  /** Notify the backend to monitor the mint transaction (best-effort). */
   async function onMintingSuccess(txHash: string): Promise<void> {
     try {
       await fetchWithCsrf('/webapi/nfts/monitor-tx/', { body: { txHash }, method: 'POST' });
@@ -254,19 +253,23 @@ export function useMintFlow() {
     }
   });
 
-  onBeforeMount(async () => {
-    // Restore a persisted wallet session in the background so the page reflects
-    // the connected state on load (no web3 chunk for sessionless visitors); kept
-    // concurrent so it never delays the metadata/token fetch.
+  /**
+   * Loads the mint page data. A persisted wallet session is restored concurrently so
+   * the page reflects the connected state on load without delaying the metadata and
+   * token fetch (and without the web3 chunk for sessionless visitors). Currencies and
+   * the allowance only load once metadata resolved successfully.
+   */
+  async function loadMintPage(): Promise<void> {
     const restore = restoreIfPersisted();
     await fetchMetadata();
-    // Only load currencies and check allowance once metadata resolved successfully.
     if (!get(metadataError)) {
       await loadPaymentTokens();
       await checkAllowanceIfNeeded();
     }
     await restore;
-  });
+  }
+
+  onBeforeMount(loadMintPage);
 
   return {
     address,

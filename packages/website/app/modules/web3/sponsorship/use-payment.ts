@@ -235,8 +235,7 @@ export function useRotkiSponsorshipPayment() {
     const client = await getWeb3Client(ensureInitialized);
     const chainId = get(CHAIN_ID);
 
-    // Approve, then wait for confirmation so the allowance is effective when we
-    // return — surfacing the approval hash to the caller, not the receipt.
+    // Wait for confirmation so the allowance is effective on return; the caller gets the approval hash.
     return pipe(
       client.approveErc20({
         amount,

@@ -61,7 +61,7 @@ export function getDisplayRank(
   page: number,
   limit: number,
 ): number {
-  return entry.rank || (index + 1 + calculateOffset(page, limit));
+  return entry.rank === null || entry.rank === 0 ? index + 1 + calculateOffset(page, limit) : entry.rank;
 }
 
 /**

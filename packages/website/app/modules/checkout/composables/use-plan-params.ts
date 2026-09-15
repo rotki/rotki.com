@@ -1,15 +1,20 @@
 import { get } from '@vueuse/shared';
 import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
+import { nonEmpty } from '~/utils/non-empty';
 
 type CurrencyParam = string | null;
 
 type DiscountCodeParam = string | undefined;
 
+/**
+ * Reads the `planId` query param.
+ *
+ * NB: backend email links also use this param name. If it changes, sync with the
+ * backend team so they update the email links.
+ */
 export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
   const route = useRoute();
   const planId = computed<number | undefined>(() => {
-    // NB: this param name is also used in backend email links,
-    // if changed, kindly sync with backend team to update email links as well.
     const { planId } = route.query;
     if (!planId)
       return undefined;
@@ -20,11 +25,15 @@ export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
   return { planId };
 }
 
+/**
+ * Reads the `currency` query param.
+ *
+ * NB: backend email links also use this param name. If it changes, sync with the
+ * backend team so they update the email links.
+ */
 export function useCurrencyParams() {
   const route = useRoute();
   const currency = computed<CurrencyParam>(() => {
-    // NB: this param name is also used in backend email links,
-    // if changed, kindly sync with backend team to update email links as well.
     const { currency } = route.query;
     if (typeof currency !== 'string')
       return null;
@@ -35,11 +44,15 @@ export function useCurrencyParams() {
   return { currency };
 }
 
+/**
+ * Reads the `discountCode` query param.
+ *
+ * NB: backend email links also use this param name. If it changes, sync with the
+ * backend team so they update the email links.
+ */
 export function useDiscountCodeParams() {
   const route = useRoute();
   const discountCode = computed<DiscountCodeParam>(() => {
-    // NB: this param name is also used in backend email links,
-    // if changed, kindly sync with backend team to update email links as well.
     const { discountCode } = route.query;
     if (typeof discountCode !== 'string' || !discountCode)
       return undefined;
@@ -60,19 +73,22 @@ export function useReferralCodeParam() {
     if (typeof ref === 'string' && ref)
       return ref;
 
-    // Fall back to the persisted cookie when the query param was stripped by
-    // navigation (top nav, logo, footer, valid-plan-id redirect).
-    return get(storedReferralCode) || undefined;
+    // Fall back to the persisted cookie when navigation stripped the query param.
+    return nonEmpty(get(storedReferralCode));
   });
 
   return { referralCode };
 }
 
+/**
+ * Reads the `id` (subscription) and `upgradeSubId` query params.
+ *
+ * NB: backend email links also use the `id` param name. If it changes, sync with
+ * the backend team so they update the email links.
+ */
 export function useSubscriptionIdParam() {
   const route = useRoute();
   const subscriptionId = computed<string | undefined>(() => {
-    // NB: this param name is also used in backend email links,
-    // if changed, kindly sync with backend team to update email links as well.
     const query = get(route).query;
     return typeof query.id === 'string' ? query.id : undefined;
   });

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
-// `linkHome` renders the call to action as a real anchor instead of a
-// click-handler button, so it still works on the statically served 404 body
-// where no JavaScript runs (see app/pages/not-found.vue).
+/*
+ * `linkHome` renders the call to action as a real anchor instead of a
+ * click-handler button, so it still works on the statically served 404 body
+ * where no JavaScript runs (see app/pages/not-found.vue).
+ */
 const { linkHome = false } = defineProps<{ statusCode: number; linkHome?: boolean }>();
 
 const emit = defineEmits<{ 'handle-error': [] }>();

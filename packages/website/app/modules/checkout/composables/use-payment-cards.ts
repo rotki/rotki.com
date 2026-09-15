@@ -11,6 +11,7 @@ import {
 } from '@rotki/card-payment-common/schemas/payment';
 import { get } from '@vueuse/shared';
 import { useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 interface UsePaymentCardsReturn {
@@ -41,13 +42,12 @@ export function usePaymentCards(): UsePaymentCardsReturn {
     if (statusCode === 429)
       return new Error(rateLimitMessage(data?.message ?? ''));
 
-    // 400s on this endpoint are either schema/JSON-decode errors (frontend bugs the user
-    // can't act on) or Braintree gateway errors (raw "Do Not Honor"-style dumps that read
-    // like a stack trace). Substitute a friendly message; raw cause is kept in the logs.
+    /* 400s here are schema errors the user can't act on or raw Braintree gateway dumps
+       ("Do Not Honor"), so show a friendly message; the raw cause stays in the logs. */
     if (statusCode === 400)
       return new Error(t('home.account.payment_methods.errors.card_declined'));
 
-    return new Error(data?.message || message || t('common.error_occurred'));
+    return new Error(nonEmpty(data?.message) ?? nonEmpty(message) ?? t('common.error_occurred'));
   }
 
   const { data, pending, refresh } = useAsyncData<SavedCard[]>(

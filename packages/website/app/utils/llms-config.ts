@@ -5,12 +5,12 @@ import type { ModuleOptions } from 'nuxt-llms';
  * markdown endpoint (`/raw/<path>.md`) for AI/LLM crawlers.
  *
  * Scope is intentionally limited to the `integrations` collection: defining a
- * section with `contentCollection` disables @nuxt/content's auto-injection of
+ * section with `contentCollection` disables `@nuxt/content`'s auto-injection of
  * all other page collections (documents, jobs, testimonials), so only the
  * integration pages are exposed. `excludeCollections` keeps the `/raw` endpoint
  * limited to integrations as well.
  *
- * @nuxt/content extends sections with `contentCollection`/`contentFilters` and
+ * `@nuxt/content` extends sections with `contentCollection`/`contentFilters` and
  * adds `contentRawMarkdown`, but the base nuxt-llms types don't declare them
  * (nuxt/content#3497), so we describe the shape we use here.
  */

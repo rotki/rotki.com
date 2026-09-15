@@ -26,12 +26,10 @@ const ENS_TIMEOUT_MS = 10_000;
 let client: PublicClient | undefined;
 
 function ensClient(): PublicClient {
-  if (!client) {
-    client = createPublicClient({
-      chain: mainnet,
-      transport: fallback(ETHEREUM_RPCS.map(url => http(url, { timeout: ENS_TIMEOUT_MS }))),
-    });
-  }
+  client ??= createPublicClient({
+    chain: mainnet,
+    transport: fallback(ETHEREUM_RPCS.map(url => http(url, { timeout: ENS_TIMEOUT_MS }))),
+  });
   return client;
 }
 

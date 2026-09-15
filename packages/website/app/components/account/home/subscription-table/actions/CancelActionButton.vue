@@ -13,6 +13,21 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' });
 
 const showTooltip = computed<boolean>(() => !!disabled);
+
+const statusMessage = computed<string>(() => {
+  switch (cancellationStatus) {
+    case 'pending':
+      return t('account.subscriptions.cancellation.status.pending');
+    case 'in_progress':
+      return t('account.subscriptions.cancellation.status.in_progress');
+    case 'completed':
+      return t('account.subscriptions.cancellation.status.completed');
+    case 'failed':
+      return t('account.subscriptions.cancellation.status.failed');
+    default:
+      return '';
+  }
+});
 </script>
 
 <template>
@@ -38,7 +53,7 @@ const showTooltip = computed<boolean>(() => !!disabled);
       </RuiButton>
     </template>
     <span v-if="cancellationStatus">
-      {{ t(`account.subscriptions.cancellation.status.${cancellationStatus}`) }}
+      {{ statusMessage }}
     </span>
   </RuiTooltip>
 </template>

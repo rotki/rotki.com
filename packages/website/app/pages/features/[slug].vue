@@ -22,8 +22,10 @@ else {
   const slug = path.replace(/\/+$/, '').split('/').pop() ?? '';
   // Keep the SERP title short (<60 chars); titleTemplate appends " | rotki".
   const title = item.label;
-  // OG image is generated per-slug at build time by the feature-seo module
-  // (with a share.png fallback written to the same path), so this URL always resolves.
+  /*
+   * OG image is generated per-slug at build time by the feature-seo module
+   * (with a share.png fallback written to the same path), so this URL always resolves.
+   */
   usePageSeo(title, item.metaDescription, path, { keywords: item.keywords, ogImage: `features/${slug}.png` });
 
   const url = `${baseUrl}${path}`;
@@ -64,8 +66,10 @@ else {
   }
 
   useHead({
-    // Escape the angle bracket so a closing-script sequence inside the JSON-LD
-    // (e.g. from FAQ content) cannot break out of the server-rendered script tag.
+    /*
+     * Escape the angle bracket so a closing-script sequence inside the JSON-LD
+     * (e.g. from FAQ content) cannot break out of the server-rendered script tag.
+     */
     script: ldBlocks.map(block => ({
       type: 'application/ld+json',
       innerHTML: block.replaceAll('<', '\\u003c'),

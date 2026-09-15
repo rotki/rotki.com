@@ -24,11 +24,13 @@ function localizeData(data: IntegrationData): IntegrationData {
 export function useIntegrationsData() {
   const { public: { isDev } } = useRuntimeConfig();
 
+  /**
+   * Fold rotki's granular catalog entries into one card per consolidated page using the
+   * explicit whitelist (e.g. the four "Makerdao *" entries become a single "MakerDAO" card).
+   * Everything else keeps its own card, so unrelated entries that share a first word
+   * (Coinbase / Coinbase Pro, FTX / FTX US, Gnosis Pay / Gnosis Chain) are never merged.
+   */
   const filterDuplicateData = (data: IntegrationData): IntegrationData => {
-    // Fold rotki's granular catalog entries into one card per consolidated page using the
-    // explicit whitelist (e.g. the four "Makerdao *" entries -> a single "MakerDAO" card).
-    // Everything else keeps its own card, so unrelated entries that share a first word
-    // (Coinbase / Coinbase Pro, FTX / FTX US, Gnosis Pay / Gnosis Chain) are never merged.
     const byCanonical: Record<string, IntegrationItem> = {};
 
     data.protocols.forEach((protocol) => {

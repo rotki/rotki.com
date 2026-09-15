@@ -2,6 +2,7 @@ import { set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useSiweAuth } from '~/modules/web3/sponsorship/use-siwe-auth';
 import { type NftSubmission, NftSubmissions } from '~/types/sponsor';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 export function useNftSubmissions() {
@@ -42,7 +43,7 @@ export function useNftSubmissions() {
         set(error, error_.message);
       }
       else {
-        set(error, error_.data?.error || 'Failed to fetch submissions');
+        set(error, nonEmpty(error_.data?.error) ?? 'Failed to fetch submissions');
       }
     }
     finally {

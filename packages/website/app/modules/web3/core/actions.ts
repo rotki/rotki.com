@@ -42,8 +42,11 @@ function isReceiptTimeout(cause: unknown): boolean {
  * is only ever reached through the dynamic-import boundary in `use-wallet`, so
  * it code-splits into the async web3 chunk and never enters the initial bundle.
  */
-// Addresses arrive as plain strings from the API/store and are normalized with
-// viem's `getAddress` here (which also validates), so callers stay cast-free.
+/**
+ * Addresses in these params arrive as plain strings from the API/store and are
+ * normalized with viem's `getAddress` here (which also validates), so callers stay
+ * cast-free.
+ */
 export interface NativeTransferParams {
   to: string;
   amount: string;
@@ -78,10 +81,12 @@ export interface ApproveParams {
   chainId: number;
 }
 
+/**
+ * Connects `connector`. `reconnect()` may have already restored it (e.g. while the
+ * picker was open), and re-connecting throws ConnectorAlreadyConnectedError, so an
+ * already-connected match counts as success and returns the live account.
+ */
 export async function connectWallet(config: Config, connector: Connector, chainId?: number): Promise<Result<{ accounts: readonly Address[]; chainId: number }, Web3Error>> {
-  // `reconnect()` may have already restored this connector (e.g. while the picker
-  // was open); re-connecting it throws ConnectorAlreadyConnectedError, so treat
-  // an already-connected match as success and return the live account.
   const account = getAccount(config);
   if (account.status === 'connected' && account.connector?.uid === connector.uid)
     return ok({ accounts: account.addresses, chainId: account.chainId });
@@ -231,15 +236,13 @@ export async function estimateFee(config: Config, params: FeeEstimateParams): Pr
           gas = await estimateGas(config, { account, chainId: params.chainId, to, ...call });
         }
         catch {
-          // estimateGas reverts when the wallet can't cover the call — exactly the
-          // low-funds case we want to warn about, so assume a typical limit instead.
+          // Reverts when the wallet can't cover the call, the low-funds case we warn about.
           gas = params.fallbackGas;
         }
 
         let fee = gas * gasPrice; // L2 execution fee
-        // OP-stack rollups add an L1 data fee that is frequently the dominant cost;
-        // omitting it badly underestimates the real fee. Best-effort: keep the
-        // L2-only figure if the oracle call fails rather than blanking the estimate.
+        /* OP-stack rollups add an L1 data fee that is often the dominant cost. Best-effort:
+           keep the L2-only figure if the oracle call fails rather than blanking the estimate. */
         if (isOpStackChain(params.chainId)) {
           try {
             const { publicActionsL2 } = await import('viem/op-stack');
@@ -313,9 +316,11 @@ export async function approveErc20(config: Config, params: ApproveParams): Promi
   );
 }
 
+/**
+ * Waits for the receipt of `hash`. viem follows replacement (sped-up/cancelled)
+ * transactions automatically and rejects with a timeout error once `timeoutMs` elapses.
+ */
 export async function waitForReceipt(config: Config, hash: Hash, chainId: number, timeoutMs: number = RECEIPT_TIMEOUT_MS): Promise<Result<Awaited<ReturnType<typeof waitForTransactionReceipt>>, Web3Error>> {
-  // viem follows replacement (sped-up/cancelled) txs automatically and rejects
-  // with a timeout error once `timeout` elapses.
   return fromPromise(
     waitForTransactionReceipt(config, { chainId, hash, timeout: timeoutMs }),
     cause => isReceiptTimeout(cause) ? timeoutError() : fromCause(cause, 'TxFailed'),

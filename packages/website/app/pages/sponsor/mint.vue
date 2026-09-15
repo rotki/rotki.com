@@ -189,18 +189,13 @@ const {
 
           <!-- Mint/Approval Button -->
           <MintButton
-            :connected="connected"
-            :address="address"
-            :needs-approval="needsApproval"
-            :is-approving="isApproving"
-            :is-button-disabled="isButtonDisabled"
-            :button-text="buttonText"
-            :button-action="buttonAction"
+            :wallet="{ connected, address, open }"
+            :approval="{ needsApproval, isApproving }"
+            :action="{ disabled: isButtonDisabled, text: buttonText, run: buttonAction }"
             :selected-currency="modelCurrency"
             :selected-tier="modelSelectedTier"
             :sponsorship-status="sponsorshipState.status"
             :get-price-for-tier="getPriceForTier"
-            :open="open"
             @approve="handleApprove($event)"
           />
 

@@ -30,15 +30,17 @@ export interface ChainMeta {
   readonly opStack?: boolean;
 }
 
-// Curated public RPCs per chain, used by viem's `fallback` transport. Every host
-// here MUST also be listed in the backend CSP `connect-src`
-// (backend/internal/csp/policies.go) or the browser blocks the read and balances
-// silently come back empty. Keep the two in sync.
-//
-// `ETHEREUM_RPCS` is exported because reverse-ENS resolution (`core/ens.ts`) runs
-// on mainnet via a standalone viem client and reuses these same already-allowed
-// hosts — ENS is mainnet-only, so it can't rely on the wagmi config, which omits
-// mainnet in testnet mode.
+/**
+ * Curated public RPCs per chain (this and the lists below), used by viem's
+ * `fallback` transport. Every host MUST also be listed in the backend CSP
+ * `connect-src` (backend/internal/csp/policies.go) or the browser blocks the read
+ * and balances silently come back empty. Keep the two in sync.
+ *
+ * `ETHEREUM_RPCS` is exported because reverse-ENS resolution (`core/ens.ts`) runs
+ * on mainnet via a standalone viem client and reuses these already-allowed hosts.
+ * ENS is mainnet-only, so it can't rely on the wagmi config, which omits mainnet in
+ * testnet mode.
+ */
 export const ETHEREUM_RPCS = [
   'https://ethereum-rpc.publicnode.com',
   'https://rpc.mevblocker.io',
@@ -136,10 +138,11 @@ export function isOpStackChain(chainId: number | undefined): boolean {
  * Lazily resolve the viem {@link Chain} objects for the given environment.
  * Pulls `viem/chains` only when called (config build time), keeping viem out of
  * the initial bundle.
+ *
+ * Imports the curated map in `chains-viem.ts` (static `viem/chains` named imports)
+ * rather than the full barrel, so only the chains we use are bundled.
  */
 export async function loadViemChains(testing: boolean): Promise<[Chain, ...Chain[]]> {
-  // Import the curated map (static `viem/chains` named imports) rather than the
-  // full barrel, so only the chains we use are bundled. See `chains-viem.ts`.
   const { VIEM_CHAINS } = await import('./chains-viem');
   const resolved = chainsFor(testing)
     .map((meta): Chain | undefined => VIEM_CHAINS[meta.viemKey])

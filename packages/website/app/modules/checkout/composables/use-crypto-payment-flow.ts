@@ -5,6 +5,7 @@ import { useAccountRefresh } from '~/composables/use-app-events';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
 import { PaymentError } from '~/types/codes';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 export interface CryptoPaymentParams {
@@ -63,7 +64,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
       const apiParams = {
         planId,
         cryptocurrencyIdentifier: currency,
-        discountCode: discountCode || undefined,
+        discountCode: nonEmpty(discountCode),
       };
 
       const result = upgradeSubId
@@ -115,7 +116,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
       const apiParams = {
         planId,
         cryptocurrencyIdentifier: currency,
-        discountCode: discountCode || undefined,
+        discountCode: nonEmpty(discountCode),
       };
 
       const result = upgradeSubId

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import { isCancelledButActive } from '@rotki/card-payment-common';
+import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
 
 const { subscription, formattedDate, relativeTime } = defineProps<{
   subscription: UserSubscription;

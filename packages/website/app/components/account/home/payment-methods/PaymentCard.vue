@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 
+/** Passed when the card is rendered as an option in a card picker. */
+export interface PaymentCardSelection {
+  selected?: boolean;
+}
+
+export interface PaymentCardDeletion {
+  deleting?: boolean;
+  disabled?: boolean;
+  tooltip?: string;
+}
+
 defineProps<{
   card: SavedCard;
   loading?: boolean;
   disabled?: boolean;
-  deleting?: boolean;
-  selectable?: boolean;
-  selected?: boolean;
+  selection?: PaymentCardSelection;
   hideActions?: boolean;
-  deleteDisabled?: boolean;
-  deleteTooltip?: string;
+  deletion?: PaymentCardDeletion;
   isLinked?: boolean;
   showLinkButton?: boolean;
 }>();
@@ -28,24 +36,26 @@ const { t } = useI18n();
 <template>
   <RuiCard
     :class="{
-      'cursor-pointer transition-all hover:border-rui-primary': selectable,
-      'border-rui-primary bg-rui-primary/5': selectable && selected,
-      'border-rui-grey-300': selectable && !selected,
-      '!border-2 !border-rui-primary': isLinked && !selectable,
+      'cursor-pointer transition-all hover:border-rui-primary': !!selection,
+      'border-rui-primary bg-rui-primary/5': !!selection?.selected,
+      'border-rui-grey-300': !!selection && !selection.selected,
+      '!border-2 !border-rui-primary': isLinked && !selection,
     }"
-    @click="selectable ? emit('select', card) : undefined"
+    @click="selection ? emit('select', card) : undefined"
   >
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
         <!-- Radio button for selection mode -->
+        <!-- eslint-disable vue/prefer-true-attribute-shorthand -- RuiRadio's value prop is untyped, so the shorthand would pass '' instead of true -->
         <RuiRadio
-          v-if="selectable"
+          v-if="selection"
           color="primary"
           :value="true"
-          :model-value="selected"
+          :model-value="selection.selected"
           hide-details
           @input="emit('select', card)"
         />
+        <!-- eslint-enable vue/prefer-true-attribute-shorthand -->
 
         <!-- Card Image -->
         <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center">
@@ -109,7 +119,7 @@ const { t } = useI18n();
         </div>
 
         <RuiTooltip
-          :disabled="!deleteDisabled"
+          :disabled="!deletion?.disabled"
           tooltip-class="max-w-40"
         >
           <template #activator>
@@ -117,8 +127,8 @@ const { t } = useI18n();
               icon
               color="error"
               variant="text"
-              :loading="deleting"
-              :disabled="disabled || deleteDisabled"
+              :loading="deletion?.deleting"
+              :disabled="disabled || deletion?.disabled"
               @click="emit('delete')"
             >
               <RuiIcon
@@ -127,13 +137,13 @@ const { t } = useI18n();
               />
             </RuiButton>
           </template>
-          {{ deleteTooltip }}
+          {{ deletion?.tooltip }}
         </RuiTooltip>
       </div>
 
       <!-- Linked badge in selection mode -->
       <RuiChip
-        v-if="selectable && isLinked"
+        v-if="selection && isLinked"
         color="info"
         size="sm"
       >

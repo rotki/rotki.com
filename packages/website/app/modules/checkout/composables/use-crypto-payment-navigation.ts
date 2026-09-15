@@ -39,7 +39,7 @@ export function useCryptoPaymentNavigation() {
   const navigateBack = async (ref?: string): Promise<void> => {
     const id = get(usedSubscriptionId);
     const upgradeId = get(upgradeSubId);
-    const hasValidId = upgradeId || id;
+    const hasValidId = Boolean(upgradeId) || Boolean(id);
     const routeName = hasValidId ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
     const currentPlanId = get(planId);
     const currentDiscountCode = get(discountCode);

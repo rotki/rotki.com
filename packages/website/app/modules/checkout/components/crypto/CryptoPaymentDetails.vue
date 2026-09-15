@@ -4,7 +4,7 @@ import { get } from '@vueuse/shared';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/modules/checkout/components/crypto/CryptoChainIcon.vue';
-import { truncateAddress } from '~/modules/web3/core/format';
+import { segmentAfterFirst, truncateAddress } from '~/modules/web3/core/format';
 import { toTitleCase } from '~/utils/text';
 
 const { data, loading } = defineProps<{
@@ -14,7 +14,7 @@ const { data, loading } = defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const currencyName = computed<string>(() => data.cryptocurrency.split(':')[1] ?? '');
+const currencyName = computed<string>(() => segmentAfterFirst(data.cryptocurrency, ':') ?? '');
 
 const paymentAmount = computed<string>(() => `${data.finalPriceInCrypto} ${get(currencyName)}`);
 </script>

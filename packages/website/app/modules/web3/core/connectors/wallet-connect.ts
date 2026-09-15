@@ -1,5 +1,6 @@
 import { createConnector } from '@wagmi/core';
 import { type Address, getAddress } from 'viem';
+import { segmentAfterFirst } from '../format';
 
 /**
  * Custom WalletConnect connector built on `@walletconnect/universal-provider`.
@@ -34,9 +35,8 @@ export interface WalletConnectParameters {
  */
 interface WcProvider {
   session?: { namespaces?: Record<string, { accounts?: string[] }> };
-  // `connect` opts are typed `any`: a real `UniversalProvider.connect` takes the
-  // richer `ConnectParams`, and with property-signature style (enforced by lint)
-  // this keeps a UniversalProvider assignable to WcProvider without a cast.
+  /* `opts` is `any` because `UniversalProvider.connect` takes the richer `ConnectParams`;
+     with the lint-enforced property-signature style this keeps it assignable without a cast. */
   connect: (opts: any) => Promise<unknown>;
   disconnect: () => Promise<void>;
   on: (event: string, listener: (...args: any[]) => void) => void;
@@ -69,15 +69,12 @@ export function walletConnect(parameters: WalletConnectParameters) {
     async function getProvider(): Promise<WcProvider> {
       if (provider)
         return provider;
-      if (!providerPromise) {
-        providerPromise = import('@walletconnect/universal-provider').then(async mod =>
-          mod.UniversalProvider.init({ metadata: parameters.metadata, projectId: parameters.projectId }),
-        );
-      }
+      providerPromise ??= import('@walletconnect/universal-provider').then(async mod =>
+        mod.UniversalProvider.init({ metadata: parameters.metadata, projectId: parameters.projectId }),
+      );
       const resolved = await providerPromise;
       if (!listenersBound) {
-        // Bind the session listeners exactly once per provider instance so
-        // repeated connect() calls (reconnects) can't stack duplicate handlers.
+        // Bound once per provider instance so reconnects can't stack duplicate handlers.
         resolved.on('accountsChanged', onAccountsChanged);
         resolved.on('chainChanged', onChainChanged);
         resolved.on('disconnect', onDisconnect);
@@ -98,7 +95,7 @@ export function walletConnect(parameters: WalletConnectParameters) {
 
     function chainIdOf(active: WcProvider): number {
       const [account] = active.session?.namespaces?.eip155?.accounts ?? [];
-      const chain = account?.split(':')[1];
+      const chain = account === undefined ? undefined : segmentAfterFirst(account, ':');
       return chain ? Number(chain) : config.chains[0].id;
     }
 
@@ -128,18 +125,21 @@ export function walletConnect(parameters: WalletConnectParameters) {
 
       getProvider,
 
-      // Generic `WithCapabilities` signature mirrors wagmi's own connectors so
-      // the return type satisfies `CreateConnectorFn` without a cast.
+      /**
+       * The generic `WithCapabilities` signature mirrors wagmi's own connectors so the
+       * return type satisfies `CreateConnectorFn` without a cast.
+       *
+       * A silent reconnect (wagmi on page load) may only resume a session that
+       * `UniversalProvider.init()` already restored from storage. Without one it fails
+       * fast: falling through to `active.connect()` would start a fresh pairing with no
+       * QR shown, hang waiting for an approval that never comes, and leave a half-open
+       * pairing that hangs the user's next manual connect too. `eth_accounts` and
+       * `isAuthorized` resolve locally from the session, so a real restore needs no
+       * relay round-trip.
+       */
       async connect<WithCapabilities extends boolean = false>({ chainId, isReconnecting, withCapabilities }: { chainId?: number; isReconnecting?: boolean; withCapabilities?: WithCapabilities | boolean } = {}) {
         const active = await getProvider();
 
-        // A silent reconnect (wagmi on page load) must only RESUME a session that
-        // UniversalProvider.init() already restored from storage. If there is none,
-        // fail fast instead of falling through to active.connect() — that would
-        // start a fresh pairing with no QR shown, hang awaiting an approval that
-        // never comes, and leave a half-open pairing that makes the user's next
-        // manual connect hang too. (`eth_accounts`/`isAuthorized` are resolved
-        // locally from the session, so a real restore needs no relay round-trip.)
         if (isReconnecting && !active.session)
           throw new Error('No WalletConnect session to resume');
 
@@ -169,10 +169,7 @@ export function walletConnect(parameters: WalletConnectParameters) {
           const addresses = accountsOf(active);
 
           return {
-            // `as never` mirrors wagmi's own connectors (mock/injected): TS cannot
-            // narrow this value to `connect`'s conditional `withCapabilities` return
-            // type, so the upstream API mandates the assertion here.
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- like wagmi's mock/injected connectors: TS can't narrow to the conditional `withCapabilities` return type
             accounts: (withCapabilities
               ? addresses.map(address => ({ address, capabilities: {} }))
               : addresses) as never,
@@ -184,10 +181,11 @@ export function walletConnect(parameters: WalletConnectParameters) {
         }
       },
 
+      /**
+       * Session listeners bound in `getProvider()` stay attached on purpose, so a later
+       * reconnect on the same provider instance works without re-binding them.
+       */
       async disconnect() {
-        // Session listeners are bound once in getProvider() and intentionally
-        // left attached so a later reconnect on the same provider instance keeps
-        // working without re-binding (and without stacking duplicates).
         const active = await getProvider();
         await active.disconnect();
       },

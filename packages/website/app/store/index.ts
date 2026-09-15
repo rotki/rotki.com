@@ -1,8 +1,8 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import type { LoginCredentials } from '~/types/login';
-import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { PaymentMethod, PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
+import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
 import { isClient, useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { acceptHMRUpdate, defineStore } from 'pinia';
@@ -82,10 +82,12 @@ export const useMainStore = defineStore('main', () => {
     }
   };
 
+  /**
+   * Checks the already-loaded subscriptions first. They are refreshed immediately
+   * after a card purchase, so the flag flips without waiting on the payments-history
+   * endpoint (which may lag right after checkout).
+   */
   const fetchHasCardPayment = async (): Promise<void> => {
-    // Check already-loaded subscriptions first — refreshed immediately after a
-    // card purchase, so the flag flips without waiting on the payments-history
-    // endpoint (which may lag right after checkout).
     const subs = get(userSubscriptions);
     const cardSub = subs.some(s =>
       s.paymentMethod === PaymentMethod.CARD

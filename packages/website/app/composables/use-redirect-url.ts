@@ -15,7 +15,7 @@ export function useRedirectUrl() {
 
   const getLastRedirectUrl = (username: string): string | undefined => {
     const stored = get(storedRedirectUrl);
-    if (stored && stored.username === username)
+    if (stored?.username === username)
       return stored.url;
 
     return undefined;

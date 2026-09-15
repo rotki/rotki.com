@@ -14,7 +14,7 @@ const CSRF_COOKIE = 'csrftoken';
 
 const MUTATION_METHODS = ['post', 'delete', 'put', 'patch'];
 
-// CSRF is only refreshed for state-changing verbs.
+/** CSRF is only refreshed for state-changing verbs. */
 export function isMutationMethod(method: string | undefined): boolean {
   return MUTATION_METHODS.includes(method?.toLowerCase() ?? '');
 }
@@ -37,8 +37,7 @@ export function buildRequestHeaders(callerHeaders: HeadersInit | undefined, toke
   for (const [key, value] of new Headers(callerHeaders))
     headers.set(key, value);
 
-  // Set the CSRF token last so the freshly resolved token always wins, even
-  // when this hook re-runs over a retried request's existing headers.
+  // Set last so the fresh token wins even when the hook re-runs over a retry's headers.
   if (token)
     headers.set(CSRF_HEADER, token);
 
@@ -89,8 +88,10 @@ export const useFetchWithCsrf = createSharedComposable(() => {
     return get(csrfToken) ?? undefined;
   }
 
-  // On the server (and in tests) requests carry the user's cookies/referer
-  // explicitly, since there's no browser to attach them.
+  /**
+   * On the server (and in tests) requests carry the user's cookies/referer
+   * explicitly, since there's no browser to attach them.
+   */
   function applyServerHeaders(headers: Headers, event: ReturnType<typeof useEvent> | null, token: string | null | undefined): void {
     let cookieString = event?.headers.get('cookie') ?? undefined;
 
@@ -172,9 +173,9 @@ export const useFetchWithCsrf = createSharedComposable(() => {
     },
     retry: FETCH_CONFIG.RETRIES,
     retryDelay: FETCH_CONFIG.RETRY_DELAY_MS,
-    // ofetch's default retryStatusCodes includes 429, but retrying a rate-limited
-    // request just burns the user's budget and (because Django rotates the CSRF
-    // cookie between requests) often comes back as a confusing 403 HTML page.
+    /* ofetch's default retryStatusCodes includes 429, but retrying a rate-limited
+       request just burns the user's budget and (because Django rotates the CSRF
+       cookie between requests) often comes back as a confusing 403 HTML page. */
     retryStatusCodes: [408, 409, 425, 500, 502, 503, 504],
     timeout: FETCH_CONFIG.TIMEOUT_MS,
   });

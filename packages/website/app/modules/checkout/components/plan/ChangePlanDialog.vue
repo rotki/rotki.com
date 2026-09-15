@@ -73,13 +73,15 @@ watch(() => visible, (visible) => {
   }
 });
 
-onBeforeMount(() => {
-  // Initialize period from current plan
+/** Preselects the billing period of the user's current plan. */
+function initPeriodFromCurrentPlan(): void {
   const currentPlan = get(currentPlanDetails);
   if (currentPlan?.period) {
     set(selectedPlanPeriod, currentPlan.period);
   }
-});
+}
+
+onBeforeMount(initPeriodFromCurrentPlan);
 </script>
 
 <template>

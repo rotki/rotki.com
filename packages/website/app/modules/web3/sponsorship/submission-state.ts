@@ -17,7 +17,7 @@ export function buildNftIdOptions(nfts: readonly StoredNft[], currentReleaseId: 
     const editingId = editingSubmission.nftId;
     if (!list.some(nft => nft.id === editingId)) {
       // Surface the edited NFT even when it isn't in the wallet's stored list.
-      list.push({ address: address?.toLowerCase() || '', id: editingId, releaseId: currentReleaseId || 1, tier: -1 });
+      list.push({ address: address?.toLowerCase() ?? '', id: editingId, releaseId: currentReleaseId === undefined || currentReleaseId === 0 ? 1 : currentReleaseId, tier: -1 });
     }
   }
 
@@ -40,7 +40,7 @@ export interface SubmissionFormInput {
 /** Assemble the multipart payload for a holder submission, omitting empty optional fields. */
 export function buildSubmissionFormData(input: SubmissionFormInput): FormData {
   const formData = new FormData();
-  formData.append('evm_address', input.address || '');
+  formData.append('evm_address', input.address ?? '');
   formData.append('display_name', input.displayName.trim());
 
   if (input.tokenId)
@@ -71,7 +71,7 @@ export function buildSubmissionFormData(input: SubmissionFormInput): FormData {
  * typed into that window and lost their input, leaving submit stuck disabled.
  */
 export function shouldResetFormForToken(editingSubmission: NftSubmission | undefined, tokenId: string): boolean {
-  return !editingSubmission || editingSubmission.nftId.toString() !== tokenId;
+  return editingSubmission?.nftId.toString() !== tokenId;
 }
 
 /**
@@ -106,21 +106,26 @@ export interface NftMetadataEvaluation {
   owner: string;
 }
 
+/** The tier, release and owner details of fetched metadata, with empty strings for missing text. */
+function metadataDetails(metadata: SimpleTokenMetadata): Omit<NftMetadataEvaluation, 'status'> {
+  return {
+    owner: metadata.owner || '',
+    releaseId: metadata.releaseId,
+    releaseName: metadata.releaseName || '',
+    tier: metadata.tier,
+  };
+}
+
 /**
  * Classify fetched NFT metadata against the connected wallet and current release.
  * Pure decision core of the form's NFT check — the composable maps the returned
  * status onto localized error messages and follow-up actions.
  */
 export function evaluateNftMetadata(metadata: SimpleTokenMetadata | undefined, address: string | undefined, currentReleaseId: number | undefined): NftMetadataEvaluation {
-  if (!metadata || !metadata.tier)
+  if (!metadata?.tier)
     return { owner: '', releaseName: '', status: 'not_found' };
 
-  const base = {
-    owner: metadata.owner || '',
-    releaseId: metadata.releaseId,
-    releaseName: metadata.releaseName || '',
-    tier: metadata.tier,
-  };
+  const base = metadataDetails(metadata);
 
   if (currentReleaseId !== undefined && metadata.releaseId !== currentReleaseId)
     return { ...base, releaseName: metadata.releaseName || `Release ${metadata.releaseId}`, status: 'wrong_release' };

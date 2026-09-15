@@ -35,18 +35,19 @@ export interface CreateWeb3ConfigOptions {
 
 /**
  * Build the singleton `@wagmi/core` {@link Config}. Everything heavy
- * (@wagmi/core, @wagmi/connectors, viem chains, our WC connector) only loads
+ * (`@wagmi/core`, `@wagmi/connectors`, viem chains, our WC connector) only loads
  * behind the `use-wallet` lazy boundary, since this whole module is reached via
  * a dynamic `import('./config')`.
  *
  * Dependency-injected by design: `connectors`/`transports` overrides let unit
  * tests construct a fully working config around wagmi's `mock()` connector with
  * no network and no real wallet.
+ *
+ * `injected`/`coinbaseWallet` are static named imports, not part of the dynamic
+ * batch: that lets Rollup drop the unused `tempoWallet`, whose `import('accounts')`
+ * (an uninstalled optional peer) otherwise breaks the chunk.
  */
 export async function createWeb3Config(options: CreateWeb3ConfigOptions): Promise<Config> {
-  // injected/coinbaseWallet are static named imports (top of file), not part of
-  // this dynamic batch: that lets Rollup drop the unused `tempoWallet`, whose
-  // `import('accounts')` (an uninstalled optional peer) otherwise breaks the chunk.
   const [{ createConfig, fallback, http }, { walletConnect }, chains] = await Promise.all([
     import('@wagmi/core'),
     import('./connectors/wallet-connect'),
@@ -80,9 +81,7 @@ export async function createWeb3Config(options: CreateWeb3ConfigOptions): Promis
   return createConfig({
     chains,
     connectors,
-    // Native EIP-6963 discovery: installed wallets self-announce and become
-    // connectors automatically; the explicit injected() above covers legacy
-    // window.ethereum wallets that don't.
+    // EIP-6963 discovery for self-announcing wallets; injected() above covers legacy window.ethereum ones.
     multiInjectedProviderDiscovery: true,
     transports,
   });

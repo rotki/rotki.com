@@ -12,6 +12,7 @@ import { useNftSubmissions } from '~/modules/web3/sponsorship/use-nft-submission
 import { useRotkiSponsorshipPayment } from '~/modules/web3/sponsorship/use-payment';
 import { useSiweAuth } from '~/modules/web3/sponsorship/use-siwe-auth';
 import { useSponsorshipData } from '~/modules/web3/sponsorship/use-sponsorship';
+import { nonEmpty } from '~/utils/non-empty';
 import { getSingleRouteParam } from '~/utils/query';
 import { useLogger } from '~/utils/use-logger';
 
@@ -135,8 +136,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
 
   function handleImageSelected(file: File): void {
     set(imageFile, file);
-    // Replacing an existing image means we no longer want to delete it.
-    set(deleteImage, false);
+    set(deleteImage, false); // Replacing an existing image cancels its deletion.
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -149,9 +149,8 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
   function removeImage(): void {
     set(imageFile, undefined);
     set(imagePreview, '');
-    // Mark a previously-saved image for deletion.
     if (get(hasExistingImage))
-      set(deleteImage, true);
+      set(deleteImage, true); // Mark the previously-saved image for deletion.
   }
 
   function clearFormForNewSubmission(): void {
@@ -165,8 +164,8 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
   }
 
   function prefillFromSubmission(submission: NftSubmission): void {
-    set(modelDisplayName, submission.displayName || '');
-    set(modelEmail, submission.email || '');
+    set(modelDisplayName, submission.displayName ?? '');
+    set(modelEmail, submission.email ?? '');
 
     if (submission.imageUrl) {
       set(imagePreview, submission.imageUrl);
@@ -193,8 +192,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
 
       if (submission) {
         prefillFromSubmission(submission);
-        // Switch the page into editing mode for this submission.
-        emit('edit-submission', submission);
+        emit('edit-submission', submission); // Switch the page into editing mode for this submission.
       }
       // No else-clear: the form is reset synchronously on token change (modelTokenId watcher).
     }
@@ -208,7 +206,29 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     }
   }
 
-  // `checkExisting` runs the existing-submission prefill (authenticated only); submit passes false.
+  /** Applies an NFT check status to the form; an owned NFT also loads its existing submission when asked. */
+  async function applyNftCheckStatus(status: NftMetadataStatus, tokenId: string, checkExisting: boolean): Promise<void> {
+    switch (status) {
+      case 'not_found':
+        set(nftCheckError, t('sponsor.submit_name.error.nft_not_found'));
+        break;
+      case 'wrong_release':
+        set(nftCheckError, 'wrong_release'); // Sentinel handled specially by the template's i18n block.
+        break;
+      case 'not_owner':
+        set(nftCheckError, t('sponsor.submit_name.error.not_owner'));
+        break;
+      case 'ok':
+        set(isNftOwnerValid, true);
+        if (checkExisting && get(isAuthenticated))
+          await checkExistingSubmission(Number(tokenId));
+        break;
+      case 'unverified':
+        break;
+    }
+  }
+
+  /** Checks the selected NFT. `checkExisting` runs the existing-submission prefill (authenticated only); submit passes false. */
   async function checkNftMetadata({ checkExisting = true }: { checkExisting?: boolean } = {}): Promise<NftMetadataStatus | undefined> {
     const tokenIdValue = get(modelTokenId);
     if (!tokenIdValue || !Number.isInteger(Number(tokenIdValue))) {
@@ -234,30 +254,12 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
       set(nftReleaseName, evaluation.releaseName);
       set(nftOwner, evaluation.owner);
 
-      switch (evaluation.status) {
-        case 'not_found':
-          set(nftCheckError, t('sponsor.submit_name.error.nft_not_found'));
-          break;
-        case 'wrong_release':
-          // Sentinel handled specially by the template's i18n block.
-          set(nftCheckError, 'wrong_release');
-          break;
-        case 'not_owner':
-          set(nftCheckError, t('sponsor.submit_name.error.not_owner'));
-          break;
-        case 'ok':
-          set(isNftOwnerValid, true);
-          if (checkExisting && get(isAuthenticated))
-            await checkExistingSubmission(Number(tokenIdValue));
-          break;
-        case 'unverified':
-          break;
-      }
+      await applyNftCheckStatus(evaluation.status, tokenIdValue, checkExisting);
 
       return evaluation.status;
     }
     catch (error_: any) {
-      set(nftCheckError, error_.data?.message || t('sponsor.submit_name.error.check_failed'));
+      set(nftCheckError, nonEmpty(error_.data?.message) ?? t('sponsor.submit_name.error.check_failed'));
       return undefined;
     }
     finally {
@@ -266,11 +268,10 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     }
   }
 
-  // Submit behind a valid SIWE session; authenticatedRequest re-signs + retries once if
-  // the backend cookie expired. Inner const isolates fetchWithCsrf's route-typed inference.
+  /** Submit behind a valid SIWE session; authenticatedRequest re-signs + retries once if the backend cookie expired. */
   async function submitHolderSubmission(payload: FormData): Promise<void> {
-    const postSubmission = async () => fetchWithCsrf('/webapi/nfts/holder-submission/', { body: payload, method: 'POST' });
-    await authenticatedRequest(toValue(address) || '', postSubmission);
+    const postSubmission = async () => fetchWithCsrf('/webapi/nfts/holder-submission/', { body: payload, method: 'POST' }); // Inner const isolates fetchWithCsrf's route-typed inference.
+    await authenticatedRequest(toValue(address) ?? '', postSubmission);
   }
 
   async function handleSubmit(): Promise<void> {
@@ -351,13 +352,11 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     if (submission && get(modelTokenId) !== submission.nftId.toString()) {
       set(modelTokenId, submission.nftId.toString());
       prefillFromSubmission(submission);
-      // Editing is never re-gated on the live owner/release check (the submit flow skips
-      // ownership when editing). Setting modelTokenId refreshes tier/release via the watcher.
+      // Editing is never re-gated on the owner check; the modelTokenId watcher refreshes tier/release.
     }
   }, { immediate: true });
 
-  // checkNftMetadata defers the existing-submission lookup until authenticated; re-run it on
-  // sign-in so a prior submission loads to edit (e.g. a ?tokenId deep-link resolved pre-auth).
+  // Re-run the deferred existing-submission lookup on sign-in (e.g. a ?tokenId deep link resolved before auth).
   watch(isAuthenticated, async (authed) => {
     const tokenId = get(modelTokenId);
     if (authed && tokenId && Number.isInteger(Number(tokenId)) && !get(existingSubmission) && !toValue(editingSubmission))

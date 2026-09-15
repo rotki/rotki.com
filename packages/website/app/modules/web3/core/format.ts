@@ -1,4 +1,22 @@
 /**
+ * The text between the first and second `separator` in `value` (up to the end when
+ * there is no second one), or `undefined` when `separator` does not occur. Same
+ * result as `value.split(separator)[1]` for a non-empty separator, without
+ * allocating the array.
+ * @example segmentAfterFirst('ethereum sepolia:ETH', ':') // 'ETH'
+ * @example segmentAfterFirst('eip155:1:0xabc', ':') // '1'
+ */
+export function segmentAfterFirst(value: string, separator: string): string | undefined {
+  const start = value.indexOf(separator);
+  if (start === -1)
+    return undefined;
+
+  const from = start + separator.length;
+  const end = value.indexOf(separator, from);
+  return end === -1 ? value.slice(from) : value.slice(from, end);
+}
+
+/**
  * Trims a human-readable token balance to at most `maxDecimals` fractional digits
  * for display, dropping trailing zeros. Operates on the decimal string directly
  * (no `Number` round-trip) so large/precise balances keep their integer part
@@ -72,8 +90,8 @@ export function alignAmounts(values: string[], maxDecimals = 6): string[] {
 /**
  * Truncates blockchain hashes (addresses / txs) retaining `truncLength+2` characters
  * from the beginning and `truncLength` characters from the end of the string.
- * @param address
- * @param [truncLength]
+ * @param address - the address or transaction hash to shorten
+ * @param truncLength - characters kept at each end, not counting a `0x` prefix
  * @returns truncated address
  */
 export function truncateAddress(address: string, truncLength = 4): string {

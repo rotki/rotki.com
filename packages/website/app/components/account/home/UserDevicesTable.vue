@@ -96,7 +96,7 @@ function showRenameDialog(device: UserDevice): void {
       :loading="loading"
       :empty="{ description: t('account.devices.no_devices_found') }"
       :rows="userDevices"
-      :outlined="true"
+      outlined
       row-attr="id"
     >
       <template #item.platform="{ row }">

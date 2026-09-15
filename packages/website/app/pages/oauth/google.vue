@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { OAuthTokenResponse } from '~/types/oauth';
 import { get, set } from '@vueuse/shared';
-import OAuthPage from '~/components/oauth/OAuthPage.vue';
+import OAuthPage, { type OAuthPageLabels, type OAuthPageTokens } from '~/components/oauth/OAuthPage.vue';
 import { useOAuth } from '~/composables/account/use-oauth';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useLogger } from '~/utils/use-logger';
@@ -33,6 +33,17 @@ const {
 
 const route = useRoute();
 const logger = useLogger();
+
+const labels = computed<OAuthPageLabels>(() => ({
+  title: t('oauth.title'),
+  description: t('oauth.description'),
+  buttonText: t('oauth.button'),
+}));
+
+const tokens = computed<OAuthPageTokens>(() => ({
+  accessToken: get(accessToken),
+  refreshToken: get(refreshToken),
+}));
 
 if (!googleClientId) {
   set(error, t('oauth.errors.client_id_not_configured'));
@@ -93,7 +104,7 @@ function handleGoogleAuth() {
   }
 }
 
-// Exchange code for access token
+/** Exchanges the OAuth authorization code for an access token through the backend. */
 async function exchangeCodeForToken(code: string, redirectUri: string): Promise<OAuthTokenResponse> {
   return await $fetch<OAuthTokenResponse>('/api/oauth/google/token', {
     method: 'POST',
@@ -105,7 +116,7 @@ async function exchangeCodeForToken(code: string, redirectUri: string): Promise<
   });
 }
 
-// Main function to handle OAuth callback
+/** Handles the OAuth callback: restores the mode from `state`, exchanges the code and completes the flow. */
 async function handleOAuthCallback() {
   const params = extractAndValidateParams();
   if (!params) {
@@ -155,9 +166,11 @@ async function handleOAuthCallback() {
   }
 }
 
-// Watch for route query params — Nuxt SSG hydration temporarily strips
-// query params via router.replace before restoring them, so onMounted
-// fires too early. Watch code and error to handle both success and denial.
+/*
+ * Watch for route query params. Nuxt SSG hydration temporarily strips
+ * query params via router.replace before restoring them, so onMounted
+ * fires too early. Watch code and error to handle both success and denial.
+ */
 watch(() => route.query.code ?? route.query.error, (value) => {
   if (value)
     handleOAuthCallback();
@@ -166,14 +179,11 @@ watch(() => route.query.code ?? route.query.error, (value) => {
 
 <template>
   <OAuthPage
-    :title="t('oauth.title')"
-    :description="t('oauth.description')"
-    :button-text="t('oauth.button')"
+    :labels="labels"
     :loading="loading"
     :error="error"
     :completed="completed"
-    :access-token="accessToken"
-    :refresh-token="refreshToken"
+    :tokens="tokens"
     :mode="mode"
     :current-mode="currentMode"
     @auth-click="handleGoogleAuth()"

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationRaw } from 'vue-router';
-import { isSubRequestingUpgrade } from '@rotki/card-payment-common';
 import { PaymentProvider, type Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import { isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
 import { get, set } from '@vueuse/shared';
 import BlockExplorerActionButton from '~/components/account/home/subscription-table/actions/BlockExplorerActionButton.vue';
 import CancelActionButton from '~/components/account/home/subscription-table/actions/CancelActionButton.vue';

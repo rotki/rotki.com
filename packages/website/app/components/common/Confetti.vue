@@ -12,9 +12,8 @@ interface ConfettiParticle {
   y: number;
 }
 
-// Composable: Use this to manage confetti animation
+/** Manages the confetti canvas, its particles and the animation loop. */
 function useConfetti() {
-  // Refs
   const confettiCanvas = useTemplateRef<HTMLCanvasElement>('confettiCanvas');
   const ctx = ref<CanvasRenderingContext2D>();
   const confettiParticles = ref<ConfettiParticle[]>([]);
@@ -23,7 +22,7 @@ function useConfetti() {
   const PARTICLE_COUNT = 150;
   const COLORS = ['#FFC107', '#4CAF50', '#2196F3', '#FF5722', '#9C27B0'];
 
-  // Initialize Canvas
+  /** Grabs the 2D context and sizes the canvas to the window. */
   function initializeCanvas(): void {
     const canvas = get(confettiCanvas);
     if (!canvas) {
@@ -36,7 +35,7 @@ function useConfetti() {
     }
   }
 
-  // Create particles
+  /** Replaces the particle list with a fresh set placed above the canvas. */
   function createParticles(): void {
     const canvas = get(confettiCanvas);
     if (!canvas) {
@@ -59,7 +58,7 @@ function useConfetti() {
     }
   }
 
-  // Render animation
+  /** Draws one animation frame and schedules the next while particles remain. */
   function renderParticles(): void {
     const ctxInstance = get(ctx);
     const canvas = get(confettiCanvas);
@@ -108,18 +107,15 @@ function useConfetti() {
     }
   }
 
-  // Start Confetti Animation
   function startConfetti(): void {
     createParticles();
     renderParticles();
   }
 
-  // Canvas resizing
   function resizeCanvas(): void {
     initializeCanvas();
   }
 
-  // Cleanup
   function stopConfetti(): void {
     cancelAnimationFrame(animationFrameId);
   }

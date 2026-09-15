@@ -81,7 +81,10 @@ function useSiweAuthInternal() {
 
   function isSessionValid(address: string): boolean {
     const session = get(sessionStorage);
-    if (!session || !address || session.address.toLowerCase() !== address.toLowerCase())
+    if (!session || !address)
+      return false;
+
+    if (session.address.toLowerCase() !== address.toLowerCase())
       return false;
 
     // Valid only if it expires more than a minute from now (clock-skew buffer).
@@ -100,9 +103,11 @@ function useSiweAuthInternal() {
     );
   }
 
-  /** Build an EIP-4361 (Sign-In With Ethereum) message bound to this origin + nonce. */
+  /**
+   * Build an EIP-4361 (Sign-In With Ethereum) message bound to this origin + nonce.
+   * Only ever called client-side, behind a user-triggered wallet signature.
+   */
   function buildSiweMessage(address: string, nonce: string): string {
-    // Only ever called client-side (behind a user-triggered wallet signature).
     const host = typeof window !== 'undefined' ? window.location.host : '';
     const uri = typeof window !== 'undefined' ? window.location.origin : '';
     return createSiweMessage({

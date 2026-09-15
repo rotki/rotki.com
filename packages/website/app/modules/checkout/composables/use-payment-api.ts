@@ -1,4 +1,4 @@
-import type { ActionResultResponse } from '@rotki/card-payment-common';
+import type { ActionResultResponse } from '@rotki/card-payment-common/schemas/api';
 import type { Result } from '~/types';
 import type { PaymentError } from '~/types/codes';
 import {
@@ -9,6 +9,7 @@ import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rot
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { handlePaymentError } from '~/utils/api-error-handling';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 /**
@@ -44,7 +45,7 @@ export function usePaymentApi() {
       }
       return {
         isError: true,
-        error: new Error(response.message || 'Failed to upgrade payment'),
+        error: new Error(nonEmpty(response.message) ?? 'Failed to upgrade payment'),
       };
     }
     catch (error: any) {
@@ -52,7 +53,7 @@ export function usePaymentApi() {
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.CARD_PAYMENT_API_ERROR,
-        errorMessage: error.message || 'unknown',
+        errorMessage: nonEmpty(error.message) ?? 'unknown',
         errorCode: String(error.statusCode ?? ''),
         step: CheckoutSteps.SUBMIT,
       });
@@ -94,7 +95,7 @@ export function usePaymentApi() {
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CARD,
         event: PaymentServerEvents.CARD_PAYMENT_API_ERROR,
-        errorMessage: error.message || 'unknown',
+        errorMessage: nonEmpty(error.message) ?? 'unknown',
         errorCode: String(error.statusCode ?? ''),
         step: CheckoutSteps.SUBMIT,
       });

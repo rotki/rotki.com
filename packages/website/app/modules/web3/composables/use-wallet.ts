@@ -35,9 +35,11 @@ const connectedChainId = shallowRef<number>();
 const status = shallowRef<ConnectionStatus>('disconnected');
 const availableConnectors = shallowRef<readonly Connector[]>([]);
 const connectorUid = shallowRef<string>();
-// True while the persisted session is being restored + liveness-verified on load.
-// Gates `connected` so the picker never surfaces wagmi's optimistic, not-yet-
-// verified "connected" state (e.g. a wallet that is actually locked).
+/**
+ * True while the persisted session is being restored + liveness-verified on load.
+ * Gates `connected` so the picker never surfaces wagmi's optimistic, not-yet-
+ * verified "connected" state (e.g. a wallet that is actually locked).
+ */
 const reconnecting = shallowRef<boolean>(false);
 
 let configPromise: Promise<Config> | undefined;
@@ -159,8 +161,7 @@ export function useWallet(): UseWalletReturn {
         wagmi.watchAccount(config, { onChange: syncAccount });
         wagmi.watchConnectors(config, { onChange: connectors => set(availableConnectors, connectors) });
 
-        // Restore + liveness-verify in the background; clear the gate once settled
-        // so `connected` only ever reflects a verified session.
+        // Restore + verify in the background; clearing the gate once settled keeps `connected` verified.
         restoreSession(config, wagmi)
           .finally(() => set(reconnecting, false))
           .catch(error => logger.debug('session restore failed', error));
@@ -168,10 +169,8 @@ export function useWallet(): UseWalletReturn {
         return config;
       }
       catch (error) {
-        // Build failed before the background restore could clear the gate — clear
-        // it here so the picker never freezes on "Restoring…", and drop the cached
-        // rejected promise so a later interaction can rebuild instead of replaying
-        // the failure forever.
+        /* The build failed before the background restore could clear the gate. Clear it so the
+           picker never freezes on "Restoring…", and drop the rejected promise so a later call rebuilds. */
         set(reconnecting, false);
         configPromise = undefined;
         throw error;
@@ -221,8 +220,7 @@ export function useWallet(): UseWalletReturn {
     if (!connector)
       return err(noWallet());
 
-    // Surface the WalletConnect pairing URI (emitted as a `message`/display_uri
-    // event) so the picker can render its own QR.
+    // Surface the WalletConnect pairing URI (a `message`/display_uri event) so the picker renders its own QR.
     let detach: (() => void) | undefined;
     if (options.onUri) {
       const handler = (payload: { type: string; data?: unknown }): void => {
@@ -242,8 +240,10 @@ export function useWallet(): UseWalletReturn {
     }
   }
 
-  // While reconnecting, wagmi may report the persisted (unverified) "connected"
-  // status — withhold it until `restoreSession` confirms the wallet is live.
+  /**
+   * While reconnecting, wagmi may report the persisted (unverified) "connected"
+   * status, so it is withheld until `restoreSession` confirms the wallet is live.
+   */
   const connected = computed<boolean>(() => get(status) === 'connected' && !get(reconnecting));
 
   function isExpectedChain(expected: number | undefined): boolean {

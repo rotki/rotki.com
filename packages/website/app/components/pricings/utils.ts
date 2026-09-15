@@ -1,4 +1,4 @@
-import type { AvailablePlan } from '@rotki/card-payment-common';
+import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import type { MappedPlan, PlanBase } from '~/components/pricings/type';
 import { PricingPeriod } from '~/types/tiers';
 

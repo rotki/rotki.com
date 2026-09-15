@@ -27,9 +27,6 @@ export function useCheckout() {
     return router.currentRoute.value;
   }
 
-  // ===================
-  // Route-derived state (read-only)
-  // ===================
   const planId = computed<number | undefined>(() => {
     const id = getCurrentRoute().query.planId;
     return id && typeof id === 'string' ? Number(id) : undefined;
@@ -50,13 +47,9 @@ export function useCheckout() {
     return id && typeof id === 'string' ? id : undefined;
   });
 
-  // Prefers the live ?ref query and falls back to the persisted cookie (see
-  // useReferralCodeParam) so the code survives navigation that stripped the param.
+  // Live ?ref query first, then the persisted cookie, so the code survives stripped navigation.
   const { referralCode } = useReferralCodeParam();
 
-  // ===================
-  // Derived flags
-  // ===================
   // Crypto mode is derived from route (crypto pages) or currency in URL
   const isCrypto = computed<boolean>(() => {
     const routeName = getCurrentRoute().name?.toString() ?? '';
@@ -64,9 +57,7 @@ export function useCheckout() {
   });
   const isUpgrade = computed<boolean>(() => !!get(upgradeSubId));
 
-  // ===================
-  // Plan data (persists across navigations via useState)
-  // ===================
+  // Persists across navigations via useState.
   const selectedPlan = useState<SelectedPlan | undefined>('checkout-selected-plan');
 
   function setSelectedPlan(plan: SelectedPlan | undefined): void {
@@ -83,17 +74,18 @@ export function useCheckout() {
     }
   }, { immediate: true });
 
-  // ===================
-  // Discount code handling
-  // ===================
-  // Tracks whether the user dismissed the auto-applied referral discount. Persisted via
-  // useState so it survives client-side navigation through the checkout (the URL cannot
-  // carry it - buildQueryParams strips empty values), and resets on a full reload.
+  /**
+   * Whether the user dismissed the auto-applied referral discount. Kept in useState so it
+   * survives client-side navigation through checkout (the URL cannot carry it, since
+   * buildQueryParams strips empty values) and resets on a full reload.
+   */
   const referralDismissed = useState<boolean>('checkout-referral-dismissed', () => false);
 
-  // Applied value (source of truth). An explicit discountCode in the URL wins; otherwise
-  // the referral code is auto-applied as a discount (mirroring the card flow) unless the
-  // user dismissed it.
+  /**
+   * Applied discount code (source of truth). An explicit discountCode in the URL wins;
+   * otherwise the referral code is auto-applied as a discount (mirroring the card flow)
+   * unless the user dismissed it.
+   */
   const appliedDiscountCode = computed<string>(() => {
     const code = getCurrentRoute().query.discountCode;
     if (typeof code === 'string' && code)
@@ -108,9 +100,7 @@ export function useCheckout() {
   // Input value (for text field binding), seeded from the applied value.
   const modelDiscountCode = ref<string>(get(appliedDiscountCode));
 
-  // ===================
-  // Breakdown data (persists across navigations via useState)
-  // ===================
+  // Persists across navigations via useState.
   const breakdown = useState<PaymentBreakdownResponse | undefined>('checkout-breakdown');
 
   // Validated discount code - only returns the code if the breakdown confirms it's valid
@@ -151,8 +141,7 @@ export function useCheckout() {
 
   async function applyDiscount(): Promise<void> {
     const code = get(modelDiscountCode);
-    // An empty input clears the discount; remember the dismissal so an auto-applied
-    // referral code is not immediately re-applied (see appliedDiscountCode).
+    // An empty input clears the discount; remember it so the referral code isn't re-applied.
     set(referralDismissed, !code);
     const currentRoute = getCurrentRoute();
     await navigateTo({
@@ -180,10 +169,8 @@ export function useCheckout() {
     }
   }
 
-  // ===================
-  // UI State (error persists across navigations via useState)
-  // ===================
   const loading = shallowRef<boolean>(false);
+  // Persists across navigations via useState.
   const error = useState<CheckoutError | undefined>('checkout-error');
 
   function setLoading(value: boolean): void {
@@ -208,20 +195,12 @@ export function useCheckout() {
     set(error, undefined);
   }
 
-  // ===================
-  // Initialization state (shared by all payment flows)
-  // ===================
+  // Initialization and plan-switching state, shared by all payment flows.
   let initPromise: Promise<boolean> | null = null;
   const initialized = shallowRef<boolean>(false);
-
-  // ===================
-  // Plan switching state (shared by all payment flows)
-  // ===================
   const planSwitchLoading = shallowRef<boolean>(false);
 
-  // ===================
-  // Reset (clears useState persisted state)
-  // ===================
+  /** Clears all checkout state, including what useState persisted across navigations. */
   function reset(): void {
     set(selectedPlan, undefined);
     set(breakdown, undefined);
@@ -233,18 +212,13 @@ export function useCheckout() {
     set(referralDismissed, false);
   }
 
-  // ===================
-  // Initialization (shared by all payment flows)
-  // ===================
-
   /**
-   * Ensures plans and breakdown are loaded.
+   * Ensures plans and breakdown are loaded. Shared by all payment flows.
    * Uses dedupe-aware fetching to avoid duplicate requests.
    * Safe to call multiple times - returns cached promise if in progress.
    * @returns true if initialization succeeded (plan selected), false otherwise
    */
   async function ensureInitialized(): Promise<boolean> {
-    // Already initialized
     if (get(initialized)) {
       return !!get(selectedPlan);
     }
@@ -285,12 +259,8 @@ export function useCheckout() {
     return !!get(selectedPlan);
   }
 
-  // ===================
-  // Plan switching (shared by all payment flows)
-  // ===================
-
   /**
-   * Updates the selected plan and URL, then fetches new breakdown.
+   * Updates the selected plan and URL, then fetches new breakdown. Shared by all payment flows.
    * @returns the new breakdown data or undefined on error
    */
   async function switchPlan(newPlan: SelectedPlan): Promise<boolean> {

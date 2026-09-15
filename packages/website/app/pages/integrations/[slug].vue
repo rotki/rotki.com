@@ -20,12 +20,16 @@ if (!isDefined(integration)) {
 else {
   const item = get(integration);
   const slug = path.replace(/\/+$/, '').split('/').pop() ?? '';
-  // Keep the SERP title short (<60 chars); titleTemplate appends " | rotki".
-  // The full descriptive tagline still lives in the visible <h1>/intro; the meta
-  // description uses the shorter `metaDescription` field to stay under 160 chars.
+  /*
+   * Keep the SERP title short (<60 chars); titleTemplate appends " | rotki".
+   * The full descriptive tagline still lives in the visible <h1>/intro; the meta
+   * description uses the shorter `metaDescription` field to stay under 160 chars.
+   */
   const title = `${item.label} support`;
-  // OG image is generated per-slug at build time by the integration-seo module
-  // (with a share.png fallback written to the same path), so this URL always resolves.
+  /*
+   * OG image is generated per-slug at build time by the integration-seo module
+   * (with a share.png fallback written to the same path), so this URL always resolves.
+   */
   usePageSeo(title, item.metaDescription, path, { keywords: item.keywords, ogImage: `integrations/${slug}.png` });
 
   const url = `${baseUrl}${path}`;
@@ -66,8 +70,10 @@ else {
   }
 
   useHead({
-    // Escape the angle bracket so a closing-script sequence inside the JSON-LD
-    // (e.g. from FAQ content) cannot break out of the server-rendered script tag.
+    /*
+     * Escape the angle bracket so a closing-script sequence inside the JSON-LD
+     * (e.g. from FAQ content) cannot break out of the server-rendered script tag.
+     */
     script: ldBlocks.map(block => ({
       type: 'application/ld+json',
       innerHTML: block.replaceAll('<', '\\u003c'),

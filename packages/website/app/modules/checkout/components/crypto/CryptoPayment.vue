@@ -112,7 +112,8 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
 }
 
 /**
- * Cancel and go back
+ * Cancels the pending crypto payment, then returns to the subscription page for
+ * upgrades or to the crypto payment request page otherwise.
  */
 async function handleCancelAndGoBack(): Promise<void> {
   setLoading(true);
@@ -126,7 +127,6 @@ async function handleCancelAndGoBack(): Promise<void> {
     return;
   }
 
-  // Navigate back
   if (get(upgradeSubId)) {
     await navigateTo({ name: 'home-subscription' });
   }
@@ -149,13 +149,10 @@ async function navigateToProducts(): Promise<void> {
   await navigateTo('/products');
 }
 
-// Initialize on mount
 onMounted(async () => {
   const success = await initialize();
-  // Only bounce back to products when there is genuinely nothing to show.
-  // If initialize() set an error (e.g. the crypto payment API returned 400),
-  // stay on the page so the user can read what went wrong instead of being
-  // silently redirected.
+  /* Redirect only when there is nothing to show. If initialize() set an error
+     (e.g. the crypto payment API returned 400), stay so the user can read it. */
   if (!success && !get(paymentData) && !get(error)) {
     await navigateToProducts();
   }

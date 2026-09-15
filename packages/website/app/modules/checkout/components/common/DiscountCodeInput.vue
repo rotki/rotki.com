@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
-import { DiscountType } from '@rotki/card-payment-common';
+import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { get, set } from '@vueuse/shared';
 
 const model = defineModel<string>({ required: true });

@@ -114,7 +114,7 @@ export interface MintButtonContext {
   isApproving: boolean;
   needsApproval: boolean;
   isPending: boolean;
-  /** Certain token shortfall (balance < price) — hard-blocks minting. */
+  /** Certain token shortfall (balance below price), which hard-blocks minting. */
   hasInsufficientFunds: boolean;
   currency: string;
 }

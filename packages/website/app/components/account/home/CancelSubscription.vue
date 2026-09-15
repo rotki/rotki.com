@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get, isDefined, set } from '@vueuse/shared';
-import ButtonLink from '~/components/common/ButtonLink.vue';
+import CancelSubscriptionBenefits from '~/components/account/home/CancelSubscriptionBenefits.vue';
 import { type CancellationFeedbackPayload, useCancellationFeedback } from '~/composables/subscription/use-cancellation-feedback';
 import { formatDate } from '~/utils/date';
 
@@ -80,28 +80,7 @@ function cancelSubscription(): void {
           scope="global"
         >
           <template #benefits>
-            <ul class="list-disc ml-5">
-              <li>{{ t('account.subscriptions.cancellation.benefits.line_1') }}</li>
-              <li>
-                <i18n-t
-                  keypath="account.subscriptions.cancellation.benefits.line_2"
-                  scope="global"
-                >
-                  <template #bug_tracker>
-                    <ButtonLink
-                      class="underline"
-                      color="primary"
-                      external
-                      inline
-                      to="https://github.com/rotki/rotki/issues"
-                    >
-                      {{ t('account.subscriptions.cancellation.bug_tracker') }}
-                    </ButtonLink>
-                  </template>
-                </i18n-t>
-              </li>
-              <li>{{ t('account.subscriptions.cancellation.benefits.line_3') }}</li>
-            </ul>
+            <CancelSubscriptionBenefits />
           </template>
 
           <template #subscription_status>
@@ -186,7 +165,7 @@ function cancelSubscription(): void {
                 :value="reason.value"
                 :label="reason.label"
                 color="primary"
-                :hide-details="true"
+                hide-details
                 size="sm"
               />
             </div>

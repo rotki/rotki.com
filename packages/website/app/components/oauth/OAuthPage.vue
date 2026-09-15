@@ -2,16 +2,24 @@
 import type { OAuthMode } from '~/types/oauth';
 import CopyButton from '~/components/common/CopyButton.vue';
 
-defineProps<{
+export interface OAuthPageLabels {
   title: string;
   description: string;
   buttonText: string;
-  loading: boolean;
-  error?: string;
-  completed: boolean;
+}
+
+export interface OAuthPageTokens {
   accessToken: string;
   refreshToken: string;
   expiresIn?: number;
+}
+
+defineProps<{
+  labels: OAuthPageLabels;
+  loading: boolean;
+  error?: string;
+  completed: boolean;
+  tokens: OAuthPageTokens;
   mode?: OAuthMode;
   currentMode?: OAuthMode;
   showExpiresIn?: boolean;
@@ -41,10 +49,10 @@ function selectText(event: MouseEvent): void {
     <div class="max-w-md w-full">
       <div class="text-center">
         <h4 class="text-h4 mt-6">
-          {{ completed ? t('oauth.completion.title') : title }}
+          {{ completed ? t('oauth.completion.title') : labels.title }}
         </h4>
         <p class="mt-2 text-sm text-rui-text-secondary">
-          {{ completed ? t('oauth.completion.description') : description }}
+          {{ completed ? t('oauth.completion.description') : labels.description }}
         </p>
       </div>
 
@@ -72,7 +80,7 @@ function selectText(event: MouseEvent): void {
           </RuiAlert>
 
           <RuiTextArea
-            :model-value="accessToken"
+            :model-value="tokens.accessToken"
             :label="t('oauth.access_token_label')"
             readonly
             variant="outlined"
@@ -81,12 +89,12 @@ function selectText(event: MouseEvent): void {
             @click="selectText($event)"
           >
             <template #append>
-              <CopyButton :model-value="accessToken" />
+              <CopyButton :model-value="tokens.accessToken" />
             </template>
           </RuiTextArea>
 
           <RuiTextArea
-            :model-value="refreshToken"
+            :model-value="tokens.refreshToken"
             :label="t('oauth.refresh_token_label')"
             readonly
             variant="outlined"
@@ -95,17 +103,17 @@ function selectText(event: MouseEvent): void {
             @click="selectText($event)"
           >
             <template #append>
-              <CopyButton :model-value="refreshToken" />
+              <CopyButton :model-value="tokens.refreshToken" />
             </template>
           </RuiTextArea>
 
           <div
-            v-if="showExpiresIn && expiresIn"
+            v-if="showExpiresIn && tokens.expiresIn"
             class="text-sm text-rui-text-secondary"
           >
             <slot
               name="expires-in"
-              :expires-in="expiresIn"
+              :expires-in="tokens.expiresIn"
             />
           </div>
         </div>
@@ -125,7 +133,7 @@ function selectText(event: MouseEvent): void {
           >
             <slot name="button-prepend" />
           </template>
-          {{ buttonText }}
+          {{ labels.buttonText }}
         </RuiButton>
       </div>
     </div>

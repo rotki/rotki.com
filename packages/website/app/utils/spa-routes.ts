@@ -58,9 +58,9 @@ export function writeSpaManifest(publicDir: string): void {
   const manifest = {
     // Generated file. Edit `clientOnlyRoutes` in app/utils/spa-routes.ts instead.
     spaShell: '200.html',
-    // The prerendered `/not-found` page, NOT `404.html`. Nuxt always emits
-    // `404.html` as an un-hydrated SPA fallback shell, which is blank without
-    // JavaScript; `not-found/index.html` has the real markup baked in.
+    /* The prerendered `/not-found` page, NOT `404.html`. Nuxt always emits
+       `404.html` as an un-hydrated SPA fallback shell, which is blank without
+       JavaScript; `not-found/index.html` has the real markup baked in. */
     notFound: 'not-found/index.html',
     spaRoutes: clientOnlyRoutes,
     nestedApps,

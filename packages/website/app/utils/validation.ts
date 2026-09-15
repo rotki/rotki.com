@@ -5,8 +5,8 @@ import { get } from '@vueuse/shared';
  * Converts an object of vuelidate's BaseValidation to an array of
  * strings to be passed to the components error-messages
  *
- * @param validation BaseValidation
- * @return string[]
+ * @param validation - The vuelidate validation object
+ * @returns The error messages
  */
 export function toMessages(validation: BaseValidation): string[] {
   return validation.$errors.map(e => get(e.$message));

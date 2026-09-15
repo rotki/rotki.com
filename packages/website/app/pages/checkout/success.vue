@@ -21,9 +21,11 @@ useAutoLogout();
 const { reset } = useCheckout();
 reset();
 
-// Consume the referral attribution: a purchase reaching this page was sent to the
-// backend with the persisted ref, so clear the cookie to avoid re-applying it to
-// the user's future purchases.
+/*
+ * Consume the referral attribution: a purchase reaching this page was sent to the
+ * backend with the persisted ref, so clear the cookie to avoid re-applying it to
+ * the user's future purchases.
+ */
 useReferralTracking().clearReferralCode();
 
 const route = useRoute();

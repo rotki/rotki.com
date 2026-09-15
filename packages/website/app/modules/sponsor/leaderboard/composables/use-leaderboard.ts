@@ -86,8 +86,10 @@ export function useLeaderboard(): UseLeaderboardReturn {
     !get(loading) && get(currentLeaderboard).length === 0 && get(leaderboardData)?.count === 0,
   );
 
-  // Skeletons reserve layout only while loading with no data yet — never once an
-  // empty response has loaded (that state renders the empty message instead).
+  /**
+   * Skeletons reserve layout only while loading with no data yet, never once an
+   * empty response has loaded (that state renders the empty message instead).
+   */
   const showSkeleton = computed<boolean>(() => !get(hasData) && !get(isEmpty));
 
   const displayedEntries = computed<LeaderboardEntry[]>(() =>

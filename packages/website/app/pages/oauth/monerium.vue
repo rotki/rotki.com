@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
-import OAuthPage from '~/components/oauth/OAuthPage.vue';
+import OAuthPage, { type OAuthPageLabels, type OAuthPageTokens } from '~/components/oauth/OAuthPage.vue';
 import { useOAuth } from '~/composables/account/use-oauth';
 import { usePkce } from '~/composables/account/use-pkce';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
@@ -41,6 +41,18 @@ const {
 
 const route = useRoute();
 const logger = useLogger();
+
+const labels = computed<OAuthPageLabels>(() => ({
+  title: t('oauth_monerium.title'),
+  description: t('oauth_monerium.description'),
+  buttonText: t('oauth_monerium.button'),
+}));
+
+const tokens = computed<OAuthPageTokens>(() => ({
+  accessToken: get(accessToken),
+  refreshToken: get(refreshToken),
+  expiresIn: get(expiresIn),
+}));
 
 const {
   generateRandomString,
@@ -172,9 +184,11 @@ async function handleOAuthCallback() {
   }
 }
 
-// Watch for route query params — Nuxt SSG hydration temporarily strips
-// query params via router.replace before restoring them, so onMounted
-// fires too early. Watch code and error to handle both success and denial.
+/*
+ * Watch for route query params. Nuxt SSG hydration temporarily strips
+ * query params via router.replace before restoring them, so onMounted
+ * fires too early. Watch code and error to handle both success and denial.
+ */
 watch(() => route.query.code ?? route.query.error, (value) => {
   if (value)
     handleOAuthCallback();
@@ -183,15 +197,11 @@ watch(() => route.query.code ?? route.query.error, (value) => {
 
 <template>
   <OAuthPage
-    :title="t('oauth_monerium.title')"
-    :description="t('oauth_monerium.description')"
-    :button-text="t('oauth_monerium.button')"
+    :labels="labels"
     :loading="loading"
     :error="error"
     :completed="completed"
-    :access-token="accessToken"
-    :refresh-token="refreshToken"
-    :expires-in="expiresIn"
+    :tokens="tokens"
     :mode="mode"
     :current-mode="currentMode"
     show-expires-in

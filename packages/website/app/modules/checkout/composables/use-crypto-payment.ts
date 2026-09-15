@@ -66,16 +66,15 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
       set(processing, false);
   });
 
-  // Reflect a persisted wallet session on load (no-op without one, and no web3
-  // chunk for sessionless / Bitcoin checkouts).
+  /* Reflect a persisted wallet session on load (no-op without one, and no web3
+     chunk for sessionless or Bitcoin checkouts). */
   onMounted(async () => {
     await restoreIfPersisted();
   });
 
   const isExpectedChain = computed<boolean>(() => wallet.isExpectedChain(toValue(data).chainId));
 
-  // Live balance + funds check for the payment token (skipped for Bitcoin, which
-  // never connects a web3 wallet, so `active` stays false there).
+  // Live balance and funds check; `active` stays false for Bitcoin, which never connects a wallet.
   const { fundsStatus, loading: balanceLoading, tokenBalance } = useTokenBalance({
     active: computed<boolean>(() => get(connected) && get(isExpectedChain)),
     chainId: () => toValue(data).chainId,

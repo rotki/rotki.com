@@ -2,14 +2,13 @@ import type { SubscriptionActionType } from '~/components/account/home/subscript
 import { set } from '@vueuse/shared';
 import { defineStore } from 'pinia';
 
-export const useSubscriptionOperationsStore = defineStore('subscription-operations', () => {
-  // Unified operation state
+/** Unified state for the subscription operation currently in progress, with its actions. */
+function subscriptionOperationsStore() {
   const operationType = ref<SubscriptionActionType>();
   const inProgress = ref<boolean>(false);
   const status = ref<string>();
   const error = ref<string>();
 
-  // Actions
   function setOperationType(type: SubscriptionActionType | undefined): void {
     set(operationType, type);
   }
@@ -52,4 +51,6 @@ export const useSubscriptionOperationsStore = defineStore('subscription-operatio
     startOperation,
     status,
   };
-});
+}
+
+export const useSubscriptionOperationsStore = defineStore('subscription-operations', subscriptionOperationsStore);

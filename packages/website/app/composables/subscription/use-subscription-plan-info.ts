@@ -22,7 +22,7 @@ export function useSubscriptionPlanInfo(subscription: MaybeRefOrGetter<UserSubsc
    */
   const planLimits = computed<PremiumTierInfoDescription[]>(() => {
     const info = get(tierInfo);
-    if (!info || !info.description) {
+    if (!info?.description) {
       return [];
     }
 

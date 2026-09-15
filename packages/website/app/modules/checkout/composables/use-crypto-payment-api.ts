@@ -16,6 +16,7 @@ import {
 } from '~/types';
 import { createSimpleErrorResult, handlePaymentError } from '~/utils/api-error-handling';
 import { assert } from '~/utils/assert';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 /**
@@ -92,7 +93,7 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
     }
     catch (error: any) {
       logger.error('Crypto payment failed:', error);
-      logPaymentEvent({ paymentMethod: CheckoutPaymentMethods.CRYPTO, event: PaymentServerEvents.CRYPTO_PAYMENT_API_ERROR, errorMessage: error.message || 'unknown', errorCode: String(error.statusCode ?? ''), step: CheckoutSteps.SUBMIT });
+      logPaymentEvent({ paymentMethod: CheckoutPaymentMethods.CRYPTO, event: PaymentServerEvents.CRYPTO_PAYMENT_API_ERROR, errorMessage: nonEmpty(error.message) ?? 'unknown', errorCode: String(error.statusCode ?? ''), step: CheckoutSteps.SUBMIT });
       return handlePaymentError(error);
     }
   };
@@ -125,7 +126,7 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
       logPaymentEvent({
         paymentMethod: CheckoutPaymentMethods.CRYPTO,
         event: PaymentServerEvents.CRYPTO_PAYMENT_API_ERROR,
-        errorMessage: error.message || 'unknown',
+        errorMessage: nonEmpty(error.message) ?? 'unknown',
         errorCode: String(error.statusCode ?? ''),
         step: CheckoutSteps.SUBMIT,
       });
@@ -248,10 +249,8 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
       };
     }
     catch (error: any) {
-      // A 409 means there is no pending payment to delete. The desired end state
-      // (nothing pending) is already true, so treat the cancellation as a success
-      // rather than blocking the user — e.g. the Back button after a failed
-      // payment creation, where no pending payment was ever recorded.
+      /* A 409 means nothing is pending, which is the state we wanted, so succeed
+         instead of blocking the user (e.g. Back after a failed payment creation). */
       if (error instanceof FetchError && error.statusCode === 409) {
         return {
           isError: false,

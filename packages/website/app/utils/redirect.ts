@@ -22,10 +22,13 @@ export function getSafeRedirectUrl(url: string, fallback: string = '/home/subscr
   }
 }
 
-// Validates an absolute URL is http(s) on the current host (or a subdomain of it).
+/**
+ * Validates an absolute URL is http(s) on the current host (or a subdomain of it).
+ *
+ * URLs that don't start with a known scheme are rejected up front, so malformed
+ * strings like "ht tp://..." are never resolved as relative, same-origin paths.
+ */
 function isSameOriginAbsoluteUrl(decoded: string): boolean {
-  // Reject URLs that don't start with a known scheme — prevents relative-URL
-  // resolution of malformed strings like "ht tp://..." into same-origin paths
   if (!/^https?:\/\//i.test(decoded))
     return false;
 
@@ -40,8 +43,8 @@ function isSameOriginAbsoluteUrl(decoded: string): boolean {
   return target.hostname === currentHostname || isSubdomainOf(target.hostname, currentHostname);
 }
 
+/** Compares the root domains of both hostnames. */
 function isSubdomainOf(hostname: string, parentHostname: string): boolean {
-  // Extract root domain from both hostnames and compare
   const targetRoot = getRootDomain(hostname);
   const currentRoot = getRootDomain(parentHostname);
   return targetRoot === currentRoot;

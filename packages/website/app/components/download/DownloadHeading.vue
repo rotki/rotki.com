@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { DownloadItemSingle, DownloadItem as DownloadItemType } from '~/types/download';
 import { SigilEvents } from '@rotki/sigil';
-import ButtonLink from '~/components/common/ButtonLink.vue';
 import DownloadItem from '~/components/download/DownloadItem.vue';
+import DownloadPlatformButton from '~/components/download/DownloadPlatformButton.vue';
+import DownloadSponsorItem, { type DownloadSponsor } from '~/components/download/DownloadSponsorItem.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 
 const { version, links, loading } = defineProps<{ version: string; links: DownloadItemType[]; loading?: boolean }>();
@@ -11,7 +12,7 @@ const { chronicle } = useSigilEvents();
 
 const showAll = ref<boolean>(false);
 
-const sponsors: { name: string; image: string; gold?: boolean; tooltip?: string }[] = [
+const sponsors: DownloadSponsor[] = [
   {
     name: 'Ambire Wallet',
     image: '/img/sponsorship-profiles/1.44.0_ambire.png',
@@ -80,35 +81,12 @@ function onDownloadClick(platform: string): void {
               {{ t('download.download_for', { platform: '...' }) }}
             </RuiButton>
             <template v-else>
-              <ButtonLink
+              <DownloadPlatformButton
                 v-for="item in highlightedDownloadItem"
                 :key="item.url"
-                :to="item.url"
-                rounded
-                color="primary"
-                variant="default"
-                size="lg"
-                data-cy="main-download-button"
+                :item="item"
                 @click="onDownloadClick(item.platform)"
-              >
-                <template #prepend>
-                  <RuiIcon
-                    v-if="item.icon"
-                    :name="item.icon"
-                    size="20"
-                  />
-                  <img
-                    v-else-if="item.image"
-                    :src="item.image"
-                    :alt="item.platform"
-                    width="20"
-                    height="20"
-                    loading="lazy"
-                    class="brightness-0 invert"
-                  />
-                </template>
-                {{ t('download.download_for', { platform: item.platform }) }}
-              </ButtonLink>
+              />
             </template>
           </div>
 
@@ -169,47 +147,11 @@ function onDownloadClick(platform: string): void {
           </div>
         </div>
         <div class="flex-1 flex items-center justify-start">
-          <div
+          <DownloadSponsorItem
             v-for="(sponsor, index) in sponsors"
             :key="index"
-            class="flex flex-col gap-3"
-          >
-            <img
-              class="size-12 min-w-12 rounded-md overflow-hidden mx-auto !object-cover"
-              :class="{ 'size-20 min-w-20': sponsor.gold }"
-              :src="sponsor.image"
-              :alt="sponsor.name"
-              :width="sponsor.gold ? 80 : 48"
-              :height="sponsor.gold ? 80 : 48"
-              loading="lazy"
-            />
-            <div class="flex flex-col items-center justify-between relative w-[12rem] max-w-full mx-auto">
-              <img
-                v-if="sponsor.gold"
-                src="/img/ribbon.png"
-                alt="Gold sponsor ribbon"
-                width="192"
-                height="42"
-                fit="cover"
-                loading="lazy"
-                class="w-full h-[125%] absolute top-0 left-0"
-              />
-              <RuiTooltip
-                :disabled="!sponsor.tooltip"
-                :popper="{ placement: 'bottom' }"
-              >
-                <template #activator>
-                  <div
-                    class="text-sm font-bold text-left text-rui-text-secondary relative"
-                    :class="{ 'text-yellow-900 max-w-[80%] px-0.5 text-center leading-8 whitespace-nowrap': sponsor.gold }"
-                  >
-                    {{ sponsor.name }}
-                  </div>
-                </template>
-                {{ sponsor.tooltip }}
-              </RuiTooltip>
-            </div>
-          </div>
+            :sponsor="sponsor"
+          />
         </div>
       </div>
     </div>

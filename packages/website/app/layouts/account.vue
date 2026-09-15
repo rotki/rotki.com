@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import PageTabs, { type PageTabItem } from '~/components/common/PageTabs.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
-
-interface TabItem {
-  icon: string;
-  label: string;
-  to: string;
-  reload?: boolean;
-}
 
 defineSlots<{
   default: () => void;
@@ -41,8 +35,8 @@ const name = computed<string>(() => {
   return `${firstName} ${lastName}`;
 });
 
-const tabs = computed<TabItem[]>(() => {
-  const all: TabItem[] = [{
+const tabs = computed<PageTabItem[]>(() => {
+  const all: PageTabItem[] = [{
     label: t('account.tabs.subscription'),
     icon: 'lu-crown',
     to: '/home/subscription',
@@ -88,50 +82,10 @@ onMounted(() => {
             {{ t('account.welcome') }} {{ name }}
           </div>
           <div class="flex flex-col lg:flex-row gap-6">
-            <div class="hidden lg:block w-[270px] shrink-0">
-              <RuiTabs
-                v-model="tabModelValue"
-                vertical
-                align="start"
-                color="primary"
-              >
-                <RuiTab
-                  v-for="tab in tabs"
-                  :key="tab.to"
-                  link
-                  :to="tab.to"
-                  :target="tab.reload ? '_top' : undefined"
-                >
-                  <template #prepend>
-                    <RuiIcon :name="tab.icon" />
-                  </template>
-                  {{ tab.label }}
-                </RuiTab>
-              </RuiTabs>
-            </div>
-            <div class="lg:hidden">
-              <RuiTabs
-                v-model="tabModelValue"
-                grow
-                color="primary"
-              >
-                <RuiTab
-                  v-for="tab in tabs"
-                  :key="tab.to"
-                  link
-                  :to="tab.to"
-                  :target="tab.reload ? '_top' : undefined"
-                >
-                  <template #prepend>
-                    <RuiIcon
-                      class="shrink-0"
-                      :name="tab.icon"
-                    />
-                  </template>
-                  {{ tab.label }}
-                </RuiTab>
-              </RuiTabs>
-            </div>
+            <PageTabs
+              v-model="tabModelValue"
+              :tabs="tabs"
+            />
 
             <div class="flex-1 overflow-x-auto">
               <slot />

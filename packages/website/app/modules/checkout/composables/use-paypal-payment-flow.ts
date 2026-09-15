@@ -13,6 +13,7 @@ import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payme
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalApi } from '~/modules/checkout/composables/use-paypal-api';
 import { assert } from '~/utils/assert';
+import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 export interface PaypalPaymentParams {
@@ -32,11 +33,31 @@ interface PaypalButtonActions {
   disable: () => void;
 }
 
-// The PayPal SDK types the `onInit` `actions` argument as a bare `object`, so narrow
-// it to the enable/disable shape we use via a guard instead of asserting.
+/**
+ * The PayPal SDK types the `onInit` `actions` argument as a bare `object`, so this
+ * guard narrows it to the enable/disable shape instead of asserting.
+ */
 function isPaypalButtonActions(value: object): value is PaypalButtonActions {
   return 'enable' in value && typeof value.enable === 'function'
     && 'disable' in value && typeof value.disable === 'function';
+}
+
+/** Request payload for a PayPal payment, omitting the empty optional fields. */
+function buildPaymentPayload(nonce: string, params: PaypalPaymentParams): CardPaymentRequest {
+  const payload: CardPaymentRequest = {
+    planId: params.planId,
+    paymentMethodNonce: nonce,
+  };
+
+  if (params.discountCode) {
+    payload.discountCode = params.discountCode;
+  }
+
+  if (params.upgradeSubId) {
+    payload.upgradeSubId = params.upgradeSubId;
+  }
+
+  return payload;
 }
 
 interface PaypalButtonCallbacks {
@@ -227,7 +248,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       },
     }).render('#paypal-button');
 
-    // Set up button enable/disable based on external condition
+    /** Enables the PayPal button only once the policy is accepted and nothing is in flight. */
     const checkEnabled = (): void => {
       const actions = get(paypalActions);
       if (get(accepted) && !get(paying) && !get(loading)) {
@@ -238,31 +259,46 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       }
     };
 
-    // Initial check
     checkEnabled();
 
-    // Watch for changes in all relevant state
     watch([paying, paypalActions, accepted, loading], checkEnabled);
   }
 
+  /**
+   * Maps a failed submission to the message to report. A 400 uses the backend's
+   * message, a 403 a generic one, and any other HTTP failure refreshes the account
+   * and flags checkout as blocked.
+   */
+  function resolveSubmitError(error: any): { errorMessage: string; blocked: boolean } {
+    let errorMessage = nonEmpty(error.message) ?? 'Payment failed';
+    let blocked = false;
+
+    if (error instanceof FetchError) {
+      if (error.status === 400) {
+        const parsed = ActionResultResponseSchema.safeParse(error.data);
+        if (parsed.success) {
+          errorMessage = parsed.data.message;
+        }
+      }
+      else if (error.status === 403) {
+        errorMessage = 'Payment failed';
+      }
+      else {
+        requestRefresh();
+        blocked = true;
+      }
+    }
+
+    return { errorMessage, blocked };
+  }
+
   async function submitPayment(nonce: string, params: PaypalPaymentParams): Promise<PaypalSubmitResult> {
-    const { planId, discountCode, upgradeSubId } = params;
+    const { planId, upgradeSubId } = params;
 
     set(paying, true);
 
     try {
-      const payload: CardPaymentRequest = {
-        planId,
-        paymentMethodNonce: nonce,
-      };
-
-      if (discountCode) {
-        payload.discountCode = discountCode;
-      }
-
-      if (upgradeSubId) {
-        payload.upgradeSubId = upgradeSubId;
-      }
+      const payload = buildPaymentPayload(nonce, params);
 
       const endpoint = upgradeSubId
         ? '/webapi/2/braintree/upgrade'
@@ -281,24 +317,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       return { success: true };
     }
     catch (error_: any) {
-      let errorMessage = error_.message || 'Payment failed';
-      let blocked = false;
-
-      if (error_ instanceof FetchError) {
-        if (error_.status === 400) {
-          const parsed = ActionResultResponseSchema.safeParse(error_.data);
-          if (parsed.success) {
-            errorMessage = parsed.data.message;
-          }
-        }
-        else if (error_.status === 403) {
-          errorMessage = 'Payment failed';
-        }
-        else {
-          requestRefresh();
-          blocked = true;
-        }
-      }
+      const { errorMessage, blocked } = resolveSubmitError(error_);
 
       logger.error('Payment submission failed:', error_);
       logPaymentEvent({

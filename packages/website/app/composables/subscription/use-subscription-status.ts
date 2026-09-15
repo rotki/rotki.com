@@ -1,5 +1,5 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import { isCancelledButActive } from '@rotki/card-payment-common';
+import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
 import { formatDate } from '~/utils/date';
 
 export function useSubscriptionStatus(subscription: MaybeRefOrGetter<UserSubscription>) {

@@ -241,9 +241,11 @@ function getCardTooltip(card: SavedCard): string | undefined {
           :card="card"
           :loading="isCardLoading(card)"
           :disabled="!emailConfirmed || !!cardOperation || deletingCard || hasActiveCryptoSubscription"
-          :deleting="isCardDeleting(card)"
-          :delete-disabled="card.linked"
-          :delete-tooltip="getCardTooltip(card)"
+          :deletion="{
+            deleting: isCardDeleting(card),
+            disabled: card.linked,
+            tooltip: getCardTooltip(card),
+          }"
           :is-linked="card.linked"
           :show-link-button="hasActiveSubscription && !hasActiveCryptoSubscription"
           @set-default="handleSetDefault(card)"

@@ -13,6 +13,10 @@ const integrationFileSchema = z.object({
 /**
  * Build-time helper: resolves the list of `/integrations/<slug>` routes to
  * prerender from the canonical `public/integrations/all.json` catalog.
+ *
+ * Granular catalog entries are folded into their consolidated page slug, so a
+ * route with no content page (which would 404 and pollute the sitemap) is never
+ * prerendered.
  */
 export function integrationPrerenderRoutes(): string[] {
   const file = path.resolve(import.meta.dirname, '../../public/integrations/all.json');
@@ -20,8 +24,6 @@ export function integrationPrerenderRoutes(): string[] {
   const all = [...data.blockchains, ...data.exchanges, ...data.protocols];
   const slugs = new Set<string>();
   for (const item of all) {
-    // Fold granular catalog entries into their consolidated page slug so we never
-    // prerender a route that has no content page (which would 404 and pollute the sitemap).
     const slug = consolidateSlug(integrationSlug(item.label));
     if (slug)
       slugs.add(slug);

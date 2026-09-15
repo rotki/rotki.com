@@ -104,9 +104,8 @@ export function useTokenBalance(options: UseTokenBalanceOptions): UseTokenBalanc
     try {
       const client = await getWeb3Client(ensureInitialized);
 
-      // Run the independent reads concurrently. The native call doubles as the
-      // token balance for native tokens, so it isn't issued twice. Each figure
-      // falls back independently (a failed gas estimate shouldn't blank balances).
+      /* Concurrent reads. The native call doubles as the token balance for native tokens, and
+         each figure falls back on its own (a failed gas estimate shouldn't blank balances). */
       const native = client.readNativeBalance({ address: owner, chainId });
       const tokenRead = isNativeToken(token.address)
         ? native
@@ -126,10 +125,9 @@ export function useTokenBalance(options: UseTokenBalanceOptions): UseTokenBalanc
     }
   }
 
-  // Flip to loading the instant the wallet/chain/token changes — before the
-  // debounced read fires — so switching currency shows a spinner instead of the
-  // previous token's stale balance during the 300ms window. (Price is excluded:
-  // a tier change re-reads the same balance and shouldn't blank it.)
+  /* Flip to loading as soon as wallet, chain or token changes, before the debounced read fires,
+     so a currency switch shows a spinner rather than the previous token's balance for 300ms.
+     Price is excluded: a tier change re-reads the same balance and shouldn't blank it. */
   watch(
     [address, () => toValue(options.chainId), () => toValue(options.token), () => toValue(options.active)],
     () => set(loading, canRead()),

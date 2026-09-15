@@ -7,7 +7,18 @@ function jobFiles(): string[] {
   return readdirSync(JOBS_DIR).filter(file => file.endsWith('.md') && !file.startsWith('_'));
 }
 
-/** Nuxt Content strips the numeric ordering prefix: `1.backend.md` -> `/jobs/backend`. */
+/** Nuxt Content strips the numeric ordering prefix, so `1.backend.md` is served at `/jobs/backend`. */
+/** Returns the text between the first two `---` markers, or everything after the first when there is no closing one. */
+function frontmatterOf(content: string): string {
+  const start = content.indexOf('---');
+  if (start === -1)
+    return '';
+
+  const bodyStart = start + 3;
+  const end = content.indexOf('---', bodyStart);
+  return end === -1 ? content.slice(bodyStart) : content.slice(bodyStart, end);
+}
+
 function jobRoute(file: string): string {
   return `/jobs/${file.replace(/\.md$/, '').replace(/^\d+\./, '')}`;
 }
@@ -39,7 +50,7 @@ export function jobsPrerenderRoutes(): string[] {
 export function closedJobRoutes(): string[] {
   return jobFiles()
     .filter((file) => {
-      const frontmatter = readFileSync(path.join(JOBS_DIR, file), 'utf8').split('---')[1] ?? '';
+      const frontmatter = frontmatterOf(readFileSync(path.join(JOBS_DIR, file), 'utf8'));
       return /^open:\s*false\s*$/m.test(frontmatter);
     })
     .map(file => jobRoute(file));

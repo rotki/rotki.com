@@ -10,13 +10,17 @@ const CHAIN_ID_BY_NAME: Record<'ethereum' | 'sepolia', number> = {
   sepolia: 11155111,
 };
 
-export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', () => {
-  // State
+/**
+ * Holds the current NFT release metadata (contract address and chain).
+ *
+ * State refs are returned as-is: Pinia owns them, and wrapping them in readonly()
+ * breaks its $state sync/hydration and emits "target is readonly" warnings.
+ */
+function sponsorshipMetadataStore() {
   const metadata = ref<SponsorshipMetadata>();
   const loading = ref<boolean>(false);
   const error = ref<Error>();
 
-  // Getters
   const contractAddress = computed<string | undefined>(() => get(metadata)?.contractAddress);
   const chain = computed<'sepolia' | 'ethereum' | undefined>(() => get(metadata)?.chain);
 
@@ -28,7 +32,6 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
   const logger = useLogger('leaderboard-metadata-store');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  // Actions
   async function fetchMetadata(): Promise<void> {
     try {
       set(loading, true);
@@ -51,16 +54,14 @@ export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', (
   }
 
   return {
-    // Getters (computed — already read-only by nature)
     chain,
     chainId,
     contractAddress,
-    // State (Pinia owns these refs; wrapping them in readonly() breaks its
-    // $state sync/hydration and emits "target is readonly" warnings)
     error,
-    // Actions
     fetchMetadata,
     loading,
     metadata,
   };
-});
+}
+
+export const useSponsorshipMetadataStore = defineStore('sponsorship-metadata', sponsorshipMetadataStore);

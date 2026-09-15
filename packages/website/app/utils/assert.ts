@@ -1,6 +1,6 @@
 class AssertionError extends Error {
-  constructor(msg?: string) {
-    super(msg ?? 'AssertionError');
+  constructor(msg?: string, options?: ErrorOptions) {
+    super(msg ?? 'AssertionError', options);
     this.name = 'AssertionError';
   }
 }

@@ -19,7 +19,7 @@ const canvas = useTemplateRef('canvas');
 const logger = useLogger('crypto-payment-qr');
 const { copy: copyToClipboard } = useClipboard({ source: qrText });
 
-// Lazy load qrcode library
+/** Lazy-loads the qrcode library so it stays out of the initial bundle. */
 async function getToCanvas(): Promise<typeof import('qrcode').toCanvas> {
   const { toCanvas } = await import('qrcode');
   return toCanvas;

@@ -62,9 +62,11 @@ function matches(connector: ConnectorLike, needle: string): boolean {
   return connector.id.toLowerCase().includes(needle) || (connector.type ?? '').toLowerCase().includes(needle);
 }
 
-/** Resolve the name + icon to show for a connector in the wallet picker. */
+/**
+ * Resolve the name + icon to show for a connector in the wallet picker. A wallet
+ * that announced itself (EIP-6963) carries its real brand icon + name, which win.
+ */
 export function getConnectorDisplay(connector: ConnectorLike): ConnectorDisplay {
-  // A wallet that announced itself (EIP-6963) carries its real brand icon + name.
   if (connector.icon)
     return { icon: connector.icon, name: connector.name };
 

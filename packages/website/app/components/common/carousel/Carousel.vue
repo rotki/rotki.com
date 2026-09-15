@@ -26,7 +26,7 @@ defineSlots<{
     :modules="[Autoplay, Keyboard]"
     :slides-per-view="1"
     :space-between="0"
-    :keyboard="true"
+    keyboard
   >
     <slot />
   </Swiper>

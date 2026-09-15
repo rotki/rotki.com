@@ -1,12 +1,7 @@
 <script setup lang="ts">
+import PageTabs, { type PageTabItem } from '~/components/common/PageTabs.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 import Default from '~/layouts/default.vue';
-
-interface TabItem {
-  label: string;
-  icon: string;
-  to: string;
-}
 
 defineSlots<{
   default: () => void;
@@ -18,7 +13,7 @@ usePageSeo('Sponsor', 'Sponsor rotki\'s development and support independent, loc
 
 const tabModelValue = ref<string>('');
 
-const tabs = computed<TabItem[]>(() => [
+const tabs = computed<PageTabItem[]>(() => [
   {
     label: t('sponsor.tabs.sponsor'),
     icon: 'lu-handshake',
@@ -42,48 +37,10 @@ const tabs = computed<TabItem[]>(() => [
     <div class="py-10 lg:py-16">
       <div class="container">
         <div class="flex flex-col lg:flex-row gap-6">
-          <div class="hidden lg:block w-[270px] shrink-0">
-            <RuiTabs
-              v-model="tabModelValue"
-              vertical
-              align="start"
-              color="primary"
-            >
-              <RuiTab
-                v-for="tab in tabs"
-                :key="tab.to"
-                link
-                :to="tab.to"
-              >
-                <template #prepend>
-                  <RuiIcon :name="tab.icon" />
-                </template>
-                {{ tab.label }}
-              </RuiTab>
-            </RuiTabs>
-          </div>
-          <div class="lg:hidden">
-            <RuiTabs
-              v-model="tabModelValue"
-              grow
-              color="primary"
-            >
-              <RuiTab
-                v-for="tab in tabs"
-                :key="tab.to"
-                link
-                :to="tab.to"
-              >
-                <template #prepend>
-                  <RuiIcon
-                    class="shrink-0"
-                    :name="tab.icon"
-                  />
-                </template>
-                {{ tab.label }}
-              </RuiTab>
-            </RuiTabs>
-          </div>
+          <PageTabs
+            v-model="tabModelValue"
+            :tabs="tabs"
+          />
 
           <div class="flex-1 overflow-x-auto">
             <slot />

@@ -82,6 +82,33 @@ function selectPlan(plan: AvailablePlan) {
   alert.show = false;
 }
 
+/** Picks the id of the plan variant that matches the billing period. */
+function getPeriodPlanId(plan: AvailablePlan, period: PricingPeriod): number | undefined {
+  return period === PricingPeriod.YEARLY
+    ? plan.yearlyPlan?.planId
+    : plan.monthlyPlan?.planId;
+}
+
+/**
+ * Resolves the checkout route that performs an upgrade for the payment method.
+ * Free and bank transfer subscriptions have no upgrade checkout, so they resolve to undefined.
+ */
+function getUpgradeRoute(paymentMethod: PaymentMethod | undefined): string | undefined {
+  if (
+    !paymentMethod
+    || paymentMethod === PaymentMethod.FREE
+    || paymentMethod === PaymentMethod.BANK_TRANSFER
+  ) {
+    return undefined;
+  }
+
+  return {
+    [PaymentMethod.CRYPTO]: '/checkout/pay/request-crypto',
+    [PaymentMethod.CARD]: '/checkout/pay/card',
+    [PaymentMethod.PAYPAL]: '/checkout/pay/paypal',
+  }[paymentMethod];
+}
+
 async function submitUpgrade() {
   const sub = get(subscription);
   const plan = get(selectedPlan);
@@ -93,9 +120,7 @@ async function submitUpgrade() {
   }
 
   const period = get(currentPeriod);
-  const planId = period === PricingPeriod.YEARLY
-    ? plan.yearlyPlan?.planId
-    : plan.monthlyPlan?.planId;
+  const planId = getPeriodPlanId(plan, period);
 
   if (!planId) {
     alert.show = true;
@@ -103,12 +128,9 @@ async function submitUpgrade() {
     return;
   }
 
-  const paymentMethod = sub.paymentMethod;
-  if (
-    !paymentMethod
-    || paymentMethod === PaymentMethod.FREE
-    || paymentMethod === PaymentMethod.BANK_TRANSFER
-  ) {
+  const routeName = getUpgradeRoute(sub.paymentMethod);
+
+  if (!routeName) {
     alert.show = true;
     alert.message = t('upgrade_plan.error.payment_method_unknown');
     return;
@@ -120,18 +142,6 @@ async function submitUpgrade() {
     planId,
     upgradeSubId: sub.id,
   };
-
-  const routeName = {
-    [PaymentMethod.CRYPTO]: '/checkout/pay/request-crypto',
-    [PaymentMethod.CARD]: '/checkout/pay/card',
-    [PaymentMethod.PAYPAL]: '/checkout/pay/paypal',
-  }[paymentMethod];
-
-  if (!routeName) {
-    alert.show = true;
-    alert.message = t('upgrade_plan.error.payment_method_unknown');
-    return;
-  }
 
   set(loading, true);
 

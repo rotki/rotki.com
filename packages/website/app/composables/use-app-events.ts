@@ -12,15 +12,13 @@ type UnsubscribeFn = () => void;
  */
 class AppEventBus {
   private static instance: AppEventBus | null = null;
-  private listeners: Map<string, Set<EventCallback>> = new Map();
-  private logger = useLogger('app-events');
+  private readonly listeners: Map<string, Set<EventCallback>> = new Map();
+  private readonly logger = useLogger('app-events');
 
   private constructor() {}
 
   static getInstance(): AppEventBus {
-    if (!AppEventBus.instance) {
-      AppEventBus.instance = new AppEventBus();
-    }
+    AppEventBus.instance ??= new AppEventBus();
     return AppEventBus.instance;
   }
 
@@ -115,7 +113,7 @@ export function useAccountRefresh() {
     { maxWait: 2000 },
   );
 
-  // Subscribe to refresh events
+  /** Subscribe to refresh events */
   const onRefresh = (callback: EventCallback): UnsubscribeFn => on('account:refresh', callback);
 
   return {

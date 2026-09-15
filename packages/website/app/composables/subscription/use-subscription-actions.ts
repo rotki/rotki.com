@@ -1,6 +1,6 @@
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import { isSubActive, isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common';
+import { isSubActive, isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
 import { get } from '@vueuse/shared';
 import { SubscriptionAction, type SubscriptionActionType } from '~/components/account/home/subscription-table/types';
 import { getHighestPlanOnPeriod } from '~/components/pricings/utils';

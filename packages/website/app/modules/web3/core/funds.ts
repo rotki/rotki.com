@@ -50,8 +50,7 @@ export function computeFundsStatus(params: FundsStatusParams): FundsStatus {
     return NEUTRAL;
 
   const native = parseAmount(params.nativeBalance);
-  // A missing gas estimate counts as 0 so we never raise a gas warning on data
-  // that hasn't loaded yet.
+  // A missing gas estimate counts as 0, so data that hasn't loaded never raises a gas warning.
   const gas = parseAmount(params.estimatedGas) ?? 0;
 
   if (params.isNative) {

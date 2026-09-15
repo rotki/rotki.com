@@ -65,9 +65,13 @@ export function useSubscription(): UseSubscriptionReturn {
         return;
       }
 
-      errorMessage = status.status === 'completed'
-        ? `${taskName} completed but result was false`
-        : status.error || `${taskName} task failed`;
+      // An empty `status.error` still falls back to the generic message.
+      if (status.status === 'completed')
+        errorMessage = `${taskName} completed but result was false`;
+      else if (status.error)
+        errorMessage = status.error;
+      else
+        errorMessage = `${taskName} task failed`;
     }
     catch (error: unknown) {
       errorMessage = getErrorMessage(error);

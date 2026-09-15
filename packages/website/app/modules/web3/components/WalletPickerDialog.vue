@@ -17,9 +17,11 @@ const errorDetail = shallowRef<string>();
 const qrUri = shallowRef<string>();
 const qrCanvas = useTemplateRef<HTMLCanvasElement>('qrCanvas');
 
-// Each connect attempt gets a token; cancelling (Back/close) bumps it so the
-// still-pending connect() promise resolves into a no-op instead of reopening
-// the QR or closing the dialog.
+/**
+ * Each connect attempt gets a token; cancelling (Back/close) bumps it so the
+ * still-pending connect() promise resolves into a no-op instead of reopening
+ * the QR or closing the dialog.
+ */
 let attemptToken = 0;
 
 const open = computed<boolean>({
@@ -54,7 +56,7 @@ async function handleDisconnect(): Promise<void> {
   }
 }
 
-// Cancel the in-flight attempt and return to the connector list.
+/** Cancel the in-flight attempt and return to the connector list. */
 function cancelConnection(): void {
   attemptToken += 1;
   set(qrUri, undefined);
@@ -71,8 +73,8 @@ async function selectConnector(connector: Connector): Promise<void> {
   const token = (attemptToken += 1);
 
   const result = await connect(connector.uid, {
+    /** Ignores a late URI from an attempt the user already cancelled. */
     onUri: (uri) => {
-      // Ignore a late URI from an attempt the user already cancelled.
       if (token === attemptToken)
         set(qrUri, uri);
     },

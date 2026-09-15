@@ -99,6 +99,30 @@ async function initialize(): Promise<boolean> {
   return true;
 }
 
+/** Records the purchase for analytics, then moves to the checkout success page. */
+async function completePurchase(plan: Pick<SelectedPlan, 'planId' | 'name' | 'durationInMonths'>): Promise<void> {
+  const breakdownData = get(breakdown);
+  const discountInfo = breakdownData?.discount;
+  let discountType: 'discount' | 'referral' | undefined;
+  if (discountInfo?.isValid === true) {
+    discountType = discountInfo.isReferral ? 'referral' : 'discount';
+  }
+
+  chronicle(SigilEvents.PURCHASE_SUCCESS, {
+    paymentMethod: 'paypal',
+    planId: plan.planId,
+    planName: plan.name,
+    planDuration: monthsToPlanDuration(plan.durationInMonths),
+    revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
+    currency: 'EUR',
+    isUpgrade: !!get(upgradeSubId),
+    discount: discountType,
+  });
+
+  sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
+  await navigateTo('/checkout/success');
+}
+
 async function handleSubmitPayment(nonce: string): Promise<void> {
   const plan = get(selectedPlan);
   if (!plan) {
@@ -123,26 +147,7 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
     });
 
     if (result.success) {
-      const breakdownData = get(breakdown);
-      const discountInfo = breakdownData?.discount;
-      let discountType: 'discount' | 'referral' | undefined;
-      if (discountInfo?.isValid === true) {
-        discountType = discountInfo.isReferral ? 'referral' : 'discount';
-      }
-
-      chronicle(SigilEvents.PURCHASE_SUCCESS, {
-        paymentMethod: 'paypal',
-        planId: plan.planId,
-        planName: plan.name,
-        planDuration: monthsToPlanDuration(plan.durationInMonths),
-        revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
-        currency: 'EUR',
-        isUpgrade: !!get(upgradeSubId),
-        discount: discountType,
-      });
-
-      sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
-      await navigateTo('/checkout/success');
+      await completePurchase(plan);
     }
     else if (result.blocked) {
       set(blocked, true);

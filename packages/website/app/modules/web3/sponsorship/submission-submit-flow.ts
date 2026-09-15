@@ -3,6 +3,7 @@ import { pipe } from 'plainfp';
 import { err, ok } from 'plainfp/result';
 import { flatMap, type ResultAsync } from 'plainfp/result-async';
 import { tag, type Tagged } from 'plainfp/tagged';
+import { nonEmpty } from '~/utils/non-empty';
 
 /**
  * Ordered, dependency-injected holder-submission flow. Each step runs only after
@@ -90,7 +91,7 @@ export function submitErrorMessage(error: SubmitError, translate: (key: string) 
     case 'AuthRequired':
       return translate('sponsor.submit_name.error.sign_failed');
     case 'SubmitFailed':
-      return error.message || translate('sponsor.submit_name.error.submit_failed');
+      return nonEmpty(error.message) ?? translate('sponsor.submit_name.error.submit_failed');
   }
 }
 

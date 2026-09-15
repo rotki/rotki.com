@@ -24,7 +24,7 @@ interface UseBraintreeClientReturn {
  * Braintree client composable for account management and checkout
  * Handles fetching client token and initializing Braintree client
  *
- * @param errorContext phrasing for `clientError`. The account pages use this
+ * @param errorContext - phrasing for `clientError`. The account pages use this
  * client to save a card, where payment wording would be wrong.
  */
 export function useBraintreeClient(errorContext: PaymentErrorContext = 'payment'): UseBraintreeClientReturn {

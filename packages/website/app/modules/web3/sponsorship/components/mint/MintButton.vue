@@ -5,19 +5,31 @@ import WalletAccountSummary from '~/modules/web3/components/WalletAccountSummary
 
 type ApprovalType = 'unlimited' | 'exact';
 
-defineProps<{
+export interface MintButtonWallet {
   connected: boolean;
   address?: string;
+  open: () => void;
+}
+
+export interface MintButtonApproval {
   needsApproval: boolean;
   isApproving: boolean;
-  isButtonDisabled: boolean;
-  buttonText: string;
-  buttonAction: () => void | Promise<void>;
+}
+
+export interface MintButtonAction {
+  disabled: boolean;
+  text: string;
+  run: () => void | Promise<void>;
+}
+
+defineProps<{
+  wallet: MintButtonWallet;
+  approval: MintButtonApproval;
+  action: MintButtonAction;
   selectedCurrency: string;
   selectedTier: TierKey;
   sponsorshipStatus: 'idle' | 'pending' | 'success' | 'error';
   getPriceForTier: (currency: string, tier: TierKey) => string | undefined;
-  open: () => void;
 }>();
 
 const emit = defineEmits<{
@@ -41,7 +53,7 @@ function handleApprove(type: ApprovalType) {
     <div class="flex gap-1 overflow-hidden">
       <!-- Approval Menu for when approval is needed -->
       <RuiMenu
-        v-if="needsApproval && !isApproving"
+        v-if="approval.needsApproval && !approval.isApproving"
         v-model="showApprovalOptions"
         :popper="{ placement: 'bottom' }"
         class="w-full"
@@ -52,7 +64,7 @@ function handleApprove(type: ApprovalType) {
             color="primary"
             size="lg"
             class="w-full flex-1 [&_span]:!text-wrap"
-            :disabled="isButtonDisabled"
+            :disabled="action.disabled"
             v-bind="attrs"
           >
             {{ t('sponsor.sponsor_page.buttons.approve', { currency: selectedCurrency }) }}
@@ -89,11 +101,11 @@ function handleApprove(type: ApprovalType) {
 
       <!-- Loading state while approving -->
       <RuiButton
-        v-if="isApproving"
+        v-if="approval.isApproving"
         color="primary"
         size="lg"
         class="w-full flex-1 [&_span]:!text-wrap"
-        :loading="true"
+        loading
         disabled
       >
         {{ t('sponsor.sponsor_page.buttons.approving') }}
@@ -101,17 +113,17 @@ function handleApprove(type: ApprovalType) {
 
       <!-- Regular mint button -->
       <RuiButton
-        v-if="!needsApproval && !isApproving"
+        v-if="!approval.needsApproval && !approval.isApproving"
         color="primary"
         size="lg"
         class="w-full flex-1 [&_span]:!text-wrap"
         :loading="sponsorshipStatus === 'pending'"
-        :disabled="isButtonDisabled"
-        @click="buttonAction()"
+        :disabled="action.disabled"
+        @click="action.run()"
       >
         <template #prepend>
           <RuiIcon
-            v-if="connected"
+            v-if="wallet.connected"
             name="lu-external-link"
           />
           <RuiIcon
@@ -119,14 +131,14 @@ function handleApprove(type: ApprovalType) {
             name="lu-wallet"
           />
         </template>
-        {{ buttonText }}
+        {{ action.text }}
       </RuiButton>
     </div>
     <WalletAccountSummary
-      v-if="connected && address"
+      v-if="wallet.connected && wallet.address"
       class="mt-3"
-      :address="address"
-      :open="open"
+      :address="wallet.address"
+      :open="wallet.open"
     />
   </div>
 </template>

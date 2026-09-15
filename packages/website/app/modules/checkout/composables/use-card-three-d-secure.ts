@@ -46,9 +46,8 @@ function expiryMatches(details: object, expiresAt: string): boolean {
   if (!parts)
     return false;
 
-  // Narrowed with `in` rather than a cast: `details` is a union of every
-  // payment-method shape braintree-web can return, and only the card ones
-  // carry an expiry.
+  /* Narrowed with `in` rather than a cast: `details` is a union of every
+     payment-method shape braintree-web can return, and only cards carry an expiry. */
   if (!('expirationMonth' in details) || !('expirationYear' in details))
     return false;
 
@@ -294,8 +293,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
     const instance = get(threeDSecureInstance);
     if (instance) {
       set(threeDSecureInstance, undefined);
-      // Without a callback teardown() returns a promise, so failures reject
-      // asynchronously instead of throwing here.
+      // Without a callback teardown() returns a promise that rejects instead of throwing.
       instance.teardown()
         .then(() => logger.debug('3DS instance torn down'))
         .catch((error: unknown) => logger.error('Error tearing down 3DS instance:', error));

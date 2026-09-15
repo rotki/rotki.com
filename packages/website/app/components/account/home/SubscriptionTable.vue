@@ -99,7 +99,6 @@ useSubscriptionPolling({
   refreshCallback: refreshSubscriptions,
 });
 
-// Action handlers using centralized composable
 async function resumeSubscription(subscription: UserSubscription): Promise<void> {
   await performResumeSubscription(subscription, activeAction, activeSubscription);
 }

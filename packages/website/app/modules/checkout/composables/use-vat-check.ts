@@ -53,11 +53,6 @@ export function useVatCheck(): UseVatCheckReturn {
   /**
    * Asynchronous function to check the validity of a VAT (Value Added Tax) ID.
    *
-   * @async
-   * @function
-   * @returns {Promise<VATCheckResult | VATCheckRateLimited>} Returns a promise that resolves to either a VATCheckResult object
-   * containing the validation result and message, or a VATCheckRateLimited object indicating the rate limit status with remaining time.
-   *
    * Possible return values:
    * - An object with `result: true` if the VAT ID check task was spawned successfully.
    * It provides no information about the validity of the VAT ID itself.
@@ -67,6 +62,9 @@ export function useVatCheck(): UseVatCheckReturn {
    * - A response with `message: 'Unknown error'` in case of unspecified errors.
    *
    * Handles potential errors during the fetch operation and logs them.
+   *
+   * @returns a VATCheckResult with the validation result and message, or a
+   * VATCheckRateLimited with the seconds left until the rate limit lifts.
    */
   const checkVAT = async (): Promise<VATCheckResult | VATCheckRateLimited> => {
     try {
@@ -85,7 +83,7 @@ export function useVatCheck(): UseVatCheckReturn {
     catch (error) {
       logger.error(error);
       if (error instanceof FetchError) {
-        const status = error?.status || -1;
+        const status = error.status ?? -1;
         const result = error.data.result;
         const isBadRequest = status === 400;
         if (isBadRequest) {
