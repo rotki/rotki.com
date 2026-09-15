@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ButtonProps } from '@rotki/ui-library';
 import ButtonLink from '~/components/common/ButtonLink.vue';
+import SponsorNavButton from '~/components/common/SponsorNavButton.vue';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -11,7 +11,6 @@ interface Menu {
   highlightExactActive?: true;
   highlightActive?: true;
   external?: true;
-  buttonProps?: ButtonProps;
 }
 
 interface MenuParent {
@@ -23,7 +22,7 @@ function isParent(item: Menu | MenuParent): item is MenuParent {
   return 'children' in item;
 }
 
-const baseMenus: (Menu | MenuParent)[] = [
+const menus: (Menu | MenuParent)[] = [
   {
     label: t('navigation_menu.home'),
     to: '/',
@@ -69,19 +68,6 @@ const baseMenus: (Menu | MenuParent)[] = [
   },
 ];
 
-const menus: (Menu | MenuParent)[] = [
-  ...baseMenus,
-  {
-    label: t('navigation_menu.sponsor'),
-    to: '/sponsor/mint',
-    highlightExactActive: true,
-    buttonProps: {
-      color: 'primary',
-      variant: 'outlined',
-    },
-  },
-];
-
 const { isMdAndDown } = useBreakpoint();
 </script>
 
@@ -96,8 +82,6 @@ const { isMdAndDown } = useBreakpoint();
         :highlight-exact-active="menu.highlightExactActive"
         :external="menu.external"
         :to="menu.to"
-        v-bind="menu.buttonProps"
-        :class="{ '!px-3': menu.buttonProps }"
       >
         {{ menu.label }}
         <template
@@ -179,5 +163,9 @@ const { isMdAndDown } = useBreakpoint();
         </ButtonLink>
       </template>
     </template>
+    <!-- Between md and xl the page header shows the sponsor button next to the account actions -->
+    <div class="contents md:max-xl:hidden">
+      <SponsorNavButton />
+    </div>
   </div>
 </template>

@@ -3,6 +3,7 @@ import { set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import AppLogo from '~/components/common/AppLogo.vue';
 import NavigationMenu from '~/components/common/NavigationMenu.vue';
+import SponsorNavButton from '~/components/common/SponsorNavButton.vue';
 import { useMainStore } from '~/store';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -67,14 +68,18 @@ watch(
       >
         <NuxtLink
           to="/"
-          class="flex w-full px-4 md:justify-center md:px-0 lg:w-auto"
+          class="flex w-full px-4 md:order-1 md:w-auto md:px-0 xl:order-none"
         >
           <AppLogo text />
         </NuxtLink>
 
-        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:w-auto md:flex-row md:border-y-0" />
+        <!-- Between md and xl: logo and actions share the first row, the links take the second -->
+        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:order-3 md:flex-row md:border-y-0 xl:order-none xl:w-auto" />
 
-        <div class="flex flex-col space-y-2 px-4 md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0">
+        <div class="flex flex-col space-y-2 px-4 md:order-2 md:ml-auto md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0 xl:order-none xl:ml-0">
+          <div class="hidden md:max-xl:contents">
+            <SponsorNavButton />
+          </div>
           <NuxtLink to="/home/subscription">
             <RuiButton
               rounded
