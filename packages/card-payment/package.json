@@ -9,7 +9,8 @@
     "typecheck": "vue-tsc --noEmit",
     "serve": "vite preview",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource/roboto": "catalog:",
@@ -28,14 +29,17 @@
     "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
     "autoprefixer": "catalog:",
+    "happy-dom": "catalog:",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vite-ssg": "catalog:",
+    "vitest": "catalog:",
     "vue-tsc": "catalog:"
   }
 }

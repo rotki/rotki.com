@@ -18,6 +18,11 @@ export default defineVitestConfig({
       NODE_ENV: 'test',
     },
     environment: 'nuxt',
+    environmentOptions: {
+      nuxt: {
+        domEnvironment: 'happy-dom',
+      },
+    },
     exclude: [
       ...configDefaults.exclude,
       '.data/**',

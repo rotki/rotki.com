@@ -131,6 +131,9 @@ jobs:
       - name: Check every router route resolves 🧭
         run: pnpm run check:routes
 
+      - name: Run package unit tests ✅
+        run: pnpm --filter "./packages/*" --filter "!@rotki/website" test
+
       - name: Run tests with coverage ✅
         run: pnpm run coverage
 
