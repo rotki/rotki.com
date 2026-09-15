@@ -1,6 +1,5 @@
-// camelCase → snake_case key conversion.
-// Used at tracking boundaries so payload interfaces stay camelCase (matching
-// the codebase convention) while the analytics layer receives snake_case keys.
+/* camelCase → snake_case key conversion, used at tracking boundaries so payload
+   interfaces stay camelCase while the analytics layer receives snake_case keys. */
 
 /**
  * Convert a single camelCase string to snake_case at runtime.

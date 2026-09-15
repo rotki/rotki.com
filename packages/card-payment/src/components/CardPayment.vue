@@ -20,7 +20,7 @@ import PlanSummary from './PlanSummary.vue';
 import SavedCardDisplay from './SavedCardDisplay.vue';
 import TermsAcceptance from './TermsAcceptance.vue';
 
-// VAT breakdown state
+/** VAT split of the current breakdown, formatted for display. */
 interface VatBreakdown {
   basePrice: string;
   vatAmount: string;
@@ -43,15 +43,19 @@ const emit = defineEmits<{
   'go-back': [];
   'payment-success': [];
   'refresh-card': [];
-  // Fatal errors that make the whole payment view unusable (e.g. Braintree client
-  // failed to initialize). The parent should show a full-screen ErrorState. Per-
-  // transaction errors (card decline, payment failure) stay inline.
+  /**
+   * Fatal errors that make the whole payment view unusable (e.g. Braintree client
+   * failed to initialize). The parent should show a full-screen ErrorState.
+   * Per-transaction errors (card decline, payment failure) stay inline.
+   */
   'fatal-error': [message: string];
 }>();
 
-// Per-transaction error (card decline, tokenization failure, payment failure). Kept
-// local so a recoverable problem doesn't escalate to App.vue's full-screen ErrorState,
-// which is reserved for genuinely fatal init failures (e.g. plan/Braintree client load).
+/**
+ * Per-transaction error (card decline, tokenization failure, payment failure). Kept
+ * local so a recoverable problem doesn't escalate to App.vue's full-screen ErrorState,
+ * which is reserved for genuinely fatal init failures (e.g. plan/Braintree client load).
+ */
 const transactionError = ref<string>();
 
 const client = shallowRef<Client>();
@@ -121,7 +125,6 @@ const isFormValid = computed<boolean>(() => {
   );
 });
 
-// Initialize Braintree client
 async function initializeBraintreeClient(): Promise<void> {
   const authorization = planData.braintreeClientToken;
   if (!authorization) {
@@ -200,6 +203,61 @@ const renewingPrice = computed<number>(() => {
   return selectedPlan.price;
 });
 
+interface PaymentCardDetails {
+  paymentToken: string;
+  paymentBin: string;
+}
+
+/**
+ * Token and BIN of the card to charge: the selected saved card, or the new card
+ * form, which is tokenized and vaulted first. Returns `undefined` when the new
+ * card form is not mounted.
+ */
+async function resolvePaymentCard(card: SavedCard | undefined): Promise<PaymentCardDetails | undefined> {
+  if (card) {
+    const paymentBin = await getSavedCardBin(card);
+    return { paymentToken: card.token, paymentBin };
+  }
+
+  const form = get(newCardForm);
+  if (!form) {
+    return undefined;
+  }
+
+  const { nonce, bin } = await form.tokenize();
+  const paymentToken = await addCard({
+    paymentMethodNonce: nonce,
+  });
+
+  emit('refresh-card');
+  return { paymentToken, paymentBin: bin };
+}
+
+/** Data the 3D Secure page needs to verify and complete the payment. */
+function buildThreeDSecureParams(
+  clientToken: string,
+  paymentNonce: string,
+  paymentBin: string,
+  currentDiscountInfo: PaymentBreakdownDiscount | undefined,
+): ThreeDSecureParams {
+  return {
+    token: clientToken,
+    planId: selectedPlan.planId,
+    amount: selectedPlan.price.toString(),
+    finalAmount: get(grandTotal).toString(),
+    renewingPrice: get(renewingPrice).toString(),
+    nonce: paymentNonce,
+    bin: paymentBin,
+    discountCode: getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined),
+    upgradeSubId: upgradeSubId || undefined,
+    durationInMonths: selectedPlan.durationInMonths,
+    planName: selectedPlan.name,
+    discountTrackingInfo: currentDiscountInfo?.isValid === true
+      ? { isReferral: currentDiscountInfo.isReferral, discountType: currentDiscountInfo.discountType }
+      : undefined,
+  };
+}
+
 async function processPayment(): Promise<void> {
   if (!get(isFormValid)) {
     return;
@@ -227,52 +285,19 @@ async function processPayment(): Promise<void> {
   }
 
   try {
-    let paymentToken: string;
-    let paymentBin: string;
-
-    if (card) {
-      paymentBin = await getSavedCardBin(card);
-      paymentToken = card.token;
-    }
-    else {
-      const form = get(newCardForm);
-      if (!form) {
-        set(transactionError, 'New card form not available');
-        set(isProcessing, false);
-        return;
-      }
-
-      const { nonce, bin } = await form.tokenize();
-      paymentBin = bin;
-      paymentToken = await addCard({
-        paymentMethodNonce: nonce,
-      });
-
-      emit('refresh-card');
+    const paymentCard = await resolvePaymentCard(card);
+    if (!paymentCard) {
+      set(transactionError, 'New card form not available');
+      set(isProcessing, false);
+      return;
     }
 
+    const { paymentToken, paymentBin } = paymentCard;
     const paymentNonce = await createCardNonce({
       paymentToken,
     });
 
-    // Store data for 3D Secure if needed
-    const threeDSecureParams: ThreeDSecureParams = {
-      token: clientToken,
-      planId: selectedPlan.planId,
-      amount: selectedPlan.price.toString(),
-      finalAmount: get(grandTotal).toString(),
-      renewingPrice: get(renewingPrice).toString(),
-      nonce: paymentNonce,
-      bin: paymentBin,
-      discountCode: getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined),
-      upgradeSubId: upgradeSubId || undefined,
-      durationInMonths: selectedPlan.durationInMonths,
-      planName: selectedPlan.name,
-      discountTrackingInfo: currentDiscountInfo?.isValid === true
-        ? { isReferral: currentDiscountInfo.isReferral, discountType: currentDiscountInfo.discountType }
-        : undefined,
-    };
-
+    const threeDSecureParams = buildThreeDSecureParams(clientToken, paymentNonce, paymentBin, currentDiscountInfo);
     sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
     emit('payment-success');
   }
@@ -286,6 +311,14 @@ async function processPayment(): Promise<void> {
       discountApplied,
     }));
     set(isProcessing, false);
+  }
+}
+
+/** Prefill the discount code from the `ref` query param, unless one is already entered. */
+function prefillReferralDiscountCode(): void {
+  const referralCodeParam = new URLSearchParams(window.location.search).get('ref');
+  if (referralCodeParam && !get(discountCode)) {
+    set(discountCode, referralCodeParam);
   }
 }
 
@@ -322,12 +355,7 @@ watch(() => cards, (newCards) => {
 });
 
 onMounted(async () => {
-  // Prefill discount code from referral code query param
-  const referralCodeParam = new URLSearchParams(window.location.search).get('ref');
-  if (referralCodeParam && !get(discountCode)) {
-    set(discountCode, referralCodeParam);
-  }
-
+  prefillReferralDiscountCode();
   await initializeBraintreeClient();
 });
 

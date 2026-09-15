@@ -35,8 +35,8 @@ export const navigation = {
 
   /**
    * Navigate back to payment method selection
-   * @param planId - The plan ID
-   * @param referralCode - The referral code
+   * @param planId - Plan to keep selected; left out of the URL when empty
+   * @param referralCode - Carried over as `ref` so the referral discount is not lost
    */
   goToPaymentMethod(planId: string | undefined, referralCode?: string | null): void {
     const href = routes.paymentMethod;
@@ -79,7 +79,12 @@ export function getUrlParams(): URLSearchParams {
  */
 export function getUrlParam(key: string, defaultValue?: string): string | null {
   const params = getUrlParams();
-  return params.get(key) || defaultValue || null;
+  return nonEmpty(params.get(key)) ?? nonEmpty(defaultValue) ?? null;
+}
+
+/** `undefined` for a missing or empty string, so an empty `?key=` still falls back. */
+function nonEmpty(value: string | null | undefined): string | undefined {
+  return value === null || value === '' ? undefined : value;
 }
 
 export function getDurationFromUrlParam(key: string): string {

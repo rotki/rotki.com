@@ -95,7 +95,36 @@ const steps = [{
   current: false,
 }];
 
-async function load() {
+/**
+ * Load checkout data, available plans and saved cards in parallel and store them.
+ * Returns the error to show when a required piece is missing, `undefined` on success.
+ */
+async function loadPaymentData(planId: number): Promise<string | undefined> {
+  const [checkoutData, availablePlansData, savedCardData] = await Promise.all([
+    checkout(planId),
+    getAvailablePlans(),
+    getSavedCard(),
+  ]);
+
+  if (!checkoutData)
+    return 'Failed to initialize payment. Please try again.';
+
+  if (!availablePlansData)
+    return 'Failed to load plan information. Please try again.';
+
+  const foundPlan = findSelectedPlanById(availablePlansData, planId);
+  if (!foundPlan)
+    return 'Invalid plan selected. Please try again.';
+
+  set(planData, checkoutData);
+  set(selectedPlan, foundPlan);
+  set(cards, savedCardData);
+  const linkedCard = savedCardData?.find(card => card.linked);
+  set(selectedCard, linkedCard || savedCardData?.[0]);
+  return undefined;
+}
+
+async function load(): Promise<void> {
   try {
     // Validate plan ID parameter
     set(loadingMessage, 'Validating plan...');
@@ -133,38 +162,11 @@ async function load() {
 
     set(loadingMessage, 'Initializing payment...');
 
-    // Load checkout data, available plans, and saved card in parallel
-    const [checkoutData, availablePlansData, savedCardData] = await Promise.all([
-      checkout(planId),
-      getAvailablePlans(),
-      getSavedCard(),
-    ]);
-
-    if (!checkoutData) {
-      set(errorMessage, 'Failed to initialize payment. Please try again.');
+    const loadError = await loadPaymentData(planId);
+    if (loadError) {
+      set(errorMessage, loadError);
       set(isLoading, false);
-      return;
     }
-
-    if (!availablePlansData) {
-      set(errorMessage, 'Failed to load plan information. Please try again.');
-      set(isLoading, false);
-      return;
-    }
-
-    // Find the selected plan by planId
-    const foundPlan = findSelectedPlanById(availablePlansData, planId);
-    if (!foundPlan) {
-      set(errorMessage, 'Invalid plan selected. Please try again.');
-      set(isLoading, false);
-      return;
-    }
-
-    set(planData, checkoutData);
-    set(selectedPlan, foundPlan);
-    set(cards, savedCardData);
-    const linkedCard = savedCardData?.find(card => card.linked);
-    set(selectedCard, linkedCard || savedCardData?.[0]);
   }
   catch (error) {
     console.error('Initialization error:', error);

@@ -37,7 +37,6 @@ export const CreateCardNoncePayloadSchema = z.object({
   paymentToken: z.string(),
 });
 
-// Inferred types
 export type SavedCard = z.infer<typeof SavedCardSchema>;
 
 export type SavedCardResponse = z.infer<typeof SavedCardResponseSchema>;

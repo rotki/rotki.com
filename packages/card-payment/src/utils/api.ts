@@ -1,3 +1,4 @@
+import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
 import {
   type AvailablePlansResponse,
   AvailablePlansResponseSchema,
@@ -5,8 +6,7 @@ import {
   type PaymentBreakdownResponse,
   PaymentBreakdownResponseSchema,
   type SelectedPlan,
-} from '@rotki/card-payment-common';
-import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
+} from '@rotki/card-payment-common/schemas/plans';
 import { type UserSubscriptions, UserSubscriptionsResponseSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { paths } from '@/config/paths';
@@ -30,7 +30,7 @@ async function fetchCSRFToken(): Promise<string> {
     const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
 
     if (csrfCookie) {
-      csrfToken = csrfCookie.split('=')[1];
+      csrfToken = csrfCookie.slice(csrfCookie.indexOf('=') + 1);
       return csrfToken;
     }
 
@@ -81,7 +81,7 @@ export async function getAccount(): Promise<Account | undefined> {
       });
       return undefined;
     }
-    return parsedResponse.data.result || undefined;
+    return parsedResponse.data.result ?? undefined;
   }
   catch (error: any) {
     console.error('Failed to get account:', error);
@@ -89,7 +89,6 @@ export async function getAccount(): Promise<Account | undefined> {
   }
 }
 
-// Checkout API functions
 export async function getPaymentBreakdown(params: PaymentBreakdownRequest): Promise<PaymentBreakdownResponse | null> {
   try {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/payment/breakdown`, {
@@ -125,7 +124,6 @@ export async function checkout(planId: number): Promise<PaymentBreakdownResponse
   return getPaymentBreakdown({ newPlanId: planId, isCryptoPayment: false });
 }
 
-// Plans API functions
 export async function getAvailablePlans(): Promise<AvailablePlansResponse | null> {
   try {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/available-tiers`, {
@@ -185,7 +183,6 @@ export function findSelectedPlanById(availablePlans: AvailablePlansResponse, pla
   return undefined;
 }
 
-// Subscription API functions
 export async function fetchUserSubscriptions(): Promise<UserSubscriptions> {
   try {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/history/subscriptions`, {
@@ -208,7 +205,7 @@ export async function fetchUserSubscriptions(): Promise<UserSubscriptions> {
       });
       return [];
     }
-    return parsedResponse.data.result || [];
+    return parsedResponse.data.result ?? [];
   }
   catch (error: any) {
     console.error('Failed to fetch user subscriptions:', error);

@@ -1,12 +1,12 @@
-// Payment failure catalog — single source of truth.
-// Each entry pairs the server-side event name (sent to /api/logging/payment)
-// with the coarse Sigil `payment_failed.reason` category. Adding a new
-// failure type means adding exactly one entry here, and both sides stay in
-// sync.
-
 import type { EnumValueOf } from './common';
 import { z } from 'zod';
 
+/**
+ * Payment failure catalog, the single source of truth.
+ * Each entry pairs the server-side event name (sent to /api/logging/payment)
+ * with the coarse Sigil `payment_failed.reason` category. Adding a new failure
+ * type means adding exactly one entry here, and both sides stay in sync.
+ */
 export const PaymentFailures = {
   BRAINTREE_INIT_FAILED: { serverEvent: 'braintree_init_failed', reason: 'braintree_init' },
   THREE_DS_VERIFICATION_FAILED: { serverEvent: '3ds_verification_failed', reason: 'three_ds_failed' },
@@ -30,11 +30,13 @@ export type PaymentFailedReason = EnumValueOf<typeof PaymentFailures>['reason'];
 
 export type PaymentServerEvent = EnumValueOf<typeof PaymentFailures>['serverEvent'];
 
-// Convenience: key → serverEvent string, preserving literal types. Built as an
-// explicit literal (values derived from PaymentFailures, so no string duplication)
-// so the precise per-key type is inferred with no assertion. `satisfies` enforces
-// that every PaymentFailureKey is present — adding an entry above without adding it
-// here is a compile error.
+/**
+ * Key to serverEvent string, preserving literal types. Built as an explicit
+ * literal (values derived from PaymentFailures, so no string duplication) so the
+ * precise per-key type is inferred with no assertion. `satisfies` enforces that
+ * every PaymentFailureKey is present: adding an entry above without adding it
+ * here is a compile error.
+ */
 export const PaymentServerEvents = {
   BRAINTREE_INIT_FAILED: PaymentFailures.BRAINTREE_INIT_FAILED.serverEvent,
   THREE_DS_VERIFICATION_FAILED: PaymentFailures.THREE_DS_VERIFICATION_FAILED.serverEvent,
@@ -61,9 +63,10 @@ const SERVER_EVENT_TO_REASON: Readonly<Record<string, PaymentFailedReason>> = Ob
 /**
  * Resolve a coarse Sigil `payment_failed.reason` from a server-side event name.
  * Use on the website side where callers already pass the server event string.
+ * The non-null assertion is safe: SERVER_EVENT_TO_REASON is built from the same
+ * catalog as PaymentServerEvent.
  */
 export function reasonForServerEvent(serverEvent: PaymentServerEvent): PaymentFailedReason {
-  // Safe: SERVER_EVENT_TO_REASON is built from the same catalog as PaymentServerEvent.
   return SERVER_EVENT_TO_REASON[serverEvent]!;
 }
 
@@ -74,35 +77,51 @@ interface CryptoErrorShape {
 }
 
 /**
- * Map an ethers/EIP-1193-shaped error from a crypto transaction attempt to a
- * specific `PaymentFailureKey`. Distinguishes user-rejected and
- * insufficient-funds failures from generic tx errors. No ethers runtime dep —
- * the function only duck-types the error.
+ * Classify by the ethers / EIP-1193 error `code`, which is the most reliable
+ * signal when the provider sets it.
  */
-export function classifyCryptoTxError(error: unknown): PaymentFailureKey {
-  const err: CryptoErrorShape = typeof error === 'object' && error !== null ? error : {};
-  const code = err.code;
-
+function classifyCryptoErrorCode(code: CryptoErrorShape['code']): PaymentFailureKey | undefined {
   if (code === 'ACTION_REJECTED' || code === 4001)
     return 'CRYPTO_USER_REJECTED';
 
   if (code === 'INSUFFICIENT_FUNDS')
     return 'CRYPTO_INSUFFICIENT_FUNDS';
 
-  const message = String(err.shortMessage ?? err.message ?? '').toLowerCase();
+  return undefined;
+}
 
+/**
+ * Classify by the lowercased error text, for providers and contracts that
+ * report the failure only in prose.
+ */
+function classifyCryptoErrorMessage(message: string): PaymentFailureKey | undefined {
   if (message.includes('insufficient funds') || message.includes('insufficient balance') || message.includes('transfer amount exceeds balance'))
     return 'CRYPTO_INSUFFICIENT_FUNDS';
 
   if (message.includes('user rejected') || message.includes('user denied'))
     return 'CRYPTO_USER_REJECTED';
 
-  return 'CRYPTO_TX_FAILED';
+  return undefined;
 }
 
-// The schemas below describe third-party error objects we do not control, so
-// every field is `.catch(undefined)`: one unexpected field type degrades that
-// field only, and never discards the rest of an otherwise usable error.
+/**
+ * Map an ethers/EIP-1193-shaped error from a crypto transaction attempt to a
+ * specific `PaymentFailureKey`. Distinguishes user-rejected and
+ * insufficient-funds failures from generic tx errors. No ethers runtime dep:
+ * the function only duck-types the error.
+ */
+export function classifyCryptoTxError(error: unknown): PaymentFailureKey {
+  const err: CryptoErrorShape = typeof error === 'object' && error !== null ? error : {};
+  const message = String(err.shortMessage ?? err.message ?? '').toLowerCase();
+
+  return classifyCryptoErrorCode(err.code)
+    ?? classifyCryptoErrorMessage(message)
+    ?? 'CRYPTO_TX_FAILED';
+}
+
+/* The schemas below describe third-party error objects we do not control, so
+   every field is `.catch(undefined)`: one unexpected field type degrades that
+   field only, and never discards the rest of an otherwise usable error. */
 
 /**
  * Cardinal's original error, attached by braintree-web as
@@ -142,18 +161,18 @@ const BraintreeErrorSchema = z.object({
  * ofetch `FetchError`, a `TypeError` from a bug of ours and a deliberate piece
  * of copy are all just `Error`s with a `message`, and only one of them may be
  * rendered.
- *
- * @param logDetail diagnostic to append to `logMessage` only. The message is
- * customer copy, so it rarely says which card or plan was involved; this is
- * where that goes.
  */
 export class PaymentUserError extends Error {
   /** Structural marker: survives bundling and duplicate package copies, unlike `instanceof`. */
   readonly userFacing = true;
+  /**
+   * Diagnostic to append to `logMessage` only. The message is customer copy, so
+   * it rarely says which card or plan was involved; this is where that goes.
+   */
   readonly logDetail?: string;
 
-  constructor(message: string, options?: { logDetail?: string }) {
-    super(message);
+  constructor(message: string, options?: ErrorOptions & { logDetail?: string }) {
+    super(message, options);
     this.name = 'PaymentUserError';
     this.logDetail = options?.logDetail;
   }
@@ -316,7 +335,21 @@ function parseUserError(error: unknown): ParsedPaymentError | undefined {
  * sentence anyone wrote, which is why reaching them can never mean `OWN`.
  */
 function describeBraintreeError(error: unknown, parsed: z.infer<typeof BraintreeErrorSchema>): string {
-  return parsed.message || parsed.code || parsed.type || String(error);
+  return nonEmpty(parsed.message) ?? nonEmpty(parsed.code) ?? nonEmpty(parsed.type) ?? String(error);
+}
+
+/** `undefined` for an absent or empty string, so an empty field falls through to the next fallback. */
+function nonEmpty(value: string | undefined): string | undefined {
+  return value === '' ? undefined : value;
+}
+
+/**
+ * A bare string rejection is unattributable: it may be third-party prose, or
+ * the `26` that started all this. Log it, never show it.
+ */
+function parseStringRejection(error: string): ParsedPaymentError {
+  const message = error || 'Unknown error';
+  return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
 }
 
 /**
@@ -330,12 +363,8 @@ function describeBraintreeError(error: unknown, parsed: z.infer<typeof Braintree
  * logs with nothing left to identify it).
  */
 export function parseBraintreeError(error: unknown): ParsedPaymentError {
-  // A bare string or a non-object rejection is unattributable: it may be
-  // third-party prose, or the `26` that started all this. Log it, never show it.
-  if (typeof error === 'string') {
-    const message = error || 'Unknown error';
-    return { message, logMessage: message, audience: PaymentErrorAudiences.OPAQUE };
-  }
+  if (typeof error === 'string')
+    return parseStringRejection(error);
 
   const own = parseUserError(error);
   if (own)

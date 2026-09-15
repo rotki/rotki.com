@@ -1,9 +1,7 @@
-// Sigil event payload shapes — one interface per event in `SigilEvents`.
-// `SigilEventPayloadMap` ties event-name → payload type for callers.
-//
-// All interfaces use camelCase keys (matching the codebase convention).
-// Conversion to snake_case happens at the tracking boundary via
-// `toSnakeCaseKeys` from `./case`.
+/* Sigil event payload shapes, one interface per event in `SigilEvents`.
+   `SigilEventPayloadMap` ties event name to payload type for callers.
+   All interfaces use camelCase keys; conversion to snake_case happens at the
+   tracking boundary via `toSnakeCaseKeys` from `./case`. */
 
 import type {
   ActivationFailedReason,

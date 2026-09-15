@@ -1,6 +1,6 @@
-// Common Sigil enums shared by event payloads, the failure catalog, and
-// host-package call sites. Each is an `as const` object so values are usable
-// at runtime and types are derived from the same source via `EnumValueOf`.
+/* Common Sigil enums shared by event payloads, the failure catalog, and
+   host-package call sites. Each is an `as const` object so values are usable
+   at runtime and types are derived from the same source via `EnumValueOf`. */
 
 /**
  * Derive a string-literal union from the values of a const enum-like object.

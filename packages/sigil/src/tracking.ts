@@ -1,6 +1,6 @@
-// Sigil track helper, UTM attribution contract, and pure tracking helpers.
-// Sigil is the only place that talks to `window.umami` directly — everything
-// else goes through `sigilTrack`.
+/* Sigil track helper, UTM attribution contract, and pure tracking helpers.
+   Sigil is the only place that talks to `window.umami` directly; everything
+   else goes through `sigilTrack`. */
 
 declare global {
   interface Window {
@@ -52,10 +52,10 @@ export function sigilTrack(event: string, data: Record<string, unknown> = {}): v
   }
 }
 
-// UTM attribution contract — types and cookie constants for the first-touch
-// attribution session that every Sigil event is tagged with. Shared so any
-// future client (e.g. the card-payment SPA) that wants session continuity can
-// read the same cookie using the same shape.
+/* UTM attribution contract: types and cookie constants for the first-touch
+   attribution session that every Sigil event is tagged with. Shared so any
+   future client (e.g. the card-payment SPA) that wants session continuity can
+   read the same cookie using the same shape. */
 
 export const UTM_COOKIE_NAME = '_utm';
 
@@ -152,10 +152,30 @@ export function createTrackingSession(input: CreateTrackingSessionInput): Tracki
     sessionId: randomSessionId(),
     utm: {
       ...input.utm,
-      referrer: input.referrer || undefined,
+      referrer: input.referrer === '' ? undefined : input.referrer,
       landingPath: input.landingPath,
       capturedAt: new Date().toISOString(),
     },
+  };
+}
+
+/**
+ * The snake_case attribution fields for a session. Every key is always present,
+ * set to `undefined` when there is no session, so they overwrite any same-named
+ * field in the event data. `utm` is read defensively because the session comes
+ * from a cookie and may be malformed.
+ */
+function sessionAttributionFields(session: TrackingSession | undefined): Record<string, unknown> {
+  const utm: UtmParams = session?.utm ?? {};
+  return {
+    session_id: session?.sessionId,
+    utm_source: utm.utmSource,
+    utm_medium: utm.utmMedium,
+    utm_campaign: utm.utmCampaign,
+    utm_content: utm.utmContent,
+    utm_term: utm.utmTerm,
+    referrer: utm.referrer,
+    landing_path: utm.landingPath,
   };
 }
 
@@ -169,14 +189,6 @@ export function buildTrackedEventData(
   session: TrackingSession | undefined,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
-  Object.assign(result, data);
-  result.session_id = session?.sessionId;
-  result.utm_source = session?.utm?.utmSource;
-  result.utm_medium = session?.utm?.utmMedium;
-  result.utm_campaign = session?.utm?.utmCampaign;
-  result.utm_content = session?.utm?.utmContent;
-  result.utm_term = session?.utm?.utmTerm;
-  result.referrer = session?.utm?.referrer;
-  result.landing_path = session?.utm?.landingPath;
+  Object.assign(result, data, sessionAttributionFields(session));
   return result;
 }

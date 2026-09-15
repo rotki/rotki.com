@@ -55,8 +55,7 @@ async function handleAddCard(): Promise<void> {
   }
 }
 
-// Reset the inline error each time the dialog is reopened so a stale alert
-// from a prior attempt doesn't persist across sessions.
+// Clear the inline error on reopen so a stale alert from a prior attempt doesn't persist.
 watch(open, (isOpen) => {
   if (isOpen) {
     set(addCardError, undefined);

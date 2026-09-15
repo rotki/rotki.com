@@ -1,7 +1,7 @@
-// Server-side payment log endpoint contract. Both the website and the card-
-// payment SPA POST to the same Go backend endpoint with the same shape; this
-// module owns the request body type and the fire-and-forget POST helper so
-// the two callers can never drift.
+/* Server-side payment log endpoint contract. Both the website and the card-payment
+   SPA POST to the same Go backend endpoint with the same shape; this module owns
+   the request body type and the fire-and-forget POST helper so the two callers
+   can never drift. */
 
 import type { CardType, CheckoutPaymentMethod, CheckoutStep } from './common';
 import type { PaymentServerEvent } from './failures';

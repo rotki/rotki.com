@@ -99,6 +99,18 @@ export function reportCardFailure(
   return paymentMessageFor(parsed);
 }
 
+/**
+ * The caught error's `message`, or `fallback` when it has no string message or
+ * the message is empty (an empty message must still fall back).
+ */
+function caughtMessageOr(error: unknown, fallback: string): string {
+  if (typeof error !== 'object' || error === null || !('message' in error))
+    return fallback;
+
+  const { message } = error;
+  return typeof message === 'string' && message !== '' ? message : fallback;
+}
+
 function extractErrorMessage(errorText: string): string {
   try {
     const parsed = JSON.parse(errorText);
@@ -119,12 +131,12 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       const backendMessage = extractErrorMessage(errorText);
-      // 400s on this endpoint are either schema/JSON-decode errors (programmer-side)
-      // or raw Braintree gateway dumps ("Do Not Honor" etc.), so they get friendly
-      // copy with the raw cause kept in logDetail. 429 surfaces the backend's
-      // already-user-friendly rate-limit message verbatim. Both are written for the
-      // customer, hence PaymentUserError, which is what lets them reach the screen;
-      // anything else is an HTTP dump and stays opaque.
+      /* 400s on this endpoint are either schema/JSON-decode errors (programmer-side)
+         or raw Braintree gateway dumps ("Do Not Honor" etc.), so they get friendly
+         copy with the raw cause kept in logDetail. 429 surfaces the backend's
+         already-user-friendly rate-limit message verbatim. Both are written for the
+         customer, hence PaymentUserError, which is what lets them reach the screen;
+         anything else is an HTTP dump and stays opaque. */
       if (response.status === 400) {
         throw new PaymentUserError(
           'We couldn\'t add this card. Please double-check the details or try a different card.',
@@ -154,8 +166,7 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
   }
   catch (error: unknown) {
     console.error('Failed to add card:', error);
-    // Rethrow as-is: re-wrapping in a plain Error would strip the
-    // PaymentUserError marker and turn customer copy into generic copy.
+    // Rethrow as-is: re-wrapping would strip the PaymentUserError marker from customer copy.
     throw error instanceof PaymentUserError
       ? error
       : new Error(error instanceof Error ? error.message : 'Failed to add card');
@@ -189,7 +200,7 @@ export async function createCardNonce(payload: CreateCardNoncePayload): Promise<
   }
   catch (error: any) {
     console.error('Failed to create card nonce:', error);
-    throw new Error(error.message || 'Failed to create card nonce');
+    throw new Error(caughtMessageOr(error, 'Failed to create card nonce'));
   }
 }
 
@@ -207,7 +218,7 @@ export async function deleteCard(token: string): Promise<void> {
   }
   catch (error: any) {
     console.error('Failed to delete card:', error);
-    throw new Error(error.message || 'Failed to delete card');
+    throw new Error(caughtMessageOr(error, 'Failed to delete card'));
   }
 }
 

@@ -6,9 +6,14 @@ import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import { APP_BASE_PATH } from './src/config/base-path.ts';
 
-// The relative import keeps its `.ts` extension on purpose: vite 8 loads this config natively and
-// warns about extensionless relative imports. eslint.config.js turns `@rotki/no-dot-ts-imports` off
-// for config files, and tsconfig.node.json sets `allowImportingTsExtensions` for vue-tsc.
+/* The relative import keeps its `.ts` extension on purpose: vite 8 loads this config natively and
+   warns about extensionless relative imports. eslint.config.js turns `@rotki/no-dot-ts-imports` off
+   for config files, and tsconfig.node.json sets `allowImportingTsExtensions` for vue-tsc. */
+
+const webapiUrl = process.env.WEBAPI_URL;
+
+// An empty WEBAPI_URL falls back to the local backend, like an unset one.
+const webapiTarget = webapiUrl === undefined || webapiUrl === '' ? 'http://127.0.0.1:8000' : webapiUrl;
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -71,7 +76,7 @@ export default defineConfig({
       '/webapi': {
         changeOrigin: true,
         secure: false,
-        target: process.env.WEBAPI_URL || 'http://127.0.0.1:8000',
+        target: webapiTarget,
       },
     },
   },

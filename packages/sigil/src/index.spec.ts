@@ -115,9 +115,7 @@ describe('parseQueryParam', () => {
     expect(parseQueryParam(true)).toBeUndefined();
   });
 
-  it('skips null entries at the front of an array', () => {
-    // Vue Router arrays can contain null entries; the current behaviour is to
-    // return undefined when the first slot is null rather than scanning.
+  it('returns undefined when a Vue Router array starts with null, rather than scanning', () => {
     expect(parseQueryParam([null, 'fallback'])).toBeUndefined();
   });
 });
@@ -197,9 +195,7 @@ describe('randomSessionId', () => {
     expect(id).toMatch(UUID_V4);
   });
 
-  it('produces unique ids across the getRandomValues path', () => {
-    // Deterministic counter so different fills produce different ids without
-    // relying on a PRNG.
+  it('produces unique ids across the getRandomValues path with a deterministic counter fill', () => {
     let counter = 0;
     const getRandomValues = vi.fn((array: Uint8Array) => {
       for (let i = 0; i < array.length; i++)
@@ -304,8 +300,7 @@ describe('buildTrackedEventData', () => {
     expect(input).toEqual({ plan_id: 42 });
   });
 
-  it('lets session attribution win over a conflicting event data field', () => {
-    // Not a supported scenario but documents the merge order.
+  it('lets session attribution win over a conflicting event data field (documents the merge order)', () => {
     const result = buildTrackedEventData({ session_id: 'override' }, session);
     expect(result.session_id).toBe('sess-abc');
   });
@@ -448,8 +443,7 @@ describe('toSnakeCaseKeys', () => {
     expect(input).toEqual({ planId: 42, isUpgrade: false });
   });
 
-  it('converts all PaymentLogPayload keys correctly', () => {
-    // Simulates the full postPaymentLog conversion
+  it('converts all PaymentLogPayload keys as postPaymentLog does', () => {
     const result = toSnakeCaseKeys({
       paymentMethod: 'card' as const,
       event: 'card_payment_api_error' as const,
@@ -481,9 +475,7 @@ describe('sigilEvents', () => {
     expect(SigilEvents.CARD_3DS_CHALLENGE_SHOWN).toBe('card_3ds_challenge_shown');
   });
 
-  it('every SigilEvents value has a corresponding SigilEventPayloadMap entry', () => {
-    // Type-level check: if a new event is added to SigilEvents but not wired
-    // into SigilEventPayloadMap, this block will produce a compile error.
+  it('every SigilEvents value has a corresponding SigilEventPayloadMap entry (fails to compile otherwise)', () => {
     const exhaustiveCheck: Record<(typeof SigilEvents)[keyof typeof SigilEvents], keyof SigilEventPayloadMap> = {
       [SigilEvents.PAYMENT_SUBMITTED]: SigilEvents.PAYMENT_SUBMITTED,
       [SigilEvents.PAYMENT_FAILED]: SigilEvents.PAYMENT_FAILED,
@@ -565,8 +557,7 @@ describe('parseBraintreeError', () => {
     expect(parsed.code).toBeUndefined();
   });
 
-  it('stringifies a bare non-error rejection, and never shows it', () => {
-    // The regression that produced `error_message: "26"` with nothing else.
+  it('stringifies a bare non-error rejection like the `26` regression, and never shows it', () => {
     expect(parseBraintreeError(26)).toEqual({ message: '26', logMessage: '26', audience: 'opaque' });
   });
 
@@ -603,9 +594,7 @@ describe('parseBraintreeError', () => {
       expect(parsed.logMessage).toBe('We could not find that card. (no vault entry for card ending 4242)');
     });
 
-    it('does not trust a plain Error, which may be any failure at all', () => {
-      // The trap this replaced: inferring "ours" from the absence of braintree
-      // fields hands the buyer whatever an unrelated throw happened to say.
+    it('does not trust a plain Error just because it lacks braintree fields, since it may be any failure at all', () => {
       expect(parseBraintreeError(new Error('kaboom')).audience).toBe('opaque');
     });
 
@@ -617,9 +606,7 @@ describe('parseBraintreeError', () => {
       expect(parseBraintreeError(fetchError).audience).toBe('opaque');
     });
 
-    it('does not trust the [object Object] fallback', () => {
-      // `message || code || type || String(error)` can only reach the last arm
-      // when nobody wrote a message, so it is never fit to render.
+    it('does not trust the [object Object] fallback, which only appears when nobody wrote a message', () => {
       const parsed = parseBraintreeError({});
 
       expect(parsed.message).toBe('[object Object]');
@@ -688,8 +675,7 @@ describe('paymentErrorCopy', () => {
     expect(copy).toEqual({ kind: 'unexpected', code: 'THREEDS_CARDINAL_SDK_ERROR' });
   });
 
-  it('omits the reference when there is no code to quote', () => {
-    // The `26` that started this: nothing to show, nothing to quote.
+  it('omits the reference when there is no code to quote, as for the bare `26` rejection', () => {
     expect(paymentErrorCopy(parseBraintreeError(26))).toEqual({ kind: 'unexpected' });
   });
 });

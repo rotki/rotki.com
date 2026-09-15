@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
-import { DiscountType } from '@rotki/card-payment-common';
+import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { get, set } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
@@ -14,7 +14,6 @@ const { discountInfo } = defineProps<{
 const value = ref<string>('');
 const focused = ref<boolean>(false);
 
-// Type guards for discriminated union
 function isValidDiscount(info: PaymentBreakdownDiscount | undefined): info is ValidPaymentBreakdownDiscount {
   return !!(info && info.isValid);
 }
@@ -51,18 +50,19 @@ function reset(): void {
   set(value, '');
 }
 
+/** Editing the input after a rejected code clears the error by resetting the model. */
+function clearErrorOnEdit(newValue: string): void {
+  if (newValue !== get(model) && get(hasError)) {
+    set(model, '');
+  }
+}
+
 // Sync internal value with model
 watch(model, (modelValue) => {
   set(value, modelValue);
 }, { immediate: true });
 
-// Clear error state when input changes
-watch(value, (newValue) => {
-  // If user is typing and there's an error, clear it by resetting model
-  if (newValue !== get(model) && hasError.value) {
-    set(model, '');
-  }
-});
+watch(value, clearErrorOnEdit);
 </script>
 
 <template>

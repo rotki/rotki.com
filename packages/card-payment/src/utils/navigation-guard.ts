@@ -14,8 +14,7 @@ export async function canBuyNewSubscription(): Promise<{ canBuy: boolean; accoun
     return { canBuy: false };
   }
 
-  // Card payments are only for new subscriptions, not renewals
-  // Users with active subscriptions should use crypto payments for renewals
+  // Card payments are only for new subscriptions; renewals go through crypto payments.
   if (account.hasActiveSubscription) {
     console.warn('User has active subscription, card payment not available - use crypto for renewals');
     return { canBuy: false };

@@ -87,7 +87,6 @@ export const PaymentBreakdownRequestSchema = z.object({
   discountCode: z.string().nullish(),
 });
 
-// Inferred types
 export type AvailablePlan = z.infer<typeof AvailablePlanSchema>;
 
 export type AvailablePlans = z.infer<typeof AvailablePlansSchema>;

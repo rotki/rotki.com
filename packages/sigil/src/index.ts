@@ -1,17 +1,16 @@
-// @rotki/sigil — shared analytics catalog and helpers for the rotki.com
-// Sigil tracker. Framework-agnostic; Nuxt composables and cookie I/O live in
-// the host packages.
-//
-// File layout:
-//   - events.ts    — `SigilEvents` event-name catalog
-//   - common.ts    — shared enum-like consts (CheckoutPaymentMethods, ...)
-//   - failures.ts  — `PaymentFailures` catalog + crypto error classifier
-//   - payloads.ts  — typed payloads, one per event in `SigilEvents`
-//   - tracking.ts  — `sigilTrack` wrapper, UTM contract, pure tracking helpers
+/* @rotki/sigil: shared analytics catalog and helpers for the rotki.com Sigil
+   tracker. Framework-agnostic; Nuxt composables and cookie I/O live in the host
+   packages.
+   File layout:
+     - events.ts: `SigilEvents` event-name catalog
+     - common.ts: shared enum-like consts (CheckoutPaymentMethods, ...)
+     - failures.ts: `PaymentFailures` catalog and crypto error classifier
+     - payloads.ts: typed payloads, one per event in `SigilEvents`
+     - tracking.ts: `sigilTrack` wrapper, UTM contract, pure tracking helpers */
 
-// Single source of truth for the Sigil script and website id. Static HTML
-// files (e.g. the card-payment SPA `index.html`) can't import this and have
-// to hardcode the same values — keep them in sync.
+/* Single source of truth for the Sigil script and website id. Static HTML files
+   (e.g. the card-payment SPA `index.html`) can't import this and have to hardcode
+   the same values, so keep them in sync. */
 
 export const SIGIL_SCRIPT_URL = 'https://sigil.rotki.com/s.js';
 
@@ -29,6 +28,6 @@ export * from './failures';
 
 export * from './logging';
 
-export * from './payloads';
+export type * from './payloads';
 
 export * from './tracking';

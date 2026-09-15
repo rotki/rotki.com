@@ -1,9 +1,10 @@
-// Single source of truth for every Sigil event name this project fires.
-// Use `SigilEvents.X` instead of raw strings so renames happen once and
-// typos become type errors.
-
 import type { EnumValueOf } from './common';
 
+/**
+ * Single source of truth for every Sigil event name this project fires.
+ * Use `SigilEvents.X` instead of raw strings so renames happen once and
+ * typos become type errors.
+ */
 export const SigilEvents = {
   PAYMENT_SUBMITTED: 'payment_submitted',
   PAYMENT_FAILED: 'payment_failed',
