@@ -1,10 +1,6 @@
+import type { CoverageProviderModule, Vitest } from 'vitest/node';
 import v8CoverageModule from '@vitest/coverage-v8';
 import { V8CoverageProvider } from '@vitest/coverage-v8/dist/provider.js';
-
-/* Vitest types are taken from the V8 provider rather than imported from `vitest/node`: the lockfile
-   holds several copies of vitest (one per @types/node version), and their classes do not type-check
-   against each other. */
-type Vitest = Parameters<V8CoverageProvider['createUncoveredFileTransformer']>[0];
 
 type UncoveredFileTransformer = ReturnType<V8CoverageProvider['createUncoveredFileTransformer']>;
 
@@ -46,7 +42,7 @@ class ClientAwareCoverageProvider extends V8CoverageProvider {
   }
 }
 
-const coverageProviderModule: typeof v8CoverageModule = {
+const coverageProviderModule: CoverageProviderModule = {
   ...v8CoverageModule,
   getProvider: () => new ClientAwareCoverageProvider(),
 };

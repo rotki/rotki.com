@@ -69,6 +69,7 @@
     "@resvg/resvg-js": "catalog:",
     "@rotki/ui-library": "catalog:",
     "@types/braintree-web": "catalog:",
+    "@types/node": "catalog:",
     "@types/paypal-checkout-components": "catalog:",
     "@types/qrcode": "catalog:",
     "@vitest/coverage-v8": "catalog:",

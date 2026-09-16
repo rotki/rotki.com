@@ -39,6 +39,7 @@
     "@nuxt/eslint-plugin": "catalog:",
     "@rotki/eslint-config": "catalog:",
     "@rotki/eslint-plugin": "catalog:",
+    "@types/node": "catalog:",
     "bumpp": "catalog:",
     "cac": "catalog:",
     "consola": "catalog:",
