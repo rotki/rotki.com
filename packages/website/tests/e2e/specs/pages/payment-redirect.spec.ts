@@ -72,7 +72,6 @@ test.describe('payment redirect after signup', () => {
     await setupUnauthenticatedMocks(page);
     const paymentPath = `/checkout/pay/method?planId=${planId}`;
     await page.goto(`/login?redirectUrl=${encodeURIComponent(paymentPath)}`);
-    await page.waitForLoadState('networkidle');
 
     const signupLink = page.getByRole('link', { name: /sign up/i });
     await expect(signupLink).toBeVisible();
@@ -96,7 +95,6 @@ test.describe('payment redirect after signup', () => {
 
     const paymentPath = `/checkout/pay/card?planId=${planId}`;
     await page.goto(`/signup?redirectUrl=${encodeURIComponent(paymentPath)}`);
-    await page.waitForLoadState('networkidle');
 
     // Step 1: Introduction
     await continuePastIntroduction(page);
@@ -131,7 +129,6 @@ test.describe('payment redirect after signup', () => {
 
     // Navigate to activation page
     await page.goto('/activate/test-uid/test-token');
-    await page.waitForLoadState('networkidle');
 
     // Verify activation succeeded
     await expect(page.getByText('Welcome to rotki').first()).toBeVisible({ timeout: 10000 });

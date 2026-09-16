@@ -17,7 +17,6 @@ test.describe('signup test', () => {
 
   test('show introduction page', async ({ page }) => {
     await page.goto('/signup');
-    await page.waitForLoadState('networkidle');
 
     await expect(page.getByText('Important Note')).toBeVisible();
     await expect(page.locator('[data-cy=next-button]')).toBeVisible();
@@ -26,7 +25,6 @@ test.describe('signup test', () => {
 
   test('show account form', async ({ page }) => {
     await page.goto('/signup');
-    await page.waitForLoadState('networkidle');
 
     await continuePastIntroduction(page);
 
@@ -51,7 +49,6 @@ test.describe('signup test', () => {
 
   test('show customer information form', async ({ page }) => {
     await page.goto('/signup');
-    await page.waitForLoadState('networkidle');
 
     await continuePastIntroduction(page);
 
@@ -81,7 +78,6 @@ test.describe('signup test', () => {
 
   test('show address form', async ({ page }) => {
     await page.goto('/signup');
-    await page.waitForLoadState('networkidle');
 
     await continuePastIntroduction(page);
 
@@ -124,7 +120,6 @@ test.describe('signup test', () => {
 
   test('checks signup postal input field for valid inputs!', async ({ page }) => {
     await page.goto('/signup');
-    await page.waitForLoadState('networkidle');
 
     await continuePastIntroduction(page);
 

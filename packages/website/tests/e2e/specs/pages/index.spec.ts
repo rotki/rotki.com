@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { test } from '../../support/test';
 
 const mockRelease = {
@@ -53,16 +53,31 @@ async function setupTiersMocks(page: import('@playwright/test').Page): Promise<v
   await page.route('**/webapi/csrf/**', async route => route.fulfill({ json: { detail: 'CSRF cookie set' } }));
 }
 
+/**
+ * Opens the list of downloads for other platforms and waits until `entry` in it can be clicked.
+ *
+ * @remarks
+ * The list is rendered collapsed, so its entries already count as visible while its container still
+ * covers them. On a cold dev server, as in CI, the first click can land before the page has hydrated
+ * and do nothing, so the click repeats (it only ever opens the list) until `entry` receives clicks.
+ */
+async function showAllDownloads(page: Page, entry: Locator): Promise<void> {
+  await expect(async () => {
+    await page.locator('[data-cy="show-all-download"]').click();
+    await entry.click({ timeout: 1_000, trial: true });
+  }).toPass({ timeout: 30_000 });
+}
+
 test.describe('homepage', () => {
   test('successfully loads', async ({ page }) => {
     await setupTiersMocks(page);
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('button', { name: 'Download rotki for free' }).first()).toBeVisible();
   });
 
   test('checks our homepage hero buttons!', async ({ page }) => {
     await setupTiersMocks(page);
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/');
 
     await expect(
       page.getByRole('button', { name: 'Download rotki for free' }).first(),
@@ -83,7 +98,7 @@ test.describe('download page', () => {
   test('download page loads properly', async ({ page }) => {
     await setupTiersMocks(page);
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/');
     await page.locator('[data-cy="pricing-section"]').scrollIntoViewIfNeeded();
     // Expand the pricing section (wrapped in ClientOnly) so the gradient overlay does not block the click
     await page.getByRole('button', { name: 'See all features' }).click({ timeout: 30000 });
@@ -114,9 +129,7 @@ test.describe('download page', () => {
     const page = await context.newPage();
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
 
-    await page.goto('/download', {
-      waitUntil: 'networkidle',
-    });
+    await page.goto('/download');
 
     // Mac has two download buttons (Apple Silicon and Intel)
     const appleSiliconButton = page.getByRole('button', { name: 'Download for MAC Apple Silicon' });
@@ -143,9 +156,7 @@ test.describe('download page', () => {
     const page = await context.newPage();
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
 
-    await page.goto('/download', {
-      waitUntil: 'networkidle',
-    });
+    await page.goto('/download');
 
     const linuxAppImageButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX AppImage' });
     const linuxDebButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX deb' });
@@ -170,9 +181,7 @@ test.describe('download page', () => {
     const page = await context.newPage();
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
 
-    await page.goto('/download', {
-      waitUntil: 'networkidle',
-    });
+    await page.goto('/download');
 
     const windowsButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for WINDOWS' });
     await expect(windowsButton).toBeVisible();
@@ -186,20 +195,11 @@ test.describe('download page', () => {
 
   test('checks all download links!', async ({ page }) => {
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
-    await page.goto('/download', {
-      waitUntil: 'networkidle',
-    });
-
-    await page.locator('[data-cy="show-all-download"]').click();
+    await page.goto('/download');
 
     const linuxLink = page.locator('h6').filter({ hasText: 'LINUX' }).first();
     const appleLink = page.locator('h6').filter({ hasText: 'MAC' }).first();
     const windowsLink = page.locator('h6').filter({ hasText: 'WINDOWS' }).first();
-
-    await expect(linuxLink).toBeVisible();
-    await expect(appleLink).toBeVisible();
-    await expect(windowsLink).toBeVisible();
-    await expect(page.locator('p').filter({ hasText: 'Latest Release: v' }).first()).toBeVisible();
 
     // Linux download button (opens menu)
     const linuxButton = linuxLink
@@ -207,6 +207,13 @@ test.describe('download page', () => {
       .locator('..')
       .locator('div button')
       .filter({ hasText: 'Download' });
+
+    await showAllDownloads(page, linuxButton);
+
+    await expect(linuxLink).toBeVisible();
+    await expect(appleLink).toBeVisible();
+    await expect(windowsLink).toBeVisible();
+    await expect(page.locator('p').filter({ hasText: 'Latest Release: v' }).first()).toBeVisible();
 
     await expect(linuxButton).toBeVisible();
     await linuxButton.click();

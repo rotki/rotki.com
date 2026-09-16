@@ -4,8 +4,8 @@ import { expect, type Page } from '@playwright/test';
  * Moves the signup form from its introduction to the account step.
  *
  * @remarks
- * `networkidle` does not mean the page has hydrated. On a cold dev server, as in CI, the Continue
- * click can land before its handler is attached and do nothing, leaving the form on the introduction.
+ * A loaded page is not necessarily hydrated. On a cold dev server, as in CI, the Continue click can
+ * land before its handler is attached and do nothing, leaving the form on the introduction.
  * The click repeats until the account step shows; it is safe to repeat, since the account step's own
  * button stays disabled until the form is filled in.
  */
