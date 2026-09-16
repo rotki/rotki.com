@@ -131,25 +131,35 @@ jobs:
       - name: Check every router route resolves 🧭
         run: pnpm run check:routes
 
-      - name: Run package unit tests ✅
-        run: pnpm --filter "./packages/*" --filter "!@rotki/website" test
-
-      - name: Run tests with coverage ✅
+      # Runs every package's unit tests. It must come before the e2e run, whose coverage report is
+      # written on the lines these reports count as code.
+      - name: Run unit tests with coverage ✅
         run: pnpm run coverage
 
-      - name: Upload frontend coverage
+      # Explicit files with search disabled: the action otherwise adds every coverage-looking file it
+      # finds, uploading the same run twice.
+      - name: Upload unit coverage
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
-          directory: packages/website/coverage
-          flags: frontend
+          files: packages/website/coverage/lcov.info,packages/sigil/coverage/lcov.info,packages/card-payment-common/coverage/lcov.info,packages/card-payment/coverage/lcov.info
+          disable_search: true
+          flags: unit
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Set .env
         run: cp .env.test .env
         working-directory: packages/website
 
-      - name: Run e2e tests 🧪
-        run: pnpm run test:e2e
+      - name: Run e2e tests with coverage 🧪
+        run: pnpm run test:e2e:coverage
+
+      - name: Upload e2e coverage
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: packages/website/tests/e2e/coverage/lcov.info
+          disable_search: true
+          flags: e2e
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -196,6 +206,7 @@ jobs:
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           files: backend/coverage.out
+          disable_search: true
           flags: backend
           token: ${{ secrets.CODECOV_TOKEN }}
 

@@ -8,19 +8,55 @@ coverage:
     project: off
     patch: off
 
-flags:
-  frontend:
-    paths:
-      - packages/website/
-    carryforward: true
-  e2e:
-    paths:
-      - packages/website/
-    carryforward: true
-  backend:
-    paths:
-      - backend/
-    carryforward: true
+# Flags say which kind of test produced the coverage; components (below) say which part of the code
+# it is on. The project total merges every flag line by line: the e2e report is written on the unit
+# reports' lines (packages/website/tests/e2e/support/coverage-report.ts), so the two add up.
+#
+# Carryforward is set per flag on purpose. A catch-all default would also carry forward flags that no
+# longer upload, such as the retired `frontend` flag, and its stale website data would be counted
+# next to `unit`.
+flag_management:
+  individual_flags:
+    - name: unit
+      carryforward: true
+      paths:
+        - packages/
+    - name: e2e
+      carryforward: true
+      paths:
+        - packages/website/app/
+        - packages/sigil/src/
+        - packages/card-payment-common/src/
+    # Go tests run in their own job, so they keep their own flag. Carryforward works per flag: if both
+    # jobs uploaded under `unit`, a commit where one job failed would still get an upload from the
+    # other, and the failed job's coverage would drop out instead of being carried forward.
+    - name: backend
+      carryforward: true
+      paths:
+        - backend/
+
+component_management:
+  individual_components:
+    - component_id: website
+      name: website
+      paths:
+        - packages/website/**
+    - component_id: card-payment
+      name: card-payment
+      paths:
+        - packages/card-payment/**
+    - component_id: card-payment-common
+      name: card-payment-common
+      paths:
+        - packages/card-payment-common/**
+    - component_id: sigil
+      name: sigil
+      paths:
+        - packages/sigil/**
+    - component_id: backend
+      name: backend
+      paths:
+        - backend/**
 
 ignore:
   - '**/*.test.ts'
