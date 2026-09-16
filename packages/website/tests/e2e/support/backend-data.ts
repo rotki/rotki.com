@@ -256,6 +256,37 @@ export function pendingSubscription(overrides: Partial<SubscriptionWire> = {}): 
   return subscriptionFor({ pending: true, status: 'Pending', ...overrides });
 }
 
+/** Id of the subscription the upgrade specs upgrade. */
+export const UPGRADE_SUBSCRIPTION_ID = 'sub-upgrade-1';
+
+/**
+ * A running crypto subscription the account may upgrade.
+ *
+ * @remarks
+ * The subscription page only offers the upgrade for an active, cancellable subscription that is
+ * not already on the highest plan of its billing period, which is why it is `Active` on Basic and
+ * carries the `cancel` action rather than `renew`.
+ */
+export function upgradableSubscription(overrides: Partial<SubscriptionWire> = {}): SubscriptionWire {
+  return subscriptionFor({
+    actions: ['cancel'],
+    id: UPGRADE_SUBSCRIPTION_ID,
+    status: 'Active',
+    ...overrides,
+  });
+}
+
+/** A subscription whose upgrade is waiting to be paid, which the pending-payment middleware resumes. */
+export function upgradeRequestedSubscription(overrides: Partial<SubscriptionWire> = {}): SubscriptionWire {
+  return subscriptionFor({
+    actions: [],
+    id: UPGRADE_SUBSCRIPTION_ID,
+    pending: true,
+    status: 'Upgrade Requested',
+    ...overrides,
+  });
+}
+
 /** Basic (plans 3 and 4) and Advanced (plans 1 and 2), matching the mock API server. */
 export function defaultTiers(): AvailableTiersWire {
   return {
