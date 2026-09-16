@@ -210,6 +210,52 @@ export function defaultAccount(): AccountWire {
   };
 }
 
+/** A logged-in account that already owns a subscription, so checkout runs as a renewal. */
+export function subscriberAccount(): AccountWire {
+  return { ...defaultAccount(), can_use_premium: true, has_active_subscription: true };
+}
+
+/** Id of the subscription the renewal specs renew. */
+export const RENEWAL_SUBSCRIPTION_ID = 'sub-renewal-1';
+
+/**
+ * Builds a subscription entry of `GET /webapi/2/history/subscriptions`.
+ *
+ * @remarks
+ * The defaults describe the Basic monthly plan paid with crypto. `actions` decides what the
+ * subscription page offers and, through `canBuy`, whether checkout lets the user in at all; a
+ * `Pending` status is what puts the subscription id in session storage for the pending-payment
+ * middleware.
+ */
+export function subscriptionFor(overrides: Partial<SubscriptionWire> = {}): SubscriptionWire {
+  return {
+    actions: ['renew'],
+    created_date: '2026-01-01T00:00:00+00:00',
+    duration_in_months: 1,
+    id: RENEWAL_SUBSCRIPTION_ID,
+    is_active: true,
+    is_legacy: false,
+    next_action_date: '2026-02-01',
+    next_billing_amount: 25,
+    payment_method: 'crypto',
+    payment_provider: 'crypto',
+    plan_id: 3,
+    plan_name: 'Basic',
+    status: 'Cancelled but still active',
+    ...overrides,
+  };
+}
+
+/** A crypto subscription due for renewal, which is what `?id=` in checkout renews. */
+export function renewableSubscription(overrides: Partial<SubscriptionWire> = {}): SubscriptionWire {
+  return subscriptionFor(overrides);
+}
+
+/** A crypto subscription waiting for its payment; it is the one the pending-payment middleware resumes. */
+export function pendingSubscription(overrides: Partial<SubscriptionWire> = {}): SubscriptionWire {
+  return subscriptionFor({ pending: true, status: 'Pending', ...overrides });
+}
+
 /** Basic (plans 3 and 4) and Advanced (plans 1 and 2), matching the mock API server. */
 export function defaultTiers(): AvailableTiersWire {
   return {
