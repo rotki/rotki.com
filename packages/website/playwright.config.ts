@@ -75,9 +75,11 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
-    // Go backend — proxies pages to Nuxt, /webapi to mock API
+    /* Go backend — proxies pages to Nuxt, /webapi to mock API. Built first and run as a binary: `go run`
+       compiles into a /tmp/go-build* directory it only removes on a clean exit, and a web server is
+       always stopped by a signal, so every run left one behind. */
     {
-      command: 'make -C ../../backend run',
+      command: 'make -C ../../backend build && exec ../../backend/server',
       env: {
         DEV_MODE: 'true',
         PORT: port,
