@@ -1272,6 +1272,7 @@
     "error": {
       "init_error": "Initialization Error",
       "payment_failure": "Payment Failure",
+      "cancel_failed": "Cancellation Failed",
       "payment": {
         "network_failure": "We couldn't reach the payment provider. Check your connection and try again.",
         "unexpected_failure": "We couldn't complete your payment. Please try again, or contact support if it keeps happening.",
