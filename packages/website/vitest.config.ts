@@ -17,9 +17,11 @@ export default defineVitestConfig({
   plugins: [],
   test: {
     coverage: {
+      // The V8 provider, fixed to compile untested files for the client under the `nuxt` environment.
+      customProviderModule: './tests/coverage-provider.ts',
       exclude: ['.nuxt/**', 'tests/**', '**/*.test.ts', '**/*.spec.ts'],
       include: ['app/**/*.{ts,vue}'],
-      provider: 'v8',
+      provider: 'custom',
       reporter: [['lcov', { projectRoot: repositoryRoot }]],
       reportsDirectory: 'coverage',
     },
