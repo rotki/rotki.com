@@ -93,6 +93,7 @@ export default defineNuxtConfig({
     './modules/comparison-seo/module.ts',
     './modules/feature-seo/module.ts',
     './modules/ui-library/module.ts',
+    './modules/card-payment-dev-proxy/module.ts',
   ],
   /*
    * SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
@@ -232,13 +233,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-03-01',
 
   nitro: {
-    devProxy: {
-      '/checkout/pay/card': {
-        changeOrigin: true,
-        target: 'http://localhost:3002/checkout/pay/card',
-        ws: true,
-      },
-    },
     // SSG: pre-render all discoverable routes
     preset: 'static',
     prerender: {

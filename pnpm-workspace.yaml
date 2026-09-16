@@ -97,6 +97,7 @@ catalog:
   defu: 6.1.7
   eslint: 10.10.0
   eslint-plugin-tsdoc: 0.5.2
+  h3: 1.15.11
   happy-dom: 20.14.0
   husky: 9.1.7
   lint-staged: 17.5.0

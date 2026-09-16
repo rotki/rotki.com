@@ -257,6 +257,9 @@ catalogs:
     eslint-plugin-tsdoc:
       specifier: 0.5.2
       version: 0.5.2
+    h3:
+      specifier: 1.15.11
+      version: 1.15.11
     happy-dom:
       specifier: 20.14.0
       version: 20.14.0
@@ -709,6 +712,9 @@ importers:
       defu:
         specifier: 'catalog:'
         version: 6.1.7
+      h3:
+        specifier: 'catalog:'
+        version: 1.15.11
       happy-dom:
         specifier: 'catalog:'
         version: 20.14.0

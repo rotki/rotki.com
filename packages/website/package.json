@@ -76,6 +76,7 @@
     "@vue/test-utils": "catalog:",
     "ast-v8-to-istanbul": "catalog:",
     "defu": "catalog:",
+    "h3": "catalog:",
     "happy-dom": "catalog:",
     "msw": "catalog:",
     "nuxt": "catalog:",

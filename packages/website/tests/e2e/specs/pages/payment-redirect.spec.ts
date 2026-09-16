@@ -144,8 +144,8 @@ test.describe('payment redirect after signup', () => {
     await expect(continueButton).toBeVisible();
 
     /* handlePaymentRedirect() sets window.location.href, so capture the outgoing request. The card
-       app is built separately and is not part of the dev server, which never answers this path and
-       leaves the tab frozen, so the navigation lands on a stub page instead. */
+       app is built separately and is not part of the e2e stack, so the navigation lands on a stub
+       page instead of the dev server's "not running" error. */
     await page.route('**/checkout/pay/card**', async route => route.fulfill({ body: '<!doctype html><title>card</title>', contentType: 'text/html' }));
     const navigationTarget = page.waitForRequest(
       request => request.url().includes('/checkout/pay/card'),
