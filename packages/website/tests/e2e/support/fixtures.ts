@@ -1,6 +1,6 @@
-import { test as base } from '@playwright/test';
 import { type BackendScenario, type FakeBackend, installFakeBackend } from './backend';
 import { type ChainScenario, type FakeChain, installFakeChain } from './rpc';
+import { test as base } from './test';
 import { defaultWalletOptions, type FakeWallet, installFakeWallet, type WalletBehavior } from './wallet';
 
 /** Wallet options a spec can override; `behavior` is merged with the defaults. */

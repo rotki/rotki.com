@@ -191,6 +191,9 @@ catalogs:
     '@vitest/coverage-v8':
       specifier: 5.0.0
       version: 5.0.0
+    '@vitest/istanbul-lib-coverage':
+      specifier: 1.0.1
+      version: 1.0.1
     '@vue/test-utils':
       specifier: 2.5.0
       version: 2.5.0
@@ -224,6 +227,9 @@ catalogs:
     '@walletconnect/universal-provider':
       specifier: 2.24.0
       version: 2.24.0
+    ast-v8-to-istanbul:
+      specifier: 1.0.6
+      version: 1.0.6
     autoprefixer:
       specifier: 10.5.5
       version: 10.5.5
@@ -691,9 +697,15 @@ importers:
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.0(vitest@5.0.0)
+      '@vitest/istanbul-lib-coverage':
+        specifier: 'catalog:'
+        version: 1.0.1
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@6.0.3))
+      ast-v8-to-istanbul:
+        specifier: 'catalog:'
+        version: 1.0.6
       defu:
         specifier: 'catalog:'
         version: 6.1.7

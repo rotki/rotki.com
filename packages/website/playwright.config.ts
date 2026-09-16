@@ -1,5 +1,6 @@
 import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
+import { isCoverageEnabled } from './tests/e2e/support/coverage';
 
 /** Reads an environment variable, treating an empty value the same as an unset one. */
 function envOrDefault(name: string, fallback: string): string {
@@ -18,6 +19,8 @@ const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
 export default defineConfig({
   testDir: './tests/e2e/specs',
   testMatch: '**/*.spec.ts',
+  // Writes tests/e2e/coverage/lcov.info once every test has run.
+  ...(isCoverageEnabled() && { globalSetup: './tests/e2e/support/coverage-global-setup.ts' }),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

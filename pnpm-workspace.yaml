@@ -75,6 +75,7 @@ catalog:
   '@unhead/vue': 2.1.17
   '@vitejs/plugin-vue': 6.0.8
   '@vitest/coverage-v8': 5.0.0
+  '@vitest/istanbul-lib-coverage': 1.0.1
   '@vue/test-utils': 2.5.0
   '@vue/tsconfig': 0.9.1
   '@vuelidate/core': 2.0.3
@@ -86,6 +87,7 @@ catalog:
   '@wagmi/connectors': 8.2.0
   '@wagmi/core': 3.6.5
   '@walletconnect/universal-provider': 2.24.0
+  ast-v8-to-istanbul: 1.0.6
   autoprefixer: 10.5.5
   better-sqlite3: 12.11.1
   braintree-web: 3.145.0
