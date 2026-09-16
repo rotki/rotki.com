@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { continuePastIntroduction } from '../../support/signup';
 import { test } from '../../support/test';
 
 const mockAvailableTiers = {
@@ -97,8 +98,8 @@ test.describe('payment redirect after signup', () => {
     await page.goto(`/signup?redirectUrl=${encodeURIComponent(paymentPath)}`);
     await page.waitForLoadState('networkidle');
 
-    // Step 1: Introduction — click Next
-    await page.locator('[data-cy=next-button]').click();
+    // Step 1: Introduction
+    await continuePastIntroduction(page);
     expect(new URL(page.url()).searchParams.get('redirectUrl')).toBe(paymentPath);
 
     // Step 2: Account form — fill and advance

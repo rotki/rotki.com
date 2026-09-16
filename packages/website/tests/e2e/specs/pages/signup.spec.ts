@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { continuePastIntroduction } from '../../support/signup';
 import { test } from '../../support/test';
 
 test.describe('signup test', () => {
@@ -27,8 +28,7 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await page.waitForLoadState('networkidle');
 
-    // Navigate past introduction
-    await page.locator('[data-cy=next-button]').click();
+    await continuePastIntroduction(page);
 
     const usernameInput = page.locator('input#username').first();
     const emailInput = page.locator('input#email').first();
@@ -53,8 +53,7 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await page.waitForLoadState('networkidle');
 
-    // Navigate past introduction
-    await page.locator('[data-cy=next-button]').click();
+    await continuePastIntroduction(page);
 
     // Fill account form
     await page.locator('input#username').first().fill('username');
@@ -84,8 +83,7 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await page.waitForLoadState('networkidle');
 
-    // Navigate past introduction
-    await page.locator('[data-cy=next-button]').click();
+    await continuePastIntroduction(page);
 
     // Fill account form
     await page.locator('input#username').first().fill('username');
@@ -128,8 +126,7 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await page.waitForLoadState('networkidle');
 
-    // Navigate past introduction
-    await page.locator('[data-cy=next-button]').click();
+    await continuePastIntroduction(page);
 
     // Fill account form
     await page.locator('input#username').first().fill('username');
