@@ -466,6 +466,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.8(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(jiti@1.21.7)(terser@5.48.0)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.0(vitest@5.0.0)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@6.0.3))
@@ -515,6 +518,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.3
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.0(vitest@5.0.0)
       happy-dom:
         specifier: 'catalog:'
         version: 20.14.0
@@ -540,6 +546,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.3
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.0(vitest@5.0.0)
       happy-dom:
         specifier: 'catalog:'
         version: 20.14.0

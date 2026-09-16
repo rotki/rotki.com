@@ -10,7 +10,8 @@
     "serve": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@fontsource/roboto": "catalog:",
@@ -29,6 +30,7 @@
     "@types/node": "catalog:",
     "@unhead/vue": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
     "autoprefixer": "catalog:",

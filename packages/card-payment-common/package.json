@@ -59,7 +59,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "peerDependencies": {
     "zod": "^3.0.0 || ^4.0.0"
@@ -70,6 +71,7 @@
   "devDependencies": {
     "@tsconfig/node24": "catalog:",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "happy-dom": "catalog:",
     "tsdown": "catalog:",
     "typescript": "catalog:",
