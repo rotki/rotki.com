@@ -261,6 +261,16 @@ export default defineNuxtConfig({
       // No automatic modulepreload links; dynamic imports still work but don't preload their dependencies.
       modulePreload: { polyfill: true, resolveDependencies: () => [] },
       rolldownOptions: {
+        treeshake: {
+          /*
+           * The ui-library ships no `sideEffects` field, so every page importing its
+           * component barrel was treated as depending on all of it, and every
+           * component the site uses anywhere landed in one chunk loaded up front.
+           * Only its dayjs plugin setup runs code on import.
+           */
+          moduleSideEffects: (id: string): boolean | undefined =>
+            /@rotki[\\/]ui-library[\\/]dist[\\/].*\.js$/.test(id) && !id.endsWith('dayjs-setup.js') ? false : undefined,
+        },
         output: {
           // The build id keeps filenames unique per deployment: _nuxt/<name>-<buildId>.<hash>.js
           chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
