@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/shared';
 import CampaignRibbon from '~/components/common/CampaignRibbon.vue';
+import { useAppConfig } from '~/composables/use-app-config';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
+import { useCheckoutDiscount } from '~/modules/checkout/composables/use-checkout';
 import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -66,6 +68,14 @@ const step = computed<number>(() => {
 
 const isFirstStep = computed<boolean>(() => get(step) === 1);
 
+const { activeCampaign } = useAppConfig();
+const { validDiscountCode } = useCheckoutDiscount();
+
+const campaignApplied = computed<boolean>(() => {
+  const campaign = get(activeCampaign);
+  return !!campaign && get(validDiscountCode) === campaign.code;
+});
+
 const { removeStoredRedirectUrl } = useRedirectUrl();
 
 onBeforeMount(() => {
@@ -75,7 +85,7 @@ onBeforeMount(() => {
 
 <template>
   <div class="flex flex-col h-full grow">
-    <CampaignRibbon />
+    <CampaignRibbon :applied="campaignApplied" />
     <div class="container flex flex-col lg:flex-row grow py-4 lg:py-8 gap-6 lg:gap-8">
       <div class="flex grow overflow-x-auto min-w-0">
         <form

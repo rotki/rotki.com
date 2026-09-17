@@ -402,8 +402,9 @@
     }
   },
   "campaign": {
-    "ribbon": "Limited-time offer: {percent}% off your first payment with code {code}",
-    "ribbon_until": "- valid until {date}"
+    "ribbon": "Limited-time offer: {percent}% off your first payment with code {code}.",
+    "ribbon_applied": "Code {code} applied: {percent}% off your first payment.",
+    "ribbon_last_day": "Last day {date} (UTC)."
   },
   "change_plan": {
     "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to switch the plan",
@@ -641,7 +642,7 @@
             "applied": "Discount code applied:",
             "referral_applied": "Referral code applied:",
             "apply_code": "Apply code",
-            "campaign_hint": "Limited-time offer: code {code} gives {percent}% off your first payment.",
+            "campaign_hint": "Code {code} gives {percent}% off your first payment.",
             "first_payment_only": "* Applies to first payment only",
             "hint": "Optional: Enter a discount code to apply savings to your purchase.",
             "you_save": "You save {amount}€",

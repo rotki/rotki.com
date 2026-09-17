@@ -28,6 +28,14 @@
       "types": "./src/utils/object.ts",
       "import": "./src/utils/object.ts"
     },
+    "./schemas/campaign": {
+      "types": "./src/schemas/campaign.ts",
+      "import": "./src/schemas/campaign.ts"
+    },
+    "./utils/campaign": {
+      "types": "./src/utils/campaign.ts",
+      "import": "./src/utils/campaign.ts"
+    },
     "./utils/checkout": {
       "types": "./src/utils/checkout.ts",
       "import": "./src/utils/checkout.ts"

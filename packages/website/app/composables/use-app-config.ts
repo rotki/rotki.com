@@ -1,3 +1,4 @@
+import type { ActiveCampaign } from '@rotki/card-payment-common/schemas/campaign';
 import { get } from '@vueuse/shared';
 import { z } from 'zod';
 
@@ -6,12 +7,6 @@ const ActiveCampaignResponse = z.object({
   percent: z.number(),
   period_end: z.string().optional(),
 });
-
-export interface ActiveCampaign {
-  code: string;
-  percent: number;
-  periodEnd?: string;
-}
 
 const AppConfigResponse = z.object({
   maintenance: z.boolean().default(false),

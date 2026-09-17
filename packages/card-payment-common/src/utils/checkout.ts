@@ -13,6 +13,13 @@ export function getValidDiscountCode(
   return discount?.isValid === true ? code : undefined;
 }
 
+/**
+ * sessionStorage key flagging that the buyer removed an auto-applied discount. Session
+ * storage rather than in-memory state, because moving between payment pages is a full page
+ * load (CSP) and the card page is a separate app on the same origin.
+ */
+export const AUTO_DISCOUNT_DISMISSED_KEY = 'rotki.checkout-auto-discount-dismissed';
+
 /** Discount code sources a checkout page can apply, in the order they are considered. */
 export interface DiscountCodeSources {
   /** Code the buyer brought or typed (the `discountCode` query param). */

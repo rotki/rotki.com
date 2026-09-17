@@ -1,7 +1,8 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
-import { getValidDiscountCode, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { type CheckoutPaymentMethod, CheckoutPaymentMethods, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
+import { useSessionStorage } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
@@ -14,6 +15,40 @@ import { logger } from '~/utils/use-logger';
 export interface CheckoutError {
   title: string;
   message: string;
+}
+
+/** Breakdown of the current checkout, persisted across navigations via useState. */
+const BREAKDOWN_KEY = 'checkout-breakdown';
+
+/**
+ * Read-only discount state of the current checkout, for components (like the checkout
+ * layout) that must reflect it without starting the breakdown flow useCheckout drives.
+ */
+export function useCheckoutDiscount() {
+  const router = useRouter();
+  // Live ?ref query first, then the persisted cookie, so the code survives stripped navigation.
+  const { referralCode } = useReferralCodeParam();
+  const { activeCampaign } = useAppConfig();
+  const autoDiscountDismissed = useSessionStorage<boolean>(AUTO_DISCOUNT_DISMISSED_KEY, false);
+  const breakdown = useState<PaymentBreakdownResponse | undefined>(BREAKDOWN_KEY);
+
+  /** Applied code (source of truth): explicit URL code, then referral, then campaign. */
+  const appliedDiscountCode = computed<string>(() => {
+    const code = router.currentRoute.value.query.discountCode;
+    return resolveDiscountCode({
+      explicit: typeof code === 'string' ? code : undefined,
+      dismissed: get(autoDiscountDismissed) === true,
+      referral: get(referralCode),
+      campaign: get(activeCampaign)?.code,
+    }) ?? '';
+  });
+
+  /** The applied code, only once the breakdown confirms it is valid. */
+  const validDiscountCode = computed<string | undefined>(() =>
+    getValidDiscountCode(get(breakdown)?.discount, get(appliedDiscountCode) || undefined),
+  );
+
+  return { appliedDiscountCode, validDiscountCode };
 }
 
 export function useCheckout() {
@@ -48,7 +83,6 @@ export function useCheckout() {
     return id && typeof id === 'string' ? id : undefined;
   });
 
-  // Live ?ref query first, then the persisted cookie, so the code survives stripped navigation.
   const { referralCode } = useReferralCodeParam();
 
   // Sitewide campaign discount served by /api/config, auto-applied as a fallback.
@@ -78,38 +112,12 @@ export function useCheckout() {
     }
   }, { immediate: true });
 
-  /**
-   * Whether the user dismissed an auto-applied discount (referral or campaign). Kept in
-   * useState so it survives client-side navigation through checkout (the URL cannot carry
-   * it, since buildQueryParams strips empty values) and resets on a full reload.
-   */
-  const autoDiscountDismissed = useState<boolean>('checkout-auto-discount-dismissed', () => false);
-
-  /**
-   * Applied discount code (source of truth). An explicit discountCode in the URL wins;
-   * otherwise the referral code (mirroring the card flow) and then the sitewide campaign
-   * code are auto-applied as a discount, unless the user dismissed the auto-apply.
-   */
-  const appliedDiscountCode = computed<string>(() => {
-    const code = getCurrentRoute().query.discountCode;
-    return resolveDiscountCode({
-      explicit: typeof code === 'string' ? code : undefined,
-      dismissed: get(autoDiscountDismissed),
-      referral: get(referralCode),
-      campaign: get(activeCampaign)?.code,
-    }) ?? '';
-  });
+  const autoDiscountDismissed = useSessionStorage<boolean>(AUTO_DISCOUNT_DISMISSED_KEY, false);
+  const breakdown = useState<PaymentBreakdownResponse | undefined>(BREAKDOWN_KEY);
+  const { appliedDiscountCode, validDiscountCode } = useCheckoutDiscount();
 
   // Input value (for text field binding), seeded from the applied value.
   const modelDiscountCode = ref<string>(get(appliedDiscountCode));
-
-  // Persists across navigations via useState.
-  const breakdown = useState<PaymentBreakdownResponse | undefined>('checkout-breakdown');
-
-  // Validated discount code - only returns the code if the breakdown confirms it's valid
-  const validDiscountCode = computed<string | undefined>(() =>
-    getValidDiscountCode(get(breakdown)?.discount, get(appliedDiscountCode) || undefined),
-  );
   const breakdownLoading = shallowRef<boolean>(false);
   const breakdownFetched = shallowRef<boolean>(false);
 
