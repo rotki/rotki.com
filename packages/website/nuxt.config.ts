@@ -13,14 +13,25 @@ const gitSha = process.env.GIT_SHA;
 const buildId = gitSha ? gitSha.slice(0, 8) : Date.now();
 
 /**
- * Ordered manual-chunk rules; the first matching predicate wins. Heavy libraries are
- * listed before the core framework so Vue isn't pulled into the heavy chunks.
+ * Named chunk groups, in precedence order: when two groups want the same module,
+ * the earlier one gets it.
+ *
+ * Rolldown also pulls every dependency of a captured module into its group. So the
+ * groups for code every page needs must come before the heavy optional ones:
+ * otherwise `swiper/vue` drags Vue into the swiper chunk, the Coinbase SDK drags
+ * the preload helper into its chunk, walletconnect drags in `destr`, and every
+ * page downloads those heavy chunks.
  */
-const manualChunkRules: [test: (id: string) => boolean, chunk: string][] = [
+const chunkGroups: [test: (id: string) => boolean, chunk: string][] = [
   // Vite preload helper: its own small chunk, so the web3 stack isn't loaded just for preloading.
   [id => id.includes('vite/preload-helper') || id.includes('vite/modulepreload-polyfill'), 'vite-helpers'],
-  // Rollup commonjs interop helpers (virtual module \0commonjsHelpers.js), shared widely.
+  // Commonjs interop helpers, shared widely.
   [id => id.includes('\0commonjsHelpers'), 'commonjs-helpers'],
+  // Vue/VueUse/Pinia share one chunk to avoid circular deps.
+  [id => id.includes('node_modules/vue') || id.includes('node_modules/@vue') || id.includes('node_modules/pinia') || id.includes('node_modules/@vueuse'), 'vue-core'],
+  // Common utilities, also dependencies of the web3 stack.
+  [id => id.includes('node_modules/destr'), 'utils'],
+  [id => id.includes('node_modules/dayjs'), 'dayjs'],
   // Web3/Wallet stack - split so it only loads when a crypto/sponsor flow needs it.
   [id => id.includes('node_modules/viem'), 'viem'],
   [id => id.includes('@wagmi/'), 'wagmi'],
@@ -37,11 +48,6 @@ const manualChunkRules: [test: (id: string) => boolean, chunk: string][] = [
   [id => id.includes('swiper'), 'swiper'],
   // QR code generation - only needed for crypto payments.
   [id => id.includes('qrcode'), 'qrcode'],
-  // Common utilities - keep separate from heavy chunks.
-  [id => id.includes('node_modules/destr'), 'utils'],
-  [id => id.includes('node_modules/dayjs'), 'dayjs'],
-  // Core framework, checked last to stay out of heavy chunks; Vue/VueUse/Pinia share one to avoid circular deps.
-  [id => id.includes('node_modules/vue') || id.includes('node_modules/@vue') || id.includes('node_modules/pinia') || id.includes('node_modules/@vueuse'), 'vue-core'],
 ];
 
 const nonIndexed = [
@@ -254,16 +260,13 @@ export default defineNuxtConfig({
     build: {
       // No automatic modulepreload links; dynamic imports still work but don't preload their dependencies.
       modulePreload: { polyfill: true, resolveDependencies: () => [] },
-      rollupOptions: {
+      rolldownOptions: {
         output: {
           // The build id keeps filenames unique per deployment: _nuxt/<name>-<buildId>.<hash>.js
           chunkFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
           entryFileNames: `_nuxt/[name]-${buildId}.[hash].js`,
-          manualChunks(id) {
-            for (const [test, chunk] of manualChunkRules) {
-              if (test(id))
-                return chunk;
-            }
+          codeSplitting: {
+            groups: chunkGroups.map(([test, name]) => ({ name, test })),
           },
         },
       },
