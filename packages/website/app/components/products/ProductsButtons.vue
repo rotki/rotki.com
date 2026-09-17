@@ -5,10 +5,8 @@ import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { useAppConfig } from '~/composables/use-app-config';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';
-import { buildQueryParams } from '~/utils/query';
 
 defineProps<{
   color?: ContextColorsType;
@@ -21,7 +19,6 @@ const store = useMainStore();
 const { account } = storeToRefs(store);
 
 const { referralCode } = useReferralCodeParam();
-const { activeCampaign } = useAppConfig();
 
 const allowNavigation = computed<boolean>(() => {
   if (!isDefined(account))
@@ -32,15 +29,11 @@ const allowNavigation = computed<boolean>(() => {
 });
 
 const checkoutLink = computed<RouteLocationRaw>(() => {
-  const query = buildQueryParams({
-    discountCode: get(activeCampaign)?.code,
-    ref: get(referralCode),
-  });
-
-  if (Object.keys(query).length > 0) {
+  const referral = get(referralCode);
+  if (referral) {
     return {
       path: '/checkout/pay',
-      query,
+      query: { ref: referral },
     };
   }
   return '/checkout/pay';

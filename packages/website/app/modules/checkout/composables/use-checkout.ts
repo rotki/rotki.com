@@ -1,6 +1,6 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
-import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import { getValidDiscountCode, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { type CheckoutPaymentMethod, CheckoutPaymentMethods, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
@@ -92,13 +92,12 @@ export function useCheckout() {
    */
   const appliedDiscountCode = computed<string>(() => {
     const code = getCurrentRoute().query.discountCode;
-    if (typeof code === 'string' && code)
-      return code;
-
-    if (get(autoDiscountDismissed))
-      return '';
-
-    return get(referralCode) ?? get(activeCampaign)?.code ?? '';
+    return resolveDiscountCode({
+      explicit: typeof code === 'string' ? code : undefined,
+      dismissed: get(autoDiscountDismissed),
+      referral: get(referralCode),
+      campaign: get(activeCampaign)?.code,
+    }) ?? '';
   });
 
   // Input value (for text field binding), seeded from the applied value.
@@ -116,8 +115,12 @@ export function useCheckout() {
 
   const braintreeToken = computed<string | undefined>(() => get(breakdown)?.braintreeClientToken);
 
+  let breakdownRequestId = 0;
+
+  /** Fetches the breakdown for the applied code; a response overtaken by a newer request is dropped. */
   async function fetchBreakdown(): Promise<void> {
     const id = get(planId);
+    const requestId = ++breakdownRequestId;
     if (!id) {
       set(breakdown, undefined);
       return;
@@ -131,15 +134,20 @@ export function useCheckout() {
         isCryptoPayment: get(isCrypto),
         discountCode: code,
       });
+      if (requestId !== breakdownRequestId)
+        return;
       set(breakdown, response);
       set(breakdownFetched, true);
     }
     catch (error) {
+      if (requestId !== breakdownRequestId)
+        return;
       logger.error('Failed to fetch breakdown:', error);
       set(breakdown, undefined);
     }
     finally {
-      set(breakdownLoading, false);
+      if (requestId === breakdownRequestId)
+        set(breakdownLoading, false);
     }
   }
 
@@ -296,6 +304,12 @@ export function useCheckout() {
 
   watch(appliedDiscountCode, (code) => {
     set(modelDiscountCode, code);
+  });
+
+  // /api/config is fetched client-side and can land after the first breakdown; re-price once it does.
+  watch(() => get(activeCampaign)?.code, async () => {
+    if (get(breakdownFetched))
+      await fetchBreakdown();
   });
 
   return {

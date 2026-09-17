@@ -641,7 +641,7 @@
             "applied": "Discount code applied:",
             "referral_applied": "Referral code applied:",
             "apply_code": "Apply code",
-            "campaign_hint": "Campaign code {code} ({percent}% off) is applied automatically. You can enter a different code instead.",
+            "campaign_hint": "Limited-time offer: code {code} gives {percent}% off your first payment.",
             "first_payment_only": "* Applies to first payment only",
             "hint": "Optional: Enter a discount code to apply savings to your purchase.",
             "you_save": "You save {amount}€",

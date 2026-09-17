@@ -35,7 +35,7 @@ const errorMessage = computed<string | undefined>(() => {
 
 const { activeCampaign } = useAppConfig();
 
-// Campaign-aware hint: advertise the sitewide code while a campaign is running.
+// The field only shows while no code is applied, so a running campaign is offered, not claimed.
 const hint = computed<string>(() => {
   const campaign = get(activeCampaign);
   if (campaign) {

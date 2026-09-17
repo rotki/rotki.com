@@ -4,7 +4,6 @@ import type { MappedPlan } from '~/components/pricings/type';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { isCustomPlan, isEntryTierPlan, isFreePlan } from '~/components/pricings/utils';
-import { useAppConfig } from '~/composables/use-app-config';
 import { useDiscountCodeParams, useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { buildQueryParams } from '~/utils/query';
 import { toTitleCase } from '~/utils/text';
@@ -24,12 +23,11 @@ const {
 
 const { referralCode } = useReferralCodeParam();
 const { discountCode } = useDiscountCodeParams();
-const { activeCampaign } = useAppConfig();
 
 const checkoutLink = computed<RouteLocationRaw>(() => {
   const query = buildQueryParams({
-    // An explicit code in the URL wins over the sitewide campaign code.
-    discountCode: get(discountCode) ?? get(activeCampaign)?.code,
+    // Only a code the buyer brought along; checkout resolves the campaign itself.
+    discountCode: get(discountCode),
     planId: plan.id,
     ref: get(referralCode),
   });
