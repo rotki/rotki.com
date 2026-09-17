@@ -24,6 +24,7 @@
     "coverage": "vitest run --coverage",
     "og:mint": "node scripts/generate-og-mint.ts",
     "seo:audit": "node scripts/seo-audit.ts",
+    "check:initial-chunks": "node scripts/check-initial-chunks.ts",
     "gen:integration-stubs": "npx tsx scripts/generate-integration-stubs.ts",
     "integrations:changed": "npx tsx scripts/integrations-changed.ts"
   },

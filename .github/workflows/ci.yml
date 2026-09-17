@@ -284,6 +284,10 @@ jobs:
         continue-on-error: true
         run: pnpm --filter @rotki/website seo:audit
 
+      # Guard 1c: no page may load wallet/payment chunks before hydrating (deterministic).
+      - name: Initial JavaScript per page
+        run: pnpm --filter @rotki/website check:initial-chunks
+
       # Guard 2: Lighthouse (report-only — serves the generated files itself)
       - name: Run Lighthouse CI
         continue-on-error: true

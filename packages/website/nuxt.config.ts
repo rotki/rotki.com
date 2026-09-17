@@ -20,7 +20,7 @@ const buildId = gitSha ? gitSha.slice(0, 8) : Date.now();
  * groups for code every page needs must come before the heavy optional ones:
  * otherwise `swiper/vue` drags Vue into the swiper chunk, the Coinbase SDK drags
  * the preload helper into its chunk, walletconnect drags in `destr`, and every
- * page downloads those heavy chunks.
+ * page downloads those heavy chunks. `pnpm check:initial-chunks` guards this.
  */
 const chunkGroups: [test: (id: string) => boolean, chunk: string][] = [
   // Vite preload helper: its own small chunk, so the web3 stack isn't loaded just for preloading.
