@@ -301,18 +301,19 @@ export default defineNuxtConfig({
       });
     },
     /**
-     * Disables prefetch and modulepreload for every chunk except fonts. This avoids
-     * unnecessary requests on the initial page load while critical fonts still
-     * preload for better CLS.
+     * Disables prefetch of lazily imported chunks, so a page never downloads code
+     * for flows it may not reach (wallets, payments).
+     *
+     * Static imports keep their modulepreload links. The page needs them before it
+     * can hydrate, and without the links the browser only finds each chunk after
+     * parsing the one that imports it, one round trip per level.
      */
     'build:manifest': (manifest) => {
       for (const [key, item] of Object.entries(manifest)) {
         const isFont = key.endsWith('.woff2') || key.endsWith('.woff') || key.endsWith('.ttf');
         if (!isFont) {
           item.prefetch = false;
-          item.preload = false;
           item.dynamicImports = [];
-          item.imports = [];
         }
       }
     },
