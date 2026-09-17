@@ -3,7 +3,7 @@ import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment
 import { formatCreditedAmount } from '@rotki/card-payment-common/utils/checkout';
 import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { getPaymentBreakdown } from '@/utils/api';
 import { formatDate } from '@/utils/date';
 
@@ -62,7 +62,15 @@ function getPlanNameFor(plan: SelectedPlan): string {
   return `${toTitleCase(plan.name)} ${getPlanName(plan.durationInMonths)}`;
 }
 
+let breakdownRequestId = 0;
+
+/**
+ * Fetches the breakdown for the current plan and code. Requests run concurrently, so a
+ * response overtaken by a newer request is dropped: applying it would price the order
+ * without the code and make CardPayment clear a valid discount.
+ */
 async function loadPaymentBreakdown(): Promise<void> {
+  const requestId = ++breakdownRequestId;
   set(isLoadingBreakdown, true);
   try {
     const code = discountCode;
@@ -71,13 +79,15 @@ async function loadPaymentBreakdown(): Promise<void> {
       isCryptoPayment: false,
       ...(code ? { discountCode: code } : {}),
     });
-    set(breakdown, response ?? undefined);
+    if (requestId === breakdownRequestId)
+      set(breakdown, response ?? undefined);
   }
   catch (error) {
     console.error('Failed to fetch payment breakdown:', error);
   }
   finally {
-    set(isLoadingBreakdown, false);
+    if (requestId === breakdownRequestId)
+      set(isLoadingBreakdown, false);
   }
 }
 
@@ -89,10 +99,6 @@ watchImmediate(() => selectedPlan, (newPlan, oldPlan) => {
 
 // Refresh breakdown when discount code changes
 watch(() => discountCode, () => {
-  loadPaymentBreakdown();
-});
-
-onMounted(() => {
   loadPaymentBreakdown();
 });
 </script>
