@@ -16,7 +16,6 @@ usePageSeo(
 
 const { public: { baseUrl } } = useRuntimeConfig();
 useHead({
-  link: [{ as: 'image', href: '/img/screenshots/1-sc-dashboard.webp', rel: 'preload', type: 'image/webp' }],
   script: [{
     type: 'application/ld+json',
     innerHTML: JSON.stringify({

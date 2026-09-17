@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Swiper } from 'swiper/types';
-import { set } from '@vueuse/shared';
+import { get, set } from '@vueuse/shared';
 import { SwiperSlide } from 'swiper/vue';
 import screenshots from 'virtual:app-screenshots';
 import Carousel from '~/components/common/carousel/Carousel.vue';
@@ -91,6 +91,26 @@ const firstImageSizes = '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 120
 
 function getSizes(index: number): string | undefined {
   return index === 0 ? firstImageSizes : undefined;
+}
+
+/**
+ * Preloads the LCP image with the same srcset and sizes as the `<img>`, so the
+ * browser picks the same variant for both. A plain `href` preload fetched the
+ * 2880w original while the `<img>` then downloaded a smaller variant too.
+ */
+const firstImage = get(images)[0];
+if (firstImage) {
+  useHead({
+    link: [{
+      as: 'image',
+      fetchpriority: 'high',
+      href: firstImage.src,
+      imagesizes: firstImageSizes,
+      imagesrcset: getSrcset(firstImage, 0),
+      rel: 'preload',
+      type: 'image/webp',
+    }],
+  });
 }
 </script>
 

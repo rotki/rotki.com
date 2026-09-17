@@ -16,7 +16,6 @@ privacy,opensource,accounting,asset-management,taxes,tax-reporting`;
 
 usePageSeo('rotki', description, '', { keywords });
 useHead({
-  link: [{ as: 'image', href: '/img/screenshots/1-sc-dashboard.webp', rel: 'preload', type: 'image/webp' }],
   titleTemplate: '',
 });
 
