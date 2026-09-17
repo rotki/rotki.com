@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PageTabs, { type PageTabItem } from '~/components/common/PageTabs.vue';
+import PageLayout from '~/components/layout/PageLayout.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
-import Default from '~/layouts/default.vue';
 
 defineSlots<{
   default: () => void;
@@ -33,7 +33,7 @@ const tabs = computed<PageTabItem[]>(() => [
 </script>
 
 <template>
-  <Default>
+  <PageLayout>
     <div class="py-10 lg:py-16">
       <div class="container">
         <div class="flex flex-col xl:flex-row gap-6">
@@ -48,5 +48,5 @@ const tabs = computed<PageTabItem[]>(() => [
         </div>
       </div>
     </div>
-  </Default>
+  </PageLayout>
 </template>

@@ -2,9 +2,9 @@
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import PageTabs, { type PageTabItem } from '~/components/common/PageTabs.vue';
+import PageLayout from '~/components/layout/PageLayout.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
-import Default from '~/layouts/default.vue';
 import { useMainStore } from '~/store';
 
 defineSlots<{
@@ -74,7 +74,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Default>
+  <PageLayout>
     <div class="py-10 lg:py-16">
       <div class="container">
         <template v-if="hydrated">
@@ -105,5 +105,5 @@ onMounted(() => {
         </div>
       </div>
     </div>
-  </Default>
+  </PageLayout>
 </template>

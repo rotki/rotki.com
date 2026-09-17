@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import PageFooter from '~/components/footer/PageFooter.vue';
-import PageHeader from '~/components/header/PageHeader.vue';
+/*
+ * The body lives in PageLayout so other layouts can reuse it without importing
+ * this file. A layout that is also a static import gets merged into a shared
+ * chunk the SSR manifest cannot map back to this file, so prerendered pages
+ * never preload it and hydration waits for an extra round trip.
+ */
+import PageLayout from '~/components/layout/PageLayout.vue';
 
 defineSlots<{
   default: () => void;
 }>();
-
-const route = useRoute();
-
-const isLanding = computed<boolean>(() => !!route.meta.landing);
 </script>
 
 <template>
-  <div>
-    <PageHeader />
-  </div>
-  <main class="flex flex-col grow">
+  <PageLayout>
     <slot />
-  </main>
-  <div>
-    <PageFooter :landing="isLanding" />
-  </div>
+  </PageLayout>
 </template>
