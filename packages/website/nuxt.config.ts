@@ -1,6 +1,5 @@
 import process from 'node:process';
 import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
-import rotkiTheme from '@rotki/ui-library/theme';
 import { comparisonPrerenderRoutes } from './app/utils/comparison-prerender';
 import { featurePrerenderRoutes } from './app/utils/feature-prerender';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
@@ -277,6 +276,7 @@ export default defineNuxtConfig({
         '../vitest.config.ts',
         '../playwright.config.ts',
         '../content.config.ts',
+        '../tailwind.config.ts',
         '../tests/**/*.ts',
         '../scripts/**/*.ts',
       ],
@@ -341,21 +341,4 @@ export default defineNuxtConfig({
 
   // Closed roles are prerendered so their URLs resolve, but stay out of the sitemap (they carry noindex).
   sitemap: { exclude: [...nonIndexed, ...closedJobRoutes()] },
-
-  tailwindcss: {
-    config: {
-      content: [
-        './app/components/**/*.{vue,js,ts}',
-        './app/layouts/**/*.vue',
-        './app/modules/**/*.{vue,js,ts}',
-        './app/pages/**/*.vue',
-      ],
-      darkMode: 'class',
-      mode: 'jit',
-      plugins: [rotkiTheme],
-      theme: {
-        container: { center: true },
-      },
-    },
-  },
 });
