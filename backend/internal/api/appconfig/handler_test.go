@@ -51,6 +51,10 @@ func TestHandler(t *testing.T) {
 				t.Errorf("expected Content-Type application/json, got %q", ct)
 			}
 
+			if cc := w.Header().Get("Cache-Control"); cc != "no-cache" {
+				t.Errorf("expected Cache-Control no-cache, got %q", cc)
+			}
+
 			if resp.ActiveCampaign != nil {
 				t.Errorf("expected no active campaign, got %+v", resp.ActiveCampaign)
 			}

@@ -69,6 +69,13 @@ PORT=3000 \
 | `CAMPAIGN_START`         | _(empty)_                  |                         | Campaign start (RFC 3339, e.g. `2026-07-01T00:00:00Z`; empty = unbounded)  |
 | `CAMPAIGN_END`           | _(empty)_                  |                         | Campaign end (RFC 3339; empty = unbounded)                                 |
 
+The campaign variables only advertise a code: the discount itself comes from the Python
+backend. Before enabling a campaign, create a percentage `Discount` there whose `code_name`
+matches `CAMPAIGN_CODE` exactly (the lookup is case-sensitive), whose amount equals
+`CAMPAIGN_PERCENT`, and whose `valid_until` matches `CAMPAIGN_END`, with enough `uses_left`.
+Otherwise the ribbon promises a discount checkout does not give. `CAMPAIGN_END` is the
+instant the offer stops, so use midnight UTC: the site shows the day before it as the last day.
+
 ## Architecture
 
 ```

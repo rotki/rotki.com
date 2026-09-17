@@ -53,6 +53,9 @@ func activeCampaign(cfg *config.Config, now time.Time) *Campaign {
 func NewHandler(cfg *config.Config, logger *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		logger.Debug("serving app config")
+		// Without it the response is heuristically cacheable, which would keep an
+		// expired campaign on screen or hide one that just started.
+		w.Header().Set("Cache-Control", "no-cache")
 		validate.WriteJSON(w, http.StatusOK, Response{
 			SponsorshipEnabled: cfg.SponsorshipEnabled,
 			Maintenance:        cfg.Maintenance,
