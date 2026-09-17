@@ -1,4 +1,5 @@
 import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
+import { type ActiveCampaign, ActiveCampaignSchema } from '@rotki/card-payment-common/schemas/campaign';
 import {
   type AvailablePlansResponse,
   AvailablePlansResponseSchema,
@@ -9,6 +10,7 @@ import {
 } from '@rotki/card-payment-common/schemas/plans';
 import { type UserSubscriptions, UserSubscriptionsResponseSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { z } from 'zod';
 import { paths } from '@/config/paths';
 
 // CSRF Token handling
@@ -85,6 +87,32 @@ export async function getAccount(): Promise<Account | undefined> {
   }
   catch (error: any) {
     console.error('Failed to get account:', error);
+    return undefined;
+  }
+}
+
+const AppConfigSchema = z.object({
+  activeCampaign: ActiveCampaignSchema.nullish(),
+});
+
+/** Fetches the running sitewide campaign; any failure counts as no campaign so checkout still works. */
+export async function getActiveCampaign(): Promise<ActiveCampaign | undefined> {
+  try {
+    const response = await fetch(`${paths.hostUrlBase}/api/config`);
+    if (!response.ok) {
+      console.error('Failed to fetch app config:', response.status);
+      return undefined;
+    }
+
+    const parsed = AppConfigSchema.safeParse(convertKeys(await response.json(), true, false));
+    if (!parsed.success) {
+      console.error('Failed to parse app config:', parsed.error);
+      return undefined;
+    }
+    return parsed.data.activeCampaign ?? undefined;
+  }
+  catch (error: any) {
+    console.error('Failed to fetch app config:', error);
     return undefined;
   }
 }

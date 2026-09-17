@@ -3,8 +3,8 @@ import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
-import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
-import { get, set } from '@vueuse/core';
+import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import { get, set, useSessionStorage, watchImmediate } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
@@ -29,14 +29,22 @@ interface VatBreakdown {
 }
 
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
+/** Whether the running campaign's code is the discount the breakdown confirmed. */
+const campaignApplied = defineModel<boolean>('campaignApplied', { default: false });
 
-const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country } = defineProps<{
+const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country, discount = {} } = defineProps<{
   planData: PaymentBreakdownResponse;
   selectedPlan: SelectedPlan;
   upgradeSubId: string | null;
   cards: SavedCard[];
   vatIdStatus?: string;
   country?: string;
+  discount?: {
+    /** Code to start with, already resolved from the URL, referral, campaign and dismissal. */
+    initialCode?: string;
+    campaignCode?: string;
+    hint?: string;
+  };
 }>();
 
 const emit = defineEmits<{
@@ -65,8 +73,10 @@ const newCardFormValid = ref<boolean>(false);
 const showCardSelectionDialog = ref<boolean>(false);
 const showAddCardDialog = ref<boolean>(false);
 const pendingCardToken = ref<string>();
-// Discount state
-const discountCode = ref<string>('');
+// Shared with the website checkout: set once the buyer removes an auto-applied code.
+const autoDiscountDismissed = useSessionStorage<boolean>(AUTO_DISCOUNT_DISMISSED_KEY, false);
+// Seeded before PlanSummary's first fetch, so the initial breakdown already carries the code.
+const discountCode = ref<string>(discount.initialCode ?? '');
 // Breakdown from PlanSummary via v-model
 const breakdown = ref<PaymentBreakdownResponse>();
 const newCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('newCardForm');
@@ -101,6 +111,15 @@ const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
   const currentBreakdown = get(breakdown);
   return currentBreakdown?.discount ?? undefined;
 });
+
+watchImmediate(() => getValidDiscountCode(get(discountInfo), get(discountCode) || undefined), (validCode) => {
+  set(campaignApplied, !!discount.campaignCode && validCode === discount.campaignCode);
+});
+
+/** Remembers a removed code across payment pages; entering a code lifts the dismissal again. */
+function handleDiscountEdit(code: string): void {
+  set(autoDiscountDismissed, !code);
+}
 
 const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
   const currentBreakdown = get(breakdown);
@@ -314,19 +333,6 @@ async function processPayment(): Promise<void> {
   }
 }
 
-/** Prefill the discount code from the `ref` query param, unless one is already entered. */
-/**
- * Prefills the explicit discountCode query param (forwarded by the website checkout, e.g.
- * for sitewide campaigns), falling back to the referral code.
- */
-function prefillDiscountCode(): void {
-  const params = new URLSearchParams(window.location.search);
-  const codeParam = params.get('discountCode') ?? params.get('ref');
-  if (codeParam && !get(discountCode)) {
-    set(discountCode, codeParam);
-  }
-}
-
 function handleCardDeleted(): void {
   emit('refresh-card');
 }
@@ -360,7 +366,6 @@ watch(() => cards, (newCards) => {
 });
 
 onMounted(async () => {
-  prefillDiscountCode();
   await initializeBraintreeClient();
 });
 
@@ -489,7 +494,9 @@ onUnmounted(async () => {
           <DiscountCodeInput
             v-model="discountCode"
             :discount-info="discountInfo"
+            :hint="discount.hint"
             class="mb-4"
+            @edit="handleDiscountEdit($event)"
           />
 
           <!-- VAT Warning -->

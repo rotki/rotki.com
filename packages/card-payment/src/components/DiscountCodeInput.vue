@@ -6,9 +6,18 @@ import { computed, ref, watch } from 'vue';
 
 const model = defineModel<string>({ required: true });
 
-const { discountInfo } = defineProps<{
+const {
+  discountInfo,
+  hint = 'Optional: Enter a discount code to apply savings to your purchase.',
+} = defineProps<{
   discountInfo?: PaymentBreakdownDiscount;
   loading?: boolean;
+  hint?: string;
+}>();
+
+const emit = defineEmits<{
+  /** The buyer applied a code, or removed one (empty string). */
+  edit: [code: string];
 }>();
 
 const value = ref<string>('');
@@ -42,12 +51,14 @@ function applyCode(): void {
   const code = get(value);
   if (code) {
     set(model, code);
+    emit('edit', code);
   }
 }
 
 function reset(): void {
   set(model, '');
   set(value, '');
+  emit('edit', '');
 }
 
 /** Editing the input after a rejected code clears the error by resetting the model. */
@@ -185,7 +196,7 @@ watch(value, clearErrorOnEdit);
         v-else
         class="text-xs leading-3 text-neutral-500 ml-2"
       >
-        Optional: Enter a discount code to apply savings to your purchase.
+        {{ hint }}
       </p>
     </form>
 

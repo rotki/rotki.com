@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import type { Account } from '@rotki/card-payment-common/schemas/account';
+import type { ActiveCampaign } from '@rotki/card-payment-common/schemas/campaign';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { AUTO_DISCOUNT_DISMISSED_KEY, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { useHead } from '@unhead/vue';
 import { get, set } from '@vueuse/core';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import CampaignRibbon from '@/components/CampaignRibbon.vue';
 import CardPayment from '@/components/CardPayment.vue';
 import CheckoutLayout from '@/components/CheckoutLayout.vue';
 import ErrorState from '@/components/ErrorState.vue';
 import LoadingState from '@/components/LoadingState.vue';
 import { assetPaths, paths } from '@/config/paths';
+import { en } from '@/i18n/en';
 import DefaultLayout from '@/layouts/default.vue';
 import {
   checkout,
   findSelectedPlanById,
+  getActiveCampaign,
   getAvailablePlans,
 } from '@/utils/api';
 import { getSavedCard } from '@/utils/card-api';
@@ -70,6 +75,30 @@ const planData = ref<PaymentBreakdownResponse>();
 const selectedPlan = ref<SelectedPlan>();
 const selectedCard = ref<SavedCard>();
 
+const campaign = ref<ActiveCampaign>();
+const campaignApplied = ref<boolean>(false);
+const initialDiscountCode = ref<string>('');
+
+const discount = computed<{ initialCode: string; campaignCode?: string; hint?: string }>(() => {
+  const active = get(campaign);
+  return {
+    initialCode: get(initialDiscountCode),
+    campaignCode: active?.code,
+    // The field only shows while no code is applied, so a running campaign is offered, not claimed.
+    hint: active ? en.campaign.hint(active.code, active.percent) : undefined,
+  };
+});
+
+/** Explicit code, then referral, then campaign, unless the buyer removed an auto-applied code. */
+function resolveInitialDiscountCode(activeCampaign: ActiveCampaign | undefined): string {
+  return resolveDiscountCode({
+    explicit: getUrlParam('discountCode') ?? undefined,
+    dismissed: sessionStorage.getItem(AUTO_DISCOUNT_DISMISSED_KEY) === 'true',
+    referral: getUrlParam('ref') ?? undefined,
+    campaign: activeCampaign?.code,
+  }) ?? '';
+}
+
 const cards = ref<SavedCard[]>([]);
 const accountData = ref<Account>();
 
@@ -100,11 +129,14 @@ const steps = [{
  * Returns the error to show when a required piece is missing, `undefined` on success.
  */
 async function loadPaymentData(planId: number): Promise<string | undefined> {
-  const [checkoutData, availablePlansData, savedCardData] = await Promise.all([
+  const [checkoutData, availablePlansData, savedCardData, activeCampaign] = await Promise.all([
     checkout(planId),
     getAvailablePlans(),
     getSavedCard(),
+    getActiveCampaign(),
   ]);
+  set(campaign, activeCampaign);
+  set(initialDiscountCode, resolveInitialDiscountCode(activeCampaign));
 
   if (!checkoutData)
     return 'Failed to initialize payment. Please try again.';
@@ -217,23 +249,30 @@ onMounted(async () => {
       @button-click="plan ? navigation.goToPaymentMethod(plan, referralCode) : navigation.goToHome()"
     />
 
-    <CheckoutLayout
-      v-else-if="planData && selectedPlan"
-      :steps="steps"
-    >
-      <CardPayment
-        v-model:selected-card="selectedCard"
-        :cards="cards"
-        :plan-data="planData"
-        :selected-plan="selectedPlan"
-        :upgrade-sub-id="upgradeSubId"
-        :vat-id-status="accountData?.vatIdStatus"
-        :country="accountData?.address.country"
-        @payment-success="navigation.goTo3DSecure(upgradeSubId)"
-        @go-back="back()"
-        @refresh-card="refreshCard()"
-        @fatal-error="errorMessage = $event"
+    <template v-else-if="planData && selectedPlan">
+      <CampaignRibbon
+        v-if="campaign"
+        :campaign="campaign"
+        :applied="campaignApplied"
       />
-    </CheckoutLayout>
+
+      <CheckoutLayout :steps="steps">
+        <CardPayment
+          v-model:selected-card="selectedCard"
+          v-model:campaign-applied="campaignApplied"
+          :discount="discount"
+          :cards="cards"
+          :plan-data="planData"
+          :selected-plan="selectedPlan"
+          :upgrade-sub-id="upgradeSubId"
+          :vat-id-status="accountData?.vatIdStatus"
+          :country="accountData?.address.country"
+          @payment-success="navigation.goTo3DSecure(upgradeSubId)"
+          @go-back="back()"
+          @refresh-card="refreshCard()"
+          @fatal-error="errorMessage = $event"
+        />
+      </CheckoutLayout>
+    </template>
   </DefaultLayout>
 </template>
