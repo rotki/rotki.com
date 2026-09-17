@@ -3,7 +3,7 @@ import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
-import { INTEGRATION_QUALIFIERS } from '~/utils/integration-slug';
+import { consolidateSlug, INTEGRATION_QUALIFIERS } from '~/utils/integration-slug';
 
 const { path } = useRoute();
 const { t } = useI18n({ useScope: 'global' });
@@ -96,7 +96,7 @@ const typeLabel = computed<string>(() => {
 const qualifierBadge = computed<string | undefined>(() => {
   if (!isDefined(integration))
     return undefined;
-  return INTEGRATION_QUALIFIERS[get(integration).slug];
+  return INTEGRATION_QUALIFIERS[consolidateSlug(get(integration).slug)];
 });
 
 const tierBadge = computed<string | undefined>(() => {

@@ -33,7 +33,7 @@ export const INTEGRATION_CONSOLIDATIONS: Record<string, { label: string; members
 export const INTEGRATION_QUALIFIERS: Record<string, string> = {
   aave: 'v1–v3',
   solana: 'early support',
-  uniswap: 'v2/v3',
+  uniswap: 'v2–v4',
 };
 
 /**
