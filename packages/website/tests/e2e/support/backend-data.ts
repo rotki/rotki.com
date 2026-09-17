@@ -75,6 +75,7 @@ export interface AccountWire {
   email: string;
   email_confirmed: boolean;
   has_active_subscription: boolean;
+  newsletter_consent: boolean;
   username: string;
   vat: number;
   vat_id_status: string;
@@ -204,6 +205,7 @@ export function defaultAccount(): AccountWire {
     email: 'test@example.com',
     email_confirmed: true,
     has_active_subscription: false,
+    newsletter_consent: false,
     username: 'testuser',
     vat: 19,
     vat_id_status: 'Not checked',
