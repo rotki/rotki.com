@@ -68,6 +68,17 @@ describe('email preferences', () => {
     expect(wrapper.get<HTMLInputElement>('#newsletter-consent').element.checked).toBe(newsletterConsent);
   });
 
+  it('disables the buttons until the consent changes', async () => {
+    const { wrapper } = await mountEmailPreferences(false);
+    const update = wrapper.get<HTMLButtonElement>('[data-cy="update-email-preferences"]');
+
+    expect(update.element.disabled).toBe(true);
+
+    await wrapper.get<HTMLInputElement>('#newsletter-consent').setValue(true);
+
+    expect(update.element.disabled).toBe(false);
+  });
+
   it.each([false, true])('submits newsletter consent as %s', async (newsletterConsent) => {
     const { updateProfile, wrapper } = await mountEmailPreferences(!newsletterConsent);
     await wrapper.get<HTMLInputElement>('#newsletter-consent').setValue(newsletterConsent);

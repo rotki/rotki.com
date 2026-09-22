@@ -175,7 +175,7 @@ watch(() => externalResults, (errors) => {
         @update:captcha-id="setCaptchaId($event)"
       />
 
-      <div class="space-y-2 text-pretty">
+      <div class="text-pretty">
         <RuiCheckbox
           id="tos"
           v-model="terms"
@@ -216,6 +216,9 @@ watch(() => externalResults, (errors) => {
           @update:model-value="updateValue('newsletterConsent', $event)"
         >
           {{ t('auth.signup.address.form.newsletter_consent') }}
+          <span class="block text-caption text-rui-text-secondary mt-1">
+            {{ t('auth.signup.address.form.newsletter_consent_hint') }}
+          </span>
         </RuiCheckbox>
       </div>
     </div>

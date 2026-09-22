@@ -31,6 +31,8 @@ const v$ = useVuelidate(rules, state, {
   $externalResults,
 });
 
+const changed = computed<boolean>(() => state.newsletterConsent !== get(account)?.newsletterConsent);
+
 function reset(): void {
   const userAccount = get(account);
   if (!userAccount)
@@ -50,7 +52,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div class="pt-2">
+  <div>
     <div class="text-h6 mb-2">
       {{ t('email_preferences.title') }}
     </div>
@@ -74,12 +76,14 @@ onBeforeMount(() => {
         size="lg"
         color="primary"
         variant="outlined"
+        :disabled="!changed"
         @click="reset()"
       >
         {{ t('actions.reset') }}
       </RuiButton>
       <RuiButton
         data-cy="update-email-preferences"
+        :disabled="!changed"
         size="lg"
         :loading="loading"
         color="primary"
