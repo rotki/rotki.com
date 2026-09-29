@@ -10,6 +10,9 @@ import type { ModuleOptions } from 'nuxt-llms';
  * integration pages are exposed. `excludeCollections` keeps the `/raw` endpoint
  * limited to integrations as well.
  *
+ * Regular Nuxt pages (download, pricing, ...) are not content documents. They
+ * are added to the generated files after prerendering, see `llms-pages.ts`.
+ *
  * `@nuxt/content` extends sections with `contentCollection`/`contentFilters` and
  * adds `contentRawMarkdown`, but the base nuxt-llms types don't declare them
  * (nuxt/content#3497), so we describe the shape we use here.
@@ -25,7 +28,7 @@ interface ContentLlmsOptions extends ModuleOptions {
 export const llms: ContentLlmsOptions = {
   domain: 'https://rotki.com',
   title: 'rotki',
-  description: 'rotki is an open-source, local-first portfolio tracker, accounting and tax tool that protects your privacy. This index covers the exchanges, blockchains, and DeFi protocols rotki integrates with.',
+  description: 'rotki is an open-source, local-first portfolio tracker, accounting and tax tool that protects your privacy. This index covers the main pages of rotki.com and the exchanges, blockchains, and DeFi protocols rotki integrates with.',
   full: {
     title: 'rotki integrations',
     description: 'Full setup steps, supported features, limitations, and FAQ for every exchange, blockchain, and DeFi protocol rotki integrates with.',

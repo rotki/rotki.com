@@ -5,6 +5,7 @@ import { featurePrerenderRoutes } from './app/utils/feature-prerender';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
 import { closedJobRoutes, jobsPrerenderRoutes } from './app/utils/jobs-prerender';
 import { llms } from './app/utils/llms-config';
+import { writeLlmsPages } from './app/utils/llms-pages';
 import { devOptimizeDeps } from './app/utils/optimize-deps';
 import { clientOnlyRouteRules, writeSpaManifest } from './app/utils/spa-routes';
 
@@ -308,6 +309,8 @@ export default defineNuxtConfig({
     'nitro:init': (nitro) => {
       nitro.hooks.hook('prerender:done', () => {
         writeSpaManifest(nitro.options.output.publicDir);
+        // Lists the regular (non-content) pages in llms.txt, read from their prerendered SEO meta.
+        writeLlmsPages(nitro.options.output.publicDir, llms.domain, llms.sections[0]?.title);
       });
     },
     /**
