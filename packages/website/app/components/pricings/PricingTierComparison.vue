@@ -43,12 +43,20 @@ const { plans, displayedFeaturesLabel, modelCompact, allowCompact } = usePricing
       />
     </div>
     <div class="flex justify-center mt-4">
+      <!-- Secondary action: outlined so the suggested plan's button stays the one filled call to action -->
       <RuiButton
         v-if="allowCompact"
         color="primary"
-        size="lg"
+        variant="outlined"
+        rounded
         @click="modelCompact = !modelCompact"
       >
+        <template #append>
+          <RuiIcon
+            :name="modelCompact ? 'lu-chevron-down' : 'lu-chevron-up'"
+            size="16"
+          />
+        </template>
         {{
           modelCompact
             ? t('pricing.see_all_features')

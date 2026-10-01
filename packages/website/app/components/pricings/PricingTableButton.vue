@@ -3,7 +3,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { isCustomPlan, isEntryTierPlan, isFreePlan } from '~/components/pricings/utils';
+import { isCustomPlan, isFreePlan, isMostPopularPlan } from '~/components/pricings/utils';
 import { useDiscountCodeParams, useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { buildQueryParams } from '~/utils/query';
 import { toTitleCase } from '~/utils/text';
@@ -60,16 +60,17 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
     v-else-if="isCustomPlan(plan)"
     class="w-full py-2 xl:text-[1rem]"
     color="primary"
-    variant="default"
+    variant="outlined"
     :to="emailMailto"
   >
     {{ t('values.contact_section.title') }}
   </ButtonLink>
 
+  <!-- Only the suggested plan gets a filled button, so one call to action leads -->
   <ButtonLink
     v-else
     class="w-full py-2 xl:text-[1rem]"
-    :variant="isEntryTierPlan(plan) ? 'outlined' : 'default'"
+    :variant="isMostPopularPlan(plan) ? 'default' : 'outlined'"
     color="primary"
     :to="checkoutLink"
   >

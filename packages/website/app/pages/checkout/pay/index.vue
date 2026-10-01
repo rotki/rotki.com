@@ -2,7 +2,6 @@
 import { SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
-import ButtonLink from '~/components/common/ButtonLink.vue';
 import PricingFeatureItem from '~/components/pricings/PricingFeatureItem.vue';
 import PricingHeading from '~/components/pricings/PricingHeading.vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
@@ -94,13 +93,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col max-w-full mx-4 md:mx-8">
+  <!-- No extra margin on phones: the layout container already has the gutter, and the plan tabs need the width -->
+  <div class="flex flex-col max-w-full md:mx-8">
     <PricingHeading />
 
     <!-- Top Section: Pricing Cards -->
-    <div class="flex flex-col gap-8 pb-10 md:pb-16 mt-6">
+    <!-- Extra top space: the "save N months" note sits above the toggle -->
+    <div class="flex flex-col gap-8 pb-10 md:pb-16 mt-14 lg:mt-16">
       <PricingPeriodTab
         v-model="selectedPricingPeriod"
+        class="self-center"
         :data="availablePlans"
       />
 
@@ -110,8 +112,12 @@ onMounted(() => {
         :tiers-data="tiersInformation"
       />
 
-      <div class="max-w-[42rem] mx-auto flex flex-col gap-6 mt-4">
-        <div class="flex flex-col gap-3">
+      <div class="w-full max-w-[42rem] mx-auto flex flex-col gap-4 mt-4">
+        <!-- The billing terms read as one block instead of a loose list under the table -->
+        <div class="flex flex-col gap-3 rounded-2xl border border-rui-grey-200 bg-rui-grey-50 p-5 lg:p-6">
+          <h2 class="text-subtitle-1 font-bold text-rui-text">
+            {{ t('pricing.page.billing_title') }}
+          </h2>
           <PricingFeatureItem
             v-for="(line, i) in planNotes"
             :key="i"
@@ -124,13 +130,12 @@ onMounted(() => {
               scope="global"
             >
               <template #integrations>
-                <ButtonLink
+                <NuxtLink
                   to="/integrations"
-                  inline
-                  color="primary"
+                  class="text-rui-primary underline hover:no-underline"
                 >
                   {{ t('home.plans.tiers.step_1.notes.integrations_link') }}
-                </ButtonLink>
+                </NuxtLink>
               </template>
             </i18n-t>
           </PricingFeatureItem>
@@ -151,13 +156,12 @@ onMounted(() => {
                 {{ countryName }}
               </template>
               <template #login>
-                <ButtonLink
+                <NuxtLink
                   :to="ROUTES.LOGIN"
-                  inline
-                  color="primary"
+                  class="text-rui-primary underline hover:no-underline"
                 >
                   {{ t('auth.login.title') }}
-                </ButtonLink>
+                </NuxtLink>
               </template>
             </i18n-t>
             <i18n-t
@@ -167,13 +171,12 @@ onMounted(() => {
               tag="div"
             >
               <template #login>
-                <ButtonLink
+                <NuxtLink
                   :to="ROUTES.LOGIN"
-                  inline
-                  color="primary"
+                  class="text-rui-primary underline hover:no-underline"
                 >
                   {{ t('auth.login.title') }}
-                </ButtonLink>
+                </NuxtLink>
               </template>
             </i18n-t>
           </div>

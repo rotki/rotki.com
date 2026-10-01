@@ -93,7 +93,11 @@ onBeforeMount(() => {
           @submit.prevent
         >
           <NuxtPage />
-          <div class="block py-10 w-full lg:hidden">
+          <!-- Like the desktop stepper, hidden on step 1, which doubles as the public /pricing page -->
+          <div
+            v-if="!isFirstStep"
+            class="block py-10 w-full lg:hidden"
+          >
             <RuiFooterStepper
               :model-value="step"
               :pages="steps.length"

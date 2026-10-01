@@ -56,31 +56,31 @@ const { t } = useI18n({ useScope: 'global' });
             <RuiSkeletonLoader class="w-32 h-6" />
           </template>
           <template v-else>
-            <div class="text-h6 text-rui-primary whitespace-nowrap">
+            <div class="text-subtitle-1 font-bold text-rui-primary whitespace-nowrap">
               {{ plan.displayedName }}
             </div>
             <template v-if="!isCustomPlan(plan)">
-              <div class="flex items-end gap-x-1">
-                <div class="text-h5 xl:text-h4 font-bold whitespace-nowrap">
+              <div class="flex items-baseline gap-x-1">
+                <div class="text-h4 font-bold whitespace-nowrap tabular-nums">
                   {{ plan.mainPriceDisplay }}
                 </div>
                 <div
                   v-if="!isFreePlan(plan)"
-                  class="text-lg font-medium"
+                  class="text-body-1 text-rui-text-secondary"
                 >
                   /{{ t('pricing.per_month') }}
                 </div>
               </div>
               <div
                 v-if="!isFreePlan(plan)"
-                class="text-rui-text-secondary"
+                class="text-body-2 text-rui-text-secondary"
               >
                 {{ plan.secondaryPriceDisplay }}
               </div>
             </template>
             <div
               v-else
-              class="text-rui-text-secondary"
+              class="text-body-2 text-rui-text-secondary"
             >
               {{ t('pricing.custom_plan_info') }}
             </div>
@@ -99,7 +99,7 @@ const { t } = useI18n({ useScope: 'global' });
     >
       <div
         :class="{ 'bg-gray-50': mainIndex % 2 === 0 }"
-        class="px-2 py-2 font-medium flex items-center"
+        class="px-3 py-2 text-sm font-medium text-rui-text flex items-center"
       >
         <template v-if="featureLabel">
           {{ featureLabel }}

@@ -2,8 +2,7 @@ import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import type { FeatureDescriptionMap, FeatureValue, PlanBase } from '~/components/pricings/type';
 import type { PremiumTiersInfo } from '~/types/tiers';
 import { describe, expect, it } from 'vitest';
-import { buildRegularPlans, parseTiersInfo, resolveFeatureValue } from '~/composables/use-pricing-comparison';
-import { formatCurrency } from '~/utils/text';
+import { buildRegularPlans, formatHeadlinePrice, parseTiersInfo, resolveFeatureValue } from '~/composables/use-pricing-comparison';
 
 /** Translation stub that returns the key, so tests can assert which key was chosen. */
 const tStub = (key: string): string => key;
@@ -319,15 +318,21 @@ describe('buildRegularPlans', () => {
     const [plan] = buildRegularPlans([availablePlan()], false, tStub);
     expect(plan?.id).toBe(1);
     expect(plan?.type).toBe('regular');
-    expect(plan?.mainPriceDisplay).toBe(`${formatCurrency(10)}€`);
+    expect(plan?.mainPriceDisplay).toBe('10€');
     expect(plan?.secondaryPriceDisplay).toBe('pricing.billed_monthly');
   });
 
   it('uses the yearly plan, divides by 12, and uses the annual billing label for the yearly period', () => {
     const [plan] = buildRegularPlans([availablePlan()], true, tStub);
     expect(plan?.id).toBe(2);
-    expect(plan?.mainPriceDisplay).toBe(`${formatCurrency(96 / 12)}€`);
+    expect(plan?.mainPriceDisplay).toBe('8€');
     expect(plan?.secondaryPriceDisplay).toBe('pricing.billed_annually');
+  });
+
+  it('keeps two decimals only when the headline price has cents', () => {
+    expect(formatHeadlinePrice(25)).toBe('25€');
+    expect(formatHeadlinePrice(250 / 12)).toBe('20.83€');
+    expect(formatHeadlinePrice(1200)).toBe('1,200€');
   });
 
   it('marks the cheapest non-custom plan as the entry tier', () => {

@@ -92,59 +92,42 @@ export function resolveFeatureValue(
   return descriptions.get(plan.name)?.get(label);
 }
 
-const PLACEHOLDER_FEATURE_COUNT = 8;
+/**
+ * The skeleton mirrors the live table (free, three paid tiers with the middle one suggested, custom;
+ * 13 feature rows as of October 2026), so nothing jumps and the suggested column stays put on load.
+ */
+const PLACEHOLDER_FEATURE_COUNT = 13;
 
 /** Rows the compact (homepage) table shows before "See all features": enough to tell the tiers apart. */
 const COMPACT_FEATURE_COUNT = 4;
 
+function placeholderPlan(name: string, type: MappedPlan['type'], flags: Partial<Pick<MappedPlan, 'isMostPopular' | 'isEntryTier'>> = {}): MappedPlan {
+  return {
+    name,
+    displayedName: '',
+    mainPriceDisplay: '',
+    type,
+    isMostPopular: flags.isMostPopular ?? false,
+    isEntryTier: flags.isEntryTier ?? false,
+    hidden: false,
+    loading: true,
+    features: Array.from<FeatureValue>({ length: PLACEHOLDER_FEATURE_COUNT }).fill(''),
+  };
+}
+
 function createPlaceholderPlans(): MappedPlan[] {
-  const emptyFeatures = Array.from<FeatureValue>({ length: PLACEHOLDER_FEATURE_COUNT }).fill('');
   return [
-    {
-      name: TIER_NAMES.FREE,
-      displayedName: '',
-      mainPriceDisplay: '',
-      type: 'free',
-      isMostPopular: false,
-      isEntryTier: false,
-      hidden: false,
-      loading: true,
-      features: [...emptyFeatures],
-    },
-    {
-      name: 'plan-1',
-      displayedName: '',
-      mainPriceDisplay: '',
-      type: 'regular',
-      isMostPopular: true,
-      isEntryTier: false,
-      hidden: false,
-      loading: true,
-      features: [...emptyFeatures],
-    },
-    {
-      name: 'plan-2',
-      displayedName: '',
-      mainPriceDisplay: '',
-      type: 'regular',
-      isMostPopular: false,
-      isEntryTier: false,
-      hidden: false,
-      loading: true,
-      features: [...emptyFeatures],
-    },
-    {
-      name: TIER_NAMES.CUSTOM,
-      displayedName: '',
-      mainPriceDisplay: '',
-      type: 'custom',
-      isMostPopular: false,
-      isEntryTier: false,
-      hidden: false,
-      loading: true,
-      features: [...emptyFeatures],
-    },
+    placeholderPlan(TIER_NAMES.FREE, 'free'),
+    placeholderPlan('plan-1', 'regular', { isEntryTier: true }),
+    placeholderPlan('plan-2', 'regular', { isMostPopular: true }),
+    placeholderPlan('plan-3', 'regular'),
+    placeholderPlan(TIER_NAMES.CUSTOM, 'custom'),
   ];
+}
+
+/** Headline price: whole amounts drop the `.00` (25€), fractions keep two decimals (20.83€). */
+export function formatHeadlinePrice(price: number): string {
+  return `${formatCurrency(price, Number.isInteger(price) ? 0 : 2)}€`;
 }
 
 interface UsePricingComparisonOptions {
@@ -167,14 +150,13 @@ function toRegularPlan(
   price: number,
   t: TranslateFn,
 ): PlanBase {
-  const formattedPrice = formatCurrency(price);
   return {
     id: targetPlan.planId,
     name: availablePlan.tierName,
     displayedName: t('pricing.plans.plan', { plan: toTitleCase(availablePlan.tierName) }),
-    mainPriceDisplay: yearly ? `${formatCurrency(price / 12)}€` : `${formattedPrice}€`,
+    mainPriceDisplay: formatHeadlinePrice(yearly ? Math.round((price / 12) * 100) / 100 : price),
     secondaryPriceDisplay: yearly
-      ? t('pricing.billed_annually', { price: formattedPrice })
+      ? t('pricing.billed_annually', { price: formatHeadlinePrice(price) })
       : t('pricing.billed_monthly'),
     type: 'regular',
     hidden: availablePlan.isCustom || false,

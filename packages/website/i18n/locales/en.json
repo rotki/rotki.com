@@ -665,7 +665,7 @@
             "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
             "integrations_link": "Integrations page",
             "line_1": "The full amount will be charged immediately and renew automatically each {period} until you cancel.",
-            "line_2": "New billing cycle starts at UTC midnight after the subscription has ran out.",
+            "line_2": "A new billing cycle starts at UTC midnight after the current one runs out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           },
@@ -1095,10 +1095,16 @@
     }
   },
   "pricing": {
-    "billed_annually": "Billed annually in € {price}",
-    "billed_monthly": "Billed monthly in EUR",
+    "billed_annually": "{price} billed yearly",
+    "billed_monthly": "Billed monthly",
     "header": {
       "heading": "Pricing"
+    },
+    "page": {
+      "eyebrow": "Pricing",
+      "title": "Choose the plan that fits your portfolio",
+      "description": "Start free with the open source app. Upgrade for more history, synced devices, analytics and the MCP server, and cancel at any time.",
+      "billing_title": "Billing details"
     },
     "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
     "custom_plan_negotiable": "Negotiable",
@@ -1108,7 +1114,7 @@
     "current_plan": "Current plan",
     "max_saved_annually": "Save {months} months vs monthly",
     "see_all_features": "See all features",
-    "see_less_features": "See less features",
+    "see_less_features": "Show fewer features",
     "compare_plans": "Compare plans",
     "everything_from": "Everything included in {plan}",
     "free": "Free",

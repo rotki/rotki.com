@@ -25,31 +25,31 @@ const { t } = useI18n({ useScope: 'global' });
           <RuiSkeletonLoader class="w-40 h-6" />
         </template>
         <template v-else>
-          <div class="text-h6 text-rui-primary">
+          <div class="text-subtitle-1 font-bold text-rui-primary">
             {{ plan.displayedName }}
           </div>
           <template v-if="!isCustomPlan(plan)">
-            <div class="flex flex-wrap items-end gap-x-1">
-              <div class="text-h4 font-bold">
+            <div class="flex flex-wrap items-baseline gap-x-1">
+              <div class="text-h4 font-bold tabular-nums">
                 {{ plan.mainPriceDisplay }}
               </div>
               <div
                 v-if="!isFreePlan(plan)"
-                class="text-lg font-medium"
+                class="text-body-1 text-rui-text-secondary"
               >
-                {{ t('pricing.per_month') }}
+                /{{ t('pricing.per_month') }}
               </div>
             </div>
             <div
               v-if="!isFreePlan(plan)"
-              class="text-rui-text-secondary"
+              class="text-body-2 text-rui-text-secondary"
             >
               {{ plan.secondaryPriceDisplay }}
             </div>
           </template>
           <div
             v-else
-            class="text-rui-text-secondary"
+            class="text-body-2 text-rui-text-secondary"
           >
             {{ t('pricing.custom_plan_info') }}
           </div>
