@@ -68,6 +68,36 @@ func TestBespoke_ReturnsGone(t *testing.T) {
 	}
 }
 
+func TestPermanentRedirects(t *testing.T) {
+	cfg := &config.Config{BaseURL: "https://rotki.com", ImageCacheDir: t.TempDir()}
+	mux := http.NewServeMux()
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
+	testRegister(mux, cfg, logger)
+
+	tests := []struct {
+		from string
+		to   string
+	}{
+		{"/pricing", "/checkout/pay"},
+		{"/sponsor", "/sponsor/mint"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.from, func(t *testing.T) {
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, tt.from, nil)
+			w := httptest.NewRecorder()
+			mux.ServeHTTP(w, req)
+
+			if w.Code != http.StatusMovedPermanently {
+				t.Fatalf("expected 301, got %d", w.Code)
+			}
+			if got := w.Header().Get("Location"); got != tt.to {
+				t.Errorf("expected Location %q, got %q", tt.to, got)
+			}
+		})
+	}
+}
+
 func TestConfigEndpoint(t *testing.T) {
 	tests := []struct {
 		name               string

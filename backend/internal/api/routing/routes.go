@@ -109,10 +109,17 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 		mux.HandleFunc("/robots.txt", robotsTxtHandler(cfg))
 	}
 
-	// Redirects
-	mux.HandleFunc("/pricing", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/checkout/pay", http.StatusMovedPermanently)
-	})
+	// Redirects. Nuxt route rules and navigateTo() only produce a meta-refresh page
+	// under the static preset, which crawlers see as a 200, so real 301s live here.
+	permanentRedirects := map[string]string{
+		"/pricing": "/checkout/pay",
+		"/sponsor": "/sponsor/mint",
+	}
+	for from, to := range permanentRedirects {
+		mux.HandleFunc(from, func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, to, http.StatusMovedPermanently)
+		})
+	}
 
 	// Deprecated route
 	mux.HandleFunc("/bespoke", func(w http.ResponseWriter, _ *http.Request) {
