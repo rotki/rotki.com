@@ -103,7 +103,7 @@ watch(imageUrl, () => {
 
 <template>
   <div class="nft-image-container w-full flex justify-center lg:block">
-    <div class="aspect-square w-full max-w-md bg-rui-grey-100 rounded-lg flex items-center justify-center overflow-hidden">
+    <div class="aspect-square w-full max-w-md lg:max-w-none bg-rui-grey-100 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden">
       <div
         v-if="error"
         class="text-rui-error text-center"

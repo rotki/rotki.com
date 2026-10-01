@@ -1269,7 +1269,26 @@
     "tabs": {
       "sponsor": "Sponsor",
       "leaderboard": "Leaderboard",
-      "submit_name": "Submit Name"
+      "submit_name": "Submit name",
+      "aria_label": "Sponsorship sections"
+    },
+    "how_it_works": {
+      "title": "How sponsorship works",
+      "step": "Step {number}",
+      "mint": {
+        "title": "Mint a sponsorship NFT",
+        "description": "Pick a tier and pay from your wallet. The NFT is minted on-chain and tied to the upcoming release."
+      },
+      "submit": {
+        "title": "Add your name",
+        "description": "Sign in with the wallet holding the NFT and submit the name, and for silver and gold an image, you want credited.",
+        "link": "Submit your name"
+      },
+      "credit": {
+        "title": "Get credited",
+        "description": "Your name appears with the release, and every NFT you hold counts towards your place on the leaderboard.",
+        "link": "See the leaderboard"
+      }
     },
     "connected_account": {
       "label": "Connected wallet",
@@ -1280,13 +1299,16 @@
     },
     "leaderboard": {
       "be_the_first": "Be the first to {mint}",
-      "mint": "mint rotki sponsorship NFT",
-      "title": "Sponsor Leaderboard",
-      "subtitle": "Recognizing those funding privacy-first, local software",
+      "mint": "mint a rotki sponsorship NFT",
+      "eyebrow": "Thank you to our supporters",
+      "sponsor_count": "{count} sponsor so far | {count} sponsors so far",
+      "title": "Sponsor leaderboard",
+      "subtitle": "The people and teams funding privacy-first, local software. Every sponsorship NFT adds to your score.",
       "loading": "Loading leaderboard...",
-      "empty_state": "Leaderboard data is empty",
+      "empty_state": "No sponsors yet",
       "nft_counts": "{medal} {count} NFT | {medal} {count} NFTs",
       "points": "{points} points",
+      "points_legend": "Points per NFT: gold 10, silver 5, bronze 2",
       "tooltip": {
         "copy_address": "Click to copy full address",
         "points_breakdown": {
@@ -1295,17 +1317,20 @@
           "bronze": "Bronze = 2 pts"
         }
       },
-      "last_updated": "Last Updated: {date}",
+      "last_updated": "Last updated {date}",
       "call_to_action": {
         "title": "Support rotki. Get recognized.",
         "description": "Mint a sponsor NFT to help fund independent, privacy-first software and earn your place on the leaderboard.",
-        "button": "Become a Sponsor"
+        "button": "Become a sponsor"
       },
       "updated_every_hour": "Updated every hour"
     },
     "submit_name": {
-      "title": "Submit Your Display Name",
-      "description": "Choose a display name that will be shown on the download page or app, depending on the tier. Do this only after you mint an NFT.",
+      "eyebrow": "After you mint",
+      "not_minted": "Haven't minted yet? {link}",
+      "not_minted_link": "Sponsor the next release",
+      "title": "Submit your display name",
+      "description": "Choose the name, and for silver and gold an image, that credits you for the release you sponsored.",
       "name_label": "Display Name",
       "name_hint": "Optional. 3-30 characters.",
       "connected_address": "Connected Address",
@@ -1355,11 +1380,13 @@
       },
       "tier": "Tier",
       "nft_info": "NFT with id #{tokenId} is in {tier} for release {releaseName}",
-      "terms_note": "* Submitted text and images are subject to review. rotki reserves the right to reject or request changes to any content that is offensive, illegal, misleading, scam-related, or otherwise inconsistent with our values."
+      "terms_note": "Submitted text and images are subject to review. rotki reserves the right to reject or request changes to any content that is offensive, illegal, misleading, scam-related, or otherwise inconsistent with our values."
     },
     "sponsor_page": {
-      "title": "Sponsor next rotki release",
-      "description": "Support the development of rotki by minting exclusive NFTs tied to a given release. Each tier comes with special perks and demonstrates your role in sustaining OSS aligned apps. The more NFTs you hold, the higher you'll appear on the {leaderboard_link}",
+      "eyebrow": "Sponsoring release {release}",
+      "eyebrow_upcoming": "Sponsoring the next release",
+      "title": "Sponsor the next rotki release",
+      "description": "Mint a sponsorship NFT tied to the upcoming release. Each tier comes with its own perks and directly funds independent, open source development. The more NFTs you hold, the higher you rank on the {leaderboard_link}.",
       "leaderboard_link_text": "leaderboard",
       "nft_image": {
         "failed_to_load": "Failed to load",
@@ -1372,15 +1399,15 @@
         "try_again": "Try again"
       },
       "no_payment_tokens_available": "No payment tokens available",
-      "payment_currency": "Payment Currency",
+      "payment_currency": "Pay with",
       "wallet_balance": "Balance: {balance} {currency}",
       "insufficient_gas": "Your balance may not be enough to cover the network fee (gas). The transaction could fail.",
-      "select_tier": "Select Tier",
+      "select_tier": "Choose a tier",
       "pricing": {
         "loading": "Loading...",
         "minted": "{current} minted",
         "minted_with_max": "{current}/{max} minted",
-        "sold_out": "(Sold Out)"
+        "sold_out": "Sold out"
       },
       "approval": {
         "unlimited_button": "Approve Unlimited",
@@ -1399,10 +1426,9 @@
       },
       "connected_to": "Connected to: {address}",
       "benefits": {
-        "title": "What you get:",
-        "benefits_label": "Perks: {benefits}",
+        "title": "What you get",
         "tier_sponsorship": "{tier} tier sponsorship for rotki release {releaseName}.",
-        "see_examples": "See how it looks like"
+        "see_examples": "See an example"
       },
       "minting_unavailable": "Minting is currently unavailable. You can still browse the tiers and leaderboard.",
       "error": {

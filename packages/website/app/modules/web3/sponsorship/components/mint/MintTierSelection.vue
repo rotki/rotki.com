@@ -7,6 +7,8 @@ interface Props {
   isLoading?: boolean;
   tierSupply: Record<string, TierSupply>;
   tierPriceDisplay: Record<string, string>;
+  /** Marketing perks per tier, so tiers can be compared without selecting each one. */
+  tierContent: Record<string, { benefits: string }>;
   visibleTiers: Array<{ key: string; label: string; tierId: number }>;
 }
 
@@ -19,21 +21,21 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div
-    class="space-y-4"
+    class="space-y-3"
     :class="{ 'opacity-50 pointer-events-none': disabled }"
   >
-    <h6 class="font-bold">
+    <h2 class="text-subtitle-1 font-medium text-rui-text">
       {{ t('sponsor.sponsor_page.select_tier') }}
-    </h6>
+    </h2>
     <div class="space-y-3">
       <RuiCard
         v-for="tier in (isLoading ? SPONSORSHIP_TIERS : visibleTiers)"
         :key="tier.key"
         class="tier-option"
-        content-class="flex items-center justify-between h-16 !py-2 transition-all"
+        content-class="flex items-center justify-between gap-4 min-h-16 !py-3 transition-all"
         :class="{
           'cursor-pointer': !isLoading,
-          '!border-rui-primary': !isLoading && selectedTier === tier.key,
+          '!border-rui-primary !bg-rui-primary/[0.04]': !isLoading && selectedTier === tier.key,
           'opacity-60': !isLoading && tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply),
         }"
         @click="!isLoading && (selectedTier = tier.key)"
@@ -49,17 +51,26 @@ const { t } = useI18n({ useScope: 'global' });
           <RuiSkeletonLoader class="w-24 h-5" />
         </template>
         <template v-else>
-          <RuiRadio
-            :id="tier.key"
-            v-model="selectedTier"
-            :value="tier.key"
-            name="tier"
-            hide-details
-            class="font-bold uppercase"
-            color="primary"
-            :label="tier.label"
-          />
-          <div class="flex flex-col items-end">
+          <div class="flex flex-col min-w-0">
+            <RuiRadio
+              :id="tier.key"
+              v-model="selectedTier"
+              :value="tier.key"
+              name="tier"
+              hide-details
+              class="font-bold uppercase"
+              color="primary"
+              :label="tier.label"
+            />
+            <!-- Offsets measured from RuiRadio: its label text starts 33px in, and the radio keeps a bottom margin we pull back -->
+            <p
+              v-if="tierContent[tier.key]"
+              class="pl-[33px] -mt-1.5 text-body-2 text-rui-text-secondary"
+            >
+              {{ tierContent[tier.key]?.benefits }}
+            </p>
+          </div>
+          <div class="flex flex-col items-end shrink-0">
             <div class="text-lg font-bold text-rui-primary">
               {{ tierPriceDisplay[tier.key] }}
             </div>
@@ -74,7 +85,7 @@ const { t } = useI18n({ useScope: 'global' });
                 {{ t('sponsor.sponsor_page.pricing.minted_with_max', { current: tierSupply[tier.key]?.currentSupply, max: tierSupply[tier.key]?.maxSupply }) }}
                 <span
                   v-if="tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply)"
-                  class="text-sm text-rui-error font-medium"
+                  class="ml-1 text-sm text-rui-error font-medium"
                 >
                   {{ t('sponsor.sponsor_page.pricing.sold_out') }}
                 </span>

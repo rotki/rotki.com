@@ -119,9 +119,9 @@ describe('getDisplayRank', () => {
 
 describe('getRankClass', () => {
   it('returns medal classes for the top three on page 1', () => {
-    expect(getRankClass(1, 0)).toEqual({ 'text-yellow-400': true, 'text-gray-400': false, 'text-amber-500': false });
-    expect(getRankClass(1, 1)).toEqual({ 'text-yellow-400': false, 'text-gray-400': true, 'text-amber-500': false });
-    expect(getRankClass(1, 2)).toEqual({ 'text-yellow-400': false, 'text-gray-400': false, 'text-amber-500': true });
+    expect(getRankClass(1, 0)).toBe('bg-[#fdf3d0] text-[#8f6a0e]');
+    expect(getRankClass(1, 1)).toBe('bg-[#e8ecf0] text-[#5f6b7a]');
+    expect(getRankClass(1, 2)).toBe('bg-[#f6e3d0] text-[#9a5420]');
   });
 
   it('returns the muted class for entries beyond the top three', () => {

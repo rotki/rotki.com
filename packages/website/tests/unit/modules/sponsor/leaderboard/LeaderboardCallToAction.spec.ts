@@ -7,7 +7,7 @@ describe('leaderboardCallToAction', () => {
     const wrapper = await mountSuspended(LeaderboardCallToAction);
 
     expect(wrapper.text()).toContain('Support rotki. Get recognized.');
-    expect(wrapper.text()).toContain('Become a Sponsor');
+    expect(wrapper.text()).toContain('Become a sponsor');
   });
 
   it('links the sponsor button to the mint page', async () => {

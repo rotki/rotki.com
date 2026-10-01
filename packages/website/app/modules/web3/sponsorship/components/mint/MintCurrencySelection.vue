@@ -28,12 +28,12 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div
-    class="space-y-4"
+    class="space-y-3"
     :class="{ 'opacity-50 pointer-events-none': disabled }"
   >
-    <h6 class="font-bold">
+    <h2 class="text-subtitle-1 font-medium text-rui-text">
       {{ t('sponsor.sponsor_page.payment_currency') }}
-    </h6>
+    </h2>
     <div
       v-if="isLoading"
       class="flex flex-wrap gap-2 max-w-full"
@@ -73,9 +73,9 @@ const { t } = useI18n({ useScope: 'global' });
     >
       {{ t('sponsor.sponsor_page.no_payment_tokens_available') }}
     </div>
-    <!-- Always rendered so the balance never shifts the layout (reserves one line). -->
+    <!-- Only reserved once a wallet is connected; the skeleton then holds the line while switching currency. -->
     <div
-      v-if="!isLoading"
+      v-if="!isLoading && (balanceLoading || balance)"
       class="flex items-center gap-1.5 text-sm text-rui-text-secondary h-5"
     >
       <RuiSkeletonLoader

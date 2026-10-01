@@ -49,7 +49,7 @@ function handleApprove(type: ApprovalType) {
 </script>
 
 <template>
-  <div class="pt-4">
+  <div>
     <div class="flex gap-1 overflow-hidden">
       <!-- Approval Menu for when approval is needed -->
       <RuiMenu

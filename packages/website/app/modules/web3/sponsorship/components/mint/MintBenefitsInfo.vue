@@ -20,19 +20,25 @@ const currentTierContent = computed<TierContent | undefined>(() => tierContent[s
 </script>
 
 <template>
-  <div class="bg-rui-grey-100 p-4 rounded-lg">
-    <h6 class="font-bold mb-2">
+  <div class="rounded-xl border border-rui-grey-200 bg-rui-grey-50 p-5">
+    <h2 class="text-subtitle-1 font-medium text-rui-text mb-2">
       {{ t('sponsor.sponsor_page.benefits.title') }}
-    </h6>
+    </h2>
     <div
       v-if="currentTierContent"
-      class="text-sm text-rui-text-secondary"
+      class="text-body-2 text-rui-text-secondary"
     >
-      <p>
+      <p v-if="releaseName">
         {{ t('sponsor.sponsor_page.benefits.tier_sponsorship', { tier: toTitleCase(selectedTier), releaseName }) }}
       </p>
-      <p class="font-medium mt-1">
-        {{ t('sponsor.sponsor_page.benefits.benefits_label', { benefits: currentTierContent.benefits }) }}
+      <!-- The tier cards list every tier's perks; this repeats the selected one as a confirmation -->
+      <p class="flex items-start gap-2 mt-2 text-rui-text">
+        <RuiIcon
+          name="lu-check"
+          size="18"
+          class="text-rui-success mt-0.5 shrink-0"
+        />
+        <span>{{ currentTierContent.benefits }}</span>
       </p>
 
       <!-- Example Sponsor Images -->
@@ -44,7 +50,7 @@ const currentTierContent = computed<TierContent | undefined>(() => tierContent[s
           variant="text"
           size="sm"
           color="primary"
-          class="!p-0 font-medium text-rui-text hover:text-rui-primary"
+          class="!p-0 font-medium"
           @click="showExampleSponsors = !showExampleSponsors"
         >
           <template #append>
@@ -64,7 +70,7 @@ const currentTierContent = computed<TierContent | undefined>(() => tierContent[s
             :key="index"
             :src="imageUrl"
             :alt="`Sponsor example ${index + 1}`"
-            class="w-full h-auto rounded-md object-cover"
+            class="w-full h-auto rounded-lg border border-rui-grey-200 object-cover"
             loading="lazy"
           />
         </div>

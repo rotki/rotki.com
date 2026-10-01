@@ -60,14 +60,16 @@ describe('leaderboardEntryRow', () => {
   it('applies the gold medal class to the first entry on page 1', async () => {
     const wrapper = await mountRow({ index: 0, page: 1 });
 
-    expect(wrapper.find('.text-yellow-400').exists()).toBe(true);
+    const rank = wrapper.find('[data-id="leaderboard-rank"]');
+    expect(rank.classes()).toContain('bg-[#fdf3d0]');
   });
 
   it('uses the muted rank class on later pages', async () => {
     const wrapper = await mountRow({ index: 0, page: 2 });
 
-    expect(wrapper.find('.text-rui-text-secondary').exists()).toBe(true);
-    expect(wrapper.find('.text-yellow-400').exists()).toBe(false);
+    const rank = wrapper.find('[data-id="leaderboard-rank"]');
+    expect(rank.classes()).toContain('text-rui-text-secondary');
+    expect(rank.classes()).not.toContain('bg-[#fdf3d0]');
   });
 
   it('emits copy with the address when the name is clicked', async () => {

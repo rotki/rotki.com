@@ -6,7 +6,7 @@ describe('leaderboardEmptyState', () => {
   it('renders the empty-state message and placeholder image', async () => {
     const wrapper = await mountSuspended(LeaderboardEmptyState);
 
-    expect(wrapper.text()).toContain('Leaderboard data is empty');
+    expect(wrapper.text()).toContain('No sponsors yet');
     const img = wrapper.find('img');
     expect(img.exists()).toBe(true);
     expect(img.attributes('src')).toBe('/img/no_data_placeholder.svg');

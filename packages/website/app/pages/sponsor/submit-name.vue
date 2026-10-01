@@ -6,7 +6,7 @@ import NftSubmissionForm from '~/modules/web3/sponsorship/components/submission/
 import NftSubmissionsList from '~/modules/web3/sponsorship/components/submission/NftSubmissionsList.vue';
 import { useSubmissionFlow } from '~/modules/web3/sponsorship/use-submission-flow';
 
-usePageSeoNoIndex('Submit Sponsor Name');
+usePageSeoNoIndex('Submit your sponsor name');
 
 definePageMeta({
   layout: 'sponsor',
@@ -28,15 +28,34 @@ const {
 </script>
 
 <template>
-  <section class="flex flex-col items-center justify-center px-4 pt-8">
-    <div class="w-full max-w-[500px]">
-      <h1 class="mb-4 text-3xl font-bold text-center">
-        {{ t('sponsor.submit_name.title') }}
-      </h1>
-
-      <p class="mb-8 text-center text-body-1 text-rui-text-secondary">
-        {{ t('sponsor.submit_name.description') }}
-      </p>
+  <section class="flex flex-col items-center justify-center">
+    <div class="w-full max-w-[520px]">
+      <div class="flex flex-col items-center gap-3 text-center mb-8 lg:mb-10">
+        <p class="text-rui-primary text-subtitle-1 font-medium">
+          {{ t('sponsor.submit_name.eyebrow') }}
+        </p>
+        <h1 class="text-h4 md:text-h3 !font-bold text-balance">
+          {{ t('sponsor.submit_name.title') }}
+        </h1>
+        <p class="text-body-1 text-rui-text-secondary text-balance">
+          {{ t('sponsor.submit_name.description') }}
+        </p>
+        <i18n-t
+          keypath="sponsor.submit_name.not_minted"
+          scope="global"
+          tag="p"
+          class="text-body-2 text-rui-text-secondary"
+        >
+          <template #link>
+            <NuxtLink
+              to="/sponsor/mint"
+              class="text-rui-primary underline hover:no-underline"
+            >
+              {{ t('sponsor.submit_name.not_minted_link') }}
+            </NuxtLink>
+          </template>
+        </i18n-t>
+      </div>
 
       <!-- Wallet Connection Card -->
       <SponsorWalletConnectionCard @view-submissions="loadSubmissions()" />
@@ -62,7 +81,7 @@ const {
       />
 
       <!-- Terms Notice -->
-      <div class="mt-6 text-sm text-rui-text-secondary">
+      <div class="mt-6 text-caption text-rui-text-secondary">
         {{ t('sponsor.submit_name.terms_note') }}
       </div>
     </div>

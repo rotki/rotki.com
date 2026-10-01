@@ -8,9 +8,10 @@ import MintCurrencySelection from '~/modules/web3/sponsorship/components/mint/Mi
 import MintNftImage from '~/modules/web3/sponsorship/components/mint/MintNftImage.vue';
 import MintSuccessDialog from '~/modules/web3/sponsorship/components/mint/MintSuccessDialog.vue';
 import MintTierSelection from '~/modules/web3/sponsorship/components/mint/MintTierSelection.vue';
+import SponsorHowItWorks from '~/modules/web3/sponsorship/components/mint/SponsorHowItWorks.vue';
 import { useMintFlow } from '~/modules/web3/sponsorship/use-mint-flow';
 
-usePageSeo('Sponsor rotki — Support Open-Source Privacy Software', 'Support rotki\'s development. Fund independent, local-first, privacy-preserving portfolio management software.', '/sponsor/mint', {
+usePageSeo('Sponsor rotki: fund open source, privacy-first software', 'Mint a sponsorship NFT for the next rotki release. Fund independent, local-first portfolio software and get your name in the release.', '/sponsor/mint', {
   ogImage: 'mint.png',
   keywords: 'open source sponsorship, open source funding, privacy software, local-first software, crypto sponsorship, NFT sponsorship, rotki sponsor',
 });
@@ -105,9 +106,34 @@ const {
     v-else
     class="marketplace-container"
   >
-    <div class="flex flex-col lg:flex-row gap-10 max-w-6xl mx-auto">
-      <!-- NFT Image Section -->
-      <div class="lg:w-1/2 flex justify-center">
+    <!-- Grid instead of two flex columns so phones read the heading before the artwork -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-8 max-w-6xl mx-auto">
+      <div class="flex flex-col gap-3 lg:col-start-2 lg:row-start-1">
+        <p class="text-rui-primary text-subtitle-1 font-medium">
+          {{ releaseName ? t('sponsor.sponsor_page.eyebrow', { release: releaseName }) : t('sponsor.sponsor_page.eyebrow_upcoming') }}
+        </p>
+        <h1 class="text-h4 !font-bold text-balance">
+          {{ t('sponsor.sponsor_page.title') }}
+        </h1>
+        <i18n-t
+          keypath="sponsor.sponsor_page.description"
+          scope="global"
+          tag="p"
+          class="text-body-1 text-rui-text-secondary"
+        >
+          <template #leaderboard_link>
+            <NuxtLink
+              to="/sponsor/leaderboard"
+              class="text-rui-primary underline hover:no-underline"
+            >
+              {{ t('sponsor.sponsor_page.leaderboard_link_text') }}
+            </NuxtLink>
+          </template>
+        </i18n-t>
+      </div>
+
+      <!-- NFT Image Section: stays in view while the options column scrolls -->
+      <div class="flex justify-center lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-8 lg:self-start">
         <MintNftImage
           :selected-tier="modelSelectedTier"
           :nft-images="nftImages"
@@ -117,26 +143,9 @@ const {
         />
       </div>
 
-      <!-- Options and Description Section -->
-      <div class="lg:w-1/2">
+      <!-- Options Section -->
+      <div class="lg:col-start-2 lg:row-start-2">
         <div class="space-y-6">
-          <div>
-            <h1 class="text-h4 font-bold mb-2">
-              {{ t('sponsor.sponsor_page.title') }}
-            </h1>
-            <p class="text-rui-text-secondary mb-6">
-              {{ t('sponsor.sponsor_page.description').replace('{leaderboard_link}', '') }}<ButtonLink
-                to="/sponsor/leaderboard"
-                color="primary"
-                inline
-                class="underline"
-                variant="text"
-              >
-                {{ t('sponsor.sponsor_page.leaderboard_link_text') }}
-              </ButtonLink>
-            </p>
-          </div>
-
           <!-- Minting Unavailable Warning -->
           <RuiAlert
             v-if="configReady && !isMintingEnabled"
@@ -162,6 +171,7 @@ const {
             :is-loading="isLoadingPaymentTokens"
             :tier-supply="tierSupply"
             :tier-price-display="tierPriceDisplay"
+            :tier-content="tierContent"
             :visible-tiers="visibleTiers"
           />
 
@@ -208,6 +218,8 @@ const {
         </div>
       </div>
     </div>
+
+    <SponsorHowItWorks class="max-w-6xl mx-auto mt-16 lg:mt-24" />
 
     <!-- Success Dialog -->
     <MintSuccessDialog

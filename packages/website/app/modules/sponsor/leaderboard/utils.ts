@@ -65,16 +65,21 @@ export function getDisplayRank(
 }
 
 /**
+ * Medal badges for the top three, in the tier colours of the sponsorship artwork.
+ * Text colours keep AA contrast on their tint; the old yellow-400 text was about 1.5:1 on white.
+ */
+const MEDAL_CLASSES: readonly string[] = [
+  'bg-[#fdf3d0] text-[#8f6a0e]',
+  'bg-[#e8ecf0] text-[#5f6b7a]',
+  'bg-[#f6e3d0] text-[#9a5420]',
+];
+
+/**
  * Colour classes for the rank badge. The top three entries on the first page
  * get medal colours (gold/silver/bronze); everything else is muted.
  */
-export function getRankClass(page: number, index: number): string | Record<string, boolean> {
-  if (page === 1 && index <= 2) {
-    return {
-      'text-yellow-400': index === 0,
-      'text-gray-400': index === 1,
-      'text-amber-500': index === 2,
-    };
-  }
+export function getRankClass(page: number, index: number): string {
+  if (page === 1 && index <= 2)
+    return MEDAL_CLASSES[index] ?? '';
   return 'text-rui-text-secondary';
 }

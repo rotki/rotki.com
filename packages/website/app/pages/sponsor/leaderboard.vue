@@ -8,7 +8,7 @@ import LeaderboardHeader from '~/modules/sponsor/leaderboard/components/Leaderbo
 import { useLeaderboard } from '~/modules/sponsor/leaderboard/composables/use-leaderboard';
 import { formatDate } from '~/utils/date';
 
-usePageSeo('Sponsor Leaderboard', 'See the top supporters of rotki, an independent open-source privacy-preserving portfolio tracker. Join the leaderboard by sponsoring a release.', '/sponsor/leaderboard', {
+usePageSeo('Sponsor leaderboard', 'See the top supporters of rotki, an independent open-source privacy-preserving portfolio tracker. Join the leaderboard by sponsoring a release.', '/sponsor/leaderboard', {
   keywords: 'open source sponsorship, open source funding, privacy software, local-first software, rotki sponsor',
 });
 
@@ -33,9 +33,12 @@ const {
 
 <template>
   <div class="max-w-2xl mx-auto">
-    <LeaderboardHeader />
+    <LeaderboardHeader :total="paginationData.total" />
 
-    <RuiCard content-class="min-h-[480px]">
+    <RuiCard
+      class="!rounded-2xl"
+      content-class="min-h-[480px]"
+    >
       <div class="relative flex flex-col">
         <!-- Loading overlay for pagination -->
         <div
@@ -56,7 +59,7 @@ const {
         >
           <RuiDivider
             v-if="index > 0"
-            class="mt-4 pt-2 w-full"
+            class="my-2 w-full"
           />
           <LeaderboardEntryRow
             v-if="hasData"
@@ -73,22 +76,26 @@ const {
 
       <!-- Empty State (only when loaded and truly empty) -->
       <LeaderboardEmptyState v-if="isEmpty" />
+
+      <!-- Pagination sits in the card so it reads as part of the list -->
+      <div
+        v-if="paginationData.total > 0"
+        class="mt-4 pt-2 border-t border-default"
+      >
+        <RuiTablePagination
+          :model-value="paginationData"
+          :loading="loading"
+          @update:model-value="handlePaginationChange($event)"
+        />
+      </div>
     </RuiCard>
 
-    <p class="text-xs text-rui-text-secondary mt-2 italic">
-      {{ lastUpdated ? t('sponsor.leaderboard.last_updated', { date: formatDate(lastUpdated, 'MMMM DD, YYYY HH:mm z') }) : t('sponsor.leaderboard.updated_every_hour') }}
-    </p>
-
-    <!-- Pagination -->
-    <div
-      v-if="paginationData.total > 0"
-      class="mt-4"
-    >
-      <RuiTablePagination
-        :model-value="paginationData"
-        :loading="loading"
-        @update:model-value="handlePaginationChange($event)"
-      />
+    <!-- The points breakdown was hover-only (a tooltip), so touch screens never saw it -->
+    <div class="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-caption text-rui-text-secondary">
+      <p>{{ t('sponsor.leaderboard.points_legend') }}</p>
+      <p>
+        {{ lastUpdated ? t('sponsor.leaderboard.last_updated', { date: formatDate(lastUpdated, 'MMMM DD, YYYY HH:mm z') }) : t('sponsor.leaderboard.updated_every_hour') }}
+      </p>
     </div>
 
     <!-- Call to Action -->

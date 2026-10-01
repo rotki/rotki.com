@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import PageTabs, { type PageTabItem } from '~/components/common/PageTabs.vue';
 import PageLayout from '~/components/layout/PageLayout.vue';
-import { usePageSeo } from '~/composables/use-page-seo';
+
+interface SponsorTab {
+  icon: string;
+  label: string;
+  to: string;
+}
 
 defineSlots<{
   default: () => void;
 }>();
 
+// Each sponsor page sets its own SEO; a layout-level call gave /sponsor/submit-name a canonical pointing at /sponsor/mint
 const { t } = useI18n({ useScope: 'global' });
 
-usePageSeo('Sponsor', 'Sponsor rotki\'s development and support independent, local-first, privacy-preserving open-source software.', '/sponsor/mint');
-
-const tabModelValue = ref<string>('');
-
-const tabs = computed<PageTabItem[]>(() => [
+const tabs = computed<SponsorTab[]>(() => [
   {
     label: t('sponsor.tabs.sponsor'),
     icon: 'lu-handshake',
@@ -34,18 +35,35 @@ const tabs = computed<PageTabItem[]>(() => [
 
 <template>
   <PageLayout>
-    <div class="py-10 lg:py-16">
+    <div class="pt-8 pb-14 lg:pt-10 lg:pb-20">
       <div class="container">
-        <div class="flex flex-col xl:flex-row gap-6">
-          <PageTabs
-            v-model="tabModelValue"
-            :tabs="tabs"
-          />
+        <!-- Three short sections, so a centered tab bar replaces the account-style sidebar and the content gets the full width -->
+        <nav
+          :aria-label="t('sponsor.tabs.aria_label')"
+          class="flex justify-center mb-10 lg:mb-14"
+        >
+          <ul class="inline-flex items-center gap-1 rounded-full border border-rui-grey-200 bg-rui-grey-50 p-1">
+            <li
+              v-for="tab in tabs"
+              :key="tab.to"
+            >
+              <NuxtLink
+                :to="tab.to"
+                class="flex items-center gap-2 rounded-full px-3 sm:px-4 py-2 text-body-2 font-medium text-rui-text-secondary whitespace-nowrap transition-colors hover:text-rui-text"
+                active-class="!text-rui-primary bg-white dark:bg-rui-grey-800 shadow-sm"
+              >
+                <RuiIcon
+                  :name="tab.icon"
+                  size="16"
+                  class="hidden sm:block shrink-0"
+                />
+                {{ tab.label }}
+              </NuxtLink>
+            </li>
+          </ul>
+        </nav>
 
-          <div class="flex-1 overflow-x-auto">
-            <slot />
-          </div>
-        </div>
+        <slot />
       </div>
     </div>
   </PageLayout>
