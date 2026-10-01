@@ -23,10 +23,11 @@ const ROUTES = {
 
 const { public: { baseUrl } } = useRuntimeConfig();
 
+// Served at /pricing (canonical, linked from the nav) and /checkout/pay (checkout step 1); see the alias below
 usePageSeo(
   'Pricing',
-  'Compare rotki premium plans — encrypted backups, multi-device sync, ETH staking tracking, detailed graphs, and more. Starting free.',
-  '/checkout/pay',
+  'Compare rotki premium plans: encrypted backups, multi-device sync, ETH staking tracking, detailed graphs, and more. Starting free.',
+  '/pricing',
 );
 
 useHead({
@@ -38,7 +39,7 @@ useHead({
       'name': 'rotki',
       'applicationCategory': 'FinanceApplication',
       'operatingSystem': 'Windows, macOS, Linux',
-      'url': `${baseUrl}/checkout/pay`,
+      'url': `${baseUrl}/pricing`,
       'offers': {
         '@type': 'AggregateOffer',
         'priceCurrency': 'EUR',
@@ -49,6 +50,8 @@ useHead({
 });
 
 definePageMeta({
+  // Same page under a marketing URL instead of a redirect; the canonical points at /pricing
+  alias: ['/pricing'],
   backendRequired: true,
   landing: true,
 });

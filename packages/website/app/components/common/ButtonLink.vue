@@ -34,7 +34,8 @@ defineSlots<{
 
 // Routes that require hard reloads due to special CSP configurations
 const SPECIAL_CSP_ROUTES = [
-  // Payment routes
+  // Payment routes (/pricing is an alias of /checkout/pay and shares its CSP)
+  '/pricing',
   '/checkout/pay',
   '/checkout/pay/card',
   '/checkout/pay/crypto',

@@ -111,8 +111,8 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 
 	// Redirects. Nuxt route rules and navigateTo() only produce a meta-refresh page
 	// under the static preset, which crawlers see as a 200, so real 301s live here.
+	// /pricing is not one: it is a prerendered alias of /checkout/pay with a canonical.
 	permanentRedirects := map[string]string{
-		"/pricing": "/checkout/pay",
 		"/sponsor": "/sponsor/mint",
 	}
 	for from, to := range permanentRedirects {

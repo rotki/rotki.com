@@ -62,6 +62,10 @@ var routeOverrides = []struct {
 	{"/checkout/pay", RouteOverride{
 		CSP: CheckoutPayCSP,
 	}},
+	// Alias of /checkout/pay: the same page, so the same policy.
+	{"/pricing", RouteOverride{
+		CSP: CheckoutPayCSP,
+	}},
 	{"/password/recover", RouteOverride{
 		CSP: PasswordRecoverCSP,
 	}},

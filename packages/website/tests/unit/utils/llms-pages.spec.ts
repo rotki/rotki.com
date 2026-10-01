@@ -30,8 +30,14 @@ describe('llms-pages', () => {
   it('skips noindex pages, redirect stubs, and pages without a description', () => {
     const description = '<meta name="description" content="x"><meta property="og:title" content="x">';
     expect(extractLlmsPage(page(`${description}<meta name="robots" content="noindex, nofollow">`), '/login')).toBeUndefined();
-    expect(extractLlmsPage(page(`<meta http-equiv="refresh" content="0; url=/checkout/pay">`), '/pricing')).toBeUndefined();
+    expect(extractLlmsPage(page(`<meta http-equiv="refresh" content="0; url=/sponsor/mint">`), '/sponsor')).toBeUndefined();
     expect(extractLlmsPage(page('<meta property="og:title" content="x">'), '/health')).toBeUndefined();
+  });
+
+  it('lists an aliased page once, under its canonical URL', () => {
+    const html = page('<meta name="description" content="x"><meta property="og:title" content="Pricing"><link rel="canonical" href="https://rotki.com/pricing">');
+    expect(extractLlmsPage(html, '/checkout/pay')).toBeUndefined();
+    expect(extractLlmsPage(html, '/pricing')?.path).toBe('/pricing');
   });
 
   it('skips collection detail pages but keeps their hubs', () => {

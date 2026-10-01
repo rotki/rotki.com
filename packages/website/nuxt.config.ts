@@ -211,8 +211,6 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    // Redirect /pricing to /checkout/pay
-    '/pricing': { redirect: { to: '/checkout/pay', statusCode: 301 } },
     /*
      * The 404 body is served at whatever URL the visitor requested, so the Nuxt
      * runtime must not boot on it: it would hydrate against a payload for
@@ -250,7 +248,8 @@ export default defineNuxtConfig({
        * (`/200.html` and `/404.html` are added automatically by Nuxt's
        * nitro-server for static presets, and are un-hydrated SPA shells.)
        */
-      routes: ['/not-found', ...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes(), ...jobsPrerenderRoutes()],
+      // `/pricing` is an alias of `/checkout/pay`; listed so it is generated even if no crawled link reaches it.
+      routes: ['/not-found', '/pricing', ...integrationPrerenderRoutes(), ...comparisonPrerenderRoutes(), ...featurePrerenderRoutes(), ...jobsPrerenderRoutes()],
     },
   },
 
@@ -356,6 +355,9 @@ export default defineNuxtConfig({
   // llms.txt / llms-full.txt / raw markdown endpoint for AI crawlers (see llms.config.ts).
   llms,
 
-  // Closed roles are prerendered so their URLs resolve, but stay out of the sitemap (they carry noindex).
-  sitemap: { exclude: [...nonIndexed, ...closedJobRoutes()] },
+  /*
+   * Closed roles are prerendered so their URLs resolve, but stay out of the sitemap (they carry noindex).
+   * `/checkout/pay` is the same page as `/pricing`, whose canonical is `/pricing`, so only that one is listed.
+   */
+  sitemap: { exclude: [...nonIndexed, ...closedJobRoutes(), '/checkout/pay'] },
 });

@@ -18,6 +18,7 @@ func TestForRoute(t *testing.T) {
 		{"/password/recover", false, PasswordRecoverCSP},
 		{"/home/saved-cards", false, SavedCardsCSP},
 		{"/checkout/pay", false, CheckoutPayCSP},
+		{"/pricing", false, CheckoutPayCSP},
 		{"/checkout/pay/card", false, CardPaymentMerged},
 		{"/checkout/pay/card/something", false, CardPaymentMerged},
 		{"/checkout/pay/3d-secure", false, ThreeDSecurePageCSP},

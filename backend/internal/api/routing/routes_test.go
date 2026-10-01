@@ -78,7 +78,6 @@ func TestPermanentRedirects(t *testing.T) {
 		from string
 		to   string
 	}{
-		{"/pricing", "/checkout/pay"},
 		{"/sponsor", "/sponsor/mint"},
 	}
 

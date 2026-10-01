@@ -59,6 +59,26 @@ function metaContent(html: string, attribute: 'name' | 'property', value: string
   return undefined;
 }
 
+/** Path of the page's `<link rel="canonical">`, without a trailing slash, or undefined when it has none. */
+function canonicalPath(html: string): string | undefined {
+  for (const match of html.matchAll(/<link\b[^>]*>/gi)) {
+    const tag = match[0];
+    if (!/\srel="canonical"/i.test(tag))
+      continue;
+    const href = /\shref="([^"]*)"/i.exec(tag)?.[1];
+    if (!href)
+      return undefined;
+    try {
+      const path = new URL(href, 'https://placeholder.invalid').pathname;
+      return path === '/' ? path : path.replace(/\/+$/, '');
+    }
+    catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
 /** og:title is the bare page title; `<title>` has the site-wide template applied, so it is only the fallback. */
 function pageTitle(html: string): string {
   const ogTitle = metaContent(html, 'property', 'og:title');
@@ -90,8 +110,13 @@ export function extractLlmsPage(html: string, route: string): LlmsPage | undefin
   if (robots && /noindex/i.test(robots))
     return undefined;
 
-  // `nuxi generate` writes `<meta http-equiv="refresh">` stubs for redirects (e.g. /pricing).
+  // `nuxi generate` writes `<meta http-equiv="refresh">` stubs for redirects (e.g. /sponsor).
   if (/<meta\b[^>]*http-equiv="refresh"/i.test(html))
+    return undefined;
+
+  // Aliases (e.g. /checkout/pay, canonical /pricing) are listed once, under their canonical URL.
+  const canonical = canonicalPath(html);
+  if (canonical !== undefined && canonical !== route)
     return undefined;
 
   const description = metaContent(html, 'name', 'description');
