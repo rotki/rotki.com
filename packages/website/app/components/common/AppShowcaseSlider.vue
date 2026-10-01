@@ -26,13 +26,13 @@ interface ScreenshotImage {
 }
 
 const screenshotAltTexts: Record<string, string> = {
-  '1-sc-dashboard': 'rotki dashboard showing portfolio overview',
-  '2-sc-history-events': 'rotki history events and transaction tracking',
-  '3-sc-statistics1': 'rotki statistics and portfolio analytics',
-  '4-sc-statistics2': 'rotki detailed statistical charts',
-  '5-sc-eth-staking': 'rotki Ethereum staking overview',
-  '6-sc-gnosis-pay': 'rotki Gnosis Pay integration',
-  '7-sc-onchain-send': 'rotki on-chain transaction sending',
+  '1-sc-dashboard': 'rotki dashboard showing net worth over time and balances per location',
+  '2-sc-history-events': 'rotki history events with decoded transactions and the filter bar',
+  '3-sc-pnl-report': 'rotki profit and loss report overview',
+  '4-sc-statistics': 'rotki statistics showing net worth and asset value over time',
+  '5-sc-actions-center': 'rotki actions center listing transfers that still need matching',
+  '6-sc-mcp': 'rotki MCP settings for connecting an AI assistant',
+  '7-sc-kraken-staking': 'rotki Kraken staking overview with rewards per asset',
 };
 
 function getAltText(path: string): string {

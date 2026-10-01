@@ -5,7 +5,7 @@ tagline: "DeFi portfolio tracking with on-chain activity decoded into readable e
 intro: "rotki tracks your DeFi portfolio by reading your on-chain activity and decoding it into readable events with full profit-and-loss accounting. It runs locally and queries chains through endpoints you choose, so you can follow swaps, liquidity positions, staking and rewards across multiple networks from one app."
 metaDescription: "rotki is a local-first DeFi portfolio tracker. It decodes on-chain swaps, LP, staking and rewards into readable events with PnL across multiple chains."
 keywords: "defi portfolio tracker, defi portfolio tracking, track defi positions, on-chain portfolio tracker, defi pnl tracker, multi-chain defi tracker"
-updatedAt: "June 2026"
+updatedAt: "October 2026"
 docsUrl: "https://docs.rotki.com/usage-guides/history/events.html"
 ctaPlan: free
 keyTakeaways:
@@ -59,7 +59,7 @@ faq:
   - q: "Does rotki support multiple chains?"
     a: "Yes. rotki tracks activity across multiple EVM chains and other supported networks. You add your addresses and choose which endpoints to query for each chain."
   - q: "Which chains does rotki support?"
-    a: "rotki covers several EVM chains, including Ethereum, Arbitrum One, Base, Optimism, Polygon PoS, Gnosis, BNB Smart Chain, Scroll, Avalanche and zkSync Lite, plus non-EVM networks such as Bitcoin, Solana, Polkadot and Kusama. The integrations directory lists the current set."
+    a: "rotki decodes activity on EVM chains including Ethereum, Arbitrum One, Base, Optimism, Polygon PoS, Gnosis, BNB Smart Chain, Scroll, HyperEVM and Monad, tracks Avalanche balances, and covers non-EVM networks such as Bitcoin, Bitcoin Cash, Solana, Hyperliquid, Polkadot and Kusama. The integrations directory lists the current set."
   - q: "Who sees my on-chain queries?"
     a: "rotki reads chain data through an RPC endpoint or data provider that you configure. Because you choose the endpoint, you control who sees those requests: a provider you trust or your own node."
   - q: "What if a protocol is not decoded?"
@@ -78,7 +78,7 @@ To read on-chain data, rotki queries an RPC endpoint or data provider. You decid
 
 ## Which chains rotki covers
 
-rotki tracks activity across several EVM chains, including Ethereum, Arbitrum One, Base, Optimism, Polygon PoS, Gnosis, BNB Smart Chain, Scroll, Avalanche and zkSync Lite, alongside non-EVM networks such as Bitcoin, Solana, Polkadot and Kusama. The supported set grows over time; the [integrations directory](/integrations) lists every chain, exchange and protocol rotki currently reads.
+rotki decodes activity across EVM chains including Ethereum, Arbitrum One, Base, Optimism, Polygon PoS, Gnosis, BNB Smart Chain, Scroll, HyperEVM and Monad, and tracks Avalanche balances. Alongside those it covers non-EVM networks such as Bitcoin, Bitcoin Cash, Solana, Hyperliquid, Polkadot and Kusama. The supported set grows over time; the [integrations directory](/integrations) lists every chain, exchange and protocol rotki currently reads.
 
 ## Protocol coverage
 

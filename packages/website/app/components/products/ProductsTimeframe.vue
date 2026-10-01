@@ -1,26 +1,44 @@
 <script setup lang="ts">
+import { get } from '@vueuse/shared';
+import { usePlanLimits } from '~/composables/tiers/use-plan-limits';
+
 const { t } = useI18n({ useScope: 'global' });
 
-const features = [
+const limits = usePlanLimits();
+
+const features = computed<{ img: string; width: number; height: number; title: string; description: string }[]>(() => [
   {
     img: '/img/products/timeframe.webp',
-    width: 616,
-    height: 280,
+    width: 2252,
+    height: 800,
     title: t('products.features.timeframe.title'),
     description: t('products.features.timeframe.description'),
   },
   {
     img: '/img/products/data_sync.webp',
-    width: 616,
-    height: 234,
+    width: 640,
+    height: 288,
     title: t('products.features.data_synchronization.title'),
-    description: t('products.features.data_synchronization.description'),
+    description: t('products.features.data_synchronization.description', {
+      basicBackup: get(limits).basic.backup,
+      basicDevices: get(limits).basic.devices,
+      advancedBackup: get(limits).advanced.backup,
+      advancedDevices: get(limits).advanced.devices,
+    }),
   },
-];
+  {
+    // Staged capture: fictional counterparties and the documentation example IBAN, see the screenshot kit manifest
+    img: '/img/products/monerium.webp',
+    width: 2400,
+    height: 1088,
+    title: t('products.features.monerium.title'),
+    description: t('products.features.monerium.description'),
+  },
+]);
 </script>
 
 <template>
-  <div class="py-14 lg:py-28">
+  <div class="py-14 lg:py-20 bg-rui-grey-50">
     <div class="container">
       <div
         v-for="(feature, index) in features"
@@ -33,7 +51,7 @@ const features = [
       >
         <div class="flex-1 flex justify-center">
           <img
-            class="h-full w-full md:w-auto"
+            class="h-auto w-full md:w-auto max-w-full rounded-xl border border-rui-grey-200 shadow-sm"
             :src="feature.img"
             :alt="feature.title"
             :width="feature.width"
@@ -42,9 +60,9 @@ const features = [
           />
         </div>
         <div class="flex flex-col gap-4 flex-1">
-          <h3 class="text-h4 lg:text-h3 font-bold">
+          <h2 class="text-h5 lg:text-h4 font-bold">
             {{ feature.title }}
-          </h3>
+          </h2>
           <div class="mt-2 text-body-1 text-rui-text-secondary">
             {{ feature.description }}
           </div>

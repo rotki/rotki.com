@@ -29,21 +29,23 @@ const features = [
   <div class="flex flex-col sm:flex-row items-center gap-10 md:gap-20">
     <div class="flex-1">
       <img
-        class="rounded-xl overflow-hidden"
+        class="rounded-xl"
         :alt="t('home.history_events.title')"
         src="/img/history_events.webp"
+        srcset="/img/history_events-654w.webp 654w, /img/history_events-1308w.webp 1308w, /img/history_events.webp 2400w"
+        sizes="(min-width: 640px) min(654px, 50vw), 100vw"
         loading="lazy"
         width="654"
         height="523"
       />
     </div>
     <div class="flex flex-1 flex-col gap-2">
-      <h6 class="text-h6 text-rui-primary">
+      <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.history_events.title') }}
-      </h6>
-      <h6 class="text-h6">
+      </p>
+      <h3 class="text-h5 !font-bold">
         {{ t('home.history_events.subtitle') }}
-      </h6>
+      </h3>
       <div class="pt-4">
         <div class="font-bold pb-2">
           {{ t('home.history_events.key_features') }}

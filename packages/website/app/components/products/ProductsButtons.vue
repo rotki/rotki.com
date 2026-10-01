@@ -47,6 +47,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
       variant="outlined"
       to="/download"
       size="lg"
+      rounded
       :color="color"
       :class="{ '!outline-white !text-rui-dark-text': !color }"
     >
@@ -62,6 +63,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
           :to="checkoutLink"
           size="lg"
           variant="filled"
+          rounded
           :disabled="!allowNavigation"
           :color="color"
         >

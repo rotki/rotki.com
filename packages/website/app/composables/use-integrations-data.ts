@@ -1,3 +1,4 @@
+import { get } from '@vueuse/shared';
 import LocalIntegrationData from '~~/public/integrations/all.json';
 import { IntegrationData, type IntegrationItem } from '~/types/integrations';
 import { consolidateSlug, INTEGRATION_CONSOLIDATIONS, integrationSlug } from '~/utils/integration-slug';
@@ -53,8 +54,16 @@ export function useIntegrationsData() {
     return isDev ? parsed : localizeData(parsed);
   });
 
+  /** Rounded down to the nearest ten so "N+ integrations" stays true as the catalog shifts. */
+  const integrationCount = computed<number>(() => {
+    const { blockchains, exchanges, protocols } = filterDuplicateData(get(data));
+    const total = blockchains.length + exchanges.length + protocols.length;
+    return Math.floor(total / 10) * 10;
+  });
+
   return {
     data,
     filterDuplicateData,
+    integrationCount,
   };
 }

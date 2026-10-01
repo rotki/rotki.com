@@ -94,6 +94,9 @@ export function resolveFeatureValue(
 
 const PLACEHOLDER_FEATURE_COUNT = 8;
 
+/** Rows the compact (homepage) table shows before "See all features": enough to tell the tiers apart. */
+const COMPACT_FEATURE_COUNT = 4;
+
 function createPlaceholderPlans(): MappedPlan[] {
   const emptyFeatures = Array.from<FeatureValue>({ length: PLACEHOLDER_FEATURE_COUNT }).fill('');
   return [
@@ -284,11 +287,12 @@ export function usePricingComparison(options: UsePricingComparisonOptions) {
   const displayedFeaturesLabel = computed<string[]>(() => {
     const { labels } = get(tiersInfo);
     if (labels.length === 0) {
-      return Array.from<string>({ length: PLACEHOLDER_FEATURE_COUNT }).fill('');
+      // Match the row count the loaded table will have so it does not jump when data arrives
+      const rows = toValue(options.compact) ? COMPACT_FEATURE_COUNT : PLACEHOLDER_FEATURE_COUNT;
+      return Array.from<string>({ length: rows }).fill('');
     }
     if (get(modelCompact)) {
-      const firstLabel = labels[0];
-      return firstLabel ? [firstLabel] : [];
+      return labels.slice(0, COMPACT_FEATURE_COUNT);
     }
     return labels;
   });

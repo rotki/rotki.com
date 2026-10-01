@@ -12,7 +12,7 @@ const title = t('jobs.title');
 const header = t('jobs.header');
 const subheader = t('jobs.description');
 
-usePageSeo(title, header, '/jobs');
+usePageSeo(title, t('jobs.seo_description'), '/jobs');
 
 const grouped = computed<Record<string, JobsCollectionItem[]>>(() => {
   const group: Record<string, JobsCollectionItem[]> = {};

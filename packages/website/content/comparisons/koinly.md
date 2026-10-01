@@ -13,7 +13,7 @@ keyTakeaways:
   - "Koinly is known for broad country coverage and a polished hosted dashboard; rotki is the choice when privacy and self-custody come first."
   - "rotki has a free local tier and integrates with 180+ exchanges, blockchains, and DeFi protocols."
 verdict: "Koinly gives you a polished hosted dashboard, but only by taking your full transaction history into its cloud. rotki delivers the same core portfolio tracking, accounting, and tax reporting on your own machine, as open-source software you can audit. If privacy and self-custody matter to you, rotki is the one to choose."
-updatedAt: "June 2026"
+updatedAt: "October 2026"
 ctaPlan: free
 dimensions:
   - label: "Data storage"
@@ -98,7 +98,7 @@ Koinly is a web application. You create an account, link your exchanges through 
 
 ## How rotki works
 
-rotki runs on your own computer. It connects to exchanges using read-only API keys and reads your on-chain activity through RPC endpoints you control, then stores everything in an encrypted local database. Nothing passes through rotki-operated servers. Because rotki is open source, you can read the code and verify exactly how your data is handled, rather than trusting a closed system.
+rotki runs on your own computer. It connects to exchanges using read-only API keys and reads your on-chain activity through RPC endpoints you control, then stores everything in an encrypted local database. Your financial data never passes through rotki-operated servers. Because rotki is open source, you can read the code and verify exactly how your data is handled, rather than trusting a closed system.
 
 ## Privacy and ownership
 

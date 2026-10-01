@@ -15,7 +15,7 @@ faq:
   - q: "What does rotki do?"
     a: "rotki is a local-first crypto portfolio tracker, accounting and tax tool. It pulls together your exchange and on-chain activity, tracks your portfolio, decodes DeFi and wallet history into readable events, and produces accounting and tax reports, all on your own computer."
   - q: "Is rotki really local and private?"
-    a: "Yes. rotki runs as a desktop app on your machine. It reads exchanges with read-only API keys and chains via RPC endpoints you choose, and stores your data in a local database encrypted with SQLCipher (256-bit AES). By default nothing passes through rotki-operated servers."
+    a: "Yes. rotki runs as a desktop app on your machine. It reads exchanges with read-only API keys and chains via RPC endpoints you choose, and stores your data in a local database encrypted with SQLCipher (256-bit AES). Your financial data never passes through rotki-operated servers."
   - q: "Is rotki free?"
     a: "rotki has a free local tier that covers core portfolio tracking, accounting and tax reporting with some limits. A premium subscription unlocks higher limits and additional features."
 ---

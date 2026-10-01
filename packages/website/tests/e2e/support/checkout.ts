@@ -2,7 +2,7 @@ import type { FakeWallet } from './wallet';
 import { expect, type Page } from '@playwright/test';
 
 /** Billing period offered by the change-plan dialog. */
-export type BillingPeriod = 'Monthly Billing' | 'Yearly billing';
+export type BillingPeriod = 'Monthly billing' | 'Yearly billing';
 
 /** Opens the autocomplete labelled `label` and picks the option showing `option`. */
 export async function pickOption(page: Page, label: string, option: string): Promise<void> {

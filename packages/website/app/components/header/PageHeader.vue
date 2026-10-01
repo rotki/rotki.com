@@ -63,30 +63,51 @@ watch(
         </RuiButton>
       </div>
       <div
-        class="transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4 md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap xl:justify-between xl:gap-y-0"
+        class="transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4 md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap lg:justify-between lg:gap-y-0"
         :class="menuOpened ? 'left-0' : '!-left-full md:left-0'"
       >
         <NuxtLink
           to="/"
-          class="flex w-full px-4 md:order-1 md:w-auto md:px-0 xl:order-none"
+          class="flex w-full px-4 md:order-1 md:w-auto md:px-0 lg:order-none"
         >
           <AppLogo text />
         </NuxtLink>
 
-        <!-- Between md and xl: logo and actions share the first row, the links take the second -->
-        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:order-3 md:flex-row md:border-y-0 xl:order-none xl:w-auto" />
+        <!-- Between md and lg: logo and actions share the first row, the links take the second -->
+        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:order-3 md:flex-row md:border-y-0 lg:order-none lg:w-auto" />
 
-        <div class="flex flex-col space-y-2 px-4 md:order-2 md:ml-auto md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0 xl:order-none xl:ml-0">
-          <div class="hidden md:max-xl:contents">
-            <SponsorNavButton />
-          </div>
-          <NuxtLink to="/home/subscription">
+        <div class="flex flex-col space-y-2 px-2 md:order-2 md:ml-auto md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0 lg:order-none lg:ml-0">
+          <SponsorNavButton />
+          <!-- The page is prerendered signed out, so a returning customer sees "Sign in" until the session check resolves -->
+          <NuxtLink :to="authenticated ? '/home/subscription' : '/login'">
+            <!-- Left-aligned in the mobile drawer to line up with the sponsor link above it -->
+            <RuiButton
+              variant="text"
+              color="primary"
+              class="w-full justify-start md:justify-center !px-2 md:!px-3 py-2 md:py-1.5"
+            >
+              <template #prepend>
+                <RuiIcon
+                  name="lu-circle-user-round"
+                  size="18"
+                />
+              </template>
+              {{ authenticated ? t('page_header.account') : t('page_header.sign_in') }}
+            </RuiButton>
+          </NuxtLink>
+          <NuxtLink to="/download">
             <RuiButton
               rounded
               color="primary"
               class="w-full py-2 md:py-1.5"
             >
-              {{ t('page_header.manage_premium') }}
+              <template #prepend>
+                <RuiIcon
+                  name="lu-download"
+                  size="18"
+                />
+              </template>
+              {{ t('page_header.download') }}
             </RuiButton>
           </NuxtLink>
           <RuiButton

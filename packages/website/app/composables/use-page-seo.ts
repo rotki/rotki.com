@@ -27,17 +27,19 @@ export function usePageSeo(
   const normalizedPath = normalizePath(path);
   const url = `${baseUrl}${normalizedPath}`;
   const imageUrl = `${baseUrl}/img/og/${options?.ogImage ?? 'share.png'}`;
+  // Social cards don't go through the <title> template, so add the brand here when it is missing
+  const socialTitle = /rotki/i.test(title) ? title : `${title} | rotki`;
 
   useSeoMeta({
     title,
     description,
     ogType: 'website',
     ogUrl: url,
-    ogTitle: title,
+    ogTitle: socialTitle,
     ogDescription: description,
     ogImage: imageUrl,
     twitterCard: 'summary_large_image',
-    twitterTitle: title,
+    twitterTitle: socialTitle,
     twitterDescription: description,
     twitterImage: imageUrl,
     ...(options?.noIndex && { robots: 'noindex, nofollow' }),

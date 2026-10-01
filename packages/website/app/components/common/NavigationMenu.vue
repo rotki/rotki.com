@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import SponsorNavButton from '~/components/common/SponsorNavButton.vue';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -22,32 +21,41 @@ function isParent(item: Menu | MenuParent): item is MenuParent {
   return 'children' in item;
 }
 
+// Download is the header's primary button, and the logo links home, so neither repeats here.
 const menus: (Menu | MenuParent)[] = [
   {
-    label: t('navigation_menu.home'),
-    to: '/',
-    highlightExactActive: true,
-  },
-  {
-    label: t('navigation_menu.rotki_premium'),
-    to: '/products',
-    highlightActive: true,
+    label: t('navigation_menu.product'),
+    children: [
+      {
+        label: t('navigation_menu.features.title'),
+        description: t('navigation_menu.features.description'),
+        to: '/features',
+        highlightActive: true,
+      },
+      {
+        label: t('navigation_menu.integration.title'),
+        description: t('navigation_menu.integration.description'),
+        to: '/integrations',
+        highlightActive: true,
+      },
+      {
+        label: t('navigation_menu.compare.title'),
+        description: t('navigation_menu.compare.description'),
+        to: '/compare',
+        highlightActive: true,
+      },
+      {
+        label: t('navigation_menu.rotki_premium'),
+        description: t('navigation_menu.premium_description'),
+        to: '/products',
+        highlightActive: true,
+      },
+    ],
   },
   {
     label: t('navigation_menu.pricing'),
     to: '/pricing',
     highlightActive: true,
-  },
-  {
-    label: t('navigation_menu.integration.title'),
-    description: t('navigation_menu.integration.description'),
-    to: '/integrations',
-    highlightActive: true,
-  },
-  {
-    label: t('navigation_menu.download'),
-    to: '/download',
-    highlightExactActive: true,
   },
   {
     label: t('navigation_menu.resources'),
@@ -147,6 +155,7 @@ const { isMdAndDown } = useBreakpoint();
           v-for="child in menu.children"
           :key="child.label"
           class="w-full justify-start"
+          :highlight-active="child.highlightActive"
           :external="child.external"
           :to="child.to"
         >
@@ -163,9 +172,5 @@ const { isMdAndDown } = useBreakpoint();
         </ButtonLink>
       </template>
     </template>
-    <!-- Between md and xl the page header shows the sponsor button next to the account actions -->
-    <div class="contents md:max-xl:hidden">
-      <SponsorNavButton />
-    </div>
   </div>
 </template>

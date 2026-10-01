@@ -28,7 +28,7 @@ const { plans, displayedFeaturesLabel, modelCompact, allowCompact } = usePricing
 </script>
 
 <template>
-  <div class="min-h-[520px] md:min-h-[560px] xl:min-h-[570px]">
+  <div :class="{ 'min-h-[520px] md:min-h-[560px] xl:min-h-[570px]': !compact }">
     <div class="hidden xl:block">
       <PricingTable
         :plans="plans"

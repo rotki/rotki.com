@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RuiIcons } from '@rotki/ui-library';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import AppDashboard from '~/components/home/features/details/AppDashboard.vue';
 import EvmProtocols from '~/components/home/features/details/EvmProtocols.vue';
 import HistoryEvents from '~/components/home/features/details/HistoryEvents.vue';
@@ -9,84 +11,89 @@ const model = ref<number>(0);
 
 const { t } = useI18n({ useScope: 'global' });
 
-const data = computed<{ title: string; subtitle: string }[]>(() => [
-  {
-    title: t('home.dashboard.title'),
-    subtitle: t('home.dashboard.subtitle'),
-  },
-  {
-    title: t('home.exchanges.title'),
-    subtitle: t('home.exchanges.subtitle'),
-  },
-  {
-    title: t('home.history_events.title'),
-    subtitle: t('home.history_events.subtitle'),
-  },
-  {
-    title: t('home.evm_protocols.title'),
-    subtitle: t('home.evm_protocols.subtitle'),
-  },
-  {
-    title: t('home.profit_loss_report.title'),
-    subtitle: t('home.profit_loss_report.subtitle'),
-  },
+const data = computed<{ icon: RuiIcons; title: string }[]>(() => [
+  { icon: 'lu-layout-dashboard', title: t('home.dashboard.title') },
+  { icon: 'lu-arrow-left-right', title: t('home.exchanges.title') },
+  { icon: 'lu-history', title: t('home.history_events.title') },
+  { icon: 'lu-blocks', title: t('home.evm_protocols.title') },
+  { icon: 'lu-file-chart-column', title: t('home.profit_loss_report.title') },
 ]);
 
 const [DefineTab, ReuseTab] = createReusableTemplate<{
+  icon: RuiIcons;
   title: string;
-  subtitle: string;
   active: boolean;
   index: number;
 }>();
 </script>
 
 <template>
-  <DefineTab #default="{ title, subtitle, active, index }">
-    <div
-      class="flex-1 flex items-center lg:items-start transition-all lg:flex-col gap-2 lg:gap-4 rounded-xl cursor-pointer px-4 py-2 lg:px-6 lg:py-8 whitespace-nowrap lg:whitespace-normal"
+  <!-- The subtitle is the panel's heading, so the tab itself only names the feature -->
+  <DefineTab #default="{ icon, title, active, index }">
+    <button
+      type="button"
+      role="tab"
+      :aria-selected="active"
+      class="flex-1 flex items-center justify-center gap-2.5 rounded-xl cursor-pointer px-4 py-3 lg:py-4 whitespace-nowrap border transition-all"
       :class="{
-        'bg-rui-primary text-white': active,
-        'bg-white text-rui-text': !active,
+        'bg-rui-primary text-white border-rui-primary shadow-lg shadow-rui-primary/20': active,
+        'bg-white text-rui-text border-rui-grey-200 hover:border-rui-primary/40': !active,
       }"
       @click="model = index"
     >
-      <div
-        class="shrink-0 w-6 h-6 lg:w-12 lg:h-12 rounded-full transition-all border-[0.375rem] lg:border-[0.75rem] border-rui-primary-lighter"
-        :class="{
-          'opacity-20': !active,
-          'opacity-60': active,
-        }"
+      <RuiIcon
+        :name="icon"
+        size="20"
+        :class="active ? 'text-white' : 'text-rui-primary'"
       />
-      <h5 class="text-h6 mt-1">
+      <span class="text-subtitle-1 font-medium">
         {{ title }}
-      </h5>
-      <div class="text-body-1 opacity-70 hidden lg:block">
-        {{ subtitle }}
-      </div>
-    </div>
+      </span>
+    </button>
   </DefineTab>
-  <div
+  <section
     id="features"
-    class="py-16 md:py-20 bg-[#f9f9f9]"
+    class="py-16 md:py-24 bg-rui-grey-50"
   >
     <div class="container">
-      <div class="pb-16 md:pb-20">
-        <i18n-t
-          class="text-h4 mb-10"
-          tag="h4"
-          scope="global"
-          keypath="home.rotki_offer"
-        >
-          <span class="text-rui-primary">rotki</span>
-        </i18n-t>
+      <div class="pb-12 md:pb-16">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div class="flex flex-col gap-3 max-w-[640px]">
+            <i18n-t
+              class="text-h4 !font-bold"
+              tag="h2"
+              scope="global"
+              keypath="home.rotki_offer"
+            >
+              <span class="text-rui-primary">rotki</span>
+            </i18n-t>
+            <p class="text-body-1 text-rui-text-secondary">
+              {{ t('home.rotki_offer_detail') }}
+            </p>
+          </div>
+          <ButtonLink
+            to="/features"
+            color="primary"
+            class="self-start md:self-auto"
+          >
+            {{ t('home.explore_features') }}
+            <template #append>
+              <RuiIcon
+                name="lu-arrow-right"
+                size="18"
+              />
+            </template>
+          </ButtonLink>
+        </div>
         <div
-          class="flex gap-4 overflow-x-auto lg:overflow-x-hidden no-scrollbar"
+          role="tablist"
+          class="flex gap-4 overflow-x-auto lg:overflow-x-hidden no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-2"
         >
           <ReuseTab
             v-for="(item, index) in data"
             :key="item.title"
+            :icon="item.icon"
             :title="item.title"
-            :subtitle="item.subtitle"
             :index="index"
             :active="index === model"
           />
@@ -113,5 +120,5 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
         </RuiTabItem>
       </RuiTabItems>
     </div>
-  </div>
+  </section>
 </template>

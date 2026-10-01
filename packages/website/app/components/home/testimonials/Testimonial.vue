@@ -14,63 +14,51 @@ defineProps<TestimonialProps>();
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
-    <span class="flex gap-2">
-      <span class="p-2 bg-rui-primary rounded-lg text-white">
-        <RuiIcon
-          name="lu-message-circle"
-          size="16"
-        />
-      </span>
-      <span
-        v-if="avatar"
-        class="rounded-full w-8 h-8 overflow-hidden flex items-center justify-center"
-      >
-        <a
-          v-if="url"
-          :href="url"
-          target="_blank"
-        >
-          <img
-            :src="avatar"
-            :alt="username"
-            width="32"
-            height="32"
-            loading="lazy"
-            class="object-cover"
-          />
-        </a>
-        <img
-          v-else
-          :src="avatar"
-          :alt="username"
-          width="32"
-          height="32"
-          loading="lazy"
-          class="object-cover"
-        />
-      </span>
-    </span>
-    <ContentRenderer :value="body">
+  <figure class="flex flex-col gap-6 md:h-full rounded-xl border border-rui-grey-200 bg-white p-6 md:p-8">
+    <RuiIcon
+      name="lu-quote"
+      size="28"
+      class="text-rui-primary/40"
+    />
+    <blockquote class="grow">
       <ContentRenderer
-        class="text-rui-text font-medium text-lg min-h-[8rem] text-justify [&_p]:mb-0"
+        class="text-rui-text text-body-1 md:text-lg [&_p]:mb-0"
         :value="body"
-        tag="span"
+        tag="div"
       />
-    </ContentRenderer>
-    <a
-      v-if="url"
-      :href="url"
-      class="text-body-1 text-sm text-rui-text-secondary"
-      target="_blank"
-    >
-      {{ username }}
-    </a>
-    <span
-      v-else
-      class="text-body-1 text-sm text-rui-text-secondary"
-    >
-      {{ username }}
-    </span>
-  </div>
+    </blockquote>
+    <figcaption class="flex items-center gap-3 pt-4 border-t border-rui-grey-100">
+      <img
+        v-if="avatar"
+        :src="avatar"
+        :alt="username"
+        width="40"
+        height="40"
+        loading="lazy"
+        class="size-10 rounded-full object-cover"
+      />
+      <span
+        v-else
+        class="flex items-center justify-center size-10 rounded-full bg-rui-primary/[0.08] text-rui-primary font-medium"
+        aria-hidden="true"
+      >
+        {{ username.replace(/^@/, '').charAt(0).toUpperCase() }}
+      </span>
+      <a
+        v-if="url"
+        :href="url"
+        class="text-body-2 font-medium text-rui-text hover:text-rui-primary"
+        target="_blank"
+        rel="noopener nofollow"
+      >
+        {{ username }}
+      </a>
+      <span
+        v-else
+        class="text-body-2 font-medium text-rui-text"
+      >
+        {{ username }}
+      </span>
+    </figcaption>
+  </figure>
 </template>

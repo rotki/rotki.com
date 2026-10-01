@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
+import DownloadCallToAction from '~/components/common/DownloadCallToAction.vue';
 import IntegrationDetails from '~/components/integration/IntegrationDetails.vue';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
 import { usePageSeo } from '~/composables/use-page-seo';
@@ -7,8 +8,8 @@ import { usePageSeo } from '~/composables/use-page-seo';
 const { t } = useI18n({ useScope: 'global' });
 
 usePageSeo(
-  'Integrations',
-  'Explore the blockchains, exchanges, and DeFi protocols supported by rotki for seamless crypto portfolio tracking.',
+  'Supported exchanges, blockchains and DeFi protocols',
+  'Every exchange, blockchain and DeFi protocol rotki supports, from Kraken and Coinbase to Ethereum, Solana, Aave and Uniswap. Track them all locally and privately.',
   '/integrations',
 );
 
@@ -69,4 +70,5 @@ definePageMeta({
     </div>
   </div>
   <IntegrationDetails />
+  <DownloadCallToAction />
 </template>

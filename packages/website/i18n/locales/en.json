@@ -466,11 +466,16 @@
   "country_select": {
     "no_data": "No matching countries found"
   },
+  "download_cta": {
+    "detail": "Install rotki in a few minutes, connect your accounts with read-only keys, and see your whole portfolio without handing your data to anyone.",
+    "docs": "Read the getting started guide",
+    "title": "Take back control of your crypto data"
+  },
   "download": {
     "action": "Download",
     "upgrade_nudge": {
       "title": "When should you upgrade?",
-      "bullet_1": "You track multiple wallets/exchanges and want higher limits",
+      "bullet_1": "You track many wallets and exchanges and need higher limits",
       "bullet_2": "You want detailed staking insights and reward tracking",
       "bullet_3": "You want advanced analytics and deeper historical insights",
       "see_plans": "See plans",
@@ -478,18 +483,50 @@
       "tagline": "Start free anytime, upgrade when you hit these needs."
     },
     "documentation": {
-      "action": "View all documentation",
-      "description": "On our documentation page you have a user guide that will help you introduce yourself and clarify any doubts that may arise during the process.",
-      "heading": "What are the first steps after installing rotki?",
-      "title": "Documentation"
+      "action": "Read the user guide",
+      "description": "Most people are up and running in a few minutes. The user guide walks through every step in detail.",
+      "heading": "Get started in three steps",
+      "step": "Step {number}",
+      "steps": {
+        "connect": {
+          "description": "Add exchanges with read-only API keys and add your wallet addresses. rotki pulls in balances and history and decodes it into readable events.",
+          "title": "Connect your accounts"
+        },
+        "install": {
+          "description": "Install rotki and create a local user. Its password encrypts your database and cannot be recovered, so keep it somewhere safe.",
+          "title": "Install and create a user"
+        },
+        "report": {
+          "description": "Check your dashboard, review your history, and create a profit and loss report for any time range.",
+          "title": "Explore and report"
+        }
+      },
+      "title": "After installing"
     },
     "download_for": "Download for {platform}",
-    "download_for_other_os": "@:download.download_for other OSes or Docker",
+    "download_for_other_os": "Other platforms and Docker",
     "heading": {
-      "description": "Download now and start using across all major Operating Systems",
-      "download_rotki": "Download rotki"
+      "verify": "Verify your download",
+      "description": "Download rotki for Windows, macOS and Linux",
+      "detail": "Free and open source. Your portfolio data is stored encrypted on your device, and you don't need a rotki account to use it.",
+      "whats_new": "rotki {version} is out: see what's new"
     },
-    "latest_release": "Latest Release",
+    "latest_release": "Latest release",
+    "sponsor": {
+      "become_sponsor": "Sponsor the next release",
+      "sponsored_by": "sponsored by",
+      "this_release": "This release"
+    },
+    "preview": {
+      "detail": "Balances, decoded history, statistics and staking, all in one app that runs on your machine.",
+      "title": "A look inside rotki"
+    },
+    "platforms": {
+      "docker": "Self-host rotki on a server you control",
+      "linux": "AppImage or a .deb package, for x86_64",
+      "mac": "Apple Silicon or Intel",
+      "windows": "64-bit installer (.exe)"
+    },
     "read_the_doc": "Read the documentation"
   },
   "home": {
@@ -514,19 +551,11 @@
         "title": "Saved Cards"
       }
     },
-    "advantages": {
-      "local_app": {
-        "description": "rotki is a local-first application with a strong focus on user privacy.",
-        "title": "Self-hosted app"
-      },
-      "open_source": {
-        "description": "rotki's source code is available to inspect, modify and enhance.",
-        "title": "Open source"
-      },
-      "own_your_data": {
-        "description": "Your financial data is kept encrypted in your system and not shared with third parties.",
-        "title": "Own your data"
-      }
+    "stats": {
+      "contributors": "contributors",
+      "integrations": "integrations",
+      "since": "open source since",
+      "stars": "GitHub stars"
     },
     "dashboard": {
       "details": {
@@ -545,54 +574,55 @@
     "history_events": {
       "subtitle": "View all historical events including, transactions, trades, deposits, withdrawals and more.",
       "title": "History events",
-      "key_features": "Key Features",
+      "key_features": "Key features",
       "features": {
         "comprehensive": {
-          "title": "Comprehensive Transaction History",
-          "description": "View all historical transactions, including trades, transfers, and fees."
+          "title": "Your full transaction history",
+          "description": "Trades, transfers, fees and on-chain activity, decoded into readable events in one timeline."
         },
         "categorization": {
-          "title": "Event Categorization",
-          "description": "Automatically classify transactions into deposits, withdrawals, trades, staking, and more."
+          "title": "Automatic categorization",
+          "description": "Transactions are classified as deposits, withdrawals, trades, staking and more."
         },
         "customizable": {
-          "title": "Customizable history",
-          "description": "Manually adjust or add missing transactions to ensure accuracy."
+          "title": "Edit and fix your history",
+          "description": "Add missing events or adjust existing ones so your history matches what actually happened."
         },
         "filter": {
-          "title": "Filter & Search",
-          "description": "Easily find specific events using filters by date, asset, protocol, event type and more."
+          "title": "Filters and saved views",
+          "description": "Combine filters in one bar, exclude what you don't need, narrow by amount range, and save the views you use often."
         },
         "csv_export": {
-          "title": "CSV Export",
-          "description": "Export historical event data for external analysis or tax reporting."
+          "title": "CSV export",
+          "description": "Export your events for your own analysis or for tax reporting."
         }
       }
     },
     "evm_protocols": {
+      "image_alt": "rotki history showing decoded DeFi swaps, approvals and reward claims",
       "subtitle": "Manage assets across multiple protocols across EVM networks.",
       "title": "EVM protocols",
-      "key_features": "Key Features",
+      "key_features": "Key features",
       "features": {
         "multi_chain_support": {
-          "title": "Multi-Chain Support",
-          "description": "Track assets across Ethereum and EVM-compatible chains like Polygon, BSC, and Arbitrum."
+          "title": "Multi-chain support",
+          "description": "Track assets on Ethereum and EVM chains such as Arbitrum, Base, Optimism, Polygon, BSC, Gnosis, HyperEVM and Monad."
         },
         "automatic_activity_importing": {
-          "title": "Automatic Activity Importing",
-          "description": "Sync wallet activity directly from the blockchain."
+          "title": "Automatic activity import",
+          "description": "Wallet activity is pulled directly from the blockchain and decoded."
         },
         "defi_balances": {
-          "title": "DeFi Balances Monitoring",
-          "description": "View balances and positions in lending, borrowing, and liquidity pools."
+          "title": "DeFi balances",
+          "description": "See your positions in lending, borrowing and liquidity pools."
         },
         "staking_yield": {
-          "title": "Staking & Yield Farming",
-          "description": "Keep tabs on rewards from staking and yield-generating protocols."
+          "title": "Staking and yield",
+          "description": "Keep track of rewards from staking and yield-generating protocols."
         },
         "historical_data": {
-          "title": "Historical Data & PnL",
-          "description": "Analyze past transactions and profit/loss from DeFi interactions."
+          "title": "History and profit and loss",
+          "description": "Every DeFi interaction is part of your history and your profit and loss report."
         }
       }
     },
@@ -602,8 +632,15 @@
       "title": "Exchanges"
     },
     "hero": {
-      "motto": "rotki is an open source, self-hosted portfolio manager, accounting and analytics tool that protects your privacy.",
-      "title": "Take control of your portfolio with unmatched privacy"
+      "eyebrow": "Local-first, unlike cloud crypto tax tools",
+      "highlights": {
+        "free": "Free to start",
+        "no_account": "No rotki account needed",
+        "platforms": "Windows, macOS, Linux and Docker"
+      },
+      "motto": "rotki brings your exchanges, wallets and DeFi positions into one app, decodes your on-chain history and produces profit and loss reports. Your data is stored encrypted on your own device, not on our servers.",
+      "title": "The open source crypto portfolio tracker that keeps your data yours",
+      "view_source": "View on GitHub"
     },
     "plans": {
       "cannot_continue": "You cannot continue because you have an active subscription. Click here to",
@@ -613,7 +650,7 @@
       "plan_selected": "Plan selected",
       "names": {
         "monthly": "Monthly",
-        "monthly_billing": "Monthly Billing",
+        "monthly_billing": "Monthly billing",
         "numeric": "{months} Months",
         "plan": "{name} Plan ({period})",
         "yearly": "Yearly",
@@ -708,47 +745,139 @@
     },
     "premium_features": {
       "features": {
-        "dex_support": {
-          "detail": "See how much you have in each liquidity pool. All your LP join/exit events are shown along with the total profit/loss per pool.\n\nDEX trades are taken into account in the tax report for premium users.",
-          "title": "Decentralized exchanges"
+        "asset_matching": {
+          "detail": "Link exchange deposits and withdrawals, and both legs of a bridge transfer, to their on-chain transactions so your history adds up.",
+          "title": "Asset movement matching"
         },
         "graphs_and_statistics": {
-          "detail": "Premium users can visit the graphs/statistics page and get graphs for:\nNet worth over time\nAsset amount and total asset value over time\nBreakdown of total net worth per location\nBreakdown of total net worth per asset",
+          "detail": "Net worth, asset amounts and value over time, with breakdowns of your holdings by location and by asset.",
           "title": "Graphs and statistics"
         },
         "history": {
-          "detail": "Free users have a limit on the number of transactions, deposits, withdrawals and other events they can see and process. Premium users have higher limits.",
-          "title": "Higher limits for trades, transactions, deposits and withdrawals"
+          "detail": "The free app processes {free} events. Supporter, Basic and Advanced raise that to {supporter}, {basic} and {advanced}.",
+          "title": "Higher history limits"
         },
-        "premium_defi": {
-          "detail": "See the entire list of activities you have done when interacting with a DeFi protocol. Get the profit/loss report for each protocol. Set watchers for various protocols to be informed via email when certain conditions are met.",
-          "title": "DeFi historical accounting, profit and loss"
+        "mcp": {
+          "detail": "Let an AI assistant analyze your events and balances through rotki's MCP server, read-only and with privacy modes you control.",
+          "title": "AI assistants via MCP"
         },
         "premium_staking": {
-          "detail": "See how much of the token is staked per account.\nWhat is the expected APR.\nHow much of the token you have earned by staking across all accounts.\n\nSee a list of all your staking events with links to the corresponding transactions.",
-          "title": "Advanced staking"
+          "detail": "Track your ETH validators: Basic covers up to {basic} ETH staked and Advanced up to {advanced} ETH, with rewards and performance per validator.",
+          "title": "ETH staking"
+        },
+        "sync": {
+          "detail": "Back up your database and use it on several devices. It is encrypted with your password before it is uploaded.",
+          "title": "Encrypted sync and backup"
         }
       },
-      "subtitle": "Enjoy all the potential that rotki offers.",
-      "title": "Premium features"
+      "basic_and_up": "Basic and Advanced",
+      "subtitle": "The free app covers the essentials. Paid plans raise the limits, and Basic and Advanced add analytics, AI assistant access and sync. Every plan funds rotki's independent, open source development.",
+      "compare_plans": "Compare plans",
+      "title": "Go further with rotki Premium",
+      "whats_included": "What's included"
     },
     "profit_loss_report": {
       "details": {
         "pnl_explanation": {
           "title": "Profit/loss report for your historical data",
-          "description": "A profit/loss report across all the user’s assets, protocols, exchanges and blockchains is created for the given time range. The results can be exported into a CSV file which can later be imported to a spreadsheet or shared directly with your accountant.\n\nProfit/loss report for free users has a transaction limit and does not take into account all possible protocols."
+          "description": "rotki creates a profit and loss report across all your assets, protocols, exchanges and blockchains for the time range you choose. Export it as CSV to open in a spreadsheet or share with your accountant."
         },
         "free_vs_premium": {
-          "title": "Free vs. Premium:",
-          "description": "Free users can generate reports with a transaction limit and partial protocol coverage. Upgrade to Premium for unlimited reporting and full protocol support."
+          "title": "Free vs. paid plans",
+          "description": "Free reports cover the first {free} events of your history. Paid plans raise the report limit to {supporter}, {basic} or {advanced} events, depending on the plan."
         }
       },
       "title": "Profit/loss report",
       "subtitle": "A profit/loss report for all your historical data"
     },
-    "rotki_offer": "What does {0} offer?",
+    "explore_features": "Explore all features",
+    "mcp": {
+      "badge": "New in 1.44",
+      "detail": "rotki runs an MCP server on your own computer, so an assistant such as Claude Code, OpenCode or ChatGPT can query your history and balances. Access is read-only, and identifiers are masked before anything reaches the assistant.",
+      "learn_more": "How it works",
+      "modes": {
+        "balanced": {
+          "description": "Masks addresses, transaction hashes and the account names you chose, but keeps readable event descriptions.",
+          "title": "Balanced"
+        },
+        "default": "Default",
+        "detail": "You decide how much the assistant sees, and the settings show an example of what it receives in each mode.",
+        "raw": {
+          "description": "Masks nothing. Only for an assistant and provider you trust with your full history.",
+          "title": "Raw"
+        },
+        "strict": {
+          "description": "Masks addresses, hashes, account names and all free text. Keeps amounts, assets, dates and locations.",
+          "title": "Strict"
+        },
+        "title": "Privacy modes"
+      },
+      "questions": {
+        "gas": "How much ETH did I spend on gas last year?",
+        "holdings": "What are my ten largest holdings right now?",
+        "protocols": "Which DeFi protocols did I use most in 2025?"
+      },
+      "setup_guide": "Setup guide",
+      "title": "Ask your AI assistant about your portfolio"
+    },
+    "pricing": {
+      "detail": "Start with the free app. Upgrade when you need higher limits or premium features, and cancel any time.",
+      "title": "Simple pricing, start for free"
+    },
+    "faq": {
+      "account": {
+        "a": "No. The app runs fully without one, and your local rotki user is protected by a password only you know. A rotki.com account is only needed to buy a premium subscription.",
+        "q": "Do I need to create an account?"
+      },
+      "data": {
+        "a": "On your own computer, in a local database encrypted with SQLCipher. Your financial data never passes through rotki servers. If you turn on premium sync, your backup is encrypted with your password before it is uploaded, so we cannot read it. Anonymous usage analytics are on by default and you can turn them off in the settings.",
+        "q": "Where is my data stored?"
+      },
+      "docs": "documentation",
+      "free": {
+        "a": "Yes. The free app covers portfolio tracking, history decoding and profit and loss reports for up to {free} events. Paid plans raise that limit, and Basic and Advanced add graphs, ETH staking tracking, AI assistant access over MCP and encrypted sync.",
+        "q": "Is rotki free?"
+      },
+      "integrations": {
+        "a": "rotki supports the major centralized exchanges, Bitcoin, Ethereum and EVM chains such as Arbitrum, Base and Optimism, Solana, and a long list of DeFi protocols. The integrations page has the full, searchable list.",
+        "q": "Which exchanges, blockchains and protocols are supported?"
+      },
+      "more": "More questions? The {docs} covers setup, every integration and troubleshooting.",
+      "platforms": {
+        "a": "Windows, macOS (Apple Silicon and Intel) and Linux (AppImage, .deb or .tar.xz on x86_64). There is also a Docker image for amd64 and arm64 if you prefer to self-host rotki on a server you control.",
+        "q": "Which operating systems does rotki run on?"
+      },
+      "taxes": {
+        "a": "rotki creates a profit and loss report for any time range across all your assets, which you can export as CSV for your accountant or tax software. It is not a tax filing service, so check the results against the rules where you live.",
+        "q": "Can rotki prepare my crypto tax report?"
+      },
+      "title": "Frequently asked questions"
+    },
+    "why_rotki": {
+      "all_integrations": "Browse all integrations",
+      "compare": "How rotki compares to Koinly, CoinTracker and others",
+      "detail": "Cloud crypto tax tools ask you to upload your entire financial history to their servers. rotki works the other way around: the app runs on your computer and your data stays in your hands.",
+      "integrations": "Works with {count}+ exchanges, blockchains and DeFi protocols",
+      "pillars": {
+        "local": {
+          "description": "Your history lives in a database encrypted with SQLCipher on your own device. Optional premium sync is encrypted with your password before it is uploaded.",
+          "title": "Local and encrypted"
+        },
+        "open_source": {
+          "description": "Every line of code is public on GitHub, so you can check exactly what rotki does with your data instead of taking our word for it.",
+          "title": "Open source"
+        },
+        "read_only": {
+          "description": "Exchanges connect through read-only API keys and blockchains are queried through endpoints you choose. rotki never holds your funds.",
+          "title": "Read-only by design"
+        }
+      },
+      "title": "Your finances, on your machine"
+    },
+    "rotki_offer": "What {0} does for you",
+    "rotki_offer_detail": "From balances to tax-ready reports: connect your accounts once and rotki keeps the full picture up to date, locally.",
     "testimonials": {
-      "detail": "Hear from some of our amazing customers who are using rotki.",
+      "detail": "What people who track their crypto with rotki say about it.",
       "title": "Don’t just take our word for it"
     }
   },
@@ -876,6 +1005,7 @@
   "jobs": {
     "description": "Our mission is to empower users to take control of their finances both in and out of crypto in a transparent and auditable way while enabling them to own their data through a self-sovereign application.",
     "header": "We’re looking for talented people",
+    "seo_description": "Open positions at rotki, the open source and local-first crypto portfolio tracker. Join a small, remote team building privacy-respecting finance software.",
     "no_open_roles_title": "No open positions",
     "no_open_roles": "There are no open positions at the moment. Check back later for new opportunities.",
     "title": "Careers at rotki",
@@ -926,8 +1056,10 @@
     "product": "Product",
     "resources": "Resources",
     "rotki_premium": "rotki Premium",
+    "premium_description": "Higher limits, analytics and encrypted sync",
     "product_and_services": "Product & Services",
     "sponsor": "Sponsor rotki's next release",
+    "sponsor_short": "Sponsor",
     "tos": "Terms of Service",
     "values": "Values"
   },
@@ -946,7 +1078,10 @@
     "download": "Get the app"
   },
   "page_header": {
-    "manage_premium": "Manage Premium"
+    "account": "My account",
+    "download": "Download",
+    "manage_premium": "Manage Premium",
+    "sign_in": "Sign in"
   },
   "logo": {
     "alt": "rotki logo"
@@ -985,104 +1120,113 @@
     }
   },
   "products": {
-    "description": "Elevate your financial management with rotki premium, our exclusive subscription offering. Gain access to advanced tools and features designed to enhance the management of your portfolio and investments.",
+    "description": "Every paid plan raises the limits on your history and reports. Basic and Advanced also add graphs and analytics, ETH staking tracking, AI assistant access over MCP, encrypted backup and sync across devices, and customer support. Every subscription funds rotki's independent, open source development.",
     "features": {
       "analytics": {
         "asset_amount_and_value": {
-          "description": "Access comprehensive analytics, including net value and asset amount over time for each owned asset.",
+          "description": "Net value and amount held over time, for every asset you own.",
           "title": "Asset tracking"
         },
         "distribution_assets": {
-          "description": "View a distribution pie chart of your net value per assets.",
-          "title": "Value distribution (assets)"
+          "description": "How your net value is split across your assets.",
+          "title": "Value distribution by asset"
         },
         "distribution_locations": {
-          "description": "View a distribution pie chart of your net value per location (exchanges, blockchain accounts, banks, etc.).",
-          "title": "Value distribution (locations)"
+          "description": "How your net value is split across exchanges, blockchain accounts, banks and other locations.",
+          "title": "Value distribution by location"
         },
         "events_analysis": {
-          "description": "View a summary of your activities, including ETH spent, exchanges/protocols used, and Gnosis Pay usage.",
+          "description": "A summary of your activity, including ETH spent on gas, the exchanges and protocols you used, and Gnosis Pay usage.",
           "title": "Events analysis"
         },
-        "heading": "Enhanced Data Insights",
-        "title": "Graphs & Analytics"
+        "heading": "Analytics",
+        "title": "Graphs and statistics"
       },
       "detailed_graphs": {
-        "description": "Access a wide array of analytics and graphs. Analyze your total net value over time, asset value distributions, and the worth distribution per asset or location.",
-        "title": "Detailed Graphs"
+        "description": "Net value over time, plus how your holdings are distributed per asset and per location.",
+        "title": "Detailed graphs"
       },
       "enriched_transactions": {
-        "description": "Connect your Monerium and Gnosis Pay accounts to automatically enrich your blockchain transactions with detailed metadata, including bank transfer details, credit card merchant data, and payment descriptions.",
-        "title": "Enriched protocol transactions"
+        "description": "Connect Monerium and Gnosis Pay to add bank transfer details, card merchant data and payment descriptions to your on-chain transactions.",
+        "title": "Enriched transactions"
+      },
+      "asset_matching": {
+        "description": "Link exchange deposits and withdrawals, and both legs of a bridge transfer, to their on-chain transactions so balances and reports line up.",
+        "title": "Asset movement matching"
+      },
+      "mcp": {
+        "description": "Connect an AI assistant to rotki's MCP server to ask questions about your events and balances. Access is read-only and privacy modes control what it sees.",
+        "title": "AI assistants via MCP"
       },
       "events_analysis": {
-        "description": "View detailed insights about your activities, including ETH spent, exchanges/protocols used, number of transactions per chain, and Gnosis Pay usage.",
-        "title": "Events Analysis"
+        "description": "Gas spent, exchanges and protocols used, transactions per chain and Gnosis Pay usage, summed up in one view.",
+        "title": "Events analysis"
       },
       "scales_with_your_need": {
-        "description": "From Free to Basic and Basic to Advanced, each rotki plan unlocks higher limits for trades, events, and data giving you the freedom to choose the plan that fits your needs.",
-        "title": "Scales With Your Needs"
+        "description": "Supporter, Basic and Advanced raise the event limit to {supporter}, {basic} and {advanced}, so you pick the plan that matches how much you track.",
+        "title": "Plans that grow with you"
       },
       "limits": {
-        "heading": "Expanded Capabilities for Premium Users",
+        "heading": "Limits",
         "history_view": {
-          "description": "Free users can access up to 1,000 of their most recent events. Premium users unlock higher limits depending on their chosen plan.",
+          "description": "Free users see their {free} most recent events. Supporter, Basic and Advanced raise that to {supporter}, {basic} and {advanced}.",
           "title": "History view"
         },
         "profit_loss_report": {
-          "description": "Free users are limited to the 1,000 most recent events in the profit & loss report. Premium users get higher limits based on their plan.",
-          "title": "Profit & Loss Reports"
+          "description": "Free reports cover the first {free} events of your history. Paid plans raise that to {supporter}, {basic} or {advanced} events.",
+          "title": "Profit and loss reports"
         },
-        "title": "Increased limits",
+        "title": "More room for your history",
         "user_notes": {
-          "description": "Free users can add up to 10 notes. Premium users enjoy unlimited notes.",
-          "title": "User Notes"
+          "description": "Free users can keep up to 10 notes. Premium users can keep as many as they like.",
+          "title": "User notes"
         },
         "validators": {
-          "description": "Free users can't track ETH staking. Premium users can track up to specific amounts of ETH depending on their chosen plan.",
-          "title": "Ethereum Staking"
+          "description": "Free and Supporter plans do not track ETH validators. Basic tracks up to {basic} ETH staked and Advanced up to {advanced} ETH.",
+          "title": "Ethereum staking"
         }
       },
       "data_synchronization": {
-        "description": "Premium users can securely back up and sync their encrypted database across devices. Your data is always protected by your password and never visible to us. The available backup size depends on your plan, and synced databases are automatically deleted one month after your subscription expires.",
-        "title": "Data Synchronization"
+        "description": "Back up your encrypted database and sync it across devices. It is protected by your password, so we can never read it. Basic stores up to {basicBackup} on {basicDevices} devices and Advanced up to {advancedBackup} on {advancedDevices} devices, and synced databases are deleted one month after a subscription ends.",
+        "title": "Data synchronization"
       },
-      "monerium_and_gnosis": {
-        "heading": "Enrich Transactions",
-        "monerium": {
-          "description": "Premium users can connect their Monerium account to enrich transactions across all supported chains with detailed bank transfer and bridging data.",
-          "title": "Monerium Bank Data"
-        },
-        "gnosis_pay": {
-          "description": "Premium users can connect their Gnosis Pay controller to enrich all card transactions with detailed merchant information.",
-          "title": "Gnosis Pay Merchant Data"
-        },
-        "title": "Monerium and Gnosis Pay Integration"
+      "monerium": {
+        "description": "On Basic and Advanced, connect your Monerium account to see who sent or received each EURe bank transfer, with the IBAN and payment memo, on every supported chain.",
+        "title": "Bank transfer details from Monerium"
+      },
+      "overview_title": "What rotki Premium adds",
+      "support": {
+        "description": "Get help from the rotki team when something in your setup, history or reports doesn't add up.",
+        "title": "Customer support"
+      },
+      "new_features": {
+        "heading": "Recently added",
+        "title": "AI assistants and asset matching"
       },
       "staking": {
-        "description": "Track your staking activities across various chains and platforms like ETH, Liquity, Kraken, and more. Get detailed insights on total gains, performance, rewards breakdown, and individual staking events.",
-        "title": "Staking"
+        "description": "Follow staking on ETH, Lido CSM, Liquity, Kraken and more, with total gains, performance, reward breakdowns and every staking event.",
+        "title": "Staking insights"
       },
       "sync_db_with_server": {
-        "description": "Effortlessly back up your data to our cloud and sync or restore it across multiple devices. Your data is encrypted and can only be decrypted with your password, ensuring complete privacy.",
-        "title": "Sync data across multiple machines"
+        "description": "On Basic and Advanced, back up your database and restore or sync it on other devices. It is encrypted with your password before upload, so only you can read it.",
+        "title": "Sync across devices"
       },
       "timeframe": {
-        "description": "Set the timeframe for the dashboard graph. Premium users have access to all options, while free users can choose between only \"2 Weeks\", and \"1 Week\".",
-        "title": "Timeframe Customization on Dashboard"
+        "description": "Pick any timeframe for the dashboard graph. The free plan is limited to the last two weeks or the last week.",
+        "title": "Dashboard timeframes"
       }
     },
     "footer": {
-      "description": "Upgrade to rotki premium today and take your financial management to the next level. Enjoy enhanced features, greater flexibility, and exclusive perks designed for the modern investor.",
+      "description": "Start with the free app and upgrade when you need more. You can cancel your subscription at any time from your account page.",
       "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
       "integrations_link": "Integrations page"
     },
-    "heading": "Unlock the Full Potential of rotki with Premium Features",
-    "title": "Upgrade rotki today",
-    "unlock": {
-      "description": "Unlock the full potential of rotki with a premium subscription. Whether you're a seasoned investor or just starting out, rotki premium provides the tools and resources you need to succeed in today's dynamic financial landscape.",
-      "title": "Unlock Premium Features"
-    }
+    "heading": "rotki Premium",
+    "pricing": {
+      "detail": "Billed monthly or yearly. The yearly plans cost less, and you can cancel at any time.",
+      "title": "Plans and pricing"
+    },
+    "title": "Everything in the free app, without the limits"
   },
   "upgrade_plan": {
     "title": "Upgrade Your Plan",

@@ -7,18 +7,18 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div class="py-20 w-full overflow-x-hidden bg-rui-primary-lighter/[0.04]">
+  <section class="py-16 md:py-24 w-full overflow-x-hidden">
     <div class="container">
-      <div class="text-rui-text font-bold text-h4 mb-4">
+      <h2 class="text-rui-text !font-bold text-h4 mb-4">
         {{ t('home.testimonials.title') }}
-      </div>
-      <div class="text-rui-text-secondary mb-16">
+      </h2>
+      <p class="text-body-1 text-rui-text-secondary mb-12">
         {{ t('home.testimonials.detail') }}
-      </div>
+      </p>
       <TestimonialCarousel
         v-if="testimonials"
         :testimonials="testimonials"
       />
     </div>
-  </div>
+  </section>
 </template>

@@ -89,7 +89,7 @@ test.describe('homepage', () => {
     ).toBeVisible({ timeout: 30000 });
 
     await expect(
-      page.getByRole('button', { name: 'Get Premium' }).first(),
+      page.getByRole('button', { name: 'Compare plans' }).first(),
     ).toBeVisible();
   });
 });
@@ -107,17 +107,7 @@ test.describe('download page', () => {
     await expect(page).toHaveURL(/.*\/download/);
 
     await expect(
-      page.locator('h6').filter({ hasText: 'Download rotki' }).first(),
-    ).toBeVisible();
-
-    await expect(
-      page
-        .locator('h1')
-        .filter({
-          hasText:
-            'Download now and start using across all major Operating Systems',
-        })
-        .first(),
+      page.getByRole('heading', { level: 1, name: 'Download rotki for Windows, macOS and Linux' }),
     ).toBeVisible();
   });
 
@@ -132,8 +122,8 @@ test.describe('download page', () => {
     await page.goto('/download');
 
     // Mac has two download buttons (Apple Silicon and Intel)
-    const appleSiliconButton = page.getByRole('button', { name: 'Download for MAC Apple Silicon' });
-    const appleIntelButton = page.getByRole('button', { name: 'Download for MAC Intel' });
+    const appleSiliconButton = page.getByRole('button', { name: 'Download for macOS Apple Silicon' });
+    const appleIntelButton = page.getByRole('button', { name: 'Download for macOS Intel' });
 
     await expect(appleSiliconButton).toBeVisible();
     await expect(appleIntelButton).toBeVisible();
@@ -158,8 +148,8 @@ test.describe('download page', () => {
 
     await page.goto('/download');
 
-    const linuxAppImageButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX AppImage' });
-    const linuxDebButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for LINUX deb' });
+    const linuxAppImageButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for Linux AppImage' });
+    const linuxDebButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for Linux deb' });
     await expect(linuxAppImageButton).toBeVisible();
     await expect(linuxDebButton).toBeVisible();
 
@@ -183,7 +173,7 @@ test.describe('download page', () => {
 
     await page.goto('/download');
 
-    const windowsButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for WINDOWS' });
+    const windowsButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for Windows' });
     await expect(windowsButton).toBeVisible();
 
     // Verify href value
@@ -197,33 +187,22 @@ test.describe('download page', () => {
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/download');
 
-    const linuxLink = page.locator('h6').filter({ hasText: 'LINUX' }).first();
-    const appleLink = page.locator('h6').filter({ hasText: 'MAC' }).first();
-    const windowsLink = page.locator('h6').filter({ hasText: 'WINDOWS' }).first();
+    // Each platform card links its builds directly; `exact` keeps the hero's "Download for …" button out
+    const linuxAppImageLink = page.getByRole('link', { name: 'Linux AppImage', exact: true });
+    const linuxDebLink = page.getByRole('link', { name: 'Linux deb', exact: true });
+    const appleSiliconLink = page.getByRole('link', { name: 'macOS Apple Silicon', exact: true });
+    const appleIntelLink = page.getByRole('link', { name: 'macOS Intel', exact: true });
+    // Scoped to its card: the hero shows the same "Download for Windows" link when the browser reports Windows
+    const windowsLink = page.locator('[data-cy="download-item"]')
+      .filter({ has: page.getByRole('heading', { level: 3, name: 'Windows', exact: true }) })
+      .getByRole('link', { name: 'Download for Windows', exact: true });
 
-    // Linux download button (opens menu)
-    const linuxButton = linuxLink
-      .locator('..')
-      .locator('..')
-      .locator('div button')
-      .filter({ hasText: 'Download' });
+    await showAllDownloads(page, linuxAppImageLink);
 
-    await showAllDownloads(page, linuxButton);
+    for (const heading of ['Linux', 'macOS', 'Windows', 'Docker'])
+      await expect(page.getByRole('heading', { level: 3, name: heading, exact: true })).toBeVisible();
 
-    await expect(linuxLink).toBeVisible();
-    await expect(appleLink).toBeVisible();
-    await expect(windowsLink).toBeVisible();
-    await expect(page.locator('p').filter({ hasText: 'Latest Release: v' }).first()).toBeVisible();
-
-    await expect(linuxButton).toBeVisible();
-    await linuxButton.click();
-
-    // Closed menus stay in the DOM, so a bare [role=menu] matches multiple elements
-    const linuxMenu = page.locator('[role=menu]').filter({ hasText: 'LINUX' });
-    await expect(linuxMenu).toBeVisible();
-
-    const linuxAppImageLink = page.getByRole('link', { name: 'LINUX AppImage' });
-    const linuxDebLink = page.getByRole('link', { name: 'LINUX deb' });
+    await expect(page.locator('p').filter({ hasText: 'Latest release: v' }).first()).toBeVisible();
 
     const appImageHref = await linuxAppImageLink.getAttribute('href');
     expect(appImageHref).toContain('rotki-linux');
@@ -233,38 +212,9 @@ test.describe('download page', () => {
     expect(debHref).toContain('rotki-linux');
     expect(debHref).toContain('.deb');
 
-    // Close the menu before proceeding
-    await page.keyboard.press('Escape');
-
-    // Windows download button
-    const windowsButton = windowsLink
-      .locator('..')
-      .locator('..')
-      .locator('div button')
-      .filter({ hasText: 'Download' });
-
-    await expect(windowsButton).toBeVisible();
-    await expect(windowsButton).toBeEnabled();
-
-    const windowsHref = await windowsButton.locator('..').getAttribute('href');
+    const windowsHref = await windowsLink.getAttribute('href');
     expect(windowsHref).toContain('rotki-win32');
     expect(windowsHref).toContain('.exe');
-
-    // Apple download button (opens menu)
-    const appleButton = appleLink
-      .locator('..')
-      .locator('..')
-      .locator('div button')
-      .filter({ hasText: 'Download' });
-
-    await expect(appleButton).toBeVisible();
-    await appleButton.click();
-
-    const appleMenu = page.locator('[role=menu]').filter({ hasText: 'MAC' });
-    await expect(appleMenu).toBeVisible();
-
-    const appleSiliconLink = page.getByRole('link', { name: 'MAC Apple Silicon' });
-    const appleIntelLink = page.getByRole('link', { name: 'MAC Intel' });
 
     const appleSiliconHref = await appleSiliconLink.getAttribute('href');
     expect(appleSiliconHref).toContain('rotki-darwin_arm');
@@ -274,11 +224,10 @@ test.describe('download page', () => {
     expect(appleIntelHref).toContain('rotki-darwin_x');
     expect(appleIntelHref).toContain('.dmg');
 
-    // Docker section
-    const dockerLink = page.locator('h6').filter({ hasText: 'DOCKER' }).first();
-    await expect(dockerLink).toBeVisible();
-
-    const dockerInput = dockerLink.locator('..').locator('input');
+    const dockerCard = page.locator('[data-cy="download-item"]').filter({
+      has: page.getByRole('heading', { level: 3, name: 'Docker', exact: true }),
+    });
+    const dockerInput = dockerCard.locator('input');
     await expect(dockerInput).toBeVisible();
     await expect(dockerInput).toHaveValue('docker pull rotki/rotki');
   });

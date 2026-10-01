@@ -2,8 +2,10 @@
 import type { DownloadItemSingle } from '~/types/download';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
-defineProps<{
+const { item, secondary = false } = defineProps<{
   item: DownloadItemSingle;
+  /** Alternative builds for the same OS (e.g. the .deb next to the AppImage) are outlined. */
+  secondary?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -18,7 +20,7 @@ const { t } = useI18n({ useScope: 'global' });
     :to="item.url"
     rounded
     color="primary"
-    variant="default"
+    :variant="secondary ? 'outlined' : 'default'"
     size="lg"
     data-cy="main-download-button"
     @click="emit('click')"
@@ -36,9 +38,9 @@ const { t } = useI18n({ useScope: 'global' });
         width="20"
         height="20"
         loading="lazy"
-        class="brightness-0 invert"
+        :class="{ 'brightness-0 invert': !secondary }"
       />
     </template>
-    {{ t('download.download_for', { platform: item.platform }) }}
+    {{ t('download.download_for', { platform: item.label }) }}
   </ButtonLink>
 </template>

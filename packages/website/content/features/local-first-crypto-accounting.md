@@ -5,7 +5,7 @@ tagline: "Local-first crypto accounting that keeps your books on your machine"
 intro: "rotki is a local-first crypto accounting tool. It reconciles your trades, transfers and on-chain activity into a complete picture of your portfolio and produces accounting and tax reports, all on your own computer, with your data stored in a local encrypted database."
 metaDescription: "rotki is local-first crypto accounting software. Reconcile trades, transfers and on-chain activity and produce reports on your own machine, not a cloud."
 keywords: "local-first crypto accounting, local crypto accounting software, self-hosted crypto accounting, crypto bookkeeping local, offline crypto accounting"
-updatedAt: "June 2026"
+updatedAt: "October 2026"
 docsUrl: "https://docs.rotki.com/usage-guides/tax-accounting/guide.html"
 ctaPlan: free
 keyTakeaways:
@@ -22,7 +22,7 @@ capabilities:
 limitations:
   - "rotki provides the accounting and reports; it is not a replacement for advice from a tax professional."
   - "It is a desktop app, not a hosted multi-user bookkeeping platform."
-  - "You keep your own backups of the local database. Premium adds optional encrypted sync."
+  - "You keep your own backups of the local database. The Basic and Advanced plans add optional encrypted sync."
 setup:
   - "Install the rotki desktop app and create a local, password-protected account."
   - "Connect exchanges with read-only API keys and add your wallet addresses."

@@ -12,12 +12,12 @@ const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integ
 <template>
   <div class="flex flex-col-reverse lg:flex-row items-center gap-10 md:gap-20">
     <div class="flex flex-1 flex-col gap-2">
-      <h6 class="text-h6 text-rui-primary">
+      <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.exchanges.title') }}
-      </h6>
-      <h4 class="text-h4">
+      </p>
+      <h3 class="text-h5 !font-bold">
         {{ t('home.exchanges.subtitle') }}
-      </h4>
+      </h3>
       <div class="text-body-1 text-rui-text-secondary pt-2">
         {{ t('home.exchanges.detail') }}
       </div>
@@ -48,12 +48,14 @@ const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integ
 
     <div class="flex-1">
       <img
-        class="overflow-hidden"
+        class="rounded-xl border border-rui-grey-200 shadow-sm"
         :alt="t('home.exchanges.title')"
-        src="/img/exchanges.png"
+        src="/img/exchanges.webp"
+        srcset="/img/exchanges-654w.webp 654w, /img/exchanges-1308w.webp 1308w, /img/exchanges.webp 2400w"
+        sizes="(min-width: 1024px) min(654px, 50vw), 100vw"
         loading="lazy"
-        width="795"
-        height="428"
+        width="654"
+        height="409"
       />
     </div>
   </div>

@@ -19,12 +19,15 @@ useHead(() => ({
     innerHTML: JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'Organization',
+      '@id': `${baseUrl}/#organization`,
       'name': 'rotki',
+      'legalName': 'Rotki Solutions GmbH',
       'url': baseUrl,
       'logo': `${baseUrl}/android-chrome-512x512.png`,
       'sameAs': [
         'https://twitter.com/rotkiapp',
         'https://github.com/rotki',
+        'https://github.com/rotki/rotki',
         'https://www.reddit.com/r/rotki',
       ],
     }),

@@ -20,8 +20,10 @@ const { tiersInformation } = usePremiumTiersInfo();
     data-cy="pricing-section"
     class="container flex flex-col gap-12 pb-10 md:pb-20"
   >
+    <!-- The compact (homepage) variant sits under a centered heading -->
     <PricingPeriodTab
       v-model="selectedPricingPeriod"
+      :class="{ 'self-center': compact }"
       :data="availablePlans"
     />
     <PricingTierComparison

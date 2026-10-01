@@ -2,15 +2,15 @@
 slug: privacy-first-portfolio-management
 label: "Privacy-first portfolio management"
 tagline: "Privacy-first crypto portfolio management on your own machine"
-intro: "rotki is a privacy-first crypto portfolio tracker. It runs as a desktop app on your own computer, reads your exchanges through read-only API keys and your wallets through endpoints you choose, and stores everything in a local database encrypted with SQLCipher. By default nothing passes through rotki-operated servers."
-metaDescription: "rotki is a privacy-first crypto portfolio tracker. Track balances and history locally in an encrypted database; by default nothing goes to rotki servers."
+intro: "rotki is a privacy-first crypto portfolio tracker. It runs as a desktop app on your own computer, reads your exchanges through read-only API keys and your wallets through endpoints you choose, and stores everything in a local database encrypted with SQLCipher. Your financial data never passes through rotki-operated servers."
+metaDescription: "rotki is a privacy-first crypto portfolio tracker. Track balances and history locally in an encrypted database; your financial data never goes to rotki servers."
 keywords: "privacy-first portfolio management, private crypto portfolio tracker, encrypted crypto tracker, local crypto portfolio tracker, no-cloud crypto tracker"
-updatedAt: "June 2026"
+updatedAt: "October 2026"
 ctaPlan: free
 keyTakeaways:
   - "rotki runs locally and stores your data in a database encrypted with SQLCipher (256-bit AES) on your own device."
   - "Exchanges are read with read-only API keys; you never hand over withdrawal access or your full history to a cloud."
-  - "By default nothing passes through rotki-operated servers. Optional premium sync is zero-knowledge."
+  - "Your financial data never passes through rotki-operated servers. Optional premium sync is zero-knowledge, and anonymous usage analytics can be turned off in the settings."
   - "It is open source, so the privacy claims can be verified in the code rather than taken on trust."
 capabilities:
   - "Tracks balances and transaction history across exchanges, wallets and chains from one local app."
@@ -20,7 +20,8 @@ capabilities:
   - "Is open source, so you can verify how and where your data is handled."
 limitations:
   - "rotki is desktop-first; it is not a hosted web dashboard you log into from any browser."
-  - "Because your data lives on your device, you are responsible for backups. Premium adds optional encrypted sync."
+  - "Because your data lives on your device, you are responsible for backups. The Basic and Advanced plans add optional encrypted sync."
+  - "Anonymous usage analytics (app version, operating system and UI events, never your financial data) are on by default. You can turn them off in the settings."
   - "Reading public chain data requires querying an RPC endpoint or data provider; you choose which one, which determines who sees those requests."
 setup:
   - "Download and install the rotki desktop app and create a local account with a password. Your encryption key is derived from it."
@@ -30,7 +31,7 @@ setup:
   - "Optionally enable premium sync for zero-knowledge encrypted backups across devices."
 troubleshooting:
   - problem: "Will my API keys or data be uploaded anywhere?"
-    fix: "No. rotki uses your API keys locally to read balances and trades, and stores everything in your local encrypted database. By default nothing is sent to rotki-operated servers; premium sync only uploads data already encrypted on your device."
+    fix: "No. rotki uses your API keys locally to read balances and trades, and stores everything in your local encrypted database. Your keys and financial data are never sent to rotki-operated servers; premium sync only uploads data already encrypted on your device."
   - problem: "I want to track a wallet without exposing my requests."
     fix: "Chain balances are read by querying an RPC endpoint or data provider. You choose which endpoint to use, so you control who sees those queries, for example a provider you trust or your own node."
 relatedIntegrations:
@@ -46,6 +47,8 @@ relatedComparisons:
   - slug: koinly
     label: "rotki vs Koinly"
 relatedFeatures:
+  - slug: ai-assistant-mcp
+    label: "AI assistants via MCP"
   - slug: local-first-crypto-accounting
     label: "Local-first crypto accounting"
   - slug: open-source-crypto-tax
@@ -56,7 +59,7 @@ faq:
   - q: "Does rotki store my portfolio in the cloud?"
     a: "No. By default your data stays in a local encrypted database on your machine. rotki offers optional premium sync, and even that is zero-knowledge: your database is encrypted on your device with a key derived from your password before it is uploaded, so rotki cannot read it."
   - q: "Can rotki move my funds?"
-    a: "No. You connect exchanges with read-only API keys that have no withdrawal permissions, so rotki can only read balances and trades."
+    a: "No. You connect exchanges with read-only API keys that have no withdrawal permissions, so rotki can only read balances and trades. rotki never holds your private keys; if you send tokens from its on-chain page, the transaction is signed in your own connected wallet."
   - q: "How is my local data protected?"
     a: "rotki stores your data in a database encrypted with SQLCipher using 256-bit AES, with the key derived from your account password."
 ---

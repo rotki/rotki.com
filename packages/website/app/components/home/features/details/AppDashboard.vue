@@ -6,7 +6,7 @@ const { t } = useI18n({ useScope: 'global' });
   <div class="flex flex-col sm:flex-row items-center gap-10 md:gap-20">
     <div class="flex-1">
       <img
-        class="rounded-xl overflow-hidden"
+        class="rounded-xl"
         :alt="t('home.dashboard.title')"
         src="/img/dashboard.webp"
         srcset="/img/dashboard-654w.webp 654w, /img/dashboard-1308w.webp 1308w, /img/dashboard.webp 2400w"
@@ -17,12 +17,12 @@ const { t } = useI18n({ useScope: 'global' });
       />
     </div>
     <div class="flex flex-1 flex-col gap-2">
-      <h6 class="text-h6 text-rui-primary">
+      <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.dashboard.title') }}
-      </h6>
-      <h6 class="text-h6">
+      </p>
+      <h3 class="text-h5 !font-bold">
         {{ t('home.dashboard.subtitle') }}
-      </h6>
+      </h3>
       <div class="flex flex-col gap-6 text-rui-text-secondary pt-4">
         <div>
           <div class="text-subtitle-1 font-bold">

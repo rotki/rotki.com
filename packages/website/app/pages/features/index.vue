@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { FeatureHubCollectionItem, FeaturesCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/shared';
+import DownloadCallToAction from '~/components/common/DownloadCallToAction.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
+import { featureIcon } from '~/utils/feature-icons';
 
 const { t } = useI18n({ useScope: 'global' });
 const { public: { baseUrl } } = useRuntimeConfig();
@@ -151,7 +153,7 @@ definePageMeta({
               />
               <RuiIcon
                 v-else
-                name="lu-sparkles"
+                :name="featureIcon(item.slug)"
                 size="24"
                 color="primary"
               />
@@ -239,5 +241,6 @@ definePageMeta({
         </div>
       </div>
     </section>
+    <DownloadCallToAction />
   </div>
 </template>

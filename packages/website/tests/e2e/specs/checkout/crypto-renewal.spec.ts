@@ -198,7 +198,7 @@ test.describe('crypto renewal', () => {
       await expect(page).toHaveURL(/\/checkout\/pay\/crypto\?/);
       await expect(page).toHaveURL(/currency=ethereum:ETH/);
 
-      await changePlan(page, { period: 'Monthly Billing', tier: 'Basic' });
+      await changePlan(page, { period: 'Monthly billing', tier: 'Basic' });
       await expect(page).toHaveURL(/planId=3/);
 
       backend.update({ payment: basePayment() });

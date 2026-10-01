@@ -65,6 +65,7 @@ function onSwiperUpdate(s: Swiper) {
       <SwiperSlide
         v-for="(testimonial, i) in testimonials"
         :key="i"
+        class="!h-auto self-start md:self-stretch"
       >
         <Testimonial
           :avatar="testimonial.avatar"

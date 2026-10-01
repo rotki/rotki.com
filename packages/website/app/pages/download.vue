@@ -9,8 +9,8 @@ import { useAppDownload } from '~/composables/use-app-download';
 import { usePageSeo } from '~/composables/use-page-seo';
 
 usePageSeo(
-  'Download',
-  'Download rotki for Linux, macOS, or Windows. Free, open-source portfolio tracking and accounting software that protects your privacy.',
+  'Download rotki for Windows, macOS and Linux',
+  'Download rotki, the free and open source crypto portfolio tracker, for Windows, macOS or Linux, or run it with Docker. Your data stays encrypted on your device.',
   '/download',
 );
 
@@ -21,15 +21,18 @@ useHead({
     innerHTML: JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
+      '@id': `${baseUrl}/#software`,
       'name': 'rotki',
       'applicationCategory': 'FinanceApplication',
       'operatingSystem': 'Windows, macOS, Linux',
-      'url': `${baseUrl}/download`,
+      'url': `${baseUrl}/`,
+      'downloadUrl': `${baseUrl}/download`,
       'offers': {
         '@type': 'Offer',
         'price': '0',
         'priceCurrency': 'EUR',
       },
+      'publisher': { '@id': `${baseUrl}/#organization` },
     }),
   }],
 });
@@ -44,23 +47,33 @@ const {
   loading,
 } = useAppDownload();
 
+const { t } = useI18n({ useScope: 'global' });
+
 const links = computed<DownloadItem[]>(() => [
-  { platform: 'LINUX', image: '/img/linux.svg', group: true, items: [{
-    name: 'LINUX AppImage',
+  { platform: 'LINUX', label: 'Linux', caption: t('download.platforms.linux'), image: '/img/linux.svg', group: true, items: [{
+    name: 'Linux AppImage',
+    analyticsKey: 'LINUX AppImage',
+    variant: 'AppImage',
     url: get(linuxAppImageUrl),
   }, {
-    name: 'LINUX deb',
+    name: 'Linux deb',
+    analyticsKey: 'LINUX deb',
+    variant: '.deb',
     url: get(linuxDebUrl),
   }] },
-  { platform: 'MAC', icon: 'lu-os-apple', group: true, items: [{
-    name: 'MAC Apple Silicon',
+  { platform: 'MAC', label: 'macOS', caption: t('download.platforms.mac'), icon: 'lu-os-apple', group: true, items: [{
+    name: 'macOS Apple Silicon',
+    analyticsKey: 'MAC Apple Silicon',
+    variant: 'Apple Silicon',
     url: get(macOSArmUrl),
   }, {
-    name: 'MAC Intel',
+    name: 'macOS Intel',
+    analyticsKey: 'MAC Intel',
+    variant: 'Intel',
     url: get(macOSUrl),
   }] },
-  { platform: 'WINDOWS', icon: 'lu-os-windows', url: get(windowsUrl) },
-  { platform: 'DOCKER', image: '/img/docker.svg', url: 'https://docs.rotki.com/requirement-and-installation/packaged-binaries.html#docker', command: 'docker pull rotki/rotki' },
+  { platform: 'WINDOWS', label: 'Windows', caption: t('download.platforms.windows'), icon: 'lu-os-windows', url: get(windowsUrl) },
+  { platform: 'DOCKER', label: 'Docker', caption: t('download.platforms.docker'), image: '/img/docker.svg', url: 'https://docs.rotki.com/requirement-and-installation/packaged-binaries.html#docker', command: 'docker pull rotki/rotki' },
 ]);
 
 definePageMeta({
@@ -69,7 +82,6 @@ definePageMeta({
 </script>
 
 <template>
-  <DownloadUpgradeNudge />
   <DownloadHeading
     :links="links"
     :version="version"
@@ -77,4 +89,5 @@ definePageMeta({
   />
   <DownloadDocs />
   <DownloadPreview />
+  <DownloadUpgradeNudge />
 </template>

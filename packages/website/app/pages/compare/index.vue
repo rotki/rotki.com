@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ComparisonHubCollectionItem, ComparisonsCollectionItem } from '@nuxt/content';
 import { get } from '@vueuse/shared';
+import DownloadCallToAction from '~/components/common/DownloadCallToAction.vue';
 import ComparisonHubTable from '~/components/comparison/ComparisonHubTable.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 
@@ -244,5 +245,6 @@ definePageMeta({
         </div>
       </div>
     </section>
+    <DownloadCallToAction />
   </div>
 </template>
