@@ -1142,7 +1142,7 @@
           "title": "Value distribution by location"
         },
         "events_analysis": {
-          "description": "A summary of your activity, including ETH spent on gas, the exchanges and protocols you used, and Gnosis Pay usage.",
+          "description": "A summary of your activity, including ETH spent on gas, the exchanges and protocols you used, and transactions per chain.",
           "title": "Events analysis"
         },
         "heading": "Analytics",
@@ -1153,7 +1153,7 @@
         "title": "Detailed graphs"
       },
       "enriched_transactions": {
-        "description": "Connect Monerium and Gnosis Pay to add bank transfer details, card merchant data and payment descriptions to your on-chain transactions.",
+        "description": "Connect Monerium to add bank transfer details and payment memos to your on-chain transactions. Gnosis Pay card spends can also get merchant names and categories.",
         "title": "Enriched transactions"
       },
       "asset_matching": {
@@ -1165,7 +1165,7 @@
         "title": "AI assistants via MCP"
       },
       "events_analysis": {
-        "description": "Gas spent, exchanges and protocols used, transactions per chain and Gnosis Pay usage, summed up in one view.",
+        "description": "Gas spent, exchanges and protocols used and transactions per chain, summed up in one view.",
         "title": "Events analysis"
       },
       "scales_with_your_need": {
