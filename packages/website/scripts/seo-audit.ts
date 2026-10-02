@@ -65,7 +65,14 @@ interface PageReport {
   route: string;
   noindex: boolean;
   redirect: boolean;
+  /** Set when the canonical names another generated page, e.g. `/pricing` for `/checkout/pay`. */
+  canonicalTo?: string;
   issues: Issue[];
+}
+
+/** The production URL of a route. The root keeps its slash, matching `<loc>` in the sitemap. */
+function urlFor(route: string): string {
+  return route === '/' ? `${BASE}/` : `${BASE}${route}`;
 }
 
 /**
@@ -103,8 +110,7 @@ function nonCrawlableAnchors(html: string): number {
   return count;
 }
 
-function checkCanonicalHref(canonical: string, expected: string): Issue[] {
-  const href = /href=["']([^"']*)["']/i.exec(canonical)?.[1] ?? '';
+function checkCanonicalHref(href: string, expected: string): Issue[] {
   if (!/^https?:\/\//i.test(href))
     return [{ type: 'relative-canonical', detail: href || '(empty)' }];
   if (href !== expected)
@@ -112,15 +118,35 @@ function checkCanonicalHref(canonical: string, expected: string): Issue[] {
   return [];
 }
 
+function canonicalTags(html: string): string[] {
+  return Array.from(html.matchAll(/<link[^>]+rel=["']canonical["'][^>]*>/gi), match => match[0]);
+}
+
+function canonicalHref(tag: string): string {
+  return /href=["']([^"']*)["']/i.exec(tag)?.[1] ?? '';
+}
+
 function checkCanonical(html: string, route: string): Issue[] {
-  const canonicals = [...html.matchAll(/<link[^>]+rel=["']canonical["'][^>]*>/gi)];
+  const canonicals = canonicalTags(html);
   if (canonicals.length === 0)
     return [{ type: 'missing-canonical' }];
   if (canonicals.length > 1)
     return [{ type: 'multiple-canonical', detail: `${canonicals.length} tags` }];
 
-  const expected = route === '/' ? BASE : `${BASE}${route}`;
-  return checkCanonicalHref(canonicals[0]?.[0] ?? '', expected);
+  return checkCanonicalHref(canonicalHref(canonicals[0] ?? ''), urlFor(route));
+}
+
+/**
+ * Returns the route a page's single canonical points at when that is another
+ * generated page: a route alias such as `/checkout/pay`, which serves the
+ * `/pricing` page and names it as canonical.
+ */
+function aliasTarget(html: string, route: string, routeByUrl: Map<string, string>): string | undefined {
+  const canonicals = canonicalTags(html);
+  if (canonicals.length !== 1)
+    return undefined;
+  const target = routeByUrl.get(canonicalHref(canonicals[0] ?? ''));
+  return target !== undefined && target !== route ? target : undefined;
 }
 
 function checkTitle(html: string): Issue[] {
@@ -151,7 +177,7 @@ function checkH1(html: string): Issue[] {
   return /<h1[\s>]/i.test(html) ? [] : [{ type: 'missing-h1' }];
 }
 
-function auditPage(html: string, route: string): PageReport {
+function auditPage(html: string, route: string, routeByUrl: Map<string, string>): PageReport {
   const issues: Issue[] = [];
 
   const robots = /<meta[^>]+name=["']robots["'][^>]*content=["']([^"']*)["']/i.exec(html);
@@ -159,14 +185,17 @@ function auditPage(html: string, route: string): PageReport {
 
   /*
    * `nuxi generate` emits a `<meta http-equiv="refresh">` stub for routes that
-   * are real 301 redirects in production (e.g. /pricing to /checkout/pay). These
+   * are real 301 redirects in production (e.g. /sponsor to /sponsor/mint). These
    * stubs have no title/canonical/lang/og by design and must not be audited as
    * indexable pages: they redirect, just like noindex pages aren't indexed.
    */
   const redirect: boolean = /<meta[^>]+http-equiv=["']refresh["']/i.test(html);
 
-  // noindex and redirect pages are intentionally out of the index — skip checks.
-  if (!noindex && !redirect) {
+  // A route alias defers to its canonical page, which is audited in its own right.
+  const canonicalTo = aliasTarget(html, route, routeByUrl);
+
+  // noindex, redirect and alias pages are intentionally out of the index — skip checks.
+  if (!noindex && !redirect && !canonicalTo) {
     issues.push(
       ...checkCanonical(html, route),
       ...checkTitle(html),
@@ -183,7 +212,7 @@ function auditPage(html: string, route: string): PageReport {
   if (!/<html[^>]+\blang=/i.test(html))
     issues.push({ type: 'missing-lang' });
 
-  return { route, noindex, redirect, issues };
+  return { route, noindex, redirect, canonicalTo, issues };
 }
 
 function collectPages(distDir: string): string[] {
@@ -223,14 +252,16 @@ function summarizeIssues(indexable: PageReport[]): IssueRow[] {
 
 function main(): void {
   const files = collectPages(DIST);
+  const routeByUrl = new Map(files.map(file => [urlFor(routeFor(file)), routeFor(file)]));
   const reports: PageReport[] = files.map((file) => {
     const html = readFileSync(path.join(DIST, file), 'utf8');
-    return auditPage(html, routeFor(file));
+    return auditPage(html, routeFor(file), routeByUrl);
   });
 
-  const indexable = reports.filter(r => !r.noindex && !r.redirect);
-  const skipped = reports.length - indexable.length;
+  const indexable = reports.filter(r => !r.noindex && !r.redirect && !r.canonicalTo);
   const redirects = reports.filter(r => r.redirect).length;
+  const aliases = reports.filter(r => !r.noindex && !r.redirect && r.canonicalTo).length;
+  const noindexed = reports.filter(r => r.noindex && !r.redirect).length;
   const pagesWithErrors = indexable.filter(r => r.issues.some(i => severityOf(i.type) === 'error'));
 
   const rows = summarizeIssues(indexable);
@@ -239,7 +270,8 @@ function main(): void {
   const lines: string[] = [];
   lines.push('## 🔍 SEO audit (report-only)\n');
   lines.push(`Base: \`${BASE}\` · audited **${indexable.length}** indexable pages `
-    + `(${skipped} skipped: ${skipped - redirects} noindex, ${redirects} redirects).\n`);
+    + `(${reports.length - indexable.length} skipped: ${noindexed} noindex, ${redirects} redirects, `
+    + `${aliases} aliases).\n`);
   lines.push(`**${pagesWithErrors.length}** pages with errors · `
     + `**${indexable.length - pagesWithErrors.length}** without errors · `
     + `**${errorRows.length}** error type(s).\n`);
