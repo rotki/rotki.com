@@ -75,8 +75,6 @@ const menus: (Menu | MenuParent)[] = [
     ],
   },
 ];
-
-const { isMdAndDown } = useBreakpoint();
 </script>
 
 <template>
@@ -102,9 +100,15 @@ const { isMdAndDown } = useBreakpoint();
           />
         </template>
       </ButtonLink>
-      <template v-else-if="!isMdAndDown">
+      <!--
+        Both layouts render and CSS picks one at the `md` breakpoint, the one the header's mobile
+        drawer uses. Choosing in script would make a phone's first render differ from the
+        prerendered HTML, which has no screen size and always took the dropdown.
+      -->
+      <template v-else>
         <RuiMenu
           :key="menu.label"
+          :class-names="{ root: 'hidden md:block' }"
           close-on-content-click
           wrapper-class="w-full"
         >
@@ -149,27 +153,30 @@ const { isMdAndDown } = useBreakpoint();
             </ButtonLink>
           </div>
         </RuiMenu>
-      </template>
-      <template v-else>
-        <ButtonLink
-          v-for="child in menu.children"
-          :key="child.label"
-          class="w-full justify-start"
-          :highlight-active="child.highlightActive"
-          :external="child.external"
-          :to="child.to"
+        <div
+          :key="`${menu.label}-links`"
+          class="contents md:hidden"
         >
-          {{ child.label }}
-          <template
-            v-if="child.external"
-            #append
+          <ButtonLink
+            v-for="child in menu.children"
+            :key="child.label"
+            class="w-full justify-start"
+            :highlight-active="child.highlightActive"
+            :external="child.external"
+            :to="child.to"
           >
-            <RuiIcon
-              size="18"
-              name="lu-external-link"
-            />
-          </template>
-        </ButtonLink>
+            {{ child.label }}
+            <template
+              v-if="child.external"
+              #append
+            >
+              <RuiIcon
+                size="18"
+                name="lu-external-link"
+              />
+            </template>
+          </ButtonLink>
+        </div>
       </template>
     </template>
   </div>

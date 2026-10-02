@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { set } from '@vueuse/shared';
+import { useMounted } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import AppLogo from '~/components/common/AppLogo.vue';
 import NavigationMenu from '~/components/common/NavigationMenu.vue';
@@ -10,6 +11,16 @@ const { t } = useI18n({ useScope: 'global' });
 
 const store = useMainStore();
 const { authenticated } = storeToRefs(store);
+
+const isMounted = useMounted();
+
+/**
+ * Whether the header shows the signed-in links. Pages are prerendered signed out, and the startup
+ * plugin loads the account before hydration, so the first render must stay signed out to match the
+ * HTML: production Vue does not patch attributes that differ during hydration, which left "My
+ * account" pointing at `/login` and the logout button out of the tab order.
+ */
+const signedIn = computed<boolean>(() => get(isMounted) && get(authenticated));
 
 async function logout() {
   await store.logout(true);
@@ -79,7 +90,7 @@ watch(
         <div class="flex flex-col space-y-2 px-2 md:order-2 md:ml-auto md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0 lg:order-none lg:ml-0">
           <SponsorNavButton />
           <!-- The page is prerendered signed out, so a returning customer sees "Sign in" until the session check resolves -->
-          <NuxtLink :to="authenticated ? '/home/subscription' : '/login'">
+          <NuxtLink :to="signedIn ? '/home/subscription' : '/login'">
             <!-- Left-aligned in the mobile drawer to line up with the sponsor link above it -->
             <RuiButton
               variant="text"
@@ -92,7 +103,7 @@ watch(
                   size="18"
                 />
               </template>
-              {{ authenticated ? t('page_header.account') : t('page_header.sign_in') }}
+              {{ signedIn ? t('page_header.account') : t('page_header.sign_in') }}
             </RuiButton>
           </NuxtLink>
           <NuxtLink to="/download">
@@ -116,8 +127,8 @@ watch(
             variant="text"
             icon
             class="!p-2"
-            :class="{ invisible: !authenticated }"
-            :tabindex="authenticated ? 0 : -1"
+            :class="{ invisible: !signedIn }"
+            :tabindex="signedIn ? 0 : -1"
             @click="logout()"
           >
             <span class="flex items-center">
