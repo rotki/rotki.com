@@ -66,7 +66,7 @@ catalog:
   '@resvg/resvg-js': 2.6.2
   '@rotki/eslint-config': 8.3.0
   '@rotki/eslint-plugin': 1.8.0
-  '@rotki/ui-library': 2.24.0
+  '@rotki/ui-library': 2.27.0
   '@tsconfig/node24': 24.0.5
   '@types/braintree-web': 3.143.0
   '@types/node': 24.13.3
@@ -80,10 +80,10 @@ catalog:
   '@vue/tsconfig': 0.9.1
   '@vuelidate/core': 2.0.3
   '@vuelidate/validators': 2.0.4
-  '@vueuse/core': 14.3.0
-  '@vueuse/math': 14.3.0
-  '@vueuse/nuxt': 14.3.0
-  '@vueuse/shared': 14.3.0
+  '@vueuse/core': 14.4.0
+  '@vueuse/math': 14.4.0
+  '@vueuse/nuxt': 14.4.0
+  '@vueuse/shared': 14.4.0
   '@wagmi/connectors': 8.2.0
   '@wagmi/core': 3.6.5
   '@walletconnect/universal-provider': 2.24.0

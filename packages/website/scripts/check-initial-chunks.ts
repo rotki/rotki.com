@@ -12,10 +12,10 @@
  * - The chunk layout in nuxt.config.ts depends on group order. When a heavy group
  *   claims a shared module (Vue, Vite's preload helper, `destr`), every page
  *   starts downloading the wallet SDKs.
- * - The ui-library declares no `sideEffects`, so nuxt.config.ts marks its modules
- *   side-effect free. Without that, its component barrel puts every component
- *   the site uses into one chunk that every page loads. A widget only a few
- *   pages render showing up on most pages is the sign of that.
+ * - The ui-library declares its modules side-effect free (`sideEffects` in its
+ *   package.json, since 2.27.0). If that ever regresses, its component barrel
+ *   puts every component the site uses into one chunk that every page loads. A
+ *   widget only a few pages render showing up on most pages is the sign of that.
  *
  * Usage:
  *   node scripts/check-initial-chunks.ts [distDir]
