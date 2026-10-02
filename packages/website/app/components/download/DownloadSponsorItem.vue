@@ -29,9 +29,8 @@ defineProps<{
         alt="Gold sponsor ribbon"
         width="192"
         height="42"
-        fit="cover"
         loading="lazy"
-        class="w-full h-[125%] absolute top-0 left-0"
+        class="w-full h-auto absolute top-0 left-0"
       />
       <RuiTooltip
         :disabled="!sponsor.tooltip"

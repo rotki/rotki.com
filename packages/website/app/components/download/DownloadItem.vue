@@ -32,9 +32,10 @@ const { t } = useI18n({ useScope: 'global' });
         />
       </div>
       <div>
-        <h3 class="text-h6 font-medium">
+        <!-- An h2: the page title is the h1, and nothing sits between them -->
+        <h2 class="text-h6 font-medium">
           {{ data.label }}
-        </h3>
+        </h2>
         <p
           v-if="data.caption"
           class="text-body-2 text-rui-text-secondary"
@@ -51,6 +52,7 @@ const { t } = useI18n({ useScope: 'global' });
       <InputWithCopyButton
         :model-value="data.command"
         :copy-value="data.command"
+        :aria-label="t('download.install_command', { platform: data.label })"
         hide-details
         dense
         readonly

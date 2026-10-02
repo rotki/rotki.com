@@ -92,8 +92,10 @@ function onDownloadClick(platform: string): void {
         <p class="text-body-1 md:text-h6 !font-normal text-rui-text-secondary max-w-[640px] text-balance">
           {{ t('download.heading.detail') }}
         </p>
-        <div class="flex flex-col items-center gap-3 pt-2 min-h-[106px]">
-          <div class="flex gap-2 flex-wrap justify-center min-h-[42px] items-center">
+        <!-- Full width, so its box does not shrink to the loading placeholder and widen once the buttons load -->
+        <div class="flex flex-col items-center gap-3 pt-2 min-h-[106px] w-full">
+          <!-- Linux and macOS show two buttons, which wrap onto two rows below `sm`; reserve both rows so the page does not shift once they load -->
+          <div class="flex gap-2 flex-wrap justify-center min-h-[80px] sm:min-h-[42px] items-center w-full">
             <RuiButton
               v-if="loading"
               rounded
@@ -135,9 +137,10 @@ function onDownloadClick(platform: string): void {
             </span>
             <p>
               {{ t('download.latest_release') }}:
+              <!-- About as wide as a version such as v1.44.0, so the centred line barely moves once it loads -->
               <span
                 v-if="loading"
-                class="inline-block w-16 h-4 bg-rui-grey-200 rounded animate-pulse align-middle"
+                class="inline-block w-12 h-4 bg-rui-grey-200 rounded animate-pulse align-middle"
               />
               <template v-else>
                 {{ version }}

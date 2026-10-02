@@ -194,13 +194,13 @@ test.describe('download page', () => {
     const appleIntelLink = page.getByRole('link', { name: 'macOS Intel', exact: true });
     // Scoped to its card: the hero shows the same "Download for Windows" link when the browser reports Windows
     const windowsLink = page.locator('[data-cy="download-item"]')
-      .filter({ has: page.getByRole('heading', { level: 3, name: 'Windows', exact: true }) })
+      .filter({ has: page.getByRole('heading', { level: 2, name: 'Windows', exact: true }) })
       .getByRole('link', { name: 'Download for Windows', exact: true });
 
     await showAllDownloads(page, linuxAppImageLink);
 
     for (const heading of ['Linux', 'macOS', 'Windows', 'Docker'])
-      await expect(page.getByRole('heading', { level: 3, name: heading, exact: true })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 2, name: heading, exact: true })).toBeVisible();
 
     await expect(page.locator('p').filter({ hasText: 'Latest release: v' }).first()).toBeVisible();
 
@@ -225,9 +225,9 @@ test.describe('download page', () => {
     expect(appleIntelHref).toContain('.dmg');
 
     const dockerCard = page.locator('[data-cy="download-item"]').filter({
-      has: page.getByRole('heading', { level: 3, name: 'Docker', exact: true }),
+      has: page.getByRole('heading', { level: 2, name: 'Docker', exact: true }),
     });
-    const dockerInput = dockerCard.locator('input');
+    const dockerInput = dockerCard.getByRole('textbox', { name: 'Docker install command' });
     await expect(dockerInput).toBeVisible();
     await expect(dockerInput).toHaveValue('docker pull rotki/rotki');
   });

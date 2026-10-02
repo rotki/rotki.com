@@ -511,6 +511,7 @@
       "detail": "Free and open source. Your portfolio data is stored encrypted on your device, and you don't need a rotki account to use it.",
       "whats_new": "rotki {version} is out: see what's new"
     },
+    "install_command": "{platform} install command",
     "latest_release": "Latest release",
     "sponsor": {
       "become_sponsor": "Sponsor the next release",
