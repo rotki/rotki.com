@@ -14,7 +14,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 usePageSeo(
   'rotki Premium: higher limits, analytics and encrypted sync',
-  'What rotki Premium adds to the free app: higher history limits, graphs and statistics, ETH staking insights, DeFi accounting, and encrypted backup and sync.',
+  'rotki Premium: Basic and Advanced add higher history limits, graphs and statistics, ETH staking insights, AI assistant access and encrypted sync. Supporter backs the project with more room for your history.',
   '/products',
 );
 

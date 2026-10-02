@@ -309,7 +309,7 @@
       "email_or_username": "Email or username",
       "first_time_premium": "First time premium?",
       "forgot_password": "Forgot password?",
-      "message": " Premium users unlock the full potential of rotki by removing all limits and unlocking all features.",
+      "message": " A subscription raises your history and report limits. Basic and Advanced also add analytics, encrypted sync and AI assistant access.",
       "sign_up_now": "Sign up now",
       "title": "Sign in"
     },
@@ -771,7 +771,7 @@
         }
       },
       "basic_and_up": "Basic and Advanced",
-      "subtitle": "The free app covers the essentials. Paid plans raise the limits, and Basic and Advanced add analytics, AI assistant access and sync. Every plan funds rotki's independent, open source development.",
+      "subtitle": "The free app covers the essentials. Basic and Advanced raise the limits and add analytics, AI assistant access and sync. If those are more than you want to spend, Supporter lets you back the project and gives you more room for your history.",
       "compare_plans": "Compare plans",
       "title": "Go further with rotki Premium",
       "whats_included": "What's included"
@@ -1126,7 +1126,7 @@
     }
   },
   "products": {
-    "description": "Every paid plan raises the limits on your history and reports. Basic and Advanced also add graphs and analytics, ETH staking tracking, AI assistant access over MCP, encrypted backup and sync across devices, and customer support. Every subscription funds rotki's independent, open source development.",
+    "description": "Basic and Advanced raise the limits on your history and reports and add graphs and analytics, ETH staking tracking, AI assistant access over MCP, encrypted backup and sync across devices, and customer support. If that is more than you want to spend, Supporter lets you back the project and still raises your limits. Every subscription funds rotki's independent, open source development.",
     "features": {
       "analytics": {
         "asset_amount_and_value": {
@@ -1184,7 +1184,7 @@
         },
         "title": "More room for your history",
         "user_notes": {
-          "description": "Free users can keep up to 10 notes. Premium users can keep as many as they like.",
+          "description": "Free users can keep up to 10 notes. Every paid plan lets you keep as many as you like.",
           "title": "User notes"
         },
         "validators": {
@@ -1214,7 +1214,7 @@
         "title": "Staking insights"
       },
       "sync_db_with_server": {
-        "description": "On Basic and Advanced, back up your database and restore or sync it on other devices. It is encrypted with your password before upload, so only you can read it.",
+        "description": "Back up your database and restore or sync it on other devices. It is encrypted with your password before upload, so only you can read it.",
         "title": "Sync across devices"
       },
       "timeframe": {
