@@ -45,6 +45,11 @@ type inflightEntry struct {
 	err     error
 }
 
+// SetPrefixTTL keeps images and 404s under a URL prefix for ttl instead of CacheTTL.
+func (s *Service) SetPrefixTTL(prefix string, ttl time.Duration) {
+	s.cache.SetPrefixTTL(prefix, ttl)
+}
+
 // NewService creates a new image service.
 func NewService(cache *CacheManager, fetcher *Fetcher, logger *slog.Logger) *Service {
 	return &Service{

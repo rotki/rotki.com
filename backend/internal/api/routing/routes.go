@@ -10,6 +10,7 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/api/appconfig"
 	"github.com/rotki/rotki.com/backend/internal/api/csp"
 	"github.com/rotki/rotki.com/backend/internal/api/ens"
+	"github.com/rotki/rotki.com/backend/internal/api/logo"
 	nftapi "github.com/rotki/rotki.com/backend/internal/api/nft"
 	"github.com/rotki/rotki.com/backend/internal/api/oauth"
 	"github.com/rotki/rotki.com/backend/internal/api/paymentlog"
@@ -65,6 +66,9 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 
 	// ENS avatar proxy (with image caching)
 	mux.Handle("GET /api/ens/avatar", ens.NewHandler(imgSvc, logger))
+
+	// Seasonal logos from rotki/data, served same-origin (mapping cached, image on the disk cache)
+	mux.Handle("GET /api/logo/{name}", logo.NewHandler(mem, red, lck, imgSvc, cfg.Testing, logger))
 
 	svcs := &Services{
 		Releases: releasesHandler,

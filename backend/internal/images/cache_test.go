@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
 )
@@ -105,6 +106,27 @@ func TestNotFoundTTL(t *testing.T) {
 	}
 	if got := notFoundTTL("https://metadata.ens.domains/mainnet/avatar/nick.eth"); got != CacheTTL {
 		t.Errorf("non-IPFS 404 TTL = %s, want %s", got, CacheTTL)
+	}
+}
+
+func TestPrefixTTL(t *testing.T) {
+	cm := testCacheManager(t)
+	cm.SetPrefixTTL("https://raw.githubusercontent.com/rotki/data/", 10*time.Minute)
+
+	logo := "https://raw.githubusercontent.com/rotki/data/main/assets/icons/app_logo.png"
+	if got := cm.imageTTL(logo); got != 10*time.Minute {
+		t.Errorf("prefixed image TTL = %s, want 10m", got)
+	}
+	if got := cm.missTTL(logo); got != 10*time.Minute {
+		t.Errorf("prefixed 404 TTL = %s, want 10m", got)
+	}
+
+	other := "https://metadata.ens.domains/mainnet/avatar/nick.eth"
+	if got := cm.imageTTL(other); got != CacheTTL {
+		t.Errorf("other image TTL = %s, want %s", got, CacheTTL)
+	}
+	if got := cm.missTTL("https://ipfs.io/ipfs/bafybeiimage"); got != IPFSNotFoundTTL {
+		t.Errorf("IPFS 404 TTL = %s, want %s", got, IPFSNotFoundTTL)
 	}
 }
 

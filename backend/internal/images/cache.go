@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
@@ -40,6 +41,36 @@ type CacheManager struct {
 	dir    string
 	redis  *cache.Redis
 	logger *slog.Logger
+
+	prefixTTLMu sync.RWMutex
+	prefixTTLs  []prefixTTL
+}
+
+// prefixTTL keeps images under a URL prefix for a shorter time than CacheTTL.
+type prefixTTL struct {
+	prefix string
+	ttl    time.Duration
+}
+
+// SetPrefixTTL caches images and 404s whose URL starts with prefix for ttl instead of
+// CacheTTL, for upstreams that change a file in place. A failed refetch after the entry
+// expires still serves the copy on disk.
+func (m *CacheManager) SetPrefixTTL(prefix string, ttl time.Duration) {
+	m.prefixTTLMu.Lock()
+	defer m.prefixTTLMu.Unlock()
+	m.prefixTTLs = append(m.prefixTTLs, prefixTTL{prefix: prefix, ttl: ttl})
+}
+
+// prefixTTLFor returns the TTL registered for the URL's prefix, if any.
+func (m *CacheManager) prefixTTLFor(url string) (time.Duration, bool) {
+	m.prefixTTLMu.RLock()
+	defer m.prefixTTLMu.RUnlock()
+	for _, p := range m.prefixTTLs {
+		if strings.HasPrefix(url, p.prefix) {
+			return p.ttl, true
+		}
+	}
+	return 0, false
 }
 
 // NewCacheManager creates a new image cache manager.
@@ -81,7 +112,23 @@ func (m *CacheManager) GetMetadata(ctx context.Context, url string) (*Metadata, 
 
 // SetMetadata stores image metadata in Redis.
 func (m *CacheManager) SetMetadata(ctx context.Context, url string, meta *Metadata) {
-	m.setMetadata(ctx, url, meta, CacheTTL)
+	m.setMetadata(ctx, url, meta, m.imageTTL(url))
+}
+
+// imageTTL is how long a stored image's metadata is kept.
+func (m *CacheManager) imageTTL(url string) time.Duration {
+	if ttl, ok := m.prefixTTLFor(url); ok {
+		return ttl
+	}
+	return CacheTTL
+}
+
+// missTTL is how long a 404 is kept: a registered prefix TTL, else notFoundTTL.
+func (m *CacheManager) missTTL(url string) time.Duration {
+	if ttl, ok := m.prefixTTLFor(url); ok {
+		return ttl
+	}
+	return notFoundTTL(url)
 }
 
 func (m *CacheManager) setMetadata(ctx context.Context, url string, meta *Metadata, ttl time.Duration) {
@@ -159,7 +206,7 @@ func (m *CacheManager) Store404(ctx context.Context, url, etag, lastModified str
 		LastModified: lastModified,
 		CachedAt:     time.Now().UTC().Format(time.RFC3339),
 	}
-	ttl := notFoundTTL(url)
+	ttl := m.missTTL(url)
 	m.setMetadata(ctx, url, meta, ttl)
 	m.logger.Debug("cached 404 response", "url", url, "ttl", ttl)
 }
