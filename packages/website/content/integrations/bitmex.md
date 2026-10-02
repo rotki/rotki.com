@@ -5,7 +5,7 @@ type: exchange
 image: "/img/integrations/bitmex.svg"
 tagline: "BitMEX historical records via wallet history CSV import"
 intro: "BitMEX has shut down and its API is no longer available, so rotki no longer connects to it with an API key. If you traded there, import your saved BitMEX wallet history CSV to bring realised PnL, deposits, and withdrawals into your portfolio history and tax reports."
-metaDescription: "BitMEX has shut down and its API is gone. Import your saved BitMEX wallet history CSV into rotki to keep realised PnL, deposits, and withdrawals in your tax reports."
+metaDescription: "BitMEX has shut down and its API is gone. Import your saved wallet history CSV into rotki to keep realised PnL, deposits and withdrawals in your reports."
 keywords: "bitmex tax report, bitmex historical data, bitmex wallet history csv, bitmex realised pnl"
 features:
   - "CSV import of the BitMEX wallet history: realised PnL rows become margin position records with their fees, and completed deposits and withdrawals become asset movements."

@@ -9,7 +9,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 usePageSeo(
   'Supported exchanges, blockchains and DeFi protocols',
-  'Every exchange, blockchain and DeFi protocol rotki supports, from Kraken and Coinbase to Ethereum, Solana, Aave and Uniswap. Track them all locally and privately.',
+  'Every exchange, blockchain and DeFi protocol rotki supports, from Kraken and Coinbase to Ethereum, Solana, Aave and Uniswap, tracked locally and privately.',
   '/integrations',
 );
 

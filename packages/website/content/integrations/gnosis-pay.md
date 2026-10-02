@@ -5,7 +5,7 @@ type: protocol
 image: "/img/integrations/gnosis_pay.png"
 tagline: "Gnosis Pay spends, refunds, and cashback, decoded locally"
 intro: "rotki decodes your Gnosis Pay activity on Gnosis Chain - card spends, refunds, cashback, and referral rewards - through your Safe. Gnosis Pay is closing its consumer card and web app on December 20, 2026, and your card history stays readable on-chain after that. Connecting your Gnosis Pay account to enrich spends with merchant details is part of the Basic and Advanced plans. You choose which Gnosis RPC endpoint handles the queries."
-metaDescription: "rotki decodes your Gnosis Pay card spends, refunds, cashback, and referral rewards on Gnosis Chain, including your history after the consumer card closes on December 20, 2026."
+metaDescription: "rotki decodes your Gnosis Pay card spends, refunds, cashback and rewards on Gnosis Chain, including your history after the card closes on December 20, 2026."
 keywords: "gnosis pay tracker, gnosis pay card, gnosis pay cashback, gnosis pay shutdown, gnosis pay transaction history, gnosis pay accounting"
 features:
   - "Card spends decoded as payment events on the free tier."

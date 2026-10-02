@@ -11,7 +11,7 @@ import MintTierSelection from '~/modules/web3/sponsorship/components/mint/MintTi
 import SponsorHowItWorks from '~/modules/web3/sponsorship/components/mint/SponsorHowItWorks.vue';
 import { useMintFlow } from '~/modules/web3/sponsorship/use-mint-flow';
 
-usePageSeo('Sponsor rotki: fund open source, privacy-first software', 'Mint a sponsorship NFT for the next rotki release. Fund independent, local-first portfolio software and get your name in the release.', '/sponsor/mint', {
+usePageSeo('Sponsor rotki: fund privacy-first open source', 'Mint a sponsorship NFT for the next rotki release. Fund independent, local-first portfolio software and get your name in the release.', '/sponsor/mint', {
   ogImage: 'mint.png',
   keywords: 'open source sponsorship, open source funding, privacy software, local-first software, crypto sponsorship, NFT sponsorship, rotki sponsor',
 });
