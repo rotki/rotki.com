@@ -91,8 +91,7 @@
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/bitmex.svg",
-      "label": "Bitmex",
-      "isExchangeWithKey": true
+      "label": "Bitmex"
     },
     {
       "image": "https://raw.githubusercontent.com/rotki/rotki/develop/frontend/app/public/assets/images/protocols/coinbase.svg",

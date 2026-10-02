@@ -79,7 +79,6 @@
       "rotkehlchen/exchanges/bitfinex.py"
     ],
     "bitmex": [
-      "rotkehlchen/exchanges/bitmex.py",
       "rotkehlchen/data_import/importers/bitmex.py"
     ],
     "bitpanda": [
