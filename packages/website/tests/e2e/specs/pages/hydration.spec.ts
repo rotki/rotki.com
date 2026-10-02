@@ -7,7 +7,8 @@ import { test } from '../../support/test';
  * render that differs from that HTML leaves stale attributes in production, since Vue only patches
  * text when hydration mismatches. The dev server these tests run against reports every mismatch.
  */
-const PAGES: readonly string[] = ['/', '/pricing', '/download'];
+// `/` and `/products` render the plans and limits the site was built with, `/pricing` the full comparison
+const PAGES: readonly string[] = ['/', '/pricing', '/products', '/download'];
 
 /** Loads the page and returns the hydration warnings Vue logged while it hydrated. */
 async function hydrationWarnings(page: Page, path: string): Promise<string[]> {

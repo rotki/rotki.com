@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue';
 import type { PremiumTierInfo, PremiumTiersInfo } from '~/types/tiers';
 import { get } from '@vueuse/shared';
-import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
+import { builtTiersInfo, usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 
 type PaidTier = 'supporter' | 'basic' | 'advanced';
 
@@ -23,29 +23,18 @@ export type PlanLimits = Record<PaidTier, TierLimits> & {
   free: string;
 };
 
-/*
- * What `/webapi/2/tiers/info` returned on 2026-10-01. The prerendered HTML is built from
- * these, so crawlers and visitors without JavaScript still see real numbers; the browser
- * swaps in the live values once the tiers request resolves.
- */
-const FALLBACK_LIMITS: Record<PaidTier, Record<string, number>> = {
-  supporter: { historyEventsLimit: 3000, pnlEventsLimit: 3000, ethStakedLimit: 0, maxBackupSizeMb: 0, limitOfDevices: 1 },
-  basic: { historyEventsLimit: 30000, pnlEventsLimit: 30000, ethStakedLimit: 128, maxBackupSizeMb: 150, limitOfDevices: 2 },
-  advanced: { historyEventsLimit: 100000, pnlEventsLimit: 100000, ethStakedLimit: 384, maxBackupSizeMb: 600, limitOfDevices: 4 },
-};
-
 /** Free tier history and PnL limit enforced by the rotki app itself (`constants/limits.py`). */
 const FREE_EVENTS_LIMIT = 1000;
 
 const numberFormat = new Intl.NumberFormat('en-US');
 
-function readLimit(tier: PremiumTierInfo | undefined, key: string, fallback: number): number {
+function readLimit(tier: PremiumTierInfo | undefined, key: string): number | undefined {
   const value = tier?.limits[key];
-  return typeof value === 'number' ? value : fallback;
+  return typeof value === 'number' ? value : undefined;
 }
 
-function toTierLimits(tier: PremiumTierInfo | undefined, fallback: Record<string, number>): TierLimits {
-  const limit = (key: string): number => readLimit(tier, key, fallback[key] ?? 0);
+function toTierLimits(tier: PremiumTierInfo | undefined, fallback: PremiumTierInfo | undefined): TierLimits {
+  const limit = (key: string): number => readLimit(tier, key) ?? readLimit(fallback, key) ?? 0;
   return {
     events: numberFormat.format(limit('historyEventsLimit')),
     pnlEvents: numberFormat.format(limit('pnlEventsLimit')),
@@ -55,19 +44,25 @@ function toTierLimits(tier: PremiumTierInfo | undefined, fallback: Record<string
   };
 }
 
+function findTier(tiers: PremiumTiersInfo, name: PaidTier): PremiumTierInfo | undefined {
+  return tiers.find(tier => tier.name.toLowerCase() === name);
+}
+
 /**
- * Formats the limits of each paid tier, falling back per tier and per limit
- * when the API response is empty, partial or missing a tier.
+ * Formats the limits of each paid tier, falling back per tier and per limit to the tier
+ * details the site was built with when the live response is partial or missing a tier.
+ *
+ * @param tiers - the live tier details
+ * @param builtTiers - the tier details read when the site was built
  */
-export function buildPlanLimits(tiers: PremiumTiersInfo): PlanLimits {
-  const byName = (name: PaidTier): PremiumTierInfo | undefined =>
-    tiers.find(tier => tier.name.toLowerCase() === name);
+export function buildPlanLimits(tiers: PremiumTiersInfo, builtTiers: PremiumTiersInfo): PlanLimits {
+  const forTier = (name: PaidTier): TierLimits => toTierLimits(findTier(tiers, name), findTier(builtTiers, name));
 
   return {
     free: numberFormat.format(FREE_EVENTS_LIMIT),
-    supporter: toTierLimits(byName('supporter'), FALLBACK_LIMITS.supporter),
-    basic: toTierLimits(byName('basic'), FALLBACK_LIMITS.basic),
-    advanced: toTierLimits(byName('advanced'), FALLBACK_LIMITS.advanced),
+    supporter: forTier('supporter'),
+    basic: forTier('basic'),
+    advanced: forTier('advanced'),
   };
 }
 
@@ -77,6 +72,7 @@ export function buildPlanLimits(tiers: PremiumTiersInfo): PlanLimits {
  */
 export function usePlanLimits(): ComputedRef<PlanLimits> {
   const { tiersInformation } = usePremiumTiersInfo();
+  const builtTiers = builtTiersInfo();
 
-  return computed<PlanLimits>(() => buildPlanLimits(get(tiersInformation)));
+  return computed<PlanLimits>(() => buildPlanLimits(get(tiersInformation), builtTiers));
 }

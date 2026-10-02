@@ -70,6 +70,8 @@ export default defineConfig({
       env: {
         TEST: 'true',
         NUXT_PUBLIC_BASE_URL: `http://localhost:${port}`,
+        // The plans the pages are built with come from the mock API, like every other request here
+        TIERS_SNAPSHOT_URL: `http://localhost:${mockApiPort}`,
       },
       url: `http://localhost:${nuxtPort}`,
       reuseExistingServer: !process.env.CI,

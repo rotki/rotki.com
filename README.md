@@ -47,6 +47,21 @@ NUXT_PUBLIC_BASE_URL=https://localhost
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
+### Plans and prices
+
+The build reads the premium plans, prices and limits once, so prerendered pages carry them:
+from `https://rotki.com` when `NUXT_PUBLIC_BASE_URL` is on rotki.com, from `https://staging.rotki.com`
+otherwise (staging, local development, CI). Plan ids differ between the two, so a build never uses
+the other environment's plans. A build fails when the API does not answer.
+
+The dev server reuses the last answer for a day (`packages/website/node_modules/.cache/tiers-snapshot/`),
+keeps an older one when the API is unreachable, and fails only when it has none. Delete that folder to
+refetch. To read the plans from somewhere else, such as the e2e mock API, set:
+
+```dotenv
+TIERS_SNAPSHOT_URL=http://localhost:9999
+```
+
 ### Backend proxy
 
 You can configure the frontend to proxy the `/webapi` to a server running somewhere:

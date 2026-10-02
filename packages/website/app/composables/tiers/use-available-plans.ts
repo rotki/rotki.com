@@ -1,7 +1,8 @@
-import type { AvailablePlan, AvailablePlans, AvailablePlansResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ComputedRef, Ref } from 'vue';
+import { type AvailablePlan, type AvailablePlans, type AvailablePlansResponse, AvailablePlansResponseSchema, type SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { until } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import tiersSnapshot from 'virtual:tiers-snapshot';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { TIER_NAMES } from '~/types/pricing';
 import { PricingPeriod } from '~/types/tiers';
@@ -31,6 +32,15 @@ const defaultAvailablePlansData: AvailablePlansResponse = {
 };
 
 /**
+ * The plans the site was built with (production for rotki.com, staging otherwise), so
+ * prerendered pages carry real prices and plan ids before the live request returns.
+ */
+function builtPlans(): AvailablePlansResponse {
+  const parsed = AvailablePlansResponseSchema.safeParse(tiersSnapshot.availablePlans);
+  return parsed.success ? parsed.data : defaultAvailablePlansData;
+}
+
+/**
  * Composable for fetching available plans
  * Uses useState to cache data and prevent duplicate fetches across components
  */
@@ -38,7 +48,7 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
   const { fetchAvailablePlans } = useTiersApi();
 
   // useState persists across all component instances and contexts
-  const availablePlansData = useState<AvailablePlansResponse>('available-plans-data', () => defaultAvailablePlansData);
+  const availablePlansData = useState<AvailablePlansResponse>('available-plans-data', builtPlans);
   const pending = useState<boolean>('available-plans-pending', () => false);
   const fetched = useState<boolean>('available-plans-fetched', () => false);
 
@@ -55,7 +65,9 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
     set(pending, true);
     try {
       const response = await fetchAvailablePlans();
-      set(availablePlansData, response);
+      // A failed request comes back with no tiers; keep the plans the site was built with
+      if (response.tiers.length > 0)
+        set(availablePlansData, response);
       set(fetched, true);
     }
     finally {

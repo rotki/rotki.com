@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { SigilEvents } from '@rotki/sigil';
+import { useMounted } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import PricingFeatureItem from '~/components/pricings/PricingFeatureItem.vue';
@@ -61,9 +62,16 @@ const selectedPricingPeriod = ref<PricingPeriod>(PricingPeriod.MONTHLY);
 
 const mainStore = useMainStore();
 const { account } = storeToRefs(mainStore);
-const { availablePlans, country, pending: plansPending } = useAvailablePlans();
+const { availablePlans, country } = useAvailablePlans();
 const { tiersInformation } = usePremiumTiersInfo();
 const { countries } = useCountries();
+const isMounted = useMounted();
+
+/**
+ * Whether the visitor is signed in, from mount on. The page is prerendered signed out, and the
+ * startup plugin loads the account before hydration, so the first render must match the HTML.
+ */
+const signedIn = computed<boolean>(() => get(isMounted) && !!get(account));
 
 const countryName = computed<string>(
   () => getCountryName(get(country), get(countries)),
@@ -141,8 +149,9 @@ onMounted(() => {
           </PricingFeatureItem>
         </div>
 
+        <!-- The built-in plans render this from the first paint; the live answer then fills in the country -->
         <div
-          v-if="!account && !plansPending && availablePlans.length > 0"
+          v-if="!signedIn && availablePlans.length > 0"
           class="flex flex-col gap-2"
         >
           <div class="text-sm text-rui-text-secondary">

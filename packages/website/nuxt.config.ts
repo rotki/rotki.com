@@ -100,6 +100,7 @@ export default defineNuxtConfig({
     './modules/feature-seo/module.ts',
     './modules/ui-library/module.ts',
     './modules/card-payment-dev-proxy/module.ts',
+    './modules/tiers-snapshot/module.ts',
   ],
   /*
    * SSR bakes per-page <head> (title, meta, OG, JSON-LD) into the static HTML
