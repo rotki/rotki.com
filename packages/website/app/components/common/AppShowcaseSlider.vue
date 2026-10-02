@@ -74,24 +74,21 @@ function getFetchPriority(index: number): 'high' | 'auto' {
 }
 
 /**
- * Responsive srcset for the first image only (the LCP element). Pre-generated
- * width variants live in a `responsive/` subfolder (the module only lists files
- * directly in the screenshots folder); the original webp is the 2880w source. Mobile pulls a ~14-40KB variant
- * instead of the 78KB source.
+ * Responsive srcset for every slide. Pre-generated width variants live in a
+ * `responsive/` subfolder (the module only lists files directly in the
+ * screenshots folder), so every screenshot needs its 640w, 960w and 1440w
+ * variants there; the original webp is the 2880w source. Phones pull a
+ * ~13-37KB variant instead of the 87-150KB source.
+ *
+ * For `/img/screenshots/1-sc-dashboard.webp` the variants are
+ * `/img/screenshots/responsive/1-sc-dashboard-640w.webp` and so on.
  */
-function getSrcset(image: ScreenshotImage, index: number): string | undefined {
-  if (index !== 0)
-    return undefined;
-  // /img/screenshots/1-sc-dashboard.webp -> /img/screenshots/responsive/1-sc-dashboard
+function getSrcset(image: ScreenshotImage): string {
   const base = image.src.replace(/\/([^/]+)\.webp$/, '/responsive/$1');
   return `${base}-640w.webp 640w, ${base}-960w.webp 960w, ${base}-1440w.webp 1440w, ${image.src} 2880w`;
 }
 
-const firstImageSizes = '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px';
-
-function getSizes(index: number): string | undefined {
-  return index === 0 ? firstImageSizes : undefined;
-}
+const imageSizes = '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px';
 
 /**
  * Preloads the LCP image with the same srcset and sizes as the `<img>`, so the
@@ -105,8 +102,8 @@ if (firstImage) {
       as: 'image',
       fetchpriority: 'high',
       href: firstImage.src,
-      imagesizes: firstImageSizes,
-      imagesrcset: getSrcset(firstImage, 0),
+      imagesizes: imageSizes,
+      imagesrcset: getSrcset(firstImage),
       rel: 'preload',
       type: 'image/webp',
     }],
@@ -134,8 +131,8 @@ if (firstImage) {
       >
         <img
           :src="image.src"
-          :srcset="getSrcset(image, i)"
-          :sizes="getSizes(i)"
+          :srcset="getSrcset(image)"
+          :sizes="imageSizes"
           :alt="image.alt"
           width="1440"
           height="810"

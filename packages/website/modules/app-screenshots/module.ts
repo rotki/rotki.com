@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { addTypeTemplate, addVitePlugin, defineNuxtModule } from '@nuxt/kit';
 
@@ -6,7 +6,8 @@ const VIRTUAL_ID = 'virtual:app-screenshots';
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
 
 const SCREENSHOT_DIR = 'public/img/screenshots';
-const EXTENSIONS = new Set(['.webp', '.png', '.jpg', '.jpeg']);
+/** Slides must be webp: their width variants and the slider's srcset are webp-only. */
+const EXTENSION = '.webp';
 
 /**
  * Enumerate the showcase screenshots at build time.
@@ -19,21 +20,32 @@ const EXTENSIONS = new Set(['.webp', '.png', '.jpg', '.jpeg']);
  * Reading the directory ourselves keeps the list auto-discovered without
  * depending on `public/` being part of the graph.
  *
- * The `responsive/` subfolder holds pre-generated width variants of the first
+ * The `responsive/` subfolder holds pre-generated width variants of each
  * slide, not slides of its own, so only files directly in the folder count.
  */
 function readScreenshots(dir: string): string[] {
   const entries = readdirSync(dir, { withFileTypes: true });
   return entries
-    .filter(entry => entry.isFile() && EXTENSIONS.has(extname(entry.name)))
+    .filter(entry => entry.isFile() && entry.name.endsWith(EXTENSION))
     .map(entry => entry.name)
     .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
     .map(name => `/img/screenshots/${name}`);
 }
 
-function extname(name: string): string {
-  const dot = name.lastIndexOf('.');
-  return dot === -1 ? '' : name.slice(dot).toLowerCase();
+/** Widths the slider's srcset asks for; each lives at `responsive/<name>-<width>w.webp`. */
+const VARIANT_WIDTHS = [640, 960, 1440];
+
+/**
+ * Lists the width variants missing from `responsive/`. The slider's srcset
+ * references all of them, so a missing one is a broken image on phones.
+ */
+function findMissingVariants(dir: string, screenshots: string[]): string[] {
+  return screenshots.flatMap((src) => {
+    const name = src.slice(src.lastIndexOf('/') + 1, -EXTENSION.length);
+    return VARIANT_WIDTHS
+      .map(width => `responsive/${name}-${width}w.webp`)
+      .filter(variant => !existsSync(resolve(dir, variant)));
+  });
 }
 
 export default defineNuxtModule({
@@ -51,6 +63,10 @@ export default defineNuxtModule({
         const screenshots = readScreenshots(dir);
         if (screenshots.length === 0)
           this.warn(`no screenshots found in ${SCREENSHOT_DIR} — the showcase carousel will be empty`);
+
+        const missing = findMissingVariants(dir, screenshots);
+        if (missing.length > 0)
+          this.error(`missing width variants in ${SCREENSHOT_DIR}: ${missing.join(', ')}`);
 
         return `export default ${JSON.stringify(screenshots)};`;
       },
