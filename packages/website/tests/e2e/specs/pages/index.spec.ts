@@ -92,6 +92,47 @@ test.describe('homepage', () => {
       page.getByRole('button', { name: 'Compare plans' }).first(),
     ).toBeVisible();
   });
+
+  for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
+    test(`lays the dashboard message over the hero without moving it (${viewport.width}px)`, async ({ page }) => {
+      const now = Math.floor(Date.now() / 1000);
+      let messages: object[] = [];
+      await setupTiersMocks(page);
+      await page.setViewportSize(viewport);
+      await page.route('**/api/messages/dashboard', async route => route.fulfill({ json: messages }));
+      const githubRequests: string[] = [];
+      page.on('request', (request) => {
+        if (request.url().includes('raw.githubusercontent.com/rotki/data/'))
+          githubRequests.push(request.url());
+      });
+
+      const heading = page.getByRole('heading', { level: 1 });
+      const eyebrow = page.getByRole('link', { name: /Local-first, unlike cloud/ });
+
+      await page.goto('/');
+      await expect(heading).toBeVisible();
+      const withoutMessage = await heading.boundingBox();
+
+      messages = [{
+        action: { text: 'Donate via Octant', url: 'https://example.com' },
+        message: 'Enjoying rotki? rotki is part of',
+        message_highlight: 'Octant Epoch 12 featuring properQF',
+        period: { end: now + 3600, start: now - 3600 },
+      }];
+      await page.reload();
+      const link = page.getByRole('link', { name: 'Donate via Octant' });
+      await expect(link).toBeVisible();
+
+      // The hero stays put, and the bar fits in the padding above the eyebrow link
+      expect(await heading.boundingBox()).toEqual(withoutMessage);
+      const linkBox = await link.boundingBox();
+      const eyebrowBox = await eyebrow.boundingBox();
+      expect(linkBox!.y + linkBox!.height).toBeLessThanOrEqual(eyebrowBox!.y);
+      expect(linkBox!.x + linkBox!.width).toBeLessThanOrEqual(viewport.width);
+
+      expect(githubRequests).toEqual([]);
+    });
+  }
 });
 
 test.describe('download page', () => {

@@ -9,9 +9,6 @@ var BaseCSP = Policy{
 	"default-src": {"'self'"},
 	"connect-src": {
 		"'self'",
-		"api.github.com",
-		"raw.githubusercontent.com/rotki/data/",
-		"raw.githubusercontent.com/rotki/rotki.com/",
 		"sigil.rotki.com",
 	},
 	"font-src":        {"'self'", "data:", "fonts.gstatic.com"},
