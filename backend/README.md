@@ -1,6 +1,6 @@
 # rotki.com Go Backend
 
-A lightweight Go server that serves the static Nuxt-generated site and a small set of `/api` routes (OAuth token exchange, NFT sponsorship, ENS avatars, releases, the seasonal logo, CSP and payment error reports).
+A lightweight Go server that serves the static Nuxt-generated site and a small set of `/api` routes (OAuth token exchange, NFT sponsorship, ENS avatars, releases, the seasonal logo and homepage messages, CSP and payment error reports).
 
 It does not serve `/webapi` or `/media` in production: Traefik routes those to the Python backend. In dev mode it can proxy them to a remote backend (`PROXY_DOMAIN`).
 
@@ -92,6 +92,7 @@ internal/
     csp/                     CSP violation report endpoint
     ens/                     ENS avatar proxy (resolves ENS names to avatar images)
     logo/                    Seasonal logos from rotki/data, served same-origin
+    messages/                Homepage dashboard messages from rotki/data, served same-origin
     nft/                     NFT tier-info, token metadata, image proxy
     oauth/                   OAuth token exchange (Google, Monerium)
     releases/                GitHub releases with multi-level caching
@@ -121,6 +122,7 @@ internal/
 | `GET`  | `/api/releases/latest`      | GitHub releases (cached)                                           |
 | `GET`  | `/api/ens/avatar`           | ENS avatar image proxy                                             |
 | `GET`  | `/api/logo/{name}`          | Seasonal logo from rotki/data (only `website`)                     |
+| `GET`  | `/api/messages/dashboard`   | Homepage messages from rotki/data, without the ones that ended     |
 | `GET`  | `/api/nft/tier-info`        | NFT tier information (only when `BASE_URL` is set)                 |
 | `GET`  | `/api/nft/{id}`             | NFT token metadata (only when `BASE_URL` is set)                   |
 | `GET`  | `/api/nft/image`            | NFT image proxy, IPFS (only when `BASE_URL` is set)                |
@@ -189,6 +191,7 @@ All dev-only flags (`NUXT_DEV_URL`, `PROXY_DOMAIN`, `PROXY_INSECURE`) are reject
 - **Redis (L2)**: Shared cache across instances (optional, degrades gracefully)
 - **Filesystem**: Image cache stored on disk with SHA-256 hashed filenames, served via zero-copy `http.ServeContent`. Entries live 7 days, except images from rotki/data (today only the logo), which refresh after 10 minutes
 - **Seasonal logo**: the rotki/data mapping is cached 10 minutes, with a 7-day stale copy for when GitHub is unreachable; browsers cache the image for 5 minutes, so a new logo shows up within about 15 minutes of its rotki/data commit
+- **Dashboard messages**: `messages/dashboard.json` is cached the same way (10 minutes, 7-day stale copy, 5 minutes in the browser); messages that ended are dropped on every request, so a cached copy never brings one back
 - **Background warming**: Scheduler pre-warms NFT image and release caches on configurable intervals
 
 ## GitHub Webhook

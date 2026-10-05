@@ -4,12 +4,16 @@ import {
   DashboardSchema,
   type VisibilityPeriod,
 } from '@/types/dynamic-messages';
-import { useAppConfig } from '~/composables/use-app-config';
 import { logger } from '~/utils/use-logger';
+
+/**
+ * The Go server reads `messages/dashboard.json` from rotki/data (develop when testing, main otherwise),
+ * caches it and drops messages that already ended, so the homepage makes no request to GitHub.
+ */
+const DASHBOARD_MESSAGES_URL = '/api/messages/dashboard';
 
 export const useDynamicMessages = createSharedComposable(() => {
   const dashboardMessages = ref<DashboardSchema>([]);
-  const { contentBranch: branch } = useAppConfig();
 
   const getValidMessages = <T extends { period: VisibilityPeriod }>(
     messages: T[],
@@ -28,14 +32,11 @@ export const useDynamicMessages = createSharedComposable(() => {
 
   const getDashboardData = async (): Promise<DashboardSchema | null> => {
     try {
-      const response = await $fetch<DashboardSchema>(
-        `https://raw.githubusercontent.com/rotki/data/${get(branch)}/messages/dashboard.json`,
-        {
-          parseResponse(responseText: string) {
-            return convertKeys(JSON.parse(responseText), true, false);
-          },
+      const response = await $fetch<DashboardSchema>(DASHBOARD_MESSAGES_URL, {
+        parseResponse(responseText: string) {
+          return convertKeys(JSON.parse(responseText), true, false);
         },
-      );
+      });
       return DashboardSchema.parse(response);
     }
     catch (error: any) {

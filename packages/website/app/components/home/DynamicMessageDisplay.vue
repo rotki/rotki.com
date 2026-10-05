@@ -11,14 +11,16 @@ const { messages } = defineProps<{
 const { step, steps, onNavigate, onPause, onResume } = useRandomStepper(messages.length);
 
 const activeItem = computed<DashboardMessage | undefined>(() => messages[get(step) - 1]);
+
+// One line at every width: the homepage lays it over the hero's top padding, so it must never grow taller
 </script>
 
 <template>
   <div
-    class="px-4 py-2 text-body-1 text-rui-primary flex items-center justify-between border-b border-rui-divider w-full bg-rui-surface gap-4"
+    class="px-4 py-2 text-body-2 md:text-body-1 text-rui-primary flex items-center justify-between border-b border-rui-divider w-full bg-rui-surface gap-4"
   >
     <div
-      class="flex-1 md:text-center"
+      class="flex-1 min-w-0"
       @mouseover="onPause()"
       @mouseleave="onResume()"
     >
@@ -33,27 +35,29 @@ const activeItem = computed<DashboardMessage | undefined>(() => messages[get(ste
         <div
           v-if="activeItem"
           :key="step"
+          class="flex items-center md:justify-center gap-1 min-w-0 whitespace-nowrap"
         >
-          {{ activeItem.message }}
-          <div class="font-semibold inline">
-            <span
-              v-if="activeItem.messageHighlight"
-              class="mr-1"
-            >
-              {{ activeItem.messageHighlight }}
-            </span>
+          <!-- Phones show only the highlight and the link; the text before them is cut first -->
+          <span class="hidden md:inline truncate min-w-0">
+            {{ activeItem.message }}
+          </span>
+          <span
+            v-if="activeItem.messageHighlight"
+            class="font-semibold truncate min-w-0"
+          >
+            {{ activeItem.messageHighlight }}
+          </span>
 
-            <ButtonLink
-              v-if="activeItem.action"
-              color="primary"
-              inline
-              class="text-left -mx-1 md:text-center underline"
-              external
-              :to="activeItem.action?.url"
-            >
-              {{ activeItem.action.text }}
-            </ButtonLink>
-          </div>
+          <ButtonLink
+            v-if="activeItem.action"
+            color="primary"
+            inline
+            class="shrink-0 font-semibold underline"
+            external
+            :to="activeItem.action?.url"
+          >
+            {{ activeItem.action.text }}
+          </ButtonLink>
         </div>
       </TransitionGroup>
     </div>

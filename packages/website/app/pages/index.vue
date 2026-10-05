@@ -77,11 +77,15 @@ definePageMeta({
 </script>
 
 <template>
-  <DynamicMessageDisplay
-    v-if="activeDashboardMessages.length > 0"
-    :messages="activeDashboardMessages"
-  />
-  <HomeBanner />
+  <!-- The messages arrive after load; laid over the hero's top padding, they move nothing -->
+  <div class="relative">
+    <DynamicMessageDisplay
+      v-if="activeDashboardMessages.length > 0"
+      class="absolute inset-x-0 top-0 z-10"
+      :messages="activeDashboardMessages"
+    />
+    <HomeBanner />
+  </div>
   <FeatureList />
   <WhyRotki />
   <McpSpotlight />
