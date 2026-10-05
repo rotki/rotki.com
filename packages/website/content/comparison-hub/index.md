@@ -16,7 +16,7 @@ faq:
   - q: "Is there a private alternative to cloud crypto tax tools like Koinly or CoinTracker?"
     a: "Yes. rotki is designed as a local-first alternative: it keeps your data encrypted on your own device and queries exchanges and blockchains directly using your own API keys and RPC endpoints, so your full transaction history is not uploaded to a third-party server."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core portfolio tracking, accounting, and tax reporting (with some limits). A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core portfolio tracking, accounting, and tax reporting (with some limits). A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 ## How we compare

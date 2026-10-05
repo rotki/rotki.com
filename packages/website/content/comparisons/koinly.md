@@ -43,7 +43,7 @@ dimensions:
     rotki: "Free local tier covers core tracking, accounting, and reporting (with limits)"
     competitor: "Free to import and preview; a paid plan is needed to download full tax reports"
   - label: "Pricing model"
-    rotki: "Free, plus an optional subscription (Basic, Advanced, Custom)"
+    rotki: "Free, plus an optional subscription (Supporter, Basic, Advanced, or a custom plan)"
     competitor: "Tiered plans, typically priced by transaction volume"
   - label: "Tax country coverage"
     rotki: "Localized reports and standard exports generated on your machine"
@@ -87,7 +87,7 @@ faq:
   - q: "Can rotki handle DeFi like Koinly?"
     a: "Yes. rotki decodes on-chain activity, including many DeFi protocols, into readable events with full profit and loss accounting, all processed locally on your machine."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 Koinly and rotki solve the same problem from opposite ends. Both connect to your exchanges and wallets, reconcile your trades and transfers, and produce portfolio views and tax reports. The difference is architectural: Koinly is a hosted cloud service, and rotki is a local-first desktop application.

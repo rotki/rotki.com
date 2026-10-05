@@ -43,7 +43,7 @@ dimensions:
     rotki: "Free local tier covers core tracking, accounting, and reporting (with limits)"
     competitor: "Free to import transactions; a paid plan is needed to view or download tax reports"
   - label: "Pricing model"
-    rotki: "Free, plus an optional subscription (Basic, Advanced, Custom)"
+    rotki: "Free, plus an optional subscription (Supporter, Basic, Advanced, or a custom plan)"
     competitor: "Tiered plans, typically priced by transaction volume"
   - label: "Tax-professional workflows"
     rotki: "Self-serve local reports and exports"
@@ -85,7 +85,7 @@ faq:
   - q: "Does rotki work with tax professionals?"
     a: "rotki generates accounting and tax reports and standard exports locally that you can share with an accountant. ZenLedger emphasizes hosted features built specifically around tax professionals, which is a different model."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 ZenLedger is a hosted crypto tax platform with features aimed at investors and the tax professionals who serve them. rotki is a local-first, open-source desktop application. Both produce accounting and tax reports; the difference is whether your records live in a managed cloud account or on your own machine.

@@ -46,7 +46,7 @@ dimensions:
     rotki: "Free local tier covers core tracking, accounting, and reporting (with limits)"
     competitor: "Free portfolio tracking (transaction-capped); a paid plan is needed for tax reports"
   - label: "Pricing model"
-    rotki: "Free, plus an optional subscription (Basic, Advanced, Custom)"
+    rotki: "Free, plus an optional subscription (Supporter, Basic, Advanced, or a custom plan)"
     competitor: "Tiered plans, typically priced by transaction volume"
   - label: "On-chain decoding"
     rotki: "Decodes on-chain activity into readable events with full PnL accounting"
@@ -84,7 +84,7 @@ faq:
   - q: "Is rotki a good alternative to CoinTracker?"
     a: "If privacy, self-custody, and open source matter to you, yes. rotki covers portfolio tracking, accounting, and tax reporting locally, with a free tier and an optional subscription for more."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 CoinTracker and rotki both track your crypto portfolio and prepare tax reports, but they make a very different promise about where your data lives. CoinTracker is a cloud service built around convenience and mobile access. rotki is a local-first desktop application built around privacy and ownership.

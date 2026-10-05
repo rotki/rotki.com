@@ -43,7 +43,7 @@ dimensions:
     rotki: "Free local tier covers core tracking, accounting, and reporting (with limits)"
     competitor: "Free tier with limits; a paid plan is needed for full tax reports"
   - label: "Pricing model"
-    rotki: "Free, plus an optional subscription (Basic, Advanced, Custom)"
+    rotki: "Free, plus an optional subscription (Supporter, Basic, Advanced, or a custom plan)"
     competitor: "Tiered plans, typically priced by transaction volume"
   - label: "DeFi and NFT decoding"
     rotki: "Decodes DeFi and NFT activity into readable events with full PnL accounting"
@@ -85,7 +85,7 @@ faq:
   - q: "Can I move my data from another tool into rotki?"
     a: "rotki imports through exchange API keys, your public addresses, and standard files. It does not offer a one-click hosted migration like Awaken's importer, because the work happens locally on your machine."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 Awaken and rotki both put on-chain activity at the center: DeFi positions, swaps, NFTs, and the messy reality of wallet history. Awaken does this as a hosted service, while rotki does it as a local-first, open-source desktop application that decodes your activity on your own machine.

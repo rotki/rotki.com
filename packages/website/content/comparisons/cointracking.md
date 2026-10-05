@@ -43,7 +43,7 @@ dimensions:
     rotki: "Free local tier covers core tracking, accounting, and reporting (with limits)"
     competitor: "Free tier is transaction-capped and largely view-only after a short trial; paid plans to import and report"
   - label: "Pricing model"
-    rotki: "Free, plus an optional subscription (Basic, Advanced, Custom)"
+    rotki: "Free, plus an optional subscription (Supporter, Basic, Advanced, or a custom plan)"
     competitor: "Tiered plans, including longer-term and lifetime options"
   - label: "Reporting breadth"
     rotki: "Core accounting and tax reports generated locally"
@@ -85,7 +85,7 @@ faq:
   - q: "Does rotki have as many reports as CoinTracking?"
     a: "CoinTracking is known for a very broad catalog of reports and charts. rotki focuses on accurate core accounting and tax reports generated locally, with transparent on-chain decoding, rather than matching that breadth."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 CoinTracking is one of the oldest names in crypto tax software, known for a deep and report-heavy hosted platform. rotki approaches the same job as a local-first, open-source desktop application. Both will track your portfolio and produce tax reports; the question is whether you want that work done in the cloud or on your own machine.

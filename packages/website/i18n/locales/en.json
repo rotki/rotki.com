@@ -772,7 +772,7 @@
         }
       },
       "basic_and_up": "Basic and Advanced",
-      "subtitle": "The free app covers the essentials. Basic and Advanced raise the limits and add analytics, AI assistant access and sync. If those are more than you want to spend, Supporter lets you back the project and gives you more room for your history.",
+      "subtitle": "The free app covers the essentials. Basic and Advanced raise the limits and add analytics, AI assistant access and sync. If those are more than you want to spend, Supporter lets you back the project and gives you more room for your history. If you need more than Advanced, contact us for a custom plan.",
       "compare_plans": "Compare plans",
       "title": "Go further with rotki Premium",
       "whats_included": "What's included"
@@ -836,7 +836,7 @@
       },
       "docs": "documentation",
       "free": {
-        "a": "Yes. The free app covers portfolio tracking, history decoding and profit and loss reports for up to {free} events. Paid plans raise that limit, and Basic and Advanced add graphs, ETH staking tracking, AI assistant access over MCP and encrypted sync.",
+        "a": "Yes. The free app covers portfolio tracking, history decoding and profit and loss reports for up to {free} events. Paid plans raise that limit, and Basic and Advanced add graphs, ETH staking tracking, AI assistant access over MCP and encrypted sync. If Advanced is not enough, we offer custom plans.",
         "q": "Is rotki free?"
       },
       "integrations": {
@@ -1104,10 +1104,10 @@
     "page": {
       "eyebrow": "Pricing",
       "title": "Choose the plan that fits your portfolio",
-      "description": "Start free with the open source app. Upgrade for more history, synced devices, analytics and the MCP server, and cancel at any time.",
+      "description": "Start free with the open source app. Upgrade for more history, synced devices, analytics and the MCP server, and cancel at any time. If Advanced is not enough, contact us for a custom plan.",
       "billing_title": "Billing details"
     },
-    "custom_plan_info": "Contact us to get a custom plan that suits your needs.",
+    "custom_plan_info": "Need more than Advanced? Higher limits, set up for your needs.",
     "custom_plan_negotiable": "Negotiable",
     "custom_plan_bespoke_support": "Bespoke & Customization assistance",
     "per_month": "mo",
@@ -1127,7 +1127,7 @@
     }
   },
   "products": {
-    "description": "Basic and Advanced raise the limits on your history and reports and add graphs and analytics, ETH staking tracking, AI assistant access over MCP, encrypted backup and sync across devices, and customer support. If that is more than you want to spend, Supporter lets you back the project and still raises your limits. Every subscription funds rotki's independent, open source development.",
+    "description": "Basic and Advanced raise the limits on your history and reports and add graphs and analytics, ETH staking tracking, AI assistant access over MCP, encrypted backup and sync across devices, and customer support. If that is more than you want to spend, Supporter lets you back the project and still raises your limits. If Advanced is not enough, contact us for a custom plan with higher limits. Every subscription funds rotki's independent, open source development.",
     "features": {
       "analytics": {
         "asset_amount_and_value": {
@@ -1170,7 +1170,7 @@
         "title": "Events analysis"
       },
       "scales_with_your_need": {
-        "description": "Supporter, Basic and Advanced raise the event limit to {supporter}, {basic} and {advanced}, so you pick the plan that matches how much you track.",
+        "description": "Supporter, Basic and Advanced raise the event limit to {supporter}, {basic} and {advanced}, so you pick the plan that matches how much you track. If you need more than Advanced, a custom plan can go higher.",
         "title": "Plans that grow with you"
       },
       "limits": {

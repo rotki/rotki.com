@@ -17,7 +17,7 @@ faq:
   - q: "Is rotki really local and private?"
     a: "Yes. rotki runs as a desktop app on your machine. It reads exchanges with read-only API keys and chains via RPC endpoints you choose, and stores your data in a local database encrypted with SQLCipher (256-bit AES). Your financial data never passes through rotki-operated servers."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core portfolio tracking, accounting and tax reporting with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core portfolio tracking, accounting and tax reporting with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 ## What these guides cover

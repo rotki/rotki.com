@@ -43,7 +43,7 @@ dimensions:
     rotki: "Free local tier covers core tracking, accounting, and reporting (with limits)"
     competitor: "Free to import and preview; a paid plan is needed to download full tax reports"
   - label: "Pricing model"
-    rotki: "Free, plus an optional subscription (Basic, Advanced, Custom)"
+    rotki: "Free, plus an optional subscription (Supporter, Basic, Advanced, or a custom plan)"
     competitor: "Tiered plans, typically priced by transaction volume"
   - label: "Tax-software exports"
     rotki: "Standard reports and exports you generate locally"
@@ -85,7 +85,7 @@ faq:
   - q: "Can rotki export reports for tax filing?"
     a: "Yes. rotki generates accounting and tax reports and standard exports locally on your machine. CoinLedger emphasizes direct integrations with consumer filing software, which rotki does not aim to replicate."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features."
+    a: "rotki has a free local tier that covers core functionality with some limits. A premium subscription unlocks higher limits and additional features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 CoinLedger is built around getting you to a finished tax report quickly, with exports into consumer filing software. rotki is a local-first, open-source desktop application that produces the same kind of reports while keeping your data on your own machine. The tools overlap on output but differ on where your data lives.

@@ -59,7 +59,7 @@ faq:
   - q: "Does my accounting data leave my computer?"
     a: "No, not by default. rotki processes and stores your accounting locally. Optional premium sync uploads only data already encrypted on your device."
   - q: "Is rotki free?"
-    a: "rotki has a free local tier covering core accounting and reporting with some limits, plus a premium subscription for higher limits and extra features."
+    a: "rotki has a free local tier covering core accounting and reporting with some limits, plus a premium subscription for higher limits and extra features. If Advanced is not enough, we offer custom plans with higher limits."
 ---
 
 Crypto accounting means turning a messy stream of trades, transfers and on-chain events into a coherent ledger you can report from. rotki does that work locally: it lives on your computer, reads your accounts, and keeps the resulting books in an encrypted database that never has to leave your machine.
