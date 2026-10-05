@@ -11,6 +11,7 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/api/csp"
 	"github.com/rotki/rotki.com/backend/internal/api/ens"
 	"github.com/rotki/rotki.com/backend/internal/api/logo"
+	"github.com/rotki/rotki.com/backend/internal/api/messages"
 	nftapi "github.com/rotki/rotki.com/backend/internal/api/nft"
 	"github.com/rotki/rotki.com/backend/internal/api/oauth"
 	"github.com/rotki/rotki.com/backend/internal/api/paymentlog"
@@ -69,6 +70,9 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 
 	// Seasonal logos from rotki/data, served same-origin (mapping cached, image on the disk cache)
 	mux.Handle("GET /api/logo/{name}", logo.NewHandler(mem, red, lck, imgSvc, cfg.Testing, logger))
+
+	// Homepage dashboard messages from rotki/data, served same-origin (cached, ended messages dropped)
+	mux.Handle("GET /api/messages/dashboard", messages.NewHandler(mem, red, lck, cfg.Testing, logger))
 
 	svcs := &Services{
 		Releases: releasesHandler,

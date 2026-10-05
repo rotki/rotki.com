@@ -537,7 +537,7 @@ The `backend/` directory contains a Go server that replaces the Node.js SSR laye
 ### Architecture
 
 - Serves Nuxt-generated static files (`nuxt generate`) with SPA fallback
-- Handles a few API routes: OAuth token exchange, CSP and payment error reports, releases, ENS avatars, the seasonal logo, NFT sponsorship, GitHub webhooks
+- Handles a few API routes: OAuth token exchange, CSP and payment error reports, releases, ENS avatars, the seasonal logo, homepage messages, NFT sponsorship, GitHub webhooks
 - Does not serve `/webapi` or `/media` in production (Traefik routes them to the Python backend); dev mode can proxy them with `PROXY_DOMAIN`
 - Permanent redirects (`permanentRedirects` in `internal/api/routing/routes.go`), since the static preset cannot send real 301s
 - Background scheduler for cache warming (NFT images, releases)
