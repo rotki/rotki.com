@@ -1,51 +1,68 @@
 # rotki.com
 
-## Build Setup
+The [rotki.com](https://rotki.com) website: the public pages, the premium checkout, account
+management and NFT sponsorship.
+
+It is a pnpm workspace:
+
+| Package                        | What it is                                                                                      |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `packages/website`             | The Nuxt site, generated as static files (SSG)                                                  |
+| `packages/card-payment`        | The card checkout app, served under `/checkout/pay/card` with its own CSP                       |
+| `packages/card-payment-common` | Schemas and helpers shared by the website and the card app                                      |
+| `packages/sigil`               | The analytics event catalog                                                                     |
+| `backend/`                     | The Go server: serves the generated files and a few `/api` routes ([README](backend/README.md)) |
+
+In production there is no Node.js: one Go binary serves the generated files, and Traefik routes
+`/webapi` and `/media` to the Python backend (rotki-web).
+
+## Requirements
+
+- Node.js 24 (see `.nvmrc`) and pnpm 12
+- Go 1.27+ for the backend
+
+## Quick start
 
 ```bash
 # install dependencies
-$ pnpm install
+pnpm install
 
-# serve with hot reload at localhost:3000
-$ make dev-web
+# Go backend on localhost:3000 + Nuxt dev server on localhost:3001 (recommended)
+make dev
 
-# or start both Go backend + Nuxt dev server
-$ make dev
-
-# build for production and launch server
-$ pnpm run build
-$ pnpm start
+# build the static site and the card app into .output/public
+pnpm run build
 ```
 
 ## Setting up the environment
 
-Make sure the environment file exists
+Create a `.env` file in `packages/website`:
 
 ```bash
-$ touch .env
+touch packages/website/.env
 ```
 
-To avoid api call loop, which freezes the app, do not set the variable to `/`
+Set the public base URL. Do not set it to `/`: that causes an API call loop that freezes the app.
 
 ```dotenv
 NUXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-And input the RECAPTCHA public key there.
+Add the reCAPTCHA public key. You can get a testing key
+from [Google](https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do).
 
 ```dotenv
 NUXT_PUBLIC_RECAPTCHA_SITE_KEY=XXXX
 ```
 
-You can get a testing key
-from [developers google](https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do).
-
-if you are running behind https make sure to also add:
+If you run behind https with a self-signed certificate, also add:
 
 ```dotenv
 NUXT_PUBLIC_BASE_URL=https://localhost
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
+
+`packages/website/.env.example` and `packages/card-payment/.env.example` list the other variables.
 
 ### Plans and prices
 
@@ -64,21 +81,23 @@ TIERS_SNAPSHOT_URL=http://localhost:9999
 
 ### Backend proxy
 
-You can configure the frontend to proxy the `/webapi` to a server running somewhere:
+Without a local Python backend, the Go server in dev mode (`make dev` or `make dev-go`) can
+proxy `/webapi` and `/media` to a remote one. This only works in dev mode; the server refuses to
+start with these set otherwise (see [backend/README.md](backend/README.md#environment-variables)).
 
-For the `production` system you could use:
+For the production system:
 
 ```dotenv
 PROXY_DOMAIN=rotki.com
 ```
 
-or if `staging` is running you could set:
+For staging:
 
 ```dotenv
 PROXY_DOMAIN=staging.rotki.com
 ```
 
-If the server where you proxy doesn't run using `https` you can set so that the backend requests are proxied to `http`:
+If that server does not use https, proxy to http instead:
 
 ```dotenv
 PROXY_INSECURE=true
@@ -86,54 +105,80 @@ PROXY_INSECURE=true
 
 ## Run
 
-Run with the development server with the following command:
-
 ```bash
-# Both Go backend + Nuxt dev server (recommended)
-$ make dev
+# Go backend + Nuxt dev server (recommended), open http://localhost:3000
+make dev
 
-# Nuxt dev server only (accepts self-signed certs)
-$ make dev-web
+# Nuxt dev server only, on localhost:3001 (accepts self-signed certs)
+make dev-web
 
-# Go backend only (dev mode)
-$ make dev-go
+# Go backend only, in dev mode
+make dev-go
 ```
 
-## Testing Production Build Locally
+`make help` lists every target.
 
-When testing locally, it's recommended to use the production build behind a proxy instead of the development server:
+## Testing the production build locally
+
+The dev server renders differently from the generated site, so check SSR and hydration issues
+against a real build served by the Go server, the same way the Docker image runs:
 
 ```bash
-$ pnpm run build
-$ pnpm run preview
+pnpm run build                 # static site + card app -> .output/public
+make build-go                  # Go binary -> backend/server
+cd backend
+PORT=3000 STATIC_DIR=../.output/public BASE_URL=http://localhost:3000 ./server
 ```
 
-This is important because SSR (Server-Side Rendering) behaves differently between development mode and production builds. Running `pnpm run build` creates the same code that runs in production, and `pnpm run preview` runs a single-threaded Node server serving the final Nuxt app—similar to how it runs in Docker.
+This serves the pages and the `/api` routes only; `/webapi` calls (login, prices, checkout) need a
+Python backend. To send them to staging, run the server in dev mode with the Nuxt proxy turned off:
+
+```bash
+DEV_MODE=true NUXT_DEV_URL= PROXY_DOMAIN=staging.rotki.com \
+  PORT=3000 STATIC_DIR=../.output/public BASE_URL=http://localhost:3000 ./server
+```
+
+Build with a base URL that is not on rotki.com for this, so the built plans are staging's
+(see [Plans and prices](#plans-and-prices)).
+
+To run it behind the local Python backend stack instead, see the production-like setup in
+[backend/README.md](backend/README.md#quick-start).
 
 ## Lint
 
-To fix any lint errors you have to run
-
 ```bash
-pnpm lint:js --fix
+pnpm lint          # frontend
+pnpm lint:fix      # frontend, with fixes
+make lint          # Go + frontend
 ```
 
 ## Tests
 
-to run vitest
-
 ```bash
-pnpm test
-
-# run watch mode
-pnpm test:watch
+pnpm test          # unit tests (Vitest)
+pnpm test:watch    # unit tests in watch mode
+pnpm test:e2e      # end-to-end tests (Playwright)
+pnpm typecheck
+make test-go       # Go tests
 ```
 
-## Changes to activation, subscription and payment links
+## Links sent in emails
 
-For to the following urls, any change requires backend sync to avoid broken email links.
+The Python backend (rotki-web) sends emails that link to these pages. Changing a path or a query
+parameter breaks links in emails people already have, so sync any change with the backend first.
 
-/password/reset/[uid]/[token]
-/activate/[uid]/[token]/
-/checkout/pay/method?p=[number_of_months]&id=[subscription_id]
-/home
+| Path                                                         | Email                                          |
+| ------------------------------------------------------------ | ---------------------------------------------- |
+| `/activate/[uid]/[token]/`                                   | Account activation                             |
+| `/password/reset/[uid]/[token]`                              | Password reset                                 |
+| `/checkout/pay?id=[subscription_id]`                         | Crypto renewal                                 |
+| `/checkout/pay/method?planId=[plan_id]&id=[subscription_id]` | Crypto renewal                                 |
+| `/home`                                                      | Invoice                                        |
+| `/home/saved-cards`                                          | Payment failed, authorization failed, past due |
+
+`/home/payment-methods`, the old name of the saved cards page, still appears in sent emails. The
+Go server redirects it to `/home/saved-cards`; keep that redirect.
+
+## License
+
+rotki.com is licensed under the [GNU Affero General Public License v3.0](LICENSE.md).

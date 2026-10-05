@@ -1,6 +1,8 @@
 # rotki.com Go Backend
 
-A lightweight Go server that serves the static Nuxt-generated site, handles API routes (OAuth, NFT sponsorship, ENS avatars, releases, CSP reports), and reverse-proxies `/webapi` + `/media` to the Python backend.
+A lightweight Go server that serves the static Nuxt-generated site and a small set of `/api` routes (OAuth token exchange, NFT sponsorship, ENS avatars, releases, the seasonal logo, CSP and payment error reports).
+
+It does not serve `/webapi` or `/media` in production: Traefik routes those to the Python backend. In dev mode it can proxy them to a remote backend (`PROXY_DOMAIN`).
 
 ## Quick Start
 
@@ -36,7 +38,7 @@ PORT=3000 \
 
 ## Requirements
 
-- Go 1.26+
+- Go 1.27+
 - golangci-lint v2 (for linting)
 - Redis (optional — used for L2 cache; falls back to memory-only if unavailable)
 
@@ -56,8 +58,8 @@ PORT=3000 \
 | `IPFS_GATEWAYS`          | _(built-in list)_          |                         | Comma-separated https IPFS gateways in fallback order (`internal/ipfs`)    |
 | `DEV_MODE`               | `false`                    |                         | Enable dev-only features (changes defaults below)                          |
 | `NUXT_DEV_URL`           | _(empty)_                  | `http://localhost:3001` | Nuxt dev server URL — proxies pages/assets instead of serving static files |
-| `PROXY_DOMAIN`           | _(empty)_                  |                         | Backend domain for `/webapi` + `/media` reverse proxy                      |
-| `PROXY_INSECURE`         | `false`                    |                         | Use HTTP instead of HTTPS for proxy                                        |
+| `PROXY_DOMAIN`           | _(empty)_                  |                         | Dev only: backend domain for the `/webapi` + `/media` reverse proxy        |
+| `PROXY_INSECURE`         | `false`                    |                         | Dev only: use HTTP instead of HTTPS for that proxy                         |
 | `TLS_SKIP_VERIFY`        | `false`                    |                         | Skip TLS certificate verification for backend API calls (NFT config)       |
 | `LOG_LEVEL`              | `info`                     |                         | Log level: `debug`, `info`, `warn`, `error`                                |
 | `GITHUB_WEBHOOK_SECRET`  | _(empty)_                  |                         | Shared secret for GitHub webhook signature verification                    |
@@ -89,6 +91,7 @@ internal/
     routing/                 Route registration
     csp/                     CSP violation report endpoint
     ens/                     ENS avatar proxy (resolves ENS names to avatar images)
+    logo/                    Seasonal logos from rotki/data, served same-origin
     nft/                     NFT tier-info, token metadata, image proxy
     oauth/                   OAuth token exchange (Google, Monerium)
     releases/                GitHub releases with multi-level caching
@@ -97,7 +100,7 @@ internal/
   csp/                       CSP middleware (nonce injection into HTML responses)
   images/                    Image proxy with filesystem cache, dedup, conditional requests
   nft/                       NFT core service (blockchain interaction, metadata, ABI)
-  proxy/                     Reverse proxy for /webapi and /media
+  proxy/                     Dev only: Nuxt dev server proxy, /webapi and /media proxy
   safedialer/                SSRF-safe dialer (blocks private/loopback IPs)
   scheduler/                 Background task scheduler (cache warming)
   validate/                  Input validation utilities
@@ -106,21 +109,39 @@ internal/
 
 ## API Routes
 
-| Method | Path                        | Description                                       |
-| ------ | --------------------------- | ------------------------------------------------- |
-| `GET`  | `/health`                   | Health check (JSON)                               |
-| `GET`  | `/api/config`               | Runtime app config (feature flags)                |
-| `POST` | `/api/oauth/google/token`   | Google OAuth token exchange                       |
-| `POST` | `/api/oauth/monerium/token` | Monerium OAuth token exchange (PKCE)              |
-| `POST` | `/api/csp/violation`        | CSP violation report collector                    |
-| `GET`  | `/api/releases/latest`      | GitHub releases (cached)                          |
-| `GET`  | `/api/ens/avatar`           | ENS avatar image proxy                            |
-| `GET`  | `/api/nft/tier-info`        | NFT tier information                              |
-| `GET`  | `/api/nft/{id}`             | NFT token metadata                                |
-| `GET`  | `/api/nft/image`            | NFT image proxy (IPFS)                            |
-| `POST` | `/api/webhooks/github`      | GitHub webhook for release/NFT cache invalidation |
-| `*`    | `/webapi/**`                | Reverse proxy to Python backend                   |
-| `*`    | `/media/**`                 | Reverse proxy to Python backend                   |
+| Method | Path                        | Description                                                        |
+| ------ | --------------------------- | ------------------------------------------------------------------ |
+| `GET`  | `/health`                   | Health check (JSON)                                                |
+| `GET`  | `/robots.txt`               | Generated from `BASE_URL` (not in dev mode, Nuxt serves it)        |
+| `GET`  | `/api/config`               | Runtime app config (feature flags)                                 |
+| `POST` | `/api/oauth/google/token`   | Google OAuth token exchange                                        |
+| `POST` | `/api/oauth/monerium/token` | Monerium OAuth token exchange (PKCE)                               |
+| `POST` | `/api/csp/violation`        | CSP violation report collector                                     |
+| `POST` | `/api/logging/payment`      | Payment error reports from the frontend (logged, no PII)           |
+| `GET`  | `/api/releases/latest`      | GitHub releases (cached)                                           |
+| `GET`  | `/api/ens/avatar`           | ENS avatar image proxy                                             |
+| `GET`  | `/api/logo/{name}`          | Seasonal logo from rotki/data (only `website`)                     |
+| `GET`  | `/api/nft/tier-info`        | NFT tier information (only when `BASE_URL` is set)                 |
+| `GET`  | `/api/nft/{id}`             | NFT token metadata (only when `BASE_URL` is set)                   |
+| `GET`  | `/api/nft/image`            | NFT image proxy, IPFS (only when `BASE_URL` is set)                |
+| `POST` | `/api/webhooks/github`      | Release/NFT cache invalidation (only with `GITHUB_WEBHOOK_SECRET`) |
+| `*`    | `/webapi/**`, `/media/**`   | Dev only, with `PROXY_DOMAIN`: proxy to the Python backend         |
+
+Everything else is a static file from `STATIC_DIR` (or, in dev mode, proxied to the Nuxt dev server).
+
+### Redirects
+
+Nuxt route rules only produce a meta-refresh page under the static preset, which crawlers see
+as a 200, so permanent redirects live in the Go server (`permanentRedirects` in
+`internal/api/routing/routes.go`):
+
+| From                    | To                  | Why                                                        |
+| ----------------------- | ------------------- | ---------------------------------------------------------- |
+| `/sponsor`              | `/sponsor/mint`     | The sponsorship landing page                               |
+| `/home/payment-methods` | `/home/saved-cards` | Old name of the saved cards page, still linked from emails |
+
+`/bespoke` answers `410 Gone`. `/pricing` is not a redirect: it is a prerendered alias of
+`/checkout/pay`, with the same CSP.
 
 ## Development
 
@@ -164,9 +185,10 @@ All dev-only flags (`NUXT_DEV_URL`, `PROXY_DOMAIN`, `PROXY_INSECURE`) are reject
 
 ## Caching Strategy
 
-- **Memory (L1)**: In-process cache for hot data (releases, NFT config)
+- **Memory (L1)**: In-process cache for hot data (releases, NFT config, logo mapping)
 - **Redis (L2)**: Shared cache across instances (optional, degrades gracefully)
-- **Filesystem**: Image cache stored on disk with SHA-256 hashed filenames, served via zero-copy `http.ServeContent`
+- **Filesystem**: Image cache stored on disk with SHA-256 hashed filenames, served via zero-copy `http.ServeContent`. Entries live 7 days, except images from rotki/data (today only the logo), which refresh after 10 minutes
+- **Seasonal logo**: the rotki/data mapping is cached 10 minutes, with a 7-day stale copy for when GitHub is unreachable; browsers cache the image for 5 minutes, so a new logo shows up within about 15 minutes of its rotki/data commit
 - **Background warming**: Scheduler pre-warms NFT image and release caches on configurable intervals
 
 ## GitHub Webhook

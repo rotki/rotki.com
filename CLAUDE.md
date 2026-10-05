@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **rotki.com** website - a Nuxt 3 website for a cryptocurrency portfolio management service. The site handles premium subscriptions, payment processing, user account management, and content delivery.
+This is the **rotki.com** website - a Nuxt 4 website for a cryptocurrency portfolio management service. The site handles premium subscriptions, payment processing, user account management, and content delivery.
 
 ## Development Commands
 
@@ -30,8 +30,9 @@ pnpm test:watch   # Run tests in watch mode
 ### Testing
 
 ```bash
-pnpm cypress:run  # Run e2e tests headless
-pnpm cypress:open # Open Cypress UI
+pnpm test:e2e     # Run Playwright e2e tests (starts the mock API, Nuxt dev and the Go server)
+pnpm test:e2e:ui  # Open the Playwright UI
+make test-go      # Run Go tests
 ```
 
 ### Release Management
@@ -44,23 +45,23 @@ pnpm release      # Bump version and generate changelog
 
 ### Tech Stack
 
-- **Framework**: Nuxt 4.4.2 with Vue 3.5.30 and TypeScript
+- **Framework**: Nuxt 4 (static generation) with Vue 3.5 and TypeScript; versions live in the `pnpm-workspace.yaml` catalog
 - **UI Library**: @rotki/ui-library (custom component library)
-- **Styling**: TailwindCSS (preferred) + SCSS
+- **Styling**: TailwindCSS
 - **State Management**: Pinia with composition API
 - **Content**: @nuxt/content for markdown-based content
-- **Payment**: Braintree, PayPal, and crypto payments (Ethers.js)
-- **Testing**: Vitest + Cypress
-- **Package Manager**: pnpm
+- **Payment**: Braintree, PayPal, and crypto payments (viem + wagmi)
+- **Testing**: Vitest + Playwright
+- **Package Manager**: pnpm workspace (`packages/website`, `packages/card-payment`, `packages/card-payment-common`, `packages/sigil`)
 
 ### Key Architectural Patterns
 
 1. **Component Organization**: Components organized by feature domain (`components/account/`, `components/checkout/`, etc.)
 
 2. **Composables Pattern**: Business logic extracted into composables:
-   - `useAuth()` - Authentication state
-   - `useWeb3Payment()` - Crypto payment handling
-   - `useRotkiSponsorship()` - NFT sponsorship functionality
+   - `useWeb3Payment()` - Crypto payment handling (`modules/checkout`)
+   - `useWallet()` - Wallet connection (`modules/web3`)
+   - `useRotkiSponsorshipPayment()` - NFT sponsorship minting (`modules/web3/sponsorship`)
 
 3. **Type Safety**: Comprehensive TypeScript with Zod schemas for runtime validation
 
@@ -79,19 +80,23 @@ The main Pinia store (`store/index.ts`) handles:
 
 ### Web3 Integration
 
-- **Wallet Connection**: @reown/appkit for wallet connections
-- **Multi-chain Support**: Ethereum, Arbitrum, Base, Optimism, Gnosis
-- **Payment Tokens**: ETH and USDC support
+- **Wallet Connection**: @wagmi/core + viem, with an own WalletConnect connector (`modules/web3/core/connectors/`)
+- **Multi-chain Support**: Ethereum, Arbitrum, Base, Optimism, Gnosis (plus testnets, see `modules/web3/core/chains-viem.ts`)
+- **Payment Tokens**: listed by the Python backend (`/webapi/payment/crypto/options/` for checkout, `/webapi/nfts/payment-tokens/` for sponsorship)
 - **Network Switching**: Automatic network detection and switching
+- Wallet state is module-level and client-only, not in Pinia
 
 ## Development Guidelines
 
 ### File Structure Conventions
 
-- `components/` - Organized by feature (account, checkout, common, content)
+All paths are under `packages/website/app/`.
+
+- `components/` - Organized by feature (account, common, content, header, pricings, ...)
+- `modules/` - Feature modules with their own components and composables (checkout, sponsor, web3)
 - `composables/` - Business logic and state management
 - `pages/` - File-based routing with nested layouts
-- `layouts/` - Shared layouts (default, account, landing, jobs, sponsor)
+- `layouts/` - Shared layouts (default, account, jobs, minimal, sponsor)
 - `types/` - TypeScript type definitions
 - `utils/` - Pure utility functions
 
@@ -484,11 +489,10 @@ PROXY_INSECURE=true     # for http proxy in development
 - Mock servers for external API testing (OAuth, GitHub)
 - Run with `make test-go` or `make test-race`
 
-### E2E Tests (Cypress)
+### E2E Tests (Playwright)
 
 - Critical user flows (registration, payment, subscription)
-- Cross-browser compatibility
-- Mobile responsiveness testing
+- Run through the Go server in dev mode: pages from the Nuxt dev server, `/webapi` from a mock API (`tests/e2e/mock-api`)
 
 ## Payment Processing
 
@@ -533,8 +537,9 @@ The `backend/` directory contains a Go server that replaces the Node.js SSR laye
 ### Architecture
 
 - Serves Nuxt-generated static files (`nuxt generate`) with SPA fallback
-- Handles API routes: OAuth token exchange, CSP reports, releases, ENS avatars, NFT sponsorship, GitHub webhooks
-- Reverse-proxies `/webapi` and `/media` to the Python backend
+- Handles a few API routes: OAuth token exchange, CSP and payment error reports, releases, ENS avatars, the seasonal logo, NFT sponsorship, GitHub webhooks
+- Does not serve `/webapi` or `/media` in production (Traefik routes them to the Python backend); dev mode can proxy them with `PROXY_DOMAIN`
+- Permanent redirects (`permanentRedirects` in `internal/api/routing/routes.go`), since the static preset cannot send real 301s
 - Background scheduler for cache warming (NFT images, releases)
 - No Node.js runtime in production — single Go binary + static files
 
@@ -549,7 +554,7 @@ make check       # vet + lint + test (Go + frontend)
 
 ### Key Go Patterns
 
-- Go 1.26, minimal dependencies (stdlib `net/http`, go-redis)
+- Go 1.27, minimal dependencies (stdlib `net/http`, go-redis)
 - L1 (memory) + L2 (Redis) caching with graceful fallback
 - Filesystem-based image cache with zero-copy serving via `http.ServeContent`
 - Input validation via `internal/validate` package
@@ -589,10 +594,10 @@ make check       # vet + lint + test (Go + frontend)
 
 ### Web3 Integration
 
-- Use `useWeb3Connection()` composable for wallet connections
+- Use `useWallet()` for wallet connections
 - Handle network switching and validation
 - Implement proper error handling for blockchain interactions
-- Use `useRotkiSponsorship()` for NFT-related functionality
+- Use the composables in `modules/web3/sponsorship/` for NFT-related functionality
 
 ## Security Best Practices
 
