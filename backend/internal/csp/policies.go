@@ -140,7 +140,6 @@ var WalletConnectCSP = Policy{
 		"https://secure.walletconnect.org",
 		"https://tokens-data.1inch.io",
 		"https://tokens.1inch.io",
-		"https://ipfs.io",
 	},
 	"script-src": {
 		"chrome-extension:",
