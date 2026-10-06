@@ -76,7 +76,7 @@ func TestCacheManager_DiskMetadata(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			url := "https://ipfs.io/ipfs/" + tt.name
+			url := "ipfs://" + tt.name
 			cm.StoreImage(ctx, url, tt.data, "ignored/by-sniffing", "", "")
 
 			meta, ok := cm.DiskMetadata(url)
@@ -95,13 +95,13 @@ func TestCacheManager_DiskMetadata(t *testing.T) {
 		})
 	}
 
-	if _, ok := cm.DiskMetadata("https://ipfs.io/ipfs/never-stored"); ok {
+	if _, ok := cm.DiskMetadata("ipfs://never-stored"); ok {
 		t.Error("expected no metadata for a file that doesn't exist")
 	}
 }
 
 func TestNotFoundTTL(t *testing.T) {
-	if got := notFoundTTL("https://ipfs.io/ipfs/bafybeiimage"); got != IPFSNotFoundTTL {
+	if got := notFoundTTL("ipfs://bafybeiimage"); got != IPFSNotFoundTTL {
 		t.Errorf("IPFS 404 TTL = %s, want %s", got, IPFSNotFoundTTL)
 	}
 	if got := notFoundTTL("https://metadata.ens.domains/mainnet/avatar/nick.eth"); got != CacheTTL {
@@ -125,7 +125,7 @@ func TestPrefixTTL(t *testing.T) {
 	if got := cm.imageTTL(other); got != CacheTTL {
 		t.Errorf("other image TTL = %s, want %s", got, CacheTTL)
 	}
-	if got := cm.missTTL("https://ipfs.io/ipfs/bafybeiimage"); got != IPFSNotFoundTTL {
+	if got := cm.missTTL("ipfs://bafybeiimage"); got != IPFSNotFoundTTL {
 		t.Errorf("IPFS 404 TTL = %s, want %s", got, IPFSNotFoundTTL)
 	}
 }

@@ -14,7 +14,6 @@ import (
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
 	"github.com/rotki/rotki.com/backend/internal/ipfs"
-	"github.com/rotki/rotki.com/backend/internal/nft"
 )
 
 func testService(t *testing.T) (*Service, *httptest.Server) {
@@ -262,7 +261,7 @@ func TestService_ServeImage_RecoversIPFSImageFromDisk(t *testing.T) {
 	raw := "ipfs://bafybeiimage"
 
 	// With no-op Redis only the file remains, like metadata that expired or was cleared on a release
-	cm.StoreImage(context.Background(), nft.NormalizeIPFSURL(raw), pngBytes, "image/png", "", "")
+	cm.StoreImage(context.Background(), raw, pngBytes, "image/png", "", "")
 
 	rec := serve(context.Background(), svc, raw)
 	if rec.Code != http.StatusOK {
@@ -296,6 +295,9 @@ func TestIPFSETag(t *testing.T) {
 		url  string
 		want string
 	}{
+		{"ipfs://bafybeiimage", `"bafybeiimage"`},
+		{"ipfs://bafybeidir/art.png", `"bafybeidir/art.png"`},
+		{"ipfs://", ""},
 		{"https://ipfs.io/ipfs/bafybeiimage", `"bafybeiimage"`},
 		{"https://ipfs.io/ipfs/bafybeidir/art.png", `"bafybeidir/art.png"`},
 		{"https://ipfs.io/ipfs/bafybeiimage?filename=x.png", `"bafybeiimage"`},
@@ -321,13 +323,44 @@ func TestService_FetchAndCache_RecoversIPFSImageFromDisk(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	svc, cm := newTestService(t, ipfs.NewPool([]string{gateway.URL + "/ipfs/"}, logger))
 	raw := "ipfs://bafybeiimage"
-	cm.StoreImage(context.Background(), nft.NormalizeIPFSURL(raw), pngBytes, "image/png", "", "")
+	cm.StoreImage(context.Background(), raw, pngBytes, "image/png", "", "")
 
 	if err := svc.FetchAndCache(context.Background(), raw); err != nil {
 		t.Fatalf("expected warm to succeed from disk, got %v", err)
 	}
 	if got := hits.Load(); got != 0 {
 		t.Errorf("expected no gateway requests, got %d", got)
+	}
+}
+
+func TestService_ServeImage_AdoptsLegacyIPFSFile(t *testing.T) {
+	var hits atomic.Int32
+	gateway := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		w.WriteHeader(http.StatusBadGateway)
+	}))
+	defer gateway.Close()
+
+	logger := slog.New(slog.DiscardHandler)
+	svc, cm := newTestService(t, ipfs.NewPool([]string{gateway.URL + "/ipfs/"}, logger))
+	raw := "ipfs://bafybeiimage"
+
+	// Files cached before ipfs:// URLs were used directly are named after their ipfs.io URL
+	legacyURL := legacyIPFSPrefix + "bafybeiimage"
+	cm.StoreImage(context.Background(), legacyURL, pngBytes, "image/png", "", "")
+
+	rec := serve(context.Background(), svc, raw)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 from the legacy file, got %d", rec.Code)
+	}
+	if got := hits.Load(); got != 0 {
+		t.Errorf("expected no gateway requests, got %d", got)
+	}
+	if _, err := os.Stat(cm.filePath(hashFilename(raw))); err != nil {
+		t.Errorf("expected the file under its ipfs:// name: %v", err)
+	}
+	if _, err := os.Stat(cm.filePath(hashFilename(legacyURL))); !os.IsNotExist(err) {
+		t.Errorf("expected the legacy file to be gone, got %v", err)
 	}
 }
 
