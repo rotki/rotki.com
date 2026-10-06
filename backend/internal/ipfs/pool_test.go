@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"slices"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -105,6 +106,14 @@ func TestParseGateways(t *testing.T) {
 	}
 }
 
+func TestDefaultGateways_ExcludeRetired(t *testing.T) {
+	for _, g := range DefaultGateways {
+		if slices.Contains(retiredGateways, g) {
+			t.Errorf("default gateway %q is retired", g)
+		}
+	}
+}
+
 func TestIsIPFS(t *testing.T) {
 	p := NewPool([]string{"https://custom.example/ipfs/"}, testLogger())
 
@@ -115,8 +124,10 @@ func TestIsIPFS(t *testing.T) {
 		{"ipfs://bafkrei123", true},
 		{"ipfs://ipfs/bafkrei123", true},
 		{"ipfs://bafybei456/image.png", true},
-		{"https://ipfs.io/ipfs/bafkrei123", true},        // default gateway host
-		{"https://custom.example/ipfs/bafkrei123", true}, // configured gateway host
+		{"https://ipfs.filebase.io/ipfs/bafkrei123", true}, // default gateway host
+		{"https://ipfs.io/ipfs/bafkrei123", true},          // retired gateway host
+		{"https://dweb.link/ipfs/bafkrei123", true},        // retired gateway host
+		{"https://custom.example/ipfs/bafkrei123", true},   // configured gateway host
 		{"https://unknown.example/ipfs/bafkrei123", false},
 		{"https://metadata.ens.domains/mainnet/avatar/vitalik.eth", false},
 		{"ipfs://", false},
