@@ -214,9 +214,10 @@ func (m *CacheManager) Store404(ctx context.Context, url, etag, lastModified str
 // DiskMetadata builds metadata for an image file that is still on disk after its Redis
 // metadata is gone (expired, evicted, or cleared on a release). The content type is
 // sniffed from the file; files that aren't a supported image type are ignored.
-// Nothing is written: callers decide whether to store the rebuilt metadata.
+// No metadata is written: callers decide whether to store the rebuilt metadata.
 func (m *CacheManager) DiskMetadata(url string) (*Metadata, bool) {
 	filename := hashFilename(url)
+	m.adoptLegacyFile(url, filename)
 	f, err := m.OpenImage(filename)
 	if err != nil || f == nil {
 		return nil, false
@@ -245,6 +246,40 @@ func (m *CacheManager) DiskMetadata(url string) (*Metadata, bool) {
 		Size:        int(stat.Size()),
 		CachedAt:    stat.ModTime().UTC().Format(time.RFC3339),
 	}, true
+}
+
+// legacyIPFSPrefix is the gateway prefix ipfs:// image URLs used to be rewritten to before
+// being cached, so files stored before 2026-10 are named after the hash of that URL.
+const legacyIPFSPrefix = "https://ipfs.io/ipfs/"
+
+// adoptLegacyFile renames the file of an ipfs:// image stored under its legacy name to
+// its current one, so it is reused instead of fetched again. Redis metadata from before
+// the rename still names the legacy file and keeps serving it until it expires; the
+// rename only happens when that metadata is gone. It can be removed once the caches
+// in use no longer hold legacy files (the cost is one refetch per remaining image).
+func (m *CacheManager) adoptLegacyFile(url, filename string) {
+	rest, ok := strings.CutPrefix(url, "ipfs://")
+	if !ok {
+		return
+	}
+	path := m.filePath(filename)
+	if _, err := os.Stat(path); err == nil { //nolint:gosec // G703: path is SHA-256 hash, not user input
+		return
+	}
+	legacy := m.filePath(hashFilename(legacyIPFSPrefix + rest))
+	if _, err := os.Stat(legacy); err != nil { //nolint:gosec // G703: path is SHA-256 hash, not user input
+		return
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), dirPermissions); err != nil { //nolint:gosec // G703: path is SHA-256 hash, not user input
+		m.logger.Error("failed to create cache subdir", "path", filepath.Dir(path), "error", err)
+		return
+	}
+	if err := os.Rename(legacy, path); err != nil { //nolint:gosec // G703: path is SHA-256 hash, not user input
+		m.logger.Error("failed to rename legacy image file", "from", legacy, "to", path, "error", err)
+		return
+	}
+	m.logger.Info("renamed legacy image file", "url", url, "file", filename)
 }
 
 // sniffImageType detects an image media type from the first bytes of a file.

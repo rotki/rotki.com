@@ -72,44 +72,43 @@ func (s *Service) ServeImage(ctx context.Context, w http.ResponseWriter, r *http
 // maxAge controls the Cache-Control lifetime sent to clients; it does not affect
 // how long the image is kept in the server-side cache.
 func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWriter, r *http.Request, rawURL string, maxAge time.Duration) {
-	normalizedURL := nft.NormalizeIPFSURL(rawURL)
 	cacheKey := nft.ImageCacheKey(rawURL)
 
 	// Check conditional request headers against cached metadata
-	if s.handleConditional(ctx, w, r, normalizedURL, maxAge) {
+	if s.handleConditional(ctx, w, r, rawURL, maxAge) {
 		return
 	}
 
 	// Try to serve from cache
-	meta, hasMeta := s.cache.GetMetadata(ctx, normalizedURL)
+	meta, hasMeta := s.cache.GetMetadata(ctx, rawURL)
 	if hasMeta {
 		if meta.Is404() {
-			s.logger.Debug("serving cached 404", "url", normalizedURL)
+			s.logger.Debug("serving cached 404", "url", rawURL)
 			w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 			http.Error(w, "Image not found", http.StatusNotFound)
 			return
 		}
 
 		if meta.Filename != "" && meta.Size > 0 {
-			if served := s.serveCached(ctx, w, r, meta, normalizedURL, maxAge); served {
+			if served := s.serveCached(ctx, w, r, meta, rawURL, maxAge); served {
 				return
 			}
 			// File missing on disk — metadata was invalidated, fall through to re-fetch
 		}
-	} else if diskMeta, ok := s.recoverFromDisk(ctx, normalizedURL); ok {
-		if s.serveCached(ctx, w, r, diskMeta, normalizedURL, maxAge) {
+	} else if diskMeta, ok := s.recoverFromDisk(ctx, rawURL); ok {
+		if s.serveCached(ctx, w, r, diskMeta, rawURL, maxAge) {
 			return
 		}
 	}
 
 	// Cache miss — fetch once for all concurrent requests
-	s.logger.Debug("cache miss, fetching", "url", normalizedURL)
-	data, headers, err := s.fetchShared(ctx, cacheKey, normalizedURL)
+	s.logger.Debug("cache miss, fetching", "url", rawURL)
+	data, headers, err := s.fetchShared(ctx, cacheKey, rawURL)
 	if err != nil {
-		if s.serveStale(ctx, w, r, normalizedURL, err) {
+		if s.serveStale(ctx, w, r, rawURL, err) {
 			return
 		}
-		s.handleFetchError(ctx, w, normalizedURL, err)
+		s.handleFetchError(ctx, w, rawURL, err)
 		return
 	}
 
@@ -131,16 +130,14 @@ var ErrUnsupportedContentType = errors.New("unsupported image content type")
 // Used for cache warming. Images already cached on disk are skipped, so repeated
 // warming (e.g. scheduler retries) doesn't refetch them from upstream.
 func (s *Service) FetchAndCache(ctx context.Context, rawURL string) error {
-	normalizedURL := nft.NormalizeIPFSURL(rawURL)
-
-	if s.isCached(ctx, normalizedURL) {
+	if s.isCached(ctx, rawURL) {
 		return nil
 	}
-	if _, ok := s.recoverFromDisk(ctx, normalizedURL); ok {
+	if _, ok := s.recoverFromDisk(ctx, rawURL); ok {
 		return nil
 	}
 
-	data, headers, err := s.fetcher.FetchImage(ctx, normalizedURL)
+	data, headers, err := s.fetcher.FetchImage(ctx, rawURL)
 	if err != nil {
 		return err
 	}
@@ -149,7 +146,7 @@ func (s *Service) FetchAndCache(ctx context.Context, rawURL string) error {
 		return fmt.Errorf("%w: %s", ErrUnsupportedContentType, headers.ContentType)
 	}
 
-	s.cache.StoreImage(ctx, normalizedURL, data, headers.ContentType, headers.ETag, headers.LastModified)
+	s.cache.StoreImage(ctx, rawURL, data, headers.ContentType, headers.ETag, headers.LastModified)
 	return nil
 }
 
@@ -278,11 +275,8 @@ func (s *Service) recoverFromDisk(ctx context.Context, url string) (*Metadata, b
 // ipfsETag returns a strong ETag for IPFS content, built from its immutable content path
 // ("<cid>" or "<cid>/<subpath>"). It returns "" for URLs without an IPFS path.
 func ipfsETag(url string) string {
-	_, path, ok := strings.Cut(url, "/ipfs/")
-	if i := strings.IndexAny(path, "?#"); i >= 0 {
-		path = path[:i]
-	}
-	if !ok || path == "" {
+	path, ok := ipfsContentPath(url)
+	if !ok {
 		return ""
 	}
 	return `"` + path + `"`
@@ -310,7 +304,21 @@ func (s *Service) serveStale(ctx context.Context, w http.ResponseWriter, r *http
 
 // isContentAddressed reports whether a URL points at immutable IPFS content.
 func isContentAddressed(url string) bool {
-	return strings.Contains(url, "/ipfs/")
+	_, ok := ipfsContentPath(url)
+	return ok
+}
+
+// ipfsContentPath returns the immutable content path ("<cid>" or "<cid>/<subpath>") of an
+// ipfs:// URI or a gateway URL, without query or fragment.
+func ipfsContentPath(url string) (string, bool) {
+	path, ok := strings.CutPrefix(url, "ipfs://")
+	if !ok {
+		_, path, ok = strings.Cut(url, "/ipfs/")
+	}
+	if i := strings.IndexAny(path, "?#"); i >= 0 {
+		path = path[:i]
+	}
+	return path, ok && path != ""
 }
 
 // isCached reports whether an image has valid metadata and its file is present on disk.

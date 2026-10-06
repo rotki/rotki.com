@@ -93,25 +93,6 @@ func TestExtractBenefits(t *testing.T) {
 	}
 }
 
-func TestNormalizeIPFSURL(t *testing.T) {
-	tests := []struct {
-		input string
-		want  string
-	}{
-		{"ipfs://QmTest", "https://ipfs.io/ipfs/QmTest"},
-		{"ipfs://QmTest/path/to/file", "https://ipfs.io/ipfs/QmTest/path/to/file"},
-		{"https://example.com/image.png", "https://example.com/image.png"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			if got := NormalizeIPFSURL(tt.input); got != tt.want {
-				t.Errorf("NormalizeIPFSURL(%q) = %q, want %q", tt.input, got, tt.want)
-			}
-		})
-	}
-}
-
 func TestFindTierByID(t *testing.T) {
 	tier := FindTierByID(0)
 	if tier == nil || tier.Key != "bronze" {

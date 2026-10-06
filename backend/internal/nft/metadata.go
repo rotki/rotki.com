@@ -1,7 +1,5 @@
 package nft
 
-import "strings"
-
 // ProcessImageURL extracts the raw image URL from metadata.
 // The raw IPFS URL is stored internally; API handlers convert it
 // to an opaque proxy URL (e.g. /api/nft/image?tier=0) before
@@ -42,13 +40,4 @@ func ExtractBenefits(metadata *TierMetadata) string {
 // ProcessTierMetadata extracts all relevant fields from tier metadata.
 func ProcessTierMetadata(metadata *TierMetadata) (imageURL, benefits, releaseName string) {
 	return ProcessImageURL(metadata), ExtractBenefits(metadata), ExtractReleaseName(metadata)
-}
-
-// NormalizeIPFSURL converts ipfs:// URLs to HTTPS gateway URLs.
-func NormalizeIPFSURL(uri string) string {
-	if strings.HasPrefix(uri, "ipfs://") {
-		cid := strings.TrimPrefix(uri, "ipfs://")
-		return IPFSGateway + cid
-	}
-	return uri
 }
