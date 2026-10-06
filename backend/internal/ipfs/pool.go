@@ -1,7 +1,7 @@
 // Package ipfs resolves ipfs:// URIs across multiple HTTP gateways.
 //
-// Public gateways rate-limit aggressively (ipfs.io answers 429 with a
-// Retry-After of half an hour after a few dozen requests) and come and go,
+// Public gateways rate-limit aggressively and come and go (ipfs.io and
+// dweb.link stopped serving server-side requests in September 2026),
 // so a single gateway is not reliable. Pool tries gateways in order and puts
 // a gateway on cooldown when it rate-limits or fails, so later requests skip
 // it instead of hammering it.
@@ -37,13 +37,24 @@ const (
 )
 
 // DefaultGateways is the ordered list of public gateways used when none are configured.
-// Only gateways from known operators with independent infrastructure are listed:
-// dweb.link, w3s.link, nftstorage.link and ipfs.infura.io share ipfs.io's rate limit,
-// so they fail together, and Cloudflare's gateway has been shut down.
+// Only gateways from known operators with independent infrastructure are listed.
 var DefaultGateways = []string{
 	"https://ipfs.filebase.io/ipfs/",
 	"https://gateway.pinata.cloud/ipfs/",
+}
+
+// retiredGateways are public gateways that no longer serve server-side requests:
+// ipfs.io and dweb.link answer every request with 429 since 2026-09-21,
+// nftstorage.link, w3s.link and storacha.link redirect to them, and Cloudflare's
+// gateway has been shut down. They are never fetched from, but URLs on them are
+// still recognised as IPFS, so content they point at is resolved through Pool.
+var retiredGateways = []string{
 	"https://ipfs.io/ipfs/",
+	"https://dweb.link/ipfs/",
+	"https://nftstorage.link/ipfs/",
+	"https://w3s.link/ipfs/",
+	"https://storacha.link/ipfs/",
+	"https://cloudflare-ipfs.com/ipfs/",
 }
 
 // ErrContentRejected marks an attempt error caused by the content itself (e.g. an
@@ -95,10 +106,10 @@ func NewPool(gateways []string, logger *slog.Logger) *Pool {
 		gateways = DefaultGateways
 	}
 
-	// Recognise URLs on any known gateway (configured or default), so metadata that
-	// points at e.g. https://ipfs.io/ipfs/<cid> still gets the fallback.
+	// Recognise URLs on any known gateway (configured, default or retired), so metadata
+	// that points at e.g. https://ipfs.io/ipfs/<cid> still gets the fallback.
 	hosts := make(map[string]bool)
-	for _, g := range slices.Concat(gateways, DefaultGateways) {
+	for _, g := range slices.Concat(gateways, DefaultGateways, retiredGateways) {
 		if u, err := url.Parse(g); err == nil && u.Host != "" {
 			hosts[strings.ToLower(u.Host)] = true
 		}
