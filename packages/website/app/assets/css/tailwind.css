@@ -56,8 +56,12 @@
 }
 
 @theme {
-  --font-sans: 'Inter Variable', 'Inter Fallback Helvetica Neue', 'Inter Fallback Arial', 'Inter Fallback Noto Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback Courier New', 'Geist Mono Fallback Noto Sans Mono', 'Geist Mono', ui-monospace, sfmono-regular, menlo, consolas, monospace;
+  --font-sans:
+    'Inter Variable', 'Inter Fallback Helvetica Neue', 'Inter Fallback Arial', 'Inter Fallback Noto Sans', 'Inter',
+    ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    'Geist Mono Variable', 'Geist Mono Fallback Courier New', 'Geist Mono Fallback Noto Sans Mono', 'Geist Mono',
+    ui-monospace, sfmono-regular, menlo, consolas, monospace;
 }
 
 /* Only the app's own code: content, tests and scripts carry words that look like classes. */
