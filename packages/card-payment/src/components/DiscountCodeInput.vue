@@ -35,6 +35,16 @@ const isApplied = computed<boolean>(() => isValidDiscount(discountInfo));
 
 const hasError = computed<boolean>(() => isInvalidDiscount(discountInfo));
 
+/** The field's border, in the states RuiTextField draws: outline, focus ring, error. */
+const fieldsetClass = computed<string[]>(() => {
+  const ring = get(focused) ? ['ring-3'] : [];
+  if (get(hasError))
+    return ['border-rui-error ring-rui-error/20', ...ring];
+  if (ring.length > 0)
+    return ['border-rui-primary ring-rui-primary/20', ...ring];
+  return ['border-rui-outline group-hover:border-rui-neutral-500'];
+});
+
 const errorMessage = computed<string>(() => {
   const info = discountInfo;
   return isInvalidDiscount(info) ? info.error : '';
@@ -81,79 +91,47 @@ watch(value, clearErrorOnEdit);
     <!-- Input Form (shown when no valid discount is applied) -->
     <form
       v-if="!isApplied"
-      class="space-y-2"
       @submit.prevent="applyCode()"
     >
-      <div class="relative w-full flex items-center">
-        <div class="flex items-center shrink-0">
-          <div class="ml-3">
-            <svg
-              class="w-6 h-6 text-black/54"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-              />
-            </svg>
-          </div>
-        </div>
-        <div class="flex flex-1 overflow-hidden">
-          <!-- Input field -->
-          <input
-            v-model="value"
-            type="text"
-            class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
-            :disabled="loading"
-            @focus="focused = true"
-            @blur="focused = false"
+      <label
+        for="discount-code"
+        class="block mb-1 text-sm leading-5 font-medium"
+        :class="hasError ? 'text-rui-error' : 'text-rui-text'"
+      >
+        Discount/Referral Code
+      </label>
+      <div class="group relative flex items-center rounded-rui-control bg-white">
+        <svg
+          class="ml-3 size-4 shrink-0 text-rui-neutral-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.75"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
           />
-          <label
-            class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
-            :class="{
-              // Float by transform only (translate up to the notch + scale down).
-              // height and font-size stay constant across states so transition-all
-              // animates smoothly with no jump. Resting/floated are mutually
-              // exclusive so they never compete in the cascade (the conflict was
-              // order-dependent and broke when the ui-library stylesheet reordered).
-              'pl-4 -translate-y-7 scale-75': value || focused,
-              'pl-12': !value && !focused,
-              'text-rui-error': hasError,
-              'text-rui-primary': focused && !hasError,
-              'text-rui-success': !hasError && value && !focused,
-            }"
-          >
-            Discount/Referral Code
-          </label>
-          <fieldset
-            class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
-            :class="{
-              'border-2 border-rui-error': hasError,
-              'border-2 border-rui-success': !hasError && value && !focused,
-              'border-2 border-rui-primary': focused && !hasError,
-              'border border-black/23': !value && !hasError && !focused,
-            }"
-          >
-            <legend class="opacity-0 text-xs whitespace-break-spaces">
-              <span v-if="value || focused">{{ '  Discount/Referral Code  ' }}</span>
-              <span v-else>&#8203;</span>
-            </legend>
-          </fieldset>
-        </div>
-        <!-- Clear button (shown when discount code is invalid) -->
+        </svg>
+        <input
+          id="discount-code"
+          v-model="value"
+          type="text"
+          class="w-full bg-transparent px-3 py-1.5 text-sm/6 text-rui-text outline-hidden"
+          :disabled="loading"
+          @focus="focused = true"
+          @blur="focused = false"
+        />
         <button
           v-if="hasError"
           type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full outline-hidden! transition-all z-10"
+          class="mr-1 p-1.5 shrink-0 text-rui-neutral-500 hover:text-rui-error hover:bg-rui-error-soft rounded-full transition-colors"
           aria-label="Clear discount code"
           @click="reset()"
         >
           <svg
-            class="w-4 h-4"
+            class="size-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -161,60 +139,49 @@ watch(value, clearErrorOnEdit);
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="1.75"
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>
         </button>
-
-        <!-- Apply button -->
         <button
           v-else
           type="submit"
           :disabled="!value || loading"
-          class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-sm font-medium rounded-sm transition-colors z-10"
-          :class="{
-            'bg-gray-300 text-neutral-500 cursor-not-allowed': !value || loading,
-            'bg-rui-primary text-white hover:bg-rui-primary-darker': value && !loading,
-          }"
+          class="mr-1 px-3 py-0.5 shrink-0 text-sm/6 font-medium rounded-rui-control transition-colors"
+          :class="value && !loading ? 'bg-rui-primary text-white hover:bg-rui-primary-darker' : 'bg-rui-surface-muted text-rui-text-disabled cursor-not-allowed'"
         >
           <span v-if="loading">...</span>
           <span v-else>Apply Code</span>
         </button>
+        <fieldset
+          class="absolute top-0 left-0 w-full h-full min-w-0 rounded-rui-control pointer-events-none transition-all border transform-gpu"
+          :class="fieldsetClass"
+        />
       </div>
-
-      <!-- Error message -->
       <p
-        v-if="hasError"
-        class="text-xs leading-3 text-red-600 ml-2"
+        class="mt-1 text-xs"
+        :class="hasError ? 'text-rui-error' : 'text-rui-text-secondary'"
       >
-        {{ errorMessage }}
-      </p>
-
-      <!-- Hint -->
-      <p
-        v-else
-        class="text-xs leading-3 text-neutral-500 ml-2"
-      >
-        {{ hint }}
+        {{ hasError ? errorMessage : hint }}
       </p>
     </form>
 
     <!-- Applied Discount Display -->
     <div v-else>
       <div
-        class="flex items-center justify-between p-3 border border-green-700 rounded-md"
+        class="flex items-center justify-between p-3 border border-rui-success-border bg-rui-success-subtle rounded-rui-control"
       >
         <div class="flex-1">
           <div class="flex items-center gap-1">
-            <span class="text-xs text-neutral-500">
+            <span class="text-xs text-rui-text-secondary">
               {{ isValidDiscount(discountInfo) && discountInfo.isReferral ? 'Referral code applied:' : 'Discount code applied:' }}
             </span>
             <span class="text-xs font-bold uppercase">
               {{ model }}
             </span>
           </div>
-          <div class="text-sm font-semibold text-green-700">
+          <div class="text-sm font-semibold text-rui-success">
             <template v-if="isValidDiscount(discountInfo)">
               You save {{ discountInfo.discountedAmount }} €
               <template v-if="appliedDiscountAmount">
@@ -227,7 +194,7 @@ watch(value, clearErrorOnEdit);
         <!-- Remove button -->
         <button
           type="button"
-          class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full outline-hidden! transition-all"
+          class="p-1.5 text-rui-neutral-500 hover:text-rui-error hover:bg-rui-error-soft rounded-full transition-colors"
           aria-label="Remove discount"
           @click="reset()"
         >
@@ -246,7 +213,7 @@ watch(value, clearErrorOnEdit);
           </svg>
         </button>
       </div>
-      <div class="text-xs text-neutral-500 mt-2">
+      <div class="text-xs text-rui-text-secondary mt-2">
         * Applies to first payment only
       </div>
     </div>

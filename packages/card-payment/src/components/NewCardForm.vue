@@ -23,14 +23,28 @@ const focusedField = ref<string>('');
 interface FieldState {
   valid: boolean;
   touched: boolean;
-  hasContent: boolean;
+}
+
+type CardFieldKey = 'number' | 'expirationDate' | 'cvv';
+
+interface CardField {
+  key: CardFieldKey;
+  /** The container Braintree mounts the field's iframe into. */
+  id: string;
+  label: string;
 }
 
 const fieldStates = reactive(new Map<string, FieldState>([
-  ['number', { valid: false, touched: false, hasContent: false }],
-  ['expirationDate', { valid: false, touched: false, hasContent: false }],
-  ['cvv', { valid: false, touched: false, hasContent: false }],
+  ['number', { valid: false, touched: false }],
+  ['expirationDate', { valid: false, touched: false }],
+  ['cvv', { valid: false, touched: false }],
 ]));
+
+const cardFields: CardField[] = [
+  { key: 'number', id: 'card-number', label: 'Card Number' },
+  { key: 'expirationDate', id: 'expiration', label: 'Expiry Date' },
+  { key: 'cvv', id: 'cvv', label: 'CVV' },
+];
 
 function updateFieldState(field: string, updates: Partial<FieldState>): void {
   const current = fieldStates.get(field);
@@ -45,18 +59,31 @@ const fieldErrors = computed<Record<string, boolean | undefined>>(() => ({
   cvv: fieldStates.get('cvv')?.touched && !fieldStates.get('cvv')?.valid,
 }));
 
-const fieldContent = computed<Record<string, boolean>>(() => ({
-  number: fieldStates.get('number')?.hasContent ?? false,
-  expirationDate: fieldStates.get('expirationDate')?.hasContent ?? false,
-  cvv: fieldStates.get('cvv')?.hasContent ?? false,
-}));
-
 const isFormValid = computed<boolean>(() => {
   const numberValid = fieldStates.get('number')?.valid ?? false;
   const expiryValid = fieldStates.get('expirationDate')?.valid ?? false;
   const cvvValid = fieldStates.get('cvv')?.valid ?? false;
   return numberValid && expiryValid && cvvValid;
 });
+
+/** The label above a field, as RuiFieldLabel draws it. */
+function labelClass(key: CardFieldKey): string {
+  if (disabled)
+    return 'text-rui-text-disabled';
+  return get(fieldErrors)[key] ? 'text-rui-error' : 'text-rui-text';
+}
+
+/** The field's border, in the states RuiTextField draws: outline, focus ring, error, disabled. */
+function fieldsetClass(key: CardFieldKey): string[] {
+  if (disabled)
+    return ['border-rui-divider'];
+  const ring = get(focusedField) === key ? ['ring-3'] : [];
+  if (get(fieldErrors)[key])
+    return ['border-rui-error ring-rui-error/20', ...ring];
+  if (ring.length > 0)
+    return ['border-rui-primary ring-rui-primary/20', ...ring];
+  return ['border-rui-outline group-hover:border-rui-neutral-500'];
+}
 
 async function initializeHostedFields(): Promise<void> {
   if (get(hostedFields)) {
@@ -69,11 +96,8 @@ async function initializeHostedFields(): Promise<void> {
     const fieldsInstance = await createHostedFields({
       client,
       styles: {
-        'body': {
-          'font-size': '16px',
-        },
         'input': {
-          'font-size': '1rem',
+          'font-size': '14px',
           // The fields live in Braintree's iframe, which cannot load our web fonts: Inter only where installed.
           'font-family': 'Inter,system-ui,sans-serif',
           'color': '#09090b',
@@ -81,8 +105,8 @@ async function initializeHostedFields(): Promise<void> {
         ':disabled': {
           color: '#a1a1aa',
         },
-        'input:not(:focus)::placeholder': {
-          color: 'transparent',
+        '::placeholder': {
+          color: '#71717a',
         },
         '.invalid': {
           color: '#c42b2b',
@@ -116,12 +140,12 @@ async function initializeHostedFields(): Promise<void> {
 
 function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
   fieldsInstance.on('focus', (event) => {
-    const field = event.emittedBy;
-    set(focusedField, field);
-    updateFieldState(field, { touched: true });
+    set(focusedField, event.emittedBy);
   });
 
+  // A field shows an error only once it has been left, not while it is first filled in.
   fieldsInstance.on('blur', (event) => {
+    updateFieldState(event.emittedBy, { touched: true });
     if (get(focusedField) === event.emittedBy) {
       set(focusedField, '');
     }
@@ -131,14 +155,6 @@ function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
     const field = event.emittedBy;
     const isValid = event.fields[field].isValid;
     updateFieldState(field, { valid: isValid });
-  });
-
-  fieldsInstance.on('empty', (event) => {
-    updateFieldState(event.emittedBy, { hasContent: false });
-  });
-
-  fieldsInstance.on('notEmpty', (event) => {
-    updateFieldState(event.emittedBy, { hasContent: true });
   });
 
   watch(() => disabled, (isDisabled) => {
@@ -200,129 +216,44 @@ defineExpose({
 </script>
 
 <template>
-  <div class="grid grid-rows-2 grid-cols-2 gap-x-4 gap-y-8">
-    <!-- Card Number Field (spans 2 columns) -->
-    <div class="col-span-2 relative w-full flex items-center">
-      <div class="flex items-center shrink-0">
-        <div class="ml-3">
-          <svg
-            class="w-6 h-6 text-black/54"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-            />
-          </svg>
-        </div>
-      </div>
-      <div class="flex flex-1 overflow-hidden">
-        <!-- Hosted field container for card number -->
+  <div class="grid grid-cols-2 gap-4">
+    <div
+      v-for="field in cardFields"
+      :key="field.key"
+      :class="{ 'col-span-2': field.key === 'number' }"
+    >
+      <span
+        class="block mb-1 text-sm leading-5 font-medium"
+        :class="labelClass(field.key)"
+      >
+        {{ field.label }}
+      </span>
+      <div
+        class="group relative flex items-center rounded-rui-control"
+        :class="disabled ? 'bg-rui-neutral-50' : 'bg-white'"
+      >
+        <svg
+          v-if="field.key === 'number'"
+          class="ml-3 size-4 shrink-0 text-rui-neutral-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.75"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+          />
+        </svg>
         <div
-          id="card-number"
-          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
+          :id="field.id"
+          class="h-9 flex-1 px-3"
         />
-        <label
-          class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
-          :class="{
-            'pl-4 -translate-y-7 scale-75': focusedField === 'number' || fieldContent.number,
-            'pl-12': focusedField !== 'number' && !fieldContent.number,
-            'text-rui-error': fieldErrors.number,
-            'text-rui-success': focusedField === 'number' && !fieldErrors.number,
-          }"
-        >
-          Card Number
-        </label>
         <fieldset
-          class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
-          :class="{
-            'border! border-dotted! border-rui-grey-400!': disabled,
-            'border-2 border-rui-error': fieldErrors.number,
-            'border-2 border-rui-success': focusedField === 'number' && !fieldErrors.number,
-            'border border-black/23': focusedField !== 'number' && !fieldContent.number && !fieldErrors.number,
-          }"
-        >
-          <legend class="opacity-0 text-xs whitespace-break-spaces">
-            <span v-if="focusedField === 'number' || fieldContent.number">{{ '  Card Number  ' }}</span>
-            <span v-else>&#8203;</span>
-          </legend>
-        </fieldset>
-      </div>
-    </div>
-
-    <!-- Expiration Field -->
-    <div class="relative w-full flex items-center">
-      <div class="flex flex-1 overflow-hidden">
-        <!-- Hosted field container for expiration -->
-        <div
-          id="expiration"
-          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
+          class="absolute top-0 left-0 w-full h-full min-w-0 rounded-rui-control pointer-events-none transition-all border transform-gpu"
+          :class="fieldsetClass(field.key)"
         />
-        <label
-          class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
-          :class="{
-            'pl-4 -translate-y-7 scale-75': focusedField === 'expirationDate' || fieldContent.expirationDate,
-            'pl-3': focusedField !== 'expirationDate' && !fieldContent.expirationDate,
-            'text-rui-error': fieldErrors.expirationDate,
-            'text-rui-success': focusedField === 'expirationDate' && !fieldErrors.expirationDate,
-          }"
-        >
-          MM / YY
-        </label>
-        <fieldset
-          class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
-          :class="{
-            'border! border-dotted! border-rui-grey-400!': disabled,
-            'border-2 border-rui-error': fieldErrors.expirationDate,
-            'border-2 border-rui-success': focusedField === 'expirationDate' && !fieldErrors.expirationDate,
-            'border border-black/23': focusedField !== 'expirationDate' && !fieldContent.expirationDate && !fieldErrors.expirationDate,
-          }"
-        >
-          <legend class="opacity-0 text-xs whitespace-break-spaces">
-            <span v-if="focusedField === 'expirationDate' || fieldContent.expirationDate">{{ '  MM / YY  ' }}</span>
-            <span v-else>&#8203;</span>
-          </legend>
-        </fieldset>
-      </div>
-    </div>
-
-    <!-- CVV Field -->
-    <div class="relative w-full flex items-center">
-      <div class="flex flex-1 overflow-hidden">
-        <!-- Hosted field container for CVV -->
-        <div
-          id="cvv"
-          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
-        />
-        <label
-          class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
-          :class="{
-            'pl-4 -translate-y-7 scale-75': focusedField === 'cvv' || fieldContent.cvv,
-            'pl-3': focusedField !== 'cvv' && !fieldContent.cvv,
-            'text-rui-error': fieldErrors.cvv,
-            'text-rui-success': focusedField === 'cvv' && !fieldErrors.cvv,
-          }"
-        >
-          CVV
-        </label>
-        <fieldset
-          class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
-          :class="{
-            'border! border-dotted! border-rui-grey-400!': disabled,
-            'border-2 border-rui-error': fieldErrors.cvv,
-            'border-2 border-rui-success': focusedField === 'cvv' && !fieldErrors.cvv,
-            'border border-black/23': focusedField !== 'cvv' && !fieldErrors.cvv,
-          }"
-        >
-          <legend class="opacity-0 text-xs whitespace-break-spaces">
-            <span v-if="focusedField === 'cvv' || fieldContent.cvv">{{ '  CVV  ' }}</span>
-            <span v-else>&#8203;</span>
-          </legend>
-        </fieldset>
       </div>
     </div>
   </div>

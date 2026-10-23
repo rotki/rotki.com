@@ -102,7 +102,7 @@ watchImmediate(model, (modelValue: string) => {
 
   <div v-else-if="discountInfo && discountInfo.isValid">
     <div
-      class="rounded-md px-3 h-14 flex items-center justify-between border border-rui-success"
+      class="rounded-rui-control px-3 py-2 flex items-center justify-between border border-rui-success-border bg-rui-success-subtle"
     >
       <div>
         <div class="flex items-center gap-1">
