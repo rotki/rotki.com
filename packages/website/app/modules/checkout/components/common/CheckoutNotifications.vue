@@ -25,7 +25,7 @@ const hasError = computed<boolean>(() => !!error);
     >
       <div
         v-if="loading"
-        class="fixed inset-0 bg-white/80 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-rui-veil flex items-center justify-center z-rui-blocking"
       >
         <RuiProgress
           variant="indeterminate"

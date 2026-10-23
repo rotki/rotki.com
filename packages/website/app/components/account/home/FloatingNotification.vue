@@ -51,7 +51,7 @@ watch(() => visible, (show) => {
   >
     <div
       v-if="visible"
-      class="fixed top-0 md:top-28 z-20 w-full md:bottom-auto right-0 md:right-2 md:w-[520px]"
+      class="fixed top-0 md:top-28 z-rui-toast w-full md:bottom-auto right-0 md:right-2 md:w-[520px]"
     >
       <RuiAlert
         :closeable="closeable"

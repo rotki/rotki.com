@@ -17,7 +17,7 @@ const { t } = useI18n({ useScope: 'global' });
     >
       <div
         v-if="visible"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs"
+        class="fixed inset-0 z-rui-blocking flex items-center justify-center bg-black/80 backdrop-blur-xs"
       >
         <div class="flex flex-col items-center justify-center text-center px-4 max-w-lg">
           <div class="mb-6">

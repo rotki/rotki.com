@@ -17,13 +17,13 @@ const { competitor, rows } = defineProps<{
     <table class="w-full border-collapse text-left">
       <thead>
         <tr class="border-b border-rui-grey-200">
-          <th class="p-4 text-body-2 font-bold text-rui-text-secondary w-1/3">
+          <th class="p-3 sm:p-4 text-body-2 font-bold text-rui-text-secondary w-1/3">
             &nbsp;
           </th>
-          <th class="p-4 text-body-1 font-bold text-rui-primary bg-rui-primary/10 border-x border-rui-primary/20">
+          <th class="p-3 sm:p-4 text-body-1 font-bold text-rui-primary bg-rui-primary/10 border-x border-rui-primary/20">
             rotki
           </th>
-          <th class="p-4 text-body-1 font-medium text-rui-text-secondary">
+          <th class="p-3 sm:p-4 text-body-1 font-medium text-rui-text-secondary">
             {{ competitor }}
           </th>
         </tr>
@@ -36,13 +36,13 @@ const { competitor, rows } = defineProps<{
         >
           <th
             scope="row"
-            class="p-4 align-top text-body-2 font-medium text-rui-text-secondary border-l-4"
+            class="p-3 sm:p-4 align-top text-body-2 font-medium text-rui-text-secondary border-l-4"
             :class="row.highlight ? 'border-rui-primary' : 'border-transparent'"
           >
             {{ row.label }}
           </th>
           <td
-            class="p-4 align-top text-body-2 border-x border-rui-primary/20"
+            class="p-3 sm:p-4 align-top text-body-2 border-x border-rui-primary/20"
             :class="row.highlight ? 'bg-rui-primary/[.07]' : 'bg-rui-primary/3'"
           >
             <div class="flex items-start gap-2">
@@ -56,7 +56,7 @@ const { competitor, rows } = defineProps<{
               <span :class="row.highlight ? 'font-medium text-rui-text' : 'text-rui-text'">{{ row.rotki }}</span>
             </div>
           </td>
-          <td class="p-4 align-top text-body-2 text-rui-text-secondary">
+          <td class="p-3 sm:p-4 align-top text-body-2 text-rui-text-secondary">
             {{ row.competitor }}
           </td>
         </tr>

@@ -116,7 +116,7 @@ async function handleDeleteCard(): Promise<void> {
     <!-- Delete Card Confirmation Dialog -->
     <div
       v-if="showDeleteConfirmation"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-rui-dialog"
       @click.self="showDeleteConfirmation = false"
     >
       <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">

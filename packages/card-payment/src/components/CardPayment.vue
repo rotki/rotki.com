@@ -547,7 +547,7 @@ onUnmounted(async () => {
       >
         <div
           v-if="isProcessing"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs"
+          class="fixed inset-0 z-rui-blocking flex items-center justify-center bg-black/80 backdrop-blur-xs"
         >
           <div class="flex flex-col items-center justify-center text-center px-4">
             <div class="mb-4">

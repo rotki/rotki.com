@@ -40,7 +40,7 @@ function handleBackdropClick(): void {
     >
       <div
         v-if="open"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-rui-dialog"
         @click.self="handleBackdropClick()"
       >
         <Transition
