@@ -100,7 +100,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      # The website's postinstall runs `nuxi prepare`, so `.nuxt/` exists before the parallel group.
       - name: Install dependencies 👨🏻‍💻
         run: pnpm install --frozen-lockfile
 
@@ -110,24 +109,8 @@ jobs:
           path: packages/website/public/img/integrations
           key: ${{ runner.os }}-integration-images-${{ hashFiles('packages/website/public/integrations/all.json') }}
 
-      # Lint reads `.nuxt/` for typed rules and the Nuxt test environment loads it without writing,
-      # so the two can share the checkout. The build rewrites `.nuxt/`, so it stays out of the group.
-      - parallel:
-          - name: Run linter 👀
-            run: pnpm run lint:all
-
-          - name: Run unit tests with coverage ✅
-            run: pnpm run coverage
-
-      # Explicit files with search disabled: the action otherwise adds every coverage-looking file it
-      # finds, uploading the same run twice.
-      - name: Upload unit coverage
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        with:
-          files: packages/website/coverage/lcov.info,packages/sigil/coverage/lcov.info,packages/card-payment-common/coverage/lcov.info,packages/card-payment/coverage/lcov.info
-          disable_search: true
-          flags: unit
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Run linter 👀
+        run: pnpm run lint:all
 
       - name: Build 🚧
         run: pnpm run build
@@ -138,9 +121,10 @@ jobs:
       - name: Check every router route resolves 🧭
         run: pnpm run check:routes
 
-  # Runs against the Nuxt dev server through the Go server in dev mode, so it needs nothing the
-  # build produces and runs beside the `ci` job.
-  e2e:
+  # Unit and e2e tests. e2e runs against the Nuxt dev server through the Go server in dev mode, so
+  # it needs nothing the build produces and runs beside the `ci` job. The unit tests run here
+  # because the e2e coverage report is written on the lines their reports count as code.
+  test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -193,16 +177,32 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.playwright.outputs.VERSION }}
 
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
-        working-directory: packages/website
+      # The unit tests use the CPU while the Playwright install waits on downloads and apt, so they
+      # overlap instead of competing. The website's postinstall already ran `nuxi prepare`.
+      - parallel:
+          - name: Run unit tests with coverage ✅
+            run: pnpm run coverage
 
-      # The cache holds the browser only, the system libraries it needs still come from apt.
-      - name: Install Playwright system dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
-        working-directory: packages/website
+          - name: Install Playwright browsers
+            if: steps.playwright-cache.outputs.cache-hit != 'true'
+            run: pnpm exec playwright install --with-deps chromium
+            working-directory: packages/website
+
+          # The cache holds the browser only, the system libraries it needs still come from apt.
+          - name: Install Playwright system dependencies
+            if: steps.playwright-cache.outputs.cache-hit == 'true'
+            run: pnpm exec playwright install-deps chromium
+            working-directory: packages/website
+
+      # Explicit files with search disabled: the action otherwise adds every coverage-looking file it
+      # finds, uploading the same run twice.
+      - name: Upload unit coverage
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: packages/website/coverage/lcov.info,packages/sigil/coverage/lcov.info,packages/card-payment-common/coverage/lcov.info,packages/card-payment/coverage/lcov.info
+          disable_search: true
+          flags: unit
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Set .env
         run: cp .env.test .env
