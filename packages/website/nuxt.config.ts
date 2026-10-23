@@ -322,11 +322,23 @@ export default defineNuxtConfig({
   },
 
   fonts: {
+    /*
+     * The ui-library theme names the variable families first ('Inter Variable'), which the npm
+     * provider maps to the installed @fontsource-variable packages. opsz.css carries the optical
+     * size axis the library's type scale is tuned for.
+     */
     families: [
       {
-        name: 'Roboto',
-        provider: 'fontsource',
-        weights: [400, 500, 600, 700],
+        name: 'Inter Variable',
+        provider: 'npm',
+        providerOptions: { npm: { file: 'opsz.css' } },
+        weights: ['400 700'],
+        subsets: ['latin'],
+      },
+      {
+        name: 'Geist Mono Variable',
+        provider: 'npm',
+        weights: ['400 700'],
         subsets: ['latin'],
       },
     ],

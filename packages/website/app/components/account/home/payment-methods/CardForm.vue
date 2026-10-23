@@ -66,7 +66,8 @@ async function initializeHostedFields(): Promise<void> {
         },
         'input': {
           'font-size': '1rem',
-          'font-family': 'Roboto,sans-serif',
+          // The fields live in Braintree's iframe, which cannot load our web fonts: Inter only where installed.
+          'font-family': 'Inter,system-ui,sans-serif',
           'color': 'rgba(0, 0, 0, 0.87)',
         },
         ':disabled': {

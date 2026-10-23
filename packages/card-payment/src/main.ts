@@ -2,7 +2,8 @@ import { setSigilDebug } from '@rotki/sigil';
 import { createRui } from '@rotki/ui-library';
 import { ViteSSG, type ViteSSGContext } from 'vite-ssg/single-page';
 import App from './App.vue';
-import '@fontsource/roboto/latin.css';
+import '@fontsource-variable/inter/opsz.css';
+import '@fontsource-variable/geist-mono';
 import './assets/styles/main.css';
 
 if (import.meta.env.VITE_SIGIL_DEBUG === 'true') {

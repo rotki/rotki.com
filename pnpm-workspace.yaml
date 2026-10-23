@@ -49,7 +49,8 @@ catalog:
   '@coinbase/wallet-sdk': 4.3.7
   '@commitlint/cli': 21.2.2
   '@commitlint/config-conventional': 21.2.2
-  '@fontsource/roboto': 5.3.0
+  '@fontsource-variable/geist-mono': 5.3.0
+  '@fontsource-variable/inter': 5.3.0
   '@nuxt/content': 3.16.0
   '@nuxt/devtools': 3.4.2
   '@nuxt/eslint-plugin': 1.17.0

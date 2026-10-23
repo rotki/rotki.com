@@ -58,6 +58,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@fontsource-variable/geist-mono": "catalog:",
+    "@fontsource-variable/inter": "catalog:",
     "@nuxt/content": "catalog:",
     "@nuxt/devtools": "catalog:",
     "@nuxt/fonts": "catalog:",

@@ -14,7 +14,8 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@fontsource/roboto": "catalog:",
+    "@fontsource-variable/geist-mono": "catalog:",
+    "@fontsource-variable/inter": "catalog:",
     "@rotki/card-payment-common": "workspace:*",
     "@rotki/sigil": "workspace:*",
     "@vueuse/core": "catalog:",
