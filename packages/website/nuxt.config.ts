@@ -85,7 +85,6 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/devtools',
-    '@nuxt/fonts',
     '@nuxtjs/sitemap',
     '@nuxt/content',
     'nuxt-llms',
@@ -318,34 +317,6 @@ export default defineNuxtConfig({
           item.dynamicImports = [];
         }
       }
-    },
-  },
-
-  fonts: {
-    /*
-     * The ui-library theme names the variable families first ('Inter Variable'), which the npm
-     * provider maps to the installed @fontsource-variable packages. opsz.css carries the optical
-     * size axis the library's type scale is tuned for.
-     */
-    families: [
-      {
-        name: 'Inter Variable',
-        provider: 'npm',
-        providerOptions: { npm: { file: 'opsz.css' } },
-        weights: ['400 700'],
-        subsets: ['latin'],
-      },
-      {
-        name: 'Geist Mono Variable',
-        provider: 'npm',
-        weights: ['400 700'],
-        subsets: ['latin'],
-      },
-    ],
-    defaults: {
-      fallbacks: {
-        'sans-serif': ['Arial', 'Helvetica Neue', 'sans-serif'],
-      },
     },
   },
 

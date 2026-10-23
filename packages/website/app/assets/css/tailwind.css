@@ -2,6 +2,64 @@
 @import 'tailwindcss' source(none);
 @import '@rotki/ui-library/tailwind.css';
 
+/* The families the ui-library theme names, bundled from node_modules: the build fetches nothing. */
+@import '@fontsource-variable/inter/opsz.css';
+@import '@fontsource-variable/geist-mono';
+
+/*
+ * Local fonts resized to the web fonts' metrics, shown until those load so the text does not shift
+ * when they swap in. Computed with fontaine from the bundled files; recompute when the fonts change.
+ */
+@font-face {
+  font-family: 'Inter Fallback Helvetica Neue';
+  src: local('Helvetica Neue');
+  size-adjust: 106.1198%;
+  ascent-override: 91.2883%;
+  descent-override: 22.7301%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback Arial';
+  src: local('Arial');
+  size-adjust: 107.1194%;
+  ascent-override: 90.4365%;
+  descent-override: 22.518%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback Noto Sans';
+  src: local('Noto Sans');
+  size-adjust: 100.7466%;
+  ascent-override: 96.1571%;
+  descent-override: 23.9423%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Geist Mono Fallback Courier New';
+  src: local('Courier New');
+  size-adjust: 99.9837%;
+  ascent-override: 100.5164%;
+  descent-override: 29.5048%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Geist Mono Fallback Noto Sans Mono';
+  src: local('Noto Sans Mono');
+  size-adjust: 100%;
+  ascent-override: 100.5%;
+  descent-override: 29.5%;
+  line-gap-override: 0%;
+}
+
+@theme {
+  --font-sans: 'Inter Variable', 'Inter Fallback Helvetica Neue', 'Inter Fallback Arial', 'Inter Fallback Noto Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback Courier New', 'Geist Mono Fallback Noto Sans Mono', 'Geist Mono', ui-monospace, sfmono-regular, menlo, consolas, monospace;
+}
+
 /* Only the app's own code: content, tests and scripts carry words that look like classes. */
 @source '../..';
 

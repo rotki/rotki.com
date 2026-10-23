@@ -62,7 +62,6 @@
     "@fontsource-variable/inter": "catalog:",
     "@nuxt/content": "catalog:",
     "@nuxt/devtools": "catalog:",
-    "@nuxt/fonts": "catalog:",
     "@nuxt/kit": "catalog:",
     "@nuxt/test-utils": "catalog:",
     "@nuxtjs/i18n": "catalog:",
