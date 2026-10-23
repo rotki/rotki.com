@@ -15,7 +15,7 @@ const activeItem = computed<DashboardMessage | undefined>(() => messages[get(ste
 
 <template>
   <div
-    class="px-4 py-2 text-body-1 text-rui-primary flex items-center justify-between border-b border-default w-full bg-white dark:bg-[#1E1E1E] gap-4"
+    class="px-4 py-2 text-body-1 text-rui-primary flex items-center justify-between border-b border-rui-divider w-full bg-rui-surface gap-4"
   >
     <div
       class="flex-1 md:text-center"

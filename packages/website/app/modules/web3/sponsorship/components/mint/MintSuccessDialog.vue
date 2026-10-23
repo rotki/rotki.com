@@ -109,6 +109,6 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
 
   <Confetti
     v-if="showDialog"
-    class="absolute top-0 left-0 w-full h-full z-10000"
+    class="absolute top-0 left-0 w-full h-full z-[calc(var(--rui-z-dialog)+1)]"
   />
 </template>
