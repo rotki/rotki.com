@@ -505,7 +505,7 @@ onUnmounted(async () => {
           <!-- VAT Warning -->
           <div
             v-if="showVatWarning"
-            class="mb-4 rounded-sm border border-rui-warning p-3 text-sm text-rui-warning-darker text-shade-[.6]"
+            class="mb-4 rounded-sm border border-rui-warning p-3 text-sm text-rui-warning-darker"
           >
             No VAT Reverse charge applied. Your VAT ID could not be verified. Update it in
             <a

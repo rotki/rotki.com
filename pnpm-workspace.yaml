@@ -110,7 +110,6 @@ catalog:
   ofetch: 1.5.1
   pinia: 4.0.3
   plainfp: 0.1.1
-  postcss: 8.5.28
   postcss-html: 1.8.1
   qrcode: 1.5.4
   rimraf: 6.1.3

@@ -16,8 +16,8 @@
       "matchPackageNames": ["@types/node", "node"]
     },
     {
-      "allowedVersions": "/^3\\./",
-      "matchPackageNames": ["tailwindcss"]
+      "groupName": "Tailwind CSS",
+      "matchPackageNames": ["tailwindcss", "@tailwindcss/vite"]
     }
   ]
 }

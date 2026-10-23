@@ -747,9 +747,6 @@ importers:
       nuxt:
         specifier: 'catalog:'
         version: 4.5.2(0a7239c3f9bdbf0d0bfad97dc316b197)
-      postcss:
-        specifier: 8.5.28
-        version: 8.5.28
       satori:
         specifier: 'catalog:'
         version: 0.29.1
