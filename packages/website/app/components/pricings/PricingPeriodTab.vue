@@ -42,17 +42,14 @@ const tabs = [
 <template>
   <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-0 relative">
     <!-- On phones the savings note goes under the toggle; beside it, it ran off the screen -->
-    <!-- Pill segmented control, the same shape as the sponsor tab bar -->
     <RuiTabs
       v-model="model"
-      class="border border-rui-grey-200 bg-rui-grey-50 rounded-full [&>div]:p-1 [&>div]:h-auto!"
+      variant="segmented"
     >
       <RuiTab
         v-for="tab in tabs"
         :key="tab.value"
         :value="tab.value"
-        class="bg-transparent rounded-full! h-9 min-h-9 px-4!"
-        active-class="bg-white! shadow-xs after:hidden text-rui-primary!"
       >
         {{ tab.label }}
       </RuiTab>
@@ -60,7 +57,7 @@ const tabs = [
 
     <div
       v-if="maxSavedAnnually > 0"
-      class="flex items-start gap-2 text-rui-primary text-body-2 sm:text-body-1 font-medium min-w-0 sm:whitespace-nowrap sm:-mt-8 sm:-ml-4 relative z-1"
+      class="flex items-start gap-2 text-rui-primary text-body-2 sm:text-body-1 font-medium min-w-0 sm:whitespace-nowrap sm:-mt-8 sm:ml-1 relative z-1"
     >
       <img
         alt=""
