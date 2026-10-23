@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 import { isCoverageEnabled } from './tests/e2e/support/coverage';
+import { nuxtPort } from './tests/e2e/support/warm-up-global-setup';
 
 /** Reads an environment variable, treating an empty value the same as an unset one. */
 function envOrDefault(name: string, fallback: string): string {
@@ -9,7 +10,6 @@ function envOrDefault(name: string, fallback: string): string {
 }
 
 const port = envOrDefault('PORT', '48123');
-const nuxtPort = '3001'; // hardcoded in package.json dev script
 const mockApiPort = '9999';
 const baseURL = envOrDefault('BASE_URL', `http://localhost:${port}`);
 
@@ -19,12 +19,16 @@ const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
 export default defineConfig({
   testDir: './tests/e2e/specs',
   testMatch: '**/*.spec.ts',
-  // Writes tests/e2e/coverage/lcov.info once every test has run.
-  ...(isCoverageEnabled() && { globalSetup: './tests/e2e/support/coverage-global-setup.ts' }),
+  globalSetup: [
+    './tests/e2e/support/warm-up-global-setup.ts',
+    // Writes tests/e2e/coverage/lcov.info once every test has run.
+    ...(isCoverageEnabled() ? ['./tests/e2e/support/coverage-global-setup.ts'] : []),
+  ],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : 4,
+  // Tests share no state; more than two would starve the dev servers on the runner's four cores.
+  workers: process.env.CI ? 2 : 4,
   timeout: 60000,
   expect: {
     timeout: 10000,

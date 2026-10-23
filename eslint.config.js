@@ -46,6 +46,7 @@ export default rotki({
     'packages/website/tests/coverage-provider.ts',
     'packages/website/tests/e2e/mock-api/routes/**/*.ts',
     'packages/website/tests/e2e/support/coverage-global-setup.ts',
+    'packages/website/tests/e2e/support/warm-up-global-setup.ts',
   ],
   rules: {
     'import/no-default-export': 'off',
