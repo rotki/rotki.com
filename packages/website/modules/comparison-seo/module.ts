@@ -89,14 +89,18 @@ function buildComparisonBody(doc: ComparisonDoc): MinimarkNode[] {
   }
 
   if (Array.isArray(doc.dimensions) && doc.dimensions.length > 0) {
-    value.push(['h2', {}, `rotki vs ${competitor}: side by side`]);
-    value.push(['ul', {}, ...doc.dimensions.map((row): MinimarkNode => (
-      ['li', {}, `${row.label}. rotki: ${row.rotki}; ${competitor}: ${row.competitor}`]
-    ))]);
+    value.push(
+      ['h2', {}, `rotki vs ${competitor}: side by side`],
+      ['ul', {}, ...doc.dimensions.map((row): MinimarkNode => (
+        ['li', {}, `${row.label}. rotki: ${row.rotki}; ${competitor}: ${row.competitor}`]
+      ))],
+    );
   }
 
-  value.push(...listSection('What sets rotki apart', doc.rotkiAdvantages));
-  value.push(...listSection('Trade-offs', doc.tradeoffs));
+  value.push(
+    ...listSection('What sets rotki apart', doc.rotkiAdvantages),
+    ...listSection('Trade-offs', doc.tradeoffs),
+  );
 
   if (Array.isArray(doc.faq) && doc.faq.length > 0) {
     value.push(['h2', {}, 'FAQ']);

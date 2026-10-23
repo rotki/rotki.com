@@ -267,21 +267,24 @@ function main(): void {
   const rows = summarizeIssues(indexable);
   const errorRows = rows.filter(r => r.severity === 'error');
 
-  const lines: string[] = [];
-  lines.push('## 🔍 SEO audit (report-only)\n');
-  lines.push(`Base: \`${BASE}\` · audited **${indexable.length}** indexable pages `
+  const lines: string[] = [
+    '## 🔍 SEO audit (report-only)\n',
+    `Base: \`${BASE}\` · audited **${indexable.length}** indexable pages `
     + `(${reports.length - indexable.length} skipped: ${noindexed} noindex, ${redirects} redirects, `
-    + `${aliases} aliases).\n`);
-  lines.push(`**${pagesWithErrors.length}** pages with errors · `
+    + `${aliases} aliases).\n`,
+    `**${pagesWithErrors.length}** pages with errors · `
     + `**${indexable.length - pagesWithErrors.length}** without errors · `
-    + `**${errorRows.length}** error type(s).\n`);
+    + `**${errorRows.length}** error type(s).\n`,
+  ];
 
   if (rows.length === 0) {
     lines.push('✅ No SEO issues found.');
   }
   else {
-    lines.push('| Severity | Issue | Pages | Example |');
-    lines.push('| --- | --- | --- | --- |');
+    lines.push(
+      '| Severity | Issue | Pages | Example |',
+      '| --- | --- | --- | --- |',
+    );
     for (const row of rows) {
       const icon = row.severity === 'error' ? '🔴' : '🟡';
       const detail = row.sample ? ` (${row.sample})` : '';

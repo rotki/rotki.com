@@ -1,10 +1,12 @@
 blockExoticSubdeps: true
+
 minimumReleaseAge: 10080
 minimumReleaseAgeExcludePrune: true
 minimumReleaseAgeExclude:
   - '@rotki/eslint-config'
   - '@rotki/eslint-plugin'
   - '@rotki/ui-library'
+
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
@@ -12,6 +14,7 @@ trustPolicyExclude:
   - '@noble/hashes@1.7.0'
   - slow-redact@0.3.2
   - tailwind-merge@2.6.1
+
 shamefullyHoist: true
 shellEmulator: true
 strictDepBuilds: true
@@ -64,8 +67,8 @@ catalog:
   '@pinia/nuxt': 1.0.2
   '@playwright/test': 1.63.0
   '@resvg/resvg-js': 2.6.2
-  '@rotki/eslint-config': 8.3.0
-  '@rotki/eslint-plugin': 1.8.0
+  '@rotki/eslint-config': 8.4.1
+  '@rotki/eslint-plugin': 1.10.0
   '@rotki/ui-library': 2.27.0
   '@tsconfig/node24': 24.0.5
   '@types/braintree-web': 3.143.0

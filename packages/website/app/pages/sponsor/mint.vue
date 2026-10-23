@@ -101,11 +101,11 @@ const {
     </div>
   </div>
 
-  <!-- Normal content when metadata loads successfully -->
   <div
     v-else
     class="marketplace-container"
   >
+    <!-- Normal content when metadata loads successfully -->
     <!-- Grid instead of two flex columns so phones read the heading before the artwork -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-8 max-w-6xl mx-auto">
       <div class="flex flex-col gap-3 lg:col-start-2 lg:row-start-1">

@@ -291,15 +291,19 @@ async function fetchData() {
   - Third-party component style overrides requiring `:deep()` or `:global()`
 - Avoid CSS modules (`$style`) for simple styling that can be done with Tailwind classes
 
+✅ Correct - Tailwind classes in template:
+
 ```vue
-<!-- ✅ Correct - Tailwind classes in template -->
 <template>
   <div class="flex items-center gap-4 p-4 rounded-lg bg-white shadow-md">
     <span class="text-rui-text font-bold text-lg">Title</span>
   </div>
 </template>
+```
 
-<!-- ❌ Incorrect - Using style block for simple styling -->
+❌ Incorrect - Using style block for simple styling:
+
+```vue
 <template>
   <div :class="$style.container">
     <span :class="$style.title">Title</span>

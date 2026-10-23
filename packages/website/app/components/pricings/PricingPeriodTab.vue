@@ -40,8 +40,8 @@ const tabs = [
 </script>
 
 <template>
-  <!-- On phones the savings note goes under the toggle; beside it, it ran off the screen -->
   <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-0 relative">
+    <!-- On phones the savings note goes under the toggle; beside it, it ran off the screen -->
     <!-- Pill segmented control, the same shape as the sponsor tab bar -->
     <RuiTabs
       v-model="model"

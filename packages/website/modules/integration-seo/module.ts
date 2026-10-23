@@ -87,9 +87,11 @@ function buildIntegrationBody(doc: IntegrationDoc): MinimarkNode[] {
   if (doc.intro)
     value.push(['p', {}, doc.intro]);
 
-  value.push(...listSection('Features', doc.features, 'ul'));
-  value.push(...listSection('Limitations', doc.limitations, 'ul'));
-  value.push(...listSection('Setup', doc.setup, 'ol'));
+  value.push(
+    ...listSection('Features', doc.features, 'ul'),
+    ...listSection('Limitations', doc.limitations, 'ul'),
+    ...listSection('Setup', doc.setup, 'ol'),
+  );
 
   if (Array.isArray(doc.faq) && doc.faq.length > 0) {
     value.push(['h2', {}, 'FAQ']);

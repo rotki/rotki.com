@@ -84,9 +84,11 @@ function buildFeatureBody(doc: FeatureDoc): MinimarkNode[] {
   if (doc.intro)
     value.push(['p', {}, doc.intro]);
 
-  value.push(...listSection('What rotki supports', doc.capabilities));
-  value.push(...listSection('How to set it up', doc.setup));
-  value.push(...listSection('Good to know', doc.limitations));
+  value.push(
+    ...listSection('What rotki supports', doc.capabilities),
+    ...listSection('How to set it up', doc.setup),
+    ...listSection('Good to know', doc.limitations),
+  );
 
   if (Array.isArray(doc.troubleshooting) && doc.troubleshooting.length > 0) {
     value.push(['h2', {}, 'Common problems and fixes']);

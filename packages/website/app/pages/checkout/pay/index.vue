@@ -101,8 +101,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- No extra margin on phones: the layout container already has the gutter, and the plan tabs need the width -->
   <div class="flex flex-col max-w-full md:mx-8">
+    <!-- No extra margin on phones: the layout container already has the gutter, and the plan tabs need the width -->
     <PricingHeading />
 
     <!-- Top Section: Pricing Cards -->

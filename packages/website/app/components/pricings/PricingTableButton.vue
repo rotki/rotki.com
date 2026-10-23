@@ -66,7 +66,6 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
     {{ t('values.contact_section.title') }}
   </ButtonLink>
 
-  <!-- Only the suggested plan gets a filled button, so one call to action leads -->
   <ButtonLink
     v-else
     class="w-full py-2 xl:text-[1rem]"
@@ -74,6 +73,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
     color="primary"
     :to="checkoutLink"
   >
+    <!-- Only the suggested plan gets a filled button, so one call to action leads -->
     {{ t('actions.get_plan', { plan: toTitleCase(plan.name) }) }}
   </ButtonLink>
 </template>

@@ -3,8 +3,8 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <!-- Same heading pattern as the other marketing pages; the checkout stepper keeps its own step title -->
   <div class="flex flex-col items-center gap-3 text-center pt-6 lg:pt-10">
+    <!-- Same heading pattern as the other marketing pages; the checkout stepper keeps its own step title -->
     <p class="text-rui-primary text-subtitle-1 font-medium">
       {{ t('pricing.page.eyebrow') }}
     </p>

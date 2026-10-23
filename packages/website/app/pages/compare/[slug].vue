@@ -34,28 +34,27 @@ else {
 
   const url = `${baseUrl}${path}`;
 
-  const ldBlocks: string[] = [];
-
-  ldBlocks.push(JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    'itemListElement': [
-      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
-      { '@type': 'ListItem', 'position': 2, 'name': 'Compare', 'item': `${baseUrl}/compare` },
-      { '@type': 'ListItem', 'position': 3, 'name': `rotki vs ${item.competitor}`, 'item': url },
-    ],
-  }));
-
-  ldBlocks.push(JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    'name': 'rotki',
-    'description': item.intro,
-    'url': url,
-    'applicationCategory': 'FinanceApplication',
-    'operatingSystem': 'Windows, macOS, Linux',
-    'offers': { '@type': 'Offer', 'price': '0', 'priceCurrency': 'USD' },
-  }));
+  const ldBlocks: string[] = [
+    JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': baseUrl },
+        { '@type': 'ListItem', 'position': 2, 'name': 'Compare', 'item': `${baseUrl}/compare` },
+        { '@type': 'ListItem', 'position': 3, 'name': `rotki vs ${item.competitor}`, 'item': url },
+      ],
+    }),
+    JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      'name': 'rotki',
+      'description': item.intro,
+      'url': url,
+      'applicationCategory': 'FinanceApplication',
+      'operatingSystem': 'Windows, macOS, Linux',
+      'offers': { '@type': 'Offer', 'price': '0', 'priceCurrency': 'USD' },
+    }),
+  ];
 
   if ((item.faq?.length ?? 0) > 0) {
     ldBlocks.push(JSON.stringify({

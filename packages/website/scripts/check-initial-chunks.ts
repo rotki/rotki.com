@@ -155,20 +155,23 @@ function main(): void {
   }));
   const leakedComponents = uiComponentPages.filter(c => c.pages > reports.length * MAX_UI_COMPONENT_PAGE_SHARE);
 
-  const lines: string[] = [];
-  lines.push('## 📦 Initial JavaScript per page\n');
-  lines.push(`Checked **${reports.length}** pages · **${failing.length}** load wallet or payment chunks up front · `
-    + `**${leakedComponents.length}** heavy ui-library component(s) load on most pages.\n`);
-  lines.push('| Page | Chunks | JS (gzip KB) | Heavy chunks |');
-  lines.push('| --- | --- | --- | --- |');
+  const lines: string[] = [
+    '## 📦 Initial JavaScript per page\n',
+    `Checked **${reports.length}** pages · **${failing.length}** load wallet or payment chunks up front · `
+    + `**${leakedComponents.length}** heavy ui-library component(s) load on most pages.\n`,
+    '| Page | Chunks | JS (gzip KB) | Heavy chunks |',
+    '| --- | --- | --- | --- |',
+  ];
   const shown = [...failing, ...reports.filter(r => r.heavy.length === 0).slice(0, 10)];
   for (const r of shown) {
     const heavy = r.heavy.length > 0 ? `🔴 ${r.heavy.join(', ')}` : '';
     lines.push(`| \`${r.route}\` | ${r.chunks} | ${kb(r.gzipBytes)} | ${heavy} |`);
   }
 
-  lines.push('\n| ui-library component | Pages loading it up front |');
-  lines.push('| --- | --- |');
+  lines.push(
+    '\n| ui-library component | Pages loading it up front |',
+    '| --- | --- |',
+  );
   for (const c of uiComponentPages) {
     const icon = leakedComponents.includes(c) ? '🔴 ' : '';
     lines.push(`| ${icon}\`${c.name}\` | ${c.pages} |`);
