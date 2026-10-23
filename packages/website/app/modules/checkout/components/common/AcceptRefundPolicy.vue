@@ -26,7 +26,7 @@ const { t } = useI18n({ useScope: 'global' });
           to="/refund-policy"
           color="primary"
           tag="span"
-          class="underline !p-0 [display:unset] [&>span]:[display:unset_!important]"
+          class="underline p-0! [display:unset] [&>span]:[display:unset_!important]"
           external
           target="_blank"
         >

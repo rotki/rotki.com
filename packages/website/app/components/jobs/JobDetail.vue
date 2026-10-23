@@ -50,7 +50,7 @@ const sideColumn = filterBy(tag => tag === 'blockquote');
       <div class="mt-8 lg:mt-0 lg:pl-16 xl:pl-24">
         <div
           v-if="data.open && sideColumn"
-          class="bg-rui-primary/[.04] p-6 lg:w-[384px]"
+          class="bg-rui-primary/4 p-6 lg:w-[384px]"
         >
           <div class="flex">
             <div class="bg-white rounded-lg p-3 text-rui-primary">
@@ -71,7 +71,7 @@ const sideColumn = filterBy(tag => tag === 'blockquote');
         </div>
         <div
           v-if="!data.open"
-          class="bg-rui-warning/[.04] p-6 lg:w-[384px]"
+          class="bg-rui-warning/4 p-6 lg:w-[384px]"
         >
           <div class="flex">
             <div class="bg-white rounded-lg p-3 text-rui-warning">

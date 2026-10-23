@@ -27,7 +27,7 @@ defineSlots<{
 }>();
 
 const buttonClasses = computed<string>(() => {
-  const baseClasses = 'relative flex items-center justify-center gap-2 font-medium outline-1 outline-offset-[-1px] outline-transparent rounded border-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'relative flex items-center justify-center gap-2 font-medium outline-1 -outline-offset-1 outline-transparent rounded-sm border-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
     'primary': 'bg-rui-primary text-white enabled:hover:bg-rui-primary-darker',
@@ -39,7 +39,7 @@ const buttonClasses = computed<string>(() => {
 
   const sizeClasses = {
     sm: 'text-sm px-4 py-2',
-    md: 'text-base leading-[1.625rem] px-6 py-2',
+    md: 'text-base leading-6.5 px-6 py-2',
     lg: 'text-lg px-8 py-3',
     icon: 'w-10 h-10 p-0',
   };

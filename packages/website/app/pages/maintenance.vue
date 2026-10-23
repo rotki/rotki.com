@@ -22,7 +22,7 @@ if (!get(isMaintenance))
     class="container w-full flex flex-1 flex-col lg:flex-row gap-10 lg:gap-20 items-center justify-center text-center lg:text-left py-4"
   >
     <img
-      class="w-1/3 lg:w-1/2 max-w-[40rem]"
+      class="w-1/3 lg:w-1/2 max-w-160"
       alt="rotki maintenance"
       src="/img/maintenance.svg"
       width="640"

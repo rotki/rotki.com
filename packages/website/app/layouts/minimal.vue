@@ -44,7 +44,7 @@ const copyright = `© Rotki Solutions GmbH 2018-${year}.`;
             <NuxtLink to="/home/subscription">
               <button
                 type="button"
-                class="px-4 py-2 bg-rui-primary text-white rounded-full hover:bg-rui-primary-darker transition-colors text-sm font-medium shadow-sm"
+                class="px-4 py-2 bg-rui-primary text-white rounded-full hover:bg-rui-primary-darker transition-colors text-sm font-medium shadow-xs"
               >
                 {{ t('page_header.manage_premium') }}
               </button>

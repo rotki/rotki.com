@@ -51,7 +51,7 @@ function formatLimitValue(value: string | number | boolean): string {
         <div
           v-for="limit in displayedLimits"
           :key="limit.label"
-          class="flex justify-between items-center text-sm gap-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          class="flex justify-between items-center text-sm gap-2 transition-all duration-300 ease-in-out"
         >
           <span class="text-rui-text-secondary">{{ limit.label }}:</span>
           <template v-if="typeof limit.value === 'boolean'">
@@ -82,7 +82,7 @@ function formatLimitValue(value: string | number | boolean): string {
         v-if="hasMoreLimits"
         variant="text"
         size="sm"
-        class="!p-0 !min-w-0 mt-2"
+        class="p-0! min-w-0! mt-2"
         @click="showAllLimits = !showAllLimits"
       >
         <template #prepend>

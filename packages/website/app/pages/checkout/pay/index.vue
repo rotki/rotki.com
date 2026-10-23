@@ -120,7 +120,7 @@ onMounted(() => {
         :tiers-data="tiersInformation"
       />
 
-      <div class="w-full max-w-[42rem] mx-auto flex flex-col gap-4 mt-4">
+      <div class="w-full max-w-2xl mx-auto flex flex-col gap-4 mt-4">
         <!-- The billing terms read as one block instead of a loose list under the table -->
         <div class="flex flex-col gap-3 rounded-2xl border border-rui-grey-200 bg-rui-grey-50 p-5 lg:p-6">
           <h2 class="text-subtitle-1 font-bold text-rui-text">

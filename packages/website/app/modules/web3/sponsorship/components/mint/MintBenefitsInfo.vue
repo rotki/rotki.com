@@ -50,7 +50,7 @@ const currentTierContent = computed<TierContent | undefined>(() => tierContent[s
           variant="text"
           size="sm"
           color="primary"
-          class="!p-0 font-medium"
+          class="p-0! font-medium"
           @click="showExampleSponsors = !showExampleSponsors"
         >
           <template #append>

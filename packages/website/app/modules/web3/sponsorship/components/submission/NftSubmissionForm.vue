@@ -70,7 +70,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
       </div>
     </div>
   </DefineNftIdOption>
-  <RuiCard class="!p-4">
+  <RuiCard class="p-4!">
     <Transition
       mode="out-in"
       enter-active-class="motion-safe:transition motion-safe:duration-200 ease-out"

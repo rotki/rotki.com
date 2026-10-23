@@ -16,10 +16,10 @@ const { t } = useI18n({ useScope: 'global' });
         aria-hidden="true"
       />
       <div class="relative flex flex-col items-center gap-5">
-        <h2 class="text-h4 md:text-h3 !font-bold max-w-[720px] text-balance">
+        <h2 class="text-h4 md:text-h3 font-bold! max-w-[720px] text-balance">
           {{ t('download_cta.title') }}
         </h2>
-        <p class="text-body-1 md:text-h6 !font-normal text-white/80 max-w-[600px] text-balance">
+        <p class="text-body-1 md:text-h6 font-normal! text-white/80 max-w-[600px] text-balance">
           {{ t('download_cta.detail') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-3 mt-2">
@@ -28,7 +28,7 @@ const { t } = useI18n({ useScope: 'global' });
             size="lg"
             rounded
             variant="default"
-            class="!bg-white !text-rui-primary"
+            class="bg-white! text-rui-primary!"
           >
             <template #prepend>
               <RuiIcon
@@ -44,7 +44,7 @@ const { t } = useI18n({ useScope: 'global' });
             size="lg"
             rounded
             variant="outlined"
-            class="!text-white !border-white/60"
+            class="text-white! border-white/60!"
           >
             {{ t('download_cta.docs') }}
           </ButtonLink>

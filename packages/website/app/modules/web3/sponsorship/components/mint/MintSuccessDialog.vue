@@ -24,7 +24,7 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
     persistent
     max-width="400px"
   >
-    <RuiCard content-class="!pt-0">
+    <RuiCard content-class="pt-0!">
       <template #header>
         <div class="flex items-center gap-3">
           <RuiIcon
@@ -109,6 +109,6 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
 
   <Confetti
     v-if="showDialog"
-    class="absolute top-0 left-0 w-full h-full z-[10000]"
+    class="absolute top-0 left-0 w-full h-full z-10000"
   />
 </template>

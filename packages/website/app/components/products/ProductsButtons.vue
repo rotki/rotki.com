@@ -49,7 +49,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
       size="lg"
       rounded
       :color="color"
-      :class="{ '!outline-white !text-rui-dark-text': !color }"
+      :class="{ 'outline-white! text-rui-dark-text!': !color }"
     >
       {{ t('actions.get_started_for_free') }}
     </ButtonLink>

@@ -224,7 +224,7 @@ watch(isOpen, (value) => {
             v-else
             variant="outlined"
             size="lg"
-            class="!justify-start !px-4 !py-3 [&>span]:w-full"
+            class="justify-start! px-4! py-3! [&>span]:w-full"
             :disabled="!!connectingId"
             @click="selectConnector(connector)"
           >
@@ -271,7 +271,7 @@ watch(isOpen, (value) => {
           </p>
           <p
             v-if="errorDetail"
-            class="text-xs text-rui-text-secondary break-words"
+            class="text-xs text-rui-text-secondary wrap-break-word"
           >
             {{ errorDetail }}
           </p>

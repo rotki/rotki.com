@@ -96,7 +96,7 @@ definePageMeta({
 
 <template>
   <div v-if="feature">
-    <section class="py-10 md:py-16 bg-rui-primary/[.04]">
+    <section class="py-10 md:py-16 bg-rui-primary/4">
       <div class="container">
         <nav class="text-sm text-rui-text-secondary mb-4">
           <NuxtLink
@@ -109,7 +109,7 @@ definePageMeta({
           <span>{{ feature.label }}</span>
         </nav>
         <div class="flex items-center gap-4 md:gap-5">
-          <div class="w-16 h-16 md:w-20 md:h-20 border-2 border-rui-primary rounded-xl p-3 bg-white shadow-sm shrink-0 flex items-center justify-center">
+          <div class="w-16 h-16 md:w-20 md:h-20 border-2 border-rui-primary rounded-xl p-3 bg-white shadow-xs shrink-0 flex items-center justify-center">
             <img
               v-if="feature.icon"
               :src="feature.icon"
@@ -153,7 +153,7 @@ definePageMeta({
       class="py-10 md:py-14"
     >
       <div class="container">
-        <div class="max-w-3xl border border-rui-primary/20 border-l-4 border-l-rui-primary bg-rui-primary/[.04] rounded-r-xl p-6 md:p-8">
+        <div class="max-w-3xl border border-rui-primary/20 border-l-4 border-l-rui-primary bg-rui-primary/4 rounded-r-xl p-6 md:p-8">
           <h2 class="text-h6 font-bold mb-4 uppercase tracking-wide text-rui-primary">
             {{ t('features.detail.takeaways_title') }}
           </h2>
@@ -178,7 +178,7 @@ definePageMeta({
 
     <section
       v-if="(feature.capabilities?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-4">
@@ -227,7 +227,7 @@ definePageMeta({
 
     <section
       v-if="(feature.limitations?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-4">
@@ -277,7 +277,7 @@ definePageMeta({
 
     <section
       v-if="(feature.troubleshooting?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-6">
@@ -326,7 +326,7 @@ definePageMeta({
             </NuxtLink>
             <NuxtLink
               to="/integrations"
-              class="inline-flex items-center gap-2 border border-rui-primary rounded-full px-4 py-2 text-body-2 text-rui-primary bg-white hover:bg-rui-primary/[.04] transition-colors"
+              class="inline-flex items-center gap-2 border border-rui-primary rounded-full px-4 py-2 text-body-2 text-rui-primary bg-white hover:bg-rui-primary/4 transition-colors"
             >
               {{ t('integration.detail.cta.all') }}
             </NuxtLink>
@@ -367,7 +367,7 @@ definePageMeta({
 
     <section
       v-if="(feature.faq?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-6">
@@ -399,7 +399,7 @@ definePageMeta({
       </div>
     </section>
 
-    <section class="py-12 md:py-16 bg-rui-primary/[.04]">
+    <section class="py-12 md:py-16 bg-rui-primary/4">
       <div class="container flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="max-w-2xl">
           <h2 class="text-h5 font-bold mb-2">

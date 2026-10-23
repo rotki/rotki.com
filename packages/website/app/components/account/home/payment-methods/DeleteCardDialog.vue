@@ -53,7 +53,7 @@ function handleCancel(): void {
     v-model="showDialog"
     max-width="500"
   >
-    <RuiCard content-class="!pt-0">
+    <RuiCard content-class="pt-0!">
       <template #header>
         {{ t('home.plans.tiers.step_3.saved_card.delete.title') }}
       </template>
@@ -64,7 +64,7 @@ function handleCancel(): void {
         v-if="card"
         class="mt-4 p-3 bg-rui-grey-50 rounded-md flex items-center gap-3"
       >
-        <div class="rounded bg-white h-8 w-12 flex items-center justify-center">
+        <div class="rounded-sm bg-white h-8 w-12 flex items-center justify-center">
           <img
             :src="card.imageUrl"
             :alt="t('common.card')"

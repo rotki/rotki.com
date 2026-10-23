@@ -50,7 +50,7 @@ const tabs = computed<SponsorTab[]>(() => [
               <NuxtLink
                 :to="tab.to"
                 class="flex items-center gap-2 rounded-full px-3 sm:px-4 py-2 text-body-2 font-medium text-rui-text-secondary whitespace-nowrap transition-colors hover:text-rui-text"
-                active-class="!text-rui-primary bg-white dark:bg-rui-grey-800 shadow-sm"
+                active-class="text-rui-primary! bg-white dark:bg-rui-grey-800 shadow-xs"
               >
                 <RuiIcon
                   :name="tab.icon"

@@ -18,7 +18,7 @@ const { t } = useI18n({ useScope: 'global' });
       color="primary"
       icon
       :loading="loading"
-      class="!p-2"
+      class="p-2!"
       @click="emit('refresh')"
     >
       <RuiIcon

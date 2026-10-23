@@ -8,7 +8,7 @@
       <div class="flex items-center gap-4">
         <!-- Card logo container -->
         <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center p-1">
-          <RuiSkeletonLoader class="w-full h-full rounded" />
+          <RuiSkeletonLoader class="w-full h-full rounded-sm" />
         </div>
         <!-- Card details -->
         <div>
@@ -25,10 +25,10 @@
         <!-- Linked card section -->
         <div class="flex flex-col items-center gap-1">
           <RuiSkeletonLoader class="w-32 h-[24px] rounded-full" />
-          <RuiSkeletonLoader class="w-24 h-[32px] rounded" />
+          <RuiSkeletonLoader class="w-24 h-[32px] rounded-sm" />
         </div>
         <!-- Delete button -->
-        <RuiSkeletonLoader class="w-10 h-10 rounded" />
+        <RuiSkeletonLoader class="w-10 h-10 rounded-sm" />
       </div>
     </div>
   </RuiCard>

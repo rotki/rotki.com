@@ -31,7 +31,7 @@ onMounted(load);
         icon
         :loading="loading"
         :disabled="initialLoading"
-        class="!p-2"
+        class="p-2!"
         @click="load()"
       >
         <RuiIcon
@@ -43,7 +43,7 @@ onMounted(load);
 
     <RuiCard
       variant="flat"
-      class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
+      class="bg-rui-grey-50! dark:bg-rui-grey-900! p-1 border border-rui-grey-300 dark:border-rui-grey-800"
     >
       <div
         v-if="initialLoading"
@@ -77,7 +77,7 @@ onMounted(load);
         <RuiAlert
           type="info"
           icon="lu-info"
-          class="border border-rui-info/[0.5]"
+          class="border border-rui-info/50"
         >
           {{ t('account.credit.disclaimer') }}
         </RuiAlert>

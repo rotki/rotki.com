@@ -11,7 +11,7 @@ const { t } = useI18n({ useScope: 'global' });
 <template>
   <table class="w-full border-collapse text-left">
     <thead>
-      <tr class="border-b border-rui-grey-200 bg-rui-primary/[.04]">
+      <tr class="border-b border-rui-grey-200 bg-rui-primary/4">
         <th class="p-4 text-body-2 font-bold text-rui-text-secondary">
           {{ t('compare.hub.col_tool') }}
         </th>

@@ -6,7 +6,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <ButtonLink
-    class="w-full justify-start !px-2 md:!px-3"
+    class="w-full justify-start px-2! md:px-3!"
     to="/sponsor/mint"
     color="primary"
     variant="text"

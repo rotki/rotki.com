@@ -135,7 +135,7 @@ const { t } = useI18n({ useScope: 'global' });
     </template>
     <div
       v-if="compact"
-      class="w-full absolute bottom-0 left-0 h-20 bg-gradient-to-b from-transparent to-white"
+      class="w-full absolute bottom-0 left-0 h-20 bg-linear-to-b from-transparent to-white"
     />
   </div>
 </template>

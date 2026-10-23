@@ -126,7 +126,7 @@ const menus: MenuGroup[] = [
             :highlight-active="menu.highlightActive"
             :highlight-exact-active="menu.highlightExactActive"
             :external="menu.external"
-            class="[&_span]:!text-wrap [&_span]:text-left"
+            class="[&_span]:text-wrap! [&_span]:text-left"
           >
             {{ menu.label }}
           </ButtonLink>

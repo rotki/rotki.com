@@ -114,7 +114,7 @@ const rankClass = computed<string>(() => getRankClass(page, index));
       >
         <template #activator>
           <!-- A tint rather than a solid chip: ten identical filled chips outweighed the names -->
-          <span class="inline-flex items-center rounded-full bg-rui-primary/[0.08] px-2.5 py-0.5 text-body-2 font-medium text-rui-primary tabular-nums whitespace-nowrap cursor-help">
+          <span class="inline-flex items-center rounded-full bg-rui-primary/8 px-2.5 py-0.5 text-body-2 font-medium text-rui-primary tabular-nums whitespace-nowrap cursor-help">
             {{ t('sponsor.leaderboard.points', { points: entry.points }) }}
           </span>
         </template>

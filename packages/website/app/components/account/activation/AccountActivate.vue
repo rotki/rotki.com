@@ -140,7 +140,7 @@ onBeforeMount(async () => {
           </span>
           <RuiButton
             color="primary"
-            class="inline-flex py-0 !px-1 !text-[1em]"
+            class="inline-flex py-0 px-1! text-[1em]!"
             variant="text"
             @click="handlePaymentRedirect()"
           >

@@ -246,7 +246,7 @@ onMounted(async () => {
     </div>
 
     <!-- Action Buttons (Outside Grid) -->
-    <div class="flex gap-4 justify-center w-full mt-6 mx-auto max-w-[27.5rem]">
+    <div class="flex gap-4 justify-center w-full mt-6 mx-auto max-w-110">
       <RuiButton
         :disabled="processing"
         :loading="paying || initializing"
@@ -276,7 +276,7 @@ onMounted(async () => {
     >
       <div
         v-if="submittingPayment"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs"
       >
         <div class="flex flex-col items-center justify-center text-center px-4">
           <div class="mb-4">

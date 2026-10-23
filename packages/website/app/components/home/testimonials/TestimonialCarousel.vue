@@ -65,7 +65,7 @@ function onSwiperUpdate(s: Swiper) {
       <SwiperSlide
         v-for="(testimonial, i) in testimonials"
         :key="i"
-        class="!h-auto self-start md:self-stretch"
+        class="h-auto! self-start md:self-stretch"
       >
         <Testimonial
           :avatar="testimonial.avatar"
@@ -78,7 +78,7 @@ function onSwiperUpdate(s: Swiper) {
     <CarouselControls
       v-if="swiperInstance"
       v-model:swiper="swiperInstance"
-      class="max-w-[17.5rem]"
+      class="max-w-70"
       :active-index="activeIndex"
       :pages="pages"
     />

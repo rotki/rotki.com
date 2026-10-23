@@ -62,7 +62,7 @@ watch(canvas, async (canvas) => {
         <!-- Loading placeholder -->
         <div
           v-if="loading"
-          class="w-[11.25rem] h-[11.25rem] flex items-center justify-center bg-rui-grey-100 dark:bg-rui-grey-800 rounded"
+          class="w-45 h-45 flex items-center justify-center bg-rui-grey-100 dark:bg-rui-grey-800 rounded-sm"
         >
           <div class="text-center text-rui-text-secondary">
             <RuiProgress
@@ -82,13 +82,13 @@ watch(canvas, async (canvas) => {
         <canvas
           v-else-if="!isWalletOpen"
           ref="canvas"
-          class="w-[11.25rem] h-[11.25rem] cursor-pointer rounded transition-all duration-200 hover:shadow-md"
+          class="w-45 h-45 cursor-pointer rounded-sm transition-all duration-200 hover:shadow-md"
           @click="handleQRClick()"
         />
 
         <div
           v-else
-          class="w-[11.25rem] h-[11.25rem] flex items-center justify-center bg-rui-grey-100 dark:bg-rui-grey-800 rounded"
+          class="w-45 h-45 flex items-center justify-center bg-rui-grey-100 dark:bg-rui-grey-800 rounded-sm"
         >
           <div class="text-center text-rui-text-secondary">
             <RuiIcon

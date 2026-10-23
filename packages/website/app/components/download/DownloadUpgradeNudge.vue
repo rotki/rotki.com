@@ -19,10 +19,10 @@ function trackSeePlansClick(): void {
 
 <template>
   <div class="container pt-14 lg:pt-20 pb-6 lg:pb-8">
-    <div class="rounded-2xl border border-rui-primary/20 bg-rui-primary/[0.04] p-6 lg:p-10">
+    <div class="rounded-2xl border border-rui-primary/20 bg-rui-primary/4 p-6 lg:p-10">
       <div class="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
         <div class="flex-1">
-          <h2 class="text-rui-text text-h5 !font-bold mb-3">
+          <h2 class="text-rui-text text-h5 font-bold! mb-3">
             {{ t('download.upgrade_nudge.title') }}
           </h2>
           <ul class="text-rui-text-secondary text-body-1 space-y-2">

@@ -51,7 +51,7 @@ const features = computed<{ img: string; width: number; height: number; title: s
       >
         <div class="flex-1 flex justify-center">
           <img
-            class="h-auto w-full md:w-auto max-w-full rounded-xl border border-rui-grey-200 shadow-sm"
+            class="h-auto w-full md:w-auto max-w-full rounded-xl border border-rui-grey-200 shadow-xs"
             :src="feature.img"
             :alt="feature.title"
             :width="feature.width"

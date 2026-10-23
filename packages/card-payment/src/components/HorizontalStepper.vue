@@ -14,7 +14,7 @@ defineProps<Props>();
 </script>
 
 <template>
-  <div class="py-10 lg:px-4 w-full max-w-[29rem] mx-auto">
+  <div class="py-10 lg:px-4 w-full max-w-116 mx-auto">
     <div class="flex justify-center">
       <div class="flex items-center space-x-3">
         <template
@@ -23,7 +23,7 @@ defineProps<Props>();
         >
           <!-- Step pill -->
           <div
-            class="h-2 w-20 md:w-[8.5rem] rounded-full transition-colors duration-200"
+            class="h-2 w-20 md:w-34 rounded-full transition-colors duration-200"
             :class="{
               'bg-rui-primary': step.current,
               'bg-rui-grey-300': !step.current,

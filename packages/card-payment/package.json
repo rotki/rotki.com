@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@rotki/ui-library": "catalog:",
+    "@tailwindcss/vite": "catalog:",
     "@tsconfig/node24": "catalog:",
     "@types/braintree-web": "catalog:",
     "@types/node": "catalog:",
@@ -33,9 +34,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
-    "autoprefixer": "catalog:",
     "happy-dom": "catalog:",
-    "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

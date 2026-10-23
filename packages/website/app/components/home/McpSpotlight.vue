@@ -31,18 +31,18 @@ const modes: { icon: RuiIcons; title: string; description: string; isDefault?: b
 </script>
 
 <template>
-  <section class="py-16 md:py-24 bg-rui-primary/[0.04]">
+  <section class="py-16 md:py-24 bg-rui-primary/4">
     <div class="container grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
       <div class="flex flex-col gap-5">
         <div class="flex flex-wrap items-center gap-2">
           <span class="rounded-full bg-rui-primary text-white px-3 py-1 text-caption font-medium">
             {{ t('home.mcp.badge') }}
           </span>
-          <span class="rounded-full bg-rui-primary/[0.08] px-3 py-1 text-caption font-medium text-rui-primary">
+          <span class="rounded-full bg-rui-primary/8 px-3 py-1 text-caption font-medium text-rui-primary">
             {{ t('home.premium_features.basic_and_up') }}
           </span>
         </div>
-        <h2 class="text-h4 !font-bold">
+        <h2 class="text-h4 font-bold!">
           {{ t('home.mcp.title') }}
         </h2>
         <p class="text-body-1 text-rui-text-secondary">
@@ -97,9 +97,9 @@ const modes: { icon: RuiIcons; title: string; description: string; isDefault?: b
             v-for="mode in modes"
             :key="mode.title"
             class="flex items-start gap-4 rounded-xl border p-4"
-            :class="mode.isDefault ? 'border-rui-primary bg-rui-primary/[0.04]' : 'border-rui-grey-200'"
+            :class="mode.isDefault ? 'border-rui-primary bg-rui-primary/4' : 'border-rui-grey-200'"
           >
-            <span class="flex items-center justify-center size-10 shrink-0 rounded-lg bg-rui-primary/[0.08] text-rui-primary">
+            <span class="flex items-center justify-center size-10 shrink-0 rounded-lg bg-rui-primary/8 text-rui-primary">
               <RuiIcon :name="mode.icon" />
             </span>
             <div class="flex flex-col gap-1">

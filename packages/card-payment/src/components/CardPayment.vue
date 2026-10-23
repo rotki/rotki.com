@@ -505,7 +505,7 @@ onUnmounted(async () => {
           <!-- VAT Warning -->
           <div
             v-if="showVatWarning"
-            class="mb-4 rounded border border-rui-warning p-3 text-sm text-rui-warning-darker text-shade-[.6]"
+            class="mb-4 rounded-sm border border-rui-warning p-3 text-sm text-rui-warning-darker text-shade-[.6]"
           >
             No VAT Reverse charge applied. Your VAT ID could not be verified. Update it in
             <a
@@ -533,7 +533,7 @@ onUnmounted(async () => {
     <TermsAcceptance
       v-model:accepted-terms="acceptedTerms"
       :disabled="isProcessing"
-      class="max-w-[27.5rem] mx-auto w-full"
+      class="max-w-110 mx-auto w-full"
     />
 
     <!-- Full Screen Processing Overlay -->
@@ -547,7 +547,7 @@ onUnmounted(async () => {
       >
         <div
           v-if="isProcessing"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs"
         >
           <div class="flex flex-col items-center justify-center text-center px-4">
             <div class="mb-4">
@@ -565,7 +565,7 @@ onUnmounted(async () => {
     </Teleport>
 
     <!-- Action Buttons (Outside Grid) -->
-    <div class="max-w-[27.5rem] mx-auto w-full">
+    <div class="max-w-110 mx-auto w-full">
       <PaymentButtons
         :disabled="!isFormValid"
         :processing="isProcessing"

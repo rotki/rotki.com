@@ -120,7 +120,7 @@ function submit(): void {
     </div>
 
     <!-- Action Buttons (Outside Grid) -->
-    <div class="flex gap-4 justify-center w-full mt-6 max-w-[27.5rem] mx-auto">
+    <div class="flex gap-4 justify-center w-full mt-6 max-w-110 mx-auto">
       <RuiButton
         v-if="!subscriptionId"
         :disabled="processing || loading"

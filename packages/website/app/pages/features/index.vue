@@ -81,7 +81,7 @@ definePageMeta({
 
 <template>
   <div>
-    <section class="py-10 md:py-20 bg-rui-primary/[.04]">
+    <section class="py-10 md:py-20 bg-rui-primary/4">
       <div class="container">
         <div class="max-w-[820px]">
           <span class="text-h6 text-rui-primary uppercase tracking-wide font-bold">
@@ -109,7 +109,7 @@ definePageMeta({
         <h2 class="text-h5 font-bold mb-6">
           {{ t('features.hub.takeaways_title') }}
         </h2>
-        <div class="max-w-3xl border border-rui-primary/20 border-l-4 border-l-rui-primary bg-rui-primary/[.04] rounded-r-xl p-6 md:p-8">
+        <div class="max-w-3xl border border-rui-primary/20 border-l-4 border-l-rui-primary bg-rui-primary/4 rounded-r-xl p-6 md:p-8">
           <ul class="space-y-3">
             <li
               v-for="takeaway in keyTakeaways"
@@ -129,7 +129,7 @@ definePageMeta({
       </div>
     </section>
 
-    <section class="py-10 md:py-14 bg-rui-primary/[.04]">
+    <section class="py-10 md:py-14 bg-rui-primary/4">
       <div class="container">
         <h2 class="text-h5 font-bold mb-6">
           {{ t('features.hub.list_title') }}
@@ -199,7 +199,7 @@ definePageMeta({
 
     <section
       v-if="hubData"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <div class="max-w-[820px]">

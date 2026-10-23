@@ -14,7 +14,7 @@ defineProps<{
 <template>
   <div class="flex flex-col gap-3">
     <img
-      class="size-12 min-w-12 rounded-md overflow-hidden mx-auto !object-cover"
+      class="size-12 min-w-12 rounded-md overflow-hidden mx-auto object-cover!"
       :class="{ 'size-20 min-w-20': sponsor.gold }"
       :src="sponsor.image"
       :alt="sponsor.name"
@@ -22,7 +22,7 @@ defineProps<{
       :height="sponsor.gold ? 80 : 48"
       loading="lazy"
     />
-    <div class="flex flex-col items-center justify-between relative w-[12rem] max-w-full mx-auto">
+    <div class="flex flex-col items-center justify-between relative w-48 max-w-full mx-auto">
       <img
         v-if="sponsor.gold"
         src="/img/ribbon.png"

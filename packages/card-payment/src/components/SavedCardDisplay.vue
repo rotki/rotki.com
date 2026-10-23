@@ -103,7 +103,7 @@ async function handleDeleteCard(): Promise<void> {
     <!-- Expired Card Error -->
     <div
       v-if="isCardExpired"
-      class="p-4 bg-red-50 border border-red-200 rounded mb-4"
+      class="p-4 bg-red-50 border border-red-200 rounded-sm mb-4"
     >
       <p class="text-red-800 mb-2">
         This card has expired

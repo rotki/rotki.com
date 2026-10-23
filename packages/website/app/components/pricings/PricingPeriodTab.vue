@@ -45,14 +45,14 @@ const tabs = [
     <!-- Pill segmented control, the same shape as the sponsor tab bar -->
     <RuiTabs
       v-model="model"
-      class="border border-rui-grey-200 bg-rui-grey-50 rounded-full [&>div]:p-1 [&>div]:!h-auto"
+      class="border border-rui-grey-200 bg-rui-grey-50 rounded-full [&>div]:p-1 [&>div]:h-auto!"
     >
       <RuiTab
         v-for="tab in tabs"
         :key="tab.value"
         :value="tab.value"
-        class="bg-transparent !rounded-full h-9 min-h-[2.25rem] !px-4"
-        active-class="!bg-white shadow-sm after:hidden !text-rui-primary"
+        class="bg-transparent rounded-full! h-9 min-h-9 px-4!"
+        active-class="bg-white! shadow-xs after:hidden text-rui-primary!"
       >
         {{ tab.label }}
       </RuiTab>

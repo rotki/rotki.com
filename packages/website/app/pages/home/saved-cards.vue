@@ -211,7 +211,7 @@ function getCardTooltip(card: SavedCard): string | undefined {
       <!-- Loading overlay for refreshes -->
       <div
         v-if="loading"
-        class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg"
+        class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-xs z-10 flex items-center justify-center rounded-lg"
       >
         <RuiProgress
           variant="indeterminate"

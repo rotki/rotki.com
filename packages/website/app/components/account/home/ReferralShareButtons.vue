@@ -31,7 +31,7 @@ const { t } = useI18n({ useScope: 'global' });
           variant="text"
           size="sm"
           color="secondary"
-          class="!p-2 !min-w-0"
+          class="p-2! min-w-0!"
         >
           <Component
             :is="button.customIcon"

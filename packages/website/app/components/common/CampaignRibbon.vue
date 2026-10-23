@@ -18,7 +18,7 @@ const lastDay = computed<string | undefined>(() => formatCampaignLastDay(get(act
 <template>
   <div
     v-if="activeCampaign"
-    class="flex items-center justify-center gap-2 px-4 py-2 text-body-2 text-rui-primary text-center font-medium border-b border-default w-full bg-rui-primary/[0.06]"
+    class="flex items-center justify-center gap-2 px-4 py-2 text-body-2 text-rui-primary text-center font-medium border-b border-default w-full bg-rui-primary/6"
   >
     <RuiIcon
       :name="applied ? 'lu-circle-check' : 'lu-tag'"

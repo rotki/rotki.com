@@ -68,7 +68,7 @@ const data = computed<PremiumFeature[]>(() => [
     <div class="container">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
         <div class="flex flex-col gap-3 max-w-[640px]">
-          <h2 class="text-h4 !font-bold">
+          <h2 class="text-h4 font-bold!">
             {{ t('home.premium_features.title') }}
           </h2>
           <p class="text-body-1 text-rui-text-secondary">
@@ -115,7 +115,7 @@ const data = computed<PremiumFeature[]>(() => [
             </p>
             <span
               v-if="item.basicAndUp"
-              class="self-start rounded-full bg-rui-primary/[0.08] px-2.5 py-0.5 text-caption font-medium text-rui-primary"
+              class="self-start rounded-full bg-rui-primary/8 px-2.5 py-0.5 text-caption font-medium text-rui-primary"
             >
               {{ t('home.premium_features.basic_and_up') }}
             </span>

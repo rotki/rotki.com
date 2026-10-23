@@ -66,7 +66,7 @@ const data = computed<LimitItem[]>(() => [
         <p class="text-rui-primary text-subtitle-1 font-medium">
           {{ t('products.features.limits.heading') }}
         </p>
-        <h2 class="text-h5 lg:text-h4 !font-bold">
+        <h2 class="text-h5 lg:text-h4 font-bold!">
           {{ t('products.features.limits.title') }}
         </h2>
       </div>
@@ -79,7 +79,7 @@ const data = computed<LimitItem[]>(() => [
           <!-- The 1.44 captures have different aspect ratios, so they sit in a fixed frame -->
           <div
             v-if="item.image"
-            class="aspect-[616/260] flex items-center justify-center rounded-xl border border-rui-grey-300 bg-rui-grey-50 overflow-hidden p-3"
+            class="aspect-616/260 flex items-center justify-center rounded-xl border border-rui-grey-300 bg-rui-grey-50 overflow-hidden p-3"
           >
             <img
               :src="item.image.src"
@@ -92,7 +92,7 @@ const data = computed<LimitItem[]>(() => [
           </div>
           <span
             v-else-if="item.icon"
-            class="flex items-center justify-center size-12 rounded-xl bg-rui-primary/[0.08] text-rui-primary"
+            class="flex items-center justify-center size-12 rounded-xl bg-rui-primary/8 text-rui-primary"
           >
             <RuiIcon :name="item.icon" />
           </span>

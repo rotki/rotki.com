@@ -31,7 +31,7 @@ const steps = computed<Step[]>(() => [
 
 <template>
   <section>
-    <h2 class="text-h5 !font-bold text-center mb-8">
+    <h2 class="text-h5 font-bold! text-center mb-8">
       {{ t('sponsor.how_it_works.title') }}
     </h2>
     <ol class="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3">
@@ -41,7 +41,7 @@ const steps = computed<Step[]>(() => [
         class="rounded-2xl border border-rui-grey-200 p-6 flex flex-col gap-3"
       >
         <div class="flex items-center gap-3">
-          <span class="flex items-center justify-center size-10 rounded-full bg-rui-primary/[0.08] text-rui-primary">
+          <span class="flex items-center justify-center size-10 rounded-full bg-rui-primary/8 text-rui-primary">
             <RuiIcon
               :name="step.icon"
               size="20"

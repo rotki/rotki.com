@@ -18,7 +18,7 @@ const icon = computed<RuiIcons | undefined>(() => {
 
 <template>
   <RuiChip
-    class="capitalize hover:!bg-transparent py-1 !min-h-0"
+    class="capitalize hover:bg-transparent! py-1 min-h-0!"
     variant="outlined"
   >
     <template

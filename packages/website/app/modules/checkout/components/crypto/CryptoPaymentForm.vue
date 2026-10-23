@@ -190,7 +190,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
   </div>
 
   <!-- Action Buttons (Outside Grid) -->
-  <div class="flex flex-col sm:flex-row gap-4 mt-6 mx-auto w-full max-w-[27.5rem]">
+  <div class="flex flex-col sm:flex-row gap-4 mt-6 mx-auto w-full max-w-110">
     <div class="grow">
       <RuiButton
         :disabled="planSwitchLoading || web3ProcessingLoading || processing"
@@ -254,7 +254,7 @@ function handleInternalPlanChange(newPlan: SelectedPlan): void {
     >
       <div
         v-if="processing"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs"
       >
         <div class="flex flex-col items-center justify-center text-center px-4">
           <div class="mb-4">

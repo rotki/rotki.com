@@ -17,9 +17,9 @@ defineSlots<{
 </script>
 
 <template>
-  <div class="container flex flex-col min-h-full flex-grow py-12">
+  <div class="container flex flex-col min-h-full grow py-12">
     <div
-      class="flex flex-grow h-full"
+      class="flex grow h-full"
       :class="{
         'items-center': centerVertically,
         'justify-center': centerHorizontally,

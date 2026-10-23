@@ -65,7 +65,7 @@ const contacts: { title: string; description: string; href: string; icon: RuiIco
         <div
           v-for="contact in contacts"
           :key="contact.title"
-          class="p-6 bg-rui-primary/[0.04] space-y-4"
+          class="p-6 bg-rui-primary/4 space-y-4"
         >
           <div
             class="w-12 h-12 rounded-[10px] bg-rui-primary text-white flex items-center justify-center"

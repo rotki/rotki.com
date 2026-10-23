@@ -9,9 +9,9 @@ defineProps<{
 <template>
   <NuxtLink
     :to="`/integrations/${integrationSlug(item.label)}`"
-    class="flex flex-col items-center gap-1.5 w-[4.5rem] hover:opacity-80 transition-opacity"
+    class="flex flex-col items-center gap-1.5 w-18 hover:opacity-80 transition-opacity"
   >
-    <div class="w-14 h-14 border border-rui-grey-300 rounded p-2.5">
+    <div class="w-14 h-14 border border-rui-grey-300 rounded-sm p-2.5">
       <img
         class="w-full h-full object-contain"
         :src="item.image"

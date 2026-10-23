@@ -31,7 +31,7 @@ const features = [
       <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.evm_protocols.title') }}
       </p>
-      <h3 class="text-h5 !font-bold">
+      <h3 class="text-h5 font-bold!">
         {{ t('home.evm_protocols.subtitle') }}
       </h3>
       <div class="pt-4">
@@ -51,7 +51,7 @@ const features = [
     </div>
     <div class="flex-1">
       <img
-        class="rounded-xl border border-rui-grey-200 shadow-sm"
+        class="rounded-xl border border-rui-grey-200 shadow-xs"
         :alt="t('home.evm_protocols.image_alt')"
         src="/img/evm_protocols.webp"
         srcset="/img/evm_protocols-654w.webp 654w, /img/evm_protocols-1308w.webp 1308w, /img/evm_protocols.webp 2400w"

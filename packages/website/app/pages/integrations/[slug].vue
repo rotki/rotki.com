@@ -115,7 +115,7 @@ definePageMeta({
 
 <template>
   <div v-if="integration">
-    <section class="py-10 md:py-16 bg-rui-primary/[.04]">
+    <section class="py-10 md:py-16 bg-rui-primary/4">
       <div class="container">
         <nav class="text-sm text-rui-text-secondary mb-4">
           <NuxtLink
@@ -128,7 +128,7 @@ definePageMeta({
           <span>{{ typeLabel }}</span>
         </nav>
         <div class="flex items-start gap-5">
-          <div class="w-16 h-16 md:w-20 md:h-20 border border-rui-grey-200 rounded-xl p-3 bg-white shadow-sm shrink-0">
+          <div class="w-16 h-16 md:w-20 md:h-20 border border-rui-grey-200 rounded-xl p-3 bg-white shadow-xs shrink-0">
             <img
               :src="integration.image"
               :alt="integration.label"
@@ -201,7 +201,7 @@ definePageMeta({
 
     <section
       v-if="(integration.limitations?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-4">
@@ -250,7 +250,7 @@ definePageMeta({
 
     <section
       v-if="(integration.screenshots?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-4">
@@ -264,7 +264,7 @@ definePageMeta({
             <img
               :src="shot.src"
               :alt="shot.alt"
-              class="rounded border border-rui-grey-300 w-full h-auto"
+              class="rounded-sm border border-rui-grey-300 w-full h-auto"
               loading="lazy"
             />
             <figcaption class="text-sm text-rui-text-secondary mt-2">
@@ -309,7 +309,7 @@ definePageMeta({
       </div>
     </section>
 
-    <section class="py-12 md:py-16 bg-rui-primary/[.04]">
+    <section class="py-12 md:py-16 bg-rui-primary/4">
       <div class="container flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="max-w-2xl">
           <h2 class="text-h5 font-bold mb-2">

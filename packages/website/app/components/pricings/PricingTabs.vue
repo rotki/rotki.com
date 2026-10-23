@@ -69,7 +69,7 @@ watch(() => plans, (newPlans) => {
         class="relative h-10 px-1 text-sm font-medium border-b-2 -mb-px transition-colors"
         :class="[
           tab === plan.name ? 'border-rui-primary text-rui-primary' : 'border-transparent text-rui-text-secondary hover:text-rui-text',
-          { 'bg-rui-primary/[0.06]': isMostPopularPlan(plan) },
+          { 'bg-rui-primary/6': isMostPopularPlan(plan) },
         ]"
         @click="tab = plan.name"
         @keydown="onKeydown($event, index)"

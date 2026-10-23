@@ -15,7 +15,7 @@ const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integ
       <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.exchanges.title') }}
       </p>
-      <h3 class="text-h5 !font-bold">
+      <h3 class="text-h5 font-bold!">
         {{ t('home.exchanges.subtitle') }}
       </h3>
       <div class="text-body-1 text-rui-text-secondary pt-2">
@@ -48,7 +48,7 @@ const exchangesWithKeys = computed<IntegrationData['exchanges']>(() => get(integ
 
     <div class="flex-1">
       <img
-        class="rounded-xl border border-rui-grey-200 shadow-sm"
+        class="rounded-xl border border-rui-grey-200 shadow-xs"
         :alt="t('home.exchanges.title')"
         src="/img/exchanges.webp"
         srcset="/img/exchanges-654w.webp 654w, /img/exchanges-1308w.webp 1308w, /img/exchanges.webp 2400w"

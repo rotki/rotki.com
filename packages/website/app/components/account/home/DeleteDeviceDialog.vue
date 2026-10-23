@@ -41,7 +41,7 @@ function close(): void {
     @closed="close()"
   >
     <RuiCard
-      content-class="!pt-0"
+      content-class="pt-0!"
     >
       <template #header>
         {{ t('account.devices.delete.title') }}

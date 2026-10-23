@@ -14,7 +14,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <PageLayout>
-    <div class="bg-rui-primary/[.04] py-10 lg:py-20">
+    <div class="bg-rui-primary/4 py-10 lg:py-20">
       <div class="container">
         <div class="max-w-[768px]">
           <div class="mb-3 text-h6 -ml-1">

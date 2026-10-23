@@ -10,9 +10,9 @@ const { t } = useI18n({ useScope: 'global' });
 
     <RuiCard
       variant="flat"
-      class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
+      class="bg-rui-grey-50! dark:bg-rui-grey-900! p-1 border border-rui-grey-300 dark:border-rui-grey-800"
     >
-      <div class="min-h-[10rem] space-y-4">
+      <div class="min-h-40 space-y-4">
         <!-- Description -->
         <div class="mb-8">
           <RuiSkeletonLoader class="h-4 w-full max-w-xl" />

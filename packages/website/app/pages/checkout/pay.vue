@@ -117,8 +117,8 @@ onBeforeMount(() => {
           :steps="steps"
           custom
           orientation="vertical"
-          subtitle-class="!text-rui-primary-lighter"
-          title-class="!text-rui-primary"
+          subtitle-class="text-rui-primary-lighter!"
+          title-class="text-rui-primary!"
         />
       </div>
     </div>

@@ -31,7 +31,6 @@
   "dependencies": {
     "@coinbase/wallet-sdk": "catalog:",
     "@nuxtjs/robots": "catalog:",
-    "@nuxtjs/tailwindcss": "catalog:",
     "@pinia/nuxt": "catalog:",
     "@rotki/card-payment-common": "workspace:*",
     "@rotki/sigil": "workspace:*",
@@ -69,6 +68,7 @@
     "@playwright/test": "catalog:",
     "@resvg/resvg-js": "catalog:",
     "@rotki/ui-library": "catalog:",
+    "@tailwindcss/vite": "catalog:",
     "@types/braintree-web": "catalog:",
     "@types/node": "catalog:",
     "@types/paypal-checkout-components": "catalog:",

@@ -90,7 +90,7 @@ onBeforeMount(initPeriodFromCurrentPlan);
     :model-value="visible"
     @closed="emit('cancel')"
   >
-    <RuiCard content-class="!pt-0">
+    <RuiCard content-class="pt-0!">
       <template #header>
         {{ t('change_plan.title') }}
       </template>
@@ -147,7 +147,7 @@ onBeforeMount(initPeriodFromCurrentPlan);
         </div>
         <div
           v-if="warning && !confirmed"
-          class="absolute w-full h-full top-0 left-0 bg-white/[0.7]"
+          class="absolute w-full h-full top-0 left-0 bg-white/70"
         />
       </div>
     </RuiCard>

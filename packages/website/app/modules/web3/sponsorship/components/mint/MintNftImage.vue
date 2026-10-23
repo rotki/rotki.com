@@ -29,17 +29,17 @@ const TIER_TINTS: Record<string, TierTint> = {
   bronze: {
     chip: 'bg-[#9a5420] text-white',
     icon: 'text-[#b8773f] ring-[#9a5420]/15',
-    panel: 'bg-gradient-to-br from-[#fbf0e4] to-[#efd2b3]',
+    panel: 'bg-linear-to-br from-[#fbf0e4] to-[#efd2b3]',
   },
   gold: {
     chip: 'bg-[#8f6a0e] text-white',
     icon: 'text-[#b08a26] ring-[#8f6a0e]/15',
-    panel: 'bg-gradient-to-br from-[#fdf8e4] to-[#f2df9e]',
+    panel: 'bg-linear-to-br from-[#fdf8e4] to-[#f2df9e]',
   },
   silver: {
     chip: 'bg-[#5f6b7a] text-white',
     icon: 'text-[#7d8896] ring-[#5f6b7a]/15',
-    panel: 'bg-gradient-to-br from-[#f5f7f9] to-[#dce1e8]',
+    panel: 'bg-linear-to-br from-[#f5f7f9] to-[#dce1e8]',
   },
 };
 
@@ -103,7 +103,7 @@ watch(imageUrl, () => {
 
 <template>
   <div class="nft-image-container w-full flex justify-center lg:block">
-    <div class="aspect-square w-full max-w-md lg:max-w-none bg-rui-grey-100 rounded-2xl shadow-sm flex items-center justify-center overflow-hidden">
+    <div class="aspect-square w-full max-w-md lg:max-w-none bg-rui-grey-100 rounded-2xl shadow-xs flex items-center justify-center overflow-hidden">
       <div
         v-if="error"
         class="text-rui-error text-center"
@@ -133,7 +133,7 @@ watch(imageUrl, () => {
           data-id="nft-image"
           :src="imageUrl"
           :alt="t('sponsor.sponsor_page.nft_image.alt', { tier: tierLabel })"
-          class="w-full h-full object-cover rounded-lg z-[2]"
+          class="w-full h-full object-cover rounded-lg z-2"
           width="448"
           height="448"
           fetchpriority="high"
@@ -142,7 +142,7 @@ watch(imageUrl, () => {
         />
         <RuiSkeletonLoader
           v-if="imageLoading"
-          class="absolute top-0 left-0 z-[0] w-full h-full"
+          class="absolute top-0 left-0 z-0 w-full h-full"
         />
       </div>
       <div
@@ -155,7 +155,7 @@ watch(imageUrl, () => {
         <span
           v-if="tierLabel"
           data-id="nft-image-tier"
-          class="absolute top-4 left-4 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm"
+          class="absolute top-4 left-4 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-xs"
           :class="tint.chip"
         >
           {{ tierLabel }}

@@ -39,7 +39,7 @@ defineProps<TestimonialProps>();
       />
       <span
         v-else
-        class="flex items-center justify-center size-10 rounded-full bg-rui-primary/[0.08] text-rui-primary font-medium"
+        class="flex items-center justify-center size-10 rounded-full bg-rui-primary/8 text-rui-primary font-medium"
         aria-hidden="true"
       >
         {{ username.replace(/^@/, '').charAt(0).toUpperCase() }}

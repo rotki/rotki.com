@@ -63,7 +63,7 @@ function handleApprove(type: ApprovalType) {
           <RuiButton
             color="primary"
             size="lg"
-            class="w-full flex-1 [&_span]:!text-wrap"
+            class="w-full flex-1 [&_span]:text-wrap!"
             :disabled="action.disabled"
             v-bind="attrs"
           >
@@ -104,7 +104,7 @@ function handleApprove(type: ApprovalType) {
         v-if="approval.isApproving"
         color="primary"
         size="lg"
-        class="w-full flex-1 [&_span]:!text-wrap"
+        class="w-full flex-1 [&_span]:text-wrap!"
         loading
         disabled
       >
@@ -116,7 +116,7 @@ function handleApprove(type: ApprovalType) {
         v-if="!approval.needsApproval && !approval.isApproving"
         color="primary"
         size="lg"
-        class="w-full flex-1 [&_span]:!text-wrap"
+        class="w-full flex-1 [&_span]:text-wrap!"
         :loading="sponsorshipStatus === 'pending'"
         :disabled="action.disabled"
         @click="action.run()"

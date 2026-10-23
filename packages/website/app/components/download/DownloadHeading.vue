@@ -73,7 +73,7 @@ function onDownloadClick(platform: string): void {
             :href="releaseUrl"
             target="_blank"
             rel="noopener"
-            class="inline-flex items-center gap-2 rounded-full border border-rui-primary/20 bg-rui-primary/[0.04] px-4 py-1.5 text-body-2 text-rui-primary hover:bg-rui-primary/[0.08] transition-colors"
+            class="inline-flex items-center gap-2 rounded-full border border-rui-primary/20 bg-rui-primary/4 px-4 py-1.5 text-body-2 text-rui-primary hover:bg-rui-primary/8 transition-colors"
           >
             <RuiIcon
               name="lu-sparkles"
@@ -86,10 +86,10 @@ function onDownloadClick(platform: string): void {
             />
           </a>
         </div>
-        <h1 class="text-rui-text text-h4 md:text-h3 !font-bold text-balance">
+        <h1 class="text-rui-text text-h4 md:text-h3 font-bold! text-balance">
           {{ t('download.heading.description') }}
         </h1>
-        <p class="text-body-1 md:text-h6 !font-normal text-rui-text-secondary max-w-[640px] text-balance">
+        <p class="text-body-1 md:text-h6 font-normal! text-rui-text-secondary max-w-[640px] text-balance">
           {{ t('download.heading.detail') }}
         </p>
         <!-- Full width, so its box does not shrink to the loading placeholder and widen once the buttons load -->
@@ -123,7 +123,7 @@ function onDownloadClick(platform: string): void {
               size="sm"
               variant="text"
               color="primary"
-              class="!p-0 !text-sm underline"
+              class="p-0! text-sm! underline"
               data-cy="show-all-download"
               @click="showAll = true"
             >
@@ -140,7 +140,7 @@ function onDownloadClick(platform: string): void {
               <!-- About as wide as a version such as v1.44.0, so the centred line barely moves once it loads -->
               <span
                 v-if="loading"
-                class="inline-block w-12 h-4 bg-rui-grey-200 rounded animate-pulse align-middle"
+                class="inline-block w-12 h-4 bg-rui-grey-200 rounded-sm animate-pulse align-middle"
               />
               <template v-else>
                 {{ version }}

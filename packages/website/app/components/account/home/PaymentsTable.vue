@@ -73,7 +73,7 @@ watch(() => pending, (pendingIs, pendingWas) => {
         color="primary"
         icon
         :loading="loading"
-        class="!p-2"
+        class="p-2!"
         @click="refresh()"
       >
         <RuiIcon

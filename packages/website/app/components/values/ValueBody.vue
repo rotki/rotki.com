@@ -14,7 +14,7 @@ const { t } = useI18n({ useScope: 'global' });
       height="500"
     />
   </div>
-  <div class="py-10 md:py-20 bg-rui-primary/[0.04]">
+  <div class="py-10 md:py-20 bg-rui-primary/4">
     <div
       class="container grid items-start md:grid-flow-col grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_3rem_auto] gap-y-10 md:gap-y-0 gap-x-20"
     >

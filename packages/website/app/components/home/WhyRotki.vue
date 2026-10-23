@@ -77,7 +77,7 @@ const featured = computed<IntegrationItem[]>(() => {
       <div class="flex flex-col gap-10">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div class="flex flex-col gap-3 max-w-[640px]">
-            <h2 class="text-h4 !font-bold">
+            <h2 class="text-h4 font-bold!">
               {{ t('home.why_rotki.title') }}
             </h2>
             <p class="text-body-1 text-rui-text-secondary">
@@ -87,7 +87,7 @@ const featured = computed<IntegrationItem[]>(() => {
           <ButtonLink
             to="/compare"
             color="primary"
-            class="self-start md:self-auto !whitespace-normal text-left -ml-3 md:ml-0"
+            class="self-start md:self-auto whitespace-normal! text-left -ml-3 md:ml-0"
           >
             {{ t('home.why_rotki.compare') }}
             <template #append>
@@ -104,7 +104,7 @@ const featured = computed<IntegrationItem[]>(() => {
             :key="pillar.title"
             class="flex flex-col gap-3 rounded-xl border border-rui-grey-200 p-6"
           >
-            <span class="flex items-center justify-center size-10 rounded-lg bg-rui-primary/[0.08] text-rui-primary">
+            <span class="flex items-center justify-center size-10 rounded-lg bg-rui-primary/8 text-rui-primary">
               <RuiIcon :name="pillar.icon" />
             </span>
             <h3 class="text-h6">
@@ -118,7 +118,7 @@ const featured = computed<IntegrationItem[]>(() => {
       </div>
 
       <div class="flex flex-col items-center gap-8 text-center">
-        <h3 class="text-h5 !font-bold max-w-[640px]">
+        <h3 class="text-h5 font-bold! max-w-[640px]">
           {{ t('home.why_rotki.integrations', { count: integrationCount }) }}
         </h3>
         <ul class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-9 gap-3 w-full">
@@ -129,7 +129,7 @@ const featured = computed<IntegrationItem[]>(() => {
           >
             <NuxtLink
               :to="`/integrations/${integrationSlug(item.label)}`"
-              class="flex flex-col items-center gap-2 rounded-xl border border-rui-grey-200 px-2 py-4 h-full hover:border-rui-primary/40 hover:shadow-sm transition-all"
+              class="flex flex-col items-center gap-2 rounded-xl border border-rui-grey-200 px-2 py-4 h-full hover:border-rui-primary/40 hover:shadow-xs transition-all"
             >
               <img
                 :src="item.image"

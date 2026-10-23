@@ -9,7 +9,7 @@
  * The marks are used nominatively: each one links to the corresponding service
  * or indicates a platform.
  *
- * Crypto network marks (`lu-bitcoin-accounts`, `lu-solana-accounts-fill`,
+ * Crypto network marks (`lu-bitcoin-accounts`, `lu-solana-accounts`,
  * `lu-substrate-accounts`) stay in the library and need no registration.
  */
 

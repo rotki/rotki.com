@@ -20,7 +20,7 @@ const { t } = useI18n({ useScope: 'global' });
       <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.dashboard.title') }}
       </p>
-      <h3 class="text-h5 !font-bold">
+      <h3 class="text-h5 font-bold!">
         {{ t('home.dashboard.subtitle') }}
       </h3>
       <div class="flex flex-col gap-6 text-rui-text-secondary pt-4">

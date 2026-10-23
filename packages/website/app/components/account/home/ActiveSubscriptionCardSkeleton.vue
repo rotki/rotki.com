@@ -1,6 +1,6 @@
 <template>
   <div>
-    <RuiCard class="!border-l-4 !border-l-gray-300 dark:!border-l-gray-600">
+    <RuiCard class="border-l-4! border-l-gray-300! dark:border-l-gray-600!">
       <!-- Next Billing Skeleton -->
       <div class="mb-6 p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
         <div class="flex items-center justify-between">

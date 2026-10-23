@@ -53,8 +53,8 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <RuiCard
-    class="!border-2"
-    :class="{ '!border-rui-error': !isSubscriber }"
+    class="border-2!"
+    :class="{ 'border-rui-error!': !isSubscriber }"
   >
     <div>
       <div

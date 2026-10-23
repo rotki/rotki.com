@@ -36,14 +36,14 @@ const {
     <LeaderboardHeader :total="paginationData.total" />
 
     <RuiCard
-      class="!rounded-2xl"
+      class="rounded-2xl!"
       content-class="min-h-[480px]"
     >
       <div class="relative flex flex-col">
         <!-- Loading overlay for pagination -->
         <div
           v-if="loading && hasData"
-          class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg"
+          class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-xs z-10 flex items-center justify-center rounded-lg"
         >
           <RuiProgress
             variant="indeterminate"

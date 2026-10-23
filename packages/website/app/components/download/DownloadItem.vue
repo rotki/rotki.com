@@ -16,7 +16,7 @@ const { t } = useI18n({ useScope: 'global' });
     class="p-6 rounded-xl border border-rui-grey-200 bg-white flex flex-col gap-4"
   >
     <div class="flex items-center gap-3">
-      <div class="flex items-center justify-center size-12 shrink-0 bg-rui-primary/[0.06] rounded-[0.625rem] text-rui-primary">
+      <div class="flex items-center justify-center size-12 shrink-0 bg-rui-primary/6 rounded-[0.625rem] text-rui-primary">
         <RuiIcon
           v-if="data.icon"
           :name="data.icon"

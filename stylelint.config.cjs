@@ -1,3 +1,16 @@
+/* Tailwind 4 at-rules. */
+const tailwindAtRules = [
+  'apply',
+  'custom-variant',
+  'layer',
+  'plugin',
+  'reference',
+  'source',
+  'theme',
+  'utility',
+  'variant',
+];
+
 module.exports = {
   extends: ['stylelint-config-standard', 'stylelint-config-recommended-vue'],
   plugins: ['stylelint-order'],
@@ -5,16 +18,7 @@ module.exports = {
     'at-rule-no-unknown': [
       true,
       {
-        ignoreAtRules: [
-          'apply',
-          'config',
-          'layer',
-          'responsive',
-          'screen',
-          'tailwind',
-          'utility',
-          'variants',
-        ],
+        ignoreAtRules: tailwindAtRules,
       },
     ],
     /* Tailwind at-rule preludes are not CSS grammar. `media` stays from the
@@ -22,23 +26,13 @@ module.exports = {
     'at-rule-prelude-no-invalid': [
       true,
       {
-        ignoreAtRules: [
-          'apply',
-          'config',
-          'layer',
-          'media',
-          'responsive',
-          'screen',
-          'tailwind',
-          'utility',
-          'variants',
-        ],
+        ignoreAtRules: [...tailwindAtRules, 'media'],
       },
     ],
     'function-no-unknown': [
       true,
       {
-        ignoreFunctions: ['theme'],
+        ignoreFunctions: ['theme', '--alpha', '--spacing'],
       },
     ],
     'import-notation': 'string',

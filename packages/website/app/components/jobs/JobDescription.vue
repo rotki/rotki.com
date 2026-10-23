@@ -12,7 +12,7 @@ defineProps<{
 
 <template>
   <div
-    class="p-4 rounded border border-rui-grey-300 space-y-4 hover:bg-rui-grey-100"
+    class="p-4 rounded-sm border border-rui-grey-300 space-y-4 hover:bg-rui-grey-100"
   >
     <div class="text-body-1">
       {{ job.title }}

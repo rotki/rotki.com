@@ -100,7 +100,7 @@ const data = computed<ProductFeature[]>(() => [
           </p>
           <span
             v-if="item.basicAndUp"
-            class="self-start rounded-full bg-rui-primary/[0.08] px-2.5 py-0.5 text-caption font-medium text-rui-primary"
+            class="self-start rounded-full bg-rui-primary/8 px-2.5 py-0.5 text-caption font-medium text-rui-primary"
           >
             {{ t('home.premium_features.basic_and_up') }}
           </span>

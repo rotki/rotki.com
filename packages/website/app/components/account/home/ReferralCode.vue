@@ -120,11 +120,11 @@ onMounted(async () => {
 
     <RuiCard
       variant="flat"
-      class="!bg-rui-grey-50 dark:!bg-rui-grey-900 p-1 border border-rui-grey-300 dark:border-rui-grey-800"
+      class="bg-rui-grey-50! dark:bg-rui-grey-900! p-1 border border-rui-grey-300 dark:border-rui-grey-800"
     >
       <div
         v-if="hasReferralCode"
-        class="min-h-[10rem] space-y-4"
+        class="min-h-40 space-y-4"
       >
         <div class="text-body-2 text-rui-text-secondary mb-8">
           {{ t('account.referral_code.share_description') }}
@@ -156,7 +156,7 @@ onMounted(async () => {
           v-if="discountText"
           type="success"
           icon="lu-gift"
-          class="border border-rui-success/[0.5]"
+          class="border border-rui-success/50"
         >
           <template #title>
             <b>{{ t('account.referral_code.discount_benefit') }}</b>
@@ -167,7 +167,7 @@ onMounted(async () => {
 
       <div
         v-else
-        class="min-h-[10rem] flex flex-col items-center justify-center gap-4"
+        class="min-h-40 flex flex-col items-center justify-center gap-4"
       >
         <div class="text-body-2 text-rui-text-secondary">
           {{ t('account.referral_code.not_created') }}

@@ -1,9 +1,15 @@
-@import '@rotki/ui-library/style.css';
-@import 'swiper/css';
+@import 'swiper/css' layer(base);
+@import 'tailwindcss' source(none);
+@import '@rotki/ui-library/tailwind.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Only the app's own code: content, tests and scripts carry words that look like classes. */
+@source '../..';
+
+@utility container {
+  margin-inline: auto;
+
+  @apply px-4 md:px-12 xl:px-16;
+}
 
 html {
   overflow-y: scroll;
@@ -13,8 +19,4 @@ html {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-.container {
-  @apply px-4 md:px-12 xl:px-16;
 }

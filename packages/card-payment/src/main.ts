@@ -4,7 +4,6 @@ import { ViteSSG, type ViteSSGContext } from 'vite-ssg/single-page';
 import App from './App.vue';
 import '@fontsource/roboto/latin.css';
 import './assets/styles/main.css';
-import '@rotki/ui-library/style.css';
 
 if (import.meta.env.VITE_SIGIL_DEBUG === 'true') {
   setSigilDebug(true);

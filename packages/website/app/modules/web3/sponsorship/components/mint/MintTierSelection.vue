@@ -32,10 +32,10 @@ const { t } = useI18n({ useScope: 'global' });
         v-for="tier in (isLoading ? SPONSORSHIP_TIERS : visibleTiers)"
         :key="tier.key"
         class="tier-option"
-        content-class="flex items-center justify-between gap-4 min-h-16 !py-3 transition-all"
+        content-class="flex items-center justify-between gap-4 min-h-16 py-3! transition-all"
         :class="{
           'cursor-pointer': !isLoading,
-          '!border-rui-primary !bg-rui-primary/[0.04]': !isLoading && selectedTier === tier.key,
+          'border-rui-primary! bg-rui-primary/4!': !isLoading && selectedTier === tier.key,
           'opacity-60': !isLoading && tierSupply[tier.key] && !isTierAvailable(tier.key, tierSupply),
         }"
         @click="!isLoading && (selectedTier = tier.key)"

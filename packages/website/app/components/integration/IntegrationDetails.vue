@@ -108,8 +108,8 @@ const { isMdAndUp } = useBreakpoint();
               v-for="(item, key) in tabCategoriesLabel"
               :key="key"
               :align="isMdAndUp ? 'start' : 'center'"
-              class="rounded cursor-pointer"
-              active-class="!bg-rui-primary [&:after]:hidden !text-white"
+              class="rounded-sm cursor-pointer"
+              active-class="bg-rui-primary! [&:after]:hidden text-white!"
               :value="key"
             >
               {{ item }}

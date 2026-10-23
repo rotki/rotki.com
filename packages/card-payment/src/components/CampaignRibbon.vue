@@ -21,7 +21,7 @@ const lastDay = computed<string | undefined>(() => (applied ? undefined : format
 </script>
 
 <template>
-  <div class="px-4 py-2 text-sm text-rui-primary text-center font-medium border-b border-rui-grey-200 w-full bg-rui-primary/[0.06]">
+  <div class="px-4 py-2 text-sm text-rui-primary text-center font-medium border-b border-rui-grey-200 w-full bg-rui-primary/6">
     {{ parts[0] }}<strong class="font-bold tracking-wide">{{ campaign.code }}</strong>{{ parts[1] }}
     <template v-if="lastDay">
       {{ en.campaign.lastDay(lastDay) }}

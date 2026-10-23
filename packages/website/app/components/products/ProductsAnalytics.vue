@@ -41,7 +41,7 @@ const data = [
         <p class="text-rui-primary text-subtitle-1 font-medium">
           {{ t('products.features.analytics.heading') }}
         </p>
-        <h2 class="text-h5 lg:text-h4 !font-bold">
+        <h2 class="text-h5 lg:text-h4 font-bold!">
           {{ t('products.features.analytics.title') }}
         </h2>
       </div>
@@ -51,7 +51,7 @@ const data = [
           :key="item.title"
           class="flex flex-col gap-6"
         >
-          <div class="aspect-[4/3] flex items-center justify-center rounded-xl border border-rui-grey-300 bg-white overflow-hidden p-3">
+          <div class="aspect-4/3 flex items-center justify-center rounded-xl border border-rui-grey-300 bg-white overflow-hidden p-3">
             <img
               :src="item.img"
               :alt="item.title"

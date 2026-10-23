@@ -59,7 +59,7 @@ watch(
         </div>
       </div>
       <div
-        class="fixed w-full h-screen bg-black/[0.5] z-[10] top-0 left-0 flex justify-end items-start p-4 md:hidden"
+        class="fixed w-full h-screen bg-black/50 z-10 top-0 left-0 flex justify-end items-start p-4 md:hidden"
         :class="{ 'invisible opacity-0': !menuOpened }"
         @click="menuOpened = false"
       >
@@ -74,20 +74,20 @@ watch(
         </RuiButton>
       </div>
       <div
-        class="transition-all h-full fixed top-0 left-0 bg-white z-[10] w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4 md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap lg:justify-between lg:gap-y-0"
-        :class="menuOpened ? 'left-0' : '!-left-full md:left-0'"
+        class="transition-all h-full fixed top-0 left-0 bg-white z-10 w-[calc(100%-5rem)] flex-col py-4 flex gap-y-4 md:h-auto md:static md:justify-center md:w-full md:flex-row md:py-0 md:items-center md:flex-wrap lg:justify-between lg:gap-y-0"
+        :class="menuOpened ? 'left-0' : '-left-full! md:left-0'"
       >
         <NuxtLink
           to="/"
-          class="flex w-full px-4 md:order-1 md:w-auto md:px-0 lg:order-none"
+          class="flex w-full px-4 md:order-1 md:w-auto md:px-0 lg:order-0"
         >
           <AppLogo text />
         </NuxtLink>
 
         <!-- Between md and lg: logo and actions share the first row, the links take the second -->
-        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:order-3 md:flex-row md:border-y-0 lg:order-none lg:w-auto" />
+        <NavigationMenu class="grow w-full p-2 md:p-0 flex-col border-y border-rui-grey-200 md:order-3 md:flex-row md:border-y-0 lg:order-0 lg:w-auto" />
 
-        <div class="flex flex-col space-y-2 px-2 md:order-2 md:ml-auto md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0 lg:order-none lg:ml-0">
+        <div class="flex flex-col space-y-2 px-2 md:order-2 md:ml-auto md:items-center md:flex-row md:space-y-0 md:space-x-2 md:px-0 lg:order-0 lg:ml-0">
           <SponsorNavButton />
           <!-- The page is prerendered signed out, so a returning customer sees "Sign in" until the session check resolves -->
           <NuxtLink :to="signedIn ? '/home/subscription' : '/login'">
@@ -95,7 +95,7 @@ watch(
             <RuiButton
               variant="text"
               color="primary"
-              class="w-full justify-start md:justify-center !px-2 md:!px-3 py-2 md:py-1.5"
+              class="w-full justify-start md:justify-center px-2! md:px-3! py-2 md:py-1.5"
             >
               <template #prepend>
                 <RuiIcon
@@ -126,7 +126,7 @@ watch(
             color="primary"
             variant="text"
             icon
-            class="!p-2"
+            class="p-2!"
             :class="{ invisible: !signedIn }"
             :tabindex="signedIn ? 0 : -1"
             @click="logout()"

@@ -61,12 +61,12 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
     </div>
   </DefineFeaturesSkeleton>
 
-  <RuiCard class="!border-l-4 !border-l-rui-primary">
+  <RuiCard class="border-l-4! border-l-rui-primary!">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex items-center gap-4">
         <div
-          class="rounded-full w-12 h-12 flex items-center justify-center bg-gradient-to-br from-rui-primary/10 to-rui-primary/5 shrink-0"
+          class="rounded-full w-12 h-12 flex items-center justify-center bg-linear-to-br from-rui-primary/10 to-rui-primary/5 shrink-0"
         >
           <AppLogo size="2" />
         </div>

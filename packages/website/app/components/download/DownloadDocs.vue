@@ -31,7 +31,7 @@ const steps: { icon: RuiIcons; title: string; description: string }[] = [
           <p class="text-rui-primary text-subtitle-1 font-medium">
             {{ t('download.documentation.title') }}
           </p>
-          <h2 class="text-rui-text text-h4 !font-bold">
+          <h2 class="text-rui-text text-h4 font-bold!">
             {{ t('download.documentation.heading') }}
           </h2>
           <p class="text-body-1 text-rui-text-secondary">
@@ -59,7 +59,7 @@ const steps: { icon: RuiIcons; title: string; description: string }[] = [
           class="flex flex-col gap-3 rounded-xl border border-rui-grey-200 bg-white p-6"
         >
           <div class="flex items-center gap-3">
-            <span class="flex items-center justify-center size-10 rounded-lg bg-rui-primary/[0.08] text-rui-primary">
+            <span class="flex items-center justify-center size-10 rounded-lg bg-rui-primary/8 text-rui-primary">
               <RuiIcon :name="step.icon" />
             </span>
             <span class="text-caption font-medium text-rui-text-secondary uppercase tracking-wide">

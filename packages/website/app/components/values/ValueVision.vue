@@ -7,7 +7,7 @@ const values: { icon: RuiIcons; label: string }[] = [
   { icon: 'lu-landmark', label: t('values.vision_section.list.line_1') },
   { icon: 'lu-badge-dollar-sign', label: t('values.vision_section.list.line_2') },
   { icon: 'lu-calendar', label: t('values.vision_section.list.line_3') },
-  { icon: 'lu-donate-fill', label: t('values.vision_section.list.line_4') },
+  { icon: 'lu-hand-heart', label: t('values.vision_section.list.line_4') },
 ];
 </script>
 
@@ -50,7 +50,7 @@ const values: { icon: RuiIcons; label: string }[] = [
             loading="lazy"
             width="400"
             height="400"
-            class="rounded-full w-full h-full border-[12px] border-rui-grey-200"
+            class="rounded-full w-full h-full border-12 border-rui-grey-200"
           />
         </div>
       </div>

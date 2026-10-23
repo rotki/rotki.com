@@ -1,5 +1,6 @@
 import process from 'node:process';
 import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki/sigil';
+import tailwindcss from '@tailwindcss/vite';
 import { comparisonPrerenderRoutes } from './app/utils/comparison-prerender';
 import { featurePrerenderRoutes } from './app/utils/feature-prerender';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
@@ -89,7 +90,6 @@ export default defineNuxtConfig({
     '@nuxt/content',
     'nuxt-llms',
     '@nuxtjs/i18n',
-    '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
     ['@pinia/nuxt', { disableVuex: true }],
     '@nuxt/test-utils/module',
@@ -254,6 +254,7 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    plugins: [tailwindcss()],
     optimizeDeps: {
       include: devOptimizeDeps,
     },
@@ -279,7 +280,6 @@ export default defineNuxtConfig({
         '../vitest.config.ts',
         '../playwright.config.ts',
         '../content.config.ts',
-        '../tailwind.config.ts',
         '../tests/**/*.ts',
         '../scripts/**/*.ts',
       ],

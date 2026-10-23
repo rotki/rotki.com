@@ -44,7 +44,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="py-10 md:py-20 bg-rui-primary/[.04]">
+  <div class="py-10 md:py-20 bg-rui-primary/4">
     <div class="container flex flex-col lg:flex-row justify-between gap-y-10 gap-x-20">
       <div class="max-w-[608px]">
         <span class="text-h6 text-rui-primary">

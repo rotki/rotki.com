@@ -56,7 +56,7 @@ const stats = computed<{ icon: RuiIcons; value: string; label: string; to: strin
     <div class="text-center flex flex-col gap-6 items-center">
       <NuxtLink
         to="/compare"
-        class="inline-flex items-center gap-2 rounded-full border border-rui-primary/20 bg-rui-primary/[0.04] px-4 py-1.5 text-body-2 text-rui-primary hover:bg-rui-primary/[0.08] transition-colors"
+        class="inline-flex items-center gap-2 rounded-full border border-rui-primary/20 bg-rui-primary/4 px-4 py-1.5 text-body-2 text-rui-primary hover:bg-rui-primary/8 transition-colors"
       >
         <RuiIcon
           name="lu-shield-check"
@@ -68,10 +68,10 @@ const stats = computed<{ icon: RuiIcons; value: string; label: string; to: strin
           size="14"
         />
       </NuxtLink>
-      <h1 class="text-h4 md:text-h3 lg:text-[3.25rem] lg:leading-[1.15] !font-bold max-w-[860px] text-balance">
+      <h1 class="text-h4 md:text-h3 lg:text-[3.25rem] lg:leading-[1.15] font-bold! max-w-[860px] text-balance">
         {{ t('home.hero.title') }}
       </h1>
-      <p class="text-body-1 md:text-h6 text-rui-text-secondary !font-normal max-w-[680px] text-balance">
+      <p class="text-body-1 md:text-h6 text-rui-text-secondary font-normal! max-w-[680px] text-balance">
         {{ t('home.hero.motto') }}
       </p>
       <div class="flex flex-col sm:flex-row items-center gap-3 mt-2">
@@ -135,7 +135,7 @@ const stats = computed<{ icon: RuiIcons; value: string; label: string; to: strin
           :target="stat.to.startsWith('http') ? '_blank' : undefined"
           class="flex flex-col items-center gap-0.5 px-2 sm:px-4 md:px-8 group"
         >
-          <span class="flex items-center gap-1.5 text-h6 md:text-h5 !font-bold text-rui-text group-hover:text-rui-primary transition-colors">
+          <span class="flex items-center gap-1.5 text-h6 md:text-h5 font-bold! text-rui-text group-hover:text-rui-primary transition-colors">
             <RuiIcon
               :name="stat.icon"
               size="18"

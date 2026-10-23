@@ -38,7 +38,7 @@ const { t } = useI18n({ useScope: 'global' });
           v-model="username"
           disabled
           dense
-          class="[&_input]:!text-rui-text"
+          class="[&_input]:text-rui-text!"
           variant="outlined"
           :label="t('auth.common.username')"
           hide-details
@@ -51,7 +51,7 @@ const { t } = useI18n({ useScope: 'global' });
             v-model="email"
             disabled
             dense
-            class="[&_input]:!text-rui-text"
+            class="[&_input]:text-rui-text!"
             variant="outlined"
             :label="t('auth.common.email')"
             hide-details
@@ -65,7 +65,7 @@ const { t } = useI18n({ useScope: 'global' });
               external
               color="primary"
               variant="text"
-              class="leading-[0]"
+              class="leading-0"
               inline
             >
               {{ rotkiEmail }}

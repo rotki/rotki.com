@@ -88,7 +88,7 @@ watch(value, clearErrorOnEdit);
         <div class="flex items-center shrink-0">
           <div class="ml-3">
             <svg
-              class="w-6 h-6 text-black/[0.54]"
+              class="w-6 h-6 text-black/54"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -107,7 +107,7 @@ watch(value, clearErrorOnEdit);
           <input
             v-model="value"
             type="text"
-            class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
+            class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
             :disabled="loading"
             @focus="focused = true"
             @blur="focused = false"
@@ -130,12 +130,12 @@ watch(value, clearErrorOnEdit);
             Discount/Referral Code
           </label>
           <fieldset
-            class="absolute w-full top-0 left-0 pointer-events-none rounded border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
+            class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
             :class="{
               'border-2 border-rui-error': hasError,
               'border-2 border-rui-success': !hasError && value && !focused,
               'border-2 border-rui-primary': focused && !hasError,
-              'border border-black/[0.23]': !value && !hasError && !focused,
+              'border border-black/23': !value && !hasError && !focused,
             }"
           >
             <legend class="opacity-0 text-xs whitespace-break-spaces">
@@ -148,7 +148,7 @@ watch(value, clearErrorOnEdit);
         <button
           v-if="hasError"
           type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all z-10"
+          class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full outline-hidden! transition-all z-10"
           aria-label="Clear discount code"
           @click="reset()"
         >
@@ -172,7 +172,7 @@ watch(value, clearErrorOnEdit);
           v-else
           type="submit"
           :disabled="!value || loading"
-          class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-sm font-medium rounded transition-colors z-10"
+          class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 text-sm font-medium rounded-sm transition-colors z-10"
           :class="{
             'bg-gray-300 text-neutral-500 cursor-not-allowed': !value || loading,
             'bg-rui-primary text-white hover:bg-rui-primary-darker': value && !loading,
@@ -227,7 +227,7 @@ watch(value, clearErrorOnEdit);
         <!-- Remove button -->
         <button
           type="button"
-          class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full !outline-none transition-all"
+          class="p-2 text-neutral-500 hover:text-red-600 hover:bg-red-100 rounded-full outline-hidden! transition-all"
           aria-label="Remove discount"
           @click="reset()"
         >

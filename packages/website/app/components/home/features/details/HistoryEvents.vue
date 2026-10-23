@@ -43,7 +43,7 @@ const features = [
       <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.history_events.title') }}
       </p>
-      <h3 class="text-h5 !font-bold">
+      <h3 class="text-h5 font-bold!">
         {{ t('home.history_events.subtitle') }}
       </h3>
       <div class="pt-4">

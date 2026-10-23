@@ -41,7 +41,7 @@ function handleBack(): void {
       </RuiAlert>
     </div>
 
-    <div class="flex gap-4 justify-center mt-9 w-full max-w-[27.5rem] mx-auto">
+    <div class="flex gap-4 justify-center mt-9 w-full max-w-110 mx-auto">
       <RuiButton
         class="w-full"
         size="lg"

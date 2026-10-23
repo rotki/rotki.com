@@ -39,7 +39,7 @@ const { t } = useI18n();
       'cursor-pointer transition-all hover:border-rui-primary': !!selection,
       'border-rui-primary bg-rui-primary/5': !!selection?.selected,
       'border-rui-grey-300': !!selection && !selection.selected,
-      '!border-2 !border-rui-primary': isLinked && !selection,
+      'border-2! border-rui-primary!': isLinked && !selection,
     }"
     @click="selection ? emit('select', card) : undefined"
   >

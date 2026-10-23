@@ -25,13 +25,13 @@ function copyToClipboard() {
         tabindex="-1"
         variant="text"
         type="button"
-        class="!p-2"
+        class="p-2!"
         icon
         :aria-label="t('copy_button.copy')"
         @click="copyToClipboard()"
       >
         <RuiIcon
-          class="text-black/[.54] dark:text-white/[.56]"
+          class="text-black/54 dark:text-white/[.56]"
           size="20"
           name="lu-copy"
         />

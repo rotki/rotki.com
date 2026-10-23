@@ -17,7 +17,12 @@ const hasError = computed<boolean>(() => !!error);
 <template>
   <!-- Global loading overlay -->
   <Teleport to="body">
-    <Transition name="fade">
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      leave-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
       <div
         v-if="loading"
         class="fixed inset-0 bg-white/80 flex items-center justify-center z-50"
@@ -45,15 +50,3 @@ const hasError = computed<boolean>(() => !!error);
     {{ error?.message }}
   </FloatingNotification>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  @apply transition-opacity duration-200;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  @apply opacity-0;
-}
-</style>

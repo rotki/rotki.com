@@ -43,7 +43,12 @@ watch(() => visible, (show) => {
 </script>
 
 <template>
-  <Transition name="fade">
+  <Transition
+    enter-active-class="transition-opacity duration-400"
+    leave-active-class="transition-opacity duration-400"
+    enter-from-class="opacity-0"
+    leave-to-class="opacity-0"
+  >
     <div
       v-if="visible"
       class="fixed top-0 md:top-28 z-20 w-full md:bottom-auto right-0 md:right-2 md:w-[520px]"
@@ -64,15 +69,3 @@ watch(() => visible, (show) => {
     </div>
   </Transition>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  @apply transition-opacity duration-[400ms];
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  @apply opacity-0;
-}
-</style>

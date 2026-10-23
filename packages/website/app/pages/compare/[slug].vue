@@ -87,7 +87,7 @@ definePageMeta({
 
 <template>
   <div v-if="comparison">
-    <section class="py-10 md:py-16 bg-rui-primary/[.04]">
+    <section class="py-10 md:py-16 bg-rui-primary/4">
       <div class="container">
         <nav class="text-sm text-rui-text-secondary mb-4">
           <NuxtLink
@@ -100,7 +100,7 @@ definePageMeta({
           <span>rotki vs {{ comparison.competitor }}</span>
         </nav>
         <div class="flex items-center gap-4 md:gap-5">
-          <div class="w-16 h-16 md:w-20 md:h-20 border border-rui-grey-200 rounded-xl p-3 bg-white shadow-sm shrink-0 flex items-center justify-center">
+          <div class="w-16 h-16 md:w-20 md:h-20 border border-rui-grey-200 rounded-xl p-3 bg-white shadow-xs shrink-0 flex items-center justify-center">
             <img
               :src="comparison.image"
               :alt="comparison.competitor"
@@ -111,7 +111,7 @@ definePageMeta({
             />
           </div>
           <span class="text-h6 md:text-h5 font-bold text-rui-text-secondary uppercase tracking-wide">vs</span>
-          <div class="w-16 h-16 md:w-20 md:h-20 border-2 border-rui-primary rounded-xl p-3 bg-white shadow-sm shrink-0 flex items-center justify-center">
+          <div class="w-16 h-16 md:w-20 md:h-20 border-2 border-rui-primary rounded-xl p-3 bg-white shadow-xs shrink-0 flex items-center justify-center">
             <img
               src="/img/logo-small.svg"
               alt="rotki"
@@ -140,7 +140,7 @@ definePageMeta({
       class="py-10 md:py-14"
     >
       <div class="container">
-        <div class="max-w-3xl border border-rui-primary/20 border-l-4 border-l-rui-primary bg-rui-primary/[.04] rounded-r-xl p-6 md:p-8">
+        <div class="max-w-3xl border border-rui-primary/20 border-l-4 border-l-rui-primary bg-rui-primary/4 rounded-r-xl p-6 md:p-8">
           <h2 class="text-h6 font-bold mb-4 uppercase tracking-wide text-rui-primary">
             {{ t('compare.detail.takeaways_title') }}
           </h2>
@@ -165,7 +165,7 @@ definePageMeta({
 
     <section class="py-10 md:py-14">
       <div class="container">
-        <div class="border-l-4 border-rui-primary bg-rui-primary/[.04] rounded-r-xl p-6 max-w-3xl">
+        <div class="border-l-4 border-rui-primary bg-rui-primary/4 rounded-r-xl p-6 max-w-3xl">
           <h2 class="text-h6 font-bold mb-2">
             {{ t('compare.detail.verdict') }}
           </h2>
@@ -178,7 +178,7 @@ definePageMeta({
 
     <section
       v-if="(comparison.dimensions?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-6">
@@ -219,7 +219,7 @@ definePageMeta({
 
     <section
       v-if="(comparison.tradeoffs?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-1">
@@ -254,7 +254,7 @@ definePageMeta({
         <h2 class="text-h5 font-bold mb-6">
           {{ t('compare.detail.who_title') }}
         </h2>
-        <div class="border border-rui-primary/30 bg-rui-primary/[.04] rounded-xl p-6 md:p-8 max-w-3xl">
+        <div class="border border-rui-primary/30 bg-rui-primary/4 rounded-xl p-6 md:p-8 max-w-3xl">
           <h3 class="text-h6 font-semibold mb-4 text-rui-primary">
             {{ t('compare.detail.who_rotki') }}
           </h3>
@@ -277,7 +277,7 @@ definePageMeta({
       </div>
     </section>
 
-    <section class="py-10 md:py-14 bg-rui-primary/[.04]">
+    <section class="py-10 md:py-14 bg-rui-primary/4">
       <div class="container">
         <h2 class="text-h5 font-bold mb-6">
           {{ t('compare.detail.deepdive_title', { competitor: comparison.competitor }) }}
@@ -310,7 +310,7 @@ definePageMeta({
           </NuxtLink>
           <NuxtLink
             to="/integrations"
-            class="inline-flex items-center gap-2 border border-rui-primary rounded-full px-4 py-2 text-body-2 text-rui-primary bg-white hover:bg-rui-primary/[.04] transition-colors"
+            class="inline-flex items-center gap-2 border border-rui-primary rounded-full px-4 py-2 text-body-2 text-rui-primary bg-white hover:bg-rui-primary/4 transition-colors"
           >
             {{ t('integration.detail.cta.all') }}
           </NuxtLink>
@@ -320,7 +320,7 @@ definePageMeta({
 
     <section
       v-if="(comparison.faq?.length ?? 0) > 0"
-      class="py-10 md:py-14 bg-rui-primary/[.04]"
+      class="py-10 md:py-14 bg-rui-primary/4"
     >
       <div class="container">
         <h2 class="text-h5 font-bold mb-6">
@@ -352,7 +352,7 @@ definePageMeta({
       </div>
     </section>
 
-    <section class="py-12 md:py-16 bg-rui-primary/[.04]">
+    <section class="py-12 md:py-16 bg-rui-primary/4">
       <div class="container flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div class="max-w-2xl">
           <h2 class="text-h5 font-bold mb-2">

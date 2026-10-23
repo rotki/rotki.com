@@ -103,19 +103,19 @@ watch(price, (newPrice) => {
 <template>
   <div
     v-if="price"
-    class="rounded-md flex flex-col min-w-[14.5rem] xl:min-w-[13rem] 2xl:min-w-[13.5rem] w-full h-full px-6 py-6 border border-solid rounded-lg bg-white border-black/[0.12] relative"
+    class="rounded-md flex flex-col min-w-58 xl:min-w-52 2xl:min-w-54 w-full h-full px-6 py-6 border border-solid rounded-lg bg-white border-black/12 relative"
     :class="{
-      'cursor-pointer hover:bg-rui-primary/[0.01]': !isDisabled,
-      '!border-rui-primary': selected && !isDisabled,
-      '!bg-rui-grey-100': isDisabled,
-      '!border-rui-primary/50': current,
+      'cursor-pointer hover:bg-rui-primary/1': !isDisabled,
+      'border-rui-primary!': selected && !isDisabled,
+      'bg-rui-grey-100!': isDisabled,
+      'border-rui-primary/50!': current,
     }"
     @click="!isDisabled && emit('click')"
   >
     <div class="flex items-center h-0 justify-center relative w-full">
       <RuiChip
         v-if="current"
-        class="-top-[2.25rem] absolute"
+        class="-top-9 absolute"
         color="primary"
         variant="outlined"
         size="sm"
@@ -124,7 +124,7 @@ watch(price, (newPrice) => {
       </RuiChip>
       <RuiChip
         v-else-if="plan.isMostPopular"
-        class="-top-[2.25rem] absolute"
+        class="-top-9 absolute"
         color="primary"
         size="sm"
       >
@@ -139,7 +139,7 @@ watch(price, (newPrice) => {
       <RuiChip
         v-if="discountInfo"
         size="sm"
-        class="!bg-green-400 font-bold text-xs"
+        class="bg-green-400! font-bold text-xs"
       >
         {{ discountInfo.discount }}% OFF
       </RuiChip>
@@ -157,7 +157,7 @@ watch(price, (newPrice) => {
       </div>
     </div>
 
-    <div class="text-sm text-rui-text-secondary mt-2 mb-4 font-normal min-h-[1.25rem]">
+    <div class="text-sm text-rui-text-secondary mt-2 mb-4 font-normal min-h-5">
       <div v-if="discountInfo">
         {{ discountInfo.monthlyPrice }}€/{{ t('pricing.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
       </div>
@@ -165,7 +165,7 @@ watch(price, (newPrice) => {
 
     <div
       v-if="visibleFeatures.length > 0"
-      class="mb-4 pb-4 border-b border-black/[0.08]"
+      class="mb-4 pb-4 border-b border-black/8"
     >
       <ul class="space-y-2">
         <li

@@ -33,7 +33,7 @@ watch(() => error, (newError, oldError) => {
     <!-- Loading state -->
     <div
       v-if="loading"
-      class="flex flex-col items-center justify-center min-h-[10rem]"
+      class="flex flex-col items-center justify-center min-h-40"
     >
       <RuiProgress
         variant="indeterminate"

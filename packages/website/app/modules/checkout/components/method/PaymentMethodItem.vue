@@ -21,10 +21,10 @@ function handleClick(): void {
 <template>
   <div
     :aria-disabled="disabled"
-    class="flex gap-4 justify-center items-center p-4 min-w-[16rem] xl:min-w-[20rem] 2xl:min-w-[26rem] w-full border border-solid rounded-lg"
+    class="flex gap-4 justify-center items-center p-4 min-w-[16rem] xl:min-w-[20rem] 2xl:min-w-104 w-full border border-solid rounded-lg"
     :class="[
-      selected ? 'border-rui-primary bg-rui-primary/10' : 'bg-white border-black/[0.12]',
-      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-rui-primary/[0.01]',
+      selected ? 'border-rui-primary bg-rui-primary/10' : 'bg-white border-black/12',
+      disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-rui-primary/1',
     ]"
     @click="handleClick()"
   >

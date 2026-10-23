@@ -1,12 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' source(none);
+@import '@rotki/ui-library/tailwind.css';
 
-@layer base {
-}
+@source '../..';
+@source '../../../index.html';
 
-@layer components {
-  .container {
-    @apply px-4 md:px-12 xl:px-16;
-  }
+@utility container {
+  margin-inline: auto;
+
+  @apply px-4 md:px-12 xl:px-16;
 }

@@ -112,7 +112,7 @@ function getColor(active: boolean, exact: boolean): ContextColorsType | undefine
         disabled,
         ...$attrs,
       }"
-      :class="{ ['inline-flex py-0 !px-1 !text-[1em]']: inline }"
+      :class="{ ['inline-flex py-0 px-1! text-[1em]!']: inline }"
     >
       <template #prepend>
         <slot name="prepend" />

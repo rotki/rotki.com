@@ -30,7 +30,7 @@ const isEditable = computed<boolean>(() => isCurrentReleaseSubmission(get(sponso
           v-if="submission.imageUrl"
           :src="submission.imageUrl"
           alt="Submission image"
-          class="size-12 rounded object-cover mt-3 mb-2"
+          class="size-12 rounded-sm object-cover mt-3 mb-2"
           width="48"
           height="48"
         />

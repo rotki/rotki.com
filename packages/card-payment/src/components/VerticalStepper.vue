@@ -94,7 +94,7 @@ defineProps<Props>();
         <!-- Divider (except for last step) -->
         <hr
           v-if="index < steps.length - 1"
-          class="block h-full max-h-full min-h-12 min-w-0 self-start border-l border-rui-grey-400 mx-5 my-[-1rem]"
+          class="block h-full max-h-full min-h-12 min-w-0 self-start border-l border-rui-grey-400 mx-5 -my-4"
         />
       </template>
     </div>

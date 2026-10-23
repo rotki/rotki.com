@@ -205,7 +205,7 @@ defineExpose({
       <div class="flex items-center shrink-0">
         <div class="ml-3">
           <svg
-            class="w-6 h-6 text-black/[0.54]"
+            class="w-6 h-6 text-black/54"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -223,7 +223,7 @@ defineExpose({
         <!-- Hosted field container for card number -->
         <div
           id="card-number"
-          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
+          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
         />
         <label
           class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
@@ -237,12 +237,12 @@ defineExpose({
           Card Number
         </label>
         <fieldset
-          class="absolute w-full top-0 left-0 pointer-events-none rounded border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
+          class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
           :class="{
-            '!border !border-dotted !border-rui-grey-400': disabled,
+            'border! border-dotted! border-rui-grey-400!': disabled,
             'border-2 border-rui-error': fieldErrors.number,
             'border-2 border-rui-success': focusedField === 'number' && !fieldErrors.number,
-            'border border-black/[0.23]': focusedField !== 'number' && !fieldContent.number && !fieldErrors.number,
+            'border border-black/23': focusedField !== 'number' && !fieldContent.number && !fieldErrors.number,
           }"
         >
           <legend class="opacity-0 text-xs whitespace-break-spaces">
@@ -259,7 +259,7 @@ defineExpose({
         <!-- Hosted field container for expiration -->
         <div
           id="expiration"
-          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
+          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
         />
         <label
           class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
@@ -273,12 +273,12 @@ defineExpose({
           MM / YY
         </label>
         <fieldset
-          class="absolute w-full top-0 left-0 pointer-events-none rounded border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
+          class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
           :class="{
-            '!border !border-dotted !border-rui-grey-400': disabled,
+            'border! border-dotted! border-rui-grey-400!': disabled,
             'border-2 border-rui-error': fieldErrors.expirationDate,
             'border-2 border-rui-success': focusedField === 'expirationDate' && !fieldErrors.expirationDate,
-            'border border-black/[0.23]': focusedField !== 'expirationDate' && !fieldContent.expirationDate && !fieldErrors.expirationDate,
+            'border border-black/23': focusedField !== 'expirationDate' && !fieldContent.expirationDate && !fieldErrors.expirationDate,
           }"
         >
           <legend class="opacity-0 text-xs whitespace-break-spaces">
@@ -295,7 +295,7 @@ defineExpose({
         <!-- Hosted field container for CVV -->
         <div
           id="cvv"
-          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-none transition-all h-14 border-b-0 px-3"
+          class="leading-6 text-rui-text w-full bg-transparent outline-0 outline-hidden transition-all h-14 border-b-0 px-3"
         />
         <label
           class="left-0 text-base text-rui-text-secondary pointer-events-none absolute flex items-center h-full w-full origin-left select-none transition-all border-0 border-transparent"
@@ -309,12 +309,12 @@ defineExpose({
           CVV
         </label>
         <fieldset
-          class="absolute w-full top-0 left-0 pointer-events-none rounded border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
+          class="absolute w-full top-0 left-0 pointer-events-none rounded-sm border px-2 transition-all -mt-2 h-[calc(100%+0.5rem)]"
           :class="{
-            '!border !border-dotted !border-rui-grey-400': disabled,
+            'border! border-dotted! border-rui-grey-400!': disabled,
             'border-2 border-rui-error': fieldErrors.cvv,
             'border-2 border-rui-success': focusedField === 'cvv' && !fieldErrors.cvv,
-            'border border-black/[0.23]': focusedField !== 'cvv' && !fieldErrors.cvv,
+            'border border-black/23': focusedField !== 'cvv' && !fieldErrors.cvv,
           }"
         >
           <legend class="opacity-0 text-xs whitespace-break-spaces">

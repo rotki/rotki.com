@@ -13,7 +13,7 @@ const { competitor, rows } = defineProps<{
 </script>
 
 <template>
-  <div class="overflow-x-auto border border-rui-grey-200 rounded-xl bg-white shadow-sm">
+  <div class="overflow-x-auto border border-rui-grey-200 rounded-xl bg-white shadow-xs">
     <table class="w-full border-collapse text-left">
       <thead>
         <tr class="border-b border-rui-grey-200">
@@ -43,7 +43,7 @@ const { competitor, rows } = defineProps<{
           </th>
           <td
             class="p-4 align-top text-body-2 border-x border-rui-primary/20"
-            :class="row.highlight ? 'bg-rui-primary/[.07]' : 'bg-rui-primary/[.03]'"
+            :class="row.highlight ? 'bg-rui-primary/[.07]' : 'bg-rui-primary/3'"
           >
             <div class="flex items-start gap-2">
               <RuiIcon

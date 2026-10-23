@@ -24,7 +24,7 @@ const limits = usePlanLimits();
       <p class="text-subtitle-1 font-medium text-rui-primary">
         {{ t('home.profit_loss_report.title') }}
       </p>
-      <h3 class="text-h5 !font-bold">
+      <h3 class="text-h5 font-bold!">
         {{ t('home.profit_loss_report.subtitle') }}
       </h3>
       <div class="flex flex-col gap-6 text-rui-text-secondary pt-4">

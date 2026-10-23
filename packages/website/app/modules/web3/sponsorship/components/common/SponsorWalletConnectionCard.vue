@@ -106,7 +106,7 @@ async function handleSignMessage(): Promise<void> {
         >
           <template #prepend>
             <img
-              class="size-4 brightness-[75%] invert"
+              class="size-4 brightness-75 invert"
               alt="ethereum"
               src="/img/chains/ethereum.svg"
               width="16"

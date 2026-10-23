@@ -119,7 +119,7 @@ if (firstImage) {
         disableOnInteraction: false,
         pauseOnMouseEnter: true,
       }"
-      class="rounded-lg md:rounded-2xl lg:rounded-3xl border border-black/[0.12]"
+      class="rounded-lg md:rounded-2xl lg:rounded-3xl border border-black/12"
       @swiper="onSwiperUpdate($event)"
       @slide-change="onSwiperUpdate($event)"
     >
@@ -142,8 +142,8 @@ if (firstImage) {
         />
       </SwiperSlide>
     </Carousel>
-    <div class="container relative !px-0">
-      <div class="flex flex-col md:absolute top-0 mt-4 transform md:translate-y-[calc(-50%-2.5rem)] md:-left-6 md:-right-6 items-center justify-center z-[1]">
+    <div class="container relative px-0!">
+      <div class="flex flex-col md:absolute top-0 mt-4 transform md:translate-y-[calc(-50%-2.5rem)] md:-left-6 md:-right-6 items-center justify-center z-1">
         <CarouselControls
           v-model:swiper="swiperInstance"
           :active-index="activeIndex"
@@ -153,7 +153,7 @@ if (firstImage) {
         />
         <div
           v-if="!hideThumbnail"
-          class="px-8 py-2 md:py-6 rounded-xl border border-black/[.12] bg-white shadow-[4px_32px_80px_0_rgba(191,194,203,0.24)]"
+          class="px-8 py-2 md:py-6 rounded-xl border border-black/12 bg-white shadow-[4px_32px_80px_0_rgba(191,194,203,0.24)]"
         >
           <slot />
         </div>

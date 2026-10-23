@@ -56,7 +56,7 @@ const { t } = useI18n({ useScope: 'global' });
     </div>
 
     <img
-      class="w-1/3 lg:w-1/2 max-w-[40rem]"
+      class="w-1/3 lg:w-1/2 max-w-160"
       alt="rotki maintenance"
       src="/img/not-found.svg"
       width="640"

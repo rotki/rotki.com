@@ -1,6 +1,7 @@
 /// <reference types="vite-ssg" />
 import process from 'node:process';
 import { fileURLToPath, URL } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
@@ -49,10 +50,10 @@ export default defineConfig({
       '@vueuse/core',
       'braintree-web',
       'zod',
-      '@rotki/ui-library/theme',
     ],
   },
   plugins: [
+    tailwindcss(),
     ...(process.env.NODE_ENV === 'development' ? [vueDevTools()] : []),
     vue({
       template: {
