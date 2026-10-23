@@ -57,7 +57,6 @@ const { t } = useI18n({ useScope: 'global' });
         id="api-key"
         :model-value="apiKey"
         :disabled="loading"
-        variant="outlined"
         :label="t('account.api_keys.api_key')"
         readonly
         dense
@@ -74,7 +73,6 @@ const { t } = useI18n({ useScope: 'global' });
         id="api-secret"
         :model-value="apiSecret"
         :disabled="loading"
-        variant="outlined"
         :label="t('account.api_keys.api_secret')"
         readonly
         dense

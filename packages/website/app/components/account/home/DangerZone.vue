@@ -107,7 +107,6 @@ const { t } = useI18n({ useScope: 'global' });
       <RuiTextField
         v-model="usernameConfirmation"
         color="primary"
-        variant="outlined"
         :label="t('auth.common.username')"
       />
 

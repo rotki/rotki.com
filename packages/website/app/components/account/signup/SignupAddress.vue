@@ -105,7 +105,6 @@ watch(() => externalResults, (errors) => {
         id="address-1"
         maxlength="128"
         :model-value="modelValue.address1"
-        variant="outlined"
         color="primary"
         autocomplete="address-line1"
         autofocus
@@ -120,7 +119,6 @@ watch(() => externalResults, (errors) => {
         id="address-2"
         maxlength="128"
         :model-value="modelValue.address2"
-        variant="outlined"
         color="primary"
         autocomplete="address-line2"
         dense
@@ -133,7 +131,6 @@ watch(() => externalResults, (errors) => {
       <RuiTextField
         id="city"
         :model-value="modelValue.city"
-        variant="outlined"
         color="primary"
         autocomplete="address-level2"
         dense
@@ -147,7 +144,6 @@ watch(() => externalResults, (errors) => {
         id="postal"
         data-cy="postal"
         :model-value="modelValue.postcode"
-        variant="outlined"
         color="primary"
         autocomplete="postal-code"
         dense

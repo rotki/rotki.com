@@ -56,7 +56,6 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
 
     <RuiTooltip
       :disabled="allowNavigation"
-      tooltip-class="max-w-[20rem]"
     >
       <template #activator>
         <ButtonLink

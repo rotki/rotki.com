@@ -72,7 +72,6 @@ watchImmediate(model, (modelValue: string) => {
     <RuiTextField
       v-model="value"
       color="primary"
-      variant="outlined"
       :label="t('home.plans.tiers.step_3.discount.label')"
       :error-messages="errorMessage"
       :hint="errorMessage ? undefined : hint"

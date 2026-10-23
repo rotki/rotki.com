@@ -83,7 +83,6 @@ function selectText(event: MouseEvent): void {
             :model-value="tokens.accessToken"
             :label="t('oauth.access_token_label')"
             readonly
-            variant="outlined"
             color="primary"
             rows="4"
             @click="selectText($event)"
@@ -97,7 +96,6 @@ function selectText(event: MouseEvent): void {
             :model-value="tokens.refreshToken"
             :label="t('oauth.refresh_token_label')"
             readonly
-            variant="outlined"
             color="primary"
             rows="4"
             @click="selectText($event)"

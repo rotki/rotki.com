@@ -55,9 +55,9 @@ function handleApprove(type: ApprovalType) {
       <RuiMenu
         v-if="approval.needsApproval && !approval.isApproving"
         v-model="showApprovalOptions"
-        :popper="{ placement: 'bottom' }"
+        :options="{ placement: 'bottom' }"
         class="w-full"
-        wrapper-class="w-full"
+        :class-names="{ wrapper: 'w-full' }"
       >
         <template #activator="{ attrs }">
           <RuiButton

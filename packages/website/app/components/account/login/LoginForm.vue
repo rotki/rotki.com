@@ -83,7 +83,6 @@ async function performLogin() {
           id="username"
           v-model="username"
           dense
-          variant="outlined"
           :disabled="loading"
           :label="t('auth.login.email_or_username')"
           autocomplete="username"
@@ -96,7 +95,6 @@ async function performLogin() {
         <RuiRevealableTextField
           id="password"
           v-model="password"
-          variant="outlined"
           :disabled="loading"
           dense
           :label="t('auth.common.password')"

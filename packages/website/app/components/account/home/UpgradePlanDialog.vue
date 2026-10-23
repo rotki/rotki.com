@@ -172,7 +172,7 @@ function cancel(): void {
     v-model="visible"
     max-width="500"
   >
-    <RuiCard content-class="pt-0!">
+    <RuiCard :class-names="{ content: 'pt-0!' }">
       <template #header>
         {{ t('upgrade_plan.title') }}
       </template>

@@ -55,7 +55,6 @@ function close(): void {
       <RuiTextField
         v-model="newLabel"
         :label="t('account.devices.rename.label')"
-        variant="outlined"
         color="primary"
         :disabled="loading"
       />

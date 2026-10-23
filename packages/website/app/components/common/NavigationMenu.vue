@@ -108,9 +108,8 @@ const menus: (Menu | MenuParent)[] = [
       <template v-else>
         <RuiMenu
           :key="menu.label"
-          :class-names="{ root: 'hidden md:block' }"
+          :class-names="{ root: 'hidden md:block', wrapper: 'w-full' }"
           close-on-content-click
-          wrapper-class="w-full"
         >
           <template #activator="{ attrs }">
             <RuiButton

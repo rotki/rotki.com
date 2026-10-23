@@ -168,7 +168,6 @@ const { t } = useI18n({ useScope: 'global' });
                 id="password"
                 v-model="password"
                 dense
-                variant="outlined"
                 :label="t('auth.password_reset.form.password')"
                 hide-details
                 color="primary"
@@ -194,7 +193,6 @@ const { t } = useI18n({ useScope: 'global' });
                 id="password-confirmation"
                 v-model="passwordConfirmation"
                 dense
-                variant="outlined"
                 :label="t('auth.password_reset.form.confirm')"
                 :hint="t('auth.common.confirm_hint')"
                 color="primary"

@@ -178,7 +178,6 @@ function cancelSubscription(): void {
               :label="isOtherSelected
                 ? t('account.subscriptions.cancellation.feedback.comment_required')
                 : t('account.subscriptions.cancellation.feedback.comment_label')"
-              variant="outlined"
               color="primary"
               :rows="2"
               :error-messages="isOtherSelected && modelComment.trim().length === 0

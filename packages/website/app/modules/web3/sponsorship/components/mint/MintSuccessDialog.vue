@@ -24,7 +24,7 @@ const tierLabel = computed<string | undefined>(() => findTierByKey(selectedTier)
     persistent
     max-width="400px"
   >
-    <RuiCard content-class="pt-0!">
+    <RuiCard :class-names="{ content: 'pt-0!' }">
       <template #header>
         <div class="flex items-center gap-3">
           <RuiIcon

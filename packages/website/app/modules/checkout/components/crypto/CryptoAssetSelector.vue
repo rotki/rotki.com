@@ -94,7 +94,6 @@ watch(tokenItems, (tokens) => {
     <div class="flex flex-col gap-4">
       <RuiAutoComplete
         v-model="selectedChain"
-        variant="outlined"
         color="primary"
         :options="blockchainItems"
         :disabled="paymentAssetsLoading"
@@ -121,7 +120,6 @@ watch(tokenItems, (tokens) => {
 
       <RuiAutoComplete
         v-model="selectedToken"
-        variant="outlined"
         color="primary"
         :options="tokenItems"
         :disabled="paymentAssetsLoading || !selectedChain"

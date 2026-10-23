@@ -37,7 +37,7 @@ const {
 
     <RuiCard
       class="rounded-2xl!"
-      content-class="min-h-[480px]"
+      :class-names="{ content: 'min-h-[480px]' }"
     >
       <div class="relative flex flex-col">
         <!-- Loading overlay for pagination -->

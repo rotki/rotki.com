@@ -90,7 +90,6 @@ const { isMdAndUp } = useBreakpoint();
       <div class="md:sticky md:top-20 w-full md:w-[18rem]">
         <RuiTextField
           v-model="search"
-          variant="outlined"
           :label="t('integration.search')"
           prepend-icon="lu-search"
           color="primary"

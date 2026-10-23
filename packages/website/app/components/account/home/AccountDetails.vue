@@ -39,7 +39,6 @@ const { t } = useI18n({ useScope: 'global' });
           disabled
           dense
           class="[&_input]:text-rui-text!"
-          variant="outlined"
           :label="t('auth.common.username')"
           hide-details
           color="primary"
@@ -52,7 +51,6 @@ const { t } = useI18n({ useScope: 'global' });
             disabled
             dense
             class="[&_input]:text-rui-text!"
-            variant="outlined"
             :label="t('auth.common.email')"
             hide-details
             color="primary"

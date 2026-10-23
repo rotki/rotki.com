@@ -53,7 +53,7 @@ function handleCancel(): void {
     v-model="showDialog"
     max-width="500"
   >
-    <RuiCard content-class="pt-0!">
+    <RuiCard :class-names="{ content: 'pt-0!' }">
       <template #header>
         {{ t('home.plans.tiers.step_3.saved_card.delete.title') }}
       </template>

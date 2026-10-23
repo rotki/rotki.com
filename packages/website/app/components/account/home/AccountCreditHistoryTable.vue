@@ -50,7 +50,6 @@ function formatEntryType(value: string): string {
     row-attr="createdAt"
     outlined
     dense
-    hide-default-footer
   >
     <template #item.entryType="{ row }">
       <RuiChip

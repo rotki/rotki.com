@@ -90,7 +90,6 @@ const { t } = useI18n({ useScope: 'global' });
             id="email"
             v-model="emailAddress"
             dense
-            variant="outlined"
             :label="t('auth.common.email')"
             autocomplete="email"
             hide-details

@@ -73,7 +73,6 @@ const { t } = useI18n({ useScope: 'global' });
         <RuiRevealableTextField
           id="current-password"
           v-model="state.currentPassword"
-          variant="outlined"
           color="primary"
           dense
           :error-messages="toMessages(v$.currentPassword)"
@@ -87,7 +86,6 @@ const { t } = useI18n({ useScope: 'global' });
             id="new-password"
             v-model="state.newPassword"
             color="primary"
-            variant="outlined"
             dense
             hide-details
             :label="t('account.change_password.new_password.label')"
@@ -123,7 +121,6 @@ const { t } = useI18n({ useScope: 'global' });
           v-model="state.passwordConfirmation"
           color="primary"
           :error-messages="toMessages(v$.passwordConfirmation)"
-          variant="outlined"
           dense
           :label="t('auth.signup.account.form.confirm_password')"
           :hint="t('auth.common.confirm_hint')"

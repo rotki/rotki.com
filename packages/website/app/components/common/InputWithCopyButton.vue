@@ -12,14 +12,12 @@ const {
   copyValue,
   disabled,
   color = 'primary',
-  variant = 'outlined',
   hideDetails = true,
 } = defineProps<{
   copyValue: string;
   disabled?: boolean;
   label?: string;
   color?: ContextColorsType;
-  variant?: 'default' | 'filled' | 'outlined';
   dense?: boolean;
   readonly?: boolean;
   hideDetails?: boolean;
@@ -36,7 +34,6 @@ defineSlots<{
     v-model="modelValue"
     :label="label"
     :color="color"
-    :variant="variant"
     :hide-details="hideDetails"
     :disabled="disabled"
     :dense="dense"

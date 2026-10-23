@@ -85,7 +85,6 @@ const { t } = useI18n({ useScope: 'global' });
         id="address-1"
         v-model="state.address1"
         maxlength="128"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="address-line1"
@@ -99,7 +98,6 @@ const { t } = useI18n({ useScope: 'global' });
         id="address-2"
         v-model="state.address2"
         maxlength="128"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="address-line2"
@@ -112,7 +110,6 @@ const { t } = useI18n({ useScope: 'global' });
       <RuiTextField
         id="city"
         v-model="state.city"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="address-level2"
@@ -125,7 +122,6 @@ const { t } = useI18n({ useScope: 'global' });
       <RuiTextField
         id="postal"
         v-model="state.postcode"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="postal-code"

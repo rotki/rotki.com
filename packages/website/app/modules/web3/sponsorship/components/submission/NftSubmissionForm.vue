@@ -98,7 +98,6 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           clearable
           custom-value
           auto-select-first
-          variant="outlined"
           color="primary"
         >
           <template #item="{ item }">
@@ -157,7 +156,6 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           :hint="t('sponsor.submit_name.name_hint')"
           :error-messages="toMessages(v$.displayName)"
           :disabled="shouldDisableFields"
-          variant="outlined"
           color="primary"
         />
 
@@ -184,7 +182,6 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           :error-messages="toMessages(v$.email)"
           :disabled="shouldDisableFields"
           type="email"
-          variant="outlined"
           color="primary"
         />
 

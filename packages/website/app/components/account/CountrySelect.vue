@@ -16,7 +16,6 @@ const { countries } = useCountries();
   <RuiAutoComplete
     id="country"
     v-model="modelValue"
-    variant="outlined"
     color="primary"
     autocomplete="country"
     :options="countries"

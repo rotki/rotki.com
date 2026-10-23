@@ -22,7 +22,7 @@ function change() {
     v-model="modelValue"
     max-width="500"
   >
-    <RuiCard content-class="pt-0!">
+    <RuiCard :class-names="{ content: 'pt-0!' }">
       <template #header>
         {{ t('home.plans.tiers.step_3.change_payment.title') }}
       </template>

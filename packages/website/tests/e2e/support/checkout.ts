@@ -4,12 +4,18 @@ import { expect, type Page } from '@playwright/test';
 /** Billing period offered by the change-plan dialog. */
 export type BillingPeriod = 'Monthly billing' | 'Yearly billing';
 
-/** Opens the autocomplete labelled `label` and picks the option showing `option`. */
+/**
+ * Opens the autocomplete labelled `label` and picks the option showing `option`.
+ *
+ * @remarks
+ * The combobox is the search input, which has no size until the field opens, so the click goes to
+ * the box around it.
+ */
 export async function pickOption(page: Page, label: string, option: string): Promise<void> {
-  const combobox = page.getByRole('combobox').filter({ hasText: label });
+  const combobox = page.getByRole('combobox', { name: label });
   await expect(combobox).toBeEnabled();
-  await combobox.click();
-  await page.locator('[aria-selected]').filter({ hasText: option }).first().click();
+  await page.locator('[data-id=activator]').filter({ has: combobox }).click();
+  await page.getByRole('option').filter({ hasText: option }).first().click();
 }
 
 /**

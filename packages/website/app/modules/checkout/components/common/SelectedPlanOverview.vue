@@ -151,8 +151,8 @@ function switchTo(selectedPlan: SelectedPlan): void {
         <span class="flex items-center gap-1 text-gray-600">
           {{ t('selected_plan_overview.prorated_price_label') }}
           <RuiTooltip
-            :popper="{ placement: 'top' }"
-            tooltip-class="max-w-xs"
+            :options="{ placement: 'top' }"
+            :class-names="{ tooltip: 'max-w-xs' }"
           >
             <template #activator>
               <RuiIcon

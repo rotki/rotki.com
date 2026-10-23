@@ -57,7 +57,6 @@ watch(() => externalResults, (errors) => {
         <RuiTextField
           id="first-name"
           :model-value="modelValue.firstName"
-          variant="outlined"
           autofocus
           color="primary"
           autocomplete="given-name"
@@ -71,7 +70,6 @@ watch(() => externalResults, (errors) => {
         <RuiTextField
           id="last-name"
           :model-value="modelValue.lastName"
-          variant="outlined"
           color="primary"
           autocomplete="family-name"
           dense
@@ -84,7 +82,6 @@ watch(() => externalResults, (errors) => {
         <RuiTextField
           id="company-name"
           :model-value="modelValue.companyName"
-          variant="outlined"
           color="primary"
           autocomplete="organization"
           dense
@@ -97,7 +94,6 @@ watch(() => externalResults, (errors) => {
         <RuiTextField
           id="vat-id"
           :model-value="modelValue.vatId"
-          variant="outlined"
           color="primary"
           dense
           :label="t('auth.signup.customer_information.form.vat_id')"

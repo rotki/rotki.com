@@ -62,7 +62,6 @@ watch(() => externalResults, (errors) => {
         <RuiTextField
           id="username"
           :model-value="modelValue.username"
-          variant="outlined"
           autofocus
           color="primary"
           dense
@@ -75,7 +74,6 @@ watch(() => externalResults, (errors) => {
         <RuiTextField
           id="email"
           :model-value="modelValue.email"
-          variant="outlined"
           color="primary"
           dense
           autocomplete="email"
@@ -89,7 +87,6 @@ watch(() => externalResults, (errors) => {
             id="password"
             type="password"
             :model-value="modelValue.password"
-            variant="outlined"
             color="primary"
             dense
             autocomplete="new-password"
@@ -124,7 +121,6 @@ watch(() => externalResults, (errors) => {
           id="password-confirmation"
           type="password"
           :model-value="modelValue.confirmPassword"
-          variant="outlined"
           color="primary"
           autocomplete="new-password"
           dense

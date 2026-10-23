@@ -90,7 +90,7 @@ onBeforeMount(initPeriodFromCurrentPlan);
     :model-value="visible"
     @closed="emit('cancel')"
   >
-    <RuiCard content-class="pt-0!">
+    <RuiCard :class-names="{ content: 'pt-0!' }">
       <template #header>
         {{ t('change_plan.title') }}
       </template>

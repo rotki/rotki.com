@@ -25,7 +25,6 @@ const paymentAmount = computed<string>(() => `${data.finalPriceInCrypto} ${get(c
       id="price"
       :model-value="paymentAmount"
       :label="t('common.amount')"
-      variant="outlined"
       hide-details
       :loading="loading"
       readonly
@@ -43,7 +42,6 @@ const paymentAmount = computed<string>(() => `${data.finalPriceInCrypto} ${get(c
       id="address"
       :model-value="data.cryptoAddress"
       :label="t('home.plans.tiers.step_3.labels.to_address')"
-      variant="outlined"
       hide-details
       readonly
       :copy-value="data.cryptoAddress"

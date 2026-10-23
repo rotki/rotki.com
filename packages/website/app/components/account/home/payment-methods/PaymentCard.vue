@@ -120,7 +120,7 @@ const { t } = useI18n();
 
         <RuiTooltip
           :disabled="!deletion?.disabled"
-          tooltip-class="max-w-40"
+          :class-names="{ tooltip: 'max-w-40' }"
         >
           <template #activator>
             <RuiButton

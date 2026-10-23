@@ -135,7 +135,6 @@ onMounted(async () => {
             id="referral-code"
             :model-value="referralCode"
             :disabled="loading"
-            variant="outlined"
             :label="t('account.referral_code.code')"
             readonly
             dense

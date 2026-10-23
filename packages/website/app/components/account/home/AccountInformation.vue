@@ -182,7 +182,6 @@ onMounted(() => {
       <RuiTextField
         id="vat-id"
         v-model="state.vatId"
-        variant="outlined"
         color="primary"
         dense
         class="flex-1"
@@ -204,7 +203,7 @@ onMounted(() => {
       <RuiButton
         v-if="!hideVATVerifyButton"
         color="primary"
-        class="h-10"
+        class="mt-6 h-8"
         :disabled="remainingTime > 0 || !state.vatId"
         :loading="loadingCheck"
         @click="handleCheckVATClick()"
@@ -221,7 +220,6 @@ onMounted(() => {
       <RuiTextField
         id="first-name"
         v-model="state.firstName"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="given-name"
@@ -234,7 +232,6 @@ onMounted(() => {
       <RuiTextField
         id="last-name"
         v-model="state.lastName"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="family-name"
@@ -247,7 +244,6 @@ onMounted(() => {
       <RuiTextField
         id="company-name"
         v-model="state.companyName"
-        variant="outlined"
         color="primary"
         dense
         autocomplete="organization"

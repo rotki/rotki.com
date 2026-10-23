@@ -11,7 +11,7 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <RuiTooltip tooltip-class="w-48">
+  <RuiTooltip :class-names="{ tooltip: 'w-48' }">
     <template #activator>
       <ButtonLink
         external

@@ -34,7 +34,7 @@ defineProps<{
       />
       <RuiTooltip
         :disabled="!sponsor.tooltip"
-        :popper="{ placement: 'bottom' }"
+        :options="{ placement: 'bottom' }"
       >
         <template #activator>
           <div
