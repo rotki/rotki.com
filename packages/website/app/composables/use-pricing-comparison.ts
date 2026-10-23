@@ -39,25 +39,30 @@ export function parseTiersInfo(tiersData: PremiumTiersInfo): TiersInfo {
 
   const featureFlags = new Set<string>();
   for (const label of labelSet) {
-    let allBoolean = true;
-    let hasValue = false;
-    for (const [, features] of descriptions) {
-      const value = features.get(label);
-      if (value === undefined) {
-        continue;
-      }
-      hasValue = true;
-      if (typeof value !== 'boolean') {
-        allBoolean = false;
-        break;
-      }
-    }
-    if (hasValue && allBoolean) {
+    if (isFeatureFlag(label, descriptions)) {
       featureFlags.add(label);
     }
   }
 
   return { labels: Array.from(labelSet), descriptions, featureFlags };
+}
+
+/**
+ * A label is a feature flag when at least one plan sets it and every plan that does uses a boolean.
+ */
+function isFeatureFlag(label: string, descriptions: FeatureDescriptionMap): boolean {
+  let hasValue = false;
+  for (const [, features] of descriptions) {
+    const value = features.get(label);
+    if (value === undefined) {
+      continue;
+    }
+    if (typeof value !== 'boolean') {
+      return false;
+    }
+    hasValue = true;
+  }
+  return hasValue;
 }
 
 /**

@@ -173,16 +173,11 @@ export default defineNuxtModule({
     const manifestPath = resolve(outputDir, MANIFEST_FILE);
     const manifest = await readManifest(manifestPath);
 
-    const expectedFiles = new Set<string>();
-    const tasks: DownloadTask[] = Array.from(urls, (url) => {
-      const filename = basename(new URL(url).pathname);
-      expectedFiles.add(filename);
-      return {
-        url,
-        dest: resolve(outputDir, filename),
-        etag: manifest[url]?.etag,
-      };
-    });
+    const tasks: DownloadTask[] = Array.from(urls, url => ({
+      url,
+      dest: resolve(outputDir, basename(new URL(url).pathname)),
+      etag: manifest[url]?.etag,
+    }));
 
     console.warn(`[integration-images] Checking ${urls.size} images...`);
 

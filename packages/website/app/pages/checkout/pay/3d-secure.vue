@@ -73,16 +73,9 @@ onUnmounted(() => {
 });
 
 onBeforeRouteLeave((to, from, next) => {
-  if (get(isProcessing)) {
-    cleanup();
-    clearStoredData();
-    next();
-  }
-  else {
-    cleanup();
-    clearStoredData();
-    next();
-  }
+  cleanup();
+  clearStoredData();
+  next();
 });
 </script>
 

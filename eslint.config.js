@@ -9,6 +9,7 @@ export default rotki({
   stylistic: true,
   formatters: true,
   slop: true,
+  sonarjs: { cognitiveComplexity: 15 },
   rotki: {
     overrides: {
       '@rotki/consistent-ref-type-annotation': ['error'],

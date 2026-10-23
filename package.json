@@ -45,6 +45,7 @@
     "consola": "catalog:",
     "eslint": "catalog:",
     "eslint-plugin-slop": "catalog:",
+    "eslint-plugin-sonarjs": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
     "husky": "catalog:",
     "lint-staged": "catalog:",
