@@ -105,7 +105,7 @@ onBeforeMount(async () => {
         v-else-if="!isValid"
         class="space-y-3"
       >
-        <div class="text-h4">
+        <div class="text-h3">
           {{ t('auth.activation.invalid.title') }}
         </div>
         <div class="text-body-1 text-rui-text-secondary">
@@ -116,7 +116,7 @@ onBeforeMount(async () => {
         v-else
         class="space-y-3"
       >
-        <div class="text-h4">
+        <div class="text-h3">
           {{ t('auth.activation.success.title') }}
         </div>
         <div class="text-body-1 text-rui-text-secondary">

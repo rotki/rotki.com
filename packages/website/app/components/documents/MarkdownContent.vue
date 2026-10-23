@@ -20,13 +20,13 @@ if (!document) {
         </div>
         <h1
           v-if="document?.subtitle"
-          class="text-h4"
+          class="text-h3"
         >
           {{ document.subtitle }}
         </h1>
       </div>
       <div v-else-if="document?.title">
-        <h1 class="text-h4">
+        <h1 class="text-h3">
           {{ document.title }}
         </h1>
       </div>

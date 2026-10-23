@@ -30,7 +30,7 @@ const { t } = useI18n({ useScope: 'global' });
           </div>
           <template v-if="!isCustomPlan(plan)">
             <div class="flex flex-wrap items-baseline gap-x-1">
-              <div class="text-h4 font-bold tabular-nums">
+              <div class="text-h3 font-bold tabular-nums">
                 {{ plan.mainPriceDisplay }}
               </div>
               <div

@@ -10,7 +10,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div class="text-center space-y-3 grow">
-    <div class="text-h4">
+    <div class="text-h3">
       {{ t('auth.signup.introduction.title') }}
     </div>
     <div class="text-body-1 text-rui-text-secondary whitespace-pre-line">

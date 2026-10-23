@@ -123,7 +123,7 @@ definePageMeta({
           </div>
         </div>
         <div class="w-16 h-1 bg-rui-primary rounded-full mt-8" />
-        <h1 class="text-h4 md:text-h3 font-bold mt-4">
+        <h1 class="text-h3 md:text-h2 font-bold mt-4">
           {{ comparison.tagline }}
         </h1>
         <p class="text-body-1 text-rui-text-secondary mt-4 max-w-3xl">

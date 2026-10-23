@@ -60,7 +60,7 @@ const [DefineTab, ReuseTab] = createReusableTemplate<{
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div class="flex flex-col gap-3 max-w-[640px]">
             <i18n-t
-              class="text-h4 font-bold!"
+              class="text-h3 font-bold!"
               tag="h2"
               scope="global"
               keypath="home.rotki_offer"

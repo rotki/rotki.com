@@ -34,7 +34,7 @@ const {
         <p class="text-rui-primary text-subtitle-1 font-medium">
           {{ t('sponsor.submit_name.eyebrow') }}
         </p>
-        <h1 class="text-h4 md:text-h3 font-bold! text-balance">
+        <h1 class="text-h3 md:text-h2 font-bold! text-balance">
           {{ t('sponsor.submit_name.title') }}
         </h1>
         <p class="text-body-1 text-rui-text-secondary text-balance">

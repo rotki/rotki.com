@@ -48,7 +48,7 @@ function selectText(event: MouseEvent): void {
   >
     <div class="max-w-md w-full">
       <div class="text-center">
-        <h4 class="text-h4 mt-6">
+        <h4 class="text-h3 mt-6">
           {{ completed ? t('oauth.completion.title') : labels.title }}
         </h4>
         <p class="mt-2 text-sm text-rui-text-secondary">

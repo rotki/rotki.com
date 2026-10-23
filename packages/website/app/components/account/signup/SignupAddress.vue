@@ -97,7 +97,7 @@ watch(() => externalResults, (errors) => {
 
 <template>
   <div class="space-y-8 grow">
-    <div class="text-h4 text-center">
+    <div class="text-h3 text-center">
       {{ t('signup_address.title') }}
     </div>
     <div class="space-y-5">

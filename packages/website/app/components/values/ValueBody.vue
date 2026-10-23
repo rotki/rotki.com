@@ -19,7 +19,7 @@ const { t } = useI18n({ useScope: 'global' });
       class="container grid items-start md:grid-flow-col grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_3rem_auto] gap-y-10 md:gap-y-0 gap-x-20"
     >
       <div class="space-y-5">
-        <div class="text-h4">
+        <div class="text-h3">
           {{ t('values.values_section.title') }}
         </div>
         <div>

@@ -68,7 +68,7 @@ const data = computed<PremiumFeature[]>(() => [
     <div class="container">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
         <div class="flex flex-col gap-3 max-w-[640px]">
-          <h2 class="text-h4 font-bold!">
+          <h2 class="text-h3 font-bold!">
             {{ t('home.premium_features.title') }}
           </h2>
           <p class="text-body-1 text-rui-text-secondary">

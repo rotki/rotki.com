@@ -88,7 +88,7 @@ definePageMeta({
             {{ t('features.header') }}
           </span>
           <div class="w-16 h-1 bg-rui-primary rounded-full mt-4" />
-          <h1 class="text-h4 md:text-h3 font-bold mt-4">
+          <h1 class="text-h3 md:text-h2 font-bold mt-4">
             {{ t('features.title') }}
           </h1>
           <p

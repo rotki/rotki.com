@@ -66,7 +66,7 @@ const data = computed<LimitItem[]>(() => [
         <p class="text-rui-primary text-subtitle-1 font-medium">
           {{ t('products.features.limits.heading') }}
         </p>
-        <h2 class="text-h5 lg:text-h4 font-bold!">
+        <h2 class="text-h5 lg:text-h3 font-bold!">
           {{ t('products.features.limits.title') }}
         </h2>
       </div>

@@ -47,7 +47,7 @@ const crypto = computed<boolean>(() => !!route.query.crypto);
         </div>
 
         <!-- Success title -->
-        <h4 class="text-h4 mb-3">
+        <h4 class="text-h3 mb-3">
           {{
             crypto
               ? t('subscription.crypto_success.title')

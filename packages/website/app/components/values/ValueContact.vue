@@ -54,7 +54,7 @@ const contacts: { title: string; description: string; href: string; icon: RuiIco
         <div class="text-h6 text-rui-primary mb-3">
           {{ t('values.contact_section.title') }}
         </div>
-        <div class="text-h4 mb-4">
+        <div class="text-h3 mb-4">
           {{ t('values.contact_section.header') }}
         </div>
         <div class="text-body-1 text-rui-text-secondary">

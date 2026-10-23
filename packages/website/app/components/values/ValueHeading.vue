@@ -8,7 +8,7 @@ const { t } = useI18n({ useScope: 'global' });
       <div class="text-h6 text-rui-primary">
         {{ t('values.title') }}
       </div>
-      <h1 class="text-h5 md:text-h3 mt-4">
+      <h1 class="text-h5 md:text-h2 font-normal! mt-4">
         {{ t('values.subtitle') }}
       </h1>
     </div>

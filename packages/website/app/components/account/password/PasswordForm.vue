@@ -77,7 +77,7 @@ const { t } = useI18n({ useScope: 'global' });
     class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
   >
     <div class="w-[360px] max-w-full space-y-8">
-      <div class="text-h4">
+      <div class="text-h3">
         {{ t('auth.recover_password.title') }}
       </div>
 

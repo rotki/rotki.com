@@ -11,7 +11,7 @@ defineSlots<{
 <template>
   <component
     :is="as"
-    class="font-bold text-h4 text-rui-text mb-3"
+    class="font-bold text-h3 text-rui-text mb-3"
   >
     <slot />
   </component>

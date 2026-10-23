@@ -50,7 +50,7 @@ definePageMeta({
         <span class="text-h6 text-rui-primary">
           {{ t('integration.header') }}
         </span>
-        <h1 class="text-h4 md:text-h3 font-bold mt-3">
+        <h1 class="text-h3 md:text-h2 font-bold mt-3">
           {{ t('integration.title') }}
         </h1>
         <p class="text-body-1 mt-4">

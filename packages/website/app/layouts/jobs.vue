@@ -26,7 +26,7 @@ const { t } = useI18n({ useScope: 'global' });
               {{ t('jobs.title') }}
             </ButtonLink>
           </div>
-          <h1 class="text-h4">
+          <h1 class="text-h3">
             <slot name="title" />
           </h1>
           <div

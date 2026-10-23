@@ -162,7 +162,7 @@ definePageMeta({
                 {{ tierBadge }}
               </RuiChip>
             </div>
-            <h1 class="text-h4 md:text-h3 font-bold">
+            <h1 class="text-h3 md:text-h2 font-bold">
               {{ integration.tagline ?? `${integration.label} integration with rotki` }}
             </h1>
           </div>

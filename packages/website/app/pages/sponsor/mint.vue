@@ -112,7 +112,7 @@ const {
         <p class="text-rui-primary text-subtitle-1 font-medium">
           {{ releaseName ? t('sponsor.sponsor_page.eyebrow', { release: releaseName }) : t('sponsor.sponsor_page.eyebrow_upcoming') }}
         </p>
-        <h1 class="text-h4 font-bold! text-balance">
+        <h1 class="text-h3 font-bold! text-balance">
           {{ t('sponsor.sponsor_page.title') }}
         </h1>
         <i18n-t

@@ -36,7 +36,7 @@ useHead({
   <section class="py-16 md:py-24 bg-rui-grey-50">
     <div class="container grid lg:grid-cols-[1fr_2fr] gap-10 lg:gap-16">
       <div class="flex flex-col gap-3">
-        <h2 class="text-h4 font-bold!">
+        <h2 class="text-h3 font-bold!">
           {{ t('home.faq.title') }}
         </h2>
         <i18n-t

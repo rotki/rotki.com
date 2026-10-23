@@ -135,7 +135,7 @@ const { isMdAndUp } = useBreakpoint();
             class="flex flex-col gap-10"
           >
             <div class="flex flex-col gap-4">
-              <h2 class="text-h4">
+              <h2 class="text-h3">
                 {{ datum.title }}
               </h2>
               <p class="text-rui-text-secondary text-body-1">

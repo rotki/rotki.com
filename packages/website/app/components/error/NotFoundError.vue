@@ -22,7 +22,7 @@ const { t } = useI18n({ useScope: 'global' });
         {{ statusCode }}
       </h6>
 
-      <h3 class="text-h3 font-bold text-rui-text">
+      <h3 class="text-h2 font-bold text-rui-text">
         {{ t('not_found.title') }}
       </h3>
 

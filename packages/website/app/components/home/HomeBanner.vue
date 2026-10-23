@@ -68,7 +68,7 @@ const stats = computed<{ icon: RuiIcons; value: string; label: string; to: strin
           size="14"
         />
       </NuxtLink>
-      <h1 class="text-h4 md:text-h3 lg:text-[3.25rem] lg:leading-[1.15] font-bold! max-w-[860px] text-balance">
+      <h1 class="text-h3 md:text-h2 lg:text-[3.25rem] lg:leading-[1.15] font-bold! max-w-[860px] text-balance">
         {{ t('home.hero.title') }}
       </h1>
       <p class="text-body-1 md:text-h6 text-rui-text-secondary font-normal! max-w-[680px] text-balance">

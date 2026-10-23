@@ -60,7 +60,7 @@ const features = computed<{ img: string; width: number; height: number; title: s
           />
         </div>
         <div class="flex flex-col gap-4 flex-1">
-          <h2 class="text-h5 lg:text-h4 font-bold">
+          <h2 class="text-h5 lg:text-h3 font-bold">
             {{ feature.title }}
           </h2>
           <div class="mt-2 text-body-1 text-rui-text-secondary">

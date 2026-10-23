@@ -144,7 +144,7 @@ const { t } = useI18n({ useScope: 'global' });
         v-else-if="!isValid"
         class="space-y-3"
       >
-        <div class="text-h4">
+        <div class="text-h3">
           {{ t('auth.password_reset.invalid.title') }}
         </div>
         <div class="text-body-1 text-rui-text-secondary">
@@ -155,7 +155,7 @@ const { t } = useI18n({ useScope: 'global' });
         v-else
         class="space-y-8"
       >
-        <div class="text-h4">
+        <div class="text-h3">
           {{ t('auth.password_reset.title') }}
         </div>
         <form

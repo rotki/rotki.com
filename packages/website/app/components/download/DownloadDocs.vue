@@ -31,7 +31,7 @@ const steps: { icon: RuiIcons; title: string; description: string }[] = [
           <p class="text-rui-primary text-subtitle-1 font-medium">
             {{ t('download.documentation.title') }}
           </p>
-          <h2 class="text-rui-text text-h4 font-bold!">
+          <h2 class="text-rui-text text-h3 font-bold!">
             {{ t('download.documentation.heading') }}
           </h2>
           <p class="text-body-1 text-rui-text-secondary">

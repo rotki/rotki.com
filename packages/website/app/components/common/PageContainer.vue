@@ -31,7 +31,7 @@ defineSlots<{
       >
         <h4
           v-if="$slots.title"
-          class="text-h4 text-rui-text text-center mb-4"
+          class="text-h3 text-rui-text text-center mb-4"
         >
           <slot name="title" />
         </h4>

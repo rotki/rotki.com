@@ -50,7 +50,7 @@ watch(() => externalResults, (errors) => {
 <template>
   <form @submit.prevent="">
     <div class="space-y-8 grow">
-      <div class="text-h4 text-center">
+      <div class="text-h3 text-center">
         {{ t('auth.signup.customer_information.title') }}
       </div>
       <div class="space-y-5">

@@ -82,7 +82,7 @@ onMounted(() => {
     <div class="py-10 lg:py-16">
       <div class="container">
         <template v-if="hydrated">
-          <div class="text-h4 mb-6">
+          <div class="text-h3 mb-6">
             {{ t('account.welcome') }} {{ name }}
           </div>
           <div class="flex flex-col xl:flex-row gap-6">

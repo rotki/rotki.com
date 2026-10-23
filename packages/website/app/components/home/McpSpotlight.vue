@@ -42,7 +42,7 @@ const modes: { icon: RuiIcons; title: string; description: string; isDefault?: b
             {{ t('home.premium_features.basic_and_up') }}
           </span>
         </div>
-        <h2 class="text-h4 font-bold!">
+        <h2 class="text-h3 font-bold!">
           {{ t('home.mcp.title') }}
         </h2>
         <p class="text-body-1 text-rui-text-secondary">

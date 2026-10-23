@@ -86,7 +86,7 @@ function onDownloadClick(platform: string): void {
             />
           </a>
         </div>
-        <h1 class="text-rui-text text-h4 md:text-h3 font-bold! text-balance">
+        <h1 class="text-rui-text text-h3 md:text-h2 font-bold! text-balance">
           {{ t('download.heading.description') }}
         </h1>
         <p class="text-body-1 md:text-h6 font-normal! text-rui-text-secondary max-w-[640px] text-balance">
