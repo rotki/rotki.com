@@ -49,6 +49,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
       size="lg"
       rounded
       :color="color"
+      class="max-sm:px-4!"
       :class="{ 'outline-white! text-rui-dark-text!': !color }"
     >
       {{ t('actions.get_started_for_free') }}
@@ -65,6 +66,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
           rounded
           :disabled="!allowNavigation"
           :color="color"
+          class="max-sm:px-4!"
         >
           {{ t('actions.get_premium') }}
         </ButtonLink>
