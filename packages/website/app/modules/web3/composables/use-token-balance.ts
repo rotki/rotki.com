@@ -8,7 +8,7 @@ import { isNativeToken } from '~/modules/web3/core/erc20';
 import { computeFundsStatus, type FundsStatus } from '~/modules/web3/core/funds';
 import { useLogger } from '~/utils/use-logger';
 
-/** The token the user is paying with — its on-chain address and decimals. */
+/** The token the user is paying with: its on-chain address and decimals. */
 export interface BalanceToken {
   address: string;
   decimals: number;
@@ -21,7 +21,7 @@ export interface UseTokenBalanceOptions {
   token: MaybeRefOrGetter<BalanceToken | undefined>;
   /** Human-readable price/amount to pay in the selected token. */
   price: MaybeRefOrGetter<string>;
-  /** Only read while true — typically `connected && isExpectedChain`. */
+  /** Only read while true, typically `connected && isExpectedChain`. */
   active: MaybeRefOrGetter<boolean>;
   /**
    * Flow-specific gas estimate as a human-readable native-coin fee (mint vs

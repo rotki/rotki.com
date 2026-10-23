@@ -63,7 +63,7 @@ export async function ensureAuthenticated(
       await actions.getAccount();
     }
     catch {
-      // getAccount failed — redirect to login
+      // getAccount failed: redirect to login
     }
   }
 

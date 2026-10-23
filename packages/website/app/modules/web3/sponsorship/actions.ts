@@ -81,7 +81,7 @@ export async function mintNft(config: Config, params: MintNftParams): Promise<Re
 }
 
 export interface MintFeeParams extends ContractRef {
-  /** The connected wallet — the estimate is from its balance/allowance perspective. */
+  /** The connected wallet; the estimate is from its balance/allowance perspective. */
   account: string;
   tierId: number;
   paymentToken: string;
@@ -94,7 +94,7 @@ export interface MintFeeParams extends ContractRef {
  * Estimated network fee for a `mint`, as a human-readable native-coin string.
  * Reuses the shared `estimateFee` path (live gas price × real `estimateGas`,
  * with a constant fallback when estimation reverts on low funds / missing
- * allowance). For the soft gas warning only — never a hard block.
+ * allowance). For the soft gas warning only, never a hard block.
  */
 export async function estimateMintFee(config: Config, params: MintFeeParams): Promise<Result<string, Web3Error>> {
   return estimateFee(config, {
@@ -119,7 +119,7 @@ export function decodeMintedTokenId(logs: readonly Log[], minter: Address): stri
         return decoded.args.tokenId.toString();
     }
     catch {
-      // Not our event — skip.
+      // Not our event, skip.
     }
   }
   return undefined;

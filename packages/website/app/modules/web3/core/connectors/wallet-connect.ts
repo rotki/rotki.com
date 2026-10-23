@@ -13,7 +13,7 @@ import { segmentAfterFirst } from '../format';
  * with the existing `qrcode` dep.
  *
  * `UniversalProvider` itself is dynamically imported inside `getProvider`, so it
- * only loads when a user actually picks WalletConnect — never on the injected or
+ * only loads when a user actually picks WalletConnect, never on the injected or
  * Coinbase path.
  */
 export interface WalletConnectMetadata {

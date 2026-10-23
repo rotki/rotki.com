@@ -54,7 +54,7 @@ export default defineConfig({
     },
   ],
   webServer: [
-    // Mock API server — starts first
+    // Mock API server, starts first
     {
       command: 'pnpm --filter e2e-mock-api dev',
       env: {
@@ -64,7 +64,7 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 60000,
     },
-    // Nuxt dev server — frontend only (port hardcoded in package.json dev script)
+    // Nuxt dev server, frontend only (port hardcoded in package.json dev script)
     {
       command: 'pnpm dev',
       env: {
@@ -77,7 +77,7 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
-    /* Go backend — proxies pages to Nuxt, /webapi to mock API. Built first and run as a binary: `go run`
+    /* Go backend: proxies pages to Nuxt, /webapi to mock API. Built first and run as a binary: `go run`
        compiles into a /tmp/go-build* directory it only removes on a clean exit, and a web server is
        always stopped by a signal, so every run left one behind. */
     {

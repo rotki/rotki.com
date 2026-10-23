@@ -4,7 +4,7 @@ import { usePageSeo } from '~/composables/use-page-seo';
 
 usePageSeo(
   'Refund Policy',
-  'Refund policy for rotki premium subscriptions — conditions, timeframes, and how to request a refund.',
+  'Refund policy for rotki premium subscriptions: conditions, timeframes, and how to request a refund.',
   '/refund-policy',
 );
 

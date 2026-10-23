@@ -88,7 +88,7 @@ function normalizeReleaseTag(value: string | undefined): string {
  * edited. The current release name (Go tier-info endpoint) and the submission's
  * release version (Python submissions endpoint) come from different backends and
  * can differ in casing or `v`-prefix, so both are normalized. A missing/unknown
- * value on either side never counts as the current release — editing stays
+ * value on either side never counts as the current release, so editing stays
  * disabled rather than being wrongly enabled for an old submission.
  */
 export function isCurrentReleaseSubmission(currentReleaseName: string | undefined, submissionReleaseVersion: string | undefined): boolean {
@@ -118,7 +118,7 @@ function metadataDetails(metadata: SimpleTokenMetadata): Omit<NftMetadataEvaluat
 
 /**
  * Classify fetched NFT metadata against the connected wallet and current release.
- * Pure decision core of the form's NFT check — the composable maps the returned
+ * Pure decision core of the form's NFT check; the composable maps the returned
  * status onto localized error messages and follow-up actions.
  */
 export function evaluateNftMetadata(metadata: SimpleTokenMetadata | undefined, address: string | undefined, currentReleaseId: number | undefined): NftMetadataEvaluation {

@@ -12,7 +12,7 @@ export enum VatIdStatus {
   NON_EU_ID = 'ID outside the EU',
 }
 
-// Comprehensive address schema that supports both package needs
+// Address schema covering the fields both packages need
 export const AddressSchema = z.object({
   address1: z.string(),
   address2: z.string(),
@@ -28,7 +28,7 @@ export const AddressSchema = z.object({
 
 export type Address = z.infer<typeof AddressSchema>;
 
-// Account schema - comprehensive to support both packages
+// Account schema covering the fields both packages need
 export const AccountSchema = z.object({
   address: AddressSchema,
   apiKey: z.string(),

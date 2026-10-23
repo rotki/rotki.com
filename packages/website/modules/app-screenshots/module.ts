@@ -15,7 +15,7 @@ const EXTENSION = '.webp';
  * These live under `public/`, which Vite deliberately keeps out of the module
  * graph, so `import.meta.glob` cannot see them in a build. It used to be used
  * here and looked fine, because the dev server resolves such patterns off the
- * filesystem — but the production build compiled the call down to
+ * filesystem, but the production build compiled the call down to
  * `Object.assign({})` and the homepage carousel silently rendered zero slides.
  * Reading the directory ourselves keeps the list auto-discovered without
  * depending on `public/` being part of the graph.
@@ -62,7 +62,7 @@ export default defineNuxtModule({
 
         const screenshots = readScreenshots(dir);
         if (screenshots.length === 0)
-          this.warn(`no screenshots found in ${SCREENSHOT_DIR} — the showcase carousel will be empty`);
+          this.warn(`no screenshots found in ${SCREENSHOT_DIR}; the showcase carousel will be empty`);
 
         const missing = findMissingVariants(dir, screenshots);
         if (missing.length > 0)

@@ -4,7 +4,7 @@ import { usePageSeo } from '~/composables/use-page-seo';
 
 usePageSeo(
   'Privacy Policy',
-  'rotki privacy policy — how we collect, use, and protect your personal data.',
+  'rotki privacy policy: how we collect, use, and protect your personal data.',
   '/privacy-policy',
 );
 

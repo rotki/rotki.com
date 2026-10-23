@@ -248,7 +248,7 @@ export function useMintFlow() {
       if (txHash)
         await onMintingSuccess(txHash);
       await refreshSponsorshipData();
-      // Balance dropped by the mint (+ gas) — re-read so the UI isn't stale.
+      // Balance dropped by the mint (+ gas): re-read so the UI isn't stale.
       await refreshBalances();
     }
   });

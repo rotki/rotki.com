@@ -229,12 +229,10 @@ if (inAllNotInMd.length === 0) {
 }
 else {
   /*
-   * An all.json slug without its own md file is only safe when the site folds it into a
-   * page that does exist. That folding is INTEGRATION_CONSOLIDATIONS (the same explicit
-   * whitelist /integrations builds its links from), so consolidateSlug is what decides,
-   * not a first-word match. A first-word heuristic here would call "Yearn vesting" safe
-   * because yearn.md exists, while the site still links /integrations/yearn-vesting and
-   * the prerender 404s.
+   * An all.json slug without its own md file is only safe when the site folds it into an
+   * existing page via INTEGRATION_CONSOLIDATIONS (the whitelist /integrations builds its
+   * links from), so consolidateSlug decides. A first-word match would pass "Yearn vesting"
+   * because yearn.md exists, yet /integrations/yearn-vesting would 404 at prerender.
    */
   const trulyMissing = inAllNotInMd.filter(s => !mdSlugs.has(consolidateSlug(s)));
   if (trulyMissing.length === 0) {

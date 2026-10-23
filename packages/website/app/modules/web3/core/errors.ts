@@ -7,7 +7,7 @@ import { tag, type Tagged } from 'plainfp/tagged';
  * the old composables. Consumers narrow on `_tag` (via `hasTag` or a switch)
  * to render a precise, translatable message.
  *
- * Pure module — only `plainfp/tagged` and the runtime-free `classifyCryptoTxError`
+ * Pure module: only `plainfp/tagged` and the runtime-free `classifyCryptoTxError`
  * duck-typer from `@rotki/sigil`.
  */
 interface ErrData {

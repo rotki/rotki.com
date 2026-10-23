@@ -101,7 +101,7 @@ test.describe('payment redirect after signup', () => {
     await continuePastIntroduction(page);
     expect(new URL(page.url()).searchParams.get('redirectUrl')).toBe(paymentPath);
 
-    // Step 2: Account form — fill and advance
+    // Step 2: Account form, fill and advance
     await page.locator('input#username').first().fill('testuser');
     await page.locator('input#email').first().fill('test@example.com');
     await page.locator('input#password').first().fill('SecureP4ss!');

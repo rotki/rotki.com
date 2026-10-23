@@ -119,8 +119,8 @@ export function parseUtmFromQuery(
  * `localhost`/`127.0.0.1`). When the app is reached over a plain-http,
  * non-localhost origin (a LAN IP, container host name, `0.0.0.0`, a tunnel,
  * etc.) the method is `undefined` and calling it throws, which would abort
- * app initialization. `crypto.getRandomValues` carries no such restriction —
- * it is available in insecure contexts too — so we use it to build a v4 UUID
+ * app initialization. `crypto.getRandomValues` carries no such restriction
+ * (it is available in insecure contexts too), so we use it to build a v4 UUID
  * by hand when `randomUUID` is missing.
  */
 export function randomSessionId(): string {

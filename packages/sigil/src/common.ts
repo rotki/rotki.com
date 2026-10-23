@@ -4,7 +4,7 @@
 
 /**
  * Derive a string-literal union from the values of a const enum-like object.
- * Internal sigil helper — used to give every "enum" exactly one source of
+ * Internal sigil helper, used to give every "enum" exactly one source of
  * truth (the `as const` object) without restating the value union.
  */
 export type EnumValueOf<T> = T[keyof T];

@@ -2,7 +2,7 @@ import { isErr, isOk } from 'plainfp/result';
 import { assert, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clearEnsCache, resolveEnsName } from '~/modules/web3/core/ens';
 
-// vitalik.eth — lowercased input so we can assert the call is checksummed.
+// vitalik.eth, lowercased input so we can assert the call is checksummed.
 const ADDRESS_LOWER = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045';
 const ADDRESS_CHECKSUMMED = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
 
@@ -82,7 +82,7 @@ describe('web3 core/ens', () => {
       expect(getEnsName).toHaveBeenCalledTimes(1);
     });
 
-    it('does not cache a failure — a later call retries', async () => {
+    it('does not cache a failure, so a later call retries', async () => {
       getEnsName.mockRejectedValueOnce(new Error('rpc down')).mockResolvedValue('vitalik.eth');
 
       const failed = await resolveEnsName(ADDRESS_LOWER);

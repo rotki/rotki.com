@@ -102,7 +102,7 @@ export const featureSchema = z.object({
   keyTakeaways: z.array(z.string()).default([]),
   // What rotki actually does for this use-case.
   capabilities: z.array(z.string()).default([]),
-  // Honest limits / what rotki does NOT do — avoid overclaiming.
+  // Honest limits / what rotki does NOT do. Avoid overclaiming.
   limitations: z.array(z.string()).default([]),
   // Ordered setup steps.
   setup: z.array(z.string()).default([]),

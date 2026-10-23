@@ -4,7 +4,7 @@
  * `use-crypto-payment` composable and the ethers human-readable `ERC20_ABI` in
  * the sponsorship constants.
  *
- * Pure data (`as const` for viem type inference) — no runtime import, safe to
+ * Pure data (`as const` for viem type inference) with no runtime import, safe to
  * reference from anywhere without pulling viem into the bundle.
  */
 export const ERC20_ABI = [

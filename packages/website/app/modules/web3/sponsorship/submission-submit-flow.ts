@@ -7,8 +7,8 @@ import { nonEmpty } from '~/utils/non-empty';
 
 /**
  * Ordered, dependency-injected holder-submission flow. Each step runs only after
- * the previous one succeeds — validate, then verify ownership, then build the
- * payload, then submit — so the outcome never depends on whether a watcher
+ * the previous one succeeds (validate, then verify ownership, then build the
+ * payload, then submit), so the outcome never depends on whether a watcher
  * happened to set an imperative flag first (the fresh-sign race). Every dependency
  * is passed in, so the whole flow is unit-testable without Vue or the network.
  */
@@ -27,7 +27,7 @@ export type SubmitError =
 export interface SubmitFlowDeps {
   /** Vuelidate `$validate()`; resolves true when the form passes. */
   validate: () => Promise<boolean>;
-  /** Editing skips the live ownership gate — the backend re-verifies on submit. */
+  /** Editing skips the live ownership gate; the backend re-verifies on submit. */
   isEditing: boolean;
   /** Runs the on-chain metadata/ownership check and resolves its status. */
   checkOwnership: () => Promise<NftMetadataStatus | undefined>;
@@ -76,7 +76,7 @@ function backendMessage(cause: unknown): string | undefined {
 /**
  * Resolve the top-level error banner text for a failed submit. Validation and NFT
  * errors already surface inline / via the nftCheckError alert, so they return ''.
- * `translate` is the i18n `t` — injected so this stays pure and testable.
+ * `translate` is the i18n `t`, injected so this stays pure and testable.
  */
 export function submitErrorMessage(error: SubmitError, translate: (key: string) => string): string {
   switch (error._tag) {

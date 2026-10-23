@@ -1,8 +1,8 @@
 /**
  * Brand logos, registered by this app rather than by `@rotki/ui-library`.
  *
- * lucide v1 removed every brand/logo glyph on purpose — brand marks are
- * third-party trademarks with their own usage rules — and the library followed
+ * lucide v1 removed every brand/logo glyph on purpose (brand marks are
+ * third-party trademarks with their own usage rules), and the library followed
  * suit, dropping the logos it used to ship as custom SVGs. Anything an app
  * renders must now be registered here or it renders blank.
  *

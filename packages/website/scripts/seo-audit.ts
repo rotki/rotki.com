@@ -1,16 +1,16 @@
 /**
  * Deterministic SEO audit over the generated static site (`nuxi generate` output).
  *
- * Parses every prerendered page and checks the SEO invariants that matter for
- * indexing — a single absolute canonical that matches the production URL, a
+ * Parses every prerendered page, checks the SEO invariants that matter for
+ * indexing (a single absolute canonical that matches the production URL, a
  * title and meta description, the core Open Graph tags, crawlable anchors, one
- * <h1>, and a lang attribute — then prints a grouped report.
+ * <h1>, and a lang attribute), then prints a grouped report.
  *
  * Why a script instead of Lighthouse: Lighthouse audits one page at a time
  * served from localhost, so it mis-flags absolute canonicals as "different
  * domain" and can't realistically cover 140+ pages. Parsing the HTML directly
  * against the production base URL covers EVERY page, never flakes, and runs in
- * seconds — ideal for catching accidental SEO regressions on every PR.
+ * seconds, which suits catching accidental SEO regressions on every PR.
  *
  * Usage:
  *   pnpm tsx scripts/seo-audit.ts [distDir] [--base=https://rotki.com] [--strict]
@@ -194,7 +194,7 @@ function auditPage(html: string, route: string, routeByUrl: Map<string, string>)
   // A route alias defers to its canonical page, which is audited in its own right.
   const canonicalTo = aliasTarget(html, route, routeByUrl);
 
-  // noindex, redirect and alias pages are intentionally out of the index — skip checks.
+  // noindex, redirect and alias pages are intentionally out of the index, so skip checks.
   if (!noindex && !redirect && !canonicalTo) {
     issues.push(
       ...checkCanonical(html, route),

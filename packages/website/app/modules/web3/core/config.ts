@@ -8,7 +8,7 @@ const APP_LOGO_URL = 'https://raw.githubusercontent.com/rotki/data/main/assets/i
 
 /**
  * Per-request RPC timeout. Bounds each read so a stalled/black-holed endpoint
- * fails fast and the `fallback` transport advances to the next URL — restoring
+ * fails fast and the `fallback` transport advances to the next URL. This restores
  * the guarantee the old circuit-breaker rpc-checker provided.
  */
 const RPC_TIMEOUT_MS = 20_000;

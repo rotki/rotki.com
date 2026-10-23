@@ -18,7 +18,7 @@ export type SponsorshipClient = {
 /**
  * Lazily load `sponsorship/actions` and bind the contract ops to the singleton
  * `Config`. Kept in its own module so the checkout flow never pulls the
- * sponsorship code into its chunk — only `getWeb3Client` is shared.
+ * sponsorship code into its chunk; only `getWeb3Client` is shared.
  */
 export async function getSponsorshipClient(ensureInitialized: () => Promise<Config>): Promise<SponsorshipClient> {
   const [config, actions] = await Promise.all([

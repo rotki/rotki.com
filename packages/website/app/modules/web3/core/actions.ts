@@ -17,7 +17,7 @@ const RECEIPT_TIMEOUT_MS = 5 * 60 * 1000;
 const READ_TIMEOUT_MS = 15_000;
 
 /**
- * Gas-limit fallbacks used only when on-chain `estimateGas` reverts — which it
+ * Gas-limit fallbacks used only when on-chain `estimateGas` reverts, which it
  * does precisely when the wallet already cannot cover the call (the case the
  * funds warning exists to catch). A simple native/ERC-20 transfer is otherwise a
  * fixed cost, so these are safe approximations for the fee buffer.
@@ -33,7 +33,7 @@ function isReceiptTimeout(cause: unknown): boolean {
 
 /**
  * Shared, framework-agnostic web3 operations. Every function takes the wagmi
- * `Config` as its first argument (dependency injection — no hidden singleton)
+ * `Config` as its first argument (dependency injection, no hidden singleton)
  * and returns a `Result<T, Web3Error>` so callers branch on a typed outcome
  * instead of `try/catch`. This is the single implementation reused by checkout
  * crypto-payment now and sponsorship minting in pass 2.
@@ -200,7 +200,7 @@ export async function readErc20Balance(config: Config, params: Erc20BalanceParam
 
 export interface FeeEstimateParams {
   chainId: number;
-  /** The connected wallet — the estimate is from its balance/allowance perspective. */
+  /** The connected wallet; the estimate is from its balance/allowance perspective. */
   account: string;
   to: string;
   value?: bigint;
@@ -251,7 +251,7 @@ export async function estimateFee(config: Config, params: FeeEstimateParams): Pr
               fee += await client.estimateL1Fee({ account, to, ...call });
           }
           catch {
-            // L1 oracle unavailable — fall back to the L2-only estimate.
+            // L1 oracle unavailable: fall back to the L2-only estimate.
           }
         }
         return formatUnits(fee, NATIVE_DECIMALS);

@@ -15,7 +15,7 @@ interface Props {
   isLoading?: boolean;
   /** Connected wallet's balance of the selected token (human-readable); empty when unknown. */
   balance?: string;
-  /** True while the balance is being (re)read — e.g. right after switching currency. */
+  /** True while the balance is being (re)read, e.g. right after switching currency. */
   balanceLoading?: boolean;
 }
 

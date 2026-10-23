@@ -214,10 +214,9 @@ export default defineNuxtConfig({
   routeRules: {
     /*
      * The 404 body is served at whatever URL the visitor requested, so the Nuxt
-     * runtime must not boot on it: it would hydrate against a payload for
-     * /not-found, logging a mismatch and rewriting the address bar so the
-     * visitor loses the URL they asked for. `noScripts` omits the runtime at
-     * render time, which is why this page is prerendered but inert.
+     * runtime must not boot on it: it would hydrate against the /not-found
+     * payload, log a mismatch and rewrite the visitor's address bar.
+     * `noScripts` omits the runtime, so the page is prerendered but inert.
      */
     '/not-found': { noScripts: true },
     ...clientOnlyRouteRules(),
@@ -242,7 +241,7 @@ export default defineNuxtConfig({
     preset: 'static',
     prerender: {
       crawlLinks: true,
-      // Guardrail: fail the build if an indexable route errors while rendering — make it ssr:false instead.
+      // Guardrail: fail the build if an indexable route errors while rendering; make it ssr:false instead.
       failOnError: true,
       /*
        * `/not-found` is the statically rendered 404 body the Go handler serves.

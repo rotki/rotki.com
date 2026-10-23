@@ -134,7 +134,7 @@ Follow this order in `<script setup>`:
     disabled?: boolean;
   }>();
 
-  // ❌ Legacy — avoid in new code
+  // ❌ Legacy: avoid in new code
   const props = withDefaults(defineProps<{
     title: string;
     count?: number;
@@ -168,12 +168,12 @@ Follow this order in `<script setup>`:
 - Use `defineModel` for all v-model bindings instead of manual prop + emit:
 
   ```typescript
-  // ✅ Correct — defineModel
+  // ✅ Correct: defineModel
   const modelValue = defineModel<string>({ required: true });
   const selected = defineModel<number>('selected');
   const filters = defineModel<Filters>('filters', { default: () => ({}) });
 
-  // ❌ Incorrect — manual prop + emit for v-model
+  // ❌ Incorrect: manual prop + emit for v-model
   const props = defineProps<{ modelValue: string }>();
   const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
   ```
@@ -183,11 +183,11 @@ Follow this order in `<script setup>`:
 - Use `useTemplateRef` for typed template refs:
 
   ```typescript
-  // ✅ Correct — Vue 3.5+
+  // ✅ Correct (Vue 3.5+)
   import { useTemplateRef } from 'vue';
   const formRef = useTemplateRef<InstanceType<typeof MyForm>>('formRef');
 
-  // ❌ Incorrect — old pattern
+  // ❌ Incorrect: old pattern
   const formRef = ref<InstanceType<typeof MyForm>>();
   ```
 
@@ -228,7 +228,7 @@ Follow this order in `<script setup>`:
   // ✅ Correct
   return { items: shallowReadonly(items) };
 
-  // ❌ Incorrect — cast hides the DeepReadonly mismatch (and can silently strip `| null`)
+  // ❌ Incorrect: the cast hides the DeepReadonly mismatch (and can silently strip `| null`)
   return { items: readonly(items) as Readonly<Ref<Item[]>> };
   ```
 

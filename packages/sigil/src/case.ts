@@ -10,7 +10,7 @@ function camelToSnake(str: string): string {
 
 /**
  * Convert all keys of a flat object from camelCase to snake_case.
- * Returns a new object — the input is not mutated.
+ * Returns a new object; the input is not mutated.
  *
  * The return type is intentionally the loose `Record<string, unknown>`: every
  * consumer (sigilTrack/buildTrackedEventData/JSON.stringify) only needs that, so

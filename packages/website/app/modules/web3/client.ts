@@ -3,7 +3,7 @@ import type { Config } from '@wagmi/core';
 /**
  * Strips the leading `config: Config` parameter from a `core/actions` function,
  * yielding the call signature the bound client exposes. Param and return types
- * (including the receipt type) flow straight from the source — the client never
+ * (including the receipt type) flow straight from the source; the client never
  * re-declares them.
  */
 export type Bound<F> = F extends (config: Config, ...rest: infer A) => infer R
@@ -34,7 +34,7 @@ export type Web3Client = {
  * The single boundary over the web3 core for domain composables: they call
  * `getWeb3Client(wallet.ensureInitialized)` and use the returned methods
  * without ever importing `core/actions` or threading `Config` themselves.
- * `use-wallet` keeps owning the `Config` singleton — `ensureInitialized` is
+ * `use-wallet` keeps owning the `Config` singleton: `ensureInitialized` is
  * passed in, not duplicated here.
  */
 export async function getWeb3Client(ensureInitialized: () => Promise<Config>): Promise<Web3Client> {

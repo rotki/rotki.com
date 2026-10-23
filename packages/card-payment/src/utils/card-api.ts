@@ -153,18 +153,17 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       const { code, message: backendMessage } = extractBackendError(errorText);
-      /* The card_add_failed 400 is returned after Braintree has vaulted the card, so
-         it gets its own error for callers that need to refresh their cards. Other 400s
-         are either schema/JSON-decode errors (programmer-side) or raw Braintree gateway
-         dumps ("Do Not Honor" etc.), so they get friendly copy with the raw cause kept
-         in logDetail. 429 surfaces the backend's already-user-friendly rate-limit
-         message verbatim. All are written for the customer, hence PaymentUserError,
-         which is what lets them reach the screen; anything else is an HTTP dump and
-         stays opaque. */
+      /* Only customer-facing errors use PaymentUserError, which is what lets them
+         reach the screen; anything else is an HTTP dump and stays opaque. */
+
+      /* card_add_failed comes after Braintree has vaulted the card, so it gets its
+         own error for callers that need to refresh their cards. */
       if (response.status === 400 && code === CARD_ADD_FAILED_CODE) {
         throw new CardAddedPaymentError(PAYMENT_METHOD_FAILED_MESSAGE, { logDetail: backendMessage });
       }
 
+      /* Other 400s are schema/JSON-decode errors or raw Braintree gateway dumps
+         ("Do Not Honor" etc.): show friendly copy, keep the raw cause in logDetail. */
       if (response.status === 400) {
         throw new PaymentUserError(
           'We couldn\'t add this card. Please double-check the details or try a different card.',
@@ -172,6 +171,7 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
         );
       }
 
+      // The backend's rate-limit message is already written for the customer.
       if (response.status === 429) {
         throw new PaymentUserError(backendMessage);
       }

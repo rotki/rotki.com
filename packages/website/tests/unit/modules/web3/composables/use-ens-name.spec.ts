@@ -150,7 +150,7 @@ describe('useEnsName', () => {
     await nextTick();
     await vi.advanceTimersByTimeAsync(300);
 
-    // A resolves late — must be ignored since B is the current address.
+    // A resolves late and must be ignored since B is the current address.
     first.resolve(ok('stale.eth'));
     await vi.advanceTimersByTimeAsync(0);
     expect(ensName.value).not.toBe('stale.eth');

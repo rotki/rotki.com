@@ -30,7 +30,7 @@ export async function selectAsset(page: Page, network: string, token: string): P
  * @remarks
  * These checkboxes are a 1px input behind their label, so the input itself does not toggle on
  * click and the text is the only reliable target. A label clicked before the page has settled is
- * swallowed, so the click repeats until the box really is checked — it is safe to repeat because
+ * swallowed, so the click repeats until the box really is checked. It is safe to repeat because
  * an already-checked box is left alone.
  */
 async function tick(page: Page, name: RegExp, text: string): Promise<void> {
@@ -92,7 +92,7 @@ export async function changePlan(page: Page, options: { period: BillingPeriod; t
  *
  * @remarks
  * Where it lands depends on the checkout: a renewal returns to the request page, an upgrade goes
- * back to the subscription page, and a failed cancellation stays put — so the caller asserts that.
+ * back to the subscription page, and a failed cancellation stays put, so the caller asserts that.
  */
 export async function confirmPaymentChange(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Change Payment' }).click();

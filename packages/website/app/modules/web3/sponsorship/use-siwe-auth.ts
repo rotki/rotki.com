@@ -92,7 +92,7 @@ function useSiweAuthInternal() {
     return session.expiresAt > now + 60;
   }
 
-  /** Step 1 — fetch a fresh nonce from the backend. */
+  /** Step 1: fetch a fresh nonce from the backend. */
   async function fetchNonce(): RA.ResultAsync<string, AuthError> {
     return pipe(
       RA.fromPromise(
@@ -121,7 +121,7 @@ function useSiweAuthInternal() {
     });
   }
 
-  /** Step 2 — build + sign the EIP-4361 message, translating wallet errors to {@link AuthError}. */
+  /** Step 2: build + sign the EIP-4361 message, translating wallet errors to {@link AuthError}. */
   async function signSiweMessage(address: string, nonce: string): Promise<Result<{ message: string; signature: string }, AuthError>> {
     const message = buildSiweMessage(address, nonce);
     return map(
@@ -132,7 +132,7 @@ function useSiweAuthInternal() {
     );
   }
 
-  /** Step 3 — verify the signed message with the backend, yielding the persisted session. */
+  /** Step 3: verify the signed message with the backend, yielding the persisted session. */
   async function verifySignature(message: string, signature: string): RA.ResultAsync<SiweSession, AuthError> {
     return pipe(
       RA.fromPromise(

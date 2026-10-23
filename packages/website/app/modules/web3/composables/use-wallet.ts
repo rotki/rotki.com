@@ -20,7 +20,7 @@ import { useLogger } from '~/utils/use-logger';
  * from {@link UseWalletReturn.ensureInitialized}.
  *
  * Laziness: NOTHING from `@wagmi/core` / `viem` / the connectors is imported
- * statically here — `ensureInitialized()` pulls `core/config` + `core/actions` +
+ * statically here. `ensureInitialized()` pulls `core/config` + `core/actions` +
  * `@wagmi/core` watchers via `await import()` on first interaction, so the whole
  * web3 stack code-splits out of the initial bundle. State and types
  * (`import type`) are the only things this module carries eagerly.
@@ -44,7 +44,7 @@ const reconnecting = shallowRef<boolean>(false);
 
 let configPromise: Promise<Config> | undefined;
 
-/** Minimal EIP-1193 surface — just enough to probe accounts cast-free. */
+/** Minimal EIP-1193 surface, just enough to probe accounts cast-free. */
 interface RequestProvider {
   request: (args: { method: string; params?: unknown }) => Promise<unknown>;
 }
@@ -101,7 +101,7 @@ export function useWallet(): UseWalletReturn {
 
   /**
    * Restore a previously authorized session without prompting, then verify it is
-   * live. wagmi's `reconnect()` is optimistic — it trusts the persisted store and
+   * live. wagmi's `reconnect()` is optimistic: it trusts the persisted store and
    * only self-corrects later via wallet events, so a wallet locked at page load
    * is restored as "connected" with a stale address. The liveness probe closes
    * that gap by dropping any restored-but-dead session.

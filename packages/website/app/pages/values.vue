@@ -7,7 +7,7 @@ import { usePageSeo } from '~/composables/use-page-seo';
 
 usePageSeo(
   'Our Values',
-  'The core values behind rotki — privacy, transparency, open source, and putting users first in crypto portfolio management.',
+  'The core values behind rotki: privacy, transparency, open source, and putting users first in crypto portfolio management.',
   '/values',
 );
 

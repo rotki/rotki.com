@@ -52,7 +52,7 @@ export const llms: ContentLlmsOptions = {
     },
     {
       title: 'Features',
-      description: 'Use-case and concept guides for what rotki does — CSV import, local-first accounting, privacy-first portfolio tracking, DeFi tracking, open-source crypto tax — covering capabilities, setup steps, limitations, and FAQs. rotki runs locally and reads your exchanges and chains with your own keys.',
+      description: 'Use-case and concept guides for what rotki does (CSV import, local-first accounting, privacy-first portfolio tracking, DeFi tracking, open-source crypto tax), covering capabilities, setup steps, limitations, and FAQs. rotki runs locally and reads your exchanges and chains with your own keys.',
       contentCollection: 'features',
       contentFilters: [
         { field: 'extension', operator: '=', value: 'md' },

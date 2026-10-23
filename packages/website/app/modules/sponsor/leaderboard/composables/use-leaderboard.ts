@@ -39,7 +39,7 @@ export function useLeaderboard(): UseLeaderboardReturn {
   const clipboardSource = shallowRef<string>('');
   const { copy } = useClipboard({ source: clipboardSource });
 
-  // Breakpoint detection — addresses are truncated on smaller screens
+  // Breakpoint detection: addresses are truncated on smaller screens
   const { isMdAndDown } = useBreakpoint();
 
   // Leaderboard data

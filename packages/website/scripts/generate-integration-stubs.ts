@@ -32,7 +32,7 @@ function deriveMetaDescription(intro: string): string {
   return text
     .slice(0, META_DESCRIPTION_MAX)
     .replace(/\s+\S*$/, '')
-    .replace(/[\s,.:;–—-]+(?:and|or|with|including)?$/i, '')
+    .replace(/[\s,.:;\u{2013}\u{2014}-]+(?:and|or|with|including)?$/iu, '')
     .trim();
 }
 

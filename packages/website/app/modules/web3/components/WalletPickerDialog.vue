@@ -80,7 +80,7 @@ async function selectConnector(connector: Connector): Promise<void> {
     },
   });
 
-  // The user pressed Back / closed the dialog while this was pending — drop it.
+  // The user pressed Back / closed the dialog while this was pending, so drop it.
   if (token !== attemptToken)
     return;
 
@@ -91,7 +91,7 @@ async function selectConnector(connector: Connector): Promise<void> {
   else {
     set(qrUri, undefined);
     const { error } = result;
-    // Always log the real cause — the friendly i18n string hides it.
+    // Always log the real cause, since the friendly i18n string hides it.
     logger.error('wallet connect failed', error.cause ?? error);
     const message = t(web3ErrorKey(error), { message: error.message });
     set(errorMessage, message);

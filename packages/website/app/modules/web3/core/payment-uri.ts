@@ -2,8 +2,8 @@ import type { CryptoPayment } from '~/types';
 import { isNativeToken } from '~/modules/web3/core/erc20';
 
 /**
- * Build the wallet payment URI encoded into the manual-payment QR — BIP-21 for
- * bitcoin, EIP-681 for EVM chains. The `parseUnits` amount conversion lives here
+ * Build the wallet payment URI encoded into the manual-payment QR (BIP-21 for
+ * bitcoin, EIP-681 for EVM chains). The `parseUnits` amount conversion lives here
  * (lazy `viem` import) so the checkout QR component carries no direct web3-lib
  * import; viem stays contained to `app/modules/web3/`.
  */

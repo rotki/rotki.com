@@ -62,7 +62,7 @@ export function parseTiersInfo(tiersData: PremiumTiersInfo): TiersInfo {
 
 /**
  * Resolve a single feature value for a plan/label combination.
- * Pure function — all dependencies passed as arguments.
+ * Pure function: all dependencies are passed as arguments.
  */
 export function resolveFeatureValue(
   plan: PlanBase,

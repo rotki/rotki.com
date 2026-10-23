@@ -7,7 +7,7 @@ import { cacheEnsName, peekEnsName, resetEnsCache } from './ens-cache';
 import { fromCause, type Web3Error } from './errors';
 
 /**
- * Per-request RPC timeout for the reverse-ENS lookup. Kept short — the name is a
+ * Per-request RPC timeout for the reverse-ENS lookup. Kept short: the name is a
  * best-effort cosmetic enhancement to the connected-wallet card, never a blocker,
  * so a stalled endpoint should fail fast and let the `fallback` transport advance.
  */
@@ -15,7 +15,7 @@ const ENS_TIMEOUT_MS = 10_000;
 
 /**
  * Standalone mainnet viem client, decoupled from the wagmi `Config`. ENS lives on
- * Ethereum mainnet only, but the wagmi config omits mainnet in testnet mode — so
+ * Ethereum mainnet only, but the wagmi config omits mainnet in testnet mode, so
  * reverse resolution can't go through `core/actions`. It reuses `ETHEREUM_RPCS`,
  * whose hosts are already in the backend CSP `connect-src`, so no extra origins.
  *
@@ -46,7 +46,7 @@ const inflight = new Map<string, Promise<Result<string | undefined, Web3Error>>>
  *
  * Backed by the session cache (see `ens-cache`) and in-flight dedup, so a fresh
  * lookup only happens on a cache miss with no request already running. Successful
- * results — including confirmed misses — are cached; errors are not, so a transient
+ * results (including confirmed misses) are cached; errors are not, so a transient
  * RPC failure retries on the next call.
  */
 export async function resolveEnsName(address: string): Promise<Result<string | undefined, Web3Error>> {

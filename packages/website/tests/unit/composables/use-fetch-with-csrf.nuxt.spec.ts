@@ -70,11 +70,10 @@ describe('useFetchWithCsrf composable', () => {
   it('fetchWithCsrf: does not duplicate the CSRF header across retries', async () => {
     retryAttempts.count = 0;
 
-    /* MSW + undici drops headers when reading them off the intercepted request
-       (mswjs/headers-polyfill#72), so assert against the headers the composable
-       builds. The per-call response hooks run after the instance onRequest (which
-       sets the CSRF header): the failed first attempt hits onResponseError, the
-       retried success hits onResponse, and both see the fully-built options.headers. */
+    /* MSW + undici drops headers off the intercepted request (mswjs/headers-polyfill#72),
+       so assert on the headers the composable builds. The per-call hooks run after the
+       instance onRequest sets the CSRF header: onResponseError sees the failed attempt,
+       onResponse the retried success. */
     const csrfHeaders: (string | null)[] = [];
     const capture = ({ options }: { options: { headers?: HeadersInit } }): void => {
       csrfHeaders.push(new Headers(options.headers).get('X-CSRFToken'));

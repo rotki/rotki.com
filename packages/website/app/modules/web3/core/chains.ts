@@ -1,7 +1,7 @@
 import type { Chain } from 'viem';
 
 /**
- * Pure chain registry — the single source of truth for the networks the app
+ * Pure chain registry: the single source of truth for the networks the app
  * supports.
  *
  * This module is intentionally free of any heavy runtime import: it only holds

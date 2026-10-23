@@ -274,7 +274,7 @@ export function useRotkiSponsorshipPayment() {
    * Estimated network fee (native coin, human-readable) for minting `tierId` with
    * `currency`. Reuses the `resolveMintInputs` validation chain; returns '' when
    * inputs aren't resolvable yet so the funds check stays neutral. Drives the soft
-   * gas warning only — never blocks minting.
+   * gas warning only and never blocks minting.
    */
   async function estimateMintFee(currency: string, tierId: number): Promise<string> {
     const inputs = resolveMintInputs(currency, tierId);

@@ -3,7 +3,7 @@
  * ethers human-readable `ROTKI_SPONSORSHIP_ABI` from the sponsorship constants
  * (only the members the app actually calls are included).
  *
- * Pure data (`as const` for viem type inference) — no runtime import.
+ * Pure data (`as const` for viem type inference) with no runtime import.
  */
 export const ROTKI_SPONSORSHIP_ABI = [
   {

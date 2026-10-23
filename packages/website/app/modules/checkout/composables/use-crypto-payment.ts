@@ -35,7 +35,7 @@ interface UseWeb3PaymentReturn {
   switchNetwork: () => Promise<Result<void, Web3Error>>;
   /** Connected wallet's balance of the payment token (human-readable); empty when unknown. */
   balance: Readonly<Ref<string>>;
-  /** True while the balance is being (re)read — e.g. right after connecting/switching. */
+  /** True while the balance is being (re)read, e.g. right after connecting/switching. */
   balanceLoading: Readonly<Ref<boolean>>;
   fundsStatus: ReturnType<typeof useTokenBalance>['fundsStatus'];
 }

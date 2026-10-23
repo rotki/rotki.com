@@ -1,6 +1,6 @@
 /**
  * Pure pre-flight funds check shared by the crypto-payment and sponsorship-mint
- * flows. No viem, no reactivity — just decimal-string comparisons (matching the
+ * flows. No viem, no reactivity, just decimal-string comparisons (matching the
  * `Number.parseFloat` convention already used in `mint-state`).
  *
  * The two shortfalls are intentionally kept separate because they differ in
@@ -8,7 +8,7 @@
  *  - `tokenShortfall` is *certain* (the balance is provably below the price) and
  *    should drive a hard block (disabled pay/mint button).
  *  - `gasShortfall` is an *estimate* (gas is predicted, not yet spent) and should
- *    only drive a soft, non-blocking warning — never disable the action on it.
+ *    only drive a soft, non-blocking warning; never disable the action on it.
  *
  * Whenever a needed figure is still missing (empty/NaN while balances load) the
  * status is neutral (no shortfall), so the UI never blocks or warns on
@@ -28,7 +28,7 @@ export interface FundsStatusParams {
 }
 
 export interface FundsStatus {
-  /** No shortfall of either kind — everything looks payable. */
+  /** No shortfall of either kind: everything looks payable. */
   sufficient: boolean;
   /** Certain: token balance is below the price. Drives a hard block. */
   tokenShortfall: boolean;

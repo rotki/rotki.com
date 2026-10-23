@@ -8,6 +8,7 @@ export default rotki({
   },
   stylistic: true,
   formatters: true,
+  slop: true,
   rotki: {
     overrides: {
       '@rotki/consistent-ref-type-annotation': ['error'],

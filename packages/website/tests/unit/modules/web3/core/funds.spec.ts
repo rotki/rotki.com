@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { computeFundsStatus } from '~/modules/web3/core/funds';
 
 describe('web3 core/funds', () => {
-  describe('computeFundsStatus — native payment', () => {
+  describe('computeFundsStatus: native payment', () => {
     const base = { estimatedGas: '0.001', isNative: true, nativeBalance: '1', price: '0.5', tokenBalance: '1' };
 
     it('is sufficient when the balance covers price and gas', () => {
@@ -31,7 +31,7 @@ describe('web3 core/funds', () => {
     });
   });
 
-  describe('computeFundsStatus — erc20 payment', () => {
+  describe('computeFundsStatus: erc20 payment', () => {
     const base = { estimatedGas: '0.002', isNative: false, nativeBalance: '0.1', price: '50', tokenBalance: '100' };
 
     it('is sufficient when the token balance covers price and native covers gas', () => {
@@ -54,7 +54,7 @@ describe('web3 core/funds', () => {
     });
   });
 
-  describe('computeFundsStatus — missing / loading data', () => {
+  describe('computeFundsStatus: missing / loading data', () => {
     it('is neutral when the price is unknown', () => {
       const result = computeFundsStatus({ estimatedGas: '0.001', isNative: true, nativeBalance: '1', price: '', tokenBalance: '1' });
       expect(result).toEqual({ gasShortfall: false, sufficient: true, tokenShortfall: false });

@@ -14,7 +14,7 @@ export interface OAuthTokenResponse {
 /**
  * Shape of the OAuth `state` payload we round-trip through the provider. It is
  * attacker-controllable by the time it comes back, so it must be validated at
- * the boundary rather than cast — see `parseState` in the monerium page.
+ * the boundary rather than cast (see `parseState` in the monerium page).
  */
 export const OAuthStateWithStorageSchema = z.object({
   mode: OAuthModeSchema,

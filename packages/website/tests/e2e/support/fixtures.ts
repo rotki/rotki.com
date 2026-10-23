@@ -26,7 +26,7 @@ interface PaymentFixtures {
  * Playwright `test` with a fake backend, a fake injected wallet and fake chain nodes.
  *
  * @remarks
- * All three fakes install for every test, whether or not it asks for the handle — a test that only
+ * All three fakes install for every test, whether or not it asks for the handle: a test that only
  * drives the UI still needs the backend's session cookies and the injected wallet. Set the starting
  * scenario with `test.use` (`backendScenario`, `walletOverrides`, `chainScenario`), or change it
  * during the test through the fixture handles.

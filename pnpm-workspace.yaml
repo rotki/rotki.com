@@ -99,6 +99,7 @@ catalog:
   consola: 3.4.2
   defu: 6.1.7
   eslint: 10.10.0
+  eslint-plugin-slop: 0.1.3
   eslint-plugin-tsdoc: 0.5.2
   h3: 1.15.11
   happy-dom: 20.14.0

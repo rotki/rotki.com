@@ -14,7 +14,7 @@ export interface UseEnsNameReturn {
 
 /**
  * Best-effort reverse-ENS lookup for a (reactive) address. Errors are swallowed (the
- * name is a cosmetic enhancement, never a blocker) — the card just keeps showing the
+ * name is a cosmetic enhancement, never a blocker), and the card just keeps showing the
  * truncated address.
  *
  * An already-resolved name is seeded *synchronously* from the session cache (see
@@ -34,7 +34,7 @@ export function useEnsName(address: MaybeRefOrGetter<string | undefined>): UseEn
     try {
       const { resolveEnsName } = await import('~/modules/web3/core/ens');
       const result = await resolveEnsName(owner);
-      // A newer address arrived while this lookup was in flight — drop the result.
+      // A newer address arrived while this lookup was in flight, so drop the result.
       if (toValue(address) !== owner)
         return;
       set(ensName, getOr(result, undefined));
@@ -56,7 +56,7 @@ export function useEnsName(address: MaybeRefOrGetter<string | undefined>): UseEn
       return;
     }
 
-    // Already known — seed in the same tick so the card shows the name immediately.
+    // Already known: seed in the same tick so the card shows the name immediately.
     const cached = peekEnsName(owner);
     if (cached.hit) {
       set(ensName, cached.name);

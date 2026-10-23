@@ -27,7 +27,7 @@ export interface PaymentLogPayload {
  * `keepalive` flag lets the request survive a navigation away from the page,
  * which matters when an error happens in the middle of a redirect.
  *
- * Sigil adds a `timestamp` field automatically — callers don't need to.
+ * Sigil adds a `timestamp` field automatically, so callers don't need to.
  * Keys are converted from camelCase to snake_case before sending.
  */
 export function postPaymentLog(payload: PaymentLogPayload): void {
@@ -40,6 +40,6 @@ export function postPaymentLog(payload: PaymentLogPayload): void {
     body: JSON.stringify({ ...toSnakeCaseKeys(payload), timestamp: Date.now() }),
     keepalive: true,
   }).catch(() => {
-    // Silently ignore — logging failures must never affect payment UX
+    // Silently ignore: logging failures must never affect payment UX
   });
 }

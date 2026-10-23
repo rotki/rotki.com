@@ -100,10 +100,10 @@ test.describe('new crypto payment', () => {
     test.use({ walletOverrides: { behavior: { sendTransaction: 'insufficientFunds' } } });
 
     /*
-     * viem rewrites the node's "insufficient funds for gas * price + value" into its own
-     * balance wording, which `classifyCryptoTxError` does not match, so the buyer is told the
-     * transaction failed rather than that the funds fell short. Asserted as-is; the pre-flight
-     * balance check above is what actually warns the buyer before they pay.
+     * viem rewrites the node's "insufficient funds for gas * price + value" into wording
+     * `classifyCryptoTxError` does not match, so the buyer sees a generic failure instead of a
+     * funds error. Asserted as-is; the pre-flight balance check above is what warns the buyer
+     * before they pay.
      */
     test('reports the failure and keeps the payment open', async ({ backend, page, wallet }) => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');

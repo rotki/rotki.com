@@ -57,7 +57,7 @@ export function useOAuth(service: OAuthService): UseOAuthReturn {
    * Extract and validate OAuth callback parameters from route query.
    * Uses route.query instead of window.location.search because Nuxt SSG
    * hydration temporarily strips query params via router.replace before
-   * restoring them — route.query reflects the final resolved state.
+   * restoring them; route.query reflects the final resolved state.
    */
   function extractAndValidateParams(): OAuthCallbackParams | undefined {
     const code = getQueryString(route.query.code);

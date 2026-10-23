@@ -1,4 +1,6 @@
-import type { CreateConnectorFn } from '@wagmi/core';
+import type { ConnectorEventMap, CreateConnectorFn } from '@wagmi/core';
+import { createEmitter } from '@wagmi/core/internal';
+import { mainnet } from 'viem/chains';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /** One fake UniversalProvider per init() call, in vi.hoisted so the hoisted vi.mock factory can reference it. */
@@ -68,13 +70,13 @@ async function importConnector() {
     metadata: { description: 'd', icons: [], name: 'rotki', url: 'https://rotki.com' },
     projectId: 'test-project',
   });
-  // wagmi's createConnector returns the factory fn; call it with a minimal config.
-  const config = {
-    chains: [{ id: 1, rpcUrls: { default: { http: ['https://rpc.example'] } } }],
-    emitter: { emit: vi.fn() },
+  // wagmi's createConnector returns the factory fn; call it with the minimal config it accepts.
+  const config: Parameters<CreateConnectorFn>[0] = {
+    chains: [mainnet],
+    emitter: createEmitter<ConnectorEventMap>('walletConnect'),
+    providers: [],
   };
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- a minimal stub, not a full wagmi config
-  return factory(config as unknown as Parameters<CreateConnectorFn>[0]);
+  return factory(config);
 }
 
 describe('walletConnect connector', () => {
@@ -87,7 +89,7 @@ describe('walletConnect connector', () => {
 
     await expect(connector.connect({ isReconnecting: true })).rejects.toThrow(/no walletconnect session/i);
 
-    // Crucially it must NOT have called the underlying pairing (no phantom QR).
+    // It must NOT have called the underlying pairing (no phantom QR).
     expect(instance(0).connect).not.toHaveBeenCalled();
   });
 
@@ -123,7 +125,7 @@ describe('walletConnect connector', () => {
     const connector = await importConnector();
 
     await connector.getProvider();
-    await connector.getProvider(); // cached — must not re-bind
+    await connector.getProvider(); // cached, must not re-bind
 
     expect(wc.init).toHaveBeenCalledTimes(1);
     const events = instance(0).on.mock.calls.map(([event]) => event);
