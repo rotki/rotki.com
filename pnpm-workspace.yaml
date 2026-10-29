@@ -35,7 +35,6 @@ patchedDependencies:
 
 allowBuilds:
   '@parcel/watcher': true
-  better-sqlite3: true
   esbuild: true
   msw: false
   vue-demi: false
@@ -82,7 +81,7 @@ catalog:
   '@wagmi/core': 3.6.7
   '@walletconnect/universal-provider': 2.26.0
   ast-v8-to-istanbul: 1.0.7
-  better-sqlite3: 12.11.1
+  better-sqlite3: 13.0.3
   braintree-web: 3.147.0
   bumpp: 12.3.0
   cac: 7.1.0
