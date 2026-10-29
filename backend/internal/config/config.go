@@ -4,6 +4,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"strconv"
@@ -101,17 +102,26 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid CAMPAIGN_END: %w", err)
 	}
 
+	secrets := make(map[string]string, len(secretKeys))
+	for _, key := range secretKeys {
+		v, err := envSecret(key)
+		if err != nil {
+			return nil, err
+		}
+		secrets[key] = v
+	}
+
 	cfg := &Config{
 		Port:      port,
 		StaticDir: envStr("STATIC_DIR", "./dist"),
 		BaseURL:   envStr("BASE_URL", fmt.Sprintf("http://localhost:%d", port)),
 
-		GoogleClientSecret:   envStr("GOOGLE_CLIENT_SECRET", ""),
-		MoneriumClientSecret: envStr("MONERIUM_CLIENT_SECRET", ""),
+		GoogleClientSecret:   secrets["GOOGLE_CLIENT_SECRET"],
+		MoneriumClientSecret: secrets["MONERIUM_CLIENT_SECRET"],
 		MoneriumAuthBaseURL:  envStr("MONERIUM_AUTH_BASE_URL", "https://api.monerium.dev"),
 
 		RedisHost:     envStr("REDIS_HOST", ""),
-		RedisPassword: envStr("REDIS_PASSWORD", ""),
+		RedisPassword: secrets["REDIS_PASSWORD"],
 
 		ImageCacheDir: envStr("IMAGE_CACHE_DIR", "./image-cache"),
 		IPFSGateways:  ipfsGateways,
@@ -123,7 +133,7 @@ func Load() (*Config, error) {
 
 		TLSSkipVerify: envBool("TLS_SKIP_VERIFY", false),
 
-		GitHubWebhookSecret: envStr("GITHUB_WEBHOOK_SECRET", ""),
+		GitHubWebhookSecret: secrets["GITHUB_WEBHOOK_SECRET"],
 
 		LogLevel:           envLogLevel("LOG_LEVEL", slog.LevelInfo),
 		SponsorshipEnabled: envBool("SPONSORSHIP_ENABLED", false),
@@ -174,6 +184,52 @@ func (c *Config) validate() error {
 	}
 
 	return nil
+}
+
+// secretKeys are the variables that also accept a <KEY>_FILE variant, so they
+// can come from Docker swarm secrets mounted under /run/secrets.
+var secretKeys = []string{
+	"GOOGLE_CLIENT_SECRET",
+	"MONERIUM_CLIENT_SECRET",
+	"REDIS_PASSWORD",
+	"GITHUB_WEBHOOK_SECRET",
+}
+
+// maxSecretSize bounds what is read from a secret file; every secret here is
+// a short token or password.
+const maxSecretSize = 64 << 10
+
+// envSecret reads a secret from the file named by <KEY>_FILE, or from <KEY>
+// itself. Setting both is an error, so a stale env var cannot shadow the file.
+// Trailing newlines are trimmed, since most editors and `echo` add one. An
+// empty file is an error: an empty secret would silently turn the feature off.
+// Errors never include the secret's value.
+func envSecret(key string) (string, error) {
+	fileKey := key + "_FILE"
+	path := os.Getenv(fileKey)
+	if path == "" {
+		return os.Getenv(key), nil
+	}
+	if os.Getenv(key) != "" {
+		return "", fmt.Errorf("set either %s or %s, not both", key, fileKey)
+	}
+	f, err := os.Open(path) //nolint:gosec // G304: path comes from operator config, not user input
+	if err != nil {
+		return "", fmt.Errorf("reading %s: %w", fileKey, err)
+	}
+	defer func() { _ = f.Close() }()
+	data, err := io.ReadAll(io.LimitReader(f, maxSecretSize+1))
+	if err != nil {
+		return "", fmt.Errorf("reading %s: %w", fileKey, err)
+	}
+	if len(data) > maxSecretSize {
+		return "", fmt.Errorf("%s is larger than %d bytes", fileKey, maxSecretSize)
+	}
+	value := strings.TrimRight(string(data), "\r\n")
+	if value == "" {
+		return "", fmt.Errorf("%s: %s is empty", fileKey, path)
+	}
+	return value, nil
 }
 
 func envStr(key, fallback string) string {

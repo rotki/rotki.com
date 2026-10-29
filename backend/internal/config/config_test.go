@@ -2,6 +2,9 @@ package config
 
 import (
 	"log/slog"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -351,6 +354,82 @@ func TestLoad_CampaignValidation(t *testing.T) {
 			_, err := Load()
 			if err == nil {
 				t.Error("expected error for invalid campaign configuration")
+			}
+		})
+	}
+}
+
+func TestLoad_SecretsFromFile(t *testing.T) {
+	dir := t.TempDir()
+	write := func(name, content string) string {
+		path := filepath.Join(dir, name)
+		if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		return path
+	}
+
+	for _, key := range secretKeys {
+		t.Setenv(key, "")
+	}
+	t.Setenv("GOOGLE_CLIENT_SECRET_FILE", write("google", "google-secret\n"))
+	t.Setenv("MONERIUM_CLIENT_SECRET_FILE", write("monerium", "monerium-secret\r\n"))
+	t.Setenv("REDIS_PASSWORD_FILE", write("redis", "  redis pass  "))
+	t.Setenv("GITHUB_WEBHOOK_SECRET", "from-env")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if cfg.GoogleClientSecret != "google-secret" {
+		t.Errorf("GoogleClientSecret = %q", cfg.GoogleClientSecret)
+	}
+	if cfg.MoneriumClientSecret != "monerium-secret" {
+		t.Errorf("MoneriumClientSecret = %q", cfg.MoneriumClientSecret)
+	}
+	// Only line endings are trimmed: spaces may be part of the secret.
+	if cfg.RedisPassword != "  redis pass  " {
+		t.Errorf("RedisPassword = %q", cfg.RedisPassword)
+	}
+	if cfg.GitHubWebhookSecret != "from-env" {
+		t.Errorf("GitHubWebhookSecret = %q", cfg.GitHubWebhookSecret)
+	}
+}
+
+func TestLoad_SecretFileErrors(t *testing.T) {
+	t.Run("both set", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "redis")
+		if err := os.WriteFile(path, []byte("file"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		t.Setenv("REDIS_PASSWORD", "env")
+		t.Setenv("REDIS_PASSWORD_FILE", path)
+		if _, err := Load(); err == nil {
+			t.Error("expected error when both REDIS_PASSWORD and REDIS_PASSWORD_FILE are set")
+		}
+	})
+
+	t.Run("missing file", func(t *testing.T) {
+		t.Setenv("REDIS_PASSWORD", "")
+		t.Setenv("REDIS_PASSWORD_FILE", filepath.Join(t.TempDir(), "missing"))
+		if _, err := Load(); err == nil {
+			t.Error("expected error for unreadable REDIS_PASSWORD_FILE")
+		}
+	})
+
+	for name, content := range map[string]string{
+		"empty file":    "\n",
+		"oversize file": strings.Repeat("x", maxSecretSize+1),
+	} {
+		t.Run(name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "redis")
+			if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			t.Setenv("REDIS_PASSWORD", "")
+			t.Setenv("REDIS_PASSWORD_FILE", path)
+			if _, err := Load(); err == nil {
+				t.Errorf("expected error for %s", name)
 			}
 		})
 	}

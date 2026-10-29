@@ -71,6 +71,43 @@ PORT=3000 \
 | `CAMPAIGN_START`         | _(empty)_                  |                         | Campaign start (RFC 3339, e.g. `2026-07-01T00:00:00Z`; empty = unbounded)  |
 | `CAMPAIGN_END`           | _(empty)_                  |                         | Campaign end (RFC 3339; empty = unbounded)                                 |
 
+### Secrets from files (Docker swarm secrets)
+
+`GOOGLE_CLIENT_SECRET`, `MONERIUM_CLIENT_SECRET`, `REDIS_PASSWORD` and `GITHUB_WEBHOOK_SECRET`
+also accept a `_FILE` variant holding a path to read the value from, for example
+`REDIS_PASSWORD_FILE=/run/secrets/redis_password`. Trailing newlines in the file are trimmed.
+Setting both the plain variable and its `_FILE` variant is a startup error, and so is an empty
+file or one over 64 KiB. The plain variables keep working, so local setups and `.env` files
+need no change.
+
+```yaml
+services:
+  app:
+    image: <rotki.com image>
+    environment:
+      GOOGLE_CLIENT_SECRET_FILE: /run/secrets/google_client_secret
+      MONERIUM_CLIENT_SECRET_FILE: /run/secrets/monerium_client_secret
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+      GITHUB_WEBHOOK_SECRET_FILE: /run/secrets/github_webhook_secret
+    secrets:
+      - google_client_secret
+      - monerium_client_secret
+      - redis_password
+      - github_webhook_secret
+
+secrets:
+  google_client_secret:
+    external: true
+  monerium_client_secret:
+    external: true
+  redis_password:
+    external: true
+  github_webhook_secret:
+    external: true
+```
+
+Create each one with `printf '%s' "$VALUE" | docker secret create redis_password -`.
+
 The campaign variables only advertise a code: the discount itself comes from the Python
 backend. Before enabling a campaign, create a percentage `Discount` there whose `code_name`
 matches `CAMPAIGN_CODE` exactly (the lookup is case-sensitive), whose amount equals
