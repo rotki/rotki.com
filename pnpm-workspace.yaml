@@ -95,7 +95,7 @@ catalog:
   happy-dom: 21.0.4
   husky: 9.1.7
   lint-staged: 17.6.0
-  msw: 2.15.0
+  msw: 3.0.3
   nitropack: 2.13.5
   npm-run-all2: 9.0.4
   nuxt: 4.6.2

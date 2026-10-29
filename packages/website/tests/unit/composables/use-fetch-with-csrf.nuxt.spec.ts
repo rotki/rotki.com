@@ -69,31 +69,18 @@ describe('useFetchWithCsrf composable', () => {
 
   it('fetchWithCsrf: does not duplicate the CSRF header across retries', async () => {
     retryAttempts.count = 0;
-
-    /* MSW + undici drops headers off the intercepted request (mswjs/headers-polyfill#72),
-       so assert on the headers the composable builds. The per-call hooks run after the
-       instance onRequest sets the CSRF header: onResponseError sees the failed attempt,
-       onResponse the retried success. */
-    const csrfHeaders: (string | null)[] = [];
-    const capture = ({ options }: { options: { headers?: HeadersInit } }): void => {
-      csrfHeaders.push(new Headers(options.headers).get('X-CSRFToken'));
-    };
+    retryAttempts.csrfHeaders = [];
 
     await expect(
       fetchWithCsrf<ApiResponse<undefined>>(`/webapi/retry/`, {
         body: { foo: 'bar' },
         method: 'POST',
-        onResponse: capture,
-        onResponseError: capture,
       }),
     ).resolves.toMatchObject({ message: 'success' });
 
     // The 503 first attempt is retried over the same reused options object
     expect(retryAttempts.count).toBe(2);
-    expect(csrfHeaders.length).toBeGreaterThanOrEqual(2);
-    // Not "1234, 1234" from appending the header again on retry
-    for (const header of csrfHeaders) {
-      expect(header).toBe('1234');
-    }
+    // As the backend received it: not "1234, 1234" from appending the header again on retry
+    expect(retryAttempts.csrfHeaders).toEqual(['1234', '1234']);
   }, 5000);
 });

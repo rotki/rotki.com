@@ -4,19 +4,25 @@ const { BACKEND_URL } = import.meta.env;
 
 declare global {
   interface Window {
-    rotkiRetryAttempts?: { count: number };
+    rotkiRetryAttempts?: RetryAttempts;
   }
 }
 
-window.rotkiRetryAttempts ??= { count: 0 };
+interface RetryAttempts {
+  count: number;
+  csrfHeaders: (string | null)[];
+}
+
+window.rotkiRetryAttempts ??= { count: 0, csrfHeaders: [] };
 
 /**
  * Counts attempts against `/webapi/retry/` so the handler can fail the first one
- * and succeed on the retry. Reset it from the test before use. It lives on `window`
- * for the same reason as the server in `server.ts`: after the module reset, the
- * listening handler and the spec would otherwise count on separate copies.
+ * and succeed on the retry, and records the CSRF header each attempt carried.
+ * Reset it from the test before use. It lives on `window` for the same reason as
+ * the server in `server.ts`: after the module reset, the listening handler and the
+ * spec would otherwise count on separate copies.
  */
-export const retryAttempts: { count: number } = window.rotkiRetryAttempts;
+export const retryAttempts: RetryAttempts = window.rotkiRetryAttempts;
 
 export const handlers = [
   // Mock app manifest requests to prevent errors during test initialization
@@ -71,8 +77,9 @@ export const handlers = [
     HttpResponse.json({ message: 'success' })),
   /* Fails the first attempt with a retryable status so ofetch retries, letting a
      test assert the CSRF header isn't duplicated (e.g. "abcd, abcd") on retry. */
-  http.post(`${BACKEND_URL}/webapi/retry/`, () => {
+  http.post(`${BACKEND_URL}/webapi/retry/`, ({ request }) => {
     retryAttempts.count += 1;
+    retryAttempts.csrfHeaders.push(request.headers.get('X-CSRFToken'));
     if (retryAttempts.count === 1)
       return HttpResponse.json({ message: 'retry' }, { status: 503 });
     return HttpResponse.json({ message: 'success' });
