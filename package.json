@@ -53,6 +53,8 @@
     "postcss-html": "catalog:",
     "rimraf": "catalog:",
     "stylelint": "catalog:",
+    "stylelint-config-html": "catalog:",
+    "stylelint-config-recommended": "catalog:",
     "stylelint-config-recommended-vue": "catalog:",
     "stylelint-config-standard": "catalog:",
     "stylelint-order": "catalog:"
