@@ -249,8 +249,8 @@ catalogs:
       specifier: 5.0.5
       version: 5.0.5
     '@vitest/istanbul-lib-coverage':
-      specifier: 1.0.2
-      version: 1.0.2
+      specifier: 2.0.0
+      version: 2.0.0
     '@vue/test-utils':
       specifier: 2.5.1
       version: 2.5.1
@@ -775,7 +775,7 @@ importers:
         version: 5.0.5(vitest@5.0.5)
       '@vitest/istanbul-lib-coverage':
         specifier: 'catalog:'
-        version: 1.0.2
+        version: 2.0.0
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@6.0.3))
@@ -3721,6 +3721,10 @@ packages:
 
   '@vitest/istanbul-lib-coverage@1.0.2':
     resolution: {integrity: sha512-9J/JMwOf9AoJhAywhrn7ScKTL38hsWQP/qPG60OtaAFcQ5OXPwKsxZFlbnuCKmZ61m8/lGgHYnFpdyQZUvG/iA==}
+    engines: {node: '>=22'}
+
+  '@vitest/istanbul-lib-coverage@2.0.0':
+    resolution: {integrity: sha512-lrEG3C2XXDdROhFqMY1ykOdLlG6c5swv0B7VT46qH5erygXlTHvDYMVYrHQSjPk5R8HXrsYPM1UniXZakW8YOw==}
     engines: {node: '>=22'}
 
   '@vitest/istanbul-lib-report@1.0.2':
@@ -11976,6 +11980,8 @@ snapshots:
       - supports-color
 
   '@vitest/istanbul-lib-coverage@1.0.2': {}
+
+  '@vitest/istanbul-lib-coverage@2.0.0': {}
 
   '@vitest/istanbul-lib-report@1.0.2':
     dependencies:
