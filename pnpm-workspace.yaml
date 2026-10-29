@@ -93,7 +93,7 @@ catalog:
   eslint-plugin-sonarjs: 4.2.2
   eslint-plugin-tsdoc: 0.5.4
   h3: 1.15.11
-  happy-dom: 20.14.6
+  happy-dom: 21.0.4
   husky: 9.1.7
   lint-staged: 17.6.0
   msw: 2.15.0
