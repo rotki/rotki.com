@@ -1,4 +1,5 @@
 import type { Account, Address } from '@rotki/card-payment-common/schemas/account';
+import { get } from '@vueuse/shared';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
@@ -101,5 +102,21 @@ describe('useProfileUpdate', () => {
       newsletterConsent: false,
     });
     expect(mockRequestRefresh).toHaveBeenCalledOnce();
+  });
+
+  it('clears done when the notification is dismissed', async () => {
+    const store = useMainStore();
+    store.account = createAccount();
+    mockUpdateProfile.mockResolvedValue({ success: true });
+    const validation = ref<{ $validate: () => Promise<boolean> }>({
+      $validate: vi.fn().mockResolvedValue(true),
+    });
+    const { dismissDone, done, updateProfile } = useProfileUpdate();
+
+    await updateProfile(validation, { firstName: 'Updated' });
+    expect(get(done)).toBe(true);
+
+    dismissDone();
+    expect(get(done)).toBe(false);
   });
 });

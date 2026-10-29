@@ -72,9 +72,14 @@ export function useProfileUpdate() {
     return result.success;
   };
 
+  function dismissDone(): void {
+    set(done, false);
+  }
+
   return {
     $externalResults: shallowReadonly($externalResults),
     account: readonly(account),
+    dismissDone,
     done: readonly(done),
     loading: readonly(loading),
     movedOffline,

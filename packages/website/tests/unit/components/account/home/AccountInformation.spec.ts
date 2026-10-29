@@ -45,6 +45,7 @@ async function mountAccountInformation(newsletterConsent: boolean) {
   mockUseProfileUpdate.mockReturnValue({
     $externalResults: ref<Record<string, string[]>>({}),
     account,
+    dismissDone: vi.fn(),
     done: ref<boolean>(false),
     loading: ref<boolean>(false),
     movedOffline: computed<boolean>(() => false),

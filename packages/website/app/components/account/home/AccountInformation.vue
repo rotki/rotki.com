@@ -39,6 +39,7 @@ const { refreshVATCheckStatus, checkVAT } = useVatCheck();
 const {
   $externalResults,
   account,
+  dismissDone,
   done,
   loading,
   movedOffline,
@@ -313,7 +314,7 @@ onMounted(() => {
     closeable
     :visible="done"
     :timeout="3000"
-    @dismiss="done = false"
+    @dismiss="dismissDone()"
   >
     {{ t('notifications.changes_saved') }}
   </FloatingNotification>

@@ -17,6 +17,7 @@ const state = reactive<EmailPreferencesFormState>({
 const {
   $externalResults,
   account,
+  dismissDone,
   done,
   loading,
   updateProfile,
@@ -99,7 +100,7 @@ onBeforeMount(() => {
     closeable
     :visible="done"
     :timeout="3000"
-    @dismiss="done = false"
+    @dismiss="dismissDone()"
   >
     {{ t('notifications.changes_saved') }}
   </FloatingNotification>

@@ -19,6 +19,7 @@ const state = reactive({
 const {
   $externalResults,
   account,
+  dismissDone,
   done,
   loading,
   movedOffline,
@@ -190,7 +191,7 @@ const { t } = useI18n({ useScope: 'global' });
     closeable
     :visible="done"
     :timeout="3000"
-    @dismiss="done = false"
+    @dismiss="dismissDone()"
   >
     {{ t('notifications.changes_saved') }}
   </FloatingNotification>
