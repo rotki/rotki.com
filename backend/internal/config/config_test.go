@@ -369,9 +369,6 @@ func TestLoad_SecretsFromFile(t *testing.T) {
 		return path
 	}
 
-	for _, key := range secretKeys {
-		t.Setenv(key, "")
-	}
 	t.Setenv("GOOGLE_CLIENT_SECRET_FILE", write("google", "google-secret\n"))
 	t.Setenv("MONERIUM_CLIENT_SECRET_FILE", write("monerium", "monerium-secret\r\n"))
 	t.Setenv("REDIS_PASSWORD_FILE", write("redis", "  redis pass  "))
@@ -397,40 +394,43 @@ func TestLoad_SecretsFromFile(t *testing.T) {
 }
 
 func TestLoad_SecretFileErrors(t *testing.T) {
-	t.Run("both set", func(t *testing.T) {
-		path := filepath.Join(t.TempDir(), "redis")
-		if err := os.WriteFile(path, []byte("file"), 0o600); err != nil {
-			t.Fatal(err)
-		}
-		t.Setenv("REDIS_PASSWORD", "env")
-		t.Setenv("REDIS_PASSWORD_FILE", path)
-		if _, err := Load(); err == nil {
-			t.Error("expected error when both REDIS_PASSWORD and REDIS_PASSWORD_FILE are set")
-		}
-	})
+	tests := []struct {
+		name    string
+		content *string // nil leaves the file missing
+		envVal  string
+		wantErr string
+	}{
+		{name: "both set", content: new("file"), envVal: "env", wantErr: "not both"},
+		{name: "missing file", wantErr: "reading REDIS_PASSWORD_FILE"},
+		{name: "empty file", content: new("\n"), wantErr: "is empty"},
+		{name: "oversize file", content: new(strings.Repeat("x", maxSecretSize+1)), wantErr: "is larger than"},
+	}
 
-	t.Run("missing file", func(t *testing.T) {
-		t.Setenv("REDIS_PASSWORD", "")
-		t.Setenv("REDIS_PASSWORD_FILE", filepath.Join(t.TempDir(), "missing"))
-		if _, err := Load(); err == nil {
-			t.Error("expected error for unreadable REDIS_PASSWORD_FILE")
-		}
-	})
-
-	for name, content := range map[string]string{
-		"empty file":    "\n",
-		"oversize file": strings.Repeat("x", maxSecretSize+1),
-	} {
-		t.Run(name, func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 			path := filepath.Join(t.TempDir(), "redis")
-			if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
-				t.Fatal(err)
+			if tt.content != nil {
+				if err := os.WriteFile(path, []byte(*tt.content), 0o600); err != nil {
+					t.Fatal(err)
+				}
 			}
-			t.Setenv("REDIS_PASSWORD", "")
+			t.Setenv("REDIS_PASSWORD", tt.envVal)
 			t.Setenv("REDIS_PASSWORD_FILE", path)
-			if _, err := Load(); err == nil {
-				t.Errorf("expected error for %s", name)
+
+			_, err := Load()
+			if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+				t.Errorf("Load() error = %v, want it to contain %q", err, tt.wantErr)
 			}
 		})
 	}
+}
+
+// TestMain clears every secret variable and its _FILE variant, so a secret
+// exported on the developer's or CI's machine cannot change test results.
+func TestMain(m *testing.M) {
+	for _, s := range (&Config{}).secrets() {
+		_ = os.Unsetenv(s.key)
+		_ = os.Unsetenv(s.key + "_FILE")
+	}
+	os.Exit(m.Run())
 }

@@ -102,26 +102,14 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid CAMPAIGN_END: %w", err)
 	}
 
-	secrets := make(map[string]string, len(secretKeys))
-	for _, key := range secretKeys {
-		v, err := envSecret(key)
-		if err != nil {
-			return nil, err
-		}
-		secrets[key] = v
-	}
-
 	cfg := &Config{
 		Port:      port,
 		StaticDir: envStr("STATIC_DIR", "./dist"),
 		BaseURL:   envStr("BASE_URL", fmt.Sprintf("http://localhost:%d", port)),
 
-		GoogleClientSecret:   secrets["GOOGLE_CLIENT_SECRET"],
-		MoneriumClientSecret: secrets["MONERIUM_CLIENT_SECRET"],
-		MoneriumAuthBaseURL:  envStr("MONERIUM_AUTH_BASE_URL", "https://api.monerium.dev"),
+		MoneriumAuthBaseURL: envStr("MONERIUM_AUTH_BASE_URL", "https://api.monerium.dev"),
 
-		RedisHost:     envStr("REDIS_HOST", ""),
-		RedisPassword: secrets["REDIS_PASSWORD"],
+		RedisHost: envStr("REDIS_HOST", ""),
 
 		ImageCacheDir: envStr("IMAGE_CACHE_DIR", "./image-cache"),
 		IPFSGateways:  ipfsGateways,
@@ -133,8 +121,6 @@ func Load() (*Config, error) {
 
 		TLSSkipVerify: envBool("TLS_SKIP_VERIFY", false),
 
-		GitHubWebhookSecret: secrets["GITHUB_WEBHOOK_SECRET"],
-
 		LogLevel:           envLogLevel("LOG_LEVEL", slog.LevelInfo),
 		SponsorshipEnabled: envBool("SPONSORSHIP_ENABLED", false),
 		Maintenance:        envBool("MAINTENANCE", false),
@@ -144,6 +130,14 @@ func Load() (*Config, error) {
 		CampaignPercent: campaignPercent,
 		CampaignStart:   campaignStart,
 		CampaignEnd:     campaignEnd,
+	}
+
+	for _, s := range cfg.secrets() {
+		v, err := envSecret(s.key)
+		if err != nil {
+			return nil, err
+		}
+		*s.dst = v
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -186,13 +180,20 @@ func (c *Config) validate() error {
 	return nil
 }
 
-// secretKeys are the variables that also accept a <KEY>_FILE variant, so they
+type secretField struct {
+	key string
+	dst *string
+}
+
+// secrets lists the variables that also accept a <KEY>_FILE variant, so they
 // can come from Docker swarm secrets mounted under /run/secrets.
-var secretKeys = []string{
-	"GOOGLE_CLIENT_SECRET",
-	"MONERIUM_CLIENT_SECRET",
-	"REDIS_PASSWORD",
-	"GITHUB_WEBHOOK_SECRET",
+func (c *Config) secrets() []secretField {
+	return []secretField{
+		{"GOOGLE_CLIENT_SECRET", &c.GoogleClientSecret},
+		{"MONERIUM_CLIENT_SECRET", &c.MoneriumClientSecret},
+		{"REDIS_PASSWORD", &c.RedisPassword},
+		{"GITHUB_WEBHOOK_SECRET", &c.GitHubWebhookSecret},
+	}
 }
 
 // maxSecretSize bounds what is read from a secret file; every secret here is
