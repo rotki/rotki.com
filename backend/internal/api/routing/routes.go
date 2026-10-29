@@ -10,6 +10,7 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/api/appconfig"
 	"github.com/rotki/rotki.com/backend/internal/api/csp"
 	"github.com/rotki/rotki.com/backend/internal/api/ens"
+	"github.com/rotki/rotki.com/backend/internal/api/icons"
 	"github.com/rotki/rotki.com/backend/internal/api/logo"
 	"github.com/rotki/rotki.com/backend/internal/api/messages"
 	nftapi "github.com/rotki/rotki.com/backend/internal/api/nft"
@@ -22,6 +23,7 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/images"
 	"github.com/rotki/rotki.com/backend/internal/ipfs"
 	"github.com/rotki/rotki.com/backend/internal/nft"
+	"github.com/rotki/rotki.com/backend/internal/rotkidata"
 )
 
 // Services holds references to services created during route registration
@@ -68,8 +70,14 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 	// ENS avatar proxy (with image caching)
 	mux.Handle("GET /api/ens/avatar", ens.NewHandler(imgSvc, logger))
 
+	// rotki/data can replace an image under the same filename, so it is cached for less time
+	rotkidata.RegisterImageTTL(imgSvc)
+
 	// Seasonal logos from rotki/data, served same-origin (mapping cached, image on the disk cache)
 	mux.Handle("GET /api/logo/{name}", logo.NewHandler(mem, red, lck, imgSvc, cfg.Testing, logger))
+
+	// Payment token icons from rotki/data, served same-origin through the image cache
+	mux.Handle("GET /api/icons/{file}", icons.NewHandler(imgSvc, cfg.Testing))
 
 	// Homepage dashboard messages from rotki/data, served same-origin (cached, ended messages dropped)
 	mux.Handle("GET /api/messages/dashboard", messages.NewHandler(mem, red, lck, cfg.Testing, logger))

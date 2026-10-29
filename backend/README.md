@@ -158,6 +158,7 @@ internal/
 | `POST` | `/api/logging/payment`      | Payment error reports from the frontend (logged, no PII)           |
 | `GET`  | `/api/releases/latest`      | GitHub releases (cached)                                           |
 | `GET`  | `/api/ens/avatar`           | ENS avatar image proxy                                             |
+| `GET`  | `/api/icons/{file}`         | Payment token icon from rotki/data `assets/icons/`                 |
 | `GET`  | `/api/logo/{name}`          | Seasonal logo from rotki/data (only `website`)                     |
 | `GET`  | `/api/messages/dashboard`   | Homepage messages from rotki/data, without the ones that ended     |
 | `GET`  | `/api/nft/tier-info`        | NFT tier information (only when `BASE_URL` is set)                 |

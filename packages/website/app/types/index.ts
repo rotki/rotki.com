@@ -1,6 +1,7 @@
 import { AddressSchema } from '@rotki/card-payment-common/schemas/account';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { z } from 'zod';
+import { localIconUrl } from '~/utils/token-icons';
 
 interface ResultError<Code = undefined> {
   isError: true;
@@ -98,7 +99,7 @@ const CryptoPayment = z.object({
   finalPriceInEur: z.number(),
   firstPayment: z.boolean(),
   hoursForPayment: z.number(),
-  iconUrl: z.string().optional(),
+  iconUrl: z.string().nullish().transform(localIconUrl).optional(),
   months: z.number(),
   numberOfMonths: z.number(),
   startDate: z.number().nullable(),
@@ -197,7 +198,7 @@ export interface CheckoutStep {
 
 export const PaymentAsset = z.object({
   address: z.string().optional(),
-  iconUrl: z.string().optional(),
+  iconUrl: z.string().nullish().transform(localIconUrl).optional(),
   isNativeCurrency: z.literal(true).optional(),
   name: z.string(),
   symbol: z.string(),

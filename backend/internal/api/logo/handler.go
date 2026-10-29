@@ -9,10 +9,10 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
+	"github.com/rotki/rotki.com/backend/internal/rotkidata"
 )
 
 // Cache keys
@@ -25,21 +25,15 @@ const (
 // TTL configuration
 const (
 	// A new seasonal logo shows up within mappingTTL + clientMaxAge of its rotki/data commit,
-	// and a logo file changed in place within imageTTL + clientMaxAge.
+	// and a logo file changed in place within rotkidata.ImageTTL + clientMaxAge.
 	mappingTTL      = 10 * time.Minute
-	imageTTL        = 10 * time.Minute
 	staleMappingTTL = 7 * 24 * time.Hour
 	clientMaxAge    = 5 * time.Minute
 	lockTTL         = 30 * time.Second
 )
 
-const dataRepoURL = "https://raw.githubusercontent.com/rotki/data"
-
 // names are the logos the site asks for; the mapping also holds the app's, which stay unserved.
 var names = map[string]bool{"website": true}
-
-// imageFile is a plain image filename, so the mapping cannot point outside `assets/icons/`.
-var imageFile = regexp.MustCompile(`(?i)^[\w.-]+\.(?:png|svg|webp|gif|jpe?g)$`)
 
 // errNoMapping is returned when rotki/data cannot be read and no earlier mapping is cached.
 var errNoMapping = errors.New("logo mapping unavailable")
@@ -47,7 +41,6 @@ var errNoMapping = errors.New("logo mapping unavailable")
 // imageServer serves a remote image through the shared image cache.
 type imageServer interface {
 	ServeImageWithMaxAge(ctx context.Context, w http.ResponseWriter, r *http.Request, rawURL string, maxAge time.Duration)
-	SetPrefixTTL(prefix string, ttl time.Duration)
 }
 
 // Handler resolves a logo name through the rotki/data asset mappings and serves its image.
@@ -63,21 +56,15 @@ type Handler struct {
 }
 
 // NewHandler creates a logo handler reading rotki/data's develop branch when testing and main otherwise.
-// rotki/data can replace a logo under the same filename, so its images are only cached for imageTTL.
 func NewHandler(memory *cache.Memory, redis *cache.Redis, lock *cache.Lock, images imageServer, testing bool, logger *slog.Logger) *Handler {
-	branch := "main"
-	if testing {
-		branch = "develop"
-	}
-	images.SetPrefixTTL(dataRepoURL+"/", imageTTL)
 	return &Handler{
 		memory:     memory,
 		redis:      redis,
 		lock:       lock,
 		images:     images,
 		httpClient: &http.Client{Timeout: 15 * time.Second},
-		baseURL:    dataRepoURL,
-		branch:     branch,
+		baseURL:    rotkidata.RepoURL,
+		branch:     rotkidata.Branch(testing),
 		logger:     logger.With("handler", "logo"),
 	}
 }
@@ -99,14 +86,14 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	file := mapping[name]
-	if !imageFile.MatchString(file) {
+	if !rotkidata.IsIconFile(file) {
 		h.logger.Warn("logo missing from mapping", "name", name, "file", file)
 		w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", int(clientMaxAge.Seconds())))
 		http.NotFound(w, r)
 		return
 	}
 
-	h.images.ServeImageWithMaxAge(r.Context(), w, r, fmt.Sprintf("%s/%s/assets/icons/%s", h.baseURL, h.branch, file), clientMaxAge)
+	h.images.ServeImageWithMaxAge(r.Context(), w, r, rotkidata.IconURL(h.baseURL, h.branch, file), clientMaxAge)
 }
 
 // mapping returns the logo section of rotki/data's asset mappings from cache, fetching it when it expired.

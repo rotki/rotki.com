@@ -15,7 +15,7 @@ var BaseCSP = Policy{
 	"form-action":     {"'self'"},
 	"frame-ancestors": {"'self'"},
 	"frame-src":       {"'none'"},
-	"img-src":         {"'self'", "data:", "https://raw.githubusercontent.com/rotki/data/", "https://raw.githubusercontent.com/rotki/rotki/"},
+	"img-src":         {"'self'", "data:", "https://raw.githubusercontent.com/rotki/rotki/"},
 	"object-src":      {"'none'"},
 	"report-uri":      {"/api/csp/violation"},
 	"report-to":       {"csp-endpoint"},

@@ -2,7 +2,13 @@ import type { PaymentToken, TierKey } from '~/modules/web3/sponsorship/types';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { isNativeToken } from '~/modules/web3/core/erc20';
+import { localIconUrl } from '~/utils/token-icons';
 import { useLogger } from '~/utils/use-logger';
+
+interface PaymentTokenResponse extends Omit<PaymentToken, 'icon' | 'iconUrl'> {
+  icon: string | null;
+  iconUrl: string | null;
+}
 
 export function usePaymentTokens() {
   const paymentTokens = ref<PaymentToken[]>([]);
@@ -17,10 +23,15 @@ export function usePaymentTokens() {
     set(error, undefined);
 
     try {
-      const response = await fetchWithCsrf<PaymentToken[]>('/webapi/nfts/payment-tokens/');
+      // The backend sends null for a token without an icon.
+      const response = await fetchWithCsrf<PaymentTokenResponse[]>('/webapi/nfts/payment-tokens/');
 
       // Sort tokens so the native token (ETH) always appears first.
-      const sortedTokens = [...response].sort((a, b) => {
+      const sortedTokens = response.map(token => ({
+        ...token,
+        icon: localIconUrl(token.icon),
+        iconUrl: localIconUrl(token.iconUrl),
+      })).sort((a, b) => {
         if (isNativeToken(a.address))
           return -1;
         if (isNativeToken(b.address))

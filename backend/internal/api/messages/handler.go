@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/cache"
+	"github.com/rotki/rotki.com/backend/internal/rotkidata"
 )
 
 // Cache keys
@@ -29,8 +30,6 @@ const (
 	clientMaxAge      = 5 * time.Minute
 	lockTTL           = 30 * time.Second
 )
-
-const dataRepoURL = "https://raw.githubusercontent.com/rotki/data"
 
 // errNoMessages is returned when rotki/data cannot be read and no earlier copy is cached.
 var errNoMessages = errors.New("dashboard messages unavailable")
@@ -55,17 +54,13 @@ type Handler struct {
 
 // NewHandler creates a dashboard messages handler reading rotki/data's develop branch when testing and main otherwise.
 func NewHandler(memory *cache.Memory, redis *cache.Redis, lock *cache.Lock, testing bool, logger *slog.Logger) *Handler {
-	branch := "main"
-	if testing {
-		branch = "develop"
-	}
 	return &Handler{
 		memory:     memory,
 		redis:      redis,
 		lock:       lock,
 		httpClient: &http.Client{Timeout: 15 * time.Second},
-		baseURL:    dataRepoURL,
-		branch:     branch,
+		baseURL:    rotkidata.RepoURL,
+		branch:     rotkidata.Branch(testing),
 		now:        time.Now,
 		logger:     logger.With("handler", "messages"),
 	}

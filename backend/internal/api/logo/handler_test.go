@@ -19,16 +19,8 @@ func testLogger() *slog.Logger {
 
 // fakeImages records the URL it was asked to serve instead of fetching it.
 type fakeImages struct {
-	url       string
-	maxAge    time.Duration
-	prefixTTL map[string]time.Duration
-}
-
-func (f *fakeImages) SetPrefixTTL(prefix string, ttl time.Duration) {
-	if f.prefixTTL == nil {
-		f.prefixTTL = map[string]time.Duration{}
-	}
-	f.prefixTTL[prefix] = ttl
+	url    string
+	maxAge time.Duration
 }
 
 func (f *fakeImages) ServeImageWithMaxAge(_ context.Context, w http.ResponseWriter, _ *http.Request, rawURL string, maxAge time.Duration) {
@@ -89,13 +81,6 @@ func TestServesTheMappedImage(t *testing.T) {
 	}
 	if images.maxAge != clientMaxAge {
 		t.Errorf("maxAge = %v, want %v", images.maxAge, clientMaxAge)
-	}
-}
-
-func TestShortensTheImageCacheForRotkiData(t *testing.T) {
-	_, images := newTestHandler(t, "http://unused")
-	if got := images.prefixTTL[dataRepoURL+"/"]; got != imageTTL {
-		t.Errorf("rotki/data image TTL = %v, want %v", got, imageTTL)
 	}
 }
 

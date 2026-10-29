@@ -4,7 +4,7 @@ import { formatTokenBalance } from '~/modules/web3/core/format';
 
 interface Token {
   symbol: string;
-  iconUrl: string;
+  iconUrl?: string;
   address: string;
   prices: Record<string, string>;
 }

@@ -35,9 +35,9 @@ export interface PaymentToken {
   symbol: string;
   address: string;
   decimals: number;
-  icon: string;
+  icon?: string;
   prices: Record<TierKey, string>;
-  iconUrl: string;
+  iconUrl?: string;
 }
 
 export interface SponsorshipState {

@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -507,5 +508,112 @@ func TestService_WarmCache(t *testing.T) {
 	}
 	if failed != 1 {
 		t.Errorf("expected 1 failed, got %d", failed)
+	}
+}
+
+// branchUpstream answers /main/<file> and /develop/<file> with the status set per path
+// (by default 200 with the branch name as body) and counts requests per path.
+func branchUpstream(t *testing.T, status map[string]int) (*httptest.Server, *sync.Map) {
+	t.Helper()
+	var hits sync.Map
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n, _ := hits.LoadOrStore(r.URL.Path, new(atomic.Int32))
+		n.(*atomic.Int32).Add(1)
+		if code, ok := status[r.URL.Path]; ok {
+			w.WriteHeader(code)
+			return
+		}
+		w.Header().Set("Content-Type", "image/png")
+		body := "main"
+		if strings.HasPrefix(r.URL.Path, "/develop/") {
+			body = "develop"
+		}
+		_, _ = w.Write([]byte(body))
+	}))
+	t.Cleanup(srv.Close)
+	return srv, &hits
+}
+
+func hitCount(hits *sync.Map, path string) int32 {
+	n, ok := hits.Load(path)
+	if !ok {
+		return 0
+	}
+	return n.(*atomic.Int32).Load()
+}
+
+func serveFirst(svc *Service, urls ...string) *httptest.ResponseRecorder {
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/api/icons/x.png", nil)
+	svc.ServeFirstImage(context.Background(), rec, req, urls, time.Hour)
+	return rec
+}
+
+func TestService_ServeFirstImage_ServesTheFirstThatExists(t *testing.T) {
+	srv, hits := branchUpstream(t, nil)
+	svc, _ := newTestService(t, nil)
+
+	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
+
+	if rec.Code != http.StatusOK || rec.Body.String() != "main" {
+		t.Fatalf("got %d %q, want 200 from main", rec.Code, rec.Body.String())
+	}
+	if got := hitCount(hits, "/develop/x.png"); got != 0 {
+		t.Errorf("develop was fetched %d times, want 0", got)
+	}
+}
+
+func TestService_ServeFirstImage_FallsBackOnNotFound(t *testing.T) {
+	srv, _ := branchUpstream(t, map[string]int{"/main/x.png": http.StatusNotFound})
+	svc, _ := newTestService(t, nil)
+
+	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
+
+	if rec.Code != http.StatusOK || rec.Body.String() != "develop" {
+		t.Fatalf("got %d %q, want 200 from develop", rec.Code, rec.Body.String())
+	}
+}
+
+func TestService_ServeFirstImage_DoesNotFallBackOnOtherErrors(t *testing.T) {
+	srv, hits := branchUpstream(t, map[string]int{"/main/x.png": http.StatusInternalServerError})
+	svc, _ := newTestService(t, nil)
+
+	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
+
+	if rec.Code != http.StatusBadGateway {
+		t.Errorf("status = %d, want 502", rec.Code)
+	}
+	if got := hitCount(hits, "/develop/x.png"); got != 0 {
+		t.Errorf("develop was fetched %d times, want 0", got)
+	}
+}
+
+func TestService_ServeFirstImage_NotFoundEverywhere(t *testing.T) {
+	srv, _ := branchUpstream(t, map[string]int{
+		"/main/x.png":    http.StatusNotFound,
+		"/develop/x.png": http.StatusNotFound,
+	})
+	svc, _ := newTestService(t, nil)
+
+	if rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png"); rec.Code != http.StatusNotFound {
+		t.Errorf("status = %d, want 404", rec.Code)
+	}
+}
+
+func TestService_ServeFirstImage_UsesTheCopyOnDisk(t *testing.T) {
+	srv, hits := branchUpstream(t, nil)
+	svc, _ := newTestService(t, nil)
+	if rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png"); rec.Code != http.StatusOK {
+		t.Fatalf("warm-up status = %d, want 200", rec.Code)
+	}
+
+	// Without Redis there is no metadata, so the second request finds main through its file
+	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
+
+	if rec.Code != http.StatusOK || rec.Body.String() != "main" {
+		t.Fatalf("got %d %q, want 200 from main", rec.Code, rec.Body.String())
+	}
+	if got := hitCount(hits, "/develop/x.png"); got != 0 {
+		t.Errorf("develop was fetched %d times, want 0", got)
 	}
 }

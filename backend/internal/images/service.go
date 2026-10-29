@@ -104,6 +104,41 @@ func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWrite
 	// Cache miss — fetch once for all concurrent requests
 	s.logger.Debug("cache miss, fetching", "url", rawURL)
 	data, headers, err := s.fetchShared(ctx, cacheKey, rawURL)
+	s.serveFetched(ctx, w, r, rawURL, data, headers, err, maxAge)
+}
+
+// ServeFirstImage serves the first of urls that upstream has, like ServeImageWithMaxAge.
+// A URL is skipped only on a confirmed 404, cached or fetched; any other failure is
+// answered as usual, so a flaky upstream does not silently switch to the next source.
+func (s *Service) ServeFirstImage(ctx context.Context, w http.ResponseWriter, r *http.Request, urls []string, maxAge time.Duration) {
+	last := len(urls) - 1
+	for _, rawURL := range urls[:last] {
+		if meta, ok := s.cache.GetMetadata(ctx, rawURL); ok {
+			if meta.Is404() {
+				continue
+			}
+			s.ServeImageWithMaxAge(ctx, w, r, rawURL, maxAge)
+			return
+		}
+		if _, ok := s.cache.DiskMetadata(rawURL); ok {
+			s.ServeImageWithMaxAge(ctx, w, r, rawURL, maxAge)
+			return
+		}
+
+		data, headers, err := s.fetchShared(ctx, nft.ImageCacheKey(rawURL), rawURL)
+		var fetchErr *FetchError
+		if errors.As(err, &fetchErr) && fetchErr.StatusCode == http.StatusNotFound {
+			continue
+		}
+		s.serveFetched(ctx, w, r, rawURL, data, headers, err, maxAge)
+		return
+	}
+	s.ServeImageWithMaxAge(ctx, w, r, urls[last], maxAge)
+}
+
+// serveFetched writes the response for an upstream fetch: the image, a stale copy from
+// disk when the fetch failed, or the error.
+func (s *Service) serveFetched(ctx context.Context, w http.ResponseWriter, r *http.Request, rawURL string, data []byte, headers *ResponseHeaders, err error, maxAge time.Duration) {
 	if err != nil {
 		if s.serveStale(ctx, w, r, rawURL, err) {
 			return
