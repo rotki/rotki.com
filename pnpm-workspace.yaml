@@ -25,15 +25,10 @@ packages:
   - packages/website/tests/e2e/mock-api
 
 overrides:
-  # stylelint-order 8.1.1 (newest) declares `postcss: ^8.5.8`, and pnpm will not
-  # re-resolve a range that is already satisfied, so it pinned a second, vulnerable
-  # copy at 8.5.15 that kept GHSA-r28c-9q8g-f849 and GHSA-fxqj-rqcc-2cmp open.
-  # Force a single copy until stylelint-order widens or we drop it.
-  postcss: 8.5.28
   # jsdom 28.1.0 (a test-tooling peer) allows undici ^7.21.0, but pnpm kept the
   # vulnerable 7.27.2 it had already resolved. Pin the 7.x line to a patched
   # release until jsdom moves on.
-  undici@^7: 7.29.1
+  undici@^7: 7.30.1
 
 patchedDependencies:
   '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch
@@ -46,36 +41,36 @@ allowBuilds:
   vue-demi: false
 
 catalog:
-  '@coinbase/wallet-sdk': 4.3.7
-  '@commitlint/cli': 21.2.2
-  '@commitlint/config-conventional': 21.2.2
+  '@coinbase/wallet-sdk': 4.4.0
+  '@commitlint/cli': 21.2.4
+  '@commitlint/config-conventional': 21.2.4
   '@fontsource-variable/geist-mono': 5.3.0
   '@fontsource-variable/inter': 5.3.0
-  '@nuxt/content': 3.16.0
-  '@nuxt/devtools': 3.4.2
+  '@nuxt/content': 3.16.2
+  '@nuxt/devtools': 3.4.4
   '@nuxt/eslint-plugin': 1.17.0
-  '@nuxt/kit': 4.5.2
-  '@nuxt/test-utils': 4.3.2
+  '@nuxt/kit': 4.6.2
+  '@nuxt/test-utils': 4.3.4
   '@nuxtjs/i18n': 10.6.0
-  '@nuxtjs/robots': 6.2.0
-  '@nuxtjs/sitemap': 8.5.0
-  '@pinia/nuxt': 1.0.2
-  '@playwright/test': 1.63.0
+  '@nuxtjs/robots': 6.2.4
+  '@nuxtjs/sitemap': 8.6.2
+  '@pinia/nuxt': 1.0.3
+  '@playwright/test': 1.64.1
   '@resvg/resvg-js': 2.6.2
   '@rotki/eslint-config': 8.4.1
   '@rotki/eslint-plugin': 1.10.0
-  '@rotki/ui-library': 3.1.1
+  '@rotki/ui-library': 3.1.7
   '@tailwindcss/vite': 4.3.3
   '@tsconfig/node24': 24.0.5
-  '@types/braintree-web': 3.143.0
-  '@types/node': 24.13.3
+  '@types/braintree-web': 3.143.2
+  '@types/node': 24.19.2
   '@types/paypal-checkout-components': 4.0.8
   '@types/qrcode': 1.5.6
   '@unhead/vue': 2.1.17
-  '@vitejs/plugin-vue': 6.0.8
-  '@vitest/coverage-v8': 5.0.0
-  '@vitest/istanbul-lib-coverage': 1.0.1
-  '@vue/test-utils': 2.5.0
+  '@vitejs/plugin-vue': 6.0.10
+  '@vitest/coverage-v8': 5.0.5
+  '@vitest/istanbul-lib-coverage': 1.0.2
+  '@vue/test-utils': 2.5.1
   '@vue/tsconfig': 0.9.1
   '@vuelidate/core': 2.0.3
   '@vuelidate/validators': 2.0.4
@@ -83,51 +78,51 @@ catalog:
   '@vueuse/math': 14.4.0
   '@vueuse/nuxt': 14.4.0
   '@vueuse/shared': 14.4.0
-  '@wagmi/connectors': 8.2.0
-  '@wagmi/core': 3.6.5
-  '@walletconnect/universal-provider': 2.24.0
-  ast-v8-to-istanbul: 1.0.6
+  '@wagmi/connectors': 8.2.2
+  '@wagmi/core': 3.6.7
+  '@walletconnect/universal-provider': 2.26.0
+  ast-v8-to-istanbul: 1.0.7
   better-sqlite3: 12.11.1
-  braintree-web: 3.145.0
+  braintree-web: 3.147.0
   bumpp: 12.3.0
-  cac: 7.0.0
+  cac: 7.1.0
   consola: 3.4.2
   defu: 6.1.7
-  eslint: 10.10.0
+  eslint: 10.13.0
   eslint-plugin-slop: 0.1.3
   eslint-plugin-sonarjs: 4.2.2
-  eslint-plugin-tsdoc: 0.5.2
+  eslint-plugin-tsdoc: 0.5.4
   h3: 1.15.11
-  happy-dom: 20.14.0
+  happy-dom: 20.14.6
   husky: 9.1.7
-  lint-staged: 17.5.0
+  lint-staged: 17.6.0
   msw: 2.15.0
-  nitropack: 2.13.4
-  npm-run-all2: 9.0.3
-  nuxt: 4.5.2
-  nuxt-llms: 0.2.0
+  nitropack: 2.13.5
+  npm-run-all2: 9.0.4
+  nuxt: 4.6.2
+  nuxt-llms: 0.3.0
   ofetch: 1.5.1
-  pinia: 4.0.3
+  pinia: 4.1.0
   plainfp: 0.1.1
   postcss-html: 1.8.1
   qrcode: 1.5.4
   rimraf: 6.1.3
-  satori: 0.29.1
-  stylelint: 17.15.0
+  satori: 0.63.2
+  stylelint: 17.16.0
   stylelint-config-recommended-vue: 1.6.1
   stylelint-config-standard: 40.0.0
-  stylelint-order: 8.1.1
-  swiper: 14.2.0
+  stylelint-order: 8.1.2
+  swiper: 14.3.0
   tailwindcss: 4.3.3
-  tsdown: 0.22.14
+  tsdown: 0.23.1
   typescript: 6.0.3
-  viem: 2.56.3
-  vite: 8.2.2
+  viem: 2.57.10
+  vite: 8.3.5
   vite-plugin-vue-devtools: 8.2.1
   vite-ssg: 28.3.0
-  vitest: 5.0.0
-  vue: 3.5.42
-  vue-router: 5.3.1
-  vue-tsc: 3.3.11
-  yaml: 2.9.0
-  zod: 4.5.4
+  vitest: 5.0.5
+  vue: 3.5.44
+  vue-router: 5.4.0
+  vue-tsc: 3.3.13
+  yaml: 2.9.1
+  zod: 4.6.7

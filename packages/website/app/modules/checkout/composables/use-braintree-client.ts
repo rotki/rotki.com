@@ -138,11 +138,7 @@ export function useBraintreeClient(errorContext: PaymentErrorContext = 'payment'
     try {
       const currentClient = get(client);
       if (currentClient) {
-        await currentClient.teardown((err) => {
-          if (err) {
-            logger.error('Error in teardown callback:', err);
-          }
-        });
+        await currentClient.teardown();
       }
       set(client, undefined);
     }
