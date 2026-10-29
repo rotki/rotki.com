@@ -73,10 +73,10 @@ catalog:
   '@vue/tsconfig': 0.9.1
   '@vuelidate/core': 2.0.3
   '@vuelidate/validators': 2.0.4
-  '@vueuse/core': 14.4.0
-  '@vueuse/math': 14.4.0
-  '@vueuse/nuxt': 14.4.0
-  '@vueuse/shared': 14.4.0
+  '@vueuse/core': 15.0.0
+  '@vueuse/math': 15.0.0
+  '@vueuse/nuxt': 15.0.0
+  '@vueuse/shared': 15.0.0
   '@wagmi/connectors': 8.2.2
   '@wagmi/core': 3.6.7
   '@walletconnect/universal-provider': 2.26.0
