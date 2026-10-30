@@ -10,6 +10,12 @@ import { writeLlmsPages } from './app/utils/llms-pages';
 import { devOptimizeDeps } from './app/utils/optimize-deps';
 import { clientOnlyRouteRules, writeSpaManifest } from './app/utils/spa-routes';
 
+/**
+ * The e2e dev server builds into its own folder. Nuxt allows one dev server per build folder, so
+ * with its own folder (and its own Vite cache and content database) e2e runs beside `pnpm dev`.
+ */
+const e2eBuildDir = process.env.E2E_NUXT_BUILD_DIR;
+
 // Build identifier for unique chunk names per deployment
 const gitSha = process.env.GIT_SHA;
 const buildId = gitSha ? gitSha.slice(0, 8) : Date.now();
@@ -82,6 +88,13 @@ const nonIndexed = [
 ];
 
 export default defineNuxtConfig({
+  ...(e2eBuildDir && {
+    buildDir: e2eBuildDir,
+    content: {
+      _localDatabase: { type: 'sqlite', filename: `${e2eBuildDir}-data/local.sqlite` },
+      database: { type: 'sqlite', filename: `${e2eBuildDir}-data/contents.sqlite` },
+    },
+  }),
 
   modules: [
     '@nuxt/devtools',
@@ -249,6 +262,7 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    ...(e2eBuildDir && { cacheDir: `node_modules/.cache/vite-e2e` }),
     plugins: [tailwindcss()],
     optimizeDeps: {
       include: devOptimizeDeps,
