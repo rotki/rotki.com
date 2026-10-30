@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { defaultAccount } from '../../support/backend-data';
 import { waitForHydration } from '../../support/hydration';
+import { FAKE_CAPTCHA_TOKEN, installFakeRecaptcha, passCaptcha } from '../../support/recaptcha';
 import { test } from '../../support/test';
 
 async function mockSignedOut(page: Page): Promise<void> {
@@ -102,6 +103,53 @@ test.describe('password recovery', () => {
     await expect(main(page).getByText('Enter a valid e-mail address.')).toBeVisible();
   });
 
+  test('sends the reset link and names the address on the next page', async ({ page }) => {
+    let requestBody: unknown;
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/password-reset/request/', async (route) => {
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({ json: {} });
+    });
+    await page.goto('/password/recover');
+    await waitForHydration(page);
+
+    await page.locator('input#email').first().fill('someone@example.com');
+    await passCaptcha(page);
+    await main(page).getByRole('button', { name: 'Send reset link' }).click();
+
+    await page.waitForURL('**/password/send');
+    await expect(main(page)).toContainText('We sent a link to someone@example.com.');
+    expect(requestBody).toEqual({ captcha: FAKE_CAPTCHA_TOKEN, email: 'someone@example.com' });
+  });
+
+  test('lets the user retry after the backend rejects the captcha', async ({ page }) => {
+    let requests = 0;
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/password-reset/request/', async (route) => {
+      requests++;
+      if (requests === 1)
+        await route.fulfill({ status: 400, json: { message: { captcha: ['Captcha verification failed'] } } });
+      else
+        await route.fulfill({ json: {} });
+    });
+    await page.goto('/password/recover');
+    await waitForHydration(page);
+
+    const send = main(page).getByRole('button', { name: 'Send reset link' });
+    await page.locator('input#email').first().fill('someone@example.com');
+    await passCaptcha(page);
+    await send.click();
+    await expect.poll(() => requests).toBe(1);
+    await expect(page.locator('[data-cy=fake-captcha]')).toHaveText('Pass captcha');
+    expect(new URL(page.url()).pathname).toBe('/password/recover');
+
+    await passCaptcha(page);
+    await send.click();
+
+    await page.waitForURL('**/password/send');
+    expect(requests).toBe(2);
+  });
+
   test('confirms the link was sent and offers a new one', async ({ page }) => {
     await page.goto('/password/send');
 
@@ -150,6 +198,27 @@ test.describe('links sent by e-mail', () => {
     await expect(heading(page, 'Password changed')).toBeVisible();
     await expect(main(page).getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
     expect(confirmBody).toMatchObject({ uid: 'MQ', token: 'abc-123', password: 'n3wP4ssword' });
+  });
+
+  test('password reset shows a password the backend rejects under the rules', async ({ page }) => {
+    await page.route('**/webapi/password-reset/validate/', async route => route.fulfill({ json: {} }));
+    await page.route('**/webapi/password-reset/confirm/', async route => route.fulfill({
+      status: 400,
+      json: { message: { password: ['This password is too common.'] } },
+    }));
+    await page.goto('/password/reset/MQ/abc-123');
+    await expect(heading(page, 'Set a new password')).toBeVisible();
+
+    await page.locator('input#password').first().fill('password123');
+    await page.locator('input#password-confirmation').first().fill('password123');
+    await page.locator('input#password-confirmation').first().press('Enter');
+
+    await expect(main(page).getByText('This password is too common.')).toBeVisible();
+    await expect(page.locator('input#password').first()).toHaveAttribute('aria-invalid', 'true');
+    expect(new URL(page.url()).pathname).toBe('/password/reset/MQ/abc-123');
+
+    await page.locator('input#password').first().fill('n3wP4ssword-x');
+    await expect(main(page).getByText('This password is too common.')).toHaveCount(0);
   });
 
   test('expired password reset link offers a new one', async ({ page }) => {

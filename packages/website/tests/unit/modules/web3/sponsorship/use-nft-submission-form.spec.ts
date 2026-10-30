@@ -208,3 +208,77 @@ describe('useNftSubmissionForm submit-button gating', () => {
     expect(get(form.modelDisplayName)).toBe('Prior Name');
   });
 });
+
+describe('useNftSubmissionForm field rules', () => {
+  beforeEach(() => {
+    set(mockMetadata, undefined);
+    set(authValid, true);
+    existingSubmission = undefined;
+    deferCheck();
+  });
+
+  it('checks the display name length and characters only when a name is given', async () => {
+    const form = await setupForm();
+
+    set(form.modelDisplayName, 'Al');
+    await nextTick();
+    expect(form.errors('displayName')).toEqual(['Name must be at least 3 characters long']);
+
+    set(form.modelDisplayName, 'A'.repeat(31));
+    await nextTick();
+    expect(form.errors('displayName')).toEqual(['Name must be at most 30 characters long']);
+
+    set(form.modelDisplayName, 'Alice <3');
+    await nextTick();
+    expect(form.errors('displayName')).toEqual(['Name can only contain letters, numbers, spaces, hyphens, underscores, and dots']);
+
+    set(form.modelDisplayName, '');
+    await nextTick();
+    expect(form.errors('displayName')).toEqual([]);
+  });
+
+  it('accepts an empty e-mail but not a malformed one', async () => {
+    const form = await setupForm();
+
+    set(form.modelEmail, 'not-an-address');
+    await nextTick();
+    expect(form.errors('email')).toEqual(['Please enter a valid email address']);
+
+    set(form.modelEmail, '');
+    await nextTick();
+    expect(form.errors('email')).toEqual([]);
+  });
+
+  it('rejects images that are too large or of the wrong type', async () => {
+    const form = await setupForm();
+
+    form.handleImageSelected(new File(['x'], 'a.gif', { type: 'image/gif' }));
+    await nextTick();
+    expect(form.errors('imageFile')).toEqual(['Image must be JPEG, PNG, or WebP']);
+
+    form.handleImageSelected(new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'big.png', { type: 'image/png' }));
+    await nextTick();
+    expect(form.errors('imageFile')).toEqual(['Image must be less than 5MB']);
+  });
+
+  it('requires a numeric token ID', async () => {
+    const form = await setupForm();
+
+    set(form.modelTokenId, 'abc');
+    await nextTick();
+    expect(form.errors('tokenId')).toEqual(['NFT Token ID must be a number']);
+  });
+
+  it('stays invalid until a name, an image or an e-mail is given', async () => {
+    const form = await setupForm();
+
+    set(form.modelTokenId, '7');
+    deferredCheck.resolve();
+    await flushMicrotasks();
+    expect(get(form.invalid)).toBe(true);
+
+    set(form.modelEmail, 'someone@example.com');
+    await nextTick();
+    expect(get(form.invalid)).toBe(false);
+  });
+});

@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
-import { completeAccountStep, completeDetailsStep, waitForSignupForm } from '../../support/signup';
+import { FAKE_CAPTCHA_TOKEN, installFakeRecaptcha, passCaptcha } from '../../support/recaptcha';
+import { completeAccountStep, completeDetailsStep, fillAddressStep, waitForSignupForm } from '../../support/signup';
 import { test } from '../../support/test';
 
 test.describe('signup test', () => {
@@ -131,6 +132,53 @@ test.describe('signup test', () => {
     await lastNameInput.fill('Last');
     await nextButton.click();
     await expect(page.locator('input#address-1').first()).toBeVisible();
+  });
+
+  test('creates the account and asks to confirm the e-mail', async ({ page }) => {
+    let requestBody: Record<string, unknown> | undefined;
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async (route) => {
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({ json: { result: true } });
+    });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await completeDetailsStep(page);
+    await fillAddressStep(page, 'Country');
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
+
+    await page.waitForURL('**/activation');
+    await expect(page.getByRole('heading', { level: 1, name: 'Confirm your e-mail address' })).toBeVisible();
+    expect(requestBody).toMatchObject({
+      captcha: FAKE_CAPTCHA_TOKEN,
+      country: 'CT',
+      email: 'email@gmail.com',
+      first_name: 'First',
+      newsletter_consent: false,
+      username: 'username',
+    });
+  });
+
+  test('goes back to the account step when the backend rejects the password', async ({ page }) => {
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async route => route.fulfill({
+      status: 400,
+      json: { message: { password: ['This password is too common.'] } },
+    }));
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await completeDetailsStep(page);
+    await fillAddressStep(page, 'Country');
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
+    await expect(page.getByText('This password is too common.')).toBeVisible();
+    await expect(page.locator('input#password').first()).toHaveAttribute('aria-invalid', 'true');
+    expect(new URL(page.url()).pathname).toBe('/signup');
   });
 
   test('show address form', async ({ page }) => {
