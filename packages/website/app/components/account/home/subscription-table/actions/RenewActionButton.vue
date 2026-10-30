@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
+import { useActionButtonStyle } from '~/components/account/home/subscription-table/types';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
 defineProps<{
@@ -9,6 +10,8 @@ defineProps<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
+const buttonStyle = useActionButtonStyle();
 </script>
 
 <template>
@@ -16,7 +19,8 @@ const { t } = useI18n({ useScope: 'global' });
     :disabled="disabled"
     :to="to"
     :class="actionsClasses"
-    size="sm"
+    :size="buttonStyle.size"
+    :variant="buttonStyle.variant"
     color="info"
   >
     <template #prepend>

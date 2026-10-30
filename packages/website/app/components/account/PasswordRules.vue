@@ -29,30 +29,30 @@ const rules = computed<{ key: string; label: string; met: boolean }[]>(() => [{
 </script>
 
 <template>
-  <div class="text-body-2 text-rui-text-secondary space-y-1">
+  <div class="pt-1 text-caption text-rui-text-secondary space-y-1">
     <ul class="space-y-1">
       <li
         v-for="rule in rules"
         :key="rule.key"
-        class="flex items-center gap-2"
+        class="flex items-center gap-1.5"
         :class="{ 'text-rui-error': invalid && !rule.met }"
         :data-met="rule.met"
       >
         <RuiIcon
           v-if="rule.met"
           name="lu-circle-check"
-          size="16"
+          size="14"
           class="text-rui-success"
         />
         <RuiIcon
           v-else-if="invalid"
           name="lu-circle-x"
-          size="16"
+          size="14"
         />
         <RuiIcon
           v-else
           name="lu-circle"
-          size="16"
+          size="14"
           class="text-rui-grey-400"
         />
         <span>{{ rule.label }}</span>

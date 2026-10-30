@@ -1,5 +1,7 @@
 .output
 .nuxt
+.nuxt-e2e
+.nuxt-e2e-data
 .nitro
 .data
 coverage

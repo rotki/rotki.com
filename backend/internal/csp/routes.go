@@ -14,7 +14,7 @@ var routeOverrides = []struct {
 	Path     string
 	Override RouteOverride
 }{
-	{"/home/saved-cards", RouteOverride{
+	{"/home/billing", RouteOverride{
 		CSP: SavedCardsCSP,
 		Headers: map[string]string{
 			"Cross-Origin-Embedder-Policy": "unsafe-none",

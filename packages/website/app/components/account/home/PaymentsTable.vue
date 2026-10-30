@@ -6,11 +6,15 @@ import type {
   TablePaginationData,
 } from '@rotki/ui-library';
 import type { UserPayment } from '~/types/account';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import PaymentAmountCell from '~/components/account/home/PaymentAmountCell.vue';
+import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useUserPayments } from '~/composables/account/use-user-payments';
 import { formatDate } from '~/utils/date';
+import { invoiceUrl } from '~/utils/payments';
 import { getPlanNameFor } from '~/utils/plans';
+import { fitsOnePage } from '~/utils/table';
 import { toTitleCase } from '~/utils/text';
 
 const { pending } = defineProps<{
@@ -28,14 +32,15 @@ const sort = ref<DataTableSortColumn<UserPayment>>({
 const { userPayments, loading, refresh } = useUserPayments();
 
 const headers: DataTableColumn<UserPayment>[] = [{
-  label: t('common.plan'),
-  key: 'plan',
-  cellClass: 'font-bold',
-  class: '[&_button]:capitalize',
-  sortable: true,
-}, {
   label: t('account.payments.headers.paid_at'),
   key: 'paidAt',
+  cellClass: 'whitespace-nowrap',
+  sortable: true,
+}, {
+  label: t('common.plan'),
+  key: 'plan',
+  cellClass: 'font-medium',
+  class: '[&_button]:capitalize',
   sortable: true,
 }, {
   label: t('account.payments.headers.method'),
@@ -52,9 +57,9 @@ const headers: DataTableColumn<UserPayment>[] = [{
   class: '[&_button]:capitalize',
   sortable: true,
 }, {
-  label: t('common.actions'),
+  label: t('account.payments.headers.invoice'),
   key: 'actions',
-  class: 'capitalize',
+  align: 'end',
 }];
 
 watch(() => pending, (pendingIs, pendingWas) => {
@@ -65,23 +70,16 @@ watch(() => pending, (pendingIs, pendingWas) => {
 </script>
 
 <template>
-  <div>
-    <div class="flex items-center gap-2 text-h6 mb-6">
-      {{ t('account.payments.title') }}
-      <RuiButton
-        variant="text"
-        color="primary"
-        icon
+  <AccountSection
+    :title="t('account.payments.title')"
+    :description="t('account.payments.description')"
+  >
+    <template #actions>
+      <RefreshButton
         :loading="loading"
-        class="p-2!"
-        @click="refresh()"
-      >
-        <RuiIcon
-          name="lu-refresh-cw"
-          size="16"
-        />
-      </RuiButton>
-    </div>
+        @refresh="refresh()"
+      />
+    </template>
     <RuiDataTable
       v-model:pagination="pagination"
       v-model:sort="sort"
@@ -90,6 +88,7 @@ watch(() => pending, (pendingIs, pendingWas) => {
       :empty="{ description: t('account.payments.no_payments_found') }"
       row-attr="identifier"
       :rows="userPayments"
+      :hide-pagination="fitsOnePage(userPayments)"
       outlined
     >
       <template #item.plan="{ row }">
@@ -107,7 +106,7 @@ watch(() => pending, (pendingIs, pendingWas) => {
         </template>
       </template>
       <template #item.paidAt="{ row }">
-        {{ formatDate(row.paidAt) }}
+        {{ formatDate(row.paidAt, 'MMM DD, YYYY') }}
       </template>
       <template #item.finalPrice="{ row }">
         <PaymentAmountCell :payment="row" />
@@ -139,6 +138,7 @@ watch(() => pending, (pendingIs, pendingWas) => {
       <template #item.status="{ row }">
         <RuiChip
           size="sm"
+          variant="tonal"
           :color="row.isRefund ? 'info' : 'success'"
         >
           {{ row.isRefund ? t("account.payments.refunded") : t("account.payments.paid") }}
@@ -146,22 +146,15 @@ watch(() => pending, (pendingIs, pendingWas) => {
       </template>
 
       <template #item.actions="{ row }">
-        <div class="flex flex-col items-start gap-1">
-          <ButtonLink
-            :to="row.legacy ? `/webapi/download/receipt/${row.identifier}/` : `/webapi/2/invoices/${row.identifier}/`"
-            color="primary"
-            external
-          >
-            <template #prepend>
-              <RuiIcon
-                name="lu-download"
-                size="16"
-              />
-            </template>
-            {{ t('actions.download') }}
-          </ButtonLink>
-        </div>
+        <ButtonLink
+          :to="invoiceUrl(row)"
+          color="primary"
+          external
+          inline
+        >
+          {{ t('account.overview.invoice') }}
+        </ButtonLink>
       </template>
     </RuiDataTable>
-  </div>
+  </AccountSection>
 </template>

@@ -8,15 +8,17 @@ import type { RouteLocationRaw } from 'vue-router';
  */
 export function getSubscriptionTableHeaders(t: ComposerTranslation): DataTableColumn<UserSubscription>[] {
   return [{
-    cellClass: 'font-bold',
+    cellClass: 'font-medium',
     class: 'capitalize',
     key: 'planName',
     label: t('common.plan'),
   }, {
+    cellClass: 'whitespace-nowrap',
     key: 'createdDate',
     label: t('account.subscriptions.headers.created'),
     sortable: true,
   }, {
+    cellClass: 'whitespace-nowrap',
     key: 'nextActionDate',
     label: t('account.subscriptions.headers.next_billing'),
     sortable: true,

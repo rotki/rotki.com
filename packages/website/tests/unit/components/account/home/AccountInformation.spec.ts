@@ -65,7 +65,8 @@ async function mountAccountInformation(newsletterConsent: boolean) {
 describe('account information', () => {
   it('continues to submit the existing customer information fields', async () => {
     const { updateProfile, wrapper } = await mountAccountInformation(false);
-    await wrapper.get('[data-cy="update-profile"]').trigger('click');
+    expect(wrapper.get('[data-cy="update-profile"]').attributes('type')).toBe('submit');
+    await wrapper.get('form').trigger('submit');
 
     await vi.waitFor(() => {
       expect(updateProfile).toHaveBeenCalledOnce();

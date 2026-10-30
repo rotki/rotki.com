@@ -2,6 +2,7 @@
 import type { ActionResult } from '~/types/common';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useMainStore } from '~/store';
@@ -52,38 +53,31 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <RuiCard
-    class="border-2!"
-    :class="{ 'border-rui-error!': !isSubscriber }"
-  >
-    <div>
-      <div
-        class="text-lg font-semibold"
-        :class="isSubscriber ? 'text-rui-text-disabled' : 'text-rui-error'"
-      >
-        {{ t('account.delete_account.title') }}
-      </div>
-      <div class="text-rui-text-secondary text-body-1">
-        {{ t('account.delete_account.description') }}
-      </div>
-    </div>
+  <AccountSection :title="t('account.delete_account.title')">
     <div
-      v-if="isSubscriber"
-      class="text-body-1 font-bold text-rui-text-secondary mt-1"
+      class="max-w-2xl rounded-lg border p-4 md:p-6"
+      :class="isSubscriber ? 'border-default' : 'border-rui-error/40'"
     >
-      {{ t('account.delete_account.unable_to_delete') }}
-    </div>
-    <div class="mt-8">
+      <p class="text-body-2 text-rui-text-secondary text-pretty">
+        {{ t('account.delete_account.description') }}
+      </p>
+      <p
+        v-if="isSubscriber"
+        class="mt-2 text-body-2 font-medium text-rui-text"
+      >
+        {{ t('account.delete_account.unable_to_delete') }}
+      </p>
       <RuiButton
         :disabled="isSubscriber"
-        size="lg"
         color="error"
+        variant="outlined"
+        class="mt-5"
         @click="confirm = true"
       >
         {{ t('account.delete_account.delete_my_account') }}
       </RuiButton>
     </div>
-  </RuiCard>
+  </AccountSection>
   <RuiDialog
     v-model="confirm"
     max-width="900"

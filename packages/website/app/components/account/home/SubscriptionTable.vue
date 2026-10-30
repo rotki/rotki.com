@@ -9,10 +9,11 @@ import type {
   SubscriptionActionType,
 } from '~/components/account/home/subscription-table/types';
 import { get, set } from '@vueuse/shared';
+import AccountSection from '~/components/account/home/AccountSection.vue';
+import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import { getSubscriptionTableHeaders } from '~/components/account/home/subscription-table/config';
 import SubscriptionActionsCell from '~/components/account/home/subscription-table/SubscriptionActionsCell.vue';
 import SubscriptionStatusChip from '~/components/account/home/subscription-table/SubscriptionStatusChip.vue';
-import SubscriptionTableHeader from '~/components/account/home/subscription-table/SubscriptionTableHeader.vue';
 import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
 import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
@@ -22,6 +23,12 @@ import { useUserSubscriptions } from '~/composables/subscription/use-user-subscr
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { formatDate } from '~/utils/date';
+import { fitsOnePage } from '~/utils/table';
+
+const { folded = false } = defineProps<{
+  /** Starts folded behind a Show button, for when no subscription has anything left to do. */
+  folded?: boolean;
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 const pagination = ref<TablePaginationData>();
@@ -45,7 +52,7 @@ const {
 const { availablePlans } = useAvailablePlans();
 
 // Composables
-const { userSubscriptions, loading, refresh: refreshSubscriptions } = useUserSubscriptions();
+const { userSubscriptions, loading, initialLoading, refresh: refreshSubscriptions } = useUserSubscriptions();
 const { getPlanDisplayName, actionsClasses } = useSubscriptionDisplay();
 
 // Use centralized subscription operations composable
@@ -69,6 +76,9 @@ const renewableSubscriptions = computed<UserSubscription[]>(() =>
 );
 
 const headers = computed<DataTableColumn<UserSubscription>[]>(() => getSubscriptionTableHeaders(t));
+
+const expanded = ref<boolean>(false);
+const showTable = computed<boolean>(() => !folded || get(expanded));
 
 // Crypto payment composable
 const {
@@ -118,13 +128,37 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
 </script>
 
 <template>
-  <div>
-    <SubscriptionTableHeader
-      :loading="loading"
-      @refresh="refreshSubscriptions()"
-    />
+  <AccountSection
+    :title="t('account.subscriptions.title')"
+    :description="showTable || initialLoading ? undefined : t('account.subscriptions.past_hint', { count: userSubscriptions.length }, userSubscriptions.length)"
+  >
+    <template
+      v-if="initialLoading"
+      #description
+    >
+      <RuiSkeletonLoader class="inline-block align-middle h-3.5 w-56" />
+    </template>
+    <template #actions>
+      <RefreshButton
+        v-if="showTable"
+        :loading="loading"
+        @refresh="refreshSubscriptions()"
+      />
+      <RuiButton
+        v-if="folded && userSubscriptions.length > 0"
+        color="primary"
+        variant="outlined"
+        aria-controls="subscriptions-table"
+        :aria-expanded="expanded"
+        @click="expanded = !expanded"
+      >
+        {{ expanded ? t('actions.hide') : t('actions.show') }}
+      </RuiButton>
+    </template>
 
     <RuiDataTable
+      v-if="showTable"
+      id="subscriptions-table"
       v-model:pagination="pagination"
       v-model:sort="sort"
       :cols="headers"
@@ -134,6 +168,7 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
         description: t('account.subscriptions.no_subscriptions_found'),
       }"
       row-attr="id"
+      :hide-pagination="fitsOnePage(userSubscriptions)"
       outlined
     >
       <template #item.planName="{ row }">
@@ -141,11 +176,11 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
       </template>
 
       <template #item.createdDate="{ row }">
-        {{ formatDate(row.createdDate) }}
+        {{ formatDate(row.createdDate, 'MMM DD, YYYY') }}
       </template>
 
       <template #item.nextActionDate="{ row }">
-        {{ formatDate(row.nextActionDate) }}
+        {{ formatDate(row.nextActionDate, 'MMM DD, YYYY') }}
       </template>
 
       <template #item.status="{ row }">
@@ -175,5 +210,5 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
       @resume-subscription="resumeSubscription($event)"
       @cancel-upgrade="cancelUpgrade($event)"
     />
-  </div>
+  </AccountSection>
 </template>

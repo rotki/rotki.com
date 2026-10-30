@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';
 
@@ -27,52 +28,41 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div>
-    <div class="text-h6 mb-6">
-      {{ t('account_details.title') }}
-    </div>
-    <div>
-      <div class="space-y-5">
+  <AccountSection :title="t('account_details.title')">
+    <div class="max-w-2xl space-y-5">
+      <RuiTextField
+        id="username"
+        v-model="username"
+        readonly
+        dense
+        :label="t('auth.common.username')"
+        details="hidden"
+        color="primary"
+        append-icon="lu-lock-keyhole"
+      />
+      <div>
         <RuiTextField
-          id="username"
-          v-model="username"
-          disabled
+          id="email"
+          v-model="email"
+          readonly
           dense
-          class="[&_input]:text-rui-text!"
-          :label="t('auth.common.username')"
-          hide-details
+          :label="t('auth.common.email')"
+          details="hidden"
           color="primary"
           append-icon="lu-lock-keyhole"
         />
-        <div>
-          <RuiTextField
-            id="email"
-            v-model="email"
-            disabled
-            dense
-            class="[&_input]:text-rui-text!"
-            :label="t('auth.common.email')"
-            hide-details
+        <p class="mt-1.5 text-caption text-rui-text-secondary">
+          {{ t('account_details.check_email') }}
+          <ButtonLink
+            :to="emailMailto"
+            external
             color="primary"
-            append-icon="lu-lock-keyhole"
-          />
-          <div class="text-rui-text-secondary pt-2 px-3 text-xs flex">
-            {{ t('account_details.check_email') }}
-            <ButtonLink
-              :to="emailMailto"
-              external
-              color="primary"
-              variant="text"
-              class="leading-0"
-              inline
-            >
-              {{ rotkiEmail }}
-            </ButtonLink>
-          </div>
-        </div>
+            inline
+          >
+            {{ rotkiEmail }}
+          </ButtonLink>
+        </p>
       </div>
-
-      <div class="mt-10 mb-5 border-t border-grey-50" />
     </div>
-  </div>
+  </AccountSection>
 </template>

@@ -2,24 +2,18 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
-import AccountCredit from '~/components/account/home/AccountCredit.vue';
+import AccountOverviewStats from '~/components/account/home/AccountOverviewStats.vue';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import ActiveSubscriptionCard from '~/components/account/home/ActiveSubscriptionCard.vue';
 import ActiveSubscriptionCardSkeleton from '~/components/account/home/ActiveSubscriptionCardSkeleton.vue';
-import ApiKeys from '~/components/account/home/ApiKeys.vue';
-import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
-import PaymentsTable from '~/components/account/home/PaymentsTable.vue';
 import PremiumPlaceholder from '~/components/account/home/PremiumPlaceholder.vue';
-import ReferralCode from '~/components/account/home/ReferralCode.vue';
-import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
-import SubscriptionTable from '~/components/account/home/SubscriptionTable.vue';
-import UnverifiedEmailWarning from '~/components/account/home/UnverifiedEmailWarning.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useMainStore } from '~/store';
-import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 
-usePageSeoNoIndex('Subscription');
+usePageSeoNoIndex('Overview');
 
 definePageMeta({
   auth: true,
@@ -28,36 +22,15 @@ definePageMeta({
 
 const { t } = useI18n({ useScope: 'global' });
 
-const store = useMainStore();
-const { account } = storeToRefs(store);
+const { account } = storeToRefs(useMainStore());
 const { userSubscriptions, activeOrPendingSubscription, refresh: refreshSubscriptions, initialLoading: initialSubscriptionsLoading } = useUserSubscriptions();
 const { requestRefresh } = useAccountRefresh();
-
-const subscriptionOpsStore = useSubscriptionOperationsStore();
-const { error, operationType } = storeToRefs(subscriptionOpsStore);
-const { setError } = subscriptionOpsStore;
 
 const premium = computed<boolean>(() => get(account)?.canUsePremium ?? false);
 const isSubscriber = computed<boolean>(() => get(account)?.hasActiveSubscription ?? false);
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
 const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
 const canUsePremium = computed<boolean>(() => get(premium) || get(pending).length > 0);
-
-const subscriptionError = computed<string>(() => get(error) || '');
-const subscriptionErrorTitle = computed<string>(() => {
-  const type = get(operationType);
-  if (type === SubscriptionAction.RESUME) {
-    return t('account.subscriptions.resume.notification.title');
-  }
-  if (type === SubscriptionAction.CANCEL) {
-    return t('account.subscriptions.cancellation.notification.title');
-  }
-  return '';
-});
-
-function dismissSubscriptionError(): void {
-  setError('');
-}
 
 onBeforeMount(() => {
   requestRefresh();
@@ -66,38 +39,45 @@ onBeforeMount(() => {
 
 <template>
   <div class="space-y-10">
-    <UnverifiedEmailWarning v-if="!emailConfirmed" />
-    <PremiumPlaceholder v-else-if="!canUsePremium && !isSubscriber" />
-
-    <template v-else>
-      <ActiveSubscriptionCardSkeleton v-if="initialSubscriptionsLoading" />
+    <AccountSection :title="t('account.subscriptions.current_plan')">
+      <p
+        v-if="!emailConfirmed"
+        class="rounded-lg border border-dashed border-default p-5 md:p-6 text-body-2 text-rui-text-secondary"
+      >
+        {{ t('account.overview.confirm_first') }}
+      </p>
+      <PremiumPlaceholder v-else-if="!canUsePremium && !isSubscriber" />
+      <ActiveSubscriptionCardSkeleton v-else-if="initialSubscriptionsLoading" />
       <ActiveSubscriptionCard
         v-else-if="activeOrPendingSubscription"
         :subscription="activeOrPendingSubscription"
         @refresh="refreshSubscriptions()"
       />
       <PremiumPlaceholder v-else />
-    </template>
+    </AccountSection>
 
-    <ApiKeys v-if="premium" />
-    <template v-if="emailConfirmed">
-      <ReferralCode />
-      <AccountCredit />
-      <SubscriptionTable />
-    </template>
-    <PaymentsTable :pending="pending" />
+    <AccountOverviewStats />
 
-    <!-- Unified subscription error notification -->
-    <FloatingNotification
-      :timeout="3000"
-      :visible="!!subscriptionError"
-      closeable
-      @dismiss="dismissSubscriptionError()"
+    <div
+      v-if="premium"
+      class="rounded-lg border border-default p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4"
     >
-      <template #title>
-        {{ subscriptionErrorTitle }}
-      </template>
-      {{ subscriptionError }}
-    </FloatingNotification>
+      <div class="flex-1 min-w-0">
+        <h2 class="text-subtitle-1 font-medium text-rui-text">
+          {{ t('account.overview.connect.title') }}
+        </h2>
+        <p class="mt-1 text-body-2 text-rui-text-secondary">
+          {{ t('account.overview.connect.description') }}
+        </p>
+      </div>
+      <ButtonLink
+        to="/home/devices"
+        color="primary"
+        variant="outlined"
+        class="self-start sm:self-auto"
+      >
+        {{ t('account.overview.connect.action') }}
+      </ButtonLink>
+    </div>
   </div>
 </template>

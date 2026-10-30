@@ -1,5 +1,5 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
-import { set } from '@vueuse/shared';
+import { get } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 export interface Country {
@@ -7,23 +7,25 @@ export interface Country {
   readonly name: string;
 }
 
+/** The country list, fetched once per visit and shared by every caller. */
 export function useCountries() {
-  const countries = ref<Country[]>([]);
-  const countriesLoadError = shallowRef<string>('');
   const { fetchWithCsrf } = useFetchWithCsrf();
 
-  const loadCountries = async () => {
-    try {
+  const { data, error } = useLazyAsyncData<Country[]>(
+    'countries',
+    async () => {
       const response = await fetchWithCsrf<ApiResponse<Country[]>>('/webapi/countries/');
-      set(countries, response.result ?? []);
-    }
-    catch (error: any) {
-      set(countriesLoadError, error.message);
-    }
-  };
-  onMounted(loadCountries);
+      return response.result ?? [];
+    },
+    {
+      default: () => [],
+      getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
+      server: false,
+    },
+  );
+
   return {
-    countries: shallowReadonly(countries),
-    countriesLoadError: readonly(countriesLoadError),
+    countries: computed<Country[]>(() => get(data)),
+    countriesLoadError: computed<string>(() => get(error)?.message ?? ''),
   };
 }

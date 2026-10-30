@@ -253,8 +253,8 @@ test.describe('links sent by e-mail', () => {
 
   for (const [path, landing] of [
     ['/home', '/home/subscription'],
-    ['/home/saved-cards', '/home/saved-cards'],
-    ['/home/payment-methods', '/home/saved-cards'],
+    ['/home/saved-cards', '/home/billing'],
+    ['/home/payment-methods', '/home/billing'],
   ] as const) {
     test(`${path} asks a signed-out visitor to sign in`, async ({ page }) => {
       await page.goto(path);

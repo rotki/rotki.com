@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ContextColorsType } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
+import { requiresHardReload } from '~/utils/navigation';
 
 defineOptions({
   inheritAttrs: false,
@@ -32,23 +33,6 @@ defineSlots<{
   append: () => void;
 }>();
 
-// Routes that require hard reloads due to special CSP configurations
-const SPECIAL_CSP_ROUTES = [
-  // Payment routes (/pricing is an alias of /checkout/pay and shares its CSP)
-  '/pricing',
-  '/checkout/pay',
-  '/checkout/pay/card',
-  '/checkout/pay/crypto',
-  '/checkout/pay/method',
-  '/checkout/pay/paypal',
-  '/checkout/pay/request-crypto',
-  // Auth routes
-  '/signup',
-  '/password/recover',
-  // Sponsor routes
-  '/sponsor',
-] as const;
-
 /**
  * Determine if this link should be treated as external (forcing hard reload)
  */
@@ -66,25 +50,6 @@ const linkTarget = computed<string>(() => {
   }
   return '_self';
 });
-
-/**
- * Check if a route requires hard reload due to special CSP configuration
- */
-function requiresHardReload(route: RouteLocationRaw): boolean {
-  if (typeof route === 'string') {
-    return SPECIAL_CSP_ROUTES.some(cspRoute =>
-      route === cspRoute || (cspRoute === '/sponsor' && route.startsWith('/sponsor')),
-    );
-  }
-
-  if (typeof route === 'object' && route.path) {
-    return SPECIAL_CSP_ROUTES.some(cspRoute =>
-      route.path === cspRoute || (cspRoute === '/sponsor' && route.path?.startsWith('/sponsor')),
-    );
-  }
-
-  return false;
-}
 
 function getColor(active: boolean, exact: boolean): ContextColorsType | undefined {
   if ((highlightActive && active) || (highlightExactActive && exact)) {

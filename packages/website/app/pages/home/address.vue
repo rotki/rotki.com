@@ -1,15 +1,10 @@
 <script lang="ts" setup>
-import AccountAddress from '~/components/account/home/AccountAddress.vue';
-import { usePageSeoNoIndex } from '~/composables/use-page-seo';
-
-usePageSeoNoIndex('Address');
-
 definePageMeta({
-  auth: true,
-  layout: 'account',
+  // In-app visits reload into Billing, so it arrives with the CSP its card forms need
+  middleware: () => navigateTo('/home/billing', { external: true, replace: true }),
 });
 </script>
 
 <template>
-  <AccountAddress />
+  <div />
 </template>

@@ -509,10 +509,10 @@ onUnmounted(async () => {
           >
             No VAT Reverse charge applied. Your VAT ID could not be verified. Update it in
             <a
-              :href="`${paths.hostUrlBase}/home/customer-information`"
+              :href="`${paths.hostUrlBase}/home/billing`"
               class="font-medium underline"
             >
-              Customer Information
+              Billing
             </a>.
           </div>
 

@@ -130,8 +130,13 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 	// /pricing is not one: it is a prerendered alias of /checkout/pay with a canonical.
 	permanentRedirects := map[string]string{
 		"/sponsor": "/sponsor/mint",
-		// Renamed in January 2026; payment failure emails from the Python backend still link here.
-		"/home/payment-methods": "/home/saved-cards",
+		// Payment failure emails from the Python backend link to these two; the card list now lives on Billing.
+		"/home/payment-methods": "/home/billing",
+		"/home/saved-cards":     "/home/billing",
+		// Account tabs merged into Billing and Account in October 2026.
+		"/home/customer-information": "/home/billing",
+		"/home/address":              "/home/billing",
+		"/home/email-preferences":    "/home/account-details",
 	}
 	for from, to := range permanentRedirects {
 		mux.HandleFunc(from, func(w http.ResponseWriter, r *http.Request) {

@@ -49,3 +49,9 @@ export function formatCurrency(value: number, decimals = 2): string {
     minimumFractionDigits: decimals,
   });
 }
+
+/** Formats a decimal amount the API sends as a string, leaving it as it is when it does not parse. */
+export function formatDecimalString(value: string): string {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? formatCurrency(parsed) : value;
+}

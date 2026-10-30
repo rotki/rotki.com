@@ -35,23 +35,29 @@ async function resend(): Promise<void> {
 </script>
 
 <template>
-  <RuiAlert type="warning">
-    {{ t('account.unverified_email.message.description') }}
-    <RuiButton
-      color="secondary"
-      size="sm"
-      class="mt-2"
-      @click="resend()"
-    >
-      <template #prepend>
-        <RuiIcon
-          name="lu-mail"
-          size="20"
-        />
-      </template>
-      {{ t('account.unverified_email.resend') }}
-    </RuiButton>
-  </RuiAlert>
+  <div
+    role="status"
+    class="border-b border-rui-warning/30 bg-rui-warning/10"
+  >
+    <div class="container py-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <RuiIcon
+        name="lu-mail"
+        size="18"
+        class="shrink-0 text-rui-warning-darker"
+      />
+      <p class="flex-1 min-w-60 text-body-2 text-rui-text">
+        {{ t('account.unverified_email.message.description') }}
+      </p>
+      <RuiButton
+        color="primary"
+        variant="outlined"
+        size="sm"
+        @click="resend()"
+      >
+        {{ t('account.unverified_email.resend') }}
+      </RuiButton>
+    </div>
+  </div>
 
   <FloatingNotification
     type="success"

@@ -176,8 +176,9 @@ parameter breaks links in emails people already have, so sync any change with th
 | `/home`                                                      | Invoice                                        |
 | `/home/saved-cards`                                          | Payment failed, authorization failed, past due |
 
-`/home/payment-methods`, the old name of the saved cards page, still appears in sent emails. The
-Go server redirects it to `/home/saved-cards`; keep that redirect.
+Saved cards now live on `/home/billing`. The Go server redirects `/home/saved-cards` and its older
+name `/home/payment-methods`, which still appears in sent emails, to `/home/billing`; keep both
+redirects.
 
 ## License
 
