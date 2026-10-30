@@ -3,27 +3,49 @@ package csp
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/rotki/rotki.com/backend/internal/validate"
+	"github.com/rotki/rotki.com/backend/internal/version"
 )
 
 const maxReportSize = 8 * 1024 // 8KB
 
+// Wire formats a report can arrive in, logged as report_format.
+const (
+	reportFormatReportURI    = "report-uri"
+	reportFormatReportingAPI = "reporting-api"
+)
+
+// Filter reasons, shared by the response body and the "CSP report filtered"
+// log line. Grafana queries match on these values, so keep them stable.
+const (
+	reasonSuspiciousPattern = "suspicious-pattern"
+	reasonBrowserExtension  = "browser-extension"
+	reasonFalsePositive     = "false-positive"
+	reasonLocalhostDev      = "localhost-development"
+	reasonBotTraffic        = "bot-traffic"
+)
+
 // Known false positive patterns to filter out.
+//
+// Reports with a blocked URI of "eval" or "inline" are deliberately not listed:
+// script-src already allows 'unsafe-eval', so an eval report that still arrives
+// points at a page whose policy differs, which is worth seeing.
 var knownFalsePositives = []*regexp.Regexp{
 	// Browser prefetch/preconnect
 	regexp.MustCompile(`^https?://[\da-z.-]+/(favicon\.ico|apple-touch-icon|robots\.txt)$`),
-	// Common CDN eval/inline issues
-	regexp.MustCompile(`(?i)eval|unsafe-eval|unsafe-inline`),
 	// Data URIs for images
 	regexp.MustCompile(`^data:image/(svg\+xml|png|jpeg|gif|webp);base64`),
 }
@@ -43,6 +65,10 @@ var extensionPattern = regexp.MustCompile(`^(moz|chrome|safari|edge|webkit)-exte
 
 // Bot/crawler user agent patterns.
 var botPattern = regexp.MustCompile(`(?i)bot|crawler|spider|scraper|headless|puppeteer|playwright`)
+
+// noncePattern matches per-request nonce sources so that policy_hash is stable
+// across requests to the same page.
+var noncePattern = regexp.MustCompile(`'nonce-[^']*'`)
 
 // Handler handles CSP violation reports.
 type Handler struct {
@@ -72,6 +98,9 @@ type cspReport struct {
 	SourceFile         string `json:"source-file"`
 	StatusCode         int    `json:"status-code"`
 	ViolatedDirective  string `json:"violated-directive"`
+
+	// format is the wire format the report arrived in (not part of the payload).
+	format string
 }
 
 type cspReportWrapper struct {
@@ -198,22 +227,26 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 	reportStr := strings.Join(reportFields, " ")
 	for _, pattern := range suspiciousPatterns {
 		if pattern.MatchString(reportStr) {
-			h.logger.Warn("suspicious CSP report pattern detected", "ip", clientIP)
+			h.logger.Warn("suspicious CSP report pattern detected",
+				"reason", reasonSuspiciousPattern,
+				"ip", clientIP,
+				"effective_directive", sanitize(report.EffectiveDirective, 100),
+			)
 			return http.StatusOK, cspResponse{
 				Message: "Report filtered due to suspicious content",
 				Status:  "filtered",
-				Reason:  "suspicious-pattern",
+				Reason:  reasonSuspiciousPattern,
 			}, nil
 		}
 	}
 
 	// Filter browser extension violations
 	if extensionPattern.MatchString(report.SourceFile) || extensionPattern.MatchString(report.BlockedURI) {
-		h.logger.Debug("CSP violation from browser extension filtered")
+		h.logFiltered(reasonBrowserExtension, report, clientIP)
 		return http.StatusOK, cspResponse{
 			Message: "Browser extension violation filtered out",
 			Status:  "ignored",
-			Reason:  "browser-extension",
+			Reason:  reasonBrowserExtension,
 		}, nil
 	}
 
@@ -221,11 +254,11 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 	if report.BlockedURI != "" {
 		for _, pattern := range knownFalsePositives {
 			if pattern.MatchString(report.BlockedURI) {
-				h.logger.Debug("known false positive filtered", "blocked_uri", report.BlockedURI)
+				h.logFiltered(reasonFalsePositive, report, clientIP)
 				return http.StatusOK, cspResponse{
 					Message: "Known false positive filtered",
 					Status:  "ignored",
-					Reason:  "false-positive",
+					Reason:  reasonFalsePositive,
 				}, nil
 			}
 		}
@@ -234,40 +267,39 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 	// Filter localhost inline/eval in development
 	if strings.Contains(report.DocumentURI, "localhost") &&
 		(report.BlockedURI == "inline" || report.BlockedURI == "eval") {
-		h.logger.Debug("localhost inline/eval violation filtered")
+		h.logFiltered(reasonLocalhostDev, report, clientIP)
 		return http.StatusOK, cspResponse{
 			Message: "Localhost development violation filtered",
 			Status:  "ignored",
-			Reason:  "localhost-development",
+			Reason:  reasonLocalhostDev,
 		}, nil
 	}
 
 	// Filter bot traffic
 	if botPattern.MatchString(userAgent) {
-		h.logger.Debug("CSP violation from bot/crawler filtered")
+		h.logFiltered(reasonBotTraffic, report, clientIP)
 		return http.StatusOK, cspResponse{
 			Message: "Bot/crawler violation filtered",
 			Status:  "ignored",
-			Reason:  "bot-traffic",
+			Reason:  reasonBotTraffic,
 		}, nil
 	}
 
-	// Log the violation with sanitized fields
-	violationType := report.ViolatedDirective
-	if idx := strings.IndexByte(violationType, ' '); idx > 0 {
-		violationType = violationType[:idx]
-	}
-
-	h.logger.Error("CSP violation detected",
+	// Client reports are not server errors, so they log at Warn.
+	h.logger.Warn("CSP violation detected",
 		"blocked_uri", sanitize(report.BlockedURI, 500),
 		"column_number", report.ColumnNumber,
 		"disposition", sanitize(report.Disposition, 20),
 		"document_uri", sanitize(report.DocumentURI, 500),
 		"effective_directive", sanitize(report.EffectiveDirective, 100),
+		"git_sha", version.GitSHA,
 		"ip", clientIP,
 		"line_number", report.LineNumber,
 		"original_policy", sanitize(report.OriginalPolicy, 1200),
+		"own_document", isOwnDocument(report.DocumentURI),
+		"policy_hash", policyHash(report.OriginalPolicy),
 		"referrer", sanitize(report.Referrer, 500),
+		"report_format", report.format,
 		"script_sample", sanitize(report.ScriptSample, 100),
 		"source_file", sanitize(report.SourceFile, 500),
 		"status_code", report.StatusCode,
@@ -276,25 +308,40 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 		"violated_directive", sanitize(report.ViolatedDirective, 100),
 	)
 
-	blockedResource := sanitize(report.BlockedURI, 100)
-	if blockedResource == "" {
-		blockedResource = "inline"
-	}
-	documentURI := sanitize(report.DocumentURI, 100)
-	if documentURI == "" {
-		documentURI = "unknown"
-	}
-
-	h.logger.Warn("CSP violation summary",
-		"type", violationType,
-		"blocked", blockedResource,
-		"document", documentURI,
-	)
-
 	return http.StatusOK, cspResponse{
 		Message: "CSP violation report received and logged",
 		Success: true,
 	}, nil
+}
+
+// logFiltered records a report that was dropped by one of the noise filters.
+// It logs at Info with a single stable message so dashboards can count
+// filtered reports per reason without treating them as violations.
+func (h *Handler) logFiltered(reason string, report cspReport, clientIP string) {
+	h.logger.Info("CSP report filtered",
+		"reason", reason,
+		"ip", clientIP,
+		"effective_directive", sanitize(report.EffectiveDirective, 100),
+	)
+}
+
+// policyHash returns a short hash of the reported policy with nonces removed,
+// so reports from the same page and deploy share a value.
+func policyHash(policy string) string {
+	normalized := strings.Join(strings.Fields(noncePattern.ReplaceAllString(policy, "")), " ")
+	sum := sha256.Sum256([]byte(normalized))
+	return hex.EncodeToString(sum[:6])
+}
+
+// isOwnDocument reports whether the document URI is on rotki.com or one of its
+// subdomains, as opposed to a mirror, proxy or forged report.
+func isOwnDocument(documentURI string) bool {
+	u, err := url.Parse(documentURI)
+	if err != nil {
+		return false
+	}
+	host := strings.ToLower(u.Hostname())
+	return host == "rotki.com" || strings.HasSuffix(host, ".rotki.com")
 }
 
 // readCSPReports decodes one or more CSP violation reports from the request
@@ -339,7 +386,9 @@ func readCSPReports(r *http.Request) ([]cspReport, error) {
 			if batch[i].Type != "" && batch[i].Type != "csp-violation" {
 				continue
 			}
-			reports = append(reports, normalizeReportingAPIReport(&batch[i]))
+			report := normalizeReportingAPIReport(&batch[i])
+			report.format = reportFormatReportingAPI
+			reports = append(reports, report)
 		}
 		return reports, nil
 	}
@@ -349,7 +398,9 @@ func readCSPReports(r *http.Request) ([]cspReport, error) {
 	if err := json.Unmarshal(data, &wrapper); err != nil {
 		return nil, errors.New("invalid request body")
 	}
-	return []cspReport{fillDirectives(wrapper.CSPReport)}, nil
+	report := fillDirectives(wrapper.CSPReport)
+	report.format = reportFormatReportURI
+	return []cspReport{report}, nil
 }
 
 // normalizeReportingAPIReport maps a Reporting API report onto the internal
