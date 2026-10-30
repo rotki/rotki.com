@@ -1,7 +1,7 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { type Subscription as UserSubscription, type UserSubscriptions, UserSubscriptionsSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive, isSubActive, isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
-import { get, set } from '@vueuse/shared';
+import { get } from '@vueuse/shared';
 import { useAuthHintCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 
@@ -23,14 +23,12 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const authHint = useAuthHintCookie();
 
-  const initialLoading = shallowRef<boolean>(true);
-
   const {
-    data: userSubscriptions,
+    data,
     error,
     pending: loading,
     refresh,
-  } = useAsyncData<UserSubscription[]>(
+  } = useAsyncData<UserSubscription[] | undefined>(
     'user-subscriptions',
     async () => {
       if (!get(authHint)) {
@@ -53,11 +51,19 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
     },
     {
       dedupe: 'defer',
-      default: () => [] satisfies UserSubscription[],
+      default: () => undefined,
       lazy: true,
       server: false,
     },
   );
+
+  const userSubscriptions = computed<UserSubscription[]>(() => get(data) ?? []);
+
+  /**
+   * True until the first fetch settles: the data is shared under its key, so a caller created after
+   * the request finished sees it at once, and a refresh keeps the previous list.
+   */
+  const initialLoading = computed<boolean>(() => get(data) === undefined);
 
   /**
    * Returns the active subscription (truly active, not pending)
@@ -76,12 +82,6 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
     get(userSubscriptions).find(sub => isSubActive(sub) || isCancelledButActive(sub) || isSubPending(sub) || isSubRequestingUpgrade(sub)),
   );
 
-  watch(loading, (isLoading) => {
-    if (!isLoading && get(initialLoading)) {
-      set(initialLoading, false);
-    }
-  });
-
   watch(error, (newError) => {
     if (newError) {
       logger.error('Subscription fetch error:', newError);
@@ -91,9 +91,9 @@ export function useUserSubscriptions(): UseUserSubscriptionsReturn {
   return {
     activeOrPendingSubscription,
     activeSubscription,
-    initialLoading: readonly(initialLoading),
+    initialLoading,
     loading: readonly(loading),
     refresh,
-    userSubscriptions: shallowReadonly(userSubscriptions),
+    userSubscriptions,
   };
 }

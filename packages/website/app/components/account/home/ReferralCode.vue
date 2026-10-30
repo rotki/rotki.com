@@ -113,78 +113,63 @@ onMounted(async () => {
 
 <template>
   <ReferralCodeSkeleton v-if="initialLoading" />
-  <div v-else>
-    <div class="text-h6 mb-6">
-      {{ t('account.referral_code.title') }}
+  <div
+    v-else-if="hasReferralCode"
+    class="space-y-5"
+  >
+    <div class="flex flex-col md:flex-row md:items-center gap-4">
+      <RuiTextField
+        id="referral-code"
+        :model-value="referralCode"
+        :disabled="loading"
+        :label="t('account.referral_code.code')"
+        readonly
+        dense
+        details="hidden"
+        color="primary"
+        class="md:flex-1 [&_input]:font-mono"
+      >
+        <template #append>
+          <div class="h-6 border-r border-rui-grey-400 ml-2 mr-1" />
+          <CopyButton :model-value="referralCode" />
+        </template>
+      </RuiTextField>
     </div>
 
-    <RuiCard
-      variant="flat"
-      class="bg-rui-grey-50! dark:bg-rui-grey-900! p-1 border border-rui-grey-300 dark:border-rui-grey-800"
+    <ReferralShareButtons :buttons="shareButtons" />
+
+    <p
+      v-if="discountText"
+      class="flex items-start gap-2 text-body-2 text-rui-text-secondary"
     >
-      <div
-        v-if="hasReferralCode"
-        class="min-h-40 space-y-4"
-      >
-        <div class="text-body-2 text-rui-text-secondary mb-8">
-          {{ t('account.referral_code.share_description') }}
-        </div>
+      <RuiIcon
+        name="lu-gift"
+        size="16"
+        class="mt-0.5 shrink-0 text-rui-success"
+      />
+      {{ discountText }}
+    </p>
+  </div>
 
-        <div class="flex flex-col md:flex-row md:items-center gap-4">
-          <RuiTextField
-            id="referral-code"
-            :model-value="referralCode"
-            :disabled="loading"
-            :label="t('account.referral_code.code')"
-            readonly
-            dense
-            hide-details
-            color="primary"
-            class="md:flex-1 [&_input]:font-mono"
-          >
-            <template #append>
-              <div class="h-6 border-r border-rui-grey-400 ml-2 mr-1" />
-              <CopyButton :model-value="referralCode" />
-            </template>
-          </RuiTextField>
-
-          <ReferralShareButtons :buttons="shareButtons" />
-        </div>
-
-        <RuiAlert
-          v-if="discountText"
-          type="success"
-          icon="lu-gift"
-          class="border border-rui-success/50"
-        >
-          <template #title>
-            <b>{{ t('account.referral_code.discount_benefit') }}</b>
-          </template>
-          {{ discountText }}
-        </RuiAlert>
-      </div>
-
-      <div
-        v-else
-        class="min-h-40 flex flex-col items-center justify-center gap-4"
-      >
-        <div class="text-body-2 text-rui-text-secondary">
-          {{ t('account.referral_code.not_created') }}
-        </div>
-        <RuiButton
-          color="primary"
-          :loading="loading"
-          @click="generateCode()"
-        >
-          <template #prepend>
-            <RuiIcon
-              name="lu-plus"
-              size="18"
-            />
-          </template>
-          {{ t('actions.create') }}
-        </RuiButton>
-      </div>
-    </RuiCard>
+  <div
+    v-else
+    class="flex flex-col items-start gap-4"
+  >
+    <p class="text-body-2 text-rui-text-secondary">
+      {{ t('account.referral_code.not_created') }}
+    </p>
+    <RuiButton
+      color="primary"
+      :loading="loading"
+      @click="generateCode()"
+    >
+      <template #prepend>
+        <RuiIcon
+          name="lu-plus"
+          size="16"
+        />
+      </template>
+      {{ t('actions.create') }}
+    </RuiButton>
   </div>
 </template>

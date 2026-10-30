@@ -1,0 +1,281 @@
+<script lang="ts" setup>
+import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import { PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
+import { parseBraintreeError } from '@rotki/sigil';
+import { objectPick } from '@vueuse/core';
+import { get, set } from '@vueuse/shared';
+import AccountSection from '~/components/account/home/AccountSection.vue';
+import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
+import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCardDialog.vue';
+import AccountPaymentCard from '~/components/account/home/payment-methods/PaymentCard.vue';
+import PaymentCardSkeleton from '~/components/account/home/payment-methods/PaymentCardSkeleton.vue';
+import ThreeDSecureModal, { type ThreeDSecureVerificationData } from '~/components/account/home/payment-methods/ThreeDSecureModal.vue';
+import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
+import { useEmailConfirmedCookie } from '~/composables/use-fetch-with-csrf';
+import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
+import { useMainStore } from '~/store';
+import { useLogger } from '~/utils/use-logger';
+
+interface CardOperation {
+  mode: 'default' | 'reauthorize';
+  token: string;
+}
+
+const { t } = useI18n({ useScope: 'global' });
+const logger = useLogger('payment-methods');
+const { userMessageFor } = usePaymentErrorMessage();
+
+const showAddCardDialog = ref<boolean>(false);
+const showDeleteDialog = ref<boolean>(false);
+const showThreeDSecureModal = ref<boolean>(false);
+const isReauthorization = ref<boolean>(false);
+const deletingCard = ref<boolean>(false);
+
+const cardOperation = ref<CardOperation>();
+const cardToDelete = ref<SavedCard>();
+const verificationData = ref<ThreeDSecureVerificationData>();
+
+const error = ref<{ title: string; message: string }>();
+
+const { account } = storeToRefs(useMainStore());
+const emailConfirmed = useEmailConfirmedCookie();
+
+const { cards, loading: cardsLoading, refresh: refreshCards } = usePaymentCards();
+const { activeSubscription, loading: subscriptionsLoading, refresh: refreshSubscriptions } = useUserSubscriptions();
+
+const loading = computed<boolean>(() => get(cardsLoading) || get(subscriptionsLoading));
+const hasCards = computed<boolean>(() => get(cards).length > 0);
+const hasActiveSubscription = computed<boolean>(() => !!get(account)?.hasActiveSubscription);
+const hasActiveCryptoSubscription = computed<boolean>(() =>
+  get(activeSubscription)?.paymentProvider === PaymentProvider.CRYPTO,
+);
+
+function confirmDeleteCard(card: SavedCard): void {
+  set(cardToDelete, card);
+  set(showDeleteDialog, true);
+}
+
+function handleDeleteError(deleteError: { title: string; message: string }): void {
+  set(error, deleteError);
+}
+
+async function handleDeleteSuccess(): Promise<void> {
+  set(cardToDelete, undefined);
+  await Promise.all([refreshCards(), refreshSubscriptions()]);
+}
+
+async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Promise<void> {
+  set(error, undefined);
+  set(isReauthorization, isReauth);
+
+  const actionType = isReauth ? 'reauthorization' : 'card verification';
+  const mode = isReauth ? 'reauthorize' : 'default';
+
+  try {
+    set(cardOperation, { mode, token: card.token });
+
+    const active = get(activeSubscription);
+
+    if (!active) {
+      logger.error(`No active subscription found for 3DS ${actionType}`);
+      set(error, {
+        title: t('common.error'),
+        message: t('home.account.payment_methods.no_active_subscription'),
+      });
+      return;
+    }
+
+    // Prevent card operations for crypto subscriptions
+    if (active.paymentProvider === PaymentProvider.CRYPTO) {
+      logger.error(`Cannot perform ${actionType} on crypto subscription`);
+      set(error, {
+        title: t('common.error'),
+        message: t('home.account.payment_methods.crypto_subscription_no_card_operations'),
+      });
+      return;
+    }
+
+    set(verificationData, {
+      cardToken: card.token,
+      cardLast4: card.last4,
+      cardExpiresAt: card.expiresAt,
+      subscriptionData: objectPick(active, ['nextBillingAmount', 'nextActionDate', 'durationInMonths']),
+    });
+    set(showThreeDSecureModal, true);
+  }
+  catch (_error: any) {
+    logger.error(`Failed to initialize ${actionType}:`, _error);
+    set(error, {
+      title: t('common.error'),
+      message: _error.message || t('common.error_occurred'),
+    });
+  }
+  finally {
+    set(cardOperation, undefined);
+  }
+}
+
+async function handleSetDefault(card: SavedCard): Promise<void> {
+  if (card.linked) {
+    return;
+  }
+  await initiate3DSVerification(card, false);
+}
+
+async function handleReauthorize(card: SavedCard): Promise<void> {
+  await initiate3DSVerification(card, true);
+}
+
+async function handleThreeDSecureSuccess(): Promise<void> {
+  set(showThreeDSecureModal, false);
+  set(verificationData, undefined);
+  await Promise.all([refreshCards(), refreshSubscriptions()]);
+}
+
+function handleThreeDSecureError(verifyError: Error): void {
+  logger.error('3DS verification failed:', verifyError);
+  set(error, {
+    title: t('common.error'),
+    message: userMessageFor(parseBraintreeError(verifyError), 'card'),
+  });
+  set(showThreeDSecureModal, false);
+  set(verificationData, undefined);
+}
+
+async function handleAddCardSuccess(): Promise<void> {
+  await Promise.all([refreshCards(), refreshSubscriptions()]);
+}
+
+function isCardLoading(card: SavedCard): boolean {
+  const operation = get(cardOperation);
+  return operation?.token === card.token && (operation.mode === 'default' || operation.mode === 'reauthorize');
+}
+
+function isCardDeleting(card: SavedCard): boolean {
+  return get(deletingCard) && get(cardToDelete)?.token === card.token;
+}
+
+function getCardTooltip(card: SavedCard): string | undefined {
+  if (card.linked) {
+    return t('home.account.payment_methods.cannot_delete_linked_card');
+  }
+  return undefined;
+}
+</script>
+
+<template>
+  <AccountSection
+    :title="t('account.billing.cards.title')"
+    :description="t('account.billing.cards.description')"
+  >
+    <template #actions>
+      <RuiButton
+        color="primary"
+        variant="outlined"
+        :disabled="!emailConfirmed"
+        @click="showAddCardDialog = true"
+      >
+        <template #prepend>
+          <RuiIcon
+            name="lu-plus"
+            size="16"
+          />
+        </template>
+        {{ t('home.account.payment_methods.add_card') }}
+      </RuiButton>
+    </template>
+
+    <PaymentCardSkeleton v-if="cardsLoading && !hasCards" />
+
+    <div
+      v-else
+      class="relative"
+    >
+      <!-- Loading overlay for refreshes -->
+      <div
+        v-if="loading"
+        class="absolute inset-0 bg-white/80 dark:bg-rui-grey-900/80 backdrop-blur-xs z-10 flex items-center justify-center rounded-lg"
+      >
+        <RuiProgress
+          variant="indeterminate"
+          size="48"
+          circular
+          color="primary"
+        />
+      </div>
+      <RuiAlert
+        v-if="error"
+        type="error"
+        class="mb-4"
+        :title="error.title"
+        closeable
+        @close="error = undefined"
+      >
+        {{ error.message }}
+      </RuiAlert>
+
+      <div
+        v-if="hasCards"
+        class="flex flex-col gap-2"
+      >
+        <AccountPaymentCard
+          v-for="card in cards"
+          :key="card.token"
+          :card="card"
+          :loading="isCardLoading(card)"
+          :disabled="!emailConfirmed || !!cardOperation || deletingCard || hasActiveCryptoSubscription"
+          :deletion="{
+            deleting: isCardDeleting(card),
+            disabled: card.linked,
+            tooltip: getCardTooltip(card),
+          }"
+          :is-linked="card.linked"
+          :show-link-button="hasActiveSubscription && !hasActiveCryptoSubscription"
+          @set-default="handleSetDefault(card)"
+          @reauthorize="handleReauthorize(card)"
+          @delete="confirmDeleteCard(card)"
+        />
+      </div>
+
+      <div
+        v-else
+        class="flex flex-col gap-2 items-center text-center rounded-lg border border-dashed border-default px-6 py-12"
+      >
+        <RuiIcon
+          name="lu-credit-card"
+          size="48"
+          class="text-rui-text-disabled mb-2"
+        />
+        <h3 class="text-h6 text-rui-text">
+          {{ t('home.account.payment_methods.no_cards') }}
+        </h3>
+        <p class="max-w-md text-body-2 text-rui-text-secondary text-pretty">
+          {{ t('home.account.payment_methods.no_cards_description') }}
+        </p>
+      </div>
+    </div>
+
+    <DeleteCardDialog
+      v-model="showDeleteDialog"
+      v-model:deleting="deletingCard"
+      :card="cardToDelete"
+      @success="handleDeleteSuccess()"
+      @error="handleDeleteError($event)"
+    />
+
+    <AddCardDialog
+      v-model="showAddCardDialog"
+      @success="handleAddCardSuccess()"
+    />
+
+    <ThreeDSecureModal
+      v-if="verificationData"
+      v-model="showThreeDSecureModal"
+      :verification-data="verificationData"
+      :is-reauthorization="isReauthorization"
+      @success="handleThreeDSecureSuccess()"
+      @error="handleThreeDSecureError($event)"
+    />
+  </AccountSection>
+</template>

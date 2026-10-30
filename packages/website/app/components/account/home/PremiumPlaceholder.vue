@@ -47,10 +47,10 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
       <div
         v-for="i in 4"
         :key="i"
-        class="flex items-start gap-2"
+        class="h-5 flex items-center gap-2"
       >
         <RuiSkeletonLoader
-          class="h-4 w-4 mt-0.5 shrink-0"
+          class="h-4 w-4 shrink-0"
           rounded="sm"
         />
         <div class="flex-1 flex items-baseline gap-1.5">
@@ -61,7 +61,7 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
     </div>
   </DefineFeaturesSkeleton>
 
-  <RuiCard class="border-l-4! border-l-rui-primary!">
+  <div class="rounded-lg border border-default p-5 md:p-7">
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex items-center gap-4">
@@ -71,9 +71,9 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
           <AppLogo size="2" />
         </div>
         <div class="flex-1">
-          <div class="text-h6 font-bold">
+          <h3 class="text-h6 text-rui-text">
             {{ t('navigation_menu.rotki_premium') }}
-          </div>
+          </h3>
           <div class="text-body-2 text-rui-text-secondary">
             {{ t('account.no_premium.tagline') }}
           </div>
@@ -137,7 +137,6 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
         >
           <RuiButton
             color="primary"
-            size="lg"
             class="w-full"
           >
             <template #prepend>
@@ -166,7 +165,6 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
           <RuiButton
             variant="outlined"
             color="primary"
-            size="lg"
             class="w-full"
           >
             {{ t('account.no_premium.view_all_plans') }}
@@ -174,5 +172,5 @@ const [DefineFeaturesSkeleton, ReuseFeaturesSkeleton] = createReusableTemplate()
         </NuxtLink>
       </div>
     </div>
-  </RuiCard>
+  </div>
 </template>

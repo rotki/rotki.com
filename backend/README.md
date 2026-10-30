@@ -175,10 +175,14 @@ Nuxt route rules only produce a meta-refresh page under the static preset, which
 as a 200, so permanent redirects live in the Go server (`permanentRedirects` in
 `internal/api/routing/routes.go`):
 
-| From                    | To                  | Why                                                        |
-| ----------------------- | ------------------- | ---------------------------------------------------------- |
-| `/sponsor`              | `/sponsor/mint`     | The sponsorship landing page                               |
-| `/home/payment-methods` | `/home/saved-cards` | Old name of the saved cards page, still linked from emails |
+| From                         | To                      | Why                                                    |
+| ---------------------------- | ----------------------- | ------------------------------------------------------ |
+| `/sponsor`                   | `/sponsor/mint`         | The sponsorship landing page                           |
+| `/home/payment-methods`      | `/home/billing`         | Old name of the saved cards page, linked from emails   |
+| `/home/saved-cards`          | `/home/billing`         | Saved cards moved to Billing, still linked from emails |
+| `/home/customer-information` | `/home/billing`         | Invoice details moved to Billing                       |
+| `/home/address`              | `/home/billing`         | Invoice details moved to Billing                       |
+| `/home/email-preferences`    | `/home/account-details` | E-mail preferences moved to Account                    |
 
 `/bespoke` answers `410 Gone`. `/pricing` is not a redirect: it is a prerendered alias of
 `/checkout/pay`, with the same CSP.

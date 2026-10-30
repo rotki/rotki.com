@@ -2,7 +2,7 @@
 import type { DataTableColumn } from '@rotki/ui-library';
 import type { CreditEntry } from '~/types/account';
 import { formatDate } from '~/utils/date';
-import { formatCurrency } from '~/utils/text';
+import { formatDecimalString } from '~/utils/text';
 
 defineProps<{
   rows: readonly CreditEntry[];
@@ -18,13 +18,8 @@ const cols = computed<DataTableColumn<CreditEntry>[]>(() => [
   { key: 'notes', label: t('account.credit.history.notes') },
 ]);
 
-function formatCreditAmount(value: string): string {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? formatCurrency(parsed) : value;
-}
-
 function formatEur(value: string): string {
-  return t('account.credit.balance_eur', { amount: formatCreditAmount(value) });
+  return t('account.credit.balance_eur', { amount: formatDecimalString(value) });
 }
 
 function isCredit(value: string): boolean {
@@ -55,7 +50,7 @@ function formatEntryType(value: string): string {
       <RuiChip
         size="sm"
         :color="isCredit(row.amountEur) ? 'success' : 'grey'"
-        variant="outlined"
+        variant="tonal"
       >
         {{ formatEntryType(row.entryType) }}
       </RuiChip>
