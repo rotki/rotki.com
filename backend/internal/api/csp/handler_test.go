@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
@@ -15,8 +14,8 @@ import (
 )
 
 func newTestHandler() *Handler {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
-	return NewHandler(logger)
+	h, _ := newLoggingTestHandler()
+	return h
 }
 
 const testOriginalPolicy = "default-src 'self'"
@@ -82,102 +81,6 @@ func TestCSPHandler_TooLarge(t *testing.T) {
 
 	if w.Code != http.StatusRequestEntityTooLarge {
 		t.Fatalf("expected 413, got %d", w.Code)
-	}
-}
-
-func TestCSPHandler_InvalidJSON(t *testing.T) {
-	h := newTestHandler()
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader("not json"))
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", w.Code)
-	}
-}
-
-func TestCSPHandler_MissingRequiredFields(t *testing.T) {
-	h := newTestHandler()
-	body := `{"csp-report": {"blocked-uri": "https://evil.com"}}`
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", w.Code)
-	}
-}
-
-func TestCSPHandler_FiltersBrowserExtension(t *testing.T) {
-	h := newTestHandler()
-	body := makeReport("chrome-extension://abc123", "https://rotki.com/", "script-src")
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", w.Code)
-	}
-	var resp cspResponse
-	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-		t.Fatal(err)
-	}
-	if resp.Reason != "browser-extension" {
-		t.Fatalf("expected reason=browser-extension, got %q", resp.Reason)
-	}
-}
-
-func TestCSPHandler_FiltersSuspiciousPattern(t *testing.T) {
-	h := newTestHandler()
-	body := makeReport("https://evil.com/<script>alert(1)</script>", "https://rotki.com/", "script-src")
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	var resp cspResponse
-	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-		t.Fatal(err)
-	}
-	if resp.Reason != "suspicious-pattern" {
-		t.Fatalf("expected reason=suspicious-pattern, got %q", resp.Reason)
-	}
-}
-
-func TestCSPHandler_FiltersFalsePositive(t *testing.T) {
-	h := newTestHandler()
-	body := makeReport("https://rotki.com/favicon.ico", "https://rotki.com/", "img-src")
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	var resp cspResponse
-	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-		t.Fatal(err)
-	}
-	if resp.Reason != "false-positive" {
-		t.Fatalf("expected reason=false-positive, got %q", resp.Reason)
-	}
-}
-
-func TestCSPHandler_FiltersLocalhostDev(t *testing.T) {
-	h := newTestHandler()
-	body := makeReport("inline", "http://localhost:3000/", "script-src")
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	var resp cspResponse
-	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-		t.Fatal(err)
-	}
-	if resp.Reason != "localhost-development" {
-		t.Fatalf("expected reason=localhost-development, got %q", resp.Reason)
 	}
 }
 
@@ -402,24 +305,6 @@ func TestCSPHandler_ReportingAPIDetectedWithoutContentType(t *testing.T) {
 	}
 }
 
-func TestCSPHandler_FiltersBotTraffic(t *testing.T) {
-	h := newTestHandler()
-	body := makeReport("https://evil.com/script.js", "https://rotki.com/", "script-src")
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
-	req.Header.Set("User-Agent", "Googlebot/2.1 (+http://www.google.com/bot.html)")
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	var resp cspResponse
-	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-		t.Fatal(err)
-	}
-	if resp.Reason != "bot-traffic" {
-		t.Fatalf("expected reason=bot-traffic, got %q", resp.Reason)
-	}
-}
-
 // newLoggingTestHandler returns a handler whose JSON log output is captured
 // at Debug level so tests can assert on messages, levels and fields.
 func newLoggingTestHandler() (*Handler, *bytes.Buffer) {
@@ -453,12 +338,23 @@ func singleRecord(t *testing.T, buf *bytes.Buffer) map[string]any {
 	return records[0]
 }
 
-func postReport(h *Handler, body, userAgent string) {
+func postReport(h *Handler, body, userAgent string) *httptest.ResponseRecorder {
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/csp/violation", strings.NewReader(body))
 	if userAgent != "" {
 		req.Header.Set("User-Agent", userAgent)
 	}
-	h.ServeHTTP(httptest.NewRecorder(), req)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+	return w
+}
+
+func decodeResponse(t *testing.T, w *httptest.ResponseRecorder) cspResponse {
+	t.Helper()
+	var resp cspResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal(err)
+	}
+	return resp
 }
 
 func TestCSPHandler_LogsDetectedViolationOnceAtWarn(t *testing.T) {
@@ -500,32 +396,40 @@ func TestCSPHandler_LogsReportingAPIFormat(t *testing.T) {
 	}
 }
 
-func TestCSPHandler_LogsFilteredReportsAtInfo(t *testing.T) {
+// Every filter answers with its reason and logs one line carrying the same
+// reason: Info "CSP report filtered" for noise, Warn for suspicious content.
+func TestCSPHandler_FiltersReports(t *testing.T) {
 	tests := []struct {
 		name      string
 		body      string
 		userAgent string
 		reason    string
+		msg       string
+		level     string
 	}{
-		{"browser extension", makeReport("chrome-extension://abc123", "https://rotki.com/", "script-src"), "", reasonBrowserExtension},
-		{"false positive", makeReport("https://rotki.com/favicon.ico", "https://rotki.com/", "img-src"), "", reasonFalsePositive},
-		{"localhost development", makeReport("inline", "http://localhost:3000/", "script-src"), "", reasonLocalhostDev},
-		{"bot traffic", makeReport("https://evil.com/script.js", "https://rotki.com/", "script-src"), "Googlebot/2.1", reasonBotTraffic},
+		{"browser extension", makeReport("chrome-extension://abc123", "https://rotki.com/", "script-src"), "", reasonBrowserExtension, "CSP report filtered", "INFO"},
+		{"false positive", makeReport("https://rotki.com/favicon.ico", "https://rotki.com/", "img-src"), "", reasonFalsePositive, "CSP report filtered", "INFO"},
+		{"localhost development", makeReport("inline", "http://localhost:3000/", "script-src"), "", reasonLocalhostDev, "CSP report filtered", "INFO"},
+		{"bot traffic", makeReport("https://evil.com/script.js", "https://rotki.com/", "script-src"), "Googlebot/2.1 (+http://www.google.com/bot.html)", reasonBotTraffic, "CSP report filtered", "INFO"},
+		{"suspicious pattern", makeReport("https://evil.com/<script>alert(1)</script>", "https://rotki.com/", "script-src"), "", reasonSuspiciousPattern, "suspicious CSP report pattern detected", "WARN"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h, buf := newLoggingTestHandler()
-			postReport(h, tt.body, tt.userAgent)
+			w := postReport(h, tt.body, tt.userAgent)
 
-			rec := singleRecord(t, buf)
-			if rec["msg"] != "CSP report filtered" {
-				t.Fatalf("unexpected msg %q", rec["msg"])
+			if w.Code != http.StatusOK {
+				t.Fatalf("expected 200, got %d", w.Code)
 			}
-			if rec["level"] != "INFO" {
-				t.Fatalf("expected level INFO, got %q", rec["level"])
+			if resp := decodeResponse(t, w); resp.Reason != tt.reason {
+				t.Fatalf("expected response reason=%s, got %q", tt.reason, resp.Reason)
+			}
+			rec := singleRecord(t, buf)
+			if rec["msg"] != tt.msg || rec["level"] != tt.level {
+				t.Fatalf("expected %s %q, got %v", tt.level, tt.msg, rec)
 			}
 			if rec["reason"] != tt.reason {
-				t.Fatalf("expected reason=%s, got %v", tt.reason, rec["reason"])
+				t.Fatalf("expected log reason=%s, got %v", tt.reason, rec["reason"])
 			}
 			if _, ok := rec["effective_directive"]; !ok {
 				t.Error("expected effective_directive field")
@@ -537,30 +441,47 @@ func TestCSPHandler_LogsFilteredReportsAtInfo(t *testing.T) {
 	}
 }
 
-func TestCSPHandler_LogsSuspiciousReportWithReason(t *testing.T) {
-	h, buf := newLoggingTestHandler()
-	postReport(h, makeReport("https://evil.com/<script>alert(1)</script>", "https://rotki.com/", "script-src"), "")
-
-	rec := singleRecord(t, buf)
-	if rec["msg"] != "suspicious CSP report pattern detected" || rec["level"] != "WARN" {
-		t.Fatalf("unexpected record %v", rec)
+// Eval reports are real signals now that script-src allows 'unsafe-eval', and
+// a public page that mentions localhost in its query is not development
+// traffic, so none of these may be dropped.
+func TestCSPHandler_DoesNotFilterRealViolations(t *testing.T) {
+	tests := []struct{ blocked, document string }{
+		{"eval", "https://rotki.com/"},
+		{"https://cdn.example.com/medieval.js", "https://rotki.com/"},
+		{"eval", "https://rotki.com/?ref=localhost"},
 	}
-	if rec["reason"] != reasonSuspiciousPattern {
-		t.Fatalf("expected reason=%s, got %v", reasonSuspiciousPattern, rec["reason"])
-	}
-}
-
-// Blocked URIs mentioning eval are real signals now that script-src allows
-// 'unsafe-eval', so they must not be dropped as false positives.
-func TestCSPHandler_DoesNotFilterEval(t *testing.T) {
-	for _, blocked := range []string{"eval", "https://cdn.example.com/medieval.js"} {
-		t.Run(blocked, func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.blocked+" on "+tt.document, func(t *testing.T) {
 			h, buf := newLoggingTestHandler()
-			postReport(h, makeReport(blocked, "https://rotki.com/", "script-src"), "")
+			postReport(h, makeReport(tt.blocked, tt.document, "script-src"), "")
 
 			rec := singleRecord(t, buf)
 			if rec["msg"] != "CSP violation detected" {
 				t.Fatalf("expected violation to be logged, got %v", rec)
+			}
+		})
+	}
+}
+
+func TestCSPHandler_RejectsInvalidReports(t *testing.T) {
+	tests := map[string]struct {
+		body string
+		msg  string
+	}{
+		"invalid json":   {"not json", "invalid CSP report format"},
+		"missing fields": {`{"csp-report": {"blocked-uri": "https://evil.com"}}`, "CSP report missing required fields"},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			h, buf := newLoggingTestHandler()
+			w := postReport(h, tt.body, "")
+
+			if w.Code != http.StatusBadRequest {
+				t.Fatalf("expected 400, got %d", w.Code)
+			}
+			rec := singleRecord(t, buf)
+			if rec["msg"] != tt.msg || rec["level"] != "WARN" {
+				t.Fatalf("expected WARN %q, got %v", tt.msg, rec)
 			}
 		})
 	}
@@ -580,71 +501,35 @@ func TestPolicyHash(t *testing.T) {
 	}
 }
 
-func TestIsOwnDocument(t *testing.T) {
-	tests := map[string]bool{
-		"https://rotki.com/":                 true,
-		"https://staging.rotki.com/checkout": true,
-		"https://ROTKI.com/":                 true,
-		"https://notrotki.com/":              false,
-		"https://rotki.com./":                true,
-		"https://rotki.com.evil.com/":        false,
-		"http://localhost:3000/":             false,
-		"about:blank":                        false,
-		"":                                   false,
-	}
-	for uri, want := range tests {
-		if got := isOwnDocument(uri); got != want {
-			t.Errorf("isOwnDocument(%q) = %v, want %v", uri, got, want)
-		}
-	}
-}
-
-func TestIsLocalhostDocument(t *testing.T) {
-	tests := map[string]bool{
-		"http://localhost:3000/":           true,
-		"https://app.localhost/":           true,
-		"http://127.0.0.1:3000/":           true,
-		"http://[::1]:3000/":               true,
-		"https://rotki.com/?ref=localhost": false,
-		"https://localhost.evil.com/":      false,
-		"https://rotki.com/":               false,
-	}
-	for uri, want := range tests {
-		if got := isLocalhostDocument(uri); got != want {
-			t.Errorf("isLocalhostDocument(%q) = %v, want %v", uri, got, want)
-		}
-	}
-}
-
-// A public page that mentions localhost in its query is not development
-// traffic, so its eval report must still be logged as a violation.
-func TestCSPHandler_DoesNotFilterLocalhostInQuery(t *testing.T) {
-	h, buf := newLoggingTestHandler()
-	postReport(h, makeReport("eval", "https://rotki.com/?ref=localhost", "script-src"), "")
-
-	rec := singleRecord(t, buf)
-	if rec["msg"] != "CSP violation detected" {
-		t.Fatalf("expected violation to be logged, got %v", rec)
-	}
-}
-
-func TestCSPHandler_LogsRejectedReportsAtWarn(t *testing.T) {
-	tests := map[string]struct {
-		body string
-		msg  string
+func TestDocumentHostClassification(t *testing.T) {
+	tests := []struct {
+		uri       string
+		own       bool
+		localhost bool
 	}{
-		"invalid json":   {"not json", "invalid CSP report format"},
-		"missing fields": {`{"csp-report": {"blocked-uri": "https://evil.com"}}`, "CSP report missing required fields"},
+		{"https://rotki.com/", true, false},
+		{"https://staging.rotki.com/checkout", true, false},
+		{"https://ROTKI.com/", true, false},
+		{"https://rotki.com./", true, false},
+		{"https://notrotki.com/", false, false},
+		{"https://rotki.com.evil.com/", false, false},
+		{"https://rotki.com/?ref=localhost", true, false},
+		{"https://localhost.evil.com/", false, false},
+		{"http://localhost:3000/", false, true},
+		{"https://app.localhost/", false, true},
+		{"http://127.0.0.1:3000/", false, true},
+		{"http://127.0.0.2/", false, true},
+		{"http://[::1]:3000/", false, true},
+		{"about:blank", false, false},
+		{"", false, false},
 	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			h, buf := newLoggingTestHandler()
-			postReport(h, tt.body, "")
-
-			rec := singleRecord(t, buf)
-			if rec["msg"] != tt.msg || rec["level"] != "WARN" {
-				t.Fatalf("expected WARN %q, got %v", tt.msg, rec)
-			}
-		})
+	for _, tt := range tests {
+		host := documentHost(tt.uri)
+		if got := isOwnHost(host); got != tt.own {
+			t.Errorf("isOwnHost(%q) = %v, want %v", tt.uri, got, tt.own)
+		}
+		if got := isLocalhost(host); got != tt.localhost {
+			t.Errorf("isLocalhost(%q) = %v, want %v", tt.uri, got, tt.localhost)
+		}
 	}
 }

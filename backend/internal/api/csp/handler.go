@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -78,7 +79,7 @@ type Handler struct {
 // NewHandler creates a new CSP violation handler.
 func NewHandler(logger *slog.Logger) *Handler {
 	return &Handler{
-		logger: logger.With("handler", "csp.violation"),
+		logger: logger.With("handler", "csp.violation", "git_sha", version.GitSHA),
 	}
 }
 
@@ -98,9 +99,6 @@ type cspReport struct {
 	SourceFile         string `json:"source-file"`
 	StatusCode         int    `json:"status-code"`
 	ViolatedDirective  string `json:"violated-directive"`
-
-	// format is the wire format the report arrived in (not part of the payload).
-	format string
 }
 
 type cspReportWrapper struct {
@@ -153,7 +151,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reports, err := readCSPReports(r)
+	reports, format, err := readCSPReports(r)
 	if err != nil {
 		h.logger.Warn("invalid CSP report format", "error", err)
 		validate.WriteJSON(w, http.StatusBadRequest, cspResponse{
@@ -178,7 +176,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Single report (the common legacy report-uri case): preserve the original
 	// per-report response semantics so callers see the precise filter reason.
 	if len(reports) == 1 {
-		status, resp, errs := h.evaluateReport(reports[0], clientIP, userAgent)
+		status, resp, errs := h.evaluateReport(reports[0], clientIP, userAgent, format)
 		if len(errs) > 0 {
 			h.logger.Warn("CSP report missing required fields", "errors", errs.Error())
 			errs.WriteJSON(w)
@@ -191,7 +189,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Reporting API batch: process every report for its side effects (filtering
 	// and structured logging) and return a single aggregate acknowledgement.
 	for _, report := range reports {
-		if _, _, errs := h.evaluateReport(report, clientIP, userAgent); len(errs) > 0 {
+		if _, _, errs := h.evaluateReport(report, clientIP, userAgent, format); len(errs) > 0 {
 			h.logger.Warn("CSP report missing required fields", "errors", errs.Error())
 		}
 	}
@@ -206,7 +204,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // and response body the handler should emit for a single-report request, plus
 // any validation errors (empty when the report is valid). All logging happens
 // as a side effect so batch callers can discard the returned response.
-func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (int, cspResponse, validate.Errors) {
+func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent, format string) (int, cspResponse, validate.Errors) {
 	// Validate required fields
 	if errs := validate.Collect(
 		validate.RequiredString("document-uri", report.DocumentURI),
@@ -227,11 +225,7 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 	reportStr := strings.Join(reportFields, " ")
 	for _, pattern := range suspiciousPatterns {
 		if pattern.MatchString(reportStr) {
-			h.logger.Warn("suspicious CSP report pattern detected",
-				"reason", reasonSuspiciousPattern,
-				"ip", clientIP,
-				"effective_directive", sanitize(report.EffectiveDirective, 100),
-			)
+			h.logger.Warn("suspicious CSP report pattern detected", filterAttrs(reasonSuspiciousPattern, report, clientIP)...)
 			return http.StatusOK, cspResponse{
 				Message: "Report filtered due to suspicious content",
 				Status:  "filtered",
@@ -242,47 +236,28 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 
 	// Filter browser extension violations
 	if extensionPattern.MatchString(report.SourceFile) || extensionPattern.MatchString(report.BlockedURI) {
-		h.logFiltered(reasonBrowserExtension, report, clientIP)
-		return http.StatusOK, cspResponse{
-			Message: "Browser extension violation filtered out",
-			Status:  "ignored",
-			Reason:  reasonBrowserExtension,
-		}, nil
+		return h.ignore(reasonBrowserExtension, "Browser extension violation filtered out", report, clientIP)
 	}
 
 	// Filter known false positives
 	if report.BlockedURI != "" {
 		for _, pattern := range knownFalsePositives {
 			if pattern.MatchString(report.BlockedURI) {
-				h.logFiltered(reasonFalsePositive, report, clientIP)
-				return http.StatusOK, cspResponse{
-					Message: "Known false positive filtered",
-					Status:  "ignored",
-					Reason:  reasonFalsePositive,
-				}, nil
+				return h.ignore(reasonFalsePositive, "Known false positive filtered", report, clientIP)
 			}
 		}
 	}
 
+	host := documentHost(report.DocumentURI)
+
 	// Filter localhost inline/eval in development
-	if isLocalhostDocument(report.DocumentURI) &&
-		(report.BlockedURI == "inline" || report.BlockedURI == "eval") {
-		h.logFiltered(reasonLocalhostDev, report, clientIP)
-		return http.StatusOK, cspResponse{
-			Message: "Localhost development violation filtered",
-			Status:  "ignored",
-			Reason:  reasonLocalhostDev,
-		}, nil
+	if (report.BlockedURI == "inline" || report.BlockedURI == "eval") && isLocalhost(host) {
+		return h.ignore(reasonLocalhostDev, "Localhost development violation filtered", report, clientIP)
 	}
 
 	// Filter bot traffic
 	if botPattern.MatchString(userAgent) {
-		h.logFiltered(reasonBotTraffic, report, clientIP)
-		return http.StatusOK, cspResponse{
-			Message: "Bot/crawler violation filtered",
-			Status:  "ignored",
-			Reason:  reasonBotTraffic,
-		}, nil
+		return h.ignore(reasonBotTraffic, "Bot/crawler violation filtered", report, clientIP)
 	}
 
 	// Client reports are not server errors, so they log at Warn.
@@ -292,14 +267,13 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 		"disposition", sanitize(report.Disposition, 20),
 		"document_uri", sanitize(report.DocumentURI, 500),
 		"effective_directive", sanitize(report.EffectiveDirective, 100),
-		"git_sha", version.GitSHA,
 		"ip", clientIP,
 		"line_number", report.LineNumber,
 		"original_policy", sanitize(report.OriginalPolicy, 1200),
-		"own_document", isOwnDocument(report.DocumentURI),
+		"own_document", isOwnHost(host),
 		"policy_hash", policyHash(report.OriginalPolicy),
 		"referrer", sanitize(report.Referrer, 500),
-		"report_format", report.format,
+		"report_format", format,
 		"script_sample", sanitize(report.ScriptSample, 100),
 		"source_file", sanitize(report.SourceFile, 500),
 		"status_code", report.StatusCode,
@@ -314,15 +288,26 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 	}, nil
 }
 
-// logFiltered records a report that was dropped by one of the noise filters.
-// It logs at Info with a single stable message so dashboards can count
-// filtered reports per reason without treating them as violations.
-func (h *Handler) logFiltered(reason string, report cspReport, clientIP string) {
-	h.logger.Info("CSP report filtered",
+// ignore records a report dropped by one of the noise filters and builds the
+// matching response. It logs at Info with a single stable message so
+// dashboards can count filtered reports per reason without treating them as
+// violations.
+func (h *Handler) ignore(reason, message string, report cspReport, clientIP string) (int, cspResponse, validate.Errors) {
+	h.logger.Info("CSP report filtered", filterAttrs(reason, report, clientIP)...)
+	return http.StatusOK, cspResponse{
+		Message: message,
+		Status:  "ignored",
+		Reason:  reason,
+	}, nil
+}
+
+// filterAttrs are the fields shared by every dropped-report log line.
+func filterAttrs(reason string, report cspReport, clientIP string) []any {
+	return []any{
 		"reason", reason,
 		"ip", clientIP,
 		"effective_directive", sanitize(report.EffectiveDirective, 100),
-	)
+	}
 }
 
 // policyHash returns a short hash of the reported policy with nonces removed,
@@ -343,19 +328,21 @@ func documentHost(documentURI string) string {
 	return strings.TrimSuffix(strings.ToLower(u.Hostname()), ".")
 }
 
-// isOwnDocument reports whether the document URI is on rotki.com or one of its
+// isOwnHost reports whether a document host is rotki.com or one of its
 // subdomains, as opposed to a mirror, proxy or forged report.
-func isOwnDocument(documentURI string) bool {
-	host := documentHost(documentURI)
+func isOwnHost(host string) bool {
 	return host == "rotki.com" || strings.HasSuffix(host, ".rotki.com")
 }
 
-// isLocalhostDocument reports whether the document URI is served from a local
-// development host. It matches the host only, so a public URL that merely
-// mentions localhost in its path or query is not treated as development.
-func isLocalhostDocument(documentURI string) bool {
-	host := documentHost(documentURI)
-	return host == "localhost" || strings.HasSuffix(host, ".localhost") || host == "127.0.0.1" || host == "::1"
+// isLocalhost reports whether a document host is a local development host.
+// It matches the host only, so a public URL that merely mentions localhost in
+// its path or query is not treated as development.
+func isLocalhost(host string) bool {
+	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // readCSPReports decodes one or more CSP violation reports from the request
@@ -370,28 +357,28 @@ func isLocalhostDocument(documentURI string) bool {
 // The format is detected by sniffing the first non-whitespace byte rather than
 // trusting Content-Type, since intermediaries occasionally rewrite it. Unknown
 // fields are silently ignored so browser-specific extras never cause a 400.
-func readCSPReports(r *http.Request) ([]cspReport, error) {
+func readCSPReports(r *http.Request) ([]cspReport, string, error) {
 	r.Body = http.MaxBytesReader(nil, r.Body, maxReportSize)
 
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		var maxBytesErr *http.MaxBytesError
 		if errors.As(err, &maxBytesErr) {
-			return nil, fmt.Errorf("request body too large (max %d bytes)", maxReportSize)
+			return nil, "", fmt.Errorf("request body too large (max %d bytes)", maxReportSize)
 		}
-		return nil, errors.New("invalid request body")
+		return nil, "", errors.New("invalid request body")
 	}
 
 	trimmed := bytes.TrimLeft(data, " \t\r\n")
 	if len(trimmed) == 0 {
-		return nil, errors.New("empty request body")
+		return nil, "", errors.New("empty request body")
 	}
 
 	// Reporting API batch: a JSON array of report objects.
 	if trimmed[0] == '[' {
 		var batch []reportingAPIReport
 		if err := json.Unmarshal(data, &batch); err != nil {
-			return nil, errors.New("invalid request body")
+			return nil, "", errors.New("invalid request body")
 		}
 		reports := make([]cspReport, 0, len(batch))
 		for i := range batch {
@@ -400,21 +387,17 @@ func readCSPReports(r *http.Request) ([]cspReport, error) {
 			if batch[i].Type != "" && batch[i].Type != "csp-violation" {
 				continue
 			}
-			report := normalizeReportingAPIReport(&batch[i])
-			report.format = reportFormatReportingAPI
-			reports = append(reports, report)
+			reports = append(reports, normalizeReportingAPIReport(&batch[i]))
 		}
-		return reports, nil
+		return reports, reportFormatReportingAPI, nil
 	}
 
 	// Legacy report-uri format: a single {"csp-report": {...}} object.
 	var wrapper cspReportWrapper
 	if err := json.Unmarshal(data, &wrapper); err != nil {
-		return nil, errors.New("invalid request body")
+		return nil, "", errors.New("invalid request body")
 	}
-	report := fillDirectives(wrapper.CSPReport)
-	report.format = reportFormatReportURI
-	return []cspReport{report}, nil
+	return []cspReport{fillDirectives(wrapper.CSPReport)}, reportFormatReportURI, nil
 }
 
 // normalizeReportingAPIReport maps a Reporting API report onto the internal
