@@ -81,7 +81,7 @@ function metadata(tier: TierKey, releaseId = CURRENT_RELEASE_ID): SimpleTokenMet
 }
 
 function submitDisabled(form: Form): boolean {
-  return !get(form.isAuthenticated) || get(form.v$).$invalid;
+  return !get(form.isAuthenticated) || get(form.invalid);
 }
 
 /** Lets the token-change watcher run fetchNftMetadata and reach (but not resolve) checkExistingSubmission. */

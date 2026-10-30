@@ -97,7 +97,7 @@ test.describe('signup test', () => {
     // An empty form stays on the step and says what is missing.
     await nextButton.click();
     await expect(page.locator('[data-cy=signup-note]')).toBeVisible();
-    await expect(page.getByText('Value is required').first()).toBeVisible();
+    await expect(page.getByText('This field is required.').first()).toBeVisible();
 
     await usernameInput.fill('username');
     await emailInput.fill('email@gmail.com');

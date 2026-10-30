@@ -34,8 +34,6 @@
     "@pinia/nuxt": "catalog:",
     "@rotki/card-payment-common": "workspace:*",
     "@rotki/sigil": "workspace:*",
-    "@vuelidate/core": "catalog:",
-    "@vuelidate/validators": "catalog:",
     "@vueuse/core": "catalog:",
     "@vueuse/math": "catalog:",
     "@vueuse/nuxt": "catalog:",

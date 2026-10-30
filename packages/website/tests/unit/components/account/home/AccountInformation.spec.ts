@@ -43,7 +43,6 @@ async function mountAccountInformation(newsletterConsent: boolean) {
   const account = ref<Account>(createAccount(newsletterConsent));
 
   mockUseProfileUpdate.mockReturnValue({
-    $externalResults: ref<Record<string, string[]>>({}),
     account,
     dismissDone: vi.fn(),
     done: ref<boolean>(false),

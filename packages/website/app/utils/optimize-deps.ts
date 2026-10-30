@@ -15,8 +15,6 @@ export const devOptimizeDeps: string[] = [
   '@rotki/ui-library/composables',
   '@vue/devtools-core',
   '@vue/devtools-kit',
-  '@vuelidate/core',
-  '@vuelidate/validators',
   'zod',
   'plainfp',
   'plainfp/interop/zod',

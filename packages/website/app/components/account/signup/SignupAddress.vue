@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import type { ValidationErrors } from '~/types/common';
 import type { SignupAddressPayload } from '~/types/signup';
-import { useVuelidate } from '@vuelidate/core';
-import { helpers, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import AuthHeading from '~/components/account/AuthHeading.vue';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
+import { useFormRules } from '~/composables/use-form-rules';
 import { useRecaptcha } from '~/composables/use-recaptcha';
-import { toMessages } from '~/utils/validation';
+import { useZodForm } from '~/composables/use-zod-form';
 
 const modelValue = defineModel<SignupAddressPayload>({ required: true });
 const captchaId = defineModel<number | undefined>('captchaId');
@@ -29,46 +29,34 @@ const emit = defineEmits<{
 }>();
 
 const terms = ref<boolean>(false);
-const $externalResults = ref<Record<string, string[]>>({});
 
 const { t } = useI18n({ useScope: 'global' });
-
-const rules = {
-  address1: { required },
-  address2: {},
-  city: { required },
-  postcode: {
-    required,
-    validateCode: helpers.withMessage(
-      'Enter a valid postal code. Only alphabets, numbers, space and -',
-      helpers.regex(/^[\d\sa-z-]+$/i),
-    ),
-  },
-  country: { required },
-  newsletterConsent: {},
-  captcha: { required },
-  terms: { checked: (value: boolean) => value },
-};
+const { required } = useFormRules();
 
 const {
   onError,
   onSuccess,
   onExpired,
+  recaptchaPassed,
   recaptchaToken,
 } = useRecaptcha();
 
-const v$ = useVuelidate(
-  rules,
-  computed(() => ({
-    ...get(modelValue),
-    captcha: recaptchaToken,
-    terms,
-  })),
-  {
-    $autoDirty: true,
-    $externalResults,
-  },
-);
+const form = useZodForm(z.object({
+  address1: required(),
+  address2: z.string(),
+  city: required(),
+  postcode: required().regex(/^[\d\sa-z-]+$/i, { error: t('validation.postcode') }),
+  country: required(),
+  newsletterConsent: z.boolean(),
+  captcha: required(),
+  terms: z.boolean().refine(accepted => accepted, { error: t('auth.signup.address.form.tos_required') }),
+}), () => ({
+  ...get(modelValue),
+  // A token the widget later reported an error for does not count as a passed captcha.
+  captcha: get(recaptchaPassed) ? get(recaptchaToken) : '',
+  terms: get(terms),
+}));
+const { errors, hasError, touch } = form;
 
 function updateValue(field: string, value: any): void {
   set(modelValue, {
@@ -81,8 +69,8 @@ function setCaptchaId(id: number): void {
   set(captchaId, id);
 }
 
-async function finish(): Promise<void> {
-  if (!await get(v$).$validate())
+function finish(): void {
+  if (!form.validate())
     return;
 
   emit('finish', {
@@ -91,10 +79,10 @@ async function finish(): Promise<void> {
   });
 }
 
-watch(() => externalResults, (errors) => {
-  set($externalResults, errors);
-  if (Object.values(errors).some(i => !!i))
-    get(v$).$validate();
+watch(() => externalResults, (fieldErrors) => {
+  form.setExternalErrors(fieldErrors);
+  if (Object.values(fieldErrors).some(Boolean))
+    form.validate();
 }, { immediate: true });
 </script>
 
@@ -114,9 +102,9 @@ watch(() => externalResults, (errors) => {
         autofocus
         dense
         :label="t('auth.signup.address.form.address_line_1')"
-        :error-messages="toMessages(v$.address1)"
+        :error-messages="errors('address1')"
         @update:model-value="updateValue('address1', $event)"
-        @blur="v$.address1.$touch()"
+        @blur="touch('address1')"
       />
       <RuiTextField
         id="address-2"
@@ -127,9 +115,9 @@ watch(() => externalResults, (errors) => {
         dense
         :label="t('auth.signup.address.form.address_line_2')"
         :hint="t('auth.common.optional')"
-        :error-messages="toMessages(v$.address2)"
+        :error-messages="errors('address2')"
         @update:model-value="updateValue('address2', $event)"
-        @blur="v$.address2.$touch()"
+        @blur="touch('address2')"
       />
       <RuiTextField
         id="city"
@@ -138,9 +126,9 @@ watch(() => externalResults, (errors) => {
         autocomplete="address-level2"
         dense
         :label="t('auth.signup.address.form.city')"
-        :error-messages="toMessages(v$.city)"
+        :error-messages="errors('city')"
         @update:model-value="updateValue('city', $event)"
-        @blur="v$.city.$touch()"
+        @blur="touch('city')"
       />
       <RuiTextField
         id="postal"
@@ -150,21 +138,21 @@ watch(() => externalResults, (errors) => {
         autocomplete="postal-code"
         dense
         :label="t('auth.signup.address.form.postal_code')"
-        :error-messages="toMessages(v$.postcode)"
+        :error-messages="errors('postcode')"
         @update:model-value="updateValue('postcode', $event)"
-        @blur="v$.postcode.$touch()"
+        @blur="touch('postcode')"
       />
 
       <CountrySelect
         :model-value="modelValue.country"
-        :error-messages="toMessages(v$.country)"
+        :error-messages="errors('country')"
         dense
-        @blur="v$.country.$touch()"
+        @blur="touch('country')"
         @update:model-value="updateValue('country', $event)"
       />
       <Recaptcha
         id="signup-captcha"
-        :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
+        :invalid="hasError('captcha')"
         @error="onError()"
         @expired="onExpired()"
         @success="onSuccess($event)"
@@ -177,7 +165,7 @@ watch(() => externalResults, (errors) => {
           v-model="terms"
           color="primary"
           details="auto"
-          :error-messages="v$.terms.$error ? [t('auth.signup.address.form.tos_required')] : []"
+          :error-messages="errors('terms')"
         >
           <i18n-t
             keypath="auth.signup.address.form.tos"

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { ValidationErrors } from '~/types/common';
 import type { SignupAccountPayload } from '~/types/signup';
-import { useVuelidate } from '@vuelidate/core';
-import { email, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import AuthHeading from '~/components/account/AuthHeading.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
-import { passwordValidators, toMessages } from '~/utils/validation';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
 
 const modelValue = defineModel<SignupAccountPayload>({ required: true });
 
@@ -18,31 +18,22 @@ const emit = defineEmits<{
   next: [];
 }>();
 
-const $externalResults = ref<Record<string, string[]>>({});
-const attempted = ref<boolean>(false);
-
 const { t } = useI18n({ useScope: 'global' });
+const { email, password, required } = useFormRules();
 
-const password = computed<string>(() => get(modelValue).password);
+const form = useZodForm(z.object({
+  username: required(),
+  email: email(),
+  password: password(),
+  confirmPassword: required(),
+}).refine(value => value.password === value.confirmPassword, {
+  error: t('validation.passwords_differ'),
+  path: ['confirmPassword'],
+}), modelValue);
+const { errors, hasError, serverErrors, submitted } = form;
 
-const rules = {
-  username: { required },
-  password: passwordValidators,
-  confirmPassword: {
-    required,
-    sameAsPassword: sameAs(password, 'password'),
-  },
-  email: { required, email },
-};
-
-const v$ = useVuelidate(rules, modelValue, {
-  $autoDirty: true,
-  $externalResults,
-});
-
-async function next(): Promise<void> {
-  set(attempted, true);
-  if (await get(v$).$validate())
+function next(): void {
+  if (form.validate())
     emit('next');
 }
 
@@ -53,10 +44,11 @@ function updateValue(field: string, value: any): void {
   });
 }
 
-watch(() => externalResults, (errors) => {
-  set($externalResults, errors);
-  if (Object.values(errors).some(i => !!i))
-    get(v$).$validate();
+// Backend errors bring the user back to this step, so mark it as submitted to show them in full.
+watch(() => externalResults, (fieldErrors) => {
+  form.setExternalErrors(fieldErrors);
+  if (Object.values(fieldErrors).some(Boolean))
+    form.validate();
 }, { immediate: true });
 </script>
 
@@ -106,7 +98,7 @@ watch(() => externalResults, (errors) => {
           :label="t('auth.common.username')"
           :hint="t('auth.signup.account.form.username_hint')"
           autocomplete="username"
-          :error-messages="toMessages(v$.username)"
+          :error-messages="errors('username')"
           @update:model-value="updateValue('username', $event)"
         />
         <RuiTextField
@@ -117,7 +109,7 @@ watch(() => externalResults, (errors) => {
           autocomplete="email"
           :label="t('auth.common.email')"
           :hint="t('auth.signup.account.form.email_hint')"
-          :error-messages="toMessages(v$.email)"
+          :error-messages="errors('email')"
           @update:model-value="updateValue('email', $event)"
         />
         <div class="space-y-2">
@@ -129,13 +121,13 @@ watch(() => externalResults, (errors) => {
             autocomplete="new-password"
             :label="t('auth.common.password')"
             details="hidden"
-            :error-messages="attempted ? toMessages(v$.password) : []"
+            :error-messages="submitted ? errors('password') : []"
             @update:model-value="updateValue('password', $event)"
           />
           <PasswordRules
             :password="modelValue.password"
-            :errors="$externalResults.password"
-            :invalid="attempted && v$.password.$error"
+            :errors="serverErrors('password')"
+            :invalid="submitted && hasError('password')"
           />
         </div>
         <RuiRevealableTextField
@@ -146,7 +138,7 @@ watch(() => externalResults, (errors) => {
           dense
           :label="t('auth.signup.account.form.confirm_password')"
           :hint="t('auth.common.confirm_hint')"
-          :error-messages="toMessages(v$.confirmPassword)"
+          :error-messages="errors('confirmPassword')"
           @update:model-value="updateValue('confirmPassword', $event)"
         />
       </div>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
 import { get } from '@vueuse/shared';
+import { z } from 'zod';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useProfileUpdate } from '~/composables/account/use-profile-update';
-import { toMessages } from '~/utils/validation';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
 
 const state = reactive({
   address1: '',
@@ -17,7 +17,6 @@ const state = reactive({
 });
 
 const {
-  $externalResults,
   account,
   dismissDone,
   done,
@@ -26,18 +25,16 @@ const {
   updateProfile,
 } = useProfileUpdate();
 
-const rules = {
-  address1: { required },
-  address2: {},
-  city: { required },
-  postcode: { required },
-  country: { required },
-};
+const { required } = useFormRules();
 
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-});
+const form = useZodForm(z.object({
+  address1: required(),
+  address2: z.string(),
+  city: required(),
+  postcode: required(),
+  country: required(),
+}), state);
+const { errors, invalid, touch } = form;
 
 const {
   public: {
@@ -62,11 +59,11 @@ function reset() {
   state.postcode = userAccount.address.postcode;
   state.country = userAccount.address.country;
 
-  get(v$).$reset();
+  form.reset();
 }
 
-async function update() {
-  await updateProfile(v$, state);
+async function update(): Promise<void> {
+  await updateProfile(form, state);
 }
 
 onBeforeMount(() => {
@@ -91,8 +88,8 @@ const { t } = useI18n({ useScope: 'global' });
         autocomplete="address-line1"
         :label="t('auth.signup.address.form.address_line_1')"
         :hint="t('auth.common.required')"
-        :error-messages="toMessages(v$.address1)"
-        @blur="v$.address1.$touch()"
+        :error-messages="errors('address1')"
+        @blur="touch('address1')"
       />
 
       <RuiTextField
@@ -104,8 +101,8 @@ const { t } = useI18n({ useScope: 'global' });
         autocomplete="address-line2"
         :label="t('auth.signup.address.form.address_line_2')"
         :hint="t('auth.common.optional')"
-        :error-messages="toMessages(v$.address2)"
-        @blur="v$.address2.$touch()"
+        :error-messages="errors('address2')"
+        @blur="touch('address2')"
       />
 
       <RuiTextField
@@ -116,8 +113,8 @@ const { t } = useI18n({ useScope: 'global' });
         autocomplete="address-level2"
         :label="t('auth.signup.address.form.city')"
         :hint="t('auth.common.required')"
-        :error-messages="toMessages(v$.city)"
-        @blur="v$.city.$touch()"
+        :error-messages="errors('city')"
+        @blur="touch('city')"
       />
 
       <RuiTextField
@@ -128,17 +125,17 @@ const { t } = useI18n({ useScope: 'global' });
         autocomplete="postal-code"
         :label="t('auth.signup.address.form.postal_code')"
         :hint="t('auth.common.required')"
-        :error-messages="toMessages(v$.postcode)"
-        @blur="v$.postcode.$touch()"
+        :error-messages="errors('postcode')"
+        @blur="touch('postcode')"
       />
 
       <CountrySelect
         v-model="state.country"
         disabled
         dense
-        :error-messages="toMessages(v$.country)"
+        :error-messages="errors('country')"
         :hint="t('account.address.country.hint', { email: supportEmail })"
-        @blur="v$.country.$touch()"
+        @blur="touch('country')"
       />
     </div>
 
@@ -154,7 +151,7 @@ const { t } = useI18n({ useScope: 'global' });
         {{ t('actions.reset') }}
       </RuiButton>
       <RuiButton
-        :disabled="v$.$invalid"
+        :disabled="invalid"
         size="lg"
         :loading="loading"
         color="primary"

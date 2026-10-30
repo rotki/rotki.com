@@ -257,12 +257,6 @@ catalogs:
     '@vue/tsconfig':
       specifier: 0.9.1
       version: 0.9.1
-    '@vuelidate/core':
-      specifier: 2.0.3
-      version: 2.0.3
-    '@vuelidate/validators':
-      specifier: 2.0.4
-      version: 2.0.4
     '@vueuse/core':
       specifier: 15.0.0
       version: 15.0.0
@@ -667,12 +661,6 @@ importers:
       '@rotki/sigil':
         specifier: workspace:*
         version: link:../sigil
-      '@vuelidate/core':
-        specifier: 'catalog:'
-        version: 2.0.3(vue@3.5.44(typescript@6.0.3))
-      '@vuelidate/validators':
-        specifier: 'catalog:'
-        version: 2.0.4(vue@3.5.44(typescript@6.0.3))
       '@vueuse/core':
         specifier: 'catalog:'
         version: 15.0.0(vue@3.5.44(typescript@6.0.3))
@@ -3995,24 +3983,6 @@ packages:
       typescript:
         optional: true
       vue:
-        optional: true
-
-  '@vuelidate/core@2.0.3':
-    resolution: {integrity: sha512-AN6l7KF7+mEfyWG0doT96z+47ljwPpZfi9/JrNMkOGLFv27XVZvKzRLXlmDPQjPl/wOB1GNnHuc54jlCLRNqGA==}
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^2.0.0 || >=3.0.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-
-  '@vuelidate/validators@2.0.4':
-    resolution: {integrity: sha512-odTxtUZ2JpwwiQ10t0QWYJkkYrfd0SyFYhdHH44QQ1jDatlZgTh/KRzrWVmn/ib9Gq7H4hFD4e8ahoo5YlUlDw==}
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^2.0.0 || >=3.0.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
         optional: true
 
   '@vueuse/core@15.0.0':
@@ -8604,17 +8574,6 @@ packages:
   vue-component-type-helpers@3.3.13:
     resolution: {integrity: sha512-02KCxSmKDhIITjKyJ4QT5csP6L0WoRborLqY/34a40+S9uvMvdNgMV0yVjO3p2Gkz3ZoPmFz/0JsGHacwJYTxw==}
 
-  vue-demi@0.13.11:
-    resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
-    engines: {node: '>=12'}
-    hasBin: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
 
@@ -12307,16 +12266,6 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
       vue: 3.5.44(typescript@6.0.3)
-
-  '@vuelidate/core@2.0.3(vue@3.5.44(typescript@6.0.3))':
-    dependencies:
-      vue: 3.5.44(typescript@6.0.3)
-      vue-demi: 0.13.11(vue@3.5.44(typescript@6.0.3))
-
-  '@vuelidate/validators@2.0.4(vue@3.5.44(typescript@6.0.3))':
-    dependencies:
-      vue: 3.5.44(typescript@6.0.3)
-      vue-demi: 0.13.11(vue@3.5.44(typescript@6.0.3))
 
   '@vueuse/core@15.0.0(vue@3.5.44(typescript@6.0.3))':
     dependencies:
@@ -18101,10 +18050,6 @@ snapshots:
       typescript: 5.9.3
 
   vue-component-type-helpers@3.3.13: {}
-
-  vue-demi@0.13.11(vue@3.5.44(typescript@6.0.3)):
-    dependencies:
-      vue: 3.5.44(typescript@6.0.3)
 
   vue-devtools-stub@0.1.0: {}
 

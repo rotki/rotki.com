@@ -2,7 +2,6 @@ import type { Account, Address } from '@rotki/card-payment-common/schemas/accoun
 import { get } from '@vueuse/shared';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
 import { useProfileUpdate } from '~/composables/account/use-profile-update';
 import { useMainStore } from '~/store';
 
@@ -74,12 +73,10 @@ describe('useProfileUpdate', () => {
       },
       success: true,
     });
-    const validation = ref<{ $validate: () => Promise<boolean> }>({
-      $validate: vi.fn().mockResolvedValue(true),
-    });
+    const form = { setExternalErrors: vi.fn(), validate: vi.fn().mockReturnValue(true) };
     const { updateProfile } = useProfileUpdate();
 
-    const success = await updateProfile(validation, {
+    const success = await updateProfile(form, {
       firstName: 'Updated',
       newsletterConsent: false,
     });
@@ -108,15 +105,34 @@ describe('useProfileUpdate', () => {
     const store = useMainStore();
     store.account = createAccount();
     mockUpdateProfile.mockResolvedValue({ success: true });
-    const validation = ref<{ $validate: () => Promise<boolean> }>({
-      $validate: vi.fn().mockResolvedValue(true),
-    });
+    const form = { setExternalErrors: vi.fn(), validate: vi.fn().mockReturnValue(true) };
     const { dismissDone, done, updateProfile } = useProfileUpdate();
 
-    await updateProfile(validation, { firstName: 'Updated' });
+    await updateProfile(form, { firstName: 'Updated' });
     expect(get(done)).toBe(true);
 
     dismissDone();
     expect(get(done)).toBe(false);
+  });
+
+  it('hands field errors from the backend to the form', async () => {
+    const store = useMainStore();
+    store.account = createAccount();
+    mockUpdateProfile.mockResolvedValue({ message: { vatId: ['VAT ID is invalid'] }, success: false });
+    const form = { setExternalErrors: vi.fn(), validate: vi.fn().mockReturnValue(true) };
+    const { updateProfile } = useProfileUpdate();
+
+    expect(await updateProfile(form, { vatId: 'X' })).toBe(false);
+    expect(form.setExternalErrors).toHaveBeenCalledWith({ vatId: ['VAT ID is invalid'] });
+  });
+
+  it('sends nothing when the form is invalid', async () => {
+    const store = useMainStore();
+    store.account = createAccount();
+    const form = { setExternalErrors: vi.fn(), validate: vi.fn().mockReturnValue(false) };
+    const { updateProfile } = useProfileUpdate();
+
+    expect(await updateProfile(form, { firstName: '' })).toBe(false);
+    expect(mockUpdateProfile).not.toHaveBeenCalled();
   });
 });

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import { requiredUnless } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useProfileUpdate } from '~/composables/account/use-profile-update';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
 import { useVatCheck } from '~/modules/checkout/composables/use-vat-check';
 import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
-import { toMessages } from '~/utils/validation';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -37,7 +37,6 @@ const [DefineVAT, ReuseVAT] = createReusableTemplate();
 const { refreshVATCheckStatus, checkVAT } = useVatCheck();
 
 const {
-  $externalResults,
   account,
   dismissDone,
   done,
@@ -46,17 +45,19 @@ const {
   updateProfile,
 } = useProfileUpdate();
 
-const rules = {
-  firstName: { required: requiredUnless(movedOffline) },
-  lastName: { required: requiredUnless(movedOffline) },
-  companyName: {},
-  vatId: {},
-};
+const { required } = useFormRules();
 
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-});
+// An account that moved offline keeps no name here, so the name fields are optional then.
+const form = useZodForm(() => {
+  const name = get(movedOffline) ? z.string() : required();
+  return z.object({
+    firstName: name,
+    lastName: name,
+    companyName: z.string(),
+    vatId: z.string(),
+  });
+}, state);
+const { errors, invalid, touch } = form;
 
 const { pause: pauseTimer, resume } = useIntervalFn(() => {
   if (!updateRemainingTime()) {
@@ -119,16 +120,16 @@ function reset(): void {
   state.lastName = userAccount.address.lastName;
   state.companyName = userAccount.address.companyName;
 
-  get(v$).$reset();
+  form.reset();
 }
 
 async function update(): Promise<void> {
-  await updateProfile(v$, state);
+  await updateProfile(form, state);
 }
 
 async function handleCheckVATClick() {
   set(loadingCheck, true);
-  await updateProfile(v$, state);
+  await updateProfile(form, state);
   const checkResult = await checkVAT();
   await refreshVATCheckStatus();
 
@@ -188,9 +189,9 @@ onMounted(() => {
         class="flex-1"
         :label="t('auth.signup.customer_information.form.vat_id')"
         :hint="vatHint"
-        :error-messages="[...toMessages(v$.vatId), vatStatusErrorMessage, vatErrorMessage]"
+        :error-messages="[...errors('vatId'), vatStatusErrorMessage, vatErrorMessage]"
         :success-messages="vatSuccessMessage"
-        @blur="v$.vatId.$touch()"
+        @blur="touch('vatId')"
       >
         <template #append>
           <RuiIcon
@@ -226,8 +227,8 @@ onMounted(() => {
         autocomplete="given-name"
         :label="t('auth.signup.customer_information.form.first_name')"
         :hint="t('auth.signup.customer_information.form.name_hint')"
-        :error-messages="toMessages(v$.firstName)"
-        @blur="v$.firstName.$touch()"
+        :error-messages="errors('firstName')"
+        @blur="touch('firstName')"
       />
 
       <RuiTextField
@@ -238,8 +239,8 @@ onMounted(() => {
         autocomplete="family-name"
         :label="t('auth.signup.customer_information.form.last_name')"
         :hint="t('auth.signup.customer_information.form.name_hint')"
-        :error-messages="toMessages(v$.lastName)"
-        @blur="v$.lastName.$touch()"
+        :error-messages="errors('lastName')"
+        @blur="touch('lastName')"
       />
 
       <RuiTextField
@@ -250,8 +251,8 @@ onMounted(() => {
         autocomplete="organization"
         :label="t('auth.signup.customer_information.form.company')"
         :hint="t('auth.signup.customer_information.form.company_hint')"
-        :error-messages="toMessages(v$.companyName)"
-        @blur="v$.companyName.$touch()"
+        :error-messages="errors('companyName')"
+        @blur="touch('companyName')"
       />
 
       <ReuseVAT />
@@ -270,7 +271,7 @@ onMounted(() => {
       </RuiButton>
       <RuiButton
         data-cy="update-profile"
-        :disabled="v$.$invalid"
+        :disabled="invalid"
         size="lg"
         :loading="loading"
         color="primary"

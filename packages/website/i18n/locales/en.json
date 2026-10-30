@@ -347,7 +347,6 @@
     },
     "recover_password": {
       "back_to_login": "Back to sign in",
-      "email_invalid": "Enter a valid e-mail address.",
       "message": "Enter the e-mail address of your rotki.com account and we will send you a link to set a new password.",
       "remembered": "Remembered your password?",
       "submit": "Send reset link",
@@ -1577,6 +1576,14 @@
       "token_exchange_failed": "Failed to exchange authorization code for access token",
       "no_access_token": "No access token received"
     }
+  },
+  "validation": {
+    "email": "Enter a valid e-mail address.",
+    "password_only_digits": "Use more than numbers.",
+    "password_too_short": "Use at least 8 characters.",
+    "passwords_differ": "The passwords do not match.",
+    "postcode": "Enter a valid postal code: letters, numbers, spaces and hyphens only.",
+    "required": "This field is required."
   },
   "values": {
     "contact_section": {

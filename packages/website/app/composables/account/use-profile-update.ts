@@ -1,3 +1,4 @@
+import type { ZodForm } from '~/composables/use-zod-form';
 import type { ProfilePayload } from '~/types/account';
 import { objectOmit } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
@@ -8,9 +9,7 @@ import { useMainStore } from '~/store';
 
 type ProfileOmitFields = 'movedOffline';
 
-interface ProfileValidation {
-  $validate: () => Promise<boolean>;
-}
+type ProfileForm = Pick<ZodForm<string>, 'setExternalErrors' | 'validate'>;
 
 export function useProfileUpdate() {
   const store = useMainStore();
@@ -20,7 +19,6 @@ export function useProfileUpdate() {
 
   const loading = shallowRef<boolean>(false);
   const done = shallowRef<boolean>(false);
-  const $externalResults = ref<Record<string, string[]>>({});
 
   const movedOffline = computed<boolean>(() => get(account)?.address.movedOffline ?? false);
 
@@ -28,7 +26,7 @@ export function useProfileUpdate() {
    * Update user profile with validated form data
    */
   const updateProfile = async <T extends Partial<ProfilePayload>>(
-    v$: Ref<ProfileValidation>,
+    form: ProfileForm,
     state: T,
     omitFields: ProfileOmitFields[] = ['movedOffline'],
   ): Promise<boolean> => {
@@ -36,8 +34,7 @@ export function useProfileUpdate() {
     if (!userAccount)
       return false;
 
-    const isValid = await get(v$).$validate();
-    if (!isValid)
+    if (!form.validate())
       return false;
 
     set(loading, true);
@@ -65,7 +62,7 @@ export function useProfileUpdate() {
       set(done, true);
     }
     else if (result.message && typeof result.message !== 'string') {
-      set($externalResults, result.message);
+      form.setExternalErrors(result.message);
     }
 
     set(loading, false);
@@ -77,7 +74,6 @@ export function useProfileUpdate() {
   }
 
   return {
-    $externalResults: shallowReadonly($externalResults),
     account: readonly(account),
     dismissDone,
     done: readonly(done),

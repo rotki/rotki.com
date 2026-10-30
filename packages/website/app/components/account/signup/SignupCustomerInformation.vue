@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { ValidationErrors } from '~/types/common';
 import type { SignupCustomerInformationPayload } from '~/types/signup';
-import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import AuthHeading from '~/components/account/AuthHeading.vue';
-import { toMessages } from '~/utils/validation';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
 
 const modelValue = defineModel<SignupCustomerInformationPayload>({ required: true });
 
@@ -18,24 +18,19 @@ const emit = defineEmits<{
   next: [];
 }>();
 
-const rules = {
-  firstName: { required },
-  lastName: { required },
-  companyName: {},
-  vatId: {},
-};
-
 const { t } = useI18n({ useScope: 'global' });
+const { required } = useFormRules();
 
-const $externalResults = ref<Record<string, string[]>>({});
+const form = useZodForm(z.object({
+  firstName: required(),
+  lastName: required(),
+  companyName: z.string(),
+  vatId: z.string(),
+}), modelValue);
+const { errors, touch } = form;
 
-const v$ = useVuelidate(rules, modelValue, {
-  $autoDirty: true,
-  $externalResults,
-});
-
-async function next(): Promise<void> {
-  if (await get(v$).$validate())
+function next(): void {
+  if (form.validate())
     emit('next');
 }
 
@@ -46,10 +41,10 @@ function updateValue(field: string, value: any): void {
   });
 }
 
-watch(() => externalResults, (errors) => {
-  set($externalResults, errors);
-  if (Object.values(errors).some(i => !!i))
-    get(v$).$validate();
+watch(() => externalResults, (fieldErrors) => {
+  form.setExternalErrors(fieldErrors);
+  if (Object.values(fieldErrors).some(Boolean))
+    form.validate();
 }, { immediate: true });
 </script>
 
@@ -69,9 +64,9 @@ watch(() => externalResults, (errors) => {
           autocomplete="given-name"
           dense
           :label="t('auth.signup.customer_information.form.first_name')"
-          :error-messages="toMessages(v$.firstName)"
+          :error-messages="errors('firstName')"
           @update:model-value="updateValue('firstName', $event)"
-          @blur="v$.firstName.$touch()"
+          @blur="touch('firstName')"
         />
         <RuiTextField
           id="last-name"
@@ -80,9 +75,9 @@ watch(() => externalResults, (errors) => {
           autocomplete="family-name"
           dense
           :label="t('auth.signup.customer_information.form.last_name')"
-          :error-messages="toMessages(v$.lastName)"
+          :error-messages="errors('lastName')"
           @update:model-value="updateValue('lastName', $event)"
-          @blur="v$.lastName.$touch()"
+          @blur="touch('lastName')"
         />
         <RuiTextField
           id="company-name"
@@ -92,9 +87,9 @@ watch(() => externalResults, (errors) => {
           dense
           :label="t('auth.signup.customer_information.form.company')"
           :hint="t('auth.signup.customer_information.form.company_hint')"
-          :error-messages="toMessages(v$.companyName)"
+          :error-messages="errors('companyName')"
           @update:model-value="updateValue('companyName', $event)"
-          @blur="v$.companyName.$touch()"
+          @blur="touch('companyName')"
         />
         <RuiTextField
           id="vat-id"
@@ -103,9 +98,9 @@ watch(() => externalResults, (errors) => {
           dense
           :label="t('auth.signup.customer_information.form.vat_id')"
           :hint="t('auth.signup.customer_information.form.vat_id_hint')"
-          :error-messages="toMessages(v$.vatId)"
+          :error-messages="errors('vatId')"
           @update:model-value="updateValue('vatId', $event)"
-          @blur="v$.vatId.$touch()"
+          @blur="touch('vatId')"
         />
       </div>
     </div>

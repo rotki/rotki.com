@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { LoginFailedReasons, SigilEvents } from '@rotki/sigil';
-import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
 import { useMainStore } from '~/store';
 import { getSingleRouteParam } from '~/utils/query';
 import { getSafeRedirectUrl } from '~/utils/redirect';
@@ -18,21 +19,13 @@ const hadError = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 
-const rules = {
-  username: { required },
-  password: { required },
-};
+const { required } = useFormRules();
 
-const v$ = useVuelidate(
-  rules,
-  {
-    username,
-    password,
-  },
-  {
-    $autoDirty: true,
-  },
-);
+const form = useZodForm(z.object({
+  username: required(t('auth.login.username_required')),
+  password: z.string().min(1, { error: t('auth.login.password_required') }),
+}), () => ({ username: get(username), password: get(password) }));
+const { errors, hasError } = form;
 
 const { login } = useMainStore();
 const route = useRoute();
@@ -43,18 +36,19 @@ onMounted(() => {
 });
 
 /**
- * A required-field message when empty. After a failed sign in it is the server error, which marks
+ * The field's own error when it is empty. After a failed sign in it is the server error, which marks
  * the field without repeating the text: the field's details are hidden then, and the alert shows it.
  */
-function fieldMessages(missing: boolean, message: string): string[] {
-  if (missing)
-    return [message];
+function fieldMessages(field: 'username' | 'password'): string[] {
+  const own = errors(field);
+  if (own.length > 0)
+    return own;
   const serverError = get(error);
   return serverError ? [serverError] : [];
 }
 
 async function performLogin(): Promise<void> {
-  if (get(loading) || !await get(v$).$validate())
+  if (get(loading) || !form.validate())
     return;
 
   set(loading, true);
@@ -97,9 +91,9 @@ async function performLogin(): Promise<void> {
           :disabled="loading"
           :label="t('auth.login.email_or_username')"
           autocomplete="username"
-          :details="v$.username.$error ? 'auto' : 'hidden'"
+          :details="hasError('username') ? 'auto' : 'hidden'"
           color="primary"
-          :error-messages="fieldMessages(v$.username.$error, t('auth.login.username_required'))"
+          :error-messages="fieldMessages('username')"
           @focus="error = ''"
         />
 
@@ -110,9 +104,9 @@ async function performLogin(): Promise<void> {
           dense
           :label="t('auth.common.password')"
           autocomplete="current-password"
-          :details="v$.password.$error ? 'auto' : 'hidden'"
+          :details="hasError('password') ? 'auto' : 'hidden'"
           color="primary"
-          :error-messages="fieldMessages(v$.password.$error, t('auth.login.password_required'))"
+          :error-messages="fieldMessages('password')"
           @focus="error = ''"
         />
       </div>

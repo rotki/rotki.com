@@ -42,7 +42,6 @@ async function mountEmailPreferences(newsletterConsent: boolean) {
   const updateProfile = vi.fn().mockResolvedValue(true);
 
   mockUseProfileUpdate.mockReturnValue({
-    $externalResults: ref<Record<string, string[]>>({}),
     account: ref<Account>(createAccount(newsletterConsent)),
     dismissDone: vi.fn(),
     done: ref<boolean>(false),

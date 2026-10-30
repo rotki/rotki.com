@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
-import { useVuelidate } from '@vuelidate/core';
-import { minLength, required, sameAs } from '@vuelidate/validators';
-import { get, set } from '@vueuse/shared';
+import { set } from '@vueuse/shared';
+import { z } from 'zod';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
-import { passwordValidators, toMessages } from '~/utils/validation';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
+import { PASSWORD_MIN_LENGTH } from '~/utils/validation';
 
 const loading = ref<boolean>(false);
 const success = ref<boolean>(false);
@@ -19,21 +20,18 @@ const state = reactive({
   passwordConfirmation: '',
 });
 
-const { newPassword } = toRefs(state);
+const { t } = useI18n({ useScope: 'global' });
+const { password, required } = useFormRules();
 
-const rules = {
-  currentPassword: { required, minLength: minLength(8) },
-  newPassword: passwordValidators,
-  passwordConfirmation: {
-    required,
-    sameAsPassword: sameAs(newPassword, 'new password'),
-  },
-};
-const $externalResults = ref<Record<string, string[]>>({});
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-});
+const form = useZodForm(z.object({
+  currentPassword: required().min(PASSWORD_MIN_LENGTH, { error: t('validation.password_too_short') }),
+  newPassword: password(),
+  passwordConfirmation: required(),
+}).refine(value => value.newPassword === value.passwordConfirmation, {
+  error: t('validation.passwords_differ'),
+  path: ['passwordConfirmation'],
+}), state);
+const { errors, invalid, serverErrors } = form;
 
 const { start: startSuccessTimeout, stop: stopSuccessTimeout } = useTimeoutFn(() => {
   set(success, false);
@@ -44,7 +42,7 @@ async function changePassword(): Promise<void> {
   const result: ActionResult = await accountApi.changePassword(state);
   set(loading, false);
   if (result.message && typeof result.message !== 'string')
-    set($externalResults, result.message);
+    form.setExternalErrors(result.message);
 
   if (result.success) {
     set(success, true);
@@ -54,14 +52,12 @@ async function changePassword(): Promise<void> {
   }
 }
 
-function reset() {
+function reset(): void {
   state.currentPassword = '';
   state.newPassword = '';
   state.passwordConfirmation = '';
-  get(v$).$reset();
+  form.reset();
 }
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
@@ -76,7 +72,7 @@ const { t } = useI18n({ useScope: 'global' });
           v-model="state.currentPassword"
           color="primary"
           dense
-          :error-messages="toMessages(v$.currentPassword)"
+          :error-messages="errors('currentPassword')"
           :hint="t('account.change_password.current_password.hint')"
           :label="t('account.change_password.current_password.label')"
           autocomplete="current-password"
@@ -91,12 +87,12 @@ const { t } = useI18n({ useScope: 'global' });
             details="hidden"
             :label="t('account.change_password.new_password.label')"
             autocomplete="new-password"
-            :error-messages="toMessages(v$.newPassword)"
+            :error-messages="errors('newPassword')"
           />
 
           <PasswordRules
             :password="state.newPassword"
-            :errors="$externalResults.newPassword"
+            :errors="serverErrors('newPassword')"
           />
         </div>
 
@@ -104,7 +100,7 @@ const { t } = useI18n({ useScope: 'global' });
           id="password-confirmation"
           v-model="state.passwordConfirmation"
           color="primary"
-          :error-messages="toMessages(v$.passwordConfirmation)"
+          :error-messages="errors('passwordConfirmation')"
           dense
           :label="t('auth.signup.account.form.confirm_password')"
           :hint="t('auth.common.confirm_hint')"
@@ -124,7 +120,7 @@ const { t } = useI18n({ useScope: 'global' });
           {{ t('actions.reset') }}
         </RuiButton>
         <RuiButton
-          :disabled="v$.$invalid"
+          :disabled="invalid"
           size="lg"
           :loading="loading"
           color="primary"

@@ -1,10 +1,10 @@
 import type { MaybeRefOrGetter } from 'vue';
 import type { StoredNft, TierKey } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
-import { useVuelidate, type ValidationArgs } from '@vuelidate/core';
-import { email as emailValidation, helpers, maxLength, minLength, numeric, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import { z } from 'zod';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useZodForm } from '~/composables/use-zod-form';
 import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, type NftMetadataStatus, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';
 import { runSubmitFlow, submitErrorMessage } from '~/modules/web3/sponsorship/submission-submit-flow';
 import { useNftMetadata } from '~/modules/web3/sponsorship/use-nft-metadata';
@@ -78,59 +78,33 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
   const nftIdOptions = computed<StoredNft[]>(() =>
     buildNftIdOptions(get(currentAddressNfts), get(sponsorshipData)?.releaseId, toValue(editingSubmission), toValue(address)));
 
-  const validNameChars = helpers.withMessage(
-    () => t('sponsor.submit_name.error.invalid_chars'),
-    (value: string) => !value || /^[\s\w.-]*$/.test(value),
-  );
+  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const isBlank = (value: string): boolean => value.trim().length === 0;
 
-  const validEmail = helpers.withMessage(
-    () => t('sponsor.submit_name.error.invalid_email'),
-    emailValidation,
-  );
+  const schema = z.object({
+    // Every field is optional, but a name that is given must have a sensible length.
+    displayName: z.string()
+      .refine(value => isBlank(value) || value.length >= 3, { error: t('sponsor.submit_name.error.too_short') })
+      .refine(value => isBlank(value) || value.length <= 30, { error: t('sponsor.submit_name.error.too_long') })
+      .regex(/^[\s\w.-]*$/, { error: t('sponsor.submit_name.error.invalid_chars') }),
+    email: z.string()
+      .refine(value => value === '' || z.regexes.email.test(value), { error: t('sponsor.submit_name.error.invalid_email') }),
+    imageFile: z.custom<File | undefined>()
+      .refine(file => !file || file.size <= 5 * 1024 * 1024, { error: t('sponsor.submit_name.error.image_too_large') })
+      .refine(file => !file || allowedImageTypes.includes(file.type), { error: t('sponsor.submit_name.error.invalid_image_type') }),
+    tokenId: z.string()
+      .min(1, { error: t('sponsor.submit_name.error.token_id_required') })
+      .regex(/^\d*(\.\d+)?$/, { error: t('sponsor.submit_name.error.token_id_invalid') }),
+  }).refine(value => !isBlank(value.displayName) || value.imageFile !== undefined || !isBlank(value.email), {
+    error: t('sponsor.submit_name.error.at_least_one_required'),
+  });
 
-  const validImageSize = helpers.withMessage(
-    () => t('sponsor.submit_name.error.image_too_large'),
-    (value: File | null) => !value || value.size <= 5 * 1024 * 1024,
-  );
-
-  const validImageType = helpers.withMessage(
-    () => t('sponsor.submit_name.error.invalid_image_type'),
-    (value: File | null) => {
-      if (!value)
-        return true;
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      return allowedTypes.includes(value.type);
-    },
-  );
-
-  const atLeastOneRequired = helpers.withMessage(
-    () => t('sponsor.submit_name.error.at_least_one_required'),
-    () => get(modelDisplayName).trim().length > 0 || get(imageFile) !== undefined || get(modelEmail).trim().length > 0,
-  );
-
-  const rules = computed<ValidationArgs>(() => ({
-    atLeastOne: {
-      atLeastOneRequired,
-    },
-    displayName: {
-      maxLength: get(modelDisplayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_long'), maxLength(30)) : {},
-      minLength: get(modelDisplayName).trim() ? helpers.withMessage(() => t('sponsor.submit_name.error.too_short'), minLength(3)) : {},
-      validNameChars,
-    },
-    email: {
-      validEmail,
-    },
-    imageFile: {
-      validImageSize,
-      validImageType,
-    },
-    tokenId: {
-      numeric: helpers.withMessage(() => t('sponsor.submit_name.error.token_id_invalid'), numeric),
-      required: helpers.withMessage(() => t('sponsor.submit_name.error.token_id_required'), required),
-    },
+  const form = useZodForm(schema, () => ({
+    displayName: get(modelDisplayName),
+    email: get(modelEmail),
+    imageFile: get(imageFile),
+    tokenId: get(modelTokenId),
   }));
-
-  const v$ = useVuelidate(rules, { atLeastOne: true, displayName: modelDisplayName, email: modelEmail, imageFile, tokenId: modelTokenId }, { $autoDirty: true });
 
   const shouldDisableFields = computed<boolean>(() => get(isSubmitting) || !get(isAuthenticated));
 
@@ -292,7 +266,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
         checkOwnership: async () => checkNftMetadata({ checkExisting: false }),
         isEditing: !!toValue(editingSubmission),
         submit: submitHolderSubmission,
-        validate: async () => get(v$).$validate(),
+        validate: async () => form.validate(),
       });
 
       if (!outcome.ok) {
@@ -310,7 +284,7 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
 
       await nextTick(() => {
         set(success, true);
-        get(v$).$reset();
+        form.reset();
       });
       emit('submission-success');
     }
@@ -373,11 +347,13 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
 
   return {
     error: shallowReadonly(error),
+    errors: form.errors,
     existingSubmission: shallowReadonly(existingSubmission),
     handleImageSelected,
     handleSubmit,
     hasCheckedNft: shallowReadonly(hasCheckedNft),
     imagePreview: shallowReadonly(imagePreview),
+    invalid: form.invalid,
     isAuthenticated,
     isAuthenticating,
     isCheckingNft: shallowReadonly(isCheckingNft),
@@ -394,6 +370,5 @@ export function useNftSubmissionForm(context: NftSubmissionFormContext) {
     shouldDisableFields,
     sponsorshipData,
     success: shallowReadonly(success),
-    v$,
   };
 }

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { SigilEvents } from '@rotki/sigil';
-import { useVuelidate } from '@vuelidate/core';
-import { required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { z } from 'zod';
 import AuthShell from '~/components/account/AuthShell.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useFormRules } from '~/composables/use-form-rules';
+import { useZodForm } from '~/composables/use-zod-form';
 import { useLogger } from '~/utils/use-logger';
-import { passwordValidators, toMessages } from '~/utils/validation';
 
 const logger = useLogger();
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -47,33 +47,28 @@ function setupTokenValidation() {
   return { validating, isValid };
 }
 
+const { t } = useI18n({ useScope: 'global' });
+
 const password = ref<string>('');
 const passwordConfirmation = ref<string>('');
-const $externalResults = ref<Record<string, string[]>>({});
 
-const v$ = useVuelidate(
-  {
-    password: passwordValidators,
-    passwordConfirmation: {
-      required,
-      sameAsPassword: sameAs(password, 'password'),
-    },
-  },
-  { password, passwordConfirmation },
-  {
-    $autoDirty: true,
-    $externalResults,
-  },
-);
+const { password: passwordRule, required } = useFormRules();
+
+const form = useZodForm(z.object({
+  password: passwordRule(),
+  passwordConfirmation: required(),
+}).refine(value => value.password === value.passwordConfirmation, {
+  error: t('validation.passwords_differ'),
+  path: ['passwordConfirmation'],
+}), () => ({ password: get(password), passwordConfirmation: get(passwordConfirmation) }));
+const { errors, hasError, serverErrors, submitted } = form;
 
 const route = useRoute();
 const { uid, token } = route.params;
 const submitting = ref<boolean>(false);
-const attempted = ref<boolean>(false);
 
 async function submit(): Promise<void> {
-  set(attempted, true);
-  if (!await get(v$).$validate())
+  if (!form.validate())
     return;
 
   set(submitting, true);
@@ -96,7 +91,7 @@ async function submit(): Promise<void> {
     if (error instanceof FetchError && error.status === 400) {
       const message = error.data.message;
       if (message && typeof message === 'object') {
-        set($externalResults, {
+        form.setExternalErrors({
           password: message.password,
           passwordConfirmation: message.password_confirmation,
         });
@@ -112,8 +107,6 @@ async function submit(): Promise<void> {
 }
 
 const { validating, isValid } = setupTokenValidation();
-
-const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
@@ -166,12 +159,12 @@ const { t } = useI18n({ useScope: 'global' });
             :label="t('auth.password_reset.form.password')"
             details="hidden"
             color="primary"
-            :error-messages="attempted ? toMessages(v$.password) : []"
+            :error-messages="submitted ? errors('password') : []"
           />
           <PasswordRules
             :password="password"
-            :errors="$externalResults.password"
-            :invalid="attempted && v$.password.$error"
+            :errors="serverErrors('password')"
+            :invalid="submitted && hasError('password')"
           />
         </div>
         <RuiRevealableTextField
@@ -182,7 +175,7 @@ const { t } = useI18n({ useScope: 'global' });
           :label="t('auth.password_reset.form.confirm')"
           :hint="t('auth.common.confirm_hint')"
           color="primary"
-          :error-messages="toMessages(v$.passwordConfirmation)"
+          :error-messages="errors('passwordConfirmation')"
         />
       </div>
       <RuiButton

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
 import { get } from '@vueuse/shared';
+import { z } from 'zod';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useProfileUpdate } from '~/composables/account/use-profile-update';
+import { useZodForm } from '~/composables/use-zod-form';
 
 interface EmailPreferencesFormState {
   newsletterConsent: boolean;
@@ -15,7 +16,6 @@ const state = reactive<EmailPreferencesFormState>({
 });
 
 const {
-  $externalResults,
   account,
   dismissDone,
   done,
@@ -23,14 +23,7 @@ const {
   updateProfile,
 } = useProfileUpdate();
 
-const rules = {
-  newsletterConsent: {},
-};
-
-const v$ = useVuelidate(rules, state, {
-  $autoDirty: true,
-  $externalResults,
-});
+const form = useZodForm(z.object({ newsletterConsent: z.boolean() }), state);
 
 const changed = computed<boolean>(() => state.newsletterConsent !== get(account)?.newsletterConsent);
 
@@ -40,11 +33,11 @@ function reset(): void {
     return;
 
   state.newsletterConsent = userAccount.newsletterConsent;
-  get(v$).$reset();
+  form.reset();
 }
 
 async function update(): Promise<void> {
-  await updateProfile(v$, state);
+  await updateProfile(form, state);
 }
 
 onBeforeMount(() => {

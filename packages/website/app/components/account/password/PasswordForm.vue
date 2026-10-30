@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import { email, helpers, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { z } from 'zod';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useFormRules } from '~/composables/use-form-rules';
 import { useRecaptcha } from '~/composables/use-recaptcha';
+import { useZodForm } from '~/composables/use-zod-form';
 import { useLogger } from '~/utils/use-logger';
-import { toMessages } from '~/utils/validation';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const emailAddress = ref<string>('');
 const loading = ref<boolean>(false);
-const $externalResults = ref<Record<string, string[]>>({});
 
 const {
   onError,
@@ -26,20 +25,15 @@ const {
   resetCaptcha,
 } = useRecaptcha();
 
-const emailMessage = t('auth.recover_password.email_invalid');
+const { email, required } = useFormRules();
 
-// Not $autoDirty: the e-mail error waits for blur or submit instead of showing on the first keystroke.
-const v$ = useVuelidate(
-  {
-    email: {
-      required: helpers.withMessage(emailMessage, required),
-      email: helpers.withMessage(emailMessage, email),
-    },
-    captcha: { required },
-  },
-  { email: emailAddress, captcha: recaptchaToken },
-  { $externalResults },
+// The e-mail error waits for blur or submit instead of showing on the first keystroke.
+const form = useZodForm(
+  z.object({ email: email(), captcha: required() }),
+  () => ({ email: get(emailAddress), captcha: get(recaptchaToken) }),
+  { touchOnChange: false },
 );
+const { errors, hasError, touch } = form;
 
 const logger = useLogger('password-form');
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -49,12 +43,7 @@ function setCaptchaId(id: number): void {
 }
 
 async function reset(): Promise<void> {
-  if (get(loading))
-    return;
-
-  // Without $autoDirty nothing clears the server's captcha error when a new captcha is solved.
-  get(v$).$clearExternalResults();
-  if (!await get(v$).$validate())
+  if (get(loading) || !form.validate())
     return;
 
   set(loading, true);
@@ -79,7 +68,7 @@ async function reset(): Promise<void> {
       && error.data?.message?.captcha
     ) {
       resetCaptcha();
-      set($externalResults, error.data.message);
+      form.setExternalErrors(error.data.message);
     }
 
     logger.error(error);
@@ -106,15 +95,15 @@ async function reset(): Promise<void> {
           :label="t('auth.common.email')"
           autocomplete="email"
           details="auto"
-          :error-messages="toMessages(v$.email)"
+          :error-messages="errors('email')"
           color="primary"
-          @blur="v$.email.$touch()"
+          @blur="touch('email')"
         />
 
         <ClientOnly>
           <Recaptcha
             data-cy="recovery-captcha"
-            :invalid="v$.captcha.$invalid && v$.captcha.$dirty"
+            :invalid="hasError('captcha')"
             @error="onError()"
             @expired="onExpired()"
             @success="onSuccess($event)"

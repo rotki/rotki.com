@@ -5,7 +5,6 @@ import ImageUploadPreview from '~/modules/web3/sponsorship/components/submission
 import { useNftSubmissionForm } from '~/modules/web3/sponsorship/use-nft-submission-form';
 import { findTierById } from '~/modules/web3/sponsorship/utils';
 import { getTierClasses } from '~/utils/nft-tiers';
-import { toMessages } from '~/utils/validation';
 
 const { address, editingSubmission, isConnected } = defineProps<{
   address: string | undefined;
@@ -23,10 +22,12 @@ const { t } = useI18n({ useScope: 'global' });
 
 const {
   error,
+  errors,
   existingSubmission,
   handleImageSelected,
   handleSubmit,
   imagePreview,
+  invalid,
   isAuthenticated,
   isAuthenticating,
   isCheckingNft,
@@ -42,7 +43,6 @@ const {
   shouldDisableFields,
   sponsorshipData,
   success,
-  v$,
 } = useNftSubmissionForm({
   address: () => address,
   editingSubmission: () => editingSubmission,
@@ -89,7 +89,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           v-model="modelTokenId"
           :label="t('sponsor.submit_name.token_id_label')"
           :hint="t('sponsor.submit_name.token_id_hint')"
-          :error-messages="toMessages(v$.tokenId)"
+          :error-messages="errors('tokenId')"
           :disabled="shouldDisableFields"
           :options="nftIdOptions"
           :loading="isCheckingNft"
@@ -154,7 +154,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           v-model="modelDisplayName"
           :label="t('sponsor.submit_name.name_label')"
           :hint="t('sponsor.submit_name.name_hint')"
-          :error-messages="toMessages(v$.displayName)"
+          :error-messages="errors('displayName')"
           :disabled="shouldDisableFields"
           color="primary"
         />
@@ -168,7 +168,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           <ImageUploadPreview
             :image-preview="imagePreview"
             :disabled="shouldDisableFields"
-            :error-messages="toMessages(v$.imageFile)"
+            :error-messages="errors('imageFile')"
             :hint="nftTier === 'silver' ? t('sponsor.submit_name.image_hint_silver') : t('sponsor.submit_name.image_hint_gold')"
             @file-selected="handleImageSelected($event)"
             @remove="removeImage()"
@@ -179,7 +179,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           v-model="modelEmail"
           :label="t('sponsor.submit_name.email_label')"
           :hint="t('sponsor.submit_name.email_hint')"
-          :error-messages="toMessages(v$.email)"
+          :error-messages="errors('email')"
           :disabled="shouldDisableFields"
           type="email"
           color="primary"
@@ -191,7 +191,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           size="lg"
           class="w-full"
           :loading="isSubmitting || isAuthenticating"
-          :disabled="v$.$invalid"
+          :disabled="invalid"
         >
           {{ editingSubmission || existingSubmission ? t('sponsor.submit_name.update') : t('sponsor.submit_name.submit') }}
         </RuiButton>
