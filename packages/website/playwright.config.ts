@@ -68,6 +68,8 @@ export default defineConfig({
       command: `pnpm exec nuxi dev --host 0.0.0.0 --port ${nuxtPort}`,
       env: {
         TEST: 'true',
+        // Its own build folder, so it can run while `pnpm dev` holds `.nuxt`
+        E2E_NUXT_BUILD_DIR: '.nuxt-e2e',
         NUXT_PUBLIC_BASE_URL: `http://localhost:${port}`,
         // The plans the pages are built with come from the mock API, like every other request here
         TIERS_SNAPSHOT_URL: mockApiUrl,
