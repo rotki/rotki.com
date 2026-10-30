@@ -408,6 +408,7 @@ func TestCSPHandler_FiltersReports(t *testing.T) {
 		level     string
 	}{
 		{"browser extension", makeReport("chrome-extension://abc123", "https://rotki.com/", "script-src"), "", reasonBrowserExtension, "CSP report filtered", "INFO"},
+		{"blob-injected inline script", `{"csp-report": {"blocked-uri": "inline", "document-uri": "https://rotki.com/", "violated-directive": "script-src-elem", "original-policy": "default-src 'self'", "source-file": "blob:https://rotki.com/0b9c6f1e", "line-number": 19}}`, "", reasonBrowserExtension, "CSP report filtered", "INFO"},
 		{"false positive", makeReport("https://rotki.com/favicon.ico", "https://rotki.com/", "img-src"), "", reasonFalsePositive, "CSP report filtered", "INFO"},
 		{"localhost development", makeReport("inline", "http://localhost:3000/", "script-src"), "", reasonLocalhostDev, "CSP report filtered", "INFO"},
 		{"bot traffic", makeReport("https://evil.com/script.js", "https://rotki.com/", "script-src"), "Googlebot/2.1 (+http://www.google.com/bot.html)", reasonBotTraffic, "CSP report filtered", "INFO"},
@@ -449,6 +450,7 @@ func TestCSPHandler_DoesNotFilterRealViolations(t *testing.T) {
 		{"eval", "https://rotki.com/"},
 		{"https://cdn.example.com/medieval.js", "https://rotki.com/"},
 		{"eval", "https://rotki.com/?ref=localhost"},
+		{"inline", "https://rotki.com/"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.blocked+" on "+tt.document, func(t *testing.T) {

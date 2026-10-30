@@ -235,7 +235,8 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent, format s
 	}
 
 	// Filter browser extension violations
-	if extensionPattern.MatchString(report.SourceFile) || extensionPattern.MatchString(report.BlockedURI) {
+	if extensionPattern.MatchString(report.SourceFile) || extensionPattern.MatchString(report.BlockedURI) ||
+		isBlobInjectedInline(report) {
 		return h.ignore(reasonBrowserExtension, "Browser extension violation filtered out", report, clientIP)
 	}
 
@@ -316,6 +317,14 @@ func policyHash(policy string) string {
 	normalized := strings.Join(strings.Fields(noncePattern.ReplaceAllString(policy, "")), " ")
 	sum := sha256.Sum256([]byte(normalized))
 	return hex.EncodeToString(sum[:6])
+}
+
+// isBlobInjectedInline reports whether an inline script was added by a script
+// running from a blob: URL. No policy allows scripts from blob:, so a page
+// script loaded that way would have been blocked itself; one that runs anyway
+// was injected outside the page's CSP by an extension or userscript.
+func isBlobInjectedInline(report cspReport) bool {
+	return report.BlockedURI == "inline" && strings.HasPrefix(report.SourceFile, "blob:")
 }
 
 // documentHost returns the lower-cased host of the document URI without a
