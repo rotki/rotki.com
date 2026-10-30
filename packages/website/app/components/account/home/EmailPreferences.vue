@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
 import { z } from 'zod';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useProfileUpdate } from '~/composables/account/use-profile-update';
 import { useZodForm } from '~/composables/use-zod-form';
@@ -25,8 +26,6 @@ const {
 
 const form = useZodForm(z.object({ newsletterConsent: z.boolean() }), state);
 
-const changed = computed<boolean>(() => state.newsletterConsent !== get(account)?.newsletterConsent);
-
 function reset(): void {
   const userAccount = get(account);
   if (!userAccount)
@@ -36,8 +35,11 @@ function reset(): void {
   form.reset();
 }
 
-async function update(): Promise<void> {
-  await updateProfile(form, state);
+/** Saves as soon as the switch flips, and flips it back when the save fails. */
+async function toggle(value: boolean): Promise<void> {
+  state.newsletterConsent = value;
+  if (!(await updateProfile(form, state)))
+    reset();
 }
 
 onBeforeMount(() => {
@@ -46,47 +48,23 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div>
-    <div class="text-h6 mb-2">
-      {{ t('email_preferences.title') }}
-    </div>
-    <p class="text-rui-text-secondary mb-6">
-      {{ t('email_preferences.description') }}
-    </p>
-
-    <RuiCheckbox
-      id="newsletter-consent"
-      v-model="state.newsletterConsent"
-      color="primary"
-      hide-details
-    >
-      {{ t('email_preferences.newsletter') }}
-    </RuiCheckbox>
-
-    <div class="mt-10 mb-5 border-t border-grey-50" />
-
-    <div class="flex justify-end gap-3">
-      <RuiButton
-        size="lg"
+  <AccountSection
+    :title="t('email_preferences.title')"
+    :description="t('email_preferences.description')"
+  >
+    <div class="max-w-2xl rounded-lg border border-default p-4 md:p-5">
+      <RuiSwitch
+        id="newsletter-consent"
+        :model-value="state.newsletterConsent"
+        :disabled="loading"
         color="primary"
-        variant="outlined"
-        :disabled="!changed"
-        @click="reset()"
-      >
-        {{ t('actions.reset') }}
-      </RuiButton>
-      <RuiButton
-        data-cy="update-email-preferences"
-        :disabled="!changed"
-        size="lg"
-        :loading="loading"
-        color="primary"
-        @click="update()"
-      >
-        {{ t('actions.update') }}
-      </RuiButton>
+        :label="t('email_preferences.newsletter')"
+        :hint="t('email_preferences.newsletter_hint')"
+        data-cy="newsletter-consent"
+        @update:model-value="toggle($event)"
+      />
     </div>
-  </div>
+  </AccountSection>
 
   <FloatingNotification
     type="success"

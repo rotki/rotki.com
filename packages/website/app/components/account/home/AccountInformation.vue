@@ -127,6 +127,13 @@ async function update(): Promise<void> {
   await updateProfile(form, state);
 }
 
+/** Enter in the VAT ID field runs the check next to it instead of submitting the whole form. */
+async function verifyOnEnter(): Promise<void> {
+  if (get(hideVATVerifyButton) || get(remainingTime) > 0 || !state.vatId || get(loadingCheck))
+    return;
+  await handleCheckVATClick();
+}
+
 async function handleCheckVATClick() {
   set(loadingCheck, true);
   await updateProfile(form, state);
@@ -192,6 +199,7 @@ onMounted(() => {
         :error-messages="[...errors('vatId'), vatStatusErrorMessage, vatErrorMessage]"
         :success-messages="vatSuccessMessage"
         @blur="touch('vatId')"
+        @keydown.enter.prevent="verifyOnEnter()"
       >
         <template #append>
           <RuiIcon
@@ -214,9 +222,10 @@ onMounted(() => {
       </RuiButton>
     </div>
   </DefineVAT>
-  <div
+  <form
     v-if="!movedOffline"
-    class="pt-2"
+    class="max-w-2xl"
+    @submit.prevent="update()"
   >
     <div class="space-y-5">
       <RuiTextField
@@ -258,32 +267,29 @@ onMounted(() => {
       <ReuseVAT />
     </div>
 
-    <div class="mt-10 mb-5 border-t border-grey-50" />
-
-    <div class="flex justify-end gap-3">
+    <div class="mt-8 flex flex-wrap gap-3">
       <RuiButton
-        size="lg"
+        type="submit"
+        data-cy="update-profile"
+        :disabled="invalid"
+        :loading="loading"
         color="primary"
-        variant="outlined"
+      >
+        {{ t('actions.save') }}
+      </RuiButton>
+      <RuiButton
+        variant="text"
+        color="primary"
         @click="reset()"
       >
         {{ t('actions.reset') }}
       </RuiButton>
-      <RuiButton
-        data-cy="update-profile"
-        :disabled="invalid"
-        size="lg"
-        :loading="loading"
-        color="primary"
-        @click="update()"
-      >
-        {{ t('actions.update') }}
-      </RuiButton>
     </div>
-  </div>
+  </form>
   <RuiAlert
     v-else
     type="info"
+    class="max-w-2xl"
   >
     <i18n-t
       keypath="account.moved_offline"
@@ -305,7 +311,7 @@ onMounted(() => {
 
   <div
     v-if="movedOffline"
-    class="mt-4"
+    class="mt-4 max-w-2xl"
   >
     <ReuseVAT />
   </div>

@@ -29,6 +29,8 @@ export const useMainStore = defineStore('main', () => {
   const braintreePaymentEnabled = ref<boolean>(true);
   const canBuy = ref<boolean>(true);
   const hasCardPayment = ref<boolean>(false);
+  /** Whether `hasCardPayment` has been worked out, so pages can hold space for card sections until it is. */
+  const cardPaymentChecked = ref<boolean>(false);
   let braintreePaymentAvailabilityRequest: Promise<void> | undefined;
 
   const logger = useLogger('store');
@@ -130,6 +132,7 @@ export const useMainStore = defineStore('main', () => {
     );
     if (cardSub) {
       set(hasCardPayment, true);
+      set(cardPaymentChecked, true);
       return;
     }
 
@@ -147,6 +150,7 @@ export const useMainStore = defineStore('main', () => {
       }
       set(hasCardPayment, false);
     }
+    set(cardPaymentChecked, true);
   };
 
   const getAccount = async (): Promise<void> => {
@@ -203,6 +207,7 @@ export const useMainStore = defineStore('main', () => {
     set(emailConfirmedCookie, undefined);
     set(canBuy, true); // Reset to default
     set(hasCardPayment, false);
+    set(cardPaymentChecked, false);
     clearPendingSubscriptionId();
   }
 
@@ -226,6 +231,7 @@ export const useMainStore = defineStore('main', () => {
     canBuy: computed<boolean>(() => get(canBuy)),
     fetchBraintreePaymentAvailability,
     getAccount,
+    cardPaymentChecked: computed<boolean>(() => get(cardPaymentChecked)),
     hasCardPayment: computed<boolean>(() => get(hasCardPayment)),
     login,
     logout,

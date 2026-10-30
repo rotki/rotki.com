@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useActionButtonStyle } from '~/components/account/home/subscription-table/types';
+
 defineProps<{
   actionsClasses?: string;
   loading?: boolean;
@@ -9,13 +11,15 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
+const buttonStyle = useActionButtonStyle();
 </script>
 
 <template>
   <RuiButton
     color="warning"
-    variant="text"
-    size="sm"
+    :variant="buttonStyle.variant"
+    :size="buttonStyle.size"
     :class="actionsClasses"
     :loading="loading"
     @click="emit('click')"

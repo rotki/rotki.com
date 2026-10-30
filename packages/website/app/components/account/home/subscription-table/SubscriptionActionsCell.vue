@@ -12,6 +12,7 @@ import RenewActionButton from '~/components/account/home/subscription-table/acti
 import ResumeActionButton from '~/components/account/home/subscription-table/actions/ResumeActionButton.vue';
 import UpgradeActionButton from '~/components/account/home/subscription-table/actions/UpgradeActionButton.vue';
 import { getPendingPaymentLink } from '~/components/account/home/subscription-table/config';
+import { ActionButtonStyleKey } from '~/components/account/home/subscription-table/types';
 import { useSubscriptionActions } from '~/composables/subscription/use-subscription-actions';
 import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
@@ -82,6 +83,8 @@ interface Props {
   operationState: OperationState;
   cryptoPaymentState: CryptoPaymentState;
   layout?: 'vertical' | 'horizontal';
+  /** Full outlined buttons instead of compact text links, for the plan card. */
+  prominent?: boolean;
 }
 
 const {
@@ -91,11 +94,14 @@ const {
   operationState,
   cryptoPaymentState,
   layout = 'vertical',
+  prominent = false,
 } = defineProps<Props>();
 
 const emit = defineEmits<{
   action: [event: SubscriptionActionEvent];
 }>();
+
+provide(ActionButtonStyleKey, prominent ? { variant: 'outlined' } : { variant: 'text', size: 'sm' });
 
 const upgradePlanId = ref<number>();
 

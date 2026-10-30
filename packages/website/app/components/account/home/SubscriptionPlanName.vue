@@ -26,6 +26,7 @@ const isUpgradeAvailable = computed<boolean>(() => !get(isUpgradePending) && can
     <RuiChip
       v-if="isUpgradePending"
       size="sm"
+      variant="tonal"
       color="warning"
     >
       <div class="flex items-center gap-1">
@@ -39,6 +40,7 @@ const isUpgradeAvailable = computed<boolean>(() => !get(isUpgradePending) && can
     <RuiChip
       v-else-if="isUpgradeAvailable"
       size="sm"
+      variant="tonal"
       color="primary"
     >
       <div class="flex items-center gap-1">

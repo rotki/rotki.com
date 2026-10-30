@@ -74,9 +74,10 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div
+  <form
     v-if="!movedOffline"
-    class="pt-2"
+    class="max-w-2xl"
+    @submit.prevent="update()"
   >
     <div class="space-y-5">
       <RuiTextField
@@ -139,31 +140,28 @@ const { t } = useI18n({ useScope: 'global' });
       />
     </div>
 
-    <div class="mt-10 mb-5 border-t border-grey-50" />
-
-    <div class="flex justify-end gap-3">
+    <div class="mt-8 flex flex-wrap gap-3">
       <RuiButton
-        size="lg"
+        type="submit"
+        :disabled="invalid"
+        :loading="loading"
         color="primary"
-        variant="outlined"
+      >
+        {{ t('actions.save') }}
+      </RuiButton>
+      <RuiButton
+        variant="text"
+        color="primary"
         @click="reset()"
       >
         {{ t('actions.reset') }}
       </RuiButton>
-      <RuiButton
-        :disabled="invalid"
-        size="lg"
-        :loading="loading"
-        color="primary"
-        @click="update()"
-      >
-        {{ t('actions.update') }}
-      </RuiButton>
     </div>
-  </div>
+  </form>
   <RuiAlert
     v-else
     type="info"
+    class="max-w-2xl"
   >
     <i18n-t
       keypath="account.moved_offline"

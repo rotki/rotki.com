@@ -12,3 +12,8 @@ export const PAID_USING_CARD = 'CREDIT_CARD';
 export function hasCardPaymentInHistory(payments: readonly Pick<UserPayment, 'paidUsing' | 'isRefund'>[]): boolean {
   return payments.some(p => p.paidUsing === PAID_USING_CARD && !p.isRefund);
 }
+
+/** Where a payment's invoice downloads from: legacy payments only have a receipt. */
+export function invoiceUrl({ identifier, legacy }: Pick<UserPayment, 'identifier' | 'legacy'>): string {
+  return legacy ? `/webapi/download/receipt/${identifier}/` : `/webapi/2/invoices/${identifier}/`;
+}

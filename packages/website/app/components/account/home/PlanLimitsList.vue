@@ -24,7 +24,7 @@ const hasMoreLimits = computed<boolean>(() => limits.length > 4);
 
 function formatLimitValue(value: string | number | boolean): string {
   if (typeof value === 'boolean') {
-    return value ? t('common.yes') : t('common.no');
+    return value ? t('account.subscriptions.included') : t('account.subscriptions.not_included');
   }
   if (typeof value === 'number') {
     return value.toLocaleString();
@@ -35,64 +35,45 @@ function formatLimitValue(value: string | number | boolean): string {
 
 <template>
   <div v-if="limits.length > 0">
-    <div class="flex items-center gap-2 text-rui-text-secondary text-sm mb-2">
-      <RuiIcon
-        name="lu-list-checks"
-        size="16"
-      />
-      <span>{{ t('account.subscriptions.plan_limits') }}</span>
-    </div>
-    <div class="space-y-2">
-      <TransitionGroup
-        name="limit-list"
-        tag="div"
-        class="space-y-2"
+    <p class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
+      {{ t('account.subscriptions.plan_limits') }}
+    </p>
+    <dl class="mt-3 grid gap-x-8 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div
+        v-for="limit in displayedLimits"
+        :key="limit.label"
+        class="min-w-0"
       >
-        <div
-          v-for="limit in displayedLimits"
-          :key="limit.label"
-          class="flex justify-between items-center text-sm gap-2 transition-all duration-300 ease-in-out"
-        >
-          <span class="text-rui-text-secondary">{{ limit.label }}:</span>
-          <template v-if="typeof limit.value === 'boolean'">
-            <RuiIcon
-              v-if="limit.value"
-              name="lu-circle-check"
-              size="20"
-              color="success"
-            />
-            <RuiIcon
-              v-else
-              name="lu-minus"
-              size="20"
-              class="text-rui-text-secondary"
-            />
-          </template>
-          <span
-            v-else
-            class="font-medium"
-          >
-            {{ formatLimitValue(limit.value) }}
-          </span>
-        </div>
-      </TransitionGroup>
-
-      <!-- Show more/less button -->
-      <RuiButton
-        v-if="hasMoreLimits"
-        variant="text"
-        size="sm"
-        class="p-0! min-w-0! mt-2"
-        @click="showAllLimits = !showAllLimits"
-      >
-        <template #prepend>
+        <dt class="text-body-2 text-rui-text-secondary">
+          {{ limit.label }}
+        </dt>
+        <dd class="mt-0.5 flex items-center gap-1.5 text-body-2 font-medium text-rui-text">
           <RuiIcon
-            :name="showAllLimits ? 'lu-chevron-up' : 'lu-chevron-down'"
+            v-if="typeof limit.value === 'boolean'"
+            :name="limit.value ? 'lu-circle-check' : 'lu-minus'"
             size="16"
+            :class="limit.value ? 'text-rui-success' : 'text-rui-text-secondary'"
           />
-        </template>
-        {{ showAllLimits ? t('common.show_less') : t('common.show_more') }}
-      </RuiButton>
-    </div>
+          {{ formatLimitValue(limit.value) }}
+        </dd>
+      </div>
+    </dl>
+
+    <RuiButton
+      v-if="hasMoreLimits"
+      variant="text"
+      color="primary"
+      size="sm"
+      class="mt-2 -ml-2"
+      @click="showAllLimits = !showAllLimits"
+    >
+      <template #prepend>
+        <RuiIcon
+          :name="showAllLimits ? 'lu-chevron-up' : 'lu-chevron-down'"
+          size="16"
+        />
+      </template>
+      {{ showAllLimits ? t('common.show_less') : t('common.show_more') }}
+    </RuiButton>
   </div>
 </template>

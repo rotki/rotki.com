@@ -3,10 +3,12 @@ import type { DataTableColumn, TablePaginationData } from '@rotki/ui-library';
 import type { UserDevice } from '~/types/account';
 import { createReusableTemplate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import DeleteDeviceDialog from '~/components/account/home/DeleteDeviceDialog.vue';
 import RenameDeviceDialog from '~/components/account/home/RenameDeviceDialog.vue';
 import { useUserDevices } from '~/composables/account/use-user-devices';
 import { formatDate } from '~/utils/date';
+import { fitsOnePage } from '~/utils/table';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -68,7 +70,10 @@ function showRenameDialog(device: UserDevice): void {
 </script>
 
 <template>
-  <div>
+  <AccountSection
+    :title="t('account.devices.title')"
+    :description="t('account.devices.description')"
+  >
     <DefinePlatformDisplay #default="{ platform }">
       <div class="flex items-center gap-2">
         <RuiIcon
@@ -87,15 +92,13 @@ function showRenameDialog(device: UserDevice): void {
         <span>{{ platform.label }}</span>
       </div>
     </DefinePlatformDisplay>
-    <div class="text-h6 mb-6">
-      {{ t('account.tabs.devices') }}
-    </div>
     <RuiDataTable
       v-model:pagination="pagination"
       :cols="headers"
       :loading="loading"
-      :empty="{ description: t('account.devices.no_devices_found') }"
+      :empty="{ label: t('account.devices.no_devices_found'), description: t('account.devices.no_devices_hint') }"
       :rows="userDevices"
+      :hide-pagination="fitsOnePage(userDevices)"
       outlined
       row-attr="id"
     >
@@ -148,5 +151,5 @@ function showRenameDialog(device: UserDevice): void {
       v-model="deviceToRename"
       v-model:loading="renameLoading"
     />
-  </div>
+  </AccountSection>
 </template>

@@ -1,9 +1,12 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { ContextColorsType } from '@rotki/ui-library';
 import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
+import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
 import { formatDate } from '~/utils/date';
 
 export function useSubscriptionStatus(subscription: MaybeRefOrGetter<UserSubscription>) {
   const { t } = useI18n({ useScope: 'global' });
+  const { getChipStatusColor } = useSubscriptionDisplay();
 
   /**
    * Returns formatted status text, including cancellation date for cancelled-but-active subscriptions
@@ -18,28 +21,11 @@ export function useSubscriptionStatus(subscription: MaybeRefOrGetter<UserSubscri
     return sub.status;
   });
 
-  /**
-   * Returns CSS classes for card border styling based on subscription status
-   */
-  const statusCardClass = computed<string>(() => {
-    const status = toValue(subscription).status;
-    // Error states (red)
-    if (status === 'Cancelled' || status === 'Payment Failed') {
-      return '!border-l-4 !border-l-rui-error';
-    }
-    // Warning states (yellow/orange)
-    if (status === 'Past Due' || status === 'Pending' || status === 'Upgrade Requested') {
-      return '!border-l-4 !border-l-rui-warning';
-    }
-    // Success states (green)
-    if (status === 'Active' || status === 'Cancelled but still active') {
-      return '!border-l-4 !border-l-rui-success';
-    }
-    return '';
-  });
+  /** Chip color for the subscription's status, grey when the status has no color of its own. */
+  const statusColor = computed<ContextColorsType | 'grey'>(() => getChipStatusColor(toValue(subscription).status) ?? 'grey');
 
   return {
     statusDisplayText,
-    statusCardClass,
+    statusColor,
   };
 }

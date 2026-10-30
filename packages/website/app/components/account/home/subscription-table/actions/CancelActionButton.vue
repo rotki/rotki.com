@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useActionButtonStyle } from '~/components/account/home/subscription-table/types';
+
 const { actionsClasses, loading, disabled, cancellationStatus } = defineProps<{
   actionsClasses?: string;
   loading?: boolean;
@@ -28,6 +30,8 @@ const statusMessage = computed<string>(() => {
       return '';
   }
 });
+
+const buttonStyle = useActionButtonStyle();
 </script>
 
 <template>
@@ -36,11 +40,11 @@ const statusMessage = computed<string>(() => {
       <RuiButton
         :loading="loading"
         :disabled="disabled"
-        variant="text"
+        :variant="buttonStyle.variant"
         type="button"
         color="error"
         :class="actionsClasses"
-        size="sm"
+        :size="buttonStyle.size"
         @click="emit('click')"
       >
         <template #prepend>

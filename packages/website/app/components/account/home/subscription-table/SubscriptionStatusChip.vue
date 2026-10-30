@@ -28,14 +28,14 @@ const isPendingCrypto = computed<boolean>(() => isCryptoPaymentPending(subscript
 <template>
   <RuiChip
     size="sm"
+    variant="tonal"
     :color="chipColor"
   >
     <RuiTooltip v-if="isCancelled">
       <template #activator>
         <div class="flex py-0.5 items-center gap-1">
           <RuiIcon
-            size="16"
-            class="text-white"
+            size="14"
             name="lu-info"
           />
           {{ t('account.subscriptions.cancelled_but_still_active.status', { date: formatDate(subscription.nextActionDate) }) }}

@@ -79,7 +79,11 @@ func TestPermanentRedirects(t *testing.T) {
 		to   string
 	}{
 		{"/sponsor", "/sponsor/mint"},
-		{"/home/payment-methods", "/home/saved-cards"},
+		{"/home/payment-methods", "/home/billing"},
+		{"/home/saved-cards", "/home/billing"},
+		{"/home/customer-information", "/home/billing"},
+		{"/home/address", "/home/billing"},
+		{"/home/email-preferences", "/home/account-details"},
 	}
 
 	for _, tt := range tests {

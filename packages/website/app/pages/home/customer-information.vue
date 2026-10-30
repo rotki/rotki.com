@@ -1,15 +1,10 @@
 <script lang="ts" setup>
-import AccountInformation from '~/components/account/home/AccountInformation.vue';
-import { usePageSeoNoIndex } from '~/composables/use-page-seo';
-
-usePageSeoNoIndex('Customer Information');
-
 definePageMeta({
-  auth: true,
-  layout: 'account',
+  // In-app visits reload into Billing, so it arrives with the CSP its card forms need
+  middleware: () => navigateTo('/home/billing', { external: true, replace: true }),
 });
 </script>
 
 <template>
-  <AccountInformation />
+  <div />
 </template>

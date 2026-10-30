@@ -12,9 +12,19 @@
     "api_keys": {
       "api_key": "API Key",
       "api_secret": "API Secret",
-      "docs_hint": "Learn how to use your API credentials in the rotki app",
+      "docs_hint": "How to add API credentials in the app",
       "not_generated": "You haven't generated an API key",
-      "title": "API Credentials"
+      "connect": {
+        "title": "Connect the rotki app",
+        "description": "Three steps, once for each device.",
+        "copy": "Copy your API credentials",
+        "open_app": "Add them in the rotki app",
+        "paste": "Your device connects",
+        "paste_hint": "It shows up in the device list below once it syncs with your account."
+      },
+      "regenerate": "Create new credentials",
+      "regenerate_hint": "Your devices stop syncing until you add the new credentials to each of them.",
+      "premium_only": "API credentials come with a premium plan. They connect the rotki app to your subscription."
     },
     "credit": {
       "balance": "Available Credit",
@@ -28,22 +38,18 @@
         "notes": "Notes",
         "title": "Credit history",
         "type": "Type"
-      },
-      "title": "Account Credit",
-      "description": "Credit is earned through referrals and other rewards. It is applied automatically to your renewals and upgrades."
+      }
     },
     "referral_code": {
       "code": "Referral Code",
-      "description": "Generate a unique referral code to share with friends and earn rewards when they subscribe to rotki premium.",
       "discount_amount": "People using this code get {amount}€ off their first subscription",
-      "discount_benefit": "Referral Discount",
       "discount_percentage": "People using this code get {percentage}% off their first subscription",
       "email_subject": "Save on rotki premium with my referral code",
       "not_created": "You haven't created a referral code yet",
-      "share_description": "Share this referral code with friends to help them save on their rotki premium subscription.",
       "share_message": "Join me on rotki premium and save {discount} with my referral code: {code}!",
       "share_via": "Share via:",
-      "title": "Referral Code"
+      "share_on": "Share on {name}",
+      "share_by_email": "Share by e-mail"
     },
     "change_password": {
       "current_password": {
@@ -56,7 +62,9 @@
       "new_password": {
         "label": "New password"
       },
-      "title": "Change Password"
+      "title": "Change Password",
+      "submit": "Change password",
+      "description": "The password you sign in with on rotki.com."
     },
     "delete_account": {
       "confirmation": {
@@ -71,7 +79,7 @@
       "unable_to_delete": "You cannot delete your account while you have an active subscription."
     },
     "devices": {
-      "no_devices_found": "No devices found",
+      "no_devices_found": "No devices yet",
       "headers": {
         "label": "Label",
         "last_seen": "Last Seen at",
@@ -85,7 +93,10 @@
         "error": "Failed to rename device",
         "label": "Device Name",
         "title": "Rename Device"
-      }
+      },
+      "no_devices_hint": "A device shows up here once a rotki app signs in with your premium API credentials.",
+      "title": "Devices",
+      "description": "The rotki apps that use your premium subscription. Remove the ones you no longer use."
     },
     "moved_offline": "Your account details have been moved offline. For editing please contact {email}.",
     "no_premium": {
@@ -99,9 +110,10 @@
     },
     "payments": {
       "headers": {
-        "method": "Method",
-        "paid_amount": "Paid Amount",
-        "paid_at": "Paid at"
+        "method": "Paid with",
+        "paid_amount": "Amount",
+        "paid_at": "Date",
+        "invoice": "Invoice"
       },
       "credit_applied": "Credit applied: {amount} €",
       "method_with_credit": "{method} + Credit",
@@ -110,7 +122,8 @@
       "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
       "upgraded_from": "Upgrade from {plan}",
-      "title": "Your latest payments"
+      "title": "Billing history",
+      "description": "Every payment, with its invoice."
     },
     "subscriptions": {
       "access_expires": "Access Expires",
@@ -120,8 +133,7 @@
       "next_action_date": "Next Action Date",
       "next_billing": "Next Billing",
       "next_billing_amount": "Next Billing Amount",
-      "plan": "Plan",
-      "plan_limits": "Plan Limits",
+      "plan_limits": "What your plan includes",
       "upgrade_available": "Upgrade Available",
       "upgrade_pending": "Upgrade Pending",
       "actions": {
@@ -201,7 +213,7 @@
         "title": "Resume your rotki subscription"
       },
       "resume_hint": "Resume the active billing of your subscription from {date}",
-      "title": "Subscription History",
+      "title": "Subscriptions",
       "upgrade": {
         "upgrade": "Upgrade plan",
         "cancel": "Cancel Upgrade Request",
@@ -213,16 +225,19 @@
             "yes": "Yes, cancel the upgrade"
           }
         }
-      }
+      },
+      "current_plan": "Your plan",
+      "past_hint": "No subscriptions yet | One past subscription, nothing to act on. | {count} past subscriptions, nothing to act on.",
+      "included": "Included",
+      "not_included": "Not included"
     },
     "tabs": {
-      "account_details": "Account Details",
-      "address": "Address",
       "customer_information": "Customer Information",
-      "devices": "Devices List",
-      "email_preferences": "Email Preferences",
-      "subscription": "Subscription",
-      "payment_methods": "Saved Cards"
+      "devices": "Devices & API",
+      "overview": "Overview",
+      "billing": "Billing",
+      "devices_short": "Devices",
+      "account": "Account"
     },
     "unverified_email": {
       "message": {
@@ -237,16 +252,61 @@
       },
       "resend": "Re-send activation e-mail"
     },
-    "welcome": "Welcome"
+    "tab_descriptions": {
+      "overview": "Your plan, what it includes, and what to do next.",
+      "billing": "How you pay, what you paid, and what goes on your invoices.",
+      "devices": "Connect the rotki app to your plan and see which devices use it.",
+      "account": "How you sign in, what we e-mail you, and closing your account."
+    },
+    "navigation": "Account",
+    "download_app": "Download the app",
+    "sign_out": "Sign out",
+    "overview": {
+      "devices": "Devices",
+      "devices_connected": "None connected | {count} connected | {count} connected",
+      "manage_devices": "Manage devices",
+      "refer_a_friend": "Refer a friend to earn more",
+      "last_payment": "Last payment",
+      "invoice": "Invoice",
+      "no_payments": "No payments yet",
+      "connect": {
+        "title": "Connect the rotki app",
+        "description": "Premium works in the app once you add your API credentials there.",
+        "action": "Get your API credentials"
+      },
+      "confirm_first": "Confirm your e-mail address to choose a plan. The link is in the e-mail we sent when you signed up.",
+      "manage_billing": "Manage billing"
+    },
+    "billing": {
+      "cards": {
+        "title": "Payment method",
+        "description": "The cards that pay for your renewals."
+      },
+      "referral": {
+        "title": "Refer a friend",
+        "description": "Friends get a discount on their first subscription, and you get account credit that pays for your renewals."
+      },
+      "invoice": {
+        "title": "Invoice details",
+        "description": "The name and address printed on your invoices.",
+        "name": "Name",
+        "company": "Company",
+        "vat_id": "VAT ID",
+        "address": "Address",
+        "name_and_vat": "Name and VAT ID",
+        "not_set": "Not set"
+      }
+    }
   },
   "account_details": {
     "check_email": "To change your email, please contact our support team via",
-    "title": "Details"
+    "title": "Sign-in details"
   },
   "email_preferences": {
-    "description": "Choose whether you receive optional emails from rotki.",
-    "newsletter": "I would like to receive product updates and news from rotki.",
-    "title": "Email Preferences"
+    "newsletter": "Product updates and news",
+    "title": "E-mail preferences",
+    "description": "Account and payment e-mails always arrive. These are optional.",
+    "newsletter_hint": "New releases and features from rotki."
   },
   "actions": {
     "add_card": "Add card",
@@ -275,8 +335,11 @@
     "resume": "Resume",
     "start_now_for_free": "Start now for free",
     "submit": "Submit",
-    "update": "Update",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "refresh": "Refresh",
+    "close": "Close",
+    "show": "Show",
+    "hide": "Hide"
   },
   "auth": {
     "activation": {
@@ -562,8 +625,8 @@
         "no_cards": "No saved cards",
         "no_cards_description": "Add a payment card to make future purchases easier",
         "reauthorize": "Re-authorize",
-        "subtitle": "Manage cards for payments and auto-renewal",
-        "title": "Saved Cards"
+        "ending_in": "Card ending in {last4}",
+        "remove_card": "Remove the card ending in {last4}"
       }
     },
     "stats": {

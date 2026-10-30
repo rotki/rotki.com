@@ -1,35 +1,25 @@
-<script setup lang="ts">
-// Skeleton loader for payment card
-</script>
-
 <template>
-  <RuiCard>
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <!-- Card logo container -->
-        <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center p-1">
-          <RuiSkeletonLoader class="w-full h-full rounded-sm" />
-        </div>
-        <!-- Card details -->
-        <div>
-          <div class="mb-1">
-            <RuiSkeletonLoader class="w-40 h-[22px]" />
-          </div>
-          <div>
-            <RuiSkeletonLoader class="w-28 h-[18px]" />
-          </div>
-        </div>
+  <div class="rounded-lg border border-default p-4 md:px-5 flex flex-wrap items-center gap-x-4 gap-y-3">
+    <!-- Mirrors PaymentCard row by row, so the list does not move when the cards arrive -->
+    <RuiSkeletonLoader
+      class="h-9 w-14 shrink-0"
+      rounded="md"
+    />
+    <div class="flex-1 min-w-40">
+      <div class="h-6 flex items-center">
+        <RuiSkeletonLoader class="h-4 w-40" />
       </div>
-      <!-- Actions -->
-      <div class="flex items-center gap-2">
-        <!-- Linked card section -->
-        <div class="flex flex-col items-center gap-1">
-          <RuiSkeletonLoader class="w-32 h-[24px] rounded-full" />
-          <RuiSkeletonLoader class="w-24 h-[32px] rounded-sm" />
-        </div>
-        <!-- Delete button -->
-        <RuiSkeletonLoader class="w-10 h-10 rounded-sm" />
+      <div class="h-5 flex items-center">
+        <RuiSkeletonLoader class="h-3.5 w-28" />
       </div>
     </div>
-  </RuiCard>
+    <RuiSkeletonLoader
+      class="h-6 w-32"
+      rounded="full"
+    />
+    <div class="flex items-center gap-1">
+      <RuiSkeletonLoader class="h-9 w-28" />
+      <RuiSkeletonLoader class="size-9" />
+    </div>
+  </div>
 </template>

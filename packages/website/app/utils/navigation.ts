@@ -11,8 +11,8 @@ const SPECIAL_CSP_ROUTES = [
   '/checkout/pay/paypal',
   '/checkout/pay/request-crypto',
   '/checkout/pay/3d-secure',
-  // Account saved cards (requires 3DS CSP)
-  '/home/saved-cards',
+  // Account billing, where saved cards are managed (requires 3DS CSP)
+  '/home/billing',
   // Auth routes
   '/signup',
   '/password/recover',

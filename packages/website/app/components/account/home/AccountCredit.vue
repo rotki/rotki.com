@@ -1,114 +1,92 @@
 <script setup lang="ts">
 import AccountCreditHistoryTable from '~/components/account/home/AccountCreditHistoryTable.vue';
+import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import { useCredit } from '~/composables/account/use-credit';
-import { formatCurrency } from '~/utils/text';
+import { formatDecimalString } from '~/utils/text';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const historyOpen = ref<number[]>([]);
+const historyOpen = ref<boolean>(false);
 
 const { balance, hasHistory, history, initialLoading, load, loading } = useCredit();
 
-function formatCreditAmount(value: string): string {
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? formatCurrency(parsed) : value;
-}
-
 function formatEur(value: string): string {
-  return t('account.credit.balance_eur', { amount: formatCreditAmount(value) });
+  return t('account.credit.balance_eur', { amount: formatDecimalString(value) });
 }
 
 onMounted(load);
 </script>
 
 <template>
-  <div>
-    <div class="flex items-center gap-2 text-h6 mb-6">
-      {{ t('account.credit.title') }}
-      <RuiButton
-        variant="text"
-        color="primary"
-        icon
+  <div class="rounded-lg bg-rui-grey-50 dark:bg-rui-grey-900 p-4 md:p-5">
+    <div class="flex items-start justify-between gap-2">
+      <p class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
+        {{ t('account.credit.balance') }}
+      </p>
+      <RefreshButton
         :loading="loading"
         :disabled="initialLoading"
-        class="p-2!"
-        @click="load()"
-      >
-        <RuiIcon
-          name="lu-refresh-cw"
-          size="16"
-        />
-      </RuiButton>
+        class="-mt-2 -mr-2"
+        @refresh="load()"
+      />
     </div>
 
-    <RuiCard
-      variant="flat"
-      class="bg-rui-grey-50! dark:bg-rui-grey-900! p-1 border border-rui-grey-300 dark:border-rui-grey-800"
-    >
-      <div
-        v-if="initialLoading"
-        class="space-y-4"
-      >
-        <RuiSkeletonLoader class="h-4 w-full max-w-xl" />
-        <RuiSkeletonLoader class="h-6 w-48" />
-        <RuiSkeletonLoader class="h-16 w-full" />
+    <!-- Same block heights as the loaded panel, so the row does not grow when the balance arrives -->
+    <template v-if="initialLoading">
+      <div class="h-[38px] flex items-center">
+        <RuiSkeletonLoader class="h-8 w-32" />
       </div>
-
-      <div
+      <div class="mt-2 h-[60px] flex flex-col justify-around">
+        <RuiSkeletonLoader class="h-3 w-full" />
+        <RuiSkeletonLoader class="h-3 w-full" />
+        <RuiSkeletonLoader class="h-3 w-2/3" />
+      </div>
+      <RuiSkeletonLoader class="mt-3 h-7 w-28" />
+    </template>
+    <template v-else>
+      <p class="text-h4 text-rui-text tabular-nums">
+        {{ formatEur(balance) }}
+      </p>
+      <p class="mt-2 text-caption text-rui-text-secondary text-pretty">
+        {{ t('account.credit.disclaimer') }}
+      </p>
+      <RuiButton
+        v-if="hasHistory"
+        variant="text"
+        color="primary"
+        size="sm"
+        class="mt-3 -ml-2"
+        @click="historyOpen = true"
+      >
+        {{ t('account.credit.history.title') }}
+      </RuiButton>
+      <p
         v-else
-        class="space-y-4"
+        class="mt-3 text-caption text-rui-text-secondary"
       >
-        <div class="text-body-2 text-rui-text-secondary">
-          {{ t('account.credit.description') }}
+        {{ t('account.credit.empty_history') }}
+      </p>
+    </template>
+
+    <RuiDialog
+      v-model="historyOpen"
+      max-width="760"
+    >
+      <RuiCard>
+        <template #header>
+          {{ t('account.credit.history.title') }}
+        </template>
+        <AccountCreditHistoryTable :rows="history" />
+        <div class="flex justify-end pt-4">
+          <RuiButton
+            variant="text"
+            color="primary"
+            @click="historyOpen = false"
+          >
+            {{ t('actions.close') }}
+          </RuiButton>
         </div>
-
-        <div class="flex items-center gap-3">
-          <RuiIcon
-            name="lu-coins"
-            size="20"
-            class="text-rui-primary"
-          />
-          <span class="text-rui-text-secondary text-body-2">{{ t('account.credit.balance') }}:</span>
-          <span class="text-h6 font-bold text-rui-primary">
-            {{ formatEur(balance) }}
-          </span>
-        </div>
-
-        <RuiAlert
-          type="info"
-          icon="lu-info"
-          class="border border-rui-info/50"
-        >
-          {{ t('account.credit.disclaimer') }}
-        </RuiAlert>
-
-        <RuiAccordions
-          v-if="hasHistory"
-          v-model="historyOpen"
-        >
-          <RuiAccordion>
-            <template #header>
-              <span class="text-body-2 font-medium">{{ t('account.credit.history.title') }}</span>
-            </template>
-
-            <div class="pt-3">
-              <AccountCreditHistoryTable :rows="history" />
-            </div>
-          </RuiAccordion>
-        </RuiAccordions>
-
-        <div
-          v-else
-          class="flex items-center gap-2 text-body-2 text-rui-text-secondary"
-        >
-          <RuiIcon
-            name="lu-clock"
-            size="16"
-            class="text-rui-text-disabled"
-          />
-          {{ t('account.credit.empty_history') }}
-        </div>
-      </div>
-    </RuiCard>
+      </RuiCard>
+    </RuiDialog>
   </div>
 </template>

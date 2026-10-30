@@ -227,7 +227,7 @@ var (
 	// DefaultCSP is the base CSP for pages with no special requirements.
 	DefaultCSP = BaseCSP
 
-	// SavedCardsCSP covers /home/saved-cards.
+	// SavedCardsCSP covers /home/billing, where saved cards are managed.
 	SavedCardsCSP = Merge(BaseCSP, BraintreeBaseCSP, ThreeDSecureCSP)
 
 	// CheckoutPayCSP covers /checkout/pay.

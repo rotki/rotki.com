@@ -16,7 +16,7 @@ func TestForRoute(t *testing.T) {
 		{"/download", true, nil},
 		{"/signup", false, SignupCSP},
 		{"/password/recover", false, PasswordRecoverCSP},
-		{"/home/saved-cards", false, SavedCardsCSP},
+		{"/home/billing", false, SavedCardsCSP},
 		{"/checkout/pay", false, CheckoutPayCSP},
 		{"/pricing", false, CheckoutPayCSP},
 		{"/checkout/pay/card", false, CardPaymentMerged},

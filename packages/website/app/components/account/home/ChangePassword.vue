@@ -2,6 +2,7 @@
 import type { ActionResult } from '~/types/common';
 import { set } from '@vueuse/shared';
 import { z } from 'zod';
+import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
@@ -9,6 +10,7 @@ import { useFormRules } from '~/composables/use-form-rules';
 import { useZodForm } from '~/composables/use-zod-form';
 import { PASSWORD_MIN_LENGTH } from '~/utils/validation';
 
+const open = ref<boolean>(false);
 const loading = ref<boolean>(false);
 const success = ref<boolean>(false);
 
@@ -38,6 +40,9 @@ const { start: startSuccessTimeout, stop: stopSuccessTimeout } = useTimeoutFn(()
 }, 4000, { immediate: false });
 
 async function changePassword(): Promise<void> {
+  if (!form.validate())
+    return;
+
   set(loading, true);
   const result: ActionResult = await accountApi.changePassword(state);
   set(loading, false);
@@ -48,24 +53,42 @@ async function changePassword(): Promise<void> {
     set(success, true);
     stopSuccessTimeout();
     startSuccessTimeout();
-    reset();
+    close();
   }
 }
 
-function reset(): void {
+function close(): void {
   state.currentPassword = '';
   state.newPassword = '';
   state.passwordConfirmation = '';
   form.reset();
+  set(open, false);
 }
 </script>
 
 <template>
-  <div>
-    <div class="text-h6 mb-6">
-      {{ t('account.change_password.title') }}
-    </div>
-    <div>
+  <AccountSection
+    :title="t('account.change_password.title')"
+    :description="t('account.change_password.description')"
+  >
+    <template #actions>
+      <RuiButton
+        v-if="!open"
+        color="primary"
+        variant="outlined"
+        aria-controls="change-password-form"
+        :aria-expanded="open"
+        @click="open = true"
+      >
+        {{ t('actions.change') }}
+      </RuiButton>
+    </template>
+    <form
+      v-if="open"
+      id="change-password-form"
+      class="max-w-2xl"
+      @submit.prevent="changePassword()"
+    >
       <div class="space-y-5">
         <RuiRevealableTextField
           id="current-password"
@@ -109,29 +132,25 @@ function reset(): void {
         />
       </div>
 
-      <div class="mt-10 mb-5 border-t border-grey-50" />
-
-      <div class="flex justify-end gap-3">
+      <div class="mt-8 flex flex-wrap gap-3">
         <RuiButton
-          size="lg"
-          color="primary"
-          variant="outlined"
-          @click="reset()"
-        >
-          {{ t('actions.reset') }}
-        </RuiButton>
-        <RuiButton
+          type="submit"
           :disabled="invalid"
-          size="lg"
           :loading="loading"
           color="primary"
-          @click="changePassword()"
         >
-          {{ t('actions.update') }}
+          {{ t('account.change_password.submit') }}
+        </RuiButton>
+        <RuiButton
+          variant="text"
+          color="primary"
+          @click="close()"
+        >
+          {{ t('actions.cancel') }}
         </RuiButton>
       </div>
-    </div>
-  </div>
+    </form>
+  </AccountSection>
 
   <FloatingNotification
     type="success"
