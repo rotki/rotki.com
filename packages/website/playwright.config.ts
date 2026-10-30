@@ -1,17 +1,10 @@
 import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 import { isCoverageEnabled } from './tests/e2e/support/coverage';
-import { nuxtPort } from './tests/e2e/support/warm-up-global-setup';
+import { envOrDefault, mockApiPort, nuxtPort, goPort as port } from './tests/e2e/support/ports';
 
-/** Reads an environment variable, treating an empty value the same as an unset one. */
-function envOrDefault(name: string, fallback: string): string {
-  const value = process.env[name];
-  return value === undefined || value === '' ? fallback : value;
-}
-
-const port = envOrDefault('PORT', '48123');
-const mockApiPort = '9999';
 const baseURL = envOrDefault('BASE_URL', `http://localhost:${port}`);
+const mockApiUrl = `http://127.0.0.1:${mockApiPort}`;
 
 // Use system Chromium if PLAYWRIGHT_CHROMIUM_PATH is set (e.g., on Arch Linux)
 const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
@@ -58,24 +51,26 @@ export default defineConfig({
     },
   ],
   webServer: [
-    // Mock API server, starts first
+    /* Mock API server, starts first. Bound to 127.0.0.1 and reached through that address: on its
+       own nitro listens on ::1 only, and the Go proxy dials localhost as 127.0.0.1, so every
+       proxied /webapi call failed with a 502. */
     {
-      command: 'pnpm --filter e2e-mock-api dev',
+      command: `pnpm --filter e2e-mock-api exec nitro dev --host 127.0.0.1 --port ${mockApiPort}`,
       env: {
         ALLOWED_ORIGIN: `http://localhost:${port}`,
       },
-      url: `http://localhost:${mockApiPort}/webapi/2/available-tiers`,
+      url: `${mockApiUrl}/webapi/2/available-tiers`,
       reuseExistingServer: !process.env.CI,
       timeout: 60000,
     },
-    // Nuxt dev server, frontend only (port hardcoded in package.json dev script)
+    // Nuxt dev server, frontend only, on its own port so a running dev stack is never reused
     {
-      command: 'pnpm dev',
+      command: `pnpm exec nuxi dev --host 0.0.0.0 --port ${nuxtPort}`,
       env: {
         TEST: 'true',
         NUXT_PUBLIC_BASE_URL: `http://localhost:${port}`,
         // The plans the pages are built with come from the mock API, like every other request here
-        TIERS_SNAPSHOT_URL: `http://localhost:${mockApiPort}`,
+        TIERS_SNAPSHOT_URL: mockApiUrl,
       },
       url: `http://localhost:${nuxtPort}`,
       reuseExistingServer: !process.env.CI,
@@ -90,7 +85,7 @@ export default defineConfig({
         DEV_MODE: 'true',
         PORT: port,
         NUXT_DEV_URL: `http://localhost:${nuxtPort}`,
-        PROXY_DOMAIN: `localhost:${mockApiPort}`,
+        PROXY_DOMAIN: `127.0.0.1:${mockApiPort}`,
         PROXY_INSECURE: 'true',
         BASE_URL: `http://localhost:${port}`,
         LOG_LEVEL: 'warn',

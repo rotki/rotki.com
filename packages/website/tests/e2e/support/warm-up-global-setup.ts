@@ -1,8 +1,6 @@
 import process from 'node:process';
 import { chromium, type FullConfig } from '@playwright/test';
-
-/** Port of the Nuxt dev server, hardcoded in the package.json `dev` script. */
-export const nuxtPort = '3001';
+import { nuxtPort } from './ports';
 
 const nuxtDevUrl = `http://localhost:${nuxtPort}`;
 
