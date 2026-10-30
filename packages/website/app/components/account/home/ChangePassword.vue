@@ -4,8 +4,9 @@ import { useVuelidate } from '@vuelidate/core';
 import { minLength, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
+import PasswordRules from '~/components/account/PasswordRules.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
-import { toMessages } from '~/utils/validation';
+import { passwordValidators, toMessages } from '~/utils/validation';
 
 const loading = ref<boolean>(false);
 const success = ref<boolean>(false);
@@ -22,7 +23,7 @@ const { newPassword } = toRefs(state);
 
 const rules = {
   currentPassword: { required, minLength: minLength(8) },
-  newPassword: { required, minLength: minLength(8) },
+  newPassword: passwordValidators,
   passwordConfirmation: {
     required,
     sameAsPassword: sameAs(newPassword, 'new password'),
@@ -87,33 +88,16 @@ const { t } = useI18n({ useScope: 'global' });
             v-model="state.newPassword"
             color="primary"
             dense
-            hide-details
+            details="hidden"
             :label="t('account.change_password.new_password.label')"
             autocomplete="new-password"
-            :error-messages="toMessages(v$.newPassword).length > 0 ? [''] : []"
+            :error-messages="toMessages(v$.newPassword)"
           />
 
-          <ul
-            class="ml-4 list-disc text-caption"
-            :class="
-              toMessages(v$.newPassword).length > 0
-                ? 'text-rui-error'
-                : 'text-rui-text-secondary'
-            "
-          >
-            <li>
-              {{ t('auth.common.password_hint.line_1') }}
-            </li>
-            <li>
-              {{ t('auth.common.password_hint.line_2') }}
-            </li>
-            <li>
-              {{ t('auth.common.password_hint.line_3') }}
-            </li>
-            <li>
-              {{ t('auth.common.password_hint.line_4') }}
-            </li>
-          </ul>
+          <PasswordRules
+            :password="state.newPassword"
+            :errors="$externalResults.newPassword"
+          />
         </div>
 
         <RuiRevealableTextField

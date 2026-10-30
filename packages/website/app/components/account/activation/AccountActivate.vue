@@ -2,6 +2,7 @@
 import { ActivationFailedReasons, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
@@ -87,67 +88,53 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div
-    class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
+  <AuthShell
+    v-if="validating"
+    loading
+  />
+  <AuthShell
+    v-else-if="!isValid"
+    icon="lu-link-2-off"
+    tone="error"
+    :title="t('auth.activation.invalid.title')"
+    :description="t('auth.activation.invalid.message')"
   >
-    <div class="w-[380px] max-w-full">
-      <div
-        v-if="validating"
-        class="flex justify-center"
+    <ButtonLink
+      color="primary"
+      variant="default"
+      class="w-full"
+      size="lg"
+      to="/login"
+    >
+      {{ t('auth.login.title') }}
+    </ButtonLink>
+  </AuthShell>
+  <AuthShell
+    v-else
+    icon="lu-circle-check"
+    tone="success"
+    :title="t('auth.activation.success.title')"
+    :description="t('auth.activation.success.message')"
+  >
+    <div class="flex flex-col gap-3">
+      <RuiButton
+        v-if="lastPaymentLink"
+        color="primary"
+        class="w-full"
+        size="lg"
+        @click="handlePaymentRedirect()"
       >
-        <RuiProgress
-          variant="indeterminate"
-          circular
-          color="primary"
-        />
-      </div>
-      <div
-        v-else-if="!isValid"
-        class="space-y-3"
+        {{ t('auth.activation.success.continue_payment') }}
+      </RuiButton>
+      <ButtonLink
+        :color="lastPaymentLink ? undefined : 'primary'"
+        variant="default"
+        class="w-full"
+        size="lg"
+        to="/home/subscription"
       >
-        <div class="text-h3">
-          {{ t('auth.activation.invalid.title') }}
-        </div>
-        <div class="text-body-1 text-rui-text-secondary">
-          {{ t('auth.activation.invalid.message') }}
-        </div>
-      </div>
-      <div
-        v-else
-        class="space-y-3"
-      >
-        <div class="text-h3">
-          {{ t('auth.activation.success.title') }}
-        </div>
-        <div class="text-body-1 text-rui-text-secondary">
-          <span>
-            {{ t('auth.activation.success.message') }}
-          </span>
-          <ButtonLink
-            to="/home/subscription"
-            inline
-            color="primary"
-          >
-            {{ t('common.here') }}
-          </ButtonLink>
-        </div>
-        <div
-          v-if="lastPaymentLink"
-          class="text-body-1 text-rui-text-secondary border-t pt-3"
-        >
-          <span>
-            {{ t('auth.activation.success.continue_payment') }}
-          </span>
-          <RuiButton
-            color="primary"
-            class="inline-flex py-0 px-1! text-[1em]!"
-            variant="text"
-            @click="handlePaymentRedirect()"
-          >
-            {{ t('common.here') }}
-          </RuiButton>
-        </div>
-      </div>
+        {{ t('auth.activation.success.go_to_account') }}
+      </ButtonLink>
     </div>
-  </div>
+  </AuthShell>
 </template>

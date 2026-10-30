@@ -6,7 +6,7 @@ definePageMeta({
   backendRequired: true,
 });
 
-usePageSeoNoIndex('password reset');
+usePageSeoNoIndex('Set a new password');
 </script>
 
 <template>

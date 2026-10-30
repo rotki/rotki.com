@@ -92,17 +92,15 @@ async function mountSignupForm() {
   const wrapper = await mountSuspended(SignupForm, {
     global: {
       stubs: {
-        RuiFooterStepper: true,
         RuiStepper: true,
         SignupAccount: NextStub,
         SignupAddress: AddressStub,
         SignupCustomerInformation: NextStub,
-        SignupIntroduction: NextStub,
       },
     },
   });
 
-  for (let step = 1; step < 4; step++) {
+  for (let step = 1; step < 3; step++) {
     await wrapper.get('[data-testid="next"]').trigger('click');
     await nextTick();
   }
@@ -173,7 +171,40 @@ describe('signup address', () => {
     expect(newsletterConsent.element.checked).toBe(false);
 
     await wrapper.get<HTMLInputElement>('#tos').setValue(true);
+    await submitButton.trigger('click');
 
-    expect(submitButton.element.disabled).toBe(false);
+    await vi.waitFor(() => {
+      expect(wrapper.emitted('finish')).toHaveLength(1);
+    });
+  });
+
+  it('does not submit until the terms are accepted', async () => {
+    const wrapper = await mountSuspended(SignupAddress, {
+      props: {
+        externalResults: {},
+        loading: false,
+        modelValue: {
+          address1: 'Address first line',
+          address2: '',
+          city: 'City',
+          country: 'CT',
+          newsletterConsent: false,
+          postcode: '11703',
+        },
+      },
+      global: {
+        stubs: {
+          CountrySelect: true,
+          Recaptcha: true,
+        },
+      },
+    });
+
+    await wrapper.get<HTMLButtonElement>('[data-cy="submit-button"]').trigger('click');
+
+    await vi.waitFor(() => {
+      expect(wrapper.text()).toContain('Accept the terms to create your account.');
+    });
+    expect(wrapper.emitted('finish')).toBeUndefined();
   });
 });

@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { continuePastIntroduction } from '../../support/signup';
+import { waitForSignupForm } from '../../support/signup';
 import { test } from '../../support/test';
 
 const mockAvailableTiers = {
@@ -74,7 +74,7 @@ test.describe('payment redirect after signup', () => {
     const paymentPath = `/checkout/pay/method?planId=${planId}`;
     await page.goto(`/login?redirectUrl=${encodeURIComponent(paymentPath)}`);
 
-    const signupLink = page.getByRole('link', { name: /sign up/i });
+    const signupLink = page.getByRole('link', { name: 'Create one' });
     await expect(signupLink).toBeVisible();
 
     const href = await signupLink.getAttribute('href');
@@ -98,7 +98,7 @@ test.describe('payment redirect after signup', () => {
     await page.goto(`/signup?redirectUrl=${encodeURIComponent(paymentPath)}`);
 
     // Step 1: Introduction
-    await continuePastIntroduction(page);
+    await waitForSignupForm(page);
     expect(new URL(page.url()).searchParams.get('redirectUrl')).toBe(paymentPath);
 
     // Step 2: Account form, fill and advance
@@ -132,14 +132,11 @@ test.describe('payment redirect after signup', () => {
     await page.goto('/activate/test-uid/test-token');
 
     // Verify activation succeeded
-    await expect(page.getByText('Welcome to rotki').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { level: 1, name: 'Welcome to rotki' })).toBeVisible({ timeout: 10000 });
 
-    // Verify payment continue section appears
-    const paymentSection = page.getByText('Or continue your payment');
-    await expect(paymentSection.first()).toBeVisible({ timeout: 10000 });
-
-    const continueButton = paymentSection.locator('..').getByRole('button', { name: 'here' });
-    await expect(continueButton).toBeVisible();
+    // Verify the payment continue button appears
+    const continueButton = page.getByRole('button', { name: 'Continue your payment' });
+    await expect(continueButton).toBeVisible({ timeout: 10000 });
 
     /* handlePaymentRedirect() sets window.location.href, so capture the outgoing request. The card
        app is built separately and is not part of the e2e stack, so the navigation lands on a stub

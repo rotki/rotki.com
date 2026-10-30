@@ -4,6 +4,7 @@ import type { SignupCustomerInformationPayload } from '~/types/signup';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import AuthHeading from '~/components/account/AuthHeading.vue';
 import { toMessages } from '~/utils/validation';
 
 const modelValue = defineModel<SignupCustomerInformationPayload>({ required: true });
@@ -33,6 +34,11 @@ const v$ = useVuelidate(rules, modelValue, {
   $externalResults,
 });
 
+async function next(): Promise<void> {
+  if (await get(v$).$validate())
+    emit('next');
+}
+
 function updateValue(field: string, value: any): void {
   set(modelValue, {
     ...get(modelValue),
@@ -48,11 +54,12 @@ watch(() => externalResults, (errors) => {
 </script>
 
 <template>
-  <form @submit.prevent="">
+  <form @submit.prevent="next()">
     <div class="space-y-8 grow">
-      <div class="text-h3 text-center">
-        {{ t('auth.signup.customer_information.title') }}
-      </div>
+      <AuthHeading
+        :title="t('auth.signup.customer_information.heading')"
+        :description="t('auth.signup.customer_information.description')"
+      />
       <div class="space-y-5">
         <RuiTextField
           id="first-name"
@@ -62,7 +69,6 @@ watch(() => externalResults, (errors) => {
           autocomplete="given-name"
           dense
           :label="t('auth.signup.customer_information.form.first_name')"
-          :hint="t('auth.signup.customer_information.form.name_hint')"
           :error-messages="toMessages(v$.firstName)"
           @update:model-value="updateValue('firstName', $event)"
           @blur="v$.firstName.$touch()"
@@ -74,7 +80,6 @@ watch(() => externalResults, (errors) => {
           autocomplete="family-name"
           dense
           :label="t('auth.signup.customer_information.form.last_name')"
-          :hint="t('auth.signup.customer_information.form.name_hint')"
           :error-messages="toMessages(v$.lastName)"
           @update:model-value="updateValue('lastName', $event)"
           @blur="v$.lastName.$touch()"
@@ -104,10 +109,10 @@ watch(() => externalResults, (errors) => {
         />
       </div>
     </div>
-    <div class="mt-16 grid md:grid-cols-2 gap-4">
+    <div class="mt-8 flex gap-3">
       <RuiButton
         type="button"
-        class="w-full row-start-2 md:row-start-auto"
+        variant="outlined"
         size="lg"
         data-cy="back-button"
         @click="emit('back')"
@@ -116,12 +121,10 @@ watch(() => externalResults, (errors) => {
       </RuiButton>
       <RuiButton
         data-cy="next-button"
-        :disabled="v$.$invalid"
         color="primary"
-        class="w-full"
+        class="flex-1"
         size="lg"
         type="submit"
-        @click="emit('next')"
       >
         {{ t('actions.continue') }}
       </RuiButton>

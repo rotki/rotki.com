@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { continuePastIntroduction } from '../../support/signup';
+import { completeAccountStep, completeDetailsStep, waitForSignupForm } from '../../support/signup';
 import { test } from '../../support/test';
 
 test.describe('signup test', () => {
@@ -15,18 +15,73 @@ test.describe('signup test', () => {
     });
   });
 
-  test('show introduction page', async ({ page }) => {
+  test('starts on the account step with the note about app accounts', async ({ page }) => {
     await page.goto('/signup');
+    await waitForSignupForm(page);
 
-    await expect(page.getByText('Important Note')).toBeVisible();
-    await expect(page.locator('[data-cy=next-button]')).toBeVisible();
-    await expect(page.locator('[data-cy=next-button]')).toBeEnabled();
+    await expect(page.getByRole('heading', { level: 1, name: 'Create your account' })).toBeVisible();
+    await expect(page.locator('[data-cy=signup-note]')).toContainText('separate from the user you create in the rotki app');
+    await expect(page.locator('[data-cy=back-button]')).toHaveCount(0);
+  });
+
+  test('ticks off the password rules while typing', async ({ page }) => {
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+
+    const rules = page.locator('li[data-met]');
+    await expect(rules).toHaveCount(2);
+    await expect(rules.nth(0)).toHaveAttribute('data-met', 'false');
+
+    await page.locator('input#password').first().fill('12345678');
+    await expect(rules.nth(0)).toHaveAttribute('data-met', 'true');
+    await expect(rules.nth(1)).toHaveAttribute('data-met', 'false');
+
+    await page.locator('input#password').first().fill('p455w0rD');
+    await expect(rules.nth(1)).toHaveAttribute('data-met', 'true');
+  });
+
+  test('links to sign in and keeps the query', async ({ page }) => {
+    await page.goto('/signup?redirectUrl=%2Fcheckout%2Fpay%2Fmethod%3FplanId%3D3');
+    await waitForSignupForm(page);
+
+    const signIn = page.getByRole('main').getByRole('link', { name: 'Sign in' });
+    await expect(signIn).toBeVisible();
+    expect(decodeURIComponent(await signIn.getAttribute('href') ?? '')).toBe('/login?redirectUrl=/checkout/pay/method?planId=3');
+  });
+
+  test('each step has one page heading', async ({ page }) => {
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
+
+    await completeAccountStep(page);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your details');
+
+    await completeDetailsStep(page);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Billing address');
+
+    await page.locator('button[data-cy=back-button]').first().click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your details');
+  });
+
+  test('shows the step as text on phones and keeps back before continue', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 1 of 3: Account');
+
+    await completeAccountStep(page);
+    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 2 of 3: Your details');
+
+    const back = await page.locator('button[data-cy=back-button]').first().boundingBox();
+    const next = await page.locator('button[data-cy=next-button]').first().boundingBox();
+    expect(back && next && back.x < next.x && Math.abs(back.y - next.y) < 1).toBe(true);
   });
 
   test('show account form', async ({ page }) => {
     await page.goto('/signup');
 
-    await continuePastIntroduction(page);
+    await waitForSignupForm(page);
 
     const usernameInput = page.locator('input#username').first();
     const emailInput = page.locator('input#email').first();
@@ -38,26 +93,25 @@ test.describe('signup test', () => {
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
     await expect(confirmPasswordInput).toBeVisible();
-    await expect(nextButton).toBeDisabled();
+
+    // An empty form stays on the step and says what is missing.
+    await nextButton.click();
+    await expect(page.locator('[data-cy=signup-note]')).toBeVisible();
+    await expect(page.getByText('Value is required').first()).toBeVisible();
 
     await usernameInput.fill('username');
     await emailInput.fill('email@gmail.com');
     await passwordInput.fill('p455w0rD');
     await confirmPasswordInput.fill('p455w0rD');
-    await expect(nextButton).toBeEnabled();
+    await nextButton.click();
+    await expect(page.locator('input#first-name').first()).toBeVisible();
   });
 
   test('show customer information form', async ({ page }) => {
     await page.goto('/signup');
 
-    await continuePastIntroduction(page);
-
-    // Fill account form
-    await page.locator('input#username').first().fill('username');
-    await page.locator('input#email').first().fill('email@gmail.com');
-    await page.locator('input#password').first().fill('p455w0rD');
-    await page.locator('input#password-confirmation').first().fill('p455w0rD');
-    await page.locator('button[data-cy=next-button]').first().click();
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
 
     const firstNameInput = page.locator('input#first-name').first();
     const lastNameInput = page.locator('input#last-name').first();
@@ -69,29 +123,22 @@ test.describe('signup test', () => {
     await expect(lastNameInput).toBeVisible();
     await expect(companyNameInput).toBeVisible();
     await expect(vatIdInput).toBeVisible();
-    await expect(nextButton).toBeDisabled();
+
+    await nextButton.click();
+    await expect(firstNameInput).toBeVisible();
 
     await firstNameInput.fill('First');
     await lastNameInput.fill('Last');
     await nextButton.click();
+    await expect(page.locator('input#address-1').first()).toBeVisible();
   });
 
   test('show address form', async ({ page }) => {
     await page.goto('/signup');
 
-    await continuePastIntroduction(page);
-
-    // Fill account form
-    await page.locator('input#username').first().fill('username');
-    await page.locator('input#email').first().fill('email@gmail.com');
-    await page.locator('input#password').first().fill('p455w0rD');
-    await page.locator('input#password-confirmation').first().fill('p455w0rD');
-    await page.locator('button[data-cy=next-button]').first().click();
-
-    // Fill customer info form
-    await page.locator('input#first-name').first().fill('First');
-    await page.locator('input#last-name').first().fill('Last');
-    await page.locator('button[data-cy=next-button]').first().click();
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await completeDetailsStep(page);
 
     const address1Input = page.locator('input#address-1').first();
     const address2Input = page.locator('input#address-2').first();
@@ -112,7 +159,9 @@ test.describe('signup test', () => {
     await expect(tosInput).toBeVisible();
     await expect(newsletterConsentInput).toBeVisible();
     await expect(newsletterConsentInput).not.toBeChecked();
-    await expect(submitButton).toBeDisabled();
+
+    await submitButton.click();
+    await expect(page.getByText('Accept the terms to create your account.')).toBeVisible();
 
     await address1Input.fill('Address first line');
     await address2Input.fill('Address second line');
@@ -124,19 +173,9 @@ test.describe('signup test', () => {
   test('checks signup postal input field for valid inputs!', async ({ page }) => {
     await page.goto('/signup');
 
-    await continuePastIntroduction(page);
-
-    // Fill account form
-    await page.locator('input#username').first().fill('username');
-    await page.locator('input#email').first().fill('email@gmail.com');
-    await page.locator('input#password').first().fill('p455w0rD');
-    await page.locator('input#password-confirmation').first().fill('p455w0rD');
-    await page.locator('button[data-cy=next-button]').first().click();
-
-    // Fill customer info form
-    await page.locator('input#first-name').first().fill('First');
-    await page.locator('input#last-name').first().fill('Last');
-    await page.locator('button[data-cy=next-button]').first().click();
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await completeDetailsStep(page);
 
     const postalInput = page.locator('input#postal').first();
     const postalError = page.locator('[data-cy=postal] .details .text-rui-error').first();

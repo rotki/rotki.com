@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import type { Ref } from 'vue';
 import { SigilEvents } from '@rotki/sigil';
 import { useVuelidate } from '@vuelidate/core';
-import { minLength, required, sameAs } from '@vuelidate/validators';
+import { required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import AuthShell from '~/components/account/AuthShell.vue';
+import PasswordRules from '~/components/account/PasswordRules.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
-import { toMessages } from '~/utils/validation';
+import { passwordValidators, toMessages } from '~/utils/validation';
 
 const logger = useLogger();
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -45,41 +47,35 @@ function setupTokenValidation() {
   return { validating, isValid };
 }
 
-function setupFormValidation(
-  password: Ref<string>,
-  passwordConfirmation: Ref<string>,
-  $externalResults: Ref<NonNullable<unknown>>,
-) {
-  const rules = {
-    password: { required, minLength: minLength(8) },
-    passwordConfirmation: {
-      required,
-      sameAsPassword: sameAs(password, 'password'),
-    },
-  };
-
-  const v$ = useVuelidate(
-    rules,
-    { password, passwordConfirmation },
-    {
-      $autoDirty: true,
-      $externalResults,
-    },
-  );
-
-  const valid = computed<boolean>(() => !get(v$).$invalid);
-  return { v$, valid };
-}
-
 const password = ref<string>('');
 const passwordConfirmation = ref<string>('');
 const $externalResults = ref<Record<string, string[]>>({});
 
+const v$ = useVuelidate(
+  {
+    password: passwordValidators,
+    passwordConfirmation: {
+      required,
+      sameAsPassword: sameAs(password, 'password'),
+    },
+  },
+  { password, passwordConfirmation },
+  {
+    $autoDirty: true,
+    $externalResults,
+  },
+);
+
 const route = useRoute();
 const { uid, token } = route.params;
 const submitting = ref<boolean>(false);
+const attempted = ref<boolean>(false);
 
-async function submit() {
+async function submit(): Promise<void> {
+  set(attempted, true);
+  if (!await get(v$).$validate())
+    return;
+
   set(submitting, true);
   try {
     await fetchWithCsrf<void>('/webapi/password-reset/confirm/', {
@@ -116,104 +112,89 @@ async function submit() {
 }
 
 const { validating, isValid } = setupTokenValidation();
-const { valid, v$ } = setupFormValidation(
-  password,
-  passwordConfirmation,
-  $externalResults,
-);
 
 const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div
-    class="container py-16 lg:pt-[200px] lg:pb-32 flex flex-col items-center justify-center"
+  <AuthShell
+    v-if="validating"
+    loading
+  />
+  <AuthShell
+    v-else-if="!isValid"
+    icon="lu-link-2-off"
+    tone="error"
+    :title="t('auth.password_reset.invalid.title')"
+    :description="t('auth.password_reset.invalid.message')"
   >
-    <div class="w-[360px] max-w-full">
-      <div
-        v-if="validating"
-        class="flex justify-center"
+    <ButtonLink
+      color="primary"
+      variant="default"
+      class="w-full"
+      size="lg"
+      to="/password/recover"
+    >
+      {{ t('auth.password_reset.invalid.request_new') }}
+    </ButtonLink>
+    <template #footer>
+      <ButtonLink
+        to="/login"
+        inline
+        color="primary"
       >
-        <RuiProgress
-          variant="indeterminate"
-          circular
+        {{ t('auth.recover_password.back_to_login') }}
+      </ButtonLink>
+    </template>
+  </AuthShell>
+  <AuthShell
+    v-else
+    :title="t('auth.password_reset.title')"
+  >
+    <form
+      class="space-y-6"
+      @submit.prevent="submit()"
+    >
+      <div class="space-y-5">
+        <div class="space-y-2">
+          <RuiRevealableTextField
+            id="password"
+            v-model="password"
+            dense
+            autofocus
+            autocomplete="new-password"
+            :label="t('auth.password_reset.form.password')"
+            details="hidden"
+            color="primary"
+            :error-messages="attempted ? toMessages(v$.password) : []"
+          />
+          <PasswordRules
+            :password="password"
+            :errors="$externalResults.password"
+            :invalid="attempted && v$.password.$error"
+          />
+        </div>
+        <RuiRevealableTextField
+          id="password-confirmation"
+          v-model="passwordConfirmation"
+          dense
+          autocomplete="new-password"
+          :label="t('auth.password_reset.form.confirm')"
+          :hint="t('auth.common.confirm_hint')"
           color="primary"
+          :error-messages="toMessages(v$.passwordConfirmation)"
         />
       </div>
-      <div
-        v-else-if="!isValid"
-        class="space-y-3"
+      <RuiButton
+        color="primary"
+        class="w-full"
+        size="lg"
+        type="submit"
+        :disabled="submitting"
+        :loading="submitting"
       >
-        <div class="text-h3">
-          {{ t('auth.password_reset.invalid.title') }}
-        </div>
-        <div class="text-body-1 text-rui-text-secondary">
-          {{ t('auth.password_reset.invalid.message') }}
-        </div>
-      </div>
-      <div
-        v-else
-        class="space-y-8"
-      >
-        <div class="text-h3">
-          {{ t('auth.password_reset.title') }}
-        </div>
-        <form
-          class="space-y-6"
-          @submit.prevent=""
-        >
-          <div class="space-y-5">
-            <div class="space-y-1">
-              <RuiRevealableTextField
-                id="password"
-                v-model="password"
-                dense
-                :label="t('auth.password_reset.form.password')"
-                hide-details
-                color="primary"
-                :error-messages="toMessages(v$.password)"
-              />
-              <ul class="ml-4 list-disc text-rui-text-secondary text-caption">
-                <li>
-                  {{ t('auth.common.password_hint.line_1') }}
-                </li>
-                <li>
-                  {{ t('auth.common.password_hint.line_2') }}
-                </li>
-                <li>
-                  {{ t('auth.common.password_hint.line_3') }}
-                </li>
-                <li>
-                  {{ t('auth.common.password_hint.line_4') }}
-                </li>
-              </ul>
-            </div>
-            <div>
-              <RuiRevealableTextField
-                id="password-confirmation"
-                v-model="passwordConfirmation"
-                dense
-                :label="t('auth.password_reset.form.confirm')"
-                :hint="t('auth.common.confirm_hint')"
-                color="primary"
-                :error-messages="toMessages(v$.passwordConfirmation)"
-              />
-            </div>
-          </div>
-          <div>
-            <RuiButton
-              color="primary"
-              :disabled="!valid"
-              class="w-full"
-              size="lg"
-              :loading="submitting"
-              @click="submit()"
-            >
-              {{ t('actions.submit') }}
-            </RuiButton>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+        {{ t('auth.password_reset.title') }}
+      </RuiButton>
+    </form>
+  </AuthShell>
 </template>

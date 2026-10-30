@@ -6,7 +6,7 @@ definePageMeta({
   backendRequired: true,
 });
 
-usePageSeoNoIndex('signup');
+usePageSeoNoIndex('Create an account');
 </script>
 
 <template>

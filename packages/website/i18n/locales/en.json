@@ -281,45 +281,52 @@
   "auth": {
     "activation": {
       "invalid": {
-        "message": "The activation link is not valid. This can happen if you have already confirmed your account.",
-        "title": "Invalid Link"
+        "message": "The link may have expired, or your account is already confirmed. Sign in either way: if your account still needs confirming, you can send a new link from there.",
+        "title": "This activation link is not valid"
       },
       "success": {
-        "continue_payment": "Or continue your payment",
-        "message": "Your rotki account has been successfully activated. To see your dashboard click",
+        "continue_payment": "Continue your payment",
+        "go_to_account": "Go to your account",
+        "message": "Your rotki.com account is active.",
         "title": "Welcome to rotki"
       }
     },
     "common": {
-      "confirm_hint": "Enter the same password as before, for verification.",
+      "confirm_hint": "Type the same password again.",
       "email": "Email",
       "optional": "Optional.",
       "password": "Password",
-      "password_hint": {
-        "line_1": "Your password can't be too similar to your other personal information.",
-        "line_2": "Your password must contain at least 8 characters.",
-        "line_3": "Your password can't be a commonly used password.",
-        "line_4": "Your password can't be entirely numeric."
+      "password_rules": {
+        "done": "done",
+        "min_length": "At least 8 characters",
+        "missing": "not yet",
+        "not_numeric": "Not only numbers",
+        "server": "It also can't be a common password or too close to your username or e-mail."
       },
       "required": "Required.",
       "username": "Username"
     },
     "login": {
-      "alert_error": "If you are writing your username and password from the app, we remind you that they are independent accounts.",
+      "alert_error": "Your rotki.com account is separate from the user you created in the rotki app, so the app's login does not work here.",
+      "create_account": "Create one",
       "email_or_username": "Email or username",
-      "first_time_premium": "First time premium?",
       "forgot_password": "Forgot password?",
-      "message": " A subscription raises your history and report limits. Basic and Advanced also add analytics, encrypted sync and AI assistant access.",
-      "sign_up_now": "Sign up now",
-      "title": "Sign in"
+      "message": "Manage your subscription, devices and invoices.",
+      "no_account": "No rotki.com account yet?",
+      "password_required": "Enter your password.",
+      "title": "Sign in",
+      "username_required": "Enter your e-mail or username."
     },
     "password_changed": {
-      "message": "Your password has been successfully reset. Click below to log in.",
+      "message": "Your password has been reset. Sign in with the new one.",
       "title": "Password changed"
     },
     "password_link_send": {
-      "message": "A recovery link has been sent to your account's address. Please check your mailbox to proceed.",
-      "title": "Password recovery"
+      "message": "We sent a link to the e-mail address of your account. Open it to set a new password.",
+      "message_with_email": "We sent a link to {email}. Open it to set a new password.",
+      "no_email": "No e-mail after a few minutes? Check your spam folder or {link}.",
+      "request_again": "request a new link",
+      "title": "Check your inbox"
     },
     "password_reset": {
       "form": {
@@ -327,28 +334,36 @@
         "password": "New password"
       },
       "invalid": {
-        "message": "The link you followed doesn't seem like a valid password reset link.",
-        "title": "Invalid password reset link"
+        "message": "Password reset links work once and expire after a while. Request a new one to continue.",
+        "request_new": "Request a new link",
+        "title": "This reset link is not valid"
       },
-      "title": "Provide your new password"
+      "title": "Set a new password"
     },
     "pending_activation": {
-      "message": "A confirm registration link has been sent to your account's address. Please check your mailbox to proceed.",
-      "title": "Please check your email"
+      "message": "We sent a confirmation link to the e-mail address you signed up with. Open it to activate your account.",
+      "no_email": "No e-mail after a few minutes? Check your spam folder, or sign in to send a new link.",
+      "title": "Confirm your e-mail address"
     },
     "recover_password": {
-      "title": "Recover password"
+      "back_to_login": "Back to sign in",
+      "email_invalid": "Enter a valid e-mail address.",
+      "message": "Enter the e-mail address of your rotki.com account and we will send you a link to set a new password.",
+      "remembered": "Remembered your password?",
+      "submit": "Send reset link",
+      "title": "Reset your password"
     },
     "signup": {
       "account": {
         "form": {
           "confirm_password": "Repeat password",
-          "email_hint": "Required. Provide a valid email address.",
-          "username_hint": "Required. Provide a unique username for your new account."
+          "email_hint": "We send the confirmation link here.",
+          "username_hint": "You can sign in with it or with your e-mail."
         },
-        "title": "Account"
+        "heading": "Create your account"
       },
       "address": {
+        "description": "Only used on your invoices.",
         "form": {
           "address_line_1": "Address line 1",
           "address_line_2": "Address line 2",
@@ -357,46 +372,47 @@
           "newsletter_consent": "I would like to receive product updates and news from rotki.",
           "newsletter_consent_hint": "Optional. You can change this anytime in Email Preferences.",
           "postal_code": "Postal code",
-          "tos": "I have read and agreed to the {tos} and the {privacy_policy}."
-        }
+          "tos": "I have read and agreed to the {tos} and the {privacy_policy}.",
+          "tos_required": "Accept the terms to create your account."
+        },
+        "heading": "Billing address"
       },
+      "already_have_account": "Already have an account?",
       "create_account": "Create Account",
       "customer_information": {
+        "description": "Only used on your invoices.",
         "form": {
           "company": "Company name",
-          "company_hint": "Optional. If you want to be invoiced as a company the given company name will be added to the invoice.",
+          "company_hint": "Optional. Invoices go to the company instead of you.",
           "first_name": "First name",
           "last_name": "Last name",
-          "name_hint": "Required. Will only be used for invoice of payments.",
+          "name_hint": "Shown on your invoices.",
           "vat_id": "VAT ID",
-          "vat_id_hint": "Optional. If you want to be invoiced as a company, the provided VAT ID will be added to the invoice."
+          "vat_id_hint": "Optional. Added to company invoices."
         },
-        "title": "Customer Information"
+        "heading": "Your details"
       },
       "introduction": {
+        "free": "rotki itself is free. To start using it, {download} the app.",
         "message": {
-          "default": "Creating an account in rotki.com is only needed to purchase a {premium_subscription}. rotki is a local application and the account you create when you use it is stored on your computer. \n\n This is not the same account as premium and credentials for one account do not work for the other. To use rotki simply {download} and run it. \n\n Proceed only if you intend to purchase premium and unlock the premium features of the application.",
+          "default": "A rotki.com account is only needed to buy a {premium_subscription}. It is separate from the user you create in the rotki app, which stays on your computer, and the two do not share passwords.",
           "download": "download",
-          "premium_subscription": "premium subscription"
-        },
-        "title": "Important Note"
+          "premium_subscription": "subscription"
+        }
       },
+      "step_label": "Step {current} of {total}: {title}",
       "steps": {
         "step_1": {
-          "description": "Important information",
-          "title": "Introduction"
-        },
-        "step_2": {
-          "description": "Set your credentials",
+          "description": "Username, e-mail and password",
           "title": "Account"
         },
-        "step_3": {
-          "description": "Information for payment invoices",
-          "title": "Customer Information"
+        "step_2": {
+          "description": "Name for your invoices",
+          "title": "Your details"
         },
-        "step_4": {
-          "description": "Will only be used for payment invoices",
-          "title": "Address"
+        "step_3": {
+          "description": "Address for your invoices",
+          "title": "Billing address"
         }
       },
       "vat": {
@@ -448,7 +464,6 @@
     "card": "Card",
     "error": "Error",
     "error_occurred": "An error occurred",
-    "here": "here",
     "loading": "Loading...",
     "monthly": "monthly",
     "please_wait": "Please wait...",
@@ -1268,9 +1283,6 @@
     "month": "month",
     "next_payment": "Renews on: {date}",
     "year": "year"
-  },
-  "signup_address": {
-    "title": "Address"
   },
   "sponsor": {
     "tabs": {

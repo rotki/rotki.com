@@ -3,6 +3,7 @@ import { LoginFailedReasons, SigilEvents } from '@rotki/sigil';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useMainStore } from '~/store';
@@ -41,7 +42,21 @@ onMounted(() => {
   chronicle(SigilEvents.LOGIN_STARTED, {});
 });
 
-async function performLogin() {
+/**
+ * A required-field message when empty. After a failed sign in it is the server error, which marks
+ * the field without repeating the text: the field's details are hidden then, and the alert shows it.
+ */
+function fieldMessages(missing: boolean, message: string): string[] {
+  if (missing)
+    return [message];
+  const serverError = get(error);
+  return serverError ? [serverError] : [];
+}
+
+async function performLogin(): Promise<void> {
+  if (get(loading) || !await get(v$).$validate())
+    return;
+
   set(loading, true);
   set(
     error,
@@ -68,27 +83,23 @@ async function performLogin() {
 </script>
 
 <template>
-  <div class="w-[360px] max-w-full space-y-8">
-    <div class="space-y-3">
-      <div class="text-h3">
-        {{ t('auth.login.title') }}
-      </div>
-      <div class="text-body-1 text-rui-text-secondary">
-        {{ t('auth.login.message') }}
-      </div>
-    </div>
-    <form @submit.prevent="">
+  <AuthShell
+    :title="t('auth.login.title')"
+    :description="t('auth.login.message')"
+  >
+    <form @submit.prevent="performLogin()">
       <div class="space-y-5">
         <RuiTextField
           id="username"
           v-model="username"
           dense
+          autofocus
           :disabled="loading"
           :label="t('auth.login.email_or_username')"
           autocomplete="username"
-          hide-details
+          :details="v$.username.$error ? 'auto' : 'hidden'"
           color="primary"
-          :error-messages="error ? [error] : []"
+          :error-messages="fieldMessages(v$.username.$error, t('auth.login.username_required'))"
           @focus="error = ''"
         />
 
@@ -99,47 +110,46 @@ async function performLogin() {
           dense
           :label="t('auth.common.password')"
           autocomplete="current-password"
-          hide-details
+          :details="v$.password.$error ? 'auto' : 'hidden'"
           color="primary"
-          :error-messages="error ? [error] : []"
-          @enter="performLogin()"
+          :error-messages="fieldMessages(v$.password.$error, t('auth.login.password_required'))"
           @focus="error = ''"
         />
       </div>
 
-      <div class="flex justify-end mb-6 mt-2">
+      <div class="flex justify-end mt-2 mb-6">
         <ButtonLink
           to="/password/recover"
           :disabled="loading"
           inline
+          color="primary"
         >
           {{ t('auth.login.forgot_password') }}
         </ButtonLink>
       </div>
 
-      <div
-        v-if="error"
-        class="text-body-1 text-center text-rui-error pb-6"
-      >
-        {{ error }}
-      </div>
+      <RuiAlert
+        v-if="hadError"
+        class="mb-6"
+        role="alert"
+        type="error"
+        :title="error || undefined"
+        :description="t('auth.login.alert_error')"
+      />
 
       <RuiButton
-        :disabled="v$.$invalid || loading"
+        :disabled="loading"
         color="primary"
         :loading="loading"
         class="w-full"
         size="lg"
         type="submit"
-        @click="performLogin()"
       >
-        {{ t('actions.continue') }}
+        {{ t('auth.login.title') }}
       </RuiButton>
     </form>
-    <div class="flex items-center justify-center">
-      <span class="text-rui-text-secondary">
-        {{ t('auth.login.first_time_premium') }}
-      </span>
+    <template #footer>
+      {{ t('auth.login.no_account') }}
       <ButtonLink
         :to="{
           path: '/signup',
@@ -148,17 +158,8 @@ async function performLogin() {
         inline
         color="primary"
       >
-        {{ t('auth.login.sign_up_now') }}
+        {{ t('auth.login.create_account') }}
       </ButtonLink>
-    </div>
-  </div>
-  <div
-    v-if="hadError"
-    class="max-w-full w-[660px] mt-14"
-  >
-    <RuiAlert
-      type="error"
-      :description="t('auth.login.alert_error')"
-    />
-  </div>
+    </template>
+  </AuthShell>
 </template>

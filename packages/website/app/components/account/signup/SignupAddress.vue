@@ -4,6 +4,7 @@ import type { SignupAddressPayload } from '~/types/signup';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
+import AuthHeading from '~/components/account/AuthHeading.vue';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useRecaptcha } from '~/composables/use-recaptcha';
@@ -50,7 +51,6 @@ const rules = {
 };
 
 const {
-  recaptchaPassed,
   onError,
   onSuccess,
   onExpired,
@@ -81,7 +81,10 @@ function setCaptchaId(id: number): void {
   set(captchaId, id);
 }
 
-function finish(): void {
+async function finish(): Promise<void> {
+  if (!await get(v$).$validate())
+    return;
+
   emit('finish', {
     recaptchaToken: get(recaptchaToken),
     onExpired,
@@ -97,9 +100,10 @@ watch(() => externalResults, (errors) => {
 
 <template>
   <div class="space-y-8 grow">
-    <div class="text-h3 text-center">
-      {{ t('signup_address.title') }}
-    </div>
+    <AuthHeading
+      :title="t('auth.signup.address.heading')"
+      :description="t('auth.signup.address.description')"
+    />
     <div class="space-y-5">
       <RuiTextField
         id="address-1"
@@ -110,7 +114,6 @@ watch(() => externalResults, (errors) => {
         autofocus
         dense
         :label="t('auth.signup.address.form.address_line_1')"
-        :hint="t('auth.common.required')"
         :error-messages="toMessages(v$.address1)"
         @update:model-value="updateValue('address1', $event)"
         @blur="v$.address1.$touch()"
@@ -135,7 +138,6 @@ watch(() => externalResults, (errors) => {
         autocomplete="address-level2"
         dense
         :label="t('auth.signup.address.form.city')"
-        :hint="t('auth.common.required')"
         :error-messages="toMessages(v$.city)"
         @update:model-value="updateValue('city', $event)"
         @blur="v$.city.$touch()"
@@ -148,7 +150,6 @@ watch(() => externalResults, (errors) => {
         autocomplete="postal-code"
         dense
         :label="t('auth.signup.address.form.postal_code')"
-        :hint="t('auth.common.required')"
         :error-messages="toMessages(v$.postcode)"
         @update:model-value="updateValue('postcode', $event)"
         @blur="v$.postcode.$touch()"
@@ -158,7 +159,6 @@ watch(() => externalResults, (errors) => {
         :model-value="modelValue.country"
         :error-messages="toMessages(v$.country)"
         dense
-        :hint="t('auth.common.required')"
         @blur="v$.country.$touch()"
         @update:model-value="updateValue('country', $event)"
       />
@@ -176,7 +176,8 @@ watch(() => externalResults, (errors) => {
           id="tos"
           v-model="terms"
           color="primary"
-          hide-details
+          details="auto"
+          :error-messages="v$.terms.$error ? [t('auth.signup.address.form.tos_required')] : []"
         >
           <i18n-t
             keypath="auth.signup.address.form.tos"
@@ -219,11 +220,11 @@ watch(() => externalResults, (errors) => {
       </div>
     </div>
   </div>
-  <div class="mt-16 grid md:grid-cols-2 gap-4">
+  <div class="mt-8 flex gap-3">
     <RuiButton
       data-cy="back-button"
       type="button"
-      class="w-full row-start-2 md:row-start-auto"
+      variant="outlined"
       size="lg"
       @click="emit('back')"
     >
@@ -231,11 +232,10 @@ watch(() => externalResults, (errors) => {
     </RuiButton>
     <RuiButton
       data-cy="submit-button"
-      :disabled="v$.$invalid || !recaptchaPassed || loading"
+      :disabled="loading"
       color="primary"
-      class="w-full"
+      class="flex-1"
       size="lg"
-      type="submit"
       :loading="loading"
       @click="finish()"
     >

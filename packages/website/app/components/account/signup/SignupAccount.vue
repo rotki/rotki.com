@@ -2,9 +2,11 @@
 import type { ValidationErrors } from '~/types/common';
 import type { SignupAccountPayload } from '~/types/signup';
 import { useVuelidate } from '@vuelidate/core';
-import { email, minLength, required, sameAs } from '@vuelidate/validators';
+import { email, required, sameAs } from '@vuelidate/validators';
 import { get, set } from '@vueuse/shared';
-import { toMessages } from '~/utils/validation';
+import AuthHeading from '~/components/account/AuthHeading.vue';
+import PasswordRules from '~/components/account/PasswordRules.vue';
+import { passwordValidators, toMessages } from '~/utils/validation';
 
 const modelValue = defineModel<SignupAccountPayload>({ required: true });
 
@@ -13,11 +15,11 @@ const { externalResults } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  back: [];
   next: [];
 }>();
 
 const $externalResults = ref<Record<string, string[]>>({});
+const attempted = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -25,7 +27,7 @@ const password = computed<string>(() => get(modelValue).password);
 
 const rules = {
   username: { required },
-  password: { required, minLength: minLength(8) },
+  password: passwordValidators,
   confirmPassword: {
     required,
     sameAsPassword: sameAs(password, 'password'),
@@ -37,6 +39,12 @@ const v$ = useVuelidate(rules, modelValue, {
   $autoDirty: true,
   $externalResults,
 });
+
+async function next(): Promise<void> {
+  set(attempted, true);
+  if (await get(v$).$validate())
+    emit('next');
+}
 
 function updateValue(field: string, value: any): void {
   set(modelValue, {
@@ -53,10 +61,40 @@ watch(() => externalResults, (errors) => {
 </script>
 
 <template>
-  <form @submit.prevent="">
+  <form @submit.prevent="next()">
     <div class="space-y-8 grow">
-      <div class="text-h3 text-center">
-        {{ t('auth.signup.account.title') }}
+      <div class="space-y-4">
+        <AuthHeading :title="t('auth.signup.account.heading')" />
+        <div
+          class="rounded-md bg-rui-primary/5 p-4 space-y-2 text-body-2 text-rui-text-secondary text-pretty"
+          data-cy="signup-note"
+        >
+          <i18n-t
+            keypath="auth.signup.introduction.message.default"
+            scope="global"
+            tag="p"
+          >
+            <template #premium_subscription>
+              <strong class="text-rui-text">
+                {{ t('auth.signup.introduction.message.premium_subscription') }}
+              </strong>
+            </template>
+          </i18n-t>
+          <i18n-t
+            keypath="auth.signup.introduction.free"
+            scope="global"
+            tag="p"
+          >
+            <template #download>
+              <NuxtLink
+                to="/download"
+                class="text-rui-primary underline"
+              >
+                {{ t('auth.signup.introduction.message.download') }}
+              </NuxtLink>
+            </template>
+          </i18n-t>
+        </div>
       </div>
       <div class="space-y-5">
         <RuiTextField
@@ -82,44 +120,26 @@ watch(() => externalResults, (errors) => {
           :error-messages="toMessages(v$.email)"
           @update:model-value="updateValue('email', $event)"
         />
-        <div class="space-y-1">
-          <RuiTextField
+        <div class="space-y-2">
+          <RuiRevealableTextField
             id="password"
-            type="password"
             :model-value="modelValue.password"
             color="primary"
             dense
             autocomplete="new-password"
             :label="t('auth.common.password')"
-            hide-details
-            :error-messages="toMessages(v$.password).length > 0 ? [''] : []"
+            details="hidden"
+            :error-messages="attempted ? toMessages(v$.password) : []"
             @update:model-value="updateValue('password', $event)"
           />
-          <ul
-            class="ml-4 list-disc text-caption"
-            :class="
-              toMessages(v$.password).length > 0
-                ? 'text-rui-error'
-                : 'text-rui-text-secondary'
-            "
-          >
-            <li>
-              {{ t('auth.common.password_hint.line_1') }}
-            </li>
-            <li>
-              {{ t('auth.common.password_hint.line_2') }}
-            </li>
-            <li>
-              {{ t('auth.common.password_hint.line_3') }}
-            </li>
-            <li>
-              {{ t('auth.common.password_hint.line_4') }}
-            </li>
-          </ul>
+          <PasswordRules
+            :password="modelValue.password"
+            :errors="$externalResults.password"
+            :invalid="attempted && v$.password.$error"
+          />
         </div>
-        <RuiTextField
+        <RuiRevealableTextField
           id="password-confirmation"
-          type="password"
           :model-value="modelValue.confirmPassword"
           color="primary"
           autocomplete="new-password"
@@ -131,27 +151,14 @@ watch(() => externalResults, (errors) => {
         />
       </div>
     </div>
-    <div class="mt-16 grid md:grid-cols-2 gap-4">
-      <RuiButton
-        type="button"
-        class="w-full row-start-2 md:row-start-auto"
-        size="lg"
-        data-cy="back-button"
-        @click="emit('back')"
-      >
-        {{ t('actions.back') }}
-      </RuiButton>
-      <RuiButton
-        data-cy="next-button"
-        :disabled="v$.$invalid"
-        color="primary"
-        class="w-full"
-        size="lg"
-        type="submit"
-        @click="emit('next')"
-      >
-        {{ t('actions.continue') }}
-      </RuiButton>
-    </div>
+    <RuiButton
+      data-cy="next-button"
+      color="primary"
+      class="mt-8 w-full"
+      size="lg"
+      type="submit"
+    >
+      {{ t('actions.continue') }}
+    </RuiButton>
   </form>
 </template>

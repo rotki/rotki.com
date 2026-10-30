@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import LoginPage from '~/components/account/login/LoginPage.vue';
+import LoginForm from '~/components/account/login/LoginForm.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   guestOnly: true,
 });
 
-usePageSeoNoIndex('login');
+usePageSeoNoIndex('Sign in');
 </script>
 
 <template>
-  <LoginPage />
+  <LoginForm />
 </template>

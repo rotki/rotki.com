@@ -13,7 +13,7 @@ import { FetchError } from 'ofetch';
 import SignupAccount from '~/components/account/signup/SignupAccount.vue';
 import SignupAddress from '~/components/account/signup/SignupAddress.vue';
 import SignupCustomerInformation from '~/components/account/signup/SignupCustomerInformation.vue';
-import SignupIntroduction from '~/components/account/signup/SignupIntroduction.vue';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useRecaptcha } from '~/composables/use-recaptcha';
@@ -63,11 +63,13 @@ const steps = computed<{ title: string; description: string }[]>(() => [
     title: t('auth.signup.steps.step_3.title'),
     description: t('auth.signup.steps.step_3.description'),
   },
-  {
-    title: t('auth.signup.steps.step_4.title'),
-    description: t('auth.signup.steps.step_4.description'),
-  },
 ]);
+
+const stepLabel = computed<string>(() => t('auth.signup.step_label', {
+  current: get(step),
+  total: get(steps).length,
+  title: get(steps)[get(step) - 1]?.title ?? '',
+}));
 
 const route = useRoute();
 const { modelCaptchaId, resetCaptcha } = useRecaptcha();
@@ -157,45 +159,42 @@ function setErrors(errors: ValidationErrors) {
   set(externalResults, errors);
 
   if (haveIntersectionKeys(errors, get(accountForm)))
-    set(step, 2);
+    set(step, 1);
 
   else if (haveIntersectionKeys(errors, get(customerInformationForm)))
-    set(step, 3);
+    set(step, 2);
 
   else if (haveIntersectionKeys(errors, get(addressForm)))
-    set(step, 4);
+    set(step, 3);
 }
 </script>
 
 <template>
-  <div
-    class="container flex flex-col lg:flex-row py-8 lg:py-14 h-full grow"
-  >
-    <div class="flex justify-center grow">
-      <form
-        class="w-[440px] max-w-full flex flex-col justify-between"
-        @submit.prevent=""
-      >
-        <SignupIntroduction
-          v-if="step === 1"
-          @next="next()"
-        />
+  <div class="container py-12 md:py-20 lg:py-24">
+    <div class="flex justify-center gap-24">
+      <div class="w-full max-w-[440px] flex flex-col">
+        <p
+          class="lg:sr-only mb-3 text-body-2 text-rui-text-secondary"
+          data-cy="step-label"
+          aria-live="polite"
+        >
+          {{ stepLabel }}
+        </p>
         <SignupAccount
-          v-if="step === 2"
+          v-if="step === 1"
           v-model="accountForm"
           :external-results="externalResults"
-          @back="back()"
           @next="next()"
         />
         <SignupCustomerInformation
-          v-if="step === 3"
+          v-if="step === 2"
           v-model="customerInformationForm"
           :external-results="externalResults"
           @back="back()"
           @next="next()"
         />
         <SignupAddress
-          v-if="step === 4"
+          v-if="step === 3"
           v-model="addressForm"
           v-model:captcha-id="modelCaptchaId"
           :loading="loading"
@@ -203,23 +202,32 @@ function setErrors(errors: ValidationErrors) {
           @back="back()"
           @finish="signup($event)"
         />
-        <div class="py-10 lg:px-4">
-          <RuiFooterStepper
-            :model-value="step"
-            :pages="4"
-            variant="pill"
-          />
-        </div>
-      </form>
-    </div>
+        <p
+          v-if="step === 1"
+          class="mt-8 pt-6 border-t border-default text-body-2 text-rui-text-secondary text-center"
+        >
+          {{ t('auth.signup.already_have_account') }}
+          <ButtonLink
+            :to="{
+              path: '/login',
+              query: route.query,
+            }"
+            inline
+            color="primary"
+          >
+            {{ t('auth.login.title') }}
+          </ButtonLink>
+        </p>
+      </div>
 
-    <div class="hidden lg:block w-[332px] sticky top-0 self-start">
-      <RuiStepper
-        custom
-        orientation="vertical"
-        :step="step"
-        :steps="steps"
-      />
+      <aside class="hidden lg:block w-[280px] shrink-0 -mt-3">
+        <RuiStepper
+          custom
+          orientation="vertical"
+          :step="step"
+          :steps="steps"
+        />
+      </aside>
     </div>
   </div>
 </template>

@@ -6,7 +6,7 @@ definePageMeta({
   backendRequired: true,
 });
 
-usePageSeoNoIndex('recovery e-mail send');
+usePageSeoNoIndex('Check your inbox');
 </script>
 
 <template>
