@@ -434,7 +434,7 @@ await fetchWithCsrf('/webapi/2/update', {
 
 ### Form Validation
 
-- Vuelidate for client-side validation
+- Zod schemas for client-side form validation through `useZodForm` (`composables/use-zod-form.ts`), with the shared required, e-mail, password and postcode rules and their translated messages in `useFormRules` (`composables/use-form-rules.ts`)
 - Zod schemas for API data validation
 - Accessible form components with proper ARIA attributes
 

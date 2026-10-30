@@ -25,7 +25,7 @@ export type SubmitError =
   | Tagged<'SubmitFailed', { message?: string }>;
 
 export interface SubmitFlowDeps {
-  /** Vuelidate `$validate()`; resolves true when the form passes. */
+  /** The form's `validate()`; resolves true when the form passes. */
   validate: () => Promise<boolean>;
   /** Editing skips the live ownership gate; the backend re-verifies on submit. */
   isEditing: boolean;
