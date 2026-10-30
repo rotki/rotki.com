@@ -10,6 +10,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/rotki/rotki.com/backend/internal/version"
 )
 
 func newTestHandler() *Handler {
@@ -474,7 +476,7 @@ func TestCSPHandler_LogsDetectedViolationOnceAtWarn(t *testing.T) {
 		"report_format":       reportFormatReportURI,
 		"own_document":        true,
 		"policy_hash":         policyHash(testOriginalPolicy),
-		"git_sha":             "unknown",
+		"git_sha":             version.GitSHA,
 		"blocked_uri":         "https://evil.com/script.js",
 		"effective_directive": "script-src",
 	}
@@ -584,6 +586,7 @@ func TestIsOwnDocument(t *testing.T) {
 		"https://staging.rotki.com/checkout": true,
 		"https://ROTKI.com/":                 true,
 		"https://notrotki.com/":              false,
+		"https://rotki.com./":                true,
 		"https://rotki.com.evil.com/":        false,
 		"http://localhost:3000/":             false,
 		"about:blank":                        false,
@@ -593,5 +596,55 @@ func TestIsOwnDocument(t *testing.T) {
 		if got := isOwnDocument(uri); got != want {
 			t.Errorf("isOwnDocument(%q) = %v, want %v", uri, got, want)
 		}
+	}
+}
+
+func TestIsLocalhostDocument(t *testing.T) {
+	tests := map[string]bool{
+		"http://localhost:3000/":           true,
+		"https://app.localhost/":           true,
+		"http://127.0.0.1:3000/":           true,
+		"http://[::1]:3000/":               true,
+		"https://rotki.com/?ref=localhost": false,
+		"https://localhost.evil.com/":      false,
+		"https://rotki.com/":               false,
+	}
+	for uri, want := range tests {
+		if got := isLocalhostDocument(uri); got != want {
+			t.Errorf("isLocalhostDocument(%q) = %v, want %v", uri, got, want)
+		}
+	}
+}
+
+// A public page that mentions localhost in its query is not development
+// traffic, so its eval report must still be logged as a violation.
+func TestCSPHandler_DoesNotFilterLocalhostInQuery(t *testing.T) {
+	h, buf := newLoggingTestHandler()
+	postReport(h, makeReport("eval", "https://rotki.com/?ref=localhost", "script-src"), "")
+
+	rec := singleRecord(t, buf)
+	if rec["msg"] != "CSP violation detected" {
+		t.Fatalf("expected violation to be logged, got %v", rec)
+	}
+}
+
+func TestCSPHandler_LogsRejectedReportsAtWarn(t *testing.T) {
+	tests := map[string]struct {
+		body string
+		msg  string
+	}{
+		"invalid json":   {"not json", "invalid CSP report format"},
+		"missing fields": {`{"csp-report": {"blocked-uri": "https://evil.com"}}`, "CSP report missing required fields"},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			h, buf := newLoggingTestHandler()
+			postReport(h, tt.body, "")
+
+			rec := singleRecord(t, buf)
+			if rec["msg"] != tt.msg || rec["level"] != "WARN" {
+				t.Fatalf("expected WARN %q, got %v", tt.msg, rec)
+			}
+		})
 	}
 }

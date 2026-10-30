@@ -40,9 +40,9 @@ const (
 
 // Known false positive patterns to filter out.
 //
-// Reports with a blocked URI of "eval" or "inline" are deliberately not listed:
-// script-src already allows 'unsafe-eval', so an eval report that still arrives
-// points at a page whose policy differs, which is worth seeing.
+// Eval reports are deliberately not listed: script-src already allows
+// 'unsafe-eval', so an eval report that still arrives points at a page whose
+// policy differs, which is worth seeing.
 var knownFalsePositives = []*regexp.Regexp{
 	// Browser prefetch/preconnect
 	regexp.MustCompile(`^https?://[\da-z.-]+/(favicon\.ico|apple-touch-icon|robots\.txt)$`),
@@ -155,7 +155,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	reports, err := readCSPReports(r)
 	if err != nil {
-		h.logger.Error("invalid CSP report format", "error", err)
+		h.logger.Warn("invalid CSP report format", "error", err)
 		validate.WriteJSON(w, http.StatusBadRequest, cspResponse{
 			Message: "Invalid CSP violation report format",
 		})
@@ -180,7 +180,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(reports) == 1 {
 		status, resp, errs := h.evaluateReport(reports[0], clientIP, userAgent)
 		if len(errs) > 0 {
-			h.logger.Error("CSP report missing required fields", "errors", errs.Error())
+			h.logger.Warn("CSP report missing required fields", "errors", errs.Error())
 			errs.WriteJSON(w)
 			return
 		}
@@ -192,7 +192,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// and structured logging) and return a single aggregate acknowledgement.
 	for _, report := range reports {
 		if _, _, errs := h.evaluateReport(report, clientIP, userAgent); len(errs) > 0 {
-			h.logger.Error("CSP report missing required fields", "errors", errs.Error())
+			h.logger.Warn("CSP report missing required fields", "errors", errs.Error())
 		}
 	}
 	validate.WriteJSON(w, http.StatusOK, cspResponse{
@@ -265,7 +265,7 @@ func (h *Handler) evaluateReport(report cspReport, clientIP, userAgent string) (
 	}
 
 	// Filter localhost inline/eval in development
-	if strings.Contains(report.DocumentURI, "localhost") &&
+	if isLocalhostDocument(report.DocumentURI) &&
 		(report.BlockedURI == "inline" || report.BlockedURI == "eval") {
 		h.logFiltered(reasonLocalhostDev, report, clientIP)
 		return http.StatusOK, cspResponse{
@@ -333,15 +333,29 @@ func policyHash(policy string) string {
 	return hex.EncodeToString(sum[:6])
 }
 
+// documentHost returns the lower-cased host of the document URI without a
+// trailing dot, or "" when the URI does not parse.
+func documentHost(documentURI string) string {
+	u, err := url.Parse(documentURI)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSuffix(strings.ToLower(u.Hostname()), ".")
+}
+
 // isOwnDocument reports whether the document URI is on rotki.com or one of its
 // subdomains, as opposed to a mirror, proxy or forged report.
 func isOwnDocument(documentURI string) bool {
-	u, err := url.Parse(documentURI)
-	if err != nil {
-		return false
-	}
-	host := strings.ToLower(u.Hostname())
+	host := documentHost(documentURI)
 	return host == "rotki.com" || strings.HasSuffix(host, ".rotki.com")
+}
+
+// isLocalhostDocument reports whether the document URI is served from a local
+// development host. It matches the host only, so a public URL that merely
+// mentions localhost in its path or query is not treated as development.
+func isLocalhostDocument(documentURI string) bool {
+	host := documentHost(documentURI)
+	return host == "localhost" || strings.HasSuffix(host, ".localhost") || host == "127.0.0.1" || host == "::1"
 }
 
 // readCSPReports decodes one or more CSP violation reports from the request
