@@ -25,13 +25,13 @@ const {
   updateProfile,
 } = useProfileUpdate();
 
-const { required } = useFormRules();
+const { postcode, required } = useFormRules();
 
 const form = useZodForm(z.object({
   address1: required(),
   address2: z.string(),
   city: required(),
-  postcode: required(),
+  postcode: postcode(),
   country: required(),
 }), state);
 const { errors, invalid, touch } = form;

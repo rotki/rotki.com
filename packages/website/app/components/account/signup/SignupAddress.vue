@@ -31,7 +31,7 @@ const emit = defineEmits<{
 const terms = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
-const { required } = useFormRules();
+const { postcode, required } = useFormRules();
 
 const {
   onError,
@@ -45,7 +45,7 @@ const form = useZodForm(z.object({
   address1: required(),
   address2: z.string(),
   city: required(),
-  postcode: required().regex(/^[\d\sa-z-]+$/i, { error: t('validation.postcode') }),
+  postcode: postcode(),
   country: required(),
   newsletterConsent: z.boolean(),
   captcha: required(),

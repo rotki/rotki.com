@@ -26,5 +26,10 @@ export function useFormRules() {
       .refine(value => !isOnlyDigits(value), { error: t('validation.password_only_digits') });
   }
 
-  return { email, password, required };
+  /** A required postal code of letters, digits, spaces and hyphens. */
+  function postcode(): z.ZodString {
+    return required().regex(/^[\d\sa-z-]+$/i, { error: t('validation.postcode') });
+  }
+
+  return { email, password, postcode, required };
 }

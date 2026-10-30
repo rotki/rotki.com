@@ -31,7 +31,7 @@ const form = useZodForm(z.object({
   error: t('validation.passwords_differ'),
   path: ['passwordConfirmation'],
 }), state);
-const { errors, invalid, serverErrors } = form;
+const { errors, hasError, invalid, serverErrors } = form;
 
 const { start: startSuccessTimeout, stop: stopSuccessTimeout } = useTimeoutFn(() => {
   set(success, false);
@@ -93,6 +93,7 @@ function reset(): void {
           <PasswordRules
             :password="state.newPassword"
             :errors="serverErrors('newPassword')"
+            :invalid="hasError('newPassword')"
           />
         </div>
 
