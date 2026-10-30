@@ -113,14 +113,11 @@ func (s *Service) ServeImageWithMaxAge(ctx context.Context, w http.ResponseWrite
 func (s *Service) ServeFirstImage(ctx context.Context, w http.ResponseWriter, r *http.Request, urls []string, maxAge time.Duration) {
 	last := len(urls) - 1
 	for _, rawURL := range urls[:last] {
-		if meta, ok := s.cache.GetMetadata(ctx, rawURL); ok {
-			if meta.Is404() {
-				continue
-			}
-			s.ServeImageWithMaxAge(ctx, w, r, rawURL, maxAge)
-			return
+		meta, hasMeta := s.cache.GetMetadata(ctx, rawURL)
+		if hasMeta && meta.Is404() {
+			continue
 		}
-		if _, ok := s.cache.DiskMetadata(rawURL); ok {
+		if hasMeta || s.hasDiskCopy(rawURL) {
 			s.ServeImageWithMaxAge(ctx, w, r, rawURL, maxAge)
 			return
 		}
@@ -134,6 +131,12 @@ func (s *Service) ServeFirstImage(ctx context.Context, w http.ResponseWriter, r 
 		return
 	}
 	s.ServeImageWithMaxAge(ctx, w, r, urls[last], maxAge)
+}
+
+// hasDiskCopy reports whether an image for the URL is on disk, so upstream had it.
+func (s *Service) hasDiskCopy(url string) bool {
+	_, ok := s.cache.DiskMetadata(url)
+	return ok
 }
 
 // serveFetched writes the response for an upstream fetch: the image, a stale copy from

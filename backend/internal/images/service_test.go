@@ -511,8 +511,14 @@ func TestService_WarmCache(t *testing.T) {
 	}
 }
 
+// Bodies start with the PNG signature so the disk cache recognises the stored files.
+var (
+	mainBody    = string(pngBytes) + "main"
+	developBody = string(pngBytes) + "develop"
+)
+
 // branchUpstream answers /main/<file> and /develop/<file> with the status set per path
-// (by default 200 with the branch name as body) and counts requests per path.
+// (by default 200 with mainBody or developBody) and counts requests per path.
 func branchUpstream(t *testing.T, status map[string]int) (*httptest.Server, *sync.Map) {
 	t.Helper()
 	var hits sync.Map
@@ -524,9 +530,9 @@ func branchUpstream(t *testing.T, status map[string]int) (*httptest.Server, *syn
 			return
 		}
 		w.Header().Set("Content-Type", "image/png")
-		body := "main"
+		body := mainBody
 		if strings.HasPrefix(r.URL.Path, "/develop/") {
-			body = "develop"
+			body = developBody
 		}
 		_, _ = w.Write([]byte(body))
 	}))
@@ -555,7 +561,7 @@ func TestService_ServeFirstImage_ServesTheFirstThatExists(t *testing.T) {
 
 	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
 
-	if rec.Code != http.StatusOK || rec.Body.String() != "main" {
+	if rec.Code != http.StatusOK || rec.Body.String() != mainBody {
 		t.Fatalf("got %d %q, want 200 from main", rec.Code, rec.Body.String())
 	}
 	if got := hitCount(hits, "/develop/x.png"); got != 0 {
@@ -569,7 +575,7 @@ func TestService_ServeFirstImage_FallsBackOnNotFound(t *testing.T) {
 
 	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
 
-	if rec.Code != http.StatusOK || rec.Body.String() != "develop" {
+	if rec.Code != http.StatusOK || rec.Body.String() != developBody {
 		t.Fatalf("got %d %q, want 200 from develop", rec.Code, rec.Body.String())
 	}
 }
@@ -607,10 +613,10 @@ func TestService_ServeFirstImage_UsesTheCopyOnDisk(t *testing.T) {
 		t.Fatalf("warm-up status = %d, want 200", rec.Code)
 	}
 
-	// Without Redis there is no metadata, so the second request finds main through its file
+	// Without Redis there is no metadata: the file on disk shows main has the image, so develop is not tried
 	rec := serveFirst(svc, srv.URL+"/main/x.png", srv.URL+"/develop/x.png")
 
-	if rec.Code != http.StatusOK || rec.Body.String() != "main" {
+	if rec.Code != http.StatusOK || rec.Body.String() != mainBody {
 		t.Fatalf("got %d %q, want 200 from main", rec.Code, rec.Body.String())
 	}
 	if got := hitCount(hits, "/develop/x.png"); got != 0 {
