@@ -88,6 +88,35 @@ test.describe('sign in', () => {
 
     await page.waitForURL('**/home/subscription');
   });
+
+  /* The app and the docs link to these pages; a signed-out visitor signs in and lands where the link
+     pointed, old card paths included through their 301. */
+  for (const [path, landing] of [
+    ['/home/devices', '/home/devices'],
+    ['/home/saved-cards', '/home/billing'],
+    ['/home/email-preferences', '/home/account-details'],
+    ['/home/subscription?utm_source=rotki_app', '/home/subscription?utm_source=rotki_app'],
+  ] as const) {
+    test(`returns to ${landing} after signing in from ${path}`, async ({ page }) => {
+      let signedIn = false;
+      await page.route('**/webapi/login/', async (route) => {
+        signedIn = true;
+        await route.fulfill({ json: { result: true } });
+      });
+      await page.route('**/webapi/account/', async route => signedIn
+        ? route.fulfill({ json: { result: defaultAccount() } })
+        : route.fulfill({ status: 401, json: { message: 'Not authenticated' } }));
+      await page.goto(path);
+      await page.waitForURL('**/login**');
+      await waitForHydration(page);
+
+      await page.locator('input#username').first().fill('testuser');
+      await page.locator('input#password').first().fill('p455w0rD');
+      await main(page).getByRole('button', { name: 'Sign in' }).click();
+
+      await page.waitForURL(url => `${url.pathname}${url.search}` === landing);
+    });
+  }
 });
 
 test.describe('password recovery', () => {
