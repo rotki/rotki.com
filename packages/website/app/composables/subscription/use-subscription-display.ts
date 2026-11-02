@@ -25,13 +25,13 @@ export function useSubscriptionDisplay(): UseSubscriptionDisplayReturn {
   }
 
   /**
-   * Get the color for a subscription status chip
+   * Get the color for a subscription status chip. An ended subscription gets none, so it shows in
+   * neutral grey: it is history, not an error.
    */
   function getChipStatusColor(status: string): ContextColorsType | undefined {
     const statusColorMap: Record<string, ContextColorsType> = {
       'Active': 'success',
       'Cancelled but still active': 'success',
-      'Cancelled': 'error',
       'Pending': 'warning',
       'Upgrade Requested': 'warning',
       'Past Due': 'warning',

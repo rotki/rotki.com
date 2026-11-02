@@ -6,9 +6,9 @@ import { get, set } from '@vueuse/shared';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import DeleteDeviceDialog from '~/components/account/home/DeleteDeviceDialog.vue';
 import RenameDeviceDialog from '~/components/account/home/RenameDeviceDialog.vue';
+import TimeAgo from '~/components/common/TimeAgo.vue';
 import { useUserDevices } from '~/composables/account/use-user-devices';
-import { formatDate } from '~/utils/date';
-import { fitsOnePage } from '~/utils/table';
+import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -23,7 +23,7 @@ const { loading, userDevices } = useUserDevices();
 const headers = computed<DataTableColumn<UserDevice>[]>(() => [{
   label: t('account.devices.headers.label'),
   key: 'label',
-  cellClass: 'font-bold',
+  cellClass: 'font-medium',
 }, {
   label: t('account.devices.headers.platform'),
   key: 'platform',
@@ -35,7 +35,6 @@ const headers = computed<DataTableColumn<UserDevice>[]>(() => [{
   key: 'actions',
   align: 'end',
   class: 'capitalize',
-  cellClass: 'flex justify-end',
 }]);
 
 interface PlatformDisplay {
@@ -94,6 +93,7 @@ function showRenameDialog(device: UserDevice): void {
     </DefinePlatformDisplay>
     <RuiDataTable
       v-model:pagination="pagination"
+      :class="SINGLE_LINE_ROWS"
       :cols="headers"
       :loading="loading"
       :empty="{ label: t('account.devices.no_devices_found'), description: t('account.devices.no_devices_hint') }"
@@ -105,39 +105,56 @@ function showRenameDialog(device: UserDevice): void {
       <template #item.platform="{ row }">
         <ReusablePlatformDisplay :platform="getPlatformDisplay(row.platform)" />
       </template>
+      <template #item.label="{ row }">
+        <span
+          class="block max-w-80 truncate"
+          :title="row.label"
+        >
+          {{ row.label }}
+        </span>
+      </template>
       <template #item.lastSeenAt="{ row }">
-        {{ formatDate(row.lastSeenAt, 'MMMM DD, YYYY - HH:mm:ss') }}
+        <TimeAgo :date="row.lastSeenAt" />
       </template>
       <template #item.actions="{ row }">
-        <div class="flex gap-2">
-          <RuiButton
-            variant="text"
-            color="primary"
-            :disabled="isLoading"
-            @click="showRenameDialog(row)"
-          >
-            <template #prepend>
-              <RuiIcon
-                name="lu-pencil"
-                size="20"
-              />
+        <div class="flex justify-end gap-1">
+          <RuiTooltip :open-delay="300">
+            <template #activator>
+              <RuiButton
+                variant="text"
+                icon
+                size="sm"
+                :aria-label="t('account.devices.rename_device', { label: row.label })"
+                :disabled="isLoading"
+                @click="showRenameDialog(row)"
+              >
+                <RuiIcon
+                  name="lu-pencil"
+                  size="16"
+                />
+              </RuiButton>
             </template>
             {{ t('actions.rename') }}
-          </RuiButton>
-          <RuiButton
-            color="error"
-            variant="text"
-            :disabled="isLoading"
-            @click="showDeleteDialog(row)"
-          >
-            <template #prepend>
-              <RuiIcon
-                name="lu-trash-2"
-                size="20"
-              />
+          </RuiTooltip>
+          <RuiTooltip :open-delay="300">
+            <template #activator>
+              <RuiButton
+                variant="text"
+                icon
+                size="sm"
+                color="error"
+                :aria-label="t('account.devices.delete_device', { label: row.label })"
+                :disabled="isLoading"
+                @click="showDeleteDialog(row)"
+              >
+                <RuiIcon
+                  name="lu-trash-2"
+                  size="16"
+                />
+              </RuiButton>
             </template>
             {{ t('actions.delete') }}
-          </RuiButton>
+          </RuiTooltip>
         </div>
       </template>
     </RuiDataTable>

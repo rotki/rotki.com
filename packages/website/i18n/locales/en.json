@@ -33,7 +33,7 @@
       "empty_history": "No credit history yet",
       "history": {
         "amount": "Amount",
-        "balance_after": "Balance After",
+        "balance_after": "Balance after",
         "date": "Date",
         "notes": "Notes",
         "title": "Credit history",
@@ -82,7 +82,7 @@
       "no_devices_found": "No devices yet",
       "headers": {
         "label": "Label",
-        "last_seen": "Last Seen at",
+        "last_seen": "Last seen",
         "platform": "Platform"
       },
       "delete": {
@@ -95,6 +95,8 @@
         "title": "Rename Device"
       },
       "no_devices_hint": "A device shows up here once a rotki app signs in with your premium API credentials.",
+      "rename_device": "Rename {label}",
+      "delete_device": "Delete {label}",
       "title": "Devices",
       "description": "The rotki apps that use your premium subscription. Remove the ones you no longer use."
     },
@@ -122,6 +124,11 @@
       "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
       "upgraded_from": "Upgrade from {plan}",
+      "methods": {
+        "paypal": "PayPal",
+        "crypto": "Crypto",
+        "bank_transfer": "Bank transfer"
+      },
       "title": "Billing history",
       "description": "Every payment, with its invoice."
     },
@@ -178,14 +185,14 @@
         "no_charge": "won't be charged",
         "status": "Active until {date}"
       },
-      "explorer": "See in Explorer",
+      "explorer": "See in explorer",
       "headers": {
-        "cost_in_symbol_per_period": "Cost in {symbol} per period",
         "created": "Created",
-        "next_billing": "Next Billing"
+        "next_billing": "Next payment",
+        "price": "Price"
       },
       "no_subscriptions_found": "No subscriptions found",
-      "payment_detail": "Payment Details",
+      "payment_detail": "Payment details",
       "pending_tx": "A transaction already exists for this subscription, please wait up to 7 minutes for our system to process the payment.",
       "resume": {
         "actions": {
@@ -216,7 +223,7 @@
       "title": "Subscriptions",
       "upgrade": {
         "upgrade": "Upgrade plan",
-        "cancel": "Cancel Upgrade Request",
+        "cancel": "Cancel upgrade request",
         "cancel_dialog": {
           "title": "Cancel Upgrade Request",
           "description": "Are you sure you want to cancel this upgrade request?\n\nIMPORTANT: Only proceed if you have NOT already sent a cryptocurrency payment for this upgrade. If you have already initiated a crypto payment, please do not cancel the upgrade request as it may cause issues with payment processing.\n\nIf you haven't made any payment yet, it's safe to proceed with the cancellation.",
@@ -288,13 +295,21 @@
       },
       "invoice": {
         "title": "Invoice details",
-        "description": "The name and address printed on your invoices.",
+        "description": "The name and address printed on your invoices. Changes apply to invoices issued after you save.",
         "name": "Name",
         "company": "Company",
         "vat_id": "VAT ID",
         "address": "Address",
         "name_and_vat": "Name and VAT ID",
-        "not_set": "Not set"
+        "not_set": "Not set",
+        "check_address": "Your address is missing or invalid. Fix it, then try again:",
+        "check_name": "Your name or VAT ID is missing or invalid. Fix it, then try again:",
+        "address_first": "Add your address first. Saving your name and VAT ID also checks the address.",
+        "add_address": "Add address",
+        "edit_address": "Edit address",
+        "edit_name": "Edit name and VAT ID",
+        "change_name": "Change name and VAT ID",
+        "change_address": "Change address"
       }
     }
   },
@@ -330,7 +345,6 @@
     "regenerate": "Regenerate",
     "rename": "Rename",
     "renew": "Renew",
-    "reset": "Reset",
     "save": "Save",
     "resume": "Resume",
     "start_now_for_free": "Start now for free",

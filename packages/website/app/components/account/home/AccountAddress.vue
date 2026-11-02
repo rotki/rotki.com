@@ -2,11 +2,17 @@
 import { get } from '@vueuse/shared';
 import { z } from 'zod';
 import CountrySelect from '~/components/account/CountrySelect.vue';
-import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { useProfileUpdate } from '~/composables/account/use-profile-update';
+import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
+import { NAME_FIELDS, useProfileUpdate } from '~/composables/account/use-profile-update';
 import { useFormRules } from '~/composables/use-form-rules';
 import { useZodForm } from '~/composables/use-zod-form';
+
+const emit = defineEmits<{
+  'saved': [];
+  'cancel': [];
+  'edit-name': [];
+}>();
 
 const state = reactive({
   address1: '',
@@ -18,8 +24,6 @@ const state = reactive({
 
 const {
   account,
-  dismissDone,
-  done,
   loading,
   movedOffline,
   updateProfile,
@@ -34,7 +38,10 @@ const form = useZodForm(z.object({
   postcode: postcode(),
   country: required(),
 }), state);
-const { errors, invalid, touch } = form;
+const { errors, formErrorFields, formErrors, invalid, touch } = form;
+
+/** The save failed on the stored name or VAT ID, which only the other form can fix. */
+const nameRejected = computed<boolean>(() => get(formErrorFields).some(field => NAME_FIELDS.includes(field)));
 
 const {
   public: {
@@ -63,7 +70,8 @@ function reset() {
 }
 
 async function update(): Promise<void> {
-  await updateProfile(form, state);
+  if (await updateProfile(form, state))
+    emit('saved');
 }
 
 onBeforeMount(() => {
@@ -140,6 +148,23 @@ const { t } = useI18n({ useScope: 'global' });
       />
     </div>
 
+    <FormErrorsAlert
+      class="mt-6"
+      :messages="formErrors"
+      :title="nameRejected ? t('account.billing.invoice.check_name') : undefined"
+    >
+      <RuiButton
+        v-if="nameRejected"
+        class="mt-2 -ms-2"
+        size="sm"
+        variant="text"
+        color="primary"
+        @click="emit('edit-name')"
+      >
+        {{ t('account.billing.invoice.edit_name') }}
+      </RuiButton>
+    </FormErrorsAlert>
+
     <div class="mt-8 flex flex-wrap gap-3">
       <RuiButton
         type="submit"
@@ -152,9 +177,9 @@ const { t } = useI18n({ useScope: 'global' });
       <RuiButton
         variant="text"
         color="primary"
-        @click="reset()"
+        @click="emit('cancel')"
       >
-        {{ t('actions.reset') }}
+        {{ t('actions.cancel') }}
       </RuiButton>
     </div>
   </form>
@@ -180,14 +205,4 @@ const { t } = useI18n({ useScope: 'global' });
       </template>
     </i18n-t>
   </RuiAlert>
-
-  <FloatingNotification
-    type="success"
-    closeable
-    :visible="done"
-    :timeout="3000"
-    @dismiss="dismissDone()"
-  >
-    {{ t('notifications.changes_saved') }}
-  </FloatingNotification>
 </template>

@@ -2,6 +2,7 @@
 import type { DataTableColumn } from '@rotki/ui-library';
 import type { CreditEntry } from '~/types/account';
 import { formatDate } from '~/utils/date';
+import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 import { formatDecimalString } from '~/utils/text';
 
 defineProps<{
@@ -40,11 +41,12 @@ function formatEntryType(value: string): string {
 
 <template>
   <RuiDataTable
+    :class="SINGLE_LINE_ROWS"
     :cols="cols"
     :rows="rows"
     row-attr="createdAt"
+    :hide-pagination="fitsOnePage(rows)"
     outlined
-    dense
   >
     <template #item.entryType="{ row }">
       <RuiChip
@@ -67,10 +69,15 @@ function formatEntryType(value: string): string {
       {{ formatEur(row.balanceAfterEur) }}
     </template>
     <template #item.createdAt="{ row }">
-      {{ formatDate(row.createdAt) }}
+      {{ formatDate(row.createdAt, 'MMM DD, YYYY') }}
     </template>
     <template #item.notes="{ row }">
-      <span class="text-rui-text-secondary">{{ row.notes || '–' }}</span>
+      <span
+        class="block max-w-56 truncate text-rui-text-secondary"
+        :title="row.notes || undefined"
+      >
+        {{ row.notes || '–' }}
+      </span>
     </template>
   </RuiDataTable>
 </template>

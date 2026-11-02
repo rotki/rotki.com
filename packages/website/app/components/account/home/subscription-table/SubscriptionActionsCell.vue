@@ -82,7 +82,8 @@ interface Props {
   availablePlans: AvailablePlans;
   operationState: OperationState;
   cryptoPaymentState: CryptoPaymentState;
-  layout?: 'vertical' | 'horizontal';
+  /** `row` keeps the actions on one line at the end, for a table cell. */
+  layout?: 'vertical' | 'horizontal' | 'row';
   /** Full outlined buttons instead of compact text links, for the plan card. */
   prominent?: boolean;
 }
@@ -247,6 +248,9 @@ const layoutClasses = computed<string>(() => {
   if (layout === 'horizontal') {
     return 'flex flex-wrap items-center gap-2';
   }
+  if (layout === 'row') {
+    return 'flex items-center justify-end gap-2';
+  }
   return 'flex flex-col items-start gap-1';
 });
 
@@ -321,10 +325,10 @@ watchImmediate(() => subscription, async (sub) => {
       @click="handleAction(SubscriptionAction.RESUME)"
     />
   </div>
-  <div
+  <span
     v-else
-    class="capitalize m-2"
+    class="sr-only"
   >
     {{ t('common.none') }}
-  </div>
+  </span>
 </template>

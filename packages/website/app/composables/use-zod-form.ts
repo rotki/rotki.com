@@ -19,6 +19,10 @@ export interface ZodForm<Field extends string> {
   hasError: (field: Field) => boolean;
   /** Only the backend errors for a field, for places that show the schema rules another way. */
   serverErrors: (field: Field) => string[];
+  /** Backend errors for fields this form does not have, to show above or below it. */
+  formErrors: Readonly<Ref<string[]>>;
+  /** The fields `formErrors` came from, so a form can tell which other form can fix them. */
+  formErrorFields: Readonly<Ref<string[]>>;
   /** True while the schema rejects the state or a backend error is still standing. */
   invalid: ComputedRef<boolean>;
   /** True once `validate` ran, so a form can hold back hints until the first submit. */
@@ -54,6 +58,9 @@ export function useZodForm<Schema extends FormSchema, Field extends string = Ext
 ): ZodForm<Field> {
   const touched = ref<Record<string, boolean>>({});
   const external = ref<Record<string, string[]>>({});
+  // Kept apart from `external`: no field here can change them, so they must not lock the form.
+  const formErrors = ref<string[]>([]);
+  const formErrorFields = ref<string[]>([]);
   const submitted = shallowRef<boolean>(false);
 
   const issues = computed<Record<string, string[]>>(() => {
@@ -102,14 +109,28 @@ export function useZodForm<Schema extends FormSchema, Field extends string = Ext
   function reset(): void {
     set(touched, {});
     set(external, {});
+    set(formErrors, []);
+    set(formErrorFields, []);
     set(submitted, false);
   }
 
   function setExternalErrors(fieldErrors: FieldErrors): void {
+    const fields = new Set<string>(Object.keys(toValue(state)));
     const next: Record<string, string[]> = {};
-    for (const [field, messages] of Object.entries(fieldErrors))
-      next[field] = toList(messages);
+    const other: string[] = [];
+    const otherFields: string[] = [];
+    for (const [field, messages] of Object.entries(fieldErrors)) {
+      if (fields.has(field)) {
+        next[field] = toList(messages);
+      }
+      else {
+        other.push(...toList(messages));
+        otherFields.push(field);
+      }
+    }
     set(external, next);
+    set(formErrors, other);
+    set(formErrorFields, otherFields);
   }
 
   // A changed field drops its backend error and, by default, starts showing its own errors.
@@ -118,6 +139,10 @@ export function useZodForm<Schema extends FormSchema, Field extends string = Ext
     if (changed.length === 0)
       return;
 
+    if (get(formErrors).length > 0) {
+      set(formErrors, []);
+      set(formErrorFields, []);
+    }
     const remaining = { ...get(external) };
     for (const field of changed)
       delete remaining[field];
@@ -133,6 +158,8 @@ export function useZodForm<Schema extends FormSchema, Field extends string = Ext
 
   return {
     errors,
+    formErrorFields: shallowReadonly(formErrorFields),
+    formErrors: shallowReadonly(formErrors),
     hasError,
     invalid,
     reset,

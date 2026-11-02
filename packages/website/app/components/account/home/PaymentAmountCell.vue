@@ -2,6 +2,7 @@
 import type { UserPayment } from '~/types/account';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { discountAmount } from '~/utils/money';
+import { formatCurrency } from '~/utils/text';
 
 defineProps<{
   payment: UserPayment;
@@ -11,7 +12,7 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div class="flex items-center justify-end gap-2">
+  <div class="flex items-center justify-end gap-2 tabular-nums">
     <RuiTooltip
       v-if="payment.discount && payment.priceBeforeDiscount"
       :open-delay="200"
@@ -29,7 +30,7 @@ const { t } = useI18n({ useScope: 'global' });
         tag="div"
       >
         <template #amount>
-          <b>{{ payment.priceBeforeDiscount }}</b>
+          <b>{{ formatCurrency(payment.priceBeforeDiscount) }}</b>
         </template>
       </i18n-t>
       <i18n-t
@@ -62,8 +63,8 @@ const { t } = useI18n({ useScope: 'global' });
           size="18"
         />
       </template>
-      {{ t('account.payments.credit_applied', { amount: payment.referralCreditAppliedEur }) }}
+      {{ t('account.payments.credit_applied', { amount: formatCurrency(payment.referralCreditAppliedEur) }) }}
     </RuiTooltip>
-    {{ payment.eurAmount }} €
+    {{ t('account.credit.balance_eur', { amount: formatCurrency(payment.eurAmount) }) }}
   </div>
 </template>

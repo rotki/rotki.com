@@ -23,10 +23,10 @@ async function open(page: Page, path: string): Promise<void> {
   await waitForHydration(page);
 }
 
-/** Opens Billing and its invoice details form, which holds the name, VAT ID and address forms. */
-async function openInvoiceDetails(page: Page): Promise<void> {
+/** Opens Billing and the invoice details dialog of one group: the name and VAT ID, or the address. */
+async function openInvoiceDetails(page: Page, group: 'name and VAT ID' | 'address'): Promise<void> {
   await open(page, '/home/billing');
-  await page.getByRole('main').getByRole('button', { name: 'Edit', exact: true }).click();
+  await page.getByRole('main').getByRole('button', { name: `Change ${group}`, exact: true }).click();
 }
 
 /** The submit button of the form that holds `field`. */
@@ -37,7 +37,7 @@ function submitButton(page: Page, field: string, name = 'Save') {
 test.describe('account forms', () => {
   test('address: an emptied required field blocks saving until it is filled', async ({ page }) => {
     const requests = await mockProfileUpdate(page);
-    await openInvoiceDetails(page);
+    await openInvoiceDetails(page, 'address');
 
     const city = page.locator('input#city').first();
     await expect(city).toHaveValue('Berlin');
@@ -55,13 +55,14 @@ test.describe('account forms', () => {
     await submitButton(page, 'input#city').click();
 
     await expect(page.getByText('Your changes have been successfully saved!')).toBeVisible();
+    await expect(page.locator('input#city')).toHaveCount(0);
     expect(requests).toHaveLength(1);
     expect(requests[0]?.postDataJSON()).toMatchObject({ city: 'Hamburg', postcode: '20095' });
   });
 
   test('customer information: names are required, company and VAT ID are not', async ({ page }) => {
     const requests = await mockProfileUpdate(page);
-    await openInvoiceDetails(page);
+    await openInvoiceDetails(page, 'name and VAT ID');
 
     const firstName = page.locator('input#first-name').first();
     await expect(firstName).toHaveValue('Test');
@@ -113,5 +114,28 @@ test.describe('account forms', () => {
 
     await expect.poll(() => requests.length).toBe(1);
     expect(requests[0]?.postDataJSON()).toMatchObject({ newsletter_consent: true });
+  });
+
+  test.describe('without a saved address', () => {
+    test.use({
+      backendScenario: {
+        account: { ...defaultAccount(), address: { ...defaultAccount().address, address1: '', city: '', postcode: '' } },
+      },
+    });
+
+    test('customer information: points to the address first and comes back with the typing kept', async ({ page }) => {
+      await openInvoiceDetails(page, 'name and VAT ID');
+      await page.locator('input#first-name').first().fill('Alice');
+
+      await expect(page.getByText('Add your address first.')).toBeVisible();
+      await page.getByRole('button', { name: 'Add address', exact: true }).click();
+
+      await expect(page.locator('input#city')).toBeVisible();
+      await expect(page.locator('input#first-name')).toBeHidden();
+
+      await page.getByRole('button', { name: 'Cancel', exact: true }).filter({ visible: true }).click();
+      await expect(page.locator('input#first-name')).toHaveValue('Alice');
+      await expect(page.locator('input#city')).toBeHidden();
+    });
   });
 });

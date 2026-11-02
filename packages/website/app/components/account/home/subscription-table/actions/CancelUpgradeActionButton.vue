@@ -17,7 +17,7 @@ const buttonStyle = useActionButtonStyle();
 
 <template>
   <RuiButton
-    color="warning"
+    color="error"
     :variant="buttonStyle.variant"
     :size="buttonStyle.size"
     :class="actionsClasses"

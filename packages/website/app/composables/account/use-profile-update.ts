@@ -9,6 +9,12 @@ import { useMainStore } from '~/store';
 
 type ProfileOmitFields = 'movedOffline';
 
+/** Profile fields the name and VAT form edits; every save also sends the others. */
+export const NAME_FIELDS: readonly string[] = ['firstName', 'lastName', 'companyName', 'vatId'];
+
+/** Profile fields the address form edits. */
+export const ADDRESS_FIELDS: readonly string[] = ['address1', 'address2', 'city', 'postcode', 'country'];
+
 type ProfileForm = Pick<ZodForm<string>, 'setExternalErrors' | 'validate'>;
 
 export function useProfileUpdate() {

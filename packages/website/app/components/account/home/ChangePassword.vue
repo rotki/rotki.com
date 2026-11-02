@@ -5,6 +5,7 @@ import { z } from 'zod';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
+import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useFormRules } from '~/composables/use-form-rules';
 import { useZodForm } from '~/composables/use-zod-form';
@@ -33,7 +34,7 @@ const form = useZodForm(z.object({
   error: t('validation.passwords_differ'),
   path: ['passwordConfirmation'],
 }), state);
-const { errors, hasError, invalid, serverErrors } = form;
+const { errors, formErrors, hasError, invalid, serverErrors } = form;
 
 const { start: startSuccessTimeout, stop: stopSuccessTimeout } = useTimeoutFn(() => {
   set(success, false);
@@ -132,6 +133,10 @@ function close(): void {
         />
       </div>
 
+      <FormErrorsAlert
+        class="mt-6"
+        :messages="formErrors"
+      />
       <div class="mt-8 flex flex-wrap gap-3">
         <RuiButton
           type="submit"

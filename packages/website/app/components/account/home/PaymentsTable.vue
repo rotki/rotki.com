@@ -6,15 +6,16 @@ import type {
   TablePaginationData,
 } from '@rotki/ui-library';
 import type { UserPayment } from '~/types/account';
+import { get } from '@vueuse/shared';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import PaymentAmountCell from '~/components/account/home/PaymentAmountCell.vue';
 import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useUserPayments } from '~/composables/account/use-user-payments';
 import { formatDate } from '~/utils/date';
-import { invoiceUrl } from '~/utils/payments';
+import { invoiceUrl, PAID_USING_CARD } from '~/utils/payments';
 import { getPlanNameFor } from '~/utils/plans';
-import { fitsOnePage } from '~/utils/table';
+import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 import { toTitleCase } from '~/utils/text';
 
 const { pending } = defineProps<{
@@ -24,14 +25,18 @@ const { pending } = defineProps<{
 const { t } = useI18n({ useScope: 'global' });
 
 const pagination = ref<TablePaginationData>();
-const sort = ref<DataTableSortColumn<UserPayment>>({
+
+/** A payment with its method as shown, so the column sorts the way it reads. */
+type PaymentRow = UserPayment & { method: string };
+
+const sort = ref<DataTableSortColumn<PaymentRow>>({
   column: 'paidAt',
   direction: 'desc',
 });
 
 const { userPayments, loading, refresh } = useUserPayments();
 
-const headers: DataTableColumn<UserPayment>[] = [{
+const headers: DataTableColumn<PaymentRow>[] = [{
   label: t('account.payments.headers.paid_at'),
   key: 'paidAt',
   cellClass: 'whitespace-nowrap',
@@ -44,16 +49,16 @@ const headers: DataTableColumn<UserPayment>[] = [{
   sortable: true,
 }, {
   label: t('account.payments.headers.method'),
-  key: 'paidUsing',
+  key: 'method',
   sortable: true,
 }, {
   label: t('account.payments.headers.paid_amount'),
-  key: 'finalPrice',
+  key: 'eurAmount',
   sortable: true,
   align: 'end',
 }, {
   label: t('common.status'),
-  key: 'status',
+  key: 'isRefund',
   class: '[&_button]:capitalize',
   sortable: true,
 }, {
@@ -61,6 +66,29 @@ const headers: DataTableColumn<UserPayment>[] = [{
   key: 'actions',
   align: 'end',
 }];
+
+/** The backend sends the `PaidVia` enum name; anything new falls back to a readable form of it. */
+function methodLabel(paidUsing: string): string {
+  switch (paidUsing) {
+    case PAID_USING_CARD:
+      return t('common.card');
+    case 'PAYPAL':
+      return t('account.payments.methods.paypal');
+    case 'CRYPTO':
+      return t('account.payments.methods.crypto');
+    case 'BANK_TRANSFER':
+      return t('account.payments.methods.bank_transfer');
+    default:
+      return toTitleCase(paidUsing);
+  }
+}
+
+const rows = computed<PaymentRow[]>(() => get(userPayments).map(payment => ({
+  ...payment,
+  method: payment.referralCreditAppliedEur > 0
+    ? t('account.payments.method_with_credit', { method: methodLabel(payment.paidUsing) })
+    : methodLabel(payment.paidUsing),
+})));
 
 watch(() => pending, (pendingIs, pendingWas) => {
   if (pendingIs.length === 0 && pendingWas.length > 0) {
@@ -83,12 +111,13 @@ watch(() => pending, (pendingIs, pendingWas) => {
     <RuiDataTable
       v-model:pagination="pagination"
       v-model:sort="sort"
+      :class="SINGLE_LINE_ROWS"
       :cols="headers"
       :loading="loading"
       :empty="{ description: t('account.payments.no_payments_found') }"
       row-attr="identifier"
-      :rows="userPayments"
-      :hide-pagination="fitsOnePage(userPayments)"
+      :rows="rows"
+      :hide-pagination="fitsOnePage(rows)"
       outlined
     >
       <template #item.plan="{ row }">
@@ -99,43 +128,19 @@ watch(() => pending, (pendingIs, pendingWas) => {
           <div>{{ getPlanNameFor(t, { name: row.plan, durationInMonths: row.durationInMonths }) }}</div>
           <div
             v-if="row.isUpgrade && row.originalPlan"
-            class="text-[10px] leading-[1.2] text-rui-text-secondary uppercase whitespace-nowrap"
+            class="text-caption leading-3.5 text-rui-text-secondary whitespace-nowrap"
           >
-            {{ t('account.payments.upgraded_from', { plan: row.originalPlan }) }}
+            {{ t('account.payments.upgraded_from', { plan: toTitleCase(row.originalPlan) }) }}
           </div>
         </template>
       </template>
       <template #item.paidAt="{ row }">
         {{ formatDate(row.paidAt, 'MMM DD, YYYY') }}
       </template>
-      <template #item.finalPrice="{ row }">
+      <template #item.eurAmount="{ row }">
         <PaymentAmountCell :payment="row" />
       </template>
-      <template #item.paidUsing="{ row }">
-        <div class="inline-flex items-center gap-1">
-          <span>
-            {{
-              row.referralCreditAppliedEur > 0
-                ? t('account.payments.method_with_credit', { method: toTitleCase(row.paidUsing) })
-                : toTitleCase(row.paidUsing)
-            }}
-          </span>
-          <RuiTooltip
-            v-if="row.referralCreditAppliedEur > 0"
-            :open-delay="200"
-          >
-            <template #activator>
-              <RuiIcon
-                name="lu-coins"
-                class="text-rui-success"
-                size="14"
-              />
-            </template>
-            {{ t('account.payments.credit_applied', { amount: row.referralCreditAppliedEur }) }}
-          </RuiTooltip>
-        </div>
-      </template>
-      <template #item.status="{ row }">
+      <template #item.isRefund="{ row }">
         <RuiChip
           size="sm"
           variant="tonal"

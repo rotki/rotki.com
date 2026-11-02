@@ -4,6 +4,7 @@ import { FetchError } from 'ofetch';
 import { z } from 'zod';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
+import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useFormRules } from '~/composables/use-form-rules';
@@ -33,7 +34,7 @@ const form = useZodForm(
   () => ({ email: get(emailAddress), captcha: get(recaptchaToken) }),
   { touchOnChange: false },
 );
-const { errors, hasError, touch } = form;
+const { errors, formErrors, hasError, touch } = form;
 
 const logger = useLogger('password-form');
 const { fetchWithCsrf } = useFetchWithCsrf();
@@ -111,6 +112,10 @@ async function reset(): Promise<void> {
           />
         </ClientOnly>
       </div>
+      <FormErrorsAlert
+        class="mb-4"
+        :messages="formErrors"
+      />
       <RuiButton
         color="primary"
         :disabled="loading"

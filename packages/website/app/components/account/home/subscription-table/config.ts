@@ -25,16 +25,15 @@ export function getSubscriptionTableHeaders(t: ComposerTranslation): DataTableCo
   }, {
     align: 'end',
     key: 'nextBillingAmount',
-    label: t('account.subscriptions.headers.cost_in_symbol_per_period', {
-      symbol: '€',
-    }),
+    cellClass: 'tabular-nums',
+    label: t('account.subscriptions.headers.price'),
     sortable: true,
   }, {
     class: 'capitalize',
     key: 'status',
     label: t('common.status'),
   }, {
-    align: 'start',
+    align: 'end',
     class: 'capitalize',
     key: 'actions',
     label: t('common.actions'),

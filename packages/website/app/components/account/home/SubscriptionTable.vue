@@ -22,15 +22,15 @@ import { useSubscriptionPolling } from '~/composables/subscription/use-subscript
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
-import { formatDate } from '~/utils/date';
-import { fitsOnePage } from '~/utils/table';
+import { formatDate, isValidDate } from '~/utils/date';
+import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 
 const { folded = false } = defineProps<{
   /** Starts folded behind a Show button, for when no subscription has anything left to do. */
   folded?: boolean;
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
+const { n, t } = useI18n({ useScope: 'global' });
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<UserSubscription>>({
   column: 'createdDate',
@@ -161,6 +161,7 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
       id="subscriptions-table"
       v-model:pagination="pagination"
       v-model:sort="sort"
+      :class="SINGLE_LINE_ROWS"
       :cols="headers"
       :rows="userSubscriptions"
       :loading="loading"
@@ -180,7 +181,13 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
       </template>
 
       <template #item.nextActionDate="{ row }">
-        {{ formatDate(row.nextActionDate, 'MMM DD, YYYY') }}
+        <span :class="{ 'text-rui-text-secondary': !isValidDate(row.nextActionDate) }">
+          {{ formatDate(row.nextActionDate, 'MMM DD, YYYY') }}
+        </span>
+      </template>
+
+      <template #item.nextBillingAmount="{ row }">
+        {{ t('account.credit.balance_eur', { amount: n(row.nextBillingAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }) }}
       </template>
 
       <template #item.status="{ row }">
@@ -193,6 +200,7 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
         <SubscriptionActionsCell
           :subscription="row"
           :actions-classes="actionsClasses"
+          layout="row"
           :available-plans="availablePlans"
           :operation-state="operationState"
           :crypto-payment-state="cryptoPaymentState"

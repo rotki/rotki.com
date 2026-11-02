@@ -5,9 +5,17 @@ import { computed, ref } from 'vue';
 import AccountInformation from '~/components/account/home/AccountInformation.vue';
 
 const mockUseProfileUpdate = vi.hoisted(() => vi.fn());
+const mockCheckVAT = vi.hoisted(() => vi.fn());
 
 vi.mock('~/composables/account/use-profile-update', () => ({
   useProfileUpdate: mockUseProfileUpdate,
+}));
+
+vi.mock('~/modules/checkout/composables/use-vat-check', () => ({
+  useVatCheck: () => ({
+    checkVAT: mockCheckVAT,
+    refreshVATCheckStatus: vi.fn(),
+  }),
 }));
 
 function createAccount(newsletterConsent: boolean): Account {
@@ -38,8 +46,8 @@ function createAccount(newsletterConsent: boolean): Account {
   };
 }
 
-async function mountAccountInformation(newsletterConsent: boolean) {
-  const updateProfile = vi.fn().mockResolvedValue(true);
+async function mountAccountInformation(newsletterConsent: boolean, saves = true) {
+  const updateProfile = vi.fn().mockResolvedValue(saves);
   const account = ref<Account>(createAccount(newsletterConsent));
 
   mockUseProfileUpdate.mockReturnValue({
@@ -80,5 +88,17 @@ describe('account information', () => {
         vatId: 'DE123456789',
       }),
     );
+  });
+
+  it('does not check the VAT ID when saving it failed', async () => {
+    const { updateProfile, wrapper } = await mountAccountInformation(false, false);
+    const verify = wrapper.findAll('button').find(button => button.text() === 'Verify');
+    expect(verify).toBeDefined();
+    await verify!.trigger('click');
+
+    await vi.waitFor(() => {
+      expect(updateProfile).toHaveBeenCalledOnce();
+    });
+    expect(mockCheckVAT).not.toHaveBeenCalled();
   });
 });

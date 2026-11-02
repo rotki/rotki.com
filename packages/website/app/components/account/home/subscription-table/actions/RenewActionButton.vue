@@ -21,7 +21,7 @@ const buttonStyle = useActionButtonStyle();
     :class="actionsClasses"
     :size="buttonStyle.size"
     :variant="buttonStyle.variant"
-    color="info"
+    color="primary"
   >
     <template #prepend>
       <RuiIcon

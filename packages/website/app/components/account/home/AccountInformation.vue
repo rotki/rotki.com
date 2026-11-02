@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
 import { z } from 'zod';
-import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { useProfileUpdate } from '~/composables/account/use-profile-update';
+import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
+import { ADDRESS_FIELDS, useProfileUpdate } from '~/composables/account/use-profile-update';
 import { useFormRules } from '~/composables/use-form-rules';
 import { useZodForm } from '~/composables/use-zod-form';
 import { useVatCheck } from '~/modules/checkout/composables/use-vat-check';
 import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
+
+const emit = defineEmits<{
+  'saved': [];
+  'cancel': [];
+  'edit-address': [];
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -34,12 +40,11 @@ const remainingTime = ref<number>(0);
 const waitUntilTime = useLocalStorage<number>('rotki.vat_check.wait_until_time', 0);
 
 const [DefineVAT, ReuseVAT] = createReusableTemplate();
+const [DefineEditAddressButton, EditAddressButton] = createReusableTemplate<{ label: string }>();
 const { refreshVATCheckStatus, checkVAT } = useVatCheck();
 
 const {
   account,
-  dismissDone,
-  done,
   loading,
   movedOffline,
   updateProfile,
@@ -57,7 +62,7 @@ const form = useZodForm(() => {
     vatId: z.string(),
   });
 }, state);
-const { errors, invalid, touch } = form;
+const { errors, formErrorFields, formErrors, invalid, touch } = form;
 
 const { pause: pauseTimer, resume } = useIntervalFn(() => {
   if (!updateRemainingTime()) {
@@ -71,6 +76,15 @@ const {
     contact: { supportEmail, supportEmailMailto },
   },
 } = useRuntimeConfig();
+
+/** The backend checks the saved address on every profile save, so it has to come first. */
+const addressMissing = computed<boolean>(() => {
+  const address = get(account)?.address;
+  return !address || !address.address1 || !address.city || !address.postcode;
+});
+
+/** The save failed on the stored address, which only the address form can fix. */
+const addressRejected = computed<boolean>(() => get(formErrorFields).some(field => ADDRESS_FIELDS.includes(field)));
 
 const isVatIdValid = computed<boolean>(() => get(account)?.vatIdStatus === VatIdStatus.VALID || false);
 
@@ -124,7 +138,8 @@ function reset(): void {
 }
 
 async function update(): Promise<void> {
-  await updateProfile(form, state);
+  if (await updateProfile(form, state))
+    emit('saved');
 }
 
 /** Enter in the VAT ID field runs the check next to it instead of submitting the whole form. */
@@ -136,35 +151,41 @@ async function verifyOnEnter(): Promise<void> {
 
 async function handleCheckVATClick() {
   set(loadingCheck, true);
-  await updateProfile(form, state);
-  const checkResult = await checkVAT();
-  await refreshVATCheckStatus();
+  try {
+    // The check reads the saved VAT ID, so there is nothing to check when the save failed.
+    if (!await updateProfile(form, state))
+      return;
+    const checkResult = await checkVAT();
+    await refreshVATCheckStatus();
 
-  if ('seconds' in checkResult) {
-    const now = Math.round(Date.now() / 1000);
-    set(waitUntilTime, now + checkResult.seconds);
-    set(remainingTime, checkResult.seconds);
-    pauseTimer();
-    if (checkResult.seconds > 0) {
-      resume();
+    if ('seconds' in checkResult) {
+      const now = Math.round(Date.now() / 1000);
+      set(waitUntilTime, now + checkResult.seconds);
+      set(remainingTime, checkResult.seconds);
+      pauseTimer();
+      if (checkResult.seconds > 0) {
+        resume();
+      }
     }
-  }
-  else if (checkResult.success) {
-    const status = get(account)?.vatIdStatus;
-    if (status === VatIdStatus.VALID) {
-      set(vatSuccessMessage, t('auth.signup.vat.verified'));
+    else if (checkResult.success) {
+      const status = get(account)?.vatIdStatus;
+      if (status === VatIdStatus.VALID) {
+        set(vatSuccessMessage, t('auth.signup.vat.verified'));
+        setTimeout(() => {
+          set(vatSuccessMessage, '');
+        }, 3000);
+      }
+    }
+    else {
+      set(vatErrorMessage, checkResult.message);
       setTimeout(() => {
-        set(vatSuccessMessage, '');
+        set(vatErrorMessage, '');
       }, 3000);
     }
   }
-  else {
-    set(vatErrorMessage, checkResult.message);
-    setTimeout(() => {
-      set(vatErrorMessage, '');
-    }, 3000);
+  finally {
+    set(loadingCheck, false);
   }
-  set(loadingCheck, false);
 }
 
 function updateRemainingTime(): boolean {
@@ -178,6 +199,12 @@ function updateRemainingTime(): boolean {
   return false;
 }
 
+// Saving the address in the other form fixes what this form's last error was about
+watch(() => get(account)?.address, () => {
+  if (get(formErrors).length > 0)
+    form.reset();
+});
+
 onMounted(() => {
   reset();
   resume();
@@ -186,6 +213,17 @@ onMounted(() => {
 </script>
 
 <template>
+  <DefineEditAddressButton #default="{ label }">
+    <RuiButton
+      class="mt-2 -ms-2"
+      size="sm"
+      variant="text"
+      color="primary"
+      @click="emit('edit-address')"
+    >
+      {{ label }}
+    </RuiButton>
+  </DefineEditAddressButton>
   <DefineVAT>
     <div class="flex gap-4 items-start">
       <RuiTextField
@@ -227,6 +265,14 @@ onMounted(() => {
     class="max-w-2xl"
     @submit.prevent="update()"
   >
+    <RuiAlert
+      v-if="addressMissing"
+      type="info"
+      class="mb-6"
+    >
+      {{ t('account.billing.invoice.address_first') }}
+      <EditAddressButton :label="t('account.billing.invoice.add_address')" />
+    </RuiAlert>
     <div class="space-y-5">
       <RuiTextField
         id="first-name"
@@ -267,6 +313,17 @@ onMounted(() => {
       <ReuseVAT />
     </div>
 
+    <FormErrorsAlert
+      class="mt-6"
+      :messages="formErrors"
+      :title="addressRejected ? t('account.billing.invoice.check_address') : undefined"
+    >
+      <EditAddressButton
+        v-if="addressRejected"
+        :label="t('account.billing.invoice.edit_address')"
+      />
+    </FormErrorsAlert>
+
     <div class="mt-8 flex flex-wrap gap-3">
       <RuiButton
         type="submit"
@@ -280,9 +337,9 @@ onMounted(() => {
       <RuiButton
         variant="text"
         color="primary"
-        @click="reset()"
+        @click="emit('cancel')"
       >
-        {{ t('actions.reset') }}
+        {{ t('actions.cancel') }}
       </RuiButton>
     </div>
   </form>
@@ -315,14 +372,4 @@ onMounted(() => {
   >
     <ReuseVAT />
   </div>
-
-  <FloatingNotification
-    type="success"
-    closeable
-    :visible="done"
-    :timeout="3000"
-    @dismiss="dismissDone()"
-  >
-    {{ t('notifications.changes_saved') }}
-  </FloatingNotification>
 </template>

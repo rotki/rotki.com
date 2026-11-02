@@ -6,6 +6,7 @@ import { z } from 'zod';
 import AuthShell from '~/components/account/AuthShell.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
+import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useFormRules } from '~/composables/use-form-rules';
@@ -61,7 +62,7 @@ const form = useZodForm(z.object({
   error: t('validation.passwords_differ'),
   path: ['passwordConfirmation'],
 }), () => ({ password: get(password), passwordConfirmation: get(passwordConfirmation) }));
-const { errors, hasError, serverErrors, submitted } = form;
+const { errors, formErrors, hasError, serverErrors, submitted } = form;
 
 const route = useRoute();
 const { uid, token } = route.params;
@@ -178,6 +179,10 @@ const { validating, isValid } = setupTokenValidation();
           :error-messages="errors('passwordConfirmation')"
         />
       </div>
+      <FormErrorsAlert
+        class="mb-4"
+        :messages="formErrors"
+      />
       <RuiButton
         color="primary"
         class="w-full"

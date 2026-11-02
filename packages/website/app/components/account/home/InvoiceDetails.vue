@@ -1,21 +1,49 @@
 <script setup lang="ts">
-import { get } from '@vueuse/shared';
+import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import AccountAddress from '~/components/account/home/AccountAddress.vue';
 import AccountInformation from '~/components/account/home/AccountInformation.vue';
 import AccountSection from '~/components/account/home/AccountSection.vue';
+import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useMainStore } from '~/store';
+
+type EditGroup = 'name' | 'address';
 
 interface DetailRow {
   label: string;
-  lines: string[];
+  value: string;
 }
 
 const { t } = useI18n({ useScope: 'global' });
 
+const groupTitles: Record<EditGroup, string> = {
+  name: t('account.billing.invoice.name_and_vat'),
+  address: t('account.billing.invoice.address'),
+};
+
+const editing = ref<EditGroup>();
+/** The group a jump to the other form came from, to go back to once that form is done. */
+const returnTo = ref<EditGroup>();
+/** Bumped on every open, so each open starts from the saved values. */
+const formsKey = ref<number>(0);
+const saved = ref<boolean>(false);
+
 const { account } = storeToRefs(useMainStore());
 
-const editing = ref<boolean>(false);
+const dialogOpen = computed<boolean>({
+  get: () => get(editing) !== undefined,
+  set: (open: boolean) => {
+    if (!open) {
+      set(editing, undefined);
+      set(returnTo, undefined);
+    }
+  },
+});
+
+const dialogTitle = computed<string>(() => {
+  const group = get(editing);
+  return group ? groupTitles[group] : '';
+});
 
 /** The country's English name, from the browser, so showing it needs no country list request. */
 function countryName(code: string): string {
@@ -29,23 +57,51 @@ function countryName(code: string): string {
   }
 }
 
-const rows = computed<DetailRow[]>(() => {
+const nameRows = computed<DetailRow[]>(() => {
   const address = get(account)?.address;
   if (!address)
     return [];
 
   const name = `${address.firstName} ${address.lastName}`.trim();
-  const cityLine = [address.postcode, address.city].filter(Boolean).join(' ');
   return [
-    { label: t('account.billing.invoice.name'), lines: name ? [name] : [] },
-    { label: t('account.billing.invoice.company'), lines: address.companyName ? [address.companyName] : [] },
-    { label: t('account.billing.invoice.vat_id'), lines: address.vatId ? [address.vatId] : [] },
-    {
-      label: t('account.billing.invoice.address'),
-      lines: [address.address1, address.address2, cityLine, countryName(address.country)].filter(Boolean),
-    },
+    { label: t('account.billing.invoice.name'), value: name },
+    { label: t('account.billing.invoice.company'), value: address.companyName },
+    { label: t('account.billing.invoice.vat_id'), value: address.vatId },
   ];
 });
+
+const addressLines = computed<string[]>(() => {
+  const address = get(account)?.address;
+  if (!address)
+    return [];
+
+  const cityLine = [address.postcode, address.city].filter(Boolean).join(' ');
+  return [address.address1, address.address2, cityLine, countryName(address.country)].filter(Boolean);
+});
+
+function open(group: EditGroup): void {
+  set(formsKey, get(formsKey) + 1);
+  set(returnTo, undefined);
+  set(editing, group);
+}
+
+/** Moves to the other form; both stay mounted, so what was typed in the first one is kept. */
+function switchTo(group: EditGroup): void {
+  set(returnTo, get(editing));
+  set(editing, group);
+}
+
+/** After a jump, saving or cancelling goes back to the form the user came from. */
+function done(): void {
+  const back = get(returnTo);
+  set(returnTo, undefined);
+  set(editing, back);
+}
+
+function onSaved(): void {
+  set(saved, true);
+  done();
+}
 </script>
 
 <template>
@@ -53,67 +109,111 @@ const rows = computed<DetailRow[]>(() => {
     :title="t('account.billing.invoice.title')"
     :description="t('account.billing.invoice.description')"
   >
-    <template #actions>
-      <RuiButton
-        color="primary"
-        variant="outlined"
-        :aria-expanded="editing"
-        aria-controls="invoice-details-edit"
-        @click="editing = !editing"
-      >
-        {{ editing ? t('actions.close') : t('actions.edit') }}
-      </RuiButton>
-    </template>
-
-    <div
-      v-if="editing"
-      id="invoice-details-edit"
-      class="space-y-10"
-    >
-      <div>
-        <h3 class="text-subtitle-1 font-medium text-rui-text mb-4">
-          {{ t('account.billing.invoice.name_and_vat') }}
-        </h3>
-        <AccountInformation />
+    <div class="rounded-lg border border-default divide-y divide-default">
+      <div class="p-4 md:p-6">
+        <div class="flex items-center justify-between gap-4">
+          <h3 class="text-subtitle-1 font-medium text-rui-text">
+            {{ t('account.billing.invoice.name_and_vat') }}
+          </h3>
+          <RuiButton
+            color="primary"
+            variant="text"
+            size="sm"
+            :aria-label="t('account.billing.invoice.change_name')"
+            @click="open('name')"
+          >
+            {{ t('actions.change') }}
+          </RuiButton>
+        </div>
+        <dl class="mt-3 grid gap-x-8 gap-y-4 sm:grid-cols-3">
+          <div
+            v-for="row in nameRows"
+            :key="row.label"
+          >
+            <dt class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
+              {{ row.label }}
+            </dt>
+            <dd
+              class="mt-1 text-body-1 break-words"
+              :class="row.value ? 'text-rui-text' : 'text-rui-text-secondary'"
+            >
+              {{ row.value || t('account.billing.invoice.not_set') }}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <div>
-        <h3 class="text-subtitle-1 font-medium text-rui-text mb-4">
-          {{ t('account.billing.invoice.address') }}
-        </h3>
-        <AccountAddress />
-      </div>
-    </div>
 
-    <dl
-      v-else
-      class="rounded-lg border border-default p-4 md:p-6 grid gap-x-8 gap-y-5 sm:grid-cols-2"
-    >
-      <div
-        v-for="row in rows"
-        :key="row.label"
-      >
-        <dt class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
-          {{ row.label }}
-        </dt>
-        <dd
-          v-if="row.lines.length > 0"
-          class="mt-1 text-body-1 text-rui-text"
+      <div class="p-4 md:p-6">
+        <div class="flex items-center justify-between gap-4">
+          <h3 class="text-subtitle-1 font-medium text-rui-text">
+            {{ t('account.billing.invoice.address') }}
+          </h3>
+          <RuiButton
+            color="primary"
+            variant="text"
+            size="sm"
+            :aria-label="t('account.billing.invoice.change_address')"
+            @click="open('address')"
+          >
+            {{ t('actions.change') }}
+          </RuiButton>
+        </div>
+        <p
+          v-if="addressLines.length > 0"
+          class="mt-3 text-body-1 text-rui-text"
         >
           <span
-            v-for="(line, index) in row.lines"
+            v-for="(line, index) in addressLines"
             :key="index"
             class="block"
           >
             {{ line }}
           </span>
-        </dd>
-        <dd
+        </p>
+        <p
           v-else
-          class="mt-1 text-body-1 text-rui-text-secondary"
+          class="mt-3 text-body-1 text-rui-text-secondary"
         >
           {{ t('account.billing.invoice.not_set') }}
-        </dd>
+        </p>
       </div>
-    </dl>
+    </div>
+
+    <RuiDialog
+      v-model="dialogOpen"
+      max-width="560"
+    >
+      <RuiCard>
+        <template #header>
+          {{ dialogTitle }}
+        </template>
+        <div :key="formsKey">
+          <div v-show="editing === 'name'">
+            <AccountInformation
+              @saved="onSaved()"
+              @cancel="done()"
+              @edit-address="switchTo('address')"
+            />
+          </div>
+          <div v-show="editing === 'address'">
+            <AccountAddress
+              @saved="onSaved()"
+              @cancel="done()"
+              @edit-name="switchTo('name')"
+            />
+          </div>
+        </div>
+      </RuiCard>
+    </RuiDialog>
+
+    <FloatingNotification
+      type="success"
+      closeable
+      :visible="saved"
+      :timeout="3000"
+      @dismiss="saved = false"
+    >
+      {{ t('notifications.changes_saved') }}
+    </FloatingNotification>
   </AccountSection>
 </template>

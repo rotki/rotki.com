@@ -78,6 +78,23 @@ describe('useZodForm', () => {
     expect(form.errors('password')).toEqual(['too common']);
   });
 
+  it('shows backend errors for fields it does not have without locking the form', () => {
+    const { form, state } = setup();
+    state.name = 'alice';
+    state.password = 'p455w0rD';
+    state.confirm = 'p455w0rD';
+
+    form.setExternalErrors({ name: 'already in use', postcode: ['invalid postcode'] });
+    expect(get(form.formErrors)).toEqual(['invalid postcode']);
+    expect(get(form.formErrorFields)).toEqual(['postcode']);
+    expect(form.errors('name')).toEqual(['already in use']);
+
+    state.name = 'bob';
+    expect(get(form.formErrors)).toEqual([]);
+    expect(get(form.formErrorFields)).toEqual([]);
+    expect(get(form.invalid)).toBe(false);
+  });
+
   it('forgets touched fields, submit and backend errors on reset', () => {
     const { form, state } = setup();
     state.password = 'short';
