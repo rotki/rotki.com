@@ -39,7 +39,7 @@ test.describe('account tables', () => {
       await open(page, '/home/devices');
       await page.getByRole('button', { name: 'Rename Work laptop', exact: true }).click();
 
-      const label = page.getByLabel('Device Name');
+      const label = page.getByLabel('Device name');
       await expect(label).toHaveValue('Work laptop');
       await label.fill('Office laptop');
       await page.getByRole('button', { name: 'Save', exact: true }).click();
@@ -90,7 +90,7 @@ test.describe('account tables', () => {
       expect([[20, 25, 50], [50, 25, 20]]).toContainEqual(amounts);
 
       const statuses: string[][] = [];
-      const status = history.getByRole('button', { name: /^status$/i });
+      const status = history.getByRole('button', { name: 'Status', exact: true });
       await status.click();
       statuses.push(await column(history, 4));
       await status.click();

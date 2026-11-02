@@ -1,35 +1,30 @@
 <script setup lang="ts">
+import type { DeepReadonly } from 'vue';
+import type { CreditEntry } from '~/types/account';
 import AccountCreditHistoryTable from '~/components/account/home/AccountCreditHistoryTable.vue';
-import RefreshButton from '~/components/account/home/RefreshButton.vue';
-import { useCredit } from '~/composables/account/use-credit';
 import { formatDecimalString } from '~/utils/text';
+
+/** The balance and its history, loaded by the page, which also offers the refresh. */
+const { balance, history, initialLoading } = defineProps<{
+  balance: string;
+  history: DeepReadonly<CreditEntry[]>;
+  initialLoading: boolean;
+}>();
 
 const { t } = useI18n({ useScope: 'global' });
 
 const historyOpen = ref<boolean>(false);
 
-const { balance, hasHistory, history, initialLoading, load, loading } = useCredit();
-
 function formatEur(value: string): string {
   return t('account.credit.balance_eur', { amount: formatDecimalString(value) });
 }
-
-onMounted(load);
 </script>
 
 <template>
   <div class="rounded-lg bg-rui-grey-50 dark:bg-rui-grey-900 p-4 md:p-5">
-    <div class="flex items-start justify-between gap-2">
-      <p class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
-        {{ t('account.credit.balance') }}
-      </p>
-      <RefreshButton
-        :loading="loading"
-        :disabled="initialLoading"
-        class="-mt-2 -mr-2"
-        @refresh="load()"
-      />
-    </div>
+    <p class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
+      {{ t('account.credit.balance') }}
+    </p>
 
     <!-- Same block heights as the loaded panel, so the row does not grow when the balance arrives -->
     <template v-if="initialLoading">
@@ -51,10 +46,9 @@ onMounted(load);
         {{ t('account.credit.disclaimer') }}
       </p>
       <RuiButton
-        v-if="hasHistory"
+        v-if="history.length > 0"
         variant="text"
         color="primary"
-        size="sm"
         class="mt-3 -ml-2"
         @click="historyOpen = true"
       >

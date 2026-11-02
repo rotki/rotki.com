@@ -53,17 +53,17 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <AccountSection :title="t('account.delete_account.title')">
+  <AccountSection
+    :title="t('account.delete_account.title')"
+    :description="t('account.delete_account.description')"
+  >
     <div
       class="max-w-2xl rounded-lg border p-4 md:p-6"
       :class="isSubscriber ? 'border-default' : 'border-rui-error/40'"
     >
-      <p class="text-body-2 text-rui-text-secondary text-pretty">
-        {{ t('account.delete_account.description') }}
-      </p>
       <p
         v-if="isSubscriber"
-        class="mt-2 text-body-2 font-medium text-rui-text"
+        class="mb-5 text-body-2 font-medium text-rui-text"
       >
         {{ t('account.delete_account.unable_to_delete') }}
       </p>
@@ -71,7 +71,6 @@ const { t } = useI18n({ useScope: 'global' });
         :disabled="isSubscriber"
         color="error"
         variant="outlined"
-        class="mt-5"
         @click="confirm = true"
       >
         {{ t('account.delete_account.delete_my_account') }}

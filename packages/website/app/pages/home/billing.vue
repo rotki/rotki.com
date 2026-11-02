@@ -9,7 +9,9 @@ import PaymentCardSkeleton from '~/components/account/home/payment-methods/Payme
 import SavedCards from '~/components/account/home/payment-methods/SavedCards.vue';
 import PaymentsTable from '~/components/account/home/PaymentsTable.vue';
 import ReferralCode from '~/components/account/home/ReferralCode.vue';
+import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import SubscriptionTable from '~/components/account/home/SubscriptionTable.vue';
+import { useCredit } from '~/composables/account/use-credit';
 import { useSubscriptionActions } from '~/composables/subscription/use-subscription-actions';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
@@ -27,6 +29,13 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { account, cardPaymentChecked, hasCardPayment } = storeToRefs(useMainStore());
 const { userSubscriptions } = useUserSubscriptions();
+const {
+  balance,
+  history: creditHistory,
+  initialLoading: creditInitialLoading,
+  load: loadCredit,
+  loading: creditLoading,
+} = useCredit();
 
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
 const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
@@ -35,6 +44,12 @@ const { displayActions } = useSubscriptionActions();
 const { availablePlans } = useAvailablePlans();
 /** Fold the subscriptions only when none would show an action button: no cancel, renew, resume or pending payment. */
 const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some(sub => displayActions(sub, get(availablePlans))));
+
+// Credit needs a confirmed e-mail address, which the account may confirm while the page is open
+watch(emailConfirmed, async (confirmed) => {
+  if (confirmed)
+    await loadCredit();
+}, { immediate: true });
 </script>
 
 <template>
@@ -57,9 +72,20 @@ const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some
       :title="t('account.billing.referral.title')"
       :description="t('account.billing.referral.description')"
     >
+      <template #actions>
+        <RefreshButton
+          :loading="creditLoading"
+          :disabled="creditInitialLoading"
+          @refresh="loadCredit()"
+        />
+      </template>
       <div class="rounded-lg border border-default p-4 md:p-6 grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <ReferralCode />
-        <AccountCredit />
+        <AccountCredit
+          :balance="balance"
+          :history="creditHistory"
+          :initial-loading="creditInitialLoading"
+        />
       </div>
     </AccountSection>
 

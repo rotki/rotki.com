@@ -34,7 +34,6 @@ const headers = computed<DataTableColumn<UserDevice>[]>(() => [{
   label: t('common.actions'),
   key: 'actions',
   align: 'end',
-  class: 'capitalize',
 }]);
 
 interface PlatformDisplay {

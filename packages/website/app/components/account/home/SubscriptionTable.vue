@@ -23,7 +23,7 @@ import { useUserSubscriptions } from '~/composables/subscription/use-user-subscr
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { formatDate, isValidDate } from '~/utils/date';
-import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
+import { fitsOnePage, orderColumns, SINGLE_LINE_ROWS } from '~/utils/table';
 
 const { folded = false } = defineProps<{
   /** Starts folded behind a Show button, for when no subscription has anything left to do. */
@@ -31,6 +31,7 @@ const { folded = false } = defineProps<{
 }>();
 
 const { n, t } = useI18n({ useScope: 'global' });
+const { isMdAndDown } = useBreakpoint();
 const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<UserSubscription>>({
   column: 'createdDate',
@@ -75,7 +76,11 @@ const renewableSubscriptions = computed<UserSubscription[]>(() =>
   get(userSubscriptions).filter(({ actions }) => actions.includes('renew')),
 );
 
-const headers = computed<DataTableColumn<UserSubscription>[]>(() => getSubscriptionTableHeaders(t));
+/** Phones see two columns at once, so what can be done comes right after the plan. */
+const headers = computed<DataTableColumn<UserSubscription>[]>(() => {
+  const columns = getSubscriptionTableHeaders(t);
+  return get(isMdAndDown) ? orderColumns(columns, ['planName', 'actions', 'status']) : columns;
+});
 
 const expanded = ref<boolean>(false);
 const showTable = computed<boolean>(() => !folded || get(expanded));
@@ -130,7 +135,7 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
 <template>
   <AccountSection
     :title="t('account.subscriptions.title')"
-    :description="showTable || initialLoading ? undefined : t('account.subscriptions.past_hint', { count: userSubscriptions.length }, userSubscriptions.length)"
+    :description="initialLoading ? undefined : showTable ? t('account.subscriptions.description') : t('account.subscriptions.past_hint', { count: userSubscriptions.length }, userSubscriptions.length)"
   >
     <template
       v-if="initialLoading"

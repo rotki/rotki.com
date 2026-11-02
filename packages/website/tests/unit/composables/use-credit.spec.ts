@@ -42,10 +42,10 @@ describe('useCredit', () => {
 
   it('should have correct initial state', async () => {
     const { useCredit } = await import('~/composables/account/use-credit');
-    const { balance, hasHistory, history, loading } = useCredit();
+    const { balance, history, loading } = useCredit();
 
     expect(get(balance)).toBe('0');
-    expect(get(hasHistory)).toBe(false);
+    expect(get(history)).toHaveLength(0);
     expect(get(history)).toEqual([]);
     expect(get(loading)).toBe(false);
   });
@@ -54,7 +54,7 @@ describe('useCredit', () => {
     mockFetchWithCsrf.mockResolvedValueOnce(validCreditBalance);
 
     const { useCredit } = await import('~/composables/account/use-credit');
-    const { balance, hasHistory, history, load, loading } = useCredit();
+    const { balance, history, load, loading } = useCredit();
 
     const loadPromise = load();
     expect(get(loading)).toBe(true);
@@ -63,7 +63,7 @@ describe('useCredit', () => {
 
     expect(get(loading)).toBe(false);
     expect(get(balance)).toBe('25.50');
-    expect(get(hasHistory)).toBe(true);
+    expect(get(history).length).toBeGreaterThan(0);
     expect(get(history)).toHaveLength(1);
     expect(mockFetchWithCsrf).toHaveBeenCalledWith(
       '/webapi/2/credit/',
@@ -75,12 +75,12 @@ describe('useCredit', () => {
     mockFetchWithCsrf.mockResolvedValueOnce(emptyCreditBalance);
 
     const { useCredit } = await import('~/composables/account/use-credit');
-    const { balance, hasHistory, history, load } = useCredit();
+    const { balance, history, load } = useCredit();
 
     await load();
 
     expect(get(balance)).toBe('0');
-    expect(get(hasHistory)).toBe(false);
+    expect(get(history)).toHaveLength(0);
     expect(get(history)).toEqual([]);
   });
 

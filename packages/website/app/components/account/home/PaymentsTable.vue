@@ -15,7 +15,7 @@ import { useUserPayments } from '~/composables/account/use-user-payments';
 import { formatDate } from '~/utils/date';
 import { invoiceUrl, paymentMethodLabel } from '~/utils/payments';
 import { getPlanNameFor } from '~/utils/plans';
-import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
+import { fitsOnePage, orderColumns, SINGLE_LINE_ROWS } from '~/utils/table';
 import { toTitleCase } from '~/utils/text';
 
 const { pending } = defineProps<{
@@ -23,6 +23,7 @@ const { pending } = defineProps<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+const { isMdAndDown } = useBreakpoint();
 
 const pagination = ref<TablePaginationData>();
 
@@ -36,7 +37,7 @@ const sort = ref<DataTableSortColumn<PaymentRow>>({
 
 const { userPayments, loading, refresh } = useUserPayments();
 
-const headers: DataTableColumn<PaymentRow>[] = [{
+const columns: DataTableColumn<PaymentRow>[] = [{
   label: t('account.payments.headers.paid_at'),
   key: 'paidAt',
   cellClass: 'whitespace-nowrap',
@@ -45,7 +46,6 @@ const headers: DataTableColumn<PaymentRow>[] = [{
   label: t('common.plan'),
   key: 'plan',
   cellClass: 'font-medium',
-  class: '[&_button]:capitalize',
   sortable: true,
 }, {
   label: t('account.payments.headers.method'),
@@ -59,13 +59,17 @@ const headers: DataTableColumn<PaymentRow>[] = [{
 }, {
   label: t('common.status'),
   key: 'isRefund',
-  class: '[&_button]:capitalize',
   sortable: true,
 }, {
   label: t('account.payments.headers.invoice'),
   key: 'actions',
   align: 'end',
 }];
+
+/** Phones see three columns at once, so the amount and the invoice come right after the date. */
+const headers = computed<DataTableColumn<PaymentRow>[]>(() =>
+  get(isMdAndDown) ? orderColumns(columns, ['paidAt', 'eurAmount', 'actions']) : columns,
+);
 
 const rows = computed<PaymentRow[]>(() => get(userPayments).map(payment => ({
   ...payment,
@@ -139,7 +143,7 @@ watch(() => pending, (pendingIs, pendingWas) => {
           external
           inline
         >
-          {{ t('account.overview.invoice') }}
+          {{ t('account.payments.download') }}
         </ButtonLink>
       </template>
     </RuiDataTable>

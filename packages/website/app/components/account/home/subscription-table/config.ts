@@ -9,9 +9,9 @@ import type { RouteLocationRaw } from 'vue-router';
 export function getSubscriptionTableHeaders(t: ComposerTranslation): DataTableColumn<UserSubscription>[] {
   return [{
     cellClass: 'font-medium',
-    class: 'capitalize',
     key: 'planName',
     label: t('common.plan'),
+    sortable: true,
   }, {
     cellClass: 'whitespace-nowrap',
     key: 'createdDate',
@@ -29,12 +29,11 @@ export function getSubscriptionTableHeaders(t: ComposerTranslation): DataTableCo
     label: t('account.subscriptions.headers.price'),
     sortable: true,
   }, {
-    class: 'capitalize',
     key: 'status',
     label: t('common.status'),
+    sortable: true,
   }, {
     align: 'end',
-    class: 'capitalize',
     key: 'actions',
     label: t('common.actions'),
   }];

@@ -28,7 +28,10 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <AccountSection :title="t('account_details.title')">
+  <AccountSection
+    :title="t('account_details.title')"
+    :description="t('account_details.description')"
+  >
     <div class="max-w-2xl space-y-5">
       <RuiTextField
         id="username"
@@ -51,17 +54,23 @@ const { t } = useI18n({ useScope: 'global' });
           color="primary"
           append-icon="lu-lock-keyhole"
         />
-        <p class="mt-1.5 text-caption text-rui-text-secondary">
-          {{ t('account_details.check_email') }}
-          <ButtonLink
-            :to="emailMailto"
-            external
-            color="primary"
-            inline
-          >
-            {{ rotkiEmail }}
-          </ButtonLink>
-        </p>
+        <i18n-t
+          keypath="account_details.check_email"
+          scope="global"
+          tag="p"
+          class="mt-1.5 text-caption text-rui-text-secondary"
+        >
+          <template #email>
+            <ButtonLink
+              :to="emailMailto"
+              external
+              color="primary"
+              inline
+            >
+              {{ rotkiEmail }}
+            </ButtonLink>
+          </template>
+        </i18n-t>
       </div>
     </div>
   </AccountSection>

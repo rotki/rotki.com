@@ -20,7 +20,7 @@ test.describe('account layout', () => {
     await expect(main(page).getByText('test@example.com', { exact: true })).toBeVisible();
     await expect(main(page).getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await expect(main(page).getByText('How you sign in, what we e-mail you, and closing your account.')).toBeVisible();
-    for (const section of ['Sign-in details', 'Change Password', 'E-mail preferences', 'Delete account'])
+    for (const section of ['Sign-in details', 'Password', 'E-mail preferences', 'Delete account'])
       await expect(main(page).getByRole('heading', { level: 2, name: section })).toBeVisible();
 
     const nav = main(page).getByRole('navigation', { name: 'Account' }).first();

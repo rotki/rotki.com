@@ -6,12 +6,12 @@
     },
     "address": {
       "country": {
-        "hint": "Required. Email us at {email} if you need to change your billing country."
+        "hint": "Required. E-mail {email} if you need to change your billing country."
       }
     },
     "api_keys": {
-      "api_key": "API Key",
-      "api_secret": "API Secret",
+      "api_key": "API key",
+      "api_secret": "API secret",
       "docs_hint": "How to add API credentials in the app",
       "not_generated": "You haven't generated an API key",
       "connect": {
@@ -41,7 +41,7 @@
       }
     },
     "referral_code": {
-      "code": "Referral Code",
+      "code": "Referral code",
       "discount_amount": "People using this code get {amount}€ off their first subscription",
       "discount_percentage": "People using this code get {percentage}% off their first subscription",
       "email_subject": "Save on rotki premium with my referral code",
@@ -62,7 +62,7 @@
       "new_password": {
         "label": "New password"
       },
-      "title": "Change Password",
+      "title": "Password",
       "submit": "Change password",
       "description": "The password you sign in with on rotki.com."
     },
@@ -71,7 +71,7 @@
         "description": "By proceeding you will delete your account and all its accompanying data from our servers. This action is not reversible. Are you sure you want to perform the deletion?\n\nType your username to continue: {username}"
       },
       "delete_my_account": "Delete my account",
-      "description": "Proceeding will completely delete your account data. If you proceed you will not be able to recover your account!",
+      "description": "Deletes your account and everything stored with it. This cannot be undone.",
       "notification": {
         "title": "Account deletion failed"
       },
@@ -86,13 +86,13 @@
         "platform": "Platform"
       },
       "delete": {
-        "title": "Delete Device",
+        "title": "Delete device",
         "description": "Are you sure you want to delete the device \"{label}\"? This action cannot be undone."
       },
       "rename": {
         "error": "Failed to rename device",
-        "label": "Device Name",
-        "title": "Rename Device"
+        "label": "Device name",
+        "title": "Rename device"
       },
       "no_devices_hint": "A device shows up here once a rotki app signs in with your premium API credentials.",
       "rename_device": "Rename {label}",
@@ -123,6 +123,7 @@
       "paid": "Paid",
       "price_before_discount": "Price before discount €{amount}",
       "refunded": "Refunded",
+      "download": "Download",
       "upgraded_from": "Upgrade from {plan}",
       "methods": {
         "paypal": "PayPal",
@@ -136,7 +137,7 @@
       "access_expires": "Access Expires",
       "active_subscription": "Active Subscription",
       "subscription": "Subscription",
-      "created_date": "Created Date",
+      "created_date": "Created",
       "next_action_date": "Next Action Date",
       "next_billing": "Next Billing",
       "next_billing_amount": "Next Billing Amount",
@@ -234,6 +235,7 @@
         }
       },
       "current_plan": "Your plan",
+      "description": "Every plan on your account, and what you can still do with it.",
       "past_hint": "No subscriptions yet | One past subscription, nothing to act on. | {count} past subscriptions, nothing to act on.",
       "included": "Included",
       "not_included": "Not included"
@@ -314,7 +316,8 @@
     }
   },
   "account_details": {
-    "check_email": "To change your email, please contact our support team via",
+    "check_email": "To change your e-mail address, write to {email}.",
+    "description": "The username and e-mail address you sign in with.",
     "title": "Sign-in details"
   },
   "email_preferences": {
@@ -370,7 +373,7 @@
     },
     "common": {
       "confirm_hint": "Type the same password again.",
-      "email": "Email",
+      "email": "E-mail",
       "optional": "Optional.",
       "password": "Password",
       "password_rules": {
@@ -535,7 +538,7 @@
     "Validation": "{message}"
   },
   "common": {
-    "actions": "actions",
+    "actions": "Actions",
     "amount": "Amount",
     "card": "Card",
     "error": "Error",
@@ -544,10 +547,10 @@
     "monthly": "monthly",
     "please_wait": "Please wait...",
     "none": "none",
-    "plan": "plan",
+    "plan": "Plan",
     "show_less": "Show less",
     "show_more": "Show more",
-    "status": "status",
+    "status": "Status",
     "yearly": "yearly"
   },
   "copy_button": {

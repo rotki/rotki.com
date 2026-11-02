@@ -118,7 +118,6 @@ function onSaved(): void {
           <RuiButton
             color="primary"
             variant="text"
-            size="sm"
             :aria-label="t('account.billing.invoice.change_name')"
             @click="open('name')"
           >
@@ -151,7 +150,6 @@ function onSaved(): void {
           <RuiButton
             color="primary"
             variant="text"
-            size="sm"
             :aria-label="t('account.billing.invoice.change_address')"
             @click="open('address')"
           >

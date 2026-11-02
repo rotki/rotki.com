@@ -22,7 +22,7 @@ const headingId = useId();
     >
       <div
         v-if="title"
-        class="min-w-0 max-w-2xl"
+        class="min-w-48 max-w-2xl grow basis-0"
       >
         <h2
           :id="headingId"

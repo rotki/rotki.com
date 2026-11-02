@@ -1,5 +1,5 @@
 import type { DeepReadonly, Ref } from 'vue';
-import { get, set } from '@vueuse/shared';
+import { set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { type CreditBalance, CreditBalance as CreditBalanceSchema, type CreditEntry } from '~/types/account';
 import { logParseFailure } from '~/utils/api-error-handling';
@@ -7,7 +7,6 @@ import { useLogger } from '~/utils/use-logger';
 
 interface UseCreditReturn {
   balance: Readonly<Ref<string>>;
-  hasHistory: Readonly<Ref<boolean>>;
   history: DeepReadonly<Ref<CreditEntry[]>>;
   initialLoading: Readonly<Ref<boolean>>;
   load: () => Promise<void>;
@@ -22,8 +21,6 @@ export function useCredit(): UseCreditReturn {
 
   const logger = useLogger('credit');
   const { fetchWithCsrf } = useFetchWithCsrf();
-
-  const hasHistory = computed<boolean>(() => get(history).length > 0);
 
   async function fetchCredit(): Promise<CreditBalance | undefined> {
     try {
@@ -60,7 +57,6 @@ export function useCredit(): UseCreditReturn {
 
   return {
     balance: readonly(balance),
-    hasHistory,
     history: readonly(history),
     initialLoading: readonly(initialLoading),
     load,
