@@ -8,7 +8,7 @@ import { useUserDevices } from '~/composables/account/use-user-devices';
 import { useUserPayments } from '~/composables/account/use-user-payments';
 import { useMainStore } from '~/store';
 import { formatDate } from '~/utils/date';
-import { invoiceUrl } from '~/utils/payments';
+import { invoiceUrl, latestPayment } from '~/utils/payments';
 import { formatCurrency, formatDecimalString } from '~/utils/text';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -21,14 +21,7 @@ const { userDevices, loading: devicesLoading } = useUserDevices();
 const { balance, initialLoading: creditLoading, load: loadCredit } = useCredit();
 const { userPayments, loading: paymentsLoading } = useUserPayments();
 
-/** The newest payment, refunds left out: those are not something the user paid. */
-const lastPayment = computed<UserPayment | undefined>(() =>
-  get(userPayments).reduce<UserPayment | undefined>((latest, payment) => {
-    if (payment.isRefund)
-      return latest;
-    return !latest || Date.parse(payment.paidAt) > Date.parse(latest.paidAt) ? payment : latest;
-  }, undefined),
-);
+const lastPayment = computed<UserPayment | undefined>(() => latestPayment(get(userPayments)));
 
 const creditText = computed<string>(() => t('account.credit.balance_eur', { amount: formatDecimalString(get(balance)) }));
 

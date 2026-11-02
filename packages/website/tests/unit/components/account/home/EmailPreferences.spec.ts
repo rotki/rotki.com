@@ -1,8 +1,9 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { describe, expect, it, vi } from 'vitest';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import EmailPreferences from '~/components/account/home/EmailPreferences.vue';
+import { createAccount, profileUpdateMock } from './account-fixture';
 
 const mockUseProfileUpdate = vi.hoisted(() => vi.fn());
 
@@ -10,45 +11,10 @@ vi.mock('~/composables/account/use-profile-update', () => ({
   useProfileUpdate: mockUseProfileUpdate,
 }));
 
-function createAccount(newsletterConsent: boolean): Account {
-  return {
-    address: {
-      address1: 'First street',
-      address2: 'Second street',
-      city: 'Berlin',
-      companyName: 'rotki',
-      country: 'DE',
-      firstName: 'Alice',
-      lastName: 'Example',
-      movedOffline: false,
-      postcode: '10115',
-      vatId: 'DE123456789',
-    },
-    apiKey: 'api-key',
-    apiSecret: 'api-secret',
-    canUsePremium: true,
-    dateNow: '2026-07-17',
-    email: 'alice@example.com',
-    emailConfirmed: true,
-    hasActiveSubscription: true,
-    newsletterConsent,
-    username: 'alice',
-    vat: 19,
-    vatIdStatus: 'Valid',
-  };
-}
-
 async function mountEmailPreferences(newsletterConsent: boolean) {
   const updateProfile = vi.fn().mockResolvedValue(true);
 
-  mockUseProfileUpdate.mockReturnValue({
-    account: ref<Account>(createAccount(newsletterConsent)),
-    dismissDone: vi.fn(),
-    done: ref<boolean>(false),
-    loading: ref<boolean>(false),
-    movedOffline: computed<boolean>(() => false),
-    updateProfile,
-  });
+  mockUseProfileUpdate.mockReturnValue(profileUpdateMock(ref<Account>(createAccount({ newsletterConsent })), updateProfile));
 
   const wrapper = await mountSuspended(EmailPreferences, {
     global: {

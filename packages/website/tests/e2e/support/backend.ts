@@ -1,4 +1,5 @@
 import type { Page, Request, Route } from '@playwright/test';
+import { cancellationReasons, type DeviceWire, type PaymentWire } from './account-data';
 import {
   type AccountWire,
   type AvailableTiersWire,
@@ -29,6 +30,8 @@ export type ApiOutcome = 'ok' | { status: number; message?: string };
 export interface BackendScenario {
   account: AccountWire;
   subscriptions: SubscriptionWire[];
+  payments: PaymentWire[];
+  devices: DeviceWire[];
   tiers: AvailableTiersWire;
   tiersInfo: TierInfoWire[];
   breakdown: BreakdownWire;
@@ -68,7 +71,14 @@ interface MockResponse {
   json: unknown;
 }
 
-type Handler = (scenario: BackendScenario) => MockResponse;
+type Handler = (scenario: BackendScenario, call: RecordedCall) => MockResponse;
+
+/** A handler for a path with an id in it, which it gets as `id`. */
+interface IdHandler {
+  method: string;
+  pattern: RegExp;
+  handle: (scenario: BackendScenario, id: string, call: RecordedCall) => MockResponse;
+}
 
 const PAYMENT_LOG_PATH = '/api/logging/payment';
 
@@ -84,10 +94,12 @@ export function defaultBackendScenario(): BackendScenario {
     createUpgrade: 'ok',
     cryptoOptions: cryptoOptionsFor([ETH_ON_ETHEREUM, USDC_ON_ETHEREUM, ETH_ON_BASE, USDC_ON_BASE]),
     deletePending: 'ok',
+    devices: [],
     markStarted: 'ok',
     payment: cryptoPaymentFor(ETH_ON_ETHEREUM),
     pending: { pending: false, transaction_started: false },
     pendingLookup: 'ok',
+    payments: [],
     subscriptions: [],
     tiers: defaultTiers(),
     tiersInfo: defaultTiersInfo(),
@@ -112,8 +124,10 @@ const HANDLERS: Record<string, Handler> = {
   'GET /webapi/2/available-tiers': s => ok(s.tiers),
   'GET /webapi/2/crypto/payment/pending/': s => withOutcome(s.pendingLookup, { result: s.pending }),
   'GET /webapi/2/crypto/payment/upgrade/': s => withOutcome(s.upgradeLookup, { result: s.upgrade }),
-  'GET /webapi/2/history/payments/': () => ok({ result: [] }),
+  'GET /webapi/2/devices/': s => ok(s.devices),
+  'GET /webapi/2/history/payments/': s => ok({ result: s.payments }),
   'GET /webapi/2/history/subscriptions': s => ok({ result: s.subscriptions }),
+  'GET /webapi/2/subscriptions/cancellation-feedback': () => ok(cancellationReasons()),
   'GET /webapi/2/tiers/info': s => ok(s.tiersInfo),
   'GET /webapi/account/': s => ok({ result: s.account }),
   'GET /webapi/csrf/': () => ok({ detail: 'CSRF cookie set' }),
@@ -125,7 +139,55 @@ const HANDLERS: Record<string, Handler> = {
   'POST /webapi/2/crypto/upgrade': s => withOutcome(s.createUpgrade, { result: s.payment }),
   'POST /webapi/2/crypto/upgrade/cancel': s => withOutcome(s.cancelUpgrade, { result: true }),
   'POST /webapi/2/payment/breakdown': s => ok(s.breakdown),
+  'POST /webapi/2/subscriptions/cancellation-feedback': () => ok({ result: true }),
 };
+
+/** Changes the subscription `id` the way the backend task would, so the refresh after it shows the result. */
+function updateSubscription(scenario: BackendScenario, id: string, patch: Partial<SubscriptionWire>): MockResponse {
+  scenario.subscriptions = scenario.subscriptions.map(sub => (sub.id === id ? { ...sub, ...patch } : sub));
+  return ok({ task_id: `task-${id}` });
+}
+
+const ID_HANDLERS: IdHandler[] = [{
+  handle: (s, id, call) => {
+    const label = typeof call.body === 'object' && call.body !== null && 'label' in call.body ? String(call.body.label) : '';
+    s.devices = s.devices.map(device => (String(device.id) === id ? { ...device, label } : device));
+    return ok(s.devices.find(device => String(device.id) === id));
+  },
+  method: 'PUT',
+  pattern: /^\/webapi\/2\/devices\/([^/]+)\/$/,
+}, {
+  handle: (s, id) => {
+    s.devices = s.devices.filter(device => String(device.id) !== id);
+    return ok({});
+  },
+  method: 'DELETE',
+  pattern: /^\/webapi\/2\/devices\/([^/]+)\/$/,
+}, {
+  handle: (s, id) => updateSubscription(s, id, { actions: ['cancel'], is_soft_canceled: false, status: 'Active' }),
+  method: 'PATCH',
+  pattern: /^\/webapi\/2\/subscriptions\/([^/]+)\/resume\/$/,
+}, {
+  handle: (s, id) => updateSubscription(s, id, { actions: [], is_soft_canceled: true, status: 'Cancelled but still active' }),
+  method: 'DELETE',
+  pattern: /^\/webapi\/2\/subscriptions\/([^/]+)\/$/,
+}, {
+  handle: () => ok({ result: true, status: 'completed' }),
+  method: 'GET',
+  pattern: /^\/webapi\/task\/status\/([^/]+)\/$/,
+}];
+
+function findHandler({ method, path }: RecordedCall): Handler | undefined {
+  const exact = HANDLERS[`${method} ${path}`];
+  if (exact)
+    return exact;
+  for (const { handle, method: handledMethod, pattern } of ID_HANDLERS) {
+    const id = handledMethod === method ? pattern.exec(path)?.[1] : undefined;
+    if (id !== undefined)
+      return (scenario, call) => handle(scenario, decodeURIComponent(id), call);
+  }
+  return undefined;
+}
 
 function readBody(request: Request): unknown {
   try {
@@ -166,14 +228,14 @@ export async function installFakeBackend(page: Page, baseURL: string, overrides:
 
   async function handle(route: Route): Promise<void> {
     const call = toRecordedCall(route.request());
-    const handler = HANDLERS[`${call.method} ${call.path}`];
+    const handler = findHandler(call);
     if (!handler) {
       unhandled.push(call);
       await route.fallback();
       return;
     }
     calls.push(call);
-    const { json, status } = handler(scenario);
+    const { json, status } = handler(scenario, call);
     await route.fulfill({ json, status });
   }
 

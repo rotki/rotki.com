@@ -13,7 +13,7 @@ import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useUserPayments } from '~/composables/account/use-user-payments';
 import { formatDate } from '~/utils/date';
-import { invoiceUrl, PAID_USING_CARD } from '~/utils/payments';
+import { invoiceUrl, paymentMethodLabel } from '~/utils/payments';
 import { getPlanNameFor } from '~/utils/plans';
 import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 import { toTitleCase } from '~/utils/text';
@@ -67,27 +67,9 @@ const headers: DataTableColumn<PaymentRow>[] = [{
   align: 'end',
 }];
 
-/** The backend sends the `PaidVia` enum name; anything new falls back to a readable form of it. */
-function methodLabel(paidUsing: string): string {
-  switch (paidUsing) {
-    case PAID_USING_CARD:
-      return t('common.card');
-    case 'PAYPAL':
-      return t('account.payments.methods.paypal');
-    case 'CRYPTO':
-      return t('account.payments.methods.crypto');
-    case 'BANK_TRANSFER':
-      return t('account.payments.methods.bank_transfer');
-    default:
-      return toTitleCase(paidUsing);
-  }
-}
-
 const rows = computed<PaymentRow[]>(() => get(userPayments).map(payment => ({
   ...payment,
-  method: payment.referralCreditAppliedEur > 0
-    ? t('account.payments.method_with_credit', { method: methodLabel(payment.paidUsing) })
-    : methodLabel(payment.paidUsing),
+  method: paymentMethodLabel(t, payment),
 })));
 
 watch(() => pending, (pendingIs, pendingWas) => {

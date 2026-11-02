@@ -2,13 +2,15 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import { useMainStore } from '~/store';
+import { createAccount } from '../components/account/home/account-fixture';
 
-const { fetchWithCsrf } = vi.hoisted(() => ({
+const { fetchWithCsrf, getAccount } = vi.hoisted(() => ({
   fetchWithCsrf: vi.fn(),
+  getAccount: vi.fn(),
 }));
 
 vi.mock('~/composables/account/use-account-api', () => ({
-  useAccountApi: () => ({ getAccount: vi.fn() }),
+  useAccountApi: () => ({ getAccount }),
 }));
 
 vi.mock('~/composables/account/use-auth-api', () => ({
@@ -85,5 +87,62 @@ describe('main store Braintree payment availability', () => {
     ]);
 
     expect(fetchWithCsrf).toHaveBeenCalledOnce();
+  });
+});
+
+describe('main store card payment check', () => {
+  /** A history entry as `fetchWithCsrf` hands it over, keys already camelCase. */
+  function payment(paidUsing: string) {
+    return {
+      durationInMonths: 1,
+      eurAmount: 25,
+      identifier: paidUsing,
+      legacy: false,
+      paidAt: '2026-10-01T10:00:00Z',
+      paidUsing,
+      plan: 'basic',
+    };
+  }
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    fetchWithCsrf.mockReset();
+    getAccount.mockResolvedValue(createAccount({ hasActiveSubscription: false }));
+  });
+
+  it('is not checked before the account loads', () => {
+    expect(useMainStore().cardPaymentChecked).toBe(false);
+  });
+
+  it('finds a card payment in the history and marks the check done', async () => {
+    fetchWithCsrf.mockResolvedValue({ result: [payment('PAYPAL'), payment('CREDIT_CARD')] });
+    const store = useMainStore();
+
+    await store.getAccount();
+
+    expect(fetchWithCsrf).toHaveBeenCalledWith('/webapi/2/history/payments/', { method: 'GET' });
+    expect(store.hasCardPayment).toBe(true);
+    expect(store.cardPaymentChecked).toBe(true);
+  });
+
+  it('marks the check done when the history cannot be read', async () => {
+    fetchWithCsrf.mockRejectedValue(new Error('unavailable'));
+    const store = useMainStore();
+
+    await store.getAccount();
+
+    expect(store.hasCardPayment).toBe(false);
+    expect(store.cardPaymentChecked).toBe(true);
+  });
+
+  it('starts over on logout', async () => {
+    fetchWithCsrf.mockResolvedValue({ result: [payment('CREDIT_CARD')] });
+    const store = useMainStore();
+    await store.getAccount();
+
+    await store.logout();
+
+    expect(store.hasCardPayment).toBe(false);
+    expect(store.cardPaymentChecked).toBe(false);
   });
 });

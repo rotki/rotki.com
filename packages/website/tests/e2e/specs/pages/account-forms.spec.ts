@@ -78,6 +78,27 @@ test.describe('account forms', () => {
     expect(requests[0]?.postDataJSON()).toMatchObject({ first_name: 'Alice', company_name: '' });
   });
 
+  test('customer information: a save rejected on the address says so and leads to the address', async ({ page }) => {
+    await page.route('**/webapi/account/', async (route) => {
+      if (route.request().method() !== 'PATCH') {
+        await route.fallback();
+        return;
+      }
+      await route.fulfill({ json: { message: { postcode: ['Enter a valid postal code.'] }, result: false }, status: 400 });
+    });
+    await openInvoiceDetails(page, 'name and VAT ID');
+    await page.locator('input#first-name').first().fill('Alice');
+    await submitButton(page, 'input#first-name').click();
+
+    await expect(page.getByText('Your address is missing or invalid.')).toBeVisible();
+    await expect(page.getByText('Enter a valid postal code.')).toBeVisible();
+    await expect(submitButton(page, 'input#first-name')).toBeEnabled();
+
+    await page.getByRole('button', { name: 'Edit address', exact: true }).click();
+    await expect(page.locator('input#postal')).toBeVisible();
+    await expect(page.locator('input#first-name')).toBeHidden();
+  });
+
   test('change password: checks the rules and the confirmation before sending', async ({ page }) => {
     const requests: Request[] = [];
     await page.route('**/webapi/change-password/', async (route) => {
