@@ -136,4 +136,35 @@ test.describe('account tables', () => {
       ]);
     });
   });
+
+  test.describe('API credentials', () => {
+    test.describe('without credentials yet', () => {
+      test.use({ backendScenario: { account: subscriberAccount() } });
+
+      test('generates them on request', async ({ backend, page }) => {
+        await open(page, '/home/devices');
+
+        await page.getByRole('main').getByRole('button', { name: 'Generate', exact: true }).click();
+
+        await expect(page.locator('input#api-key')).toHaveValue('new-api-key');
+        await expect(page.locator('input#api-secret')).toHaveValue('new-api-secret');
+        expect(backend.callsTo('PATCH', '/webapi/regenerate-keys/')).toHaveLength(1);
+      });
+    });
+
+    test.describe('with credentials', () => {
+      test.use({ backendScenario: { account: { ...subscriberAccount(), api_key: 'old-api-key', api_secret: 'old-api-secret' } } });
+
+      test('shows them and replaces them with new ones', async ({ backend, page }) => {
+        await open(page, '/home/devices');
+        await expect(page.locator('input#api-key')).toHaveValue('old-api-key');
+        await expect(page.locator('input#api-secret')).toHaveValue('old-api-secret');
+
+        await page.getByRole('main').getByRole('button', { name: 'Create new credentials', exact: true }).click();
+
+        await expect(page.locator('input#api-key')).toHaveValue('new-api-key');
+        expect(backend.callsTo('PATCH', '/webapi/regenerate-keys/')).toHaveLength(1);
+      });
+    });
+  });
 });

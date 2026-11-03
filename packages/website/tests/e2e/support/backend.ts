@@ -1,5 +1,5 @@
 import type { Page, Request, Route } from '@playwright/test';
-import { cancellationReasons, type DeviceWire, type PaymentWire } from './account-data';
+import { cancellationReasons, type CardWire, type CreditWire, type DeviceWire, type PaymentWire } from './account-data';
 import {
   type AccountWire,
   type AvailableTiersWire,
@@ -32,6 +32,12 @@ export interface BackendScenario {
   subscriptions: SubscriptionWire[];
   payments: PaymentWire[];
   devices: DeviceWire[];
+  cards: CardWire[];
+  /** Answered with a 404 when unset, the way the backend answers before any credit exists. */
+  credit?: CreditWire;
+  /** How the backend task behind a cancel or resume ends. */
+  subscriptionTask: 'completed' | 'failed';
+  regenerateKeys: { api_key: string; api_secret: string };
   tiers: AvailableTiersWire;
   tiersInfo: TierInfoWire[];
   breakdown: BreakdownWire;
@@ -90,6 +96,7 @@ export function defaultBackendScenario(): BackendScenario {
     account: defaultAccount(),
     breakdown: defaultBreakdown(),
     cancelUpgrade: 'ok',
+    cards: [],
     createPayment: 'ok',
     createUpgrade: 'ok',
     cryptoOptions: cryptoOptionsFor([ETH_ON_ETHEREUM, USDC_ON_ETHEREUM, ETH_ON_BASE, USDC_ON_BASE]),
@@ -100,6 +107,8 @@ export function defaultBackendScenario(): BackendScenario {
     pending: { pending: false, transaction_started: false },
     pendingLookup: 'ok',
     payments: [],
+    regenerateKeys: { api_key: 'new-api-key', api_secret: 'new-api-secret' },
+    subscriptionTask: 'completed',
     subscriptions: [],
     tiers: defaultTiers(),
     tiersInfo: defaultTiersInfo(),
@@ -124,6 +133,12 @@ const HANDLERS: Record<string, Handler> = {
   'GET /webapi/2/available-tiers': s => ok(s.tiers),
   'GET /webapi/2/crypto/payment/pending/': s => withOutcome(s.pendingLookup, { result: s.pending }),
   'GET /webapi/2/crypto/payment/upgrade/': s => withOutcome(s.upgradeLookup, { result: s.upgrade }),
+  'DELETE /webapi/payment/btr/cards/': (s, call) => {
+    const token = typeof call.body === 'object' && call.body !== null && 'payment_token' in call.body ? call.body.payment_token : undefined;
+    s.cards = s.cards.filter(card => card.token !== token);
+    return ok({ result: true });
+  },
+  'GET /webapi/2/credit/': s => (s.credit ? ok(s.credit) : { json: { message: 'No credit' }, status: 404 }),
   'GET /webapi/2/devices/': s => ok(s.devices),
   'GET /webapi/2/history/payments/': s => ok({ result: s.payments }),
   'GET /webapi/2/history/subscriptions': s => ok({ result: s.subscriptions }),
@@ -131,7 +146,12 @@ const HANDLERS: Record<string, Handler> = {
   'GET /webapi/2/tiers/info': s => ok(s.tiersInfo),
   'GET /webapi/account/': s => ok({ result: s.account }),
   'GET /webapi/csrf/': () => ok({ detail: 'CSRF cookie set' }),
+  'GET /webapi/payment/btr/cards/': s => ok({ cards: s.cards }),
   'GET /webapi/payment/crypto/options/': s => ok(s.cryptoOptions),
+  'PATCH /webapi/regenerate-keys/': (s) => {
+    s.account = { ...s.account, ...s.regenerateKeys };
+    return ok({ result: s.regenerateKeys });
+  },
   'PATCH /webapi/2/crypto/payment/pending/': s => withOutcome(s.markStarted, { result: true }),
   'PATCH /webapi/2/crypto/payment/upgrade/': s => withOutcome(s.markStarted, { result: true }),
   'POST /api/logging/payment': () => ok({}),
@@ -142,9 +162,13 @@ const HANDLERS: Record<string, Handler> = {
   'POST /webapi/2/subscriptions/cancellation-feedback': () => ok({ result: true }),
 };
 
-/** Changes the subscription `id` the way the backend task would, so the refresh after it shows the result. */
+/**
+ * Changes the subscription `id` the way the backend task would, so the refresh after it shows the
+ * result. A failing task leaves it as it was.
+ */
 function updateSubscription(scenario: BackendScenario, id: string, patch: Partial<SubscriptionWire>): MockResponse {
-  scenario.subscriptions = scenario.subscriptions.map(sub => (sub.id === id ? { ...sub, ...patch } : sub));
+  if (scenario.subscriptionTask === 'completed')
+    scenario.subscriptions = scenario.subscriptions.map(sub => (sub.id === id ? { ...sub, ...patch } : sub));
   return ok({ task_id: `task-${id}` });
 }
 
@@ -172,7 +196,9 @@ const ID_HANDLERS: IdHandler[] = [{
   method: 'DELETE',
   pattern: /^\/webapi\/2\/subscriptions\/([^/]+)\/$/,
 }, {
-  handle: () => ok({ result: true, status: 'completed' }),
+  handle: s => (s.subscriptionTask === 'completed'
+    ? ok({ result: true, status: 'completed' })
+    : ok({ error: 'The payment provider did not answer', status: 'failed' })),
   method: 'GET',
   pattern: /^\/webapi\/task\/status\/([^/]+)\/$/,
 }];

@@ -1,0 +1,201 @@
+import { expect, type Locator, type Page } from '@playwright/test';
+import { cardFor, creditWithHistory, paymentFor } from '../../support/account-data';
+import { subscriberAccount, subscriptionFor } from '../../support/backend-data';
+import { test } from '../../support/fixtures';
+import { waitForHydration } from '../../support/hydration';
+
+async function open(page: Page, path: string): Promise<void> {
+  await page.goto(path);
+  await waitForHydration(page);
+}
+
+/** The section headed `title`. */
+function section(page: Page, title: string): Locator {
+  return page.getByRole('main').locator('section').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+}
+
+/** The saved card row that names the card ending in `last4`. */
+function cardRow(page: Page, last4: string): Locator {
+  return section(page, 'Payment method').locator('.rounded-lg.border').filter({ hasText: `Card ending in ${last4}` });
+}
+
+const cardSubscription = subscriptionFor({ actions: ['cancel'], id: 'sub-card-1', payment_method: 'card', payment_provider: 'braintree', status: 'Active' });
+
+test.describe('account billing', () => {
+  test.describe('with saved cards', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        cards: [cardFor('4242', true), cardFor('1111')],
+        subscriptions: [cardSubscription],
+      },
+    });
+
+    test('shows which card renews the plan and what each card can do', async ({ page }) => {
+      await open(page, '/home/billing');
+
+      const renewal = cardRow(page, '4242');
+      await expect(renewal).toContainText('Auto-renewal card');
+      await expect(renewal.getByRole('button', { name: 'Re-authorize' })).toBeEnabled();
+      await expect(renewal.getByRole('button', { name: 'Remove the card ending in 4242' })).toBeDisabled();
+
+      const other = cardRow(page, '1111');
+      await expect(other).not.toContainText('Auto-renewal card');
+      await expect(other.getByRole('button', { name: 'Set for auto-renewal' })).toBeEnabled();
+      await expect(other.getByRole('button', { name: 'Remove the card ending in 1111' })).toBeEnabled();
+    });
+
+    test('removes a card after asking', async ({ backend, page }) => {
+      await open(page, '/home/billing');
+
+      await cardRow(page, '1111').getByRole('button', { name: 'Remove the card ending in 1111' }).click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toContainText('Remove Saved Card');
+      await dialog.getByRole('button', { name: 'Delete', exact: true }).click();
+
+      await expect(cardRow(page, '1111')).toHaveCount(0);
+      await expect(cardRow(page, '4242')).toBeVisible();
+      expect(backend.callsTo('DELETE', '/webapi/payment/btr/cards/').map(call => call.body)).toEqual([{ payment_token: 'card-1111' }]);
+    });
+
+    test('shows a failed re-authorization above the cards, where the refresh cannot cover it', async ({ page }) => {
+      await page.route('**/webapi/2/braintree/customer', async route => route.fulfill({ json: { message: 'Braintree is down' }, status: 500 }));
+      await open(page, '/home/billing');
+
+      await cardRow(page, '4242').getByRole('button', { name: 'Re-authorize' }).click();
+
+      const alert = section(page, 'Payment method').getByText('Error', { exact: true });
+      await expect(alert).toBeVisible();
+      const alertBox = await alert.boundingBox();
+      const cardBox = await cardRow(page, '4242').boundingBox();
+      expect(alertBox!.y).toBeLessThan(cardBox!.y);
+    });
+  });
+
+  test.describe('with a crypto subscription and a saved card', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        cards: [cardFor('4242', true)],
+        payments: [paymentFor()],
+        subscriptions: [subscriptionFor({ actions: ['cancel'], payment_provider: 'crypto', status: 'Active' })],
+      },
+    });
+
+    test('offers no card operations', async ({ page }) => {
+      await open(page, '/home/billing');
+
+      await expect(cardRow(page, '4242').getByRole('button', { name: 'Re-authorize' })).toBeDisabled();
+    });
+  });
+
+  test.describe('with only an ended subscription', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        subscriptions: [subscriptionFor({ actions: [], is_active: false, next_action_date: 'Never', status: 'Cancelled' })],
+      },
+    });
+
+    test('folds the subscriptions behind Show', async ({ page }) => {
+      await open(page, '/home/billing');
+      const subscriptions = section(page, 'Subscriptions');
+
+      await expect(subscriptions).toContainText('One past subscription, nothing to act on.');
+      await expect(subscriptions.getByRole('table')).toHaveCount(0);
+
+      await subscriptions.getByRole('button', { name: 'Show', exact: true }).click();
+      await expect(subscriptions.getByRole('table').locator('tbody tr')).toHaveCount(1);
+      await expect(subscriptions.getByRole('table')).toContainText('Cancelled');
+      await expect(subscriptions.getByRole('button', { name: 'Hide', exact: true })).toBeVisible();
+    });
+  });
+
+  test.describe('with an active and an ended subscription', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        subscriptions: [
+          cardSubscription,
+          subscriptionFor({ actions: [], id: 'sub-old', is_active: false, next_action_date: 'Never', plan_name: 'Basic', status: 'Cancelled' }),
+        ],
+      },
+    });
+
+    test('lists both and cancels the active one from its row', async ({ backend, page }) => {
+      await open(page, '/home/billing');
+      const table = section(page, 'Subscriptions').getByRole('table');
+      await expect(table.locator('tbody tr')).toHaveCount(2);
+
+      await table.getByRole('button', { name: 'Cancel subscription' }).click();
+      await page.getByText('Too expensive', { exact: true }).click();
+      await page.getByRole('button', { name: 'Yes, cancel my subscription', exact: true }).click();
+
+      await expect(table.getByRole('button', { name: 'Resume subscription' })).toBeVisible();
+      expect(backend.callsTo('DELETE', '/webapi/2/subscriptions/sub-card-1/')).toHaveLength(1);
+    });
+  });
+
+  test.describe('when the backend task fails', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        subscriptionTask: 'failed',
+        subscriptions: [
+          cardSubscription,
+          subscriptionFor({ actions: [], id: 'sub-soft', is_soft_canceled: true, plan_name: 'Basic', status: 'Cancelled but still active' }),
+        ],
+      },
+    });
+
+    test('says the cancellation failed and keeps the subscription', async ({ page }) => {
+      await open(page, '/home/billing');
+      const table = section(page, 'Subscriptions').getByRole('table');
+
+      await table.getByRole('button', { name: 'Cancel subscription' }).click();
+      await page.getByText('Too expensive', { exact: true }).click();
+      await page.getByRole('button', { name: 'Yes, cancel my subscription', exact: true }).click();
+
+      await expect(page.getByText('Could not cancel your subscription')).toBeVisible();
+      await expect(page.getByText('The payment provider did not answer')).toBeVisible();
+      await expect(table.getByRole('button', { name: 'Cancel subscription' })).toBeVisible();
+    });
+
+    test('says the resume failed instead of claiming it worked', async ({ page }) => {
+      await open(page, '/home/billing');
+      const table = section(page, 'Subscriptions').getByRole('table');
+
+      await table.getByRole('button', { name: 'Resume subscription' }).click();
+      await page.getByRole('button', { name: 'Yes, resume my subscription', exact: true }).click();
+
+      await expect(page.getByText('Could not resume your subscription')).toBeVisible();
+      await expect(page.getByText('The payment provider did not answer')).toBeVisible();
+      await expect(table.getByRole('button', { name: 'Resume subscription' })).toBeVisible();
+    });
+  });
+
+  test.describe('with account credit', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        credit: creditWithHistory(),
+      },
+    });
+
+    test('opens the credit history with each entry signed', async ({ page }) => {
+      await open(page, '/home/billing');
+      await expect(section(page, 'Refer a friend')).toContainText('12.50 €');
+
+      await section(page, 'Refer a friend').getByRole('button', { name: 'Credit history' }).click();
+      const dialog = page.getByRole('dialog');
+      const rows = dialog.getByRole('table').locator('tbody tr');
+      await expect(rows).toHaveCount(3);
+      await expect(dialog).toContainText('+10.00 €');
+      await expect(dialog).toContainText('-7.50 €');
+      await expect(dialog).toContainText('Referral Reward');
+
+      await dialog.getByRole('button', { name: 'Close', exact: true }).click();
+      await expect(dialog).toHaveCount(0);
+    });
+  });
+});

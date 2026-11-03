@@ -161,7 +161,7 @@
         "bug_tracker": "bug tracker",
         "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the rotki community.",
         "notification": {
-          "title": "Cancellation Failure"
+          "title": "Could not cancel your subscription"
         },
         "status": {
           "pending": "Cancellation request queued...",
@@ -210,7 +210,7 @@
           "plan_name": "Subscription Plan: {plan}"
         },
         "notification": {
-          "title": "Your subscription was successfully resumed."
+          "title": "Could not resume your subscription"
         },
         "status": {
           "pending": "Resume request queued...",
