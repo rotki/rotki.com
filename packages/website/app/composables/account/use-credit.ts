@@ -13,7 +13,12 @@ interface UseCreditReturn {
   loading: Readonly<Ref<boolean>>;
 }
 
-export function useCredit(): UseCreditReturn {
+interface UseCreditOptions {
+  /** Loads the balance once this is true, such as when the account's e-mail address is confirmed. */
+  loadWhen?: MaybeRefOrGetter<boolean>;
+}
+
+export function useCredit({ loadWhen }: UseCreditOptions = {}): UseCreditReturn {
   const loading = shallowRef<boolean>(false);
   const initialLoading = shallowRef<boolean>(true);
   const balance = shallowRef<string>('0');
@@ -53,6 +58,13 @@ export function useCredit(): UseCreditReturn {
       set(loading, false);
       set(initialLoading, false);
     }
+  }
+
+  if (loadWhen !== undefined) {
+    watchImmediate(() => toValue(loadWhen), async (ready) => {
+      if (ready)
+        await load();
+    });
   }
 
   return {

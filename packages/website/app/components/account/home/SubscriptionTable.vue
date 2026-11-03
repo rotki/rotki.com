@@ -1,29 +1,21 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import type { DataTableColumn, DataTableSortColumn, TablePaginationData } from '@rotki/ui-library';
-import type { CancelSubscriptionConfirmEvent } from '~/components/account/home/CancelSubscription.vue';
-import type {
-  CryptoPaymentState,
-  OperationState,
-  SubscriptionActionEvent,
-  SubscriptionActionType,
-} from '~/components/account/home/subscription-table/types';
-import { get, set } from '@vueuse/shared';
+import type { DataTableColumn, DataTableSortColumn } from '@rotki/ui-library';
+import { get } from '@vueuse/shared';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import { getSubscriptionTableHeaders } from '~/components/account/home/subscription-table/config';
 import SubscriptionActionsCell from '~/components/account/home/subscription-table/SubscriptionActionsCell.vue';
 import SubscriptionStatusChip from '~/components/account/home/subscription-table/SubscriptionStatusChip.vue';
 import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
-import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
+import { useSubscriptionActionFlow } from '~/composables/subscription/use-subscription-action-flow';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
-import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
 import { useSubscriptionPolling } from '~/composables/subscription/use-subscription-polling';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
-import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
+import { useAccountTable } from '~/composables/use-account-table';
 import { formatDate, isValidDate } from '~/utils/date';
-import { fitsOnePage, orderColumns, SINGLE_LINE_ROWS } from '~/utils/table';
+import { orderColumns } from '~/utils/table';
 
 const { folded = false } = defineProps<{
   /** Starts folded behind a Show button, for when no subscription has anything left to do. */
@@ -32,40 +24,16 @@ const { folded = false } = defineProps<{
 
 const { n, t } = useI18n({ useScope: 'global' });
 const { isMdAndDown } = useBreakpoint();
-const pagination = ref<TablePaginationData>();
 const sort = ref<DataTableSortColumn<UserSubscription>>({
   column: 'createdDate',
   direction: 'desc',
 });
-
-// Unified action state
-const activeAction = ref<SubscriptionActionType>();
-const activeSubscription = ref<UserSubscription>();
-
-// Store setup
-const subscriptionOpsStore = useSubscriptionOperationsStore();
-const {
-  inProgress,
-  operationType,
-  status,
-} = storeToRefs(subscriptionOpsStore);
 
 const { availablePlans } = useAvailablePlans();
 
 // Composables
 const { userSubscriptions, loading, initialLoading, refresh: refreshSubscriptions } = useUserSubscriptions();
 const { getPlanDisplayName, actionsClasses } = useSubscriptionDisplay();
-
-// Use centralized subscription operations composable
-const {
-  resumeSubscription: performResumeSubscription,
-  cancelSubscription: performCancelSubscription,
-  cancelUpgrade: performCancelUpgrade,
-} = useSubscriptionOperations({
-  onActionComplete: async () => {
-    await refreshSubscriptions();
-  },
-});
 
 // Computed properties
 const pending = computed<UserSubscription[]>(() =>
@@ -82,30 +50,28 @@ const headers = computed<DataTableColumn<UserSubscription>[]>(() => {
   return get(isMdAndDown) ? orderColumns(columns, ['planName', 'actions', 'status']) : columns;
 });
 
+const { modelPagination, tableProps } = useAccountTable(userSubscriptions);
+
 const expanded = ref<boolean>(false);
 const showTable = computed<boolean>(() => !folded || get(expanded));
 
-// Crypto payment composable
 const {
-  pendingTx,
-  renewLink,
-} = useSubscriptionCryptoPayment({
+  activeAction,
+  cancelSubscription,
+  cancelUpgrade,
+  cryptoPaymentState,
+  handleAction: handleSubscriptionAction,
+  inProgress,
+  modelActiveSubscription,
+  operationState,
+  operationType,
+  resumeSubscription,
+} = useSubscriptionActionFlow({
   renewableSubscriptions,
+  onActionComplete: async () => {
+    await refreshSubscriptions();
+  },
 });
-
-// Grouped state for SubscriptionActionsCell
-const operationState = computed<OperationState>(() => ({
-  inProgress: get(inProgress),
-  operationType: get(operationType),
-  status: get(status),
-  activeAction: get(activeAction),
-  activeSubscription: get(activeSubscription),
-}));
-
-const cryptoPaymentState = computed<CryptoPaymentState>(() => ({
-  pendingTx: get(pendingTx),
-  renewLink: get(renewLink),
-}));
 
 // Polling setup
 useSubscriptionPolling({
@@ -113,23 +79,6 @@ useSubscriptionPolling({
   pendingSubscriptions: pending,
   refreshCallback: refreshSubscriptions,
 });
-
-async function resumeSubscription(subscription: UserSubscription): Promise<void> {
-  await performResumeSubscription(subscription, activeAction, activeSubscription);
-}
-
-async function cancelSubscription({ subscription, feedback }: CancelSubscriptionConfirmEvent): Promise<void> {
-  await performCancelSubscription(subscription, activeAction, activeSubscription, feedback);
-}
-
-async function cancelUpgrade(subscriptionId: string): Promise<void> {
-  await performCancelUpgrade(subscriptionId, activeAction, activeSubscription);
-}
-
-function handleSubscriptionAction({ action, subscription }: SubscriptionActionEvent): void {
-  set(activeAction, action);
-  set(activeSubscription, subscription);
-}
 </script>
 
 <template>
@@ -164,9 +113,9 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
     <RuiDataTable
       v-if="showTable"
       id="subscriptions-table"
-      v-model:pagination="pagination"
+      v-model:pagination="modelPagination"
+      v-bind="tableProps"
       v-model:sort="sort"
-      :class="SINGLE_LINE_ROWS"
       :cols="headers"
       :rows="userSubscriptions"
       :loading="loading"
@@ -174,8 +123,6 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
         description: t('account.subscriptions.no_subscriptions_found'),
       }"
       row-attr="id"
-      :hide-pagination="fitsOnePage(userSubscriptions)"
-      outlined
     >
       <template #item.planName="{ row }">
         {{ getPlanDisplayName(row) }}
@@ -215,7 +162,7 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
     </RuiDataTable>
 
     <SubscriptionDialogs
-      v-model="activeSubscription"
+      v-model="modelActiveSubscription"
       :active-action="activeAction"
       :in-progress="inProgress"
       :operation-type="operationType"

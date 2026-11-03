@@ -8,29 +8,21 @@ const { t } = useI18n({ useScope: 'global' });
 
 const accountApi = useAccountApi();
 
-const success = ref<boolean>(false);
-const error = ref<string>('');
+/** How long the result of a resend stays on screen. */
+const MESSAGE_DURATION_MS = 4000;
 
-function reset(): void {
-  set(success, false);
-  set(error, '');
-}
-
-const { start: startResetTimeout, stop: stopResetTimeout } = useTimeoutFn(() => {
-  reset();
-}, 4000, { immediate: false });
+const success = refAutoReset<boolean>(false, MESSAGE_DURATION_MS);
+const error = refAutoReset<string>('', MESSAGE_DURATION_MS);
 
 async function resend(): Promise<void> {
-  reset();
+  set(success, false);
+  set(error, '');
   const result: ActionResult = await accountApi.resendVerificationCode(t);
 
   if (result.success)
     set(success, true);
   else
     set(error, result.message);
-
-  stopResetTimeout();
-  startResetTimeout();
 }
 </script>
 

@@ -1,27 +1,16 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import type { CancelSubscriptionConfirmEvent } from '~/components/account/home/CancelSubscription.vue';
-import type {
-  CryptoPaymentState,
-  OperationState,
-  SubscriptionActionEvent,
-  SubscriptionActionType,
-} from '~/components/account/home/subscription-table/types';
 import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
-import { get, set } from '@vueuse/shared';
-import { storeToRefs } from 'pinia';
 import PlanLimitsList from '~/components/account/home/PlanLimitsList.vue';
 import SubscriptionActionsCell from '~/components/account/home/subscription-table/SubscriptionActionsCell.vue';
 import SubscriptionBillingSection from '~/components/account/home/SubscriptionBillingSection.vue';
 import SubscriptionDialogs from '~/components/account/home/SubscriptionDialogs.vue';
 import SubscriptionPlanName from '~/components/account/home/SubscriptionPlanName.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
-import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
-import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
+import { useSubscriptionActionFlow } from '~/composables/subscription/use-subscription-action-flow';
 import { useSubscriptionPlanInfo } from '~/composables/subscription/use-subscription-plan-info';
 import { useSubscriptionStatus } from '~/composables/subscription/use-subscription-status';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
-import { useSubscriptionOperationsStore } from '~/store/subscription-operations';
 import { formatDate } from '~/utils/date';
 
 const { subscription } = defineProps<{
@@ -41,57 +30,25 @@ const { statusDisplayText, statusColor } = useSubscriptionStatus(subscriptionRef
 // Plan information and limits
 const { planLimits, planDisplayName } = useSubscriptionPlanInfo(subscriptionRef);
 
-// Use centralized subscription operations composable
+const { availablePlans } = useAvailablePlans();
+
 const {
-  resumeSubscription: performResumeSubscription,
-  cancelSubscription: performCancelSubscription,
-  cancelUpgrade: performCancelUpgrade,
-} = useSubscriptionOperations({
+  activeAction,
+  cancelSubscription,
+  cancelUpgrade,
+  cryptoPaymentState,
+  handleAction: handleSubscriptionAction,
+  inProgress,
+  modelActiveSubscription,
+  operationState,
+  operationType,
+  resumeSubscription,
+} = useSubscriptionActionFlow({
+  renewableSubscriptions: computed<UserSubscription[]>(() => (subscription.actions.includes('renew') ? [subscription] : [])),
   onActionComplete: async () => {
     emit('refresh');
   },
 });
-
-// Store setup
-const subscriptionOpsStore = useSubscriptionOperationsStore();
-const {
-  inProgress,
-  operationType,
-  status,
-} = storeToRefs(subscriptionOpsStore);
-
-const { availablePlans } = useAvailablePlans();
-
-// Unified action state
-const activeAction = ref<SubscriptionActionType>();
-const activeActionSubscription = ref<UserSubscription>();
-
-// Computed for renewableSubscriptions
-const renewableSubscriptions = computed<UserSubscription[]>(() =>
-  subscription.actions.includes('renew') ? [subscription] : [],
-);
-
-// Crypto payment composable
-const {
-  pendingTx,
-  renewLink,
-} = useSubscriptionCryptoPayment({
-  renewableSubscriptions,
-});
-
-// Grouped state for SubscriptionActionsCell
-const operationState = computed<OperationState>(() => ({
-  inProgress: get(inProgress),
-  operationType: get(operationType),
-  status: get(status),
-  activeAction: get(activeAction),
-  activeSubscription: get(activeActionSubscription),
-}));
-
-const cryptoPaymentState = computed<CryptoPaymentState>(() => ({
-  pendingTx: get(pendingTx),
-  renewLink: get(renewLink),
-}));
 
 // Relative date calculations using VueUse
 const createdRelative = useTimeAgo(
@@ -101,23 +58,6 @@ const createdRelative = useTimeAgo(
 const nextActionRelative = useTimeAgo(
   computed<Date>(() => new Date(subscription.nextActionDate)),
 );
-
-async function resumeSubscription(subscription: UserSubscription): Promise<void> {
-  await performResumeSubscription(subscription, activeAction, activeActionSubscription);
-}
-
-async function cancelSubscription({ subscription, feedback }: CancelSubscriptionConfirmEvent): Promise<void> {
-  await performCancelSubscription(subscription, activeAction, activeActionSubscription, feedback);
-}
-
-async function cancelUpgrade(subscriptionId: string): Promise<void> {
-  await performCancelUpgrade(subscriptionId, activeAction, activeActionSubscription);
-}
-
-function handleSubscriptionAction({ action, subscription }: SubscriptionActionEvent): void {
-  set(activeAction, action);
-  set(activeActionSubscription, subscription);
-}
 </script>
 
 <template>
@@ -201,7 +141,7 @@ function handleSubscriptionAction({ action, subscription }: SubscriptionActionEv
   </div>
 
   <SubscriptionDialogs
-    v-model="activeActionSubscription"
+    v-model="modelActiveSubscription"
     :active-action="activeAction"
     :in-progress="inProgress"
     :operation-type="operationType"

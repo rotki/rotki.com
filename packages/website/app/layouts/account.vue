@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/shared';
+import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import SubscriptionErrorNotification from '~/components/account/home/SubscriptionErrorNotification.vue';
 import UnverifiedEmailWarning from '~/components/account/home/UnverifiedEmailWarning.vue';
@@ -30,7 +30,8 @@ usePageSeoNoIndex('account');
 const { t } = useI18n({ useScope: 'global' });
 useAutoLogout();
 
-const hydrated = ref<boolean>(false);
+/** The tabs depend on the client-only account, so they render after mount. */
+const hydrated = useMounted();
 
 const store = useMainStore();
 const { account } = storeToRefs(store);
@@ -84,10 +85,6 @@ async function logout(): Promise<void> {
   await store.logout(true);
   await navigateTo('/login');
 }
-
-onMounted(() => {
-  set(hydrated, true);
-});
 </script>
 
 <template>

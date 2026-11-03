@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import type { DataTableColumn } from '@rotki/ui-library';
 import type { CreditEntry } from '~/types/account';
+import { useAccountTable } from '~/composables/use-account-table';
 import { formatDate } from '~/utils/date';
-import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 import { formatDecimalString } from '~/utils/text';
 
-defineProps<{
+const { rows } = defineProps<{
   rows: readonly CreditEntry[];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
+
+const { modelPagination, tableProps } = useAccountTable(() => rows);
 
 const cols = computed<DataTableColumn<CreditEntry>[]>(() => [
   { key: 'entryType', label: t('account.credit.history.type') },
@@ -41,12 +43,11 @@ function formatEntryType(value: string): string {
 
 <template>
   <RuiDataTable
-    :class="SINGLE_LINE_ROWS"
+    v-model:pagination="modelPagination"
+    v-bind="tableProps"
     :cols="cols"
     :rows="rows"
     row-attr="createdAt"
-    :hide-pagination="fitsOnePage(rows)"
-    outlined
   >
     <template #item.entryType="{ row }">
       <RuiChip

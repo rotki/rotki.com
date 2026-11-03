@@ -18,17 +18,12 @@ const { account } = storeToRefs(useMainStore());
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
 
 const { userDevices, loading: devicesLoading } = useUserDevices();
-const { balance, initialLoading: creditLoading, load: loadCredit } = useCredit();
+const { balance, initialLoading: creditLoading } = useCredit({ loadWhen: emailConfirmed });
 const { userPayments, loading: paymentsLoading } = useUserPayments();
 
 const lastPayment = computed<UserPayment | undefined>(() => latestPayment(get(userPayments)));
 
 const creditText = computed<string>(() => t('account.credit.balance_eur', { amount: formatDecimalString(get(balance)) }));
-
-onMounted(async () => {
-  if (get(emailConfirmed))
-    await loadCredit();
-});
 </script>
 
 <template>

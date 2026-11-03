@@ -29,27 +29,21 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { account, cardPaymentChecked, hasCardPayment } = storeToRefs(useMainStore());
 const { userSubscriptions } = useUserSubscriptions();
+
+const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
 const {
   balance,
   history: creditHistory,
   initialLoading: creditInitialLoading,
   load: loadCredit,
   loading: creditLoading,
-} = useCredit();
-
-const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
+} = useCredit({ loadWhen: emailConfirmed });
 const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
 
 const { displayActions } = useSubscriptionActions();
 const { availablePlans } = useAvailablePlans();
 /** Fold the subscriptions only when none would show an action button: no cancel, renew, resume or pending payment. */
 const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some(sub => displayActions(sub, get(availablePlans))));
-
-// Credit needs a confirmed e-mail address, which the account may confirm while the page is open
-watch(emailConfirmed, async (confirmed) => {
-  if (confirmed)
-    await loadCredit();
-}, { immediate: true });
 </script>
 
 <template>

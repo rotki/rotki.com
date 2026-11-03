@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { get, set } from '@vueuse/shared';
+import { get } from '@vueuse/shared';
 import { z } from 'zod';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
 import { ADDRESS_FIELDS, useProfileUpdate } from '~/composables/account/use-profile-update';
+import { useVatVerification } from '~/composables/account/use-vat-verification';
 import { useFormRules } from '~/composables/use-form-rules';
 import { useZodForm } from '~/composables/use-zod-form';
-import { useVatCheck } from '~/modules/checkout/composables/use-vat-check';
 import { VatIdStatus } from '~/types/account';
 import { formatSeconds } from '~/utils/text';
 
@@ -32,16 +32,8 @@ const state = reactive<ProfileFormState>({
   vatId: '',
 });
 
-const vatSuccessMessage = ref<string>('');
-const vatErrorMessage = ref<string>('');
-const loadingCheck = ref<boolean>(false);
-const remainingTime = ref<number>(0);
-
-const waitUntilTime = useLocalStorage<number>('rotki.vat_check.wait_until_time', 0);
-
 const [DefineVAT, ReuseVAT] = createReusableTemplate();
 const [DefineEditAddressButton, EditAddressButton] = createReusableTemplate<{ label: string }>();
-const { refreshVATCheckStatus, checkVAT } = useVatCheck();
 
 const {
   account,
@@ -64,12 +56,13 @@ const form = useZodForm(() => {
 }, state);
 const { errors, formErrorFields, formErrors, invalid, touch } = form;
 
-const { pause: pauseTimer, resume } = useIntervalFn(() => {
-  if (!updateRemainingTime()) {
-    set(remainingTime, 0);
-    pauseTimer();
-  }
-}, 1000, { immediate: false });
+const {
+  checking: loadingCheck,
+  errorMessage: vatErrorMessage,
+  remainingTime,
+  successMessage: vatSuccessMessage,
+  verify: handleCheckVATClick,
+} = useVatVerification(async () => updateProfile(form, state));
 
 const {
   public: {
@@ -149,56 +142,6 @@ async function verifyOnEnter(): Promise<void> {
   await handleCheckVATClick();
 }
 
-async function handleCheckVATClick() {
-  set(loadingCheck, true);
-  try {
-    // The check reads the saved VAT ID, so there is nothing to check when the save failed.
-    if (!await updateProfile(form, state))
-      return;
-    const checkResult = await checkVAT();
-    await refreshVATCheckStatus();
-
-    if ('seconds' in checkResult) {
-      const now = Math.round(Date.now() / 1000);
-      set(waitUntilTime, now + checkResult.seconds);
-      set(remainingTime, checkResult.seconds);
-      pauseTimer();
-      if (checkResult.seconds > 0) {
-        resume();
-      }
-    }
-    else if (checkResult.success) {
-      const status = get(account)?.vatIdStatus;
-      if (status === VatIdStatus.VALID) {
-        set(vatSuccessMessage, t('auth.signup.vat.verified'));
-        setTimeout(() => {
-          set(vatSuccessMessage, '');
-        }, 3000);
-      }
-    }
-    else {
-      set(vatErrorMessage, checkResult.message);
-      setTimeout(() => {
-        set(vatErrorMessage, '');
-      }, 3000);
-    }
-  }
-  finally {
-    set(loadingCheck, false);
-  }
-}
-
-function updateRemainingTime(): boolean {
-  const now = Math.round(Date.now() / 1000);
-  const endTime = get(waitUntilTime);
-
-  if (endTime && endTime > now) {
-    set(remainingTime, endTime - now);
-    return true;
-  }
-  return false;
-}
-
 // Saving the address in the other form fixes what this form's last error was about
 watch(() => get(account)?.address, () => {
   if (get(formErrors).length > 0)
@@ -207,8 +150,6 @@ watch(() => get(account)?.address, () => {
 
 onMounted(() => {
   reset();
-  resume();
-  updateRemainingTime();
 });
 </script>
 

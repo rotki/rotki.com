@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { CancelSubscriptionConfirmEvent } from '~/components/account/home/subscription-table/types';
 import { get, isDefined, set } from '@vueuse/shared';
 import CancelSubscriptionBenefits from '~/components/account/home/CancelSubscriptionBenefits.vue';
-import { type CancellationFeedbackPayload, useCancellationFeedback } from '~/composables/subscription/use-cancellation-feedback';
+import { useCancellationFeedback } from '~/composables/subscription/use-cancellation-feedback';
 import { formatDate } from '~/utils/date';
-
-export interface CancelSubscriptionConfirmEvent {
-  subscription: UserSubscription;
-  feedback: CancellationFeedbackPayload;
-}
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 

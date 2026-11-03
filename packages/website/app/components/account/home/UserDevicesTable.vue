@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataTableColumn, TablePaginationData } from '@rotki/ui-library';
+import type { DataTableColumn } from '@rotki/ui-library';
 import type { UserDevice } from '~/types/account';
 import { createReusableTemplate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
@@ -8,17 +8,17 @@ import DeleteDeviceDialog from '~/components/account/home/DeleteDeviceDialog.vue
 import RenameDeviceDialog from '~/components/account/home/RenameDeviceDialog.vue';
 import TimeAgo from '~/components/common/TimeAgo.vue';
 import { useUserDevices } from '~/composables/account/use-user-devices';
-import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
+import { useAccountTable } from '~/composables/use-account-table';
 
 const { t } = useI18n({ useScope: 'global' });
 
-const pagination = ref<TablePaginationData>();
 const deviceToDelete = ref<UserDevice>();
 const deviceToRename = ref<UserDevice>();
 const deleteLoading = ref<boolean>(false);
 const renameLoading = ref<boolean>(false);
 
 const { loading, userDevices } = useUserDevices();
+const { modelPagination, tableProps } = useAccountTable(userDevices);
 
 const headers = computed<DataTableColumn<UserDevice>[]>(() => [{
   label: t('account.devices.headers.label'),
@@ -91,14 +91,12 @@ function showRenameDialog(device: UserDevice): void {
       </div>
     </DefinePlatformDisplay>
     <RuiDataTable
-      v-model:pagination="pagination"
-      :class="SINGLE_LINE_ROWS"
+      v-model:pagination="modelPagination"
+      v-bind="tableProps"
       :cols="headers"
       :loading="loading"
       :empty="{ label: t('account.devices.no_devices_found'), description: t('account.devices.no_devices_hint') }"
       :rows="userDevices"
-      :hide-pagination="fitsOnePage(userDevices)"
-      outlined
       row-attr="id"
     >
       <template #item.platform="{ row }">

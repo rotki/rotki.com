@@ -1,6 +1,7 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { InjectionKey } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
+import type { CancellationFeedbackPayload } from '~/composables/subscription/use-cancellation-feedback';
 import type { PendingTx } from '~/types';
 
 export const SubscriptionAction = {
@@ -43,4 +44,10 @@ export const ActionButtonStyleKey: InjectionKey<ActionButtonStyle> = Symbol('sub
 /** The style the surrounding actions cell asks for, compact links by default. */
 export function useActionButtonStyle(): ActionButtonStyle {
   return inject(ActionButtonStyleKey, { variant: 'text', size: 'sm' });
+}
+
+/** What the cancel dialog confirms: the subscription and why the user is leaving. */
+export interface CancelSubscriptionConfirmEvent {
+  subscription: UserSubscription;
+  feedback: CancellationFeedbackPayload;
 }

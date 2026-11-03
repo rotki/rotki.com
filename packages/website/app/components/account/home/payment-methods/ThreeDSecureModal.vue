@@ -1,24 +1,15 @@
 <script setup lang="ts">
-import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { CardVerificationData } from '~/types/payment';
 import { parseBraintreeError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import ThreeDSecureBillingInfo from '~/components/account/home/payment-methods/ThreeDSecureBillingInfo.vue';
 import { useCardThreeDSecure } from '~/modules/checkout/composables/use-card-three-d-secure';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 
-export interface ThreeDSecureVerificationData {
-  cardToken: string;
-  /** Identifies the card in the Braintree vault, which holds all of them. */
-  cardLast4: string;
-  /** Disambiguates two vault entries that share a last four. */
-  cardExpiresAt: string;
-  subscriptionData: Pick<Subscription, 'nextBillingAmount' | 'nextActionDate' | 'durationInMonths'>;
-}
-
 const model = defineModel<boolean>({ required: true });
 
 const { verificationData, isReauthorization } = defineProps<{
-  verificationData: ThreeDSecureVerificationData;
+  verificationData: CardVerificationData;
   isReauthorization?: boolean;
 }>();
 
@@ -86,7 +77,7 @@ async function startVerification(): Promise<void> {
 }
 
 // Start verification when modal opens
-watch(model, (isOpen) => {
+watchImmediate(model, (isOpen) => {
   if (isOpen) {
     startVerification();
   }
@@ -94,7 +85,7 @@ watch(model, (isOpen) => {
     // Cleanup when modal closes
     teardown();
   }
-}, { immediate: true });
+});
 </script>
 
 <template>

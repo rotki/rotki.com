@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import CancelSubscription, { type CancelSubscriptionConfirmEvent } from '~/components/account/home/CancelSubscription.vue';
+import CancelSubscription from '~/components/account/home/CancelSubscription.vue';
 import CancelUpgradeDialog from '~/components/account/home/CancelUpgradeDialog.vue';
 import ResumeSubscriptionDialog from '~/components/account/home/ResumeSubscriptionDialog.vue';
-import {
-  SubscriptionAction,
-  type SubscriptionActionType,
-} from '~/components/account/home/subscription-table/types';
+import { type CancelSubscriptionConfirmEvent, SubscriptionAction, type SubscriptionActionType } from '~/components/account/home/subscription-table/types';
 import UpgradePlanDialog from '~/components/account/home/UpgradePlanDialog.vue';
 
 const activeSubscription = defineModel<UserSubscription>();

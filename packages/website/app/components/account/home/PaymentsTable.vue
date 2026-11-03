@@ -3,7 +3,6 @@ import type { Subscription as UserSubscription } from '@rotki/card-payment-commo
 import type {
   DataTableColumn,
   DataTableSortColumn,
-  TablePaginationData,
 } from '@rotki/ui-library';
 import type { UserPayment } from '~/types/account';
 import { get } from '@vueuse/shared';
@@ -12,10 +11,11 @@ import PaymentAmountCell from '~/components/account/home/PaymentAmountCell.vue';
 import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useUserPayments } from '~/composables/account/use-user-payments';
+import { useAccountTable } from '~/composables/use-account-table';
 import { formatDate } from '~/utils/date';
 import { invoiceUrl, paymentMethodLabel } from '~/utils/payments';
 import { getPlanNameFor } from '~/utils/plans';
-import { fitsOnePage, orderColumns, SINGLE_LINE_ROWS } from '~/utils/table';
+import { orderColumns } from '~/utils/table';
 import { toTitleCase } from '~/utils/text';
 
 const { pending } = defineProps<{
@@ -24,8 +24,6 @@ const { pending } = defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 const { isMdAndDown } = useBreakpoint();
-
-const pagination = ref<TablePaginationData>();
 
 /** A payment with its method as shown, so the column sorts the way it reads. */
 type PaymentRow = UserPayment & { method: string };
@@ -76,6 +74,8 @@ const rows = computed<PaymentRow[]>(() => get(userPayments).map(payment => ({
   method: paymentMethodLabel(t, payment),
 })));
 
+const { modelPagination, tableProps } = useAccountTable(rows);
+
 watch(() => pending, (pendingIs, pendingWas) => {
   if (pendingIs.length === 0 && pendingWas.length > 0) {
     refresh();
@@ -95,16 +95,14 @@ watch(() => pending, (pendingIs, pendingWas) => {
       />
     </template>
     <RuiDataTable
-      v-model:pagination="pagination"
+      v-model:pagination="modelPagination"
+      v-bind="tableProps"
       v-model:sort="sort"
-      :class="SINGLE_LINE_ROWS"
       :cols="headers"
       :loading="loading"
       :empty="{ description: t('account.payments.no_payments_found') }"
       row-attr="identifier"
       :rows="rows"
-      :hide-pagination="fitsOnePage(rows)"
-      outlined
     >
       <template #item.plan="{ row }">
         <template v-if="row.legacy">
