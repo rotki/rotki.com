@@ -36,12 +36,14 @@ export default defineConfig({
     video: process.env.CI ? 'on-first-retry' : 'off',
     screenshot: process.env.CI ? 'only-on-failure' : 'off',
     viewport: { width: 1280, height: 720 },
-    ...(chromiumPath && {
-      launchOptions: {
+    launchOptions: {
+      // Playwright starts Chromium without its sandbox unless told otherwise; CI containers cannot run it.
+      chromiumSandbox: !process.env.CI,
+      ...(chromiumPath && {
         executablePath: chromiumPath,
         args: ['--headless=new'],
-      },
-    }),
+      }),
+    },
   },
   outputDir: './tests/e2e/test-results',
   projects: [
