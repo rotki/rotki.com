@@ -17,8 +17,22 @@ import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payme
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 
+/** Why a saved card goes through 3-D Secure: to become the renewal card, or to renew its authorization. */
+const CardOperationMode = {
+  LINK: 'link',
+  REAUTHORIZE: 'reauthorize',
+} as const;
+
+type CardOperationModeType = typeof CardOperationMode[keyof typeof CardOperationMode];
+
+/** How each mode reads in the logs. */
+const operationLogName: Record<CardOperationModeType, string> = {
+  [CardOperationMode.LINK]: 'card verification',
+  [CardOperationMode.REAUTHORIZE]: 'reauthorization',
+};
+
 interface CardOperation {
-  mode: 'default' | 'reauthorize';
+  mode: CardOperationModeType;
   token: string;
 }
 
@@ -29,10 +43,11 @@ const { userMessageFor } = usePaymentErrorMessage();
 const showAddCardDialog = ref<boolean>(false);
 const showDeleteDialog = ref<boolean>(false);
 const showThreeDSecureModal = ref<boolean>(false);
-const isReauthorization = ref<boolean>(false);
 const deletingCard = ref<boolean>(false);
 
 const cardOperation = ref<CardOperation>();
+/** The mode of the verification in the 3-D Secure dialog, which outlives the operation that opened it. */
+const verificationMode = ref<CardOperationModeType>();
 const cardToDelete = ref<SavedCard>();
 const verificationData = ref<ThreeDSecureVerificationData>();
 
@@ -47,6 +62,7 @@ const { activeSubscription, loading: subscriptionsLoading, refresh: refreshSubsc
 const loading = computed<boolean>(() => get(cardsLoading) || get(subscriptionsLoading));
 const hasCards = computed<boolean>(() => get(cards).length > 0);
 const hasActiveSubscription = computed<boolean>(() => !!get(account)?.hasActiveSubscription);
+const isReauthorization = computed<boolean>(() => get(verificationMode) === CardOperationMode.REAUTHORIZE);
 const hasActiveCryptoSubscription = computed<boolean>(() =>
   get(activeSubscription)?.paymentProvider === PaymentProvider.CRYPTO,
 );
@@ -65,12 +81,11 @@ async function handleDeleteSuccess(): Promise<void> {
   await Promise.all([refreshCards(), refreshSubscriptions()]);
 }
 
-async function initiate3DSVerification(card: SavedCard, isReauth: boolean): Promise<void> {
+async function initiate3DSVerification(card: SavedCard, mode: CardOperationModeType): Promise<void> {
   set(error, undefined);
-  set(isReauthorization, isReauth);
+  set(verificationMode, mode);
 
-  const actionType = isReauth ? 'reauthorization' : 'card verification';
-  const mode = isReauth ? 'reauthorize' : 'default';
+  const actionType = operationLogName[mode];
 
   try {
     set(cardOperation, { mode, token: card.token });
@@ -120,11 +135,11 @@ async function handleSetDefault(card: SavedCard): Promise<void> {
   if (card.linked) {
     return;
   }
-  await initiate3DSVerification(card, false);
+  await initiate3DSVerification(card, CardOperationMode.LINK);
 }
 
 async function handleReauthorize(card: SavedCard): Promise<void> {
-  await initiate3DSVerification(card, true);
+  await initiate3DSVerification(card, CardOperationMode.REAUTHORIZE);
 }
 
 async function handleThreeDSecureSuccess(): Promise<void> {
@@ -148,8 +163,7 @@ async function handleAddCardSuccess(): Promise<void> {
 }
 
 function isCardLoading(card: SavedCard): boolean {
-  const operation = get(cardOperation);
-  return operation?.token === card.token && (operation.mode === 'default' || operation.mode === 'reauthorize');
+  return get(cardOperation)?.token === card.token;
 }
 
 function isCardDeleting(card: SavedCard): boolean {

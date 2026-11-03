@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import PaymentCardLayout from '~/components/account/home/payment-methods/PaymentCardLayout.vue';
 
 /** Passed when the card is rendered as an option in a card picker. */
 export interface PaymentCardSelection {
@@ -34,8 +35,8 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div
-    class="rounded-lg border p-4 md:px-5 flex flex-wrap items-center gap-x-4 gap-y-3 transition-colors"
+  <PaymentCardLayout
+    class="transition-colors"
     :class="{
       'border-default': !selection,
       'cursor-pointer hover:border-rui-primary': !!selection,
@@ -44,48 +45,56 @@ const { t } = useI18n();
     }"
     @click="selection ? emit('select', card) : undefined"
   >
-    <!-- eslint-disable vue/prefer-true-attribute-shorthand -- RuiRadio's value prop is untyped, so the shorthand would pass '' instead of true -->
-    <RuiRadio
+    <template
       v-if="selection"
-      color="primary"
-      :value="true"
-      :model-value="selection.selected"
-      hide-details
-      @input="emit('select', card)"
-    />
-    <!-- eslint-enable vue/prefer-true-attribute-shorthand -->
-
-    <div class="shrink-0 rounded-md border border-default bg-white h-9 w-14 flex items-center justify-center overflow-hidden">
-      <img
-        :src="card.imageUrl"
-        :alt="t('common.card')"
-        class="w-full h-full object-contain object-center"
-        width="56"
-        height="36"
-      />
-    </div>
-
-    <div class="flex-1 min-w-40">
-      <p class="text-body-1 font-medium text-rui-text">
-        {{ t('home.account.payment_methods.ending_in', { last4: card.last4 }) }}
-      </p>
-      <p class="text-body-2 text-rui-text-secondary">
-        {{ t('home.plans.tiers.step_3.saved_card.expiry', { expiresAt: card.expiresAt }) }}
-      </p>
-    </div>
-
-    <RuiChip
-      v-if="isLinked"
-      size="sm"
-      variant="tonal"
-      color="primary"
+      #leading
     >
-      {{ t('home.account.payment_methods.linked_card') }}
-    </RuiChip>
+      <!-- eslint-disable vue/prefer-true-attribute-shorthand -- RuiRadio's value prop is untyped, so the shorthand would pass '' instead of true -->
+      <RuiRadio
+        color="primary"
+        :value="true"
+        :model-value="selection.selected"
+        hide-details
+        @input="emit('select', card)"
+      />
+      <!-- eslint-enable vue/prefer-true-attribute-shorthand -->
+    </template>
 
-    <div
+    <template #logo>
+      <div class="size-full rounded-md border border-default bg-white flex items-center justify-center">
+        <img
+          :src="card.imageUrl"
+          :alt="t('common.card')"
+          class="w-full h-full object-contain object-center"
+          width="56"
+          height="36"
+        />
+      </div>
+    </template>
+
+    <template #title>
+      {{ t('home.account.payment_methods.ending_in', { last4: card.last4 }) }}
+    </template>
+    <template #subtitle>
+      {{ t('home.plans.tiers.step_3.saved_card.expiry', { expiresAt: card.expiresAt }) }}
+    </template>
+
+    <template
+      v-if="isLinked"
+      #badge
+    >
+      <RuiChip
+        size="sm"
+        variant="tonal"
+        color="primary"
+      >
+        {{ t('home.account.payment_methods.linked_card') }}
+      </RuiChip>
+    </template>
+
+    <template
       v-if="!hideActions"
-      class="flex items-center gap-1"
+      #actions
     >
       <RuiButton
         v-if="!isLinked && showLinkButton"
@@ -130,6 +139,6 @@ const { t } = useI18n();
         </template>
         {{ deletion?.tooltip }}
       </RuiTooltip>
-    </div>
-  </div>
+    </template>
+  </PaymentCardLayout>
 </template>
