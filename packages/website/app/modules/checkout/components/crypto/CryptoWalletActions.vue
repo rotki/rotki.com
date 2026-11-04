@@ -17,7 +17,7 @@ const { t } = useI18n({ useScope: 'global' });
 </script>
 
 <template>
-  <div class="wallet-actions-section">
+  <div class="w-full sm:w-auto">
     <div class="flex flex-col sm:flex-row gap-1">
       <RuiButton
         v-if="!connected"
@@ -25,7 +25,7 @@ const { t } = useI18n({ useScope: 'global' });
         :loading="processing"
         :disabled="processing"
         size="lg"
-        class="w-full"
+        class="w-full sm:w-auto"
         @click="$emit('connect')"
       >
         {{ t('home.plans.tiers.step_3.wallet.connect_wallet') }}
@@ -38,7 +38,7 @@ const { t } = useI18n({ useScope: 'global' });
           :disabled="processing || payDisabled"
           color="primary"
           size="lg"
-          class="w-full"
+          class="w-full sm:w-auto"
           @click="$emit('pay')"
         >
           {{ t('home.plans.tiers.step_3.wallet.pay_with_wallet') }}
@@ -48,7 +48,7 @@ const { t } = useI18n({ useScope: 'global' });
           v-else
           color="primary"
           size="lg"
-          class="w-full"
+          class="w-full sm:w-auto"
           @click="$emit('switch-network')"
         >
           {{ t('home.plans.tiers.step_3.wallet.switch_network') }}

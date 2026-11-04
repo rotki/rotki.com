@@ -13,30 +13,39 @@ import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
 
-// CSRF Token handling
-let csrfToken: string | null = null;
+/** The CSRF token from the `csrftoken` cookie the rotki.com backend sets. */
+function readCSRFCookie(): string | undefined {
+  const cookie = document.cookie.split(';').find(entry => entry.trim().startsWith('csrftoken='));
+  return cookie ? cookie.slice(cookie.indexOf('=') + 1) : undefined;
+}
 
-async function fetchCSRFToken(): Promise<string> {
-  if (csrfToken) {
-    return csrfToken;
-  }
+/** Shared by the requests that start together on load, so the token is asked for once. */
+let pendingCSRFToken: Promise<string> | undefined;
 
-  try {
-    // Get CSRF token from the parent rotki.com domain
-    await fetch(`${paths.hostUrlBase}/webapi/csrf/`, {
-      credentials: 'include',
-    });
-
-    // The CSRF token should now be set in the csrftoken cookie
-    const cookies = document.cookie.split(';');
-    const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
-
-    if (csrfCookie) {
-      csrfToken = csrfCookie.slice(csrfCookie.indexOf('=') + 1);
-      return csrfToken;
-    }
-
+async function requestCSRFToken(): Promise<string> {
+  await fetch(`${paths.hostUrlBase}/webapi/csrf/`, {
+    credentials: 'include',
+  });
+  const token = readCSRFCookie();
+  if (!token)
     throw new Error('CSRF token not found in cookies');
+  return token;
+}
+
+/**
+ * The CSRF token, asking the backend only when the cookie is missing. A signed-in visitor
+ * already has it from rotki.com, which saves a round trip before the first request.
+ */
+export async function fetchCSRFToken(): Promise<string> {
+  const existing = readCSRFCookie();
+  if (existing)
+    return existing;
+
+  pendingCSRFToken ??= requestCSRFToken().finally(() => {
+    pendingCSRFToken = undefined;
+  });
+  try {
+    return await pendingCSRFToken;
   }
   catch (error) {
     console.error('Failed to get CSRF token:', error);

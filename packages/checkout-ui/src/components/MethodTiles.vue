@@ -7,6 +7,8 @@ interface TileView {
   id: CheckoutMethodId;
   title: string;
   renewal: string;
+  /** The renewal in two words, for the narrow tiles on phones. */
+  renewalShort: string;
   href: string;
   disabled: boolean;
   current: boolean;
@@ -48,6 +50,17 @@ function renewal(id: CheckoutMethodId): string {
   }
 }
 
+function renewalShort(id: CheckoutMethodId): string {
+  switch (id) {
+    case 'card':
+      return t('checkout.methods.card_renewal_short');
+    case 'paypal':
+      return t('checkout.methods.paypal_renewal_short');
+    case 'crypto':
+      return t('checkout.methods.crypto_renewal_short');
+  }
+}
+
 const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
   const link = links[id];
   if (!link)
@@ -58,6 +71,7 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
     href: link.href,
     id,
     renewal: renewal(id),
+    renewalShort: renewalShort(id),
     title: title(id),
   }];
 }));
@@ -66,7 +80,7 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
 <template>
   <nav
     :aria-label="t('checkout.methods.label')"
-    class="grid grid-cols-1 sm:grid-cols-3 gap-3"
+    class="grid grid-cols-3 gap-2 sm:gap-3"
   >
     <template
       v-for="tile in tiles"
@@ -75,7 +89,7 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
       <div
         v-if="tile.disabled"
         aria-disabled="true"
-        class="min-h-[4.5rem] flex flex-col justify-center gap-0.5 p-4 rounded-rui-card border border-rui-divider bg-rui-surface-muted cursor-not-allowed"
+        class="min-h-16 sm:min-h-[4.5rem] flex flex-col justify-center gap-0.5 p-3 sm:p-4 rounded-rui-card border border-rui-divider bg-rui-surface-muted cursor-not-allowed"
         :data-cy="`method-${tile.id}`"
       >
         <span class="flex items-center gap-2 font-medium text-rui-text-disabled">
@@ -85,20 +99,23 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
           />
           {{ tile.title }}
         </span>
-        <span class="pl-6 text-sm text-rui-text-secondary">{{ t('checkout.methods.unavailable') }}</span>
+        <span class="sm:pl-6 text-sm text-rui-text-secondary">
+          <span class="sm:hidden">{{ t('checkout.methods.unavailable_short') }}</span>
+          <span class="hidden sm:inline">{{ t('checkout.methods.unavailable') }}</span>
+        </span>
       </div>
       <a
         v-else
         :href="tile.href"
         :aria-current="tile.current ? 'page' : undefined"
-        class="min-h-[4.5rem] flex flex-col justify-center gap-0.5 p-4 rounded-rui-card bg-rui-surface no-underline transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-rui-primary focus-visible:ring-offset-2"
-        :class="tile.current ? 'border-2 border-rui-primary p-[calc(1rem-1px)]!' : 'border border-rui-outline hover:border-rui-primary'"
+        class="min-h-16 sm:min-h-[4.5rem] flex flex-col justify-center gap-0.5 p-3 sm:p-4 rounded-rui-card bg-rui-surface no-underline transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-rui-primary focus-visible:ring-offset-2"
+        :class="tile.current ? 'border-2 border-rui-primary p-[calc(0.75rem-1px)]! sm:p-[calc(1rem-1px)]!' : 'border border-rui-outline hover:border-rui-primary'"
         :data-cy="`method-${tile.id}`"
         @click="emit('select', tile.id)"
       >
         <span
           class="flex items-center gap-2"
-          :class="tile.current ? 'font-bold text-rui-primary' : 'font-medium text-rui-text'"
+          :class="tile.current ? 'font-semibold text-rui-primary' : 'font-medium text-rui-text'"
         >
           <span
             aria-hidden="true"
@@ -107,7 +124,10 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
           />
           {{ tile.title }}
         </span>
-        <span class="pl-6 text-sm text-rui-text-secondary">{{ tile.renewal }}</span>
+        <span class="sm:pl-6 text-sm text-rui-text-secondary whitespace-nowrap">
+          <span class="sm:hidden">{{ tile.renewalShort }}</span>
+          <span class="hidden sm:inline">{{ tile.renewal }}</span>
+        </span>
       </a>
     </template>
   </nav>

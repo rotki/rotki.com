@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { CheckoutPaymentMethods } from '@rotki/sigil';
-import { get } from '@vueuse/shared';
-import CheckoutDescription from '~/modules/checkout/components/common/CheckoutDescription.vue';
-import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
+import { get, set } from '@vueuse/shared';
+import CheckoutErrorAlert from '~/modules/checkout/components/common/CheckoutErrorAlert.vue';
+import CheckoutLoadingOverlay from '~/modules/checkout/components/common/CheckoutLoadingOverlay.vue';
 import CryptoPaymentActions from '~/modules/checkout/components/crypto/CryptoPaymentActions.vue';
 import CryptoPaymentForm from '~/modules/checkout/components/crypto/CryptoPaymentForm.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-payment-flow';
-import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
+import { buildPaymentReceipt, storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -40,6 +40,9 @@ const {
   switchPlan: flowSwitchPlan,
   cancelPayment,
 } = useCryptoPaymentFlow();
+
+/** False until the first load finishes; before that the page has nothing to show but its loading state. */
+const initialized = ref<boolean>(false);
 
 const loading = computed<boolean>(() => get(checkoutLoading) || get(flowLoading));
 
@@ -81,7 +84,7 @@ async function initialize(): Promise<boolean> {
   }
 
   if (result.alreadyStarted) {
-    sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
+    storePaymentReceipt(buildPaymentReceipt('crypto', plan, get(breakdown), !!get(upgradeSubId)));
     await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
     return true;
   }
@@ -151,6 +154,7 @@ async function navigateToProducts(): Promise<void> {
 
 onMounted(async () => {
   const success = await initialize();
+  set(initialized, true);
   /* Redirect only when there is nothing to show. If initialize() set an error
      (e.g. the crypto payment API returned 400), stay so the user can read it. */
   if (!success && !get(paymentData) && !get(error)) {
@@ -160,37 +164,34 @@ onMounted(async () => {
 </script>
 
 <template>
-  <PaymentLayout
-    :error="error"
-    :loading="loading"
-    @clear-error="clearError()"
+  <CryptoPaymentForm
+    v-if="paymentData && selectedPlan"
+    v-model:discount-code="modelDiscountCode"
+    :data="paymentData"
+    :plan="selectedPlan"
+    :plan-switch-loading="planSwitchLoading"
+    :web3-processing-loading="flowLoading"
+    :upgrade-sub-id="upgradeSubId"
+    :breakdown="breakdown"
+    @change="handleCancelAndGoBack()"
+    @plan-change="handlePlanChange($event)"
+    @apply-discount="applyDiscount()"
+    @error="handleWeb3Error($event)"
   >
-    <template #description>
-      <CheckoutDescription>
-        {{ t('home.plans.tiers.step_3.subtitle') }}
-      </CheckoutDescription>
+    <template #alert>
+      <CheckoutErrorAlert
+        :error="error"
+        @dismiss="clearError()"
+      />
     </template>
+  </CryptoPaymentForm>
 
-    <CryptoPaymentForm
-      v-if="paymentData && selectedPlan"
-      v-model:discount-code="modelDiscountCode"
-      :data="paymentData"
-      :plan="selectedPlan"
-      :plan-switch-loading="planSwitchLoading"
-      :web3-processing-loading="flowLoading"
-      :upgrade-sub-id="upgradeSubId"
-      :breakdown="breakdown"
-      @change="handleCancelAndGoBack()"
-      @plan-change="handlePlanChange($event)"
-      @apply-discount="applyDiscount()"
-      @error="handleWeb3Error($event)"
-    />
+  <CryptoPaymentActions
+    v-else
+    :loading="loading || !initialized"
+    :error="error?.message"
+    @back="handleCancelAndGoBack()"
+  />
 
-    <CryptoPaymentActions
-      v-else
-      :loading="loading"
-      :error="error?.message"
-      @back="handleCancelAndGoBack()"
-    />
-  </PaymentLayout>
+  <CheckoutLoadingOverlay :loading="loading" />
 </template>

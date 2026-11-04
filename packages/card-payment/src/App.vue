@@ -59,30 +59,31 @@ function resolveInitialDiscountCode(activeCampaign: ActiveCampaign | undefined):
   }) ?? '';
 }
 
-const cards = ref<SavedCard[]>([]);
+/** `undefined` until the saved cards arrive; the page renders without waiting for them. */
+const cards = ref<SavedCard[]>();
 const accountData = ref<Account>();
 
 /*
  * An upgrade keeps the subscription's payment method and starts from the subscription page,
- * so it gets neither the way back to the plans nor the switch to another method. The link
- * waits for the load: the prerendered page has no query params, and hydration keeps the
- * prerendered href.
+ * so its way back leads there and it gets no switch to another method. The link waits for
+ * the load: the prerendered page has no query params, and hydration keeps the prerendered href.
  */
-const backToPlans = computed<string | undefined>(() =>
-  get(isLoading) || get(upgradeSubId) ? undefined : withCheckoutParams(routes.plans),
-);
+const backHref = computed<string | undefined>(() => {
+  if (get(isLoading))
+    return undefined;
+  return get(upgradeSubId) ? routes.subscription : withCheckoutParams(routes.plans);
+});
 
 const methodLinks = checkoutMethodLinks();
 
 /**
- * Load checkout data, available plans and saved cards in parallel and store them.
+ * Load checkout data and available plans in parallel and store them.
  * Returns the error to show when a required piece is missing, `undefined` on success.
  */
 async function loadPaymentData(planId: number): Promise<string | undefined> {
-  const [checkoutData, availablePlansData, savedCardData, activeCampaign] = await Promise.all([
+  const [checkoutData, availablePlansData, activeCampaign] = await Promise.all([
     checkout(planId),
     getAvailablePlans(),
-    getSavedCard(),
     getActiveCampaign(),
   ]);
   set(campaign, activeCampaign);
@@ -100,10 +101,24 @@ async function loadPaymentData(planId: number): Promise<string | undefined> {
 
   set(planData, checkoutData);
   set(selectedPlan, foundPlan);
-  set(cards, savedCardData);
-  const linkedCard = savedCardData?.find(card => card.linked);
-  set(selectedCard, linkedCard || savedCardData?.[0]);
   return undefined;
+}
+
+/** Stores the saved cards and picks the linked one, or the first. */
+function applyCards(savedCardData: SavedCard[]): void {
+  set(cards, savedCardData);
+  const linkedCard = savedCardData.find(card => card.linked);
+  set(selectedCard, linkedCard || savedCardData[0]);
+}
+
+/** Saved cards come from Braintree through the backend and are the slowest call, so they load on their own. */
+function loadCards(): void {
+  getSavedCard()
+    .then(applyCards)
+    .catch((error: unknown) => {
+      console.error('Error loading saved cards:', error);
+      set(cards, []);
+    });
 }
 
 async function load(): Promise<void> {
@@ -125,7 +140,14 @@ async function load(): Promise<void> {
       return;
     }
 
-    // Check user authentication
+    // The payment data loads while the account is checked; a visitor who cannot buy is sent away and it is dropped.
+    const paymentData = loadPaymentData(planId).catch((error: unknown) => {
+      console.error('Failed to load payment data:', error);
+      return 'An error occurred. Please try again.';
+    });
+    // Rendering does not wait for the cards; the card section shows a placeholder until they arrive.
+    loadCards();
+
     set(loadingMessage, 'Checking authentication...');
 
     const { canBuy, account } = await canBuyNewSubscription();
@@ -140,7 +162,7 @@ async function load(): Promise<void> {
 
     set(loadingMessage, 'Initializing payment...');
 
-    const loadError = await loadPaymentData(planId);
+    const loadError = await paymentData;
     if (loadError) {
       set(errorMessage, loadError);
       set(isLoading, false);
@@ -157,22 +179,10 @@ async function load(): Promise<void> {
 
 async function refreshCard(): Promise<void> {
   try {
-    const savedCardData = await getSavedCard();
-    set(cards, savedCardData);
-    const linkedCard = savedCardData?.find(c => c.linked);
-    set(selectedCard, linkedCard || savedCardData?.[0]);
+    applyCards(await getSavedCard());
   }
   catch (error: any) {
     console.error('Error refreshing card:', error);
-  }
-}
-
-function back(): void {
-  if (get(upgradeSubId)) {
-    navigation.goToSubscription();
-  }
-  else {
-    navigation.goToPlans();
   }
 }
 
@@ -186,7 +196,8 @@ onMounted(async () => {
     step="payment"
     :logo-src="logoSmall"
     :home-href="routes.home"
-    :back-href="backToPlans"
+    :back-href="backHref"
+    :back-to="upgradeSubId ? 'subscription' : 'plans'"
     :site-url="paths.hostUrlBase"
   >
     <LoadingState
@@ -197,7 +208,7 @@ onMounted(async () => {
     <ErrorState
       v-else-if="errorMessage"
       :message="errorMessage"
-      button-text="Go Back"
+      button-text="Go back"
       @button-click="navigation.goToPlans()"
     />
 
@@ -219,7 +230,6 @@ onMounted(async () => {
         :vat-id-status="accountData?.vatIdStatus"
         :country="accountData?.address.country"
         @payment-success="navigation.goTo3DSecure(upgradeSubId)"
-        @go-back="back()"
         @refresh-card="refreshCard()"
         @fatal-error="errorMessage = $event"
       >

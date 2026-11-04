@@ -77,10 +77,17 @@ describe('priceRows', () => {
     expect(wrapper.find('[data-cy="grand-total"]').text()).toBe('22.50 €');
   });
 
-  it('shows the plan price without VAT before the breakdown loads', () => {
+  it('shows the plan price and holds the VAT row\'s place before the breakdown loads', () => {
     const wrapper = mountRows({ breakdown: undefined });
 
     expect(row(wrapper, 'subtotal')?.value).toBe('25.00 €');
+    expect(row(wrapper, 'vat')).toEqual({ label: '', value: '' });
+    expect(wrapper.findAllComponents({ name: 'RuiSkeletonLoader' }).length).toBeGreaterThan(0);
+  });
+
+  it('drops the held VAT row when no VAT applies', () => {
+    const wrapper = mountRows({ breakdown: { ...breakdown, vatRate: '0', vatAmount: '0.00' } });
+
     expect(row(wrapper, 'vat')).toBeUndefined();
   });
 

@@ -15,6 +15,8 @@ interface PriceRow {
   deduction?: boolean;
   /** For information only, not part of the sum (the VAT already in the price). */
   info?: boolean;
+  /** Holds a row's place until the breakdown says whether it applies. */
+  pending?: boolean;
 }
 
 const {
@@ -63,6 +65,9 @@ const rows = computed<PriceRow[]>(() => {
     result.push({ id: 'credit', label: t('checkout.price_rows.credit'), value: `−${credit.formatted}`, deduction: true });
   if (vat)
     result.push({ id: 'vat', label: t('checkout.price_rows.vat_included', { rate: vat.formattedRate }), value: vat.amount.formatted, info: true });
+  // Most buyers pay VAT, so its row is held while the breakdown loads and the rows below stay put.
+  else if (!breakdown)
+    result.push({ id: 'vat', label: '', value: '', info: true, pending: true });
   return result;
 });
 
@@ -89,7 +94,13 @@ const nextPayment = computed<string>(() => {
           :class="row.deduction ? 'text-rui-success' : 'text-rui-text-secondary'"
           :data-cy="`price-row-${row.id}`"
         >
-          {{ row.label }}
+          <RuiSkeletonLoader
+            v-if="row.pending"
+            class="w-32 h-5"
+          />
+          <template v-else>
+            {{ row.label }}
+          </template>
         </dt>
         <dd
           class="text-right tabular-nums"
@@ -100,7 +111,7 @@ const nextPayment = computed<string>(() => {
           }"
         >
           <RuiSkeletonLoader
-            v-if="loading"
+            v-if="loading || row.pending"
             class="w-16 h-5 ml-auto"
           />
           <template v-else>
@@ -118,7 +129,7 @@ const nextPayment = computed<string>(() => {
       />
       <span
         v-else
-        class="text-2xl font-semibold text-rui-primary-darker tabular-nums"
+        class="text-2xl md:text-[1.75rem] md:leading-9 font-semibold text-rui-primary-darker tabular-nums"
         data-cy="grand-total"
       >
         {{ summary.dueToday.formatted }}

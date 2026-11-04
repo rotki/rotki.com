@@ -1,7 +1,6 @@
 import { get } from '@vueuse/shared';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useDiscountCodeParams, usePlanIdParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
-import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { buildQueryParams } from '~/utils/query';
 
 /**
@@ -53,14 +52,6 @@ export function useCryptoPaymentNavigation() {
   };
 
   /**
-   * Navigate to success page
-   */
-  const navigateToSuccess = async (): Promise<void> => {
-    sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
-    await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
-  };
-
-  /**
    * Navigate to subscription page
    */
   const navigateToSubscription = async (): Promise<void> => {
@@ -79,7 +70,6 @@ export function useCryptoPaymentNavigation() {
     usedSubscriptionId,
     upgradeSubId,
     navigateBack,
-    navigateToSuccess,
     navigateToSubscription,
     navigateToProducts,
   };

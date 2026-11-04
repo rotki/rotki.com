@@ -7,6 +7,10 @@ import type { MessageTree } from '../utils/translator';
  */
 export const checkoutMessages: MessageTree = {
   checkout: {
+    consent: {
+      agree: 'I agree to the',
+      policy: 'refund and cancellation policy',
+    },
     discount: {
       applied: 'Discount code applied:',
       add: 'Add a discount or referral code',
@@ -23,18 +27,34 @@ export const checkoutMessages: MessageTree = {
     methods: {
       card: 'Card',
       card_renewal: 'Renews automatically',
+      card_renewal_short: 'Auto-renews',
       crypto: 'Crypto',
       crypto_renewal: 'One payment, no renewal',
+      crypto_renewal_short: 'No renewal',
       label: 'Payment method',
       paypal: 'PayPal',
       paypal_renewal: 'Renews through PayPal',
+      paypal_renewal_short: 'Auto-renews',
       unavailable: 'Not available right now',
+      unavailable_short: 'Unavailable',
+    },
+    page: {
+      summary: 'Order summary',
+      then_month: 'then {amount}/month',
+      then_year: 'then {amount}/year',
+      title: 'How would you like to pay?',
+    },
+    pay: {
+      subscribe: 'Subscribe and pay {amount}',
+      upgrade: 'Upgrade and pay {amount}',
     },
     plan: {
       name_monthly: '{name}, monthly',
+      name_one_month: '{name}, 1 month',
+      name_one_year: '{name}, 12 months',
       name_yearly: '{name}, yearly',
-      one_time_month: '1 month, paid once',
-      one_time_year: '12 months, paid once',
+      one_time_month: 'Paid once, no renewal',
+      one_time_year: 'Paid once, no renewal',
       recurring_month: 'Monthly subscription',
       recurring_year: 'Yearly subscription',
       starts: 'Starts {date}',
@@ -60,6 +80,7 @@ export const checkoutMessages: MessageTree = {
     },
     shell: {
       back_to_plans: 'Back to plans',
+      back_to_subscription: 'Back to your subscription',
       copyright: '© Rotki Solutions GmbH 2018-{year}. All rights reserved.',
       home: 'rotki home page',
       imprint: 'Imprint',

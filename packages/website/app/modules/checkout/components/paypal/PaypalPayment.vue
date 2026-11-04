@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
+import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
+import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
 import { CheckoutPaymentMethods, monthsToPlanDuration, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
-import AcceptRefundPolicy from '~/modules/checkout/components/common/AcceptRefundPolicy.vue';
+import CheckoutErrorAlert from '~/modules/checkout/components/common/CheckoutErrorAlert.vue';
+import CheckoutLoadingOverlay from '~/modules/checkout/components/common/CheckoutLoadingOverlay.vue';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
-import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
 import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import CheckoutMethodTiles from '~/modules/checkout/components/method/CheckoutMethodTiles.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
-import { useReferralCodeParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
-import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
-import { buildQueryParams } from '~/utils/query';
+import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
+import { buildPaymentReceipt, storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const accepted = ref<boolean>(false);
 const initializing = ref<boolean>(false);
+/** PayPal could not start, so its buttons will not appear. */
+const unavailable = ref<boolean>(false);
 const submittingPayment = ref<boolean>(false);
 const blocked = ref<boolean>(false);
 
@@ -41,7 +45,6 @@ const {
 } = checkout;
 
 const { upgradeSubId } = useSubscriptionIdParam();
-const { referralCode } = useReferralCodeParam();
 const { chronicle } = useSigilEvents();
 
 const {
@@ -55,6 +58,31 @@ const {
     planId: get(planId),
     isUpgrade: !!get(upgradeSubId),
   }),
+});
+
+const summary = computed<OrderSummary | undefined>(() => {
+  const plan = get(selectedPlan);
+  return plan ? buildOrderSummary({ plan, breakdown: get(breakdown), upgrade: !!get(upgradeSubId) }) : undefined;
+});
+
+/** The phone summary bar's line under the total. */
+const totalNote = computed<string | undefined>(() => {
+  const info = get(summary);
+  const plan = get(selectedPlan);
+  if (!info || !plan)
+    return undefined;
+  const amount = info.renewal.formatted;
+  return plan.durationInMonths === 12 ? t('checkout.page.then_year', { amount }) : t('checkout.page.then_month', { amount });
+});
+
+const renewalNote = computed<string>(() => {
+  const info = get(summary);
+  const plan = get(selectedPlan);
+  if (!info || !plan)
+    return '';
+  return plan.durationInMonths === 12
+    ? t('checkout_paypal.renewal_year', { amount: info.renewal.formatted })
+    : t('checkout_paypal.renewal_month', { amount: info.renewal.formatted });
 });
 
 const processing = computed<boolean>(() => get(paying) || get(checkoutLoading) || get(planSwitchLoading) || get(blocked));
@@ -120,7 +148,7 @@ async function completePurchase(plan: Pick<SelectedPlan, 'planId' | 'name' | 'du
     discount: discountType,
   });
 
-  sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
+  storePaymentReceipt(buildPaymentReceipt('paypal', plan, breakdownData, !!get(upgradeSubId)));
   await navigateTo('/checkout/success');
 }
 
@@ -167,6 +195,10 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
   }
 }
 
+function reload(): void {
+  window.location.reload();
+}
+
 async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
   const success = await checkoutSwitchPlan(newPlan);
   if (!success)
@@ -177,27 +209,10 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
   updateAmount(amount);
 }
 
-async function navigateBack(): Promise<void> {
-  if (get(upgradeSubId)) {
-    await navigateTo({ name: 'home-subscription' });
-    return;
-  }
-
-  const query = buildQueryParams({
-    planId: get(planId),
-    ref: get(referralCode),
-  });
-
-  await navigateTo({
-    name: 'checkout-pay',
-    query,
-  });
-}
-
 onMounted(async () => {
   set(initializing, true);
   try {
-    await initialize();
+    set(unavailable, !(await initialize()));
   }
   finally {
     set(initializing, false);
@@ -206,85 +221,110 @@ onMounted(async () => {
 </script>
 
 <template>
-  <PaymentLayout
-    :error="error"
-    :loading="checkoutLoading"
-    @clear-error="clearError()"
+  <PaymentPage
+    :total="summary?.dueToday.formatted"
+    :total-note="totalNote"
   >
+    <template #alert>
+      <!-- A failed PayPal start is explained where its buttons would be. -->
+      <CheckoutErrorAlert
+        :error="unavailable ? undefined : error"
+        @dismiss="clearError()"
+      />
+    </template>
+
     <template #methods>
       <CheckoutMethodTiles current="paypal" />
     </template>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr] lg:gap-8 lg:items-start">
-      <!-- Main Content (Left Column) -->
-      <div class="flex flex-col gap-6 min-w-0">
-        <RuiCard>
-          <AcceptRefundPolicy
-            v-model="accepted"
-            :disabled="processing || initializing"
-            class="mb-4"
-          />
-
-          <!--
-            Holds the space of PayPal's stack while the SDK loads: the PayPal and the debit or credit card
-            buttons at 48 px each, then the "Powered by PayPal" line, 138 px in all. The buttons take the
-            placeholder's spot and nothing moves.
-          -->
-          <div class="relative min-h-[138px]">
-            <div
-              v-if="initializing"
-              class="absolute inset-0 flex flex-col items-center gap-4"
-              data-cy="paypal-button-loading"
-            >
-              <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
-              <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
-              <RuiSkeletonLoader class="w-36 h-3 mt-1" />
-            </div>
-            <div
-              id="paypal-button"
-              class="flex flex-col"
-              :class="[
-                { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
-              ]"
-            />
-          </div>
-        </RuiCard>
-      </div>
-
-      <!-- Sidebar (Right Column) -->
-      <aside class="w-full lg:sticky lg:top-8 lg:self-start lg:max-w-sm">
-        <OrderSummaryCard
-          v-model:discount-code="modelDiscountCode"
-          :selected-plan="selectedPlan"
-          :breakdown="breakdown"
-          :upgrade-sub-id="upgradeSubId"
-          :is-crypto="isCrypto"
-          :loading="planSwitchLoading"
-          :disabled="planSwitchLoading || paying"
-          @plan-change="handlePlanChange($event)"
-          @apply-discount="applyDiscount()"
-        />
-      </aside>
-    </div>
-
-    <!-- Action Buttons (Outside Grid) -->
-    <div class="flex gap-4 justify-center w-full mt-6 mx-auto max-w-110">
-      <RuiButton
-        :disabled="processing"
-        class="w-full"
-        size="lg"
-        @click="navigateBack()"
+    <section
+      aria-labelledby="paypal-title"
+      class="flex flex-col gap-3 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
+      data-cy="paypal-panel"
+    >
+      <h2
+        id="paypal-title"
+        class="text-lg md:text-xl font-semibold text-rui-text"
       >
-        <template #prepend>
-          <RuiIcon
-            name="lu-arrow-left"
-            size="16"
-          />
-        </template>
-        {{ t('actions.back') }}
-      </RuiButton>
-    </div>
-  </PaymentLayout>
+        {{ t('checkout_paypal.title') }}
+      </h2>
+      <p class="text-rui-text">
+        {{ t('checkout_paypal.approve', { amount: summary?.dueToday.formatted ?? '' }) }}
+      </p>
+      <p class="text-sm text-rui-text-secondary">
+        {{ renewalNote }}
+      </p>
+    </section>
+
+    <template #summary>
+      <OrderSummaryCard
+        v-model:discount-code="modelDiscountCode"
+        :selected-plan="selectedPlan"
+        :breakdown="breakdown"
+        :upgrade-sub-id="upgradeSubId"
+        :is-crypto="isCrypto"
+        :loading="planSwitchLoading"
+        :disabled="planSwitchLoading || paying"
+        @plan-change="handlePlanChange($event)"
+        @apply-discount="applyDiscount()"
+      />
+    </template>
+
+    <template #pay>
+      <PolicyConsent
+        v-model="accepted"
+        policy-href="/refund-policy"
+        :disabled="processing || initializing"
+      />
+      <!--
+        Holds the space of PayPal's stack while the SDK loads: the PayPal and the debit or credit card
+        buttons at 48 px each, then the "Powered by PayPal" line, 138 px in all. The buttons take the
+        placeholder's spot and nothing moves.
+      -->
+      <div class="relative min-h-[138px] mt-2">
+        <div
+          v-if="unavailable"
+          class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center rounded-rui-card border border-dashed border-rui-outline"
+          data-cy="paypal-unavailable"
+        >
+          <p class="text-sm text-rui-text-secondary">
+            {{ t('subscription.error.payment_init_failed') }}
+          </p>
+          <RuiButton
+            variant="outlined"
+            color="primary"
+            @click="reload()"
+          >
+            {{ t('checkout_paypal.reload') }}
+          </RuiButton>
+        </div>
+        <div
+          v-else-if="initializing"
+          class="absolute inset-0 flex flex-col items-center gap-4"
+          data-cy="paypal-button-loading"
+        >
+          <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
+          <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
+          <RuiSkeletonLoader class="w-36 h-3 mt-1" />
+        </div>
+        <div
+          id="paypal-button"
+          class="flex flex-col"
+          :class="[
+            { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
+          ]"
+        />
+      </div>
+      <p
+        v-if="!unavailable"
+        class="hidden lg:block text-sm text-center text-rui-text-secondary"
+      >
+        {{ t('checkout_paypal.window_hint') }}
+      </p>
+    </template>
+  </PaymentPage>
+
+  <CheckoutLoadingOverlay :loading="checkoutLoading" />
 
   <!-- Processing overlay -->
   <Teleport to="body">

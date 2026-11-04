@@ -12,7 +12,10 @@
     "./components/CheckoutStepper.vue": "./src/components/CheckoutStepper.vue",
     "./components/DiscountCodeField.vue": "./src/components/DiscountCodeField.vue",
     "./components/MethodTiles.vue": "./src/components/MethodTiles.vue",
+    "./components/OrderSummary.vue": "./src/components/OrderSummary.vue",
+    "./components/PaymentPage.vue": "./src/components/PaymentPage.vue",
     "./components/PlanLine.vue": "./src/components/PlanLine.vue",
+    "./components/PolicyConsent.vue": "./src/components/PolicyConsent.vue",
     "./components/PriceRows.vue": "./src/components/PriceRows.vue",
     "./composables/checkout-messages": {
       "types": "./src/composables/checkout-messages.ts",

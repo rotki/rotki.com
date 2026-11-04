@@ -2,7 +2,6 @@ import type { Client } from 'braintree-web/client';
 import type { ThreeDSecure, ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import type { PayEvent } from '~/types/common';
 import {
-  type PaymentInfo,
   THREE_D_SECURE_SESSION_KEY,
   type ThreeDSecureParams,
   ThreeDSecureParamsSchema,
@@ -15,10 +14,15 @@ import { useAccountRefresh } from '~/composables/use-app-events';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
-import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
+import { storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 import { PaymentError } from '~/types/codes';
-import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
+
+/**
+ * Why the payment stopped: the bank did not confirm it (nothing was charged), or the payment
+ * itself failed before or after the confirmation (init error, a decline from the backend).
+ */
+export type ThreeDSecureFailure = 'not-confirmed' | 'payment';
 
 interface UseThreeDSecureReturn {
   cleanup: () => void;
@@ -26,10 +30,11 @@ interface UseThreeDSecureReturn {
   initializeProcess: () => Promise<{ success: boolean; params?: ThreeDSecureParams }>;
   challengeVisible: Readonly<Ref<boolean>>;
   error: Readonly<Ref<string>>;
+  failure: Readonly<Ref<ThreeDSecureFailure | undefined>>;
   isProcessing: ComputedRef<boolean>;
   serverError: Readonly<Ref<boolean>>;
   state: Readonly<Ref<ThreeDSecureState>>;
-  paymentInfo: Readonly<Ref<PaymentInfo | undefined>>;
+  params: Readonly<Ref<ThreeDSecureParams | undefined>>;
 }
 
 /**
@@ -45,15 +50,16 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
   const state = shallowRef<ThreeDSecureState>('initializing');
   const error = shallowRef<string>('');
+  const failure = shallowRef<ThreeDSecureFailure>();
   const challengeVisible = shallowRef<boolean>(false);
   const serverError = shallowRef<boolean>(false);
   const btClient = shallowRef<Client>();
   const btThreeDSecure = shallowRef<ThreeDSecure>();
-  const paymentInfo = ref<PaymentInfo>();
+  const params = shallowRef<ThreeDSecureParams>();
 
   const isProcessing = computed<boolean>(() => {
     const currentState = get(state);
-    return currentState === 'initializing' || currentState === 'verifying' || currentState === 'challenge-active';
+    return currentState === 'initializing' || currentState === 'verifying' || currentState === 'challenge-active' || currentState === 'finishing';
   });
 
   /**
@@ -150,20 +156,20 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     };
 
     const iframeHandler = (event: any, next: any) => {
-      const iframe = event.element;
-      if (!iframe) {
+      const challengeFrame = event.element;
+      if (!challengeFrame) {
         logger.error('3D Secure iframe element missing');
         return;
       }
-      // Standard 3D Secure 2.0 challenge window (500x600), with a responsive width for mobile.
-      iframe.style.maxWidth = '100%';
-      iframe.style.minHeight = '400px';
-      iframe.style.border = 'none';
-      iframe.style.borderRadius = '8px';
+      // Braintree's wrapper around the bank's iframe: the standard 500x600 window, narrower on phones.
+      challengeFrame.style.maxWidth = 'min(100%, 500px)';
+      challengeFrame.style.minHeight = '400px';
+      challengeFrame.style.border = 'none';
+      challengeFrame.style.borderRadius = '8px';
       const container = typeof document === 'undefined' ? null : document.getElementById('threeds-iframe-container');
       if (container) {
         container.innerHTML = '';
-        container.appendChild(iframe);
+        container.appendChild(challengeFrame);
         set(challengeVisible, true);
         set(state, 'challenge-active');
         logger.info('3D Secure challenge active');
@@ -232,6 +238,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     catch (verifyError: unknown) {
       set(challengeVisible, false);
       set(state, 'error');
+      set(failure, 'not-confirmed');
       const parsed = parseBraintreeError(verifyError);
 
       set(error, userMessageFor(parsed));
@@ -263,6 +270,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     await initialize(params);
 
     const payEvent = await verify(params);
+    set(state, 'finishing');
 
     const paymentPayload = {
       planId: payEvent.planId,
@@ -306,7 +314,14 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
 
     // Request account refresh and prepare for success navigation
     requestRefresh();
-    sessionStorage.setItem(PAYMENT_COMPLETED_KEY, 'true');
+    storePaymentReceipt({
+      method: 'card',
+      planName: params.planName,
+      durationInMonths: params.durationInMonths,
+      paid: params.finalAmount,
+      renewingPrice: params.renewingPrice,
+      upgrade: !!params.upgradeSubId,
+    });
     clearStoredData();
   }
 
@@ -318,28 +333,25 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     const storedParams = getStoredParams();
 
     if (!storedParams) {
+      set(state, 'error');
       return { success: false };
     }
 
-    logger.info('storedParams', storedParams);
-    set(paymentInfo, {
-      durationInMonths: storedParams.durationInMonths.toString(),
-      amount: storedParams.amount,
-      finalAmount: storedParams.finalAmount,
-      renewingPrice: storedParams.renewingPrice,
-    });
+    set(params, storedParams);
 
     try {
       // Complete the entire 3D Secure and payment flow
       await verifyAndFinalizePayment(storedParams);
       return { success: true, params: storedParams };
     }
-    catch (initError: any) {
-      // Error is handled by the composable state
-      const errorMessage = `3D Secure process failed:\n${nonEmpty(initError.message) ?? initError.toString()}`;
-      console.error(errorMessage);
+    catch (processError: unknown) {
+      logger.error('3D Secure process failed:', processError);
       set(state, 'error');
-      set(error, errorMessage);
+      if (!get(failure))
+        set(failure, 'payment');
+      // Init and verify failures already set their message; a failed charge has not yet.
+      if (!get(error))
+        set(error, userMessageFor(parseBraintreeError(processError)));
       return { success: false, params: storedParams };
     }
   }
@@ -359,11 +371,12 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     cleanup,
     clearStoredData,
     initializeProcess,
-    challengeVisible: readonly(challengeVisible),
-    error: readonly(error),
+    challengeVisible: shallowReadonly(challengeVisible),
+    error: shallowReadonly(error),
+    failure: shallowReadonly(failure),
     isProcessing,
-    serverError: readonly(serverError),
-    state: readonly(state),
-    paymentInfo: readonly(paymentInfo),
+    params: shallowReadonly(params),
+    serverError: shallowReadonly(serverError),
+    state: shallowReadonly(state),
   };
 }

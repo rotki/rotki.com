@@ -49,10 +49,14 @@ async function tick(page: Page, name: RegExp, text: string): Promise<void> {
   }).toPass({ timeout: 15_000 });
 }
 
-/** Accepts the refund policy and continues to the crypto payment page. */
+/**
+ * Accepts the refund policy and continues to the crypto payment page. The consent is a real
+ * checkbox whose label also holds the policy link, so it is checked directly: clicking the
+ * label text could open the policy instead.
+ */
 export async function acceptPolicyAndContinue(page: Page): Promise<void> {
-  await tick(page, /Refunds\/Cancellation Policy/, 'I have read and agreed to the');
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('checkbox', { name: /refund and cancellation policy/ }).check();
+  await page.getByRole('button', { name: 'Show payment details' }).click();
   await expect(page).toHaveURL(/\/checkout\/pay\/crypto\?/);
 }
 
@@ -71,7 +75,7 @@ export async function payWithWallet(page: Page): Promise<void> {
 
 /** Asks the wallet to move to the chain the payment expects. */
 export async function switchNetwork(page: Page): Promise<void> {
-  await page.getByRole('button', { name: 'Switch Network' }).click();
+  await page.getByRole('button', { name: 'Switch network' }).click();
 }
 
 /**
@@ -83,7 +87,7 @@ export async function switchNetwork(page: Page): Promise<void> {
  */
 export async function changePlan(page: Page, options: { period: BillingPeriod; tier: string; confirm?: boolean }): Promise<void> {
   const { confirm = true, period, tier } = options;
-  await page.getByRole('button', { name: 'Change', exact: true }).click();
+  await page.locator('[data-cy="change-plan"]').click();
   await expect(page.getByText('Change Plan')).toBeVisible();
 
   if (confirm)
@@ -101,9 +105,9 @@ export async function changePlan(page: Page, options: { period: BillingPeriod; t
  * back to the subscription page, and a failed cancellation stays put, so the caller asserts that.
  */
 export async function confirmPaymentChange(page: Page): Promise<void> {
-  await page.getByRole('button', { name: 'Change Payment' }).click();
+  await page.locator('[data-cy="change-crypto-asset"]').click();
   await tick(page, /Allow me to change the payment method/, 'Allow me to change the payment method');
-  await page.getByRole('button', { name: 'Change Payment' }).last().click();
+  await page.getByRole('button', { name: 'Change Payment' }).click();
 }
 
 /** Cancels the pending payment through the change-payment dialog and returns to the request page. */
@@ -115,5 +119,6 @@ export async function changePaymentMethod(page: Page): Promise<void> {
 /** Waits for the pending success page the checkout shows once a transaction is on its way. */
 export async function expectPendingSuccess(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/checkout\/success\?crypto=1/, { timeout: 15_000 });
-  await expect(page.getByText('Transaction Pending')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Your payment is on its way' })).toBeVisible();
+  await expect(page.locator('[data-cy="receipt-method"]')).toHaveText('Crypto');
 }

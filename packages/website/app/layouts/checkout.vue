@@ -31,13 +31,15 @@ const { subscriptionId, upgradeSubId } = useSubscriptionIdParam();
 
 const step = computed<CheckoutStepId>(() => (route.name === 'checkout-success' ? 'confirmation' : 'payment'));
 
-/**
- * The plan step with the buyer's params, on pages that offer it. An upgrade starts from the
- * subscription page and a renewal from its e-mail, so neither gets one.
- */
-function plansHref(): string | undefined {
-  if (get(upgradeSubId) || get(subscriptionId) || typeof route.name !== 'string' || !PAGES_WITH_BACK_LINK.has(route.name))
+/** An upgrade starts from the subscription page and a renewal from its e-mail, so both lead back to the subscription. */
+const fromSubscription = computed<boolean>(() => !!get(upgradeSubId) || !!get(subscriptionId));
+
+/** The way back on pages that offer one: the subscription, or the plan step with the buyer's params. */
+function backHrefFor(): string | undefined {
+  if (typeof route.name !== 'string' || !PAGES_WITH_BACK_LINK.has(route.name))
     return undefined;
+  if (get(fromSubscription))
+    return router.resolve({ name: 'home-subscription' }).href;
 
   return router.resolve({
     name: 'checkout-pay',
@@ -49,13 +51,14 @@ function plansHref(): string | undefined {
   }).href;
 }
 
-const backHref = computed<string | undefined>(() => plansHref());
+const backHref = computed<string | undefined>(() => backHrefFor());
 </script>
 
 <template>
   <CheckoutShell
     :step="step"
     :back-href="backHref"
+    :back-to="fromSubscription ? 'subscription' : 'plans'"
     home-href="/"
     logo-src="/img/logo-small.svg"
   >

@@ -38,8 +38,15 @@ describe('planLine', () => {
   it('describes a one-time crypto payment without a start date', () => {
     const wrapper = mountLine({ oneTime: true, startsAt: new Date(2026, 10, 3) });
 
-    expect(wrapper.text()).toContain('1 month, paid once');
+    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Basic, 1 month');
+    expect(wrapper.text()).toContain('Paid once, no renewal');
     expect(wrapper.text()).not.toContain('Starts');
+  });
+
+  it('names a yearly one-time payment by its twelve months', () => {
+    const wrapper = mountLine({ oneTime: true, plan: { name: 'advanced', durationInMonths: 12 } });
+
+    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Advanced, 12 months');
   });
 
   it('marks an upgrade', () => {

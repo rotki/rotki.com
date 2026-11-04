@@ -70,7 +70,7 @@ watch(open, (isOpen) => {
 <template>
   <BaseDialog
     v-model:open="open"
-    title="Add New Card"
+    title="Add a new card"
   >
     <NewCardForm
       v-if="client"
@@ -118,7 +118,7 @@ watch(open, (isOpen) => {
         :loading="isAddingCard"
         @click="handleAddCard()"
       >
-        {{ isAddingCard ? 'Adding...' : 'Add Card' }}
+        {{ isAddingCard ? 'Adding...' : 'Add card' }}
       </BaseButton>
     </template>
   </BaseDialog>

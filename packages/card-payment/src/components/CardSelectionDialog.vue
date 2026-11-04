@@ -32,7 +32,7 @@ function handleAddNewCard(): void {
 <template>
   <BaseDialog
     v-model:open="open"
-    title="Select a Card"
+    title="Select a card"
   >
     <div class="space-y-3">
       <SavedCardListItem

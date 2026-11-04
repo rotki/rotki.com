@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CheckoutStepId } from '../utils/checkout-flow';
+import { computed } from 'vue';
 import { useCheckoutMessages } from '../composables/checkout-messages';
 import CheckoutStepper from './CheckoutStepper.vue';
 
@@ -8,13 +9,16 @@ const {
   logoSrc,
   homeHref,
   backHref,
+  backTo = 'plans',
   siteUrl = '',
 } = defineProps<{
   step: CheckoutStepId;
   logoSrc: string;
   homeHref: string;
-  /** "Back to plans" in the header; left out where going back makes no sense (3D Secure, success). */
+  /** The way back in the header; left out where going back makes no sense (3D Secure, success). */
   backHref?: string;
+  /** Where the way back leads, which names the link: the plans, or the subscription an upgrade started from. */
+  backTo?: 'plans' | 'subscription';
   /** Prefix for the legal links in the footer. The card app is served apart from the site, so it passes the site's origin. */
   siteUrl?: string;
 }>();
@@ -26,6 +30,8 @@ defineSlots<{
 const t = useCheckoutMessages();
 
 const year = new Date().getFullYear();
+
+const backLabel = computed<string>(() => (backTo === 'subscription' ? t('checkout.shell.back_to_subscription') : t('checkout.shell.back_to_plans')));
 </script>
 
 <template>
@@ -73,7 +79,7 @@ const year = new Date().getFullYear();
           class="hidden md:block justify-self-end text-sm text-rui-primary underline-offset-2 hover:underline"
           data-cy="checkout-back-to-plans"
         >
-          {{ t('checkout.shell.back_to_plans') }}
+          {{ backLabel }}
         </a>
       </div>
     </header>
@@ -85,7 +91,7 @@ const year = new Date().getFullYear();
         :href="backHref"
         class="md:hidden self-center mt-6 p-3 text-sm text-rui-primary underline underline-offset-2"
       >
-        {{ t('checkout.shell.back_to_plans') }}
+        {{ backLabel }}
       </a>
     </main>
 

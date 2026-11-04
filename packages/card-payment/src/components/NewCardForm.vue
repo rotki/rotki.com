@@ -41,8 +41,8 @@ const fieldStates = reactive(new Map<string, FieldState>([
 ]));
 
 const cardFields: CardField[] = [
-  { key: 'number', id: 'card-number', label: 'Card Number' },
-  { key: 'expirationDate', id: 'expiration', label: 'Expiry Date' },
+  { key: 'number', id: 'card-number', label: 'Card number' },
+  { key: 'expirationDate', id: 'expiration', label: 'Expiry date' },
   { key: 'cvv', id: 'cvv', label: 'CVV' },
 ];
 

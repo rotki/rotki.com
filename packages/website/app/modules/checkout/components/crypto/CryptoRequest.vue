@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { get, isDefined, set } from '@vueuse/shared';
-import AcceptRefundPolicy from '~/modules/checkout/components/common/AcceptRefundPolicy.vue';
+import { buildOrderSummary } from '@rotki/card-payment-common/utils/order-summary';
+import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
+import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
+import { get, set } from '@vueuse/shared';
+import CheckoutErrorAlert from '~/modules/checkout/components/common/CheckoutErrorAlert.vue';
+import CheckoutLoadingOverlay from '~/modules/checkout/components/common/CheckoutLoadingOverlay.vue';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
-import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
 import CryptoAssetSelector from '~/modules/checkout/components/crypto/CryptoAssetSelector.vue';
-import CryptoPaymentInfo from '~/modules/checkout/components/crypto/CryptoPaymentInfo.vue';
 import CheckoutMethodTiles from '~/modules/checkout/components/method/CheckoutMethodTiles.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { buildQueryParams } from '~/utils/query';
@@ -19,7 +21,6 @@ const {
   planId,
   subscriptionId,
   upgradeSubId,
-  referralCode,
   appliedDiscountCode,
   fetchBreakdown,
   breakdownLoading,
@@ -44,23 +45,12 @@ onMounted(async () => {
 
 const valid = computed<boolean>(() => get(isRefundPolicyAccepted) && !!get(selectedCurrency));
 
-/** An upgrade or a renewal started from the subscription; a new purchase goes back to the plans. */
-async function back(): Promise<void> {
-  if (isDefined(upgradeSubId) || isDefined(subscriptionId)) {
-    await navigateTo({ name: 'home-subscription' });
-    return;
-  }
+const total = computed<string | undefined>(() => {
+  const plan = get(selectedPlan);
+  return plan ? buildOrderSummary({ plan, breakdown: get(breakdown), upgrade: !!get(upgradeSubId) }).dueToday.formatted : undefined;
+});
 
-  const query = buildQueryParams({
-    planId: get(planId),
-    ref: get(referralCode),
-  });
-
-  await navigateTo({
-    name: 'checkout-pay',
-    query,
-  });
-}
+const panelClass = 'flex flex-col gap-4 p-4 md:p-6 rounded-rui-card';
 
 function submit(): void {
   set(processing, true);
@@ -81,76 +71,82 @@ function submit(): void {
 </script>
 
 <template>
-  <PaymentLayout
-    :error="error"
-    :loading="loading"
-    @clear-error="clearError()"
+  <PaymentPage
+    :total="total"
+    :total-note="t('checkout_crypto.paid_in_crypto')"
   >
+    <template #alert>
+      <CheckoutErrorAlert
+        :error="error"
+        @dismiss="clearError()"
+      />
+    </template>
+
     <template #methods>
       <CheckoutMethodTiles current="crypto" />
     </template>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr] lg:gap-8 lg:items-start">
-      <!-- Main Content (Left Column) -->
-      <div class="flex flex-col gap-6 min-w-0">
-        <CryptoPaymentInfo class="mb-2" />
-
-        <RuiCard>
-          <div class="text-lg font-medium mb-6">
-            {{ t('home.plans.tiers.step_3.select_payment') }}
-          </div>
-          <CryptoAssetSelector v-model="selectedCurrency" />
-        </RuiCard>
-
-        <AcceptRefundPolicy
-          v-model="isRefundPolicyAccepted"
-          :disabled="processing || loading"
-        />
-      </div>
-
-      <!-- Sidebar (Right Column) -->
-      <aside class="w-full lg:sticky lg:top-8 lg:self-start lg:max-w-sm">
-        <OrderSummaryCard
-          v-model:discount-code="modelDiscountCode"
-          :selected-plan="selectedPlan"
-          :breakdown="breakdown"
-          :upgrade-sub-id="upgradeSubId"
-          :is-crypto="isCrypto"
-          :loading="loading"
-          :disabled="planSwitchLoading"
-          @plan-change="switchPlan($event)"
-          @apply-discount="applyDiscount()"
-        />
-      </aside>
-    </div>
-
-    <!-- Action Buttons (Outside Grid) -->
-    <div class="flex gap-4 justify-center w-full mt-6 max-w-110 mx-auto">
-      <RuiButton
-        v-if="!subscriptionId"
-        :disabled="processing || loading"
-        class="w-full"
-        size="lg"
-        @click="back()"
+    <section
+      aria-labelledby="crypto-asset-title"
+      class="bg-rui-surface border border-rui-divider"
+      :class="[panelClass]"
+      data-cy="crypto-panel"
+    >
+      <h2
+        id="crypto-asset-title"
+        class="text-lg md:text-xl font-semibold text-rui-text"
       >
-        <template #prepend>
-          <RuiIcon
-            name="lu-arrow-left"
-            size="16"
-          />
-        </template>
-        {{ t('actions.back') }}
-      </RuiButton>
+        {{ t('checkout_crypto.choose_title') }}
+      </h2>
+      <CryptoAssetSelector v-model="selectedCurrency" />
+      <p class="text-sm text-rui-text-secondary">
+        {{ t('checkout_crypto.hold_price') }}
+      </p>
+      <PolicyConsent
+        v-model="isRefundPolicyAccepted"
+        policy-href="/refund-policy"
+        :disabled="processing || loading"
+      />
       <RuiButton
         :disabled="!valid || loading"
         :loading="processing"
-        class="w-full"
+        class="w-full sm:w-auto sm:self-start"
         color="primary"
         size="lg"
+        data-cy="show-payment-details"
         @click="submit()"
       >
-        {{ t('actions.continue') }}
+        {{ t('checkout_crypto.show_details') }}
       </RuiButton>
-    </div>
-  </PaymentLayout>
+    </section>
+
+    <section
+      class="gap-1! border border-dashed border-rui-outline"
+      :class="[panelClass]"
+      data-cy="crypto-send-placeholder"
+    >
+      <h2 class="text-lg md:text-xl font-semibold text-rui-text-secondary">
+        {{ t('checkout_crypto.send_step') }}
+      </h2>
+      <p class="text-sm text-rui-text-secondary">
+        {{ t('checkout_crypto.send_placeholder') }}
+      </p>
+    </section>
+
+    <template #summary>
+      <OrderSummaryCard
+        v-model:discount-code="modelDiscountCode"
+        :selected-plan="selectedPlan"
+        :breakdown="breakdown"
+        :upgrade-sub-id="upgradeSubId"
+        :is-crypto="isCrypto"
+        :loading="loading"
+        :disabled="planSwitchLoading"
+        @plan-change="switchPlan($event)"
+        @apply-discount="applyDiscount()"
+      />
+    </template>
+  </PaymentPage>
+
+  <CheckoutLoadingOverlay :loading="loading" />
 </template>

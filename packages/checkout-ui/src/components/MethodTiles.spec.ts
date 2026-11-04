@@ -13,9 +13,10 @@ const allMethods: Props['links'] = {
   paypal: { href: '/checkout/pay/paypal?planId=1' },
 };
 
-/** A tile's title and the line under it. */
+/** The tile's title, its short renewal line for phones, and the full one for wider screens. */
 function lines(tile: Pick<DOMWrapper<Element>, 'findAll'>): string[] {
-  return tile.findAll(':scope > span').map(line => line.text());
+  const [title, renewal] = tile.findAll(':scope > span');
+  return [title?.text() ?? '', renewal?.get('.sm\\:hidden').text() ?? '', renewal?.get('.sm\\:inline').text() ?? ''];
 }
 
 function mountTiles(props: Partial<Props> = {}): VueWrapper {
@@ -39,9 +40,9 @@ describe('methodTiles', () => {
       '/checkout/pay/request-crypto?planId=1',
     ]);
     expect(links.map(lines)).toEqual([
-      ['Card', 'Renews automatically'],
-      ['PayPal', 'Renews through PayPal'],
-      ['Crypto', 'One payment, no renewal'],
+      ['Card', 'Auto-renews', 'Renews automatically'],
+      ['PayPal', 'Auto-renews', 'Renews through PayPal'],
+      ['Crypto', 'No renewal', 'One payment, no renewal'],
     ]);
   });
 
@@ -66,7 +67,7 @@ describe('methodTiles', () => {
     const card = wrapper.get('[data-cy="method-card"]');
     expect(card.element.tagName).toBe('DIV');
     expect(card.attributes('aria-disabled')).toBe('true');
-    expect(lines(card)).toEqual(['Card', 'Not available right now']);
+    expect(lines(card)).toEqual(['Card', 'Unavailable', 'Not available right now']);
     expect(wrapper.findAll('a')).toHaveLength(2);
   });
 

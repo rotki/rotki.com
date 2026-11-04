@@ -83,74 +83,65 @@ watch(tokenItems, (tokens) => {
 </script>
 
 <template>
-  <RuiCard class="mt-6 bg-rui-grey-50 h-auto">
-    <div class="text-rui-text-secondary text-caption font-medium mb-4 flex items-center gap-2">
-      <RuiIcon
-        name="lu-link"
-        size="14"
-      />
-      {{ t('home.plans.tiers.step_3.labels.select_network_and_token') }}
-    </div>
-    <div class="flex flex-col gap-4">
-      <RuiAutoComplete
-        v-model="selectedChain"
-        color="primary"
-        :options="blockchainItems"
-        :disabled="paymentAssetsLoading"
-        :loading="paymentAssetsLoading"
-        auto-select-first
-        key-attr="id"
-        hide-details
-        text-attr="label"
-        :label="t('home.plans.tiers.step_3.labels.network')"
-      >
-        <template #item="{ item }">
-          <div class="flex items-center gap-3">
-            <CryptoChainIcon :chain="item.id" />
-            {{ item.label }}
-          </div>
-        </template>
-        <template #selection="{ item }">
-          <div class="flex items-center gap-3">
-            <CryptoChainIcon :chain="item.id" />
-            {{ item.label }}
-          </div>
-        </template>
-      </RuiAutoComplete>
+  <div class="flex flex-col gap-4">
+    <RuiAutoComplete
+      v-model="selectedChain"
+      color="primary"
+      :options="blockchainItems"
+      :disabled="paymentAssetsLoading"
+      :loading="paymentAssetsLoading"
+      auto-select-first
+      key-attr="id"
+      hide-details
+      text-attr="label"
+      :label="t('home.plans.tiers.step_3.labels.network')"
+    >
+      <template #item="{ item }">
+        <div class="flex items-center gap-3">
+          <CryptoChainIcon :chain="item.id" />
+          {{ item.label }}
+        </div>
+      </template>
+      <template #selection="{ item }">
+        <div class="flex items-center gap-3">
+          <CryptoChainIcon :chain="item.id" />
+          {{ item.label }}
+        </div>
+      </template>
+    </RuiAutoComplete>
 
-      <RuiAutoComplete
-        v-model="selectedToken"
-        color="primary"
-        :options="tokenItems"
-        :disabled="paymentAssetsLoading || !selectedChain"
-        :loading="paymentAssetsLoading"
-        auto-select-first
-        key-attr="id"
-        hide-details
-        text-attr="label"
-        :hint="hint"
-        return-object
-        :label="t('home.plans.tiers.step_3.labels.token')"
-      >
-        <template #item="{ item }">
-          <div class="flex items-center gap-3">
-            <CryptoAssetIcon
-              :name="item.label"
-              :icon-url="item.iconUrl"
-            />
-            {{ item.label }}
-          </div>
-        </template>
-        <template #selection="{ item }">
-          <div class="flex items-center gap-3">
-            <CryptoAssetIcon
-              :name="item.label"
-              :icon-url="item.iconUrl"
-            />
-            {{ item.label }}
-          </div>
-        </template>
-      </RuiAutoComplete>
-    </div>
-  </RuiCard>
+    <RuiAutoComplete
+      v-model="selectedToken"
+      color="primary"
+      :options="tokenItems"
+      :disabled="paymentAssetsLoading || !selectedChain"
+      :loading="paymentAssetsLoading"
+      auto-select-first
+      key-attr="id"
+      hide-details
+      text-attr="label"
+      :hint="hint"
+      return-object
+      :label="t('home.plans.tiers.step_3.labels.token')"
+    >
+      <template #item="{ item }">
+        <div class="flex items-center gap-3">
+          <CryptoAssetIcon
+            :name="item.label"
+            :icon-url="item.iconUrl"
+          />
+          {{ item.label }}
+        </div>
+      </template>
+      <template #selection="{ item }">
+        <div class="flex items-center gap-3">
+          <CryptoAssetIcon
+            :name="item.label"
+            :icon-url="item.iconUrl"
+          />
+          {{ item.label }}
+        </div>
+      </template>
+    </RuiAutoComplete>
+  </div>
 </template>

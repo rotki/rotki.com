@@ -1,4 +1,35 @@
 {
+  "checkout_crypto": {
+    "send_title": "Send the payment",
+    "hold_price": "Have a funded wallet ready. We hold the price for 3 hours once you show the payment details.",
+    "show_details": "Show payment details",
+    "choose_title": "1. Choose network and token",
+    "send_step": "2. Send the payment",
+    "send_placeholder": "The amount, address and QR code appear here after you show the payment details.",
+    "paid_in_crypto": "paid in crypto",
+    "network_title": "1. Network and token",
+    "asset_on_network": "{token} on {network}",
+    "amount_on_network": "{amount} on {network}",
+    "waiting": "Waiting for your payment",
+    "exact_amount": "Send exactly {amount}, on {network} only.",
+    "exact_amount_detail": "A different amount, network or token can't be matched to your order.",
+    "wallet_hint": "Fills in the amount and network for you",
+    "manual_title": "Or send it yourself from any wallet",
+    "manual_only_title": "Send it from any wallet",
+    "to_address": "To address on {network}",
+    "show_qr": "Show QR code",
+    "hide_qr": "Hide QR code",
+    "already_sent": "Already sent it from another wallet? There is nothing else to do. We e-mail you once it is confirmed, usually within 7 minutes.",
+    "switch_hint": "Your wallet is on another network. Switch it to {network} to pay."
+  },
+  "checkout_paypal": {
+    "approve": "The PayPal button opens a PayPal window where you log in and approve {amount}. This page updates by itself when you are done.",
+    "renewal_month": "PayPal then charges {amount} each month. Cancel any time from your rotki account; the billing agreement also shows in your PayPal account.",
+    "renewal_year": "PayPal then charges {amount} each year. Cancel any time from your rotki account; the billing agreement also shows in your PayPal account.",
+    "title": "Pay with PayPal",
+    "window_hint": "Opens a PayPal window. Keep this tab open.",
+    "reload": "Reload the page"
+  },
   "account": {
     "account_deleted": {
       "message": "Your rotki premium account has been successfully deleted.",
@@ -356,7 +387,8 @@
     "refresh": "Refresh",
     "close": "Close",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "try_again": "Try again"
   },
   "auth": {
     "activation": {
@@ -770,7 +802,6 @@
             "title": "Change Payment",
             "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent."
           },
-          "chose": "Your choice:",
           "discount": {
             "you_save": "You save {amount}",
             "percent_off": "({percentage} off)"
@@ -779,15 +810,8 @@
             "network": "Network",
             "to_address": "Send to address",
             "token": "Token",
-            "token_contract": "Token contract: ",
-            "select_network_and_token": "Select network and token to pay"
+            "token_contract": "Token contract: "
           },
-          "notes": {
-            "line_1": "Please submit a payment request. Once that is done an email will be sent to your account with a payment request of the equivalent € amount of that cryptocurrency",
-            "line_2": "Once the whole amount is sent and processed by our system, then a receipt will be sent to your email and your subscription will be activated.",
-            "line_3": "Finally, when the end of the subscription period approaches an email with a prompt to generate another payment request will be sent."
-          },
-          "payment_description": "Payments are safely processed with Braintree a PayPal Service",
           "saved_card": {
             "delete": {
               "description": "Are you sure you want to remove this card?",
@@ -797,11 +821,6 @@
           },
           "subtitle": "Complete your payment by sending the exact amount.",
           "title": "Payment Details",
-          "how_crypto_works": "How crypto payments work",
-          "select_payment": "Select network and token to pay",
-          "order_summary": "Order Summary",
-          "upgrade_plan_description": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period. You'll only pay the difference for the time left in your current billing cycle.",
-          "upgrade_to_plan": "Upgrade to plan:",
           "qr": {
             "click_to_copy": "Click to copy"
           },
@@ -812,7 +831,7 @@
             "paid_notice_1": "If you already have made a transaction you don't need to do anything more.",
             "paid_notice_2": "You will be notified about your subscription via e-mail as soon as your transaction is confirmed.",
             "pay_with_wallet": "Pay with wallet",
-            "switch_network": "Switch Network"
+            "switch_network": "Switch network"
           }
         }
       }
@@ -1159,14 +1178,6 @@
   },
   "logo": {
     "alt": "rotki logo"
-  },
-  "policies": {
-    "refund": {
-      "accept_policy": {
-        "action": "Refunds/Cancellation Policy",
-        "text": "I have read and agreed to the {action}"
-      }
-    }
   },
   "pricing": {
     "billed_annually": "{price} billed yearly",
@@ -1517,12 +1528,12 @@
       "insufficient_gas": "Your balance may not be enough to cover the network fee (gas). The transaction could fail."
     },
     "crypto_success": {
-      "message": "Once minted, please wait up to 7 minutes for our system to process your payment. You will receive an e-mail confirming the activation of your subscription.",
-      "title": "Transaction Pending"
+      "message": "We e-mail you once the transaction is confirmed and your subscription is active, usually within 7 minutes.",
+      "title": "Your payment is on its way"
     },
     "error": {
-      "init_error": "Initialization Error",
-      "payment_failure": "Payment Failure",
+      "init_error": "PayPal is not available",
+      "payment_failure": "Payment failed",
       "cancel_failed": "Cancellation Failed",
       "payment": {
         "network_failure": "We couldn't reach the payment provider. Check your connection and try again.",
@@ -1538,53 +1549,78 @@
       "server_error_warning": "Something went wrong while processing your payment. Your subscription may have been activated. Please check your subscription status before trying again to avoid duplicate charges.",
       "check_subscription": "Check Subscription Status",
       "server_error_title": "Unexpected Server Error",
-      "server_error_description": "Something went wrong while processing your payment. Your subscription may have already been activated. Please check your subscription status before attempting another payment to avoid duplicate charges."
+      "server_error_description": "Something went wrong while processing your payment. Your subscription may have already been activated. Please check your subscription status before attempting another payment to avoid duplicate charges.",
+      "payment_init_failed": "PayPal didn't load. Reload the page, or choose another payment method.",
+      "no_plan_selected": "No plan is selected. Go back to the plans and choose one."
     },
     "payment": {
       "failure": {
-        "title": "Payment Failed",
+        "title": "Payment failed",
         "message": "We were unable to process your payment. Please try again or select a different payment method."
       }
     },
     "progress": {
       "payment_progress": "Payment in progress",
-      "payment_progress_message": "Please confirm your transaction..."
+      "payment_progress_message": "Confirm the transaction in your wallet."
     },
     "success": {
-      "message": "Your payment was processed successfully. Visit the account management page to manage your account.",
-      "title": "Payment Success"
+      "title": "You're on {plan}",
+      "title_generic": "Your payment went through",
+      "paid": "Your payment of {amount} went through.",
+      "account": "Go to your account",
+      "next": {
+        "title": "Next: turn on Premium in the rotki app",
+        "credentials": "Create API credentials in your account.",
+        "app": "In the rotki app, open the Premium settings and paste the key and secret.",
+        "crypto_note": "You can do this once Premium is active.",
+        "create": "Create API credentials",
+        "guide": "Read the setup guide"
+      },
+      "summary": {
+        "title": "Your subscription",
+        "plan": "Plan",
+        "paid_today": "Paid today",
+        "next_payment": "Next payment",
+        "next_payment_value": "{amount} on {date}",
+        "paid_with": "Paid with",
+        "method": {
+          "card": "Card",
+          "paypal": "PayPal",
+          "crypto": "Crypto"
+        }
+      }
     },
     "3d_secure": {
-      "page_title": "3D Secure Verification",
-      "page_description": "Secure payment verification in progress. Please complete the authentication challenge if prompted.",
-      "error_title": "Verification Failed",
-      "error_help": "If the problem persists, please try a different payment method or contact support.",
-      "invalid_params_title": "Invalid Verification Request",
-      "invalid_params_message": "The 3D Secure verification cannot be completed because the required parameters are missing or invalid.",
-      "possible_causes": "Possible causes",
-      "cause_direct_access": "Accessing this page directly instead of through the payment flow",
-      "cause_expired_session": "The verification session has expired",
-      "cause_browser_refresh": "Refreshing or navigating back from this page",
-      "back_to_payment_selection": "Back to Payment Selection",
-      "payment_complete_notice": "Your subscription is now active. Check out our ",
-      "setup_guide": "setup guide",
-      "get_started_text": " to get started with rotki premium.",
-      "initializing": "Initializing secure payment verification...",
-      "ready": "Ready for verification",
-      "verifying": "Preparing your bank's verification interface...",
-      "challenge_active": "Complete the verification challenge",
-      "success": "Verification successful",
-      "error": "Verification failed",
-      "challenge_instructions": "Please complete the security challenge below",
-      "security_notice": "This page uses bank-grade security to protect your payment information",
-      "payment_info": {
-        "title": "Payment Summary",
-        "charge_today": "Charge today",
-        "recurring_charge": "Recurring charge",
-        "per_month": "/mo",
-        "per_year": "/yr",
-        "approval_notice": "By completing this verification, you agree to an immediate charge of {immediateAmount} and recurring payments of {renewingPrice} {period} until you cancel your subscription."
-      }
+      "title": "Confirm with your bank",
+      "description": "Your bank wants to confirm this payment. Complete the step below; it usually takes less than a minute.",
+      "connecting": "Connecting to your bank…",
+      "finishing": "Finishing your payment. Keep this page open for a few seconds.",
+      "cancel": "Problems? {link}",
+      "cancel_link": "Cancel and go back to the payment page",
+      "summary": {
+        "title": "You are paying",
+        "renews_monthly": "Then {amount} per month until you cancel.",
+        "renews_yearly": "Then {amount} per year until you cancel.",
+        "renews_monthly_from": "Then {amount} per month from {date} until you cancel.",
+        "renews_yearly_from": "Then {amount} per year from {date} until you cancel.",
+        "note": "Renewals are usually charged without this step. After you confirm, keep this page open for a few seconds while we finish the payment."
+      },
+      "not_confirmed": {
+        "title": "Your bank didn't confirm the payment",
+        "message": "This happens when the code was wrong, the time ran out, or the check was cancelled."
+      },
+      "failed": {
+        "title": "Your payment didn't go through"
+      },
+      "try_again": "Try again",
+      "help": "Still stuck? Your bank can tell you why it declined. You can also write to {email} and include your rotki.com username.",
+      "expired": {
+        "title": "This bank confirmation has ended",
+        "message": "There is no payment waiting for your bank's confirmation. This happens after a page reload, or when the page is opened directly.",
+        "action": "Back to the plans"
+      },
+      "nothing_charged": "Nothing was charged, so you can safely try again with the same card or a different one.",
+      "outcome_unknown": "We could not confirm whether the payment went through. Check your subscription before you try again."
     }
   },
   "oauth": {

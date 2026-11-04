@@ -31,9 +31,11 @@ watch(() => error, (newError, oldError) => {
 <template>
   <div class="flex flex-col gap-4 justify-center w-full grow pt-8">
     <!-- Loading state -->
+    <!-- As tall as the screen: the payment page that follows is taller, so the footer stays below the fold. -->
     <div
       v-if="loading"
-      class="flex flex-col items-center justify-center min-h-40"
+      class="flex flex-col items-center justify-center min-h-svh"
+      data-cy="crypto-payment-loading"
     >
       <RuiProgress
         variant="indeterminate"
@@ -57,8 +59,12 @@ watch(() => error, (newError, oldError) => {
         <h3 class="text-xl font-semibold text-rui-text mb-2">
           {{ t('subscription.payment.failure.title') }}
         </h3>
-        <p class="text-center text-rui-text-secondary max-w-md">
-          {{ t('subscription.payment.failure.message') }}
+        <p
+          role="alert"
+          class="text-center text-rui-text-secondary max-w-md"
+          data-cy="crypto-payment-error"
+        >
+          {{ error || t('subscription.payment.failure.message') }}
         </p>
       </div>
 
