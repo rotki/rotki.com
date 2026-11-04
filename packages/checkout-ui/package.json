@@ -12,6 +12,7 @@
     "./components/CheckoutStepper.vue": "./src/components/CheckoutStepper.vue",
     "./components/DiscountCodeField.vue": "./src/components/DiscountCodeField.vue",
     "./components/MethodTiles.vue": "./src/components/MethodTiles.vue",
+    "./components/PlanLine.vue": "./src/components/PlanLine.vue",
     "./components/PriceRows.vue": "./src/components/PriceRows.vue",
     "./composables/checkout-messages": {
       "types": "./src/composables/checkout-messages.ts",

@@ -16,6 +16,9 @@ import { assert } from '~/utils/assert';
 import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
+/** Height of the PayPal button in px, the same as the checkout's large buttons; the page reserves this space while it loads. */
+export const PAYPAL_BUTTON_HEIGHT = 48;
+
 export interface PaypalPaymentParams {
   planId: number;
   discountCode?: string;
@@ -186,7 +189,9 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       buttonContainer.innerHTML = '';
     }
 
-    paypal.Buttons({
+    const buttons = paypal.Buttons({
+      // A fixed button height, so the space reserved while the buttons load fits and nothing moves.
+      style: { height: PAYPAL_BUTTON_HEIGHT, tagline: false },
       createBillingAgreement: async () => {
         set(paying, true);
         callbacks.onPaymentStart();
@@ -246,7 +251,9 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
         set(paypalActions, actions);
         actions.disable();
       },
-    }).render('#paypal-button');
+    });
+    // The SDK's render returns a promise that settles once the button's iframe is drawn; the typings say void.
+    await Promise.resolve(buttons.render('#paypal-button'));
 
     /** Enables the PayPal button only once the policy is accepted and nothing is in flight. */
     const checkEnabled = (): void => {

@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { formatLongDate } from '@rotki/card-payment-common/utils/date';
-import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
+import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import PlanLine from '@rotki/checkout-ui/components/PlanLine.vue';
 import { set } from '@vueuse/shared';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
-import { getPlanNameFor } from '~/utils/plans';
 
 const {
   plan,
-  breakdown,
   crypto = false,
   warning = false,
   disabled = false,
@@ -16,7 +13,6 @@ const {
   upgrade = false,
 } = defineProps<{
   plan: SelectedPlan;
-  breakdown?: PaymentBreakdownResponse;
   crypto?: boolean;
   warning?: boolean;
   disabled?: boolean;
@@ -32,11 +28,8 @@ const selection = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 
-const name = computed<string>(() => getPlanNameFor(t, plan));
-
-const date = computed<string>(() => formatLongDate(new Date()));
-
-const summary = computed<OrderSummary>(() => buildOrderSummary({ plan, breakdown, upgrade }));
+// Starts on payment, which is today.
+const startsAt = new Date();
 
 function select(): void {
   set(selection, true);
@@ -50,100 +43,28 @@ function switchTo(selectedPlan: SelectedPlan): void {
 
 <template>
   <div class="mb-4">
-    <!-- Plan name with upgrade badge and change button -->
-    <div class="flex items-center justify-between mb-1">
-      <div class="flex items-center gap-2">
-        <span class="text-base font-semibold text-rui-text">{{ name }}</span>
-        <span
-          v-if="upgrade"
-          class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-rui-primary/10 text-rui-primary rounded-full"
-        >
-          <RuiIcon
-            name="lu-arrow-up"
-            size="12"
-          />
-          {{ t('actions.upgrade') }}
-        </span>
-      </div>
-      <RuiButton
-        v-if="!upgrade"
-        :disabled="disabled"
-        :loading="loading"
-        color="primary"
-        variant="outlined"
-        size="sm"
-        @click="select()"
-      >
-        {{ t('actions.change') }}
-      </RuiButton>
-    </div>
-
-    <!-- Duration description -->
-    <i18n-t
-      keypath="selected_plan_overview.plan"
-      :plural="crypto ? 0 : 1"
-      scope="global"
-      tag="p"
-      class="text-sm text-gray-500 mb-3"
+    <PlanLine
+      :plan="plan"
+      :upgrade="upgrade"
+      :one-time="crypto"
+      :starts-at="startsAt"
     >
-      <template #period>
-        {{ t('selected_plan_overview.renew_period', { months: plan.durationInMonths }, plan.durationInMonths) }}
+      <template
+        v-if="!upgrade"
+        #action
+      >
+        <RuiButton
+          :disabled="disabled"
+          :loading="loading"
+          color="primary"
+          variant="outlined"
+          size="sm"
+          @click="select()"
+        >
+          {{ t('actions.change') }}
+        </RuiButton>
       </template>
-    </i18n-t>
-
-    <!-- Price details -->
-    <div class="space-y-1.5 text-sm">
-      <!-- Full price -->
-      <div class="flex justify-between">
-        <span class="text-gray-600">
-          {{ summary.proratedPrice ? t('selected_plan_overview.full_price_label') : t('selected_plan_overview.price_label') }}
-        </span>
-        <span :class="summary.proratedPrice ? 'text-gray-400 line-through' : 'font-medium text-rui-text'">
-          {{ summary.price.formatted }}
-        </span>
-      </div>
-
-      <!-- Prorated price (upgrade only) -->
-      <div
-        v-if="summary.proratedPrice"
-        class="flex justify-between items-center"
-      >
-        <span class="flex items-center gap-1 text-gray-600">
-          {{ t('selected_plan_overview.prorated_price_label') }}
-          <RuiTooltip
-            :options="{ placement: 'top' }"
-            :class-names="{ tooltip: 'max-w-xs' }"
-          >
-            <template #activator>
-              <RuiIcon
-                name="lu-info"
-                class="text-gray-400 cursor-help"
-                size="14"
-              />
-            </template>
-            {{ t('selected_plan_overview.proration_info') }}
-          </RuiTooltip>
-        </span>
-        <span class="font-medium text-rui-primary">{{ summary.proratedPrice.formatted }}</span>
-      </div>
-
-      <div
-        v-if="summary.credit"
-        class="flex justify-between items-center"
-      >
-        <span class="text-gray-600">{{ t('payment_grand_total.credit_applied') }}</span>
-        <span class="font-medium text-green-600">-{{ summary.credit.formatted }}</span>
-      </div>
-
-      <!-- Starting date -->
-      <div
-        v-if="!crypto"
-        class="flex justify-between pt-1"
-      >
-        <span class="text-gray-600">{{ t('selected_plan_overview.starting_label') }}</span>
-        <span class="font-medium text-rui-text">{{ date }}</span>
-      </div>
-    </div>
+    </PlanLine>
 
     <ChangePlanDialog
       :crypto="crypto"

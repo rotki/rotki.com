@@ -7,6 +7,16 @@ import { get } from '@vueuse/shared';
 import { computed } from 'vue';
 import { useCheckoutMessages } from '../composables/checkout-messages';
 
+interface PriceRow {
+  id: string;
+  label: string;
+  value: string;
+  /** Takes money off the subtotal, shown as a saving. */
+  deduction?: boolean;
+  /** For information only, not part of the sum (the VAT already in the price). */
+  info?: boolean;
+}
+
 const {
   plan,
   breakdown,
@@ -33,133 +43,99 @@ const t = useCheckoutMessages();
 
 const summary = computed<OrderSummary>(() => buildOrderSummary({ plan, breakdown, upgrade }));
 
-const hasAdjustments = computed<boolean>(() => {
-  const { credit, discount } = get(summary);
-  return !!discount || !!credit;
+function discountLabel({ isReferral, percent }: NonNullable<OrderSummary['discount']>): string {
+  if (isReferral)
+    return percent ? t('checkout.price_rows.referral_percent', { percent }) : t('checkout.price_rows.referral');
+  return percent ? t('checkout.price_rows.discount_percent', { percent }) : t('checkout.price_rows.discount');
+}
+
+/** Subtotal, then what comes off it, then the VAT the amount due already contains. */
+const rows = computed<PriceRow[]>(() => {
+  const { credit, discount, prorated, subtotal, vat } = get(summary);
+  const result: PriceRow[] = [{
+    id: 'subtotal',
+    label: prorated ? t('checkout.price_rows.prorated_subtotal') : t('checkout.price_rows.subtotal'),
+    value: subtotal.formatted,
+  }];
+  if (discount)
+    result.push({ id: 'discount', label: discountLabel(discount), value: `−${discount.saved.formatted}`, deduction: true });
+  if (credit)
+    result.push({ id: 'credit', label: t('checkout.price_rows.credit'), value: `−${credit.formatted}`, deduction: true });
+  if (vat)
+    result.push({ id: 'vat', label: t('checkout.price_rows.vat_included', { rate: vat.formattedRate }), value: vat.amount.formatted, info: true });
+  return result;
 });
 
-const renewalDate = computed<string>(() => (renewsAt ? formatLongDate(renewsAt) : ''));
+const nextPayment = computed<string>(() => {
+  const date = renewsAt ? formatLongDate(renewsAt) : '';
+  if (oneTime)
+    return date ? t('checkout.price_rows.one_time', { date }) : t('checkout.price_rows.one_time_no_date');
 
-const recurringInfo = computed<string>(() => durationInMonths === 12
-  ? t('checkout.price_rows.recurring_year')
-  : t('checkout.price_rows.recurring_month'));
+  const amount = get(summary).renewal.formatted;
+  if (durationInMonths === 12)
+    return date ? t('checkout.price_rows.renews_year', { amount, date }) : t('checkout.price_rows.renews_year_no_date', { amount });
+  return date ? t('checkout.price_rows.renews_month', { amount, date }) : t('checkout.price_rows.renews_month_no_date', { amount });
+});
 </script>
 
 <template>
-  <div class="pt-4">
-    <div
-      v-if="hasAdjustments"
-      class="space-y-2 pb-3"
-    >
-      <div
-        v-if="summary.discount && summary.vat.rate > 0"
-        class="flex justify-between text-sm text-rui-text-secondary"
+  <div class="flex flex-col gap-3">
+    <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
+      <template
+        v-for="row in rows"
+        :key="row.id"
       >
-        <span>{{ t('checkout.price_rows.original_price') }}</span>
-        <RuiSkeletonLoader
-          v-if="loading"
-          class="w-16 h-5"
-        />
-        <span
-          v-else
-          class="line-through"
+        <dt
+          :class="row.deduction ? 'text-rui-success' : 'text-rui-text-secondary'"
+          :data-cy="`price-row-${row.id}`"
         >
-          {{ summary.fullAmount.formatted }}
-        </span>
-      </div>
-
-      <div
-        v-if="summary.discount"
-        class="flex justify-between text-sm font-medium text-rui-success"
-      >
-        <span>{{ t('checkout.price_rows.discount_savings') }}</span>
-        <RuiSkeletonLoader
-          v-if="loading"
-          class="w-16 h-5"
-        />
-        <span v-else>-{{ summary.discount.saved.formatted }}</span>
-      </div>
-
-      <div
-        v-if="summary.credit"
-        class="flex justify-between text-sm font-medium text-rui-success"
-      >
-        <span>{{ t('checkout.price_rows.credit_applied') }}</span>
-        <RuiSkeletonLoader
-          v-if="loading"
-          class="w-16 h-5"
-        />
-        <span v-else>-{{ summary.credit.formatted }}</span>
-      </div>
-    </div>
-
-    <div
-      v-if="hasAdjustments"
-      class="border-t border-dashed border-rui-divider my-3"
-    />
-
-    <div class="space-y-1.5 pb-3">
-      <div class="flex justify-between text-sm">
-        <span class="text-rui-text-secondary">{{ t('checkout.price_rows.subtotal') }}</span>
-        <RuiSkeletonLoader
-          v-if="loading"
-          class="w-16 h-5"
-        />
-        <span
-          v-else
-          class="font-medium text-rui-text"
+          {{ row.label }}
+        </dt>
+        <dd
+          class="text-right tabular-nums"
+          :class="{
+            'text-rui-success': row.deduction,
+            'text-rui-text-secondary': row.info,
+            'text-rui-text': !row.deduction && !row.info,
+          }"
         >
-          {{ summary.subtotal.formatted }}
-        </span>
-      </div>
+          <RuiSkeletonLoader
+            v-if="loading"
+            class="w-16 h-5 ml-auto"
+          />
+          <template v-else>
+            {{ row.value }}
+          </template>
+        </dd>
+      </template>
+    </dl>
 
-      <div class="flex justify-between text-sm">
-        <span class="text-rui-text-secondary">{{ t('checkout.price_rows.vat', { rate: summary.vat.formattedRate }) }}</span>
-        <RuiSkeletonLoader
-          v-if="loading"
-          class="w-16 h-5"
-        />
-        <span
-          v-else
-          class="font-medium text-rui-text"
-        >
-          {{ summary.vat.amount.formatted }}
-        </span>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between pt-3 border-t border-rui-divider">
-      <span class="text-rui-text font-semibold">{{ t('checkout.price_rows.grand_total') }}</span>
+    <div class="flex items-baseline justify-between pt-3 border-t border-rui-divider">
+      <span class="font-medium text-rui-text">{{ t('checkout.price_rows.due_today') }}</span>
       <RuiSkeletonLoader
         v-if="loading"
         class="w-24 h-8"
       />
       <span
         v-else
-        class="text-2xl font-bold text-rui-primary"
+        class="text-2xl font-semibold text-rui-primary-darker tabular-nums"
         data-cy="grand-total"
       >
         {{ summary.dueToday.formatted }}
       </span>
     </div>
 
-    <div
-      v-if="oneTime"
-      class="mt-3 text-xs text-rui-text-secondary text-right italic whitespace-pre-line"
+    <p
+      class="text-sm text-rui-text-secondary"
+      data-cy="next-payment"
     >
-      {{ t('checkout.price_rows.one_time') }}
-    </div>
-    <div
-      v-else
-      class="mt-3 text-xs text-rui-text-secondary text-right"
+      {{ nextPayment }}
+    </p>
+    <p
+      v-if="summary.prorated"
+      class="text-sm text-rui-text-secondary"
     >
-      <div v-if="renewalDate">
-        {{ t('checkout.price_rows.renews_on') }}
-        <span class="font-medium text-rui-text">{{ renewalDate }}</span>
-      </div>
-      <div class="italic mt-1">
-        {{ recurringInfo }}
-      </div>
-    </div>
+      {{ t('checkout.price_rows.proration_note') }}
+    </p>
   </div>
 </template>

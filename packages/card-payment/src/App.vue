@@ -31,9 +31,7 @@ const isLoading = ref<boolean>(true);
 const loadingMessage = ref<string>('Checking authentication...');
 const errorMessage = ref<string>('');
 
-const plan = ref<string>();
 const upgradeSubId = ref<string | null>(null);
-const referralCode = ref<string | null>(null);
 const planData = ref<PaymentBreakdownResponse>();
 const selectedPlan = ref<SelectedPlan>();
 const selectedCard = ref<SavedCard>();
@@ -127,16 +125,12 @@ async function load(): Promise<void> {
       return;
     }
 
-    set(plan, planIdParam);
-
     // Check user authentication
     set(loadingMessage, 'Checking authentication...');
 
     const { canBuy, account } = await canBuyNewSubscription();
     const upgradeId = getUrlParam('upgradeSubId');
-    const refParam = getUrlParam('ref');
     set(upgradeSubId, upgradeId);
-    set(referralCode, refParam);
     set(accountData, account);
 
     if (!canBuy && !upgradeId) {
@@ -178,7 +172,7 @@ function back(): void {
     navigation.goToSubscription();
   }
   else {
-    navigation.goToPaymentMethod(get(plan), get(referralCode));
+    navigation.goToPlans();
   }
 }
 
@@ -204,7 +198,7 @@ onMounted(async () => {
       v-else-if="errorMessage"
       :message="errorMessage"
       button-text="Go Back"
-      @button-click="plan ? navigation.goToPaymentMethod(plan, referralCode) : navigation.goToHome()"
+      @button-click="navigation.goToPlans()"
     />
 
     <template v-else-if="planData && selectedPlan">

@@ -33,19 +33,15 @@ export function useCryptoPaymentNavigation() {
     () => get(subscriptionId) ?? get(currentCryptoSubscriptionId),
   );
 
-  /**
-   * Navigate back to the appropriate page
-   */
+  /** Back to the crypto request, to pick another token or network for the same order. */
   const navigateBack = async (ref?: string): Promise<void> => {
     const id = get(usedSubscriptionId);
     const upgradeId = get(upgradeSubId);
-    const hasValidId = Boolean(upgradeId) || Boolean(id);
-    const routeName = hasValidId ? 'checkout-pay-request-crypto' : 'checkout-pay-method';
     const currentPlanId = get(planId);
     const currentDiscountCode = get(discountCode);
 
     await navigateTo({
-      name: routeName,
+      name: 'checkout-pay-request-crypto',
       query: buildQueryParams({
         id,
         planId: currentPlanId,

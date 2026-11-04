@@ -11,6 +11,14 @@ import { test } from '../../support/fixtures';
 import { tokenBalanceFor } from '../../support/rpc';
 
 test.describe('new crypto payment', () => {
+  test('the payment step opens the card page (stubbed, a separate app) with the checkout params', async ({ page }) => {
+    await page.route('**/checkout/pay/card?**', async route => route.fulfill({ body: '<title>card</title>', contentType: 'text/html' }));
+
+    await page.goto('/checkout/pay/method?planId=3&discountCode=AUTUMN');
+
+    await page.waitForURL('**/checkout/pay/card?planId=3&discountCode=AUTUMN');
+  });
+
   test('pays with ETH from an injected wallet and lands on the pending success page', async ({ backend, chain, page, wallet }) => {
     await page.goto('/checkout/pay/request-crypto?planId=3');
 

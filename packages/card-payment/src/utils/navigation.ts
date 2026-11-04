@@ -10,7 +10,6 @@ import { paths } from '@/config/paths';
 export const routes = {
   cryptoRequest: `${paths.hostUrlBase}/checkout/pay/request-crypto`,
   home: paths.hostUrlBase,
-  paymentMethod: `${paths.hostUrlBase}/checkout/pay/method`,
   paypal: `${paths.hostUrlBase}/checkout/pay/paypal`,
   plans: `${paths.hostUrlBase}/checkout/pay`,
   refundPolicy: `${paths.hostUrlBase}/refund-policy`,
@@ -57,32 +56,9 @@ export const navigation = {
     window.location.href = upgradeSubId ? `${href}?upgradeSubId=${upgradeSubId}` : href;
   },
 
-  /**
-   * Navigate to home page
-   */
-  goToHome(): void {
-    window.location.href = routes.home;
-  },
-
-  /**
-   * Navigate back to payment method selection
-   * @param planId - Plan to keep selected; left out of the URL when empty
-   * @param referralCode - Carried over as `ref` so the referral discount is not lost
-   */
-  goToPaymentMethod(planId: string | undefined, referralCode?: string | null): void {
-    const href = routes.paymentMethod;
-    const params = new URLSearchParams();
-
-    if (planId) {
-      params.set('planId', planId);
-    }
-
-    if (referralCode) {
-      params.set('ref', referralCode);
-    }
-
-    const queryString = params.toString();
-    window.location.href = queryString ? `${href}?${queryString}` : href;
+  /** Back to the plans, keeping the buyer's plan, referral and discount code. */
+  goToPlans(): void {
+    window.location.href = withCheckoutParams(routes.plans);
   },
 
   /**

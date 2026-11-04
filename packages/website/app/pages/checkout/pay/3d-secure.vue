@@ -39,7 +39,7 @@ const hasValidParams = computed<boolean>(() => !!get(params));
 /**
  * Handle navigation back to appropriate payment page
  * - If we have valid params: go to card page for the plan
- * - If no valid params: go to payment method selection
+ * - If no valid params: go to the plans
  */
 function handleBack(): void {
   const storedParams = get(params);
@@ -47,7 +47,7 @@ function handleBack(): void {
     window.location.href = `/checkout/pay/card?planId=${storedParams.planId}`;
   }
   else {
-    navigateTo('/checkout/pay/method');
+    navigateTo('/checkout/pay');
   }
 }
 

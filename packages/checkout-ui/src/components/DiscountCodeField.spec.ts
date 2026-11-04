@@ -1,6 +1,6 @@
 import type { PaymentBreakdownResponse } from '@rotki/card-payment-common/schemas/plans';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
-import { mount, type VueWrapper } from '@vue/test-utils';
+import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { installCheckoutMessages } from '../composables/checkout-messages';
 import { checkoutMessages } from '../messages/en';
@@ -28,14 +28,32 @@ function mountField(props: Partial<Props> = {}): VueWrapper {
 }
 
 describe('discountCodeField', () => {
-  it('offers the general hint, or the running campaign when there is one', () => {
-    expect(mountField().text()).toContain('Optional: Enter a discount code');
+  it('starts folded behind a link, mentioning a running campaign', () => {
+    const wrapper = mountField();
+    expect(wrapper.find('form').exists()).toBe(false);
+    expect(wrapper.get('[data-cy="discount-open"]').text()).toBe('Add a discount or referral code');
+
     expect(mountField({ campaign: { code: 'AUTUMN', percent: 20 } }).text())
       .toContain('Code AUTUMN gives 20% off your first payment.');
   });
 
+  it('opens the field on request and moves the focus into it', async () => {
+    const wrapper = mountField();
+
+    await wrapper.get('[data-cy="discount-open"]').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.find('form').exists()).toBe(true);
+    expect(document.activeElement).toBe(wrapper.find('input').element);
+  });
+
+  it('starts open when a code is already set', () => {
+    expect(mountField({ modelValue: 'AUTUMN' }).find('form').exists()).toBe(true);
+  });
+
   it('applies the typed code and emits it', async () => {
     const wrapper = mountField();
+    await wrapper.get('[data-cy="discount-open"]').trigger('click');
     const submit = wrapper.find('button[type="submit"]');
 
     expect(submit.attributes('disabled')).toBeDefined();
@@ -52,7 +70,6 @@ describe('discountCodeField', () => {
     const wrapper = mountField({ discount: { error: 'This code has expired', isValid: false }, modelValue: 'OLD' });
 
     expect(wrapper.text()).toContain('This code has expired');
-    expect(wrapper.text()).not.toContain('Optional: Enter a discount code');
 
     await wrapper.find('button[aria-label="Clear discount code"]').trigger('click');
 

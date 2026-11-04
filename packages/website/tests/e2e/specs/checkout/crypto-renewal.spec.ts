@@ -61,6 +61,12 @@ test.describe('crypto renewal', () => {
     chainScenario: { tokenBalances: tokenBalanceFor(USDC_ON_BASE, '100') },
   });
 
+  test('opens the crypto request from the renewal link to the payment step', async ({ page }) => {
+    await page.goto(`/checkout/pay/method?${RENEWAL_QUERY}`);
+
+    await page.waitForURL(`**/checkout/pay/request-crypto?${RENEWAL_QUERY}`);
+  });
+
   test('renews the existing subscription with ETH', async ({ backend, page, wallet }) => {
     await page.goto(`/checkout/pay/request-crypto?${RENEWAL_QUERY}`);
 

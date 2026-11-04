@@ -10,8 +10,8 @@ describe('shared checkout copy', () => {
       props: { durationInMonths: 1, plan: { price: 25 } },
     });
 
-    expect(wrapper.text()).toContain('Grand Total');
-    expect(wrapper.text()).toContain('VAT (0%):');
+    expect(wrapper.text()).toContain('Due today');
+    expect(wrapper.text()).toContain('Subtotal');
     expect(wrapper.text()).not.toContain('checkout.price_rows');
   });
 });

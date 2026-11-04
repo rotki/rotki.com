@@ -189,7 +189,7 @@ async function navigateBack(): Promise<void> {
   });
 
   await navigateTo({
-    name: 'checkout-pay-method',
+    name: 'checkout-pay',
     query,
   });
 }
@@ -218,19 +218,36 @@ onMounted(async () => {
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr] lg:gap-8 lg:items-start">
       <!-- Main Content (Left Column) -->
       <div class="flex flex-col gap-6 min-w-0">
-        <RuiCard class="min-h-64">
+        <RuiCard>
           <AcceptRefundPolicy
             v-model="accepted"
             :disabled="processing || initializing"
             class="mb-4"
           />
 
-          <div
-            id="paypal-button"
-            :class="[
-              { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
-            ]"
-          />
+          <!--
+            Holds the space of PayPal's stack while the SDK loads: the PayPal and the debit or credit card
+            buttons at 48 px each, then the "Powered by PayPal" line, 138 px in all. The buttons take the
+            placeholder's spot and nothing moves.
+          -->
+          <div class="relative min-h-[138px]">
+            <div
+              v-if="initializing"
+              class="absolute inset-0 flex flex-col items-center gap-4"
+              data-cy="paypal-button-loading"
+            >
+              <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
+              <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
+              <RuiSkeletonLoader class="w-36 h-3 mt-1" />
+            </div>
+            <div
+              id="paypal-button"
+              class="flex flex-col"
+              :class="[
+                { 'opacity-50 cursor-not-allowed pointer-events-none': !accepted || processing },
+              ]"
+            />
+          </div>
         </RuiCard>
       </div>
 
@@ -254,7 +271,6 @@ onMounted(async () => {
     <div class="flex gap-4 justify-center w-full mt-6 mx-auto max-w-110">
       <RuiButton
         :disabled="processing"
-        :loading="paying || initializing"
         class="w-full"
         size="lg"
         @click="navigateBack()"

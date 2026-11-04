@@ -23,22 +23,22 @@ export interface OrderSummaryVat {
   readonly amount: MoneyValue;
 }
 
-/** Everything the checkout shows about the price of an order, in display order. */
+/**
+ * Everything the checkout shows about the price of an order, in display order. Amounts include
+ * VAT, so the rows read top to bottom: subtotal, minus discount, minus credit, is what is due.
+ */
 export interface OrderSummary {
-  /** Plan price line: the breakdown's full amount for a new subscription, the plan list price for an upgrade. */
-  readonly price: MoneyValue;
-  /** Upgrades only: the prorated charge before discount and credit. */
-  readonly proratedPrice?: MoneyValue;
-  /** Price before discount and credit ("Original price"). */
-  readonly fullAmount: MoneyValue;
+  /** The plan price, or for an upgrade the prorated charge, before discount and credit. */
+  readonly subtotal: MoneyValue;
+  /** Whether the subtotal is an upgrade's prorated charge. */
+  readonly prorated: boolean;
   /** Present when the breakdown confirms a valid discount or referral code. */
   readonly discount?: OrderSummaryDiscount;
   /** Present when account credit lowers the charge. */
   readonly credit?: MoneyValue;
-  /** Net amount charged today, before VAT. */
-  readonly subtotal: MoneyValue;
-  readonly vat: OrderSummaryVat;
-  /** Total charged today, VAT included. */
+  /** The VAT contained in the amount due, for information; absent when no VAT applies. */
+  readonly vat?: OrderSummaryVat;
+  /** Total charged today. */
   readonly dueToday: MoneyValue;
   /** Amount of each renewal after this payment. */
   readonly renewal: MoneyValue;
@@ -106,10 +106,8 @@ function buildVat(rate: number, vatCents: number): OrderSummaryVat {
 function buildPlanOnlySummary(price: number): OrderSummary {
   const planPrice = money(price);
   return {
-    price: planPrice,
-    fullAmount: planPrice,
     subtotal: planPrice,
-    vat: buildVat(0, 0),
+    prorated: false,
     dueToday: planPrice,
     renewal: planPrice,
   };
@@ -117,27 +115,22 @@ function buildPlanOnlySummary(price: number): OrderSummary {
 
 /**
  * Builds the order summary both checkouts render from the payment breakdown. It only
- * centralises the numbers the API already computed; the one derived value is the net
- * subtotal (total minus VAT), done in cents.
+ * arranges the numbers the API already computed: the API takes the discount and then the
+ * credit off the full amount, so the rows add up to the amount due without any maths here.
  */
 export function buildOrderSummary({ plan, breakdown, upgrade = false }: OrderSummaryInput): OrderSummary {
   if (!breakdown)
     return buildPlanOnlySummary(plan.price);
 
-  const dueToday = money(breakdown.finalAmount);
   const rate = vatRatePercent(breakdown.vatRate);
-  const vatCents = rate > 0 ? toCents(breakdown.vatAmount) : 0;
-  const fullAmount = money(breakdown.fullAmount);
 
   return {
-    price: upgrade ? money(plan.price) : fullAmount,
-    proratedPrice: upgrade ? fullAmount : undefined,
-    fullAmount,
+    subtotal: money(breakdown.fullAmount),
+    prorated: upgrade,
     discount: buildDiscountSummary(breakdown.discount),
     credit: buildCredit(breakdown),
-    subtotal: rate > 0 ? moneyFromCents(toCents(dueToday.amount) - vatCents) : dueToday,
-    vat: buildVat(rate, vatCents),
-    dueToday,
+    vat: rate > 0 ? buildVat(rate, toCents(breakdown.vatAmount)) : undefined,
+    dueToday: money(breakdown.finalAmount),
     renewal: money(breakdown.renewingPrice),
   };
 }

@@ -44,20 +44,20 @@ onMounted(async () => {
 
 const valid = computed<boolean>(() => get(isRefundPolicyAccepted) && !!get(selectedCurrency));
 
+/** An upgrade or a renewal started from the subscription; a new purchase goes back to the plans. */
 async function back(): Promise<void> {
-  if (isDefined(upgradeSubId)) {
+  if (isDefined(upgradeSubId) || isDefined(subscriptionId)) {
     await navigateTo({ name: 'home-subscription' });
     return;
   }
 
   const query = buildQueryParams({
     planId: get(planId),
-    id: get(subscriptionId),
     ref: get(referralCode),
   });
 
   await navigateTo({
-    name: 'checkout-pay-method',
+    name: 'checkout-pay',
     query,
   });
 }

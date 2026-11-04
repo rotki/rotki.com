@@ -80,7 +80,6 @@ function handlePlanChange(newPlan: SelectedPlan): void {
 
     <SelectedPlanOverview
       :plan="selectedPlan"
-      :breakdown="breakdown"
       :upgrade="!!upgradeSubId"
       :crypto="isCrypto"
       :disabled="disabled"

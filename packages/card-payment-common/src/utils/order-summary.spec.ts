@@ -69,172 +69,126 @@ describe('buildDiscountSummary', () => {
 });
 
 describe('buildOrderSummary', () => {
+  const referral = {
+    discountAmount: '10',
+    discountType: DiscountType.PERCENTAGE,
+    discountedAmount: '2.50',
+    isReferral: true,
+    isValid: true,
+  } as const;
+
+  /** Subtotal minus discount and credit must give the amount due, so the rows add up. */
+  function rowsAddUp(summary: ReturnType<typeof buildOrderSummary>): boolean {
+    const deductions = (summary.discount?.saved.amount ?? 0) + (summary.credit?.amount ?? 0);
+    return Math.round((summary.subtotal.amount - deductions) * 100) === Math.round(summary.dueToday.amount * 100);
+  }
+
   it('should fall back to the plan price without a breakdown', () => {
     const summary = buildOrderSummary({ plan });
 
-    expect(summary.price.formatted).toBe('25.00 €');
-    expect(summary.proratedPrice).toBeUndefined();
-    expect(summary.fullAmount.formatted).toBe('25.00 €');
-    expect(summary.discount).toBeUndefined();
-    expect(summary.credit).toBeUndefined();
     expect(summary.subtotal.formatted).toBe('25.00 €');
-    expect(summary.vat).toEqual({ rate: 0, formattedRate: '0%', amount: { amount: 0, formatted: '0.00 €' } });
-    expect(summary.dueToday).toEqual({ amount: 25, formatted: '25.00 €' });
-    expect(summary.renewal).toEqual({ amount: 25, formatted: '25.00 €' });
-  });
-
-  it('should summarise a plain plan with 0% VAT', () => {
-    const summary = buildOrderSummary({ plan, breakdown: breakdownWith() });
-
-    expect(summary.price.formatted).toBe('25.00 €');
-    expect(summary.subtotal.formatted).toBe('25.00 €');
-    expect(summary.vat.rate).toBe(0);
-    expect(summary.vat.formattedRate).toBe('0%');
-    expect(summary.vat.amount.formatted).toBe('0.00 €');
     expect(summary.dueToday.formatted).toBe('25.00 €');
-  });
-
-  it('should ignore the VAT amount when the rate is 0', () => {
-    const summary = buildOrderSummary({ plan, breakdown: breakdownWith({ vatAmount: '3.99' }) });
-
-    expect(summary.vat.amount.amount).toBe(0);
-    expect(summary.subtotal.amount).toBe(25);
-  });
-
-  it('should split 19% VAT out of the total in cents', () => {
-    const summary = buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({ fullAmount: '29.75', finalAmount: '29.75', vatRate: '0.19', vatAmount: '4.75', renewingPrice: '29.75' }),
-    });
-
-    expect(summary.price.formatted).toBe('29.75 €');
-    expect(summary.subtotal).toEqual({ amount: 25, formatted: '25.00 €' });
-    expect(summary.vat).toEqual({ rate: 19, formattedRate: '19%', amount: { amount: 4.75, formatted: '4.75 €' } });
-    expect(summary.dueToday.formatted).toBe('29.75 €');
-    expect(summary.renewal.formatted).toBe('29.75 €');
-  });
-
-  it('should subtract in cents, so 0.30 - 0.10 is 0.2 and not 0.19999999999999998', () => {
-    const summary = buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({ finalAmount: '0.30', vatRate: '19', vatAmount: '0.10' }),
-    });
-
-    expect(summary.subtotal.amount).toBe(0.2);
-  });
-
-  it('should add the referral discount line', () => {
-    const summary = buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({
-        finalAmount: '22.50',
-        renewingPrice: '25.00',
-        discount: { isValid: true, isReferral: true, discountType: 'Percentage', discountAmount: '10.00', discountedAmount: '2.50' },
-      }),
-    });
-
-    expect(summary.fullAmount.formatted).toBe('25.00 €');
-    expect(summary.discount).toEqual({
-      saved: { amount: 2.5, formatted: '2.50 €' },
-      isReferral: true,
-      percent: '10%',
-    });
-    expect(summary.dueToday.formatted).toBe('22.50 €');
     expect(summary.renewal.formatted).toBe('25.00 €');
+    expect(summary.vat).toBeUndefined();
+    expect(summary.prorated).toBe(false);
   });
 
-  it('should add a fixed discount code without a percentage', () => {
+  it('should show the VAT a German consumer pays as included in the price', () => {
+    const summary = buildOrderSummary({ plan, breakdown: breakdownWith({ vatRate: '0.1900', vatAmount: '3.99' }) });
+
+    expect(summary.subtotal.formatted).toBe('25.00 €');
+    expect(summary.vat).toEqual({ rate: 19, formattedRate: '19%', amount: { amount: 3.99, formatted: '3.99 €' } });
+    expect(summary.dueToday.formatted).toBe('25.00 €');
+    expect(rowsAddUp(summary)).toBe(true);
+  });
+
+  it('should take a referral off the full price for a German consumer', () => {
+    const summary = buildOrderSummary({
+      plan,
+      breakdown: breakdownWith({ discount: referral, finalAmount: '22.50', vatRate: '0.1900', vatAmount: '3.59' }),
+    });
+
+    expect(summary.subtotal.formatted).toBe('25.00 €');
+    expect(summary.discount).toEqual({ saved: { amount: 2.5, formatted: '2.50 €' }, isReferral: true, percent: '10%' });
+    expect(summary.vat?.amount.formatted).toBe('3.59 €');
+    expect(summary.dueToday.formatted).toBe('22.50 €');
+    expect(rowsAddUp(summary)).toBe(true);
+  });
+
+  it('should leave VAT out for a customer whose country has none, such as the US', () => {
+    const summary = buildOrderSummary({ plan, breakdown: breakdownWith({ discount: referral, finalAmount: '22.50' }) });
+
+    expect(summary.vat).toBeUndefined();
+    expect(summary.dueToday.formatted).toBe('22.50 €');
+    expect(rowsAddUp(summary)).toBe(true);
+  });
+
+  it('should ignore a VAT amount sent with a zero rate', () => {
+    const summary = buildOrderSummary({ plan, breakdown: breakdownWith({ vatAmount: '4.00' }) });
+
+    expect(summary.vat).toBeUndefined();
+  });
+
+  it('should start from the price without VAT for an EU business with a valid VAT ID (France, 20%, removed before the discount)', () => {
     const summary = buildOrderSummary({
       plan,
       breakdown: breakdownWith({
-        finalAmount: '20.00',
-        discount: { isValid: true, isReferral: false, discountType: 'Fixed Amount', discountAmount: '5', discountedAmount: '5' },
+        discount: { ...referral, discountedAmount: '2.08' },
+        finalAmount: '18.75',
+        fullAmount: '20.83',
+        renewingPrice: '20.83',
       }),
     });
 
-    expect(summary.discount).toEqual({
-      saved: { amount: 5, formatted: '5.00 €' },
-      isReferral: false,
-      percent: undefined,
+    expect(summary.subtotal.formatted).toBe('20.83 €');
+    expect(summary.vat).toBeUndefined();
+    expect(summary.dueToday.formatted).toBe('18.75 €');
+    expect(summary.renewal.formatted).toBe('20.83 €');
+    expect(rowsAddUp(summary)).toBe(true);
+  });
+
+  it('should start an upgrade from the prorated charge and take the credit off', () => {
+    const summary = buildOrderSummary({
+      plan: { price: 50 },
+      upgrade: true,
+      breakdown: breakdownWith({
+        credit: { availableAmount: '20.00', creditedAmount: '5.00' },
+        finalAmount: '7.50',
+        fullAmount: '12.50',
+        renewingPrice: '50.00',
+        vatRate: '0.1900',
+        vatAmount: '1.20',
+      }),
     });
+
+    expect(summary.prorated).toBe(true);
+    expect(summary.subtotal.formatted).toBe('12.50 €');
+    expect(summary.credit?.formatted).toBe('5.00 €');
+    expect(summary.vat?.amount.formatted).toBe('1.20 €');
+    expect(summary.dueToday.formatted).toBe('7.50 €');
+    expect(summary.renewal.formatted).toBe('50.00 €');
+    expect(rowsAddUp(summary)).toBe(true);
   });
 
   it('should skip an invalid discount', () => {
-    const summary = buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({ discount: { isValid: false, error: 'Code expired' } }),
-    });
+    const summary = buildOrderSummary({ plan, breakdown: breakdownWith({ discount: { isValid: false, error: 'Expired' } }) });
 
     expect(summary.discount).toBeUndefined();
   });
 
-  it('should add the account credit line', () => {
-    const summary = buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({ finalAmount: '15.00', credit: { availableAmount: '30.00', creditedAmount: '10' } }),
-    });
-
-    expect(summary.credit).toEqual({ amount: 10, formatted: '10.00 €' });
-    expect(summary.dueToday.formatted).toBe('15.00 €');
-  });
-
   it('should skip credit that does not lower the charge', () => {
-    expect(buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({ credit: { availableAmount: '0', creditedAmount: '0.00' } }),
-    }).credit).toBeUndefined();
-    expect(buildOrderSummary({
-      plan,
-      breakdown: breakdownWith({ credit: { availableAmount: '0', creditedAmount: 'abc' } }),
-    }).credit).toBeUndefined();
+    const summary = buildOrderSummary({ plan, breakdown: breakdownWith({ credit: { availableAmount: '0.00', creditedAmount: '0.00' } }) });
+
+    expect(summary.credit).toBeUndefined();
   });
 
-  it('should show the plan price and the prorated charge for an upgrade', () => {
+  it('should keep amounts in cents, so 0.30 - 0.10 shows as 0.20', () => {
     const summary = buildOrderSummary({
-      plan: { price: 45 },
-      upgrade: true,
-      breakdown: breakdownWith({
-        fullAmount: '12.34',
-        finalAmount: '12.34',
-        vatRate: '0.19',
-        vatAmount: '1.97',
-        renewingPrice: '53.55',
-        nextPayment: 1767225600,
-      }),
+      plan: { price: 0.3 },
+      breakdown: breakdownWith({ credit: { availableAmount: '1.00', creditedAmount: '0.10' }, finalAmount: '0.20', fullAmount: '0.30' }),
     });
 
-    expect(summary.price.formatted).toBe('45.00 €');
-    expect(summary.proratedPrice?.formatted).toBe('12.34 €');
-    expect(summary.subtotal.formatted).toBe('10.37 €');
-    expect(summary.vat.amount.formatted).toBe('1.97 €');
-    expect(summary.dueToday.formatted).toBe('12.34 €');
-    expect(summary.renewal.formatted).toBe('53.55 €');
-  });
-
-  it('should not show a prorated charge for an upgrade without a breakdown', () => {
-    const summary = buildOrderSummary({ plan: { price: 45 }, upgrade: true });
-
-    expect(summary.price.formatted).toBe('45.00 €');
-    expect(summary.proratedPrice).toBeUndefined();
-  });
-
-  it('should combine discount, credit and VAT', () => {
-    const summary = buildOrderSummary({
-      plan: { price: 250 },
-      breakdown: breakdownWith({
-        fullAmount: '297.50',
-        finalAmount: '1234.50',
-        vatRate: '19',
-        vatAmount: '197.10',
-        renewingPrice: '297.50',
-        discount: { isValid: true, isReferral: false, discountType: 'Percentage', discountAmount: '12.50', discountedAmount: '37.19' },
-        credit: { availableAmount: '20', creditedAmount: '20.00' },
-      }),
-    });
-
-    expect(summary.discount?.percent).toBe('12.5%');
-    expect(summary.credit?.formatted).toBe('20.00 €');
-    expect(summary.subtotal.formatted).toBe('1,037.40 €');
-    expect(summary.dueToday.formatted).toBe('1,234.50 €');
+    expect(summary.dueToday.amount).toBe(0.2);
+    expect(rowsAddUp(summary)).toBe(true);
   });
 });

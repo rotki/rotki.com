@@ -764,10 +764,6 @@
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
           }
         },
-        "step_2": {
-          "subtitle": "Please select one of the following payment methods.",
-          "title": "Payment Methods"
-        },
         "step_3": {
           "change_payment": {
             "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to change the payment method.",
@@ -1327,19 +1323,6 @@
     "expired_captcha": "Invalid or expired captcha, please try again"
   },
   "selected_plan_overview": {
-    "includes_vat": "(includes {vat}% VAT)",
-    "plan": "{period} recurring subscription | {period} subscription",
-    "price": "Price: {price} € {vat}",
-    "price_label": "Price:",
-    "full_price": "Full price: {price} € {vat}",
-    "full_price_label": "Full price:",
-    "prorated_price": "Prorated upgrade: {price} € {vat}",
-    "prorated_price_label": "Prorated price:",
-    "proration_info": "Upgrade charges are calculated as the price difference between plans, prorated for your remaining subscription period.",
-    "starting": "Starting Date: {date}",
-    "starting_label": "Starting:",
-    "renew_period": "{months} month | 1 year ({months} months)",
-    "vat": "({vat}% VAT: {basePrice}€ + {vatAmount}€)",
     "month": "month",
     "year": "year"
   },
@@ -1698,9 +1681,6 @@
       },
       "title": "Vision"
     }
-  },
-  "payment_grand_total": {
-    "credit_applied": "Credit applied:"
   },
   "payment_methods": {
     "title": "Payment Methods",
