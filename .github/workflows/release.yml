@@ -9,6 +9,7 @@ permissions: { }
 
 jobs:
   release:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -10,6 +10,7 @@ permissions: { }
 
 jobs:
   analyze:
+    if: github.repository == 'rotki/rotki.com'
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     permissions:

@@ -22,6 +22,7 @@ permissions: { }
 
 jobs:
   commit-lint:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -69,6 +70,7 @@ jobs:
         run: pnpm exec commitlint --from "${BASE_SHA}" --to "${HEAD_SHA}" --verbose
 
   ci:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -125,6 +127,7 @@ jobs:
   # it needs nothing the build produces and runs beside the `ci` job. The unit tests run here
   # because the e2e coverage report is written on the lines their reports count as code.
   test:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -236,6 +239,7 @@ jobs:
           retention-days: 7
 
   backend:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -275,6 +279,7 @@ jobs:
           working-directory: backend
 
   lighthouse:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -404,6 +409,7 @@ jobs:
           include-hidden-files: true
 
   build-docker:
+    if: github.repository == 'rotki/rotki.com'
     runs-on: ubuntu-latest
     permissions:
       contents: read
