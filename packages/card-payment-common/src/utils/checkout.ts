@@ -1,4 +1,4 @@
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount } from '../schemas/plans';
+import type { PaymentBreakdownDiscount } from '../schemas/plans';
 
 /**
  * Returns the discount code only if the breakdown confirms it is valid.
@@ -40,17 +40,4 @@ export function resolveDiscountCode({ explicit, dismissed, referral, campaign }:
   if (dismissed)
     return undefined;
   return [referral, campaign].find(Boolean);
-}
-
-/**
- * Formats the credited amount from a payment breakdown credit response.
- * Returns undefined if the credit is missing or the amount is non-positive.
- */
-export function formatCreditedAmount(credit: PaymentBreakdownCredit | null | undefined): string | undefined {
-  if (!credit)
-    return undefined;
-  const amount = parseFloat(credit.creditedAmount);
-  if (!isFinite(amount) || amount <= 0)
-    return undefined;
-  return amount.toFixed(2);
 }

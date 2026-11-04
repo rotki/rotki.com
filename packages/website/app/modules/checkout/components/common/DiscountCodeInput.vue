@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
+import { formatEur, formatPercent } from '@rotki/card-payment-common/utils/money';
 import { get, set } from '@vueuse/shared';
 import { useAppConfig } from '~/composables/use-app-config';
 
@@ -115,11 +116,11 @@ watchImmediate(model, (modelValue: string) => {
         </div>
         <div class="flex gap-1 font-bold text-sm text-rui-primary">
           <div class="text-rui-success">
-            {{ t('home.plans.tiers.step_3.discount.you_save', { amount: discountInfo.discountedAmount }) }}
+            {{ t('home.plans.tiers.step_3.discount.you_save', { amount: formatEur(discountInfo.discountedAmount) }) }}
             <template v-if="discountInfo.discountType.includes(DiscountType.PERCENTAGE)">
               {{
                 t('home.plans.tiers.step_3.discount.percent_off', {
-                  percentage: discountInfo.discountAmount,
+                  percentage: formatPercent(discountInfo.discountAmount),
                 })
               }}
             </template>

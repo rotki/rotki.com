@@ -10,12 +10,12 @@ export default mergeConfig(viteConfig, defineConfig({
   test: {
     coverage: {
       exclude: ['**/*.spec.ts'],
-      include: ['src/**/*.{ts,vue}'],
+      include: ['src/**/*.{ts,vue}', 'vite-plugins/**/*.ts'],
       provider: 'v8',
       reporter: [['lcov', { projectRoot: repositoryRoot }]],
       reportsDirectory: 'coverage',
     },
     environment: 'happy-dom',
-    include: ['src/**/*.spec.ts'],
+    include: ['src/**/*.spec.ts', 'vite-plugins/**/*.spec.ts'],
   },
 }));

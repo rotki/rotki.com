@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PaymentInfo } from '@rotki/card-payment-common/schemas/three-d-secure';
+import { formatEur } from '@rotki/card-payment-common/utils/money';
 import { get } from '@vueuse/shared';
 
 const { paymentInfo } = defineProps<{
@@ -24,8 +25,8 @@ const billingPeriod = computed<string>(() =>
 const approvalInfo = computed<Record<string, string>>(() => {
   const { renewingPrice, finalAmount } = paymentInfo;
   return {
-    renewingPrice,
-    immediateAmount: finalAmount,
+    renewingPrice: formatEur(renewingPrice),
+    immediateAmount: formatEur(finalAmount),
     period: get(billingPeriod),
   };
 });
@@ -48,7 +49,7 @@ const approvalInfo = computed<Record<string, string>>(() => {
         <span class="text-rui-text-secondary">{{ t('subscription.3d_secure.payment_info.recurring_charge') }}</span>
         <div class="text-right">
           <div class="font-semibold text-rui-text">
-            {{ paymentInfo.renewingPrice }}€ <span class="text-sm text-rui-text-secondary font-normal">{{ billingPeriod }}</span>
+            {{ approvalInfo.renewingPrice }} <span class="text-sm text-rui-text-secondary font-normal">{{ billingPeriod }}</span>
           </div>
         </div>
       </div>
@@ -56,7 +57,7 @@ const approvalInfo = computed<Record<string, string>>(() => {
       <!-- Current charge (Grand Total) -->
       <div class="flex justify-between items-center py-4 border-y border-default">
         <span class="text-rui-text-secondary">{{ t('subscription.3d_secure.payment_info.charge_today') }}</span>
-        <span class="font-bold text-xl underline">{{ paymentInfo.finalAmount }}€</span>
+        <span class="font-bold text-xl underline">{{ approvalInfo.immediateAmount }}</span>
       </div>
 
       <!-- Approval notice -->

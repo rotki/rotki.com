@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
 import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
@@ -19,14 +19,6 @@ import PaymentGrandTotal from './PaymentGrandTotal.vue';
 import PlanSummary from './PlanSummary.vue';
 import SavedCardDisplay from './SavedCardDisplay.vue';
 import TermsAcceptance from './TermsAcceptance.vue';
-
-/** VAT split of the current breakdown, formatted for display. */
-interface VatBreakdown {
-  basePrice: string;
-  vatAmount: string;
-  vatRate: string;
-  fullAmount: string;
-}
 
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
 /** Whether the running campaign's code is the discount the breakdown confirmed. */
@@ -81,31 +73,6 @@ const discountCode = ref<string>(discount.initialCode ?? '');
 const breakdown = ref<PaymentBreakdownResponse>();
 const newCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('newCardForm');
 
-// Derive vatBreakdown from breakdown
-const vatBreakdown = computed<VatBreakdown | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  if (!currentBreakdown) {
-    return undefined;
-  }
-
-  const floatRate = parseFloat(currentBreakdown.vatRate);
-  if (isFinite(floatRate) && floatRate <= 0) {
-    return undefined;
-  }
-
-  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
-  const finalAmount = parseFloat(currentBreakdown.finalAmount);
-  const vatAmount = parseFloat(currentBreakdown.vatAmount);
-  const basePrice = (finalAmount - vatAmount).toFixed(2);
-
-  return {
-    basePrice,
-    vatAmount: vatAmount.toFixed(2),
-    vatRate,
-    fullAmount: currentBreakdown.fullAmount,
-  };
-});
-
 // Derive discountInfo from breakdown
 const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
   const currentBreakdown = get(breakdown);
@@ -120,11 +87,6 @@ watchImmediate(() => getValidDiscountCode(get(discountInfo), get(discountCode) |
 function handleDiscountEdit(code: string): void {
   set(autoDiscountDismissed, !code);
 }
-
-const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.credit ?? undefined;
-});
 
 const showVatWarning = computed<boolean>(() => vatIdStatus === VatIdStatus.NOT_VALID && country !== 'DE');
 
@@ -518,10 +480,9 @@ onUnmounted(async () => {
 
           <!-- Payment Grand Total -->
           <PaymentGrandTotal
-            :vat-breakdown="vatBreakdown"
-            :discount-info="discountInfo"
-            :credit-info="creditInfo"
-            :grand-total="grandTotal"
+            :breakdown="breakdown"
+            :selected-plan="selectedPlan"
+            :upgrade="!!upgradeSubId"
             :next-payment="planData.nextPayment"
             :duration-in-months="selectedPlan.durationInMonths"
           />

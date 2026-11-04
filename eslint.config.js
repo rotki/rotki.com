@@ -93,6 +93,38 @@ export default rotki({
     '@rotki/no-dot-ts-imports': 'off',
   },
 }, {
+  /* The shared checkout packages are bundled into the card payment page, whose scripts are
+     inventoried (scripts/check-card-bundle.mjs). Keep app frameworks, network clients, wallet
+     stacks and payment SDKs in the apps. */
+  files: [
+    'packages/checkout-ui/**/*.{ts,vue}',
+    'packages/card-payment-common/**/*.ts',
+  ],
+  rules: {
+    'no-restricted-imports': ['error', {
+      patterns: [{
+        group: [
+          '#app',
+          '#imports',
+          '@nuxt/*',
+          '@nuxtjs/*',
+          '@wagmi/*',
+          '@walletconnect/*',
+          'braintree-web',
+          'braintree-web/*',
+          'nuxt',
+          'nuxt/*',
+          'ofetch',
+          'pinia',
+          'viem',
+          'viem/*',
+          'vue-i18n',
+        ],
+        message: 'Shared checkout code is bundled into the card payment page; keep this import in the app.',
+      }],
+    }],
+  },
+}, {
   ignores: [
     '**/dist/**',
     '**/node_modules/**',

@@ -16,10 +16,6 @@
       "types": "./src/schemas/discount.ts",
       "import": "./src/schemas/discount.ts"
     },
-    "./schemas/checkout": {
-      "types": "./src/schemas/checkout.ts",
-      "import": "./src/schemas/checkout.ts"
-    },
     "./schemas/api": {
       "types": "./src/schemas/api.ts",
       "import": "./src/schemas/api.ts"
@@ -39,6 +35,14 @@
     "./utils/checkout": {
       "types": "./src/utils/checkout.ts",
       "import": "./src/utils/checkout.ts"
+    },
+    "./utils/money": {
+      "types": "./src/utils/money.ts",
+      "import": "./src/utils/money.ts"
+    },
+    "./utils/order-summary": {
+      "types": "./src/utils/order-summary.ts",
+      "import": "./src/utils/order-summary.ts"
     },
     "./utils/subscription": {
       "types": "./src/utils/subscription.ts",

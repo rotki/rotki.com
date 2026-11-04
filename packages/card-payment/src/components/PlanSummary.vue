@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { formatCreditedAmount } from '@rotki/card-payment-common/utils/checkout';
+import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
 import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { computed, ref, watch } from 'vue';
@@ -29,23 +29,11 @@ const durationDescription = computed<string>(() => {
   return '1 month recurring subscription';
 });
 
-const displayPrice = computed<string>(() => {
-  const currentBreakdown = get(breakdown);
-  if (currentBreakdown && !upgrade) {
-    return currentBreakdown.fullAmount;
-  }
-  return selectedPlan.price.toString();
-});
-
-const proratedPrice = computed<string | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  if (!currentBreakdown || !upgrade) {
-    return undefined;
-  }
-  return currentBreakdown.fullAmount;
-});
-
-const creditedAmount = computed<string | undefined>(() => formatCreditedAmount(get(breakdown)?.credit));
+const summary = computed<OrderSummary>(() => buildOrderSummary({
+  plan: selectedPlan,
+  breakdown: get(breakdown),
+  upgrade,
+}));
 
 function toTitleCase(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -138,15 +126,15 @@ watch(() => discountCode, () => {
     <div class="space-y-1.5 text-sm">
       <!-- Full price (shown for both regular and upgrade) -->
       <div class="flex justify-between">
-        <span class="text-gray-600">{{ proratedPrice ? 'Full price:' : 'Price:' }}</span>
-        <span :class="proratedPrice ? 'text-gray-400 line-through' : 'font-medium text-rui-text'">
-          {{ displayPrice }} €
+        <span class="text-gray-600">{{ summary.proratedPrice ? 'Full price:' : 'Price:' }}</span>
+        <span :class="summary.proratedPrice ? 'text-gray-400 line-through' : 'font-medium text-rui-text'">
+          {{ summary.price.formatted }}
         </span>
       </div>
 
       <!-- Prorated price (upgrade only) -->
       <div
-        v-if="proratedPrice"
+        v-if="summary.proratedPrice"
         class="flex justify-between items-center"
       >
         <span class="flex items-center gap-1 text-gray-600">
@@ -176,15 +164,15 @@ watch(() => discountCode, () => {
             </span>
           </span>
         </span>
-        <span class="font-medium text-rui-primary">{{ proratedPrice }} €</span>
+        <span class="font-medium text-rui-primary">{{ summary.proratedPrice.formatted }}</span>
       </div>
 
       <div
-        v-if="creditedAmount"
+        v-if="summary.credit"
         class="flex justify-between items-center"
       >
         <span class="text-gray-600">Credit applied:</span>
-        <span class="font-medium text-green-600">-{{ creditedAmount }} €</span>
+        <span class="font-medium text-green-600">-{{ summary.credit.formatted }}</span>
       </div>
 
       <!-- Starting date -->

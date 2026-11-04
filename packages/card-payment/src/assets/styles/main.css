@@ -4,6 +4,9 @@
 @source '../..';
 @source '../../../index.html';
 
+/* Shared checkout components; their classes are purged without this. */
+@source '../../../../checkout-ui/src';
+
 @utility container {
   margin-inline: auto;
 

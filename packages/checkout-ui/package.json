@@ -1,0 +1,42 @@
+{
+  "name": "@rotki/checkout-ui",
+  "version": "2026.10.0",
+  "private": true,
+  "description": "Checkout components and composables shared by the rotki.com website and the card payment app",
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "exports": {
+    "./composables/checkout-messages": {
+      "types": "./src/composables/checkout-messages.ts",
+      "import": "./src/composables/checkout-messages.ts"
+    },
+    "./utils/translator": {
+      "types": "./src/utils/translator.ts",
+      "import": "./src/utils/translator.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

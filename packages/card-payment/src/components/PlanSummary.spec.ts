@@ -37,6 +37,44 @@ describe('components/PlanSummary', () => {
     expect(getPaymentBreakdown).toHaveBeenCalledWith({ newPlanId: 3, isCryptoPayment: false, discountCode: 'SUMMER' });
   });
 
+  it('renders the price and credit in the shared money format', async () => {
+    vi.mocked(getPaymentBreakdown).mockResolvedValue({
+      ...breakdownFor('15.00'),
+      credit: { availableAmount: '20.00', creditedAmount: '10' },
+    });
+
+    const wrapper = mount(PlanSummary, { props: { upgrade: false, selectedPlan: plan } });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('25.00 €');
+    expect(wrapper.text()).toContain('-10.00 €');
+  });
+
+  it('shows the plan price before the breakdown arrives', () => {
+    vi.mocked(getPaymentBreakdown).mockImplementation(async () => new Promise(() => {}));
+
+    const wrapper = mount(PlanSummary, { props: { upgrade: false, selectedPlan: plan } });
+
+    expect(wrapper.text()).toContain('Price:25.00 €');
+    expect(wrapper.text()).not.toContain('Prorated price');
+    expect(wrapper.text()).toContain('1 month recurring subscription');
+  });
+
+  it('strikes the list price and shows the prorated charge for an upgrade', async () => {
+    const advanced: SelectedPlan = { planId: 7, name: 'advanced', price: 450, durationInMonths: 12 };
+    vi.mocked(getPaymentBreakdown).mockResolvedValue({ ...breakdownFor('120.00'), fullAmount: '120.00' });
+
+    const wrapper = mount(PlanSummary, { props: { upgrade: true, selectedPlan: advanced } });
+    await flushPromises();
+
+    const fullPrice = wrapper.find('.line-through');
+    expect(wrapper.text()).toContain('Full price:');
+    expect(fullPrice.text()).toBe('450.00 €');
+    expect(wrapper.text()).toContain('Prorated price:');
+    expect(wrapper.text()).toContain('120.00 €');
+    expect(wrapper.text()).toContain('1 year (12 months) recurring subscription');
+  });
+
   it('keeps the newest breakdown when an older request resolves last', async () => {
     const pending: ((value: PaymentBreakdownResponse) => void)[] = [];
     vi.mocked(getPaymentBreakdown).mockImplementation(async () => new Promise((resolve) => {

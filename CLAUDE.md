@@ -52,7 +52,8 @@ pnpm release      # Bump version and generate changelog
 - **Content**: @nuxt/content for markdown-based content
 - **Payment**: Braintree, PayPal, and crypto payments (viem + wagmi)
 - **Testing**: Vitest + Playwright
-- **Package Manager**: pnpm workspace (`packages/website`, `packages/card-payment`, `packages/card-payment-common`, `packages/sigil`)
+- **Package Manager**: pnpm workspace (`packages/website`, `packages/card-payment`, `packages/card-payment-common`, `packages/checkout-ui`, `packages/sigil`)
+- **Shared checkout code**: `card-payment-common` (pure TS, zod only) and `checkout-ui` (Vue components and composables, peer dependencies only) are bundled into the card payment page. Keep app-specific and third-party runtime code in the apps; `pnpm check:card-bundle` compares the card bundle with `packages/card-payment/bundle-allowlist.json` after `pnpm build:card`.
 
 ### Key Architectural Patterns
 

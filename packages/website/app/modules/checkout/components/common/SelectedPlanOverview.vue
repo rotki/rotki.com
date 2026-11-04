@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { formatCreditedAmount } from '@rotki/card-payment-common/utils/checkout';
+import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
 import { set } from '@vueuse/shared';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
 import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
-
-interface VatOverview { vat: string; basePrice: string; vatAmount: string }
 
 const {
   plan,
@@ -38,45 +36,7 @@ const name = computed<string>(() => getPlanNameFor(t, plan));
 
 const date = computed<string>(() => formatDate(new Date()));
 
-const displayPrice = computed<string>(() => {
-  if (breakdown && !upgrade) {
-    return breakdown.fullAmount;
-  }
-  return plan.price.toString();
-});
-
-const proratedPrice = computed<string | undefined>(() => {
-  if (!breakdown || !upgrade) {
-    return undefined;
-  }
-  return breakdown.fullAmount;
-});
-
-const creditedAmount = computed<string | undefined>(() => formatCreditedAmount(breakdown?.credit));
-
-const vatOverview = computed<VatOverview | undefined>(() => {
-  if (!breakdown) {
-    return undefined;
-  }
-
-  const floatRate = parseFloat(breakdown.vatRate);
-  if (isFinite(floatRate) && floatRate <= 0) {
-    return undefined;
-  }
-
-  const vat = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : breakdown.vatRate;
-
-  // Calculate base price from finalAmount - vatAmount for prorated VAT display
-  const finalAmount = parseFloat(breakdown.finalAmount);
-  const vatAmount = parseFloat(breakdown.vatAmount);
-  const basePrice = (finalAmount - vatAmount).toFixed(2);
-
-  return {
-    vat,
-    basePrice,
-    vatAmount: vatAmount.toFixed(2),
-  };
-});
+const summary = computed<OrderSummary>(() => buildOrderSummary({ plan, breakdown, upgrade }));
 
 function select(): void {
   set(selection, true);
@@ -136,16 +96,16 @@ function switchTo(selectedPlan: SelectedPlan): void {
       <!-- Full price -->
       <div class="flex justify-between">
         <span class="text-gray-600">
-          {{ proratedPrice ? t('selected_plan_overview.full_price_label') : t('selected_plan_overview.price_label') }}
+          {{ summary.proratedPrice ? t('selected_plan_overview.full_price_label') : t('selected_plan_overview.price_label') }}
         </span>
-        <span :class="proratedPrice ? 'text-gray-400 line-through' : 'font-medium text-rui-text'">
-          {{ displayPrice }} €
+        <span :class="summary.proratedPrice ? 'text-gray-400 line-through' : 'font-medium text-rui-text'">
+          {{ summary.price.formatted }}
         </span>
       </div>
 
       <!-- Prorated price (upgrade only) -->
       <div
-        v-if="proratedPrice"
+        v-if="summary.proratedPrice"
         class="flex justify-between items-center"
       >
         <span class="flex items-center gap-1 text-gray-600">
@@ -164,15 +124,15 @@ function switchTo(selectedPlan: SelectedPlan): void {
             {{ t('selected_plan_overview.proration_info') }}
           </RuiTooltip>
         </span>
-        <span class="font-medium text-rui-primary">{{ proratedPrice }} €</span>
+        <span class="font-medium text-rui-primary">{{ summary.proratedPrice.formatted }}</span>
       </div>
 
       <div
-        v-if="creditedAmount"
+        v-if="summary.credit"
         class="flex justify-between items-center"
       >
         <span class="text-gray-600">{{ t('payment_grand_total.credit_applied') }}</span>
-        <span class="font-medium text-green-600">-{{ creditedAmount }} €</span>
+        <span class="font-medium text-green-600">-{{ summary.credit.formatted }}</span>
       </div>
 
       <!-- Starting date -->
@@ -188,7 +148,6 @@ function switchTo(selectedPlan: SelectedPlan): void {
     <ChangePlanDialog
       :crypto="crypto"
       :warning="warning"
-      :vat="vatOverview?.vat"
       :visible="selection"
       @cancel="selection = false"
       @select="switchTo($event)"

@@ -1,51 +1,23 @@
 <script setup lang="ts">
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
 import { formatDate } from '~/utils/date';
-
-interface VatBreakdown {
-  basePrice: string;
-  vatAmount: string;
-  vatRate: string;
-  fullAmount: string;
-}
 
 const {
   plan,
-  grandTotal,
+  summary,
   loading,
-  discountInfo,
-  creditInfo,
   crypto,
-  vatBreakdown,
 } = defineProps<{
   plan: SelectedPlan;
-  grandTotal: number;
+  summary: OrderSummary;
   loading?: boolean;
-  discountInfo?: PaymentBreakdownDiscount;
-  creditInfo?: PaymentBreakdownCredit;
   crypto?: boolean;
-  vatBreakdown?: VatBreakdown;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
 
-const hasDiscount = computed<boolean>(() => discountInfo?.isValid ?? false);
-
-// Parse the string discount amount from breakdown response
-const discountAmount = computed<number>(() =>
-  discountInfo && discountInfo.isValid ? parseFloat(discountInfo.discountedAmount) : 0,
-);
-
-const hasCredit = computed<boolean>(() => !!(creditInfo && parseFloat(creditInfo.creditedAmount) > 0));
-
-const creditedAmount = computed<number>(() => {
-  if (!creditInfo) {
-    return 0;
-  }
-  return parseFloat(creditInfo.creditedAmount);
-});
-
-const hasAdjustments = computed<boolean>(() => hasDiscount.value || hasCredit.value);
+const hasAdjustments = computed<boolean>(() => !!summary.discount || !!summary.credit);
 
 const durationLabel = computed<string>(() => {
   if (plan.durationInMonths === 12)
@@ -59,12 +31,6 @@ const renewalDate = computed<string>(() => {
   renewal.setMonth(renewal.getMonth() + plan.durationInMonths);
   return formatDate(renewal);
 });
-
-const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: string }>(() => ({
-  subtotal: vatBreakdown?.basePrice ?? grandTotal.toFixed(2),
-  vatRate: vatBreakdown?.vatRate ?? '0',
-  vatAmount: vatBreakdown?.vatAmount ?? '0',
-}));
 </script>
 
 <template>
@@ -76,7 +42,7 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
     >
       <!-- Original price before discount -->
       <div
-        v-if="hasDiscount && vatBreakdown"
+        v-if="summary.discount && summary.vat.rate > 0"
         class="flex justify-between text-sm text-gray-500"
       >
         <span>{{ t('payment_grand_total.original_price') }}</span>
@@ -86,14 +52,14 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
             class="w-16 h-5"
           />
           <template v-else>
-            {{ vatBreakdown.fullAmount }} €
+            {{ summary.fullAmount.formatted }}
           </template>
         </span>
       </div>
 
       <!-- Discount savings -->
       <div
-        v-if="hasDiscount"
+        v-if="summary.discount"
         class="flex justify-between text-sm font-medium text-green-600"
       >
         <span>{{ t('payment_grand_total.discount_savings') }}</span>
@@ -103,13 +69,13 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
             class="w-16 h-5"
           />
           <template v-else>
-            -{{ discountAmount.toFixed(2) }} €
+            -{{ summary.discount.saved.formatted }}
           </template>
         </span>
       </div>
 
       <div
-        v-if="hasCredit"
+        v-if="summary.credit"
         class="flex justify-between text-sm font-medium text-green-600"
       >
         <span>{{ t('payment_grand_total.credit_applied') }}</span>
@@ -119,7 +85,7 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
             class="w-16 h-5"
           />
           <template v-else>
-            -{{ creditedAmount.toFixed(2) }} €
+            -{{ summary.credit.formatted }}
           </template>
         </span>
       </div>
@@ -142,21 +108,21 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
             class="w-16 h-5"
           />
           <template v-else>
-            {{ priceBreakdown.subtotal }} €
+            {{ summary.subtotal.formatted }}
           </template>
         </span>
       </div>
 
       <!-- VAT -->
       <div class="flex justify-between text-sm">
-        <span class="text-gray-600">{{ t('payment_grand_total.vat', { rate: priceBreakdown.vatRate }) }}</span>
+        <span class="text-gray-600">{{ t('payment_grand_total.vat', { rate: summary.vat.formattedRate }) }}</span>
         <span class="font-medium text-rui-text">
           <RuiSkeletonLoader
             v-if="loading"
             class="w-16 h-5"
           />
           <template v-else>
-            {{ priceBreakdown.vatAmount }} €
+            {{ summary.vat.amount.formatted }}
           </template>
         </span>
       </div>
@@ -173,7 +139,7 @@ const priceBreakdown = computed<{ subtotal: string; vatRate: string; vatAmount: 
           class="w-24 h-8"
         />
         <template v-else>
-          {{ grandTotal.toFixed(2) }} €
+          {{ summary.dueToday.formatted }}
         </template>
       </div>
     </div>

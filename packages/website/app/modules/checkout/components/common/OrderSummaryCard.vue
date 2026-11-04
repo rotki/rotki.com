@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
+import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
 import { get } from '@vueuse/shared';
 import DiscountCodeInput from '~/modules/checkout/components/common/DiscountCodeInput.vue';
 import PaymentGrandTotal from '~/modules/checkout/components/common/PaymentGrandTotal.vue';
 import SelectedPlanOverview from '~/modules/checkout/components/common/SelectedPlanOverview.vue';
 import { useMainStore } from '~/store';
-
-interface VatBreakdown {
-  basePrice: string;
-  vatAmount: string;
-  vatRate: string;
-  fullAmount: string;
-}
 
 const discountCodeInput = defineModel<string>('discountCode', { default: '' });
 
@@ -53,43 +47,11 @@ const discountSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'))
 // Derive discountInfo from breakdown
 const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => breakdown?.discount ?? undefined);
 
-const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.credit ?? undefined;
-});
-
-// Derive vatBreakdown from breakdown
-const vatBreakdown = computed<VatBreakdown | undefined>(() => {
-  if (!breakdown) {
-    return undefined;
-  }
-
-  const floatRate = parseFloat(breakdown.vatRate);
-  if (isFinite(floatRate) && floatRate <= 0) {
-    return undefined;
-  }
-
-  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : breakdown.vatRate;
-  const finalAmount = parseFloat(breakdown.finalAmount);
-  const vatAmount = parseFloat(breakdown.vatAmount);
-  const basePrice = (finalAmount - vatAmount).toFixed(2);
-
-  return {
-    basePrice,
-    vatAmount: vatAmount.toFixed(2),
-    vatRate,
-    fullAmount: breakdown.fullAmount,
-  };
-});
-
-const grandTotal = computed<number>(() => {
-  if (breakdown) {
-    return parseFloat(breakdown.finalAmount);
-  }
-
-  // Fallback to plan price
-  return selectedPlan?.price ?? 0;
-});
+const summary = computed<OrderSummary>(() => buildOrderSummary({
+  plan: { price: selectedPlan?.price ?? 0 },
+  breakdown,
+  upgrade: !!upgradeSubId,
+}));
 
 const showVatWarning = computed<boolean>(() => {
   const acc = get(account);
@@ -154,12 +116,9 @@ function handlePlanChange(newPlan: SelectedPlan): void {
 
     <PaymentGrandTotal
       :plan="selectedPlan"
-      :grand-total="grandTotal"
+      :summary="summary"
       :loading="loading"
-      :discount-info="discountInfo"
-      :credit-info="creditInfo"
       :crypto="isCrypto"
-      :vat-breakdown="vatBreakdown"
     />
   </RuiCard>
 </template>

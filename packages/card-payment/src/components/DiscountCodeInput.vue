@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount, ValidPaymentBreakdownDiscount } from '@rotki/card-payment-common/schemas/plans';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
+import { formatEur, formatPercent } from '@rotki/card-payment-common/utils/money';
 import { get, set } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
@@ -53,7 +54,7 @@ const errorMessage = computed<string>(() => {
 const appliedDiscountAmount = computed<string>(() => {
   const info = discountInfo;
   return isValidDiscount(info) && info.discountType === DiscountType.PERCENTAGE && info.discountAmount
-    ? `${info.discountAmount}% off`
+    ? `${formatPercent(info.discountAmount)} off`
     : '';
 });
 
@@ -183,7 +184,7 @@ watch(value, clearErrorOnEdit);
           </div>
           <div class="text-sm font-semibold text-rui-success">
             <template v-if="isValidDiscount(discountInfo)">
-              You save {{ discountInfo.discountedAmount }} €
+              You save {{ formatEur(discountInfo.discountedAmount) }}
               <template v-if="appliedDiscountAmount">
                 ({{ appliedDiscountAmount }})
               </template>

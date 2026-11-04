@@ -787,8 +787,8 @@
             "campaign_hint": "Code {code} gives {percent}% off your first payment.",
             "first_payment_only": "* Applies to first payment only",
             "hint": "Optional: Enter a discount code to apply savings to your purchase.",
-            "you_save": "You save {amount}€",
-            "percent_off": "({percentage}% off)",
+            "you_save": "You save {amount}",
+            "percent_off": "({percentage} off)",
             "label": "Discount/Referral Code"
           },
           "grand_total": "Grand Total",
@@ -1620,7 +1620,7 @@
         "recurring_charge": "Recurring charge",
         "per_month": "/mo",
         "per_year": "/yr",
-        "approval_notice": "By completing this verification, you agree to an immediate charge of {immediateAmount}€ and recurring payments of {renewingPrice}€ {period} until you cancel your subscription."
+        "approval_notice": "By completing this verification, you agree to an immediate charge of {immediateAmount} and recurring payments of {renewingPrice} {period} until you cancel your subscription."
       }
     }
   },
@@ -1724,7 +1724,7 @@
     "discount_savings": "Discount savings:",
     "original_price": "Original price:",
     "subtotal": "Subtotal:",
-    "vat": "VAT ({rate}%):"
+    "vat": "VAT ({rate}):"
   },
   "payment_methods": {
     "title": "Payment Methods",

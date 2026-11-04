@@ -67,6 +67,9 @@
 /* Only the app's own code: content, tests and scripts carry words that look like classes. */
 @source '../..';
 
+/* Shared checkout components; their classes are purged without this. */
+@source '../../../../checkout-ui/src';
+
 @utility container {
   margin-inline: auto;
 
