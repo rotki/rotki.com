@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
 import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import DiscountCodeField from '@rotki/checkout-ui/components/DiscountCodeField.vue';
 import PriceRows from '@rotki/checkout-ui/components/PriceRows.vue';
 import { get, set, useSessionStorage, watchImmediate } from '@vueuse/core';
-import { type Client, create } from 'braintree-web/client';
-import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
-import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
+import { useBraintreeClient } from '@/composables/braintree-client';
+import { useCardCheckout } from '@/composables/card-checkout';
+import { useSavedCardSelection } from '@/composables/saved-card-selection';
 import { paths } from '@/config/paths';
-import { addCard, CardAddedPaymentError, createCardNonce, reportCardFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
+import { reportCardFailure } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
 import NewCardForm from './NewCardForm.vue';
@@ -56,20 +56,10 @@ defineSlots<{
   methods?: () => any;
 }>();
 
-/**
- * Per-transaction error (card decline, tokenization failure, payment failure). Kept
- * local so a recoverable problem doesn't escalate to App.vue's full-screen ErrorState,
- * which is reserved for genuinely fatal init failures (e.g. plan/Braintree client load).
- */
-const transactionError = ref<string>();
-
-const client = shallowRef<Client>();
-const isProcessing = ref<boolean>(false);
 const acceptedTerms = ref<boolean>(false);
 const newCardFormValid = ref<boolean>(false);
 const showCardSelectionDialog = ref<boolean>(false);
 const showAddCardDialog = ref<boolean>(false);
-const pendingCardToken = ref<string>();
 // Shared with the website checkout: set once the buyer removes an auto-applied code.
 const autoDiscountDismissed = useSessionStorage<boolean>(AUTO_DISCOUNT_DISMISSED_KEY, false);
 // Seeded before PlanSummary's first fetch, so the initial breakdown already carries the code.
@@ -78,14 +68,41 @@ const discountCode = ref<string>(discount.initialCode ?? '');
 const breakdown = ref<PaymentBreakdownResponse>();
 const newCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('newCardForm');
 
-// Derive discountInfo from breakdown
-const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.discount ?? undefined;
+const { client } = useBraintreeClient(planData.braintreeClientToken, (error) => {
+  emit('fatal-error', reportCardFailure(error, {
+    failure: 'BRAINTREE_INIT_FAILED',
+    planId: selectedPlan.planId,
+    isUpgrade: !!upgradeSubId,
+    step: 'init',
+  }));
 });
 
-watchImmediate(() => getValidDiscountCode(get(discountInfo), get(discountCode) || undefined), (validCode) => {
-  set(campaignApplied, !!discount.campaign && validCode === discount.campaign.code);
+const { processing, transactionError, setTransactionError, submit } = useCardCheckout({
+  plan: () => selectedPlan,
+  upgradeSubId: () => upgradeSubId ?? undefined,
+  clientToken: () => planData.braintreeClientToken,
+  breakdown,
+  discountCode,
+  client,
+  tokenizeNewCard: async () => get(newCardForm)?.tokenize(),
+  onCardSaved: () => emit('refresh-card'),
+  onHandoff: () => emit('payment-success'),
+});
+
+const { selectWhenAdded } = useSavedCardSelection(selectedCard, () => cards);
+
+const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => get(breakdown)?.discount ?? undefined);
+
+const showVatWarning = computed<boolean>(() => vatIdStatus === VatIdStatus.NOT_VALID && country !== 'DE');
+
+// The API sends the next payment as a unix timestamp in seconds; 0 means it has none.
+const renewsAt = computed<Date | undefined>(() => (planData.nextPayment ? new Date(planData.nextPayment * 1000) : undefined));
+
+const isFormValid = computed<boolean>(() => {
+  if (!get(acceptedTerms) || get(processing))
+    return false;
+
+  return !!get(selectedCard) || get(newCardFormValid);
 });
 
 /** Remembers a removed code across payment pages; entering a code lifts the dismissal again. */
@@ -93,261 +110,19 @@ function handleDiscountEdit(code: string): void {
   set(autoDiscountDismissed, !code);
 }
 
-const showVatWarning = computed<boolean>(() => vatIdStatus === VatIdStatus.NOT_VALID && country !== 'DE');
-
-const isFormValid = computed<boolean>(() => {
-  const card = get(selectedCard);
-  const hasAcceptedTerms = get(acceptedTerms);
-  const notProcessing = !get(isProcessing);
-
-  if (card) {
-    return hasAcceptedTerms && notProcessing;
-  }
-
-  return (
-    get(newCardFormValid) &&
-    hasAcceptedTerms &&
-    notProcessing
-  );
-});
-
-async function initializeBraintreeClient(): Promise<void> {
-  const authorization = planData.braintreeClientToken;
-  if (!authorization) {
-    throw new Error('Braintree client token not available');
-  }
-
-  try {
-    const clientInstance = await create({
-      authorization,
-    });
-    set(client, clientInstance);
-  }
-  catch (error_: unknown) {
-    console.error(error_);
-    emit('fatal-error', reportCardFailure(error_, {
-      failure: 'BRAINTREE_INIT_FAILED',
-      planId: selectedPlan.planId,
-      isUpgrade: !!upgradeSubId,
-      step: 'init',
-    }));
-  }
-}
-
-async function getSavedCardBin(card: SavedCard): Promise<string> {
-  let vaultManager: VaultManager | null = null;
-
-  try {
-    vaultManager = await createVaultManager({
-      client: client.value,
-    });
-
-    const methods = await vaultManager.fetchPaymentMethods();
-    const method = methods.find(({ type, details }) =>
-      type === 'CreditCard' &&
-      details &&
-      'lastFour' in details &&
-      details?.lastFour === card.last4,
-    );
-
-    if (method?.details && 'bin' in method.details && method.details.bin) {
-      return method.details.bin;
-    }
-
-    return '';
-  }
-  catch (error_) {
-    console.error('Failed to fetch bin from vault manager:', error_);
-    return '';
-  }
-  finally {
-    if (vaultManager) {
-      await vaultManager.teardown();
-    }
-  }
-}
-
-const grandTotal = computed<number>(() => {
-  const currentBreakdown = get(breakdown);
-
-  // Use breakdown if available
-  if (currentBreakdown) {
-    return parseFloat(currentBreakdown.finalAmount);
-  }
-
-  return selectedPlan.price;
-});
-
-// The API sends the next payment as a unix timestamp in seconds; 0 means it has none.
-const renewsAt = computed<Date | undefined>(() => (planData.nextPayment ? new Date(planData.nextPayment * 1000) : undefined));
-
-const renewingPrice = computed<number>(() => {
-  const currentBreakdown = get(breakdown);
-
-  // Use breakdown if available
-  if (currentBreakdown) {
-    return parseFloat(currentBreakdown.renewingPrice);
-  }
-
-  return selectedPlan.price;
-});
-
-interface PaymentCardDetails {
-  paymentToken: string;
-  paymentBin: string;
-}
-
-/**
- * Token and BIN of the card to charge: the selected saved card, or the new card
- * form, which is tokenized and vaulted first. Returns `undefined` when the new
- * card form is not mounted.
- */
-async function resolvePaymentCard(card: SavedCard | undefined): Promise<PaymentCardDetails | undefined> {
-  if (card) {
-    const paymentBin = await getSavedCardBin(card);
-    return { paymentToken: card.token, paymentBin };
-  }
-
-  const form = get(newCardForm);
-  if (!form) {
-    return undefined;
-  }
-
-  const { nonce, bin } = await form.tokenize();
-  const paymentToken = await addCard({
-    paymentMethodNonce: nonce,
-  });
-
-  emit('refresh-card');
-  return { paymentToken, paymentBin: bin };
-}
-
-/** Data the 3D Secure page needs to verify and complete the payment. */
-function buildThreeDSecureParams(
-  clientToken: string,
-  paymentNonce: string,
-  paymentBin: string,
-  currentDiscountInfo: PaymentBreakdownDiscount | undefined,
-): ThreeDSecureParams {
-  return {
-    token: clientToken,
-    planId: selectedPlan.planId,
-    amount: selectedPlan.price.toString(),
-    finalAmount: get(grandTotal).toString(),
-    renewingPrice: get(renewingPrice).toString(),
-    nonce: paymentNonce,
-    bin: paymentBin,
-    discountCode: getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined),
-    upgradeSubId: upgradeSubId || undefined,
-    durationInMonths: selectedPlan.durationInMonths,
-    planName: selectedPlan.name,
-    discountTrackingInfo: currentDiscountInfo?.isValid === true
-      ? { isReferral: currentDiscountInfo.isReferral, discountType: currentDiscountInfo.discountType }
-      : undefined,
-  };
-}
-
-async function processPayment(): Promise<void> {
-  if (!get(isFormValid)) {
-    return;
-  }
-
-  set(isProcessing, true);
-  set(transactionError, '');
-
-  const card = get(selectedCard);
-  const cardType = card ? 'saved' as const : 'new' as const;
-  const currentDiscountInfo = get(discountInfo);
-  const discountApplied = currentDiscountInfo?.isValid === true;
-
-  trackCardPaymentSubmitted({
-    planId: selectedPlan.planId,
-    durationInMonths: selectedPlan.durationInMonths,
-    isUpgrade: !!upgradeSubId,
-    cardType,
-    discountApplied,
-  });
-
-  const clientToken = planData.braintreeClientToken;
-  if (!clientToken) {
-    throw new Error('Braintree client token not available');
-  }
-
-  try {
-    const paymentCard = await resolvePaymentCard(card);
-    if (!paymentCard) {
-      set(transactionError, 'New card form not available');
-      set(isProcessing, false);
-      return;
-    }
-
-    const { paymentToken, paymentBin } = paymentCard;
-    const paymentNonce = await createCardNonce({
-      paymentToken,
-    });
-
-    const threeDSecureParams = buildThreeDSecureParams(clientToken, paymentNonce, paymentBin, currentDiscountInfo);
-    sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
-    emit('payment-success');
-  }
-  catch (error_: unknown) {
-    if (error_ instanceof CardAddedPaymentError) {
-      emit('refresh-card');
-    }
-    set(transactionError, reportCardFailure(error_, {
-      failure: 'CARD_PAYMENT_API_ERROR',
-      planId: selectedPlan.planId,
-      isUpgrade: !!upgradeSubId,
-      step: 'submit',
-      cardType,
-      discountApplied,
-    }));
-    set(isProcessing, false);
-  }
-}
-
-function handleCardDeleted(): void {
-  emit('refresh-card');
-}
-
 function handleCardAdded(token: string): void {
-  set(pendingCardToken, token);
+  selectWhenAdded(token);
   emit('refresh-card');
 }
 
-function handleSelectCard(card: SavedCard): void {
-  set(selectedCard, card);
-}
+watchImmediate(() => getValidDiscountCode(get(discountInfo), get(discountCode) || undefined), (validCode) => {
+  set(campaignApplied, !!discount.campaign && validCode === discount.campaign.code);
+});
 
 // Clear discount code only when a previously valid discount becomes invalid (e.g., plan switch)
 watch(breakdown, (newBreakdown, oldBreakdown) => {
   if (get(discountCode) && oldBreakdown?.discount?.isValid && !getValidDiscountCode(newBreakdown?.discount, get(discountCode))) {
     set(discountCode, '');
-  }
-});
-
-// Watch for cards changes to select newly added card
-watch(() => cards, (newCards) => {
-  const token = get(pendingCardToken);
-  if (token) {
-    const newCard = newCards.find(card => card.token === token);
-    if (newCard) {
-      set(selectedCard, newCard);
-      set(pendingCardToken, undefined);
-    }
-  }
-});
-
-onMounted(async () => {
-  await initializeBraintreeClient();
-});
-
-onUnmounted(async () => {
-  try {
-    await client.value?.teardown(() => {});
-  }
-  catch (error_) {
-    console.error('Error during cleanup:', error_);
   }
 });
 </script>
@@ -399,7 +174,7 @@ onUnmounted(async () => {
             type="button"
             class="shrink-0 text-rui-error hover:opacity-70"
             aria-label="Dismiss"
-            @click="transactionError = undefined"
+            @click="setTransactionError(undefined)"
           >
             <svg
               class="h-4 w-4"
@@ -423,16 +198,16 @@ onUnmounted(async () => {
           <div v-if="selectedCard">
             <SavedCardDisplay
               :card="selectedCard"
-              :disabled="isProcessing"
-              @card-deleted="handleCardDeleted()"
-              @error="transactionError = $event"
+              :disabled="processing"
+              @card-deleted="emit('refresh-card')"
+              @error="setTransactionError($event)"
             />
 
             <!-- Button to change card -->
             <div class="flex justify-end mt-4">
               <button
                 type="button"
-                :disabled="isProcessing"
+                :disabled="processing"
                 class="text-sm text-neutral-500 hover:bg-neutral-100 px-1.5 py-0.5 rounded-md hover:underline"
                 @click="showCardSelectionDialog = true"
               >
@@ -446,9 +221,9 @@ onUnmounted(async () => {
             v-else-if="client"
             ref="newCardForm"
             :client="client"
-            :disabled="isProcessing"
+            :disabled="processing"
             @validation-change="newCardFormValid = $event"
-            @error="transactionError = $event"
+            @error="setTransactionError($event)"
           />
         </div>
       </div>
@@ -508,7 +283,7 @@ onUnmounted(async () => {
     <!-- Accept Refund Policy (Outside Grid) -->
     <TermsAcceptance
       v-model:accepted-terms="acceptedTerms"
-      :disabled="isProcessing"
+      :disabled="processing"
       class="max-w-110 mx-auto w-full"
     />
 
@@ -522,7 +297,7 @@ onUnmounted(async () => {
         appear
       >
         <div
-          v-if="isProcessing"
+          v-if="processing"
           class="fixed inset-0 z-rui-blocking flex items-center justify-center bg-black/80 backdrop-blur-xs"
         >
           <div class="flex flex-col items-center justify-center text-center px-4">
@@ -544,9 +319,9 @@ onUnmounted(async () => {
     <div class="max-w-110 mx-auto w-full">
       <PaymentButtons
         :disabled="!isFormValid"
-        :processing="isProcessing"
+        :processing="processing"
         @go-back="emit('go-back')"
-        @continue="processPayment()"
+        @continue="submit(selectedCard)"
       />
     </div>
 
@@ -555,8 +330,8 @@ onUnmounted(async () => {
       v-model:open="showCardSelectionDialog"
       :cards="cards"
       :selected-card="selectedCard"
-      :disabled="isProcessing"
-      @select-card="handleSelectCard($event)"
+      :disabled="processing"
+      @select-card="selectedCard = $event"
       @add-new-card="showAddCardDialog = true"
     />
 

@@ -3,6 +3,7 @@ import type { ThreeDSecure, ThreeDSecureVerifyOptions } from 'braintree-web/thre
 import type { PayEvent } from '~/types/common';
 import {
   type PaymentInfo,
+  THREE_D_SECURE_SESSION_KEY,
   type ThreeDSecureParams,
   ThreeDSecureParamsSchema,
   type ThreeDSecureState,
@@ -18,8 +19,6 @@ import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
 import { PaymentError } from '~/types/codes';
 import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
-
-const SESSION_KEY = 'threeDSecureData';
 
 interface UseThreeDSecureReturn {
   cleanup: () => void;
@@ -62,7 +61,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
    */
   function getStoredParams(): ThreeDSecureParams | undefined {
     try {
-      const stored = sessionStorage.getItem(SESSION_KEY);
+      const stored = sessionStorage.getItem(THREE_D_SECURE_SESSION_KEY);
       if (!stored) {
         return undefined;
       }
@@ -71,14 +70,14 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       const result = ThreeDSecureParamsSchema.safeParse(parsed);
       if (!result.success) {
         logger.error('Invalid stored 3D Secure parameters:', result.error);
-        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(THREE_D_SECURE_SESSION_KEY);
         return undefined;
       }
       return result.data;
     }
     catch (parseError) {
       logger.error('Failed to parse stored 3D Secure parameters:', parseError);
-      sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(THREE_D_SECURE_SESSION_KEY);
       return undefined;
     }
   }
@@ -87,7 +86,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
    * Clear stored 3D Secure data
    */
   function clearStoredData(): void {
-    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(THREE_D_SECURE_SESSION_KEY);
   }
 
   /**
