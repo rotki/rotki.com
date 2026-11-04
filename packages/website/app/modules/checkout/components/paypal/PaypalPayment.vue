@@ -7,6 +7,7 @@ import AcceptRefundPolicy from '~/modules/checkout/components/common/AcceptRefun
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
 import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
+import CheckoutMethodTiles from '~/modules/checkout/components/method/CheckoutMethodTiles.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useReferralCodeParam, useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
@@ -210,6 +211,10 @@ onMounted(async () => {
     :loading="checkoutLoading"
     @clear-error="clearError()"
   >
+    <template #methods>
+      <CheckoutMethodTiles current="paypal" />
+    </template>
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr] lg:gap-8 lg:items-start">
       <!-- Main Content (Left Column) -->
       <div class="flex flex-col gap-6 min-w-0">

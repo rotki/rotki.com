@@ -755,7 +755,6 @@
       "saving": "save {months} months vs monthly",
       "tiers": {
         "step_1": {
-          "description": "Select the premium plan that best fits your needs",
           "notes": {
             "integrations": "Coverage varies per chain and protocol: check the exact chains, exchanges and protocols on the {integrations} before subscribing.",
             "integrations_link": "Integrations page",
@@ -763,14 +762,11 @@
             "line_2": "A new billing cycle starts at UTC midnight after the current one runs out.",
             "line_3": "An invoice is generated for each payment and you can access it from your account page.",
             "line_4": "Subscriptions can be canceled from the account page at any point in time."
-          },
-          "title": "Premium Subscription Plans"
+          }
         },
         "step_2": {
-          "description": "Select one of the different methods",
           "subtitle": "Please select one of the following payment methods.",
-          "title": "Payment Methods",
-          "unavailable": "Not available right now"
+          "title": "Payment Methods"
         },
         "step_3": {
           "change_payment": {
@@ -779,19 +775,10 @@
             "warning": "Changing the payment method after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent."
           },
           "chose": "Your choice:",
-          "description": "Proceed to the payment",
           "discount": {
-            "applied": "Discount code applied:",
-            "referral_applied": "Referral code applied:",
-            "apply_code": "Apply code",
-            "campaign_hint": "Code {code} gives {percent}% off your first payment.",
-            "first_payment_only": "* Applies to first payment only",
-            "hint": "Optional: Enter a discount code to apply savings to your purchase.",
             "you_save": "You save {amount}",
-            "percent_off": "({percentage} off)",
-            "label": "Discount/Referral Code"
+            "percent_off": "({percentage} off)"
           },
-          "grand_total": "Grand Total",
           "labels": {
             "network": "Network",
             "to_address": "Send to address",
@@ -831,10 +818,6 @@
             "pay_with_wallet": "Pay with wallet",
             "switch_network": "Switch Network"
           }
-        },
-        "step_4": {
-          "description": "Secure authentication verification",
-          "title": "3D Secure Verification"
         }
       }
     },
@@ -1357,10 +1340,7 @@
     "starting_label": "Starting:",
     "renew_period": "{months} month | 1 year ({months} months)",
     "vat": "({vat}% VAT: {basePrice}€ + {vatAmount}€)",
-    "recurring_info": "You will be charged automatically each {period} until you cancel",
-    "one_time_payment": "Crypto payments are non-recurring (one time payment). \nManual renewal is required.",
     "month": "month",
-    "next_payment": "Renews on: {date}",
     "year": "year"
   },
   "sponsor": {
@@ -1720,11 +1700,7 @@
     }
   },
   "payment_grand_total": {
-    "credit_applied": "Credit applied:",
-    "discount_savings": "Discount savings:",
-    "original_price": "Original price:",
-    "subtotal": "Subtotal:",
-    "vat": "VAT ({rate}):"
+    "credit_applied": "Credit applied:"
   },
   "payment_methods": {
     "title": "Payment Methods",

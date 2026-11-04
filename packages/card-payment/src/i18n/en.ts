@@ -16,12 +16,11 @@ export const en = {
     unexpectedFailureWithReference: (code: string): string =>
       `We couldn't complete your payment. Please try again, or contact support quoting reference ${code}.`,
   },
-  // Keep in step with `campaign.*` and `step_3.discount.campaign_hint` in the website's en.json.
+  // Keep in step with `campaign.*` in the website's en.json.
   campaign: {
     offer: 'Limited-time offer: {percent}% off your first payment with code {code}.',
     applied: 'Code {code} applied: {percent}% off your first payment.',
     lastDay: (date: string): string => `Last day ${date} (UTC).`,
-    hint: (code: string, percent: number): string => `Code ${code} gives ${percent}% off your first payment.`,
   },
   card: {
     networkFailure: 'We couldn\'t reach the payment provider. Check your connection and try again.',

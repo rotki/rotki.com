@@ -5,11 +5,11 @@ import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import PaymentMethodSelection from '~/modules/checkout/components/method/PaymentMethodSelection.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
-import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';
 
 definePageMeta({
   auth: true,
+  layout: 'checkout',
   middleware: ['pending-payment', 'valid-plan-id'],
   requiresSubscriber: true,
   requiresVerified: true,
@@ -17,7 +17,6 @@ definePageMeta({
 
 usePageSeoNoIndex('select payment method');
 
-const { subscriptionId } = useSubscriptionIdParam();
 const { fetchBraintreePaymentAvailability } = useMainStore();
 
 await fetchBraintreePaymentAvailability();
@@ -47,5 +46,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <PaymentMethodSelection :identifier="subscriptionId" />
+  <PaymentMethodSelection />
 </template>

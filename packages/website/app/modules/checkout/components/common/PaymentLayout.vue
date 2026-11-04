@@ -17,6 +17,8 @@ const emit = defineEmits<{
 defineSlots<{
   default: () => void;
   description?: () => void;
+  /** Switching to another payment method, between the header and the page. */
+  methods?: () => void;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -36,6 +38,13 @@ const { t } = useI18n({ useScope: 'global' });
           {{ t('home.plans.tiers.step_3.subtitle') }}
         </CheckoutDescription>
       </slot>
+    </div>
+
+    <div
+      v-if="$slots.methods"
+      class="mb-6"
+    >
+      <slot name="methods" />
     </div>
 
     <slot />

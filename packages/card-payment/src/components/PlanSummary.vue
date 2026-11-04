@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { formatLongDate } from '@rotki/card-payment-common/utils/date';
 import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
 import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { computed, ref, watch } from 'vue';
 import { getPaymentBreakdown } from '@/utils/api';
-import { formatDate } from '@/utils/date';
 
 interface Props {
   upgrade: boolean;
@@ -21,7 +21,7 @@ const isLoadingBreakdown = ref<boolean>(false);
 
 const name = computed<string>(() => getPlanNameFor(selectedPlan));
 
-const date = computed<string>(() => formatDate(new Date()));
+const date = computed<string>(() => formatLongDate(new Date()));
 
 const durationDescription = computed<string>(() => {
   if (selectedPlan.durationInMonths === 12)

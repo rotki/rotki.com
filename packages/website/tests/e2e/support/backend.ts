@@ -131,6 +131,7 @@ function withOutcome(outcome: ApiOutcome, json: unknown): MockResponse {
 const HANDLERS: Record<string, Handler> = {
   'DELETE /webapi/2/crypto/payment/pending/': s => withOutcome(s.deletePending, { result: true }),
   'GET /webapi/2/available-tiers': s => ok(s.tiers),
+  'GET /webapi/2/braintree/payment/enabled': () => ok({ enabled: true }),
   'GET /webapi/2/crypto/payment/pending/': s => withOutcome(s.pendingLookup, { result: s.pending }),
   'GET /webapi/2/crypto/payment/upgrade/': s => withOutcome(s.upgradeLookup, { result: s.upgrade }),
   'DELETE /webapi/payment/btr/cards/': (s, call) => {

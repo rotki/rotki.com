@@ -5,6 +5,7 @@ import CryptoPayment from '~/modules/checkout/components/crypto/CryptoPayment.vu
 
 definePageMeta({
   auth: true,
+  layout: 'checkout',
   middleware: ['valid-plan-id'],
   requiresSubscriber: true,
   requiresVerified: true,

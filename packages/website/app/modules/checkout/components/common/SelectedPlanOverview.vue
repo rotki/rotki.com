@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { formatLongDate } from '@rotki/card-payment-common/utils/date';
 import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
 import { set } from '@vueuse/shared';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
-import { formatDate } from '~/utils/date';
 import { getPlanNameFor } from '~/utils/plans';
 
 const {
@@ -34,7 +34,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 const name = computed<string>(() => getPlanNameFor(t, plan));
 
-const date = computed<string>(() => formatDate(new Date()));
+const date = computed<string>(() => formatLongDate(new Date()));
 
 const summary = computed<OrderSummary>(() => buildOrderSummary({ plan, breakdown, upgrade }));
 

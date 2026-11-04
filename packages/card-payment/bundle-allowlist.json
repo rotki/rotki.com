@@ -2,6 +2,7 @@
   "@fontsource-variable/geist-mono",
   "@fontsource-variable/inter",
   "@rotki/card-payment-common",
+  "@rotki/checkout-ui",
   "@rotki/sigil",
   "@rotki/ui-library",
   "@unhead/vue",
@@ -13,6 +14,7 @@
   "@vueuse/shared",
   "braintree-web",
   "hookable",
+  "tailwind-variants",
   "unhead",
   "vite-ssg",
   "zod"

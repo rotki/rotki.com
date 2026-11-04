@@ -74,7 +74,11 @@ export function vatRatePercent(rate: number | string): number {
   return fromCents(toCents(percent));
 }
 
-function buildDiscount({ discount }: PaymentBreakdownResponse): OrderSummaryDiscount | undefined {
+/**
+ * Summarises a discount or referral code the breakdown confirmed: what it saves and, for
+ * percentage codes, the percentage. Undefined for a missing or rejected code.
+ */
+export function buildDiscountSummary(discount: PaymentBreakdownResponse['discount'] | undefined): OrderSummaryDiscount | undefined {
   if (!discount?.isValid)
     return undefined;
   const isPercentage = discount.discountType.includes(DiscountType.PERCENTAGE);
@@ -129,7 +133,7 @@ export function buildOrderSummary({ plan, breakdown, upgrade = false }: OrderSum
     price: upgrade ? money(plan.price) : fullAmount,
     proratedPrice: upgrade ? fullAmount : undefined,
     fullAmount,
-    discount: buildDiscount(breakdown),
+    discount: buildDiscountSummary(breakdown.discount),
     credit: buildCredit(breakdown),
     subtotal: rate > 0 ? moneyFromCents(toCents(dueToday.amount) - vatCents) : dueToday,
     vat: buildVat(rate, vatCents),

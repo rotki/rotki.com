@@ -5,6 +5,7 @@ import PaypalPayment from '~/modules/checkout/components/paypal/PaypalPayment.vu
 
 definePageMeta({
   auth: true,
+  layout: 'checkout',
   middleware: ['valid-plan-id'],
   requiresSubscriber: true,
   requiresVerified: true,

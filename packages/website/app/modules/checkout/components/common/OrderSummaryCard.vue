@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
-import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
+import DiscountCodeField from '@rotki/checkout-ui/components/DiscountCodeField.vue';
+import PriceRows from '@rotki/checkout-ui/components/PriceRows.vue';
 import { get } from '@vueuse/shared';
-import DiscountCodeInput from '~/modules/checkout/components/common/DiscountCodeInput.vue';
-import PaymentGrandTotal from '~/modules/checkout/components/common/PaymentGrandTotal.vue';
+import { useAppConfig } from '~/composables/use-app-config';
 import SelectedPlanOverview from '~/modules/checkout/components/common/SelectedPlanOverview.vue';
 import { useMainStore } from '~/store';
 
@@ -39,6 +39,9 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { account } = storeToRefs(useMainStore());
 
+// Offered in the discount field's hint while no code is applied.
+const { activeCampaign } = useAppConfig();
+
 // Spacing classes based on compact mode
 const spacingClass = computed<string>(() => (compact ? 'my-4' : 'my-6'));
 const titleSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'));
@@ -47,11 +50,14 @@ const discountSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'))
 // Derive discountInfo from breakdown
 const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => breakdown?.discount ?? undefined);
 
-const summary = computed<OrderSummary>(() => buildOrderSummary({
-  plan: { price: selectedPlan?.price ?? 0 },
-  breakdown,
-  upgrade: !!upgradeSubId,
-}));
+// A new subscription renews one billing period from today.
+const renewsAt = computed<Date | undefined>(() => {
+  if (!selectedPlan)
+    return undefined;
+  const renewal = new Date();
+  renewal.setMonth(renewal.getMonth() + selectedPlan.durationInMonths);
+  return renewal;
+});
 
 const showVatWarning = computed<boolean>(() => {
   const acc = get(account);
@@ -85,10 +91,11 @@ function handlePlanChange(newPlan: SelectedPlan): void {
 
     <RuiDivider :class="spacingClass" />
 
-    <DiscountCodeInput
+    <DiscountCodeField
       v-model="discountCodeInput"
       :disabled="disabled"
-      :discount-info="discountInfo"
+      :discount="discountInfo"
+      :campaign="activeCampaign"
       :class="discountSpacingClass"
       @apply="emit('apply-discount')"
     />
@@ -114,11 +121,14 @@ function handlePlanChange(newPlan: SelectedPlan): void {
       </i18n-t>
     </RuiAlert>
 
-    <PaymentGrandTotal
+    <PriceRows
       :plan="selectedPlan"
-      :summary="summary"
+      :breakdown="breakdown"
+      :upgrade="!!upgradeSubId"
       :loading="loading"
-      :crypto="isCrypto"
+      :duration-in-months="selectedPlan.durationInMonths"
+      :renews-at="renewsAt"
+      :one-time="isCrypto"
     />
   </RuiCard>
 </template>

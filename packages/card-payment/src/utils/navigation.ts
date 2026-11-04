@@ -1,18 +1,49 @@
 /**
  * Centralized navigation configuration and utilities for card payment app
  */
+import type { MethodLinks } from '@rotki/checkout-ui/utils/checkout-flow';
 import { paths } from '@/config/paths';
 
 /**
  * Route definitions for the card payment application
  */
 export const routes = {
+  cryptoRequest: `${paths.hostUrlBase}/checkout/pay/request-crypto`,
   home: paths.hostUrlBase,
   paymentMethod: `${paths.hostUrlBase}/checkout/pay/method`,
+  paypal: `${paths.hostUrlBase}/checkout/pay/paypal`,
+  plans: `${paths.hostUrlBase}/checkout/pay`,
   refundPolicy: `${paths.hostUrlBase}/refund-policy`,
   subscription: `${paths.hostUrlBase}/home/subscription`,
   threeDSecure: `${paths.hostUrlBase}/checkout/pay/3d-secure`,
 } as const;
+
+/** Checkout query params that carry over between the website's checkout pages and this app. */
+const CARRIED_PARAMS = ['planId', 'ref', 'discountCode', 'id'] as const;
+
+/**
+ * Adds the checkout params of the current URL (plan, referral, explicit discount code, renewal
+ * subscription) to `href`, so a link to another checkout page keeps what the buyer chose.
+ */
+export function withCheckoutParams(href: string): string {
+  const params = new URLSearchParams();
+  for (const key of CARRIED_PARAMS) {
+    const value = getUrlParam(key);
+    if (value)
+      params.set(key, value);
+  }
+  const query = params.toString();
+  return query ? `${href}?${query}` : href;
+}
+
+/** Links for the method tiles: this page for card, the website's pages for PayPal and crypto. */
+export function checkoutMethodLinks(): MethodLinks {
+  return {
+    card: { href: withCheckoutParams(paths.appUrlBase) },
+    crypto: { href: withCheckoutParams(routes.cryptoRequest) },
+    paypal: { href: withCheckoutParams(routes.paypal) },
+  };
+}
 
 /**
  * Navigation utility functions

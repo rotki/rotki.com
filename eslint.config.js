@@ -43,6 +43,7 @@ export default rotki({
     'packages/website/app/middleware/**/*.ts',
     'packages/website/app/plugins/**/*.ts',
     'packages/website/app/types/recaptcha.d.ts',
+    'packages/website/i18n/locales/*.ts',
     'packages/website/tests/coverage-provider.ts',
     'packages/website/tests/e2e/mock-api/routes/**/*.ts',
     'packages/website/tests/e2e/support/coverage-global-setup.ts',

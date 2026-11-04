@@ -12,6 +12,7 @@ import { useThreeDSecure } from '~/modules/checkout/composables/use-three-d-secu
 
 definePageMeta({
   auth: true,
+  layout: 'checkout',
   requiresSubscriber: true,
   requiresVerified: true,
 });

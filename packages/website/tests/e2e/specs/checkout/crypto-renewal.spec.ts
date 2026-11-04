@@ -65,6 +65,10 @@ test.describe('crypto renewal', () => {
     await page.goto(`/checkout/pay/request-crypto?${RENEWAL_QUERY}`);
 
     await selectAsset(page, 'Ethereum', 'ETH (Ether)');
+    // A renewal is paid in crypto and does not start a new purchase, so it offers neither.
+    await expect(page.getByRole('navigation', { name: 'Payment method' })).toHaveCount(0);
+    await expect(page.locator('[data-cy="checkout-back-to-plans"]')).toHaveCount(0);
+
     await acceptPolicyAndContinue(page);
 
     await connectWallet(page, wallet);

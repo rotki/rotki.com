@@ -4,6 +4,8 @@ import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan }
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
 import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import DiscountCodeField from '@rotki/checkout-ui/components/DiscountCodeField.vue';
+import PriceRows from '@rotki/checkout-ui/components/PriceRows.vue';
 import { get, set, useSessionStorage, watchImmediate } from '@vueuse/core';
 import { type Client, create } from 'braintree-web/client';
 import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
@@ -12,10 +14,8 @@ import { paths } from '@/config/paths';
 import { addCard, CardAddedPaymentError, createCardNonce, reportCardFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
-import DiscountCodeInput from './DiscountCodeInput.vue';
 import NewCardForm from './NewCardForm.vue';
 import PaymentButtons from './PaymentButtons.vue';
-import PaymentGrandTotal from './PaymentGrandTotal.vue';
 import PlanSummary from './PlanSummary.vue';
 import SavedCardDisplay from './SavedCardDisplay.vue';
 import TermsAcceptance from './TermsAcceptance.vue';
@@ -34,8 +34,8 @@ const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country, disco
   discount?: {
     /** Code to start with, already resolved from the URL, referral, campaign and dismissal. */
     initialCode?: string;
-    campaignCode?: string;
-    hint?: string;
+    /** Running campaign; its code counts as the campaign discount and is offered in the field's hint. */
+    campaign?: { code: string; percent: number };
   };
 }>();
 
@@ -49,6 +49,11 @@ const emit = defineEmits<{
    * Per-transaction errors (card decline, payment failure) stay inline.
    */
   'fatal-error': [message: string];
+}>();
+
+defineSlots<{
+  /** Switching to another payment method, shown under the title. */
+  methods?: () => any;
 }>();
 
 /**
@@ -80,7 +85,7 @@ const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
 });
 
 watchImmediate(() => getValidDiscountCode(get(discountInfo), get(discountCode) || undefined), (validCode) => {
-  set(campaignApplied, !!discount.campaignCode && validCode === discount.campaignCode);
+  set(campaignApplied, !!discount.campaign && validCode === discount.campaign.code);
 });
 
 /** Remembers a removed code across payment pages; entering a code lifts the dismissal again. */
@@ -172,6 +177,9 @@ const grandTotal = computed<number>(() => {
 
   return selectedPlan.price;
 });
+
+// The API sends the next payment as a unix timestamp in seconds; 0 means it has none.
+const renewsAt = computed<Date | undefined>(() => (planData.nextPayment ? new Date(planData.nextPayment * 1000) : undefined));
 
 const renewingPrice = computed<number>(() => {
   const currentBreakdown = get(breakdown);
@@ -356,6 +364,13 @@ onUnmounted(async () => {
       </div>
     </div>
 
+    <div
+      v-if="$slots.methods"
+      class="mb-6"
+    >
+      <slot name="methods" />
+    </div>
+
     <!-- Two Column Layout -->
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_1fr] xl:gap-8 xl:items-start">
       <!-- Left Column: Payment Form -->
@@ -456,12 +471,12 @@ onUnmounted(async () => {
           <hr class="my-4 border-rui-grey-300" />
 
           <!-- Discount Code Input -->
-          <DiscountCodeInput
+          <DiscountCodeField
             v-model="discountCode"
-            :discount-info="discountInfo"
-            :hint="discount.hint"
+            :discount="discountInfo"
+            :campaign="discount.campaign"
             class="mb-4"
-            @edit="handleDiscountEdit($event)"
+            @apply="handleDiscountEdit($event)"
           />
 
           <!-- VAT Warning -->
@@ -479,12 +494,12 @@ onUnmounted(async () => {
           </div>
 
           <!-- Payment Grand Total -->
-          <PaymentGrandTotal
+          <PriceRows
+            :plan="selectedPlan"
             :breakdown="breakdown"
-            :selected-plan="selectedPlan"
             :upgrade="!!upgradeSubId"
-            :next-payment="planData.nextPayment"
             :duration-in-months="selectedPlan.durationInMonths"
+            :renews-at="renewsAt"
           />
         </div>
       </aside>

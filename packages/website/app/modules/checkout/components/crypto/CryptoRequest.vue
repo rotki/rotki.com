@@ -5,6 +5,7 @@ import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryC
 import PaymentLayout from '~/modules/checkout/components/common/PaymentLayout.vue';
 import CryptoAssetSelector from '~/modules/checkout/components/crypto/CryptoAssetSelector.vue';
 import CryptoPaymentInfo from '~/modules/checkout/components/crypto/CryptoPaymentInfo.vue';
+import CheckoutMethodTiles from '~/modules/checkout/components/method/CheckoutMethodTiles.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { buildQueryParams } from '~/utils/query';
 
@@ -85,6 +86,10 @@ function submit(): void {
     :loading="loading"
     @clear-error="clearError()"
   >
+    <template #methods>
+      <CheckoutMethodTiles current="crypto" />
+    </template>
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr] lg:gap-8 lg:items-start">
       <!-- Main Content (Left Column) -->
       <div class="flex flex-col gap-6 min-w-0">

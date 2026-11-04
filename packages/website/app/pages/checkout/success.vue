@@ -8,6 +8,7 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 
 definePageMeta({
+  layout: 'checkout',
   middleware: ['payment-success'],
 });
 

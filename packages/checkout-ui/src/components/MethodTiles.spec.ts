@@ -1,0 +1,80 @@
+import { type DOMWrapper, mount, type VueWrapper } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
+import { installCheckoutMessages } from '../composables/checkout-messages';
+import { checkoutMessages } from '../messages/en';
+import { createTranslator } from '../utils/translator';
+import MethodTiles from './MethodTiles.vue';
+
+type Props = InstanceType<typeof MethodTiles>['$props'];
+
+const allMethods: Props['links'] = {
+  crypto: { href: '/checkout/pay/request-crypto?planId=1' },
+  card: { href: '/checkout/pay/card?planId=1' },
+  paypal: { href: '/checkout/pay/paypal?planId=1' },
+};
+
+/** A tile's title and the line under it. */
+function lines(tile: Pick<DOMWrapper<Element>, 'findAll'>): string[] {
+  return tile.findAll(':scope > span').map(line => line.text());
+}
+
+function mountTiles(props: Partial<Props> = {}): VueWrapper {
+  return mount(MethodTiles, {
+    global: {
+      plugins: [{ install: app => installCheckoutMessages(app, createTranslator(checkoutMessages)) }],
+    },
+    props: { links: allMethods, ...props },
+  });
+}
+
+describe('methodTiles', () => {
+  it('links each method in a fixed order inside a labelled nav', () => {
+    const wrapper = mountTiles();
+
+    expect(wrapper.get('nav').attributes('aria-label')).toBe('Payment method');
+    const links = wrapper.findAll('a');
+    expect(links.map(link => link.attributes('href'))).toEqual([
+      '/checkout/pay/card?planId=1',
+      '/checkout/pay/paypal?planId=1',
+      '/checkout/pay/request-crypto?planId=1',
+    ]);
+    expect(links.map(lines)).toEqual([
+      ['Card', 'Renews automatically'],
+      ['PayPal', 'Renews through PayPal'],
+      ['Crypto', 'One payment, no renewal'],
+    ]);
+  });
+
+  it('marks the method of the current page', () => {
+    const links = mountTiles({ current: 'paypal' }).findAll('a');
+
+    expect(links.map(link => link.attributes('aria-current'))).toEqual([undefined, 'page', undefined]);
+  });
+
+  it('leaves out methods without a link', () => {
+    const wrapper = mountTiles({ links: { card: allMethods.card } });
+
+    expect(wrapper.findAll('a')).toHaveLength(1);
+    expect(wrapper.text()).not.toContain('PayPal');
+  });
+
+  it('shows an unavailable method without a link', () => {
+    const wrapper = mountTiles({
+      links: { ...allMethods, card: { disabled: true, href: '/checkout/pay/card' } },
+    });
+
+    const card = wrapper.get('[data-cy="method-card"]');
+    expect(card.element.tagName).toBe('DIV');
+    expect(card.attributes('aria-disabled')).toBe('true');
+    expect(lines(card)).toEqual(['Card', 'Not available right now']);
+    expect(wrapper.findAll('a')).toHaveLength(2);
+  });
+
+  it('reports which method the buyer followed', async () => {
+    const wrapper = mountTiles();
+
+    await wrapper.get('[data-cy="method-crypto"]').trigger('click');
+
+    expect(wrapper.emitted('select')).toEqual([['crypto']]);
+  });
+});

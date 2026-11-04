@@ -332,7 +332,8 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: 'en-US',
-    locales: [{ code: 'en-US', file: 'en.json', language: 'en-US' }],
+    // checkout.ts holds the copy of the shared checkout components (@rotki/checkout-ui).
+    locales: [{ code: 'en-US', files: ['en.json', 'checkout.ts'], language: 'en-US' }],
     strategy: 'no_prefix',
   },
   // llms.txt / llms-full.txt / raw markdown endpoint for AI crawlers (see llms.config.ts).

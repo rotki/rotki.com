@@ -1,6 +1,7 @@
 import type { PaymentBreakdownResponse } from '../schemas/plans';
 import { describe, expect, it } from 'vitest';
-import { buildOrderSummary, vatRatePercent } from './order-summary';
+import { DiscountType } from '../schemas/discount';
+import { buildDiscountSummary, buildOrderSummary, vatRatePercent } from './order-summary';
 
 const plan = { price: 25 };
 
@@ -36,6 +37,34 @@ describe('vatRatePercent', () => {
     expect(vatRatePercent('-1')).toBe(0);
     expect(vatRatePercent('')).toBe(0);
     expect(vatRatePercent('abc')).toBe(0);
+  });
+});
+
+describe('buildDiscountSummary', () => {
+  it('should be undefined without a code or for a rejected code', () => {
+    expect(buildDiscountSummary(undefined)).toBeUndefined();
+    expect(buildDiscountSummary(null)).toBeUndefined();
+    expect(buildDiscountSummary({ error: 'Code expired', isValid: false })).toBeUndefined();
+  });
+
+  it('should give the saving and the percentage of a percentage code', () => {
+    expect(buildDiscountSummary({
+      discountAmount: '10.00',
+      discountType: DiscountType.PERCENTAGE,
+      discountedAmount: '2.5',
+      isReferral: true,
+      isValid: true,
+    })).toEqual({ isReferral: true, percent: '10%', saved: { amount: 2.5, formatted: '2.50 €' } });
+  });
+
+  it('should leave the percentage out for a fixed amount code', () => {
+    expect(buildDiscountSummary({
+      discountAmount: '5.00',
+      discountType: DiscountType.FIXED,
+      discountedAmount: '5',
+      isReferral: false,
+      isValid: true,
+    })).toEqual({ isReferral: false, percent: undefined, saved: { amount: 5, formatted: '5.00 €' } });
   });
 });
 
