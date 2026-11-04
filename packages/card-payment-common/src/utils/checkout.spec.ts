@@ -1,6 +1,7 @@
 import type { PaymentBreakdownDiscount } from '../schemas/plans';
 import { describe, expect, it } from 'vitest';
-import { getValidDiscountCode, resolveDiscountCode } from './checkout';
+import { VatIdStatus } from '../schemas/account';
+import { getValidDiscountCode, needsVatWarning, resolveDiscountCode } from './checkout';
 
 describe('resolveDiscountCode', () => {
   it('should prefer the explicit code over referral and campaign', () => {
@@ -83,5 +84,17 @@ describe('getValidDiscountCode', () => {
       discountedAmount: '90.00',
     };
     expect(getValidDiscountCode(referralDiscount, 'REF123')).toBe('REF123');
+  });
+});
+
+describe('needsVatWarning', () => {
+  it.each([
+    [VatIdStatus.NOT_VALID, 'FR', true],
+    [VatIdStatus.NOT_VALID, 'DE', false],
+    [VatIdStatus.VALID, 'FR', false],
+    [VatIdStatus.NOT_CHECKED, 'FR', false],
+    [undefined, undefined, false],
+  ])('warns for status %s in %s: %s', (status, country, expected) => {
+    expect(needsVatWarning(status, country)).toBe(expected);
   });
 });

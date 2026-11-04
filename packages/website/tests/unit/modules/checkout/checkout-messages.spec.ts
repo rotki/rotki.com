@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 describe('shared checkout copy', () => {
   it('reaches the shared components through vue-i18n', async () => {
     const wrapper = await mountSuspended(PriceRows, {
-      props: { durationInMonths: 1, plan: { price: 25 } },
+      props: { plan: { price: 25, durationInMonths: 1 } },
     });
 
     expect(wrapper.text()).toContain('Due today');

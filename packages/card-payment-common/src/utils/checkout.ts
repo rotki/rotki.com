@@ -1,4 +1,5 @@
 import type { PaymentBreakdownDiscount } from '../schemas/plans';
+import { VatIdStatus } from '../schemas/account';
 
 /**
  * Returns the discount code only if the breakdown confirms it is valid.
@@ -40,4 +41,12 @@ export function resolveDiscountCode({ explicit, dismissed, referral, campaign }:
   if (dismissed)
     return undefined;
   return [referral, campaign].find(Boolean);
+}
+
+/**
+ * Whether to warn that VAT is charged because the buyer's VAT ID did not verify. A German
+ * business pays German VAT either way, so it gets no warning.
+ */
+export function needsVatWarning(status: string | undefined, country: string | undefined): boolean {
+  return status === VatIdStatus.NOT_VALID && country !== 'DE';
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { PaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
-import { formatLongDate } from '@rotki/card-payment-common/utils/date';
+import { formatLongDate, renewalDateFrom } from '@rotki/card-payment-common/utils/date';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
+import { planTitle } from '@rotki/checkout-ui/utils/plan-title';
 import { get } from '@vueuse/shared';
 
 const { receipt } = defineProps<{
@@ -13,12 +14,8 @@ const { t } = useI18n({ useScope: 'global' });
 const plan = computed<string | undefined>(() => {
   if (!receipt.planName)
     return undefined;
-  const name = receipt.planName.charAt(0).toUpperCase() + receipt.planName.slice(1).toLowerCase();
-  const yearly = receipt.durationInMonths === 12;
   // Crypto pays once for the period, so it names the period instead of a billing cycle.
-  if (receipt.method === 'crypto')
-    return yearly ? t('checkout.plan.name_one_year', { name }) : t('checkout.plan.name_one_month', { name });
-  return yearly ? t('checkout.plan.name_yearly', { name }) : t('checkout.plan.name_monthly', { name });
+  return planTitle(t, { name: receipt.planName, durationInMonths: receipt.durationInMonths }, receipt.method === 'crypto');
 });
 
 const method = computed<string>(() => ({
@@ -31,8 +28,7 @@ const method = computed<string>(() => ({
 const nextPayment = computed<string | undefined>(() => {
   if (receipt.method === 'crypto' || receipt.upgrade || !receipt.renewingPrice)
     return undefined;
-  const date = new Date();
-  date.setMonth(date.getMonth() + receipt.durationInMonths);
+  const date = renewalDateFrom(receipt.durationInMonths);
   return t('subscription.success.summary.next_payment_value', { amount: formatEur(receipt.renewingPrice), date: formatLongDate(date) });
 });
 

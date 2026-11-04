@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
+import { needsVatWarning } from '@rotki/card-payment-common/utils/checkout';
+import { renewalDateFrom } from '@rotki/card-payment-common/utils/date';
 import OrderSummary from '@rotki/checkout-ui/components/OrderSummary.vue';
+import VatNotice from '@rotki/checkout-ui/components/VatNotice.vue';
 import { get } from '@vueuse/shared';
 import { useAppConfig } from '~/composables/use-app-config';
 import ChangePlanAction from '~/modules/checkout/components/common/ChangePlanAction.vue';
@@ -33,25 +35,17 @@ const emit = defineEmits<{
   'apply-discount': [];
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
-
 const { account } = storeToRefs(useMainStore());
 
 // Offered next to the discount field while no code is applied.
 const { activeCampaign } = useAppConfig();
 
 // A new subscription renews one billing period from today.
-const renewsAt = computed<Date | undefined>(() => {
-  if (!selectedPlan)
-    return undefined;
-  const renewal = new Date();
-  renewal.setMonth(renewal.getMonth() + selectedPlan.durationInMonths);
-  return renewal;
-});
+const renewsAt = computed<Date | undefined>(() => (selectedPlan ? renewalDateFrom(selectedPlan.durationInMonths) : undefined));
 
 const showVatWarning = computed<boolean>(() => {
   const acc = get(account);
-  return acc?.vatIdStatus === VatIdStatus.NOT_VALID && acc.address.country !== 'DE';
+  return needsVatWarning(acc?.vatIdStatus, acc?.address.country);
 });
 </script>
 
@@ -85,24 +79,7 @@ const showVatWarning = computed<boolean>(() => {
       v-if="showVatWarning"
       #notice
     >
-      <RuiAlert
-        type="warning"
-        variant="outlined"
-      >
-        <i18n-t
-          keypath="auth.signup.vat.vat_invalid_checkout_warning"
-          tag="span"
-        >
-          <template #link>
-            <NuxtLink
-              to="/home/billing"
-              class="font-medium underline"
-            >
-              {{ t('account.tabs.customer_information') }}
-            </NuxtLink>
-          </template>
-        </i18n-t>
-      </RuiAlert>
+      <VatNotice billing-href="/home/billing" />
     </template>
   </OrderSummary>
 </template>

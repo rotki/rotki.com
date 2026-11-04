@@ -4,6 +4,7 @@ import { formatLongDate } from '@rotki/card-payment-common/utils/date';
 import { get } from '@vueuse/shared';
 import { computed } from 'vue';
 import { useCheckoutMessages } from '../composables/checkout-messages';
+import { planTitle } from '../utils/plan-title';
 
 const { plan, upgrade = false, oneTime = false, startsAt } = defineProps<{
   plan: Pick<SelectedPlan, 'name' | 'durationInMonths'>;
@@ -23,12 +24,7 @@ const t = useCheckoutMessages();
 
 const yearly = computed<boolean>(() => plan.durationInMonths === 12);
 
-const title = computed<string>(() => {
-  const name = plan.name.charAt(0).toUpperCase() + plan.name.slice(1).toLowerCase();
-  if (oneTime)
-    return get(yearly) ? t('checkout.plan.name_one_year', { name }) : t('checkout.plan.name_one_month', { name });
-  return get(yearly) ? t('checkout.plan.name_yearly', { name }) : t('checkout.plan.name_monthly', { name });
-});
+const title = computed<string>(() => planTitle(t, plan, oneTime));
 
 const period = computed<string>(() => {
   if (oneTime)

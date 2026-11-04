@@ -8,7 +8,6 @@ import {
   PaymentBreakdownResponseSchema,
   type SelectedPlan,
 } from '@rotki/card-payment-common/schemas/plans';
-import { type UserSubscriptions, UserSubscriptionsResponseSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
@@ -218,34 +217,4 @@ export function findSelectedPlanById(availablePlans: AvailablePlansResponse, pla
   }
 
   return undefined;
-}
-
-export async function fetchUserSubscriptions(): Promise<UserSubscriptions> {
-  try {
-    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/history/subscriptions`, {
-      method: 'GET',
-    });
-
-    if (!response.ok) {
-      console.error('Failed to fetch user subscriptions:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = UserSubscriptionsResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse UserSubscriptionsResponse:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      return [];
-    }
-    return parsedResponse.data.result ?? [];
-  }
-  catch (error: any) {
-    console.error('Failed to fetch user subscriptions:', error);
-    return [];
-  }
 }

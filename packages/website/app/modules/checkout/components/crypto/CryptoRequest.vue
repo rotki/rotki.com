@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { buildOrderSummary } from '@rotki/card-payment-common/utils/order-summary';
+import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
 import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
 import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
+import { useOrderTotals } from '@rotki/checkout-ui/composables/order-totals';
 import { get, set } from '@vueuse/shared';
-import CheckoutErrorAlert from '~/modules/checkout/components/common/CheckoutErrorAlert.vue';
 import CheckoutLoadingOverlay from '~/modules/checkout/components/common/CheckoutLoadingOverlay.vue';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import CryptoAssetSelector from '~/modules/checkout/components/crypto/CryptoAssetSelector.vue';
@@ -45,10 +45,7 @@ onMounted(async () => {
 
 const valid = computed<boolean>(() => get(isRefundPolicyAccepted) && !!get(selectedCurrency));
 
-const total = computed<string | undefined>(() => {
-  const plan = get(selectedPlan);
-  return plan ? buildOrderSummary({ plan, breakdown: get(breakdown), upgrade: !!get(upgradeSubId) }).dueToday.formatted : undefined;
-});
+const { total } = useOrderTotals({ plan: selectedPlan, breakdown, upgrade: () => !!get(upgradeSubId) });
 
 const panelClass = 'flex flex-col gap-4 p-4 md:p-6 rounded-rui-card';
 
@@ -76,8 +73,10 @@ function submit(): void {
     :total-note="t('checkout_crypto.paid_in_crypto')"
   >
     <template #alert>
-      <CheckoutErrorAlert
-        :error="error"
+      <CheckoutAlert
+        v-if="error"
+        :title="error.title"
+        :message="error.message"
         @dismiss="clearError()"
       />
     </template>

@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { buildOrderSummary, type OrderSummary } from '@rotki/card-payment-common/utils/order-summary';
+import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
 import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
 import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
+import ProcessingOverlay from '@rotki/checkout-ui/components/ProcessingOverlay.vue';
+import { useOrderTotals } from '@rotki/checkout-ui/composables/order-totals';
 import { CheckoutPaymentMethods, monthsToPlanDuration, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
-import CheckoutErrorAlert from '~/modules/checkout/components/common/CheckoutErrorAlert.vue';
 import CheckoutLoadingOverlay from '~/modules/checkout/components/common/CheckoutLoadingOverlay.vue';
 import OrderSummaryCard from '~/modules/checkout/components/common/OrderSummaryCard.vue';
 import ServerErrorOverlay from '~/modules/checkout/components/common/ServerErrorOverlay.vue';
 import CheckoutMethodTiles from '~/modules/checkout/components/method/CheckoutMethodTiles.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
+import { purchaseDiscount, useCompletePurchase } from '~/modules/checkout/composables/use-complete-purchase';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
-import { buildPaymentReceipt, storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -46,6 +47,7 @@ const {
 
 const { upgradeSubId } = useSubscriptionIdParam();
 const { chronicle } = useSigilEvents();
+const { completePurchase: recordPurchase } = useCompletePurchase();
 
 const {
   paying,
@@ -60,20 +62,7 @@ const {
   }),
 });
 
-const summary = computed<OrderSummary | undefined>(() => {
-  const plan = get(selectedPlan);
-  return plan ? buildOrderSummary({ plan, breakdown: get(breakdown), upgrade: !!get(upgradeSubId) }) : undefined;
-});
-
-/** The phone summary bar's line under the total. */
-const totalNote = computed<string | undefined>(() => {
-  const info = get(summary);
-  const plan = get(selectedPlan);
-  if (!info || !plan)
-    return undefined;
-  const amount = info.renewal.formatted;
-  return plan.durationInMonths === 12 ? t('checkout.page.then_year', { amount }) : t('checkout.page.then_month', { amount });
-});
+const { summary, total, totalNote } = useOrderTotals({ plan: selectedPlan, breakdown, upgrade: () => !!get(upgradeSubId) });
 
 const renewalNote = computed<string>(() => {
   const info = get(summary);
@@ -131,24 +120,14 @@ async function initialize(): Promise<boolean> {
 /** Records the purchase for analytics, then moves to the checkout success page. */
 async function completePurchase(plan: Pick<SelectedPlan, 'planId' | 'name' | 'durationInMonths'>): Promise<void> {
   const breakdownData = get(breakdown);
-  const discountInfo = breakdownData?.discount;
-  let discountType: 'discount' | 'referral' | undefined;
-  if (discountInfo?.isValid === true) {
-    discountType = discountInfo.isReferral ? 'referral' : 'discount';
-  }
-
-  chronicle(SigilEvents.PURCHASE_SUCCESS, {
-    paymentMethod: 'paypal',
-    planId: plan.planId,
-    planName: plan.name,
-    planDuration: monthsToPlanDuration(plan.durationInMonths),
-    revenue: breakdownData?.finalAmount ? Number.parseFloat(breakdownData.finalAmount) : undefined,
-    currency: 'EUR',
-    isUpgrade: !!get(upgradeSubId),
-    discount: discountType,
+  recordPurchase({
+    method: 'paypal',
+    plan,
+    paid: breakdownData?.finalAmount,
+    renewingPrice: breakdownData?.renewingPrice,
+    upgrade: !!get(upgradeSubId),
+    discount: purchaseDiscount(breakdownData?.discount),
   });
-
-  storePaymentReceipt(buildPaymentReceipt('paypal', plan, breakdownData, !!get(upgradeSubId)));
   await navigateTo('/checkout/success');
 }
 
@@ -222,13 +201,15 @@ onMounted(async () => {
 
 <template>
   <PaymentPage
-    :total="summary?.dueToday.formatted"
+    :total="total"
     :total-note="totalNote"
   >
     <template #alert>
       <!-- A failed PayPal start is explained where its buttons would be. -->
-      <CheckoutErrorAlert
-        :error="unavailable ? undefined : error"
+      <CheckoutAlert
+        v-if="error && !unavailable"
+        :title="error.title"
+        :message="error.message"
         @dismiss="clearError()"
       />
     </template>
@@ -249,7 +230,7 @@ onMounted(async () => {
         {{ t('checkout_paypal.title') }}
       </h2>
       <p class="text-rui-text">
-        {{ t('checkout_paypal.approve', { amount: summary?.dueToday.formatted ?? '' }) }}
+        {{ t('checkout_paypal.approve', { amount: total ?? '' }) }}
       </p>
       <p class="text-sm text-rui-text-secondary">
         {{ renewalNote }}
@@ -326,38 +307,7 @@ onMounted(async () => {
 
   <CheckoutLoadingOverlay :loading="checkoutLoading" />
 
-  <!-- Processing overlay -->
-  <Teleport to="body">
-    <Transition
-      enter-active-class="transition-opacity duration-300 ease-in-out"
-      leave-active-class="transition-opacity duration-300 ease-in-out"
-      enter-from-class="opacity-0"
-      leave-to-class="opacity-0"
-      appear
-    >
-      <div
-        v-if="submittingPayment"
-        class="fixed inset-0 z-rui-blocking flex items-center justify-center bg-black/80 backdrop-blur-xs"
-      >
-        <div class="flex flex-col items-center justify-center text-center px-4">
-          <div class="mb-4">
-            <RuiProgress
-              variant="indeterminate"
-              size="48"
-              circular
-              color="primary"
-            />
-          </div>
-          <h3 class="text-lg font-medium text-white mb-1">
-            {{ t('subscription.progress.payment_progress') }}
-          </h3>
-          <p class="text-white/80">
-            {{ t('common.please_wait') }}
-          </p>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
+  <ProcessingOverlay :visible="submittingPayment" />
 
   <ServerErrorOverlay :visible="blocked" />
 </template>

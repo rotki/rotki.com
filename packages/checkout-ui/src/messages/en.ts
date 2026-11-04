@@ -7,6 +7,9 @@ import type { MessageTree } from '../utils/translator';
  */
 export const checkoutMessages: MessageTree = {
   checkout: {
+    alert: {
+      dismiss: 'Dismiss',
+    },
     consent: {
       agree: 'I agree to the',
       policy: 'refund and cancellation policy',
@@ -78,6 +81,10 @@ export const checkoutMessages: MessageTree = {
       subtotal: 'Subtotal',
       vat_included: 'VAT ({rate}, included)',
     },
+    processing: {
+      title: 'Processing payment',
+      wait: 'Please wait and do not close this window.',
+    },
     shell: {
       back_to_plans: 'Back to plans',
       back_to_subscription: 'Back to your subscription',
@@ -89,6 +96,10 @@ export const checkoutMessages: MessageTree = {
       refund: 'Refund policy',
       secure_checkout: 'Secure checkout',
       terms: 'Terms of service',
+    },
+    vat: {
+      billing: 'Billing',
+      invalid: 'No VAT reverse charge applied: your VAT ID could not be verified. Update it in',
     },
     steps: {
       confirmation: 'Confirmation',

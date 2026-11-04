@@ -7,7 +7,7 @@ import { checkoutMessages } from '../messages/en';
 import { createTranslator } from '../utils/translator';
 import PriceRows from './PriceRows.vue';
 
-const plan = { price: 25 };
+const plan = { price: 25, durationInMonths: 1 };
 
 const breakdown: PaymentBreakdownResponse = {
   discount: null,
@@ -39,7 +39,7 @@ function mountRows(props: Partial<Props> = {}): VueWrapper {
     global: {
       plugins: [{ install: app => installCheckoutMessages(app, createTranslator(checkoutMessages)) }],
     },
-    props: { breakdown, durationInMonths: 1, plan, ...props },
+    props: { breakdown, plan, ...props },
   });
 }
 
@@ -117,7 +117,7 @@ describe('priceRows', () => {
     const monthly = mountRows({ renewsAt: new Date(2026, 10, 2) });
     expect(monthly.find('[data-cy="next-payment"]').text()).toBe('Then 25.00 € per month from November 2, 2026. Cancel any time from your account.');
 
-    const yearly = mountRows({ durationInMonths: 12 });
+    const yearly = mountRows({ plan: { ...plan, durationInMonths: 12 } });
     expect(yearly.find('[data-cy="next-payment"]').text()).toBe('Then 25.00 € per year. Cancel any time from your account.');
   });
 

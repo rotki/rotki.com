@@ -11,3 +11,10 @@ const longDateFormatter = new Intl.DateTimeFormat('en-US', {
 export function formatLongDate(date: Date): string {
   return Number.isNaN(date.getTime()) ? '' : longDateFormatter.format(date);
 }
+
+/** When a plan bought on `from` renews: the same day, `durationInMonths` later. */
+export function renewalDateFrom(durationInMonths: number, from: Date = new Date()): Date {
+  const renewal = new Date(from);
+  renewal.setMonth(renewal.getMonth() + durationInMonths);
+  return renewal;
+}

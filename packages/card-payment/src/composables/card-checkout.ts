@@ -1,11 +1,12 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { Client } from 'braintree-web/client';
+import { saveThreeDSecureHandoff } from '@rotki/card-payment-common/utils/three-d-secure-handoff';
 import { get, set } from '@vueuse/core';
 import { type MaybeRefOrGetter, type Ref, shallowReadonly, shallowRef, toValue } from 'vue';
 import { addCard, CardAddedPaymentError, createCardNonce, reportCardFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
 import { findSavedCardBin } from '@/utils/saved-card-bin';
-import { buildThreeDSecureParams, saveThreeDSecureHandoff } from '@/utils/three-d-secure-handoff';
+import { buildThreeDSecureParams } from '@/utils/three-d-secure-handoff';
 
 export interface TokenizedCard {
   nonce: string;

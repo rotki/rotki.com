@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { PaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
+import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
@@ -45,7 +46,7 @@ const title = computed<string>(() => {
   const name = get(receipt)?.planName;
   if (!name)
     return t('subscription.success.title_generic');
-  return t('subscription.success.title', { plan: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() });
+  return t('subscription.success.title', { plan: formatPlanName(name) });
 });
 
 const message = computed<string>(() => {

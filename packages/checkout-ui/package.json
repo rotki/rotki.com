@@ -8,6 +8,7 @@
     "src"
   ],
   "exports": {
+    "./components/CheckoutAlert.vue": "./src/components/CheckoutAlert.vue",
     "./components/CheckoutShell.vue": "./src/components/CheckoutShell.vue",
     "./components/CheckoutStepper.vue": "./src/components/CheckoutStepper.vue",
     "./components/DiscountCodeField.vue": "./src/components/DiscountCodeField.vue",
@@ -17,9 +18,15 @@
     "./components/PlanLine.vue": "./src/components/PlanLine.vue",
     "./components/PolicyConsent.vue": "./src/components/PolicyConsent.vue",
     "./components/PriceRows.vue": "./src/components/PriceRows.vue",
+    "./components/ProcessingOverlay.vue": "./src/components/ProcessingOverlay.vue",
+    "./components/VatNotice.vue": "./src/components/VatNotice.vue",
     "./composables/checkout-messages": {
       "types": "./src/composables/checkout-messages.ts",
       "import": "./src/composables/checkout-messages.ts"
+    },
+    "./composables/order-totals": {
+      "types": "./src/composables/order-totals.ts",
+      "import": "./src/composables/order-totals.ts"
     },
     "./messages/en": {
       "types": "./src/messages/en.ts",
@@ -28,6 +35,10 @@
     "./utils/checkout-flow": {
       "types": "./src/utils/checkout-flow.ts",
       "import": "./src/utils/checkout-flow.ts"
+    },
+    "./utils/plan-title": {
+      "types": "./src/utils/plan-title.ts",
+      "import": "./src/utils/plan-title.ts"
     },
     "./utils/translator": {
       "types": "./src/utils/translator.ts",

@@ -85,7 +85,7 @@ async function mountComponent() {
     global: {
       stubs: {
         CheckoutLoadingOverlay: true,
-        CryptoPaymentForm: true,
+        CryptoSendPage: true,
         CryptoPaymentActions: true,
       },
     },

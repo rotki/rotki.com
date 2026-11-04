@@ -1,7 +1,7 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { THREE_D_SECURE_SESSION_KEY, ThreeDSecureParamsSchema } from '@rotki/card-payment-common/schemas/three-d-secure';
+import { ThreeDSecureParamsSchema } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildThreeDSecureParams, paymentAmounts, saveThreeDSecureHandoff } from './three-d-secure-handoff';
+import { buildThreeDSecureParams, paymentAmounts } from './three-d-secure-handoff';
 
 const plan: SelectedPlan = { planId: 3, name: 'basic', price: 25, durationInMonths: 1 };
 
@@ -81,12 +81,5 @@ describe('utils/three-d-secure-handoff', () => {
     it('carries the subscription being upgraded', () => {
       expect(buildThreeDSecureParams({ ...base, breakdown: breakdown(), upgradeSubId: 'sub-7' }).upgradeSubId).toBe('sub-7');
     });
-  });
-
-  it('stores the handoff under the key the 3D Secure page reads', () => {
-    const params = buildThreeDSecureParams({ ...base, breakdown: breakdown() });
-    saveThreeDSecureHandoff(params);
-
-    expect(JSON.parse(sessionStorage.getItem(THREE_D_SECURE_SESSION_KEY) ?? '')).toEqual(params);
   });
 });

@@ -24,17 +24,15 @@ const {
   breakdown,
   upgrade = false,
   loading = false,
-  durationInMonths,
   renewsAt,
   oneTime = false,
 } = defineProps<{
-  plan: Pick<SelectedPlan, 'price'>;
+  plan: Pick<SelectedPlan, 'price' | 'durationInMonths'>;
   /** Payment breakdown from the API; until it loads the rows show the plan price. */
   breakdown?: PaymentBreakdownResponse;
   upgrade?: boolean;
   /** Shows placeholders instead of amounts while a new breakdown is on its way. */
   loading?: boolean;
-  durationInMonths: number;
   /** When the next charge happens; the renewal line leaves the date out without it. */
   renewsAt?: Date;
   /** One-time payments (crypto) explain that they do not renew instead. */
@@ -77,7 +75,7 @@ const nextPayment = computed<string>(() => {
     return date ? t('checkout.price_rows.one_time', { date }) : t('checkout.price_rows.one_time_no_date');
 
   const amount = get(summary).renewal.formatted;
-  if (durationInMonths === 12)
+  if (plan.durationInMonths === 12)
     return date ? t('checkout.price_rows.renews_year', { amount, date }) : t('checkout.price_rows.renews_year_no_date', { amount });
   return date ? t('checkout.price_rows.renews_month', { amount, date }) : t('checkout.price_rows.renews_month_no_date', { amount });
 });

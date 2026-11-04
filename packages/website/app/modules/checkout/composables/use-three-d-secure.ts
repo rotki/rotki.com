@@ -1,20 +1,16 @@
+import type { ThreeDSecureParams, ThreeDSecureState } from '@rotki/card-payment-common/schemas/three-d-secure';
 import type { Client } from 'braintree-web/client';
 import type { ThreeDSecure, ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
 import type { PayEvent } from '~/types/common';
-import {
-  THREE_D_SECURE_SESSION_KEY,
-  type ThreeDSecureParams,
-  ThreeDSecureParamsSchema,
-  type ThreeDSecureState,
-} from '@rotki/card-payment-common/schemas/three-d-secure';
-import { CheckoutPaymentMethods, CheckoutSteps, monthsToPlanDuration, parseBraintreeError, PaymentServerEvents, PaymentUserError, SigilEvents } from '@rotki/sigil';
+import { clearThreeDSecureHandoff, readThreeDSecureHandoff } from '@rotki/card-payment-common/utils/three-d-secure-handoff';
+import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents, PaymentUserError, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
+import { type PurchaseDiscount, useCompletePurchase } from '~/modules/checkout/composables/use-complete-purchase';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
-import { storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 import { PaymentError } from '~/types/codes';
 import { useLogger } from '~/utils/use-logger';
 
@@ -45,6 +41,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
   const { logPaymentEvent } = usePaymentLogger();
   const { userMessageFor } = usePaymentErrorMessage();
   const { chronicle } = useSigilEvents();
+  const { completePurchase } = useCompletePurchase();
   const paymentApi = usePaymentApi();
   const { requestRefresh } = useAccountRefresh();
 
@@ -62,37 +59,16 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
     return currentState === 'initializing' || currentState === 'verifying' || currentState === 'challenge-active' || currentState === 'finishing';
   });
 
-  /**
-   * Retrieve 3D Secure parameters from session storage
-   */
+  /** The payment the card page handed over, logging one that could not be read. */
   function getStoredParams(): ThreeDSecureParams | undefined {
-    try {
-      const stored = sessionStorage.getItem(THREE_D_SECURE_SESSION_KEY);
-      if (!stored) {
-        return undefined;
-      }
-
-      const parsed = JSON.parse(stored);
-      const result = ThreeDSecureParamsSchema.safeParse(parsed);
-      if (!result.success) {
-        logger.error('Invalid stored 3D Secure parameters:', result.error);
-        sessionStorage.removeItem(THREE_D_SECURE_SESSION_KEY);
-        return undefined;
-      }
-      return result.data;
-    }
-    catch (parseError) {
-      logger.error('Failed to parse stored 3D Secure parameters:', parseError);
-      sessionStorage.removeItem(THREE_D_SECURE_SESSION_KEY);
-      return undefined;
-    }
+    const handoff = readThreeDSecureHandoff();
+    if (handoff.problem === 'invalid')
+      logger.error('Invalid stored 3D Secure parameters:', handoff.cause);
+    return handoff.params;
   }
 
-  /**
-   * Clear stored 3D Secure data
-   */
   function clearStoredData(): void {
-    sessionStorage.removeItem(THREE_D_SECURE_SESSION_KEY);
+    clearThreeDSecureHandoff();
   }
 
   /**
@@ -293,35 +269,20 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       throw new PaymentUserError(result.error.message);
     }
 
-    // Use discount tracking info passed from card payment page via session storage
-    const discountTrackingInfo = params.discountTrackingInfo;
-    let discountType: 'discount' | 'referral' | undefined;
-    if (discountTrackingInfo) {
-      discountType = discountTrackingInfo.isReferral ? 'referral' : 'discount';
-    }
-
-    // Track purchase success
-    chronicle(SigilEvents.PURCHASE_SUCCESS, {
-      paymentMethod: CheckoutPaymentMethods.CARD,
-      planId: params.planId,
-      planName: params.planName,
-      planDuration: monthsToPlanDuration(params.durationInMonths),
-      revenue: Number.parseFloat(params.finalAmount),
-      currency: 'EUR',
-      isUpgrade: !!params.upgradeSubId,
-      discount: discountType,
-    });
-
-    // Request account refresh and prepare for success navigation
-    requestRefresh();
-    storePaymentReceipt({
+    // The card page passes what the discount was, since this page has no breakdown.
+    const tracking = params.discountTrackingInfo;
+    let discount: PurchaseDiscount | undefined;
+    if (tracking)
+      discount = tracking.isReferral ? 'referral' : 'discount';
+    completePurchase({
       method: 'card',
-      planName: params.planName,
-      durationInMonths: params.durationInMonths,
+      plan: { planId: params.planId, name: params.planName, durationInMonths: params.durationInMonths },
       paid: params.finalAmount,
       renewingPrice: params.renewingPrice,
       upgrade: !!params.upgradeSubId,
+      discount,
     });
+    requestRefresh();
     clearStoredData();
   }
 

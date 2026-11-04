@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
 import { CheckoutPaymentMethods } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
-import CheckoutErrorAlert from '~/modules/checkout/components/common/CheckoutErrorAlert.vue';
 import CheckoutLoadingOverlay from '~/modules/checkout/components/common/CheckoutLoadingOverlay.vue';
 import CryptoPaymentActions from '~/modules/checkout/components/crypto/CryptoPaymentActions.vue';
-import CryptoPaymentForm from '~/modules/checkout/components/crypto/CryptoPaymentForm.vue';
+import CryptoSendPage from '~/modules/checkout/components/crypto/CryptoSendPage.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-payment-flow';
 import { buildPaymentReceipt, storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
@@ -85,7 +85,7 @@ async function initialize(): Promise<boolean> {
 
   if (result.alreadyStarted) {
     storePaymentReceipt(buildPaymentReceipt('crypto', plan, get(breakdown), !!get(upgradeSubId)));
-    await navigateTo({ name: 'checkout-success', query: { crypto: '1' } });
+    await navigateTo({ name: 'checkout-success' });
     return true;
   }
 
@@ -164,7 +164,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <CryptoPaymentForm
+  <CryptoSendPage
     v-if="paymentData && selectedPlan"
     v-model:discount-code="modelDiscountCode"
     :data="paymentData"
@@ -179,12 +179,14 @@ onMounted(async () => {
     @error="handleWeb3Error($event)"
   >
     <template #alert>
-      <CheckoutErrorAlert
-        :error="error"
+      <CheckoutAlert
+        v-if="error"
+        :title="error.title"
+        :message="error.message"
         @dismiss="clearError()"
       />
     </template>
-  </CryptoPaymentForm>
+  </CryptoSendPage>
 
   <CryptoPaymentActions
     v-else

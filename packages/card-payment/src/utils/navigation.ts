@@ -1,47 +1,34 @@
 /**
  * Centralized navigation configuration and utilities for card payment app
  */
-import type { MethodLinks } from '@rotki/checkout-ui/utils/checkout-flow';
+import { buildMethodLinks, CARRIED_CHECKOUT_PARAMS, type CheckoutParams, checkoutSearch, type MethodLinks } from '@rotki/checkout-ui/utils/checkout-flow';
 import { paths } from '@/config/paths';
 
 /**
  * Route definitions for the card payment application
  */
 export const routes = {
-  cryptoRequest: `${paths.hostUrlBase}/checkout/pay/request-crypto`,
+  billing: `${paths.hostUrlBase}/home/billing`,
   home: paths.hostUrlBase,
-  paypal: `${paths.hostUrlBase}/checkout/pay/paypal`,
   plans: `${paths.hostUrlBase}/checkout/pay`,
   refundPolicy: `${paths.hostUrlBase}/refund-policy`,
   subscription: `${paths.hostUrlBase}/home/subscription`,
   threeDSecure: `${paths.hostUrlBase}/checkout/pay/3d-secure`,
 } as const;
 
-/** Checkout query params that carry over between the website's checkout pages and this app. */
-const CARRIED_PARAMS = ['planId', 'ref', 'discountCode', 'id'] as const;
-
-/**
- * Adds the checkout params of the current URL (plan, referral, explicit discount code, renewal
- * subscription) to `href`, so a link to another checkout page keeps what the buyer chose.
- */
-export function withCheckoutParams(href: string): string {
-  const params = new URLSearchParams();
-  for (const key of CARRIED_PARAMS) {
-    const value = getUrlParam(key);
-    if (value)
-      params.set(key, value);
-  }
-  const query = params.toString();
-  return query ? `${href}?${query}` : href;
+/** The checkout params of the current URL: plan, referral, explicit discount code, renewal subscription. */
+function currentCheckoutParams(): CheckoutParams {
+  return Object.fromEntries(CARRIED_CHECKOUT_PARAMS.map(key => [key, getUrlParam(key) ?? undefined]));
 }
 
-/** Links for the method tiles: this page for card, the website's pages for PayPal and crypto. */
+/** Adds the current URL's checkout params to `href`, so a link to another checkout page keeps what the buyer chose. */
+export function withCheckoutParams(href: string): string {
+  return `${href}${checkoutSearch(currentCheckoutParams())}`;
+}
+
+/** Links for the method tiles, to the checkout pages on rotki.com. */
 export function checkoutMethodLinks(): MethodLinks {
-  return {
-    card: { href: withCheckoutParams(paths.appUrlBase) },
-    crypto: { href: withCheckoutParams(routes.cryptoRequest) },
-    paypal: { href: withCheckoutParams(routes.paypal) },
-  };
+  return buildMethodLinks({ base: paths.hostUrlBase, params: currentCheckoutParams() });
 }
 
 /**
@@ -92,27 +79,4 @@ export function getUrlParam(key: string, defaultValue?: string): string | null {
 /** `undefined` for a missing or empty string, so an empty `?key=` still falls back. */
 function nonEmpty(value: string | null | undefined): string | undefined {
   return value === null || value === '' ? undefined : value;
-}
-
-export function getDurationFromUrlParam(key: string): string {
-  const params = getUrlParam(key);
-  if (!params || params === '12') {
-    return '12';
-  }
-
-  return '1';
-}
-
-/**
- * Get numeric query parameter value
- * @param key - The parameter key
- * @param defaultValue - Default value if parameter is not found or invalid
- */
-export function getNumericUrlParam(key: string, defaultValue: number): number {
-  const value = getUrlParam(key);
-  if (!value)
-    return defaultValue;
-
-  const parsed = parseFloat(value);
-  return isNaN(parsed) ? defaultValue : parsed;
 }

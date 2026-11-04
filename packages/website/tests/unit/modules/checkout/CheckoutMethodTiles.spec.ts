@@ -56,7 +56,7 @@ describe('checkoutMethodTiles', () => {
 
     const wrapper = await mountSuspended(CheckoutMethodTiles);
 
-    const query = 'discountCode=AUTUMN&planId=3&ref=DGXXOU';
+    const query = 'planId=3&ref=DGXXOU&discountCode=AUTUMN';
     expect(hrefs(wrapper)).toEqual([
       `/checkout/pay/card?${query}`,
       `/checkout/pay/paypal?${query}`,
@@ -91,7 +91,7 @@ describe('checkoutMethodTiles', () => {
 
     const wrapper = await mountSuspended(CheckoutMethodTiles);
 
-    expect(hrefs(wrapper)).toEqual(['/checkout/pay/request-crypto?id=sub-1&planId=3']);
+    expect(hrefs(wrapper)).toEqual(['/checkout/pay/request-crypto?planId=3&id=sub-1']);
   });
 
   it('offers no switch on the renewal payment page itself', async () => {

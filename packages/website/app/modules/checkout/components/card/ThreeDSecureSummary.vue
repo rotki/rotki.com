@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { formatLongDate } from '@rotki/card-payment-common/utils/date';
+import { formatLongDate, renewalDateFrom } from '@rotki/card-payment-common/utils/date';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import PlanLine from '@rotki/checkout-ui/components/PlanLine.vue';
 
@@ -23,9 +23,7 @@ const renewal = computed<string>(() => {
       ? t('subscription.3d_secure.summary.renews_yearly', { amount })
       : t('subscription.3d_secure.summary.renews_monthly', { amount });
   }
-  const renewsAt = new Date();
-  renewsAt.setMonth(renewsAt.getMonth() + payment.durationInMonths);
-  const date = formatLongDate(renewsAt);
+  const date = formatLongDate(renewalDateFrom(payment.durationInMonths));
   return yearly
     ? t('subscription.3d_secure.summary.renews_yearly_from', { amount, date })
     : t('subscription.3d_secure.summary.renews_monthly_from', { amount, date });

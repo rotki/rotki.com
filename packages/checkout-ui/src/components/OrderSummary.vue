@@ -96,7 +96,6 @@ const startsAt = new Date();
       :breakdown="breakdown"
       :upgrade="upgrade"
       :loading="loading"
-      :duration-in-months="plan.durationInMonths"
       :renews-at="renewsAt"
       :one-time="oneTime"
     />

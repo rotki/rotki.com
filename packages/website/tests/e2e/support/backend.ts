@@ -41,6 +41,8 @@ export interface BackendScenario {
   tiers: AvailableTiersWire;
   tiersInfo: TierInfoWire[];
   breakdown: BreakdownWire;
+  /** Outcome of `POST /webapi/2/braintree/payments` (card and PayPal charges). */
+  braintreePayment: ApiOutcome;
   cryptoOptions: Record<string, Record<string, CryptoOptionWire>>;
   payment: CryptoPaymentWire;
   createPayment: ApiOutcome;
@@ -95,6 +97,7 @@ export function defaultBackendScenario(): BackendScenario {
   return {
     account: defaultAccount(),
     breakdown: defaultBreakdown(),
+    braintreePayment: 'ok',
     cancelUpgrade: 'ok',
     cards: [],
     createPayment: 'ok',
@@ -160,6 +163,9 @@ const HANDLERS: Record<string, Handler> = {
   'POST /webapi/2/crypto/upgrade': s => withOutcome(s.createUpgrade, { result: s.payment }),
   'POST /webapi/2/crypto/upgrade/cancel': s => withOutcome(s.cancelUpgrade, { result: true }),
   'POST /webapi/2/payment/breakdown': s => ok(s.breakdown),
+  'POST /webapi/2/braintree/payments': s => withOutcome(s.braintreePayment, { result: true }),
+  'POST /webapi/payment/btr/paypal/': () => ok({ email: 'buyer@example.com', image_url: '', token: 'paypal-vault-token' }),
+  'POST /webapi/payment/btr/paypal/nonce/': () => ok({ payment_nonce: 'paypal-vault-nonce' }),
   'POST /webapi/2/subscriptions/cancellation-feedback': () => ok({ result: true }),
 };
 

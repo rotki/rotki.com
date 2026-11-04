@@ -1,5 +1,5 @@
 import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { THREE_D_SECURE_SESSION_KEY, type ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
+import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 
 export interface PaymentAmounts {
@@ -50,9 +50,4 @@ export function buildThreeDSecureParams(input: ThreeDSecureHandoffInput): ThreeD
       ? { isReferral: discount.isReferral, discountType: discount.discountType }
       : undefined,
   };
-}
-
-/** Hands the payment to the 3D Secure page, which is a full page load away on the website. */
-export function saveThreeDSecureHandoff(params: ThreeDSecureParams): void {
-  sessionStorage.setItem(THREE_D_SECURE_SESSION_KEY, JSON.stringify(params));
 }

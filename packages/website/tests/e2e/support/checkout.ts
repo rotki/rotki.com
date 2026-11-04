@@ -118,7 +118,7 @@ export async function changePaymentMethod(page: Page): Promise<void> {
 
 /** Waits for the pending success page the checkout shows once a transaction is on its way. */
 export async function expectPendingSuccess(page: Page): Promise<void> {
-  await expect(page).toHaveURL(/\/checkout\/success\?crypto=1/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/checkout\/success$/, { timeout: 15_000 });
   await expect(page.getByRole('heading', { level: 1, name: 'Your payment is on its way' })).toBeVisible();
   await expect(page.locator('[data-cy="receipt-method"]')).toHaveText('Crypto');
 }
