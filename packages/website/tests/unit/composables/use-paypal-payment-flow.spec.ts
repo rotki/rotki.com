@@ -22,9 +22,13 @@ vi.mock('~/composables/use-app-events', () => ({
 
 vi.mock('~/modules/checkout/composables/use-braintree-client', () => ({
   useBraintreeClient: () => ({
-    client: ref(undefined),
-    initializeClientWithToken: vi.fn(),
+    client: ref({}),
+    initializeClientWithToken: vi.fn(async () => true),
   }),
+}));
+
+vi.mock('braintree-web/paypal-checkout', () => ({
+  create: vi.fn(async () => ({ loadPayPalSDK: vi.fn(async () => {}) })),
 }));
 
 // `useI18n` needs a setup context these tests lack; sigil's `paymentErrorCopy` tests cover the real mapping
@@ -46,6 +50,37 @@ vi.mock('~/modules/checkout/composables/use-paypal-api', () => ({
 describe('usePaypalPaymentFlow', () => {
   afterEach(() => {
     vi.clearAllMocks();
+    Reflect.deleteProperty(window, 'paypal');
+  });
+
+  describe('renderButton', () => {
+    it('draws the buttons at the reserved height and returns once they are drawn', async () => {
+      let drawn = false;
+      const render = vi.fn(async () => {
+        await Promise.resolve();
+        drawn = true;
+      });
+      const Buttons = vi.fn(() => ({ render }));
+      Object.assign(window, { paypal: { Buttons } });
+
+      const { PAYPAL_BUTTON_HEIGHT, usePaypalPaymentFlow } = await import(
+        '~/modules/checkout/composables/use-paypal-payment-flow',
+      );
+      const { initializeSdk, renderButton } = usePaypalPaymentFlow();
+
+      await expect(initializeSdk('client-token', 25)).resolves.toEqual({ success: true });
+      await renderButton({
+        callbacks: { onPaymentCancel: vi.fn(), onPaymentError: vi.fn(), onPaymentStart: vi.fn(), onPaymentSuccess: vi.fn() },
+        accepted: ref<boolean>(false),
+        loading: ref<boolean>(false),
+      });
+
+      expect(Buttons).toHaveBeenCalledWith(expect.objectContaining({
+        style: { height: PAYPAL_BUTTON_HEIGHT, tagline: false },
+      }));
+      expect(render).toHaveBeenCalledWith('#paypal-button');
+      expect(drawn).toBe(true);
+    });
   });
 
   describe('submitPayment', () => {

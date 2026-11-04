@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UserPayment } from '~/types/account';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
-import { discountAmount } from '~/utils/money';
+import { discountAmount, formatEur, formatPercent } from '@rotki/card-payment-common/utils/money';
 import { formatCurrency } from '~/utils/text';
 
 defineProps<{
@@ -40,11 +40,11 @@ const { t } = useI18n({ useScope: 'global' });
       >
         <template #amount>
           <div class="inline-flex gap-1">
-            <b>{{ discountAmount(payment.priceBeforeDiscount, payment.eurAmount) }}</b>
+            <b>{{ formatEur(discountAmount(payment.priceBeforeDiscount, payment.eurAmount)) }}</b>
             <template v-if="payment.discount.type === DiscountType.PERCENTAGE">
               {{
                 t('home.plans.tiers.step_3.discount.percent_off', {
-                  percentage: payment.discount.amount,
+                  percentage: formatPercent(payment.discount.amount),
                 })
               }}
             </template>

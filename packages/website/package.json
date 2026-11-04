@@ -33,6 +33,7 @@
     "@nuxtjs/robots": "catalog:",
     "@pinia/nuxt": "catalog:",
     "@rotki/card-payment-common": "workspace:*",
+    "@rotki/checkout-ui": "workspace:*",
     "@rotki/sigil": "workspace:*",
     "@vueuse/core": "catalog:",
     "@vueuse/math": "catalog:",

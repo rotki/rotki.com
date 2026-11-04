@@ -16,10 +16,6 @@
       "types": "./src/schemas/discount.ts",
       "import": "./src/schemas/discount.ts"
     },
-    "./schemas/checkout": {
-      "types": "./src/schemas/checkout.ts",
-      "import": "./src/schemas/checkout.ts"
-    },
     "./schemas/api": {
       "types": "./src/schemas/api.ts",
       "import": "./src/schemas/api.ts"
@@ -40,6 +36,22 @@
       "types": "./src/utils/checkout.ts",
       "import": "./src/utils/checkout.ts"
     },
+    "./utils/plan": {
+      "types": "./src/utils/plan.ts",
+      "import": "./src/utils/plan.ts"
+    },
+    "./utils/date": {
+      "types": "./src/utils/date.ts",
+      "import": "./src/utils/date.ts"
+    },
+    "./utils/money": {
+      "types": "./src/utils/money.ts",
+      "import": "./src/utils/money.ts"
+    },
+    "./utils/order-summary": {
+      "types": "./src/utils/order-summary.ts",
+      "import": "./src/utils/order-summary.ts"
+    },
     "./utils/subscription": {
       "types": "./src/utils/subscription.ts",
       "import": "./src/utils/subscription.ts"
@@ -47,6 +59,10 @@
     "./schemas/account": {
       "types": "./src/schemas/account.ts",
       "import": "./src/schemas/account.ts"
+    },
+    "./utils/three-d-secure-handoff": {
+      "types": "./src/utils/three-d-secure-handoff.ts",
+      "import": "./src/utils/three-d-secure-handoff.ts"
     },
     "./schemas/three-d-secure": {
       "types": "./src/schemas/three-d-secure.ts",

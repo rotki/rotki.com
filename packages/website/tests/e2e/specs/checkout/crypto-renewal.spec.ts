@@ -61,10 +61,21 @@ test.describe('crypto renewal', () => {
     chainScenario: { tokenBalances: tokenBalanceFor(USDC_ON_BASE, '100') },
   });
 
+  test('opens the crypto request from the renewal link to the payment step', async ({ page }) => {
+    await page.goto(`/checkout/pay/method?${RENEWAL_QUERY}`);
+
+    await page.waitForURL(`**/checkout/pay/request-crypto?${RENEWAL_QUERY}`);
+  });
+
   test('renews the existing subscription with ETH', async ({ backend, page, wallet }) => {
     await page.goto(`/checkout/pay/request-crypto?${RENEWAL_QUERY}`);
 
     await selectAsset(page, 'Ethereum', 'ETH (Ether)');
+    // A renewal is paid in crypto and starts from the subscription, so no method switch and the way back leads there.
+    await expect(page.getByRole('navigation', { name: 'Payment method' })).toHaveCount(0);
+    await expect(page.locator('[data-cy="checkout-back-to-plans"]')).toHaveText('Back to your subscription');
+    await expect(page.locator('[data-cy="checkout-back-to-plans"]')).toHaveAttribute('href', '/home/subscription');
+
     await acceptPolicyAndContinue(page);
 
     await connectWallet(page, wallet);
@@ -143,8 +154,9 @@ test.describe('crypto renewal', () => {
         await connectWallet(page, wallet);
         await switchNetwork(page);
 
-        await expect(page.getByText('Payment Failure')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Switch Network' })).toBeVisible();
+        await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Switch network' })).toBeVisible();
+        await expect(page.locator('[data-cy="crypto-switch-hint"]')).toHaveText(/Your wallet is on another network\. Switch it to \w+/);
         expect(await wallet.sentTransactions()).toHaveLength(0);
       });
     });

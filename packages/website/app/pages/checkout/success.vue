@@ -1,19 +1,26 @@
 <script lang="ts" setup>
-import { navigateTo } from '#app';
-import PageContainer from '~/components/common/PageContainer.vue';
-import PageContent from '~/components/common/PageContent.vue';
+import type { PaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
+import { formatEur } from '@rotki/card-payment-common/utils/money';
+import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
+import { get } from '@vueuse/shared';
+import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
+import SubscriptionReceipt from '~/modules/checkout/components/success/SubscriptionReceipt.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 
 definePageMeta({
+  layout: 'checkout',
   middleware: ['payment-success'],
 });
 
 usePageSeoNoIndex('payment success');
 
 const { t } = useI18n({ useScope: 'global' });
+
+/** Set by the `payment-success` middleware from the payment just made. */
+const receipt = useState<PaymentReceipt | undefined>('payment-receipt');
 
 useAutoLogout();
 
@@ -28,83 +35,112 @@ reset();
  */
 useReferralTracking().clearReferralCode();
 
-const route = useRoute();
-const crypto = computed<boolean>(() => !!route.query.crypto);
+const SETUP_GUIDE = 'https://docs.rotki.com/usage-guides/#set-up-rotki-premium';
+
+/** A crypto payment is confirmed on chain later, so it is still pending here. */
+const crypto = computed<boolean>(() => get(receipt)?.method === 'crypto');
+
+const title = computed<string>(() => {
+  if (get(crypto))
+    return t('subscription.crypto_success.title');
+  const name = get(receipt)?.planName;
+  if (!name)
+    return t('subscription.success.title_generic');
+  return t('subscription.success.title', { plan: formatPlanName(name) });
+});
+
+const message = computed<string>(() => {
+  if (get(crypto))
+    return t('subscription.crypto_success.message');
+  const paid = get(receipt)?.paid;
+  return paid ? t('subscription.success.paid', { amount: formatEur(paid) }) : '';
+});
 </script>
 
 <template>
-  <PageContainer>
-    <PageContent>
-      <div class="text-center max-w-104 mx-auto">
-        <!-- Success icon -->
-        <div class="mb-6">
-          <RuiIcon
-            name="lu-circle-check"
-            size="64"
-            color="success"
-            class="mx-auto"
-          />
-        </div>
-
-        <!-- Success title -->
-        <h4 class="text-h3 mb-3">
-          {{
-            crypto
-              ? t('subscription.crypto_success.title')
-              : t('subscription.success.title')
-          }}
-        </h4>
-
-        <!-- Success message -->
-        <p class="text-body-1 text-rui-text-secondary mb-8">
-          {{
-            crypto
-              ? t('subscription.crypto_success.message')
-              : t('subscription.success.message')
-          }}
-        </p>
-
-        <!-- Manage Premium button -->
-        <RuiButton
-          class="w-full max-w-sm mx-auto"
-          color="primary"
-          @click="navigateTo({ name: 'home-subscription' })"
+  <div
+    class="flex flex-col gap-6 md:gap-8"
+    data-cy="payment-success"
+  >
+    <header class="flex flex-col gap-4">
+      <span
+        class="size-12 rounded-full flex items-center justify-center"
+        :class="crypto ? 'bg-rui-warning-soft' : 'bg-rui-success-soft'"
+      >
+        <RuiIcon
+          :name="crypto ? 'lu-clock' : 'lu-check'"
+          size="26"
+          :color="crypto ? 'warning' : 'success'"
+        />
+      </span>
+      <div class="flex flex-col gap-2">
+        <h1 class="text-2xl md:text-3xl font-semibold text-rui-text">
+          {{ title }}
+        </h1>
+        <p
+          v-if="message"
+          class="text-rui-text"
+          data-cy="payment-success-message"
         >
-          {{ t('page_header.manage_premium') }}
-        </RuiButton>
-
-        <!-- Success notice with setup link (only for non-crypto payments) -->
-        <template v-if="!crypto">
-          <div
-            class="text-center mt-4 p-4 bg-rui-grey-50 dark:bg-rui-grey-800 rounded-lg border border-rui-grey-200 dark:border-rui-grey-700"
-          >
-            <p class="text-xs text-rui-text-secondary">
-              {{ t('subscription.3d_secure.payment_complete_notice') }}
-              <NuxtLink
-                to="https://docs.rotki.com/usage-guides/#set-up-rotki-premium"
-                external
-                target="_blank"
-                class="text-rui-primary underline hover:text-rui-primary-darker font-medium"
-              >
-                {{ t('subscription.3d_secure.setup_guide') }}
-              </NuxtLink>
-              {{ t('subscription.3d_secure.get_started_text') }}
-            </p>
-          </div>
-
-          <!-- Security reassurance -->
-          <div class="mt-6 text-center">
-            <p class="text-xs text-rui-text-secondary flex items-center justify-center gap-1">
-              <RuiIcon
-                name="lu-shield-check"
-                size="16"
-                color="success"
-              />
-              Your payment details were processed securely
-            </p>
-          </div>
-        </template>
+          {{ message }}
+        </p>
       </div>
-    </PageContent>
-  </PageContainer>
+    </header>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-12">
+      <section
+        class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
+        data-cy="payment-success-next"
+      >
+        <h2 class="text-lg md:text-xl font-semibold text-rui-text">
+          {{ t('subscription.success.next.title') }}
+        </h2>
+        <ol class="list-decimal pl-5 flex flex-col gap-2 text-rui-text">
+          <li>{{ t('subscription.success.next.credentials') }}</li>
+          <li>{{ t('subscription.success.next.app') }}</li>
+        </ol>
+        <p
+          v-if="crypto"
+          class="text-sm text-rui-text-secondary"
+        >
+          {{ t('subscription.success.next.crypto_note') }}
+        </p>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5 mt-auto">
+          <ButtonLink
+            to="/home/devices"
+            variant="default"
+            color="primary"
+            size="lg"
+            class="w-full sm:w-auto"
+          >
+            {{ t('subscription.success.next.create') }}
+          </ButtonLink>
+          <NuxtLink
+            :to="SETUP_GUIDE"
+            external
+            target="_blank"
+            class="self-center sm:self-auto p-3 sm:p-0 text-rui-primary underline"
+          >
+            {{ t('subscription.success.next.guide') }}
+          </NuxtLink>
+        </div>
+      </section>
+
+      <aside class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card">
+        <SubscriptionReceipt
+          v-if="receipt"
+          :receipt="receipt"
+        />
+        <ButtonLink
+          to="/home/subscription"
+          variant="outlined"
+          color="primary"
+          class="w-full lg:w-auto lg:self-start mt-auto"
+          data-cy="payment-success-account"
+        >
+          {{ t('subscription.success.account') }}
+        </ButtonLink>
+      </aside>
+    </div>
+  </div>
 </template>

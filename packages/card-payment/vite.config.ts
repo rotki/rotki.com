@@ -6,6 +6,7 @@ import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import { APP_BASE_PATH } from './src/config/base-path.ts';
+import { bundlePackages } from './vite-plugins/bundle-packages.ts';
 
 /* The relative import keeps its `.ts` extension on purpose: vite 8 loads this config natively and
    warns about extensionless relative imports. eslint.config.js turns `@rotki/no-dot-ts-imports` off
@@ -63,6 +64,7 @@ export default defineConfig({
         },
       },
     }),
+    bundlePackages(fileURLToPath(new URL('.', import.meta.url))),
   ],
   resolve: {
     alias: {

@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+/** sessionStorage key of the handoff from the card page to the website's 3D Secure page. */
+export const THREE_D_SECURE_SESSION_KEY = 'threeDSecureData';
+
 export const DiscountTrackingInfoSchema = z.object({
   isReferral: z.boolean(),
   discountType: z.string(),
@@ -28,13 +31,6 @@ export const ThreeDSecureParamsSchema = z.object({
 
 export type ThreeDSecureParams = z.infer<typeof ThreeDSecureParamsSchema>;
 
-export interface PaymentInfo {
-  amount: string;
-  finalAmount: string;
-  durationInMonths: string;
-  renewingPrice: string;
-}
-
 /**
  * 3D Secure verification state
  */
@@ -43,5 +39,6 @@ export type ThreeDSecureState =
   | 'ready'
   | 'verifying'
   | 'challenge-active'
+  | 'finishing'
   | 'success'
   | 'error';

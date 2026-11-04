@@ -5,6 +5,7 @@ import CryptoRequest from '~/modules/checkout/components/crypto/CryptoRequest.vu
 
 definePageMeta({
   auth: true,
+  layout: 'checkout',
   middleware: ['pending-payment', 'valid-plan-id'],
   requiresSubscriber: true,
   requiresVerified: true,

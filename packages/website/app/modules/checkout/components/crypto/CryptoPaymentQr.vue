@@ -36,12 +36,9 @@ async function createPaymentQR(payment: CryptoPayment, canvas: HTMLCanvasElement
   return qrText;
 }
 
-/**
- * Handle QR code click to copy
- */
+/** Copies the payment link the QR code holds. */
 function handleQRClick(): void {
   copyToClipboard(get(qrText));
-  // Could add toast notification here
 }
 
 /**
@@ -56,56 +53,38 @@ watch(canvas, async (canvas) => {
 </script>
 
 <template>
-  <div class="qr-code-section">
-    <div class="flex justify-center mb-3">
-      <div class="border mx-auto rounded-md">
-        <!-- Loading placeholder -->
-        <div
-          v-if="loading"
-          class="w-45 h-45 flex items-center justify-center bg-rui-grey-100 dark:bg-rui-grey-800 rounded-sm"
-        >
-          <div class="text-center text-rui-text-secondary">
-            <RuiProgress
-              circular
-              color="primary"
-              size="32"
-              thickness="3"
-              variant="indeterminate"
-              class="mb-2"
-            />
-            <p class="text-sm">
-              {{ t('common.loading') }}
-            </p>
-          </div>
-        </div>
-        <!-- QR Canvas -->
-        <canvas
-          v-else-if="!isWalletOpen"
-          ref="canvas"
-          class="w-45 h-45 cursor-pointer rounded-sm transition-all duration-200 hover:shadow-md"
-          @click="handleQRClick()"
-        />
-
-        <div
-          v-else
-          class="w-45 h-45 flex items-center justify-center bg-rui-grey-100 dark:bg-rui-grey-800 rounded-sm"
-        >
-          <div class="text-center text-rui-text-secondary">
-            <RuiIcon
-              name="lu-wallet"
-              size="32"
-              class="mb-2"
-            />
-            <p class="text-sm">
-              {{ t('home.plans.tiers.step_3.wallet.connected') }}
-            </p>
-          </div>
-        </div>
-      </div>
+  <div
+    class="size-40 shrink-0 rounded-rui-control border border-rui-divider bg-white overflow-hidden"
+    data-cy="crypto-payment-qr"
+  >
+    <div
+      v-if="loading"
+      class="size-full flex items-center justify-center"
+    >
+      <RuiProgress
+        circular
+        color="primary"
+        size="32"
+        thickness="3"
+        variant="indeterminate"
+      />
     </div>
-
-    <p class="text-center text-sm text-rui-text-secondary">
-      {{ t('home.plans.tiers.step_3.qr.click_to_copy') }}
-    </p>
+    <canvas
+      v-else-if="!isWalletOpen"
+      ref="canvas"
+      :title="t('home.plans.tiers.step_3.qr.click_to_copy')"
+      class="size-full! cursor-pointer"
+      @click="handleQRClick()"
+    />
+    <div
+      v-else
+      class="size-full flex flex-col items-center justify-center gap-2 p-3 text-center text-sm text-rui-text-secondary bg-rui-surface-muted"
+    >
+      <RuiIcon
+        name="lu-wallet"
+        size="32"
+      />
+      {{ t('home.plans.tiers.step_3.wallet.connected') }}
+    </div>
   </div>
 </template>

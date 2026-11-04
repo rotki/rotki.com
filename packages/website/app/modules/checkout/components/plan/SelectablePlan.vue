@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
+import { formatEur, formatPercent } from '@rotki/card-payment-common/utils/money';
 import { get, set } from '@vueuse/shared';
 import { type PremiumTierInfoDescription, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
-import { formatCurrency, toTitleCase } from '~/utils/text';
+import { toTitleCase } from '~/utils/text';
 
 const {
   plan,
@@ -39,7 +40,7 @@ const price = computed<string | undefined>(() => {
   const targetPlan = period === PricingPeriod.YEARLY ? yearlyPlan : monthlyPlan;
   if (!targetPlan)
     return undefined;
-  return formatCurrency(parseFloat(targetPlan.price));
+  return formatEur(targetPlan.price);
 });
 
 const discountInfo = computed<{
@@ -68,8 +69,8 @@ const discountInfo = computed<{
   return {
     discount: discountPercentage,
     freeMonths,
-    originalPrice: formatCurrency(monthlyTotal),
-    monthlyPrice: formatCurrency(yearlyPrice / 12),
+    originalPrice: formatEur(monthlyTotal),
+    monthlyPrice: formatEur(yearlyPrice / 12),
   };
 });
 
@@ -141,25 +142,25 @@ watch(price, (newPrice) => {
         size="sm"
         class="bg-green-400! font-bold text-xs"
       >
-        {{ discountInfo.discount }}% OFF
+        {{ formatPercent(discountInfo.discount) }} OFF
       </RuiChip>
     </div>
 
     <div class="flex items-baseline gap-2">
       <div class="font-bold text-[2.5rem] leading-none text-rui-text">
-        {{ price }}€
+        {{ price }}
       </div>
       <div
         v-if="discountInfo"
         class="text-base text-rui-text-secondary line-through font-normal opacity-70"
       >
-        {{ discountInfo.originalPrice }}€
+        {{ discountInfo.originalPrice }}
       </div>
     </div>
 
     <div class="text-sm text-rui-text-secondary mt-2 mb-4 font-normal min-h-5">
       <div v-if="discountInfo">
-        {{ discountInfo.monthlyPrice }}€/{{ t('pricing.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
+        {{ discountInfo.monthlyPrice }}/{{ t('pricing.per_month') }} ({{ t('home.plans.saving', { months: discountInfo.freeMonths }) }})
       </div>
     </div>
 

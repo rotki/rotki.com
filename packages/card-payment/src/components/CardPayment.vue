@@ -1,32 +1,24 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
-import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
-import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode, needsVatWarning } from '@rotki/card-payment-common/utils/checkout';
+import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
+import OrderSummary from '@rotki/checkout-ui/components/OrderSummary.vue';
+import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
+import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
+import ProcessingOverlay from '@rotki/checkout-ui/components/ProcessingOverlay.vue';
+import VatNotice from '@rotki/checkout-ui/components/VatNotice.vue';
+import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
+import { useOrderTotals } from '@rotki/checkout-ui/composables/order-totals';
+import { RuiButton } from '@rotki/ui-library';
 import { get, set, useSessionStorage, watchImmediate } from '@vueuse/core';
-import { type Client, create } from 'braintree-web/client';
-import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
-import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';
-import { paths } from '@/config/paths';
-import { addCard, CardAddedPaymentError, createCardNonce, reportCardFailure, trackCardPaymentSubmitted } from '@/utils/card-api';
-import AddCardDialog from './AddCardDialog.vue';
-import CardSelectionDialog from './CardSelectionDialog.vue';
-import DiscountCodeInput from './DiscountCodeInput.vue';
-import NewCardForm from './NewCardForm.vue';
-import PaymentButtons from './PaymentButtons.vue';
-import PaymentGrandTotal from './PaymentGrandTotal.vue';
-import PlanSummary from './PlanSummary.vue';
-import SavedCardDisplay from './SavedCardDisplay.vue';
-import TermsAcceptance from './TermsAcceptance.vue';
-
-/** VAT split of the current breakdown, formatted for display. */
-interface VatBreakdown {
-  basePrice: string;
-  vatAmount: string;
-  vatRate: string;
-  fullAmount: string;
-}
+import { computed, ref, useTemplateRef, watch } from 'vue';
+import { useBraintreeClient } from '@/composables/braintree-client';
+import { useCardCheckout } from '@/composables/card-checkout';
+import { usePaymentBreakdown } from '@/composables/payment-breakdown';
+import { reportCardFailure } from '@/utils/card-api';
+import { routes } from '@/utils/navigation';
+import CardDetails from './CardDetails.vue';
 
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
 /** Whether the running campaign's code is the discount the breakdown confirmed. */
@@ -36,20 +28,21 @@ const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country, disco
   planData: PaymentBreakdownResponse;
   selectedPlan: SelectedPlan;
   upgradeSubId: string | null;
-  cards: SavedCard[];
+  /** `undefined` while the saved cards load. */
+  cards?: SavedCard[];
   vatIdStatus?: string;
   country?: string;
   discount?: {
     /** Code to start with, already resolved from the URL, referral, campaign and dismissal. */
     initialCode?: string;
-    campaignCode?: string;
-    hint?: string;
+    /** Running campaign; its code counts as the campaign discount and is offered next to the field. */
+    campaign?: { code: string; percent: number };
   };
 }>();
 
 const emit = defineEmits<{
-  'go-back': [];
-  'payment-success': [];
+  /** The card is verified and handed to the website's 3D Secure page. */
+  'handoff': [];
   'refresh-card': [];
   /**
    * Fatal errors that make the whole payment view unusable (e.g. Braintree client
@@ -59,61 +52,61 @@ const emit = defineEmits<{
   'fatal-error': [message: string];
 }>();
 
-/**
- * Per-transaction error (card decline, tokenization failure, payment failure). Kept
- * local so a recoverable problem doesn't escalate to App.vue's full-screen ErrorState,
- * which is reserved for genuinely fatal init failures (e.g. plan/Braintree client load).
- */
-const transactionError = ref<string>();
+defineSlots<{
+  /** Switching to another payment method, under the heading. */
+  methods?: () => any;
+}>();
 
-const client = shallowRef<Client>();
-const isProcessing = ref<boolean>(false);
+const t = useCheckoutMessages();
+
 const acceptedTerms = ref<boolean>(false);
 const newCardFormValid = ref<boolean>(false);
-const showCardSelectionDialog = ref<boolean>(false);
-const showAddCardDialog = ref<boolean>(false);
-const pendingCardToken = ref<string>();
 // Shared with the website checkout: set once the buyer removes an auto-applied code.
 const autoDiscountDismissed = useSessionStorage<boolean>(AUTO_DISCOUNT_DISMISSED_KEY, false);
-// Seeded before PlanSummary's first fetch, so the initial breakdown already carries the code.
+// Seeded before the first breakdown request, so it already carries the code.
 const discountCode = ref<string>(discount.initialCode ?? '');
-// Breakdown from PlanSummary via v-model
-const breakdown = ref<PaymentBreakdownResponse>();
-const newCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('newCardForm');
+const cardDetails = useTemplateRef<InstanceType<typeof CardDetails>>('cardDetails');
 
-// Derive vatBreakdown from breakdown
-const vatBreakdown = computed<VatBreakdown | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  if (!currentBreakdown) {
-    return undefined;
-  }
+const { breakdown, loading: breakdownLoading } = usePaymentBreakdown(() => selectedPlan, () => get(discountCode) || undefined, planData);
 
-  const floatRate = parseFloat(currentBreakdown.vatRate);
-  if (isFinite(floatRate) && floatRate <= 0) {
-    return undefined;
-  }
-
-  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : currentBreakdown.vatRate;
-  const finalAmount = parseFloat(currentBreakdown.finalAmount);
-  const vatAmount = parseFloat(currentBreakdown.vatAmount);
-  const basePrice = (finalAmount - vatAmount).toFixed(2);
-
-  return {
-    basePrice,
-    vatAmount: vatAmount.toFixed(2),
-    vatRate,
-    fullAmount: currentBreakdown.fullAmount,
-  };
+const { client } = useBraintreeClient(planData.braintreeClientToken, (error) => {
+  emit('fatal-error', reportCardFailure(error, {
+    failure: 'BRAINTREE_INIT_FAILED',
+    planId: selectedPlan.planId,
+    isUpgrade: !!upgradeSubId,
+    step: 'init',
+  }));
 });
 
-// Derive discountInfo from breakdown
-const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.discount ?? undefined;
+const { processing, transactionError, setTransactionError, submit } = useCardCheckout({
+  plan: () => selectedPlan,
+  upgradeSubId: () => upgradeSubId ?? undefined,
+  clientToken: () => planData.braintreeClientToken,
+  breakdown,
+  discountCode,
+  client,
+  tokenizeNewCard: async () => get(cardDetails)?.tokenize(),
+  onCardSaved: () => emit('refresh-card'),
+  onHandoff: () => emit('handoff'),
 });
 
-watchImmediate(() => getValidDiscountCode(get(discountInfo), get(discountCode) || undefined), (validCode) => {
-  set(campaignApplied, !!discount.campaignCode && validCode === discount.campaignCode);
+const showVatWarning = computed<boolean>(() => needsVatWarning(vatIdStatus, country));
+
+// The API sends the next payment as a unix timestamp in seconds; 0 means it has none.
+const renewsAt = computed<Date | undefined>(() => (planData.nextPayment ? new Date(planData.nextPayment * 1000) : undefined));
+
+const { total, totalNote } = useOrderTotals({ plan: () => selectedPlan, breakdown, upgrade: () => !!upgradeSubId });
+
+const payLabel = computed<string>(() => {
+  const amount = get(total) ?? '';
+  return upgradeSubId ? t('checkout.pay.upgrade', { amount }) : t('checkout.pay.subscribe', { amount });
+});
+
+const isFormValid = computed<boolean>(() => {
+  if (!get(acceptedTerms) || get(processing) || get(breakdownLoading))
+    return false;
+
+  return !!get(selectedCard) || get(newCardFormValid);
 });
 
 /** Remembers a removed code across payment pages; entering a code lifts the dismissal again. */
@@ -121,233 +114,9 @@ function handleDiscountEdit(code: string): void {
   set(autoDiscountDismissed, !code);
 }
 
-const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.credit ?? undefined;
+watchImmediate(() => getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined), (validCode) => {
+  set(campaignApplied, !!discount.campaign && validCode === discount.campaign.code);
 });
-
-const showVatWarning = computed<boolean>(() => vatIdStatus === VatIdStatus.NOT_VALID && country !== 'DE');
-
-const isFormValid = computed<boolean>(() => {
-  const card = get(selectedCard);
-  const hasAcceptedTerms = get(acceptedTerms);
-  const notProcessing = !get(isProcessing);
-
-  if (card) {
-    return hasAcceptedTerms && notProcessing;
-  }
-
-  return (
-    get(newCardFormValid) &&
-    hasAcceptedTerms &&
-    notProcessing
-  );
-});
-
-async function initializeBraintreeClient(): Promise<void> {
-  const authorization = planData.braintreeClientToken;
-  if (!authorization) {
-    throw new Error('Braintree client token not available');
-  }
-
-  try {
-    const clientInstance = await create({
-      authorization,
-    });
-    set(client, clientInstance);
-  }
-  catch (error_: unknown) {
-    console.error(error_);
-    emit('fatal-error', reportCardFailure(error_, {
-      failure: 'BRAINTREE_INIT_FAILED',
-      planId: selectedPlan.planId,
-      isUpgrade: !!upgradeSubId,
-      step: 'init',
-    }));
-  }
-}
-
-async function getSavedCardBin(card: SavedCard): Promise<string> {
-  let vaultManager: VaultManager | null = null;
-
-  try {
-    vaultManager = await createVaultManager({
-      client: client.value,
-    });
-
-    const methods = await vaultManager.fetchPaymentMethods();
-    const method = methods.find(({ type, details }) =>
-      type === 'CreditCard' &&
-      details &&
-      'lastFour' in details &&
-      details?.lastFour === card.last4,
-    );
-
-    if (method?.details && 'bin' in method.details && method.details.bin) {
-      return method.details.bin;
-    }
-
-    return '';
-  }
-  catch (error_) {
-    console.error('Failed to fetch bin from vault manager:', error_);
-    return '';
-  }
-  finally {
-    if (vaultManager) {
-      await vaultManager.teardown();
-    }
-  }
-}
-
-const grandTotal = computed<number>(() => {
-  const currentBreakdown = get(breakdown);
-
-  // Use breakdown if available
-  if (currentBreakdown) {
-    return parseFloat(currentBreakdown.finalAmount);
-  }
-
-  return selectedPlan.price;
-});
-
-const renewingPrice = computed<number>(() => {
-  const currentBreakdown = get(breakdown);
-
-  // Use breakdown if available
-  if (currentBreakdown) {
-    return parseFloat(currentBreakdown.renewingPrice);
-  }
-
-  return selectedPlan.price;
-});
-
-interface PaymentCardDetails {
-  paymentToken: string;
-  paymentBin: string;
-}
-
-/**
- * Token and BIN of the card to charge: the selected saved card, or the new card
- * form, which is tokenized and vaulted first. Returns `undefined` when the new
- * card form is not mounted.
- */
-async function resolvePaymentCard(card: SavedCard | undefined): Promise<PaymentCardDetails | undefined> {
-  if (card) {
-    const paymentBin = await getSavedCardBin(card);
-    return { paymentToken: card.token, paymentBin };
-  }
-
-  const form = get(newCardForm);
-  if (!form) {
-    return undefined;
-  }
-
-  const { nonce, bin } = await form.tokenize();
-  const paymentToken = await addCard({
-    paymentMethodNonce: nonce,
-  });
-
-  emit('refresh-card');
-  return { paymentToken, paymentBin: bin };
-}
-
-/** Data the 3D Secure page needs to verify and complete the payment. */
-function buildThreeDSecureParams(
-  clientToken: string,
-  paymentNonce: string,
-  paymentBin: string,
-  currentDiscountInfo: PaymentBreakdownDiscount | undefined,
-): ThreeDSecureParams {
-  return {
-    token: clientToken,
-    planId: selectedPlan.planId,
-    amount: selectedPlan.price.toString(),
-    finalAmount: get(grandTotal).toString(),
-    renewingPrice: get(renewingPrice).toString(),
-    nonce: paymentNonce,
-    bin: paymentBin,
-    discountCode: getValidDiscountCode(get(breakdown)?.discount, get(discountCode) || undefined),
-    upgradeSubId: upgradeSubId || undefined,
-    durationInMonths: selectedPlan.durationInMonths,
-    planName: selectedPlan.name,
-    discountTrackingInfo: currentDiscountInfo?.isValid === true
-      ? { isReferral: currentDiscountInfo.isReferral, discountType: currentDiscountInfo.discountType }
-      : undefined,
-  };
-}
-
-async function processPayment(): Promise<void> {
-  if (!get(isFormValid)) {
-    return;
-  }
-
-  set(isProcessing, true);
-  set(transactionError, '');
-
-  const card = get(selectedCard);
-  const cardType = card ? 'saved' as const : 'new' as const;
-  const currentDiscountInfo = get(discountInfo);
-  const discountApplied = currentDiscountInfo?.isValid === true;
-
-  trackCardPaymentSubmitted({
-    planId: selectedPlan.planId,
-    durationInMonths: selectedPlan.durationInMonths,
-    isUpgrade: !!upgradeSubId,
-    cardType,
-    discountApplied,
-  });
-
-  const clientToken = planData.braintreeClientToken;
-  if (!clientToken) {
-    throw new Error('Braintree client token not available');
-  }
-
-  try {
-    const paymentCard = await resolvePaymentCard(card);
-    if (!paymentCard) {
-      set(transactionError, 'New card form not available');
-      set(isProcessing, false);
-      return;
-    }
-
-    const { paymentToken, paymentBin } = paymentCard;
-    const paymentNonce = await createCardNonce({
-      paymentToken,
-    });
-
-    const threeDSecureParams = buildThreeDSecureParams(clientToken, paymentNonce, paymentBin, currentDiscountInfo);
-    sessionStorage.setItem('threeDSecureData', JSON.stringify(threeDSecureParams));
-    emit('payment-success');
-  }
-  catch (error_: unknown) {
-    if (error_ instanceof CardAddedPaymentError) {
-      emit('refresh-card');
-    }
-    set(transactionError, reportCardFailure(error_, {
-      failure: 'CARD_PAYMENT_API_ERROR',
-      planId: selectedPlan.planId,
-      isUpgrade: !!upgradeSubId,
-      step: 'submit',
-      cardType,
-      discountApplied,
-    }));
-    set(isProcessing, false);
-  }
-}
-
-function handleCardDeleted(): void {
-  emit('refresh-card');
-}
-
-function handleCardAdded(token: string): void {
-  set(pendingCardToken, token);
-  emit('refresh-card');
-}
-
-function handleSelectCard(card: SavedCard): void {
-  set(selectedCard, card);
-}
 
 // Clear discount code only when a previously valid discount becomes invalid (e.g., plan switch)
 watch(breakdown, (newBreakdown, oldBreakdown) => {
@@ -355,241 +124,80 @@ watch(breakdown, (newBreakdown, oldBreakdown) => {
     set(discountCode, '');
   }
 });
-
-// Watch for cards changes to select newly added card
-watch(() => cards, (newCards) => {
-  const token = get(pendingCardToken);
-  if (token) {
-    const newCard = newCards.find(card => card.token === token);
-    if (newCard) {
-      set(selectedCard, newCard);
-      set(pendingCardToken, undefined);
-    }
-  }
-});
-
-onMounted(async () => {
-  await initializeBraintreeClient();
-});
-
-onUnmounted(async () => {
-  try {
-    await client.value?.teardown(() => {});
-  }
-  catch (error_) {
-    console.error('Error during cleanup:', error_);
-  }
-});
 </script>
 
 <template>
-  <div class="flex flex-col w-full max-w-7xl mx-auto grow">
-    <!-- Title -->
-    <div class="mb-6">
-      <h4 class="font-bold text-h4 text-rui-text mb-3">
-        Payment Details
-      </h4>
-      <div class="text-body-1 text-rui-text-secondary">
-        Payments are safely processed with Braintree a PayPal Service
-      </div>
-    </div>
+  <PaymentPage
+    :total="total"
+    :total-note="totalNote"
+  >
+    <template
+      v-if="$slots.methods"
+      #methods
+    >
+      <slot name="methods" />
+    </template>
 
-    <!-- Two Column Layout -->
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_1fr] xl:gap-8 xl:items-start">
-      <!-- Left Column: Payment Form -->
-      <div class="flex flex-col gap-6 min-w-0">
-        <!-- Inline transaction error (card decline, payment failure, etc.) -->
-        <div
-          v-if="transactionError"
-          class="flex items-start gap-3 rounded-md border border-rui-error/30 bg-rui-error/10 p-4 text-sm text-rui-error"
-          role="alert"
-        >
-          <svg
-            class="h-5 w-5 shrink-0 mt-0.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-          <span class="flex-1">{{ transactionError }}</span>
-          <button
-            type="button"
-            class="shrink-0 text-rui-error hover:opacity-70"
-            aria-label="Dismiss"
-            @click="transactionError = undefined"
-          >
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Card Input Section -->
-        <div class="bg-white rounded-lg border border-rui-grey-300 p-6">
-          <!-- Saved Card Display -->
-          <div v-if="selectedCard">
-            <SavedCardDisplay
-              :card="selectedCard"
-              :disabled="isProcessing"
-              @card-deleted="handleCardDeleted()"
-              @error="transactionError = $event"
-            />
-
-            <!-- Button to change card -->
-            <div class="flex justify-end mt-4">
-              <button
-                type="button"
-                :disabled="isProcessing"
-                class="text-sm text-neutral-500 hover:bg-neutral-100 px-1.5 py-0.5 rounded-md hover:underline"
-                @click="showCardSelectionDialog = true"
-              >
-                Use other cards {{ cards.length > 1 ? `(${cards.length - 1})` : undefined }}
-              </button>
-            </div>
-          </div>
-
-          <!-- New Card Form (only show if no saved card) -->
-          <NewCardForm
-            v-else-if="client"
-            ref="newCardForm"
-            :client="client"
-            :disabled="isProcessing"
-            @validation-change="newCardFormValid = $event"
-            @error="transactionError = $event"
-          />
-        </div>
-      </div>
-
-      <!-- Right Column: Order Summary -->
-      <aside class="w-full xl:sticky xl:top-8 xl:self-start">
-        <div class="bg-white rounded-lg border border-rui-grey-300 p-6">
-          <div class="text-lg font-medium mb-4">
-            Order Summary
-          </div>
-
-          <!-- Plan Summary -->
-          <PlanSummary
-            v-model:breakdown="breakdown"
-            :upgrade="!!upgradeSubId"
-            :selected-plan="selectedPlan"
-            :discount-code="discountCode || undefined"
-          />
-
-          <hr class="my-4 border-rui-grey-300" />
-
-          <!-- Discount Code Input -->
-          <DiscountCodeInput
-            v-model="discountCode"
-            :discount-info="discountInfo"
-            :hint="discount.hint"
-            class="mb-4"
-            @edit="handleDiscountEdit($event)"
-          />
-
-          <!-- VAT Warning -->
-          <div
-            v-if="showVatWarning"
-            class="mb-4 rounded-sm border border-rui-warning p-3 text-sm text-rui-warning-darker"
-          >
-            No VAT Reverse charge applied. Your VAT ID could not be verified. Update it in
-            <a
-              :href="`${paths.hostUrlBase}/home/billing`"
-              class="font-medium underline"
-            >
-              Billing
-            </a>.
-          </div>
-
-          <!-- Payment Grand Total -->
-          <PaymentGrandTotal
-            :vat-breakdown="vatBreakdown"
-            :discount-info="discountInfo"
-            :credit-info="creditInfo"
-            :grand-total="grandTotal"
-            :next-payment="planData.nextPayment"
-            :duration-in-months="selectedPlan.durationInMonths"
-          />
-        </div>
-      </aside>
-    </div>
-
-    <!-- Accept Refund Policy (Outside Grid) -->
-    <TermsAcceptance
-      v-model:accepted-terms="acceptedTerms"
-      :disabled="isProcessing"
-      class="max-w-110 mx-auto w-full"
+    <CheckoutAlert
+      v-if="transactionError"
+      :message="transactionError"
+      data-cy="transaction-error"
+      @dismiss="setTransactionError(undefined)"
     />
 
-    <!-- Full Screen Processing Overlay -->
-    <Teleport to="body">
-      <Transition
-        enter-active-class="transition-opacity duration-300 ease-in-out"
-        leave-active-class="transition-opacity duration-300 ease-in-out"
-        enter-from-class="opacity-0"
-        leave-to-class="opacity-0"
-        appear
-      >
-        <div
-          v-if="isProcessing"
-          class="fixed inset-0 z-rui-blocking flex items-center justify-center bg-black/80 backdrop-blur-xs"
-        >
-          <div class="flex flex-col items-center justify-center text-center px-4">
-            <div class="mb-4">
-              <div class="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-            </div>
-            <h3 class="text-lg font-medium text-white mb-1">
-              Processing payment
-            </h3>
-            <p class="text-white/80">
-              Please wait and do not close this window...
-            </p>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
-
-    <!-- Action Buttons (Outside Grid) -->
-    <div class="max-w-110 mx-auto w-full">
-      <PaymentButtons
-        :disabled="!isFormValid"
-        :processing="isProcessing"
-        @go-back="emit('go-back')"
-        @continue="processPayment()"
-      />
-    </div>
-
-    <!-- Card Selection Dialog -->
-    <CardSelectionDialog
-      v-model:open="showCardSelectionDialog"
-      :cards="cards"
-      :selected-card="selectedCard"
-      :disabled="isProcessing"
-      @select-card="handleSelectCard($event)"
-      @add-new-card="showAddCardDialog = true"
-    />
-
-    <!-- Add Card Dialog -->
-    <AddCardDialog
-      v-model:open="showAddCardDialog"
+    <CardDetails
+      ref="cardDetails"
+      v-model:selected-card="selectedCard"
       :client="client"
-      @card-added="handleCardAdded($event)"
+      :cards="cards"
+      :disabled="processing"
+      @validation-change="newCardFormValid = $event"
+      @error="setTransactionError($event)"
       @refresh-card="emit('refresh-card')"
     />
-  </div>
+
+    <template #summary>
+      <OrderSummary
+        v-model:code="discountCode"
+        :plan="selectedPlan"
+        :breakdown="breakdown"
+        :upgrade="!!upgradeSubId"
+        :loading="breakdownLoading"
+        :disabled="processing"
+        :campaign="discount.campaign"
+        :renews-at="renewsAt"
+        @apply="handleDiscountEdit($event)"
+      >
+        <template
+          v-if="showVatWarning"
+          #notice
+        >
+          <VatNotice :billing-href="routes.billing" />
+        </template>
+      </OrderSummary>
+    </template>
+
+    <template #pay>
+      <div class="flex flex-col gap-2">
+        <PolicyConsent
+          v-model="acceptedTerms"
+          :policy-href="routes.refundPolicy"
+          :disabled="processing"
+        />
+        <RuiButton
+          color="primary"
+          size="lg"
+          class="w-full"
+          :disabled="!isFormValid"
+          :loading="processing"
+          data-cy="pay"
+          @click="submit(selectedCard)"
+        >
+          {{ payLabel }}
+        </RuiButton>
+      </div>
+    </template>
+  </PaymentPage>
+
+  <ProcessingOverlay :visible="processing" />
 </template>

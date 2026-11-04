@@ -27,6 +27,7 @@ flag_management:
         - packages/website/app/
         - packages/sigil/src/
         - packages/card-payment-common/src/
+        - packages/checkout-ui/src/
     # Go tests run in their own job, so they keep their own flag. Carryforward works per flag: if both
     # jobs uploaded under `unit`, a commit where one job failed would still get an upload from the
     # other, and the failed job's coverage would drop out instead of being carried forward.
@@ -49,6 +50,10 @@ component_management:
       name: card-payment-common
       paths:
         - packages/card-payment-common/**
+    - component_id: checkout-ui
+      name: checkout-ui
+      paths:
+        - packages/checkout-ui/**
     - component_id: sigil
       name: sigil
       paths:

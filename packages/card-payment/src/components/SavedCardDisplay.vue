@@ -82,9 +82,12 @@ async function handleDeleteCard(): Promise<void> {
         size="icon"
         :disabled="disabled || card.linked"
         :loading="deletingCard"
+        aria-label="Delete card"
+        :title="card.linked ? 'This card pays your subscription, so it cannot be deleted' : undefined"
         @click="deleteCardClick()"
       >
         <svg
+          aria-hidden="true"
           class="w-5 h-5"
           fill="none"
           stroke="currentColor"
@@ -121,7 +124,7 @@ async function handleDeleteCard(): Promise<void> {
     >
       <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <h3 class="text-lg font-medium text-rui-text mb-4">
-          Delete Saved Card
+          Delete saved card
         </h3>
         <p class="text-rui-text-secondary mb-6">
           Are you sure you want to delete this saved card? This action cannot be undone.

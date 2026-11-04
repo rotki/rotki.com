@@ -11,6 +11,14 @@ import { test } from '../../support/fixtures';
 import { tokenBalanceFor } from '../../support/rpc';
 
 test.describe('new crypto payment', () => {
+  test('the payment step opens the card page (stubbed, a separate app) with the checkout params', async ({ page }) => {
+    await page.route('**/checkout/pay/card?**', async route => route.fulfill({ body: '<title>card</title>', contentType: 'text/html' }));
+
+    await page.goto('/checkout/pay/method?planId=3&discountCode=AUTUMN');
+
+    await page.waitForURL('**/checkout/pay/card?planId=3&discountCode=AUTUMN');
+  });
+
   test('pays with ETH from an injected wallet and lands on the pending success page', async ({ backend, chain, page, wallet }) => {
     await page.goto('/checkout/pay/request-crypto?planId=3');
 
@@ -39,7 +47,7 @@ test.describe('new crypto payment', () => {
     test('shows the backend message and stays on the payment page', async ({ backend, page }) => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
 
-      await expect(page.getByText('Payment Failure')).toBeVisible();
+      await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
       await expect(page.getByText('This plan is no longer available')).toBeVisible();
       await expect(page).toHaveURL(/\/checkout\/pay\/crypto\?/);
       expect(backend.callsTo('POST', '/webapi/2/crypto/payments')).toHaveLength(1);
@@ -62,7 +70,7 @@ test.describe('new crypto payment', () => {
     test('reports a payment failure without sending the user away', async ({ page }) => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
 
-      await expect(page.getByText('Payment Failure')).toBeVisible();
+      await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
       await expect(page).toHaveURL(/\/checkout\/pay\/crypto\?/);
     });
   });
@@ -128,7 +136,7 @@ test.describe('new crypto payment', () => {
 
       await connectWallet(page, wallet);
 
-      await expect(page.getByText('balance is not enough to cover this payment')).toBeVisible();
+      await expect(page.getByText('Your USDC balance is not enough to cover this payment.')).toBeVisible();
       await expect(page.getByRole('button', { name: 'Pay with wallet' })).toBeDisabled();
       expect(await wallet.sentTransactions()).toHaveLength(0);
     });

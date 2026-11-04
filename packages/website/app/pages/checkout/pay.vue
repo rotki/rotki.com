@@ -4,69 +4,14 @@ import CampaignRibbon from '~/components/common/CampaignRibbon.vue';
 import { useAppConfig } from '~/composables/use-app-config';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { useCheckoutDiscount } from '~/modules/checkout/composables/use-checkout';
-import { CHECKOUT_ROUTE_NAMES, type CheckoutStep } from '~/types';
-
-const { t } = useI18n({ useScope: 'global' });
 
 const route = useRoute();
 
-const isCardOrSecureRoute = computed<boolean>(() => {
-  const routeName = route.name;
-  if (!Array.prototype.includes.call(CHECKOUT_ROUTE_NAMES, routeName)) {
-    return false;
-  }
-  return routeName === 'checkout-pay-card' || routeName === 'checkout-pay-3d-secure';
-});
-
-const steps = computed<CheckoutStep[]>(() => {
-  const baseSteps: CheckoutStep[] = [
-    {
-      title: t('home.plans.tiers.step_1.title'),
-      description: t('home.plans.tiers.step_1.description'),
-      names: ['checkout-pay'],
-    },
-    {
-      title: t('home.plans.tiers.step_2.title'),
-      description: t('home.plans.tiers.step_2.description'),
-      names: ['checkout-pay-method'],
-    },
-    {
-      title: t('home.plans.tiers.step_3.title'),
-      description: t('home.plans.tiers.step_3.description'),
-      names: [
-        'checkout-pay-request-crypto',
-        'checkout-pay-crypto',
-        'checkout-pay-card',
-        'checkout-pay-paypal',
-      ],
-    },
-  ];
-
-  // Only add step 4 for card and 3D secure routes
-  if (get(isCardOrSecureRoute)) {
-    baseSteps.push({
-      title: t('home.plans.tiers.step_4.title'),
-      description: t('home.plans.tiers.step_4.description'),
-      names: ['checkout-pay-3d-secure'],
-    });
-  }
-
-  return baseSteps;
-});
-
-const step = computed<number>(() => {
-  const routeName = route.name;
-  if (!Array.prototype.includes.call(CHECKOUT_ROUTE_NAMES, routeName)) {
-    return 1; // Default to first step if route name is invalid
-  }
-
-  const index = get(steps).findIndex(step =>
-    Array.prototype.includes.call(step.names, routeName),
-  );
-  return index + 1;
-});
-
-const isFirstStep = computed<boolean>(() => get(step) === 1);
+/*
+ * The plan step doubles as the public /pricing page and keeps the site layout. The later
+ * steps use the checkout layout, which brings the shell with the stepper.
+ */
+const isFirstStep = computed<boolean>(() => route.name === 'checkout-pay');
 
 const { activeCampaign } = useAppConfig();
 const { validDiscountCode } = useCheckoutDiscount();
@@ -86,40 +31,16 @@ onBeforeMount(() => {
 <template>
   <div class="flex flex-col h-full grow">
     <CampaignRibbon :applied="campaignApplied" />
-    <div class="container flex flex-col lg:flex-row grow py-4 lg:py-8 gap-6 lg:gap-8">
-      <div class="flex grow overflow-x-auto min-w-0">
-        <form
-          class="flex flex-col justify-between w-full"
-          @submit.prevent
-        >
-          <NuxtPage />
-          <!-- Like the desktop stepper, hidden on step 1, which doubles as the public /pricing page -->
-          <div
-            v-if="!isFirstStep"
-            class="block py-10 w-full lg:hidden"
-          >
-            <RuiFooterStepper
-              :model-value="step"
-              :pages="steps.length"
-              class="mx-auto max-w-7xl"
-              variant="pill"
-            />
-          </div>
-        </form>
-      </div>
-
-      <div
-        v-if="!isFirstStep"
-        class="hidden lg:block w-48 shrink-0 sticky top-8 self-start"
+    <div
+      class="flex grow min-w-0"
+      :class="{ 'container py-4 lg:py-8 overflow-x-auto': isFirstStep }"
+    >
+      <form
+        class="flex flex-col justify-between w-full"
+        @submit.prevent
       >
-        <RuiStepper
-          :step="step"
-          :steps="steps"
-          custom
-          orientation="vertical"
-          :class-names="{ title: 'text-rui-primary!', subtitle: 'text-rui-primary-lighter!' }"
-        />
-      </div>
+        <NuxtPage />
+      </form>
     </div>
   </div>
 </template>

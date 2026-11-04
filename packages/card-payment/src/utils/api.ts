@@ -8,35 +8,43 @@ import {
   PaymentBreakdownResponseSchema,
   type SelectedPlan,
 } from '@rotki/card-payment-common/schemas/plans';
-import { type UserSubscriptions, UserSubscriptionsResponseSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
 
-// CSRF Token handling
-let csrfToken: string | null = null;
+/** The CSRF token from the `csrftoken` cookie the rotki.com backend sets. */
+function readCSRFCookie(): string | undefined {
+  const cookie = document.cookie.split(';').find(entry => entry.trim().startsWith('csrftoken='));
+  return cookie ? cookie.slice(cookie.indexOf('=') + 1) : undefined;
+}
 
-async function fetchCSRFToken(): Promise<string> {
-  if (csrfToken) {
-    return csrfToken;
-  }
+/** Shared by the requests that start together on load, so the token is asked for once. */
+let pendingCSRFToken: Promise<string> | undefined;
 
-  try {
-    // Get CSRF token from the parent rotki.com domain
-    await fetch(`${paths.hostUrlBase}/webapi/csrf/`, {
-      credentials: 'include',
-    });
-
-    // The CSRF token should now be set in the csrftoken cookie
-    const cookies = document.cookie.split(';');
-    const csrfCookie = cookies.find(cookie => cookie.trim().startsWith('csrftoken='));
-
-    if (csrfCookie) {
-      csrfToken = csrfCookie.slice(csrfCookie.indexOf('=') + 1);
-      return csrfToken;
-    }
-
+async function requestCSRFToken(): Promise<string> {
+  await fetch(`${paths.hostUrlBase}/webapi/csrf/`, {
+    credentials: 'include',
+  });
+  const token = readCSRFCookie();
+  if (!token)
     throw new Error('CSRF token not found in cookies');
+  return token;
+}
+
+/**
+ * The CSRF token, asking the backend only when the cookie is missing. A signed-in visitor
+ * already has it from rotki.com, which saves a round trip before the first request.
+ */
+export async function fetchCSRFToken(): Promise<string> {
+  const existing = readCSRFCookie();
+  if (existing)
+    return existing;
+
+  pendingCSRFToken ??= requestCSRFToken().finally(() => {
+    pendingCSRFToken = undefined;
+  });
+  try {
+    return await pendingCSRFToken;
   }
   catch (error) {
     console.error('Failed to get CSRF token:', error);
@@ -209,34 +217,4 @@ export function findSelectedPlanById(availablePlans: AvailablePlansResponse, pla
   }
 
   return undefined;
-}
-
-export async function fetchUserSubscriptions(): Promise<UserSubscriptions> {
-  try {
-    const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/history/subscriptions`, {
-      method: 'GET',
-    });
-
-    if (!response.ok) {
-      console.error('Failed to fetch user subscriptions:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = UserSubscriptionsResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse UserSubscriptionsResponse:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      return [];
-    }
-    return parsedResponse.data.result ?? [];
-  }
-  catch (error: any) {
-    console.error('Failed to fetch user subscriptions:', error);
-    return [];
-  }
 }

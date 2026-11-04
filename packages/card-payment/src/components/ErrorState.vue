@@ -31,7 +31,7 @@ defineEmits<Emits>();
         </svg>
       </div>
       <h2 class="text-xl font-medium mb-2">
-        Payment Initialization Failed
+        Payment could not start
       </h2>
       <p class="text-rui-text-secondary mb-6">
         {{ message }}

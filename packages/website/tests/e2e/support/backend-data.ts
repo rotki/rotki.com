@@ -137,6 +137,8 @@ export interface BreakdownWire {
   next_payment: number;
   discount: { is_valid: true; is_referral: boolean; discount_type: string; discount_amount: string; discounted_amount: string } | { is_valid: false; error: string } | null;
   credit: { available_amount: string; credited_amount: string } | null;
+  /** Braintree client token for the PayPal page; see `support/braintree.ts`. */
+  braintree_client_token?: string;
 }
 
 /** One asset entry of `GET /webapi/payment/crypto/options/`. */

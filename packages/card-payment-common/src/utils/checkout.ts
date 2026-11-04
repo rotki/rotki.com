@@ -1,4 +1,5 @@
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount } from '../schemas/plans';
+import type { PaymentBreakdownDiscount } from '../schemas/plans';
+import { VatIdStatus } from '../schemas/account';
 
 /**
  * Returns the discount code only if the breakdown confirms it is valid.
@@ -43,14 +44,9 @@ export function resolveDiscountCode({ explicit, dismissed, referral, campaign }:
 }
 
 /**
- * Formats the credited amount from a payment breakdown credit response.
- * Returns undefined if the credit is missing or the amount is non-positive.
+ * Whether to warn that VAT is charged because the buyer's VAT ID did not verify. A German
+ * business pays German VAT either way, so it gets no warning.
  */
-export function formatCreditedAmount(credit: PaymentBreakdownCredit | null | undefined): string | undefined {
-  if (!credit)
-    return undefined;
-  const amount = parseFloat(credit.creditedAmount);
-  if (!isFinite(amount) || amount <= 0)
-    return undefined;
-  return amount.toFixed(2);
+export function needsVatWarning(status: string | undefined, country: string | undefined): boolean {
+  return status === VatIdStatus.NOT_VALID && country !== 'DE';
 }

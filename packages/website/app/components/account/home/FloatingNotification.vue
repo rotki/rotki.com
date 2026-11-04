@@ -49,9 +49,12 @@ watch(() => visible, (show) => {
     enter-from-class="opacity-0"
     leave-to-class="opacity-0"
   >
+    <!-- The alert's tint is see-through, so an opaque surface keeps the page from showing through. -->
     <div
       v-if="visible"
-      class="fixed top-0 md:top-28 z-rui-toast w-full md:bottom-auto right-0 md:right-2 md:w-[520px]"
+      role="alert"
+      class="fixed top-0 md:top-28 z-rui-toast w-full md:bottom-auto right-0 md:right-2 md:w-[520px] bg-rui-surface md:rounded-rui-card shadow-lg"
+      data-cy="floating-notification"
     >
       <RuiAlert
         :closeable="closeable"

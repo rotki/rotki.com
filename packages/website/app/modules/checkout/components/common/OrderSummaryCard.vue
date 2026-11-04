@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import type { PaymentBreakdownCredit, PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
-import { VatIdStatus } from '@rotki/card-payment-common/schemas/account';
+import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { needsVatWarning } from '@rotki/card-payment-common/utils/checkout';
+import { renewalDateFrom } from '@rotki/card-payment-common/utils/date';
+import OrderSummary from '@rotki/checkout-ui/components/OrderSummary.vue';
+import VatNotice from '@rotki/checkout-ui/components/VatNotice.vue';
 import { get } from '@vueuse/shared';
-import DiscountCodeInput from '~/modules/checkout/components/common/DiscountCodeInput.vue';
-import PaymentGrandTotal from '~/modules/checkout/components/common/PaymentGrandTotal.vue';
-import SelectedPlanOverview from '~/modules/checkout/components/common/SelectedPlanOverview.vue';
+import { useAppConfig } from '~/composables/use-app-config';
+import ChangePlanAction from '~/modules/checkout/components/common/ChangePlanAction.vue';
 import { useMainStore } from '~/store';
-
-interface VatBreakdown {
-  basePrice: string;
-  vatAmount: string;
-  vatRate: string;
-  fullAmount: string;
-}
 
 const discountCodeInput = defineModel<string>('discountCode', { default: '' });
 
@@ -22,7 +17,6 @@ const {
   upgradeSubId,
   isCrypto = false,
   warning = false,
-  compact = false,
   loading = false,
   disabled = false,
 } = defineProps<{
@@ -30,8 +24,8 @@ const {
   breakdown?: PaymentBreakdownResponse;
   upgradeSubId?: string;
   isCrypto?: boolean;
+  /** Warns in the plan dialog that switching after a crypto payment was sent can break the activation. */
   warning?: boolean;
-  compact?: boolean;
   loading?: boolean;
   disabled?: boolean;
 }>();
@@ -41,125 +35,51 @@ const emit = defineEmits<{
   'apply-discount': [];
 }>();
 
-const { t } = useI18n({ useScope: 'global' });
-
 const { account } = storeToRefs(useMainStore());
 
-// Spacing classes based on compact mode
-const spacingClass = computed<string>(() => (compact ? 'my-4' : 'my-6'));
-const titleSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'));
-const discountSpacingClass = computed<string>(() => (compact ? 'mb-4' : 'mb-6'));
+// Offered next to the discount field while no code is applied.
+const { activeCampaign } = useAppConfig();
 
-// Derive discountInfo from breakdown
-const discountInfo = computed<PaymentBreakdownDiscount | undefined>(() => breakdown?.discount ?? undefined);
-
-const creditInfo = computed<PaymentBreakdownCredit | undefined>(() => {
-  const currentBreakdown = get(breakdown);
-  return currentBreakdown?.credit ?? undefined;
-});
-
-// Derive vatBreakdown from breakdown
-const vatBreakdown = computed<VatBreakdown | undefined>(() => {
-  if (!breakdown) {
-    return undefined;
-  }
-
-  const floatRate = parseFloat(breakdown.vatRate);
-  if (isFinite(floatRate) && floatRate <= 0) {
-    return undefined;
-  }
-
-  const vatRate = floatRate > 0 && floatRate < 1 ? `${floatRate * 100}` : breakdown.vatRate;
-  const finalAmount = parseFloat(breakdown.finalAmount);
-  const vatAmount = parseFloat(breakdown.vatAmount);
-  const basePrice = (finalAmount - vatAmount).toFixed(2);
-
-  return {
-    basePrice,
-    vatAmount: vatAmount.toFixed(2),
-    vatRate,
-    fullAmount: breakdown.fullAmount,
-  };
-});
-
-const grandTotal = computed<number>(() => {
-  if (breakdown) {
-    return parseFloat(breakdown.finalAmount);
-  }
-
-  // Fallback to plan price
-  return selectedPlan?.price ?? 0;
-});
+// A new subscription renews one billing period from today.
+const renewsAt = computed<Date | undefined>(() => (selectedPlan ? renewalDateFrom(selectedPlan.durationInMonths) : undefined));
 
 const showVatWarning = computed<boolean>(() => {
   const acc = get(account);
-  return acc?.vatIdStatus === VatIdStatus.NOT_VALID && acc.address.country !== 'DE';
+  return needsVatWarning(acc?.vatIdStatus, acc?.address.country);
 });
-
-function handlePlanChange(newPlan: SelectedPlan): void {
-  emit('plan-change', newPlan);
-}
 </script>
 
 <template>
-  <RuiCard v-if="selectedPlan">
-    <div
-      class="text-lg font-medium"
-      :class="titleSpacingClass"
+  <OrderSummary
+    v-if="selectedPlan"
+    v-model:code="discountCodeInput"
+    :plan="selectedPlan"
+    :breakdown="breakdown"
+    :upgrade="!!upgradeSubId"
+    :one-time="isCrypto"
+    :loading="loading"
+    :disabled="disabled"
+    :campaign="activeCampaign"
+    :renews-at="renewsAt"
+    @apply="emit('apply-discount')"
+  >
+    <template
+      v-if="!upgradeSubId"
+      #plan-action
     >
-      {{ t('home.plans.tiers.step_3.order_summary') }}
-    </div>
-
-    <SelectedPlanOverview
-      :plan="selectedPlan"
-      :breakdown="breakdown"
-      :upgrade="!!upgradeSubId"
-      :crypto="isCrypto"
-      :disabled="disabled"
-      :loading="loading"
-      :warning="warning"
-      @plan-change="handlePlanChange($event)"
-    />
-
-    <RuiDivider :class="spacingClass" />
-
-    <DiscountCodeInput
-      v-model="discountCodeInput"
-      :disabled="disabled"
-      :discount-info="discountInfo"
-      :class="discountSpacingClass"
-      @apply="emit('apply-discount')"
-    />
-
-    <RuiAlert
+      <ChangePlanAction
+        :crypto="isCrypto"
+        :warning="warning"
+        :disabled="disabled"
+        :loading="loading"
+        @select="emit('plan-change', $event)"
+      />
+    </template>
+    <template
       v-if="showVatWarning"
-      type="warning"
-      variant="outlined"
-      class="mb-4"
+      #notice
     >
-      <i18n-t
-        keypath="auth.signup.vat.vat_invalid_checkout_warning"
-        tag="span"
-      >
-        <template #link>
-          <NuxtLink
-            to="/home/customer-information"
-            class="font-medium underline"
-          >
-            {{ t('account.tabs.customer_information') }}
-          </NuxtLink>
-        </template>
-      </i18n-t>
-    </RuiAlert>
-
-    <PaymentGrandTotal
-      :plan="selectedPlan"
-      :grand-total="grandTotal"
-      :loading="loading"
-      :discount-info="discountInfo"
-      :credit-info="creditInfo"
-      :crypto="isCrypto"
-      :vat-breakdown="vatBreakdown"
-    />
-  </RuiCard>
+      <VatNotice billing-href="/home/billing" />
+    </template>
+  </OrderSummary>
 </template>

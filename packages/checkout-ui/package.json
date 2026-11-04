@@ -1,0 +1,76 @@
+{
+  "name": "@rotki/checkout-ui",
+  "version": "2026.10.0",
+  "private": true,
+  "description": "Checkout components and composables shared by the rotki.com website and the card payment app",
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "exports": {
+    "./components/CheckoutAlert.vue": "./src/components/CheckoutAlert.vue",
+    "./components/CheckoutShell.vue": "./src/components/CheckoutShell.vue",
+    "./components/CheckoutStepper.vue": "./src/components/CheckoutStepper.vue",
+    "./components/DiscountCodeField.vue": "./src/components/DiscountCodeField.vue",
+    "./components/MethodTiles.vue": "./src/components/MethodTiles.vue",
+    "./components/OrderSummary.vue": "./src/components/OrderSummary.vue",
+    "./components/PaymentPage.vue": "./src/components/PaymentPage.vue",
+    "./components/PlanLine.vue": "./src/components/PlanLine.vue",
+    "./components/PolicyConsent.vue": "./src/components/PolicyConsent.vue",
+    "./components/PriceRows.vue": "./src/components/PriceRows.vue",
+    "./components/ProcessingOverlay.vue": "./src/components/ProcessingOverlay.vue",
+    "./components/VatNotice.vue": "./src/components/VatNotice.vue",
+    "./composables/checkout-messages": {
+      "types": "./src/composables/checkout-messages.ts",
+      "import": "./src/composables/checkout-messages.ts"
+    },
+    "./composables/order-totals": {
+      "types": "./src/composables/order-totals.ts",
+      "import": "./src/composables/order-totals.ts"
+    },
+    "./messages/en": {
+      "types": "./src/messages/en.ts",
+      "import": "./src/messages/en.ts"
+    },
+    "./utils/checkout-flow": {
+      "types": "./src/utils/checkout-flow.ts",
+      "import": "./src/utils/checkout-flow.ts"
+    },
+    "./utils/plan-title": {
+      "types": "./src/utils/plan-title.ts",
+      "import": "./src/utils/plan-title.ts"
+    },
+    "./utils/translator": {
+      "types": "./src/utils/translator.ts",
+      "import": "./src/utils/translator.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "@rotki/card-payment-common": "workspace:*",
+    "@rotki/ui-library": "^3.1.0",
+    "@vueuse/shared": "^15.0.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@rotki/card-payment-common": "workspace:*",
+    "@rotki/ui-library": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "@vueuse/shared": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

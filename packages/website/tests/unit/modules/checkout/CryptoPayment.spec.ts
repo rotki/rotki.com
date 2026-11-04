@@ -84,9 +84,8 @@ async function mountComponent() {
   return mountSuspended(CryptoPayment, {
     global: {
       stubs: {
-        PaymentLayout: { template: '<div><slot name="description" /><slot /></div>' },
-        CheckoutDescription: true,
-        CryptoPaymentForm: true,
+        CheckoutLoadingOverlay: true,
+        CryptoSendPage: true,
         CryptoPaymentActions: true,
       },
     },
