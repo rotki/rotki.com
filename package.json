@@ -19,7 +19,7 @@
     "generate": "pnpm --filter @rotki/website generate",
     "lint": "eslint . --ignore-pattern \"packages/**\" && pnpm -r lint",
     "lint:fix": "eslint . --ignore-pattern \"packages/**\" --fix && pnpm -r lint:fix",
-    "lint:all": "pnpm -r lint:all",
+    "lint:all": "pnpm lint && pnpm --filter @rotki/website lint:style",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:watch": "pnpm --filter @rotki/website test:watch",

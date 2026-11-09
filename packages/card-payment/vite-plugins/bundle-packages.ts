@@ -2,9 +2,9 @@ import type { Plugin } from 'vite';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-/* Records which packages end up in the card payment page's client bundle. Everything listed
-   runs on the payment page, so the list is compared against bundle-allowlist.json in CI
-   (scripts/check-card-bundle.mjs): PCI DSS 6.4.3 wants every payment page script accounted for.
+/* Records which packages end up in the card payment page's client bundle. CI compares the list
+   against bundle-allowlist.json (scripts/check-card-bundle.mjs): PCI DSS 6.4.3 wants every
+   payment page script accounted for.
    The report goes to node_modules/.tmp instead of dist, so it is never served. */
 
 const NODE_MODULES = '/node_modules/';

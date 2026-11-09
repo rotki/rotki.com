@@ -25,12 +25,12 @@ packages:
   - packages/website/tests/e2e/mock-api
 
 overrides:
+  # oxfmt (through @rotki/eslint-config) pins the vulnerable 2.1.0. Drop this when it moves on.
+  tinypool@2.1.0: 2.1.2
   # jsdom 28.1.0 (a test-tooling peer) allows undici ^7.21.0, but pnpm kept the
   # vulnerable 7.27.2 it had already resolved. Pin the 7.x line to a patched
   # release until jsdom moves on.
   undici@^7: 7.30.1
-  # oxfmt (through @rotki/eslint-config) pins the vulnerable 2.1.0. Drop this when it moves on.
-  tinypool@2.1.0: 2.1.2
 
 patchedDependencies:
   '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch
