@@ -3,19 +3,6 @@ import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { z } from 'zod';
 import { localIconUrl } from '~/utils/token-icons';
 
-interface ResultError<Code = undefined> {
-  isError: true;
-  error: Error;
-  code?: Code;
-}
-
-interface ResultSuccess<T> {
-  isError: false;
-  result: T;
-}
-
-export type Result<T, Code = undefined> = ResultError<Code> | ResultSuccess<T>;
-
 const StringArray = z.array(z.string());
 
 export const ApiError = z.union([z.string(), z.record(z.string(), StringArray)]);

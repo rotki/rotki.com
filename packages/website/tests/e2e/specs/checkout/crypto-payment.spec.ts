@@ -67,11 +67,26 @@ test.describe('new crypto payment', () => {
   test.describe('when the backend fails unexpectedly', () => {
     test.use({ backendScenario: { createPayment: { status: 500 } } });
 
-    test('reports a payment failure without sending the user away', async ({ page }) => {
+    test('reports a payment failure without sending the user away', async ({ backend, page }) => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
 
       await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
+      await expect(page.locator('[data-cy="crypto-payment-error"]')).toHaveText('Something went wrong on our side. Please try again.');
       await expect(page).toHaveURL(/\/checkout\/pay\/crypto\?/);
+      expect(backend.callsTo('POST', '/webapi/2/crypto/payments')).toHaveLength(1);
+    });
+
+    test('shows the same copy when the error page is not JSON', async ({ page }) => {
+      await page.route('**/webapi/2/crypto/payments', async route => route.fulfill({
+        body: 'MultipleObjectsReturned at /webapi/2/crypto/payments',
+        contentType: 'text/plain',
+        status: 500,
+      }));
+
+      await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
+
+      await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
+      await expect(page.locator('[data-cy="crypto-payment-error"]')).toHaveText('Something went wrong on our side. Please try again.');
     });
   });
 

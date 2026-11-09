@@ -1,19 +1,16 @@
 import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/payment';
 import type { PayPalCheckout } from 'braintree-web';
 import type { DeepReadonly, Ref } from 'vue';
-import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
-import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
-import { FetchError } from 'ofetch';
 import { useAccountRefresh } from '~/composables/use-app-events';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
+import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalApi } from '~/modules/checkout/composables/use-paypal-api';
+import { isOutcomeUnknown, paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 import { assert } from '~/utils/assert';
-import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
 /** Height of the PayPal button in px, the same as the checkout's large buttons; the page reserves this space while it loads. */
@@ -106,7 +103,7 @@ interface UsePaypalPaymentFlowReturn {
 export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}): UsePaypalPaymentFlowReturn {
   const { addPaypalAccount, createPaypalNonce } = usePaypalApi();
   const { client, initializeClientWithToken } = useBraintreeClient();
-  const { fetchWithCsrf } = useFetchWithCsrf();
+  const paymentApi = usePaymentApi({ method: 'paypal' });
   const { requestRefresh } = useAccountRefresh();
   const logger = useLogger('paypal-payment-flow');
   const { logPaymentEvent } = usePaymentLogger();
@@ -271,72 +268,24 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
     watch([paying, paypalActions, accepted, loading], checkEnabled);
   }
 
-  /**
-   * Maps a failed submission to the message to report. A 400 uses the backend's
-   * message, a 403 a generic one, and any other HTTP failure refreshes the account
-   * and flags checkout as blocked.
-   */
-  function resolveSubmitError(error: any): { errorMessage: string; blocked: boolean } {
-    let errorMessage = nonEmpty(error.message) ?? 'Payment failed';
-    let blocked = false;
-
-    if (error instanceof FetchError) {
-      if (error.status === 400) {
-        const parsed = ActionResultResponseSchema.safeParse(error.data);
-        if (parsed.success) {
-          errorMessage = parsed.data.message;
-        }
-      }
-      else if (error.status === 403) {
-        errorMessage = 'Payment failed';
-      }
-      else {
-        requestRefresh();
-        blocked = true;
-      }
-    }
-
-    return { errorMessage, blocked };
-  }
-
   async function submitPayment(nonce: string, params: PaypalPaymentParams): Promise<PaypalSubmitResult> {
-    const { planId, upgradeSubId } = params;
+    const { upgradeSubId } = params;
 
     set(paying, true);
 
     try {
       const payload = buildPaymentPayload(nonce, params);
+      const result = upgradeSubId ? await paymentApi.upgrade(payload, upgradeSubId) : await paymentApi.pay(payload);
 
-      const endpoint = upgradeSubId
-        ? '/webapi/2/braintree/upgrade'
-        : '/webapi/2/braintree/payments';
+      if (result.ok) {
+        requestRefresh();
+        return { success: true };
+      }
 
-      const body = upgradeSubId
-        ? convertKeys({ ...payload, subscriptionId: upgradeSubId }, false, false)
-        : convertKeys(payload, false, false);
-
-      await fetchWithCsrf(endpoint, {
-        method: 'POST',
-        body,
-      });
-
-      requestRefresh();
-      return { success: true };
-    }
-    catch (error_: any) {
-      const { errorMessage, blocked } = resolveSubmitError(error_);
-
-      logger.error('Payment submission failed:', error_);
-      logPaymentEvent({
-        paymentMethod: CheckoutPaymentMethods.PAYPAL,
-        event: PaymentServerEvents.PAYPAL_SUBMIT_ERROR,
-        errorMessage,
-        errorCode: String(error_?.status ?? ''),
-        step: CheckoutSteps.SUBMIT,
-        planId,
-        isUpgrade: !!upgradeSubId,
-      });
-      return { success: false, error: errorMessage, blocked };
+      const blocked = isOutcomeUnknown(result.error);
+      if (blocked)
+        requestRefresh();
+      return { success: false, error: paymentFailureMessage(result.error), blocked };
     }
     finally {
       set(paying, false);

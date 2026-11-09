@@ -27,10 +27,10 @@ async function checkUpgradePayment(pendingSub: UserSubscription, paymentApi: Cry
   const { durationInMonths, id, planId } = pendingSub;
   const response = await paymentApi.checkCryptoUpgradePayment(id);
 
-  if (response.isError || !isDefined(planId))
+  if (!response.ok || !isDefined(planId))
     return { done: true };
 
-  const { currency, pending, toPlan, transactionStarted } = response.result;
+  const { currency, pending, toPlan, transactionStarted } = response.value;
 
   if (transactionStarted)
     return { done: true, target: SUBSCRIPTION_PATH };
@@ -63,10 +63,10 @@ async function getPendingPaymentTarget(pendingSub: UserSubscription, paymentApi:
   const { durationInMonths, id, planId, planName } = pendingSub;
   const response = await paymentApi.checkPendingCryptoPayment(id);
 
-  if (response.isError || !isDefined(planId))
+  if (!response.ok || !isDefined(planId))
     return undefined;
 
-  const { currency, discount, pending, transactionStarted } = response.result;
+  const { currency, discount, pending, transactionStarted } = response.value;
 
   if (transactionStarted)
     return SUBSCRIPTION_PATH;

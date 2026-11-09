@@ -1,6 +1,7 @@
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { createSharedComposable, isClient } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { parseJsonBody } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
 
 export const useSessionIdCookie = () => useCookie('sessionid');
@@ -169,7 +170,7 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       }
     },
     parseResponse(responseText: string) {
-      return convertKeys(JSON.parse(responseText), true, false);
+      return convertKeys(parseJsonBody(responseText), true, false);
     },
     retry: FETCH_CONFIG.RETRIES,
     retryDelay: FETCH_CONFIG.RETRY_DELAY_MS,

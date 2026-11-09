@@ -11,7 +11,7 @@ import { type PurchaseDiscount, useCompletePurchase } from '~/modules/checkout/c
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
-import { PaymentError } from '~/types/codes';
+import { isOutcomeUnknown, paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 import { useLogger } from '~/utils/use-logger';
 
 /**
@@ -258,15 +258,15 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
       ? await paymentApi.upgrade(paymentPayload, payEvent.upgradeSubId)
       : await paymentApi.pay(paymentPayload);
 
-    if (result.isError) {
-      if (result.code === PaymentError.SERVER_ERROR) {
+    if (!result.ok) {
+      const message = paymentFailureMessage(result.error);
+      if (isOutcomeUnknown(result.error)) {
         requestRefresh();
         set(serverError, true);
-        // The full-screen overlay explains this one; the raw 5xx dump stays opaque.
-        throw new Error(result.error.message);
+        // The full-screen overlay explains this one, so the message stays opaque.
+        throw new Error(message);
       }
-      // A 400 carries the backend's customer-facing message ("Do Not Honor", declines, validation).
-      throw new PaymentUserError(result.error.message);
+      throw new PaymentUserError(message);
     }
 
     // The card page passes what the discount was, since this page has no breakdown.

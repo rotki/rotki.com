@@ -3,7 +3,8 @@ import { SigilEvents } from '@rotki/sigil';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useThreeDSecure } from '~/modules/checkout/composables/use-three-d-secure';
 import { PAYMENT_COMPLETED_KEY } from '~/modules/checkout/constants';
-import { PaymentError } from '~/types/codes';
+import { rejected, toPaymentFailure, unexpected } from '~/modules/checkout/utils/payment-failure';
+import { createFetchError } from '../../utils';
 
 const { chronicle, pay, upgrade, requestRefresh, verifyCard, teardown } = vi.hoisted(() => ({
   chronicle: vi.fn(),
@@ -69,8 +70,8 @@ function confirmed(): { nonce: string; threeDSecureInfo: { liabilityShifted: boo
 describe('useThreeDSecure', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    pay.mockResolvedValue({ isError: false, result: true });
-    upgrade.mockResolvedValue({ isError: false, result: true });
+    pay.mockResolvedValue({ ok: true, value: true });
+    upgrade.mockResolvedValue({ ok: true, value: true });
   });
 
   afterEach(() => {
@@ -159,7 +160,7 @@ describe('useThreeDSecure', () => {
   it('keeps the backend\'s decline message when the charge fails after the confirmation', async () => {
     store(PARAMS);
     verifyCard.mockResolvedValue(confirmed());
-    pay.mockResolvedValue({ isError: true, error: new Error('Do Not Honor') });
+    pay.mockResolvedValue({ ok: false, error: rejected('Do Not Honor') });
     const { initializeProcess, failure, error } = useThreeDSecure();
 
     await initializeProcess();
@@ -171,7 +172,7 @@ describe('useThreeDSecure', () => {
   it('shows the server error overlay on a 5xx', async () => {
     store(PARAMS);
     verifyCard.mockResolvedValue(confirmed());
-    pay.mockResolvedValue({ isError: true, code: PaymentError.SERVER_ERROR, error: new Error('502') });
+    pay.mockResolvedValue({ ok: false, error: toPaymentFailure(createFetchError(502)) });
     const { initializeProcess, serverError, failure } = useThreeDSecure();
 
     await initializeProcess();
@@ -179,5 +180,17 @@ describe('useThreeDSecure', () => {
     expect(serverError.value).toBe(true);
     expect(failure.value).toBe('payment');
     expect(requestRefresh).toHaveBeenCalled();
+  });
+
+  it('never shows a bug\'s message as a decline, and cannot rule out the charge', async () => {
+    store(PARAMS);
+    verifyCard.mockResolvedValue(confirmed());
+    pay.mockResolvedValue({ ok: false, error: unexpected(new TypeError('cannot read properties of undefined')) });
+    const { initializeProcess, serverError, error } = useThreeDSecure();
+
+    await initializeProcess();
+
+    expect(serverError.value).toBe(true);
+    expect(error.value).not.toContain('cannot read properties');
   });
 });

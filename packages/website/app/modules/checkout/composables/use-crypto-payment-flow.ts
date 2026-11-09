@@ -4,7 +4,7 @@ import { set } from '@vueuse/shared';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
-import { PaymentError } from '~/types/codes';
+import { paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
@@ -73,26 +73,26 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
 
       requestRefresh();
 
-      if (result.isError) {
+      if (!result.ok) {
         return {
           success: false,
-          error: result.error.message,
-          isUnverified: result.code === PaymentError.UNVERIFIED,
+          error: paymentFailureMessage(result.error),
+          isUnverified: result.error._tag === 'Unverified',
         };
       }
 
       // Check if transaction already started (existing pending payment)
-      if (result.result.transactionStarted) {
+      if (result.value.transactionStarted) {
         return {
           success: true,
           alreadyStarted: true,
         };
       }
 
-      set(paymentData, result.result);
+      set(paymentData, result.value);
       return {
         success: true,
-        data: result.result,
+        data: result.value,
       };
     }
     catch (error: any) {
@@ -123,17 +123,17 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
         ? await api.switchCryptoUpgradePlan({ ...apiParams, subscriptionId: upgradeSubId })
         : await api.switchCryptoPlan({ ...apiParams, subscriptionId });
 
-      if (result.isError) {
+      if (!result.ok) {
         return {
           success: false,
-          error: result.error.message,
+          error: paymentFailureMessage(result.error),
         };
       }
 
-      set(paymentData, result.result);
+      set(paymentData, result.value);
       return {
         success: true,
-        data: result.result,
+        data: result.value,
       };
     }
     catch (error: any) {
@@ -156,8 +156,8 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
         ? await api.cancelUpgradeRequest(upgradeSubId)
         : await api.deletePendingPayment();
 
-      if (result.isError) {
-        return { success: false, error: result.error.message };
+      if (!result.ok) {
+        return { success: false, error: paymentFailureMessage(result.error) };
       }
 
       reset();

@@ -85,7 +85,7 @@ describe('usePaypalPaymentFlow', () => {
 
   describe('submitPayment', () => {
     it('should return success on successful payment', async () => {
-      mockFetchWithCsrf.mockResolvedValueOnce({ result: true });
+      mockFetchWithCsrf.mockResolvedValueOnce({ paymentMethodNonce: 'nonce-123', planId: 1 });
 
       const { usePaypalPaymentFlow } = await import(
         '~/modules/checkout/composables/use-paypal-payment-flow',
@@ -162,8 +162,8 @@ describe('usePaypalPaymentFlow', () => {
       expect(mockRequestRefresh).not.toHaveBeenCalled();
     });
 
-    it('should not block on non-FetchError', async () => {
-      mockFetchWithCsrf.mockRejectedValueOnce(new Error('Network error'));
+    it('should block on an unexpected error, which cannot rule out the charge', async () => {
+      mockFetchWithCsrf.mockRejectedValueOnce(new TypeError('cannot read properties of undefined'));
 
       const { usePaypalPaymentFlow } = await import(
         '~/modules/checkout/composables/use-paypal-payment-flow',
@@ -173,8 +173,25 @@ describe('usePaypalPaymentFlow', () => {
       const result = await submitPayment('nonce-123', { planId: 1 });
 
       expect(result.success).toBe(false);
-      expect(result.blocked).toBe(false);
-      expect(mockRequestRefresh).not.toHaveBeenCalled();
+      expect(result.blocked).toBe(true);
+      expect(result.error).not.toContain('cannot read properties');
+      expect(mockRequestRefresh).toHaveBeenCalledOnce();
+    });
+
+    it('should not retry the charge', async () => {
+      mockFetchWithCsrf.mockResolvedValueOnce({ paymentMethodNonce: 'nonce-123', planId: 1 });
+
+      const { usePaypalPaymentFlow } = await import(
+        '~/modules/checkout/composables/use-paypal-payment-flow',
+      );
+      const { submitPayment } = usePaypalPaymentFlow();
+
+      await submitPayment('nonce-123', { planId: 1 });
+
+      expect(mockFetchWithCsrf).toHaveBeenCalledWith(
+        '/webapi/2/braintree/payments',
+        expect.objectContaining({ method: 'POST', retry: false }),
+      );
     });
 
     it('should call upgrade endpoint when upgradeSubId is provided', async () => {

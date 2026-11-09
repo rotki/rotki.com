@@ -31,6 +31,26 @@ test.describe('PayPal payment', () => {
     expect(backend.callsTo('POST', '/webapi/2/braintree/payments')[0]?.body).toMatchObject({ payment_method_nonce: 'paypal-vault-nonce', plan_id: 3 });
   });
 
+  test.describe('when the server fails on the charge', () => {
+    test.use({
+      backendScenario: {
+        braintreePayment: { message: 'boom', status: 500 },
+        breakdown: { ...defaultBreakdown(), braintree_client_token: BRAINTREE_CLIENT_TOKEN },
+      },
+    });
+
+    test('warns that the outcome is unknown and does not send the charge again', async ({ backend, page }) => {
+      await page.goto('/checkout/pay/paypal?planId=3');
+      await page.getByRole('checkbox', { name: /refund and cancellation policy/ }).check();
+      await page.locator('[data-cy="paypal-stub-button"]').click();
+
+      await expect(page.locator('[data-cy="checkout-alert"]')).toBeVisible();
+      await expect(page.getByText('boom')).toHaveCount(0);
+      await page.waitForTimeout(1000);
+      expect(backend.callsTo('POST', '/webapi/2/braintree/payments')).toHaveLength(1);
+    });
+  });
+
   test.describe('when the charge is declined', () => {
     test.use({
       backendScenario: {

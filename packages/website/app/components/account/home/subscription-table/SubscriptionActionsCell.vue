@@ -106,8 +106,8 @@ watchImmediate(() => subscription, async (sub) => {
   }
 
   const upgradePaymentResponse = await checkCryptoUpgradePayment(sub.id);
-  if (!upgradePaymentResponse.isError) {
-    const { toPlan: { id } } = upgradePaymentResponse.result;
+  if (upgradePaymentResponse.ok) {
+    const { toPlan: { id } } = upgradePaymentResponse.value;
     set(upgradePlanId, id);
   }
   else {

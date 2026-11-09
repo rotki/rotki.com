@@ -1,10 +1,12 @@
-import type { PaymentError } from '~/types/codes';
-import { type ActionResultResponse, ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
+import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { CheckoutPaymentMethods, CheckoutSteps, PaymentServerEvents } from '@rotki/sigil';
 import { FetchError } from 'ofetch';
+import { pipe } from 'plainfp/pipe';
+import { flatMap, fromPromise, type ResultAsync } from 'plainfp/result-async';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { parseApiResult, type PaymentFailure, toPaymentFailure } from '~/modules/checkout/utils/payment-failure';
 import {
   type CryptoPayment,
   CryptoPaymentResponse,
@@ -12,10 +14,7 @@ import {
   CryptoUpgradePaymentResponse,
   type PendingCryptoPayment,
   PendingCryptoPaymentResponse,
-  type Result,
 } from '~/types';
-import { createSimpleErrorResult, handlePaymentError } from '~/utils/api-error-handling';
-import { assert } from '~/utils/assert';
 import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
@@ -40,15 +39,25 @@ export interface CryptoUpgradePaymentParams {
 }
 
 interface UseCryptoPaymentApiReturn {
-  checkPendingCryptoPayment: (subscriptionId?: string) => Promise<Result<PendingCryptoPayment>>;
-  checkCryptoUpgradePayment: (subscriptionId?: string) => Promise<Result<CryptoUpgradePayment>>;
-  cryptoPayment: (params: CryptoPaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
-  deletePendingPayment: () => Promise<Result<boolean>>;
-  markTransactionStarted: (isUpgrade: boolean) => Promise<Result<boolean>>;
-  switchCryptoPlan: (params: CryptoPaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
-  switchCryptoUpgradePlan: (params: CryptoUpgradePaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
-  cancelUpgradeRequest: (subscriptionId: string) => Promise<Result<boolean>>;
-  upgradeCryptoSubscription: (params: CryptoUpgradePaymentParams) => Promise<Result<CryptoPayment, PaymentError>>;
+  checkPendingCryptoPayment: (subscriptionId?: string) => ResultAsync<PendingCryptoPayment, PaymentFailure>;
+  checkCryptoUpgradePayment: (subscriptionId?: string) => ResultAsync<CryptoUpgradePayment, PaymentFailure>;
+  cryptoPayment: (params: CryptoPaymentParams) => ResultAsync<CryptoPayment, PaymentFailure>;
+  deletePendingPayment: () => ResultAsync<boolean, PaymentFailure>;
+  markTransactionStarted: (isUpgrade: boolean) => ResultAsync<boolean, PaymentFailure>;
+  switchCryptoPlan: (params: CryptoPaymentParams) => ResultAsync<CryptoPayment, PaymentFailure>;
+  switchCryptoUpgradePlan: (params: CryptoUpgradePaymentParams) => ResultAsync<CryptoPayment, PaymentFailure>;
+  cancelUpgradeRequest: (subscriptionId: string) => ResultAsync<boolean, PaymentFailure>;
+  upgradeCryptoSubscription: (params: CryptoUpgradePaymentParams) => ResultAsync<CryptoPayment, PaymentFailure>;
+}
+
+/**
+ * A 409 on delete means nothing is pending, which is the state we wanted, so it counts as a success
+ * instead of blocking the user (e.g. Back after a failed payment creation).
+ */
+function nothingPendingIsDeleted(error: unknown): { result: boolean } {
+  if (error instanceof FetchError && error.statusCode === 409)
+    return { result: true };
+  throw error;
 }
 
 /**
@@ -60,291 +69,121 @@ export function useCryptoPaymentApi(): UseCryptoPaymentApiReturn {
   const { fetchWithCsrf } = useFetchWithCsrf();
   const { logPaymentEvent } = usePaymentLogger();
 
+  /** Logs what a call threw, with the detail the failure itself leaves out, and sorts it. */
+  function onThrown(label: string): (cause: unknown) => PaymentFailure {
+    return (cause) => {
+      logger.error(label, cause);
+      return toPaymentFailure(cause);
+    };
+  }
+
+  /** {@link onThrown} for the calls that create a payment, which also report to the payment log. */
+  function onCreateThrown(cause: any): PaymentFailure {
+    logPaymentEvent({
+      paymentMethod: CheckoutPaymentMethods.CRYPTO,
+      event: PaymentServerEvents.CRYPTO_PAYMENT_API_ERROR,
+      errorMessage: nonEmpty(cause?.message) ?? 'unknown',
+      errorCode: String(cause?.statusCode ?? ''),
+      step: CheckoutSteps.SUBMIT,
+    });
+    return onThrown('Crypto payment failed:')(cause);
+  }
+
   /**
    * Create crypto payment request
    */
-  const cryptoPayment = async (params: CryptoPaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
+  async function cryptoPayment(params: CryptoPaymentParams): ResultAsync<CryptoPayment, PaymentFailure> {
     const { planId, cryptocurrencyIdentifier, subscriptionId, discountCode } = params;
+    return pipe(
+      fromPromise(fetchWithCsrf<unknown>('/webapi/2/crypto/payments', {
+        body: convertKeys({ cryptocurrencyIdentifier, planId, subscriptionId, discountCode }, false, false),
+        method: 'POST',
+        retry: false,
+      }), onCreateThrown),
+      flatMap(parseApiResult(CryptoPaymentResponse)),
+    );
+  }
 
-    try {
-      const response = await fetchWithCsrf<CryptoPaymentResponse>(
-        '/webapi/2/crypto/payments',
-        {
-          body: convertKeys(
-            {
-              cryptocurrencyIdentifier,
-              planId,
-              subscriptionId,
-              discountCode,
-            },
-            false,
-            false,
-          ),
-          method: 'POST',
-        },
-      );
-
-      const { result } = CryptoPaymentResponse.parse(response);
-      assert(result);
-      return {
-        isError: false,
-        result,
-      };
-    }
-    catch (error: any) {
-      logger.error('Crypto payment failed:', error);
-      logPaymentEvent({ paymentMethod: CheckoutPaymentMethods.CRYPTO, event: PaymentServerEvents.CRYPTO_PAYMENT_API_ERROR, errorMessage: nonEmpty(error.message) ?? 'unknown', errorCode: String(error.statusCode ?? ''), step: CheckoutSteps.SUBMIT });
-      return handlePaymentError(error);
-    }
-  };
-
-  const upgradeCryptoSubscription = async (params: CryptoUpgradePaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
+  async function upgradeCryptoSubscription(params: CryptoUpgradePaymentParams): ResultAsync<CryptoPayment, PaymentFailure> {
     const { planId, cryptocurrencyIdentifier, subscriptionId, discountCode } = params;
+    return pipe(
+      fromPromise(fetchWithCsrf<unknown>('/webapi/2/crypto/upgrade', {
+        body: { cryptocurrencyIdentifier, planId, subscriptionId, discountCode },
+        method: 'POST',
+        retry: false,
+      }), onCreateThrown),
+      flatMap(parseApiResult(CryptoPaymentResponse)),
+    );
+  }
 
-    try {
-      const response = await fetchWithCsrf<CryptoPaymentResponse>(
-        '/webapi/2/crypto/upgrade',
-        {
-          body: {
-            cryptocurrencyIdentifier,
-            planId,
-            subscriptionId,
-            discountCode,
-          },
-          method: 'POST',
-        },
-      );
-      const { result } = CryptoPaymentResponse.parse(response);
-      assert(result);
-      return {
-        isError: false,
-        result,
-      };
-    }
-    catch (error: any) {
-      logger.error('Crypto payment failed:', error);
-      logPaymentEvent({
-        paymentMethod: CheckoutPaymentMethods.CRYPTO,
-        event: PaymentServerEvents.CRYPTO_PAYMENT_API_ERROR,
-        errorMessage: nonEmpty(error.message) ?? 'unknown',
-        errorCode: String(error.statusCode ?? ''),
-        step: CheckoutSteps.SUBMIT,
-      });
-      return handlePaymentError(error);
-    }
-  };
-
-  const checkCryptoUpgradePayment = async (
-    subscriptionId?: string,
-  ): Promise<Result<CryptoUpgradePayment>> => {
-    try {
-      const response = await fetchWithCsrf<CryptoUpgradePaymentResponse>(
-        '/webapi/2/crypto/payment/upgrade/',
-        {
-          query: convertKeys({ subscriptionId }, false, false),
-        },
-      );
-      const data = CryptoUpgradePaymentResponse.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
+  async function checkCryptoUpgradePayment(subscriptionId?: string): ResultAsync<CryptoUpgradePayment, PaymentFailure> {
+    return pipe(
+      fromPromise(fetchWithCsrf<unknown>('/webapi/2/crypto/payment/upgrade/', {
+        query: convertKeys({ subscriptionId }, false, false),
+      }), onThrown('Failed to check crypto upgrade payment:')),
+      flatMap(parseApiResult(CryptoUpgradePaymentResponse)),
+    );
+  }
 
   /**
    * Check pending crypto payment status
    */
-  const checkPendingCryptoPayment = async (
-    subscriptionId?: string,
-  ): Promise<Result<PendingCryptoPayment>> => {
-    try {
-      const response = await fetchWithCsrf<PendingCryptoPaymentResponse>(
-        '/webapi/2/crypto/payment/pending/',
-        {
-          query: convertKeys({ subscriptionId }, false, false),
-        },
-      );
-      const data = PendingCryptoPaymentResponse.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error('Failed to check pending crypto payment:', error);
-      return createSimpleErrorResult(error);
-    }
-  };
+  async function checkPendingCryptoPayment(subscriptionId?: string): ResultAsync<PendingCryptoPayment, PaymentFailure> {
+    return pipe(
+      fromPromise(fetchWithCsrf<unknown>('/webapi/2/crypto/payment/pending/', {
+        query: convertKeys({ subscriptionId }, false, false),
+      }), onThrown('Failed to check pending crypto payment:')),
+      flatMap(parseApiResult(PendingCryptoPaymentResponse)),
+    );
+  }
 
   /**
    * Mark crypto payment transaction as started
    */
-  const markTransactionStarted = async (isUpgrade: boolean): Promise<Result<boolean>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
+  async function markTransactionStarted(isUpgrade: boolean): ResultAsync<boolean, PaymentFailure> {
+    return pipe(
+      fromPromise(fetchWithCsrf<unknown>(
         isUpgrade ? '/webapi/2/crypto/payment/upgrade/' : '/webapi/2/crypto/payment/pending/',
-        {
-          method: 'PATCH',
-        },
-      );
-      const data = ActionResultResponseSchema.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error('Failed to mark transaction as started:', error);
-      return createSimpleErrorResult(error);
-    }
-  };
+        { method: 'PATCH' },
+      ), onThrown('Failed to mark transaction as started:')),
+      flatMap(parseApiResult(ActionResultResponseSchema)),
+    );
+  }
 
   /**
    * Delete pending crypto payment
    */
-  const deletePendingPayment = async (): Promise<Result<boolean>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>(
-        '/webapi/2/crypto/payment/pending/',
-        {
-          method: 'DELETE',
-        },
-      );
-      const data = ActionResultResponseSchema.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      /* A 409 means nothing is pending, which is the state we wanted, so succeed
-         instead of blocking the user (e.g. Back after a failed payment creation). */
-      if (error instanceof FetchError && error.statusCode === 409) {
-        return {
-          isError: false,
-          result: true,
-        };
-      }
-      logger.error('Failed to delete pending payment:', error);
-      return createSimpleErrorResult(error);
-    }
-  };
+  async function deletePendingPayment(): ResultAsync<boolean, PaymentFailure> {
+    const request = fetchWithCsrf<unknown>('/webapi/2/crypto/payment/pending/', { method: 'DELETE' }).catch(nothingPendingIsDeleted);
+    return pipe(
+      fromPromise(request, onThrown('Failed to delete pending payment:')),
+      flatMap(parseApiResult(ActionResultResponseSchema)),
+    );
+  }
 
   /**
    * Switch crypto payment plan (delete current and create new)
    */
-  const switchCryptoPlan = async (params: CryptoPaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
-    try {
-      const data = await deletePendingPayment();
-      if (!data.isError) {
-        const payment = await cryptoPayment(params);
-        if (payment.isError) {
-          return payment;
-        }
+  async function switchCryptoPlan(params: CryptoPaymentParams): ResultAsync<CryptoPayment, PaymentFailure> {
+    return pipe(deletePendingPayment(), flatMap(async () => cryptoPayment(params)));
+  }
 
-        return {
-          isError: false,
-          result: payment.result,
-        };
-      }
-      return createSimpleErrorResult(data.error);
-    }
-    catch (error: any) {
-      logger.error('Failed to switch crypto plan:', error);
-      return createSimpleErrorResult(error);
-    }
-  };
-
-  const cancelUpgradeRequest = async (subscriptionId: string): Promise<Result<boolean>> => {
-    try {
-      const response = await fetchWithCsrf<ActionResultResponse>('/webapi/2/crypto/upgrade/cancel', {
-        body: {
-          subscriptionId,
-        },
+  async function cancelUpgradeRequest(subscriptionId: string): ResultAsync<boolean, PaymentFailure> {
+    return pipe(
+      fromPromise(fetchWithCsrf<unknown>('/webapi/2/crypto/upgrade/cancel', {
+        body: { subscriptionId },
         method: 'POST',
-      });
-      const data = ActionResultResponseSchema.parse(response);
-      if (data.result) {
-        return {
-          isError: false,
-          result: data.result,
-        };
-      }
-      return {
-        error: new Error(data.message),
-        isError: true,
-      };
-    }
-    catch (error: any) {
-      logger.error(error);
-      return {
-        error,
-        isError: true,
-      };
-    }
-  };
+      }), onThrown('Failed to cancel upgrade request:')),
+      flatMap(parseApiResult(ActionResultResponseSchema)),
+    );
+  }
 
   /**
    * Switch crypto upgrade plan (cancel current upgrade and create new)
    */
-  const switchCryptoUpgradePlan = async (params: CryptoUpgradePaymentParams): Promise<Result<CryptoPayment, PaymentError>> => {
-    const { subscriptionId } = params;
-
-    try {
-      // Cancel existing upgrade request
-      const cancelResult = await cancelUpgradeRequest(subscriptionId);
-      if (cancelResult.isError) {
-        return createSimpleErrorResult(cancelResult.error);
-      }
-
-      // Create new upgrade payment
-      const payment = await upgradeCryptoSubscription(params);
-      if (payment.isError) {
-        return payment;
-      }
-
-      return {
-        isError: false,
-        result: payment.result,
-      };
-    }
-    catch (error: any) {
-      logger.error('Failed to switch crypto upgrade plan:', error);
-      return createSimpleErrorResult(error);
-    }
-  };
+  async function switchCryptoUpgradePlan(params: CryptoUpgradePaymentParams): ResultAsync<CryptoPayment, PaymentFailure> {
+    return pipe(cancelUpgradeRequest(params.subscriptionId), flatMap(async () => upgradeCryptoSubscription(params)));
+  }
 
   return {
     cancelUpgradeRequest,

@@ -1,7 +1,6 @@
-import { assert, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { PaymentError } from '~/types/codes';
-import { getErrorMessage, handlePaymentError } from '~/utils/api-error-handling';
+import { getErrorMessage, parseJsonBody, UnreadableResponseError } from '~/utils/api-error-handling';
 
 import { createFetchError } from '../../utils';
 
@@ -15,70 +14,31 @@ function fetchError400(data: unknown): ReturnType<typeof createFetchError> {
   return error;
 }
 
-describe('handlePaymentError', () => {
-  it('should return error with parsed message for 400 status', () => {
-    const fetchError = createFetchError(400, {
-      message: 'Invalid discount code',
-      result: false,
-    });
-
-    const result = handlePaymentError(fetchError);
-
-    assert(result.isError);
-    expect(result.error).toBeInstanceOf(Error);
-    expect((result.error).message).toBe('Invalid discount code');
-    expect(result.code).toBeUndefined();
+describe('parseJsonBody', () => {
+  it('parses JSON', () => {
+    expect(parseJsonBody('{"result":true}')).toEqual({ result: true });
   });
 
-  it('should return UNVERIFIED code for 403 status', () => {
-    const fetchError = createFetchError(403);
+  it('fails with readable copy and keeps the parser error as the cause', () => {
+    let failure: unknown;
+    try {
+      parseJsonBody('MultipleObjectsReturned at /webapi/2/crypto/payments');
+    }
+    catch (error) {
+      failure = error;
+    }
 
-    const result = handlePaymentError(fetchError);
-
-    assert(result.isError);
-    expect(result.code).toBe(PaymentError.UNVERIFIED);
-  });
-
-  it('should return SERVER_ERROR code for 500 status', () => {
-    const fetchError = createFetchError(500);
-
-    const result = handlePaymentError(fetchError);
-
-    assert(result.isError);
-    expect(result.code).toBe(PaymentError.SERVER_ERROR);
-    expect(result.error).toBeInstanceOf(Error);
-  });
-
-  it('should return SERVER_ERROR code for 502 status', () => {
-    const fetchError = createFetchError(502);
-
-    const result = handlePaymentError(fetchError);
-
-    assert(result.isError);
-    expect(result.code).toBe(PaymentError.SERVER_ERROR);
-  });
-
-  it('should return SERVER_ERROR code for 503 status', () => {
-    const fetchError = createFetchError(503);
-
-    const result = handlePaymentError(fetchError);
-
-    assert(result.isError);
-    expect(result.code).toBe(PaymentError.SERVER_ERROR);
-  });
-
-  it('should return no code for non-FetchError', () => {
-    const error = new Error('Something went wrong');
-
-    const result = handlePaymentError(error);
-
-    assert(result.isError);
-    expect(result.code).toBeUndefined();
-    expect(result.error).toBe(error);
+    expect(failure).toBeInstanceOf(UnreadableResponseError);
+    expect(failure).toHaveProperty('message', 'Something went wrong on our side. Please try again.');
+    expect(failure).toHaveProperty('cause', expect.any(SyntaxError));
   });
 });
 
 describe('getErrorMessage', () => {
+  it('returns readable copy for a body that is not JSON', () => {
+    expect(getErrorMessage(new UnreadableResponseError())).toBe('Something went wrong on our side. Please try again.');
+  });
+
   it('returns the message of a plain Error', () => {
     expect(getErrorMessage(new Error('boom'))).toBe('boom');
   });

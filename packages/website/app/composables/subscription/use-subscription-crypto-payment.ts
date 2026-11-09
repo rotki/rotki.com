@@ -89,8 +89,8 @@ export function useSubscriptionCryptoPayment({
     try {
       const response = await paymentApi.checkPendingCryptoPayment(subId);
 
-      if (!response.isError && response.result.pending) {
-        set(pendingPaymentCurrency, response.result.currency);
+      if (response.ok && response.value.pending) {
+        set(pendingPaymentCurrency, response.value.currency);
       }
       else {
         set(pendingPaymentCurrency, undefined);

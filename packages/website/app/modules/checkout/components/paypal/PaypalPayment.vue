@@ -146,6 +146,7 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
     discountApplied: get(breakdown)?.discount?.isValid === true,
   });
 
+  clearError();
   set(submittingPayment, true);
   try {
     const result = await submitPayment(nonce, {

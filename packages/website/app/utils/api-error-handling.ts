@@ -1,11 +1,33 @@
 import type { ZodSafeParseError } from 'zod';
-import type { Result } from '~/types';
 import type { ActionResult } from '~/types/common';
 import type { useLogger } from '~/utils/use-logger';
 import { ActionResultResponseSchema } from '@rotki/card-payment-common/schemas/api';
 import { FetchError } from 'ofetch';
-import { PaymentError } from '~/types/codes';
 import { nonEmpty } from '~/utils/non-empty';
+
+/** What a buyer reads when the server failed; the technical detail only goes to the logs. */
+export const SERVER_ERROR_MESSAGE = 'Something went wrong on our side. Please try again.';
+
+/** The server answered with a body that is not JSON, such as a framework's plain text 500 page. */
+export class UnreadableResponseError extends Error {
+  constructor(message: string = SERVER_ERROR_MESSAGE, options?: ErrorOptions) {
+    super(message, options);
+    this.name = 'UnreadableResponseError';
+  }
+}
+
+/**
+ * Parses an API response body. A body that is not JSON fails with copy a buyer can read, since
+ * callers show `error.message` and the parser's own message quotes the start of the body.
+ */
+export function parseJsonBody(body: string): unknown {
+  try {
+    return JSON.parse(body);
+  }
+  catch (error) {
+    throw new UnreadableResponseError(SERVER_ERROR_MESSAGE, { cause: error });
+  }
+}
 
 /**
  * Check if error is a 401 Unauthorized response
@@ -51,46 +73,6 @@ export function createErrorResult(error: any): ActionResult {
  */
 export function createSuccessResult(): ActionResult {
   return { success: true };
-}
-
-/**
- * Handle payment API errors with specific error codes
- */
-export function handlePaymentError<T>(originalError: any): Result<T, PaymentError> {
-  let error = originalError;
-  let code: PaymentError | undefined;
-
-  if (originalError instanceof FetchError) {
-    if (originalError.status === 400) {
-      const parsed = ActionResultResponseSchema.safeParse(originalError.data);
-      const message = parsed.success ? parsed.data.message : originalError.message;
-      error = new Error(message);
-    }
-    else if (originalError.status === 403) {
-      error = '';
-      code = PaymentError.UNVERIFIED;
-    }
-    else {
-      code = PaymentError.SERVER_ERROR;
-      error = new Error(originalError.message || 'An unexpected error occurred');
-    }
-  }
-
-  return {
-    code,
-    error,
-    isError: true,
-  };
-}
-
-/**
- * Create simple error result for Result type
- */
-export function createSimpleErrorResult(error: any): Result<any> {
-  return {
-    error,
-    isError: true,
-  };
 }
 
 /**

@@ -1,7 +1,5 @@
 import { afterEach, assert, describe, expect, it, vi } from 'vitest';
-
-import { PaymentError } from '~/types/codes';
-
+import { paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 import { createFetchError } from '../../utils';
 
 const mockFetchWithCsrf = vi.fn();
@@ -35,14 +33,14 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      expect(result.isError).toBe(false);
+      expect(result.ok).toBe(true);
       expect(mockFetchWithCsrf).toHaveBeenCalledWith(
         '/webapi/2/braintree/payments',
         expect.objectContaining({ method: 'POST' }),
       );
     });
 
-    it('should return SERVER_ERROR code on 500 response', async () => {
+    it('should return a server error on 500 response', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(500));
 
       const { usePaymentApi } = await import('~/modules/checkout/composables/use-payment-api');
@@ -53,11 +51,11 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      assert(result.isError);
-      expect(result.code).toBe(PaymentError.SERVER_ERROR);
+      assert(!result.ok);
+      expect(result.error._tag).toBe('ServerError');
     });
 
-    it('should return no special code on 400 response', async () => {
+    it('should return the refusal from the backend on 400 response', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(
         createFetchError(400, { message: 'Invalid nonce', result: false }),
       );
@@ -70,13 +68,12 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      assert(result.isError);
-      expect(result.code).toBeUndefined();
-      expect(result.error).toBeInstanceOf(Error);
-      expect((result.error).message).toBe('Invalid nonce');
+      assert(!result.ok);
+      expect(result.error._tag).toBe('Rejected');
+      expect(paymentFailureMessage(result.error)).toBe('Invalid nonce');
     });
 
-    it('should return UNVERIFIED code on 403 response', async () => {
+    it('should return an unverified failure on 403 response', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(403));
 
       const { usePaymentApi } = await import('~/modules/checkout/composables/use-payment-api');
@@ -87,8 +84,8 @@ describe('usePaymentApi', () => {
         paymentMethodNonce: 'nonce-123',
       });
 
-      assert(result.isError);
-      expect(result.code).toBe(PaymentError.UNVERIFIED);
+      assert(!result.ok);
+      expect(result.error._tag).toBe('Unverified');
     });
   });
 
@@ -107,7 +104,7 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      expect(result.isError).toBe(false);
+      expect(result.ok).toBe(true);
       expect(mockFetchWithCsrf).toHaveBeenCalledWith(
         '/webapi/2/braintree/upgrade',
         expect.objectContaining({
@@ -131,11 +128,11 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      assert(result.isError);
-      expect(result.error.message).toBe('Upgrade not allowed');
+      assert(!result.ok);
+      expect(paymentFailureMessage(result.error)).toBe('Upgrade not allowed');
     });
 
-    it('should return SERVER_ERROR code on 502 response', async () => {
+    it('should return a server error on 502 response', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(502));
 
       const { usePaymentApi } = await import('~/modules/checkout/composables/use-payment-api');
@@ -146,11 +143,11 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      assert(result.isError);
-      expect(result.code).toBe(PaymentError.SERVER_ERROR);
+      assert(!result.ok);
+      expect(result.error._tag).toBe('ServerError');
     });
 
-    it('should return UNVERIFIED code on 403 response', async () => {
+    it('should return an unverified failure on 403 response', async () => {
       mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(403));
 
       const { usePaymentApi } = await import('~/modules/checkout/composables/use-payment-api');
@@ -161,8 +158,8 @@ describe('usePaymentApi', () => {
         'sub-789',
       );
 
-      assert(result.isError);
-      expect(result.code).toBe(PaymentError.UNVERIFIED);
+      assert(!result.ok);
+      expect(result.error._tag).toBe('Unverified');
     });
   });
 });

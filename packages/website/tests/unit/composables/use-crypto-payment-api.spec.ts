@@ -27,8 +27,8 @@ describe('useCryptoPaymentApi', () => {
 
       const result = await deletePendingPayment();
 
-      assert(!result.isError);
-      expect(result.result).toBe(true);
+      assert(result.ok);
+      expect(result.value).toBe(true);
       expect(mockFetchWithCsrf).toHaveBeenCalledWith(
         '/webapi/2/crypto/payment/pending/',
         expect.objectContaining({ method: 'DELETE' }),
@@ -45,8 +45,8 @@ describe('useCryptoPaymentApi', () => {
 
       const result = await deletePendingPayment();
 
-      assert(!result.isError);
-      expect(result.result).toBe(true);
+      assert(result.ok);
+      expect(result.value).toBe(true);
     });
 
     it('still surfaces other failures (e.g. 500) as errors', async () => {
@@ -57,7 +57,8 @@ describe('useCryptoPaymentApi', () => {
 
       const result = await deletePendingPayment();
 
-      assert(result.isError);
+      assert(!result.ok);
+      expect(result.error._tag).toBe('ServerError');
     });
   });
 });
