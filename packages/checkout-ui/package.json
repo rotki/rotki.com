@@ -16,6 +16,7 @@
     "./components/OrderSummary.vue": "./src/components/OrderSummary.vue",
     "./components/PaymentPage.vue": "./src/components/PaymentPage.vue",
     "./components/PlanLine.vue": "./src/components/PlanLine.vue",
+    "./components/PlanOptions.vue": "./src/components/PlanOptions.vue",
     "./components/PolicyConsent.vue": "./src/components/PolicyConsent.vue",
     "./components/PriceRows.vue": "./src/components/PriceRows.vue",
     "./components/ProcessingOverlay.vue": "./src/components/ProcessingOverlay.vue",

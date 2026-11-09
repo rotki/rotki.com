@@ -31,6 +31,13 @@ export function checkoutMethodLinks(): MethodLinks {
   return buildMethodLinks({ base: paths.hostUrlBase, params: currentCheckoutParams() });
 }
 
+/** Keeps the plan in the URL in step with the page, so links and a reload use the plan on screen. */
+export function replacePlanInUrl(planId: number): void {
+  const url = new URL(window.location.href);
+  url.searchParams.set('planId', planId.toString());
+  window.history.replaceState(window.history.state, '', url);
+}
+
 /**
  * Navigation utility functions
  */

@@ -10,6 +10,17 @@ export const checkoutMessages: MessageTree = {
     alert: {
       dismiss: 'Dismiss',
     },
+    change_plan: {
+      action: 'Change',
+      cancel: 'Cancel',
+      current: 'Current plan',
+      monthly: 'Monthly billing',
+      per_month: '{amount} per month',
+      per_year: '{amount} per year',
+      period: 'Billing period',
+      title: 'Change plan',
+      yearly: 'Yearly billing',
+    },
     consent: {
       agree: 'I agree to the',
       policy: 'refund and cancellation policy',

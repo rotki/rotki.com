@@ -54,7 +54,9 @@ const emit = defineEmits<{
 
 defineSlots<{
   /** Switching to another payment method, under the heading. */
-  methods?: () => any;
+  'methods'?: () => any;
+  /** Next to the plan name, e.g. a button to change the plan. */
+  'plan-action'?: (props: { disabled: boolean }) => any;
 }>();
 
 const t = useCheckoutMessages();
@@ -93,7 +95,10 @@ const { processing, transactionError, setTransactionError, submit } = useCardChe
 const showVatWarning = computed<boolean>(() => needsVatWarning(vatIdStatus, country));
 
 // The API sends the next payment as a unix timestamp in seconds; 0 means it has none.
-const renewsAt = computed<Date | undefined>(() => (planData.nextPayment ? new Date(planData.nextPayment * 1000) : undefined));
+const renewsAt = computed<Date | undefined>(() => {
+  const next = get(breakdown)?.nextPayment ?? planData.nextPayment;
+  return next ? new Date(next * 1000) : undefined;
+});
 
 const { total, totalNote } = useOrderTotals({ plan: () => selectedPlan, breakdown, upgrade: () => !!upgradeSubId });
 
@@ -168,6 +173,15 @@ watch(breakdown, (newBreakdown, oldBreakdown) => {
         :renews-at="renewsAt"
         @apply="handleDiscountEdit($event)"
       >
+        <template
+          v-if="$slots['plan-action']"
+          #plan-action
+        >
+          <slot
+            name="plan-action"
+            :disabled="processing || breakdownLoading"
+          />
+        </template>
         <template
           v-if="showVatWarning"
           #notice

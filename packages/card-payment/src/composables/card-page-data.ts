@@ -1,13 +1,13 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { ActiveCampaign } from '@rotki/card-payment-common/schemas/campaign';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { AvailablePlan, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { AUTO_DISCOUNT_DISMISSED_KEY, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { get, set } from '@vueuse/core';
 import { computed, type ComputedRef, type Ref, shallowReadonly, shallowRef } from 'vue';
 import { checkout, findSelectedPlanById, getActiveCampaign, getAvailablePlans } from '@/utils/api';
 import { getSavedCard } from '@/utils/card-api';
-import { getUrlParam, navigation } from '@/utils/navigation';
+import { getUrlParam, navigation, replacePlanInUrl } from '@/utils/navigation';
 import { canBuyNewSubscription } from '@/utils/navigation-guard';
 
 export interface UseCardPageDataReturn {
@@ -19,6 +19,8 @@ export interface UseCardPageDataReturn {
   upgradeSubId: Readonly<Ref<string | null>>;
   planData: Readonly<Ref<PaymentBreakdownResponse | undefined>>;
   selectedPlan: Readonly<Ref<SelectedPlan | undefined>>;
+  /** The plans the buyer can switch to. */
+  plans: Readonly<Ref<AvailablePlan[]>>;
   /** `undefined` until the saved cards arrive; the page renders without waiting for them. */
   cards: Readonly<Ref<SavedCard[] | undefined>>;
   account: Readonly<Ref<Account | undefined>>;
@@ -30,6 +32,8 @@ export interface UseCardPageDataReturn {
   load: () => Promise<void>;
   /** Loads the saved cards again after one was added or deleted. */
   refreshCards: () => Promise<void>;
+  /** Moves the order to another plan without leaving the page, so a typed card stays. */
+  switchPlan: (plan: SelectedPlan) => void;
   /** Replaces the page with an error the card page could not recover from. */
   fail: (message: string) => void;
 }
@@ -68,6 +72,7 @@ export function useCardPageData(): UseCardPageDataReturn {
   const upgradeSubId = shallowRef<string | null>(null);
   const planData = shallowRef<PaymentBreakdownResponse>();
   const selectedPlan = shallowRef<SelectedPlan>();
+  const plans = shallowRef<AvailablePlan[]>([]);
   const cards = shallowRef<SavedCard[]>();
   const account = shallowRef<Account>();
   const campaign = shallowRef<ActiveCampaign>();
@@ -96,6 +101,7 @@ export function useCardPageData(): UseCardPageDataReturn {
 
     set(planData, checkoutData);
     set(selectedPlan, foundPlan);
+    set(plans, availablePlansData.tiers);
     return undefined;
   }
 
@@ -166,6 +172,11 @@ export function useCardPageData(): UseCardPageDataReturn {
     }
   }
 
+  function switchPlan(plan: SelectedPlan): void {
+    replacePlanInUrl(plan.planId);
+    set(selectedPlan, plan);
+  }
+
   function fail(message: string): void {
     set(errorMessage, message);
   }
@@ -182,8 +193,10 @@ export function useCardPageData(): UseCardPageDataReturn {
     loadingMessage: shallowReadonly(loadingMessage),
     modelSelectedCard,
     planData: shallowReadonly(planData),
+    plans: shallowReadonly(plans),
     refreshCards,
     selectedPlan: shallowReadonly(selectedPlan),
+    switchPlan,
     upgradeSubId: shallowReadonly(upgradeSubId),
   };
 }

@@ -5,6 +5,7 @@ import { get } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import CampaignRibbon from '@/components/CampaignRibbon.vue';
 import CardPayment from '@/components/CardPayment.vue';
+import ChangePlanButton from '@/components/ChangePlanButton.vue';
 import ErrorState from '@/components/ErrorState.vue';
 import LoadingState from '@/components/LoadingState.vue';
 import { useCardPageData } from '@/composables/card-page-data';
@@ -27,8 +28,10 @@ const {
   loadingMessage,
   modelSelectedCard,
   planData,
+  plans,
   refreshCards,
   selectedPlan,
+  switchPlan,
   upgradeSubId,
 } = useCardPageData();
 
@@ -51,10 +54,16 @@ const discount = computed<{ initialCode: string; campaign?: { code: string; perc
 const backHref = computed<string | undefined>(() => {
   if (get(loading))
     return undefined;
+  // Reads the plan so the link follows a plan switch, which only changes the URL.
+  get(selectedPlan);
   return get(upgradeSubId) ? routes.subscription : withCheckoutParams(routes.plans);
 });
 
-const methodLinks = checkoutMethodLinks();
+/** The links carry the plan, so they follow a plan switch. */
+const methodLinks = computed<ReturnType<typeof checkoutMethodLinks>>(() => {
+  get(selectedPlan);
+  return checkoutMethodLinks();
+});
 
 onMounted(async () => {
   await load();
@@ -110,6 +119,17 @@ onMounted(async () => {
           <MethodTiles
             :links="methodLinks"
             current="card"
+          />
+        </template>
+        <template
+          v-if="!upgradeSubId && plans.length > 0"
+          #plan-action="{ disabled }"
+        >
+          <ChangePlanButton
+            :plans="plans"
+            :current-plan-id="selectedPlan.planId"
+            :disabled="disabled"
+            @select="switchPlan($event)"
           />
         </template>
       </CardPayment>

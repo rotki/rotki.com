@@ -8,6 +8,7 @@ import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, type App as VueApp } from 'vue';
 import App from './App.vue';
+import ChangePlanButton from './components/ChangePlanButton.vue';
 
 const api = vi.hoisted(() => ({
   canBuyNewSubscription: vi.fn<() => Promise<{ canBuy: boolean; account?: Account }>>(),
@@ -41,7 +42,7 @@ const CardPayment = defineComponent({
   name: 'CardPayment',
   props: ['cards', 'selectedCard', 'planData', 'selectedPlan', 'upgradeSubId'],
   setup(_, { slots }) {
-    return () => h('section', { 'data-cy': 'card-payment' }, slots.methods?.());
+    return () => h('section', { 'data-cy': 'card-payment' }, [slots.methods?.(), slots['plan-action']?.({ disabled: false })]);
   },
 });
 
@@ -184,6 +185,38 @@ describe('app', () => {
     expect(cardProps(wrapper).upgradeSubId).toBe('sub-1');
     expect(wrapper.find('[data-cy="card-payment"] nav').exists()).toBe(false);
     expect(wrapper.get('a[href$="/home/subscription"]').text()).toContain('Back to your subscription');
+  });
+
+  describe('changing the plan', () => {
+    const planTiers: AvailablePlansResponse = {
+      settings: { country: 'DE', isAuthenticated: true },
+      tiers: [{ isCustom: false, isMostPopular: false, tierName: 'basic', monthlyPlan: { planId: 3, price: '25.00' }, yearlyPlan: { planId: 4, price: '250.00' } }],
+    };
+    const yearly: SelectedPlan = { planId: 4, name: 'basic', price: 250, durationInMonths: 12 };
+
+    it('moves the order to the chosen plan and keeps the links in step', async () => {
+      api.getAvailablePlans.mockResolvedValue(planTiers);
+      const wrapper = mountApp();
+      await flushPromises();
+
+      wrapper.findComponent(ChangePlanButton).vm.$emit('select', yearly);
+      await flushPromises();
+
+      expect(cardProps(wrapper).selectedPlan).toEqual(yearly);
+      expect(window.location.search).toBe('?planId=4');
+      expect(wrapper.get('a[href*="/checkout/pay/paypal"]').attributes('href')).toContain('planId=4');
+      expect(wrapper.get('a[href*="/checkout/pay?"]').attributes('href')).toContain('planId=4');
+    });
+
+    it('does not offer it for an upgrade, which is bound to its subscription', async () => {
+      visit('?planId=3&upgradeSubId=sub-1');
+      api.canBuyNewSubscription.mockResolvedValue({ canBuy: false });
+      api.getAvailablePlans.mockResolvedValue(planTiers);
+      const wrapper = mountApp();
+      await flushPromises();
+
+      expect(wrapper.findComponent(ChangePlanButton).exists()).toBe(false);
+    });
   });
 
   it('sends a buyer who cannot start a subscription to the subscription page', async () => {
