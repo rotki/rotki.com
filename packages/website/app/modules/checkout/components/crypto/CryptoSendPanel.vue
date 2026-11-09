@@ -55,8 +55,12 @@ const isBtc = computed<boolean>(() => data.chainName === 'bitcoin');
 async function handlePay(): Promise<void> {
   emit('attempt');
   const result = await pay(upgrade);
-  if (!result.ok)
-    emit('error', { title: t('checkout_crypto.not_sent_title'), message: t(web3ErrorKey(result.error), { message: result.error.message }) });
+  if (!result.ok) {
+    emit('error', {
+      title: result.error._tag === 'WalletNoAnswer' ? t('checkout_crypto.wallet_waiting_title') : t('checkout_crypto.not_sent_title'),
+      message: t(web3ErrorKey(result.error), { message: result.error.message }),
+    });
+  }
 }
 
 async function handleSwitchNetwork(): Promise<void> {

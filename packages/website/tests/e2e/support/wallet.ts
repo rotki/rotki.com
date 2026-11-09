@@ -52,6 +52,8 @@ export interface FakeWallet {
   readonly options: FakeWalletOptions;
   /** Changes how the wallet answers from now on, including after page reloads. */
   setBehavior: (patch: Partial<WalletBehavior>) => Promise<void>;
+  /** Approves a `hang` send request in the wallet, as a buyer who comes back to it would. */
+  approvePendingSend: () => Promise<void>;
   /** Switches the chain from inside the wallet, as a user would, and emits `chainChanged`. */
   switchChainInWallet: (chainId: number) => Promise<void>;
   requests: () => Promise<WalletRequest[]>;
@@ -59,6 +61,7 @@ export interface FakeWallet {
 }
 
 interface FakeWalletHandle {
+  approvePendingSend: () => void;
   requests: WalletRequest[];
   setBehavior: (patch: Partial<WalletBehavior>) => void;
   setChain: (chainId: number) => void;
@@ -102,6 +105,7 @@ function installWalletInPage(options: FakeWalletOptions): void {
   const storageKey = 'e2e.fake-wallet';
   const listeners = new Map<string, Set<(payload: unknown) => void>>();
   const requests: WalletRequest[] = [];
+  const pendingSends: ((hash: string) => void)[] = [];
   const state = { addedChains: [options.chainId], behavior: { ...options.behavior }, chainId: options.chainId, connected: false, txCount: 0 };
 
   try {
@@ -162,8 +166,11 @@ function installWalletInPage(options: FakeWalletOptions): void {
   };
   const sendTransaction = async (): Promise<string> => {
     const behavior = state.behavior.sendTransaction;
-    if (behavior === 'hang')
-      return new Promise<string>(() => {});
+    if (behavior === 'hang') {
+      return new Promise<string>((resolve) => {
+        pendingSends.push(resolve);
+      });
+    }
     if (behavior === 'reject')
       throw rejected();
     if (behavior === 'insufficientFunds')
@@ -229,6 +236,10 @@ function installWalletInPage(options: FakeWalletOptions): void {
 
   Object.defineProperty(window, 'ethereum', { configurable: true, value: provider });
   window.__fakeWallet = {
+    approvePendingSend: () => {
+      for (const resolve of pendingSends.splice(0))
+        resolve(`0x${'a'.repeat(64)}`);
+    },
     requests,
     setBehavior: (patch) => {
       Object.assign(state.behavior, patch);
@@ -247,6 +258,9 @@ function installWalletInPage(options: FakeWalletOptions): void {
 export async function installFakeWallet(page: Page, options: FakeWalletOptions): Promise<FakeWallet> {
   await page.addInitScript(installWalletInPage, options);
   return {
+    approvePendingSend: async () => {
+      await page.evaluate(() => window.__fakeWallet?.approvePendingSend());
+    },
     options,
     requests: async () => page.evaluate(() => [...(window.__fakeWallet?.requests ?? [])]),
     sentTransactions: async () => {

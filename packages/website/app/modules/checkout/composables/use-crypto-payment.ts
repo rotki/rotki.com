@@ -9,6 +9,7 @@ import { useAccountRefresh } from '~/composables/use-app-events';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
+import { useWalletRequest } from '~/modules/checkout/composables/use-wallet-request';
 import { getWeb3Client } from '~/modules/web3/client';
 import { useTokenBalance } from '~/modules/web3/composables/use-token-balance';
 import { useWallet } from '~/modules/web3/composables/use-wallet';
@@ -16,7 +17,6 @@ import { useWalletPicker } from '~/modules/web3/composables/use-wallet-picker';
 import { blockExplorerTxUrl } from '~/modules/web3/core/chains';
 import { isNativeToken } from '~/modules/web3/core/erc20';
 import { notConnected, type Web3Error, wrongChain } from '~/modules/web3/core/errors';
-import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
 interface UseWeb3PaymentOptions {
@@ -47,6 +47,7 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
   const { logPaymentEvent } = usePaymentLogger();
   const { chronicle } = useSigilEvents();
   const pendingTx = usePendingTx();
+  const walletRequest = useWalletRequest();
 
   const wallet = useWallet();
   const picker = useWalletPicker();
@@ -109,6 +110,27 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
     return err(error);
   }
 
+  /** Records a transaction the wallet sent and starts the wait before the success page. */
+  function onTransactionSent(hash: `0x${string}`, chainId: number, payment: CryptoPayment, isUpgrade: boolean): void {
+    const { cryptocurrency, subscriptionId } = payment;
+    logger.info(`transaction is pending: ${hash}`);
+
+    chronicle(SigilEvents.CRYPTO_TX_SUBMITTED, { asset: cryptocurrency, chainId });
+
+    set(pendingTx, {
+      // Full, correctly-formed explorer URL (single source of truth in chains.ts).
+      blockExplorerUrl: blockExplorerTxUrl(chainId, hash) ?? '',
+      chainId,
+      hash,
+      isUpgrade,
+      subscriptionId: subscriptionId.toString(),
+    });
+    paymentApi.markTransactionStarted(isUpgrade).catch(error => logger.error('Failed to mark transaction as started:', error));
+    requestRefresh();
+    set(processing, true);
+    start();
+  }
+
   const pay = async (isUpgrade: boolean): Promise<Result<void, Web3Error>> => {
     if (get(processing))
       return ok(undefined);
@@ -125,9 +147,9 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
     if (!get(connected))
       return fail(notConnected(), 'CRYPTO_WALLET_NOT_CONNECTED', CheckoutSteps.INIT, isUpgrade);
 
-    assert(payment);
-    const { chainId, cryptoAddress, decimals, finalPriceInCrypto, subscriptionId, tokenAddress } = payment;
-    assert(chainId);
+    const { chainId, cryptoAddress, decimals, finalPriceInCrypto, tokenAddress } = payment;
+    if (chainId === undefined)
+      return fail(wrongChain(0, get(connectedChainId)), 'CRYPTO_WRONG_CHAIN', CheckoutSteps.VERIFY, isUpgrade);
 
     if (get(connectedChainId) !== chainId)
       return fail(wrongChain(chainId, get(connectedChainId)), 'CRYPTO_WRONG_CHAIN', CheckoutSteps.VERIFY, isUpgrade);
@@ -139,31 +161,24 @@ export function useWeb3Payment(data: MaybeRefOrGetter<CryptoPayment>, options: U
 
     const client = await getWeb3Client(ensureInitialized);
 
-    const result = isNativeToken(tokenAddress)
-      ? await client.sendNativeTransfer({ amount, chainId, decimals: tokenDecimals, to: cryptoAddress })
-      : await client.sendErc20Transfer({ amount, chainId, decimals: tokenDecimals, to: cryptoAddress, token: tokenAddress! });
+    const result = await walletRequest.request(
+      async () => (isNativeToken(tokenAddress)
+        ? client.sendNativeTransfer({ amount, chainId, decimals: tokenDecimals, to: cryptoAddress })
+        : client.sendErc20Transfer({ amount, chainId, decimals: tokenDecimals, to: cryptoAddress, token: tokenAddress! })),
+      hash => onTransactionSent(hash, chainId, payment, isUpgrade),
+    );
+
+    if (!result.ok && result.error._tag === 'WalletNoAnswer') {
+      set(processing, false);
+      return err(result.error);
+    }
 
     if (!result.ok) {
       logger.error(result.error.cause ?? result.error);
       return fail(result.error, classifyCryptoTxError(result.error.cause), CheckoutSteps.SUBMIT, isUpgrade);
     }
 
-    const hash = result.value;
-    logger.info(`transaction is pending: ${hash}`);
-
-    chronicle(SigilEvents.CRYPTO_TX_SUBMITTED, { asset: payment.cryptocurrency, chainId });
-
-    set(pendingTx, {
-      // Full, correctly-formed explorer URL (single source of truth in chains.ts).
-      blockExplorerUrl: blockExplorerTxUrl(chainId, hash) ?? '',
-      chainId,
-      hash,
-      isUpgrade,
-      subscriptionId: subscriptionId.toString(),
-    });
-    paymentApi.markTransactionStarted(isUpgrade).catch(error => logger.error('Failed to mark transaction as started:', error));
-    requestRefresh();
-    start();
+    onTransactionSent(result.value, chainId, payment, isUpgrade);
     return ok(undefined);
   };
 

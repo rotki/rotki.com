@@ -3,6 +3,7 @@
     "send_title": "Send the payment",
     "pay_title": "Pay with crypto",
     "not_sent_title": "Payment not sent",
+    "wallet_waiting_title": "Waiting for your wallet",
     "switch_failed_title": "Network not switched",
     "hold_price": "Have a funded wallet ready. We hold the price for 3 hours once you show the payment details.",
     "show_details": "Show payment details",
@@ -569,6 +570,7 @@
     "SwitchChainFailed": "Failed to switch network. Please switch it in your wallet.",
     "TxFailed": "The transaction failed. Please try again.",
     "Timeout": "The transaction timed out. Check your wallet for its status.",
+    "WalletNoAnswer": "Your wallet has not answered. Open it and approve or reject the request; this page carries on by itself. Paying again stays blocked until then, so you cannot pay twice.",
     "Validation": "{message}"
   },
   "common": {

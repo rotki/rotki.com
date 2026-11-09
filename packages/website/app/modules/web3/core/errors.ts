@@ -28,6 +28,8 @@ export type Web3Error =
   | Tagged<'SwitchChainFailed', ErrData>
   | Tagged<'TxFailed', ErrData>
   | Tagged<'Timeout', ErrData>
+  // The wallet has not answered yet, so the request may still be approved.
+  | Tagged<'WalletNoAnswer', ErrData>
   // Domain/precondition failure carrying its own already-resolved message.
   | Tagged<'Validation', ErrData>;
 
@@ -43,6 +45,8 @@ export const userRejected = (message = 'Request rejected', cause?: unknown): Web
 export const insufficientFunds = (message = 'Insufficient funds', cause?: unknown): Web3Error => tag('InsufficientFunds')({ cause, message });
 
 export const timeout = (message = 'The operation timed out'): Web3Error => tag('Timeout')({ message });
+
+export const walletNoAnswer = (message = 'The wallet has not answered'): Web3Error => tag('WalletNoAnswer')({ message });
 
 export const validation = (message: string): Web3Error => tag('Validation')({ message });
 

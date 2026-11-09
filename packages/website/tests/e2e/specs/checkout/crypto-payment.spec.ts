@@ -90,6 +90,35 @@ test.describe('new crypto payment', () => {
     });
   });
 
+  test.describe('when the wallet does not answer', () => {
+    test.use({ walletOverrides: { behavior: { sendTransaction: 'hang' } } });
+
+    test('stops blocking the page, refuses a second request and carries on if the buyer approves', async ({ backend, page, wallet }) => {
+      await page.clock.install();
+      await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
+      await connectWallet(page, wallet);
+      await payWithWallet(page);
+      await expect(page.locator('[data-cy="processing-overlay"]')).toBeVisible();
+      // The overlay shows before the wallet is asked, and the wait only starts with the request.
+      await expect.poll(async () => (await wallet.sentTransactions()).length).toBe(1);
+
+      await page.clock.fastForward('02:01');
+
+      await expect(page.locator('[data-cy="processing-overlay"]')).toBeHidden();
+      await expect(page.getByText('Waiting for your wallet', { exact: true })).toBeVisible();
+
+      await payWithWallet(page);
+      await expect(page.getByText('Waiting for your wallet', { exact: true })).toBeVisible();
+      expect(await wallet.sentTransactions()).toHaveLength(1);
+
+      await wallet.approvePendingSend();
+      await expect(page.locator('[data-cy="processing-overlay"]')).toBeVisible();
+      await page.clock.fastForward('00:06');
+      await expectPendingSuccess(page);
+      expect(backend.callsTo('PATCH', '/webapi/2/crypto/payment/pending/')).toHaveLength(1);
+    });
+  });
+
   test.describe('when the wallet rejects the connection', () => {
     test.use({ walletOverrides: { behavior: { connect: 'reject' } } });
 
