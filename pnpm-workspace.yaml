@@ -6,6 +6,8 @@ minimumReleaseAgeExclude:
   - '@rotki/eslint-config'
   - '@rotki/eslint-plugin'
   - '@rotki/ui-library'
+  # Renovate security update: nuxt@4.6.3
+  - nuxt@4.6.3
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
@@ -96,7 +98,7 @@ catalog:
   msw: 3.0.3
   nitropack: 2.13.5
   npm-run-all2: 9.0.4
-  nuxt: 4.6.2
+  nuxt: 4.6.3
   nuxt-llms: 0.3.0
   ofetch: 1.5.1
   pinia: 4.1.0
