@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { paths } from '@/config/paths';
 import { paymentMessageFor } from '@/utils/payment-error';
 import { fetchWithCSRF } from './api';
+import { readResponse } from './read-response';
 
 interface CardSubmittedInput {
   planId: number;
@@ -39,6 +40,8 @@ const BackendErrorSchema = z.object({
   code: z.string().optional(),
   message: z.string(),
 });
+
+const INVALID_RESPONSE_MESSAGE = 'Invalid response format from server';
 
 const t = createTranslator(checkoutMessages);
 
@@ -160,18 +163,10 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
       throw new Error(`HTTP ${response.status}: ${backendMessage}`);
     }
 
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedCard = SavedCardSchema.safeParse(transformedData);
-    if (!parsedCard.success) {
-      console.error('Failed to parse SavedCard response:', {
-        data,
-        error: parsedCard.error,
-        transformedData,
-      });
-      throw new Error('Invalid response format from server');
-    }
-    return parsedCard.data.token;
+    const card = await readResponse(response, SavedCardSchema, 'SavedCard response');
+    if (!card)
+      throw new Error(INVALID_RESPONSE_MESSAGE);
+    return card.token;
   }
   catch (error: unknown) {
     console.error('Failed to add card:', error);
@@ -194,18 +189,10 @@ export async function createCardNonce(payload: CreateCardNoncePayload): Promise<
       throw new Error(extractBackendError(errorText).message);
     }
 
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = CreateCardNonceResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse CreateCardNonce response:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      throw new Error('Invalid response format from server');
-    }
-    return parsedResponse.data.paymentNonce;
+    const parsed = await readResponse(response, CreateCardNonceResponseSchema, 'CreateCardNonce response');
+    if (!parsed)
+      throw new Error(INVALID_RESPONSE_MESSAGE);
+    return parsed.paymentNonce;
   }
   catch (error: any) {
     console.error('Failed to create card nonce:', error);
@@ -245,18 +232,8 @@ export async function getSavedCard(): Promise<SavedCard[]> {
       throw new Error(extractBackendError(errorText).message);
     }
 
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = SavedCardResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse SavedCardResponse:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      return [];
-    }
-    return parsedResponse.data.cards;
+    const parsed = await readResponse(response, SavedCardResponseSchema, 'SavedCardResponse');
+    return parsed?.cards ?? [];
   }
   catch (error: any) {
     console.error('Failed to get saved card:', error);

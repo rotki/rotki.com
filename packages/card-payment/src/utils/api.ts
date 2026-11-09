@@ -10,6 +10,7 @@ import {
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
+import { readResponse } from './read-response';
 
 /** The CSRF token from the `csrftoken` cookie the rotki.com backend sets. */
 function readCSRFCookie(): string | undefined {
@@ -79,18 +80,8 @@ export async function getAccount(): Promise<Account | undefined> {
       return undefined;
     }
 
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = AccountResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse Account response:', {
-        error: parsedResponse.error,
-        originalData: data,
-        transformedData,
-      });
-      return undefined;
-    }
-    return parsedResponse.data.result ?? undefined;
+    const parsed = await readResponse(response, AccountResponseSchema, 'Account response');
+    return parsed?.result ?? undefined;
   }
   catch (error: any) {
     console.error('Failed to get account:', error);
@@ -111,12 +102,8 @@ export async function getActiveCampaign(): Promise<ActiveCampaign | undefined> {
       return undefined;
     }
 
-    const parsed = AppConfigSchema.safeParse(convertKeys(await response.json(), true, false));
-    if (!parsed.success) {
-      console.error('Failed to parse app config:', parsed.error);
-      return undefined;
-    }
-    return parsed.data.activeCampaign ?? undefined;
+    const parsed = await readResponse(response, AppConfigSchema, 'app config');
+    return parsed?.activeCampaign ?? undefined;
   }
   catch (error: any) {
     console.error('Failed to fetch app config:', error);
@@ -136,18 +123,7 @@ export async function getPaymentBreakdown(params: PaymentBreakdownRequest): Prom
       return null;
     }
 
-    const data = await response.json();
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = PaymentBreakdownResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse PaymentBreakdownResponse:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      return null;
-    }
-    return parsedResponse.data;
+    return await readResponse(response, PaymentBreakdownResponseSchema, 'PaymentBreakdownResponse') ?? null;
   }
   catch (error: any) {
     console.error('Failed to fetch payment breakdown:', error);
@@ -170,19 +146,7 @@ export async function getAvailablePlans(): Promise<AvailablePlansResponse | null
       return null;
     }
 
-    const data = await response.json();
-    // Convert snake_case keys to camelCase for schema parsing
-    const transformedData = convertKeys(data, true, false);
-    const parsedResponse = AvailablePlansResponseSchema.safeParse(transformedData);
-    if (!parsedResponse.success) {
-      console.error('Failed to parse AvailablePlansResponse:', {
-        data,
-        error: parsedResponse.error,
-        transformedData,
-      });
-      return null;
-    }
-    return parsedResponse.data;
+    return await readResponse(response, AvailablePlansResponseSchema, 'AvailablePlansResponse') ?? null;
   }
   catch (error: any) {
     console.error('Failed to get available plans:', error);

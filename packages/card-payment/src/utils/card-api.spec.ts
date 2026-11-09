@@ -92,6 +92,12 @@ describe('utils/card-api', () => {
       expect(error).not.toBeInstanceOf(PaymentUserError);
       expect(error).toHaveProperty('message', 'HTTP 500: Internal Server Error');
     });
+
+    it('fails on a response in an unknown shape', async () => {
+      respond(200, { token: 'tok-1' });
+
+      await expect(addCard({ paymentMethodNonce: 'nonce-1' })).rejects.toThrow('Invalid response format from server');
+    });
   });
 
   describe('createCardNonce', () => {
@@ -106,6 +112,12 @@ describe('utils/card-api', () => {
       respond(400, { message: 'Card expired' });
 
       await expect(createCardNonce({ paymentToken: 'tok-1' })).rejects.toThrow('Card expired');
+    });
+
+    it('fails on a response in an unknown shape', async () => {
+      respond(200, { nonce: 'nonce-2' });
+
+      await expect(createCardNonce({ paymentToken: 'tok-1' })).rejects.toThrow('Invalid response format from server');
     });
   });
 
