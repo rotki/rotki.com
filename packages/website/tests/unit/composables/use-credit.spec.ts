@@ -1,6 +1,7 @@
 import type { CreditBalance } from '~/types/account';
 import { get } from '@vueuse/shared';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createFetchError } from '../../utils';
 
 const mockFetchWithCsrf = vi.fn();
 
@@ -97,16 +98,52 @@ describe('useCredit', () => {
     expect(get(history)).toEqual([]);
   });
 
+  it('should report a failed load instead of a balance of zero', async () => {
+    mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(500, {}));
+
+    const { useCredit } = await import('~/composables/account/use-credit');
+    const { load, loadFailed } = useCredit();
+
+    await load();
+
+    expect(get(loadFailed)).toBe(true);
+  });
+
+  it('should read a 404 as an account without credit, not a failure', async () => {
+    mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(404, { message: 'No credit' }));
+
+    const { useCredit } = await import('~/composables/account/use-credit');
+    const { balance, load, loadFailed } = useCredit();
+
+    await load();
+
+    expect(get(loadFailed)).toBe(false);
+    expect(get(balance)).toBe('0');
+  });
+
+  it('should clear the failure once a load succeeds', async () => {
+    mockFetchWithCsrf.mockRejectedValueOnce(new Error('Network error')).mockResolvedValueOnce(validCreditBalance);
+
+    const { useCredit } = await import('~/composables/account/use-credit');
+    const { load, loadFailed } = useCredit();
+
+    await load();
+    await load();
+
+    expect(get(loadFailed)).toBe(false);
+  });
+
   it('should handle invalid response data', async () => {
     mockFetchWithCsrf.mockResolvedValueOnce({ invalid: 'data' });
 
     const { useCredit } = await import('~/composables/account/use-credit');
-    const { balance, history, load } = useCredit();
+    const { balance, history, load, loadFailed } = useCredit();
 
     await load();
 
     expect(get(balance)).toBe('0');
     expect(get(history)).toEqual([]);
+    expect(get(loadFailed)).toBe(true);
   });
 
   it('should not overwrite data when load fails', async () => {

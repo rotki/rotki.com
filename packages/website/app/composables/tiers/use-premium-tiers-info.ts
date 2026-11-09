@@ -45,10 +45,12 @@ export function usePremiumTiersInfo(): UsePremiumTiersInfoReturn {
     set(pending, true);
     try {
       const response = await fetchPremiumTiersInfo();
-      // A failed request comes back empty; keep the tier details the site was built with
-      if (response.length > 0)
-        set(tiersInformation, response);
-      set(fetched, true);
+      // A failed request keeps the tier details the site was built with, and the next use asks again.
+      if (response.ok) {
+        if (response.value.length > 0)
+          set(tiersInformation, response.value);
+        set(fetched, true);
+      }
     }
     finally {
       set(pending, false);

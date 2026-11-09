@@ -142,14 +142,8 @@ export function useCheckout() {
       });
       if (requestId !== breakdownRequestId)
         return;
-      set(breakdown, response);
-      set(breakdownFetched, true);
-    }
-    catch (error) {
-      if (requestId !== breakdownRequestId)
-        return;
-      logger.error('Failed to fetch breakdown:', error);
-      set(breakdown, undefined);
+      set(breakdown, response.ok ? response.value : undefined);
+      set(breakdownFetched, response.ok);
     }
     finally {
       if (requestId === breakdownRequestId)

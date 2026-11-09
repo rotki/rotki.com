@@ -41,6 +41,7 @@ const {
   history: creditHistory,
   initialLoading: creditInitialLoading,
   load: loadCredit,
+  loadFailed: creditLoadFailed,
   loading: creditLoading,
 } = useCredit({ loadWhen: emailConfirmed });
 const pending = computed<UserSubscription[]>(() => get(userSubscriptions).filter(sub => sub.pending));
@@ -84,6 +85,7 @@ const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some
           :balance="balance"
           :history="creditHistory"
           :initial-loading="creditInitialLoading"
+          :load-failed="creditLoadFailed"
         />
       </div>
     </AccountSection>

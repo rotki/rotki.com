@@ -104,6 +104,29 @@ test.describe('account billing', () => {
     });
   });
 
+  test.describe('when the credit balance fails to load', () => {
+    test.use({ backendScenario: { account: subscriberAccount() } });
+
+    test('does not claim a balance of zero', async ({ page }) => {
+      await page.route('**/webapi/2/credit/', async route => route.fulfill({ json: { message: 'Down' }, status: 500 }));
+      await open(page, '/home/billing');
+
+      await expect(page.locator('[data-cy="credit-load-failed"]')).toContainText('We couldn\'t load your credit.');
+      await expect(section(page, 'Refer a friend')).not.toContainText('0.00 €');
+    });
+  });
+
+  test.describe('without any account credit', () => {
+    test.use({ backendScenario: { account: subscriberAccount() } });
+
+    test('shows a balance of zero for the backend\'s 404', async ({ page }) => {
+      await open(page, '/home/billing');
+
+      await expect(section(page, 'Refer a friend')).toContainText('0.00 €');
+      await expect(page.locator('[data-cy="credit-load-failed"]')).toHaveCount(0);
+    });
+  });
+
   test.describe('with a subscription that offers several actions', () => {
     test.use({
       backendScenario: {

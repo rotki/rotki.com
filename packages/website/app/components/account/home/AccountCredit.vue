@@ -5,10 +5,12 @@ import AccountCreditHistoryTable from '~/components/account/home/AccountCreditHi
 import { formatDecimalString } from '~/utils/text';
 
 /** The balance and its history, loaded by the page, which also offers the refresh. */
-const { balance, history, initialLoading } = defineProps<{
+const { balance, history, initialLoading, loadFailed = false } = defineProps<{
   balance: string;
   history: DeepReadonly<CreditEntry[]>;
   initialLoading: boolean;
+  /** The balance could not be loaded, so showing it would read as having none. */
+  loadFailed?: boolean;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -38,6 +40,13 @@ function formatEur(value: string): string {
       </div>
       <RuiSkeletonLoader class="mt-3 h-7 w-28" />
     </template>
+    <p
+      v-else-if="loadFailed"
+      class="mt-1 text-body-1 text-rui-text"
+      data-cy="credit-load-failed"
+    >
+      {{ t('account.credit.load_failed') }}
+    </p>
     <template v-else>
       <p class="text-h4 text-rui-text tabular-nums">
         {{ formatEur(balance) }}

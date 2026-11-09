@@ -66,10 +66,12 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
     set(pending, true);
     try {
       const response = await fetchAvailablePlans();
-      // A failed request comes back with no tiers; keep the plans the site was built with
-      if (response.tiers.length > 0)
-        set(availablePlansData, response);
-      set(fetched, true);
+      // A failed request keeps the plans the site was built with, and the next use asks again.
+      if (response.ok) {
+        if (response.value.tiers.length > 0)
+          set(availablePlansData, response.value);
+        set(fetched, true);
+      }
     }
     finally {
       set(pending, false);
