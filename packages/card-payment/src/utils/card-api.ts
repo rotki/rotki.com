@@ -10,7 +10,7 @@ import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { checkoutMessages } from '@rotki/checkout-ui/messages/en';
 import { addCardErrorMessage, isCardAddedFailure } from '@rotki/checkout-ui/utils/add-card-error';
 import { createTranslator } from '@rotki/checkout-ui/utils/translator';
-import { type CardType, type CheckoutStep, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, PaymentUserError, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { type CardType, type CheckoutStep, logPaymentFailure, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, PaymentUserError, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
 import { paymentMessageFor } from '@/utils/payment-error';
@@ -74,11 +74,9 @@ export function trackCardPaymentSubmitted({ planId, durationInMonths, isUpgrade,
  * `@rotki/sigil` catalog so the two destinations can never drift.
  */
 export function trackCardPaymentFailure({ failure, errorMessage, planId, isUpgrade, step, errorCode, cardType, discountApplied }: CardFailureInput): void {
-  const entry = PaymentFailures[failure];
-
-  postPaymentLog({
+  logPaymentFailure({
     paymentMethod: 'card',
-    event: entry.serverEvent,
+    event: PaymentFailures[failure].serverEvent,
     errorMessage,
     errorCode,
     planId,
@@ -86,17 +84,7 @@ export function trackCardPaymentFailure({ failure, errorMessage, planId, isUpgra
     isUpgrade,
     cardType,
     discountApplied,
-  });
-
-  sigilTrack(SigilEvents.PAYMENT_FAILED, toSnakeCaseKeys({
-    paymentMethod: 'card',
-    reason: entry.reason,
-    planId,
-    isUpgrade,
-    step,
-    cardType,
-    discountApplied,
-  }));
+  }, (event, payload) => sigilTrack(event, toSnakeCaseKeys(payload)));
 }
 
 /**

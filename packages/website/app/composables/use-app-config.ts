@@ -1,29 +1,18 @@
-import type { ActiveCampaign } from '@rotki/card-payment-common/schemas/campaign';
+import { type ActiveCampaign, ActiveCampaignSchema } from '@rotki/card-payment-common/schemas/campaign';
+import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { get } from '@vueuse/shared';
 import { z } from 'zod';
-
-const ActiveCampaignResponse = z.object({
-  code: z.string(),
-  percent: z.number(),
-  period_end: z.string().optional(),
-});
 
 const AppConfigResponse = z.object({
   maintenance: z.boolean().default(false),
   sponsorship_enabled: z.boolean().default(false),
   testing: z.boolean().default(false),
-  active_campaign: ActiveCampaignResponse.nullish(),
+  active_campaign: z.preprocess(value => (value ? convertKeys(value, true, false) : value), ActiveCampaignSchema.nullish()),
 }).transform(data => ({
   maintenance: data.maintenance,
   sponsorshipEnabled: data.sponsorship_enabled,
   testing: data.testing,
-  activeCampaign: data.active_campaign
-    ? {
-      code: data.active_campaign.code,
-      percent: data.active_campaign.percent,
-      periodEnd: data.active_campaign.period_end,
-    } satisfies ActiveCampaign
-    : undefined,
+  activeCampaign: data.active_campaign ?? undefined,
 }));
 
 type AppConfig = z.output<typeof AppConfigResponse>;

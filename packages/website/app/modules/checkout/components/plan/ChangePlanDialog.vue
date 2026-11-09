@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { selectedPlanFrom } from '@rotki/card-payment-common/utils/plan';
 import { get, set } from '@vueuse/shared';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
@@ -49,20 +50,11 @@ function select(plan: AvailablePlan): void {
     return;
   }
 
-  const period = get(selectedPlanPeriod);
-  const planDetails = plan[period === PricingPeriod.MONTHLY ? 'monthlyPlan' : 'yearlyPlan'];
-
-  if (!planDetails) {
+  const selectedPlan = selectedPlanFrom(plan, get(selectedPlanPeriod) === PricingPeriod.YEARLY);
+  if (!selectedPlan) {
     logger.error('Plan details not found for selected period');
     return;
   }
-
-  const selectedPlan: SelectedPlan = {
-    planId: planDetails.planId,
-    name: plan.tierName,
-    price: Number.parseFloat(planDetails.price),
-    durationInMonths: period === PricingPeriod.MONTHLY ? 1 : 12,
-  };
 
   emit('select', selectedPlan);
 }

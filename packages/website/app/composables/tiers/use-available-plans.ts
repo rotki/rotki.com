@@ -1,5 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
 import { type AvailablePlan, type AvailablePlans, type AvailablePlansResponse, AvailablePlansResponseSchema, type SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { findSelectedPlan } from '@rotki/card-payment-common/utils/plan';
 import { until } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import tiersSnapshot from 'virtual:tiers-snapshot';
@@ -118,23 +119,7 @@ export function useAvailablePlans(): UseAvailablePlansReturn {
   }
 
   function getSelectedPlanFromId(planId: number): SelectedPlan | undefined {
-    const planDetails = getPlanDetailsFromId(planId);
-    if (!planDetails)
-      return undefined;
-
-    const { availablePlan, period } = planDetails;
-    const isMonthly = period === PricingPeriod.MONTHLY;
-    const foundPlan = isMonthly ? availablePlan.monthlyPlan : availablePlan.yearlyPlan;
-
-    if (!foundPlan)
-      return undefined;
-
-    return {
-      durationInMonths: isMonthly ? 1 : 12,
-      name: availablePlan.tierName,
-      planId: foundPlan.planId,
-      price: Number.parseFloat(foundPlan.price),
-    };
+    return findSelectedPlan(get(availablePlans), planId);
   }
 
   // Auto-fetch on first use if not already fetched

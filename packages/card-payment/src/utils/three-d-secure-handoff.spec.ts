@@ -1,7 +1,7 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { ThreeDSecureParamsSchema } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildThreeDSecureParams, paymentAmounts } from './three-d-secure-handoff';
+import { buildThreeDSecureParams } from './three-d-secure-handoff';
 
 const plan: SelectedPlan = { planId: 3, name: 'basic', price: 25, durationInMonths: 1 };
 
@@ -30,16 +30,6 @@ const base = {
 describe('utils/three-d-secure-handoff', () => {
   afterEach(() => {
     sessionStorage.clear();
-  });
-
-  describe('paymentAmounts', () => {
-    it('falls back to the plan price before the breakdown loads', () => {
-      expect(paymentAmounts(undefined, plan)).toEqual({ finalAmount: 25, renewingPrice: 25 });
-    });
-
-    it('takes today and renewal amounts from the breakdown', () => {
-      expect(paymentAmounts(breakdown({ renewingPrice: '24.00' }), plan)).toEqual({ finalAmount: 22.5, renewingPrice: 24 });
-    });
   });
 
   describe('buildThreeDSecureParams', () => {

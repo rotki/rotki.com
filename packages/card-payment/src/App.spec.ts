@@ -13,7 +13,6 @@ import ChangePlanButton from './components/ChangePlanButton.vue';
 const api = vi.hoisted(() => ({
   canBuyNewSubscription: vi.fn<() => Promise<{ canBuy: boolean; account?: Account }>>(),
   checkout: vi.fn<() => Promise<PaymentBreakdownResponse | null>>(),
-  findSelectedPlanById: vi.fn<() => SelectedPlan | undefined>(),
   getActiveCampaign: vi.fn(async () => undefined),
   getAvailablePlans: vi.fn<() => Promise<AvailablePlansResponse | null>>(),
   getSavedCard: vi.fn<() => Promise<SavedCard[]>>(),
@@ -22,7 +21,6 @@ const api = vi.hoisted(() => ({
 
 vi.mock('@/utils/api', () => ({
   checkout: api.checkout,
-  findSelectedPlanById: api.findSelectedPlanById,
   getActiveCampaign: api.getActiveCampaign,
   getAvailablePlans: api.getAvailablePlans,
 }));
@@ -46,7 +44,6 @@ const CardPayment = defineComponent({
   },
 });
 
-const plan: SelectedPlan = { planId: 3, name: 'basic', price: 25, durationInMonths: 1 };
 const breakdown: PaymentBreakdownResponse = {
   braintreeClientToken: 'client-token',
   discount: null,
@@ -57,8 +54,10 @@ const breakdown: PaymentBreakdownResponse = {
   vatAmount: '3.99',
   vatRate: '0.1900',
 };
-// The plan itself comes from the mocked `findSelectedPlanById`.
-const tiers: AvailablePlansResponse = { settings: { country: 'DE', isAuthenticated: true }, tiers: [] };
+const tiers: AvailablePlansResponse = {
+  settings: { country: 'DE', isAuthenticated: true },
+  tiers: [{ isCustom: false, isMostPopular: false, tierName: 'basic', monthlyPlan: { planId: 3, price: '25.00' }, yearlyPlan: { planId: 4, price: '250.00' } }],
+};
 const account: Account = {
   address: {
     address1: 'First street',
@@ -118,7 +117,6 @@ describe('app', () => {
     api.canBuyNewSubscription.mockResolvedValue({ canBuy: true, account });
     api.checkout.mockResolvedValue(breakdown);
     api.getAvailablePlans.mockResolvedValue(tiers);
-    api.findSelectedPlanById.mockReturnValue(plan);
     api.getSavedCard.mockResolvedValue([other, linked]);
   });
 
@@ -188,14 +186,9 @@ describe('app', () => {
   });
 
   describe('changing the plan', () => {
-    const planTiers: AvailablePlansResponse = {
-      settings: { country: 'DE', isAuthenticated: true },
-      tiers: [{ isCustom: false, isMostPopular: false, tierName: 'basic', monthlyPlan: { planId: 3, price: '25.00' }, yearlyPlan: { planId: 4, price: '250.00' } }],
-    };
     const yearly: SelectedPlan = { planId: 4, name: 'basic', price: 250, durationInMonths: 12 };
 
     it('moves the order to the chosen plan and keeps the links in step', async () => {
-      api.getAvailablePlans.mockResolvedValue(planTiers);
       const wrapper = mountApp();
       await flushPromises();
 
@@ -211,7 +204,6 @@ describe('app', () => {
     it('does not offer it for an upgrade, which is bound to its subscription', async () => {
       visit('?planId=3&upgradeSubId=sub-1');
       api.canBuyNewSubscription.mockResolvedValue({ canBuy: false });
-      api.getAvailablePlans.mockResolvedValue(planTiers);
       const wrapper = mountApp();
       await flushPromises();
 
@@ -246,7 +238,7 @@ describe('app', () => {
   it.each([
     ['the breakdown is missing', (): void => { api.checkout.mockResolvedValue(null); }, 'Failed to initialize payment. Please try again.'],
     ['the plans are missing', (): void => { api.getAvailablePlans.mockResolvedValue(null); }, 'Failed to load plan information. Please try again.'],
-    ['the plan is unknown', (): void => { api.findSelectedPlanById.mockReturnValue(undefined); }, 'Invalid plan selected. Please try again.'],
+    ['the plan is unknown', (): void => { api.getAvailablePlans.mockResolvedValue({ ...tiers, tiers: [] }); }, 'Invalid plan selected. Please try again.'],
   ])('shows an error when %s', async (_, arrange, message) => {
     arrange();
     const wrapper = mountApp();

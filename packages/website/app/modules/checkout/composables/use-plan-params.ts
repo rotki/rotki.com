@@ -1,3 +1,4 @@
+import { parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { get } from '@vueuse/shared';
 import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 import { nonEmpty } from '~/utils/non-empty';
@@ -14,13 +15,7 @@ type DiscountCodeParam = string | undefined;
  */
 export function usePlanIdParam(): { planId: ComputedRef<number | undefined> } {
   const route = useRoute();
-  const planId = computed<number | undefined>(() => {
-    const { planId } = route.query;
-    if (!planId)
-      return undefined;
-
-    return typeof planId === 'string' ? parseInt(planId) : undefined;
-  });
+  const planId = computed<number | undefined>(() => parsePlanId(route.query.planId));
 
   return { planId };
 }

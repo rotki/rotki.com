@@ -6,7 +6,6 @@ import {
   type PaymentBreakdownRequest,
   type PaymentBreakdownResponse,
   PaymentBreakdownResponseSchema,
-  type SelectedPlan,
 } from '@rotki/card-payment-common/schemas/plans';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { z } from 'zod';
@@ -189,32 +188,4 @@ export async function getAvailablePlans(): Promise<AvailablePlansResponse | null
     console.error('Failed to get available plans:', error);
     return null;
   }
-}
-
-export function findSelectedPlanById(availablePlans: AvailablePlansResponse, planId: number): SelectedPlan | undefined {
-  const plans = availablePlans.tiers;
-
-  for (const tier of plans) {
-    // Check monthly plan
-    if (tier.monthlyPlan?.planId === planId) {
-      return {
-        planId: tier.monthlyPlan.planId,
-        name: tier.tierName,
-        price: parseFloat(tier.monthlyPlan.price),
-        durationInMonths: 1,
-      };
-    }
-
-    // Check yearly plan
-    if (tier.yearlyPlan?.planId === planId) {
-      return {
-        planId: tier.yearlyPlan.planId,
-        name: tier.tierName,
-        price: parseFloat(tier.yearlyPlan.price),
-        durationInMonths: 12,
-      };
-    }
-  }
-
-  return undefined;
 }

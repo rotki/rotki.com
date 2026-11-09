@@ -1,22 +1,7 @@
 import type { PaymentBreakdownDiscount, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/three-d-secure';
 import { getValidDiscountCode } from '@rotki/card-payment-common/utils/checkout';
-
-export interface PaymentAmounts {
-  finalAmount: number;
-  renewingPrice: number;
-}
-
-/** What the buyer pays today and on renewal; the plan price until the breakdown has loaded. */
-export function paymentAmounts(breakdown: PaymentBreakdownResponse | undefined, plan: SelectedPlan): PaymentAmounts {
-  if (!breakdown)
-    return { finalAmount: plan.price, renewingPrice: plan.price };
-
-  return {
-    finalAmount: parseFloat(breakdown.finalAmount),
-    renewingPrice: parseFloat(breakdown.renewingPrice),
-  };
-}
+import { paymentAmounts } from '@rotki/card-payment-common/utils/plan';
 
 export interface ThreeDSecureHandoffInput {
   clientToken: string;

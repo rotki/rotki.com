@@ -1,7 +1,6 @@
+import { parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { get } from '@vueuse/shared';
-import { z } from 'zod';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
-import { parseRouteParam } from '~/utils/query';
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const { availablePlans, execute } = useAvailablePlans();
@@ -16,7 +15,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   // Get planId from the route query directly
-  const currentPlanId = parseRouteParam(to.query.planId, z.coerce.number().int().positive());
+  const currentPlanId = parsePlanId(to.query.planId);
 
   // If planId doesn't exist in route params, redirect to checkout
   if (!currentPlanId) {

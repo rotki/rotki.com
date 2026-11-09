@@ -1,6 +1,5 @@
-import type { AvailablePlansResponse } from '@rotki/card-payment-common/schemas/plans';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fetchCSRFToken, findSelectedPlanById, getAccount, getActiveCampaign, getAvailablePlans, getPaymentBreakdown } from './api';
+import { fetchCSRFToken, getAccount, getActiveCampaign, getAvailablePlans, getPaymentBreakdown } from './api';
 
 function clearCookie(): void {
   document.cookie = 'csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
@@ -66,13 +65,6 @@ const breakdown = {
   vat_rate: '0.1900',
 };
 
-const plans: AvailablePlansResponse = {
-  settings: { country: 'DE', isAuthenticated: true },
-  tiers: [
-    { isCustom: false, isMostPopular: false, monthlyPlan: { planId: 3, price: '25.00' }, tierName: 'basic', yearlyPlan: { planId: 4, price: '250.00' } },
-  ],
-};
-
 describe('utils/api requests', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -107,12 +99,6 @@ describe('utils/api requests', () => {
 
     respondWith(503, {});
     await expect(getAvailablePlans()).resolves.toBeNull();
-  });
-
-  it('finds a plan by its monthly or yearly id', () => {
-    expect(findSelectedPlanById(plans, 3)).toEqual({ planId: 3, name: 'basic', price: 25, durationInMonths: 1 });
-    expect(findSelectedPlanById(plans, 4)).toEqual({ planId: 4, name: 'basic', price: 250, durationInMonths: 12 });
-    expect(findSelectedPlanById(plans, 99)).toBeUndefined();
   });
 
   it('has no account for a visitor who is not signed in', async () => {

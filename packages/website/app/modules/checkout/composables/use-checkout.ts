@@ -1,6 +1,7 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
 import { AUTO_DISCOUNT_DISMISSED_KEY, getValidDiscountCode, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import { parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { type CheckoutPaymentMethod, CheckoutPaymentMethods, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { useSessionStorage } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
@@ -63,10 +64,7 @@ export function useCheckout() {
     return router.currentRoute.value;
   }
 
-  const planId = computed<number | undefined>(() => {
-    const id = getCurrentRoute().query.planId;
-    return id && typeof id === 'string' ? Number(id) : undefined;
-  });
+  const planId = computed<number | undefined>(() => parsePlanId(getCurrentRoute().query.planId));
 
   const currency = computed<string | undefined>(() => {
     const curr = getCurrentRoute().query.currency;

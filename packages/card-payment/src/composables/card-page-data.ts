@@ -3,9 +3,10 @@ import type { ActiveCampaign } from '@rotki/card-payment-common/schemas/campaign
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { AvailablePlan, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { AUTO_DISCOUNT_DISMISSED_KEY, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
+import { findSelectedPlan, parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { get, set } from '@vueuse/core';
 import { computed, type ComputedRef, type Ref, shallowReadonly, shallowRef } from 'vue';
-import { checkout, findSelectedPlanById, getActiveCampaign, getAvailablePlans } from '@/utils/api';
+import { checkout, getActiveCampaign, getAvailablePlans } from '@/utils/api';
 import { getSavedCard } from '@/utils/card-api';
 import { getUrlParam, navigation, replacePlanInUrl } from '@/utils/navigation';
 import { canBuyNewSubscription } from '@/utils/navigation-guard';
@@ -53,8 +54,8 @@ function readPlanId(): { planId: number } | { error: string } {
   const planIdParam = getUrlParam('planId');
   if (!planIdParam)
     return { error: 'No plan selected. Please select a plan first.' };
-  const planId = Number.parseInt(planIdParam);
-  if (Number.isNaN(planId) || planId <= 0)
+  const planId = parsePlanId(planIdParam);
+  if (planId === undefined)
     return { error: 'Invalid plan ID. Please select a valid plan.' };
   return { planId };
 }
@@ -95,7 +96,7 @@ export function useCardPageData(): UseCardPageDataReturn {
       return 'Failed to initialize payment. Please try again.';
     if (!availablePlansData)
       return 'Failed to load plan information. Please try again.';
-    const foundPlan = findSelectedPlanById(availablePlansData, planId);
+    const foundPlan = findSelectedPlan(availablePlansData.tiers, planId);
     if (!foundPlan)
       return 'Invalid plan selected. Please try again.';
 

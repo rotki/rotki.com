@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
-import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
+import { formatPlanName, selectedPlanFrom } from '@rotki/card-payment-common/utils/plan';
 import { computed, ref } from 'vue';
 import { useCheckoutMessages } from '../composables/checkout-messages';
 
@@ -9,7 +9,6 @@ type Period = 'monthly' | 'yearly';
 
 interface PlanOption {
   planId: number;
-  name: string;
   label: string;
   price: string;
   value: SelectedPlan;
@@ -37,20 +36,14 @@ const options = computed<PlanOption[]>(() => {
   const yearly = period.value === 'yearly';
   const list: PlanOption[] = [];
   for (const plan of plans) {
-    const priced = yearly ? plan.yearlyPlan : plan.monthlyPlan;
-    if (!priced)
+    const value = selectedPlanFrom(plan, yearly);
+    if (!value)
       continue;
     list.push({
-      planId: priced.planId,
-      name: plan.tierName,
+      planId: value.planId,
       label: formatPlanName(plan.tierName),
-      price: t(yearly ? 'checkout.change_plan.per_year' : 'checkout.change_plan.per_month', { amount: formatEur(priced.price) }),
-      value: {
-        planId: priced.planId,
-        name: plan.tierName,
-        price: Number.parseFloat(priced.price),
-        durationInMonths: yearly ? 12 : 1,
-      },
+      price: t(yearly ? 'checkout.change_plan.per_year' : 'checkout.change_plan.per_month', { amount: formatEur(value.price) }),
+      value,
     });
   }
   return list;

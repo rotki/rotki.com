@@ -4,8 +4,9 @@
    can never drift. */
 
 import type { CardType, CheckoutPaymentMethod, CheckoutStep } from './common';
-import type { PaymentServerEvent } from './failures';
 import { toSnakeCaseKeys } from './case';
+import { SigilEvents } from './events';
+import { type PaymentServerEvent, reasonForServerEvent } from './failures';
 
 export const PAYMENT_LOG_ENDPOINT = '/api/logging/payment';
 
@@ -41,5 +42,33 @@ export function postPaymentLog(payload: PaymentLogPayload): void {
     keepalive: true,
   }).catch(() => {
     // Silently ignore: logging failures must never affect payment UX
+  });
+}
+
+/** What a payment failure tells the funnel, in the app's own way of sending events. */
+export type PaymentFailedTracker = (event: typeof SigilEvents.PAYMENT_FAILED, payload: {
+  paymentMethod: CheckoutPaymentMethod;
+  reason: ReturnType<typeof reasonForServerEvent>;
+  planId?: number;
+  isUpgrade: boolean;
+  step?: CheckoutStep;
+  cardType?: CardType;
+  discountApplied?: boolean;
+}) => void;
+
+/**
+ * Reports a payment failure to the backend log and mirrors its category into the funnel, so both
+ * apps send the same thing. Fire and forget: logging failures never affect the payment.
+ */
+export function logPaymentFailure(event: PaymentLogPayload, track: PaymentFailedTracker): void {
+  postPaymentLog(event);
+  track(SigilEvents.PAYMENT_FAILED, {
+    paymentMethod: event.paymentMethod,
+    reason: reasonForServerEvent(event.event),
+    planId: event.planId,
+    isUpgrade: event.isUpgrade ?? false,
+    step: event.step,
+    cardType: event.cardType,
+    discountApplied: event.discountApplied,
   });
 }

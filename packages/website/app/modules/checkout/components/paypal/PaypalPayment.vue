@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { paymentAmounts } from '@rotki/card-payment-common/utils/plan';
 import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
 import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
 import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
@@ -90,8 +91,7 @@ async function initialize(): Promise<boolean> {
   }
 
   const plan = get(selectedPlan);
-  const breakdownData = get(breakdown);
-  const amount = breakdownData ? Number.parseFloat(breakdownData.finalAmount) : plan?.price ?? 0;
+  const amount = plan ? paymentAmounts(get(breakdown), plan).finalAmount : 0;
 
   const result = await initializeSdk(token, amount);
   if (!result.success) {
@@ -184,9 +184,7 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
   if (!success)
     return;
 
-  const breakdownData = get(breakdown);
-  const amount = breakdownData ? Number.parseFloat(breakdownData.finalAmount) : newPlan.price;
-  updateAmount(amount);
+  updateAmount(paymentAmounts(get(breakdown), newPlan).finalAmount);
 }
 
 onMounted(async () => {
