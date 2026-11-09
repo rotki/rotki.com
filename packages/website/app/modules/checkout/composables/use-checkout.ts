@@ -102,8 +102,8 @@ export function useCheckout() {
     set(selectedPlan, plan);
   }
 
-  // Initialize selectedPlan from URL when planId changes
-  watch(planId, (id) => {
+  // Follows the URL, and the live plans once they replace the build-time snapshot.
+  watch([planId, availablePlans], ([id]) => {
     if (id) {
       const plan = getSelectedPlanFromId(id);
       if (plan) {

@@ -23,17 +23,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigate();
   }
 
-  // Ensure available plans are loaded (uses dedupe - won't re-fetch if pending/loaded)
-  if (get(availablePlans).length === 0) {
-    await execute();
-  }
-
-  // Check if planId exists in any of the available plans
-  const planExists = get(availablePlans).some(plan => (plan.monthlyPlan?.planId === currentPlanId)
+  const planExists = (): boolean => get(availablePlans).some(plan => (plan.monthlyPlan?.planId === currentPlanId)
     || (plan.yearlyPlan?.planId === currentPlanId));
 
+  // The plans start from the snapshot taken at build time, so only the live list can rule a plan out.
+  if (!planExists())
+    await execute();
+
   // If plan doesn't exist, redirect to checkout
-  if (!planExists) {
+  if (!planExists()) {
     return navigate();
   }
 });
