@@ -37,6 +37,7 @@ export const checkoutMessages: MessageTree = {
       delete_confirm: 'Are you sure you want to delete this saved card? This action cannot be undone.',
       delete_failed: 'Failed to delete card',
       delete_title: 'Delete saved card',
+      error_account: 'We couldn\'t check your account. Please reload the page to try again.',
       error_generic: 'An error occurred. Please try again.',
       error_init: 'Failed to initialize payment. Please try again.',
       error_invalid_plan: 'Invalid plan selected. Please try again.',

@@ -14,7 +14,7 @@ import ChangePlanButton from './components/ChangePlanButton.vue';
 import { type ApiFailure, failed } from './utils/api-failure';
 
 const api = vi.hoisted(() => ({
-  canBuyNewSubscription: vi.fn<() => Promise<{ canBuy: boolean; account?: Account }>>(),
+  canBuyNewSubscription: vi.fn<() => ResultAsync<{ canBuy: boolean; account?: Account }, ApiFailure>>(),
   checkout: vi.fn<() => ResultAsync<PaymentBreakdownResponse, ApiFailure>>(),
   getActiveCampaign: vi.fn<() => ResultAsync<undefined, ApiFailure>>(),
   getAvailablePlans: vi.fn<() => ResultAsync<AvailablePlansResponse, ApiFailure>>(),
@@ -117,7 +117,7 @@ function cardProps(wrapper: VueWrapper): Record<string, unknown> {
 describe('app', () => {
   beforeEach(() => {
     visit('?planId=3');
-    api.canBuyNewSubscription.mockResolvedValue({ canBuy: true, account });
+    api.canBuyNewSubscription.mockResolvedValue(ok({ canBuy: true, account }));
     api.checkout.mockResolvedValue(ok(breakdown));
     api.getActiveCampaign.mockResolvedValue(ok(undefined));
     api.getAvailablePlans.mockResolvedValue(ok(tiers));
@@ -222,7 +222,7 @@ describe('app', () => {
 
   it('leads an upgrade back to the subscription, without other methods', async () => {
     visit('?planId=3&upgradeSubId=sub-1');
-    api.canBuyNewSubscription.mockResolvedValue({ canBuy: false });
+    api.canBuyNewSubscription.mockResolvedValue(ok({ canBuy: false }));
     const wrapper = mountApp();
     await flushPromises();
 
@@ -250,7 +250,7 @@ describe('app', () => {
 
     it('does not offer it for an upgrade, which is bound to its subscription', async () => {
       visit('?planId=3&upgradeSubId=sub-1');
-      api.canBuyNewSubscription.mockResolvedValue({ canBuy: false });
+      api.canBuyNewSubscription.mockResolvedValue(ok({ canBuy: false }));
       const wrapper = mountApp();
       await flushPromises();
 
@@ -258,9 +258,23 @@ describe('app', () => {
     });
   });
 
+  it.each([
+    ['a new subscription', '?planId=3'],
+    ['an upgrade', '?planId=3&upgradeSubId=sub-1'],
+  ])('explains a failed account check on %s instead of sending the buyer away', async (_, query) => {
+    visit(query);
+    api.canBuyNewSubscription.mockResolvedValue(err(failed('HTTP 500')));
+    const wrapper = mountApp();
+    await flushPromises();
+
+    expect(api.goToSubscription).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain('We couldn\'t check your account.');
+    expect(wrapper.find('[data-cy="card-payment"]').exists()).toBe(false);
+  });
+
   it('sends a buyer who cannot start a subscription to the subscription page', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
-    api.canBuyNewSubscription.mockResolvedValue({ canBuy: false });
+    api.canBuyNewSubscription.mockResolvedValue(ok({ canBuy: false }));
     const wrapper = mountApp();
     await flushPromises();
 

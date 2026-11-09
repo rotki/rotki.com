@@ -1,26 +1,37 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
-import { getOr } from 'plainfp/result';
+import type { ResultAsync } from 'plainfp/result-async';
+import type { ApiFailure } from '@/utils/api-failure';
+import { ok } from 'plainfp/result';
 import { getAccount } from '@/utils/api';
 
-/** Whether the visitor can start a subscription. A failed account check counts as not signed in. */
-export async function canBuyNewSubscription(): Promise<{ canBuy: boolean; account?: Account }> {
-  const account = getOr(await getAccount(), undefined);
+interface PurchaseAccess {
+  canBuy: boolean;
+  account?: Account;
+}
+
+/** Whether the visitor can start a subscription; failing to check says neither, so it stays a failure. */
+export async function canBuyNewSubscription(): ResultAsync<PurchaseAccess, ApiFailure> {
+  const current = await getAccount();
+  if (!current.ok)
+    return current;
+
+  const account = current.value;
 
   if (!account) {
     console.warn('User not authenticated, redirecting to subscription page');
-    return { canBuy: false };
+    return ok({ canBuy: false });
   }
 
   if (!account.emailConfirmed) {
     console.warn('User email not confirmed, redirecting to subscription page');
-    return { canBuy: false };
+    return ok({ canBuy: false });
   }
 
   // Card payments are only for new subscriptions; renewals go through crypto payments.
   if (account.hasActiveSubscription) {
     console.warn('User has active subscription, card payment not available - use crypto for renewals');
-    return { canBuy: false };
+    return ok({ canBuy: false });
   }
 
-  return { canBuy: true, account };
+  return ok({ canBuy: true, account });
 }

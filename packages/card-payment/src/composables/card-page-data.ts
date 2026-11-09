@@ -154,7 +154,13 @@ export function useCardPageData(): UseCardPageDataReturn {
       loadCards().catch((error: unknown) => console.error('Error loading saved cards:', error));
 
       set(loadingMessage, t('checkout.card_page.checking_account'));
-      const { canBuy, account: currentAccount } = await canBuyNewSubscription();
+      const access = await canBuyNewSubscription();
+      if (!access.ok) {
+        set(errorMessage, t('checkout.card_page.error_account'));
+        return;
+      }
+
+      const { canBuy, account: currentAccount } = access.value;
       const upgradeId = getUrlParam('upgradeSubId');
       set(upgradeSubId, upgradeId);
       set(account, currentAccount);
