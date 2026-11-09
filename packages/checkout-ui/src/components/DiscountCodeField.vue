@@ -5,6 +5,7 @@ import { get, set } from '@vueuse/shared';
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { useCheckoutMessages } from '../composables/checkout-messages';
 import { useDiscountCode } from '../composables/discount-code';
+import DiscountTagIcon from './DiscountTagIcon.vue';
 
 const code = defineModel<string>({ required: true });
 
@@ -82,24 +83,7 @@ function clear(): void {
       data-cy="discount-open"
       @click="openField()"
     >
-      <svg
-        class="size-4"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
-        <circle
-          cx="7.5"
-          cy="7.5"
-          r=".5"
-          fill="currentColor"
-        />
-      </svg>
+      <DiscountTagIcon class="size-4" />
       {{ t('checkout.discount.add') }}
     </button>
     <p
@@ -124,24 +108,7 @@ function clear(): void {
       :disabled="disabled || loading"
     >
       <template #prepend>
-        <svg
-          class="size-4 text-rui-text-secondary"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
-          <circle
-            cx="7.5"
-            cy="7.5"
-            r=".5"
-            fill="currentColor"
-          />
-        </svg>
+        <DiscountTagIcon class="size-4 text-rui-text-secondary" />
       </template>
       <template #append>
         <RuiButton
