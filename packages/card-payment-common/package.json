@@ -36,6 +36,10 @@
       "types": "./src/utils/checkout.ts",
       "import": "./src/utils/checkout.ts"
     },
+    "./utils/saved-card": {
+      "types": "./src/utils/saved-card.ts",
+      "import": "./src/utils/saved-card.ts"
+    },
     "./utils/plan": {
       "types": "./src/utils/plan.ts",
       "import": "./src/utils/plan.ts"

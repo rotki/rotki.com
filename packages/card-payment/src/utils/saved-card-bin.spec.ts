@@ -1,4 +1,5 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import { PaymentUserError } from '@rotki/sigil';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { findSavedCardBin } from './saved-card-bin';
 
@@ -17,7 +18,6 @@ describe('utils/saved-card-bin', () => {
   beforeEach(() => {
     vault.fetchPaymentMethods.mockReset();
     vault.teardown.mockReset().mockResolvedValue(undefined);
-    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('returns the bin of the vaulted card with the same last four digits', async () => {
@@ -31,16 +31,20 @@ describe('utils/saved-card-bin', () => {
     expect(vault.teardown).toHaveBeenCalledOnce();
   });
 
-  it('returns an empty bin when no vaulted card matches', async () => {
+  it('fails with copy the buyer can read when the vault does not have the card', async () => {
     vault.fetchPaymentMethods.mockResolvedValue([{ type: 'CreditCard', details: { lastFour: '4444', bin: '555555' } }]);
 
-    await expect(findSavedCardBin(undefined, card)).resolves.toBe('');
+    const failure = findSavedCardBin(undefined, card);
+
+    await expect(failure).rejects.toBeInstanceOf(PaymentUserError);
+    await expect(failure).rejects.toThrow('We could not find that card.');
+    expect(vault.teardown).toHaveBeenCalledOnce();
   });
 
-  it('returns an empty bin and still tears down when the vault lookup fails', async () => {
+  it('passes a failed lookup on and still tears down', async () => {
     vault.fetchPaymentMethods.mockRejectedValue(new Error('network'));
 
-    await expect(findSavedCardBin(undefined, card)).resolves.toBe('');
+    await expect(findSavedCardBin(undefined, card)).rejects.toThrow('network');
     expect(vault.teardown).toHaveBeenCalledOnce();
   });
 });

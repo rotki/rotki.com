@@ -1,37 +1,27 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { Client } from 'braintree-web/client';
-import { create as createVaultManager, type VaultManager } from 'braintree-web/vault-manager';
+import { CARD_NOT_IN_VAULT_MESSAGE, findVaultBin } from '@rotki/card-payment-common/utils/saved-card';
+import { PaymentUserError } from '@rotki/sigil';
+import { create as createVaultManager } from 'braintree-web/vault-manager';
 
 /**
- * BIN of a saved card, which 3D Secure needs and our API does not return. Read from the
- * Braintree vault by matching the last four digits; empty when the vault has no match or
- * the lookup fails.
+ * BIN of a saved card, read from the Braintree vault. The 3D Secure page cannot start without one,
+ * so a card the vault does not have fails here, where the buyer can still pick another.
  */
 export async function findSavedCardBin(client: Client | undefined, card: SavedCard): Promise<string> {
-  let vaultManager: VaultManager | undefined;
+  const vaultManager = await createVaultManager({ client });
 
   try {
-    vaultManager = await createVaultManager({ client });
-
     const methods = await vaultManager.fetchPaymentMethods();
-    const method = methods.find(({ type, details }) =>
-      type === 'CreditCard'
-      && details
-      && 'lastFour' in details
-      && details.lastFour === card.last4,
-    );
-
-    if (method?.details && 'bin' in method.details && method.details.bin)
-      return method.details.bin;
-
-    return '';
-  }
-  catch (error) {
-    console.error('Failed to fetch bin from vault manager:', error);
-    return '';
+    const bin = findVaultBin(methods, card.last4, card.expiresAt);
+    if (!bin) {
+      throw new PaymentUserError(CARD_NOT_IN_VAULT_MESSAGE, {
+        logDetail: `no vault entry for card ending ${card.last4} among ${methods.length} methods`,
+      });
+    }
+    return bin;
   }
   finally {
-    if (vaultManager)
-      await vaultManager.teardown();
+    await vaultManager.teardown();
   }
 }

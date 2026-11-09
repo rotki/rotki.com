@@ -67,6 +67,19 @@ describe('composables/card-checkout', () => {
     vi.mocked(findSavedCardBin).mockResolvedValue('411111');
   });
 
+  it('stays on the page without a handoff when the vault does not have the saved card', async () => {
+    vi.mocked(findSavedCardBin).mockRejectedValue(new Error('no vault entry'));
+    const { checkout, options } = setup();
+
+    await checkout.submit(savedCard);
+
+    expect(createCardNonce).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem(THREE_D_SECURE_SESSION_KEY)).toBeNull();
+    expect(options.onHandoff).not.toHaveBeenCalled();
+    expect(checkout.processing.value).toBe(false);
+    expect(checkout.transactionError.value).toBeTruthy();
+  });
+
   it('hands a saved card payment to the 3D Secure page', async () => {
     const { checkout, options } = setup();
 

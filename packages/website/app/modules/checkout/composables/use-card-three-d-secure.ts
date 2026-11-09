@@ -1,5 +1,6 @@
 import type { Client } from 'braintree-web/client';
 import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure';
+import { CARD_NOT_IN_VAULT_MESSAGE, findVaultBin } from '@rotki/card-payment-common/utils/saved-card';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents, PaymentUserError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
@@ -34,30 +35,6 @@ interface UseCardThreeDSecureReturn {
   initialize: (request: Omit<CardVerificationRequest, 'onVerificationComplete'> & { braintreeToken: string }) => Promise<string>;
   verifyAndSetDefaultCard: (request: CardVerificationRequest) => Promise<void>;
   teardown: () => void;
-}
-
-/**
- * Compare a vault entry's expiry against a `SavedCard.expiresAt` (`MM/YY` or
- * `MM/YYYY`). Two-digit years are compared on their last two digits, which is
- * all a card prints.
- */
-function expiryMatches(details: object, expiresAt: string): boolean {
-  const parts = /^(\d{2})\/(\d{2,4})$/.exec(expiresAt);
-  if (!parts)
-    return false;
-
-  /* Narrowed with `in` rather than a cast: `details` is a union of every
-     payment-method shape braintree-web can return, and only cards carry an expiry. */
-  if (!('expirationMonth' in details) || !('expirationYear' in details))
-    return false;
-
-  const [, month, year] = parts;
-  const { expirationMonth: vaultMonth, expirationYear: vaultYear } = details;
-
-  if (typeof vaultMonth !== 'string' || typeof vaultYear !== 'string')
-    return false;
-
-  return vaultMonth.padStart(2, '0') === month && vaultYear.slice(-2) === year!.slice(-2);
 }
 
 export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
@@ -156,28 +133,13 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
       const paymentMethods = await vmInstance.fetchPaymentMethods();
       logger.debug(`Fetched ${paymentMethods.length} payment methods from vault`);
 
-      const matches = paymentMethods.filter(({ type, details }) =>
-        type === 'CreditCard' &&
-        details &&
-        'lastFour' in details &&
-        details.lastFour === cardLast4,
-      );
-
-      const paymentMethod = matches.length > 1
-        ? matches.find(({ details }) => details && expiryMatches(details, cardExpiresAt)) ?? matches[0]
-        : matches[0];
-      logger.debug('Found payment method:', paymentMethod);
-
-      if (!paymentMethod?.details || !('bin' in paymentMethod.details) || !paymentMethod.details.bin) {
+      const bin = findVaultBin(paymentMethods, cardLast4, cardExpiresAt);
+      if (!bin) {
         logger.error(`BIN not found for card ending ${cardLast4}`);
-        throw new PaymentUserError(
-          'We could not find that card. Please refresh the page and try again.',
-          { logDetail: `no vault entry for card ending ${cardLast4} among ${paymentMethods.length} methods` },
-        );
+        throw new PaymentUserError(CARD_NOT_IN_VAULT_MESSAGE, {
+          logDetail: `no vault entry for card ending ${cardLast4} among ${paymentMethods.length} methods`,
+        });
       }
-
-      const bin = paymentMethod.details.bin;
-      logger.debug('BIN extracted from payment method:', bin);
 
       return bin;
     }

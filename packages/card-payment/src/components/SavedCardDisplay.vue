@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import { isCardExpired } from '@rotki/card-payment-common/utils/saved-card';
 import { set } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { deleteCard } from '@/utils/card-api';
@@ -22,20 +23,7 @@ const deletingCard = ref<boolean>(false);
 
 const last4Digits = computed<string>(() => `•••• •••• •••• ${card.last4}`);
 
-const isCardExpired = computed<boolean>(() => {
-  const expiryMatch = card.expiresAt.match(/^(\d{2})\/(\d{2,4})$/);
-  if (!expiryMatch)
-    return true;
-
-  const current = new Date();
-  const month = current.getMonth() + 1;
-  const year = current.getFullYear();
-  const expirationMonth = Number(expiryMatch[1]);
-  const yearPart = Number(expiryMatch[2]);
-  const expirationYear = yearPart < 100 ? yearPart + 2000 : yearPart;
-
-  return !(expirationYear > year || (expirationYear === year && expirationMonth > month));
-});
+const expired = computed<boolean>(() => isCardExpired(card.expiresAt));
 
 function deleteCardClick(): void {
   set(showDeleteConfirmation, true);
@@ -105,7 +93,7 @@ async function handleDeleteCard(): Promise<void> {
 
     <!-- Expired Card Error -->
     <div
-      v-if="isCardExpired"
+      v-if="expired"
       class="p-4 bg-red-50 border border-red-200 rounded-sm mb-4"
     >
       <p class="text-red-800 mb-2">
