@@ -2,6 +2,7 @@
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { paymentAmounts } from '@rotki/card-payment-common/utils/plan';
 import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
 import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
 import ProcessingOverlay from '@rotki/checkout-ui/components/ProcessingOverlay.vue';
@@ -217,9 +218,8 @@ onMounted(async () => {
       <CheckoutMethodTiles current="paypal" />
     </template>
 
-    <section
+    <CheckoutPanel
       aria-labelledby="paypal-title"
-      class="flex flex-col gap-3 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
       data-cy="paypal-panel"
     >
       <h2
@@ -234,7 +234,7 @@ onMounted(async () => {
       <p class="text-sm text-rui-text-secondary">
         {{ renewalNote }}
       </p>
-    </section>
+    </CheckoutPanel>
 
     <template #summary>
       <OrderSummaryCard

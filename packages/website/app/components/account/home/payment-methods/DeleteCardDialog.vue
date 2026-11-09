@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import SavedCardRow from '@rotki/checkout-ui/components/SavedCardRow.vue';
 import { set } from '@vueuse/shared';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useLogger } from '~/utils/use-logger';
@@ -64,23 +65,7 @@ function handleCancel(): void {
         v-if="card"
         class="mt-4 p-3 bg-rui-grey-50 rounded-md flex items-center gap-3"
       >
-        <div class="rounded-sm bg-white h-8 w-12 flex items-center justify-center">
-          <img
-            :src="card.imageUrl"
-            :alt="t('common.card')"
-            class="w-full h-full object-contain object-center"
-            width="48"
-            height="32"
-          />
-        </div>
-        <div>
-          <div class="font-medium text-sm">
-            •••• •••• •••• {{ card.last4 }}
-          </div>
-          <div class="text-xs text-rui-text-secondary">
-            {{ t('home.plans.tiers.step_3.saved_card.expiry', { expiresAt: card.expiresAt }) }}
-          </div>
-        </div>
+        <SavedCardRow :card="card" />
       </div>
 
       <template #footer>

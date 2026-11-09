@@ -2,6 +2,7 @@
 import type { PaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import { get } from '@vueuse/shared';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
@@ -97,9 +98,8 @@ const message = computed<string>(() => {
       class="grid grid-cols-1 gap-6"
       :class="existingSubscriber ? 'lg:grid-cols-[25rem]' : 'lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-12'"
     >
-      <section
+      <CheckoutPanel
         v-if="!existingSubscriber"
-        class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
         data-cy="payment-success-next"
       >
         <h2 class="text-lg md:text-xl font-semibold text-rui-text">
@@ -134,9 +134,11 @@ const message = computed<string>(() => {
             {{ t('subscription.success.next.guide') }}
           </NuxtLink>
         </div>
-      </section>
+      </CheckoutPanel>
 
-      <aside class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card">
+      <CheckoutPanel
+        as="aside"
+      >
         <SubscriptionReceipt
           v-if="receipt"
           :receipt="receipt"
@@ -150,7 +152,7 @@ const message = computed<string>(() => {
         >
           {{ t('subscription.success.account') }}
         </ButtonLink>
-      </aside>
+      </CheckoutPanel>
     </div>
   </div>
 </template>

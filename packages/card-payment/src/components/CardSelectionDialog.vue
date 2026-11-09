@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { set } from '@vueuse/core';
 import BaseButton from './BaseButton.vue';
 import BaseDialog from './BaseDialog.vue';
@@ -18,6 +19,8 @@ const emit = defineEmits<{
   'add-new-card': [];
 }>();
 
+const t = useCheckoutMessages();
+
 function handleSelectCard(card: SavedCard): void {
   emit('select-card', card);
   set(open, false);
@@ -32,7 +35,7 @@ function handleAddNewCard(): void {
 <template>
   <BaseDialog
     v-model:open="open"
-    title="Select a card"
+    :title="t('checkout.card_page.select_card')"
   >
     <div class="space-y-3">
       <SavedCardListItem
@@ -51,14 +54,14 @@ function handleAddNewCard(): void {
         size="sm"
         @click="handleAddNewCard()"
       >
-        Add new card
+        {{ t('checkout.card_page.add_new_card') }}
       </BaseButton>
       <BaseButton
         variant="ghost"
         size="sm"
         @click="open = false"
       >
-        Cancel
+        {{ t('checkout.card_page.cancel') }}
       </BaseButton>
     </template>
   </BaseDialog>

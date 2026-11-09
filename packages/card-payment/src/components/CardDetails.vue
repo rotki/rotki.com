@@ -2,6 +2,7 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { Client } from 'braintree-web/client';
 import type { TokenizedCard } from '@/composables/card-checkout';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
 import { get } from '@vueuse/core';
 import { ref, useTemplateRef } from 'vue';
@@ -49,9 +50,8 @@ defineExpose({ tokenize });
 </script>
 
 <template>
-  <section
+  <CheckoutPanel
     aria-labelledby="card-details-title"
-    class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
     data-cy="card-details"
   >
     <h2
@@ -143,5 +143,5 @@ defineExpose({ tokenize });
       @card-added="handleCardAdded($event)"
       @refresh-card="emit('refresh-card')"
     />
-  </section>
+  </CheckoutPanel>
 </template>

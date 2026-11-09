@@ -2,6 +2,7 @@
 import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
 import CheckoutShell from '@rotki/checkout-ui/components/CheckoutShell.vue';
 import MethodTiles from '@rotki/checkout-ui/components/MethodTiles.vue';
+import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { get } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
 import CardPayment from '@/components/CardPayment.vue';
@@ -15,6 +16,8 @@ import { checkoutMethodLinks, navigation, routes, withCheckoutParams } from '@/u
 import logoSmall from '/img/logo-small.svg';
 
 useCardPageHead();
+
+const t = useCheckoutMessages();
 
 const {
   account,
@@ -87,7 +90,7 @@ onMounted(async () => {
     <ErrorState
       v-else-if="errorMessage"
       :message="errorMessage"
-      button-text="Go back"
+      :button-text="t('checkout.card_page.go_back')"
       @button-click="navigation.goToPlans()"
     />
 

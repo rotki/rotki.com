@@ -2,8 +2,10 @@ import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { ActiveCampaign } from '@rotki/card-payment-common/schemas/campaign';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { AvailablePlan, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { CheckoutTranslate } from '@rotki/checkout-ui/utils/translator';
 import { AUTO_DISCOUNT_DISMISSED_KEY, resolveDiscountCode } from '@rotki/card-payment-common/utils/checkout';
 import { findSelectedPlan, parsePlanId } from '@rotki/card-payment-common/utils/plan';
+import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { get, set } from '@vueuse/core';
 import { computed, type ComputedRef, type Ref, shallowReadonly, shallowRef } from 'vue';
 import { checkout, getActiveCampaign, getAvailablePlans } from '@/utils/api';
@@ -50,13 +52,13 @@ function resolveInitialDiscountCode(activeCampaign: ActiveCampaign | undefined):
 }
 
 /** The plan id from the URL, or the error to show for a missing or malformed one. */
-function readPlanId(): { planId: number } | { error: string } {
+function readPlanId(t: CheckoutTranslate): { planId: number } | { error: string } {
   const planIdParam = getUrlParam('planId');
   if (!planIdParam)
-    return { error: 'No plan selected. Please select a plan first.' };
+    return { error: t('checkout.card_page.error_no_plan') };
   const planId = parsePlanId(planIdParam);
   if (planId === undefined)
-    return { error: 'Invalid plan ID. Please select a valid plan.' };
+    return { error: t('checkout.card_page.error_invalid_plan_id') };
   return { planId };
 }
 
@@ -66,9 +68,10 @@ function readPlanId(): { planId: number } | { error: string } {
  * load while the account is checked; the page renders without waiting for the cards.
  */
 export function useCardPageData(): UseCardPageDataReturn {
+  const t = useCheckoutMessages();
   const isLoading = shallowRef<boolean>(true);
   const redirecting = shallowRef<boolean>(false);
-  const loadingMessage = shallowRef<string>('Checking authentication...');
+  const loadingMessage = shallowRef<string>(t('checkout.card_page.checking_account'));
   const errorMessage = shallowRef<string>('');
   const upgradeSubId = shallowRef<string | null>(null);
   const planData = shallowRef<PaymentBreakdownResponse>();
@@ -93,12 +96,12 @@ export function useCardPageData(): UseCardPageDataReturn {
     set(initialDiscountCode, resolveInitialDiscountCode(activeCampaign));
 
     if (!checkoutData)
-      return 'Failed to initialize payment. Please try again.';
+      return t('checkout.card_page.error_init');
     if (!availablePlansData)
-      return 'Failed to load plan information. Please try again.';
+      return t('checkout.card_page.error_plans');
     const foundPlan = findSelectedPlan(availablePlansData.tiers, planId);
     if (!foundPlan)
-      return 'Invalid plan selected. Please try again.';
+      return t('checkout.card_page.error_invalid_plan');
 
     set(planData, checkoutData);
     set(selectedPlan, foundPlan);
@@ -124,8 +127,8 @@ export function useCardPageData(): UseCardPageDataReturn {
 
   async function load(): Promise<void> {
     try {
-      set(loadingMessage, 'Validating plan...');
-      const plan = readPlanId();
+      set(loadingMessage, t('checkout.card_page.validating_plan'));
+      const plan = readPlanId(t);
       if ('error' in plan) {
         set(errorMessage, plan.error);
         return;
@@ -134,11 +137,11 @@ export function useCardPageData(): UseCardPageDataReturn {
       // A visitor who cannot buy is sent away and this data is dropped.
       const paymentData = loadPaymentData(plan.planId).catch((error: unknown) => {
         console.error('Failed to load payment data:', error);
-        return 'An error occurred. Please try again.';
+        return t('checkout.card_page.error_generic');
       });
       loadCards();
 
-      set(loadingMessage, 'Checking authentication...');
+      set(loadingMessage, t('checkout.card_page.checking_account'));
       const { canBuy, account: currentAccount } = await canBuyNewSubscription();
       const upgradeId = getUrlParam('upgradeSubId');
       set(upgradeSubId, upgradeId);
@@ -150,14 +153,14 @@ export function useCardPageData(): UseCardPageDataReturn {
         return;
       }
 
-      set(loadingMessage, 'Initializing payment...');
+      set(loadingMessage, t('checkout.card_page.initializing'));
       const loadError = await paymentData;
       if (loadError)
         set(errorMessage, loadError);
     }
     catch (error) {
       console.error('Initialization error:', error);
-      set(errorMessage, 'An error occurred. Please try again.');
+      set(errorMessage, t('checkout.card_page.error_generic'));
     }
     finally {
       set(isLoading, false);

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Client } from 'braintree-web/client';
+import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
 import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
+import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { get, set } from '@vueuse/core';
 import { ref, useTemplateRef, watch } from 'vue';
 import { addCard, CardAddedPaymentError } from '@/utils/card-api';
@@ -19,6 +21,8 @@ const emit = defineEmits<{
   'card-added': [token: string];
   'refresh-card': [];
 }>();
+
+const t = useCheckoutMessages();
 
 const addCardFormValid = ref<boolean>(false);
 const isAddingCard = ref<boolean>(false);
@@ -71,7 +75,7 @@ watch(open, (isOpen) => {
 <template>
   <BaseDialog
     v-model:open="open"
-    title="Add a new card"
+    :title="t('checkout.card_page.add_card_title')"
   >
     <HostedCardForm
       v-if="client"
@@ -82,26 +86,12 @@ watch(open, (isOpen) => {
       @error="addCardError = $event"
     />
 
-    <div
+    <CheckoutAlert
       v-if="addCardError"
-      class="mt-4 flex items-start gap-3 rounded-md border border-rui-error/30 bg-rui-error/10 p-3 text-sm text-rui-error"
-      role="alert"
-    >
-      <svg
-        class="h-5 w-5 shrink-0 mt-0.5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-        />
-      </svg>
-      <span class="flex-1">{{ addCardError }}</span>
-    </div>
+      class="mt-4"
+      :message="addCardError"
+      @dismiss="addCardError = ''"
+    />
 
     <template #actions>
       <BaseButton
@@ -110,7 +100,7 @@ watch(open, (isOpen) => {
         :disabled="isAddingCard"
         @click="open = false"
       >
-        Cancel
+        {{ t('checkout.card_page.cancel') }}
       </BaseButton>
       <BaseButton
         variant="primary"
@@ -119,7 +109,7 @@ watch(open, (isOpen) => {
         :loading="isAddingCard"
         @click="handleAddCard()"
       >
-        {{ isAddingCard ? 'Adding...' : 'Add card' }}
+        {{ isAddingCard ? t('checkout.card_page.adding_card') : t('checkout.card_page.add_card') }}
       </BaseButton>
     </template>
   </BaseDialog>

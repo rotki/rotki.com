@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import ProcessingOverlay from '@rotki/checkout-ui/components/ProcessingOverlay.vue';
 import { set } from '@vueuse/shared';
 import CryptoPaymentDetails from '~/modules/checkout/components/crypto/CryptoPaymentDetails.vue';
@@ -76,9 +77,8 @@ watch(processing, (busy) => {
 </script>
 
 <template>
-  <section
+  <CheckoutPanel
     aria-labelledby="crypto-send-title"
-    class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
     data-cy="crypto-payment-panel"
   >
     <h2
@@ -188,7 +188,7 @@ watch(processing, (busy) => {
     <p class="text-sm text-rui-text-secondary">
       {{ t('checkout_crypto.already_sent') }}
     </p>
-  </section>
+  </CheckoutPanel>
 
   <ProcessingOverlay
     :visible="processing"

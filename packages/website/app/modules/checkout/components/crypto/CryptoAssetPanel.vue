@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import ChangeCryptoPayment from '~/modules/checkout/components/crypto/ChangeCryptoPayment.vue';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import { type CryptoPaymentLabels, cryptoPaymentLabels } from '~/modules/checkout/utils/crypto-payment-labels';
@@ -22,9 +23,8 @@ const labels = computed<CryptoPaymentLabels>(() => cryptoPaymentLabels(data));
 </script>
 
 <template>
-  <section
+  <CheckoutPanel
     aria-labelledby="crypto-asset-title"
-    class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
     data-cy="crypto-asset-panel"
   >
     <div class="flex items-center justify-between gap-4">
@@ -61,7 +61,7 @@ const labels = computed<CryptoPaymentLabels>(() => cryptoPaymentLabels(data));
         </template>
       </i18n-t>
     </div>
-  </section>
+  </CheckoutPanel>
 
   <ChangeCryptoPayment
     v-model="showChangePaymentDialog"

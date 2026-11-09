@@ -47,8 +47,6 @@ const valid = computed<boolean>(() => get(isRefundPolicyAccepted) && !!get(selec
 
 const { total } = useOrderTotals({ plan: selectedPlan, breakdown, upgrade: () => !!get(upgradeSubId) });
 
-const panelClass = 'flex flex-col gap-4 p-4 md:p-6 rounded-rui-card';
-
 function submit(): void {
   set(processing, true);
 
@@ -86,10 +84,8 @@ function submit(): void {
       <CheckoutMethodTiles current="crypto" />
     </template>
 
-    <section
+    <CheckoutPanel
       aria-labelledby="crypto-asset-title"
-      class="bg-rui-surface border border-rui-divider"
-      :class="[panelClass]"
       data-cy="crypto-panel"
     >
       <h2
@@ -118,11 +114,10 @@ function submit(): void {
       >
         {{ t('checkout_crypto.show_details') }}
       </RuiButton>
-    </section>
+    </CheckoutPanel>
 
     <section
-      class="gap-1! border border-dashed border-rui-outline"
-      :class="[panelClass]"
+      class="flex flex-col gap-1 p-4 md:p-6 rounded-rui-card border border-dashed border-rui-outline"
       data-cy="crypto-send-placeholder"
     >
       <h2 class="text-lg md:text-xl font-semibold text-rui-text-secondary">

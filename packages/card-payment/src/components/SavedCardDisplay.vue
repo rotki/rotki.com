@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { isCardExpired } from '@rotki/card-payment-common/utils/saved-card';
+import SavedCardRow from '@rotki/checkout-ui/components/SavedCardRow.vue';
+import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { set } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { deleteCard } from '@/utils/card-api';
 import BaseButton from './BaseButton.vue';
+import BaseDialog from './BaseDialog.vue';
 
 interface Props {
   card: SavedCard;
@@ -18,10 +21,10 @@ const emit = defineEmits<{
   'error': [message: string];
 }>();
 
+const t = useCheckoutMessages();
+
 const showDeleteConfirmation = ref<boolean>(false);
 const deletingCard = ref<boolean>(false);
-
-const last4Digits = computed<string>(() => `•••• •••• •••• ${card.last4}`);
 
 const expired = computed<boolean>(() => isCardExpired(card.expiresAt));
 
@@ -38,7 +41,7 @@ async function handleDeleteCard(): Promise<void> {
     emit('card-deleted');
   }
   catch (error: any) {
-    emit('error', error.message || 'Failed to delete card');
+    emit('error', error.message || t('checkout.card_page.delete_failed'));
   }
   finally {
     set(deletingCard, false);
@@ -50,28 +53,14 @@ async function handleDeleteCard(): Promise<void> {
   <div>
     <!-- Saved Card Display -->
     <div class="p-4 flex items-center gap-4 border rounded-md">
-      <div class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center">
-        <img
-          :src="card.imageUrl"
-          alt="Card image"
-          class="w-full h-full object-contain object-center"
-        />
-      </div>
-      <div class="grow">
-        <div class="text-rui-text">
-          {{ last4Digits }}
-        </div>
-        <div class="text-sm text-rui-text-secondary">
-          Expires {{ card.expiresAt }}
-        </div>
-      </div>
+      <SavedCardRow :card="card" />
       <BaseButton
         variant="danger-ghost"
         size="icon"
         :disabled="disabled || card.linked"
         :loading="deletingCard"
-        aria-label="Delete card"
-        :title="card.linked ? 'This card pays your subscription, so it cannot be deleted' : undefined"
+        :aria-label="t('checkout.card_page.delete_card')"
+        :title="card.linked ? t('checkout.card_page.card_linked') : undefined"
         @click="deleteCardClick()"
       >
         <svg
@@ -97,41 +86,34 @@ async function handleDeleteCard(): Promise<void> {
       class="p-4 bg-red-50 border border-red-200 rounded-sm mb-4"
     >
       <p class="text-red-800 mb-2">
-        This card has expired
+        {{ t('checkout.card_page.card_expired') }}
       </p>
       <p class="text-red-700 text-sm">
-        Please delete the expired card and add a new one
+        {{ t('checkout.card_page.card_expired_hint') }}
       </p>
     </div>
 
-    <!-- Delete Card Confirmation Dialog -->
-    <div
-      v-if="showDeleteConfirmation"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-rui-dialog"
-      @click.self="showDeleteConfirmation = false"
+    <BaseDialog
+      v-model:open="showDeleteConfirmation"
+      :title="t('checkout.card_page.delete_title')"
     >
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-lg font-medium text-rui-text mb-4">
-          Delete saved card
-        </h3>
-        <p class="text-rui-text-secondary mb-6">
-          Are you sure you want to delete this saved card? This action cannot be undone.
-        </p>
-        <div class="flex justify-end gap-4">
-          <BaseButton
-            variant="ghost"
-            @click="showDeleteConfirmation = false"
-          >
-            Cancel
-          </BaseButton>
-          <BaseButton
-            variant="danger"
-            @click="handleDeleteCard()"
-          >
-            Delete
-          </BaseButton>
-        </div>
-      </div>
-    </div>
+      <p class="text-rui-text-secondary">
+        {{ t('checkout.card_page.delete_confirm') }}
+      </p>
+      <template #actions>
+        <BaseButton
+          variant="ghost"
+          @click="showDeleteConfirmation = false"
+        >
+          {{ t('checkout.card_page.cancel') }}
+        </BaseButton>
+        <BaseButton
+          variant="danger"
+          @click="handleDeleteCard()"
+        >
+          {{ t('checkout.card_page.delete') }}
+        </BaseButton>
+      </template>
+    </BaseDialog>
   </div>
 </template>

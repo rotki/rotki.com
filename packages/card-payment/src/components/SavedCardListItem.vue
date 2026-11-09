@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import SavedCardRow from '@rotki/checkout-ui/components/SavedCardRow.vue';
 
 const { card, selected = false, disabled = false } = defineProps<{
   card: SavedCard;
@@ -29,21 +30,7 @@ function handleClick(): void {
     :disabled="disabled"
     @click="handleClick()"
   >
-    <span class="rounded-md bg-rui-grey-50 h-10 w-14 flex items-center justify-center">
-      <img
-        :src="card.imageUrl"
-        alt="Card image"
-        class="w-full h-full object-contain object-center"
-      />
-    </span>
-    <span class="grow text-left flex flex-col">
-      <span class="text-rui-text">
-        •••• •••• •••• {{ card.last4 }}
-      </span>
-      <span class="text-sm text-rui-text-secondary">
-        Expires {{ card.expiresAt }}
-      </span>
-    </span>
+    <SavedCardRow :card="card" />
     <svg
       v-if="selected"
       class="w-5 h-5 text-rui-primary"

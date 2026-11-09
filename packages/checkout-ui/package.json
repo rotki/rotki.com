@@ -9,6 +9,7 @@
   ],
   "exports": {
     "./components/CheckoutAlert.vue": "./src/components/CheckoutAlert.vue",
+    "./components/CheckoutPanel.vue": "./src/components/CheckoutPanel.vue",
     "./components/CheckoutShell.vue": "./src/components/CheckoutShell.vue",
     "./components/CheckoutStepper.vue": "./src/components/CheckoutStepper.vue",
     "./components/DiscountCodeField.vue": "./src/components/DiscountCodeField.vue",
@@ -22,6 +23,7 @@
     "./components/PolicyConsent.vue": "./src/components/PolicyConsent.vue",
     "./components/PriceRows.vue": "./src/components/PriceRows.vue",
     "./components/ProcessingOverlay.vue": "./src/components/ProcessingOverlay.vue",
+    "./components/SavedCardRow.vue": "./src/components/SavedCardRow.vue",
     "./components/VatNotice.vue": "./src/components/VatNotice.vue",
     "./composables/checkout-messages": {
       "types": "./src/composables/checkout-messages.ts",

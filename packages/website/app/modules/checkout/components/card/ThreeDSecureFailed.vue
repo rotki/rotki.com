@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ThreeDSecureFailure } from '~/modules/checkout/composables/use-three-d-secure';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
 const { failure, message, retryHref } = defineProps<{
@@ -20,8 +21,8 @@ const {
 </script>
 
 <template>
-  <div
-    class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
+  <CheckoutPanel
+    as="div"
     data-cy="three-d-secure-failed"
   >
     <div
@@ -64,5 +65,5 @@ const {
         </template>
       </i18n-t>
     </p>
-  </div>
+  </CheckoutPanel>
 </template>
