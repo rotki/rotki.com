@@ -104,6 +104,45 @@ test.describe('account billing', () => {
     });
   });
 
+  test.describe('with a subscription that offers several actions', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        cards: [cardFor('4242', true)],
+        subscriptions: [subscriptionFor({ actions: ['cancel', 'upgrade'], id: 'sub-card-1', payment_method: 'card', payment_provider: 'braintree', status: 'Active' })],
+      },
+    });
+
+    test('fits them in the table without scrolling sideways', async ({ page }) => {
+      await page.setViewportSize({ height: 1000, width: 1280 });
+      await open(page, '/home/billing');
+
+      const subscriptions = section(page, 'Subscriptions');
+      const cancel = subscriptions.getByRole('button', { name: 'Cancel subscription' });
+      await expect(subscriptions.getByRole('button', { name: 'Upgrade plan' })).toBeVisible();
+      await expect(cancel).toBeVisible();
+
+      const tableBox = await page.locator('#subscriptions-table').boundingBox();
+      const cancelBox = await cancel.boundingBox();
+      expect(cancelBox!.x + cancelBox!.width).toBeLessThanOrEqual(tableBox!.x + tableBox!.width);
+    });
+  });
+
+  test.describe('with a saved card and no card payment yet', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        cards: [cardFor('1111')],
+      },
+    });
+
+    test('still lists the card, so it can be removed', async ({ page }) => {
+      await open(page, '/home/billing');
+
+      await expect(cardRow(page, '1111').getByRole('button', { name: 'Remove the card ending in 1111' })).toBeEnabled();
+    });
+  });
+
   test.describe('with a crypto subscription and a saved card', () => {
     test.use({
       backendScenario: {

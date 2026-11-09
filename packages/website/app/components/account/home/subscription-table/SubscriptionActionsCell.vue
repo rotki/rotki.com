@@ -29,7 +29,7 @@ interface Props {
   availablePlans: AvailablePlans;
   operationState: OperationState;
   cryptoPaymentState: CryptoPaymentState;
-  /** `row` keeps the actions on one line at the end, for a table cell. */
+  /** `row` lines the actions up at the end, wrapping when the table is narrow, for a table cell. */
   layout?: 'vertical' | 'horizontal' | 'row';
   /** Full outlined buttons instead of compact text links, for the plan card. */
   prominent?: boolean;
@@ -84,7 +84,7 @@ const layoutClasses = computed<string>(() => {
     return 'flex flex-wrap items-center gap-2';
   }
   if (layout === 'row') {
-    return 'flex items-center justify-end gap-2';
+    return 'flex flex-wrap items-center justify-end gap-x-2 gap-y-1';
   }
   return 'flex flex-col items-start gap-1';
 });

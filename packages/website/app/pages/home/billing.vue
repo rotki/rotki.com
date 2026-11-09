@@ -16,6 +16,7 @@ import { useSubscriptionActions } from '~/composables/subscription/use-subscript
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
+import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { useMainStore } from '~/store';
 
 usePageSeoNoIndex('Billing');
@@ -29,6 +30,10 @@ const { t } = useI18n({ useScope: 'global' });
 
 const { account, cardPaymentChecked, hasCardPayment } = storeToRefs(useMainStore());
 const { userSubscriptions } = useUserSubscriptions();
+const { cards: savedCards } = usePaymentCards();
+
+/** A card can be saved without ever paying with it, such as after a failed checkout, and has to stay removable. */
+const showCards = computed<boolean>(() => get(hasCardPayment) || get(savedCards).length > 0);
 
 const emailConfirmed = computed<boolean>(() => get(account)?.emailConfirmed ?? false);
 const {
@@ -48,7 +53,7 @@ const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some
 
 <template>
   <div class="space-y-12">
-    <SavedCards v-if="hasCardPayment" />
+    <SavedCards v-if="showCards" />
     <!-- Holds the card section's space until the store knows whether the account pays by card -->
     <div
       v-else-if="!cardPaymentChecked"
