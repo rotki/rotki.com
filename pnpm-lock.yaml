@@ -532,6 +532,9 @@ importers:
       braintree-web:
         specifier: 'catalog:'
         version: 3.147.0
+      plainfp:
+        specifier: 'catalog:'
+        version: 0.1.1(zod@4.6.7)
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@6.0.3)

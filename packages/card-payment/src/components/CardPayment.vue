@@ -24,12 +24,14 @@ const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { requir
 /** Whether the running campaign's code is the discount the breakdown confirmed. */
 const campaignApplied = defineModel<boolean>('campaignApplied', { default: false });
 
-const { planData, selectedPlan, upgradeSubId, cards, vatIdStatus, country, discount = {} } = defineProps<{
+const { planData, selectedPlan, upgradeSubId, cards, cardsFailed = false, vatIdStatus, country, discount = {} } = defineProps<{
   planData: PaymentBreakdownResponse;
   selectedPlan: SelectedPlan;
   upgradeSubId: string | null;
   /** `undefined` while the saved cards load. */
   cards?: SavedCard[];
+  /** The saved cards could not be loaded, so an empty list does not mean the buyer has none. */
+  cardsFailed?: boolean;
   vatIdStatus?: string;
   country?: string;
   discount?: {
@@ -62,6 +64,7 @@ defineSlots<{
 const t = useCheckoutMessages();
 
 const acceptedTerms = ref<boolean>(false);
+const cardsFailedDismissed = ref<boolean>(false);
 const newCardFormValid = ref<boolean>(false);
 // Shared with the website checkout: set once the buyer removes an auto-applied code.
 const autoDiscountDismissed = useSessionStorage<boolean>(AUTO_DISCOUNT_DISMISSED_KEY, false);
@@ -148,6 +151,13 @@ watch(breakdown, (newBreakdown, oldBreakdown) => {
       :message="transactionError"
       data-cy="transaction-error"
       @dismiss="setTransactionError(undefined)"
+    />
+
+    <CheckoutAlert
+      v-if="cardsFailed && !cardsFailedDismissed"
+      :message="t('checkout.card_page.cards_load_failed')"
+      data-cy="cards-load-failed"
+      @dismiss="cardsFailedDismissed = true"
     />
 
     <CardDetails

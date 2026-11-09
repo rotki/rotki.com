@@ -23,6 +23,7 @@ const {
   account,
   campaign,
   cards,
+  cardsFailed,
   errorMessage,
   fail,
   initialDiscountCode,
@@ -106,6 +107,7 @@ onMounted(async () => {
         v-model:campaign-applied="campaignApplied"
         :discount="discount"
         :cards="cards"
+        :cards-failed="cardsFailed"
         :plan-data="planData"
         :selected-plan="selectedPlan"
         :upgrade-sub-id="upgradeSubId"

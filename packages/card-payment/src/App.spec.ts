@@ -1,21 +1,24 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { AvailablePlansResponse, PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import type { ResultAsync } from 'plainfp/result-async';
 import { installCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { checkoutMessages } from '@rotki/checkout-ui/messages/en';
 import { createTranslator } from '@rotki/checkout-ui/utils/translator';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { err, ok, type Result } from 'plainfp/result';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, type App as VueApp } from 'vue';
 import App from './App.vue';
 import ChangePlanButton from './components/ChangePlanButton.vue';
+import { type ApiFailure, failed } from './utils/api-failure';
 
 const api = vi.hoisted(() => ({
   canBuyNewSubscription: vi.fn<() => Promise<{ canBuy: boolean; account?: Account }>>(),
-  checkout: vi.fn<() => Promise<PaymentBreakdownResponse | null>>(),
-  getActiveCampaign: vi.fn(async () => undefined),
-  getAvailablePlans: vi.fn<() => Promise<AvailablePlansResponse | null>>(),
-  getSavedCard: vi.fn<() => Promise<SavedCard[]>>(),
+  checkout: vi.fn<() => ResultAsync<PaymentBreakdownResponse, ApiFailure>>(),
+  getActiveCampaign: vi.fn<() => ResultAsync<undefined, ApiFailure>>(),
+  getAvailablePlans: vi.fn<() => ResultAsync<AvailablePlansResponse, ApiFailure>>(),
+  getSavedCard: vi.fn<() => ResultAsync<SavedCard[], ApiFailure>>(),
   goToSubscription: vi.fn(),
 }));
 
@@ -38,7 +41,7 @@ vi.mock('@/utils/navigation', async (importOriginal) => {
 
 const CardPayment = defineComponent({
   name: 'CardPayment',
-  props: ['cards', 'selectedCard', 'planData', 'selectedPlan', 'upgradeSubId'],
+  props: ['cards', 'cardsFailed', 'selectedCard', 'planData', 'selectedPlan', 'upgradeSubId'],
   setup(_, { slots }) {
     return () => h('section', { 'data-cy': 'card-payment' }, [slots.methods?.(), slots['plan-action']?.({ disabled: false })]);
   },
@@ -115,9 +118,10 @@ describe('app', () => {
   beforeEach(() => {
     visit('?planId=3');
     api.canBuyNewSubscription.mockResolvedValue({ canBuy: true, account });
-    api.checkout.mockResolvedValue(breakdown);
-    api.getAvailablePlans.mockResolvedValue(tiers);
-    api.getSavedCard.mockResolvedValue([other, linked]);
+    api.checkout.mockResolvedValue(ok(breakdown));
+    api.getActiveCampaign.mockResolvedValue(ok(undefined));
+    api.getAvailablePlans.mockResolvedValue(ok(tiers));
+    api.getSavedCard.mockResolvedValue(ok([other, linked]));
   });
 
   afterEach(() => {
@@ -143,27 +147,70 @@ describe('app', () => {
   });
 
   it('renders the card page before the saved cards arrive, then picks the linked card', async () => {
-    const cards = deferred<SavedCard[]>();
+    const cards = deferred<Result<SavedCard[], ApiFailure>>();
     api.getSavedCard.mockReturnValue(cards.promise);
     const wrapper = mountApp();
     await flushPromises();
 
     expect(cardProps(wrapper).cards).toBeUndefined();
 
-    cards.resolve([other, linked]);
+    cards.resolve(ok([other, linked]));
     await flushPromises();
 
     expect(cardProps(wrapper).cards).toEqual([other, linked]);
     expect(cardProps(wrapper).selectedCard).toEqual(linked);
+    expect(cardProps(wrapper).cardsFailed).toBe(false);
   });
 
-  it('treats saved cards that fail to load as none, without blocking the page', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    api.getSavedCard.mockRejectedValue(new Error('offline'));
+  it('says the saved cards failed to load, without blocking the page', async () => {
+    api.getSavedCard.mockResolvedValue(err(failed('offline')));
     const wrapper = mountApp();
     await flushPromises();
 
     expect(cardProps(wrapper).cards).toEqual([]);
+    expect(cardProps(wrapper).cardsFailed).toBe(true);
+  });
+
+  it('does not report a failure for a buyer with no saved cards', async () => {
+    api.getSavedCard.mockResolvedValue(ok([]));
+    const wrapper = mountApp();
+    await flushPromises();
+
+    expect(cardProps(wrapper).cards).toEqual([]);
+    expect(cardProps(wrapper).cardsFailed).toBe(false);
+  });
+
+  it('keeps the list when refreshing the saved cards fails', async () => {
+    const wrapper = mountApp();
+    await flushPromises();
+
+    api.getSavedCard.mockResolvedValue(err(failed('offline')));
+    wrapper.findComponent({ name: 'CardPayment' }).vm.$emit('refresh-card');
+    await flushPromises();
+
+    expect(cardProps(wrapper).cards).toEqual([other, linked]);
+    expect(cardProps(wrapper).cardsFailed).toBe(false);
+  });
+
+  it('clears the failure once a refresh loads the saved cards', async () => {
+    api.getSavedCard.mockResolvedValue(err(failed('offline')));
+    const wrapper = mountApp();
+    await flushPromises();
+
+    api.getSavedCard.mockResolvedValue(ok([linked]));
+    wrapper.findComponent({ name: 'CardPayment' }).vm.$emit('refresh-card');
+    await flushPromises();
+
+    expect(cardProps(wrapper).cards).toEqual([linked]);
+    expect(cardProps(wrapper).cardsFailed).toBe(false);
+  });
+
+  it('carries on without a campaign when reading it fails', async () => {
+    api.getActiveCampaign.mockResolvedValue(err(failed('offline')));
+    const wrapper = mountApp();
+    await flushPromises();
+
+    expect(wrapper.find('[data-cy="card-payment"]').exists()).toBe(true);
   });
 
   it('offers the other methods for a new subscription', async () => {
@@ -236,9 +283,9 @@ describe('app', () => {
   });
 
   it.each([
-    ['the breakdown is missing', (): void => { api.checkout.mockResolvedValue(null); }, 'Failed to initialize payment. Please try again.'],
-    ['the plans are missing', (): void => { api.getAvailablePlans.mockResolvedValue(null); }, 'Failed to load plan information. Please try again.'],
-    ['the plan is unknown', (): void => { api.getAvailablePlans.mockResolvedValue({ ...tiers, tiers: [] }); }, 'Invalid plan selected. Please try again.'],
+    ['the breakdown is missing', (): void => { api.checkout.mockResolvedValue(err(failed('HTTP 500'))); }, 'Failed to initialize payment. Please try again.'],
+    ['the plans are missing', (): void => { api.getAvailablePlans.mockResolvedValue(err(failed('HTTP 500'))); }, 'Failed to load plan information. Please try again.'],
+    ['the plan is unknown', (): void => { api.getAvailablePlans.mockResolvedValue(ok({ ...tiers, tiers: [] })); }, 'Invalid plan selected. Please try again.'],
   ])('shows an error when %s', async (_, arrange, message) => {
     arrange();
     const wrapper = mountApp();

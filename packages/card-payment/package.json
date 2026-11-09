@@ -23,6 +23,7 @@
     "@vueuse/core": "catalog:",
     "@vueuse/shared": "catalog:",
     "braintree-web": "catalog:",
+    "plainfp": "catalog:",
     "vue": "catalog:",
     "zod": "catalog:"
   },

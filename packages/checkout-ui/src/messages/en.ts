@@ -30,6 +30,7 @@ export const checkoutMessages: MessageTree = {
       card_linked: 'This card pays your subscription, so it cannot be deleted',
       card_expired: 'This card has expired',
       card_expired_hint: 'Please delete the expired card and add a new one',
+      cards_load_failed: 'We couldn\'t load your saved cards. You can pay with a new card, or reload the page to try again.',
       checking_account: 'Checking authentication...',
       delete: 'Delete',
       delete_card: 'Delete card',

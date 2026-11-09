@@ -1,8 +1,10 @@
 import type { PaymentBreakdownResponse, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { flushPromises } from '@vue/test-utils';
+import { err, ok, type Result } from 'plainfp/result';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { effectScope, ref } from 'vue';
 import { getPaymentBreakdown } from '@/utils/api';
+import { type ApiFailure, failed } from '@/utils/api-failure';
 import { usePaymentBreakdown } from './payment-breakdown';
 
 vi.mock('@/utils/api', () => ({
@@ -38,7 +40,7 @@ describe('composables/payment-breakdown', () => {
   });
 
   it('fetches the breakdown for the plan and code right away', async () => {
-    vi.mocked(getPaymentBreakdown).mockResolvedValue(breakdownFor('25.00'));
+    vi.mocked(getPaymentBreakdown).mockResolvedValue(ok(breakdownFor('25.00')));
 
     const { result } = setup(ref<string>('SUMMER'));
     expect(result.loading.value).toBe(true);
@@ -50,7 +52,7 @@ describe('composables/payment-breakdown', () => {
   });
 
   it('fetches again when the code changes, without one when it is cleared', async () => {
-    vi.mocked(getPaymentBreakdown).mockResolvedValue(breakdownFor('25.00'));
+    vi.mocked(getPaymentBreakdown).mockResolvedValue(ok(breakdownFor('25.00')));
     const { code } = setup(ref<string>('SUMMER'));
     await flushPromises();
 
@@ -61,7 +63,7 @@ describe('composables/payment-breakdown', () => {
   });
 
   it('keeps the newest breakdown when an older request resolves last', async () => {
-    const pending: ((value: PaymentBreakdownResponse) => void)[] = [];
+    const pending: ((value: Result<PaymentBreakdownResponse, ApiFailure>) => void)[] = [];
     vi.mocked(getPaymentBreakdown).mockImplementation(async () => new Promise((resolve) => {
       pending.push(resolve);
     }));
@@ -71,9 +73,9 @@ describe('composables/payment-breakdown', () => {
     await flushPromises();
     expect(pending).toHaveLength(2);
 
-    pending[1]?.(breakdownFor('20.00'));
+    pending[1]?.(ok(breakdownFor('20.00')));
     await flushPromises();
-    pending[0]?.(breakdownFor('25.00'));
+    pending[0]?.(ok(breakdownFor('25.00')));
     await flushPromises();
 
     expect(result.breakdown.value?.finalAmount).toBe('20.00');
@@ -90,7 +92,7 @@ describe('composables/payment-breakdown', () => {
   });
 
   it('asks for its own breakdown when the page starts with a code', async () => {
-    vi.mocked(getPaymentBreakdown).mockResolvedValue(breakdownFor('22.50'));
+    vi.mocked(getPaymentBreakdown).mockResolvedValue(ok(breakdownFor('22.50')));
 
     const { result } = setup(ref<string>('FRIEND'), breakdownFor('25.00'));
     expect(result.breakdown.value).toBeUndefined();
@@ -100,15 +102,15 @@ describe('composables/payment-breakdown', () => {
     expect(result.breakdown.value?.finalAmount).toBe('22.50');
   });
 
-  it('keeps the last breakdown when a request fails', async () => {
-    vi.mocked(getPaymentBreakdown).mockResolvedValueOnce(breakdownFor('25.00')).mockRejectedValueOnce(new Error('offline'));
+  it('drops the breakdown when a request fails, as it may price another plan', async () => {
+    vi.mocked(getPaymentBreakdown).mockResolvedValueOnce(ok(breakdownFor('25.00'))).mockResolvedValueOnce(err(failed('offline')));
     const { result, code } = setup();
     await flushPromises();
 
     code.value = 'SUMMER';
     await flushPromises();
 
-    expect(result.breakdown.value?.finalAmount).toBe('25.00');
+    expect(result.breakdown.value).toBeUndefined();
     expect(result.loading.value).toBe(false);
   });
 });

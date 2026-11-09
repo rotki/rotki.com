@@ -34,23 +34,18 @@ export function usePaymentBreakdown(
   async function load(): Promise<void> {
     const requestId = ++latestRequest;
     set(loading, true);
-    try {
-      const code = toValue(discountCode);
-      const response = await getPaymentBreakdown({
-        newPlanId: toValue(plan).planId,
-        isCryptoPayment: false,
-        ...(code ? { discountCode: code } : {}),
-      });
-      if (requestId === latestRequest)
-        set(breakdown, response ?? undefined);
-    }
-    catch (error) {
-      console.error('Failed to fetch payment breakdown:', error);
-    }
-    finally {
-      if (requestId === latestRequest)
-        set(loading, false);
-    }
+    const code = toValue(discountCode);
+    const response = await getPaymentBreakdown({
+      newPlanId: toValue(plan).planId,
+      isCryptoPayment: false,
+      ...(code ? { discountCode: code } : {}),
+    });
+    if (requestId !== latestRequest)
+      return;
+
+    // A failure drops the breakdown: the previous one may price another plan.
+    set(breakdown, response.ok ? response.value : undefined);
+    set(loading, false);
   }
 
   watch(() => toValue(plan).planId, async () => {

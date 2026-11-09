@@ -1,8 +1,10 @@
 import type { Account } from '@rotki/card-payment-common/schemas/account';
+import { getOr } from 'plainfp/result';
 import { getAccount } from '@/utils/api';
 
+/** Whether the visitor can start a subscription. A failed account check counts as not signed in. */
 export async function canBuyNewSubscription(): Promise<{ canBuy: boolean; account?: Account }> {
-  const account = await getAccount();
+  const account = getOr(await getAccount(), undefined);
 
   if (!account) {
     console.warn('User not authenticated, redirecting to subscription page');

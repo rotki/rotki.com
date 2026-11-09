@@ -1,3 +1,4 @@
+import type { ResultAsync } from 'plainfp/result-async';
 import {
   type AddCardPayload,
   type CreateCardNoncePayload,
@@ -10,11 +11,13 @@ import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { checkoutMessages } from '@rotki/checkout-ui/messages/en';
 import { addCardErrorMessage, isCardAddedFailure } from '@rotki/checkout-ui/utils/add-card-error';
 import { createTranslator } from '@rotki/checkout-ui/utils/translator';
-import { type CardType, type CheckoutStep, logPaymentFailure, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, PaymentUserError, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { type CardType, type CheckoutStep, logPaymentFailure, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { err, map, ok } from 'plainfp/result';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
 import { paymentMessageFor } from '@/utils/payment-error';
 import { fetchWithCSRF } from './api';
+import { type ApiFailure, attempt, failed, userFacing } from './api-failure';
 import { readResponse } from './read-response';
 
 interface CardSubmittedInput {
@@ -41,22 +44,9 @@ const BackendErrorSchema = z.object({
   message: z.string(),
 });
 
-const INVALID_RESPONSE_MESSAGE = 'Invalid response format from server';
-
 const t = createTranslator(checkoutMessages);
 
 type BackendError = z.infer<typeof BackendErrorSchema>;
-
-/**
- * The backend vaulted the card before the add failed, so callers must refresh
- * their saved cards. Customer copy, hence `PaymentUserError`.
- */
-export class CardAddedPaymentError extends PaymentUserError {
-  constructor(message: string, options?: ErrorOptions & { logDetail?: string }) {
-    super(message, options);
-    this.name = 'CardAddedPaymentError';
-  }
-}
 
 export function trackCardPaymentSubmitted({ planId, durationInMonths, isUpgrade, cardType, discountApplied }: CardSubmittedInput): void {
   sigilTrack(SigilEvents.PAYMENT_SUBMITTED, toSnakeCaseKeys({
@@ -114,18 +104,6 @@ export function reportCardFailure(
   return paymentMessageFor(parsed);
 }
 
-/**
- * The caught error's `message`, or `fallback` when it has no string message or
- * the message is empty (an empty message must still fall back).
- */
-function caughtMessageOr(error: unknown, fallback: string): string {
-  if (typeof error !== 'object' || error === null || !('message' in error))
-    return fallback;
-
-  const { message } = error;
-  return typeof message === 'string' && message !== '' ? message : fallback;
-}
-
 function extractBackendError(errorText: string): BackendError {
   try {
     const parsed: unknown = JSON.parse(errorText);
@@ -137,106 +115,73 @@ function extractBackendError(errorText: string): BackendError {
   return { message: errorText };
 }
 
-export async function addCard(payload: AddCardPayload): Promise<string> {
-  try {
+async function backendFailure(response: Response): Promise<ApiFailure> {
+  return failed(extractBackendError(await response.text()).message);
+}
+
+/** Only copy written for the buyer can reach the screen; anything else is an HTTP dump and stays opaque. */
+async function addCardFailure(response: Response): Promise<ApiFailure> {
+  const { code, message: backendMessage } = extractBackendError(await response.text());
+  const failure = { code, message: backendMessage, status: response.status };
+  const message = addCardErrorMessage(t, failure);
+
+  return message
+    ? userFacing(message, backendMessage, isCardAddedFailure(failure))
+    : failed(`HTTP ${response.status}: ${backendMessage}`);
+}
+
+export async function addCard(payload: AddCardPayload): ResultAsync<string, ApiFailure> {
+  return attempt('Failed to add card', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/payment/btr/cards/`, {
       body: JSON.stringify(convertKeys(payload, false, false)),
       method: 'POST',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      const { code, message: backendMessage } = extractBackendError(errorText);
-      const failure = { code, message: backendMessage, status: response.status };
-      const message = addCardErrorMessage(t, failure);
+    if (!response.ok)
+      return err(await addCardFailure(response));
 
-      /* It comes after Braintree has vaulted the card, so it gets its own error for callers
-         that need to refresh their cards. */
-      if (message && isCardAddedFailure(failure))
-        throw new CardAddedPaymentError(message, { logDetail: backendMessage });
-
-      /* Only customer-facing errors use PaymentUserError, which is what lets them reach the
-         screen; anything else is an HTTP dump and stays opaque. */
-      if (message)
-        throw new PaymentUserError(message, { logDetail: backendMessage });
-
-      throw new Error(`HTTP ${response.status}: ${backendMessage}`);
-    }
-
-    const card = await readResponse(response, SavedCardSchema, 'SavedCard response');
-    if (!card)
-      throw new Error(INVALID_RESPONSE_MESSAGE);
-    return card.token;
-  }
-  catch (error: unknown) {
-    console.error('Failed to add card:', error);
-    // Rethrow as-is: re-wrapping would strip the PaymentUserError marker and subclass.
-    throw error instanceof PaymentUserError
-      ? error
-      : new Error(error instanceof Error ? error.message : 'Failed to add card');
-  }
+    return map(await readResponse(response, SavedCardSchema, 'SavedCard response'), card => card.token);
+  });
 }
 
-export async function createCardNonce(payload: CreateCardNoncePayload): Promise<string> {
-  try {
+export async function createCardNonce(payload: CreateCardNoncePayload): ResultAsync<string, ApiFailure> {
+  return attempt('Failed to create card nonce', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/payment/btr/cards/nonce/`, {
       body: JSON.stringify(convertKeys(payload, false, false)),
       method: 'POST',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(extractBackendError(errorText).message);
-    }
+    if (!response.ok)
+      return err(await backendFailure(response));
 
-    const parsed = await readResponse(response, CreateCardNonceResponseSchema, 'CreateCardNonce response');
-    if (!parsed)
-      throw new Error(INVALID_RESPONSE_MESSAGE);
-    return parsed.paymentNonce;
-  }
-  catch (error: any) {
-    console.error('Failed to create card nonce:', error);
-    throw new Error(caughtMessageOr(error, 'Failed to create card nonce'));
-  }
+    return map(await readResponse(response, CreateCardNonceResponseSchema, 'CreateCardNonce response'), parsed => parsed.paymentNonce);
+  });
 }
 
-export async function deleteCard(token: string): Promise<void> {
-  try {
+export async function deleteCard(token: string): ResultAsync<undefined, ApiFailure> {
+  return attempt('Failed to delete card', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/payment/btr/cards/`, {
       body: JSON.stringify({ payment_token: token }),
       method: 'DELETE',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(extractBackendError(errorText).message);
-    }
-  }
-  catch (error: any) {
-    console.error('Failed to delete card:', error);
-    throw new Error(caughtMessageOr(error, 'Failed to delete card'));
-  }
+    return response.ok ? ok(undefined) : err(await backendFailure(response));
+  });
 }
 
-export async function getSavedCard(): Promise<SavedCard[]> {
-  try {
+/** The saved cards. A 404 means there are none, which is different from failing to load them. */
+export async function getSavedCard(): ResultAsync<SavedCard[], ApiFailure> {
+  return attempt('Failed to get saved card', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/payment/btr/cards/`, {
       method: 'GET',
     });
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        return [];
-      }
-      const errorText = await response.text();
-      throw new Error(extractBackendError(errorText).message);
-    }
+    if (response.status === 404)
+      return ok([]);
 
-    const parsed = await readResponse(response, SavedCardResponseSchema, 'SavedCardResponse');
-    return parsed?.cards ?? [];
-  }
-  catch (error: any) {
-    console.error('Failed to get saved card:', error);
-    return [];
-  }
+    if (!response.ok)
+      return err(await backendFailure(response));
+
+    return map(await readResponse(response, SavedCardResponseSchema, 'SavedCardResponse'), parsed => parsed.cards);
+  });
 }

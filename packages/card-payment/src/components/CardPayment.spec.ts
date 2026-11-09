@@ -78,6 +78,17 @@ describe('components/CardPayment', () => {
     expect(wrapper.get('[data-cy="summary-toggle"]').text()).toContain('25.00 €');
   });
 
+  it('says when the saved cards failed to load, until the buyer dismisses it', async () => {
+    expect(mountPage({ cards: [] }).find('[data-cy="cards-load-failed"]').exists()).toBe(false);
+
+    const wrapper = mountPage({ cards: [], cardsFailed: true });
+    const notice = wrapper.get('[data-cy="cards-load-failed"]');
+    expect(notice.text()).toContain('We couldn\'t load your saved cards.');
+
+    await notice.get('button').trigger('click');
+    expect(wrapper.find('[data-cy="cards-load-failed"]').exists()).toBe(false);
+  });
+
   it('names the amount on the pay button, and an upgrade as such', () => {
     expect(mountPage().get('[data-cy="pay"]').text()).toBe('Subscribe and pay 25.00 €');
     expect(mountPage({ upgradeSubId: 'sub-1' }).get('[data-cy="pay"]').text()).toBe('Upgrade and pay 25.00 €');

@@ -5,7 +5,8 @@ import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
 import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { get, set } from '@vueuse/core';
 import { ref, useTemplateRef, watch } from 'vue';
-import { addCard, CardAddedPaymentError } from '@/utils/card-api';
+import { isCardAdded, toPaymentError } from '@/utils/api-failure';
+import { addCard } from '@/utils/card-api';
 import { cardFieldsFor } from '@/utils/hosted-fields';
 import { userPaymentMessage } from '@/utils/payment-error';
 import BaseButton from './BaseButton.vue';
@@ -46,17 +47,22 @@ async function handleAddCard(): Promise<void> {
     }
 
     const { nonce } = await form.tokenize();
-    const newCardToken = await addCard({
+    const added = await addCard({
       paymentMethodNonce: nonce,
     });
 
-    emit('card-added', newCardToken);
+    if (!added.ok) {
+      if (isCardAdded(added.error)) {
+        emit('refresh-card');
+      }
+      set(addCardError, userPaymentMessage(toPaymentError(added.error), 'card'));
+      return;
+    }
+
+    emit('card-added', added.value);
     set(open, false);
   }
   catch (caughtError: unknown) {
-    if (caughtError instanceof CardAddedPaymentError) {
-      emit('refresh-card');
-    }
     set(addCardError, userPaymentMessage(caughtError, 'card'));
   }
   finally {

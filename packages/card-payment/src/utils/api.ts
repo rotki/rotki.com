@@ -1,3 +1,4 @@
+import type { ResultAsync } from 'plainfp/result-async';
 import { type Account, AccountResponseSchema } from '@rotki/card-payment-common/schemas/account';
 import { type ActiveCampaign, ActiveCampaignSchema } from '@rotki/card-payment-common/schemas/campaign';
 import {
@@ -8,8 +9,10 @@ import {
   PaymentBreakdownResponseSchema,
 } from '@rotki/card-payment-common/schemas/plans';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { err, map, ok } from 'plainfp/result';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
+import { type ApiFailure, attempt, failed } from './api-failure';
 import { readResponse } from './read-response';
 
 /** The CSRF token from the `csrftoken` cookie the rotki.com backend sets. */
@@ -67,89 +70,56 @@ export async function fetchWithCSRF(url: string, options: RequestInit = {}): Pro
   });
 }
 
-export async function getAccount(): Promise<Account | undefined> {
-  try {
+/** {@link readResponse} for a response that may have an error status, which is a failure. */
+async function readOkResponse<T>(response: Response, schema: z.ZodType<T>, label: string): ResultAsync<T, ApiFailure> {
+  return response.ok ? readResponse(response, schema, label) : err(failed(`HTTP ${response.status}`));
+}
+
+/** The signed-in account. No account is an answer, for a visitor who is not signed in; only a failed check is a failure. */
+export async function getAccount(): ResultAsync<Account | undefined, ApiFailure> {
+  return attempt('Failed to get account', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/account/`, {
       method: 'GET',
     });
 
-    if (!response.ok) {
-      if (response.status !== 401) {
-        console.error('Failed to fetch account:', response.status);
-      }
-      return undefined;
-    }
+    if (response.status === 401)
+      return ok(undefined);
 
-    const parsed = await readResponse(response, AccountResponseSchema, 'Account response');
-    return parsed?.result ?? undefined;
-  }
-  catch (error: any) {
-    console.error('Failed to get account:', error);
-    return undefined;
-  }
+    return map(await readOkResponse(response, AccountResponseSchema, 'Account response'), ({ result }) => result ?? undefined);
+  });
 }
 
 const AppConfigSchema = z.object({
   activeCampaign: ActiveCampaignSchema.nullish(),
 });
 
-/** Fetches the running sitewide campaign; any failure counts as no campaign so checkout still works. */
-export async function getActiveCampaign(): Promise<ActiveCampaign | undefined> {
-  try {
+/** The running sitewide campaign, if any. */
+export async function getActiveCampaign(): ResultAsync<ActiveCampaign | undefined, ApiFailure> {
+  return attempt('Failed to fetch app config', async () => {
     const response = await fetch(`${paths.hostUrlBase}/api/config`);
-    if (!response.ok) {
-      console.error('Failed to fetch app config:', response.status);
-      return undefined;
-    }
-
-    const parsed = await readResponse(response, AppConfigSchema, 'app config');
-    return parsed?.activeCampaign ?? undefined;
-  }
-  catch (error: any) {
-    console.error('Failed to fetch app config:', error);
-    return undefined;
-  }
+    return map(await readOkResponse(response, AppConfigSchema, 'app config'), ({ activeCampaign }) => activeCampaign ?? undefined);
+  });
 }
 
-export async function getPaymentBreakdown(params: PaymentBreakdownRequest): Promise<PaymentBreakdownResponse | null> {
-  try {
+export async function getPaymentBreakdown(params: PaymentBreakdownRequest): ResultAsync<PaymentBreakdownResponse, ApiFailure> {
+  return attempt('Failed to fetch payment breakdown', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/payment/breakdown`, {
       method: 'POST',
       body: JSON.stringify(convertKeys(params, false, false)),
     });
-
-    if (!response.ok) {
-      console.error('Failed to fetch payment breakdown:', response.status);
-      return null;
-    }
-
-    return await readResponse(response, PaymentBreakdownResponseSchema, 'PaymentBreakdownResponse') ?? null;
-  }
-  catch (error: any) {
-    console.error('Failed to fetch payment breakdown:', error);
-    return null;
-  }
+    return readOkResponse(response, PaymentBreakdownResponseSchema, 'PaymentBreakdownResponse');
+  });
 }
 
-export async function checkout(planId: number): Promise<PaymentBreakdownResponse | null> {
+export async function checkout(planId: number): ResultAsync<PaymentBreakdownResponse, ApiFailure> {
   return getPaymentBreakdown({ newPlanId: planId, isCryptoPayment: false });
 }
 
-export async function getAvailablePlans(): Promise<AvailablePlansResponse | null> {
-  try {
+export async function getAvailablePlans(): ResultAsync<AvailablePlansResponse, ApiFailure> {
+  return attempt('Failed to get available plans', async () => {
     const response = await fetchWithCSRF(`${paths.hostUrlBase}/webapi/2/available-tiers`, {
       method: 'GET',
     });
-
-    if (!response.ok) {
-      console.error('Failed to fetch available plans:', response.status);
-      return null;
-    }
-
-    return await readResponse(response, AvailablePlansResponseSchema, 'AvailablePlansResponse') ?? null;
-  }
-  catch (error: any) {
-    console.error('Failed to get available plans:', error);
-    return null;
-  }
+    return readOkResponse(response, AvailablePlansResponseSchema, 'AvailablePlansResponse');
+  });
 }

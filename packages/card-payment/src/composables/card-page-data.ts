@@ -7,6 +7,7 @@ import { AUTO_DISCOUNT_DISMISSED_KEY, resolveDiscountCode } from '@rotki/card-pa
 import { findSelectedPlan, parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { useCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
 import { get, set } from '@vueuse/core';
+import { getOr } from 'plainfp/result';
 import { computed, type ComputedRef, type Ref, shallowReadonly, shallowRef } from 'vue';
 import { checkout, getActiveCampaign, getAvailablePlans } from '@/utils/api';
 import { getSavedCard } from '@/utils/card-api';
@@ -26,6 +27,8 @@ export interface UseCardPageDataReturn {
   plans: Readonly<Ref<AvailablePlan[]>>;
   /** `undefined` until the saved cards arrive; the page renders without waiting for them. */
   cards: Readonly<Ref<SavedCard[] | undefined>>;
+  /** The saved cards could not be loaded, which is different from having none. */
+  cardsFailed: Readonly<Ref<boolean>>;
   account: Readonly<Ref<Account | undefined>>;
   campaign: Readonly<Ref<ActiveCampaign | undefined>>;
   /** The code the discount field starts with: explicit, then referral, then campaign. */
@@ -78,6 +81,7 @@ export function useCardPageData(): UseCardPageDataReturn {
   const selectedPlan = shallowRef<SelectedPlan>();
   const plans = shallowRef<AvailablePlan[]>([]);
   const cards = shallowRef<SavedCard[]>();
+  const cardsFailed = shallowRef<boolean>(false);
   const account = shallowRef<Account>();
   const campaign = shallowRef<ActiveCampaign>();
   const initialDiscountCode = shallowRef<string>('');
@@ -92,37 +96,45 @@ export function useCardPageData(): UseCardPageDataReturn {
       getAvailablePlans(),
       getActiveCampaign(),
     ]);
-    set(campaign, activeCampaign);
-    set(initialDiscountCode, resolveInitialDiscountCode(activeCampaign));
+    // Checkout works without a campaign, so failing to read one counts as none running.
+    const runningCampaign = getOr(activeCampaign, undefined);
+    set(campaign, runningCampaign);
+    set(initialDiscountCode, resolveInitialDiscountCode(runningCampaign));
 
-    if (!checkoutData)
+    if (!checkoutData.ok)
       return t('checkout.card_page.error_init');
-    if (!availablePlansData)
+    if (!availablePlansData.ok)
       return t('checkout.card_page.error_plans');
-    const foundPlan = findSelectedPlan(availablePlansData.tiers, planId);
+    const foundPlan = findSelectedPlan(availablePlansData.value.tiers, planId);
     if (!foundPlan)
       return t('checkout.card_page.error_invalid_plan');
 
-    set(planData, checkoutData);
+    set(planData, checkoutData.value);
     set(selectedPlan, foundPlan);
-    set(plans, availablePlansData.tiers);
+    set(plans, availablePlansData.value.tiers);
     return undefined;
   }
 
   /** Stores the saved cards and picks the linked one, or the first. */
   function applyCards(savedCards: SavedCard[]): void {
+    set(cardsFailed, false);
     set(cards, savedCards);
     set(modelSelectedCard, savedCards.find(card => card.linked) ?? savedCards[0]);
   }
 
-  /** Saved cards come from Braintree through the backend and are the slowest call, so they load on their own. */
-  function loadCards(): void {
-    getSavedCard()
-      .then(applyCards)
-      .catch((error: unknown) => {
-        console.error('Error loading saved cards:', error);
-        set(cards, []);
-      });
+  /**
+   * Saved cards come from Braintree through the backend and are the slowest call, so they load on
+   * their own. The buyer can still pay with a new card when they fail, so the page carries on.
+   */
+  async function loadCards(): Promise<void> {
+    const savedCards = await getSavedCard();
+    if (savedCards.ok) {
+      applyCards(savedCards.value);
+    }
+    else {
+      set(cardsFailed, true);
+      set(cards, []);
+    }
   }
 
   async function load(): Promise<void> {
@@ -139,7 +151,7 @@ export function useCardPageData(): UseCardPageDataReturn {
         console.error('Failed to load payment data:', error);
         return t('checkout.card_page.error_generic');
       });
-      loadCards();
+      loadCards().catch((error: unknown) => console.error('Error loading saved cards:', error));
 
       set(loadingMessage, t('checkout.card_page.checking_account'));
       const { canBuy, account: currentAccount } = await canBuyNewSubscription();
@@ -167,13 +179,11 @@ export function useCardPageData(): UseCardPageDataReturn {
     }
   }
 
+  /** A failed refresh keeps the list the buyer already has. */
   async function refreshCards(): Promise<void> {
-    try {
-      applyCards(await getSavedCard());
-    }
-    catch (error) {
-      console.error('Error refreshing card:', error);
-    }
+    const savedCards = await getSavedCard();
+    if (savedCards.ok)
+      applyCards(savedCards.value);
   }
 
   function switchPlan(plan: SelectedPlan): void {
@@ -189,6 +199,7 @@ export function useCardPageData(): UseCardPageDataReturn {
     account: shallowReadonly(account),
     campaign: shallowReadonly(campaign),
     cards: shallowReadonly(cards),
+    cardsFailed: shallowReadonly(cardsFailed),
     errorMessage: shallowReadonly(errorMessage),
     fail,
     initialDiscountCode: shallowReadonly(initialDiscountCode),

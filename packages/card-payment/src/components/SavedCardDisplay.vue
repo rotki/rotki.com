@@ -36,16 +36,13 @@ async function handleDeleteCard(): Promise<void> {
   set(showDeleteConfirmation, false);
   set(deletingCard, true);
 
-  try {
-    await deleteCard(card.token);
+  const deleted = await deleteCard(card.token);
+  set(deletingCard, false);
+
+  if (deleted.ok)
     emit('card-deleted');
-  }
-  catch (error: any) {
-    emit('error', error.message || t('checkout.card_page.delete_failed'));
-  }
-  finally {
-    set(deletingCard, false);
-  }
+  else
+    emit('error', deleted.error.message || t('checkout.card_page.delete_failed'));
 }
 </script>
 

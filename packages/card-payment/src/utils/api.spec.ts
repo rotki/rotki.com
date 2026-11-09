@@ -1,5 +1,7 @@
+import { err, ok } from 'plainfp/result';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchCSRFToken, getAccount, getActiveCampaign, getAvailablePlans, getPaymentBreakdown } from './api';
+import { failed } from './api-failure';
 
 function clearCookie(): void {
   document.cookie = 'csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
@@ -78,41 +80,59 @@ describe('utils/api requests', () => {
   it('asks for the breakdown in snake case with the CSRF token, and reads it in camel case', async () => {
     const fetch = respondWith(200, breakdown);
 
-    await expect(getPaymentBreakdown({ newPlanId: 3, isCryptoPayment: false, discountCode: 'SUMMER' })).resolves.toMatchObject({ braintreeClientToken: 'client-token', finalAmount: '25.00' });
+    await expect(getPaymentBreakdown({ newPlanId: 3, isCryptoPayment: false, discountCode: 'SUMMER' })).resolves.toMatchObject({ ok: true, value: { braintreeClientToken: 'client-token', finalAmount: '25.00' } });
     const [, init] = fetch.mock.calls[0] ?? [];
     expect(JSON.parse(String(init?.body))).toEqual({ new_plan_id: 3, is_crypto_payment: false, discount_code: 'SUMMER' });
     expect(new Headers(init?.headers).get('X-CSRFToken')).toBe('from-site');
   });
 
   it.each([
-    ['an error status', 500, breakdown],
-    ['an unknown shape', 200, { final_amount: 25 }],
-  ])('has no breakdown for %s', async (_, status, body) => {
+    ['an error status', 500, breakdown, 'HTTP 500'],
+    ['an unknown shape', 200, { final_amount: 25 }, 'Invalid response format from server'],
+  ])('fails to get the breakdown for %s', async (_, status, body, message) => {
     respondWith(status, body);
 
-    await expect(getPaymentBreakdown({ newPlanId: 3, isCryptoPayment: false })).resolves.toBeNull();
+    await expect(getPaymentBreakdown({ newPlanId: 3, isCryptoPayment: false })).resolves.toEqual(err(failed(message)));
   });
 
-  it('reads the available plans, and none on an error', async () => {
+  it('fails when the network does', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new TypeError('Failed to fetch');
+    }));
+    document.cookie = 'csrftoken=from-site';
+
+    await expect(getPaymentBreakdown({ newPlanId: 3, isCryptoPayment: false })).resolves.toEqual(err(failed('Failed to fetch')));
+  });
+
+  it('reads the available plans, and fails on an error', async () => {
     respondWith(200, { settings: { country: 'DE', is_authenticated: true }, tiers: [{ tier_name: 'basic', monthly_plan: { plan_id: 3, price: '25.00' }, yearly_plan: { plan_id: 4, price: '250.00' } }] });
-    await expect(getAvailablePlans()).resolves.toMatchObject({ tiers: [{ tierName: 'basic' }] });
+    await expect(getAvailablePlans()).resolves.toMatchObject({ ok: true, value: { tiers: [{ tierName: 'basic' }] } });
 
     respondWith(503, {});
-    await expect(getAvailablePlans()).resolves.toBeNull();
+    await expect(getAvailablePlans()).resolves.toEqual(err(failed('HTTP 503')));
   });
 
-  it('has no account for a visitor who is not signed in', async () => {
+  it('has no account for a visitor who is not signed in, which is not a failure', async () => {
     respondWith(401, { message: 'Unauthorized' });
 
-    await expect(getAccount()).resolves.toBeUndefined();
+    await expect(getAccount()).resolves.toEqual(ok(undefined));
     expect(console.error).not.toHaveBeenCalled();
   });
 
-  it('reads the running campaign, and treats a failure as none', async () => {
+  it('fails when the account cannot be checked', async () => {
+    respondWith(500, {});
+
+    await expect(getAccount()).resolves.toEqual(err(failed('HTTP 500')));
+  });
+
+  it('reads the running campaign, and tells none running from a failure', async () => {
     respondWith(200, { active_campaign: { code: 'AUTUMN', percent: 20 } });
-    await expect(getActiveCampaign()).resolves.toEqual({ code: 'AUTUMN', percent: 20 });
+    await expect(getActiveCampaign()).resolves.toEqual(ok({ code: 'AUTUMN', percent: 20 }));
+
+    respondWith(200, {});
+    await expect(getActiveCampaign()).resolves.toEqual(ok(undefined));
 
     respondWith(500, {});
-    await expect(getActiveCampaign()).resolves.toBeUndefined();
+    await expect(getActiveCampaign()).resolves.toEqual(err(failed('HTTP 500')));
   });
 });
