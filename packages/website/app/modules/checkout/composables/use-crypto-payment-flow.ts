@@ -24,6 +24,19 @@ export interface CryptoPaymentResult {
   alreadyStarted?: boolean;
 }
 
+type CryptoPaymentApi = ReturnType<typeof useCryptoPaymentApi>;
+
+interface PaymentRequest {
+  regular: CryptoPaymentApi['cryptoPayment'];
+  upgrade: CryptoPaymentApi['upgradeCryptoSubscription'];
+  /** Logged when a call throws instead of returning a failure. */
+  failureLog: string;
+  /** Runs once the backend answered, whatever the answer. */
+  onAnswer?: () => void;
+  /** Reports a payment whose transaction already started as done, rather than keeping it. */
+  detectStarted?: boolean;
+}
+
 interface UseCryptoPaymentFlowReturn {
   // State
   paymentData: DeepReadonly<Ref<CryptoPayment | undefined>>;
@@ -55,7 +68,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
     set(loading, false);
   }
 
-  async function createPayment(params: CryptoPaymentParams): Promise<CryptoPaymentResult> {
+  async function requestPayment(params: CryptoPaymentParams, request: PaymentRequest): Promise<CryptoPaymentResult> {
     const { planId, currency, discountCode, subscriptionId, upgradeSubId } = params;
 
     set(loading, true);
@@ -68,10 +81,10 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
       };
 
       const result = upgradeSubId
-        ? await api.upgradeCryptoSubscription({ ...apiParams, subscriptionId: upgradeSubId })
-        : await api.cryptoPayment({ ...apiParams, subscriptionId });
+        ? await request.upgrade({ ...apiParams, subscriptionId: upgradeSubId })
+        : await request.regular({ ...apiParams, subscriptionId });
 
-      requestRefresh();
+      request.onAnswer?.();
 
       if (!result.ok) {
         return {
@@ -81,8 +94,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
         };
       }
 
-      // Check if transaction already started (existing pending payment)
-      if (result.value.transactionStarted) {
+      if (request.detectStarted && result.value.transactionStarted) {
         return {
           success: true,
           alreadyStarted: true,
@@ -96,7 +108,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
       };
     }
     catch (error: any) {
-      logger.error('Failed to create crypto payment:', error);
+      logger.error(request.failureLog, error);
       return {
         success: false,
         error: error.message,
@@ -107,45 +119,22 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
     }
   }
 
+  async function createPayment(params: CryptoPaymentParams): Promise<CryptoPaymentResult> {
+    return requestPayment(params, {
+      regular: api.cryptoPayment,
+      upgrade: api.upgradeCryptoSubscription,
+      failureLog: 'Failed to create crypto payment:',
+      onAnswer: requestRefresh,
+      detectStarted: true,
+    });
+  }
+
   async function switchPlan(params: CryptoPaymentParams): Promise<CryptoPaymentResult> {
-    const { planId, currency, discountCode, subscriptionId, upgradeSubId } = params;
-
-    set(loading, true);
-
-    try {
-      const apiParams = {
-        planId,
-        cryptocurrencyIdentifier: currency,
-        discountCode: nonEmpty(discountCode),
-      };
-
-      const result = upgradeSubId
-        ? await api.switchCryptoUpgradePlan({ ...apiParams, subscriptionId: upgradeSubId })
-        : await api.switchCryptoPlan({ ...apiParams, subscriptionId });
-
-      if (!result.ok) {
-        return {
-          success: false,
-          error: paymentFailureMessage(result.error),
-        };
-      }
-
-      set(paymentData, result.value);
-      return {
-        success: true,
-        data: result.value,
-      };
-    }
-    catch (error: any) {
-      logger.error('Failed to switch plan:', error);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-    finally {
-      set(loading, false);
-    }
+    return requestPayment(params, {
+      regular: api.switchCryptoPlan,
+      upgrade: api.switchCryptoUpgradePlan,
+      failureLog: 'Failed to switch plan:',
+    });
   }
 
   async function cancelPayment(upgradeSubId?: string): Promise<{ success: boolean; error?: string }> {
