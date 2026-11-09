@@ -8,6 +8,7 @@ import CryptoPaymentActions from '~/modules/checkout/components/crypto/CryptoPay
 import CryptoSendPage from '~/modules/checkout/components/crypto/CryptoSendPage.vue';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-payment-flow';
+import { paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 import { buildPaymentReceipt, storePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 
 const { t } = useI18n({ useScope: 'global' });
@@ -75,15 +76,16 @@ async function initialize(): Promise<boolean> {
 
   setLoading(false);
 
-  if (!result.success) {
-    const errorMsg = result.isUnverified
+  if (!result.ok) {
+    const errorMsg = result.error._tag === 'Unverified'
       ? t('subscription.error.unverified_email')
-      : result.error || t('subscription.error.payment_failure');
+      : paymentFailureMessage(result.error);
     setError(t('subscription.error.payment_failure'), errorMsg, CheckoutPaymentMethods.CRYPTO);
     return false;
   }
 
-  if (result.alreadyStarted) {
+  // An existing payment already on its way has nothing left to send here.
+  if (result.value.transactionStarted) {
     storePaymentReceipt(buildPaymentReceipt('crypto', plan, get(breakdown), !!get(upgradeSubId)));
     await navigateTo({ name: 'checkout-success' });
     return true;
@@ -109,8 +111,8 @@ async function handlePlanChange(newPlan: SelectedPlan): Promise<void> {
     upgradeSubId: get(upgradeSubId),
   });
 
-  if (!result.success) {
-    setError(t('subscription.error.payment_failure'), result.error || 'Failed to switch plan', CheckoutPaymentMethods.CRYPTO);
+  if (!result.ok) {
+    setError(t('subscription.error.payment_failure'), paymentFailureMessage(result.error), CheckoutPaymentMethods.CRYPTO);
   }
 }
 
@@ -125,8 +127,8 @@ async function handleCancelAndGoBack(): Promise<void> {
 
   setLoading(false);
 
-  if (!result.success) {
-    setError(t('subscription.error.cancel_failed'), result.error || 'Failed to cancel', CheckoutPaymentMethods.CRYPTO);
+  if (!result.ok) {
+    setError(t('subscription.error.cancel_failed'), paymentFailureMessage(result.error), CheckoutPaymentMethods.CRYPTO);
     return;
   }
 

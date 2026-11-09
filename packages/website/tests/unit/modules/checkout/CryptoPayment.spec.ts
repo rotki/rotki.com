@@ -1,9 +1,11 @@
-import type { CryptoPaymentResult } from '~/modules/checkout/composables/use-crypto-payment-flow';
+import type { CryptoPayment as CryptoPaymentData } from '~/types';
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
 import { get, set } from '@vueuse/shared';
+import { err, type Result } from 'plainfp/result';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import CryptoPayment from '~/modules/checkout/components/crypto/CryptoPayment.vue';
+import { type PaymentFailure, rejected } from '~/modules/checkout/utils/payment-failure';
 
 interface CheckoutError {
   title: string;
@@ -33,7 +35,7 @@ const {
     error,
     paymentData: ref<unknown>(),
     ensureInitialized: vi.fn<() => Promise<boolean>>(),
-    createPayment: vi.fn<() => Promise<CryptoPaymentResult>>(),
+    createPayment: vi.fn<() => Promise<Result<CryptoPaymentData, PaymentFailure>>>(),
     setError: vi.fn((title: string, message: string) => {
       set(error, { title, message });
     }),
@@ -106,7 +108,7 @@ describe('cryptoPayment.vue redirect on failure', () => {
   it('keeps the user on the page and shows the error when the crypto payment API returns 400', async () => {
     ensureInitialized.mockResolvedValue(true);
     // Mirrors a 400 from /webapi/2/crypto/payments surfaced through the flow.
-    createPayment.mockResolvedValue({ success: false, error: 'Invalid plan' });
+    createPayment.mockResolvedValue(err(rejected('Invalid plan')));
 
     await mountComponent();
 

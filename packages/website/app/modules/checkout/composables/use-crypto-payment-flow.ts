@@ -1,10 +1,12 @@
+import type { ResultAsync } from 'plainfp/result-async';
 import type { DeepReadonly, Ref } from 'vue';
 import type { CryptoPayment } from '~/types';
 import { set } from '@vueuse/shared';
+import { err } from 'plainfp/result';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePendingSubscriptionId } from '~/modules/checkout/composables/use-pending-subscription-id';
-import { paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
+import { type PaymentFailure, unexpected } from '~/modules/checkout/utils/payment-failure';
 import { nonEmpty } from '~/utils/non-empty';
 import { useLogger } from '~/utils/use-logger';
 
@@ -16,14 +18,6 @@ export interface CryptoPaymentParams {
   upgradeSubId?: string;
 }
 
-export interface CryptoPaymentResult {
-  success: boolean;
-  data?: CryptoPayment;
-  error?: string;
-  isUnverified?: boolean;
-  alreadyStarted?: boolean;
-}
-
 type CryptoPaymentApi = ReturnType<typeof useCryptoPaymentApi>;
 
 interface PaymentRequest {
@@ -33,8 +27,8 @@ interface PaymentRequest {
   failureLog: string;
   /** Runs once the backend answered, whatever the answer. */
   onAnswer?: () => void;
-  /** Reports a payment whose transaction already started as done, rather than keeping it. */
-  detectStarted?: boolean;
+  /** Leaves out a payment whose transaction already started, which has nothing left to send. */
+  skipStarted?: boolean;
 }
 
 interface UseCryptoPaymentFlowReturn {
@@ -43,9 +37,9 @@ interface UseCryptoPaymentFlowReturn {
   loading: DeepReadonly<Ref<boolean>>;
 
   // Actions
-  createPayment: (params: CryptoPaymentParams) => Promise<CryptoPaymentResult>;
-  switchPlan: (params: CryptoPaymentParams) => Promise<CryptoPaymentResult>;
-  cancelPayment: (upgradeSubId?: string) => Promise<{ success: boolean; error?: string }>;
+  createPayment: (params: CryptoPaymentParams) => ResultAsync<CryptoPayment, PaymentFailure>;
+  switchPlan: (params: CryptoPaymentParams) => ResultAsync<CryptoPayment, PaymentFailure>;
+  cancelPayment: (upgradeSubId?: string) => ResultAsync<boolean, PaymentFailure>;
   markTransactionStarted: (isUpgrade: boolean) => Promise<void>;
   reset: () => void;
 }
@@ -68,7 +62,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
     set(loading, false);
   }
 
-  async function requestPayment(params: CryptoPaymentParams, request: PaymentRequest): Promise<CryptoPaymentResult> {
+  async function requestPayment(params: CryptoPaymentParams, request: PaymentRequest): ResultAsync<CryptoPayment, PaymentFailure> {
     const { planId, currency, discountCode, subscriptionId, upgradeSubId } = params;
 
     set(loading, true);
@@ -86,50 +80,31 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
 
       request.onAnswer?.();
 
-      if (!result.ok) {
-        return {
-          success: false,
-          error: paymentFailureMessage(result.error),
-          isUnverified: result.error._tag === 'Unverified',
-        };
-      }
+      if (result.ok && !(request.skipStarted && result.value.transactionStarted))
+        set(paymentData, result.value);
 
-      if (request.detectStarted && result.value.transactionStarted) {
-        return {
-          success: true,
-          alreadyStarted: true,
-        };
-      }
-
-      set(paymentData, result.value);
-      return {
-        success: true,
-        data: result.value,
-      };
+      return result;
     }
-    catch (error: any) {
+    catch (error: unknown) {
       logger.error(request.failureLog, error);
-      return {
-        success: false,
-        error: error.message,
-      };
+      return err(unexpected(error));
     }
     finally {
       set(loading, false);
     }
   }
 
-  async function createPayment(params: CryptoPaymentParams): Promise<CryptoPaymentResult> {
+  async function createPayment(params: CryptoPaymentParams): ResultAsync<CryptoPayment, PaymentFailure> {
     return requestPayment(params, {
       regular: api.cryptoPayment,
       upgrade: api.upgradeCryptoSubscription,
       failureLog: 'Failed to create crypto payment:',
       onAnswer: requestRefresh,
-      detectStarted: true,
+      skipStarted: true,
     });
   }
 
-  async function switchPlan(params: CryptoPaymentParams): Promise<CryptoPaymentResult> {
+  async function switchPlan(params: CryptoPaymentParams): ResultAsync<CryptoPayment, PaymentFailure> {
     return requestPayment(params, {
       regular: api.switchCryptoPlan,
       upgrade: api.switchCryptoUpgradePlan,
@@ -137,7 +112,7 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
     });
   }
 
-  async function cancelPayment(upgradeSubId?: string): Promise<{ success: boolean; error?: string }> {
+  async function cancelPayment(upgradeSubId?: string): ResultAsync<boolean, PaymentFailure> {
     set(loading, true);
 
     try {
@@ -145,17 +120,15 @@ export function useCryptoPaymentFlow(): UseCryptoPaymentFlowReturn {
         ? await api.cancelUpgradeRequest(upgradeSubId)
         : await api.deletePendingPayment();
 
-      if (!result.ok) {
-        return { success: false, error: paymentFailureMessage(result.error) };
+      if (result.ok) {
+        reset();
+        clearPendingSubscriptionId();
       }
-
-      reset();
-      clearPendingSubscriptionId();
-      return { success: true };
+      return result;
     }
-    catch (error: any) {
+    catch (error: unknown) {
       logger.error('Failed to cancel payment:', error);
-      return { success: false, error: error.message };
+      return err(unexpected(error));
     }
     finally {
       set(loading, false);

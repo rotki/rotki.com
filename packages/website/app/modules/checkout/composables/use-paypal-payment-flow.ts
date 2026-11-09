@@ -1,15 +1,17 @@
 import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/payment';
 import type { PayPalCheckout } from 'braintree-web';
+import type { ResultAsync } from 'plainfp/result-async';
 import type { DeepReadonly, Ref } from 'vue';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
+import { err, ok } from 'plainfp/result';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { usePaypalApi } from '~/modules/checkout/composables/use-paypal-api';
-import { isOutcomeUnknown, paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
+import { isOutcomeUnknown, type PaymentFailure } from '~/modules/checkout/utils/payment-failure';
 import { assert } from '~/utils/assert';
 import { useLogger } from '~/utils/use-logger';
 
@@ -20,12 +22,6 @@ export interface PaypalPaymentParams {
   planId: number;
   discountCode?: string;
   upgradeSubId?: string;
-}
-
-export interface PaypalSubmitResult {
-  success: boolean;
-  error?: string;
-  blocked?: boolean;
 }
 
 interface PaypalButtonActions {
@@ -89,10 +85,11 @@ interface UsePaypalPaymentFlowReturn {
   initialized: DeepReadonly<Ref<boolean>>;
 
   // Actions
-  initializeSdk: (token: string, amount: number) => Promise<{ success: boolean; error?: string }>;
+  /** Fails with the message to show the buyer. */
+  initializeSdk: (token: string, amount: number) => ResultAsync<undefined, string>;
   renderButton: (options: RenderButtonOptions) => Promise<void>;
   updateAmount: (amount: number) => void;
-  submitPayment: (nonce: string, params: PaypalPaymentParams) => Promise<PaypalSubmitResult>;
+  submitPayment: (nonce: string, params: PaypalPaymentParams) => ResultAsync<true, PaymentFailure>;
   reset: () => void;
 }
 
@@ -132,11 +129,11 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
     set(currentAmount, amount);
   }
 
-  async function initializeSdk(token: string, amount: number): Promise<{ success: boolean; error?: string }> {
+  async function initializeSdk(token: string, amount: number): ResultAsync<undefined, string> {
     try {
       const clientSuccess = await initializeClientWithToken(token);
       if (!clientSuccess) {
-        return { success: false, error: 'Failed to initialize Braintree client' };
+        return err('Failed to initialize Braintree client');
       }
 
       set(currentAmount, amount);
@@ -156,7 +153,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       });
 
       set(initialized, true);
-      return { success: true };
+      return ok(undefined);
     }
     catch (error: unknown) {
       logger.error('Failed to initialize PayPal SDK:', error);
@@ -171,7 +168,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
         planId: ctx.planId,
         isUpgrade: ctx.isUpgrade,
       });
-      return { success: false, error: userMessageFor(parsed) };
+      return err(userMessageFor(parsed));
     }
   }
 
@@ -268,7 +265,7 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
     watch([paying, paypalActions, accepted, loading], checkEnabled);
   }
 
-  async function submitPayment(nonce: string, params: PaypalPaymentParams): Promise<PaypalSubmitResult> {
+  async function submitPayment(nonce: string, params: PaypalPaymentParams): ResultAsync<true, PaymentFailure> {
     const { upgradeSubId } = params;
 
     set(paying, true);
@@ -277,15 +274,9 @@ export function usePaypalPaymentFlow(options: UsePaypalPaymentFlowOptions = {}):
       const payload = buildPaymentPayload(nonce, params);
       const result = upgradeSubId ? await paymentApi.upgrade(payload, upgradeSubId) : await paymentApi.pay(payload);
 
-      if (result.ok) {
+      if (result.ok || isOutcomeUnknown(result.error))
         requestRefresh();
-        return { success: true };
-      }
-
-      const blocked = isOutcomeUnknown(result.error);
-      if (blocked)
-        requestRefresh();
-      return { success: false, error: paymentFailureMessage(result.error), blocked };
+      return result;
     }
     finally {
       set(paying, false);

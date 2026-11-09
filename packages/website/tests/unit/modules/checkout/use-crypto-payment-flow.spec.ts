@@ -4,13 +4,16 @@ import { useCryptoPaymentFlow } from '~/modules/checkout/composables/use-crypto-
 import { rejected } from '~/modules/checkout/utils/payment-failure';
 
 const api = vi.hoisted(() => ({
+  cancelUpgradeRequest: vi.fn(),
   cryptoPayment: vi.fn(),
+  deletePendingPayment: vi.fn(),
   switchCryptoPlan: vi.fn(),
   switchCryptoUpgradePlan: vi.fn(),
   upgradeCryptoSubscription: vi.fn(),
 }));
 
 const requestRefresh = vi.hoisted(() => vi.fn());
+const clearPendingSubscriptionId = vi.hoisted(() => vi.fn());
 
 vi.mock('~/modules/checkout/composables/use-crypto-payment-api', () => ({
   useCryptoPaymentApi: () => api,
@@ -21,7 +24,7 @@ vi.mock('~/composables/use-app-events', () => ({
 }));
 
 vi.mock('~/modules/checkout/composables/use-pending-subscription-id', () => ({
-  usePendingSubscriptionId: () => ({ clearPendingSubscriptionId: vi.fn() }),
+  usePendingSubscriptionId: () => ({ clearPendingSubscriptionId }),
 }));
 
 const payment = { cryptoAddress: '0xabc', transactionStarted: false };
@@ -52,7 +55,7 @@ describe('useCryptoPaymentFlow', () => {
       regular.mockResolvedValue(ok(payment));
       const flow = useCryptoPaymentFlow();
 
-      await expect(flow[action](params)).resolves.toEqual({ success: true, data: payment });
+      await expect(flow[action](params)).resolves.toEqual(ok(payment));
 
       expect(regular).toHaveBeenCalledWith({ ...expectedBody, subscriptionId: 'sub-1' });
       expect(upgrade).not.toHaveBeenCalled();
@@ -78,21 +81,22 @@ describe('useCryptoPaymentFlow', () => {
       expect(regular).toHaveBeenCalledWith(expect.objectContaining({ discountCode: 'SUMMER' }));
     });
 
-    it('reports a refusal with its message and keeps no payment', async () => {
-      regular.mockResolvedValue(err(rejected('Plan not available')));
+    it('hands a refusal over and keeps no payment', async () => {
+      const refusal = err(rejected('Plan not available'));
+      regular.mockResolvedValue(refusal);
       const flow = useCryptoPaymentFlow();
 
-      await expect(flow[action](params)).resolves.toMatchObject({ success: false, error: 'Plan not available' });
+      await expect(flow[action](params)).resolves.toEqual(refusal);
 
       expect(flow.paymentData.value).toBeUndefined();
       expect(flow.loading.value).toBe(false);
     });
 
-    it('reports a call that throws, without an account refresh', async () => {
+    it('reports a call that throws without showing what it threw, and without an account refresh', async () => {
       regular.mockRejectedValue(new Error('boom'));
       const flow = useCryptoPaymentFlow();
 
-      await expect(flow[action](params)).resolves.toEqual({ success: false, error: 'boom' });
+      await expect(flow[action](params)).resolves.toMatchObject({ ok: false, error: { _tag: 'Unexpected' } });
 
       expect(requestRefresh).not.toHaveBeenCalled();
       expect(flow.loading.value).toBe(false);
@@ -124,17 +128,18 @@ describe('useCryptoPaymentFlow', () => {
       expect(requestRefresh).toHaveBeenCalledOnce();
     });
 
-    it('flags an account that has to verify its e-mail address', async () => {
+    it('hands over an account that has to verify its e-mail address', async () => {
       api.cryptoPayment.mockResolvedValue(err({ _tag: 'Unverified' }));
 
-      await expect(useCryptoPaymentFlow().createPayment(params)).resolves.toMatchObject({ success: false, isUnverified: true });
+      await expect(useCryptoPaymentFlow().createPayment(params)).resolves.toMatchObject({ ok: false, error: { _tag: 'Unverified' } });
     });
 
-    it('treats a transaction that already started as done, keeping no payment', async () => {
-      api.cryptoPayment.mockResolvedValue(ok({ ...payment, transactionStarted: true }));
+    it('does not keep a payment whose transaction already started', async () => {
+      const started = { ...payment, transactionStarted: true };
+      api.cryptoPayment.mockResolvedValue(ok(started));
       const flow = useCryptoPaymentFlow();
 
-      await expect(flow.createPayment(params)).resolves.toEqual({ success: true, alreadyStarted: true });
+      await expect(flow.createPayment(params)).resolves.toEqual(ok(started));
 
       expect(flow.paymentData.value).toBeUndefined();
     });
@@ -154,9 +159,37 @@ describe('useCryptoPaymentFlow', () => {
       api.switchCryptoPlan.mockResolvedValue(ok(started));
       const flow = useCryptoPaymentFlow();
 
-      await expect(flow.switchPlan(params)).resolves.toEqual({ success: true, data: started });
+      await expect(flow.switchPlan(params)).resolves.toEqual(ok(started));
 
       expect(flow.paymentData.value).toEqual(started);
+    });
+  });
+
+  describe('cancelPayment', () => {
+    it('forgets the pending payment once it is cancelled', async () => {
+      api.deletePendingPayment.mockResolvedValue(ok(true));
+
+      await expect(useCryptoPaymentFlow().cancelPayment()).resolves.toEqual(ok(true));
+
+      expect(clearPendingSubscriptionId).toHaveBeenCalledOnce();
+    });
+
+    it('cancels an upgrade by its subscription', async () => {
+      api.cancelUpgradeRequest.mockResolvedValue(ok(true));
+
+      await useCryptoPaymentFlow().cancelPayment('upgrade-1');
+
+      expect(api.cancelUpgradeRequest).toHaveBeenCalledWith('upgrade-1');
+      expect(api.deletePendingPayment).not.toHaveBeenCalled();
+    });
+
+    it('keeps the pending payment when cancelling fails', async () => {
+      const refusal = err(rejected('Already paid'));
+      api.deletePendingPayment.mockResolvedValue(refusal);
+
+      await expect(useCryptoPaymentFlow().cancelPayment()).resolves.toEqual(refusal);
+
+      expect(clearPendingSubscriptionId).not.toHaveBeenCalled();
     });
   });
 });

@@ -68,7 +68,7 @@ describe('usePaypalPaymentFlow', () => {
       );
       const { initializeSdk, renderButton } = usePaypalPaymentFlow();
 
-      await expect(initializeSdk('client-token', 25)).resolves.toEqual({ success: true });
+      await expect(initializeSdk('client-token', 25)).resolves.toMatchObject({ ok: true });
       await renderButton({
         callbacks: { onPaymentCancel: vi.fn(), onPaymentError: vi.fn(), onPaymentStart: vi.fn(), onPaymentSuccess: vi.fn() },
         accepted: ref<boolean>(false),
@@ -94,8 +94,7 @@ describe('usePaypalPaymentFlow', () => {
 
       const result = await submitPayment('nonce-123', { planId: 1 });
 
-      expect(result.success).toBe(true);
-      expect(result.blocked).toBeUndefined();
+      expect(result.ok).toBe(true);
       expect(mockRequestRefresh).toHaveBeenCalledOnce();
     });
 
@@ -109,8 +108,7 @@ describe('usePaypalPaymentFlow', () => {
 
       const result = await submitPayment('nonce-123', { planId: 1 });
 
-      expect(result.success).toBe(false);
-      expect(result.blocked).toBe(true);
+      expect(result).toMatchObject({ ok: false, error: { _tag: 'ServerError' } });
       expect(mockRequestRefresh).toHaveBeenCalledOnce();
     });
 
@@ -124,8 +122,7 @@ describe('usePaypalPaymentFlow', () => {
 
       const result = await submitPayment('nonce-123', { planId: 1 });
 
-      expect(result.success).toBe(false);
-      expect(result.blocked).toBe(true);
+      expect(result).toMatchObject({ ok: false, error: { _tag: 'ServerError' } });
       expect(mockRequestRefresh).toHaveBeenCalledOnce();
     });
 
@@ -141,9 +138,7 @@ describe('usePaypalPaymentFlow', () => {
 
       const result = await submitPayment('nonce-123', { planId: 1 });
 
-      expect(result.success).toBe(false);
-      expect(result.blocked).toBe(false);
-      expect(result.error).toBe('Invalid discount code');
+      expect(result).toMatchObject({ ok: false, error: { _tag: 'Rejected', message: 'Invalid discount code' } });
       expect(mockRequestRefresh).not.toHaveBeenCalled();
     });
 
@@ -157,8 +152,7 @@ describe('usePaypalPaymentFlow', () => {
 
       const result = await submitPayment('nonce-123', { planId: 1 });
 
-      expect(result.success).toBe(false);
-      expect(result.blocked).toBe(false);
+      expect(result).toMatchObject({ ok: false, error: { _tag: 'Unverified' } });
       expect(mockRequestRefresh).not.toHaveBeenCalled();
     });
 
@@ -172,9 +166,7 @@ describe('usePaypalPaymentFlow', () => {
 
       const result = await submitPayment('nonce-123', { planId: 1 });
 
-      expect(result.success).toBe(false);
-      expect(result.blocked).toBe(true);
-      expect(result.error).not.toContain('cannot read properties');
+      expect(result).toMatchObject({ ok: false, error: { _tag: 'Unexpected' } });
       expect(mockRequestRefresh).toHaveBeenCalledOnce();
     });
 
@@ -207,7 +199,7 @@ describe('usePaypalPaymentFlow', () => {
         upgradeSubId: 'sub-789',
       });
 
-      expect(result.blocked).toBe(true);
+      expect(result).toMatchObject({ ok: false, error: { _tag: 'ServerError' } });
       expect(mockRequestRefresh).toHaveBeenCalledOnce();
       expect(mockFetchWithCsrf).toHaveBeenCalledWith(
         '/webapi/2/braintree/upgrade',

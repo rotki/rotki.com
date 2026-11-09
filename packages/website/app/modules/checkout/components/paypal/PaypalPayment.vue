@@ -18,6 +18,7 @@ import { useCheckout } from '~/modules/checkout/composables/use-checkout';
 import { purchaseDiscount, useCompletePurchase } from '~/modules/checkout/composables/use-complete-purchase';
 import { usePaypalPaymentFlow } from '~/modules/checkout/composables/use-paypal-payment-flow';
 import { useSubscriptionIdParam } from '~/modules/checkout/composables/use-plan-params';
+import { isOutcomeUnknown, paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -95,8 +96,8 @@ async function initialize(): Promise<boolean> {
   const amount = plan ? paymentAmounts(get(breakdown), plan).finalAmount : 0;
 
   const result = await initializeSdk(token, amount);
-  if (!result.success) {
-    setError(t('subscription.error.init_error'), result.error || t('subscription.error.payment_init_failed'), CheckoutPaymentMethods.PAYPAL);
+  if (!result.ok) {
+    setError(t('subscription.error.init_error'), result.error, CheckoutPaymentMethods.PAYPAL);
     return false;
   }
 
@@ -156,10 +157,10 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
       upgradeSubId: get(upgradeSubId),
     });
 
-    if (result.success) {
+    if (result.ok) {
       await completePurchase(plan);
     }
-    else if (result.blocked) {
+    else if (isOutcomeUnknown(result.error)) {
       set(blocked, true);
       setError(
         t('subscription.error.payment_failure'),
@@ -168,7 +169,7 @@ async function handleSubmitPayment(nonce: string): Promise<void> {
       );
     }
     else {
-      setError(t('subscription.error.payment_failure'), result.error || 'Payment failed', CheckoutPaymentMethods.PAYPAL);
+      setError(t('subscription.error.payment_failure'), paymentFailureMessage(result.error), CheckoutPaymentMethods.PAYPAL);
     }
   }
   finally {
