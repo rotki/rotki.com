@@ -29,6 +29,8 @@ overrides:
   # vulnerable 7.27.2 it had already resolved. Pin the 7.x line to a patched
   # release until jsdom moves on.
   undici@^7: 7.30.1
+  # oxfmt (through @rotki/eslint-config) pins the vulnerable 2.1.0. Drop this when it moves on.
+  tinypool@2.1.0: 2.1.2
 
 patchedDependencies:
   '@types/paypal-checkout-components@4.0.8': patches/@types__paypal-checkout-components@4.0.8.patch
@@ -48,7 +50,7 @@ catalog:
   '@nuxt/content': 3.16.2
   '@nuxt/devtools': 3.4.4
   '@nuxt/eslint-plugin': 1.17.0
-  '@nuxt/kit': 4.6.2
+  '@nuxt/kit': 4.6.3
   '@nuxt/test-utils': 4.3.4
   '@nuxtjs/i18n': 10.6.0
   '@nuxtjs/robots': 7.0.2
@@ -58,7 +60,7 @@ catalog:
   '@resvg/resvg-js': 2.6.2
   '@rotki/eslint-config': 8.4.1
   '@rotki/eslint-plugin': 1.10.0
-  '@rotki/ui-library': 3.1.7
+  '@rotki/ui-library': 3.2.0
   '@tailwindcss/vite': 4.3.3
   '@tsconfig/node24': 24.0.5
   '@types/braintree-web': 3.143.2
@@ -68,7 +70,7 @@ catalog:
   '@unhead/vue': 2.1.17
   '@vitejs/plugin-vue': 6.0.10
   '@vitest/coverage-v8': 5.0.5
-  '@vitest/istanbul-lib-coverage': 2.0.0
+  '@vitest/istanbul-lib-coverage': 2.1.0
   '@vue/test-utils': 2.5.1
   '@vue/tsconfig': 0.9.1
   '@vueuse/core': 15.0.0
@@ -85,7 +87,7 @@ catalog:
   cac: 7.1.0
   consola: 3.4.2
   defu: 6.1.7
-  eslint: 10.13.0
+  eslint: 10.14.0
   eslint-plugin-slop: 0.1.3
   eslint-plugin-sonarjs: 4.2.2
   eslint-plugin-tsdoc: 0.5.4
@@ -96,8 +98,8 @@ catalog:
   msw: 3.0.3
   nitropack: 2.13.5
   npm-run-all2: 9.0.4
-  nuxt: 4.6.2
-  nuxt-llms: 0.3.0
+  nuxt: 4.6.3
+  nuxt-llms: 0.3.1
   ofetch: 1.5.1
   pinia: 4.1.0
   plainfp: 0.1.1
@@ -111,17 +113,17 @@ catalog:
   stylelint-config-recommended-vue: 2.0.0
   stylelint-config-standard: 40.0.0
   stylelint-order: 8.1.2
-  swiper: 14.3.0
+  swiper: 14.4.0
   tailwindcss: 4.3.3
-  tsdown: 0.23.1
+  tsdown: 0.23.4
   typescript: 6.0.3
-  viem: 2.57.10
+  viem: 2.57.14
   vite: 8.3.5
   vite-plugin-vue-devtools: 8.2.1
   vite-ssg: 28.3.0
   vitest: 5.0.5
   vue: 3.5.44
   vue-router: 5.4.0
-  vue-tsc: 3.3.13
+  vue-tsc: 3.3.14
   yaml: 2.9.1
   zod: 4.6.7
