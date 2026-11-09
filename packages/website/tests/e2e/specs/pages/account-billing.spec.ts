@@ -58,6 +58,38 @@ test.describe('account billing', () => {
       expect(backend.callsTo('DELETE', '/webapi/payment/btr/cards/').map(call => call.body)).toEqual([{ payment_token: 'card-1111' }]);
     });
 
+    test('says so when removing a card fails, and keeps the card', async ({ page }) => {
+      await page.route('**/webapi/payment/btr/cards/', async (route) => {
+        if (route.request().method() === 'DELETE')
+          await route.fulfill({ json: { message: 'This card cannot be removed right now' }, status: 400 });
+        else
+          await route.fallback();
+      });
+      await open(page, '/home/billing');
+
+      await cardRow(page, '1111').getByRole('button', { name: 'Remove the card ending in 1111' }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Delete', exact: true }).click();
+
+      await expect(section(page, 'Payment method')).toContainText('This card cannot be removed right now');
+      await expect(cardRow(page, '1111')).toBeVisible();
+    });
+
+    test('does not claim there are no cards when they fail to load, and can try again', async ({ page }) => {
+      const failLoad = '**/webapi/payment/btr/cards/';
+      await page.route(failLoad, async route => route.fulfill({ json: { message: 'Braintree is down' }, status: 500 }));
+      await open(page, '/home/billing');
+
+      const failure = page.locator('[data-cy="cards-load-failed"]');
+      await expect(failure).toContainText('We couldn\'t load your saved cards.');
+      await expect(section(page, 'Payment method')).not.toContainText('No saved cards');
+
+      await page.unroute(failLoad);
+      await failure.getByRole('button', { name: 'Try again' }).click();
+
+      await expect(failure).toHaveCount(0);
+      await expect(cardRow(page, '1111')).toBeVisible();
+    });
+
     test('shows a failed re-authorization above the cards, where the refresh cannot cover it', async ({ page }) => {
       await page.route('**/webapi/2/braintree/customer', async route => route.fulfill({ json: { message: 'Braintree is down' }, status: 500 }));
       await open(page, '/home/billing');

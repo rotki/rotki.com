@@ -27,7 +27,7 @@ const error = ref<CardVerificationError>();
 const { account } = storeToRefs(useMainStore());
 const emailConfirmed = useEmailConfirmedCookie();
 
-const { cards, loading: cardsLoading, refresh: refreshCards } = usePaymentCards();
+const { cards, loadFailed: cardsLoadFailed, loading: cardsLoading, refresh: refreshCards } = usePaymentCards();
 const { activeSubscription, loading: subscriptionsLoading, refresh: refreshSubscriptions } = useUserSubscriptions();
 
 /** A card change can move which card renews the subscription, so both lists reload. */
@@ -173,6 +173,23 @@ function getCardTooltip(card: SavedCard): string | undefined {
           @reauthorize="handleReauthorize(card)"
           @delete="confirmDeleteCard(card)"
         />
+      </div>
+
+      <div
+        v-else-if="cardsLoadFailed"
+        class="flex flex-col gap-3 items-center text-center rounded-lg border border-dashed border-default px-4 py-8"
+        data-cy="cards-load-failed"
+      >
+        <p class="max-w-md text-body-2 text-rui-text-secondary text-pretty">
+          {{ t('home.account.payment_methods.load_failed') }}
+        </p>
+        <RuiButton
+          color="primary"
+          variant="outlined"
+          @click="refreshCards()"
+        >
+          {{ t('actions.try_again') }}
+        </RuiButton>
       </div>
 
       <div

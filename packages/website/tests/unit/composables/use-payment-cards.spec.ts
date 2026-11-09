@@ -170,4 +170,34 @@ describe('usePaymentCards', () => {
         .toThrow('common.error_occurred');
     });
   });
+
+  describe('deleteCard', () => {
+    it('deletes the card by its token', async () => {
+      mockFetchWithCsrf.mockResolvedValueOnce({ result: true });
+
+      const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
+      const { deleteCard } = usePaymentCards();
+
+      await expect(deleteCard('tok-1')).resolves.toMatchObject({ ok: true });
+      expect(mockFetchWithCsrf).toHaveBeenCalledWith('/webapi/payment/btr/cards/', { body: { paymentToken: 'tok-1' }, method: 'DELETE' });
+    });
+
+    it('reports the backend refusing rather than treating it as deleted', async () => {
+      mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(400, { message: 'This card pays your subscription' }));
+
+      const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
+      const { deleteCard } = usePaymentCards();
+
+      await expect(deleteCard('tok-1')).resolves.toMatchObject({ ok: false, error: { _tag: 'Rejected', message: 'This card pays your subscription' } });
+    });
+
+    it('reports a server error rather than treating it as deleted', async () => {
+      mockFetchWithCsrf.mockRejectedValueOnce(createFetchError(500, {}));
+
+      const { usePaymentCards } = await import('~/modules/checkout/composables/use-payment-cards');
+      const { deleteCard } = usePaymentCards();
+
+      await expect(deleteCard('tok-1')).resolves.toMatchObject({ ok: false, error: { _tag: 'ServerError' } });
+    });
+  });
 });

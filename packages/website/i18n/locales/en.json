@@ -663,6 +663,7 @@
         "crypto_subscription_no_card_operations": "Card operations are not available for cryptocurrency subscriptions",
         "link_card": "Set for auto-renewal",
         "linked_card": "Auto-renewal card",
+        "load_failed": "We couldn't load your saved cards.",
         "no_active_subscription": "No active subscription found",
         "no_cards": "No saved cards",
         "no_cards_description": "Add a payment card to make future purchases easier",

@@ -3,7 +3,7 @@ import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import SavedCardRow from '@rotki/checkout-ui/components/SavedCardRow.vue';
 import { set } from '@vueuse/shared';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
-import { useLogger } from '~/utils/use-logger';
+import { paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 
 const showDialog = defineModel<boolean>({ required: true });
 const deleting = defineModel<boolean>('deleting', { default: false });
@@ -17,7 +17,6 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
-const logger = useLogger('delete-card-dialog');
 
 const { deleteCard } = usePaymentCards();
 
@@ -26,22 +25,20 @@ async function handleDeleteCard(): Promise<void> {
     return;
   }
 
-  try {
-    set(deleting, true);
-    set(showDialog, false);
-    await deleteCard(card.token);
+  set(deleting, true);
+  set(showDialog, false);
+  const deleted = await deleteCard(card.token);
+  set(deleting, false);
+
+  if (deleted.ok) {
     emit('success');
+    return;
   }
-  catch (error: any) {
-    logger.error('Failed to delete card:', error);
-    emit('error', {
-      title: t('common.error'),
-      message: error.message || t('common.error_occurred'),
-    });
-  }
-  finally {
-    set(deleting, false);
-  }
+
+  emit('error', {
+    title: t('common.error'),
+    message: paymentFailureMessage(deleted.error),
+  });
 }
 
 function handleCancel(): void {
