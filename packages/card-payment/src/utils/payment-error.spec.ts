@@ -12,6 +12,6 @@ describe('utils/payment-error', () => {
   });
 
   it('says nothing was charged while a card is being saved', () => {
-    expect(userPaymentMessage(new Error('boom'), 'card')).toContain('We couldn\'t save this card.');
+    expect(userPaymentMessage(new Error('boom'), 'card')).toContain('We couldn\'t process this card.');
   });
 });

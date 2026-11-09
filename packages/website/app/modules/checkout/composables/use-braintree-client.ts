@@ -1,8 +1,9 @@
+import type { PaymentErrorContext } from '@rotki/checkout-ui/utils/payment-error-message';
 import type { Client } from 'braintree-web/client';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { type PaymentErrorContext, usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
+import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useLogger } from '~/utils/use-logger';
 

@@ -62,6 +62,13 @@ export const checkoutMessages: MessageTree = {
       subscribe: 'Subscribe and pay {amount}',
       upgrade: 'Upgrade and pay {amount}',
     },
+    payment_error: {
+      card: 'We couldn\'t process this card. Please try again, or contact support if it keeps happening.',
+      card_with_reference: 'We couldn\'t process this card. Please try again, or contact support quoting reference {code}.',
+      network: 'We couldn\'t reach the payment provider. Check your connection and try again.',
+      payment: 'We couldn\'t complete your payment. Please try again, or contact support if it keeps happening.',
+      payment_with_reference: 'We couldn\'t complete your payment. Please try again, or contact support quoting reference {code}.',
+    },
     plan: {
       name_monthly: '{name}, monthly',
       name_one_month: '{name}, 1 month',

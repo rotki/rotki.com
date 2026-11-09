@@ -37,6 +37,10 @@
       "types": "./src/utils/checkout-flow.ts",
       "import": "./src/utils/checkout-flow.ts"
     },
+    "./utils/payment-error-message": {
+      "types": "./src/utils/payment-error-message.ts",
+      "import": "./src/utils/payment-error-message.ts"
+    },
     "./utils/plan-title": {
       "types": "./src/utils/plan-title.ts",
       "import": "./src/utils/plan-title.ts"
