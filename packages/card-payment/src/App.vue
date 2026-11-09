@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
 import CheckoutShell from '@rotki/checkout-ui/components/CheckoutShell.vue';
 import MethodTiles from '@rotki/checkout-ui/components/MethodTiles.vue';
 import { get } from '@vueuse/core';
 import { computed, onMounted, ref } from 'vue';
-import CampaignRibbon from '@/components/CampaignRibbon.vue';
 import CardPayment from '@/components/CardPayment.vue';
 import ChangePlanButton from '@/components/ChangePlanButton.vue';
 import ErrorState from '@/components/ErrorState.vue';

@@ -12,6 +12,8 @@
     "./components/CheckoutShell.vue": "./src/components/CheckoutShell.vue",
     "./components/CheckoutStepper.vue": "./src/components/CheckoutStepper.vue",
     "./components/DiscountCodeField.vue": "./src/components/DiscountCodeField.vue",
+    "./components/CampaignRibbon.vue": "./src/components/CampaignRibbon.vue",
+    "./components/HostedCardForm.vue": "./src/components/HostedCardForm.vue",
     "./components/MethodTiles.vue": "./src/components/MethodTiles.vue",
     "./components/OrderSummary.vue": "./src/components/OrderSummary.vue",
     "./components/PaymentPage.vue": "./src/components/PaymentPage.vue",
@@ -32,6 +34,14 @@
     "./messages/en": {
       "types": "./src/messages/en.ts",
       "import": "./src/messages/en.ts"
+    },
+    "./utils/add-card-error": {
+      "types": "./src/utils/add-card-error.ts",
+      "import": "./src/utils/add-card-error.ts"
+    },
+    "./utils/hosted-fields": {
+      "types": "./src/utils/hosted-fields.ts",
+      "import": "./src/utils/hosted-fields.ts"
     },
     "./utils/checkout-flow": {
       "types": "./src/utils/checkout-flow.ts",

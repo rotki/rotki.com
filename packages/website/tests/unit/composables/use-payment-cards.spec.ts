@@ -52,7 +52,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.rate_limited_failures');
+        .toThrow('checkout.add_card.rate_limited_failures');
     });
 
     it('uses the generic rate-limit i18n key for the total-attempts gate', async () => {
@@ -65,7 +65,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.rate_limited');
+        .toThrow('checkout.add_card.rate_limited');
     });
 
     it('falls back to the generic rate-limit i18n key for upstream 429s without a JSON body (e.g. Traefik)', async () => {
@@ -76,7 +76,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.rate_limited');
+        .toThrow('checkout.add_card.rate_limited');
     });
   });
 
@@ -94,7 +94,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.payment_method_failed');
+        .toThrow('checkout.add_card.payment_method_failed');
     });
 
     it('does not classify a failure from the backend message without the error code', async () => {
@@ -109,7 +109,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.card_declined');
+        .toThrow('checkout.add_card.declined');
     });
 
     it('replaces the raw Braintree gateway dump with the friendly card-declined string', async () => {
@@ -125,7 +125,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.card_declined');
+        .toThrow('checkout.add_card.declined');
     });
 
     it('uses the friendly card-declined string for schema/validation 400s too', async () => {
@@ -138,7 +138,7 @@ describe('usePaymentCards', () => {
 
       await expect(addCard({ paymentMethodNonce: 'nonce' }))
         .rejects
-        .toThrow('home.account.payment_methods.errors.card_declined');
+        .toThrow('checkout.add_card.declined');
     });
   });
 

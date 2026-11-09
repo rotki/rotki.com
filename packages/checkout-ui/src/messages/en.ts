@@ -10,6 +10,24 @@ export const checkoutMessages: MessageTree = {
     alert: {
       dismiss: 'Dismiss',
     },
+    add_card: {
+      declined: 'We couldn\'t add this card. Please double-check the details or try a different card.',
+      payment_method_failed: 'We couldn\'t process this payment method. Please try a different card or contact us at {email} if the problem continues.',
+      rate_limited: 'Too many add-card attempts. Please wait a while before trying again.',
+      rate_limited_failures: 'Too many failed card attempts. For your security, please wait a while before trying again.',
+    },
+    campaign: {
+      applied: 'Code {code} applied: {percent}% off your first payment.',
+      last_day: 'Last day {date} (UTC).',
+      offer: 'Limited-time offer: {percent}% off your first payment with code {code}.',
+    },
+    card_form: {
+      cvv: 'CVV',
+      expiry: 'Expiry date',
+      expiry_placeholder: 'MM / YY',
+      init_failed: 'The card form could not start. Please reload the page and try again.',
+      number: 'Card number',
+    },
     change_plan: {
       action: 'Change',
       cancel: 'Cancel',

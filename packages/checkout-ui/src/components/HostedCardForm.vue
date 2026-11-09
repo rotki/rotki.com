@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import type { Client } from 'braintree-web/client';
-import { get, set } from '@vueuse/core';
-import { create as createHostedFields, type HostedFields } from 'braintree-web/hosted-fields';
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import type { CardFieldKey, CardFieldsInstance, CreateCardFields } from '../utils/hosted-fields';
+import { get, set } from '@vueuse/shared';
+import { computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch } from 'vue';
+import { useCheckoutMessages } from '../composables/checkout-messages';
 
-interface Props {
-  client: Client;
+const { createFields, disabled } = defineProps<{
+  /** Sets the fields up on the app's Braintree client. */
+  createFields: CreateCardFields;
   disabled?: boolean;
-}
-
-const { client, disabled } = defineProps<Props>();
+}>();
 
 const emit = defineEmits<{
   'validation-change': [isValid: boolean];
   'error': [message: string];
 }>();
 
-const hostedFields = ref<HostedFields>();
+const t = useCheckoutMessages();
+
+const hostedFields = shallowRef<CardFieldsInstance>();
 const hostedFieldsInitializing = ref<boolean>(false);
 const focusedField = ref<string>('');
 
@@ -24,8 +25,6 @@ interface FieldState {
   valid: boolean;
   touched: boolean;
 }
-
-type CardFieldKey = 'number' | 'expirationDate' | 'cvv';
 
 interface CardField {
   key: CardFieldKey;
@@ -41,9 +40,9 @@ const fieldStates = reactive(new Map<string, FieldState>([
 ]));
 
 const cardFields: CardField[] = [
-  { key: 'number', id: 'card-number', label: 'Card number' },
-  { key: 'expirationDate', id: 'expiration', label: 'Expiry date' },
-  { key: 'cvv', id: 'cvv', label: 'CVV' },
+  { key: 'number', id: 'card-number', label: t('checkout.card_form.number') },
+  { key: 'expirationDate', id: 'expiration', label: t('checkout.card_form.expiry') },
+  { key: 'cvv', id: 'cvv', label: t('checkout.card_form.cvv') },
 ];
 
 function updateFieldState(field: string, updates: Partial<FieldState>): void {
@@ -93,8 +92,7 @@ async function initializeHostedFields(): Promise<void> {
   set(hostedFieldsInitializing, true);
 
   try {
-    const fieldsInstance = await createHostedFields({
-      client,
+    const fieldsInstance = await createFields({
       styles: {
         'input': {
           'font-size': '14px',
@@ -121,7 +119,7 @@ async function initializeHostedFields(): Promise<void> {
         },
         expirationDate: {
           container: '#expiration',
-          placeholder: 'MM / YY',
+          placeholder: t('checkout.card_form.expiry_placeholder'),
         },
       },
     });
@@ -129,8 +127,8 @@ async function initializeHostedFields(): Promise<void> {
     setupHostedFieldsEvents(fieldsInstance);
     set(hostedFields, fieldsInstance);
   }
-  catch (error: any) {
-    emit('error', `Failed to initialize payment form: ${error.message}`);
+  catch (error) {
+    emit('error', t('checkout.card_form.init_failed'));
     console.error(error);
   }
   finally {
@@ -138,7 +136,7 @@ async function initializeHostedFields(): Promise<void> {
   }
 }
 
-function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
+function setupHostedFieldsEvents(fieldsInstance: CardFieldsInstance): void {
   fieldsInstance.on('focus', (event) => {
     set(focusedField, event.emittedBy);
   });
@@ -152,9 +150,9 @@ function setupHostedFieldsEvents(fieldsInstance: HostedFields): void {
   });
 
   fieldsInstance.on('validityChange', (event) => {
-    const field = event.emittedBy;
-    const isValid = event.fields[field].isValid;
-    updateFieldState(field, { valid: isValid });
+    const key = cardFields.find(({ key }) => key === event.emittedBy)?.key;
+    if (key)
+      updateFieldState(key, { valid: event.fields[key].isValid });
   });
 
   watch(() => disabled, (isDisabled) => {
@@ -188,9 +186,6 @@ async function tokenize(): Promise<{ nonce: string; bin: string }> {
   return { nonce, bin: details.bin };
 }
 
-// Expose tokenize method to parent
-
-// Watch form validity and emit changes
 watch(isFormValid, (valid) => {
   emit('validation-change', valid);
 }, { immediate: true });

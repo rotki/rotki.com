@@ -2,12 +2,13 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import type { Client } from 'braintree-web/client';
 import type { TokenizedCard } from '@/composables/card-checkout';
+import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
 import { get } from '@vueuse/core';
 import { ref, useTemplateRef } from 'vue';
 import { useSavedCardSelection } from '@/composables/saved-card-selection';
+import { cardFieldsFor } from '@/utils/hosted-fields';
 import AddCardDialog from './AddCardDialog.vue';
 import CardSelectionDialog from './CardSelectionDialog.vue';
-import NewCardForm from './NewCardForm.vue';
 import SavedCardDisplay from './SavedCardDisplay.vue';
 
 const selectedCard = defineModel<SavedCard | undefined>('selectedCard', { required: true });
@@ -30,7 +31,7 @@ const emit = defineEmits<{
 
 const showCardSelection = ref<boolean>(false);
 const showAddCard = ref<boolean>(false);
-const newCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('newCardForm');
+const newCardForm = useTemplateRef<InstanceType<typeof HostedCardForm>>('newCardForm');
 
 const { selectWhenAdded } = useSavedCardSelection(selectedCard, () => cards ?? []);
 
@@ -96,10 +97,10 @@ defineExpose({ tokenize });
         </button>
       </template>
 
-      <NewCardForm
+      <HostedCardForm
         v-else-if="client"
         ref="newCardForm"
-        :client="client"
+        :create-fields="cardFieldsFor(client)"
         :disabled="disabled"
         @validation-change="emit('validation-change', $event)"
         @error="emit('error', $event)"

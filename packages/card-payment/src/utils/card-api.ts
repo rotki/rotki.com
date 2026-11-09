@@ -7,6 +7,9 @@ import {
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { checkoutMessages } from '@rotki/checkout-ui/messages/en';
+import { addCardErrorMessage, isCardAddedFailure } from '@rotki/checkout-ui/utils/add-card-error';
+import { createTranslator } from '@rotki/checkout-ui/utils/translator';
 import { type CardType, type CheckoutStep, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, PaymentUserError, postPaymentLog, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
@@ -36,8 +39,8 @@ const BackendErrorSchema = z.object({
   code: z.string().optional(),
   message: z.string(),
 });
-const CARD_ADD_FAILED_CODE = 'card_add_failed';
-const PAYMENT_METHOD_FAILED_MESSAGE = 'We couldn\'t process this payment method. Please try a different card or contact us at support@rotki.com if the problem continues.';
+
+const t = createTranslator(checkoutMessages);
 
 type BackendError = z.infer<typeof BackendErrorSchema>;
 
@@ -153,28 +156,18 @@ export async function addCard(payload: AddCardPayload): Promise<string> {
     if (!response.ok) {
       const errorText = await response.text();
       const { code, message: backendMessage } = extractBackendError(errorText);
-      /* Only customer-facing errors use PaymentUserError, which is what lets them
-         reach the screen; anything else is an HTTP dump and stays opaque. */
+      const failure = { code, message: backendMessage, status: response.status };
+      const message = addCardErrorMessage(t, failure);
 
-      /* card_add_failed comes after Braintree has vaulted the card, so it gets its
-         own error for callers that need to refresh their cards. */
-      if (response.status === 400 && code === CARD_ADD_FAILED_CODE) {
-        throw new CardAddedPaymentError(PAYMENT_METHOD_FAILED_MESSAGE, { logDetail: backendMessage });
-      }
+      /* It comes after Braintree has vaulted the card, so it gets its own error for callers
+         that need to refresh their cards. */
+      if (message && isCardAddedFailure(failure))
+        throw new CardAddedPaymentError(message, { logDetail: backendMessage });
 
-      /* Other 400s are schema/JSON-decode errors or raw Braintree gateway dumps
-         ("Do Not Honor" etc.): show friendly copy, keep the raw cause in logDetail. */
-      if (response.status === 400) {
-        throw new PaymentUserError(
-          'We couldn\'t add this card. Please double-check the details or try a different card.',
-          { logDetail: backendMessage },
-        );
-      }
-
-      // The backend's rate-limit message is already written for the customer.
-      if (response.status === 429) {
-        throw new PaymentUserError(backendMessage);
-      }
+      /* Only customer-facing errors use PaymentUserError, which is what lets them reach the
+         screen; anything else is an HTTP dump and stays opaque. */
+      if (message)
+        throw new PaymentUserError(message, { logDetail: backendMessage });
 
       throw new Error(`HTTP ${response.status}: ${backendMessage}`);
     }

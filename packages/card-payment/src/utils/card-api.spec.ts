@@ -79,10 +79,10 @@ describe('utils/card-api', () => {
       expect(error).toHaveProperty('message', 'We couldn\'t add this card. Please double-check the details or try a different card.');
     });
 
-    it('passes the backend\'s rate limit message through, as it is written for the buyer', async () => {
+    it('explains the rate limit', async () => {
       respond(429, { message: 'Too many attempts. Try again in a minute.' });
 
-      await expect(addCard({ paymentMethodNonce: 'nonce-1' })).rejects.toThrow('Too many attempts. Try again in a minute.');
+      await expect(addCard({ paymentMethodNonce: 'nonce-1' })).rejects.toThrow('Too many add-card attempts.');
     });
 
     it('keeps other failures opaque to the buyer', async () => {

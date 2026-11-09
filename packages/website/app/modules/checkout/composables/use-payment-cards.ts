@@ -9,6 +9,7 @@ import {
   SavedCardResponseSchema,
   SavedCardSchema,
 } from '@rotki/card-payment-common/schemas/payment';
+import { addCardErrorMessage, type AddCardFailure, isCardAddedFailure } from '@rotki/checkout-ui/utils/add-card-error';
 import { get } from '@vueuse/shared';
 import { useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { nonEmpty } from '~/utils/non-empty';
@@ -24,39 +25,19 @@ interface UsePaymentCardsReturn {
   setDefaultCard: (token: string) => Promise<void>;
 }
 
-const CARD_ADD_FAILED_CODE = 'card_add_failed';
-
 export function usePaymentCards(): UsePaymentCardsReturn {
   const logger = useLogger('card-payment');
   const { fetchWithCsrf } = useFetchWithCsrf();
   const emailConfirmed = useEmailConfirmedCookie();
   const { t } = useI18n();
 
-  function rateLimitMessage(backendMessage: string): string {
-    return backendMessage.toLowerCase().includes('failed')
-      ? t('home.account.payment_methods.errors.rate_limited_failures')
-      : t('home.account.payment_methods.errors.rate_limited');
-  }
-
-  function isCardAddedPaymentError(error: any): boolean {
-    return error?.statusCode === 400 && error?.data?.code === CARD_ADD_FAILED_CODE;
+  function addCardFailure(error: any): AddCardFailure {
+    return { code: error?.data?.code, message: error?.data?.message, status: error?.statusCode };
   }
 
   function buildAddCardError(error: any): Error {
-    const { statusCode, data, message } = error ?? {};
-
-    if (statusCode === 429)
-      return new Error(rateLimitMessage(data?.message ?? ''));
-
-    if (isCardAddedPaymentError(error))
-      return new Error(t('home.account.payment_methods.errors.payment_method_failed'));
-
-    /* 400s here are schema errors the user can't act on or raw Braintree gateway dumps
-       ("Do Not Honor"), so show a friendly message; the raw cause stays in the logs. */
-    if (statusCode === 400)
-      return new Error(t('home.account.payment_methods.errors.card_declined'));
-
-    return new Error(nonEmpty(data?.message) ?? nonEmpty(message) ?? t('common.error_occurred'));
+    const message = addCardErrorMessage(t, addCardFailure(error));
+    return new Error(message ?? nonEmpty(error?.data?.message) ?? nonEmpty(error?.message) ?? t('common.error_occurred'));
   }
 
   const { data, pending, refresh } = useAsyncData<SavedCard[]>(
@@ -107,7 +88,7 @@ export function usePaymentCards(): UsePaymentCardsReturn {
     }
     catch (error: any) {
       logger.error(error);
-      if (isCardAddedPaymentError(error)) {
+      if (isCardAddedFailure(addCardFailure(error))) {
         await refresh();
       }
       throw buildAddCardError(error);

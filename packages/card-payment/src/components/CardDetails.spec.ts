@@ -9,9 +9,9 @@ const client: Client = { authorization: 'client-token', getConfiguration: vi.fn(
 
 const tokenize = vi.fn(async () => ({ bin: '411111', nonce: 'nonce-1' }));
 
-const NewCardForm = defineComponent({
-  name: 'NewCardForm',
-  props: { client: { type: Object, required: true }, disabled: Boolean },
+const HostedCardForm = defineComponent({
+  name: 'HostedCardForm',
+  props: { createFields: { type: Function, required: true }, disabled: Boolean },
   emits: ['validation-change', 'error'],
   setup(_, { expose }) {
     expose({ tokenize });
@@ -28,7 +28,7 @@ type Props = InstanceType<typeof CardDetails>['$props'];
 const stubs = {
   AddCardDialog: true,
   CardSelectionDialog: true,
-  NewCardForm,
+  HostedCardForm,
   SavedCardDisplay: { props: ['card'], template: '<div data-cy="saved-card">{{ card.last4 }}</div>' },
 };
 
@@ -67,7 +67,7 @@ describe('components/CardDetails', () => {
   it('passes the new card form\'s validity and tokenizing on', async () => {
     const wrapper = mount(CardDetails, { global: { stubs }, props: { cards: [], client, selectedCard: undefined } });
 
-    wrapper.getComponent(NewCardForm).vm.$emit('validation-change', true);
+    wrapper.getComponent(HostedCardForm).vm.$emit('validation-change', true);
     expect(wrapper.emitted('validation-change')).toEqual([[true]]);
 
     await expect(wrapper.vm.tokenize()).resolves.toEqual({ bin: '411111', nonce: 'nonce-1' });

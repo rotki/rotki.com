@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import type { CreateCardFields } from '@rotki/checkout-ui/utils/hosted-fields';
+import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
 import { parseBraintreeError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { ref } from 'vue';
-import CardForm from '~/components/account/home/payment-methods/CardForm.vue';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
@@ -17,7 +18,7 @@ const emit = defineEmits<{
 const isProcessing = ref<boolean>(false);
 const cardFormValid = ref<boolean>(false);
 const error = ref<{ title: string; message: string }>();
-const cardForm = useTemplateRef<InstanceType<typeof CardForm>>('cardForm');
+const cardForm = useTemplateRef<InstanceType<typeof HostedCardForm>>('cardForm');
 
 const { t } = useI18n({ useScope: 'global' });
 const logger = useLogger('add-card-dialog');
@@ -27,6 +28,16 @@ const { userMessageFor } = usePaymentErrorMessage();
 const { client, clientError, initializeClient, teardownClient } = useBraintreeClient('card');
 
 const isFormValid = logicAnd(cardFormValid, logicNot(isProcessing));
+
+/** Loads Braintree only when the dialog opens a form. */
+const createFields: CreateCardFields = async (options) => {
+  const { create } = await import('braintree-web/hosted-fields');
+  return create({ client: get(client)!, ...options });
+};
+
+function showFormError(message: string): void {
+  set(error, { title: t('common.error'), message });
+}
 
 async function handleAddCard() {
   if (!get(cardForm) || !get(isFormValid)) {
@@ -123,12 +134,12 @@ onUnmounted(async () => {
       />
 
       <!-- Card Form -->
-      <CardForm
+      <HostedCardForm
         v-if="client"
         ref="cardForm"
-        :client="client"
+        :create-fields="createFields"
         :disabled="isProcessing"
-        @update:error="error = $event"
+        @error="showFormError($event)"
         @validation-change="cardFormValid = $event"
       />
 

@@ -1,35 +1,33 @@
-import type { Client } from 'braintree-web/client';
+import type { CardFieldEvent, CardFieldsInstance } from '../utils/hosted-fields';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { create } from 'braintree-web/hosted-fields';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import NewCardForm from './NewCardForm.vue';
+import { installCheckoutMessages } from '../composables/checkout-messages';
+import { checkoutMessages } from '../messages/en';
+import { createTranslator } from '../utils/translator';
+import HostedCardForm from './HostedCardForm.vue';
 
 type FieldKey = 'number' | 'expirationDate' | 'cvv';
 
-type Handler = (event: { emittedBy: FieldKey; fields: Record<FieldKey, { isValid: boolean }> }) => void;
-
 const fields = vi.hoisted(() => ({
-  handlers: new Map<string, (event: unknown) => void>(),
+  handlers: new Map<string, (event: CardFieldEvent) => void>(),
   setAttribute: vi.fn(),
   removeAttribute: vi.fn(),
   tokenize: vi.fn(async () => ({ nonce: 'card-nonce', details: { bin: '411111' } })),
   teardown: vi.fn(async () => {}),
 }));
 
-vi.mock('braintree-web/hosted-fields', () => ({
-  create: vi.fn(async () => ({
-    on: (name: string, handler: (event: unknown) => void) => fields.handlers.set(name, handler),
-    setAttribute: fields.setAttribute,
-    removeAttribute: fields.removeAttribute,
-    tokenize: fields.tokenize,
-    teardown: fields.teardown,
-  })),
+const create = vi.fn(async (): Promise<CardFieldsInstance> => ({
+  on: (name, handler) => {
+    fields.handlers.set(name, handler);
+  },
+  setAttribute: fields.setAttribute,
+  removeAttribute: fields.removeAttribute,
+  tokenize: fields.tokenize,
+  teardown: fields.teardown,
 }));
 
-const client: Client = { authorization: 'client-token', getConfiguration: vi.fn(), request: vi.fn(), teardown: vi.fn() };
-
 function fire(name: string, emittedBy: FieldKey, valid: Partial<Record<FieldKey, boolean>> = {}): void {
-  const handler: Handler | undefined = fields.handlers.get(name);
+  const handler = fields.handlers.get(name);
   handler?.({
     emittedBy,
     fields: {
@@ -40,8 +38,13 @@ function fire(name: string, emittedBy: FieldKey, valid: Partial<Record<FieldKey,
   });
 }
 
-async function mountForm(disabled = false): Promise<VueWrapper<InstanceType<typeof NewCardForm>>> {
-  const wrapper = mount(NewCardForm, { props: { client, disabled } });
+async function mountForm(disabled = false): Promise<VueWrapper<InstanceType<typeof HostedCardForm>>> {
+  const wrapper = mount(HostedCardForm, {
+    global: {
+      plugins: [{ install: app => installCheckoutMessages(app, createTranslator(checkoutMessages)) }],
+    },
+    props: { createFields: create, disabled },
+  });
   await flushPromises();
   return wrapper;
 }
@@ -52,7 +55,7 @@ function label(wrapper: VueWrapper, text: string): string {
   return found?.classes().join(' ') ?? '';
 }
 
-describe('components/NewCardForm', () => {
+describe('hostedCardForm', () => {
   beforeEach(() => {
     fields.handlers.clear();
   });
@@ -65,7 +68,6 @@ describe('components/NewCardForm', () => {
     const wrapper = await mountForm();
 
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
-      client,
       fields: {
         number: { container: '#card-number' },
         cvv: { container: '#cvv' },
@@ -126,10 +128,10 @@ describe('components/NewCardForm', () => {
 
   it('reports when Braintree cannot set the fields up', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.mocked(create).mockRejectedValueOnce(new Error('bad token'));
+    create.mockRejectedValueOnce(new Error('bad token'));
     const wrapper = await mountForm();
 
-    expect(wrapper.emitted('error')).toEqual([['Failed to initialize payment form: bad token']]);
+    expect(wrapper.emitted('error')).toEqual([['The card form could not start. Please reload the page and try again.']]);
     await expect(wrapper.vm.tokenize()).rejects.toThrow('Hosted fields not initialized');
   });
 

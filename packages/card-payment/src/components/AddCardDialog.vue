@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { Client } from 'braintree-web/client';
+import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
 import { get, set } from '@vueuse/core';
 import { ref, useTemplateRef, watch } from 'vue';
 import { addCard, CardAddedPaymentError } from '@/utils/card-api';
+import { cardFieldsFor } from '@/utils/hosted-fields';
 import { userPaymentMessage } from '@/utils/payment-error';
 import BaseButton from './BaseButton.vue';
 import BaseDialog from './BaseDialog.vue';
-import NewCardForm from './NewCardForm.vue';
 
 const open = defineModel<boolean>('open', { required: true });
 
@@ -22,7 +23,7 @@ const emit = defineEmits<{
 const addCardFormValid = ref<boolean>(false);
 const isAddingCard = ref<boolean>(false);
 const addCardError = ref<string>();
-const addCardForm = useTemplateRef<InstanceType<typeof NewCardForm>>('addCardForm');
+const addCardForm = useTemplateRef<InstanceType<typeof HostedCardForm>>('addCardForm');
 
 async function handleAddCard(): Promise<void> {
   if (!get(addCardFormValid)) {
@@ -72,10 +73,10 @@ watch(open, (isOpen) => {
     v-model:open="open"
     title="Add a new card"
   >
-    <NewCardForm
+    <HostedCardForm
       v-if="client"
       ref="addCardForm"
-      :client="client"
+      :create-fields="cardFieldsFor(client)"
       :disabled="isAddingCard"
       @validation-change="addCardFormValid = $event"
       @error="addCardError = $event"

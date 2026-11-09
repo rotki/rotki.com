@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
 import { get } from '@vueuse/shared';
-import CampaignRibbon from '~/components/common/CampaignRibbon.vue';
 import { useAppConfig } from '~/composables/use-app-config';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { useCheckoutDiscount } from '~/modules/checkout/composables/use-checkout';
@@ -30,7 +30,11 @@ onBeforeMount(() => {
 
 <template>
   <div class="flex flex-col h-full grow">
-    <CampaignRibbon :applied="campaignApplied" />
+    <CampaignRibbon
+      v-if="activeCampaign"
+      :campaign="activeCampaign"
+      :applied="campaignApplied"
+    />
     <div
       class="flex grow min-w-0"
       :class="{ 'container py-4 lg:py-8 overflow-x-auto': isFirstStep }"

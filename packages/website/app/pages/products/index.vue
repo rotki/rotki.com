@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CampaignRibbon from '~/components/common/CampaignRibbon.vue';
+import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
 import PricingSection from '~/components/pricings/PricingSection.vue';
 import ProductsAnalytics from '~/components/products/ProductsAnalytics.vue';
 import ProductsBlocks from '~/components/products/ProductsBlocks.vue';
@@ -8,9 +8,12 @@ import ProductsHeading from '~/components/products/ProductsHeading.vue';
 import ProductsLimits from '~/components/products/ProductsLimits.vue';
 import ProductsNewFeatures from '~/components/products/ProductsNewFeatures.vue';
 import ProductsTimeframe from '~/components/products/ProductsTimeframe.vue';
+import { useAppConfig } from '~/composables/use-app-config';
 import { usePageSeo } from '~/composables/use-page-seo';
 
 const { t } = useI18n({ useScope: 'global' });
+
+const { activeCampaign } = useAppConfig();
 
 usePageSeo(
   'rotki Premium: higher limits, analytics and sync',
@@ -24,7 +27,10 @@ definePageMeta({
 </script>
 
 <template>
-  <CampaignRibbon />
+  <CampaignRibbon
+    v-if="activeCampaign"
+    :campaign="activeCampaign"
+  />
   <ProductsHeading />
   <ProductsBlocks />
   <ProductsNewFeatures />

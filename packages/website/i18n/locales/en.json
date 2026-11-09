@@ -539,11 +539,6 @@
       }
     }
   },
-  "campaign": {
-    "ribbon": "Limited-time offer: {percent}% off your first payment with code {code}.",
-    "ribbon_applied": "Code {code} applied: {percent}% off your first payment.",
-    "ribbon_last_day": "Last day {date} (UTC)."
-  },
   "change_plan": {
     "switch_agree": "I confirm that no payment has been sent. {separator}Allow me to switch the plan",
     "switch_warning": "Switching a plan after sending a payment can lead to problems with the activation of your subscription. Please only switch a plan if no payment has been sent.",
@@ -666,12 +661,6 @@
         "add_card": "Add card",
         "cannot_delete_linked_card": "This card is used for subscription auto-renewal and cannot be deleted",
         "crypto_subscription_no_card_operations": "Card operations are not available for cryptocurrency subscriptions",
-        "errors": {
-          "card_declined": "We couldn't add this card. Please double-check the details or try a different card.",
-          "payment_method_failed": "We couldn't process this payment method. Please try a different card or contact us at support{'@'}rotki.com if the problem continues.",
-          "rate_limited": "Too many add-card attempts. Please wait a while before trying again.",
-          "rate_limited_failures": "Too many failed card attempts. For your security, please wait a while before trying again."
-        },
         "link_card": "Set for auto-renewal",
         "linked_card": "Auto-renewal card",
         "no_active_subscription": "No active subscription found",
