@@ -45,8 +45,6 @@ export type CreateCardNonceResponse = z.infer<typeof CreateCardNonceResponseSche
 
 export type CardPaymentRequest = z.infer<typeof CardPaymentRequestSchema>;
 
-export type CardPaymentResponse = z.infer<typeof CardPaymentResponseSchema>;
-
 export type AddCardPayload = z.infer<typeof AddCardPayloadSchema>;
 
 export type CreateCardNoncePayload = z.infer<typeof CreateCardNoncePayloadSchema>;

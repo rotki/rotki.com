@@ -31,18 +31,6 @@ export const SelectedPlanSchema = z.object({
   durationInMonths: z.number(),
 });
 
-export const PriceBreakdownSchema = z.object({
-  planId: z.number(),
-  vatRate: z.string(),
-  billingFrequencyMonths: z.number(),
-  priceBreakdown: z.object({
-    finalPrice: z.string(),
-    basePrice: z.string(),
-    vatAmount: z.string(),
-  }),
-  country: z.string(),
-});
-
 // Discount info schemas for payment breakdown response (discriminated union)
 export const ValidPaymentBreakdownDiscountSchema = z.object({
   isValid: z.literal(true),
@@ -95,15 +83,7 @@ export type AvailablePlansResponse = z.infer<typeof AvailablePlansResponseSchema
 
 export type SelectedPlan = z.infer<typeof SelectedPlanSchema>;
 
-export type PriceBreakdown = z.infer<typeof PriceBreakdownSchema>;
-
-export type ValidPaymentBreakdownDiscount = z.infer<typeof ValidPaymentBreakdownDiscountSchema>;
-
-export type InvalidPaymentBreakdownDiscount = z.infer<typeof InvalidPaymentBreakdownDiscountSchema>;
-
 export type PaymentBreakdownDiscount = z.infer<typeof PaymentBreakdownDiscountSchema>;
-
-export type PaymentBreakdownCredit = z.infer<typeof PaymentBreakdownCreditSchema>;
 
 export type PaymentBreakdownResponse = z.infer<typeof PaymentBreakdownResponseSchema>;
 

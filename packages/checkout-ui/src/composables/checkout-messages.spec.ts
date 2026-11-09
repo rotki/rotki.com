@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { defineComponent, h } from 'vue';
 import { createTranslator } from '../utils/translator';
-import { installCheckoutMessages, provideCheckoutMessages, useCheckoutMessages } from './checkout-messages';
+import { installCheckoutMessages, useCheckoutMessages } from './checkout-messages';
 
 const Child = defineComponent({
   setup() {
@@ -20,17 +20,6 @@ describe('checkout messages', () => {
     });
 
     expect(wrapper.text()).toBe('Hello rotki');
-  });
-
-  it('gives child components the translate function provided by a parent', () => {
-    const Parent = defineComponent({
-      setup() {
-        provideCheckoutMessages(translate);
-        return () => h(Child);
-      },
-    });
-
-    expect(mount(Parent).text()).toBe('Hello rotki');
   });
 
   it('throws when nothing was supplied', () => {

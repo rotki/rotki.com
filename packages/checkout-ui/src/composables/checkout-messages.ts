@@ -1,5 +1,5 @@
 import type { CheckoutTranslate } from '../utils/translator';
-import { type App, inject, type InjectionKey, provide } from 'vue';
+import { type App, inject, type InjectionKey } from 'vue';
 
 const checkoutMessagesKey: InjectionKey<CheckoutTranslate> = Symbol('checkout-messages');
 
@@ -10,14 +10,6 @@ const checkoutMessagesKey: InjectionKey<CheckoutTranslate> = Symbol('checkout-me
  */
 export function installCheckoutMessages(app: App, translate: CheckoutTranslate): void {
   app.provide(checkoutMessagesKey, translate);
-}
-
-/**
- * Supplies the translate function to the shared checkout components below the calling
- * component only. Mostly for tests and previews; apps use `installCheckoutMessages`.
- */
-export function provideCheckoutMessages(translate: CheckoutTranslate): void {
-  provide(checkoutMessagesKey, translate);
 }
 
 /**

@@ -51,5 +51,3 @@ export const AccountResponseSchema = z.object({
   message: z.string().optional(),
   result: AccountSchema.optional(),
 });
-
-export type AccountResponse = z.infer<typeof AccountResponseSchema>;

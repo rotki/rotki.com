@@ -58,9 +58,3 @@ export const UserSubscriptionsSchema = z.array(SubscriptionSchema);
 export type UserSubscriptions = z.infer<typeof UserSubscriptionsSchema>;
 
 // User subscriptions response wrapper
-export const UserSubscriptionsResponseSchema = z.object({
-  message: z.string().optional(),
-  result: UserSubscriptionsSchema.optional(),
-});
-
-export type UserSubscriptionsResponse = z.infer<typeof UserSubscriptionsResponseSchema>;

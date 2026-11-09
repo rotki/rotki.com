@@ -3,17 +3,14 @@ import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOpti
 import { CARD_NOT_IN_VAULT_MESSAGE, findVaultBin } from '@rotki/card-payment-common/utils/saved-card';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents, PaymentUserError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useBraintreeToken } from '~/modules/checkout/composables/use-braintree-token';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
+import { mountChallengeFrame } from '~/modules/checkout/utils/three-d-secure-challenge';
 import { useLogger } from '~/utils/use-logger';
 
 interface AuthenticationIframeEvent {
   element: HTMLIFrameElement;
-}
-
-interface BraintreeClientTokenResponse {
-  braintreeClientToken: string;
 }
 
 export interface CardVerificationRequest {
@@ -39,7 +36,7 @@ interface UseCardThreeDSecureReturn {
 
 export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   const logger = useLogger('card-three-d-secure');
-  const { fetchWithCsrf } = useFetchWithCsrf();
+  const { fetchClientToken } = useBraintreeToken();
   const { logPaymentEvent } = usePaymentLogger();
   const { createCardNonce, setDefaultCard } = usePaymentCards();
 
@@ -85,19 +82,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
         return;
       }
 
-      logger.debug('3DS iframe element found, styling and adding to container');
-
-      // Style the iframe
-      iframe.style.maxWidth = '100%';
-      iframe.style.minHeight = '400px';
-      iframe.style.border = 'none';
-      iframe.style.borderRadius = '8px';
-
-      const container = typeof document === 'undefined' ? null : document.getElementById('threeds-iframe-container');
-      if (container) {
-        logger.debug('3DS iframe container found, appending iframe');
-        container.innerHTML = '';
-        container.appendChild(iframe);
+      if (mountChallengeFrame(iframe)) {
         onChallengeRequired();
         logger.info('3DS challenge active - iframe added to DOM');
       }
@@ -223,13 +208,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
   async function verifyAndSetDefaultCard({ cardToken, cardLast4, cardExpiresAt, amount, onChallengeRequired, onVerificationComplete }: CardVerificationRequest): Promise<void> {
     logger.debug('Starting complete 3DS verification and card setup flow');
 
-    // Fetch Braintree client token
-    const tokenResponse = await fetchWithCsrf<BraintreeClientTokenResponse>(
-      '/webapi/2/braintree/customer',
-      {
-        method: 'GET',
-      },
-    );
+    const braintreeToken = await fetchClientToken();
 
     // Run 3DS verification
     const enrichedNonce = await initialize({
@@ -237,7 +216,7 @@ export function useCardThreeDSecure(): UseCardThreeDSecureReturn {
       cardLast4,
       cardExpiresAt,
       amount,
-      braintreeToken: tokenResponse.braintreeClientToken,
+      braintreeToken,
       onChallengeRequired,
     });
 

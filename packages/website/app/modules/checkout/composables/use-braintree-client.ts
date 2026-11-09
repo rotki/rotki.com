@@ -2,14 +2,10 @@ import type { PaymentErrorContext } from '@rotki/checkout-ui/utils/payment-error
 import type { Client } from 'braintree-web/client';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
-import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
+import { useBraintreeToken } from '~/modules/checkout/composables/use-braintree-token';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { useLogger } from '~/utils/use-logger';
-
-interface BraintreeClientTokenResponse {
-  braintreeClientToken: string;
-}
 
 interface UseBraintreeClientReturn {
   client: Readonly<Ref<Client | undefined>>;
@@ -34,84 +30,23 @@ export function useBraintreeClient(errorContext: PaymentErrorContext = 'payment'
   const clientInitializing = shallowRef<boolean>(false);
 
   const logger = useLogger('braintree-client');
-  const { fetchWithCsrf } = useFetchWithCsrf();
+  const { fetchClientToken } = useBraintreeToken();
   const { logPaymentEvent } = usePaymentLogger();
   const { userMessageFor } = usePaymentErrorMessage();
   const { t } = useI18n({ useScope: 'global' });
 
-  /**
-   * Initialize Braintree client with a provided token
-   * Used by checkout flow where token comes from payment breakdown
-   * @param token - The Braintree client token
-   * @returns true if successful, false if failed
-   */
-  const initializeClientWithToken = async (token: string): Promise<boolean> => {
-    if (get(client) || get(clientInitializing)) {
+  /** Creates the client once; a failure ends up in `clientError` and the payment log. */
+  async function connect(readToken: () => Promise<string> | string): Promise<boolean> {
+    if (get(client) || get(clientInitializing))
       return true;
-    }
-
-    if (!token) {
-      set(clientError, t('subscription.error.init_error'));
-      return false;
-    }
 
     set(clientInitializing, true);
     set(clientError, undefined);
 
     try {
+      const authorization = await readToken();
       const { create } = await import('braintree-web/client');
-      const newClient = await create({
-        authorization: token,
-      });
-
-      set(client, newClient);
-      return true;
-    }
-    catch (error: unknown) {
-      logger.error('Failed to initialize Braintree client with token:', error);
-      const parsed = parseBraintreeError(error);
-      logPaymentEvent({
-        paymentMethod: CheckoutPaymentMethods.CARD,
-        event: PaymentServerEvents.BRAINTREE_INIT_FAILED,
-        errorMessage: parsed.logMessage,
-        errorCode: parsed.code,
-        step: CheckoutSteps.INIT,
-      });
-      set(clientError, userMessageFor(parsed, errorContext));
-      return false;
-    }
-    finally {
-      set(clientInitializing, false);
-    }
-  };
-
-  /**
-   * Initialize Braintree client by fetching token and creating client instance
-   * Used by account management features
-   * @returns true if successful, false if failed (check clientError for details)
-   */
-  const initializeClient = async (): Promise<boolean> => {
-    if (get(client) || get(clientInitializing)) {
-      return true;
-    }
-
-    set(clientInitializing, true);
-    set(clientError, undefined);
-
-    try {
-      const tokenResponse = await fetchWithCsrf<BraintreeClientTokenResponse>(
-        '/webapi/2/braintree/customer',
-        {
-          method: 'GET',
-        },
-      );
-
-      const { create } = await import('braintree-web/client');
-      const newClient = await create({
-        authorization: tokenResponse.braintreeClientToken,
-      });
-
-      set(client, newClient);
+      set(client, await create({ authorization }));
       return true;
     }
     catch (error: unknown) {
@@ -130,7 +65,19 @@ export function useBraintreeClient(errorContext: PaymentErrorContext = 'payment'
     finally {
       set(clientInitializing, false);
     }
+  }
+
+  /** For the checkout, where the token comes with the payment breakdown. */
+  const initializeClientWithToken = async (token: string): Promise<boolean> => {
+    if (!token && !get(client) && !get(clientInitializing)) {
+      set(clientError, t('subscription.error.init_error'));
+      return false;
+    }
+    return connect(() => token);
   };
+
+  /** For the account pages, which ask the backend for a token. */
+  const initializeClient = async (): Promise<boolean> => connect(fetchClientToken);
 
   /**
    * Teardown Braintree client to clean up resources

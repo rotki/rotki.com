@@ -12,6 +12,7 @@ import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';
 import { isOutcomeUnknown, paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
+import { mountChallengeFrame } from '~/modules/checkout/utils/three-d-secure-challenge';
 import { useLogger } from '~/utils/use-logger';
 
 /**
@@ -137,15 +138,7 @@ export function useThreeDSecure(): UseThreeDSecureReturn {
         logger.error('3D Secure iframe element missing');
         return;
       }
-      // Braintree's wrapper around the bank's iframe: the standard 500x600 window, narrower on phones.
-      challengeFrame.style.maxWidth = 'min(100%, 500px)';
-      challengeFrame.style.minHeight = '400px';
-      challengeFrame.style.border = 'none';
-      challengeFrame.style.borderRadius = '8px';
-      const container = typeof document === 'undefined' ? null : document.getElementById('threeds-iframe-container');
-      if (container) {
-        container.innerHTML = '';
-        container.appendChild(challengeFrame);
+      if (mountChallengeFrame(challengeFrame)) {
         set(challengeVisible, true);
         set(state, 'challenge-active');
         logger.info('3D Secure challenge active');
