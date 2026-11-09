@@ -9,6 +9,7 @@ import {
   PaymentBreakdownResponseSchema,
 } from '@rotki/card-payment-common/schemas/plans';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { readCookie } from '@rotki/sigil';
 import { err, map, ok } from 'plainfp/result';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
@@ -17,8 +18,7 @@ import { readResponse } from './read-response';
 
 /** The CSRF token from the `csrftoken` cookie the rotki.com backend sets. */
 function readCSRFCookie(): string | undefined {
-  const cookie = document.cookie.split(';').find(entry => entry.trim().startsWith('csrftoken='));
-  return cookie ? cookie.slice(cookie.indexOf('=') + 1) : undefined;
+  return readCookie(document.cookie, 'csrftoken');
 }
 
 /** Shared by the requests that start together on load, so the token is asked for once. */

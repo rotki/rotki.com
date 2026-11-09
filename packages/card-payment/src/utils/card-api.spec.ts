@@ -2,7 +2,7 @@ import { err, ok } from 'plainfp/result';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchWithCSRF } from './api';
 import { failed, userFacing } from './api-failure';
-import { addCard, createCardNonce, deleteCard, getSavedCard } from './card-api';
+import { addCard, createCardNonce, deleteCard, getSavedCard, trackCardPaymentFailure, trackCardPaymentSubmitted } from './card-api';
 
 vi.mock('./api', () => ({ fetchWithCSRF: vi.fn() }));
 
@@ -134,6 +134,58 @@ describe('utils/card-api', () => {
       respond(400, { message: 'This card pays your subscription' });
 
       await expect(deleteCard('tok-1')).resolves.toEqual(err(failed('This card pays your subscription')));
+    });
+  });
+
+  describe('event attribution', () => {
+    const track = vi.fn();
+    const session = { sessionId: 'sess-abc', utm: { utmSource: 'newsletter', utmCampaign: 'autumn', landingPath: '/' } };
+
+    beforeEach(() => {
+      vi.stubGlobal('umami', { track });
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response()));
+      document.cookie = `_utm=${encodeURIComponent(JSON.stringify(session))}`;
+    });
+
+    afterEach(() => {
+      document.cookie = '_utm=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      track.mockReset();
+      vi.unstubAllGlobals();
+    });
+
+    const attribution = { session_id: 'sess-abc', utm_source: 'newsletter', utm_campaign: 'autumn', landing_path: '/' };
+
+    it('tags a submitted card payment with the session in the cookie', () => {
+      trackCardPaymentSubmitted({ planId: 1, durationInMonths: 12, isUpgrade: false, cardType: 'new', discountApplied: false });
+
+      expect(track).toHaveBeenCalledWith('payment_submitted', expect.objectContaining({ payment_method: 'card', plan_id: 1, ...attribution }));
+    });
+
+    it('tags a failed card payment with the session in the cookie', () => {
+      trackCardPaymentFailure({ failure: 'CARD_PAYMENT_API_ERROR', errorMessage: 'boom', planId: 1, isUpgrade: false, step: 'submit' });
+
+      expect(track).toHaveBeenCalledWith('payment_failed', expect.objectContaining({ payment_method: 'card', plan_id: 1, ...attribution }));
+    });
+
+    it('still sends the event when the cookie cannot be read', () => {
+      const blocked = vi.spyOn(document, 'cookie', 'get').mockImplementation(() => {
+        throw new DOMException('Blocked', 'SecurityError');
+      });
+
+      expect(() => trackCardPaymentSubmitted({ planId: 1, durationInMonths: 12, isUpgrade: false, cardType: 'new', discountApplied: false })).not.toThrow();
+      blocked.mockRestore();
+
+      expect(track).toHaveBeenCalledWith('payment_submitted', expect.objectContaining({ payment_method: 'card' }));
+    });
+
+    it('still sends the event when there is no cookie', () => {
+      document.cookie = '_utm=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+      trackCardPaymentSubmitted({ planId: 1, durationInMonths: 12, isUpgrade: false, cardType: 'new', discountApplied: false });
+
+      const data: unknown = track.mock.calls[0]?.[1];
+      expect(data).toEqual(expect.objectContaining({ payment_method: 'card' }));
+      expect(data).not.toHaveProperty('utm_source');
     });
   });
 });

@@ -1,4 +1,4 @@
-import { createTrackingSession, parseUtmFromQuery, type TrackingSession, UTM_COOKIE_MAX_AGE_SECONDS, UTM_COOKIE_NAME } from '@rotki/sigil';
+import { parseUtmFromQuery, resolveTrackingSession, type TrackingSession, UTM_COOKIE_MAX_AGE_SECONDS, UTM_COOKIE_NAME } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 
 export function useUtmTracking() {
@@ -11,19 +11,15 @@ export function useUtmTracking() {
     if (import.meta.server)
       return;
 
-    if (get(utmCookie))
-      return;
-
     const route = useRoute();
-    const utm = parseUtmFromQuery(route.query);
-    const hasUtm = Object.values(utm).some(v => !!v);
-    const referrer = typeof document === 'undefined' ? '' : document.referrer;
-
-    set(utmCookie, createTrackingSession({
-      utm: hasUtm ? utm : undefined,
-      referrer,
+    const session = resolveTrackingSession(get(utmCookie), {
+      utm: parseUtmFromQuery(route.query),
+      referrer: typeof document === 'undefined' ? '' : document.referrer,
       landingPath: route.fullPath,
-    }));
+    });
+
+    if (session)
+      set(utmCookie, session);
   }
 
   function getTrackingData(): TrackingSession | undefined {

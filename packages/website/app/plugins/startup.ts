@@ -12,7 +12,7 @@ export default defineNuxtPlugin(async () => {
   if (name === 'health')
     return;
 
-  // Capture UTM params on first visit (client-side only)
+  // Capture UTM params on each page load (client-side only)
   if (import.meta.client) {
     const { sigilDebug } = useRuntimeConfig().public;
     if (sigilDebug) {

@@ -11,7 +11,7 @@ import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { checkoutMessages } from '@rotki/checkout-ui/messages/en';
 import { addCardErrorMessage, isCardAddedFailure } from '@rotki/checkout-ui/utils/add-card-error';
 import { createTranslator } from '@rotki/checkout-ui/utils/translator';
-import { type CardType, type CheckoutStep, logPaymentFailure, monthsToPlanDuration, parseBraintreeError, type PaymentFailureKey, PaymentFailures, SigilEvents, sigilTrack, toSnakeCaseKeys } from '@rotki/sigil';
+import { buildTrackedEventData, type CardType, type CheckoutStep, logPaymentFailure, monthsToPlanDuration, parseBraintreeError, parseTrackingSessionCookie, type PaymentFailureKey, PaymentFailures, SigilEvents, sigilTrack, toSnakeCaseKeys, type TrackingSession } from '@rotki/sigil';
 import { err, map, ok } from 'plainfp/result';
 import { z } from 'zod';
 import { paths } from '@/config/paths';
@@ -48,15 +48,29 @@ const t = createTranslator(checkoutMessages);
 
 type BackendError = z.infer<typeof BackendErrorSchema>;
 
+/** The attribution session the website stored. Tracking must never break a payment, so a blocked cookie read gives none. */
+function readTrackingSession(): TrackingSession | undefined {
+  try {
+    return parseTrackingSessionCookie(document.cookie);
+  }
+  catch {
+    return undefined;
+  }
+}
+
+function trackWithAttribution(event: string, data: object): void {
+  sigilTrack(event, buildTrackedEventData(toSnakeCaseKeys(data), readTrackingSession()));
+}
+
 export function trackCardPaymentSubmitted({ planId, durationInMonths, isUpgrade, cardType, discountApplied }: CardSubmittedInput): void {
-  sigilTrack(SigilEvents.PAYMENT_SUBMITTED, toSnakeCaseKeys({
+  trackWithAttribution(SigilEvents.PAYMENT_SUBMITTED, {
     paymentMethod: 'card',
     planId,
     planDuration: monthsToPlanDuration(durationInMonths),
     isUpgrade,
     cardType,
     discountApplied,
-  }));
+  });
 }
 
 /**
@@ -77,7 +91,7 @@ export function trackCardPaymentFailure({ failure, errorMessage, planId, isUpgra
     isUpgrade,
     cardType,
     discountApplied,
-  }, (event, payload) => sigilTrack(event, toSnakeCaseKeys(payload)));
+  }, trackWithAttribution);
 }
 
 /**

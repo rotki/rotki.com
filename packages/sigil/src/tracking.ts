@@ -1,6 +1,7 @@
 /* Sigil track helper, UTM attribution contract, and pure tracking helpers.
    Sigil is the only place that talks to `window.umami` directly; everything
    else goes through `sigilTrack`. */
+import { z } from 'zod';
 
 declare global {
   interface Window {
@@ -52,46 +53,67 @@ export function sigilTrack(event: string, data: Record<string, unknown> = {}): v
   }
 }
 
-/* UTM attribution contract: types and cookie constants for the first-touch
-   attribution session that every Sigil event is tagged with. Shared so any
-   future client (e.g. the card-payment SPA) that wants session continuity can
-   read the same cookie using the same shape. */
+/* UTM attribution contract: types and cookie constants for the attribution
+   session that every Sigil event is tagged with. The first non-empty
+   `utm_source` within the 30-day window wins. The website writes the cookie and
+   the card-payment SPA only reads it. */
 
 export const UTM_COOKIE_NAME = '_utm';
 
 export const UTM_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
-export interface UtmParams {
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
-  utmContent?: string;
-  utmTerm?: string;
-  referrer?: string;
-  landingPath?: string;
-  capturedAt?: string;
+const UtmParamsSchema = z.object({
+  utmSource: z.string().optional(),
+  utmMedium: z.string().optional(),
+  utmCampaign: z.string().optional(),
+  utmContent: z.string().optional(),
+  utmTerm: z.string().optional(),
+  referrer: z.string().optional(),
+  landingPath: z.string().optional(),
+  capturedAt: z.string().optional(),
+});
+
+const TrackingSessionSchema = z.object({
+  sessionId: z.string(),
+  utm: UtmParamsSchema,
+});
+
+export type UtmParams = z.infer<typeof UtmParamsSchema>;
+
+export type TrackingSession = z.infer<typeof TrackingSessionSchema>;
+
+/** The raw value of the cookie called `name` in a `document.cookie` string. */
+export function readCookie(cookies: string, name: string): string | undefined {
+  const prefix = `${name}=`;
+  return cookies.split(';').map(cookie => cookie.trim()).find(cookie => cookie.startsWith(prefix))?.slice(prefix.length);
 }
 
-export interface TrackingSession {
-  sessionId: string;
-  utm: UtmParams;
+/**
+ * Read the tracking session out of a `document.cookie` string, for clients that
+ * can't use Nuxt's `useCookie`. A missing or malformed cookie gives `undefined`.
+ */
+export function parseTrackingSessionCookie(cookies: string): TrackingSession | undefined {
+  const value = readCookie(cookies, UTM_COOKIE_NAME);
+  if (!value)
+    return undefined;
+
+  try {
+    const parsed = TrackingSessionSchema.safeParse(JSON.parse(decodeURIComponent(value)));
+    return parsed.success ? parsed.data : undefined;
+  }
+  catch {
+    return undefined;
+  }
 }
 
 /**
  * Normalize a single query parameter value to a string or undefined.
  * Accepts whatever a router might hand us (string, null, string[], undefined)
- * and returns the first usable string.
+ * and returns the first usable string, trimmed.
  */
 export function parseQueryParam(value: unknown): string | undefined {
-  if (value == null)
-    return undefined;
-
-  if (Array.isArray(value)) {
-    const first = value[0];
-    return typeof first === 'string' ? first : undefined;
-  }
-
-  return typeof value === 'string' ? value : undefined;
+  const first: unknown = Array.isArray(value) ? value[0] : value;
+  return typeof first === 'string' ? first.trim() : undefined;
 }
 
 /**
@@ -141,6 +163,24 @@ interface CreateTrackingSessionInput {
   landingPath: string;
 }
 
+/* Routes whose remaining path segments are one-time credentials from an e-mail. */
+const TOKEN_PATH_PREFIXES = ['/activate', '/password/reset'];
+
+/**
+ * A landing path that is safe to send to analytics. Only `utm_*` query parameters
+ * survive, since others can carry OAuth codes, and token routes lose their token.
+ */
+export function sanitizeLandingPath(fullPath: string): string {
+  const [pathAndQuery = ''] = fullPath.split('#');
+  const queryStart = pathAndQuery.indexOf('?');
+  const path = queryStart === -1 ? pathAndQuery : pathAndQuery.slice(0, queryStart);
+  const query = queryStart === -1 ? '' : pathAndQuery.slice(queryStart + 1);
+
+  const safePath = TOKEN_PATH_PREFIXES.find(prefix => path.startsWith(`${prefix}/`)) ?? path;
+  const tags = query.split('&').filter(param => param.startsWith('utm_')).join('&');
+  return tags ? `${safePath}?${tags}` : safePath;
+}
+
 /**
  * Build a fresh first-touch tracking session. Callers provide the already-
  * parsed UTM fields (if any), the referrer, and the landing path; sigil adds
@@ -153,29 +193,52 @@ export function createTrackingSession(input: CreateTrackingSessionInput): Tracki
     utm: {
       ...input.utm,
       referrer: input.referrer === '' ? undefined : input.referrer,
-      landingPath: input.landingPath,
+      landingPath: sanitizeLandingPath(input.landingPath),
       capturedAt: new Date().toISOString(),
     },
   };
 }
 
 /**
+ * The session to store after a page load, or `undefined` to keep the stored one.
+ * A stored source is never replaced. A visit with a source fills in a session that
+ * has none and keeps its id, so earlier events still link to the same visitor.
+ * Fields without a `utm_source` are not recorded.
+ */
+export function resolveTrackingSession(
+  existing: TrackingSession | undefined,
+  input: CreateTrackingSessionInput,
+): TrackingSession | undefined {
+  if (existing?.utm?.utmSource)
+    return undefined;
+
+  const hasSource = !!input.utm?.utmSource;
+  if (existing && !hasSource)
+    return undefined;
+
+  const session = createTrackingSession({ ...input, utm: hasSource ? input.utm : undefined });
+  return existing?.sessionId ? { ...session, sessionId: existing.sessionId } : session;
+}
+
+/**
  * The snake_case attribution fields for a session. Every key is always present,
  * set to `undefined` when there is no session, so they overwrite any same-named
  * field in the event data. `utm` is read defensively because the session comes
- * from a cookie and may be malformed.
+ * from a cookie and may be malformed. Cookies written before the current rules can
+ * hold tags without a source or an unsanitized path, so both are handled here too.
  */
 function sessionAttributionFields(session: TrackingSession | undefined): Record<string, unknown> {
   const utm: UtmParams = session?.utm ?? {};
+  const tags: UtmParams = utm.utmSource ? utm : {};
   return {
     session_id: session?.sessionId,
-    utm_source: utm.utmSource,
-    utm_medium: utm.utmMedium,
-    utm_campaign: utm.utmCampaign,
-    utm_content: utm.utmContent,
-    utm_term: utm.utmTerm,
+    utm_source: tags.utmSource,
+    utm_medium: tags.utmMedium,
+    utm_campaign: tags.utmCampaign,
+    utm_content: tags.utmContent,
+    utm_term: tags.utmTerm,
     referrer: utm.referrer,
-    landing_path: utm.landingPath,
+    landing_path: typeof utm.landingPath === 'string' ? sanitizeLandingPath(utm.landingPath) : undefined,
   };
 }
 

@@ -6,6 +6,7 @@ import {
   monthsToPlanDuration,
   parseBraintreeError,
   parseQueryParam,
+  parseTrackingSessionCookie,
   parseUtmFromQuery,
   PAYMENT_LOG_ENDPOINT,
   paymentErrorCopy,
@@ -14,7 +15,10 @@ import {
   PaymentUserError,
   postPaymentLog,
   randomSessionId,
+  readCookie,
   reasonForServerEvent,
+  resolveTrackingSession,
+  sanitizeLandingPath,
   type SigilEventPayloadMap,
   SigilEvents,
   toSnakeCaseKeys,
@@ -108,6 +112,11 @@ describe('parseQueryParam', () => {
   it('returns undefined for null/undefined', () => {
     expect(parseQueryParam(null)).toBeUndefined();
     expect(parseQueryParam(undefined)).toBeUndefined();
+  });
+
+  it('trims whitespace, so a blank value counts as empty', () => {
+    expect(parseQueryParam(' twitter ')).toBe('twitter');
+    expect(parseQueryParam('  ')).toBe('');
   });
 
   it('returns undefined for non-string scalars', () => {
@@ -257,6 +266,132 @@ describe('createTrackingSession', () => {
   });
 });
 
+describe('resolveTrackingSession', () => {
+  const untagged: TrackingSession = {
+    sessionId: 'sess-untagged',
+    utm: { landingPath: '/', capturedAt: '2026-11-01T00:00:00.000Z' },
+  };
+  const tagged: TrackingSession = {
+    sessionId: 'sess-tagged',
+    utm: { utmSource: 'newsletter', landingPath: '/?utm_source=newsletter' },
+  };
+
+  it('starts a session without UTM fields on an untagged first visit', () => {
+    const session = resolveTrackingSession(undefined, { utm: {}, landingPath: '/' });
+    expect(session?.sessionId).toBeTruthy();
+    expect(session?.utm.utmSource).toBeUndefined();
+    expect(session?.utm.landingPath).toBe('/');
+  });
+
+  it('stores the source on a tagged first visit', () => {
+    const session = resolveTrackingSession(undefined, {
+      utm: { utmSource: 'newsletter', utmCampaign: 'autumn' },
+      landingPath: '/?utm_source=newsletter',
+    });
+    expect(session?.utm.utmSource).toBe('newsletter');
+    expect(session?.utm.utmCampaign).toBe('autumn');
+  });
+
+  it('fills in the source after an untagged visit and keeps the session id', () => {
+    const session = resolveTrackingSession(untagged, {
+      utm: { utmSource: 'newsletter', utmCampaign: 'autumn' },
+      referrer: 'https://mail.example.com/',
+      landingPath: '/?utm_source=newsletter',
+    });
+    expect(session?.sessionId).toBe('sess-untagged');
+    expect(session?.utm.utmSource).toBe('newsletter');
+    expect(session?.utm.utmCampaign).toBe('autumn');
+    expect(session?.utm.referrer).toBe('https://mail.example.com/');
+    expect(session?.utm.landingPath).toBe('/?utm_source=newsletter');
+    expect(session?.utm.capturedAt).not.toBe(untagged.utm.capturedAt);
+  });
+
+  it('keeps the first source when a later visit has another one', () => {
+    expect(resolveTrackingSession(tagged, { utm: { utmSource: 'twitter' }, landingPath: '/?utm_source=twitter' })).toBeUndefined();
+  });
+
+  it('keeps the stored session when an untagged visit returns', () => {
+    expect(resolveTrackingSession(untagged, { utm: {}, landingPath: '/pricing' })).toBeUndefined();
+    expect(resolveTrackingSession(tagged, { utm: {}, landingPath: '/pricing' })).toBeUndefined();
+  });
+
+  it.each([
+    ['an empty source', { utmSource: '', utmMedium: 'email' }],
+    ['no source', { utmCampaign: 'autumn' }],
+  ])('does not count %s as tagged', (_, utm) => {
+    expect(resolveTrackingSession(untagged, { utm, landingPath: '/' })).toBeUndefined();
+
+    const session = resolveTrackingSession(undefined, { utm, landingPath: '/' });
+    expect(session?.utm.utmMedium).toBeUndefined();
+    expect(session?.utm.utmCampaign).toBeUndefined();
+  });
+
+  it('replaces a stored session that only has a campaign', () => {
+    const campaignOnly: TrackingSession = { sessionId: 'sess-old', utm: { utmCampaign: 'old' } };
+    const session = resolveTrackingSession(campaignOnly, { utm: { utmSource: 'newsletter' }, landingPath: '/' });
+    expect(session?.sessionId).toBe('sess-old');
+    expect(session?.utm.utmSource).toBe('newsletter');
+    expect(session?.utm.utmCampaign).toBeUndefined();
+  });
+});
+
+describe('sanitizeLandingPath', () => {
+  it.each([
+    ['a plain path', '/pricing', '/pricing'],
+    ['utm parameters', '/?utm_source=a&utm_campaign=b', '/?utm_source=a&utm_campaign=b'],
+    ['other parameters', '/oauth/google?code=secret&state=x', '/oauth/google'],
+    ['a mix of parameters', '/?gclid=x&utm_source=a&ref=y', '/?utm_source=a'],
+    ['a hash', '/pricing?utm_source=a#plans', '/pricing?utm_source=a'],
+    ['an activation token', '/activate/uid-1/token-1', '/activate'],
+    ['a password reset token', '/password/reset/uid-1/token-1?utm_source=a', '/password/reset?utm_source=a'],
+    ['a path that only starts the same way', '/activated/uid-1', '/activated/uid-1'],
+    ['the password reset page itself', '/password/reset', '/password/reset'],
+  ])('handles %s', (_, input, expected) => {
+    expect(sanitizeLandingPath(input)).toBe(expected);
+  });
+
+  it('is applied when a session is created', () => {
+    expect(createTrackingSession({ landingPath: '/activate/uid-1/token-1' }).utm.landingPath).toBe('/activate');
+  });
+});
+
+describe('readCookie', () => {
+  it('returns the raw value of the named cookie', () => {
+    expect(readCookie('a=1; csrftoken=x=y; b=2', 'csrftoken')).toBe('x=y');
+  });
+
+  it('does not match a name that only ends the same way', () => {
+    expect(readCookie('xcsrftoken=1', 'csrftoken')).toBeUndefined();
+  });
+});
+
+describe('parseTrackingSessionCookie', () => {
+  const session: TrackingSession = {
+    sessionId: 'sess-abc',
+    utm: { utmSource: 'newsletter', landingPath: '/?utm_source=newsletter&a=b' },
+  };
+
+  it('reads the session the way Nuxt encodes it, among other cookies', () => {
+    const value = encodeURIComponent(JSON.stringify(session));
+    expect(parseTrackingSessionCookie(`csrftoken=abc; _utm=${value}; other=1`)).toEqual(session);
+  });
+
+  it('does not match a cookie whose name only ends the same way', () => {
+    const value = encodeURIComponent(JSON.stringify(session));
+    expect(parseTrackingSessionCookie(`x_utm=${value}`)).toBeUndefined();
+  });
+
+  it.each([
+    ['no cookies', ''],
+    ['another cookie only', 'csrftoken=abc'],
+    ['bad percent encoding', '_utm=%E0%A4%A'],
+    ['invalid JSON', '_utm=not-json'],
+    ['the wrong shape', `_utm=${encodeURIComponent(JSON.stringify({ sessionId: 1 }))}`],
+  ])('returns undefined for %s', (_, cookies) => {
+    expect(parseTrackingSessionCookie(cookies)).toBeUndefined();
+  });
+});
+
 describe('buildTrackedEventData', () => {
   const session: TrackingSession = {
     sessionId: 'sess-abc',
@@ -285,6 +420,18 @@ describe('buildTrackedEventData', () => {
       referrer: 'https://x.com/',
       landing_path: '/',
     });
+  });
+
+  it('does not send tags from an older cookie that has no source', () => {
+    const result = buildTrackedEventData({}, { sessionId: 'sess-old', utm: { utmCampaign: 'old', landingPath: '/' } });
+    expect(result.session_id).toBe('sess-old');
+    expect(result.utm_campaign).toBeUndefined();
+    expect(result.landing_path).toBe('/');
+  });
+
+  it('sanitizes the landing path of an older cookie', () => {
+    const result = buildTrackedEventData({}, { sessionId: 'sess-old', utm: { landingPath: '/password/reset/uid-1/token-1' } });
+    expect(result.landing_path).toBe('/password/reset');
   });
 
   it('leaves attribution fields undefined when no session is provided', () => {
