@@ -72,6 +72,29 @@ describe('checkout success page', () => {
     expect(row(wrapper, 'method').text()).toBe('Crypto');
   });
 
+  it('calls a pending crypto payment an amount, not paid', async () => {
+    const wrapper = await mountWith({ ...CARD, method: 'crypto' });
+
+    expect(row(wrapper, 'paid').element.previousElementSibling?.textContent?.trim()).toBe('Amount');
+  });
+
+  it.each([
+    ['an upgrade', { method: 'card', upgrade: true }],
+    ['a crypto upgrade', { method: 'crypto', upgrade: true }],
+    ['a crypto renewal', { method: 'crypto', renewal: true }],
+  ] as const)('skips the first-time setup steps for %s', async (_, receipt) => {
+    const wrapper = await mountWith({ ...CARD, ...receipt });
+
+    expect(wrapper.find('[data-cy="payment-success-next"]').exists()).toBe(false);
+    expect(wrapper.get('a[href="/home/subscription"]').text()).toBe('Go to your account');
+  });
+
+  it('does not promise an activation for a crypto renewal', async () => {
+    const wrapper = await mountWith({ ...CARD, method: 'crypto', renewal: true });
+
+    expect(wrapper.get('[data-cy="payment-success-message"]').text()).toContain('Your current subscription stays as it is');
+  });
+
   it('falls back to a plain confirmation without a plan name', async () => {
     const wrapper = await mountWith({ ...CARD, planName: undefined, paid: undefined });
 

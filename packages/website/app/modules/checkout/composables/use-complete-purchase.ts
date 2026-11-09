@@ -13,6 +13,7 @@ export interface CompletedPurchase {
   /** EUR price of each following period. */
   renewingPrice?: string;
   upgrade: boolean;
+  renewal?: boolean;
   discount?: PurchaseDiscount;
 }
 
@@ -34,7 +35,7 @@ export function purchaseDiscount(discount: PaymentBreakdownResponse['discount'] 
 export function useCompletePurchase(): UseCompletePurchaseReturn {
   const { chronicle } = useSigilEvents();
 
-  function completePurchase({ method, plan, paid, renewingPrice, upgrade, discount }: CompletedPurchase): void {
+  function completePurchase({ method, plan, paid, renewingPrice, upgrade, renewal, discount }: CompletedPurchase): void {
     chronicle(SigilEvents.PURCHASE_SUCCESS, {
       paymentMethod: method,
       planId: plan.planId,
@@ -52,6 +53,7 @@ export function useCompletePurchase(): UseCompletePurchaseReturn {
       paid,
       renewingPrice,
       upgrade,
+      renewal,
     });
   }
 

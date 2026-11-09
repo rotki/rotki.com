@@ -4,8 +4,10 @@ import { formatLongDate, renewalDateFrom } from '@rotki/card-payment-common/util
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import PlanLine from '@rotki/checkout-ui/components/PlanLine.vue';
 
-const { payment } = defineProps<{
+const { payment, failed = false } = defineProps<{
   payment: Pick<ThreeDSecureParams, 'planName' | 'durationInMonths' | 'finalAmount' | 'renewingPrice' | 'upgradeSubId'>;
+  /** The check is over, so the note about completing it no longer applies. */
+  failed?: boolean;
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -52,7 +54,10 @@ const renewal = computed<string>(() => {
     <p class="text-sm text-rui-text-secondary">
       {{ renewal }}
     </p>
-    <p class="text-sm text-rui-text-secondary pt-3 border-t border-rui-divider">
+    <p
+      v-if="!failed"
+      class="text-sm text-rui-text-secondary pt-3 border-t border-rui-divider"
+    >
       {{ t('subscription.3d_secure.summary.note') }}
     </p>
   </div>

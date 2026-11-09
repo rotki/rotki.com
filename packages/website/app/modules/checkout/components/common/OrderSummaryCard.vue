@@ -15,6 +15,7 @@ const {
   selectedPlan,
   breakdown,
   upgradeSubId,
+  renewing = false,
   isCrypto = false,
   warning = false,
   loading = false,
@@ -23,6 +24,8 @@ const {
   selectedPlan?: SelectedPlan;
   breakdown?: PaymentBreakdownResponse;
   upgradeSubId?: string;
+  /** Pays the next period of an existing subscription, whose dates are not known here. */
+  renewing?: boolean;
   isCrypto?: boolean;
   /** Warns in the plan dialog that switching after a crypto payment was sent can break the activation. */
   warning?: boolean;
@@ -40,8 +43,12 @@ const { account } = storeToRefs(useMainStore());
 // Offered next to the discount field while no code is applied.
 const { activeCampaign } = useAppConfig();
 
-// A new subscription renews one billing period from today.
-const renewsAt = computed<Date | undefined>(() => (selectedPlan ? renewalDateFrom(selectedPlan.durationInMonths) : undefined));
+// A new subscription renews one billing period from today; an existing one keeps its own dates.
+const renewsAt = computed<Date | undefined>(() => {
+  if (!selectedPlan || upgradeSubId || renewing)
+    return undefined;
+  return renewalDateFrom(selectedPlan.durationInMonths);
+});
 
 const showVatWarning = computed<boolean>(() => {
   const acc = get(account);

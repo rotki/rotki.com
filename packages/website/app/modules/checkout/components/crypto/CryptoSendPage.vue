@@ -32,7 +32,8 @@ const emit = defineEmits<{
   'change': [];
   'plan-change': [plan: SelectedPlan];
   'apply-discount': [];
-  'error': [message: string];
+  'error': [failure: { title: string; message: string }];
+  'attempt': [];
 }>();
 
 defineSlots<{
@@ -61,6 +62,7 @@ async function navigateToSuccess(): Promise<void> {
     paid: breakdown?.finalAmount,
     renewingPrice: breakdown?.renewingPrice,
     upgrade: !!upgradeSubId,
+    renewal: !data.firstPayment,
     discount: purchaseDiscount(breakdown?.discount),
   });
   await navigateTo({ name: 'checkout-success' });
@@ -93,6 +95,7 @@ async function navigateToSuccess(): Promise<void> {
       :disabled="planSwitchLoading || web3ProcessingLoading"
       @paid="navigateToSuccess()"
       @error="emit('error', $event)"
+      @attempt="emit('attempt')"
     />
 
     <template #summary>
@@ -102,6 +105,7 @@ async function navigateToSuccess(): Promise<void> {
         :selected-plan="plan"
         :breakdown="breakdown"
         :upgrade-sub-id="upgradeSubId"
+        :renewing="!data.firstPayment"
         is-crypto
         :loading="planSwitchLoading"
         :disabled="locked"

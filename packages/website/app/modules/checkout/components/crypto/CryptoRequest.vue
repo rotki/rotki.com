@@ -69,6 +69,7 @@ function submit(): void {
 
 <template>
   <PaymentPage
+    :title="subscriptionId || upgradeSubId ? t('checkout_crypto.pay_title') : undefined"
     :total="total"
     :total-note="t('checkout_crypto.paid_in_crypto')"
   >
@@ -138,6 +139,7 @@ function submit(): void {
         :selected-plan="selectedPlan"
         :breakdown="breakdown"
         :upgrade-sub-id="upgradeSubId"
+        :renewing="!!subscriptionId"
         :is-crypto="isCrypto"
         :loading="loading"
         :disabled="planSwitchLoading"

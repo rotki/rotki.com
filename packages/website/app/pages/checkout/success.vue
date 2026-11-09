@@ -40,6 +40,12 @@ const SETUP_GUIDE = 'https://docs.rotki.com/usage-guides/#set-up-rotki-premium';
 /** A crypto payment is confirmed on chain later, so it is still pending here. */
 const crypto = computed<boolean>(() => get(receipt)?.method === 'crypto');
 
+/** An upgrade or a renewal: this account has its credentials and Premium set up already. */
+const existingSubscriber = computed<boolean>(() => {
+  const paid = get(receipt);
+  return !!paid && (paid.upgrade || !!paid.renewal);
+});
+
 const title = computed<string>(() => {
   if (get(crypto))
     return t('subscription.crypto_success.title');
@@ -51,7 +57,7 @@ const title = computed<string>(() => {
 
 const message = computed<string>(() => {
   if (get(crypto))
-    return t('subscription.crypto_success.message');
+    return get(existingSubscriber) ? t('subscription.crypto_success.message_existing') : t('subscription.crypto_success.message');
   const paid = get(receipt)?.paid;
   return paid ? t('subscription.success.paid', { amount: formatEur(paid) }) : '';
 });
@@ -87,8 +93,12 @@ const message = computed<string>(() => {
       </div>
     </header>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-12">
+    <div
+      class="grid grid-cols-1 gap-6"
+      :class="existingSubscriber ? 'lg:grid-cols-[25rem]' : 'lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-12'"
+    >
       <section
+        v-if="!existingSubscriber"
         class="flex flex-col gap-4 p-4 md:p-6 bg-rui-surface border border-rui-divider rounded-rui-card"
         data-cy="payment-success-next"
       >

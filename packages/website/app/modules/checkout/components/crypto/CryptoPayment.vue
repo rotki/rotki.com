@@ -46,8 +46,8 @@ const initialized = ref<boolean>(false);
 
 const loading = computed<boolean>(() => get(checkoutLoading) || get(flowLoading));
 
-function handleWeb3Error(message: string): void {
-  setError(t('subscription.error.payment_failure'), message, CheckoutPaymentMethods.CRYPTO);
+function handleWeb3Error({ title, message }: { title: string; message: string }): void {
+  setError(title, message, CheckoutPaymentMethods.CRYPTO);
 }
 
 async function initialize(): Promise<boolean> {
@@ -177,6 +177,7 @@ onMounted(async () => {
     @plan-change="handlePlanChange($event)"
     @apply-discount="applyDiscount()"
     @error="handleWeb3Error($event)"
+    @attempt="clearError()"
   >
     <template #alert>
       <CheckoutAlert

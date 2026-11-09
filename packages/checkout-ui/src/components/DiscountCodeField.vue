@@ -18,6 +18,8 @@ const {
   discount?: PaymentBreakdownResponse['discount'];
   /** A running campaign, offered in the hint while no code is applied. */
   campaign?: { code: string; percent: number };
+  /** A one-time payment (crypto) has no later payments the code could leave out. */
+  oneTime?: boolean;
   disabled?: boolean;
   loading?: boolean;
 }>();
@@ -215,7 +217,10 @@ function clear(): void {
         </svg>
       </RuiButton>
     </div>
-    <div class="text-xs text-rui-text-secondary mt-2">
+    <div
+      v-if="!oneTime"
+      class="text-xs text-rui-text-secondary mt-2"
+    >
       {{ t('checkout.discount.first_payment_only') }}
     </div>
   </div>

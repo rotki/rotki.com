@@ -95,6 +95,13 @@ describe('discountCodeField', () => {
     expect(wrapper.text()).toContain('Applies to first payment only');
   });
 
+  it('leaves the first payment note out of a one-time payment', () => {
+    const wrapper = mountField({ discount: referral, modelValue: 'DGXXOU', oneTime: true });
+
+    expect(wrapper.text()).toContain('You save 2.50 € (10% off)');
+    expect(wrapper.text()).not.toContain('Applies to first payment only');
+  });
+
   it('labels a plain discount code and leaves the percentage out for fixed amounts', () => {
     const wrapper = mountField({
       discount: { ...referral, discountType: DiscountType.FIXED, isReferral: false },

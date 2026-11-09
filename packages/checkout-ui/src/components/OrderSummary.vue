@@ -84,6 +84,7 @@ const startsAt = new Date();
       v-model="code"
       :discount="breakdown?.discount ?? undefined"
       :campaign="campaign"
+      :one-time="oneTime"
       :disabled="disabled"
       :loading="loading"
       @apply="emit('apply', $event)"

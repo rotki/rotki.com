@@ -39,8 +39,14 @@ const rows = computed<ReceiptRow[]>(() => {
   const planName = get(plan);
   if (planName)
     list.push({ id: 'plan', label: t('subscription.success.summary.plan'), value: planName });
-  if (receipt.paid)
-    list.push({ id: 'paid', label: t('subscription.success.summary.paid_today'), value: formatEur(receipt.paid) });
+  if (receipt.paid) {
+    list.push({
+      id: 'paid',
+      // A crypto payment is confirmed on chain later, so it has not been paid yet.
+      label: receipt.method === 'crypto' ? t('subscription.success.summary.amount') : t('subscription.success.summary.paid_today'),
+      value: formatEur(receipt.paid),
+    });
+  }
   const next = get(nextPayment);
   if (next)
     list.push({ id: 'next-payment', label: t('subscription.success.summary.next_payment'), value: next });
@@ -62,11 +68,11 @@ const rows = computed<ReceiptRow[]>(() => {
         v-for="row in rows"
         :key="row.id"
       >
-        <dt class="text-rui-text-secondary">
+        <dt class="text-rui-text-secondary whitespace-nowrap">
           {{ row.label }}
         </dt>
         <dd
-          class="text-right text-rui-text tabular-nums whitespace-nowrap"
+          class="text-right text-rui-text tabular-nums"
           :data-cy="`receipt-${row.id}`"
         >
           {{ row.value }}

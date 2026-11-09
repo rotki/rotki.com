@@ -154,7 +154,7 @@ test.describe('crypto renewal', () => {
         await connectWallet(page, wallet);
         await switchNetwork(page);
 
-        await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
+        await expect(page.getByText('Network not switched', { exact: true })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Switch network' })).toBeVisible();
         await expect(page.locator('[data-cy="crypto-switch-hint"]')).toHaveText(/Your wallet is on another network\. Switch it to \w+/);
         expect(await wallet.sentTransactions()).toHaveLength(0);

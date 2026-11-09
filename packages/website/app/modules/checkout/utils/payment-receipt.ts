@@ -11,6 +11,8 @@ export const PaymentReceiptSchema = z.object({
   /** EUR price of each following period. */
   renewingPrice: z.string().optional(),
   upgrade: z.boolean(),
+  /** Pays the next period of a subscription that already exists. */
+  renewal: z.boolean().optional(),
 });
 
 export type PaymentReceipt = z.infer<typeof PaymentReceiptSchema>;

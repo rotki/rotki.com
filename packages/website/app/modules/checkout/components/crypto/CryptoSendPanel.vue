@@ -24,7 +24,10 @@ const { data, upgrade = false, disabled = false } = defineProps<{
 const emit = defineEmits<{
   /** The wallet sent the payment. */
   paid: [];
-  error: [message: string];
+  /** A wallet action failed. */
+  error: [failure: { title: string; message: string }];
+  /** The buyer tries a wallet action, so an earlier error no longer applies. */
+  attempt: [];
 }>();
 
 const { t } = useI18n({ useScope: 'global' });
@@ -50,15 +53,17 @@ const labels = computed<CryptoPaymentLabels>(() => cryptoPaymentLabels(data));
 const isBtc = computed<boolean>(() => data.chainName === 'bitcoin');
 
 async function handlePay(): Promise<void> {
+  emit('attempt');
   const result = await pay(upgrade);
   if (!result.ok)
-    emit('error', t(web3ErrorKey(result.error), { message: result.error.message }));
+    emit('error', { title: t('checkout_crypto.not_sent_title'), message: t(web3ErrorKey(result.error), { message: result.error.message }) });
 }
 
 async function handleSwitchNetwork(): Promise<void> {
+  emit('attempt');
   const result = await switchNetwork();
   if (!result.ok)
-    emit('error', t(web3ErrorKey(result.error), { message: result.error.message }));
+    emit('error', { title: t('checkout_crypto.switch_failed_title'), message: t(web3ErrorKey(result.error), { message: result.error.message }) });
 }
 
 watch(processing, (busy) => {

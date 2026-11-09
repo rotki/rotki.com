@@ -164,7 +164,10 @@ onBeforeRouteLeave((to, from, next) => {
       </p>
 
       <template #summary>
-        <ThreeDSecureSummary :payment="params" />
+        <ThreeDSecureSummary
+          :payment="params"
+          :failed="!!failure"
+        />
       </template>
     </PaymentPage>
 

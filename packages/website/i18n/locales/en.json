@@ -1,6 +1,9 @@
 {
   "checkout_crypto": {
     "send_title": "Send the payment",
+    "pay_title": "Pay with crypto",
+    "not_sent_title": "Payment not sent",
+    "switch_failed_title": "Network not switched",
     "hold_price": "Have a funded wallet ready. We hold the price for 3 hours once you show the payment details.",
     "show_details": "Show payment details",
     "choose_title": "1. Choose network and token",
@@ -1528,6 +1531,7 @@
     },
     "crypto_success": {
       "message": "We e-mail you once the transaction is confirmed and your subscription is active, usually within 7 minutes.",
+      "message_existing": "We e-mail you once the transaction is confirmed, usually within 7 minutes. Your current subscription stays as it is until then.",
       "title": "Your payment is on its way"
     },
     "error": {
@@ -1579,6 +1583,7 @@
         "title": "Your subscription",
         "plan": "Plan",
         "paid_today": "Paid today",
+        "amount": "Amount",
         "next_payment": "Next payment",
         "next_payment_value": "{amount} on {date}",
         "paid_with": "Paid with",
