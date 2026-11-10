@@ -222,11 +222,49 @@ test.describe('account billing', () => {
       await expect(table.locator('tbody tr')).toHaveCount(2);
 
       await table.getByRole('button', { name: 'Cancel subscription' }).click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toContainText('You won\'t be charged again. Your plan stays active until');
+      await expect(dialog.locator('[data-cy="cancellation-consequences"]')).toContainText('Your data stays on your computer.');
+      await expect(dialog).toContainText('We e-mail you a confirmation of the cancellation.');
+      // Basic is the cheapest paid plan here, so there is nothing cheaper to suggest.
+      await expect(dialog.locator('[data-cy="cancellation-cheaper-plan"]')).toHaveCount(0);
+      await expect(dialog.getByRole('button', { name: 'Cancel subscription', exact: true })).toBeDisabled();
+
       await page.getByText('Too expensive', { exact: true }).click();
-      await page.getByRole('button', { name: 'Yes, cancel my subscription', exact: true }).click();
+      await dialog.getByRole('button', { name: 'Cancel subscription', exact: true }).click();
 
       await expect(table.getByRole('button', { name: 'Resume subscription' })).toBeVisible();
       expect(backend.callsTo('DELETE', '/webapi/2/subscriptions/sub-card-1/')).toHaveLength(1);
+    });
+
+    test('keeps the plan when the buyer changes their mind', async ({ backend, page }) => {
+      await open(page, '/home/billing');
+      const table = section(page, 'Subscriptions').getByRole('table');
+
+      await table.getByRole('button', { name: 'Cancel subscription' }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Keep my plan', exact: true }).click();
+
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+      await expect(table.getByRole('button', { name: 'Cancel subscription' })).toBeVisible();
+      expect(backend.callsTo('DELETE', '/webapi/2/subscriptions/sub-card-1/')).toHaveLength(0);
+    });
+  });
+
+  test.describe('cancelling a plan that has a cheaper one', () => {
+    test.use({
+      backendScenario: {
+        account: subscriberAccount(),
+        subscriptions: [subscriptionFor({ actions: ['cancel'], id: 'sub-advanced', payment_method: 'card', payment_provider: 'braintree', plan_name: 'Advanced', status: 'Active' })],
+      },
+    });
+
+    test('suggests subscribing to the cheaper plan once this one ends', async ({ page }) => {
+      await open(page, '/home/billing');
+
+      await section(page, 'Subscriptions').getByRole('table').getByRole('button', { name: 'Cancel subscription' }).click();
+
+      await expect(page.getByRole('dialog').locator('[data-cy="cancellation-cheaper-plan"]'))
+        .toContainText('you can subscribe to Basic for 25.00 € per month');
     });
   });
 
@@ -248,7 +286,7 @@ test.describe('account billing', () => {
 
       await table.getByRole('button', { name: 'Cancel subscription' }).click();
       await page.getByText('Too expensive', { exact: true }).click();
-      await page.getByRole('button', { name: 'Yes, cancel my subscription', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Cancel subscription', exact: true }).click();
 
       await expect(page.getByText('Could not cancel your subscription')).toBeVisible();
       await expect(page.getByText('The payment provider did not answer')).toBeVisible();

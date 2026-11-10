@@ -186,16 +186,19 @@
       },
       "cancellation": {
         "actions": {
-          "no": "No, don't cancel",
-          "yes": "Yes, cancel my subscription"
+          "cancel": "Cancel subscription",
+          "keep": "Keep my plan"
         },
-        "benefits": {
-          "line_1": "rotki is open-source software, and your subscription helps support its development.",
-          "line_2": "If you cancel your subscription, you will no longer be able to use any rotki premium features until you subscribe again.",
-          "line_3": "We're constantly developing new premium features that will soon be available to our subscribers."
+        "active_until": "You won't be charged again. Your plan stays active until {date}.",
+        "after": {
+          "data_stays": "Your data stays on your computer. Nothing is deleted locally.",
+          "free_limits": "Your account goes back to the free limits.",
+          "premium_off": "Premium features in the rotki app turn off on all devices.",
+          "resubscribe": "You can subscribe again at any time.",
+          "title": "What happens after {date}"
         },
-        "bug_tracker": "bug tracker",
-        "description": "We're sorry to see you go. Before you cancel, we'd like to remind you of some benefits of being a rotki premium user: \n {benefits} \n{subscription_status} \n\nAre you absolutely sure you want to cancel your subscription? Your support has been greatly appreciated, and we'd love to keep you as part of the rotki community.",
+        "cheaper_plan": "Want to pay less? After {date} you can subscribe to {plan} for {price} per month, with lower limits.",
+        "confirmation_email": "We e-mail you a confirmation of the cancellation.",
         "notification": {
           "title": "Could not cancel your subscription"
         },
@@ -205,11 +208,8 @@
           "completed": "Cancellation completed successfully",
           "failed": "Cancellation failed"
         },
-        "subscription_status": {
-          "normal": "Please note that your current subscription, which was created on {start_date}, will run until {end_date}. Until then, you will be able to fully utilize all rotki premium features.",
-          "pending": "Please note that your pending subscription, which was created on {start_date} will never be billed if you cancel. We are sad to see you go."
-        },
-        "title": "Canceling Your rotki Subscription",
+        "pending": "This subscription has not been paid yet, so cancelling it means you will never be billed for it.",
+        "title": "Cancel your subscription",
         "feedback": {
           "title": "Help us improve",
           "description": "Please let us know why you're cancelling:",

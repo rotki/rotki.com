@@ -127,7 +127,7 @@ test.describe('account tables', () => {
 
       await main.getByRole('button', { name: 'Cancel subscription', exact: true }).click();
       await page.getByText('Too expensive', { exact: true }).click();
-      await page.getByRole('button', { name: 'Yes, cancel my subscription', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Cancel subscription', exact: true }).click();
 
       await expect(main.getByRole('button', { name: 'Resume subscription', exact: true })).toBeVisible();
       expect(backend.callsTo('DELETE', '/webapi/2/subscriptions/sub-card-1/')).toHaveLength(1);

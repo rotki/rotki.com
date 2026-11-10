@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { CancelSubscriptionConfirmEvent } from '~/components/account/home/subscription-table/types';
+import { formatEur } from '@rotki/card-payment-common/utils/money';
+import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
 import { get, isDefined, set } from '@vueuse/shared';
-import CancelSubscriptionBenefits from '~/components/account/home/CancelSubscriptionBenefits.vue';
 import { useCancellationFeedback } from '~/composables/subscription/use-cancellation-feedback';
+import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { formatDate } from '~/utils/date';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
@@ -29,8 +31,32 @@ const {
   fetchReasons,
   reset,
 } = useCancellationFeedback();
+const { availablePlans } = useAvailablePlans();
 
 const isPending = computed<boolean>(() => get(modelValue)?.status === 'Pending');
+
+/** The last day the plan stays active, which is also its next billing date. */
+const endDate = computed<string>(() => formatDate(get(modelValue)?.nextActionDate));
+
+/**
+ * The cheapest monthly plan below the one being cancelled. A plan cannot be moved to a lower one,
+ * so this is offered as a new subscription once the current plan has ended.
+ */
+const cheaperPlan = computed<{ name: string; price: string } | undefined>(() => {
+  const subscription = get(modelValue);
+  if (!subscription)
+    return undefined;
+
+  const monthly = get(availablePlans).flatMap(plan => plan.monthlyPlan ? [{ name: plan.tierName, price: Number(plan.monthlyPlan.price) }] : []);
+  const current = monthly.find(plan => plan.name.toLowerCase() === subscription.planName.toLowerCase());
+  if (!current)
+    return undefined;
+
+  const cheapest = monthly
+    .filter(plan => plan.price > 0 && plan.price < current.price)
+    .toSorted((a, b) => a.price - b.price)[0];
+  return cheapest ? { name: formatPlanName(cheapest.name), price: formatEur(cheapest.price) } : undefined;
+});
 
 watch(modelValue, (val) => {
   if (val) {
@@ -70,46 +96,38 @@ function cancelSubscription(): void {
         {{ t('account.subscriptions.cancellation.title') }}
       </template>
 
-      <div class="whitespace-break-spaces mb-4">
-        <i18n-t
-          keypath="account.subscriptions.cancellation.description"
-          scope="global"
+      <p
+        v-if="isPending"
+        class="mb-4"
+      >
+        {{ t('account.subscriptions.cancellation.pending') }}
+      </p>
+      <template v-else>
+        <p class="mb-4">
+          {{ t('account.subscriptions.cancellation.active_until', { date: endDate }) }}
+        </p>
+        <div
+          class="rounded-lg border border-rui-grey-300 p-4 mb-4"
+          data-cy="cancellation-consequences"
         >
-          <template #benefits>
-            <CancelSubscriptionBenefits />
-          </template>
-
-          <template #subscription_status>
-            <i18n-t
-              v-if="!isPending"
-              keypath="account.subscriptions.cancellation.subscription_status.normal"
-              scope="global"
-            >
-              <template #start_date>
-                <strong>
-                  {{ formatDate(modelValue?.createdDate) }}
-                </strong>
-              </template>
-              <template #end_date>
-                <strong>
-                  {{ formatDate(modelValue?.nextActionDate) }}
-                </strong>
-              </template>
-            </i18n-t>
-            <i18n-t
-              v-else
-              scope="global"
-              keypath="account.subscriptions.cancellation.subscription_status.pending"
-            >
-              <template #start_date>
-                <strong>
-                  {{ formatDate(modelValue?.createdDate) }}
-                </strong>
-              </template>
-            </i18n-t>
-          </template>
-        </i18n-t>
-      </div>
+          <h6 class="text-sm font-bold leading-snug mb-2">
+            {{ t('account.subscriptions.cancellation.after.title', { date: endDate }) }}
+          </h6>
+          <ul class="list-disc ml-5 space-y-1 text-sm">
+            <li>{{ t('account.subscriptions.cancellation.after.free_limits') }}</li>
+            <li>{{ t('account.subscriptions.cancellation.after.premium_off') }}</li>
+            <li>{{ t('account.subscriptions.cancellation.after.data_stays') }}</li>
+            <li>{{ t('account.subscriptions.cancellation.after.resubscribe') }}</li>
+          </ul>
+        </div>
+        <p
+          v-if="cheaperPlan"
+          class="rounded-lg bg-rui-primary/5 px-4 py-3 mb-4 text-sm"
+          data-cy="cancellation-cheaper-plan"
+        >
+          {{ t('account.subscriptions.cancellation.cheaper_plan', { date: endDate, plan: cheaperPlan.name, price: cheaperPlan.price }) }}
+        </p>
+      </template>
 
       <div class="rounded-lg border border-rui-grey-300 p-4 space-y-3">
         <div class="flex items-start gap-2.5">
@@ -184,22 +202,27 @@ function cancelSubscription(): void {
         </template>
       </div>
 
-      <div class="flex justify-end gap-4 pt-4">
-        <RuiButton
-          color="primary"
-          variant="text"
-          @click="modelValue = undefined"
-        >
-          {{ t('account.subscriptions.cancellation.actions.no') }}
-        </RuiButton>
+      <div class="flex flex-wrap items-center justify-between gap-4 pt-4">
+        <p class="text-sm text-rui-text-secondary">
+          {{ t('account.subscriptions.cancellation.confirmation_email') }}
+        </p>
+        <div class="flex gap-4 ml-auto">
+          <RuiButton
+            color="primary"
+            variant="outlined"
+            @click="modelValue = undefined"
+          >
+            {{ t('account.subscriptions.cancellation.actions.keep') }}
+          </RuiButton>
 
-        <RuiButton
-          color="error"
-          :disabled="!isValid"
-          @click="cancelSubscription()"
-        >
-          {{ t('account.subscriptions.cancellation.actions.yes') }}
-        </RuiButton>
+          <RuiButton
+            color="error"
+            :disabled="!isValid"
+            @click="cancelSubscription()"
+          >
+            {{ t('account.subscriptions.cancellation.actions.cancel') }}
+          </RuiButton>
+        </div>
       </div>
     </RuiCard>
   </RuiDialog>
