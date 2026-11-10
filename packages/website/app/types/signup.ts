@@ -5,14 +5,12 @@ export interface SignupAccountPayload {
   readonly confirmPassword: string;
 }
 
-export interface SignupCustomerInformationPayload {
+/** The second step: the name and address printed on invoices, plus the newsletter choice. */
+export interface SignupInvoicePayload {
   readonly firstName: string;
   readonly lastName: string;
   readonly companyName: string;
   readonly vatId: string;
-}
-
-export interface SignupAddressPayload {
   readonly address1: string;
   readonly address2: string;
   readonly city: string;
@@ -21,7 +19,4 @@ export interface SignupAddressPayload {
   readonly newsletterConsent: boolean;
 }
 
-export interface SignupPayload
-  extends SignupAccountPayload,
-  SignupCustomerInformationPayload,
-  SignupAddressPayload {}
+export interface SignupPayload extends SignupAccountPayload, SignupInvoicePayload {}

@@ -3,7 +3,6 @@ import type { ValidationErrors } from '~/types/common';
 import type { SignupAccountPayload } from '~/types/signup';
 import { get, set } from '@vueuse/shared';
 import { z } from 'zod';
-import AuthHeading from '~/components/account/AuthHeading.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import { useFormRules } from '~/composables/use-form-rules';
 import { useZodForm } from '~/composables/use-zod-form';
@@ -37,7 +36,7 @@ function next(): void {
     emit('next');
 }
 
-function updateValue(field: string, value: any): void {
+function updateValue(field: keyof SignupAccountPayload, value: string): void {
   set(modelValue, {
     ...get(modelValue),
     [field]: value,
@@ -54,94 +53,86 @@ watch(() => externalResults, (fieldErrors) => {
 
 <template>
   <form @submit.prevent="next()">
-    <div class="space-y-8 grow">
-      <div class="space-y-4">
-        <AuthHeading :title="t('auth.signup.account.heading')" />
-        <div
-          class="rounded-md bg-rui-primary/5 p-4 space-y-2 text-body-2 text-rui-text-secondary text-pretty"
-          data-cy="signup-note"
-        >
-          <i18n-t
-            keypath="auth.signup.introduction.message.default"
-            scope="global"
-            tag="p"
-          >
-            <template #premium_subscription>
-              <strong class="text-rui-text">
-                {{ t('auth.signup.introduction.message.premium_subscription') }}
-              </strong>
-            </template>
-          </i18n-t>
-          <i18n-t
-            keypath="auth.signup.introduction.free"
-            scope="global"
-            tag="p"
-          >
-            <template #download>
-              <NuxtLink
-                to="/download"
-                class="text-rui-primary underline"
-              >
-                {{ t('auth.signup.introduction.message.download') }}
-              </NuxtLink>
-            </template>
-          </i18n-t>
-        </div>
-      </div>
-      <div class="space-y-5">
-        <RuiTextField
-          id="username"
-          :model-value="modelValue.username"
-          autofocus
-          color="primary"
-          dense
-          :label="t('auth.common.username')"
-          :hint="t('auth.signup.account.form.username_hint')"
-          autocomplete="username"
-          :error-messages="errors('username')"
-          @update:model-value="updateValue('username', $event)"
-        />
-        <RuiTextField
-          id="email"
-          :model-value="modelValue.email"
-          color="primary"
-          dense
-          autocomplete="email"
-          :label="t('auth.common.email')"
-          :hint="t('auth.signup.account.form.email_hint')"
-          :error-messages="errors('email')"
-          @update:model-value="updateValue('email', $event)"
-        />
-        <div class="space-y-2">
-          <RuiRevealableTextField
-            id="password"
-            :model-value="modelValue.password"
-            color="primary"
-            dense
-            autocomplete="new-password"
-            :label="t('auth.common.password')"
-            details="hidden"
-            :error-messages="submitted ? errors('password') : []"
-            @update:model-value="updateValue('password', $event)"
-          />
-          <PasswordRules
-            :password="modelValue.password"
-            :errors="serverErrors('password')"
-            :invalid="submitted && hasError('password')"
-          />
-        </div>
+    <h1 class="text-h5 md:text-h4 text-rui-text text-pretty">
+      {{ t('auth.signup.account.heading') }}
+    </h1>
+    <!-- On large screens the side panel says this. -->
+    <div class="lg:hidden mt-3">
+      <p class="text-body-1 text-rui-text-secondary text-pretty">
+        {{ t('auth.signup.account.intro') }}
+      </p>
+      <details
+        class="mt-1"
+        data-cy="signup-note"
+      >
+        <summary class="cursor-pointer py-2 text-body-1 font-medium text-rui-primary">
+          {{ t('auth.signup.account.app_login.question') }}
+        </summary>
+        <p class="mt-1 rounded-lg bg-rui-grey-100 px-4 py-3 text-body-2 text-rui-text-secondary text-pretty">
+          {{ t('auth.signup.account.app_login.answer') }}
+        </p>
+      </details>
+    </div>
+
+    <div class="mt-6 lg:mt-7 space-y-5">
+      <RuiTextField
+        id="username"
+        :model-value="modelValue.username"
+        autofocus
+        color="primary"
+        dense
+        :label="t('auth.common.username')"
+        :hint="t('auth.signup.account.form.username_hint')"
+        autocomplete="username"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        :error-messages="errors('username')"
+        @update:model-value="updateValue('username', $event)"
+      />
+      <RuiTextField
+        id="email"
+        :model-value="modelValue.email"
+        color="primary"
+        dense
+        type="email"
+        inputmode="email"
+        autocapitalize="off"
+        autocomplete="email"
+        :label="t('auth.common.email')"
+        :hint="t('auth.signup.account.form.email_hint')"
+        :error-messages="errors('email')"
+        @update:model-value="updateValue('email', $event)"
+      />
+      <div class="space-y-2">
         <RuiRevealableTextField
-          id="password-confirmation"
-          :model-value="modelValue.confirmPassword"
+          id="password"
+          :model-value="modelValue.password"
           color="primary"
-          autocomplete="new-password"
           dense
-          :label="t('auth.signup.account.form.confirm_password')"
-          :hint="t('auth.common.confirm_hint')"
-          :error-messages="errors('confirmPassword')"
-          @update:model-value="updateValue('confirmPassword', $event)"
+          autocomplete="new-password"
+          :label="t('auth.common.password')"
+          details="hidden"
+          :error-messages="submitted ? errors('password') : []"
+          @update:model-value="updateValue('password', $event)"
+        />
+        <PasswordRules
+          :password="modelValue.password"
+          :errors="serverErrors('password')"
+          :invalid="submitted && hasError('password')"
         />
       </div>
+      <RuiRevealableTextField
+        id="password-confirmation"
+        :model-value="modelValue.confirmPassword"
+        color="primary"
+        autocomplete="new-password"
+        dense
+        :label="t('auth.signup.account.form.confirm_password')"
+        :hint="t('auth.common.confirm_hint')"
+        :error-messages="errors('confirmPassword')"
+        @update:model-value="updateValue('confirmPassword', $event)"
+      />
     </div>
     <RuiButton
       data-cy="next-button"

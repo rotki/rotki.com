@@ -7,7 +7,7 @@ export async function waitForSignupForm(page: Page): Promise<void> {
   await waitForHydration(page);
 }
 
-/** Fills the account step with valid values and continues to the details step. */
+/** Fills the account step with valid values and continues to the invoice details step. */
 export async function completeAccountStep(page: Page): Promise<void> {
   await page.locator('input#username').first().fill('username');
   await page.locator('input#email').first().fill('email@gmail.com');
@@ -17,25 +17,19 @@ export async function completeAccountStep(page: Page): Promise<void> {
 }
 
 /**
- * Fills the address step with a valid address, picks the first country matching `country` and
- * accepts the terms. The captcha is left to the caller.
+ * Fills the invoice details step with a name and a valid address, picks the first country matching
+ * `country` and accepts the terms. The captcha is left to the caller.
  */
-export async function fillAddressStep(page: Page, country: string): Promise<void> {
-  await page.locator('input#address-1').first().fill('Test Street 1');
-  await page.locator('input#city').first().fill('Berlin');
-  await page.locator('input#postal').first().fill('10115');
+export async function fillInvoiceStep(page: Page, country: string): Promise<void> {
+  await page.locator('input#first-name').first().fill('First');
+  await page.locator('input#last-name').first().fill('Last');
   const countryInput = page.locator('#country input').first();
   await countryInput.click();
   await countryInput.fill(country);
   await page.getByRole('option', { name: country }).click();
   await expect(countryInput).toHaveValue(country);
-  await page.getByText('I have read and agreed to the').click();
-  await expect(page.locator('input#tos').first()).toBeChecked();
-}
-
-/** Fills the required details and continues to the address step. */
-export async function completeDetailsStep(page: Page): Promise<void> {
-  await page.locator('input#first-name').first().fill('First');
-  await page.locator('input#last-name').first().fill('Last');
-  await page.locator('button[data-cy=next-button]').first().click();
+  await page.locator('input#address-1').first().fill('Test Street 1');
+  await page.locator('input#postal').first().fill('10115');
+  await page.locator('input#city').first().fill('Berlin');
+  await page.getByRole('checkbox', { name: /I agree to the/ }).check();
 }

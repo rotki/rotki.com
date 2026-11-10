@@ -473,32 +473,58 @@
     },
     "signup": {
       "account": {
+        "app_login": {
+          "answer": "No. Your rotki app user and your data stay on your computer. This account only handles your subscription and invoices, and the two don't share passwords.",
+          "question": "Is this my rotki app login?"
+        },
         "form": {
           "confirm_password": "Repeat password",
           "email_hint": "We send the confirmation link here.",
           "username_hint": "You can sign in with it or with your e-mail."
         },
-        "heading": "Create your account"
+        "heading": "Create your account",
+        "intro": "Only needed for a Premium subscription. rotki itself is free."
       },
       "address": {
-        "description": "Only used on your invoices.",
         "form": {
           "address_line_1": "Address line 1",
           "address_line_2": "Address line 2",
           "city": "City",
           "country": "Country",
-          "newsletter_consent": "I would like to receive product updates and news from rotki.",
-          "newsletter_consent_hint": "Optional. You can change this anytime in Email Preferences.",
-          "postal_code": "Postal code",
-          "tos": "I have read and agreed to the {tos} and the {privacy_policy}.",
-          "tos_required": "Accept the terms to create your account."
-        },
-        "heading": "Billing address"
+          "postal_code": "Postal code"
+        }
       },
       "already_have_account": "Already have an account?",
-      "create_account": "Create Account",
+      "aside": {
+        "account": {
+          "cancel": {
+            "text": "Your plan keeps running until the end of the period.",
+            "title": "Cancel anytime"
+          },
+          "description": "rotki itself is free and runs on your computer. You only need this account to buy and manage a Premium subscription.",
+          "download": "Just want the app?",
+          "download_link": "Download rotki",
+          "eyebrow": "rotki.com account",
+          "pay": {
+            "text": "Card, PayPal or crypto.",
+            "title": "Pay how you like"
+          },
+          "separate": {
+            "text": "Your rotki user and your data stay on your computer and never come here.",
+            "title": "Separate from the app"
+          },
+          "title": "Your subscription and invoices, in one place"
+        },
+        "invoice": {
+          "description": "Every subscription payment comes with an invoice, and an invoice needs a name and an address. You can change them later under Billing.",
+          "edit": "Edit",
+          "eyebrow": "Why we ask",
+          "signing_up_as": "Signing up as",
+          "title": "Only printed on your invoices"
+        }
+      },
+      "create_account": "Create account",
       "customer_information": {
-        "description": "Only used on your invoices.",
         "form": {
           "company": "Company name",
           "company_hint": "Optional. Invoices go to the company instead of you.",
@@ -507,30 +533,32 @@
           "name_hint": "Shown on your invoices.",
           "vat_id": "VAT ID",
           "vat_id_hint": "Optional. Added to company invoices."
-        },
-        "heading": "Your details"
-      },
-      "introduction": {
-        "free": "rotki itself is free. To start using it, {download} the app.",
-        "message": {
-          "default": "A rotki.com account is only needed to buy a {premium_subscription}. It is separate from the user you create in the rotki app, which stays on your computer, and the two do not share passwords.",
-          "download": "download",
-          "premium_subscription": "subscription"
         }
+      },
+      "invoice": {
+        "address_section": "Billing address",
+        "company_toggle": "I'm buying for a company",
+        "description": "Only printed on your invoices. You can change them later under Billing.",
+        "form": {
+          "address_line_1": "Street and number",
+          "address_line_2": "Apartment, floor, etc. (optional)",
+          "company_hint": "Invoices go to the company instead of you.",
+          "newsletter_consent": "Send me product updates and news",
+          "optional": "(optional)",
+          "tos": "I agree to the {tos} and the {privacy_policy}.",
+          "tos_required": "Accept the terms to create your account.",
+          "vat_id": "VAT ID (optional)"
+        },
+        "heading": "Invoice details",
+        "name_section": "Name"
       },
       "step_label": "Step {current} of {total}: {title}",
       "steps": {
         "step_1": {
-          "description": "Username, e-mail and password",
           "title": "Account"
         },
         "step_2": {
-          "description": "Name for your invoices",
-          "title": "Your details"
-        },
-        "step_3": {
-          "description": "Address for your invoices",
-          "title": "Billing address"
+          "title": "Invoice details"
         }
       },
       "vat": {

@@ -1,12 +1,12 @@
-import type { SignupAddressPayload } from '~/types/signup';
+import type { SignupInvoicePayload } from '~/types/signup';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { get, set } from '@vueuse/shared';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
 import { server } from '~~/tests/mocks/server';
-import SignupAddress from '~/components/account/signup/SignupAddress.vue';
 import SignupForm from '~/components/account/signup/SignupForm.vue';
+import SignupInvoiceDetails from '~/components/account/signup/SignupInvoiceDetails.vue';
 
 vi.mock('~/composables/chronicling/use-sigil-events', () => ({
   useSigilEvents: () => ({
@@ -32,6 +32,47 @@ vi.mock('~/composables/use-redirect-url', () => ({
   }),
 }));
 
+const EMPTY_INVOICE: SignupInvoicePayload = {
+  address1: '',
+  address2: '',
+  city: '',
+  companyName: '',
+  country: '',
+  firstName: '',
+  lastName: '',
+  newsletterConsent: false,
+  postcode: '',
+  vatId: '',
+};
+
+const FILLED_INVOICE: SignupInvoicePayload = {
+  ...EMPTY_INVOICE,
+  address1: 'Address first line',
+  city: 'City',
+  country: 'CT',
+  firstName: 'First',
+  lastName: 'Last',
+  postcode: '11703',
+};
+
+/** Mounts the invoice step on its own, with the widgets that need a browser stubbed. */
+async function mountInvoiceDetails() {
+  return mountSuspended(SignupInvoiceDetails, {
+    props: {
+      email: 'email@example.com',
+      externalResults: {},
+      loading: false,
+      modelValue: FILLED_INVOICE,
+    },
+    global: {
+      stubs: {
+        CountrySelect: true,
+        Recaptcha: true,
+      },
+    },
+  });
+}
+
 const NextStub = defineComponent({
   emits: {
     next: (): boolean => true,
@@ -44,13 +85,10 @@ const NextStub = defineComponent({
   },
 });
 
-const AddressStub = defineComponent({
+const InvoiceStub = defineComponent({
   emits: {
-    'finish': (_events: {
-      recaptchaToken: string;
-      onExpired: () => void;
-    }): boolean => true,
-    'update:modelValue': (_value: SignupAddressPayload): boolean => true,
+    'finish': (_recaptchaToken: string): boolean => true,
+    'update:modelValue': (_value: SignupInvoicePayload): boolean => true,
   },
   setup(_, { emit }) {
     const newsletterConsent = ref<boolean>(false);
@@ -60,14 +98,7 @@ const AddressStub = defineComponent({
         return;
 
       set(newsletterConsent, event.target.checked);
-      emit('update:modelValue', {
-        address1: '',
-        address2: '',
-        city: '',
-        country: '',
-        newsletterConsent: event.target.checked,
-        postcode: '',
-      });
+      emit('update:modelValue', { ...EMPTY_INVOICE, newsletterConsent: event.target.checked });
     }
 
     return () => h('div', [
@@ -79,10 +110,7 @@ const AddressStub = defineComponent({
       }),
       h('button', {
         'data-testid': 'finish',
-        'onClick': () => emit('finish', {
-          recaptchaToken: 'test-token',
-          onExpired: vi.fn(),
-        }),
+        'onClick': () => emit('finish', 'test-token'),
       }),
     ]);
   },
@@ -92,18 +120,15 @@ async function mountSignupForm() {
   const wrapper = await mountSuspended(SignupForm, {
     global: {
       stubs: {
-        RuiStepper: true,
         SignupAccount: NextStub,
-        SignupAddress: AddressStub,
-        SignupCustomerInformation: NextStub,
+        SignupAside: true,
+        SignupInvoiceDetails: InvoiceStub,
       },
     },
   });
 
-  for (let step = 1; step < 3; step++) {
-    await wrapper.get('[data-testid="next"]').trigger('click');
-    await nextTick();
-  }
+  await wrapper.get('[data-testid="next"]').trigger('click');
+  await nextTick();
 
   return wrapper;
 }
@@ -142,36 +167,16 @@ describe('signup form', () => {
   });
 });
 
-describe('signup address', () => {
+describe('signup invoice details', () => {
   it('keeps signup available when newsletter consent is unchecked', async () => {
-    const wrapper = await mountSuspended(SignupAddress, {
-      props: {
-        externalResults: {},
-        loading: false,
-        modelValue: {
-          address1: 'Address first line',
-          address2: '',
-          city: 'City',
-          country: 'CT',
-          newsletterConsent: false,
-          postcode: '11703',
-        },
-      },
-      global: {
-        stubs: {
-          CountrySelect: true,
-          Recaptcha: true,
-        },
-      },
-    });
+    const wrapper = await mountInvoiceDetails();
 
     const newsletterConsent = wrapper.get<HTMLInputElement>('#newsletter-consent');
-    const submitButton = wrapper.get<HTMLButtonElement>('[data-cy="submit-button"]');
 
     expect(newsletterConsent.element.checked).toBe(false);
 
     await wrapper.get<HTMLInputElement>('#tos').setValue(true);
-    await submitButton.trigger('click');
+    await wrapper.get('form').trigger('submit');
 
     await vi.waitFor(() => {
       expect(wrapper.emitted('finish')).toHaveLength(1);
@@ -179,28 +184,9 @@ describe('signup address', () => {
   });
 
   it('does not submit until the terms are accepted', async () => {
-    const wrapper = await mountSuspended(SignupAddress, {
-      props: {
-        externalResults: {},
-        loading: false,
-        modelValue: {
-          address1: 'Address first line',
-          address2: '',
-          city: 'City',
-          country: 'CT',
-          newsletterConsent: false,
-          postcode: '11703',
-        },
-      },
-      global: {
-        stubs: {
-          CountrySelect: true,
-          Recaptcha: true,
-        },
-      },
-    });
+    const wrapper = await mountInvoiceDetails();
 
-    await wrapper.get<HTMLButtonElement>('[data-cy="submit-button"]').trigger('click');
+    await wrapper.get('form').trigger('submit');
 
     await vi.waitFor(() => {
       expect(wrapper.text()).toContain('Accept the terms to create your account.');

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { FAKE_CAPTCHA_TOKEN, installFakeRecaptcha, passCaptcha } from '../../support/recaptcha';
-import { completeAccountStep, completeDetailsStep, fillAddressStep, waitForSignupForm } from '../../support/signup';
+import { completeAccountStep, fillInvoiceStep, waitForSignupForm } from '../../support/signup';
 import { test } from '../../support/test';
 
 test.describe('signup test', () => {
@@ -16,13 +16,26 @@ test.describe('signup test', () => {
     });
   });
 
-  test('starts on the account step with the note about app accounts', async ({ page }) => {
+  test('starts on the account step and explains the account next to the form', async ({ page }) => {
     await page.goto('/signup');
     await waitForSignupForm(page);
 
     await expect(page.getByRole('heading', { level: 1, name: 'Create your account' })).toBeVisible();
-    await expect(page.locator('[data-cy=signup-note]')).toContainText('separate from the user you create in the rotki app');
+    await expect(page.locator('[data-cy=signup-aside]')).toContainText('Your rotki user and your data stay on your computer');
+    await expect(page.locator('[data-cy=signup-note]')).toBeHidden();
     await expect(page.locator('[data-cy=back-button]')).toHaveCount(0);
+  });
+
+  test('on phones, folds the note about app accounts into a question', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+
+    const note = page.locator('[data-cy=signup-note]');
+    await expect(page.locator('[data-cy=signup-aside]')).toBeHidden();
+    await expect(note.getByText('the two don\'t share passwords')).toBeHidden();
+    await note.getByText('Is this my rotki app login?').click();
+    await expect(note.getByText('the two don\'t share passwords')).toBeVisible();
   });
 
   test('ticks off the password rules while typing', async ({ page }) => {
@@ -41,11 +54,11 @@ test.describe('signup test', () => {
     await expect(rules.nth(1)).toHaveAttribute('data-met', 'true');
   });
 
-  test('links to sign in and keeps the query', async ({ page }) => {
+  test('links to sign in from the header and keeps the query', async ({ page }) => {
     await page.goto('/signup?redirectUrl=%2Fcheckout%2Fpay%2Fmethod%3FplanId%3D3');
     await waitForSignupForm(page);
 
-    const signIn = page.getByRole('main').getByRole('link', { name: 'Sign in' });
+    const signIn = page.getByRole('banner').getByRole('link', { name: 'Sign in' });
     await expect(signIn).toBeVisible();
     expect(decodeURIComponent(await signIn.getAttribute('href') ?? '')).toBe('/login?redirectUrl=/checkout/pay/method?planId=3');
   });
@@ -56,27 +69,40 @@ test.describe('signup test', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
 
     await completeAccountStep(page);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your details');
-
-    await completeDetailsStep(page);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Billing address');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
 
     await page.locator('button[data-cy=back-button]').first().click();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your details');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
+    await expect(page.locator('input#username').first()).toHaveValue('username');
   });
 
-  test('shows the step as text on phones and keeps back before continue', async ({ page }) => {
+  test('shows who is signing up next to the invoice details, with a way back', async ({ page }) => {
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+
+    const aside = page.getByRole('complementary');
+    await expect(aside).toContainText('Signing up as');
+    await expect(aside).toContainText('email@gmail.com');
+    await aside.getByRole('button', { name: 'Edit' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
+  });
+
+  test('on phones, names the step and keeps the actions on screen', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/signup');
     await waitForSignupForm(page);
-    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 1 of 3: Account');
+    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 1 of 2: Account');
 
     await completeAccountStep(page);
-    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 2 of 3: Your details');
+    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 2 of 2: Invoice details');
+    await expect(page.locator('[data-cy=signing-up-as]')).toContainText('email@gmail.com');
 
     const back = await page.locator('button[data-cy=back-button]').first().boundingBox();
-    const next = await page.locator('button[data-cy=next-button]').first().boundingBox();
-    expect(back && next && back.x < next.x && Math.abs(back.y - next.y) < 1).toBe(true);
+    const submit = await page.locator('button[data-cy=submit-button]').first().boundingBox();
+    expect(back && submit && back.x < submit.x && Math.abs(back.y - submit.y) < 1).toBe(true);
+    // The form is taller than the screen, but the actions stick to its bottom edge.
+    expect(submit && submit.y + submit.height <= 844).toBe(true);
   });
 
   test('show account form', async ({ page }) => {
@@ -97,7 +123,7 @@ test.describe('signup test', () => {
 
     // An empty form stays on the step and says what is missing.
     await nextButton.click();
-    await expect(page.locator('[data-cy=signup-note]')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
     await expect(page.getByText('This field is required.').first()).toBeVisible();
 
     await usernameInput.fill('username');
@@ -108,30 +134,44 @@ test.describe('signup test', () => {
     await expect(page.locator('input#first-name').first()).toBeVisible();
   });
 
-  test('show customer information form', async ({ page }) => {
+  test('show invoice details form', async ({ page }) => {
     await page.goto('/signup');
 
     await waitForSignupForm(page);
     await completeAccountStep(page);
 
-    const firstNameInput = page.locator('input#first-name').first();
-    const lastNameInput = page.locator('input#last-name').first();
-    const companyNameInput = page.locator('input#company-name').first();
-    const vatIdInput = page.locator('input#vat-id').first();
-    const nextButton = page.locator('button[data-cy=next-button]').first();
-
-    await expect(firstNameInput).toBeVisible();
-    await expect(lastNameInput).toBeVisible();
-    await expect(companyNameInput).toBeVisible();
-    await expect(vatIdInput).toBeVisible();
-
-    await nextButton.click();
-    await expect(firstNameInput).toBeVisible();
-
-    await firstNameInput.fill('First');
-    await lastNameInput.fill('Last');
-    await nextButton.click();
+    await expect(page.locator('input#first-name').first()).toBeVisible();
+    await expect(page.locator('input#last-name').first()).toBeVisible();
+    await expect(page.locator('#country input').first()).toBeVisible();
     await expect(page.locator('input#address-1').first()).toBeVisible();
+    await expect(page.locator('input#address-2').first()).toBeVisible();
+    await expect(page.locator('input#postal').first()).toBeVisible();
+    await expect(page.locator('input#city').first()).toBeVisible();
+    await expect(page.locator('div#signup-captcha').first()).toBeVisible();
+    await expect(page.locator('input#tos').first()).toBeVisible();
+    await expect(page.locator('input#newsletter-consent').first()).not.toBeChecked();
+
+    // Country comes before the street.
+    const country = await page.locator('#country input').first().boundingBox();
+    const street = await page.locator('input#address-1').first().boundingBox();
+    expect(country && street && country.y < street.y).toBe(true);
+
+    await page.locator('button[data-cy=submit-button]').first().click();
+    await expect(page.getByText('Accept the terms to create your account.')).toBeVisible();
+    await expect(page.getByText('This field is required.').first()).toBeVisible();
+  });
+
+  test('asks for company name and VAT ID only for company purchases', async ({ page }) => {
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+
+    await expect(page.locator('input#company-name')).toHaveCount(0);
+    await expect(page.locator('input#vat-id')).toHaveCount(0);
+
+    await page.getByText('I\'m buying for a company').click();
+    await expect(page.locator('input#company-name').first()).toBeVisible();
+    await expect(page.locator('input#vat-id').first()).toBeVisible();
   });
 
   test('creates the account and asks to confirm the e-mail', async ({ page }) => {
@@ -144,20 +184,51 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await waitForSignupForm(page);
     await completeAccountStep(page);
-    await completeDetailsStep(page);
-    await fillAddressStep(page, 'Country');
+    await fillInvoiceStep(page, 'Country');
     await passCaptcha(page);
     await page.locator('button[data-cy=submit-button]').first().click();
 
     await page.waitForURL('**/activation');
-    await expect(page.getByRole('heading', { level: 1, name: 'Confirm your e-mail address' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible();
+    await expect(page.locator('[data-cy=sent-to]')).toHaveText('email@gmail.com');
+    expect(page.url()).not.toContain('email');
     expect(requestBody).toMatchObject({
+      address_1: 'Test Street 1',
       captcha: FAKE_CAPTCHA_TOKEN,
+      city: 'Berlin',
+      company_name: '',
       country: 'CT',
       email: 'email@gmail.com',
       first_name: 'First',
+      last_name: 'Last',
       newsletter_consent: false,
+      postcode: '10115',
       username: 'username',
+      vat_id: '',
+    });
+  });
+
+  test('sends the company when buying for one', async ({ page }) => {
+    let requestBody: Record<string, unknown> | undefined;
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async (route) => {
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({ json: { result: true } });
+    });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await fillInvoiceStep(page, 'Country');
+    await page.getByText('I\'m buying for a company').click();
+    await page.locator('input#company-name').first().fill('Rotki Test GmbH');
+    await page.locator('input#vat-id').first().fill('DE123456789');
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
+
+    await page.waitForURL('**/activation');
+    expect(requestBody).toMatchObject({
+      company_name: 'Rotki Test GmbH',
+      vat_id: 'DE123456789',
     });
   });
 
@@ -170,8 +241,7 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await waitForSignupForm(page);
     await completeAccountStep(page);
-    await completeDetailsStep(page);
-    await fillAddressStep(page, 'Country');
+    await fillInvoiceStep(page, 'Country');
     await passCaptcha(page);
     await page.locator('button[data-cy=submit-button]').first().click();
 
@@ -181,41 +251,25 @@ test.describe('signup test', () => {
     expect(new URL(page.url()).pathname).toBe('/signup');
   });
 
-  test('show address form', async ({ page }) => {
+  test('opens the company fields when the backend rejects the VAT ID', async ({ page }) => {
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async route => route.fulfill({
+      status: 400,
+      json: { message: { vat_id: ['VAT ID is invalid.'] } },
+    }));
     await page.goto('/signup');
-
     await waitForSignupForm(page);
     await completeAccountStep(page);
-    await completeDetailsStep(page);
+    await fillInvoiceStep(page, 'Country');
+    await page.getByText('I\'m buying for a company').click();
+    await page.locator('input#company-name').first().fill('Rotki Test GmbH');
+    await page.locator('input#vat-id').first().fill('XX1');
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
 
-    const address1Input = page.locator('input#address-1').first();
-    const address2Input = page.locator('input#address-2').first();
-    const cityInput = page.locator('input#city').first();
-    const postalInput = page.locator('input#postal').first();
-    const countryInput = page.locator('#country input').first();
-    const captcha = page.locator('div#signup-captcha').first();
-    const tosInput = page.locator('input#tos').first();
-    const newsletterConsentInput = page.locator('input#newsletter-consent').first();
-    const submitButton = page.locator('button[data-cy=submit-button]').first();
-
-    await expect(address1Input).toBeVisible();
-    await expect(address2Input).toBeVisible();
-    await expect(cityInput).toBeVisible();
-    await expect(postalInput).toBeVisible();
-    await expect(countryInput).toBeVisible();
-    await expect(captcha).toBeVisible();
-    await expect(tosInput).toBeVisible();
-    await expect(newsletterConsentInput).toBeVisible();
-    await expect(newsletterConsentInput).not.toBeChecked();
-
-    await submitButton.click();
-    await expect(page.getByText('Accept the terms to create your account.')).toBeVisible();
-
-    await address1Input.fill('Address first line');
-    await address2Input.fill('Address second line');
-    await cityInput.fill('City');
-    await postalInput.fill('11703');
-    await tosInput.click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
+    await expect(page.getByText('VAT ID is invalid.')).toBeVisible();
+    await expect(page.locator('input#vat-id').first()).toHaveValue('XX1');
   });
 
   test('checks signup postal input field for valid inputs!', async ({ page }) => {
@@ -223,7 +277,6 @@ test.describe('signup test', () => {
 
     await waitForSignupForm(page);
     await completeAccountStep(page);
-    await completeDetailsStep(page);
 
     const postalInput = page.locator('input#postal').first();
     const postalError = page.locator('[data-cy=postal] .details .text-rui-error').first();
@@ -243,6 +296,7 @@ test.describe('signup test', () => {
     // Invalid inputs
     await postalInput.clear();
     await postalInput.fill('12@345');
+    await postalInput.blur();
     await expect(postalError).toBeVisible();
 
     await postalInput.clear();

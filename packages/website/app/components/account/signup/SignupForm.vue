@@ -1,27 +1,21 @@
 <script lang="ts" setup>
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import type { ValidationErrors } from '~/types/common';
-import type {
-  SignupAccountPayload,
-  SignupAddressPayload,
-  SignupCustomerInformationPayload,
-  SignupPayload,
-} from '~/types/signup';
+import type { SignupAccountPayload, SignupInvoicePayload, SignupPayload } from '~/types/signup';
 import { SigilEvents, SignupFailedReasons } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
 import SignupAccount from '~/components/account/signup/SignupAccount.vue';
-import SignupAddress from '~/components/account/signup/SignupAddress.vue';
-import SignupCustomerInformation from '~/components/account/signup/SignupCustomerInformation.vue';
-import ButtonLink from '~/components/common/ButtonLink.vue';
+import SignupAside from '~/components/account/signup/SignupAside.vue';
+import SignupInvoiceDetails from '~/components/account/signup/SignupInvoiceDetails.vue';
+import SignupSteps from '~/components/account/signup/SignupSteps.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
-import { useRecaptcha } from '~/composables/use-recaptcha';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { getSingleRouteParam } from '~/utils/query';
 import { getSafeRedirectUrl } from '~/utils/redirect';
 
-const { t } = useI18n({ useScope: 'global' });
+const route = useRoute();
 
 const accountForm = ref<SignupAccountPayload>({
   username: '',
@@ -30,14 +24,11 @@ const accountForm = ref<SignupAccountPayload>({
   email: '',
 });
 
-const customerInformationForm = ref<SignupCustomerInformationPayload>({
+const invoiceForm = ref<SignupInvoicePayload>({
   firstName: '',
   lastName: '',
   companyName: '',
   vatId: '',
-});
-
-const addressForm = ref<SignupAddressPayload>({
   address1: '',
   address2: '',
   city: '',
@@ -50,49 +41,16 @@ const loading = ref<boolean>(false);
 const externalResults = ref<ValidationErrors>({});
 const step = ref<number>(1);
 
-const steps = computed<{ title: string; description: string }[]>(() => [
-  {
-    title: t('auth.signup.steps.step_1.title'),
-    description: t('auth.signup.steps.step_1.description'),
-  },
-  {
-    title: t('auth.signup.steps.step_2.title'),
-    description: t('auth.signup.steps.step_2.description'),
-  },
-  {
-    title: t('auth.signup.steps.step_3.title'),
-    description: t('auth.signup.steps.step_3.description'),
-  },
-]);
-
-const stepLabel = computed<string>(() => t('auth.signup.step_label', {
-  current: get(step),
-  total: get(steps).length,
-  title: get(steps)[get(step) - 1]?.title ?? '',
-}));
-
-const route = useRoute();
-const { modelCaptchaId, resetCaptcha } = useRecaptcha();
 const { fetchWithCsrf } = useFetchWithCsrf();
 const { saveRedirectUrl } = useRedirectUrl();
 const { chronicle } = useSigilEvents();
 
-onMounted(() => {
-  chronicle(SigilEvents.SIGNUP_STARTED, {});
-});
-
-async function signup({
-  recaptchaToken,
-}: {
-  recaptchaToken: string;
-  onExpired: () => void;
-}) {
+async function signup(recaptchaToken: string): Promise<void> {
   set(loading, true);
 
   const payload: SignupPayload = {
     ...get(accountForm),
-    ...get(customerInformationForm),
-    ...get(addressForm),
+    ...get(invoiceForm),
   };
 
   try {
@@ -114,11 +72,11 @@ async function signup({
           saveRedirectUrl(payload.username, safeUrl);
       }
 
-      await navigateTo({ path: '/activation' });
+      // History state, not the query: the address must not end up in the URL.
+      await navigateTo({ path: '/activation', state: { email: payload.email } });
     }
     else if (typeof message === 'object') {
       chronicle(SigilEvents.SIGNUP_FAILED, { reason: SignupFailedReasons.VALIDATION });
-      resetCaptcha();
       setErrors(message);
     }
   }
@@ -130,7 +88,6 @@ async function signup({
       && typeof error.data.message === 'object'
     ) {
       chronicle(SigilEvents.SIGNUP_FAILED, { reason: SignupFailedReasons.VALIDATION });
-      resetCaptcha();
       setErrors(error.data.message);
     }
     else {
@@ -140,94 +97,61 @@ async function signup({
   set(loading, false);
 }
 
-function back() {
-  set(step, Math.max(get(step) - 1, 1));
+function back(): void {
+  set(step, 1);
 }
 
-function next() {
-  set(step, Math.min(get(step) + 1, steps.value.length));
+function next(): void {
+  set(step, 2);
 }
 
-function haveIntersectionKeys(obj1: object, obj2: object) {
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-
-  return keys1.some(key => keys2.includes(key));
-}
-
-function setErrors(errors: ValidationErrors) {
+function setErrors(errors: ValidationErrors): void {
   set(externalResults, errors);
-
-  if (haveIntersectionKeys(errors, get(accountForm)))
-    set(step, 1);
-
-  else if (haveIntersectionKeys(errors, get(customerInformationForm)))
-    set(step, 2);
-
-  else if (haveIntersectionKeys(errors, get(addressForm)))
-    set(step, 3);
+  const accountFields = Object.keys(get(accountForm));
+  set(step, Object.keys(errors).some(key => accountFields.includes(key)) ? 1 : 2);
 }
+
+onMounted(() => {
+  chronicle(SigilEvents.SIGNUP_STARTED, {});
+});
 </script>
 
 <template>
-  <div class="container py-12 md:py-20 lg:py-24">
-    <div class="flex justify-center gap-24">
-      <div class="w-full max-w-[440px] flex flex-col">
-        <p
-          class="lg:sr-only mb-3 text-body-2 text-rui-text-secondary"
-          data-cy="step-label"
-          aria-live="polite"
-        >
-          {{ stepLabel }}
-        </p>
-        <SignupAccount
-          v-if="step === 1"
-          v-model="accountForm"
-          :external-results="externalResults"
-          @next="next()"
-        />
-        <SignupCustomerInformation
-          v-if="step === 2"
-          v-model="customerInformationForm"
-          :external-results="externalResults"
-          @back="back()"
-          @next="next()"
-        />
-        <SignupAddress
-          v-if="step === 3"
-          v-model="addressForm"
-          v-model:captcha-id="modelCaptchaId"
-          :loading="loading"
-          :external-results="externalResults"
-          @back="back()"
-          @finish="signup($event)"
-        />
-        <p
-          v-if="step === 1"
-          class="mt-8 pt-6 border-t border-default text-body-2 text-rui-text-secondary text-center"
-        >
-          {{ t('auth.signup.already_have_account') }}
-          <ButtonLink
-            :to="{
-              path: '/login',
-              query: route.query,
-            }"
-            inline
-            color="primary"
-          >
-            {{ t('auth.login.title') }}
-          </ButtonLink>
-        </p>
-      </div>
+  <div class="container py-6 md:py-12 lg:py-14">
+    <div class="mx-auto max-w-[1040px] flex flex-col lg:flex-row lg:items-start gap-14">
+      <SignupAside
+        class="hidden lg:block lg:flex-1 lg:min-w-0"
+        :step="step"
+        :username="accountForm.username"
+        :email="accountForm.email"
+        @edit="back()"
+      />
 
-      <aside class="hidden lg:block w-[280px] shrink-0 -mt-3">
-        <RuiStepper
-          custom
-          orientation="vertical"
+      <section class="w-full md:mx-auto md:max-w-[500px] lg:mx-0 lg:shrink-0 md:rounded-2xl md:border md:border-default md:bg-white md:p-10 md:shadow-sm">
+        <SignupSteps
+          class="mb-6 md:mb-8"
           :step="step"
-          :steps="steps"
         />
-      </aside>
+
+        <!-- Kept alive so going back to step 1 keeps step 2's fields and solved captcha. -->
+        <KeepAlive>
+          <SignupAccount
+            v-if="step === 1"
+            v-model="accountForm"
+            :external-results="externalResults"
+            @next="next()"
+          />
+          <SignupInvoiceDetails
+            v-else
+            v-model="invoiceForm"
+            :email="accountForm.email"
+            :loading="loading"
+            :external-results="externalResults"
+            @back="back()"
+            @finish="signup($event)"
+          />
+        </KeepAlive>
+      </section>
     </div>
   </div>
 </template>
