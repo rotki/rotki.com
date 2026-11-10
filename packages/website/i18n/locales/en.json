@@ -438,11 +438,12 @@
       "title": "Password changed"
     },
     "password_link_send": {
-      "message": "We sent a link to the e-mail address of your account. Open it to set a new password.",
-      "message_with_email": "We sent a link to {email}. Open it to set a new password.",
       "no_email": "No e-mail after a few minutes? Check your spam folder or {link}.",
+      "open_link": "Open it to set a new password.",
       "request_again": "request a new link",
-      "title": "Check your inbox"
+      "sent_to": "We sent a link to",
+      "title": "Check your inbox",
+      "your_address": "the e-mail address of your account"
     },
     "password_reset": {
       "form": {
@@ -457,9 +458,11 @@
       "title": "Set a new password"
     },
     "pending_activation": {
-      "message": "We sent a confirmation link to the e-mail address you signed up with. Open it to activate your account.",
       "no_email": "No e-mail after a few minutes? Check your spam folder, or sign in to send a new link.",
-      "title": "Confirm your e-mail address"
+      "open_link": "Open it to activate your account.",
+      "sent_to": "We sent a confirmation link to",
+      "title": "Check your inbox",
+      "your_address": "the e-mail address you signed up with"
     },
     "recover_password": {
       "back_to_login": "Back to sign in",

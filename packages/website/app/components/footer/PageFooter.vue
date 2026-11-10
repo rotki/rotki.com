@@ -3,6 +3,7 @@ import AppLogo from '~/components/common/AppLogo.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import FooterIconLinks from '~/components/footer/FooterIconLinks.vue';
 import FooterNavigation from '~/components/footer/FooterNavigation.vue';
+import { copyrightNotice } from '~/utils/copyright';
 
 defineProps<{
   landing?: boolean;
@@ -10,8 +11,7 @@ defineProps<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const year = new Date().getFullYear().toString();
-const copyright = computed<string>(() => `© Rotki Solutions GmbH 2018-${year}.`);
+const copyright = copyrightNotice();
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   backendRequired: true,
+  layout: 'focused',
 });
 
 usePageSeoNoIndex('Check your inbox');

@@ -147,7 +147,7 @@ test.describe('password recovery', () => {
     await main(page).getByRole('button', { name: 'Send reset link' }).click();
 
     await page.waitForURL('**/password/send');
-    await expect(main(page)).toContainText('We sent a link to someone@example.com.');
+    await expect(page.locator('[data-cy=sent-to]')).toHaveText('someone@example.com');
     expect(requestBody).toEqual({ captcha: FAKE_CAPTCHA_TOKEN, email: 'someone@example.com' });
   });
 
@@ -183,7 +183,7 @@ test.describe('password recovery', () => {
     await page.goto('/password/send');
 
     await expect(heading(page, 'Check your inbox')).toBeVisible();
-    await expect(main(page)).toContainText('the e-mail address of your account');
+    await expect(page.locator('[data-cy=sent-to]')).toHaveText('the e-mail address of your account');
     await expect(main(page).getByRole('link', { name: 'request a new link' })).toHaveAttribute('href', '/password/recover');
     await expect(main(page).getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login');
   });
@@ -192,14 +192,15 @@ test.describe('password recovery', () => {
     await page.addInitScript(() => history.replaceState({ ...history.state, email: 'someone@example.com' }, ''));
     await page.goto('/password/send');
 
-    await expect(main(page)).toContainText('We sent a link to someone@example.com.');
+    await expect(page.locator('[data-cy=sent-to]')).toHaveText('someone@example.com');
     expect(page.url()).not.toContain('someone');
   });
 
   test('shows the pending activation notice with a way to get a new link', async ({ page }) => {
     await page.goto('/activation');
 
-    await expect(heading(page, 'Confirm your e-mail address')).toBeVisible();
+    await expect(heading(page, 'Check your inbox')).toBeVisible();
+    await expect(page.locator('[data-cy=sent-to]')).toHaveText('the e-mail address you signed up with');
     await expect(main(page)).toContainText('sign in to send a new link');
     await expect(main(page).getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
   });

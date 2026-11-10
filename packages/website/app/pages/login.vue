@@ -4,6 +4,7 @@ import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
 definePageMeta({
   guestOnly: true,
+  layout: 'focused',
 });
 
 usePageSeoNoIndex('Sign in');

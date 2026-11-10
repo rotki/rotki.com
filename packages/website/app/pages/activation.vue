@@ -2,7 +2,11 @@
 import PendingActivation from '~/components/account/activation/PendingActivation.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 
-usePageSeoNoIndex('Confirm your e-mail address');
+definePageMeta({
+  layout: 'focused',
+});
+
+usePageSeoNoIndex('Check your inbox');
 </script>
 
 <template>
