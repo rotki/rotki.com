@@ -174,6 +174,33 @@ test.describe('signup test', () => {
     await expect(page.locator('input#vat-id').first()).toBeVisible();
   });
 
+  test('keeps the invoice details and the solved captcha after going back', async ({ page }) => {
+    await installFakeRecaptcha(page);
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await page.locator('input#first-name').first().fill('First');
+    await passCaptcha(page);
+
+    await page.locator('button[data-cy=back-button]').first().click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
+    await page.locator('button[data-cy=next-button]').first().click();
+
+    await expect(page.locator('input#first-name').first()).toHaveValue('First');
+    await expect(page.locator('[data-cy=fake-captcha]')).toHaveText('Captcha passed');
+  });
+
+  test('on phones, goes back to the account from the invoice step', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+
+    await page.locator('[data-cy=signing-up-as]').getByRole('button', { name: 'Edit' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
+    await expect(page.locator('input#email').first()).toHaveValue('email@gmail.com');
+  });
+
   test('creates the account and asks to confirm the e-mail', async ({ page }) => {
     let requestBody: Record<string, unknown> | undefined;
     await installFakeRecaptcha(page);
@@ -232,6 +259,69 @@ test.describe('signup test', () => {
     });
   });
 
+  test('sends no company once the company fields are closed again', async ({ page }) => {
+    let requestBody: Record<string, unknown> | undefined;
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async (route) => {
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({ json: { result: true } });
+    });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await fillInvoiceStep(page, 'Country');
+    const companyToggle = page.getByText('I\'m buying for a company');
+    await companyToggle.click();
+    await page.locator('input#company-name').first().fill('Rotki Test GmbH');
+    await page.locator('input#vat-id').first().fill('DE123456789');
+    await companyToggle.click();
+    await expect(page.locator('input#company-name')).toHaveCount(0);
+
+    // Reopening shows empty fields: closing them dropped what was typed.
+    await companyToggle.click();
+    await expect(page.locator('input#company-name').first()).toHaveValue('');
+    await companyToggle.click();
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
+
+    await page.waitForURL('**/activation');
+    expect(requestBody).toMatchObject({ company_name: '', vat_id: '' });
+  });
+
+  test('sends the newsletter choice when it is ticked', async ({ page }) => {
+    let requestBody: Record<string, unknown> | undefined;
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async (route) => {
+      requestBody = route.request().postDataJSON();
+      await route.fulfill({ json: { result: true } });
+    });
+    await page.goto('/signup');
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await fillInvoiceStep(page, 'Country');
+    await page.getByRole('checkbox', { name: /Send me product updates/ }).check();
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
+
+    await page.waitForURL('**/activation');
+    expect(requestBody).toMatchObject({ newsletter_consent: true });
+  });
+
+  test('remembers where to continue after activation when signup started from checkout', async ({ page }) => {
+    await installFakeRecaptcha(page);
+    await page.route('**/webapi/signup/', async route => route.fulfill({ json: { result: true } }));
+    await page.goto(`/signup?redirectUrl=${encodeURIComponent('/checkout/pay/card?planId=3')}`);
+    await waitForSignupForm(page);
+    await completeAccountStep(page);
+    await fillInvoiceStep(page, 'Country');
+    await passCaptcha(page);
+    await page.locator('button[data-cy=submit-button]').first().click();
+
+    await page.waitForURL('**/activation');
+    const stored = await page.evaluate(() => localStorage.getItem('rotki.redirect_url'));
+    expect(JSON.parse(stored ?? 'null')).toEqual({ url: '/checkout/pay/card?planId=3', username: 'username' });
+  });
+
   test('goes back to the account step when the backend rejects the password', async ({ page }) => {
     await installFakeRecaptcha(page);
     await page.route('**/webapi/signup/', async route => route.fulfill({
@@ -251,12 +341,16 @@ test.describe('signup test', () => {
     expect(new URL(page.url()).pathname).toBe('/signup');
   });
 
-  test('opens the company fields when the backend rejects the VAT ID', async ({ page }) => {
+  test('opens the company fields and asks for the captcha again when the backend rejects the VAT ID', async ({ page }) => {
+    let requests = 0;
     await installFakeRecaptcha(page);
-    await page.route('**/webapi/signup/', async route => route.fulfill({
-      status: 400,
-      json: { message: { vat_id: ['VAT ID is invalid.'] } },
-    }));
+    await page.route('**/webapi/signup/', async (route) => {
+      requests++;
+      await route.fulfill({
+        status: 400,
+        json: { message: { vat_id: ['VAT ID is invalid.'] } },
+      });
+    });
     await page.goto('/signup');
     await waitForSignupForm(page);
     await completeAccountStep(page);
@@ -270,6 +364,13 @@ test.describe('signup test', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
     await expect(page.getByText('VAT ID is invalid.')).toBeVisible();
     await expect(page.locator('input#vat-id').first()).toHaveValue('XX1');
+
+    // The rejected request used up the token, so the widget is reset and the form waits for a new one.
+    await expect(page.locator('[data-cy=fake-captcha]')).toHaveText('Pass captcha');
+    await page.locator('input#vat-id').first().fill('DE123456789');
+    await page.locator('button[data-cy=submit-button]').first().click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
+    expect(requests).toBe(1);
   });
 
   test('checks signup postal input field for valid inputs!', async ({ page }) => {
