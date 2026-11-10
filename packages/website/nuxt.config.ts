@@ -3,6 +3,7 @@ import { SIGIL_SCRIPT_URL, SIGIL_TRACKED_DOMAIN, SIGIL_WEBSITE_ID } from '@rotki
 import tailwindcss from '@tailwindcss/vite';
 import { comparisonPrerenderRoutes } from './app/utils/comparison-prerender';
 import { featurePrerenderRoutes } from './app/utils/feature-prerender';
+import { withFontPreload } from './app/utils/font-preload';
 import { integrationPrerenderRoutes } from './app/utils/integration-prerender';
 import { closedJobRoutes, jobsPrerenderRoutes } from './app/utils/jobs-prerender';
 import { llms } from './app/utils/llms-config';
@@ -303,8 +304,15 @@ export default defineNuxtConfig({
      *
      * Hooked on `prerender:done` so the manifest is written against the
      * finished output rather than at `rollup:before`, when nothing exists yet.
+     *
+     * Also preloads Inter in every generated HTML file as it is written, the
+     * client-only routes' 200.html shell included.
      */
     'nitro:init': (nitro) => {
+      nitro.hooks.hook('prerender:generate', (route) => {
+        if (route.contents && route.fileName?.endsWith('.html'))
+          route.contents = withFontPreload(route.contents, nitro.options.publicAssets);
+      });
       nitro.hooks.hook('prerender:done', () => {
         writeSpaManifest(nitro.options.output.publicDir);
         // Lists the regular (non-content) pages in llms.txt, read from their prerendered SEO meta.

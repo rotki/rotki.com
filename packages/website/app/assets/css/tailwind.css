@@ -9,10 +9,14 @@
 /*
  * Local fonts resized to the web fonts' metrics, shown until those load so the text does not shift
  * when they swap in. Computed with fontaine from the bundled files; recompute when the fonts change.
+ *
+ * Browsers match local() by a font's full or PostScript name, so each face lists those too: on Linux
+ * `local('Noto Sans')` alone finds nothing, and Arial and Courier New only exist as the
+ * metric-compatible Liberation Sans and Liberation Mono.
  */
 @font-face {
   font-family: 'Inter Fallback Helvetica Neue';
-  src: local('Helvetica Neue');
+  src: local('Helvetica Neue'), local('HelveticaNeue');
   size-adjust: 106.1198%;
   ascent-override: 91.2883%;
   descent-override: 22.7301%;
@@ -21,7 +25,7 @@
 
 @font-face {
   font-family: 'Inter Fallback Arial';
-  src: local('Arial');
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans');
   size-adjust: 107.1194%;
   ascent-override: 90.4365%;
   descent-override: 22.518%;
@@ -30,7 +34,7 @@
 
 @font-face {
   font-family: 'Inter Fallback Noto Sans';
-  src: local('Noto Sans');
+  src: local('Noto Sans'), local('Noto Sans Regular'), local('NotoSans-Regular');
   size-adjust: 100.7466%;
   ascent-override: 96.1571%;
   descent-override: 23.9423%;
@@ -39,7 +43,7 @@
 
 @font-face {
   font-family: 'Geist Mono Fallback Courier New';
-  src: local('Courier New');
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'), local('LiberationMono');
   size-adjust: 99.9837%;
   ascent-override: 100.5164%;
   descent-override: 29.5048%;
@@ -48,7 +52,7 @@
 
 @font-face {
   font-family: 'Geist Mono Fallback Noto Sans Mono';
-  src: local('Noto Sans Mono');
+  src: local('Noto Sans Mono'), local('Noto Sans Mono Regular'), local('NotoSansMono-Regular');
   size-adjust: 100%;
   ascent-override: 100.5%;
   descent-override: 29.5%;
