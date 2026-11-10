@@ -298,7 +298,7 @@ test.describe('account billing', () => {
       const table = section(page, 'Subscriptions').getByRole('table');
 
       await table.getByRole('button', { name: 'Resume subscription' }).click();
-      await page.getByRole('button', { name: 'Yes, resume my subscription', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Resume subscription', exact: true }).click();
 
       await expect(page.getByText('Could not resume your subscription')).toBeVisible();
       await expect(page.getByText('The payment provider did not answer')).toBeVisible();

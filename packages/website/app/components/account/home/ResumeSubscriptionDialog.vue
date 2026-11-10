@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import { formatEur } from '@rotki/card-payment-common/utils/money';
+import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
 import { get, isDefined } from '@vueuse/shared';
-import ResumeSubscriptionDetails from '~/components/account/home/ResumeSubscriptionDetails.vue';
+import { formatDate } from '~/utils/date';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 
-defineProps<{
+const { loading } = defineProps<{
   loading: boolean;
 }>();
 
@@ -15,7 +17,33 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-async function resumeSubscription(): Promise<void> {
+const nextPayment = computed<string>(() => formatDate(get(modelValue)?.nextActionDate));
+
+const details = computed<{ label: string; value: string }[]>(() => {
+  const subscription = get(modelValue);
+  if (!subscription)
+    return [];
+
+  return [
+    {
+      label: t('account.subscriptions.resume.details.plan'),
+      value: formatPlanName(subscription.planName),
+    },
+    {
+      label: t('account.subscriptions.resume.details.billing'),
+      value: t('account.subscriptions.resume.details.every_months', { n: subscription.durationInMonths }, subscription.durationInMonths),
+    },
+    {
+      label: t('account.subscriptions.resume.details.next_payment'),
+      value: t('account.subscriptions.resume.details.amount_on_date', {
+        amount: formatEur(subscription.nextBillingAmount),
+        date: get(nextPayment),
+      }),
+    },
+  ];
+});
+
+function resumeSubscription(): void {
   if (!isDefined(modelValue))
     return;
 
@@ -26,7 +54,7 @@ async function resumeSubscription(): Promise<void> {
 <template>
   <RuiDialog
     :model-value="!!modelValue && !loading"
-    max-width="900"
+    max-width="560"
     @closed="modelValue = undefined"
   >
     <RuiCard>
@@ -34,29 +62,42 @@ async function resumeSubscription(): Promise<void> {
         {{ t('account.subscriptions.resume.title') }}
       </template>
 
-      <div class="whitespace-break-spaces mb-4">
-        <div v-if="modelValue">
-          <ResumeSubscriptionDetails :subscription="modelValue" />
-        </div>
-        <div class="mt-4">
-          {{ t('account.subscriptions.resume.description') }}
-        </div>
-      </div>
+      <p class="mb-4">
+        {{ t('account.subscriptions.resume.description', { date: nextPayment }) }}
+      </p>
 
-      <div class="flex justify-end gap-4 pt-4">
+      <dl
+        class="rounded-lg border border-rui-grey-300 divide-y divide-rui-grey-300 text-sm"
+        data-cy="resume-details"
+      >
+        <div
+          v-for="detail in details"
+          :key="detail.label"
+          class="flex items-baseline justify-between gap-4 px-4 py-3"
+        >
+          <dt class="text-rui-text-secondary">
+            {{ detail.label }}
+          </dt>
+          <dd class="font-medium text-right">
+            {{ detail.value }}
+          </dd>
+        </div>
+      </dl>
+
+      <div class="flex flex-wrap justify-end gap-4 pt-6">
         <RuiButton
           color="primary"
-          variant="text"
+          variant="outlined"
           @click="modelValue = undefined"
         >
-          {{ t('account.subscriptions.resume.actions.no') }}
+          {{ t('account.subscriptions.resume.actions.keep_canceled') }}
         </RuiButton>
 
         <RuiButton
           color="primary"
           @click="resumeSubscription()"
         >
-          {{ t('account.subscriptions.resume.actions.yes') }}
+          {{ t('account.subscriptions.resume.actions.resume') }}
         </RuiButton>
       </div>
     </RuiCard>

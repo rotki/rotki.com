@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { get } from '@vueuse/shared';
 import { useActionButtonStyle } from '~/components/account/home/subscription-table/types';
 
 const { actionsClasses, loading, disabled, cancellationStatus } = defineProps<{
@@ -14,8 +15,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' });
 
-const showTooltip = computed<boolean>(() => !!disabled);
-
 const statusMessage = computed<string>(() => {
   switch (cancellationStatus) {
     case 'pending':
@@ -30,6 +29,9 @@ const statusMessage = computed<string>(() => {
       return '';
   }
 });
+
+/** A disabled button explains itself, but only once there is a status to show. */
+const showTooltip = computed<boolean>(() => !!disabled && get(statusMessage).length > 0);
 
 const buttonStyle = useActionButtonStyle();
 </script>
@@ -56,8 +58,6 @@ const buttonStyle = useActionButtonStyle();
         {{ t('account.subscriptions.actions.cancel') }}
       </RuiButton>
     </template>
-    <span v-if="cancellationStatus">
-      {{ statusMessage }}
-    </span>
+    {{ statusMessage }}
   </RuiTooltip>
 </template>

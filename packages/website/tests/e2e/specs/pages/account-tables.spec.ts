@@ -120,7 +120,12 @@ test.describe('account tables', () => {
       const main = page.getByRole('main');
 
       await main.getByRole('button', { name: 'Resume subscription', exact: true }).click();
-      await page.getByRole('button', { name: 'Yes, resume my subscription', exact: true }).click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog.getByText('you are charged again from February 01, 2026')).toBeVisible();
+      await expect(dialog.locator('[data-cy=resume-details]')).toContainText('Basic');
+      await expect(dialog.locator('[data-cy=resume-details]')).toContainText('Every month');
+      await expect(dialog.locator('[data-cy=resume-details]')).toContainText('25.00 € on February 01, 2026');
+      await dialog.getByRole('button', { name: 'Resume subscription', exact: true }).click();
 
       await expect(main.getByRole('button', { name: 'Cancel subscription', exact: true })).toBeVisible();
       expect(backend.callsTo('PATCH', '/webapi/2/subscriptions/sub-card-1/resume/')).toHaveLength(1);

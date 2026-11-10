@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { get } from '@vueuse/shared';
 import { useActionButtonStyle } from '~/components/account/home/subscription-table/types';
+import { formatDate } from '~/utils/date';
 
-const { resumeStatus } = defineProps<{
+const { disabled, resumeStatus, nextActionDate } = defineProps<{
   actionsClasses?: string;
   loading?: boolean;
   disabled?: boolean;
@@ -30,11 +32,21 @@ const statusMessage = computed<string>(() => {
   }
 });
 
+/** What a disabled button says: the running operation's status, else when billing would start again. */
+const tooltip = computed<string>(() => {
+  if (!disabled)
+    return '';
+  const status = get(statusMessage);
+  if (status)
+    return status;
+  return nextActionDate ? t('account.subscriptions.resume_hint', { date: formatDate(nextActionDate) }) : '';
+});
+
 const buttonStyle = useActionButtonStyle();
 </script>
 
 <template>
-  <RuiTooltip :disabled="!disabled">
+  <RuiTooltip :disabled="!tooltip">
     <template #activator>
       <RuiButton
         :loading="loading"
@@ -55,11 +67,6 @@ const buttonStyle = useActionButtonStyle();
         {{ t('account.subscriptions.actions.resume') }}
       </RuiButton>
     </template>
-    <span v-if="resumeStatus">
-      {{ statusMessage }}
-    </span>
-    <span v-else-if="nextActionDate">
-      {{ t('account.subscriptions.resume_hint', { date: nextActionDate }) }}
-    </span>
+    {{ tooltip }}
   </RuiTooltip>
 </template>

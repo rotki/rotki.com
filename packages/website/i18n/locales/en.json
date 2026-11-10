@@ -208,11 +208,11 @@
           "completed": "Cancellation completed successfully",
           "failed": "Cancellation failed"
         },
-        "pending": "This subscription has not been paid yet, so cancelling it means you will never be billed for it.",
+        "pending": "This subscription has not been paid yet, so canceling it means you will never be billed for it.",
         "title": "Cancel your subscription",
         "feedback": {
           "title": "Help us improve",
-          "description": "Please let us know why you're cancelling:",
+          "description": "Please let us know why you're canceling:",
           "comment_label": "Additional comments (optional)",
           "comment_required": "Please tell us more about your reason"
         }
@@ -233,17 +233,16 @@
       "pending_tx": "A transaction already exists for this subscription, please wait up to 7 minutes for our system to process the payment.",
       "resume": {
         "actions": {
-          "no": "No, don't resume",
-          "yes": "Yes, resume my subscription"
+          "keep_canceled": "Keep it canceled",
+          "resume": "Resume subscription"
         },
-        "description": "By confirming, your subscription's billing cycle will resume, and you will be charged according to your selected plan starting from the next billing date. Are you sure you want to resume your subscription?",
+        "description": "Your plan renews as before, and you are charged again from {date}.",
         "details": {
-          "amount_in_eur": "{amount} €",
-          "billing_amount": "Billing Amount: {amount}",
-          "billing_cycle": "Billing Cycle: {duration}",
-          "duration_in_months": "every {duration} month|every {duration} months",
-          "next_billing_date": "Next billing date: {date}",
-          "plan_name": "Subscription Plan: {plan}"
+          "amount_on_date": "{amount} on {date}",
+          "billing": "Billing",
+          "every_months": "Every month|Every {n} months",
+          "next_payment": "Next payment",
+          "plan": "Plan"
         },
         "notification": {
           "title": "Could not resume your subscription"
@@ -254,7 +253,7 @@
           "completed": "Resume completed successfully",
           "failed": "Resume failed"
         },
-        "title": "Resume your rotki subscription"
+        "title": "Resume your subscription"
       },
       "resume_hint": "Resume the active billing of your subscription from {date}",
       "title": "Subscriptions",
@@ -1594,7 +1593,7 @@
       },
       "not_confirmed": {
         "title": "Your bank didn't confirm the payment",
-        "message": "This happens when the code was wrong, the time ran out, or the check was cancelled."
+        "message": "This happens when the code was wrong, the time ran out, or the check was canceled."
       },
       "failed": {
         "title": "Your payment didn't go through"
