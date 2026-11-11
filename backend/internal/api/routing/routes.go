@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/rotki/rotki.com/backend/internal/api/appconfig"
@@ -24,7 +25,28 @@ import (
 	"github.com/rotki/rotki.com/backend/internal/ipfs"
 	"github.com/rotki/rotki.com/backend/internal/nft"
 	"github.com/rotki/rotki.com/backend/internal/rotkidata"
+	"github.com/rotki/rotki.com/backend/internal/validate"
 )
+
+// redirectParams are the query parameters a permanent redirect carries over, so
+// campaign tags and referral codes survive it. Anything else is dropped.
+var redirectParams = []string{"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "ref"}
+
+// redirectParamMaxLen caps each carried value, so junk can't grow the target URL.
+const redirectParamMaxLen = 200
+
+// redirectQuery is the encoded query a permanent redirect appends to its fixed
+// target: the first value of each allowed parameter, sanitized and re-escaped.
+func redirectQuery(r *http.Request) string {
+	incoming := r.URL.Query()
+	kept := url.Values{}
+	for _, name := range redirectParams {
+		if value := validate.SanitizeString(incoming.Get(name), redirectParamMaxLen); value != "" {
+			kept.Set(name, value)
+		}
+	}
+	return kept.Encode()
+}
 
 // Services holds references to services created during route registration
 // that may be needed by other components (e.g. the scheduler).
@@ -140,7 +162,11 @@ func Register(mux *http.ServeMux, cfg *config.Config, logger *slog.Logger, mem *
 	}
 	for from, to := range permanentRedirects {
 		mux.HandleFunc(from, func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, to, http.StatusMovedPermanently)
+			target := to
+			if query := redirectQuery(r); query != "" {
+				target += "?" + query
+			}
+			http.Redirect(w, r, target, http.StatusMovedPermanently)
 		})
 	}
 

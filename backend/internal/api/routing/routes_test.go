@@ -84,6 +84,14 @@ func TestPermanentRedirects(t *testing.T) {
 		{"/home/customer-information", "/home/billing"},
 		{"/home/address", "/home/billing"},
 		{"/home/email-preferences", "/home/account-details"},
+		// Campaign tags and referral codes are carried over; everything else is dropped.
+		{"/sponsor?utm_source=newsletter&utm_campaign=autumn", "/sponsor/mint?utm_campaign=autumn&utm_source=newsletter"},
+		{"/sponsor?ref=CODE1&gclid=x&token=secret", "/sponsor/mint?ref=CODE1"},
+		{"/sponsor?gclid=x", "/sponsor/mint"},
+		{"/sponsor?utm_source=a&utm_source=b", "/sponsor/mint?utm_source=a"},
+		{"/sponsor?utm_source=%20%20&utm_medium=email", "/sponsor/mint?utm_medium=email"},
+		{"/sponsor?utm_source=a%26b%3Dc", "/sponsor/mint?utm_source=a%26b%3Dc"},
+		{"/sponsor?utm_source=" + strings.Repeat("a", 300), "/sponsor/mint?utm_source=" + strings.Repeat("a", 200)},
 	}
 
 	for _, tt := range tests {
