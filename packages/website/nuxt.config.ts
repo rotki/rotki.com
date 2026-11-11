@@ -177,8 +177,10 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          'src': SIGIL_SCRIPT_URL,
+          // Adds the tracker itself, with a hook that cleans the URLs it reports.
+          'src': '/sigil-loader.js',
           'defer': true,
+          'data-tracker-src': SIGIL_SCRIPT_URL,
           'data-website-id': SIGIL_WEBSITE_ID,
           'data-domains': SIGIL_TRACKED_DOMAIN,
         },
