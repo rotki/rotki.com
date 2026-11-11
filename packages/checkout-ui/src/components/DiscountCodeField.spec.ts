@@ -31,7 +31,7 @@ describe('discountCodeField', () => {
   it('starts folded behind a link, mentioning a running campaign', () => {
     const wrapper = mountField();
     expect(wrapper.find('form').exists()).toBe(false);
-    expect(wrapper.get('[data-cy="discount-open"]').text()).toBe('Add a discount or referral code');
+    expect(wrapper.get('[data-testid="discount-open"]').text()).toBe('Add a discount or referral code');
 
     expect(mountField({ campaign: { code: 'AUTUMN', percent: 20 } }).text())
       .toContain('Code AUTUMN gives 20% off your first payment.');
@@ -40,7 +40,7 @@ describe('discountCodeField', () => {
   it('opens the field on request and moves the focus into it', async () => {
     const wrapper = mountField();
 
-    await wrapper.get('[data-cy="discount-open"]').trigger('click');
+    await wrapper.get('[data-testid="discount-open"]').trigger('click');
     await flushPromises();
 
     expect(wrapper.find('form').exists()).toBe(true);
@@ -53,7 +53,7 @@ describe('discountCodeField', () => {
 
   it('applies the typed code and emits it', async () => {
     const wrapper = mountField();
-    await wrapper.get('[data-cy="discount-open"]').trigger('click');
+    await wrapper.get('[data-testid="discount-open"]').trigger('click');
     const submit = wrapper.find('button[type="submit"]');
 
     expect(submit.attributes('disabled')).toBeDefined();
@@ -90,7 +90,7 @@ describe('discountCodeField', () => {
 
     expect(wrapper.find('form').exists()).toBe(false);
     expect(wrapper.text()).toContain('Referral code applied:');
-    expect(wrapper.find('[data-cy="applied-code"]').text()).toBe('DGXXOU');
+    expect(wrapper.find('[data-testid="applied-code"]').text()).toBe('DGXXOU');
     expect(wrapper.text()).toContain('You save 2.50 € (10% off)');
     expect(wrapper.text()).toContain('Applies to first payment only');
   });

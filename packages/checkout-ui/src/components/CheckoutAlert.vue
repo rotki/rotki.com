@@ -37,7 +37,7 @@ onMounted(async () => {
     role="alert"
     tabindex="-1"
     class="flex items-start gap-3 p-4 rounded-rui-control border border-rui-error-border bg-rui-error-subtle text-sm text-rui-error-darker outline-hidden"
-    data-cy="checkout-alert"
+    data-testid="checkout-alert"
   >
     <svg
       aria-hidden="true"

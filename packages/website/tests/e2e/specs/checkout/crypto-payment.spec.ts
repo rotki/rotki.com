@@ -71,7 +71,7 @@ test.describe('new crypto payment', () => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
 
       await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
-      await expect(page.locator('[data-cy="crypto-payment-error"]')).toHaveText('Something went wrong on our side. Please try again.');
+      await expect(page.getByTestId('crypto-payment-error')).toHaveText('Something went wrong on our side. Please try again.');
       await expect(page).toHaveURL(/\/checkout\/pay\/crypto\?/);
       expect(backend.callsTo('POST', '/webapi/2/crypto/payments')).toHaveLength(1);
     });
@@ -86,7 +86,7 @@ test.describe('new crypto payment', () => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
 
       await expect(page.getByText('Payment failed', { exact: true })).toBeVisible();
-      await expect(page.locator('[data-cy="crypto-payment-error"]')).toHaveText('Something went wrong on our side. Please try again.');
+      await expect(page.getByTestId('crypto-payment-error')).toHaveText('Something went wrong on our side. Please try again.');
     });
   });
 
@@ -98,13 +98,13 @@ test.describe('new crypto payment', () => {
       await page.goto('/checkout/pay/crypto?planId=3&currency=ethereum:ETH');
       await connectWallet(page, wallet);
       await payWithWallet(page);
-      await expect(page.locator('[data-cy="processing-overlay"]')).toBeVisible();
+      await expect(page.getByTestId('processing-overlay')).toBeVisible();
       // The overlay shows before the wallet is asked, and the wait only starts with the request.
       await expect.poll(async () => (await wallet.sentTransactions()).length).toBe(1);
 
       await page.clock.fastForward('02:01');
 
-      await expect(page.locator('[data-cy="processing-overlay"]')).toBeHidden();
+      await expect(page.getByTestId('processing-overlay')).toBeHidden();
       await expect(page.getByText('Waiting for your wallet', { exact: true })).toBeVisible();
 
       await payWithWallet(page);
@@ -112,7 +112,7 @@ test.describe('new crypto payment', () => {
       expect(await wallet.sentTransactions()).toHaveLength(1);
 
       await wallet.approvePendingSend();
-      await expect(page.locator('[data-cy="processing-overlay"]')).toBeVisible();
+      await expect(page.getByTestId('processing-overlay')).toBeVisible();
       await page.clock.fastForward('00:06');
       await expectPendingSuccess(page);
       expect(backend.callsTo('PATCH', '/webapi/2/crypto/payment/pending/')).toHaveLength(1);

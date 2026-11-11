@@ -68,7 +68,7 @@ function resumeSubscription(): void {
 
       <dl
         class="rounded-lg border border-rui-grey-300 divide-y divide-rui-grey-300 text-sm"
-        data-cy="resume-details"
+        data-testid="resume-details"
       >
         <div
           v-for="detail in details"

@@ -24,32 +24,32 @@ describe('planOptions', () => {
   it('lists the plans of the current plan\'s period and marks the current one', () => {
     const wrapper = mountOptions(3);
 
-    const current = wrapper.get('[data-cy="plan-option-3"]');
+    const current = wrapper.get('[data-testid="plan-option"][data-key="3"]');
     expect(current.text()).toContain('Current plan');
     expect(current.attributes('disabled')).toBeDefined();
-    expect(wrapper.get('[data-cy="plan-option-5"]').text()).toContain('45.00 € per month');
-    expect(wrapper.get('[data-cy="plan-period-monthly"]').attributes('aria-pressed')).toBe('true');
+    expect(wrapper.get('[data-testid="plan-option"][data-key="5"]').text()).toContain('45.00 € per month');
+    expect(wrapper.get('[data-testid="plan-period"][data-key="monthly"]').attributes('aria-pressed')).toBe('true');
   });
 
   it('starts on the yearly plans for a yearly plan', () => {
     const wrapper = mountOptions(4);
 
-    expect(wrapper.get('[data-cy="plan-period-yearly"]').attributes('aria-pressed')).toBe('true');
+    expect(wrapper.get('[data-testid="plan-period"][data-key="yearly"]').attributes('aria-pressed')).toBe('true');
   });
 
   it('leaves out a plan the period does not offer', async () => {
     const wrapper = mountOptions(3);
 
-    await wrapper.get('[data-cy="plan-period-yearly"]').trigger('click');
+    await wrapper.get('[data-testid="plan-period"][data-key="yearly"]').trigger('click');
 
-    expect(wrapper.get('[data-cy="plan-option-4"]').text()).toContain('250.00 € per year');
-    expect(wrapper.find('[data-cy="plan-option-5"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="plan-option"][data-key="4"]').text()).toContain('250.00 € per year');
+    expect(wrapper.find('[data-testid="plan-option"][data-key="5"]').exists()).toBe(false);
   });
 
   it('hands over the chosen plan', async () => {
     const wrapper = mountOptions(3);
 
-    await wrapper.get('[data-cy="plan-option-5"]').trigger('click');
+    await wrapper.get('[data-testid="plan-option"][data-key="5"]').trigger('click');
 
     expect(wrapper.emitted('select')?.[0]).toEqual([{ durationInMonths: 1, name: 'advanced', planId: 5, price: 45 }]);
   });

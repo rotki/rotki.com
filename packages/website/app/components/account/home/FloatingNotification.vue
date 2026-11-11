@@ -54,7 +54,6 @@ watch(() => visible, (show) => {
       v-if="visible"
       role="alert"
       class="fixed top-0 md:top-28 z-rui-toast w-full md:bottom-auto right-0 md:right-2 md:w-[520px] bg-rui-surface md:rounded-rui-card shadow-lg"
-      data-cy="floating-notification"
     >
       <RuiAlert
         :closeable="closeable"

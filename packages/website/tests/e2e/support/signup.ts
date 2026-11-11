@@ -13,7 +13,7 @@ export async function completeAccountStep(page: Page): Promise<void> {
   await page.locator('input#email').first().fill('email@gmail.com');
   await page.locator('input#password').first().fill('p455w0rD');
   await page.locator('input#password-confirmation').first().fill('p455w0rD');
-  await page.locator('button[data-cy=next-button]').first().click();
+  await page.getByTestId('next-button').first().click();
 }
 
 /**

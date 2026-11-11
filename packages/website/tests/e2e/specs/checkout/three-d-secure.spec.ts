@@ -29,7 +29,7 @@ test.describe('3D Secure page', () => {
   test('explains a missing handoff and leads back to the plans', async ({ page }) => {
     await page.goto('/checkout/pay/3d-secure');
 
-    const expired = page.locator('[data-cy="three-d-secure-expired"]');
+    const expired = page.getByTestId('three-d-secure-expired');
     await expect(expired.getByRole('heading', { level: 1, name: 'This bank confirmation has ended' })).toBeVisible();
     await expect(expired.getByRole('link', { name: 'Back to the plans' })).toHaveAttribute('href', '/checkout/pay');
   });
@@ -43,11 +43,11 @@ test.describe('3D Secure page', () => {
     await page.goto('/checkout/pay/3d-secure');
 
     await expect(page.getByRole('heading', { level: 1, name: 'Your payment didn\'t go through' })).toBeVisible();
-    const summary = page.locator('[data-cy="three-d-secure-summary"]');
-    await expect(summary.locator('[data-cy="three-d-secure-amount"]')).toHaveText('22.50 €');
-    await expect(summary.locator('[data-cy="plan-name"]')).toHaveText('Basic, monthly');
+    const summary = page.getByTestId('three-d-secure-summary');
+    await expect(summary.getByTestId('three-d-secure-amount')).toHaveText('22.50 €');
+    await expect(summary.getByTestId('plan-name')).toHaveText('Basic, monthly');
 
-    const failed = page.locator('[data-cy="three-d-secure-failed"]');
+    const failed = page.getByTestId('three-d-secure-failed');
     await expect(failed.getByRole('alert')).toBeVisible();
     await expect(failed.getByRole('link', { name: 'Try again' })).toHaveAttribute('href', '/checkout/pay/card?planId=3&discountCode=SUMMER');
   });

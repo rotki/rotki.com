@@ -22,7 +22,7 @@ describe('planLine', () => {
   it('names the plan and its billing period, with the start date', () => {
     const wrapper = mountLine({ startsAt: new Date(2026, 10, 3) });
 
-    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Basic, monthly');
+    expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Basic, monthly');
     expect(wrapper.text()).toContain('Monthly subscription');
     expect(wrapper.text()).toContain('Starts November 3, 2026');
     expect(wrapper.text()).not.toContain('Upgrade');
@@ -31,14 +31,14 @@ describe('planLine', () => {
   it('describes a yearly plan', () => {
     const wrapper = mountLine({ plan: { durationInMonths: 12, name: 'ADVANCED' } });
 
-    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Advanced, yearly');
+    expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Advanced, yearly');
     expect(wrapper.text()).toContain('Yearly subscription');
   });
 
   it('describes a one-time crypto payment without a start date', () => {
     const wrapper = mountLine({ oneTime: true, startsAt: new Date(2026, 10, 3) });
 
-    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Basic, 1 month');
+    expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Basic, 1 month');
     expect(wrapper.text()).toContain('Paid once, no renewal');
     expect(wrapper.text()).not.toContain('Starts');
   });
@@ -46,7 +46,7 @@ describe('planLine', () => {
   it('names a yearly one-time payment by its twelve months', () => {
     const wrapper = mountLine({ oneTime: true, plan: { name: 'advanced', durationInMonths: 12 } });
 
-    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Advanced, 12 months');
+    expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Advanced, 12 months');
   });
 
   it('marks an upgrade', () => {

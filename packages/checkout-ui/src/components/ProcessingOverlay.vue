@@ -23,7 +23,7 @@ const t = useCheckoutMessages();
         v-if="visible"
         role="status"
         class="fixed inset-0 z-rui-blocking flex items-center justify-center bg-black/80 backdrop-blur-xs"
-        data-cy="processing-overlay"
+        data-testid="processing-overlay"
       >
         <div class="flex flex-col items-center gap-1 px-4 text-center">
           <div

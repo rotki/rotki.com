@@ -55,7 +55,7 @@ watch(canvas, async (canvas) => {
 <template>
   <div
     class="size-40 shrink-0 rounded-rui-control border border-rui-divider bg-white overflow-hidden"
-    data-cy="crypto-payment-qr"
+    data-testid="crypto-payment-qr"
   >
     <div
       v-if="loading"

@@ -73,8 +73,8 @@ test.describe('crypto renewal', () => {
     await selectAsset(page, 'Ethereum', 'ETH (Ether)');
     // A renewal is paid in crypto and starts from the subscription, so no method switch and the way back leads there.
     await expect(page.getByRole('navigation', { name: 'Payment method' })).toHaveCount(0);
-    await expect(page.locator('[data-cy="checkout-back-to-plans"]')).toHaveText('Back to your subscription');
-    await expect(page.locator('[data-cy="checkout-back-to-plans"]')).toHaveAttribute('href', '/home/subscription');
+    await expect(page.getByTestId('checkout-back-to-plans')).toHaveText('Back to your subscription');
+    await expect(page.getByTestId('checkout-back-to-plans')).toHaveAttribute('href', '/home/subscription');
 
     await acceptPolicyAndContinue(page);
 
@@ -156,7 +156,7 @@ test.describe('crypto renewal', () => {
 
         await expect(page.getByText('Network not switched', { exact: true })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Switch network' })).toBeVisible();
-        await expect(page.locator('[data-cy="crypto-switch-hint"]')).toHaveText(/Your wallet is on another network\. Switch it to \w+/);
+        await expect(page.getByTestId('crypto-switch-hint')).toHaveText(/Your wallet is on another network\. Switch it to \w+/);
         expect(await wallet.sentTransactions()).toHaveLength(0);
       });
     });

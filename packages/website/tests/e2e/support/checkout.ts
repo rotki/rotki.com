@@ -87,7 +87,7 @@ export async function switchNetwork(page: Page): Promise<void> {
  */
 export async function changePlan(page: Page, options: { period: BillingPeriod; tier: string; confirm?: boolean }): Promise<void> {
   const { confirm = true, period, tier } = options;
-  await page.locator('[data-cy="change-plan"]').click();
+  await page.getByTestId('change-plan').click();
   await expect(page.getByText('Change Plan')).toBeVisible();
 
   if (confirm)
@@ -105,7 +105,7 @@ export async function changePlan(page: Page, options: { period: BillingPeriod; t
  * back to the subscription page, and a failed cancellation stays put, so the caller asserts that.
  */
 export async function confirmPaymentChange(page: Page): Promise<void> {
-  await page.locator('[data-cy="change-crypto-asset"]').click();
+  await page.getByTestId('change-crypto-asset').click();
   await tick(page, /Allow me to change the payment method/, 'Allow me to change the payment method');
   await page.getByRole('button', { name: 'Change Payment' }).click();
 }
@@ -120,5 +120,5 @@ export async function changePaymentMethod(page: Page): Promise<void> {
 export async function expectPendingSuccess(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/checkout\/success$/, { timeout: 15_000 });
   await expect(page.getByRole('heading', { level: 1, name: 'Your payment is on its way' })).toBeVisible();
-  await expect(page.locator('[data-cy="receipt-method"]')).toHaveText('Crypto');
+  await expect(page.locator('[data-testid=receipt-value][data-key=method]')).toHaveText('Crypto');
 }

@@ -69,8 +69,8 @@ test.describe('crypto upgrade', () => {
     await acceptPolicyAndContinue(page);
 
     // An upgrade is tied to the plan it was requested for, so the order summary offers no switch.
-    await expect(page.locator('[data-cy="price-row-subtotal"]')).toHaveText('Prorated upgrade');
-    await expect(page.locator('[data-cy="change-plan"]')).toBeHidden();
+    await expect(page.locator('[data-testid=price-row][data-key=subtotal]')).toHaveText('Prorated upgrade');
+    await expect(page.getByTestId('change-plan')).toBeHidden();
 
     await connectWallet(page, wallet);
     await payWithWallet(page);

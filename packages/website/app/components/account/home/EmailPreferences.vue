@@ -60,7 +60,7 @@ onBeforeMount(() => {
         color="primary"
         :label="t('email_preferences.newsletter')"
         :hint="t('email_preferences.newsletter_hint')"
-        data-cy="newsletter-consent"
+        data-testid="newsletter-consent"
         @update:model-value="toggle($event)"
       />
     </div>

@@ -58,7 +58,7 @@ const rows = computed<ReceiptRow[]>(() => {
 <template>
   <div
     class="flex flex-col gap-4"
-    data-cy="subscription-receipt"
+    data-testid="subscription-receipt"
   >
     <h2 class="text-lg md:text-xl font-semibold text-rui-text">
       {{ t('subscription.success.summary.title') }}
@@ -73,7 +73,8 @@ const rows = computed<ReceiptRow[]>(() => {
         </dt>
         <dd
           class="text-right text-rui-text tabular-nums"
-          :data-cy="`receipt-${row.id}`"
+          data-testid="receipt-value"
+          :data-key="row.id"
         >
           {{ row.value }}
         </dd>

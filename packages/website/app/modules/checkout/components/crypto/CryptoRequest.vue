@@ -86,7 +86,7 @@ function submit(): void {
 
     <CheckoutPanel
       aria-labelledby="crypto-asset-title"
-      data-cy="crypto-panel"
+      data-testid="crypto-panel"
     >
       <h2
         id="crypto-asset-title"
@@ -109,7 +109,6 @@ function submit(): void {
         class="w-full sm:w-auto sm:self-start"
         color="primary"
         size="lg"
-        data-cy="show-payment-details"
         @click="submit()"
       >
         {{ t('checkout_crypto.show_details') }}
@@ -118,7 +117,7 @@ function submit(): void {
 
     <section
       class="flex flex-col gap-1 p-4 md:p-6 rounded-rui-card border border-dashed border-rui-outline"
-      data-cy="crypto-send-placeholder"
+      data-testid="crypto-send-placeholder"
     >
       <h2 class="text-lg md:text-xl font-semibold text-rui-text-secondary">
         {{ t('checkout_crypto.send_step') }}

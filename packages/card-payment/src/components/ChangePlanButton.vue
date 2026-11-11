@@ -34,7 +34,7 @@ function choose(plan: SelectedPlan): void {
       color="primary"
       variant="outlined"
       size="sm"
-      data-cy="change-plan"
+      data-testid="change-plan"
       @click="open = true"
     >
       {{ t('checkout.change_plan.action') }}

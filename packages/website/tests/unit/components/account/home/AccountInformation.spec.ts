@@ -43,7 +43,7 @@ function findButton(wrapper: VueWrapper, text: string) {
 describe('account information', () => {
   it('continues to submit the existing customer information fields', async () => {
     const { updateProfile, wrapper } = await mountAccountInformation();
-    expect(wrapper.get('[data-cy="update-profile"]').attributes('type')).toBe('submit');
+    expect(wrapper.get('[data-testid="update-profile"]').attributes('type')).toBe('submit');
     await wrapper.get('form').trigger('submit');
 
     await vi.waitFor(() => {
@@ -92,7 +92,7 @@ describe('account information', () => {
 
     expect(wrapper.text()).toContain('Your address is missing or invalid.');
     expect(wrapper.text()).toContain('This field may not be blank.');
-    expect(wrapper.get('[data-cy="update-profile"]').attributes('disabled')).toBeUndefined();
+    expect(wrapper.get('[data-testid="update-profile"]').attributes('disabled')).toBeUndefined();
 
     await findButton(wrapper, 'Edit address')!.trigger('click');
     expect(wrapper.emitted('edit-address')).toHaveLength(1);

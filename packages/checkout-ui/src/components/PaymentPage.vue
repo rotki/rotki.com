@@ -42,11 +42,11 @@ function toggleSummary(): void {
 <template>
   <div
     class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-x-12 lg:gap-y-6 lg:items-start"
-    data-cy="payment-page"
+    data-testid="payment-page"
   >
     <div
       class="flex flex-col gap-2 lg:col-span-2 lg:row-start-1"
-      data-cy="payment-page-heading"
+      data-testid="payment-page-heading"
     >
       <h1 class="text-2xl md:text-3xl font-semibold text-rui-text">
         {{ heading }}
@@ -62,7 +62,7 @@ function toggleSummary(): void {
 
     <div
       class="flex flex-col gap-6 min-w-0 lg:col-start-1 lg:row-start-2"
-      data-cy="payment-page-main"
+      data-testid="payment-page-main"
     >
       <slot name="methods" />
       <slot />
@@ -76,7 +76,7 @@ function toggleSummary(): void {
           class="lg:hidden w-full min-h-16 px-4 py-3 flex items-center justify-between gap-4 text-left"
           :aria-expanded="summaryOpen"
           aria-controls="payment-page-summary"
-          data-cy="summary-toggle"
+          data-testid="summary-toggle"
           @click="toggleSummary()"
         >
           <span class="flex items-center gap-1.5 font-medium text-rui-primary">
@@ -112,7 +112,7 @@ function toggleSummary(): void {
           id="payment-page-summary"
           class="px-4 pb-4 lg:block lg:p-6"
           :class="{ hidden: !summaryOpen }"
-          data-cy="payment-page-summary"
+          data-testid="payment-page-summary"
         >
           <slot name="summary" />
         </div>
@@ -121,7 +121,7 @@ function toggleSummary(): void {
       <div
         v-if="$slots.pay"
         class="sticky bottom-0 z-10 -mx-4 px-4 py-3 bg-rui-surface border-t border-rui-divider lg:static lg:m-0 lg:p-0 lg:bg-transparent lg:border-0"
-        data-cy="payment-page-pay"
+        data-testid="payment-page-pay"
       >
         <slot name="pay" />
       </div>

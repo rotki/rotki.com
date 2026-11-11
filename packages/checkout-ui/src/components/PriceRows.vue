@@ -90,7 +90,8 @@ const nextPayment = computed<string>(() => {
       >
         <dt
           :class="row.deduction ? 'text-rui-success' : 'text-rui-text-secondary'"
-          :data-cy="`price-row-${row.id}`"
+          data-testid="price-row"
+          :data-key="row.id"
         >
           <RuiSkeletonLoader
             v-if="row.pending"
@@ -128,7 +129,7 @@ const nextPayment = computed<string>(() => {
       <span
         v-else
         class="text-2xl md:text-[1.75rem] md:leading-9 font-semibold text-rui-primary-darker tabular-nums"
-        data-cy="grand-total"
+        data-testid="grand-total"
       >
         {{ summary.dueToday.formatted }}
       </span>
@@ -136,7 +137,7 @@ const nextPayment = computed<string>(() => {
 
     <p
       class="text-sm text-rui-text-secondary"
-      data-cy="next-payment"
+      data-testid="next-payment"
     >
       {{ nextPayment }}
     </p>

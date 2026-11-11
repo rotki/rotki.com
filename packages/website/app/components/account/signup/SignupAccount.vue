@@ -63,7 +63,7 @@ watch(() => externalResults, (fieldErrors) => {
       </p>
       <details
         class="mt-1"
-        data-cy="signup-note"
+        data-testid="signup-note"
       >
         <summary class="cursor-pointer py-2 text-body-1 font-medium text-rui-primary">
           {{ t('auth.signup.account.app_login.question') }}
@@ -135,7 +135,7 @@ watch(() => externalResults, (fieldErrors) => {
       />
     </div>
     <RuiButton
-      data-cy="next-button"
+      data-testid="next-button"
       color="primary"
       class="mt-8 w-full"
       size="lg"

@@ -28,7 +28,7 @@ onMounted(() => {
   <p>{{ sentTo }}</p>
   <p
     class="my-1 font-medium text-rui-text [overflow-wrap:anywhere]"
-    data-cy="sent-to"
+    data-testid="sent-to"
   >
     {{ recipient }}
   </p>

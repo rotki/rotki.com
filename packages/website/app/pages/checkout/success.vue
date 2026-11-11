@@ -67,7 +67,7 @@ const message = computed<string>(() => {
 <template>
   <div
     class="flex flex-col gap-6 md:gap-8"
-    data-cy="payment-success"
+    data-testid="payment-success"
   >
     <header class="flex flex-col gap-4">
       <span
@@ -87,7 +87,7 @@ const message = computed<string>(() => {
         <p
           v-if="message"
           class="text-rui-text"
-          data-cy="payment-success-message"
+          data-testid="payment-success-message"
         >
           {{ message }}
         </p>
@@ -100,7 +100,7 @@ const message = computed<string>(() => {
     >
       <CheckoutPanel
         v-if="!existingSubscriber"
-        data-cy="payment-success-next"
+        data-testid="payment-success-next"
       >
         <h2 class="text-lg md:text-xl font-semibold text-rui-text">
           {{ t('subscription.success.next.title') }}
@@ -148,7 +148,6 @@ const message = computed<string>(() => {
           variant="outlined"
           color="primary"
           class="w-full lg:w-auto lg:self-start mt-auto"
-          data-cy="payment-success-account"
         >
           {{ t('subscription.success.account') }}
         </ButtonLink>

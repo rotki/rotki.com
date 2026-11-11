@@ -43,7 +43,7 @@ function formatEur(value: string): string {
     <p
       v-else-if="loadFailed"
       class="mt-1 text-body-1 text-rui-text"
-      data-cy="credit-load-failed"
+      data-testid="credit-load-failed"
     >
       {{ t('account.credit.load_failed') }}
     </p>

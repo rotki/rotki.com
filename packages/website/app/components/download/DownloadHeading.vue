@@ -124,7 +124,7 @@ function onDownloadClick(platform: string): void {
               variant="text"
               color="primary"
               class="p-0! text-sm! underline"
-              data-cy="show-all-download"
+              data-testid="show-all-download"
               @click="showAll = true"
             >
               {{ t('download.download_for_other_os') }}

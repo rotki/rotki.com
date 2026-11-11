@@ -77,7 +77,7 @@ const backLabel = computed<string>(() => (backTo === 'subscription' ? t('checkou
           v-if="backHref"
           :href="backHref"
           class="hidden md:block justify-self-end text-sm text-rui-primary underline-offset-2 hover:underline"
-          data-cy="checkout-back-to-plans"
+          data-testid="checkout-back-to-plans"
         >
           {{ backLabel }}
         </a>

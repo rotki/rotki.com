@@ -25,7 +25,7 @@ const labels = computed<CryptoPaymentLabels>(() => cryptoPaymentLabels(data));
 <template>
   <CheckoutPanel
     aria-labelledby="crypto-asset-title"
-    data-cy="crypto-asset-panel"
+    data-testid="crypto-asset-panel"
   >
     <div class="flex items-center justify-between gap-4">
       <h2
@@ -38,7 +38,7 @@ const labels = computed<CryptoPaymentLabels>(() => cryptoPaymentLabels(data));
         :disabled="disabled"
         variant="text"
         color="primary"
-        data-cy="change-crypto-asset"
+        data-testid="change-crypto-asset"
         @click="showChangePaymentDialog = true"
       >
         {{ t('actions.change') }}

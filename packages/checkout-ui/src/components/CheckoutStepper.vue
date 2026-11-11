@@ -84,7 +84,7 @@ const progress = computed<string>(() => t('checkout.steps.progress', {
   </ol>
   <span
     class="md:hidden text-sm text-rui-text-secondary"
-    data-cy="checkout-step-progress"
+    data-testid="checkout-step-progress"
   >
     {{ progress }}
   </span>

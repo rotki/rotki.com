@@ -48,7 +48,6 @@ function trackSeePlansClick(): void {
               color="primary"
               variant="default"
               rounded
-              data-cy="see-plans-button"
               @click="trackSeePlansClick()"
             >
               {{ t('download.upgrade_nudge.see_plans') }}
@@ -58,7 +57,6 @@ function trackSeePlansClick(): void {
               color="primary"
               variant="outlined"
               rounded
-              data-cy="what-do-i-get-button"
             >
               {{ t('download.upgrade_nudge.what_do_i_get') }}
             </ButtonLink>

@@ -44,7 +44,7 @@ function mountRows(props: Partial<Props> = {}): VueWrapper {
 }
 
 function row(wrapper: VueWrapper, id: string): { label: string; value: string } | undefined {
-  const label = wrapper.find(`[data-cy="price-row-${id}"]`);
+  const label = wrapper.find(`[data-testid="price-row"][data-key="${id}"]`);
   if (!label.exists())
     return undefined;
   const value = label.element.nextElementSibling?.textContent ?? '';
@@ -57,7 +57,7 @@ describe('priceRows', () => {
 
     expect(row(wrapper, 'subtotal')).toEqual({ label: 'Subtotal', value: '25.00 €' });
     expect(row(wrapper, 'vat')).toEqual({ label: 'VAT (19%, included)', value: '3.99 €' });
-    expect(wrapper.find('[data-cy="grand-total"]').text()).toBe('25.00 €');
+    expect(wrapper.find('[data-testid="grand-total"]').text()).toBe('25.00 €');
     expect(row(wrapper, 'discount')).toBeUndefined();
   });
 
@@ -67,14 +67,14 @@ describe('priceRows', () => {
     expect(row(wrapper, 'subtotal')?.value).toBe('25.00 €');
     expect(row(wrapper, 'discount')).toEqual({ label: 'Referral discount (10%)', value: '−2.50 €' });
     expect(row(wrapper, 'vat')?.value).toBe('3.59 €');
-    expect(wrapper.find('[data-cy="grand-total"]').text()).toBe('22.50 €');
+    expect(wrapper.find('[data-testid="grand-total"]').text()).toBe('22.50 €');
   });
 
   it('shows no VAT row when no VAT applies', () => {
     const wrapper = mountRows({ breakdown: { ...referral, vatAmount: '0', vatRate: '0' } });
 
     expect(row(wrapper, 'vat')).toBeUndefined();
-    expect(wrapper.find('[data-cy="grand-total"]').text()).toBe('22.50 €');
+    expect(wrapper.find('[data-testid="grand-total"]').text()).toBe('22.50 €');
   });
 
   it('shows the plan price and holds the VAT row\'s place before the breakdown loads', () => {
@@ -109,21 +109,21 @@ describe('priceRows', () => {
   it('shows placeholders instead of amounts while loading', () => {
     const wrapper = mountRows({ breakdown: referral, loading: true });
 
-    expect(wrapper.find('[data-cy="grand-total"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="grand-total"]').exists()).toBe(false);
     expect(row(wrapper, 'discount')?.value).toBe('');
   });
 
   it('says when and what the next payment is', () => {
     const monthly = mountRows({ renewsAt: new Date(2026, 10, 2) });
-    expect(monthly.find('[data-cy="next-payment"]').text()).toBe('Then 25.00 € per month from November 2, 2026. Cancel any time from your account.');
+    expect(monthly.find('[data-testid="next-payment"]').text()).toBe('Then 25.00 € per month from November 2, 2026. Cancel any time from your account.');
 
     const yearly = mountRows({ plan: { ...plan, durationInMonths: 12 } });
-    expect(yearly.find('[data-cy="next-payment"]').text()).toBe('Then 25.00 € per year. Cancel any time from your account.');
+    expect(yearly.find('[data-testid="next-payment"]').text()).toBe('Then 25.00 € per year. Cancel any time from your account.');
   });
 
   it('explains one-time payments instead of a renewal', () => {
     const wrapper = mountRows({ oneTime: true, renewsAt: new Date(2026, 10, 2) });
 
-    expect(wrapper.find('[data-cy="next-payment"]').text()).toBe('Crypto payments do not renew. We e-mail you before November 2, 2026 so you can pay for the next period.');
+    expect(wrapper.find('[data-testid="next-payment"]').text()).toBe('Crypto payments do not renew. We e-mail you before November 2, 2026 so you can pay for the next period.');
   });
 });

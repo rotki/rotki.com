@@ -18,20 +18,20 @@ test.describe('payment page layout', () => {
       await expect(page.getByRole('navigation', { name: 'Payment method' }).getByRole('link', { name: /PayPal/ })).toHaveAttribute('aria-current', 'page');
       await expect(page.getByRole('heading', { level: 2, name: 'Pay with PayPal' })).toBeVisible();
 
-      const summary = page.locator('[data-cy="order-summary"]');
+      const summary = page.getByTestId('order-summary');
       await expect(summary.getByRole('heading', { name: 'Order summary' })).toBeVisible();
-      await expect(summary.locator('[data-cy="grand-total"]')).toHaveText('25.00 €');
+      await expect(summary.getByTestId('grand-total')).toHaveText('25.00 €');
 
-      const pay = page.locator('[data-cy="payment-page-pay"]');
+      const pay = page.getByTestId('payment-page-pay');
       await expect(pay.getByRole('checkbox', { name: 'I agree to the refund and cancellation policy' })).toBeVisible();
       await expect(pay.locator('#paypal-button')).toBeAttached();
       // The e2e backend gives PayPal no client token, so the slot explains it and offers a reload.
-      await expect(pay.locator('[data-cy="paypal-unavailable"]')).toContainText('PayPal didn\'t load.');
-      await expect(page.locator('[data-cy="checkout-error"]')).toHaveCount(0);
+      await expect(pay.getByTestId('paypal-unavailable')).toContainText('PayPal didn\'t load.');
+      await expect(page.getByTestId('checkout-error')).toHaveCount(0);
       await expect(page.getByRole('button', { name: 'Back', exact: true })).toHaveCount(0);
 
       // The summary column sits to the right of the PayPal panel on a desktop.
-      const panel = await page.locator('[data-cy="paypal-panel"]').boundingBox();
+      const panel = await page.getByTestId('paypal-panel').boundingBox();
       const summaryBox = await summary.boundingBox();
       expect(summaryBox?.x).toBeGreaterThan((panel?.x ?? 0) + (panel?.width ?? 0));
       await expectNoSidewaysScroll(page);
@@ -43,17 +43,17 @@ test.describe('payment page layout', () => {
       test('folds the summary into a bar with the total and keeps consent at the bottom of the screen', async ({ page }) => {
         await page.goto('/checkout/pay/paypal?planId=3');
 
-        const toggle = page.locator('[data-cy="summary-toggle"]');
+        const toggle = page.getByTestId('summary-toggle');
         await expect(toggle).toContainText('Order summary');
         await expect(toggle).toContainText('then 25.00 €/month');
         await expect(toggle).toContainText('25.00 €');
-        await expect(page.locator('[data-cy="order-summary"]')).toBeHidden();
+        await expect(page.getByTestId('order-summary')).toBeHidden();
 
         await toggle.click();
         await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-        await expect(page.locator('[data-cy="order-summary"]')).toBeVisible();
+        await expect(page.getByTestId('order-summary')).toBeVisible();
 
-        const pay = await page.locator('[data-cy="payment-page-pay"]').boundingBox();
+        const pay = await page.getByTestId('payment-page-pay').boundingBox();
         expect(Math.round((pay?.y ?? 0) + (pay?.height ?? 0))).toBe(PHONE.height);
         await expectNoSidewaysScroll(page);
       });
@@ -67,8 +67,8 @@ test.describe('payment page layout', () => {
       await expect(page.getByRole('heading', { level: 1, name: 'How would you like to pay?' })).toBeVisible();
       await expect(page.getByRole('navigation', { name: 'Payment method' }).getByRole('link', { name: /Crypto/ })).toHaveAttribute('aria-current', 'page');
       await expect(page.getByRole('heading', { level: 2, name: '1. Choose network and token' })).toBeVisible();
-      await expect(page.locator('[data-cy="crypto-send-placeholder"]')).toContainText('2. Send the payment');
-      await expect(page.locator('[data-cy="order-summary"] [data-cy="next-payment"]')).toContainText('Crypto payments do not renew');
+      await expect(page.getByTestId('crypto-send-placeholder')).toContainText('2. Send the payment');
+      await expect(page.getByTestId('order-summary').getByTestId('next-payment')).toContainText('Crypto payments do not renew');
 
       const show = page.getByRole('button', { name: 'Show payment details' });
       await expect(show).toBeDisabled();
@@ -78,13 +78,13 @@ test.describe('payment page layout', () => {
       await acceptPolicyAndContinue(page);
 
       await expect(page.getByRole('heading', { level: 1, name: 'Send the payment' })).toBeVisible();
-      await expect(page.locator('[data-cy="crypto-asset-panel"]')).toContainText('ETH on Ethereum');
-      const panel = page.locator('[data-cy="crypto-payment-panel"]');
+      await expect(page.getByTestId('crypto-asset-panel')).toContainText('ETH on Ethereum');
+      const panel = page.getByTestId('crypto-payment-panel');
       await expect(panel.getByRole('heading', { level: 2, name: '2. Send the payment' })).toBeVisible();
-      await expect(panel.locator('[data-cy="crypto-exact-amount"]')).toContainText('Send exactly 0.01 ETH, on Ethereum only.');
+      await expect(panel.getByTestId('crypto-exact-amount')).toContainText('Send exactly 0.01 ETH, on Ethereum only.');
       await expect(panel.getByRole('button', { name: 'Connect wallet' })).toBeVisible();
-      await expect(panel.locator('[data-cy="crypto-payment-qr"]')).toBeVisible();
-      await expect(page.locator('[data-cy="order-summary"]')).toBeAttached();
+      await expect(panel.getByTestId('crypto-payment-qr')).toBeVisible();
+      await expect(page.getByTestId('order-summary')).toBeAttached();
       await expectNoSidewaysScroll(page);
     });
 
@@ -94,14 +94,14 @@ test.describe('payment page layout', () => {
       test('keeps the summary folded, the tiles on one row and the consent inside the crypto panel', async ({ page }) => {
         await page.goto('/checkout/pay/request-crypto?planId=3');
 
-        const toggle = page.locator('[data-cy="summary-toggle"]');
+        const toggle = page.getByTestId('summary-toggle');
         await expect(toggle).toContainText('25.00 €');
         await expect(toggle).toContainText('paid in crypto');
         const tiles = page.getByRole('navigation', { name: 'Payment method' }).getByRole('link');
         const tops = await tiles.evaluateAll(links => links.map(link => Math.round(link.getBoundingClientRect().top)));
         expect(new Set(tops).size).toBe(1);
-        await expect(page.locator('[data-cy="crypto-panel"]').getByRole('button', { name: 'Show payment details' })).toBeVisible();
-        await expect(page.locator('[data-cy="payment-page-pay"]')).toHaveCount(0);
+        await expect(page.getByTestId('crypto-panel').getByRole('button', { name: 'Show payment details' })).toBeVisible();
+        await expect(page.getByTestId('payment-page-pay')).toHaveCount(0);
         await expectNoSidewaysScroll(page);
       });
 
@@ -110,9 +110,9 @@ test.describe('payment page layout', () => {
         await selectAsset(page, 'Ethereum', 'ETH (Ether)');
         await acceptPolicyAndContinue(page);
 
-        const qr = page.locator('[data-cy="crypto-payment-qr"]');
+        const qr = page.getByTestId('crypto-payment-qr');
         await expect(qr).toBeHidden();
-        await page.locator('[data-cy="crypto-qr-toggle"]').click();
+        await page.getByTestId('crypto-qr-toggle').click();
         await expect(qr).toBeVisible();
         await expectNoSidewaysScroll(page);
       });

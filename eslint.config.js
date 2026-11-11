@@ -27,6 +27,35 @@ export default rotki({
     'nuxt/prefer-import-meta': 'error',
   },
 }, {
+  /* Test ids are static, so a search finds every element a test can reach. Anything variable
+     goes on `data-key`, and tests select `[data-testid=row][data-key=value]`. */
+  files: ['**/*.vue'],
+  rules: {
+    'vue/no-restricted-static-attribute': ['error', {
+      key: 'data-cy',
+      message: 'Use `data-testid`. `data-cy` is a Cypress-era leftover.',
+    }],
+    'vue/no-restricted-v-bind': ['error', {
+      argument: 'data-testid',
+      message: 'Keep `data-testid` static and put the variable part on `data-key`.',
+    }, {
+      argument: 'data-cy',
+      message: 'Use `data-testid`. `data-cy` is a Cypress-era leftover.',
+    }],
+  },
+}, {
+  // The template rules cannot see selector strings in tests.
+  files: ['**/*.spec.ts', 'packages/website/tests/**/*.ts'],
+  rules: {
+    'no-restricted-syntax': ['error', {
+      message: 'Query on `data-testid`. `data-cy` is a Cypress-era leftover.',
+      selector: 'Literal[value=/data-cy/]',
+    }, {
+      message: 'Query on `data-testid`. `data-cy` is a Cypress-era leftover.',
+      selector: 'TemplateElement[value.raw=/data-cy/]',
+    }],
+  },
+}, {
   files: ['packages/website/nuxt.config.ts'],
   plugins: {
     nuxt: pluginNuxt,

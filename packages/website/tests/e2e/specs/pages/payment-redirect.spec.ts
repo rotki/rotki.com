@@ -106,7 +106,7 @@ test.describe('payment redirect after signup', () => {
     await page.locator('input#email').first().fill('test@example.com');
     await page.locator('input#password').first().fill('SecureP4ss!');
     await page.locator('input#password-confirmation').first().fill('SecureP4ss!');
-    await page.locator('button[data-cy=next-button]').first().click();
+    await page.getByTestId('next-button').first().click();
 
     // Verify redirectUrl survives step navigation
     expect(new URL(page.url()).searchParams.get('redirectUrl')).toBe(paymentPath);

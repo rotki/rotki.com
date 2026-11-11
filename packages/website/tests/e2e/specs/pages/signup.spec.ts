@@ -21,9 +21,9 @@ test.describe('signup test', () => {
     await waitForSignupForm(page);
 
     await expect(page.getByRole('heading', { level: 1, name: 'Create your account' })).toBeVisible();
-    await expect(page.locator('[data-cy=signup-aside]')).toContainText('Your rotki user and your data stay on your computer');
-    await expect(page.locator('[data-cy=signup-note]')).toBeHidden();
-    await expect(page.locator('[data-cy=back-button]')).toHaveCount(0);
+    await expect(page.getByTestId('signup-aside')).toContainText('Your rotki user and your data stay on your computer');
+    await expect(page.getByTestId('signup-note')).toBeHidden();
+    await expect(page.getByTestId('back-button')).toHaveCount(0);
   });
 
   test('on phones, folds the note about app accounts into a question', async ({ page }) => {
@@ -31,8 +31,8 @@ test.describe('signup test', () => {
     await page.goto('/signup');
     await waitForSignupForm(page);
 
-    const note = page.locator('[data-cy=signup-note]');
-    await expect(page.locator('[data-cy=signup-aside]')).toBeHidden();
+    const note = page.getByTestId('signup-note');
+    await expect(page.getByTestId('signup-aside')).toBeHidden();
     await expect(note.getByText('the two don\'t share passwords')).toBeHidden();
     await note.getByText('Is this my rotki app login?').click();
     await expect(note.getByText('the two don\'t share passwords')).toBeVisible();
@@ -71,7 +71,7 @@ test.describe('signup test', () => {
     await completeAccountStep(page);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
 
-    await page.locator('button[data-cy=back-button]').first().click();
+    await page.getByTestId('back-button').first().click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
     await expect(page.locator('input#username').first()).toHaveValue('username');
   });
@@ -92,14 +92,14 @@ test.describe('signup test', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/signup');
     await waitForSignupForm(page);
-    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 1 of 2: Account');
+    await expect(page.getByTestId('step-label')).toHaveText('Step 1 of 2: Account');
 
     await completeAccountStep(page);
-    await expect(page.locator('[data-cy=step-label]')).toHaveText('Step 2 of 2: Invoice details');
-    await expect(page.locator('[data-cy=signing-up-as]')).toContainText('email@gmail.com');
+    await expect(page.getByTestId('step-label')).toHaveText('Step 2 of 2: Invoice details');
+    await expect(page.getByTestId('signing-up-as')).toContainText('email@gmail.com');
 
-    const back = await page.locator('button[data-cy=back-button]').first().boundingBox();
-    const submit = await page.locator('button[data-cy=submit-button]').first().boundingBox();
+    const back = await page.getByTestId('back-button').first().boundingBox();
+    const submit = await page.getByTestId('submit-button').first().boundingBox();
     expect(back && submit && back.x < submit.x && Math.abs(back.y - submit.y) < 1).toBe(true);
     // The form is taller than the screen, but the actions stick to its bottom edge.
     expect(submit && submit.y + submit.height <= 844).toBe(true);
@@ -114,7 +114,7 @@ test.describe('signup test', () => {
     const emailInput = page.locator('input#email').first();
     const passwordInput = page.locator('input#password').first();
     const confirmPasswordInput = page.locator('input#password-confirmation').first();
-    const nextButton = page.locator('button[data-cy=next-button]').first();
+    const nextButton = page.getByTestId('next-button').first();
 
     await expect(usernameInput).toBeVisible();
     await expect(emailInput).toBeVisible();
@@ -156,7 +156,7 @@ test.describe('signup test', () => {
     const street = await page.locator('input#address-1').first().boundingBox();
     expect(country && street && country.y < street.y).toBe(true);
 
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
     await expect(page.getByText('Accept the terms to create your account.')).toBeVisible();
     await expect(page.getByText('This field is required.').first()).toBeVisible();
   });
@@ -182,12 +182,12 @@ test.describe('signup test', () => {
     await page.locator('input#first-name').first().fill('First');
     await passCaptcha(page);
 
-    await page.locator('button[data-cy=back-button]').first().click();
+    await page.getByTestId('back-button').first().click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
-    await page.locator('button[data-cy=next-button]').first().click();
+    await page.getByTestId('next-button').first().click();
 
     await expect(page.locator('input#first-name').first()).toHaveValue('First');
-    await expect(page.locator('[data-cy=fake-captcha]')).toHaveText('Captcha passed');
+    await expect(page.getByTestId('fake-captcha')).toHaveText('Captcha passed');
   });
 
   test('on phones, goes back to the account from the invoice step', async ({ page }) => {
@@ -196,7 +196,7 @@ test.describe('signup test', () => {
     await waitForSignupForm(page);
     await completeAccountStep(page);
 
-    await page.locator('[data-cy=signing-up-as]').getByRole('button', { name: 'Edit' }).click();
+    await page.getByTestId('signing-up-as').getByRole('button', { name: 'Edit' }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
     await expect(page.locator('input#email').first()).toHaveValue('email@gmail.com');
   });
@@ -213,11 +213,11 @@ test.describe('signup test', () => {
     await completeAccountStep(page);
     await fillInvoiceStep(page, 'Country');
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await page.waitForURL('**/activation');
     await expect(page.getByRole('heading', { level: 1, name: 'Check your inbox' })).toBeVisible();
-    await expect(page.locator('[data-cy=sent-to]')).toHaveText('email@gmail.com');
+    await expect(page.getByTestId('sent-to')).toHaveText('email@gmail.com');
     expect(page.url()).not.toContain('email');
     expect(requestBody).toMatchObject({
       address_1: 'Test Street 1',
@@ -250,7 +250,7 @@ test.describe('signup test', () => {
     await page.locator('input#company-name').first().fill('Rotki Test GmbH');
     await page.locator('input#vat-id').first().fill('DE123456789');
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await page.waitForURL('**/activation');
     expect(requestBody).toMatchObject({
@@ -282,7 +282,7 @@ test.describe('signup test', () => {
     await expect(page.locator('input#company-name').first()).toHaveValue('');
     await companyToggle.click();
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await page.waitForURL('**/activation');
     expect(requestBody).toMatchObject({ company_name: '', vat_id: '' });
@@ -301,7 +301,7 @@ test.describe('signup test', () => {
     await fillInvoiceStep(page, 'Country');
     await page.getByRole('checkbox', { name: /Send me product updates/ }).check();
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await page.waitForURL('**/activation');
     expect(requestBody).toMatchObject({ newsletter_consent: true });
@@ -315,7 +315,7 @@ test.describe('signup test', () => {
     await completeAccountStep(page);
     await fillInvoiceStep(page, 'Country');
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await page.waitForURL('**/activation');
     const stored = await page.evaluate(() => localStorage.getItem('rotki.redirect_url'));
@@ -333,7 +333,7 @@ test.describe('signup test', () => {
     await completeAccountStep(page);
     await fillInvoiceStep(page, 'Country');
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Create your account');
     await expect(page.getByText('This password is too common.')).toBeVisible();
@@ -359,16 +359,16 @@ test.describe('signup test', () => {
     await page.locator('input#company-name').first().fill('Rotki Test GmbH');
     await page.locator('input#vat-id').first().fill('XX1');
     await passCaptcha(page);
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
     await expect(page.getByText('VAT ID is invalid.')).toBeVisible();
     await expect(page.locator('input#vat-id').first()).toHaveValue('XX1');
 
     // The rejected request used up the token, so the widget is reset and the form waits for a new one.
-    await expect(page.locator('[data-cy=fake-captcha]')).toHaveText('Pass captcha');
+    await expect(page.getByTestId('fake-captcha')).toHaveText('Pass captcha');
     await page.locator('input#vat-id').first().fill('DE123456789');
-    await page.locator('button[data-cy=submit-button]').first().click();
+    await page.getByTestId('submit-button').first().click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invoice details');
     expect(requests).toBe(1);
   });
@@ -380,19 +380,19 @@ test.describe('signup test', () => {
     await completeAccountStep(page);
 
     const postalInput = page.locator('input#postal').first();
-    const postalError = page.locator('[data-cy=postal] .details .text-rui-error').first();
+    const postalError = page.getByTestId('postal').locator('.details .text-rui-error').first();
 
     // Valid inputs
     await postalInput.fill('12345');
-    await expect(page.locator('[data-cy=postal] .details .text-rui-error')).not.toBeVisible();
+    await expect(page.getByTestId('postal').locator('.details .text-rui-error')).not.toBeVisible();
 
     await postalInput.clear();
     await postalInput.fill('ABC-40');
-    await expect(page.locator('[data-cy=postal] .details .text-rui-error')).not.toBeVisible();
+    await expect(page.getByTestId('postal').locator('.details .text-rui-error')).not.toBeVisible();
 
     await postalInput.clear();
     await postalInput.fill('ABC-40 224');
-    await expect(page.locator('[data-cy=postal] .details .text-rui-error')).not.toBeVisible();
+    await expect(page.getByTestId('postal').locator('.details .text-rui-error')).not.toBeVisible();
 
     // Invalid inputs
     await postalInput.clear();

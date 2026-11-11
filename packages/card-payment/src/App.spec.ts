@@ -43,7 +43,7 @@ const CardPayment = defineComponent({
   name: 'CardPayment',
   props: ['cards', 'cardsFailed', 'selectedCard', 'planData', 'selectedPlan', 'upgradeSubId'],
   setup(_, { slots }) {
-    return () => h('section', { 'data-cy': 'card-payment' }, [slots.methods?.(), slots['plan-action']?.({ disabled: false })]);
+    return () => h('section', { 'data-testid': 'card-payment' }, [slots.methods?.(), slots['plan-action']?.({ disabled: false })]);
   },
 });
 
@@ -132,7 +132,7 @@ describe('app', () => {
     api.canBuyNewSubscription.mockReturnValue(new Promise(() => {}));
     const wrapper = mountApp();
 
-    expect(wrapper.find('[data-cy="loading-state"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="loading-state"]').exists()).toBe(true);
     expect(wrapper.get('[role="status"]').text()).toBe('Checking authentication...');
   });
 
@@ -210,14 +210,14 @@ describe('app', () => {
     const wrapper = mountApp();
     await flushPromises();
 
-    expect(wrapper.find('[data-cy="card-payment"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="card-payment"]').exists()).toBe(true);
   });
 
   it('offers the other methods for a new subscription', async () => {
     const wrapper = mountApp();
     await flushPromises();
 
-    expect(wrapper.find('[data-cy="card-payment"] nav').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="card-payment"] nav').exists()).toBe(true);
   });
 
   it('leads an upgrade back to the subscription, without other methods', async () => {
@@ -228,7 +228,7 @@ describe('app', () => {
 
     expect(api.goToSubscription).not.toHaveBeenCalled();
     expect(cardProps(wrapper).upgradeSubId).toBe('sub-1');
-    expect(wrapper.find('[data-cy="card-payment"] nav').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="card-payment"] nav').exists()).toBe(false);
     expect(wrapper.get('a[href$="/home/subscription"]').text()).toContain('Back to your subscription');
   });
 
@@ -269,7 +269,7 @@ describe('app', () => {
 
     expect(api.goToSubscription).not.toHaveBeenCalled();
     expect(wrapper.text()).toContain('We couldn\'t check your account.');
-    expect(wrapper.find('[data-cy="card-payment"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="card-payment"]').exists()).toBe(false);
   });
 
   it('sends a buyer who cannot start a subscription to the subscription page', async () => {
@@ -279,8 +279,8 @@ describe('app', () => {
     await flushPromises();
 
     expect(api.goToSubscription).toHaveBeenCalledOnce();
-    expect(wrapper.find('[data-cy="card-payment"]').exists()).toBe(false);
-    expect(wrapper.find('[data-cy="loading-state"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="card-payment"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="loading-state"]').exists()).toBe(true);
   });
 
   it.each([
@@ -306,6 +306,6 @@ describe('app', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain(message);
-    expect(wrapper.find('[data-cy="card-payment"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="card-payment"]').exists()).toBe(false);
   });
 });

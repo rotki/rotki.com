@@ -55,7 +55,7 @@ function mountPage(props: Partial<Props> = {}): VueWrapper {
   return mount(CardPayment, {
     global: {
       plugins: [{ install: (app: App): void => installCheckoutMessages(app, createTranslator(checkoutMessages)) }],
-      stubs: { CardDetails: { template: '<section data-cy="card-details" />' }, Teleport: true },
+      stubs: { CardDetails: { template: '<section data-testid="card-details" />' }, Teleport: true },
     },
     props: { cards: [savedCard], planData, selectedCard: savedCard, selectedPlan: plan, upgradeSubId: null, ...props },
   });
@@ -73,34 +73,34 @@ describe('components/CardPayment', () => {
     const wrapper = mountPage();
 
     expect(wrapper.get('h1').text()).toBe('How would you like to pay?');
-    expect(wrapper.find('[data-cy="card-details"]').exists()).toBe(true);
-    expect(wrapper.get('[data-cy="order-summary"] [data-cy="grand-total"]').text()).toBe('25.00 €');
-    expect(wrapper.get('[data-cy="summary-toggle"]').text()).toContain('25.00 €');
+    expect(wrapper.find('[data-testid="card-details"]').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="order-summary"] [data-testid="grand-total"]').text()).toBe('25.00 €');
+    expect(wrapper.get('[data-testid="summary-toggle"]').text()).toContain('25.00 €');
   });
 
   it('says when the saved cards failed to load, until the buyer dismisses it', async () => {
-    expect(mountPage({ cards: [] }).find('[data-cy="cards-load-failed"]').exists()).toBe(false);
+    expect(mountPage({ cards: [] }).find('[data-testid="cards-load-failed"]').exists()).toBe(false);
 
     const wrapper = mountPage({ cards: [], cardsFailed: true });
-    const notice = wrapper.get('[data-cy="cards-load-failed"]');
+    const notice = wrapper.get('[data-testid="cards-load-failed"]');
     expect(notice.text()).toContain('We couldn\'t load your saved cards.');
 
     await notice.get('button').trigger('click');
-    expect(wrapper.find('[data-cy="cards-load-failed"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="cards-load-failed"]').exists()).toBe(false);
   });
 
   it('names the amount on the pay button, and an upgrade as such', () => {
-    expect(mountPage().get('[data-cy="pay"]').text()).toBe('Subscribe and pay 25.00 €');
-    expect(mountPage({ upgradeSubId: 'sub-1' }).get('[data-cy="pay"]').text()).toBe('Upgrade and pay 25.00 €');
+    expect(mountPage().get('[data-testid="pay"]').text()).toBe('Subscribe and pay 25.00 €');
+    expect(mountPage({ upgradeSubId: 'sub-1' }).get('[data-testid="pay"]').text()).toBe('Upgrade and pay 25.00 €');
   });
 
   it('pays with the selected card only once the policy is accepted', async () => {
     const wrapper = mountPage();
-    const pay = wrapper.get('[data-cy="pay"]');
+    const pay = wrapper.get('[data-testid="pay"]');
 
     expect(pay.attributes('disabled')).toBeDefined();
 
-    await wrapper.get('[data-cy="policy-consent"] input').setValue(true);
+    await wrapper.get('[data-testid="policy-consent"] input').setValue(true);
     expect(pay.attributes('disabled')).toBeUndefined();
 
     await pay.trigger('click');
@@ -110,16 +110,16 @@ describe('components/CardPayment', () => {
   it('cannot pay without a saved card until the new card form is complete', async () => {
     const wrapper = mountPage({ selectedCard: undefined });
 
-    await wrapper.get('[data-cy="policy-consent"] input').setValue(true);
+    await wrapper.get('[data-testid="policy-consent"] input').setValue(true);
 
-    expect(wrapper.get('[data-cy="pay"]').attributes('disabled')).toBeDefined();
+    expect(wrapper.get('[data-testid="pay"]').attributes('disabled')).toBeDefined();
   });
 
   it('shows a failed payment above the card panel and lets the buyer dismiss it', async () => {
     transactionError.value = 'Your bank declined the payment.';
     const wrapper = mountPage();
 
-    const alert = wrapper.get('[data-cy="transaction-error"]');
+    const alert = wrapper.get('[data-testid="transaction-error"]');
     expect(alert.attributes('role')).toBe('alert');
     expect(alert.text()).toContain('Your bank declined the payment.');
 

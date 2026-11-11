@@ -52,7 +52,7 @@ defineExpose({ tokenize });
 <template>
   <CheckoutPanel
     aria-labelledby="card-details-title"
-    data-cy="card-details"
+    data-testid="card-details"
   >
     <h2
       id="card-details-title"
@@ -67,7 +67,7 @@ defineExpose({ tokenize });
         v-if="!cards"
         aria-hidden="true"
         class="grid grid-cols-2 gap-4 animate-pulse"
-        data-cy="card-details-loading"
+        data-testid="card-details-loading"
       >
         <div
           v-for="(span, index) in ['col-span-2', '', '']"
@@ -90,7 +90,7 @@ defineExpose({ tokenize });
           type="button"
           :disabled="disabled"
           class="self-start text-sm font-medium text-rui-primary hover:underline underline-offset-2 disabled:opacity-50"
-          data-cy="use-other-card"
+          data-testid="use-other-card"
           @click="showCardSelection = true"
         >
           Use another card{{ cards.length > 1 ? ` (${cards.length - 1} saved)` : '' }}

@@ -26,9 +26,9 @@ test.describe('checkout success page', () => {
 
     await expect(page.getByRole('heading', { level: 1, name: 'You\'re on Basic' })).toBeVisible();
     await expect(page.getByText('Your payment of 22.50 € went through.')).toBeVisible();
-    const receipt = page.locator('[data-cy="subscription-receipt"]');
-    await expect(receipt.locator('[data-cy="receipt-plan"]')).toHaveText('Basic, monthly');
-    await expect(receipt.locator('[data-cy="receipt-method"]')).toHaveText('Card');
+    const receipt = page.getByTestId('subscription-receipt');
+    await expect(receipt.locator('[data-testid=receipt-value][data-key=plan]')).toHaveText('Basic, monthly');
+    await expect(receipt.locator('[data-testid=receipt-value][data-key=method]')).toHaveText('Card');
     await expect(page.getByRole('link', { name: 'Create API credentials' })).toHaveAttribute('href', '/home/devices');
     await expect(page.getByRole('list', { name: 'Checkout steps' }).locator('[aria-current="step"]')).toContainText('Confirmation');
   });

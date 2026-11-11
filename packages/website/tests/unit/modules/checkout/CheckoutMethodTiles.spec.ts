@@ -76,8 +76,8 @@ describe('checkoutMethodTiles', () => {
     const wrapper = await mountSuspended(CheckoutMethodTiles);
 
     expect(hrefs(wrapper)).toEqual(['/checkout/pay/request-crypto?planId=3']);
-    expect(wrapper.get('[data-cy="method-card"]').attributes('aria-disabled')).toBe('true');
-    expect(wrapper.get('[data-cy="method-paypal"]').attributes('aria-disabled')).toBe('true');
+    expect(wrapper.get('[data-testid="method-tile"][data-key="card"]').attributes('aria-disabled')).toBe('true');
+    expect(wrapper.get('[data-testid="method-tile"][data-key="paypal"]').attributes('aria-disabled')).toBe('true');
   });
 
   it('checks Braintree itself, since payment pages can be opened directly', async () => {
@@ -113,7 +113,7 @@ describe('checkoutMethodTiles', () => {
   it('tracks a switch to another method, not a click on the current one', async () => {
     const wrapper = await mountSuspended(CheckoutMethodTiles, { props: { current: 'paypal' } });
     const follow = (method: string): void => {
-      const link = wrapper.get(`[data-cy="method-${method}"]`).element;
+      const link = wrapper.get(`[data-testid="method-tile"][data-key="${method}"]`).element;
       // Keep the link from navigating the test page.
       link.addEventListener('click', event => event.preventDefault());
       link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));

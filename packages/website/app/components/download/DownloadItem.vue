@@ -12,7 +12,7 @@ const { t } = useI18n({ useScope: 'global' });
 
 <template>
   <div
-    data-cy="download-item"
+    data-testid="download-item"
     class="p-6 rounded-xl border border-rui-grey-200 bg-white flex flex-col gap-4"
   >
     <div class="flex items-center gap-3">

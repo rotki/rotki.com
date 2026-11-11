@@ -22,7 +22,7 @@ export async function installFakeRecaptcha(page: Page): Promise<void> {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = 'Pass captcha';
-      button.dataset.cy = 'fake-captcha';
+      button.dataset.testid = 'fake-captcha';
       button.addEventListener('click', () => {
         button.textContent = 'Captcha passed';
         widget.options.callback(token);
@@ -46,5 +46,5 @@ export async function installFakeRecaptcha(page: Page): Promise<void> {
 
 /** Clicks the fake captcha so the form receives a token. */
 export async function passCaptcha(page: Page): Promise<void> {
-  await page.locator('[data-cy=fake-captcha]').first().click();
+  await page.getByTestId('fake-captcha').first().click();
 }

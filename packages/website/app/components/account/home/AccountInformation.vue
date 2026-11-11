@@ -268,7 +268,7 @@ onMounted(() => {
     <div class="mt-8 flex flex-wrap gap-3">
       <RuiButton
         type="submit"
-        data-cy="update-profile"
+        data-testid="update-profile"
         :disabled="invalid"
         :loading="loading"
         color="primary"

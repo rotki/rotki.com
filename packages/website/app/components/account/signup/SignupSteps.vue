@@ -23,7 +23,7 @@ const label = computed<string>(() => t('auth.signup.step_label', {
   <div>
     <p
       class="sr-only"
-      data-cy="step-label"
+      data-testid="step-label"
       aria-live="polite"
     >
       {{ label }}

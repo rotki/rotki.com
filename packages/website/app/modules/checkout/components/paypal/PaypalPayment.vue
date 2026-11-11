@@ -221,7 +221,7 @@ onMounted(async () => {
 
     <CheckoutPanel
       aria-labelledby="paypal-title"
-      data-cy="paypal-panel"
+      data-testid="paypal-panel"
     >
       <h2
         id="paypal-title"
@@ -266,7 +266,7 @@ onMounted(async () => {
         <div
           v-if="unavailable"
           class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center rounded-rui-card border border-dashed border-rui-outline"
-          data-cy="paypal-unavailable"
+          data-testid="paypal-unavailable"
         >
           <p class="text-sm text-rui-text-secondary">
             {{ t('subscription.error.payment_init_failed') }}
@@ -282,7 +282,6 @@ onMounted(async () => {
         <div
           v-else-if="initializing"
           class="absolute inset-0 flex flex-col items-center gap-4"
-          data-cy="paypal-button-loading"
         >
           <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />
           <RuiSkeletonLoader class="w-full h-12 rounded-rui-control" />

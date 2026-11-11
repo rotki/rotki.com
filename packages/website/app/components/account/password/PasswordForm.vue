@@ -103,7 +103,6 @@ async function reset(): Promise<void> {
 
         <ClientOnly>
           <Recaptcha
-            data-cy="recovery-captcha"
             :invalid="hasError('captcha')"
             @error="onError()"
             @expired="onExpired()"

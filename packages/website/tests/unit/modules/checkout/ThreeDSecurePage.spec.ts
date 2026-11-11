@@ -63,10 +63,10 @@ describe('3D Secure page', () => {
     const wrapper = await mountPage();
 
     expect(wrapper.get('h1').text()).toBe('Confirm with your bank');
-    expect(wrapper.get('[data-cy="three-d-secure-status"]').text()).toBe('Connecting to your bank…');
-    const summary = wrapper.get('[data-cy="three-d-secure-summary"]');
-    expect(summary.get('[data-cy="three-d-secure-amount"]').text()).toBe('22.50 €');
-    expect(summary.get('[data-cy="plan-name"]').text()).toBe('Basic, monthly');
+    expect(wrapper.get('[data-testid="three-d-secure-status"]').text()).toBe('Connecting to your bank…');
+    const summary = wrapper.get('[data-testid="three-d-secure-summary"]');
+    expect(summary.get('[data-testid="three-d-secure-amount"]').text()).toBe('22.50 €');
+    expect(summary.get('[data-testid="plan-name"]').text()).toBe('Basic, monthly');
     expect(summary.text()).toContain('Then 25.00 € per month from');
   });
 
@@ -74,14 +74,14 @@ describe('3D Secure page', () => {
     set(fake.params, { ...PARAMS, upgradeSubId: 'sub-1' });
     const wrapper = await mountPage();
 
-    expect(wrapper.get('[data-cy="three-d-secure-summary"]').text()).toContain('Then 25.00 € per month until you cancel.');
+    expect(wrapper.get('[data-testid="three-d-secure-summary"]').text()).toContain('Then 25.00 € per month until you cancel.');
   });
 
   it('asks the buyer to keep the page open while the payment finishes', async () => {
     set(fake.state, 'finishing');
     const wrapper = await mountPage();
 
-    expect(wrapper.get('[data-cy="three-d-secure-status"]').text()).toBe('Finishing your payment. Keep this page open for a few seconds.');
+    expect(wrapper.get('[data-testid="three-d-secure-status"]').text()).toBe('Finishing your payment. Keep this page open for a few seconds.');
   });
 
   it('offers the way back under the bank\'s challenge, not above it', async () => {
@@ -89,10 +89,10 @@ describe('3D Secure page', () => {
     set(fake.challengeVisible, true);
     const wrapper = await mountPage();
 
-    const challenge = wrapper.get('[data-cy="three-d-secure-challenge"]').element;
+    const challenge = wrapper.get('[data-testid="three-d-secure-challenge"]').element;
     const cancel = wrapper.get('a[href^="/checkout/pay/card"]').element;
     expect(challenge.compareDocumentPosition(cancel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(wrapper.find('[data-cy="three-d-secure-status"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="three-d-secure-status"]').exists()).toBe(false);
   });
 
   it('opens the success page once the payment went through', async () => {
@@ -109,8 +109,8 @@ describe('3D Secure page', () => {
     const wrapper = await mountPage();
 
     expect(wrapper.get('h1').text()).toBe('Your bank didn\'t confirm the payment');
-    const failed = wrapper.get('[data-cy="three-d-secure-failed"]');
-    expect(wrapper.get('[data-cy="payment-page-heading"]').text()).toContain('Nothing was charged');
+    const failed = wrapper.get('[data-testid="three-d-secure-failed"]');
+    expect(wrapper.get('[data-testid="payment-page-heading"]').text()).toContain('Nothing was charged');
     expect(failed.get('[role="alert"]').text()).toContain('the code was wrong');
     expect(failed.text()).not.toContain('authenticate failed');
     expect(failed.get('a[href^="/checkout/pay/card"]').attributes('href')).toBe('/checkout/pay/card?planId=3&discountCode=SUMMER');
@@ -124,8 +124,8 @@ describe('3D Secure page', () => {
     const wrapper = await mountPage();
 
     expect(wrapper.get('h1').text()).toBe('Your payment didn\'t go through');
-    const failed = wrapper.get('[data-cy="three-d-secure-failed"]');
-    expect(failed.get('[data-cy="three-d-secure-error"]').text()).toBe('Do Not Honor');
+    const failed = wrapper.get('[data-testid="three-d-secure-failed"]');
+    expect(failed.get('[data-testid="three-d-secure-error"]').text()).toBe('Do Not Honor');
     expect(failed.get('a[href^="/checkout/pay/card"]').attributes('href')).toBe('/checkout/pay/card?planId=3&upgradeSubId=sub-1');
   });
 
@@ -135,7 +135,7 @@ describe('3D Secure page', () => {
     set(fake.serverError, true);
     const wrapper = await mountPage();
 
-    const heading = wrapper.get('[data-cy="payment-page-heading"]').text();
+    const heading = wrapper.get('[data-testid="payment-page-heading"]').text();
     expect(heading).toContain('We could not confirm whether the payment went through.');
     expect(heading).not.toContain('Nothing was charged');
   });
@@ -145,9 +145,9 @@ describe('3D Secure page', () => {
     set(fake.params, undefined);
     const wrapper = await mountPage();
 
-    const expired = wrapper.get('[data-cy="three-d-secure-expired"]');
+    const expired = wrapper.get('[data-testid="three-d-secure-expired"]');
     expect(expired.get('h1').text()).toBe('This bank confirmation has ended');
     expect(expired.get('a').attributes('href')).toBe('/checkout/pay');
-    expect(wrapper.find('[data-cy="payment-page"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="payment-page"]').exists()).toBe(false);
   });
 });

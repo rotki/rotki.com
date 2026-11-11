@@ -64,7 +64,7 @@ describe('methodTiles', () => {
       links: { ...allMethods, card: { disabled: true, href: '/checkout/pay/card' } },
     });
 
-    const card = wrapper.get('[data-cy="method-card"]');
+    const card = wrapper.get('[data-testid="method-tile"][data-key="card"]');
     expect(card.element.tagName).toBe('DIV');
     expect(card.attributes('aria-disabled')).toBe('true');
     expect(lines(card)).toEqual(['Card', 'Unavailable', 'Not available right now']);
@@ -74,7 +74,7 @@ describe('methodTiles', () => {
   it('reports which method the buyer followed', async () => {
     const wrapper = mountTiles();
 
-    await wrapper.get('[data-cy="method-crypto"]').trigger('click');
+    await wrapper.get('[data-testid="method-tile"][data-key="crypto"]').trigger('click');
 
     expect(wrapper.emitted('select')).toEqual([['crypto']]);
   });

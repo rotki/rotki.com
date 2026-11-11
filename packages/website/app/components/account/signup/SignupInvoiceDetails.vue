@@ -139,7 +139,7 @@ watch(() => externalResults, (fieldErrors) => {
       </p>
       <div
         class="mt-4 flex items-center justify-between gap-3 rounded-lg bg-rui-grey-100 pl-4 pr-1 py-1 text-body-2 text-rui-text-secondary"
-        data-cy="signing-up-as"
+        data-testid="signing-up-as"
       >
         <span class="min-w-0 truncate">
           {{ t('auth.signup.aside.invoice.signing_up_as') }}
@@ -189,7 +189,6 @@ watch(() => externalResults, (fieldErrors) => {
         <div
           v-if="isCompany"
           class="space-y-4 md:pl-8"
-          data-cy="company-fields"
         >
           <RuiTextField
             id="company-name"
@@ -228,7 +227,7 @@ watch(() => externalResults, (fieldErrors) => {
         <div class="grid grid-cols-[8rem_minmax(0,1fr)] md:grid-cols-[10rem_minmax(0,1fr)] gap-3 md:gap-4">
           <RuiTextField
             id="postal"
-            data-cy="postal"
+            data-testid="postal"
             v-bind="field('postcode')"
             autocomplete="postal-code"
             :label="t('auth.signup.address.form.postal_code')"
@@ -302,7 +301,7 @@ watch(() => externalResults, (fieldErrors) => {
     <!-- On phones the actions stay at the bottom of the screen while the form scrolls. -->
     <div class="sticky bottom-0 z-[5] -mx-4 mt-8 flex gap-3 border-t border-default bg-white px-4 pt-3 pb-4 md:static md:mx-0 md:border-0 md:p-0">
       <RuiButton
-        data-cy="back-button"
+        data-testid="back-button"
         type="button"
         variant="outlined"
         size="lg"
@@ -311,7 +310,7 @@ watch(() => externalResults, (fieldErrors) => {
         {{ t('actions.back') }}
       </RuiButton>
       <RuiButton
-        data-cy="submit-button"
+        data-testid="submit-button"
         type="submit"
         :disabled="loading"
         color="primary"

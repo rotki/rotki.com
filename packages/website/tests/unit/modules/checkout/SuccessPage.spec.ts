@@ -26,7 +26,7 @@ async function mountWith(receipt: PaymentReceipt | undefined): Promise<VueWrappe
 }
 
 function row(wrapper: VueWrapper, id: string): DOMWrapper<Element> {
-  return wrapper.find(`[data-cy="receipt-${id}"]`);
+  return wrapper.find(`[data-testid="receipt-value"][data-key="${id}"]`);
 }
 
 describe('checkout success page', () => {
@@ -38,7 +38,7 @@ describe('checkout success page', () => {
     const wrapper = await mountWith(CARD);
 
     expect(wrapper.get('h1').text()).toBe('You\'re on Basic');
-    expect(wrapper.get('[data-cy="payment-success-message"]').text()).toBe('Your payment of 22.50 € went through.');
+    expect(wrapper.get('[data-testid="payment-success-message"]').text()).toBe('Your payment of 22.50 € went through.');
     expect(row(wrapper, 'plan').text()).toBe('Basic, monthly');
     expect(row(wrapper, 'paid').text()).toBe('22.50 €');
     expect(row(wrapper, 'next-payment').text()).toMatch(/^25\.00 € on \w+ \d{1,2}, \d{4}$/);
@@ -48,7 +48,7 @@ describe('checkout success page', () => {
   it('leads to the API credentials, the setup guide and the account', async () => {
     const wrapper = await mountWith(CARD);
 
-    const next = wrapper.get('[data-cy="payment-success-next"]');
+    const next = wrapper.get('[data-testid="payment-success-next"]');
     expect(next.get('a[href="/home/devices"]').text()).toBe('Create API credentials');
     expect(next.get('a[href^="https://docs.rotki.com"]').text()).toBe('Read the setup guide');
     expect(wrapper.get('a[href="/home/subscription"]').text()).toBe('Go to your account');
@@ -85,21 +85,21 @@ describe('checkout success page', () => {
   ] as const)('skips the first-time setup steps for %s', async (_, receipt) => {
     const wrapper = await mountWith({ ...CARD, ...receipt });
 
-    expect(wrapper.find('[data-cy="payment-success-next"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="payment-success-next"]').exists()).toBe(false);
     expect(wrapper.get('a[href="/home/subscription"]').text()).toBe('Go to your account');
   });
 
   it('does not promise an activation for a crypto renewal', async () => {
     const wrapper = await mountWith({ ...CARD, method: 'crypto', renewal: true });
 
-    expect(wrapper.get('[data-cy="payment-success-message"]').text()).toContain('Your current subscription stays as it is');
+    expect(wrapper.get('[data-testid="payment-success-message"]').text()).toContain('Your current subscription stays as it is');
   });
 
   it('falls back to a plain confirmation without a plan name', async () => {
     const wrapper = await mountWith({ ...CARD, planName: undefined, paid: undefined });
 
     expect(wrapper.get('h1').text()).toBe('Your payment went through');
-    expect(wrapper.find('[data-cy="payment-success-message"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="payment-success-message"]').exists()).toBe(false);
     expect(row(wrapper, 'plan').exists()).toBe(false);
   });
 });

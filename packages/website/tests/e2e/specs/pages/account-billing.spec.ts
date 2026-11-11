@@ -79,7 +79,7 @@ test.describe('account billing', () => {
       await page.route(failLoad, async route => route.fulfill({ json: { message: 'Braintree is down' }, status: 500 }));
       await open(page, '/home/billing');
 
-      const failure = page.locator('[data-cy="cards-load-failed"]');
+      const failure = page.getByTestId('cards-load-failed');
       await expect(failure).toContainText('We couldn\'t load your saved cards.');
       await expect(section(page, 'Payment method')).not.toContainText('No saved cards');
 
@@ -111,7 +111,7 @@ test.describe('account billing', () => {
       await page.route('**/webapi/2/credit/', async route => route.fulfill({ json: { message: 'Down' }, status: 500 }));
       await open(page, '/home/billing');
 
-      await expect(page.locator('[data-cy="credit-load-failed"]')).toContainText('We couldn\'t load your credit.');
+      await expect(page.getByTestId('credit-load-failed')).toContainText('We couldn\'t load your credit.');
       await expect(section(page, 'Refer a friend')).not.toContainText('0.00 €');
     });
   });
@@ -123,7 +123,7 @@ test.describe('account billing', () => {
       await open(page, '/home/billing');
 
       await expect(section(page, 'Refer a friend')).toContainText('0.00 €');
-      await expect(page.locator('[data-cy="credit-load-failed"]')).toHaveCount(0);
+      await expect(page.getByTestId('credit-load-failed')).toHaveCount(0);
     });
   });
 
@@ -224,10 +224,10 @@ test.describe('account billing', () => {
       await table.getByRole('button', { name: 'Cancel subscription' }).click();
       const dialog = page.getByRole('dialog');
       await expect(dialog).toContainText('You won\'t be charged again. Your plan stays active until');
-      await expect(dialog.locator('[data-cy="cancellation-consequences"]')).toContainText('Your data stays on your computer.');
+      await expect(dialog.getByTestId('cancellation-consequences')).toContainText('Your data stays on your computer.');
       await expect(dialog).toContainText('We e-mail you a confirmation of the cancellation.');
       // Basic is the cheapest paid plan here, so there is nothing cheaper to suggest.
-      await expect(dialog.locator('[data-cy="cancellation-cheaper-plan"]')).toHaveCount(0);
+      await expect(dialog.getByTestId('cancellation-cheaper-plan')).toHaveCount(0);
       await expect(dialog.getByRole('button', { name: 'Cancel subscription', exact: true })).toBeDisabled();
 
       await page.getByText('Too expensive', { exact: true }).click();
@@ -263,7 +263,7 @@ test.describe('account billing', () => {
 
       await section(page, 'Subscriptions').getByRole('table').getByRole('button', { name: 'Cancel subscription' }).click();
 
-      await expect(page.getByRole('dialog').locator('[data-cy="cancellation-cheaper-plan"]'))
+      await expect(page.getByRole('dialog').getByTestId('cancellation-cheaper-plan'))
         .toContainText('you can subscribe to Basic for 25.00 € per month');
     });
   });

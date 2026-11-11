@@ -42,6 +42,6 @@ describe('checkoutStepper', () => {
   });
 
   it('says where the buyer is for phones', () => {
-    expect(mountStepper('payment').get('[data-cy="checkout-step-progress"]').text()).toBe('Step 2 of 3');
+    expect(mountStepper('payment').get('[data-testid="checkout-step-progress"]').text()).toBe('Step 2 of 3');
   });
 });

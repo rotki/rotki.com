@@ -119,7 +119,7 @@ onBeforeRouteLeave((to, from, next) => {
         <div
           v-if="isProcessing && !challengeVisible"
           class="flex flex-col items-center justify-center gap-4 min-h-75 rounded-rui-card border border-rui-divider bg-rui-surface"
-          data-cy="three-d-secure-status"
+          data-testid="three-d-secure-status"
         >
           <RuiProgress
             variant="indeterminate"
@@ -141,7 +141,7 @@ onBeforeRouteLeave((to, from, next) => {
         v-show="challengeVisible"
         id="threeds-iframe-container"
         class="w-full flex justify-center rounded-rui-card border border-rui-divider bg-rui-surface p-2 md:p-6 [&>div]:w-full [&_iframe]:w-full [&_iframe]:min-h-150"
-        data-cy="three-d-secure-challenge"
+        data-testid="three-d-secure-challenge"
       />
       <p
         v-if="challengeVisible && !failure"
@@ -174,7 +174,7 @@ onBeforeRouteLeave((to, from, next) => {
     <div
       v-else-if="state !== 'initializing'"
       class="max-w-xl flex flex-col gap-4"
-      data-cy="three-d-secure-expired"
+      data-testid="three-d-secure-expired"
     >
       <h1 class="text-2xl md:text-3xl font-semibold text-rui-text">
         {{ title }}

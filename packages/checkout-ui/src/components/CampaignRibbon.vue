@@ -26,7 +26,6 @@ const lastDay = computed<string | undefined>(() => (applied ? undefined : format
 <template>
   <div
     class="flex items-center justify-center gap-2 px-4 py-2 text-sm text-rui-primary text-center font-medium border-b border-rui-divider w-full bg-rui-primary/6"
-    data-cy="campaign-ribbon"
   >
     <svg
       class="size-4 shrink-0 hidden sm:block"

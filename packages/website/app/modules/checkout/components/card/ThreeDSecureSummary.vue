@@ -35,14 +35,14 @@ const renewal = computed<string>(() => {
 <template>
   <div
     class="flex flex-col gap-3"
-    data-cy="three-d-secure-summary"
+    data-testid="three-d-secure-summary"
   >
     <h2 class="text-lg md:text-xl font-semibold text-rui-text">
       {{ t('subscription.3d_secure.summary.title') }}
     </h2>
     <div
       class="text-[1.75rem] leading-9 font-semibold text-rui-primary-darker tabular-nums"
-      data-cy="three-d-secure-amount"
+      data-testid="three-d-secure-amount"
     >
       {{ formatEur(payment.finalAmount) }}
     </div>

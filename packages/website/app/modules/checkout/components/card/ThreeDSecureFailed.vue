@@ -23,7 +23,7 @@ const {
 <template>
   <CheckoutPanel
     as="div"
-    data-cy="three-d-secure-failed"
+    data-testid="three-d-secure-failed"
   >
     <div
       role="alert"
@@ -36,7 +36,7 @@ const {
       />
       <p
         class="text-rui-text-secondary whitespace-break-spaces"
-        data-cy="three-d-secure-error"
+        data-testid="three-d-secure-error"
       >
         {{ failure === 'not-confirmed' ? t('subscription.3d_secure.not_confirmed.message') : message }}
       </p>
@@ -47,7 +47,6 @@ const {
       color="primary"
       size="lg"
       class="w-full sm:w-auto"
-      data-cy="three-d-secure-retry"
     >
       {{ t('subscription.3d_secure.try_again') }}
     </ButtonLink>

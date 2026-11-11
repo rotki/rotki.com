@@ -56,7 +56,7 @@ const points = computed<{ icon: RuiIcons; title: string; text: string }[]>(() =>
     <template v-if="step === 1">
       <ul
         class="space-y-5 mb-8"
-        data-cy="signup-aside"
+        data-testid="signup-aside"
       >
         <li
           v-for="point in points"

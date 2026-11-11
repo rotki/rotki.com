@@ -38,7 +38,7 @@ function switchTo(plan: SelectedPlan): void {
       color="primary"
       variant="outlined"
       size="sm"
-      data-cy="change-plan"
+      data-testid="change-plan"
       @click="open = true"
     >
       {{ t('actions.change') }}

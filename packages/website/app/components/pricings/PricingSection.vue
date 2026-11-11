@@ -17,7 +17,7 @@ const { tiersInformation } = usePremiumTiersInfo();
 
 <template>
   <div
-    data-cy="pricing-section"
+    data-testid="pricing-section"
     class="container flex flex-col gap-12 pb-10 md:pb-20"
   >
     <!-- The compact (homepage) variant sits under a centered heading -->

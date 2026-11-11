@@ -79,7 +79,7 @@ watch(processing, (busy) => {
 <template>
   <CheckoutPanel
     aria-labelledby="crypto-send-title"
-    data-cy="crypto-payment-panel"
+    data-testid="crypto-payment-panel"
   >
     <h2
       id="crypto-send-title"
@@ -99,7 +99,7 @@ watch(processing, (busy) => {
     </div>
     <p
       class="px-4 py-3 rounded-rui-control border border-rui-warning-border bg-rui-warning-subtle text-sm text-rui-warning-darker"
-      data-cy="crypto-exact-amount"
+      data-testid="crypto-exact-amount"
     >
       <strong class="font-semibold">{{ t('checkout_crypto.exact_amount', { amount: labels.amount, network: labels.network }) }}</strong>
       {{ t('checkout_crypto.exact_amount_detail') }}
@@ -153,7 +153,7 @@ watch(processing, (busy) => {
         <span
           v-else-if="!isExpectedChain"
           class="text-sm text-rui-text-secondary"
-          data-cy="crypto-switch-hint"
+          data-testid="crypto-switch-hint"
         >
           {{ t('checkout_crypto.switch_hint', { network: labels.network }) }}
         </span>

@@ -70,6 +70,5 @@ onMounted(async () => {
 <template>
   <div
     class="grow"
-    data-cy="checkout-method-redirect"
   />
 </template>

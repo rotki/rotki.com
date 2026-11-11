@@ -149,14 +149,14 @@ watch(breakdown, (newBreakdown, oldBreakdown) => {
     <CheckoutAlert
       v-if="transactionError"
       :message="transactionError"
-      data-cy="transaction-error"
+      data-testid="transaction-error"
       @dismiss="setTransactionError(undefined)"
     />
 
     <CheckoutAlert
       v-if="cardsFailed && !cardsFailedDismissed"
       :message="t('checkout.card_page.cards_load_failed')"
-      data-cy="cards-load-failed"
+      data-testid="cards-load-failed"
       @dismiss="cardsFailedDismissed = true"
     />
 
@@ -214,7 +214,7 @@ watch(breakdown, (newBreakdown, oldBreakdown) => {
           class="w-full"
           :disabled="!isFormValid"
           :loading="processing"
-          data-cy="pay"
+          data-testid="pay"
           @click="submit(selectedCard)"
         >
           {{ payLabel }}

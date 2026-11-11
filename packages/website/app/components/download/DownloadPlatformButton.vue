@@ -22,7 +22,7 @@ const { t } = useI18n({ useScope: 'global' });
     color="primary"
     :variant="secondary ? 'outlined' : 'default'"
     size="lg"
-    data-cy="main-download-button"
+    data-testid="main-download-button"
     @click="emit('click')"
   >
     <template #prepend>

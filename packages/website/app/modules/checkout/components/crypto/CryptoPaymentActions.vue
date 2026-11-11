@@ -35,7 +35,6 @@ watch(() => error, (newError, oldError) => {
     <div
       v-if="loading"
       class="flex flex-col items-center justify-center min-h-svh"
-      data-cy="crypto-payment-loading"
     >
       <RuiProgress
         variant="indeterminate"
@@ -62,7 +61,7 @@ watch(() => error, (newError, oldError) => {
         <p
           role="alert"
           class="text-center text-rui-text-secondary max-w-md"
-          data-cy="crypto-payment-error"
+          data-testid="crypto-payment-error"
         >
           {{ error || t('subscription.payment.failure.message') }}
         </p>

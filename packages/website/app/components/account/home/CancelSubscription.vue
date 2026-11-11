@@ -108,7 +108,7 @@ function cancelSubscription(): void {
         </p>
         <div
           class="rounded-lg border border-rui-grey-300 p-4 mb-4"
-          data-cy="cancellation-consequences"
+          data-testid="cancellation-consequences"
         >
           <h6 class="text-sm font-bold leading-snug mb-2">
             {{ t('account.subscriptions.cancellation.after.title', { date: endDate }) }}
@@ -123,7 +123,7 @@ function cancelSubscription(): void {
         <p
           v-if="cheaperPlan"
           class="rounded-lg bg-rui-primary/5 px-4 py-3 mb-4 text-sm"
-          data-cy="cancellation-cheaper-plan"
+          data-testid="cancellation-cheaper-plan"
         >
           {{ t('account.subscriptions.cancellation.cheaper_plan', { date: endDate, plan: cheaperPlan.name, price: cheaperPlan.price }) }}
         </p>

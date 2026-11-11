@@ -41,7 +41,7 @@ const starts = computed<string>(() => (startsAt && !oneTime ? t('checkout.plan.s
       <div class="flex items-center gap-2">
         <span
           class="font-medium text-rui-text"
-          data-cy="plan-name"
+          data-testid="plan-name"
         >
           {{ title }}
         </span>

@@ -15,7 +15,7 @@ const HostedCardForm = defineComponent({
   emits: ['validation-change', 'error'],
   setup(_, { expose }) {
     expose({ tokenize });
-    return () => h('div', { 'data-cy': 'new-card-form' });
+    return () => h('div', { 'data-testid': 'new-card-form' });
   },
 });
 
@@ -29,7 +29,7 @@ const stubs = {
   AddCardDialog: true,
   CardSelectionDialog: true,
   HostedCardForm,
-  SavedCardDisplay: { props: ['card'], template: '<div data-cy="saved-card">{{ card.last4 }}</div>' },
+  SavedCardDisplay: { props: ['card'], template: '<div data-testid="saved-card">{{ card.last4 }}</div>' },
 };
 
 function mountDetails(props: Partial<Props> = {}): VueWrapper {
@@ -42,22 +42,22 @@ describe('components/CardDetails', () => {
     const wrapper = mountDetails({ cards: [first, card('tok-2', '2222')], selectedCard: first });
 
     expect(wrapper.get('h2').text()).toBe('Card details');
-    expect(wrapper.get('[data-cy="saved-card"]').text()).toBe('1111');
-    expect(wrapper.get('[data-cy="use-other-card"]').text()).toBe('Use another card (1 saved)');
-    expect(wrapper.find('[data-cy="new-card-form"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="saved-card"]').text()).toBe('1111');
+    expect(wrapper.get('[data-testid="use-other-card"]').text()).toBe('Use another card (1 saved)');
+    expect(wrapper.find('[data-testid="new-card-form"]').exists()).toBe(false);
   });
 
   it('asks for a new card when none is saved, once the Braintree client is there', () => {
-    expect(mountDetails().find('[data-cy="new-card-form"]').exists()).toBe(true);
-    expect(mountDetails({ client: undefined }).find('[data-cy="new-card-form"]').exists()).toBe(false);
+    expect(mountDetails().find('[data-testid="new-card-form"]').exists()).toBe(true);
+    expect(mountDetails({ client: undefined }).find('[data-testid="new-card-form"]').exists()).toBe(false);
   });
 
   it('holds the card fields\' place while the saved cards load, so the form does not flash first', () => {
     const wrapper = mount(CardDetails, { global: { stubs }, props: { client, selectedCard: undefined } });
 
-    expect(wrapper.find('[data-cy="card-details-loading"]').exists()).toBe(true);
-    expect(wrapper.find('[data-cy="new-card-form"]').exists()).toBe(false);
-    expect(wrapper.find('[data-cy="saved-card"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="card-details-loading"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="new-card-form"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="saved-card"]').exists()).toBe(false);
   });
 
   it('says that Braintree, not rotki, handles the card number', () => {

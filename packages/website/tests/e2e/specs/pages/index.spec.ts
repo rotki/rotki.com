@@ -63,7 +63,7 @@ async function setupTiersMocks(page: import('@playwright/test').Page): Promise<v
  */
 async function showAllDownloads(page: Page, entry: Locator): Promise<void> {
   await expect(async () => {
-    await page.locator('[data-cy="show-all-download"]').click();
+    await page.getByTestId('show-all-download').click();
     await entry.click({ timeout: 1_000, trial: true });
   }).toPass({ timeout: 30_000 });
 }
@@ -140,7 +140,7 @@ test.describe('download page', () => {
     await setupTiersMocks(page);
     await page.route('**/api/releases/latest', async route => route.fulfill({ json: mockRelease }));
     await page.goto('/');
-    await page.locator('[data-cy="pricing-section"]').scrollIntoViewIfNeeded();
+    await page.getByTestId('pricing-section').scrollIntoViewIfNeeded();
     // Expand the pricing section (wrapped in ClientOnly) so the gradient overlay does not block the click
     await page.getByRole('button', { name: 'See all features' }).click({ timeout: 30000 });
     await page.getByRole('button', { name: 'Start now for free' }).first().click({ timeout: 30000 });
@@ -189,8 +189,8 @@ test.describe('download page', () => {
 
     await page.goto('/download');
 
-    const linuxAppImageButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for Linux AppImage' });
-    const linuxDebButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for Linux deb' });
+    const linuxAppImageButton = page.getByTestId('main-download-button').filter({ hasText: 'Download for Linux AppImage' });
+    const linuxDebButton = page.getByTestId('main-download-button').filter({ hasText: 'Download for Linux deb' });
     await expect(linuxAppImageButton).toBeVisible();
     await expect(linuxDebButton).toBeVisible();
 
@@ -214,7 +214,7 @@ test.describe('download page', () => {
 
     await page.goto('/download');
 
-    const windowsButton = page.locator('[data-cy="main-download-button"]').filter({ hasText: 'Download for Windows' });
+    const windowsButton = page.getByTestId('main-download-button').filter({ hasText: 'Download for Windows' });
     await expect(windowsButton).toBeVisible();
 
     // Verify href value
@@ -234,7 +234,7 @@ test.describe('download page', () => {
     const appleSiliconLink = page.getByRole('link', { name: 'macOS Apple Silicon', exact: true });
     const appleIntelLink = page.getByRole('link', { name: 'macOS Intel', exact: true });
     // Scoped to its card: the hero shows the same "Download for Windows" link when the browser reports Windows
-    const windowsLink = page.locator('[data-cy="download-item"]')
+    const windowsLink = page.getByTestId('download-item')
       .filter({ has: page.getByRole('heading', { level: 2, name: 'Windows', exact: true }) })
       .getByRole('link', { name: 'Download for Windows', exact: true });
 
@@ -265,7 +265,7 @@ test.describe('download page', () => {
     expect(appleIntelHref).toContain('rotki-darwin_x');
     expect(appleIntelHref).toContain('.dmg');
 
-    const dockerCard = page.locator('[data-cy="download-item"]').filter({
+    const dockerCard = page.getByTestId('download-item').filter({
       has: page.getByRole('heading', { level: 2, name: 'Docker', exact: true }),
     });
     const dockerInput = dockerCard.getByRole('textbox', { name: 'Docker install command' });

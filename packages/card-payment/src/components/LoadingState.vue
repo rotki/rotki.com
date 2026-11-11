@@ -9,7 +9,7 @@ const { message } = defineProps<{
   <div
     aria-busy="true"
     class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-x-12 lg:gap-y-6 lg:items-start"
-    data-cy="loading-state"
+    data-testid="loading-state"
   >
     <!-- Prerendered into the page, so the first paint already has the payment page's layout. -->
     <p

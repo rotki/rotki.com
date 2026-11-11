@@ -15,8 +15,8 @@ function mountPage(props: Partial<Props> = {}, slots: Record<string, () => unkno
     },
     props,
     slots: {
-      default: () => h('div', { 'data-cy': 'panel' }, 'Card fields'),
-      summary: () => h('div', { 'data-cy': 'summary' }, 'Order summary'),
+      default: () => h('div', { 'data-testid': 'panel' }, 'Card fields'),
+      summary: () => h('div', { 'data-testid': 'summary' }, 'Order summary'),
       ...slots,
     },
   });
@@ -31,53 +31,53 @@ describe('paymentPage', () => {
   it('places the method tiles and the panel in the main column', () => {
     const wrapper = mountPage({}, { methods: () => h('nav', 'Tiles') });
 
-    const main = wrapper.get('[data-cy="payment-page-main"]');
+    const main = wrapper.get('[data-testid="payment-page-main"]');
     expect(main.text()).toContain('Tiles');
-    expect(main.find('[data-cy="panel"]').exists()).toBe(true);
+    expect(main.find('[data-testid="panel"]').exists()).toBe(true);
   });
 
   it('spans the heading over both columns, so the main column and the summary start level', () => {
     const wrapper = mountPage({}, { pay: () => h('button', 'Pay') });
 
-    const heading = wrapper.get('[data-cy="payment-page-heading"]');
+    const heading = wrapper.get('[data-testid="payment-page-heading"]');
     expect(heading.find('h1').exists()).toBe(true);
     expect(heading.classes()).toContain('lg:col-span-2');
-    expect(wrapper.get('[data-cy="payment-page-main"]').classes()).toContain('lg:row-start-2');
+    expect(wrapper.get('[data-testid="payment-page-main"]').classes()).toContain('lg:row-start-2');
     expect(wrapper.get('aside').element.parentElement?.classList).toContain('lg:row-start-2');
-    expect(wrapper.get('[data-cy="payment-page-pay"]').element.parentElement).toBe(wrapper.get('aside').element.parentElement);
+    expect(wrapper.get('[data-testid="payment-page-pay"]').element.parentElement).toBe(wrapper.get('aside').element.parentElement);
   });
 
   it('renders the summary and the pay action once each', () => {
-    const wrapper = mountPage({}, { pay: () => h('button', { 'data-cy': 'pay' }, 'Subscribe and pay') });
+    const wrapper = mountPage({}, { pay: () => h('button', { 'data-testid': 'pay' }, 'Subscribe and pay') });
 
-    expect(wrapper.findAll('[data-cy="summary"]')).toHaveLength(1);
-    expect(wrapper.findAll('[data-cy="pay"]')).toHaveLength(1);
-    expect(wrapper.find('[data-cy="payment-page-pay"] [data-cy="pay"]').exists()).toBe(true);
+    expect(wrapper.findAll('[data-testid="summary"]')).toHaveLength(1);
+    expect(wrapper.findAll('[data-testid="pay"]')).toHaveLength(1);
+    expect(wrapper.find('[data-testid="payment-page-pay"] [data-testid="pay"]').exists()).toBe(true);
   });
 
   it('shows a page alert under the heading, above both columns', () => {
-    const wrapper = mountPage({}, { alert: () => h('div', { 'data-cy': 'page-alert' }, 'Payment failed') });
+    const wrapper = mountPage({}, { alert: () => h('div', { 'data-testid': 'page-alert' }, 'Payment failed') });
 
-    expect(wrapper.find('[data-cy="payment-page-heading"] [data-cy="page-alert"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="payment-page-heading"] [data-testid="page-alert"]').exists()).toBe(true);
   });
 
   it('leaves out the pay bar when the page has no pay action', () => {
-    expect(mountPage().find('[data-cy="payment-page-pay"]').exists()).toBe(false);
+    expect(mountPage().find('[data-testid="payment-page-pay"]').exists()).toBe(false);
   });
 
   it('folds the summary on phones into a bar with the total, and unfolds it on request', async () => {
     const wrapper = mountPage({ total: '22.50 €', totalNote: 'then 25.00 €/month' });
-    const toggle = wrapper.get('[data-cy="summary-toggle"]');
+    const toggle = wrapper.get('[data-testid="summary-toggle"]');
 
     expect(toggle.text()).toContain('Order summary');
     expect(toggle.text()).toContain('22.50 €');
     expect(toggle.text()).toContain('then 25.00 €/month');
     expect(toggle.attributes('aria-expanded')).toBe('false');
-    expect(wrapper.get('[data-cy="payment-page-summary"]').classes()).toContain('hidden');
+    expect(wrapper.get('[data-testid="payment-page-summary"]').classes()).toContain('hidden');
 
     await toggle.trigger('click');
 
     expect(toggle.attributes('aria-expanded')).toBe('true');
-    expect(wrapper.get('[data-cy="payment-page-summary"]').classes()).not.toContain('hidden');
+    expect(wrapper.get('[data-testid="payment-page-summary"]').classes()).not.toContain('hidden');
   });
 });

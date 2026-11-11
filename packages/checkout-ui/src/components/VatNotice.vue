@@ -12,7 +12,6 @@ const t = useCheckoutMessages();
 <template>
   <p
     class="p-3 rounded-rui-control border border-rui-warning-border bg-rui-warning-subtle text-sm text-rui-warning-darker"
-    data-cy="vat-notice"
   >
     {{ t('checkout.vat.invalid') }}
     <a

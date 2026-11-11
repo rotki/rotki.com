@@ -15,7 +15,7 @@ const t = useCheckoutMessages();
 <template>
   <label
     class="flex items-start gap-3 min-h-11 py-2 text-sm text-rui-text cursor-pointer has-[:disabled]:cursor-not-allowed"
-    data-cy="policy-consent"
+    data-testid="policy-consent"
   >
     <input
       v-model="accepted"

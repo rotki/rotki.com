@@ -90,7 +90,8 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
         v-if="tile.disabled"
         aria-disabled="true"
         class="min-h-16 sm:min-h-[4.5rem] flex flex-col justify-center gap-0.5 p-3 sm:p-4 rounded-rui-card border border-rui-divider bg-rui-surface-muted cursor-not-allowed"
-        :data-cy="`method-${tile.id}`"
+        data-testid="method-tile"
+        :data-key="tile.id"
       >
         <span class="flex items-center gap-2 font-medium text-rui-text-disabled">
           <span
@@ -110,7 +111,8 @@ const tiles = computed<TileView[]>(() => CHECKOUT_METHODS.flatMap((id) => {
         :aria-current="tile.current ? 'page' : undefined"
         class="min-h-16 sm:min-h-[4.5rem] flex flex-col justify-center gap-0.5 p-3 sm:p-4 rounded-rui-card bg-rui-surface no-underline transition-colors outline-hidden focus-visible:ring-2 focus-visible:ring-rui-primary focus-visible:ring-offset-2"
         :class="tile.current ? 'border-2 border-rui-primary p-[calc(0.75rem-1px)]! sm:p-[calc(1rem-1px)]!' : 'border border-rui-outline hover:border-rui-primary'"
-        :data-cy="`method-${tile.id}`"
+        data-testid="method-tile"
+        :data-key="tile.id"
         @click="emit('select', tile.id)"
       >
         <span

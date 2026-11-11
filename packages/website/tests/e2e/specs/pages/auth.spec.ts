@@ -147,7 +147,7 @@ test.describe('password recovery', () => {
     await main(page).getByRole('button', { name: 'Send reset link' }).click();
 
     await page.waitForURL('**/password/send');
-    await expect(page.locator('[data-cy=sent-to]')).toHaveText('someone@example.com');
+    await expect(page.getByTestId('sent-to')).toHaveText('someone@example.com');
     expect(requestBody).toEqual({ captcha: FAKE_CAPTCHA_TOKEN, email: 'someone@example.com' });
   });
 
@@ -169,7 +169,7 @@ test.describe('password recovery', () => {
     await passCaptcha(page);
     await send.click();
     await expect.poll(() => requests).toBe(1);
-    await expect(page.locator('[data-cy=fake-captcha]')).toHaveText('Pass captcha');
+    await expect(page.getByTestId('fake-captcha')).toHaveText('Pass captcha');
     expect(new URL(page.url()).pathname).toBe('/password/recover');
 
     await passCaptcha(page);
@@ -183,7 +183,7 @@ test.describe('password recovery', () => {
     await page.goto('/password/send');
 
     await expect(heading(page, 'Check your inbox')).toBeVisible();
-    await expect(page.locator('[data-cy=sent-to]')).toHaveText('the e-mail address of your account');
+    await expect(page.getByTestId('sent-to')).toHaveText('the e-mail address of your account');
     await expect(main(page).getByRole('link', { name: 'request a new link' })).toHaveAttribute('href', '/password/recover');
     await expect(main(page).getByRole('link', { name: 'Back to sign in' })).toHaveAttribute('href', '/login');
   });
@@ -192,7 +192,7 @@ test.describe('password recovery', () => {
     await page.addInitScript(() => history.replaceState({ ...history.state, email: 'someone@example.com' }, ''));
     await page.goto('/password/send');
 
-    await expect(page.locator('[data-cy=sent-to]')).toHaveText('someone@example.com');
+    await expect(page.getByTestId('sent-to')).toHaveText('someone@example.com');
     expect(page.url()).not.toContain('someone');
   });
 
@@ -200,7 +200,7 @@ test.describe('password recovery', () => {
     await page.goto('/activation');
 
     await expect(heading(page, 'Check your inbox')).toBeVisible();
-    await expect(page.locator('[data-cy=sent-to]')).toHaveText('the e-mail address you signed up with');
+    await expect(page.getByTestId('sent-to')).toHaveText('the e-mail address you signed up with');
     await expect(main(page)).toContainText('sign in to send a new link');
     await expect(main(page).getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
   });

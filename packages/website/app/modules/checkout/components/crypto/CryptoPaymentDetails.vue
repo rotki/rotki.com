@@ -33,7 +33,6 @@ function toggleQr(): void {
 <template>
   <div
     class="flex flex-col gap-3"
-    data-cy="crypto-manual-payment"
   >
     <h3 class="font-medium text-rui-text">
       {{ manualOnly ? t('checkout_crypto.manual_only_title') : t('checkout_crypto.manual_title') }}
@@ -96,7 +95,7 @@ function toggleQr(): void {
       class="md:hidden self-start min-h-11 flex items-center gap-1.5 font-medium text-rui-primary"
       :aria-expanded="showQr"
       aria-controls="crypto-payment-qr"
-      data-cy="crypto-qr-toggle"
+      data-testid="crypto-qr-toggle"
       @click="toggleQr()"
     >
       {{ showQr ? t('checkout_crypto.hide_qr') : t('checkout_crypto.show_qr') }}

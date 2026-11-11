@@ -43,16 +43,16 @@ describe('orderSummary', () => {
     const wrapper = mountSummary();
 
     expect(wrapper.get('h2').text()).toBe('Order summary');
-    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Basic, monthly');
-    expect(wrapper.find('[data-cy="discount-open"]').exists()).toBe(true);
-    expect(wrapper.get('[data-cy="grand-total"]').text()).toBe('25.00 €');
+    expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Basic, monthly');
+    expect(wrapper.find('[data-testid="discount-open"]').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="grand-total"]').text()).toBe('25.00 €');
   });
 
   it('shows an applied referral from the breakdown and its effect on the total', () => {
     const wrapper = mountSummary({ breakdown: referral, code: 'DGXXOU' });
 
-    expect(wrapper.get('[data-cy="applied-code"]').text()).toBe('DGXXOU');
-    expect(wrapper.get('[data-cy="grand-total"]').text()).toBe('22.50 €');
+    expect(wrapper.get('[data-testid="applied-code"]').text()).toBe('DGXXOU');
+    expect(wrapper.get('[data-testid="grand-total"]').text()).toBe('22.50 €');
   });
 
   it('passes a removed code on', async () => {
@@ -66,19 +66,19 @@ describe('orderSummary', () => {
 
   it('places the page\'s plan action and notice', () => {
     const wrapper = mountSummary({}, {
-      'notice': () => h('p', { 'data-cy': 'notice' }, 'No reverse charge'),
+      'notice': () => h('p', { 'data-testid': 'notice' }, 'No reverse charge'),
       'plan-action': () => h('button', 'Change'),
     });
 
     expect(wrapper.get('button').text()).toBe('Change');
-    expect(wrapper.find('[data-cy="notice"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="notice"]').exists()).toBe(true);
   });
 
   it('describes a one-time crypto payment', () => {
     const wrapper = mountSummary({ oneTime: true, renewsAt: new Date(2026, 11, 3) });
 
-    expect(wrapper.get('[data-cy="plan-name"]').text()).toBe('Basic, 1 month');
+    expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Basic, 1 month');
     expect(wrapper.text()).toContain('Paid once, no renewal');
-    expect(wrapper.get('[data-cy="next-payment"]').text()).toContain('Crypto payments do not renew');
+    expect(wrapper.get('[data-testid="next-payment"]').text()).toContain('Crypto payments do not renew');
   });
 });

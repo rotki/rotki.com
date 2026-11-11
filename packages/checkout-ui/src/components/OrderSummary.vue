@@ -55,7 +55,7 @@ const startsAt = new Date();
   <section
     aria-labelledby="order-summary-title"
     class="flex flex-col gap-4"
-    data-cy="order-summary"
+    data-testid="order-summary"
   >
     <h2
       id="order-summary-title"

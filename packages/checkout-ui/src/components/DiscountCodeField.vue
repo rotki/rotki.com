@@ -80,7 +80,7 @@ function clear(): void {
       type="button"
       class="inline-flex items-center gap-1.5 text-sm font-medium text-rui-primary hover:text-rui-primary-darker hover:underline underline-offset-2 disabled:opacity-50"
       :disabled="disabled"
-      data-cy="discount-open"
+      data-testid="discount-open"
       @click="openField()"
     >
       <DiscountTagIcon class="size-4" />
@@ -154,7 +154,7 @@ function clear(): void {
           </span>
           <span
             class="font-bold uppercase"
-            data-cy="applied-code"
+            data-testid="applied-code"
           >
             {{ code }}
           </span>

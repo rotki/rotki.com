@@ -53,7 +53,6 @@ const options = computed<PlanOption[]>(() => {
 <template>
   <div
     class="flex flex-col gap-4"
-    data-cy="plan-options"
   >
     <div
       role="group"
@@ -67,7 +66,8 @@ const options = computed<PlanOption[]>(() => {
         class="px-3 py-2 rounded-rui-control text-sm font-medium transition-colors"
         :class="period === item.value ? 'bg-rui-surface text-rui-text shadow-sm' : 'text-rui-text-secondary'"
         :aria-pressed="period === item.value"
-        :data-cy="`plan-period-${item.value}`"
+        data-testid="plan-period"
+        :data-key="item.value"
         @click="period = item.value"
       >
         {{ item.label }}
@@ -84,7 +84,8 @@ const options = computed<PlanOption[]>(() => {
           class="w-full flex items-center justify-between gap-4 px-4 py-3 text-left border rounded-rui-control transition-colors"
           :class="option.planId === currentPlanId ? 'border-rui-primary bg-rui-primary-subtle cursor-default' : 'border-rui-divider hover:border-rui-primary'"
           :disabled="option.planId === currentPlanId"
-          :data-cy="`plan-option-${option.planId}`"
+          data-testid="plan-option"
+          :data-key="option.planId"
           @click="emit('select', option.value)"
         >
           <span class="flex flex-col">
