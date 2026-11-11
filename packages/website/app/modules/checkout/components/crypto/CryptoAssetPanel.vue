@@ -24,7 +24,7 @@ const labels = computed<CryptoPaymentLabels>(() => cryptoPaymentLabels(data));
 
 <template>
   <CheckoutPanel
-    aria-labelledby="crypto-asset-title"
+    labelled-by="crypto-asset-title"
     data-testid="crypto-asset-panel"
   >
     <div class="flex items-center justify-between gap-4">

@@ -62,7 +62,7 @@ const checkoutLink = computed<RouteLocationRaw>(() => {
         <ButtonLink
           :to="checkoutLink"
           size="lg"
-          variant="filled"
+          variant="default"
           rounded
           :disabled="!allowNavigation"
           :color="color"

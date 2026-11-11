@@ -37,7 +37,7 @@ const copyright = copyrightNotice();
               size="lg"
               to="/download"
               rounded
-              variant="filled"
+              variant="default"
             >
               {{ t('page_footer.download') }}
             </ButtonLink>

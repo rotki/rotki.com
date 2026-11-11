@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SPONSORSHIP_TIERS, type TierSupply } from '~/modules/web3/sponsorship/types';
+import { SPONSORSHIP_TIERS, type SponsorshipTier, type TierKey, type TierSupply } from '~/modules/web3/sponsorship/types';
 import { isTierAvailable } from '~/modules/web3/sponsorship/utils';
 
 interface Props {
@@ -9,10 +9,10 @@ interface Props {
   tierPriceDisplay: Record<string, string>;
   /** Marketing perks per tier, so tiers can be compared without selecting each one. */
   tierContent: Record<string, { benefits: string }>;
-  visibleTiers: Array<{ key: string; label: string; tierId: number }>;
+  visibleTiers: SponsorshipTier[];
 }
 
-const selectedTier = defineModel<string>({ required: true });
+const selectedTier = defineModel<TierKey>({ required: true });
 
 const { disabled = false, isLoading = false } = defineProps<Props>();
 

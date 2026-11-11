@@ -96,6 +96,7 @@ const [DefineNftIdOption, ReuseNftIdOption] = createReusableTemplate<{
           key-attr="id"
           text-attr="id"
           clearable
+          value-on-clear=""
           custom-value
           auto-select-first
           color="primary"

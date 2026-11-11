@@ -51,7 +51,7 @@ defineExpose({ tokenize });
 
 <template>
   <CheckoutPanel
-    aria-labelledby="card-details-title"
+    labelled-by="card-details-title"
     data-testid="card-details"
   >
     <h2

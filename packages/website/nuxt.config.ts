@@ -286,7 +286,15 @@ export default defineNuxtConfig({
 
   typescript: {
     tsConfig: {
+      /* Unknown props, events, components and directives in templates are type errors. Attributes a
+         component passes on to its root element are typed from that element. */
+      vueCompilerOptions: {
+        fallthroughAttributes: true,
+        strictTemplates: true,
+      },
       include: [
+        // Lets every template put `data-*` attributes on elements and components.
+        '../../checkout-ui/src/template-attributes.d.ts',
         '../vitest.config.ts',
         '../playwright.config.ts',
         '../content.config.ts',

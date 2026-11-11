@@ -4,12 +4,10 @@ import { set } from '@vueuse/shared';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
 
 const {
-  crypto = false,
   warning = false,
   disabled = false,
   loading = false,
 } = defineProps<{
-  crypto?: boolean;
   /** Warns that switching after a crypto payment was sent can break the activation. */
   warning?: boolean;
   disabled?: boolean;
@@ -44,7 +42,6 @@ function switchTo(plan: SelectedPlan): void {
       {{ t('actions.change') }}
     </RuiButton>
     <ChangePlanDialog
-      :crypto="crypto"
       :warning="warning"
       :visible="open"
       @cancel="open = false"

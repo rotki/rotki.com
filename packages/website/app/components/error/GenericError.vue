@@ -18,7 +18,6 @@ const { t } = useI18n({ useScope: 'global' });
     <RuiButton
       variant="default"
       size="lg"
-      filled
       color="primary"
       @click="emit('handle-error')"
     >

@@ -78,7 +78,7 @@ watch(processing, (busy) => {
 
 <template>
   <CheckoutPanel
-    aria-labelledby="crypto-send-title"
+    labelled-by="crypto-send-title"
     data-testid="crypto-payment-panel"
   >
     <h2

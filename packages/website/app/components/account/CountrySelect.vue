@@ -17,7 +17,6 @@ const { countries } = useCountries();
     id="country"
     v-model="modelValue"
     color="primary"
-    autocomplete="country"
     :options="countries"
     :disabled="disabled"
     key-attr="code"

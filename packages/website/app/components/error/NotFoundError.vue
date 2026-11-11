@@ -37,7 +37,6 @@ const { t } = useI18n({ useScope: 'global' });
         to="/"
         variant="default"
         size="lg"
-        filled
         color="primary"
       >
         {{ t('actions.go_back_home') }}
@@ -47,7 +46,6 @@ const { t } = useI18n({ useScope: 'global' });
         class="self-center lg:self-start"
         variant="default"
         size="lg"
-        filled
         color="primary"
         @click="emit('handle-error')"
       >

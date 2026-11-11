@@ -107,7 +107,7 @@ async function reset(): Promise<void> {
             @error="onError()"
             @expired="onExpired()"
             @success="onSuccess($event)"
-            @update:captcha-id="setCaptchaId($event)"
+            @captcha-id="setCaptchaId($event)"
           />
         </ClientOnly>
       </div>

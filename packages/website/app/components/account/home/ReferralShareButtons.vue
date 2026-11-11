@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Component } from 'vue';
+import type { Component as IconComponent } from 'vue';
 
 export interface ShareButton {
   icon?: string;
-  customIcon?: Component;
+  customIcon?: IconComponent;
   name: string;
   url: string;
   colorClass: string;
@@ -33,7 +33,7 @@ function shareLabel({ name }: ShareButton): string {
         :aria-label="shareLabel(button)"
         class="inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-rui-grey-100 dark:hover:bg-rui-grey-800 focus-visible:outline-2 focus-visible:outline-rui-primary"
       >
-        <Component
+        <component
           :is="button.customIcon"
           v-if="button.customIcon"
           :class="button.colorClass"

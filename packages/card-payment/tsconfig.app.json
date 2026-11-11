@@ -7,6 +7,10 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "vueCompilerOptions": {
+    "fallthroughAttributes": true,
+    "strictTemplates": true
+  },
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "../checkout-ui/src/template-attributes.d.ts"],
   "exclude": ["src/**/*.spec.ts"]
 }

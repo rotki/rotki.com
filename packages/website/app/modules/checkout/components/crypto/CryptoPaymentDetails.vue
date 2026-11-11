@@ -55,7 +55,6 @@ function toggleQr(): void {
           :model-value="paymentAmount"
           :label="t('common.amount')"
           hide-details
-          :loading="loading"
           readonly
           :copy-value="data.finalPriceInCrypto.toString()"
         >

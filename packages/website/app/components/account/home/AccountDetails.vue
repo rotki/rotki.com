@@ -35,7 +35,7 @@ const { t } = useI18n({ useScope: 'global' });
     <div class="max-w-2xl space-y-5">
       <RuiTextField
         id="username"
-        v-model="username"
+        :model-value="username"
         readonly
         dense
         :label="t('auth.common.username')"
@@ -46,7 +46,7 @@ const { t } = useI18n({ useScope: 'global' });
       <div>
         <RuiTextField
           id="email"
-          v-model="email"
+          :model-value="email"
           readonly
           dense
           :label="t('auth.common.email')"

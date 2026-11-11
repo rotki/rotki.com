@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import CheckoutAlert from '@rotki/checkout-ui/components/CheckoutAlert.vue';
+import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
 import PolicyConsent from '@rotki/checkout-ui/components/PolicyConsent.vue';
 import { useOrderTotals } from '@rotki/checkout-ui/composables/order-totals';
@@ -85,7 +86,7 @@ function submit(): void {
     </template>
 
     <CheckoutPanel
-      aria-labelledby="crypto-asset-title"
+      labelled-by="crypto-asset-title"
       data-testid="crypto-panel"
     >
       <h2

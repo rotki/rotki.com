@@ -75,7 +75,6 @@ const showVatWarning = computed<boolean>(() => {
       #plan-action
     >
       <ChangePlanAction
-        :crypto="isCrypto"
         :warning="warning"
         :disabled="disabled"
         :loading="loading"

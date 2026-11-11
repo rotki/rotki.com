@@ -220,7 +220,7 @@ onMounted(async () => {
     </template>
 
     <CheckoutPanel
-      aria-labelledby="paypal-title"
+      labelled-by="paypal-title"
       data-testid="paypal-panel"
     >
       <h2
