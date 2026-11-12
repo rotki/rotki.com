@@ -65,6 +65,15 @@ describe('paymentPage', () => {
     expect(mountPage().find('[data-testid="payment-page-pay"]').exists()).toBe(false);
   });
 
+  it('draws the summary and the pay bar edge to edge only on phones, as cards from md', () => {
+    const wrapper = mountPage({}, { pay: () => h('button', 'Pay') });
+
+    const aside = wrapper.get('aside').classes();
+    expect(aside).toEqual(expect.arrayContaining(['-mx-4', 'md:m-0', 'md:border', 'md:rounded-rui-card']));
+    const pay = wrapper.get('[data-testid="payment-page-pay"]').classes();
+    expect(pay).toEqual(expect.arrayContaining(['-mx-4', 'md:mx-0', 'md:rounded-t-rui-card', 'lg:rounded-none']));
+  });
+
   it('folds the summary on phones into a bar with the total, and unfolds it on request', async () => {
     const wrapper = mountPage({ total: '22.50 €', totalNote: 'then 25.00 €/month' });
     const toggle = wrapper.get('[data-testid="summary-toggle"]');

@@ -68,12 +68,12 @@ function toggleSummary(): void {
       <slot />
     </div>
 
-    <!-- One column on a desktop so the pay action sits right under the summary; on phones the summary goes first and the pay bar last. -->
+    <!-- One column on a desktop so the pay action sits right under the summary; below that the summary goes first and the pay bar last. Edge to edge on phones, cards from md, where the container stops short of the screen edges. -->
     <div class="contents lg:flex lg:flex-col lg:gap-6 lg:col-start-2 lg:row-start-2">
-      <aside class="order-first -mx-4 -mt-6 md:-mt-12 lg:m-0 bg-rui-surface border-b border-rui-divider lg:border lg:rounded-rui-card">
+      <aside class="order-first -mx-4 -mt-6 md:m-0 bg-rui-surface border-b border-rui-divider md:border md:rounded-rui-card">
         <button
           type="button"
-          class="lg:hidden w-full min-h-16 px-4 py-3 flex items-center justify-between gap-4 text-left"
+          class="lg:hidden w-full min-h-16 px-4 md:px-6 py-3 flex items-center justify-between gap-4 text-left"
           :aria-expanded="summaryOpen"
           aria-controls="payment-page-summary"
           data-testid="summary-toggle"
@@ -110,7 +110,7 @@ function toggleSummary(): void {
         </button>
         <div
           id="payment-page-summary"
-          class="px-4 pb-4 lg:block lg:p-6"
+          class="px-4 pb-4 md:px-6 md:pb-6 lg:block lg:p-6"
           :class="{ hidden: !summaryOpen }"
           data-testid="payment-page-summary"
         >
@@ -120,7 +120,7 @@ function toggleSummary(): void {
 
       <div
         v-if="$slots.pay"
-        class="sticky bottom-0 z-10 -mx-4 px-4 py-3 bg-rui-surface border-t border-rui-divider lg:static lg:m-0 lg:p-0 lg:bg-transparent lg:border-0"
+        class="sticky bottom-0 z-10 -mx-4 px-4 py-3 bg-rui-surface border-t border-rui-divider md:mx-0 md:px-6 md:border-x md:rounded-t-rui-card lg:static lg:p-0 lg:bg-transparent lg:border-0 lg:rounded-none"
         data-testid="payment-page-pay"
       >
         <slot name="pay" />

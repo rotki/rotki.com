@@ -57,9 +57,10 @@ const startsAt = new Date();
     class="flex flex-col gap-4"
     data-testid="order-summary"
   >
+    <!-- Below lg the payment page's summary bar already shows this title, so it stays for screen readers only. -->
     <h2
       id="order-summary-title"
-      class="text-lg md:text-xl font-semibold text-rui-text"
+      class="text-lg md:text-xl font-semibold text-rui-text max-lg:sr-only"
     >
       {{ t('checkout.page.summary') }}
     </h2>

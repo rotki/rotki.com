@@ -70,6 +70,15 @@ describe('3D Secure page', () => {
     expect(summary.text()).toContain('Then 25.00 € per month from');
   });
 
+  it('shows the amount due and the renewal on the folded summary bar, as the card page does', async () => {
+    const toggle = (await mountPage()).get('[data-testid="summary-toggle"]');
+    expect(toggle.text()).toContain('22.50 €');
+    expect(toggle.text()).toContain('then 25.00 €/month');
+
+    set(fake.params, { ...PARAMS, durationInMonths: 12, renewingPrice: '250.00' });
+    expect((await mountPage()).get('[data-testid="summary-toggle"]').text()).toContain('then 250.00 €/year');
+  });
+
   it('leaves the renewal date out for an upgrade', async () => {
     set(fake.params, { ...PARAMS, upgradeSubId: 'sub-1' });
     const wrapper = await mountPage();

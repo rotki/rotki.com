@@ -43,6 +43,8 @@ describe('orderSummary', () => {
     const wrapper = mountSummary();
 
     expect(wrapper.get('h2').text()).toBe('Order summary');
+    // The payment page's summary bar shows the same title below lg.
+    expect(wrapper.get('h2').classes()).toContain('max-lg:sr-only');
     expect(wrapper.get('[data-testid="plan-name"]').text()).toBe('Basic, monthly');
     expect(wrapper.find('[data-testid="discount-open"]').exists()).toBe(true);
     expect(wrapper.get('[data-testid="grand-total"]').text()).toBe('25.00 €');

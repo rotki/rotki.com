@@ -76,6 +76,15 @@ const total = computed<string | undefined>(() => {
   return payment ? formatEur(payment.finalAmount) : undefined;
 });
 
+/** What each later period costs, under the total on the folded summary bar, as on the card page. */
+const totalNote = computed<string | undefined>(() => {
+  const payment = get(params);
+  if (!payment)
+    return undefined;
+  const amount = formatEur(payment.renewingPrice);
+  return payment.durationInMonths === 12 ? t('checkout.page.then_year', { amount }) : t('checkout.page.then_month', { amount });
+});
+
 async function startProcess(): Promise<void> {
   const result = await initializeProcess();
   if (result.success)
@@ -103,6 +112,7 @@ onBeforeRouteLeave((to, from, next) => {
       v-if="params"
       :title="title"
       :total="total"
+      :total-note="totalNote"
     >
       <!-- A failure keeps a line here too, so the page does not jump up when it shows. -->
       <template #description>
