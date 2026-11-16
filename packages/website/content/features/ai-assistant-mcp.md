@@ -6,7 +6,7 @@ intro: "rotki includes a Model Context Protocol (MCP) server, so an AI assistant
 metaDescription: "Connect Claude, ChatGPT or OpenCode to your crypto portfolio with rotki's local MCP server. Read-only access with privacy modes that mask your identifiers."
 keywords: "crypto portfolio mcp server, mcp crypto tax, ai crypto portfolio assistant, claude crypto portfolio, chatgpt crypto taxes, rotki mcp"
 updatedAt: "October 2026"
-docsUrl: "https://docs.rotki.com/usage-guides/mcp.html"
+docsUrl: "https://docs.rotki.com/usage-guides/mcp.html?utm_source=rotki.com&utm_medium=referral&utm_campaign=build-on-rotki"
 ctaPlan: basic
 keyTakeaways:
   - "rotki runs an MCP server on your own machine, so an AI assistant can query your history events and balances."
@@ -40,6 +40,8 @@ troubleshooting:
   - problem: "I changed the privacy mode but the assistant still sees the old data."
     fix: "The new mode applies right away, but a connected assistant has to reload its analytics data before it can query again."
 relatedFeatures:
+  - slug: local-finance-data-for-ai-agents
+    label: "Local finance data for AI agents"
   - slug: privacy-first-portfolio-management
     label: "Privacy-first portfolio management"
   - slug: local-first-crypto-accounting
