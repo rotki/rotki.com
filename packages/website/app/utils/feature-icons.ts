@@ -5,6 +5,7 @@ const FEATURE_ICONS: Record<string, RuiIcons> = {
   'ai-assistant-mcp': 'lu-bot',
   'csv-import': 'lu-file-spreadsheet',
   'defi-portfolio-tracking': 'lu-blocks',
+  'local-finance-data-for-ai-agents': 'lu-code-xml',
   'local-first-crypto-accounting': 'lu-laptop-minimal',
   'open-source-crypto-tax': 'lu-code-xml',
   'privacy-first-portfolio-management': 'lu-shield-check',
