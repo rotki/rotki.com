@@ -1,5 +1,5 @@
 import type { Page, Request, Route } from '@playwright/test';
-import { cancellationReasons, type CardWire, type CreditWire, type DeviceWire, type PaymentWire } from './account-data';
+import { cancellationReasons, type CardWire, type CreditWire, type DeviceWire, type PaymentWire, type ReferralWire, referralWithCode } from './account-data';
 import {
   type AccountWire,
   type AvailableTiersWire,
@@ -35,6 +35,8 @@ export interface BackendScenario {
   cards: CardWire[];
   /** Answered with a 404 when unset, the way the backend answers before any credit exists. */
   credit?: CreditWire;
+  /** The account's referral code; `POST /webapi/2/referral` creates `referralWithCode()` when there is none. */
+  referral: ReferralWire;
   /** How the backend task behind a cancel or resume ends. */
   subscriptionTask: 'completed' | 'failed';
   regenerateKeys: { api_key: string; api_secret: string };
@@ -110,6 +112,7 @@ export function defaultBackendScenario(): BackendScenario {
     pending: { pending: false, transaction_started: false },
     pendingLookup: 'ok',
     payments: [],
+    referral: { has_referral: false },
     regenerateKeys: { api_key: 'new-api-key', api_secret: 'new-api-secret' },
     subscriptionTask: 'completed',
     subscriptions: [],
@@ -144,6 +147,7 @@ const HANDLERS: Record<string, Handler> = {
   },
   'GET /webapi/2/credit/': s => (s.credit ? ok(s.credit) : { json: { message: 'No credit' }, status: 404 }),
   'GET /webapi/2/devices/': s => ok(s.devices),
+  'GET /webapi/2/referral': s => ok(s.referral),
   'GET /webapi/2/history/payments/': s => ok({ result: s.payments }),
   'GET /webapi/2/history/subscriptions': s => ok({ result: s.subscriptions }),
   'GET /webapi/2/subscriptions/cancellation-feedback': () => ok(cancellationReasons()),
@@ -163,6 +167,11 @@ const HANDLERS: Record<string, Handler> = {
   'POST /webapi/2/crypto/upgrade': s => withOutcome(s.createUpgrade, { result: s.payment }),
   'POST /webapi/2/crypto/upgrade/cancel': s => withOutcome(s.cancelUpgrade, { result: true }),
   'POST /webapi/2/payment/breakdown': s => ok(s.breakdown),
+  'POST /webapi/2/referral': (s) => {
+    if (!s.referral.has_referral)
+      s.referral = referralWithCode();
+    return ok(s.referral);
+  },
   // A successful charge echoes the validated request, as the real backend does.
   'POST /webapi/2/braintree/payments': (s, call) => withOutcome(s.braintreePayment, call.body),
   'POST /webapi/payment/btr/paypal/': () => ok({ email: 'buyer@example.com', image_url: '', token: 'paypal-vault-token' }),

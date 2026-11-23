@@ -2,6 +2,7 @@
 import type { UserPayment } from '~/types/account';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import OverviewReferralCode from '~/components/account/home/OverviewReferralCode.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useCredit } from '~/composables/account/use-credit';
 import { useUserDevices } from '~/composables/account/use-user-devices';
@@ -52,11 +53,10 @@ const creditText = computed<string>(() => get(creditFailed)
       </span>
     </NuxtLink>
 
-    <NuxtLink
+    <div
       v-if="emailConfirmed"
-      to="/home/billing"
-      external
-      class="group rounded-lg border border-default p-5 flex flex-col gap-1 transition-colors hover:border-rui-primary/40 focus-visible:outline-2 focus-visible:outline-rui-primary"
+      class="rounded-lg border border-default p-5 flex flex-col gap-1 min-w-0"
+      data-testid="overview-credit"
     >
       <span class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">
         {{ t('account.credit.balance') }}
@@ -71,10 +71,15 @@ const creditText = computed<string>(() => get(creditFailed)
       >
         {{ creditText }}
       </span>
-      <span class="mt-1 text-body-2 font-medium text-rui-primary group-hover:underline">
-        {{ t('account.overview.refer_a_friend') }}
-      </span>
-    </NuxtLink>
+      <OverviewReferralCode class="mt-3" />
+      <NuxtLink
+        to="/home/billing#refer-a-friend"
+        external
+        class="mt-3 self-start text-body-2 font-medium text-rui-primary hover:underline focus-visible:outline-2 focus-visible:outline-rui-primary"
+      >
+        {{ t('account.overview.share_referral') }}
+      </NuxtLink>
+    </div>
 
     <div class="rounded-lg border border-default p-5 flex flex-col gap-1">
       <span class="text-caption font-medium uppercase tracking-wide text-rui-text-secondary">

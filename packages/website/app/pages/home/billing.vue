@@ -69,6 +69,8 @@ const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some
 
     <AccountSection
       v-if="emailConfirmed"
+      id="refer-a-friend"
+      class="scroll-mt-6"
       :title="t('account.billing.referral.title')"
       :description="t('account.billing.referral.description')"
     >

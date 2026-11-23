@@ -22,7 +22,6 @@ function copyToClipboard() {
     <template #activator>
       <RuiButton
         :disabled="disabled"
-        tabindex="-1"
         variant="text"
         type="button"
         class="p-2!"

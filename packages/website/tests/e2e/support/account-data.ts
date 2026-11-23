@@ -94,6 +94,22 @@ export interface CreditWire {
   }[];
 }
 
+/** The referral code as returned by `GET` and `POST /webapi/2/referral`. */
+export type ReferralWire = { has_referral: false } | {
+  has_referral: true;
+  code: string;
+  discount: { amount: string; discount_type: 'Fixed Amount' | 'Percentage'; uses_left: number; valid_until: string };
+};
+
+/** A referral code that gives friends 10% off. */
+export function referralWithCode(code: string = 'FRIEND10'): ReferralWire {
+  return {
+    code,
+    discount: { amount: '10', discount_type: 'Percentage', uses_left: 50, valid_until: '2027-01-01T00:00:00Z' },
+    has_referral: true,
+  };
+}
+
 /** 12.50 € from two referrals with 7.50 € spent on a renewal in between. */
 export function creditWithHistory(): CreditWire {
   return {
