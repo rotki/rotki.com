@@ -16,6 +16,8 @@ const password = ref<string>('');
 const loading = ref<boolean>(false);
 const error = ref<string>('');
 const hadError = ref<boolean>(false);
+/** Focusing a field clears only this marking; the alert keeps its text so the form below it does not move. */
+const fieldsMarked = ref<boolean>(false);
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -44,7 +46,7 @@ function fieldMessages(field: 'username' | 'password'): string[] {
   if (own.length > 0)
     return own;
   const serverError = get(error);
-  return serverError ? [serverError] : [];
+  return serverError && get(fieldsMarked) ? [serverError] : [];
 }
 
 async function performLogin(): Promise<void> {
@@ -72,6 +74,7 @@ async function performLogin(): Promise<void> {
   else {
     chronicle(SigilEvents.LOGIN_FAILED, { reason: LoginFailedReasons.INVALID_CREDENTIALS });
     set(hadError, true);
+    set(fieldsMarked, true);
   }
 }
 </script>
@@ -94,7 +97,7 @@ async function performLogin(): Promise<void> {
           :details="hasError('username') ? 'auto' : 'hidden'"
           color="primary"
           :error-messages="fieldMessages('username')"
-          @focus="error = ''"
+          @focus="fieldsMarked = false"
         />
 
         <RuiRevealableTextField
@@ -107,7 +110,7 @@ async function performLogin(): Promise<void> {
           :details="hasError('password') ? 'auto' : 'hidden'"
           color="primary"
           :error-messages="fieldMessages('password')"
-          @focus="error = ''"
+          @focus="fieldsMarked = false"
         />
       </div>
 

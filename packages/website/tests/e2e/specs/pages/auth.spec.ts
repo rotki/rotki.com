@@ -70,6 +70,29 @@ test.describe('sign in', () => {
     expect(new URL(page.url()).pathname).toBe('/login');
   });
 
+  test('keeps the error in place when the user goes back to a field', async ({ page }) => {
+    await page.route('**/webapi/login/', async route => route.fulfill({ status: 400, json: { message: 'Unable to log in with provided credentials.' } }));
+    await page.goto('/login');
+    await waitForHydration(page);
+
+    const username = page.locator('input#username').first();
+    const password = page.locator('input#password').first();
+    await username.fill('testuser');
+    await password.fill('wrong-password');
+    await password.press('Enter');
+
+    const alert = main(page).getByRole('alert');
+    await expect(alert).toContainText('Unable to log in with provided credentials.');
+    const submit = main(page).getByRole('button', { name: 'Sign in' });
+    const before = await submit.boundingBox();
+
+    await password.focus();
+
+    await expect(username).not.toHaveAttribute('aria-invalid', 'true');
+    await expect(alert).toContainText('Unable to log in with provided credentials.');
+    expect(await submit.boundingBox()).toEqual(before);
+  });
+
   test('goes to the subscription page after signing in', async ({ page }) => {
     let signedIn = false;
     await page.route('**/webapi/login/', async (route) => {
