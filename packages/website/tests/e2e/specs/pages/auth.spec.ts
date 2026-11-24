@@ -83,6 +83,7 @@ test.describe('sign in', () => {
 
     const alert = main(page).getByRole('alert');
     await expect(alert).toContainText('Unable to log in with provided credentials.');
+    await page.getByTestId('login-error').evaluate(async el => Promise.all(el.getAnimations().map(async animation => animation.finished)));
     const submit = main(page).getByRole('button', { name: 'Sign in' });
     const before = await submit.boundingBox();
 

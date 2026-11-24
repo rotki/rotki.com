@@ -125,14 +125,23 @@ async function performLogin(): Promise<void> {
         </ButtonLink>
       </div>
 
-      <RuiAlert
-        v-if="hadError"
-        class="mb-6"
-        role="alert"
-        type="error"
-        :title="error || undefined"
-        :description="t('auth.login.alert_error')"
-      />
+      <!-- Grows from zero height so the button below slides down instead of jumping -->
+      <div
+        class="grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none"
+        :class="hadError ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
+        data-testid="login-error"
+      >
+        <div class="min-h-0 overflow-hidden">
+          <RuiAlert
+            v-if="hadError"
+            class="mb-6"
+            role="alert"
+            type="error"
+            :title="error || undefined"
+            :description="t('auth.login.alert_error')"
+          />
+        </div>
+      </div>
 
       <RuiButton
         :disabled="loading"
