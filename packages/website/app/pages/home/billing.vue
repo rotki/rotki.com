@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { ComponentPublicInstance } from 'vue';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
 import AccountCredit from '~/components/account/home/AccountCredit.vue';
@@ -27,6 +28,11 @@ definePageMeta({
 });
 
 const { t } = useI18n({ useScope: 'global' });
+const route = useRoute();
+
+/** Overview links here with this hash. */
+const REFERRAL_SECTION_ID = 'refer-a-friend';
+const referralSection = useTemplateRef<ComponentPublicInstance>('referralSection');
 
 const { account, cardPaymentChecked, hasCardPayment } = storeToRefs(useMainStore());
 const { userSubscriptions } = useUserSubscriptions();
@@ -50,6 +56,17 @@ const { displayActions } = useSubscriptionActions();
 const { availablePlans } = useAvailablePlans();
 /** Fold the subscriptions only when none would show an action button: no cancel, renew, resume or pending payment. */
 const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some(sub => displayActions(sub, get(availablePlans))));
+
+/** The referral section renders once the account has loaded, after the browser looked for the hash, so the jump happens here. */
+const stopReferralScroll = watch(referralSection, async (section) => {
+  if (!section)
+    return;
+  stopReferralScroll();
+  if (route.hash !== `#${REFERRAL_SECTION_ID}`)
+    return;
+  await nextTick();
+  (section.$el as HTMLElement).scrollIntoView();
+});
 </script>
 
 <template>
@@ -69,7 +86,8 @@ const subscriptionsFolded = computed<boolean>(() => !get(userSubscriptions).some
 
     <AccountSection
       v-if="emailConfirmed"
-      id="refer-a-friend"
+      :id="REFERRAL_SECTION_ID"
+      ref="referralSection"
       class="scroll-mt-6"
       :title="t('account.billing.referral.title')"
       :description="t('account.billing.referral.description')"

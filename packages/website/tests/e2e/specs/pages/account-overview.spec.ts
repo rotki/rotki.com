@@ -25,11 +25,17 @@ test.describe('account overview referral code', () => {
       await expect(tile.getByRole('button', { name: 'Copy to clipboard' })).toBeVisible();
       await expect(tile.getByRole('button', { name: 'Create referral code' })).toHaveCount(0);
 
+      // The section renders once the account loads; a slow answer puts that after the browser's own jump to the hash.
+      await page.route('**/webapi/account/', async (route) => {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        await route.fallback();
+      });
       await tile.getByRole('link', { name: 'Share it or see credit history' }).click();
       await page.waitForURL('**/home/billing#refer-a-friend');
       const section = page.getByRole('main').getByRole('region', { name: 'Refer a friend' });
       await expect(section.getByRole('textbox', { name: 'Referral code' })).toHaveValue('FRIEND10');
-      await expect(section).toBeInViewport();
+      const heading = section.getByRole('heading', { name: 'Refer a friend' });
+      await expect.poll(async () => (await heading.boundingBox())?.y).toBeLessThan(100);
     });
   });
 
@@ -42,6 +48,7 @@ test.describe('account overview referral code', () => {
 
       await expect(tile.getByRole('group', { name: 'Your referral code' })).toContainText('FRIEND10');
       await expect(tile.getByRole('button', { name: 'Create referral code' })).toHaveCount(0);
+      await expect(tile.getByRole('button', { name: 'Copy to clipboard' })).toBeFocused();
       expect(backend.callsTo('POST', '/webapi/2/referral')).toHaveLength(1);
     });
   });

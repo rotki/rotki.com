@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { get } from '@vueuse/shared';
 import CopyButton from '~/components/common/CopyButton.vue';
 import { useReferralCode } from '~/composables/account/use-referral-code';
 
@@ -15,9 +16,20 @@ const {
   referralCode,
 } = useReferralCode();
 
+const codeGroup = useTemplateRef<HTMLElement>('codeGroup');
+
 onMounted(async () => {
   await loadReferralCode();
 });
+
+/** The create button disappears once the code exists, so focus moves to the copy button instead of the page start. */
+async function create(): Promise<void> {
+  await createCode();
+  if (!get(hasReferralCode))
+    return;
+  await nextTick();
+  get(codeGroup)?.querySelector<HTMLButtonElement>('button')?.focus();
+}
 </script>
 
 <template>
@@ -34,6 +46,7 @@ onMounted(async () => {
     />
     <div
       v-else-if="hasReferralCode"
+      ref="codeGroup"
       role="group"
       :aria-labelledby="labelId"
       class="inline-flex max-w-full items-center gap-1 rounded-md border border-default py-0.5 pl-3 pr-0.5"
@@ -52,7 +65,7 @@ onMounted(async () => {
       variant="outlined"
       size="sm"
       :loading="loading"
-      @click="createCode()"
+      @click="create()"
     >
       <template #prepend>
         <RuiIcon

@@ -68,6 +68,18 @@ describe('overview referral code', () => {
     expect(findCreateButton(wrapper)).toBeUndefined();
   });
 
+  it('moves focus to the copy button after creating a code', async () => {
+    const wrapper = await mountWith(withoutCode, withCode);
+    document.body.append(wrapper.element);
+
+    await findCreateButton(wrapper)!.trigger('click');
+
+    await vi.waitFor(() => {
+      expect(document.activeElement).toBe(wrapper.get('button[aria-label="Copy to clipboard"]').element);
+    });
+    wrapper.element.remove();
+  });
+
   it('keeps offering to create a code when the lookup fails', async () => {
     mockFetchWithCsrf.mockRejectedValueOnce(new Error('offline'));
 
