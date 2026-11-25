@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents working with code in this repository.
 
 ## Project Overview
 
@@ -102,6 +102,17 @@ All paths are under `packages/website/app/`.
 - `utils/` - Pure utility functions
 
 ### Vue/TypeScript Coding Standards
+
+#### Explicit imports
+
+Auto-imports are off (`imports.autoImport: false`, `components: false`), so every file imports what it uses:
+
+- Vue APIs (`ref`, `computed`, `watch`, ...) from `'vue'`
+- Nuxt composables (`useRoute`, `navigateTo`, `useAsyncData`, `useState`, ...) from `'#app'`, and `definePageMeta` from `'#app/composables/pages'`
+- `useI18n` from `'vue-i18n'`, `defineStore`/`storeToRefs` from `'pinia'`, VueUse from `'@vueuse/core'` or `'@vueuse/shared'`
+- Components: app components by path (`~/components/...`), `Rui*` components from `'@rotki/ui-library/components'`, Nuxt built-ins (`NuxtLink`, `NuxtPage`, `ClientOnly`, `ContentRenderer`) from `'#components'`
+
+Module helpers without a package export (`queryCollection` from @nuxt/content, `defineI18nConfig`/`defineI18nLocale`) come from `'#imports'`. `$fetch` is a global and needs no import. A missing import fails `pnpm typecheck`. Tests follow the same rule.
 
 #### Component Setup Script Order
 
@@ -238,6 +249,7 @@ Follow this order in `<script setup>`:
 ```typescript
 // ✅ Correct - Explicit typing with VueUse get/set
 import { get, set } from '@vueuse/shared';
+import { computed, ref } from 'vue';
 
 const isVisible = ref<boolean>(true);
 const count = ref<number>(0);
@@ -327,6 +339,8 @@ Follow this order in Pinia stores using `defineStore` with composition API: stat
 
 ```typescript
 import { get, set } from '@vueuse/shared';
+import { defineStore } from 'pinia';
+import { computed, ref, watch } from 'vue';
 
 export const useCounterStore = defineStore('counter', () => {
   const count = ref<number>(0);
@@ -391,6 +405,8 @@ export const useData = createSharedComposable(useDataInternal);
 ✅ Correct, let Nuxt handle deduplication:
 
 ```typescript
+import { useLazyAsyncData } from '#app';
+
 export function useData() {
   const { data } = useLazyAsyncData('my-key', fetchFn, {
     server: false,

@@ -1,6 +1,6 @@
 import { get } from '@vueuse/shared';
+import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
-import { storeToRefs } from '#imports';
 import { useSponsorshipMetadataStore } from '~/store/sponsorship-metadata';
 
 /** Sponsorship contract chain id and address, for client-side composables. */

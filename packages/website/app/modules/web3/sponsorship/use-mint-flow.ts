@@ -1,10 +1,11 @@
 import type { PaymentToken, SponsorshipTier, TierKey, TierSupply } from '~/modules/web3/sponsorship/types';
 import { watchDebounced } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { storeToRefs } from 'pinia';
 import { computed, onBeforeMount, shallowReadonly, shallowRef, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAsyncData } from '#app';
-import { queryCollection, storeToRefs } from '#imports';
+import { queryCollection } from '#imports';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { type BalanceToken, useTokenBalance } from '~/modules/web3/composables/use-token-balance';
 import { isNativeToken } from '~/modules/web3/core/erc20';

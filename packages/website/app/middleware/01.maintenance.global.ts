@@ -1,5 +1,5 @@
 import { get } from '@vueuse/shared';
-import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
+import { defineNuxtRouteMiddleware, navigateTo } from '#app';
 import { useAppConfig } from '~/composables/use-app-config';
 
 export default defineNuxtRouteMiddleware(async (to) => {

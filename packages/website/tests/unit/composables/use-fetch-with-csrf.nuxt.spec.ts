@@ -12,9 +12,6 @@ import { retryAttempts } from '../../mocks/handlers';
 mockNuxtImport('useCookie', () => (name: string) =>
   ref(name === 'csrftoken' ? '1234' : undefined));
 
-// The server/test code path reads the token from the request event's cookies (a runtime global, not an auto-import)
-vi.stubGlobal('parseCookies', () => ({ csrftoken: '1234' }));
-
 const logout = vi.fn();
 const refresh = vi.fn();
 

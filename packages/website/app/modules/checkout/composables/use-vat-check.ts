@@ -1,7 +1,7 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
-import { storeToRefs } from '#imports';
+import { storeToRefs } from 'pinia';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useMainStore } from '~/store';
 import { logger } from '~/utils/use-logger';
