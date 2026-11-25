@@ -35,6 +35,17 @@ pnpm test:e2e:ui  # Open the Playwright UI
 make test-go      # Run Go tests
 ```
 
+### Verifying changes
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the full setup, the backend choices for signed-in pages and the per-change check list. In short:
+
+- Start `make dev` in the background and open `http://localhost:3000`, never `:3001`. Wait for `/health` and the first page compile (up to a minute).
+- With a Chromium MCP, check every page the change touches: console free of errors, `[Vue warn]` and hydration warnings, screenshots at 375, 768 and 1280 px, the changed interactions, no unexplained failed `/webapi` calls.
+- Run `pnpm lint`, `pnpm typecheck` and `pnpm test` for every change. CI does not run typecheck. For routing, data loading or config changes, also `pnpm build`, `pnpm check:routes` and `pnpm test:e2e`.
+- Only one `nuxi dev` runs per checkout. `pnpm test:e2e` uses its own ports and build folder, so it can run beside `make dev`.
+- Never type real passwords, card numbers or seed phrases. Never commit `.env` files.
+- When reporting back, say which pages, widths and backend were checked, and what was not.
+
 ### Release Management
 
 ```bash

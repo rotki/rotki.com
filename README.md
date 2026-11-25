@@ -10,16 +10,20 @@ It is a pnpm workspace:
 | `packages/website`             | The Nuxt site, generated as static files (SSG)                                                  |
 | `packages/card-payment`        | The card checkout app, served under `/checkout/pay/card` with its own CSP                       |
 | `packages/card-payment-common` | Schemas and helpers shared by the website and the card app                                      |
+| `packages/checkout-ui`         | Vue components and composables shared by the website checkout and the card app                  |
 | `packages/sigil`               | The analytics event catalog                                                                     |
 | `backend/`                     | The Go server: serves the generated files and a few `/api` routes ([README](backend/README.md)) |
 
 In production there is no Node.js: one Go binary serves the generated files, and Traefik routes
 `/webapi` and `/media` to the Python backend (rotki-web).
 
+To make a change and check it locally, including with a coding agent and a Chromium MCP, start
+with [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Requirements
 
 - Node.js 24 (see `.nvmrc`) and pnpm 12
-- Go 1.27+ for the backend
+- Go 1.27+: the Go server runs in front of the site in `make dev` and in the e2e tests
 
 ## Quick start
 
@@ -158,9 +162,12 @@ make lint          # Go + frontend
 pnpm test          # unit tests (Vitest)
 pnpm test:watch    # unit tests in watch mode
 pnpm test:e2e      # end-to-end tests (Playwright)
-pnpm typecheck
+pnpm typecheck     # not run by CI, so run it before a pull request
 make test-go       # Go tests
 ```
+
+The e2e tests need Chromium once: `pnpm --filter @rotki/website exec playwright install chromium`.
+[CONTRIBUTING.md](CONTRIBUTING.md#checks-before-a-pull-request) lists every check and when to run it.
 
 ## Links sent in emails
 
