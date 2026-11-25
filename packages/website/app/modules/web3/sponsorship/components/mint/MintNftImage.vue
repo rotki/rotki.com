@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon, RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { findTierByKey } from '~/modules/web3/sponsorship/utils';
 
 interface Props {

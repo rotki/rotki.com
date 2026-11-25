@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { Connector } from '@wagmi/core';
+import { RuiButton, RuiCard, RuiDialog, RuiIcon } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, shallowRef, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { dedupeConnectors, useWalletPicker } from '~/modules/web3/composables/use-wallet-picker';
 import { type ConnectorDisplay, getConnectorDisplay, omitGenericInjected, sortConnectors } from '~/modules/web3/core/connector-display';
 import { web3ErrorKey } from '~/modules/web3/core/errors';

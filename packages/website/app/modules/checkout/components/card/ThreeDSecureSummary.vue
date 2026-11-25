@@ -3,6 +3,8 @@ import type { ThreeDSecureParams } from '@rotki/card-payment-common/schemas/thre
 import { formatLongDate, renewalDateFrom } from '@rotki/card-payment-common/utils/date';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import PlanLine from '@rotki/checkout-ui/components/PlanLine.vue';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { payment, failed = false } = defineProps<{
   payment: Pick<ThreeDSecureParams, 'planName' | 'durationInMonths' | 'finalAmount' | 'renewingPrice' | 'upgradeSubId'>;

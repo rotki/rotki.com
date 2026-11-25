@@ -1,4 +1,6 @@
+import { useIntervalFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { nextTick, onMounted, readonly, shallowRef } from 'vue';
 
 export function useRandomStepper(steps: number, interval: number = 10000) {
   const step = shallowRef<number>(1);

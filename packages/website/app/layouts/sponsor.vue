@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { RuiIcon } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NuxtLink } from '#components';
 import PageLayout from '~/components/layout/PageLayout.vue';
 
 interface SponsorTab {

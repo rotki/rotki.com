@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { NftSubmission } from '~/types/sponsor';
+import { RuiAlert, RuiButton, RuiCard, RuiIcon, RuiProgress } from '@rotki/ui-library/components';
+import { onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useWalletPicker } from '~/modules/web3/composables/use-wallet-picker';
 import NftSubmissionItem from '~/modules/web3/sponsorship/components/submission/NftSubmissionItem.vue';
 import { useNftSubmissions } from '~/modules/web3/sponsorship/use-nft-submissions';

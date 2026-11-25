@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
+import { refAutoReset } from '@vueuse/core';
 import { set } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 

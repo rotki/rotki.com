@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ButtonProps, ContextColorsType } from '@rotki/ui-library';
-import type { ButtonHTMLAttributes } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
+import { RuiButton } from '@rotki/ui-library/components';
+import { type ButtonHTMLAttributes, computed } from 'vue';
+import { NuxtLink } from '#components';
 import { requiresHardReload } from '~/utils/navigation';
 
 /** What the link passes on to its RuiButton, typed by the button itself. */

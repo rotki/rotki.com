@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
+import { RuiButton } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ChangePlanDialog from '~/modules/checkout/components/plan/ChangePlanDialog.vue';
 
 const {

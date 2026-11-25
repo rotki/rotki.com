@@ -1,4 +1,3 @@
-import type { Ref } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import type { PendingTx } from '~/types';
 import {
@@ -7,6 +6,8 @@ import {
 } from '@rotki/card-payment-common/schemas/subscription';
 import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
 import { get, set } from '@vueuse/shared';
+import { computed, type Ref, watch } from 'vue';
+import { useState } from '#app';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';
 import { usePendingTx } from '~/modules/checkout/composables/use-pending-tx';
 import { blockExplorerTxUrl } from '~/modules/web3/core/chains';

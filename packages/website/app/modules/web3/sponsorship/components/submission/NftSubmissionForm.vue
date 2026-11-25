@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { StoredNft } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
+import { RuiAlert, RuiAutoComplete, RuiButton, RuiCard, RuiIcon, RuiTextField } from '@rotki/ui-library/components';
+import { createReusableTemplate } from '@vueuse/core';
+import { useI18n } from 'vue-i18n';
 import ImageUploadPreview from '~/modules/web3/sponsorship/components/submission/ImageUploadPreview.vue';
 import { useNftSubmissionForm } from '~/modules/web3/sponsorship/use-nft-submission-form';
 import { findTierById } from '~/modules/web3/sponsorship/utils';

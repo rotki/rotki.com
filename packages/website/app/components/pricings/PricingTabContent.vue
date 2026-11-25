@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { MappedPlan } from '~/components/pricings/type';
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import PricingTableButton from '~/components/pricings/PricingTableButton.vue';
 import PricingTableCell from '~/components/pricings/PricingTableCell.vue';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiAlert } from '@rotki/ui-library/components';
+
 /** Backend errors that belong to no field of the form, from `useZodForm`'s `formErrors`. */
 const { messages, title } = defineProps<{
   messages: readonly string[];

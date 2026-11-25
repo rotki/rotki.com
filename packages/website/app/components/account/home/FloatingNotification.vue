@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { ContextColorsType } from '@rotki/ui-library';
-import { isDefined } from '@vueuse/core';
+import { RuiAlert } from '@rotki/ui-library/components';
+import { isDefined, useTimeoutFn } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { watch } from 'vue';
 
 const { visible, closeable = false, timeout, type = 'error' } = defineProps<{
   visible: boolean;

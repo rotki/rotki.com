@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { AvailablePlan, SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { selectedPlanFrom } from '@rotki/card-payment-common/utils/plan';
+import { RuiButton, RuiCard, RuiCheckbox, RuiDialog } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, onBeforeMount, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';

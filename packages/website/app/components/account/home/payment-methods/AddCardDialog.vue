@@ -2,8 +2,11 @@
 import type { CreateCardFields } from '@rotki/checkout-ui/utils/hosted-fields';
 import HostedCardForm from '@rotki/checkout-ui/components/HostedCardForm.vue';
 import { parseBraintreeError } from '@rotki/sigil';
+import { RuiAlert, RuiButton, RuiCard, RuiDialog, RuiProgress } from '@rotki/ui-library/components';
+import { logicAnd, logicNot } from '@vueuse/math';
 import { get, set } from '@vueuse/shared';
-import { ref } from 'vue';
+import { onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';

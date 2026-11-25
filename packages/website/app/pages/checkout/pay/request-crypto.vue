@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { definePageMeta } from '#app/composables/pages';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import CryptoRequest from '~/modules/checkout/components/crypto/CryptoRequest.vue';

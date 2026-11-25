@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { ThreeDSecureFailure } from '~/modules/checkout/composables/use-three-d-secure';
 import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
+import { RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
+import { useRuntimeConfig } from '#app';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
 const { failure, message, retryHref } = defineProps<{

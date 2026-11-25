@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { NftSubmission } from '~/types/sponsor';
+import { RuiButton, RuiIcon, RuiTooltip } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import NftSubmissionItemChips from '~/modules/web3/sponsorship/components/submission/NftSubmissionItemChips.vue';
 import { isCurrentReleaseSubmission } from '~/modules/web3/sponsorship/submission-state';
 import { useSponsorshipData } from '~/modules/web3/sponsorship/use-sponsorship';

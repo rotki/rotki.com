@@ -7,6 +7,7 @@ import {
   ActionResultResponseSchema,
   type ApiResponse,
 } from '@rotki/card-payment-common/schemas/api';
+import { isDefined } from '@vueuse/core';
 import { FetchError } from 'ofetch';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {

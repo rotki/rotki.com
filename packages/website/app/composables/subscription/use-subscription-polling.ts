@@ -1,6 +1,6 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import type { Ref } from 'vue';
 import { get, useIntervalFn } from '@vueuse/shared';
+import { onUnmounted, type Ref, watch } from 'vue';
 
 interface UseSubscriptionPollingReturn {
   pause: () => void;

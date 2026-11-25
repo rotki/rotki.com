@@ -1,9 +1,9 @@
-import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue';
 import type { CryptoPayment } from '~/types';
 import { CheckoutPaymentMethods, CheckoutSteps, classifyCryptoTxError, monthsToPlanDuration, PaymentServerEvents, SigilEvents } from '@rotki/sigil';
 import { useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { err, getOr, ok, type Result } from 'plainfp/result';
+import { computed, type ComputedRef, type MaybeRefOrGetter, onMounted, type Ref, shallowReadonly, shallowRef, toValue, watch } from 'vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';

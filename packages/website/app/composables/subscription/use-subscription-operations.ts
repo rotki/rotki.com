@@ -1,4 +1,5 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import type { Ref } from 'vue';
 import type { CancellationFeedbackPayload } from '~/composables/subscription/use-cancellation-feedback';
 import { SigilEvents } from '@rotki/sigil';
 import { set } from '@vueuse/shared';

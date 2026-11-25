@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { NuxtLink } from '#components';
 import { integrationQualifier, integrationSlug } from '~/utils/integration-slug';
 
 defineProps<{

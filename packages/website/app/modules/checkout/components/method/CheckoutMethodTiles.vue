@@ -4,6 +4,7 @@ import { buildMethodLinks, type CheckoutMethodId, type MethodLinks } from '@rotk
 import { SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, onMounted } from 'vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import {
   useDiscountCodeParams,

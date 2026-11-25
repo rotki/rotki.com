@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { RuiAlert, RuiButton, RuiTextField } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed, onBeforeMount, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { useRuntimeConfig } from '#app';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';

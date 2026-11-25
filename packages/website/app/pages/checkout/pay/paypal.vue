@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onBeforeRouteLeave } from 'vue-router';
+import { definePageMeta } from '#app/composables/pages';
 import { useAutoLogout } from '~/composables/account/use-auto-logout';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import PaypalPayment from '~/modules/checkout/components/paypal/PaypalPayment.vue';

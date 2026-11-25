@@ -1,4 +1,5 @@
 import { set } from '@vueuse/shared';
+import { defineNuxtRouteMiddleware, navigateTo, useState } from '#app';
 import { type PaymentReceipt, takePaymentReceipt } from '~/modules/checkout/utils/payment-receipt';
 
 /**

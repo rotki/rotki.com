@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
+import { computed, ref } from 'vue';
 import { useAppConfig } from '~/composables/use-app-config';
 
 const { chain } = defineProps<{

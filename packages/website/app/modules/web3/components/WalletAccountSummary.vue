@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon, RuiTooltip } from '@rotki/ui-library/components';
 import { useClipboard } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AddressAvatar from '~/components/common/AddressAvatar.vue';
 import { useEnsName } from '~/modules/web3/composables/use-ens-name';
 import { truncateAddress } from '~/modules/web3/core/format';

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import AppLogo from '~/components/common/AppLogo.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import FooterIconLinks from '~/components/footer/FooterIconLinks.vue';

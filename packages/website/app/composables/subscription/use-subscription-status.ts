@@ -1,6 +1,8 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { ContextColorsType } from '@rotki/ui-library';
 import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
+import { computed, type MaybeRefOrGetter, toValue } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
 import { formatDate } from '~/utils/date';
 

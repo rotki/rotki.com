@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
+import { useHead } from '#app';
 import { usePlanLimits } from '~/composables/tiers/use-plan-limits';
 
 const { t } = useI18n({ useScope: 'global' });

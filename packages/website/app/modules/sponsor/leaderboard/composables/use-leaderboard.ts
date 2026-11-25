@@ -1,5 +1,8 @@
-import type { Ref } from 'vue';
+import { useBreakpoint } from '@rotki/ui-library/composables';
+import { useClipboard } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { computed, type Ref, ref, shallowReadonly, shallowRef, watch } from 'vue';
+import { useAsyncData } from '#app';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import {
   type LeaderboardEntry,

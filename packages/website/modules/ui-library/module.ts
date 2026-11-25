@@ -1,14 +1,10 @@
 import {
-  addComponent,
-  addImports,
   addPlugin,
   addTypeTemplate,
   addVitePlugin,
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit';
-import * as components from '@rotki/ui-library/components';
-import * as composables from '@rotki/ui-library/composables';
 import { ruiIconsPlugin } from '@rotki/ui-library/vite-plugin';
 import defu from 'defu';
 import { brandIconNames } from './runtime/brand-icons';
@@ -43,24 +39,5 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.typescript.tsConfig,
       { include: [typeDst] },
     );
-
-    for (const component in components) {
-      addComponent({
-        export: component,
-        filePath: '@rotki/ui-library/components',
-        name: component,
-      });
-    }
-
-    for (const composable in composables) {
-      if (composable === 'default') {
-        continue;
-      }
-      addImports({
-        as: composable,
-        from: '@rotki/ui-library/composables',
-        name: composable,
-      });
-    }
   },
 });

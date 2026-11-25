@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Component as IconComponent } from 'vue';
+import { RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 
 export interface ShareButton {
   icon?: string;

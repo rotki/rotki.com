@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { DeepReadonly } from 'vue';
 import type { CreditEntry } from '~/types/account';
+import { RuiButton, RuiCard, RuiDialog, RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { type DeepReadonly, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AccountCreditHistoryTable from '~/components/account/home/AccountCreditHistoryTable.vue';
 import { formatDecimalString } from '~/utils/text';
 

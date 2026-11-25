@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
+import { RuiIcon, RuiTabItem, RuiTabItems } from '@rotki/ui-library/components';
+import { createReusableTemplate } from '@vueuse/core';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import AppDashboard from '~/components/home/features/details/AppDashboard.vue';
 import EvmProtocols from '~/components/home/features/details/EvmProtocols.vue';

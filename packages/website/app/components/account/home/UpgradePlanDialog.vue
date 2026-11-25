@@ -2,7 +2,11 @@
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { PaymentMethod, type Subscription } from '@rotki/card-payment-common/schemas/subscription';
 import { SigilEvents } from '@rotki/sigil';
+import { RuiAlert, RuiButton, RuiCard, RuiDialog, RuiIcon } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from '#app';
 import { getHighestPlanOnPeriod, getPricingPeriod } from '~/components/pricings/utils';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';

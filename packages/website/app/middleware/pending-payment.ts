@@ -1,8 +1,10 @@
 import type { UserSubscriptions } from '@rotki/card-payment-common/schemas/subscription';
 import type { RouteLocationRaw } from 'vue-router';
 import { isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
+import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { defineNuxtRouteMiddleware, navigateTo } from '#app';
 import { getPricingPeriod } from '~/components/pricings/utils';
 import { useFetchUserSubscriptions } from '~/composables/subscription/use-fetch-user-subscriptions';
 import { useCryptoPaymentApi } from '~/modules/checkout/composables/use-crypto-payment-api';

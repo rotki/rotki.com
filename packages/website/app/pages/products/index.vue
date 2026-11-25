@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
+import { useI18n } from 'vue-i18n';
+import { definePageMeta } from '#app/composables/pages';
 import PricingSection from '~/components/pricings/PricingSection.vue';
 import ProductsAnalytics from '~/components/products/ProductsAnalytics.vue';
 import ProductsBlocks from '~/components/products/ProductsBlocks.vue';

@@ -2,6 +2,8 @@
 import type { UserPayment } from '~/types/account';
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
 import { discountAmount, formatEur, formatPercent } from '@rotki/card-payment-common/utils/money';
+import { RuiIcon, RuiTooltip } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import { formatCurrency } from '~/utils/text';
 
 defineProps<{

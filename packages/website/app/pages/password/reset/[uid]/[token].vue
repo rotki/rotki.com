@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { definePageMeta } from '#app/composables/pages';
 import PasswordReset from '~/components/account/password/PasswordReset.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 

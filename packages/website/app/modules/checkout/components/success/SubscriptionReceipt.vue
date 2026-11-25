@@ -4,6 +4,8 @@ import { formatLongDate, renewalDateFrom } from '@rotki/card-payment-common/util
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import { planTitle } from '@rotki/checkout-ui/utils/plan-title';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { receipt } = defineProps<{
   receipt: PaymentReceipt;

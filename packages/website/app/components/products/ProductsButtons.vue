@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { ContextColorsType } from '@rotki/ui-library';
 import type { RouteLocationRaw } from 'vue-router';
+import { RuiTooltip } from '@rotki/ui-library/components';
 import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';
 import { useMainStore } from '~/store';

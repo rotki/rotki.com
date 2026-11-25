@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import PricingPeriodTab from '~/components/pricings/PricingPeriodTab.vue';
 import PricingTierComparison from '~/components/pricings/PricingTierComparison.vue';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';

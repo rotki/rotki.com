@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
+import { clearNuxtData, clearNuxtState } from '#app';
 
 const { mockFetchWithCsrf } = vi.hoisted(() => ({ mockFetchWithCsrf: vi.fn() }));
 

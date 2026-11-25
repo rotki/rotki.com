@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiAutoComplete } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import { useCountries } from '~/composables/use-countries';
 
 const modelValue = defineModel<string>({ required: true });

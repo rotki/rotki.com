@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiIcon, RuiSkeletonLoader } from '@rotki/ui-library/components';
+
 const { loading = false } = defineProps<{
   label?: string;
   value?: number | string | boolean;

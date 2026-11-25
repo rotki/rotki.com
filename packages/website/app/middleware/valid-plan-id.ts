@@ -1,5 +1,6 @@
 import { parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { get } from '@vueuse/shared';
+import { defineNuxtRouteMiddleware, navigateTo } from '#app';
 import { useAvailablePlans } from '~/composables/tiers/use-available-plans';
 
 export default defineNuxtRouteMiddleware(async (to) => {

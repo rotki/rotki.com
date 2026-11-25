@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { OAuthMode } from '~/types/oauth';
+import { RuiAlert, RuiButton, RuiTextArea } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import CopyButton from '~/components/common/CopyButton.vue';
 
 export interface OAuthPageLabels {

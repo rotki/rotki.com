@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { CardVerificationData } from '~/types/payment';
 import { parseBraintreeError } from '@rotki/sigil';
+import { RuiAlert, RuiButton, RuiCard, RuiDialog, RuiProgress } from '@rotki/ui-library/components';
+import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ThreeDSecureBillingInfo from '~/components/account/home/payment-methods/ThreeDSecureBillingInfo.vue';
 import { useCardThreeDSecure } from '~/modules/checkout/composables/use-card-three-d-secure';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';

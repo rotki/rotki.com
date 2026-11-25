@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { ValidationErrors } from '~/types/common';
 import type { SignupAccountPayload } from '~/types/signup';
+import { RuiButton, RuiRevealableTextField, RuiTextField } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import { useFormRules } from '~/composables/use-form-rules';

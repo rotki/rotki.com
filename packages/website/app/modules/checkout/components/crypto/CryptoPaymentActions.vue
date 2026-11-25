@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon, RuiProgress } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { loading, showRetry, error } = defineProps<{
   loading?: boolean;

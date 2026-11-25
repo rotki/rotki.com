@@ -1,5 +1,7 @@
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
 import LocalIntegrationData from '~~/public/integrations/all.json';
+import { useRuntimeConfig } from '#app';
 import { IntegrationData, type IntegrationItem } from '~/types/integrations';
 import { consolidateSlug, INTEGRATION_CONSOLIDATIONS, integrationSlug } from '~/utils/integration-slug';
 

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import { useRoute } from '#app';
+import { definePageMeta } from '#app/composables/pages';
+import { NuxtLayout } from '#components';
 import SignupForm from '~/components/account/signup/SignupForm.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';

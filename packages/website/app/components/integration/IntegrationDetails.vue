@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import { RuiDivider, RuiTab, RuiTabs, RuiTextField } from '@rotki/ui-library/components';
+import { useBreakpoint } from '@rotki/ui-library/composables';
+import { createReusableTemplate, refDebounced } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { useRoute, useRouter } from '#app';
+import { ClientOnly } from '#components';
 import IntegrationTile from '~/components/integration/IntegrationTile.vue';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
 import { parseRouteParam } from '~/utils/query';

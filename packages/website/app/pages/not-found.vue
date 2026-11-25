@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import NotFoundError from '~/components/error/NotFoundError.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 

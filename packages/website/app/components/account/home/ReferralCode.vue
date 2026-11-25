@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { DiscountType } from '@rotki/card-payment-common/schemas/discount';
+import { RuiButton, RuiIcon, RuiTextField } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRuntimeConfig } from '#app';
 import ReferralCodeSkeleton from '~/components/account/home/ReferralCodeSkeleton.vue';
 import ReferralShareButtons, { type ShareButton } from '~/components/account/home/ReferralShareButtons.vue';
 import CopyButton from '~/components/common/CopyButton.vue';

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import { NuxtLink } from '#components';
 import AppLogo from '~/components/common/AppLogo.vue';
 import { copyrightNotice } from '~/utils/copyright';
 

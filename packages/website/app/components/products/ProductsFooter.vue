@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import ProductsButtons from '~/components/products/ProductsButtons.vue';
 

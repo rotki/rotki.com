@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
+import { navigateTo } from '#app';
+
 defineProps<{
   visible: boolean;
 }>();

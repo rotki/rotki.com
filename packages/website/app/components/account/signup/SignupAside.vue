@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NuxtLink } from '#components';
 
 const { step, username, email } = defineProps<{
   step: number;

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Subscription } from '@rotki/card-payment-common/schemas/subscription';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { formatDate } from '~/utils/date';
 import { formatCurrency } from '~/utils/text';
 

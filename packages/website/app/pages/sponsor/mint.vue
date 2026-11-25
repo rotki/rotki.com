@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { RuiAlert } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
+import { useRuntimeConfig } from '#app';
+import { definePageMeta } from '#app/composables/pages';
+import { NuxtLink } from '#components';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 import WalletPickerDialog from '~/modules/web3/components/WalletPickerDialog.vue';

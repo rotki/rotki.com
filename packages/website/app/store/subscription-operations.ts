@@ -1,6 +1,7 @@
 import type { SubscriptionActionType } from '~/components/account/home/subscription-table/types';
 import { set } from '@vueuse/shared';
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 /** Unified state for the subscription operation currently in progress, with its actions. */
 function subscriptionOperationsStore() {

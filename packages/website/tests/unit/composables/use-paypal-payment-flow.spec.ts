@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ref } from 'vue';
 import { createFetchError } from '../../utils';
 
 const mockFetchWithCsrf = vi.fn();

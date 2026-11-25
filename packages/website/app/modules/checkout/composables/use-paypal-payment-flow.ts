@@ -1,10 +1,10 @@
 import type { CardPaymentRequest } from '@rotki/card-payment-common/schemas/payment';
 import type { PayPalCheckout } from 'braintree-web';
 import type { ResultAsync } from 'plainfp/result-async';
-import type { DeepReadonly, Ref } from 'vue';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { err, ok } from 'plainfp/result';
+import { type DeepReadonly, readonly, type Ref, ref, shallowRef, watch } from 'vue';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useBraintreeClient } from '~/modules/checkout/composables/use-braintree-client';
 import { usePaymentApi } from '~/modules/checkout/composables/use-payment-api';

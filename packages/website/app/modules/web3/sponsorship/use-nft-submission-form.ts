@@ -1,8 +1,10 @@
-import type { MaybeRefOrGetter } from 'vue';
 import type { StoredNft, TierKey } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
 import { get, set } from '@vueuse/shared';
+import { computed, type MaybeRefOrGetter, nextTick, onMounted, shallowReadonly, shallowRef, toValue, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { useRoute } from '#app';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useZodForm } from '~/composables/use-zod-form';
 import { buildNftIdOptions, buildSubmissionFormData, evaluateNftMetadata, type NftMetadataStatus, shouldResetFormForToken } from '~/modules/web3/sponsorship/submission-state';

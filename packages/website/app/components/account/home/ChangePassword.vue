@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
+import { RuiButton, RuiRevealableTextField } from '@rotki/ui-library/components';
+import { useTimeoutFn } from '@vueuse/core';
 import { set } from '@vueuse/shared';
+import { reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';

@@ -5,6 +5,7 @@ import type { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
+import { navigateTo } from '#app';
 import { retryAttempts } from '../../mocks/handlers';
 
 // Requests must carry a CSRF token to exercise the retry header-dedup path

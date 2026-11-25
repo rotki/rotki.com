@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { DownloadItem } from '~/types/download';
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 

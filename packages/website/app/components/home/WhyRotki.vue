@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
 import type { IntegrationItem } from '~/types/integrations';
+import { RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NuxtLink } from '#components';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
 import { integrationSlug } from '~/utils/integration-slug';

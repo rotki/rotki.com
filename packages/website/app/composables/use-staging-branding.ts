@@ -1,6 +1,7 @@
-import type { Ref } from 'vue';
 import { createSharedComposable } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { computed, readonly, type Ref } from 'vue';
+import { useHead, useRuntimeConfig } from '#app';
 
 const STAGING_HOSTNAME = 'staging.rotki.com';
 const LOCALHOST = 'localhost';

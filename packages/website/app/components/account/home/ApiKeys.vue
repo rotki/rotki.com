@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon, RuiRevealableTextField } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import CopyButton from '~/components/common/CopyButton.vue';
 import { useApiKeys } from '~/composables/account/use-api-keys';

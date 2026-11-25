@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
+import { RuiButton, RuiChip, RuiIcon, RuiRadio, RuiTooltip } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import PaymentCardLayout from '~/components/account/home/payment-methods/PaymentCardLayout.vue';
 
 /** Passed when the card is rendered as an option in a card picker. */

@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { FeatureHubCollectionItem, FeaturesCollectionItem } from '@nuxt/content';
+import { RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAsyncData, useHead, useRuntimeConfig } from '#app';
+import { definePageMeta } from '#app/composables/pages';
+import { ContentRenderer, NuxtLink } from '#components';
+import { queryCollection } from '#imports';
 import DownloadCallToAction from '~/components/common/DownloadCallToAction.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 import { featureIcon } from '~/utils/feature-icons';

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
 import type { MappedPlan } from '~/components/pricings/type';
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRuntimeConfig } from '#app';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { isCustomPlan, isFreePlan, isMostPopularPlan } from '~/components/pricings/utils';
 import { useDiscountCodeParams, useReferralCodeParam } from '~/modules/checkout/composables/use-plan-params';

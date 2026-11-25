@@ -1,4 +1,4 @@
-import { createSharedComposable } from '@vueuse/core';
+import { createSharedComposable, useLocalStorage } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { fromZod } from 'plainfp/interop/zod';
 import { pipe } from 'plainfp/pipe';
@@ -7,6 +7,7 @@ import * as RA from 'plainfp/result-async';
 import { tag, type Tagged } from 'plainfp/tagged';
 import { getAddress } from 'viem';
 import { createSiweMessage } from 'viem/siwe';
+import { shallowReadonly, shallowRef, watch } from 'vue';
 import { z } from 'zod';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useWallet } from '~/modules/web3/composables/use-wallet';

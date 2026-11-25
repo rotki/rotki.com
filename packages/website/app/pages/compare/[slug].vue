@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { RuiIcon } from '@rotki/ui-library/components';
 import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
+import { showError, useAsyncData, useHead, useRoute, useRuntimeConfig } from '#app';
+import { definePageMeta } from '#app/composables/pages';
+import { ContentRenderer, NuxtLink } from '#components';
+import { queryCollection } from '#imports';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import ComparisonTable from '~/components/comparison/ComparisonTable.vue';
 import { usePageSeo } from '~/composables/use-page-seo';

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { LoginFailedReasons, SigilEvents } from '@rotki/sigil';
+import { RuiAlert, RuiButton, RuiRevealableTextField, RuiTextField } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { navigateTo, useRoute } from '#app';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';

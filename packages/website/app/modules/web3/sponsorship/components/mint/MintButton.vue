@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { TierKey } from '~/modules/web3/sponsorship/types';
+import { RuiButton, RuiIcon, RuiMenu } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import WalletAccountSummary from '~/modules/web3/components/WalletAccountSummary.vue';
 
 type ApprovalType = 'unlimited' | 'exact';

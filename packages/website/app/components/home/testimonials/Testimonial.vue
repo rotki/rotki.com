@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { TestimonialsCollectionItem } from '@nuxt/content';
+import { RuiIcon } from '@rotki/ui-library/components';
+import { ContentRenderer } from '#components';
 
 type TestimonialBody = TestimonialsCollectionItem['body'];
 

@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { JobsCollectionItem, MinimarkTree } from '@nuxt/content';
+import { RuiIcon } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { ContentRenderer } from '#components';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { assert } from '~/utils/assert';
 

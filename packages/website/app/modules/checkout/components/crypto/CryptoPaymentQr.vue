@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
+import { RuiIcon, RuiProgress } from '@rotki/ui-library/components';
 import { useClipboard } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { ref, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { buildPaymentUri } from '~/modules/web3/core/payment-uri';
 import { useLogger } from '~/utils/use-logger';
 

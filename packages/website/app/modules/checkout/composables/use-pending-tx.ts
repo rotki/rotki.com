@@ -1,4 +1,5 @@
 import type { PendingTx } from '~/types';
+import { createSharedComposable, useLocalStorage } from '@vueuse/core';
 
 /**
  * Shared composable for managing pending crypto transaction state in localStorage.

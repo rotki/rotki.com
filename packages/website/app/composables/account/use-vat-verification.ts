@@ -1,6 +1,8 @@
-import type { Ref } from 'vue';
+import { useIntervalFn, useLocalStorage, useTimestamp, watchImmediate } from '@vueuse/core';
 import { get, refAutoReset, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, type Ref, shallowReadonly, shallowRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useVatCheck } from '~/modules/checkout/composables/use-vat-check';
 import { useMainStore } from '~/store';
 import { VatIdStatus } from '~/types/account';

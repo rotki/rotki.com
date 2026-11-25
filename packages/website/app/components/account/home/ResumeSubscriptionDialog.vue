@@ -2,7 +2,10 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import { formatPlanName } from '@rotki/card-payment-common/utils/plan';
+import { RuiButton, RuiCard, RuiDialog } from '@rotki/ui-library/components';
 import { get, isDefined } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { formatDate } from '~/utils/date';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });

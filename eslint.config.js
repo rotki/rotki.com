@@ -13,6 +13,8 @@ export default rotki({
   rotki: {
     overrides: {
       '@rotki/consistent-ref-type-annotation': ['error'],
+      // Vue and Nuxt are imported explicitly, so each file has a few more import lines.
+      '@rotki/max-dependencies': ['error', { max: 25 }],
     },
   },
 }, {

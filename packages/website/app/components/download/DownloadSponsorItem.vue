@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiTooltip } from '@rotki/ui-library/components';
+
 export interface DownloadSponsor {
   name: string;
   image: string;

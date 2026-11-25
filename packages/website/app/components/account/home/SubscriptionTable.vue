@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { DataTableColumn, DataTableSortColumn } from '@rotki/ui-library';
+import { RuiButton, RuiDataTable, RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { useBreakpoint } from '@rotki/ui-library/composables';
 import { get } from '@vueuse/shared';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import RefreshButton from '~/components/account/home/RefreshButton.vue';
 import { getSubscriptionTableHeaders } from '~/components/account/home/subscription-table/config';

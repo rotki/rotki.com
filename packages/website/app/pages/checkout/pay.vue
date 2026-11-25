@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
 import { get } from '@vueuse/shared';
+import { computed, onBeforeMount } from 'vue';
+import { useRoute } from '#app';
+import { NuxtPage } from '#components';
 import { useAppConfig } from '~/composables/use-app-config';
 import { useRedirectUrl } from '~/composables/use-redirect-url';
 import { useCheckoutDiscount } from '~/modules/checkout/composables/use-checkout';

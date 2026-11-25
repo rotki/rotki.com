@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import type { ValidationErrors } from '~/types/common';
 import type { SignupInvoicePayload } from '~/types/signup';
+import { RuiButton, RuiCheckbox, RuiTextField } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { NuxtLink } from '#components';
 import CountrySelect from '~/components/account/CountrySelect.vue';
 import Recaptcha from '~/components/common/Recaptcha.client.vue';
 import { useFormRules } from '~/composables/use-form-rules';

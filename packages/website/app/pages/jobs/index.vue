@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import type { JobsCollectionItem } from '@nuxt/content';
+import { RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAsyncData } from '#app';
+import { definePageMeta } from '#app/composables/pages';
+import { NuxtLayout, NuxtLink } from '#components';
+import { queryCollection } from '#imports';
 import JobDescription from '~/components/jobs/JobDescription.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 

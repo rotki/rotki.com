@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
+import { RuiIcon, RuiTooltip } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import InputWithCopyButton from '~/components/common/InputWithCopyButton.vue';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoPaymentQr from '~/modules/checkout/components/crypto/CryptoPaymentQr.vue';

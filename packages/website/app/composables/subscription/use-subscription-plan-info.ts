@@ -1,6 +1,7 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { PremiumTierInfo, PremiumTierInfoDescription } from '~/types/tiers';
 import { get } from '@vueuse/shared';
+import { computed, type MaybeRefOrGetter, toValue } from 'vue';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 

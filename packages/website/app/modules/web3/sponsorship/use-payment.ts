@@ -5,6 +5,8 @@ import { get, set } from '@vueuse/shared';
 import { pipe, ResultAsync as RA } from 'plainfp';
 import { fromZod } from 'plainfp/interop/zod';
 import { err, flatMap, fromNullable, fromThrowable, getOr, map, ok, type Result } from 'plainfp/result';
+import { computed, ref, shallowReadonly, shallowRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { getWeb3Client } from '~/modules/web3/client';
 import { useWallet } from '~/modules/web3/composables/use-wallet';
 import { useWalletPicker } from '~/modules/web3/composables/use-wallet-picker';

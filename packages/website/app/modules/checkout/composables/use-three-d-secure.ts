@@ -5,6 +5,7 @@ import type { PayEvent } from '~/types/common';
 import { clearThreeDSecureHandoff, readThreeDSecureHandoff } from '@rotki/card-payment-common/utils/three-d-secure-handoff';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents, PaymentUserError, SigilEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
+import { computed, type ComputedRef, type Ref, shallowReadonly, shallowRef } from 'vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { type PurchaseDiscount, useCompletePurchase } from '~/modules/checkout/composables/use-complete-purchase';

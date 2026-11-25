@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { RuiButton, RuiCard, RuiDialog, RuiIcon } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import Confetti from '~/components/common/Confetti.vue';
 import { findTierByKey } from '~/modules/web3/sponsorship/utils';

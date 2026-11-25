@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 
 const { t } = useI18n({ useScope: 'global' });

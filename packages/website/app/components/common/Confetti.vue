@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
+import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
 
 interface ConfettiParticle {
   color: string;

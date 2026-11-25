@@ -1,3 +1,5 @@
+import { defineEventHandler, setCookie } from 'h3';
+
 /** Sets the CSRF cookie like the real backend does. */
 export default defineEventHandler((event) => {
   setCookie(event, 'csrftoken', 'mock-csrf-token-for-testing', {

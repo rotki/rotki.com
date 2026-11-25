@@ -1,5 +1,7 @@
 import type { GithubRelease, GithubReleaseAsset } from '~/types/github';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useFetch } from '#app';
 
 export function useAppDownload(fallbackUrl = 'https://github.com/rotki/rotki/releases/latest') {
   const { data, status } = useFetch<GithubRelease>('/api/releases/latest', {

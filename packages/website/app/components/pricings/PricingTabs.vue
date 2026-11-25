@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { MappedPlan } from '~/components/pricings/type';
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import PricingTabContent from '~/components/pricings/PricingTabContent.vue';
 import { isMostPopularPlan } from '~/components/pricings/utils';
 import { toTitleCase } from '~/utils/text';

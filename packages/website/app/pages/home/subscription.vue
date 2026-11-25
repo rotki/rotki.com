@@ -2,6 +2,9 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, onBeforeMount } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { definePageMeta } from '#app/composables/pages';
 import AccountOverviewStats from '~/components/account/home/AccountOverviewStats.vue';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import ActiveSubscriptionCard from '~/components/account/home/ActiveSubscriptionCard.vue';

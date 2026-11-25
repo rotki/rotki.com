@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import { showError, useAsyncData } from '#app';
+import { ContentRenderer } from '#components';
+import { queryCollection } from '#imports';
+
 const { path } = defineProps<{ path: string }>();
 
 const { data: document } = await useAsyncData(path, () => queryCollection('documents').path(path).first(), { dedupe: 'defer' });

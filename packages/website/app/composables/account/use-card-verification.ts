@@ -1,10 +1,11 @@
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
-import type { Ref } from 'vue';
 import type { CardVerificationData } from '~/types/payment';
 import { PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
 import { parseBraintreeError } from '@rotki/sigil';
 import { objectPick } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { computed, type Ref, shallowReadonly, shallowRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { useLogger } from '~/utils/use-logger';

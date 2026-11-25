@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
+import { RuiChip, RuiIcon } from '@rotki/ui-library/components';
+import { computed } from 'vue';
 
 const { tag } = defineProps<{
   tag: string;

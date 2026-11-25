@@ -1,7 +1,7 @@
-import type { ComposerTranslation } from 'vue-i18n';
 import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { defineComponent, h } from 'vue';
+import { type ComposerTranslation, useI18n } from 'vue-i18n';
 import { hasCardPaymentInHistory, invoiceUrl, latestPayment, paymentMethodLabel } from '~/utils/payments';
 
 describe('utils/payments.ts - hasCardPaymentInHistory', () => {

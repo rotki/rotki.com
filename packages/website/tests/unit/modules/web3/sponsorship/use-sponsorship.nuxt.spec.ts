@@ -3,6 +3,7 @@ import { get } from '@vueuse/shared';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it } from 'vitest';
 import { server } from '~~/tests/mocks/server';
+import { clearNuxtData } from '#app';
 import { useSponsorshipData } from '~/modules/web3/sponsorship/use-sponsorship';
 
 function tierInfo(overrides: Partial<TierInfoResult> = {}): TierInfoResult {

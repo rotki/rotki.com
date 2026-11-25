@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import type { DownloadItemSingle, DownloadItem as DownloadItemType } from '~/types/download';
 import { SigilEvents } from '@rotki/sigil';
+import { RuiAccordion, RuiAccordions, RuiButton, RuiIcon } from '@rotki/ui-library/components';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import DownloadItem from '~/components/download/DownloadItem.vue';
 import DownloadPlatformButton from '~/components/download/DownloadPlatformButton.vue';

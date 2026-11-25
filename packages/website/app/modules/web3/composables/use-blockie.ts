@@ -1,4 +1,5 @@
 import { createBlockie } from '@rotki/ui-library';
+import { createSharedComposable } from '@vueuse/core';
 
 const CACHE_SIZE = 100;
 

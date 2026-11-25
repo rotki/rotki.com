@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { RuiTab, RuiTabs } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { PricingPeriod } from '~/types/tiers';
 
 const model = defineModel<PricingPeriod>({ required: true });

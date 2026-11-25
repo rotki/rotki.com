@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from '#app';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import PageHeader from '~/components/header/PageHeader.vue';
 

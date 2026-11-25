@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon, RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { toTitleCase } from '~/utils/text';
 
 interface TierContent {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiLogo } from '@rotki/ui-library/components';
 import { useStagingBranding } from '~/composables/use-staging-branding';
 
 defineOptions({

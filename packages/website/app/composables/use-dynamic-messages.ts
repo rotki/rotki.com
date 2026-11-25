@@ -1,5 +1,7 @@
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
+import { createSharedComposable, isDefined } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { computed, ref } from 'vue';
 import {
   DashboardSchema,
   type VisibilityPeriod,

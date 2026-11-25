@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { RuiButton, RuiCard, RuiDialog } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AccountAddress from '~/components/account/home/AccountAddress.vue';
 import AccountInformation from '~/components/account/home/AccountInformation.vue';
 import AccountSection from '~/components/account/home/AccountSection.vue';

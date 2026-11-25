@@ -12,6 +12,9 @@ import {
 import { addCardErrorMessage, type AddCardFailure, isCardAddedFailure } from '@rotki/checkout-ui/utils/add-card-error';
 import { get } from '@vueuse/shared';
 import { fromPromise, type ResultAsync } from 'plainfp/result-async';
+import { computed, type Ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useAsyncData } from '#app';
 import { useEmailConfirmedCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { type PaymentFailure, toPaymentFailure } from '~/modules/checkout/utils/payment-failure';
 import { nonEmpty } from '~/utils/non-empty';

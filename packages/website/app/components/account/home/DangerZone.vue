@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import type { ActionResult } from '~/types/common';
+import { RuiButton, RuiCard, RuiDialog, RuiTextField } from '@rotki/ui-library/components';
+import { useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { navigateTo } from '#app';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { useAccountApi } from '~/composables/account/use-account-api';

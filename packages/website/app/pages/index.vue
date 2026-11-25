@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { onBeforeMount } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useHead, useRuntimeConfig } from '#app';
+import { definePageMeta } from '#app/composables/pages';
 import DownloadCallToAction from '~/components/common/DownloadCallToAction.vue';
 import DynamicMessageDisplay from '~/components/home/DynamicMessageDisplay.vue';
 import FeatureList from '~/components/home/features/FeatureList.vue';

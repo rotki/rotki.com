@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { RuiTextField } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRuntimeConfig } from '#app';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useMainStore } from '~/store';

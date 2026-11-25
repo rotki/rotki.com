@@ -3,6 +3,7 @@ import type { TestimonialsCollectionItem } from '@nuxt/content';
 import type { Swiper, SwiperOptions } from 'swiper/types';
 import { get, set } from '@vueuse/shared';
 import { SwiperSlide } from 'swiper/vue';
+import { ref } from 'vue';
 import Carousel from '~/components/common/carousel/Carousel.vue';
 import CarouselControls from '~/components/common/carousel/CarouselControls.vue';
 import Testimonial from '~/components/home/testimonials/Testimonial.vue';

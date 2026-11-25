@@ -2,6 +2,7 @@ import type { LeaderboardEntry, LeaderboardResponse, PaginationData } from '~/mo
 import { flushPromises } from '@vue/test-utils';
 import { get } from '@vueuse/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { clearNuxtData } from '#app';
 
 const { mockFetchWithCsrf } = vi.hoisted(() => ({ mockFetchWithCsrf: vi.fn() }));
 

@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import SavedCardRow from '@rotki/checkout-ui/components/SavedCardRow.vue';
+import { RuiButton, RuiCard, RuiDialog } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { paymentFailureMessage } from '~/modules/checkout/utils/payment-failure';
 

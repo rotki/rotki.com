@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiButton, RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import { formatTokenBalance } from '~/modules/web3/core/format';
 

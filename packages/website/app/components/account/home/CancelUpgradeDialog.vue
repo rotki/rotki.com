@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
+import { RuiButton, RuiCard, RuiDialog } from '@rotki/ui-library/components';
 import { get, isDefined } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
 
 const modelValue = defineModel<UserSubscription | undefined>({ required: true });
 

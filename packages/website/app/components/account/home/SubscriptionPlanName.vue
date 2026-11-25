@@ -2,7 +2,10 @@
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
+import { RuiChip, RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useSubscriptionActions } from '~/composables/subscription/use-subscription-actions';
 
 const { subscription, availablePlans } = defineProps<{

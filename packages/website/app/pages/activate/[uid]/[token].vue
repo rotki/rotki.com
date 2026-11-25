@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { definePageMeta } from '#app/composables/pages';
 import AccountActivate from '~/components/account/activation/AccountActivate.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 

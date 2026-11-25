@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { DataTableColumn } from '@rotki/ui-library';
 import type { UserDevice } from '~/types/account';
+import { RuiButton, RuiDataTable, RuiIcon, RuiTooltip } from '@rotki/ui-library/components';
 import { createReusableTemplate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import DeleteDeviceDialog from '~/components/account/home/DeleteDeviceDialog.vue';
 import RenameDeviceDialog from '~/components/account/home/RenameDeviceDialog.vue';

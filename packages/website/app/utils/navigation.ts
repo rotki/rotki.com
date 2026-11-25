@@ -1,4 +1,5 @@
 import type { RouteLocationRaw } from 'vue-router';
+import { navigateTo, useRouter } from '#app';
 
 // Routes that require hard reloads due to special CSP configurations
 const SPECIAL_CSP_ROUTES = [

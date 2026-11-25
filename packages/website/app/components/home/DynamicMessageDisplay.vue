@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { DashboardMessage } from '@/types/dynamic-messages';
+import { RuiFooterStepper } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useRandomStepper } from '~/composables/use-random-stepper';
 

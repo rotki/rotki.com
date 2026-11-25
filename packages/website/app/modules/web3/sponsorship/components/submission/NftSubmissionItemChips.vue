@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { SponsorshipTier } from '~/modules/web3/sponsorship/types';
 import type { NftSubmission } from '~/types/sponsor';
+import { RuiChip } from '@rotki/ui-library/components';
 import { get, isDefined } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { findTierById } from '~/modules/web3/sponsorship/utils';
 import { getTierClasses, getTierMedal } from '~/utils/nft-tiers';
 

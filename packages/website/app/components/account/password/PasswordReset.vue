@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { SigilEvents } from '@rotki/sigil';
+import { RuiButton, RuiRevealableTextField } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { navigateTo, useRoute } from '#app';
 import AuthShell from '~/components/account/AuthShell.vue';
 import PasswordRules from '~/components/account/PasswordRules.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';

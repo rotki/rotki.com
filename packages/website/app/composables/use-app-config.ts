@@ -1,7 +1,9 @@
 import { type ActiveCampaign, ActiveCampaignSchema } from '@rotki/card-payment-common/schemas/campaign';
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
 import { get } from '@vueuse/shared';
+import { computed, readonly } from 'vue';
 import { z } from 'zod';
+import { useFetch } from '#app';
 
 const AppConfigResponse = z.object({
   maintenance: z.boolean().default(false),

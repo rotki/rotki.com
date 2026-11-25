@@ -5,7 +5,11 @@ import type {
   DataTableSortColumn,
 } from '@rotki/ui-library';
 import type { UserPayment } from '~/types/account';
+import { RuiChip, RuiDataTable } from '@rotki/ui-library/components';
+import { useBreakpoint } from '@rotki/ui-library/composables';
 import { get } from '@vueuse/shared';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import PaymentAmountCell from '~/components/account/home/PaymentAmountCell.vue';
 import RefreshButton from '~/components/account/home/RefreshButton.vue';

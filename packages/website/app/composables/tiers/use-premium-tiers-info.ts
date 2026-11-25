@@ -1,6 +1,7 @@
 import type { Ref } from 'vue';
 import { get, set, until } from '@vueuse/shared';
 import tiersSnapshot from 'virtual:tiers-snapshot';
+import { useState } from '#app';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { PremiumTiersInfo } from '~/types/tiers';
 import { logger } from '~/utils/use-logger';

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
+import { RuiChip } from '@rotki/ui-library/components';
+import { useTimeAgo } from '@vueuse/core';
+import { computed, toRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import PlanLimitsList from '~/components/account/home/PlanLimitsList.vue';
 import SubscriptionActionsCell from '~/components/account/home/subscription-table/SubscriptionActionsCell.vue';
 import SubscriptionBillingSection from '~/components/account/home/SubscriptionBillingSection.vue';

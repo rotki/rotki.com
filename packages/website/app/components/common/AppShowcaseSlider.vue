@@ -3,6 +3,8 @@ import type { Swiper } from 'swiper/types';
 import { get, set } from '@vueuse/shared';
 import { SwiperSlide } from 'swiper/vue';
 import screenshots from 'virtual:app-screenshots';
+import { ref } from 'vue';
+import { useHead } from '#app';
 import Carousel from '~/components/common/carousel/Carousel.vue';
 import CarouselControls from '~/components/common/carousel/CarouselControls.vue';
 import 'swiper/css/pagination';

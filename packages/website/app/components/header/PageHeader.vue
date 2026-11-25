@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
 import { useMounted } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { navigateTo, useRoute } from '#app';
+import { NuxtLink } from '#components';
 import AppLogo from '~/components/common/AppLogo.vue';
 import NavigationMenu from '~/components/common/NavigationMenu.vue';
 import SponsorNavButton from '~/components/common/SponsorNavButton.vue';

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import type { AddressDisplay, LeaderboardEntry } from '~/modules/sponsor/leaderboard/types';
+import { RuiTooltip } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AddressAvatar from '~/components/common/AddressAvatar.vue';
 import { buildAddressDisplay, getDisplayRank, getRankClass } from '~/modules/sponsor/leaderboard/utils';
 import { truncateAddress } from '~/modules/web3/core/format';

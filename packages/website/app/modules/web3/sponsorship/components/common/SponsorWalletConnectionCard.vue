@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { RuiAlert, RuiButton, RuiCard, RuiDivider, RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import WalletAccountSummary from '~/modules/web3/components/WalletAccountSummary.vue';
 import { useWallet } from '~/modules/web3/composables/use-wallet';
 import { useWalletPicker } from '~/modules/web3/composables/use-wallet-picker';

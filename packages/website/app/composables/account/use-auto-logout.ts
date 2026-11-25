@@ -1,4 +1,6 @@
 import { storeToRefs } from 'pinia';
+import { watch } from 'vue';
+import { navigateTo } from '#app';
 import { useMainStore } from '~/store';
 import { useLogger } from '~/utils/use-logger';
 

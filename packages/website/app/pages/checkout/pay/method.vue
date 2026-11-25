@@ -2,6 +2,9 @@
 import { monthsToPlanDuration, SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
+import { navigateTo, useRoute, useRouter } from '#app';
+import { definePageMeta } from '#app/composables/pages';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import { useCheckout } from '~/modules/checkout/composables/use-checkout';

@@ -1,5 +1,7 @@
 import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useLazyAsyncData } from '#app';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 
 export interface Country {

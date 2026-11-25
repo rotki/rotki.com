@@ -1,7 +1,8 @@
 import type { AvailablePlan, AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
-import type { MaybeRefOrGetter } from 'vue';
 import type { FeatureDescriptionMap, FeatureValue, MappedPlan, PlanBase } from '~/components/pricings/type';
 import { get, set } from '@vueuse/shared';
+import { computed, type MaybeRefOrGetter, shallowRef, toValue, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { isCustomPlan, isFreePlan } from '~/components/pricings/utils';
 import { useFreePlanFeatures } from '~/modules/checkout/composables/use-free-plan-features';
 import { TIER_NAMES } from '~/types/pricing';

@@ -1,5 +1,6 @@
 import { get, set } from '@vueuse/shared';
 import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { SponsorshipMetadata } from '~/types/sponsor';
 import { useLogger } from '~/utils/use-logger';

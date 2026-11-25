@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { usePlanLimits } from '~/composables/tiers/use-plan-limits';
 
 const { t } = useI18n({ useScope: 'global' });

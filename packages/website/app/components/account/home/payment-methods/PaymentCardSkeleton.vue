@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
 import PaymentCardLayout from '~/components/account/home/payment-methods/PaymentCardLayout.vue';
 </script>
 

@@ -1,5 +1,6 @@
 import { setSigilDebug } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
+import { defineNuxtPlugin, useRoute, useRuntimeConfig } from '#app';
 import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 import { useUtmTracking } from '~/composables/chronicling/use-utm-tracking';
 import { useAuthHintCookie } from '~/composables/use-fetch-with-csrf';

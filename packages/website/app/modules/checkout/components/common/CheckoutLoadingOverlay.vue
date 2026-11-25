@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiProgress } from '@rotki/ui-library/components';
+
 const { loading = false } = defineProps<{
   loading?: boolean;
 }>();

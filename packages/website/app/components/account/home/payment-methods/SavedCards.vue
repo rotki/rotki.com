@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import type { SavedCard } from '@rotki/card-payment-common/schemas/payment';
 import { PaymentProvider } from '@rotki/card-payment-common/schemas/subscription';
+import { RuiAlert, RuiButton, RuiIcon, RuiProgress } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { storeToRefs } from '#imports';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import AddCardDialog from '~/components/account/home/payment-methods/AddCardDialog.vue';
 import DeleteCardDialog from '~/components/account/home/payment-methods/DeleteCardDialog.vue';

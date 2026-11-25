@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { UserDevice } from '~/types/account';
+import { RuiButton, RuiCard, RuiDialog, RuiTextField } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useUserDevices } from '~/composables/account/use-user-devices';
 import { logger } from '~/utils/use-logger';
 

@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { isDefined } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
+import { showError, useAsyncData, useHead, useRoute } from '#app';
+import { definePageMeta } from '#app/composables/pages';
+import { NuxtLayout } from '#components';
+import { queryCollection } from '#imports';
 import JobDetail from '~/components/jobs/JobDetail.vue';
 import { usePageSeo } from '~/composables/use-page-seo';
 

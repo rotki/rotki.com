@@ -1,10 +1,11 @@
 import type { Config, Connector, GetAccountReturnType } from '@wagmi/core';
 import type { Address } from 'viem';
-import type { ComputedRef, Ref } from 'vue';
 import { get, set } from '@vueuse/shared';
 import { pipe } from 'plainfp/pipe';
 import { err, type Result } from 'plainfp/result';
 import * as RA from 'plainfp/result-async';
+import { computed, type ComputedRef, type Ref, shallowReadonly, shallowRef } from 'vue';
+import { useRuntimeConfig } from '#app';
 import { useAppConfig } from '~/composables/use-app-config';
 import { noWallet, type Web3Error } from '~/modules/web3/core/errors';
 import { useLogger } from '~/utils/use-logger';

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
+import { RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRuntimeConfig } from '#app';
+import { NuxtLink } from '#components';
 import AppShowcaseSlider from '~/components/common/AppShowcaseSlider.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useIntegrationsData } from '~/composables/use-integrations-data';

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { formatEur } from '@rotki/card-payment-common/utils/money';
 import PaymentPage from '@rotki/checkout-ui/components/PaymentPage.vue';
+import { RuiProgress } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed, onBeforeMount, onUnmounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { onBeforeRouteLeave } from 'vue-router';
+import { navigateTo } from '#app';
+import { definePageMeta } from '#app/composables/pages';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import ThreeDSecureFailed from '~/modules/checkout/components/card/ThreeDSecureFailed.vue';

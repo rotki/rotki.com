@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { RuiButton } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
+
 defineProps<{ statusCode: number; title: string }>();
 
 const emit = defineEmits<{ 'handle-error': [] }>();

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import PageFooter from '~/components/footer/PageFooter.vue';
 import PageLayout from '~/components/layout/PageLayout.vue';

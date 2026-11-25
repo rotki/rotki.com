@@ -5,6 +5,8 @@ import type { SignupAccountPayload, SignupInvoicePayload, SignupPayload } from '
 import { SigilEvents, SignupFailedReasons } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { onMounted, ref } from 'vue';
+import { navigateTo, useRoute } from '#app';
 import SignupAccount from '~/components/account/signup/SignupAccount.vue';
 import SignupAside from '~/components/account/signup/SignupAside.vue';
 import SignupInvoiceDetails from '~/components/account/signup/SignupInvoiceDetails.vue';

@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { RuiButton, RuiTextField } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { navigateTo } from '#app';
+import { ClientOnly } from '#components';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';

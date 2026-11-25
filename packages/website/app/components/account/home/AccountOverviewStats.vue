@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { UserPayment } from '~/types/account';
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { NuxtLink } from '#components';
 import OverviewReferralCode from '~/components/account/home/OverviewReferralCode.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useCredit } from '~/composables/account/use-credit';

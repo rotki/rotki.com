@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useBlockie } from '~/modules/web3/composables/use-blockie';
 
 const { ensName, address } = defineProps<{

@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { RuiSwitch } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { onBeforeMount, reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';

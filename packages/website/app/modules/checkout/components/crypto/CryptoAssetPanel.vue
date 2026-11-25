@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { CryptoPayment } from '~/types';
 import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
+import { RuiButton } from '@rotki/ui-library/components';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import ChangeCryptoPayment from '~/modules/checkout/components/crypto/ChangeCryptoPayment.vue';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import { type CryptoPaymentLabels, cryptoPaymentLabels } from '~/modules/checkout/utils/crypto-payment-labels';

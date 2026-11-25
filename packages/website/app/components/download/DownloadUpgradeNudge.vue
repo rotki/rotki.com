@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { SigilEvents } from '@rotki/sigil';
+import { RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';
 

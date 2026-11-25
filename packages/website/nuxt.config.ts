@@ -125,7 +125,9 @@ export default defineNuxtConfig({
   // Application components are imported explicitly; Nuxt built-ins (NuxtLink, NuxtPage) stay available.
   components: false,
 
+  // Vue, Nuxt and module composables are imported explicitly too.
   imports: {
+    autoImport: false,
     scan: false,
   },
 

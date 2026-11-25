@@ -1,5 +1,7 @@
 import { parseUtmFromQuery, resolveTrackingSession, type TrackingSession, UTM_COOKIE_MAX_AGE_SECONDS, UTM_COOKIE_NAME } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
+import { readonly } from 'vue';
+import { useCookie, useRoute } from '#app';
 
 export function useUtmTracking() {
   const utmCookie = useCookie<TrackingSession | undefined>(UTM_COOKIE_NAME, {

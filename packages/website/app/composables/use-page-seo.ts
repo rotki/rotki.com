@@ -1,4 +1,5 @@
 import type { MaybeRefOrGetter } from 'vue';
+import { useHead, useRuntimeConfig, useSeoMeta } from '#app';
 import { commonAttrs } from '~/utils/metadata';
 
 interface PageSeoOptions {

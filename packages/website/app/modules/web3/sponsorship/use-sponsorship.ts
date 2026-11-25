@@ -1,4 +1,6 @@
 import { get, set } from '@vueuse/shared';
+import { readonly, ref, shallowRef } from 'vue';
+import { useAsyncData, useRoute } from '#app';
 import { useLogger } from '~/utils/use-logger';
 import { SPONSORSHIP_TIERS, type TierBenefits, type TierInfoResult, type TierSupply } from './types';
 import { isTierAvailable as isTierAvailableUtil } from './utils';

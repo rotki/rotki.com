@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
+
 const { total = 0 } = defineProps<{
   total?: number;
 }>();

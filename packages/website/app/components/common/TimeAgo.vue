@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTimeAgo } from '@vueuse/core';
 import { formatDate } from '~/utils/date';
 
 /** "5 minutes ago" that keeps itself current, with the exact time on hover. */

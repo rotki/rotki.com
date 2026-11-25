@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import type { ComponentPublicInstance } from 'vue';
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { type ComponentPublicInstance, computed, nextTick, useTemplateRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute } from '#app';
+import { definePageMeta } from '#app/composables/pages';
 import AccountCredit from '~/components/account/home/AccountCredit.vue';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import InvoiceDetails from '~/components/account/home/InvoiceDetails.vue';

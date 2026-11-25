@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { RuiButton, RuiIcon, RuiTooltip } from '@rotki/ui-library/components';
+import { useClipboard, useTimeoutFn } from '@vueuse/core';
 import { set } from '@vueuse/shared';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { modelValue, disabled } = defineProps<{ modelValue: string; disabled?: boolean }>();
 

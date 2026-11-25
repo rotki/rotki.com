@@ -1,5 +1,7 @@
 import { parsePlanId } from '@rotki/card-payment-common/utils/plan';
 import { get } from '@vueuse/shared';
+import { computed, type ComputedRef } from 'vue';
+import { useRoute } from '#app';
 import { useReferralTracking } from '~/composables/chronicling/use-referral-tracking';
 import { nonEmpty } from '~/utils/non-empty';
 

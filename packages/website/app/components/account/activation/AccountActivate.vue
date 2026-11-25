@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ActivationFailedReasons, SigilEvents } from '@rotki/sigil';
+import { RuiButton } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
 import { FetchError } from 'ofetch';
+import { computed, onBeforeMount, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute } from '#app';
+import { storeToRefs } from '#imports';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';

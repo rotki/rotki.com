@@ -1,8 +1,8 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import type { InjectionKey } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import type { CancellationFeedbackPayload } from '~/composables/subscription/use-cancellation-feedback';
 import type { PendingTx } from '~/types';
+import { inject, type InjectionKey } from 'vue';
 
 export const SubscriptionAction = {
   UPGRADE: 'upgrade',

@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { SigilEvents } from '@rotki/sigil';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { clearError, useError, useRoute } from '#app';
+import { NuxtLayout } from '#components';
 import GenericError from '~/components/error/GenericError.vue';
 import NotFoundError from '~/components/error/NotFoundError.vue';
 import { useSigilEvents } from '~/composables/chronicling/use-sigil-events';

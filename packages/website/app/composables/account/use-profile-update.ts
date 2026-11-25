@@ -3,6 +3,7 @@ import type { ProfilePayload } from '~/types/account';
 import { objectOmit } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, readonly, shallowRef } from 'vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useAccountRefresh } from '~/composables/use-app-events';
 import { useMainStore } from '~/store';

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiIcon } from '@rotki/ui-library/components';
+
 export interface ComparisonRow {
   label: string;
   rotki: string;

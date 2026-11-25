@@ -3,6 +3,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime';
 import { type DOMWrapper, flushPromises, type VueWrapper } from '@vue/test-utils';
 import { set } from '@vueuse/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { useState } from '#app';
 import SuccessPage from '~/pages/checkout/success.vue';
 
 vi.mock('~/composables/account/use-auto-logout', () => ({

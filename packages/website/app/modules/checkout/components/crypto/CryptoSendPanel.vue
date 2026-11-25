@@ -2,7 +2,10 @@
 import type { CryptoPayment } from '~/types';
 import CheckoutPanel from '@rotki/checkout-ui/components/CheckoutPanel.vue';
 import ProcessingOverlay from '@rotki/checkout-ui/components/ProcessingOverlay.vue';
+import { RuiAlert, RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import CryptoPaymentDetails from '~/modules/checkout/components/crypto/CryptoPaymentDetails.vue';
 import CryptoWalletActions from '~/modules/checkout/components/crypto/CryptoWalletActions.vue';
 import { useWeb3Payment } from '~/modules/checkout/composables/use-crypto-payment';

@@ -1,4 +1,5 @@
 import { installCheckoutMessages } from '@rotki/checkout-ui/composables/checkout-messages';
+import { defineNuxtPlugin } from '#app';
 
 /**
  * Gives the shared checkout components (the checkout-ui package) vue-i18n's translate function.

@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import { RuiIcon, RuiProgress, RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { useMounted } from '@vueuse/core';
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { navigateTo, useRoute } from '#app';
+import { NuxtLink } from '#components';
 import SubscriptionErrorNotification from '~/components/account/home/SubscriptionErrorNotification.vue';
 import UnverifiedEmailWarning from '~/components/account/home/UnverifiedEmailWarning.vue';
 import PageLayout from '~/components/layout/PageLayout.vue';

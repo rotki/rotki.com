@@ -1,7 +1,7 @@
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { get } from '@vueuse/shared';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type EffectScope, effectScope } from 'vue';
+import { type EffectScope, effectScope, ref } from 'vue';
 
 const mockFetchWithCsrf = vi.fn();
 const mockSignMessage = vi.fn();

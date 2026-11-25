@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { RuiAlert, RuiButton, RuiIcon, RuiTextField } from '@rotki/ui-library/components';
+import { createReusableTemplate } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { computed, onMounted, reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
+import { useRuntimeConfig } from '#app';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import FormErrorsAlert from '~/components/common/FormErrorsAlert.vue';
 import { ADDRESS_FIELDS, useProfileUpdate } from '~/composables/account/use-profile-update';

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import FloatingNotification from '~/components/account/home/FloatingNotification.vue';
 import { SubscriptionAction } from '~/components/account/home/subscription-table/types';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';

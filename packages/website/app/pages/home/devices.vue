@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { get } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { definePageMeta } from '#app/composables/pages';
 import AccountSection from '~/components/account/home/AccountSection.vue';
 import ApiKeys from '~/components/account/home/ApiKeys.vue';
 import UserDevicesTable from '~/components/account/home/UserDevicesTable.vue';

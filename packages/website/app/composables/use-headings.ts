@@ -1,4 +1,5 @@
-import type { MaybeRefOrGetter } from 'vue';
+import { computed, type MaybeRefOrGetter, type Ref, toValue } from 'vue';
+import { useRuntimeConfig } from '#app';
 
 interface UseHeadingsReturn {
   generate: Ref<boolean>;

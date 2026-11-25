@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RuiCard, RuiRadio, RuiSkeletonLoader } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import { SPONSORSHIP_TIERS, type SponsorshipTier, type TierKey, type TierSupply } from '~/modules/web3/sponsorship/types';
 import { isTierAvailable } from '~/modules/web3/sponsorship/utils';
 

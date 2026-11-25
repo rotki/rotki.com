@@ -5,6 +5,8 @@ import { renewalDateFrom } from '@rotki/card-payment-common/utils/date';
 import OrderSummary from '@rotki/checkout-ui/components/OrderSummary.vue';
 import VatNotice from '@rotki/checkout-ui/components/VatNotice.vue';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { storeToRefs } from '#imports';
 import { useAppConfig } from '~/composables/use-app-config';
 import ChangePlanAction from '~/modules/checkout/components/common/ChangePlanAction.vue';
 import { useMainStore } from '~/store';

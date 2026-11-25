@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { PremiumTierInfo, PremiumTierInfoDescription } from '~/types/tiers';
+import { RuiButton, RuiIcon, RuiSkeletonLoader } from '@rotki/ui-library/components';
 import { createReusableTemplate } from '@vueuse/core';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { ClientOnly, NuxtLink } from '#components';
 import AppLogo from '~/components/common/AppLogo.vue';
 import { usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 

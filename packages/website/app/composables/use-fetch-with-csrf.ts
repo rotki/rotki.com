@@ -1,6 +1,8 @@
 import { convertKeys } from '@rotki/card-payment-common/utils/object';
-import { createSharedComposable, isClient } from '@vueuse/core';
+import { createSharedComposable, isClient, isDefined } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { ref } from 'vue';
+import { navigateTo, tryUseNuxtApp, useCookie, useRequestHeaders, useRuntimeConfig } from '#app';
 import { parseJsonBody } from '~/utils/api-error-handling';
 import { useLogger } from '~/utils/use-logger';
 
@@ -93,8 +95,8 @@ export const useFetchWithCsrf = createSharedComposable(() => {
    * On the server (and in tests) requests carry the user's cookies/referer
    * explicitly, since there's no browser to attach them.
    */
-  function applyServerHeaders(headers: Headers, event: ReturnType<typeof useEvent> | null, token: string | null | undefined): void {
-    let cookieString = event?.headers.get('cookie') ?? undefined;
+  function applyServerHeaders(headers: Headers, token: string | null | undefined): void {
+    let cookieString: string | undefined;
 
     // Only try useRequestHeaders if we have a valid Nuxt context
     const nuxtApp = tryUseNuxtApp();
@@ -122,11 +124,7 @@ export const useFetchWithCsrf = createSharedComposable(() => {
   const fetchWithCsrf = $fetch.create({
     credentials: 'include',
     async onRequest({ options }): Promise<void> {
-      const event = typeof useEvent === 'function' ? useEvent() : null;
-
-      let token = event
-        ? parseCookies(event)[CSRF_COOKIE]
-        : get(csrfToken);
+      let token = get(csrfToken);
 
       if (import.meta.client && isMutationMethod(options?.method))
         token = await initCsrf();
@@ -135,7 +133,7 @@ export const useFetchWithCsrf = createSharedComposable(() => {
       const headers = buildRequestHeaders(options.headers, token, isFormData);
 
       if (import.meta.server || import.meta.env.NODE_ENV === 'test')
-        applyServerHeaders(headers, event, token);
+        applyServerHeaders(headers, token);
 
       options.headers = headers;
       options.baseURL = baseUrl;

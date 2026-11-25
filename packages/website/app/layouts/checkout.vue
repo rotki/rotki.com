@@ -2,6 +2,8 @@
 import type { CheckoutStepId } from '@rotki/checkout-ui/utils/checkout-flow';
 import CheckoutShell from '@rotki/checkout-ui/components/CheckoutShell.vue';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useRoute, useRouter } from '#app';
 import {
   useDiscountCodeParams,
   usePlanIdParam,

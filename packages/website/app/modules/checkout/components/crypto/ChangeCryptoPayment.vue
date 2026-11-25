@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { RuiButton, RuiCard, RuiCheckbox, RuiDialog } from '@rotki/ui-library/components';
 import { set } from '@vueuse/shared';
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const modelValue = defineModel<boolean>({ required: true });
 

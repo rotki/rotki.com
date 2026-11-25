@@ -6,6 +6,7 @@ import { isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common
 import { isClient, useTimeoutFn } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { acceptHMRUpdate, defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 import { useAccountApi } from '~/composables/account/use-account-api';
 import { useAuthApi } from '~/composables/account/use-auth-api';
 import { useUserSubscriptions } from '~/composables/subscription/use-user-subscriptions';

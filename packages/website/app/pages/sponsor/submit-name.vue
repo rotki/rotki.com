@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import { definePageMeta } from '#app/composables/pages';
+import { NuxtLink } from '#components';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 import WalletPickerDialog from '~/modules/web3/components/WalletPickerDialog.vue';
 import SponsorWalletConnectionCard from '~/modules/web3/sponsorship/components/common/SponsorWalletConnectionCard.vue';

@@ -1,3 +1,5 @@
+import { readonly, type Ref } from 'vue';
+import { useLazyAsyncData } from '#app';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { PaymentAssetResponse } from '~/types';
 

@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import type { DownloadItem } from '~/types/download';
 import { get } from '@vueuse/shared';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useHead, useRuntimeConfig } from '#app';
+import { definePageMeta } from '#app/composables/pages';
 import DownloadDocs from '~/components/download/DownloadDocs.vue';
 import DownloadHeading from '~/components/download/DownloadHeading.vue';
 import DownloadPreview from '~/components/download/DownloadPreview.vue';

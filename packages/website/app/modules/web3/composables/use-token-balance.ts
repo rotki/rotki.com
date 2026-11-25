@@ -1,7 +1,7 @@
-import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue';
 import { watchDebounced } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import { getOr } from 'plainfp/result';
+import { computed, type ComputedRef, type MaybeRefOrGetter, type Ref, shallowReadonly, shallowRef, toValue, watch } from 'vue';
 import { getWeb3Client } from '~/modules/web3/client';
 import { useWallet } from '~/modules/web3/composables/use-wallet';
 import { isNativeToken } from '~/modules/web3/core/erc20';

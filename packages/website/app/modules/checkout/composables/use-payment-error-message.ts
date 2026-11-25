@@ -1,5 +1,6 @@
 import { type PaymentErrorContext, paymentErrorMessage } from '@rotki/checkout-ui/utils/payment-error-message';
 import { type ParsedPaymentError, paymentErrorCopy } from '@rotki/sigil';
+import { useI18n } from 'vue-i18n';
 
 interface UsePaymentErrorMessageReturn {
   userMessageFor: (parsed: ParsedPaymentError, context?: PaymentErrorContext) => string;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RuiIcons } from '@rotki/ui-library';
+import { RuiIcon, RuiProgress } from '@rotki/ui-library/components';
 
 type AuthShellTone = 'primary' | 'success' | 'error';
 

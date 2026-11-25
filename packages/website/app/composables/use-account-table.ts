@@ -1,5 +1,5 @@
 import type { TablePaginationData } from '@rotki/ui-library';
-import type { Ref } from 'vue';
+import { computed, type MaybeRefOrGetter, type Ref, ref, toValue } from 'vue';
 import { fitsOnePage, SINGLE_LINE_ROWS } from '~/utils/table';
 
 /** The `RuiDataTable` props every account table shares. */

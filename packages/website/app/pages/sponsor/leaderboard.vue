@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { RuiCard, RuiDivider, RuiProgress, RuiTablePagination } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
+import { definePageMeta } from '#app/composables/pages';
 import { usePageSeo } from '~/composables/use-page-seo';
 import LeaderboardCallToAction from '~/modules/sponsor/leaderboard/components/LeaderboardCallToAction.vue';
 import LeaderboardEmptyState from '~/modules/sponsor/leaderboard/components/LeaderboardEmptyState.vue';

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
+import { RuiAutoComplete } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import CryptoAssetIcon from '~/modules/checkout/components/crypto/CryptoAssetIcon.vue';
 import CryptoChainIcon from '~/modules/checkout/components/crypto/CryptoChainIcon.vue';
 import { usePaymentAssets } from '~/modules/checkout/composables/use-payment-assets';

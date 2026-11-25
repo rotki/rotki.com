@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ContextColorsType } from '@rotki/ui-library';
+import { RuiTextField } from '@rotki/ui-library/components';
 import CopyButton from '~/components/common/CopyButton.vue';
 
 defineOptions({

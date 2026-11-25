@@ -1,9 +1,10 @@
-import type { ComputedRef, Ref } from 'vue';
 import { type AvailablePlan, type AvailablePlans, type AvailablePlansResponse, AvailablePlansResponseSchema, type SelectedPlan } from '@rotki/card-payment-common/schemas/plans';
 import { findSelectedPlan } from '@rotki/card-payment-common/utils/plan';
 import { until } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
 import tiersSnapshot from 'virtual:tiers-snapshot';
+import { computed, type ComputedRef, type Ref } from 'vue';
+import { useState } from '#app';
 import { useTiersApi } from '~/composables/tiers/use-tiers-api';
 import { TIER_NAMES } from '~/types/pricing';
 import { PricingPeriod } from '~/types/tiers';

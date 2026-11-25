@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NuxtLink } from '#components';
+
 const { href = '#', target = '_self' } = defineProps<{
   href?: string;
   target?: string;

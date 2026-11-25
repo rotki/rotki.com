@@ -1,5 +1,6 @@
 import type { PaymentToken, TierKey } from '~/modules/web3/sponsorship/types';
 import { get, set } from '@vueuse/shared';
+import { ref, shallowReadonly, shallowRef } from 'vue';
 import { useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { isNativeToken } from '~/modules/web3/core/erc20';
 import { localIconUrl } from '~/utils/token-icons';

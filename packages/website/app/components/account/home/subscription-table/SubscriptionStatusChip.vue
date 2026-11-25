@@ -2,6 +2,9 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { ContextColorsType } from '@rotki/ui-library';
 import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
+import { RuiChip, RuiIcon, RuiProgress, RuiTooltip } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
 import { useSubscriptionDisplay } from '~/composables/subscription/use-subscription-display';
 import { formatDate } from '~/utils/date';

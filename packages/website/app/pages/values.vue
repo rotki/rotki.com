@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { definePageMeta } from '#app/composables/pages';
 import ValueBody from '~/components/values/ValueBody.vue';
 import ValueContact from '~/components/values/ValueContact.vue';
 import ValueHeading from '~/components/values/ValueHeading.vue';

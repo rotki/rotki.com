@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import type { PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
+import { useI18n } from 'vue-i18n';
 import PricingTable from '~/components/pricings/PricingTable.vue';
 import PricingTabs from '~/components/pricings/PricingTabs.vue';
 import { usePricingComparison } from '~/composables/use-pricing-comparison';

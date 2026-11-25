@@ -1,3 +1,4 @@
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
 import { isOnlyDigits, PASSWORD_MIN_LENGTH } from '~/utils/validation';
 

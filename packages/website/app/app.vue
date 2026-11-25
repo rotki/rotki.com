@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useHead, useRuntimeConfig } from '#app';
+import { NuxtLayout, NuxtPage } from '#components';
 import { useStagingBranding } from '~/composables/use-staging-branding';
 import { commonAttrs } from '~/utils/metadata';
 

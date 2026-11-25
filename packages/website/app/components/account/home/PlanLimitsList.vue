@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { PremiumTierInfoDescription } from '~/types/tiers';
+import { RuiButton, RuiIcon } from '@rotki/ui-library/components';
 import { get } from '@vueuse/shared';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { limits } = defineProps<{
   limits: PremiumTierInfoDescription[];

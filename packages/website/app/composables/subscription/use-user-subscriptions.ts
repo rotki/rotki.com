@@ -2,6 +2,8 @@ import type { ApiResponse } from '@rotki/card-payment-common/schemas/api';
 import { type Subscription as UserSubscription, type UserSubscriptions, UserSubscriptionsSchema } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive, isSubActive, isSubPending, isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
 import { get } from '@vueuse/shared';
+import { computed, type ComputedRef, readonly, type Ref, watch } from 'vue';
+import { useAsyncData } from '#app';
 import { useAuthHintCookie, useFetchWithCsrf } from '~/composables/use-fetch-with-csrf';
 import { useLogger } from '~/utils/use-logger';
 

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { get } from '@vueuse/shared';
+import { useI18n } from 'vue-i18n';
+import { navigateTo, useRuntimeConfig } from '#app';
+import { definePageMeta } from '#app/composables/pages';
 import { useAppConfig } from '~/composables/use-app-config';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';
 

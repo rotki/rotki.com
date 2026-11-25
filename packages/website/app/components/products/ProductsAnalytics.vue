@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
 const { t } = useI18n({ useScope: 'global' });
 
 // Intrinsic sizes of the 1.44 captures; they differ in shape, so the template frames them.

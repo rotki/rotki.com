@@ -2,7 +2,10 @@
 import type { AvailablePlans } from '@rotki/card-payment-common/schemas/plans';
 import { PaymentProvider, type Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isSubRequestingUpgrade } from '@rotki/card-payment-common/utils/subscription';
+import { watchImmediate } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { computed, provide, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { type ActionState, buildActionState } from '~/components/account/home/subscription-table/action-state';
 import BlockExplorerActionButton from '~/components/account/home/subscription-table/actions/BlockExplorerActionButton.vue';
 import CancelActionButton from '~/components/account/home/subscription-table/actions/CancelActionButton.vue';

@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
+</script>
+
 <template>
   <div class="rounded-lg border border-default p-5 md:p-7 flex flex-col gap-7">
     <div class="min-w-0 flex flex-col gap-6">

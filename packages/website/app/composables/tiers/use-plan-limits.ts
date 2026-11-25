@@ -1,6 +1,6 @@
-import type { ComputedRef } from 'vue';
 import type { PremiumTierInfo, PremiumTiersInfo } from '~/types/tiers';
 import { get } from '@vueuse/shared';
+import { computed, type ComputedRef } from 'vue';
 import { builtTiersInfo, usePremiumTiersInfo } from '~/composables/tiers/use-premium-tiers-info';
 
 type PaidTier = 'supporter' | 'basic' | 'advanced';

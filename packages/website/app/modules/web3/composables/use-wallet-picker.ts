@@ -1,7 +1,7 @@
 import type { Connector } from '@wagmi/core';
-import type { Ref } from 'vue';
 import { until } from '@vueuse/core';
 import { get, set } from '@vueuse/shared';
+import { type Ref, shallowReadonly, shallowRef } from 'vue';
 import { useWallet } from '~/modules/web3/composables/use-wallet';
 
 /**

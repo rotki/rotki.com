@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { AvailablePlan } from '@rotki/card-payment-common/schemas/plans';
 import { formatEur, formatPercent } from '@rotki/card-payment-common/utils/money';
+import { RuiButton, RuiChip, RuiIcon } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { type PremiumTierInfoDescription, type PremiumTiersInfo, PricingPeriod } from '~/types/tiers';
 import { toTitleCase } from '~/utils/text';
 

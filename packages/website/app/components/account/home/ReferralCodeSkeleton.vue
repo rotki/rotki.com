@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { RuiSkeletonLoader } from '@rotki/ui-library/components';
+</script>
+
 <template>
   <div class="space-y-5">
     <RuiSkeletonLoader class="h-10 w-full" />

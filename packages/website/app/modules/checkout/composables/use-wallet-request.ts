@@ -1,6 +1,7 @@
 import { get, set } from '@vueuse/shared';
 import { err, type Result } from 'plainfp/result';
 import { timeout as withTimeout } from 'plainfp/result-async';
+import { shallowRef } from 'vue';
 import { walletNoAnswer, type Web3Error } from '~/modules/web3/core/errors';
 import { useLogger } from '~/utils/use-logger';
 

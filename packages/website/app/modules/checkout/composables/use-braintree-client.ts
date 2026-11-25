@@ -2,6 +2,8 @@ import type { PaymentErrorContext } from '@rotki/checkout-ui/utils/payment-error
 import type { Client } from 'braintree-web/client';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
+import { readonly, type Ref, ref, shallowReadonly, shallowRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useBraintreeToken } from '~/modules/checkout/composables/use-braintree-token';
 import { usePaymentErrorMessage } from '~/modules/checkout/composables/use-payment-error-message';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';

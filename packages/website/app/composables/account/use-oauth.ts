@@ -2,6 +2,9 @@ import type { LocationQueryValue } from 'vue-router';
 import type { OAuthCallbackParams, OAuthMode, OAuthService, OAuthTokenResponse } from '~/types/oauth';
 import { useTimeoutFn } from '@vueuse/core';
 import { set } from '@vueuse/shared';
+import { computed, type ComputedRef, readonly, type Ref, ref, shallowRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute } from '#app';
 import { OAUTH_CALLBACK_FAILURE, OAUTH_CALLBACK_SUCCESS, OAUTH_DEFAULT_TOKEN_TYPE, OAUTH_REDIRECT_DELAY } from '~/constants/oauth';
 import { useLogger } from '~/utils/use-logger';
 

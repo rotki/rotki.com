@@ -1,5 +1,4 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
-import type { Ref } from 'vue';
 import type {
   CancelSubscriptionConfirmEvent,
   CryptoPaymentState,
@@ -9,6 +8,7 @@ import type {
 } from '~/components/account/home/subscription-table/types';
 import { get, set } from '@vueuse/shared';
 import { storeToRefs } from 'pinia';
+import { computed, type Ref, ref, shallowReadonly } from 'vue';
 import { useSubscriptionCryptoPayment } from '~/composables/subscription/use-subscription-crypto-payment';
 import { useSubscriptionOperations } from '~/composables/subscription/use-subscription-operations';
 import { useSubscriptionOperationsStore } from '~/store/subscription-operations';

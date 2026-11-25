@@ -1,5 +1,6 @@
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import type { ContextColorsType } from '@rotki/ui-library';
+import { useI18n } from 'vue-i18n';
 import { getPlanNameFor } from '~/utils/plans';
 
 interface UseSubscriptionDisplayReturn {

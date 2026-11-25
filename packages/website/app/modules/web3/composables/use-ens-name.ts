@@ -1,7 +1,7 @@
-import type { MaybeRefOrGetter, Ref } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import { set } from '@vueuse/shared';
 import { getOr } from 'plainfp/result';
+import { type MaybeRefOrGetter, type Ref, shallowReadonly, shallowRef, toValue, watch } from 'vue';
 import { peekEnsName } from '~/modules/web3/core/ens-cache';
 import { useLogger } from '~/utils/use-logger';
 

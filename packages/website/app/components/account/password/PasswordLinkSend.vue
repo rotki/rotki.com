@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import { NuxtLink } from '#components';
 import AuthSentTo from '~/components/account/AuthSentTo.vue';
 import AuthShell from '~/components/account/AuthShell.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';

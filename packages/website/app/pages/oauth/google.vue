@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { OAuthTokenResponse } from '~/types/oauth';
 import { get, set } from '@vueuse/shared';
+import { computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute, useRuntimeConfig } from '#app';
 import OAuthPage, { type OAuthPageLabels, type OAuthPageTokens } from '~/components/oauth/OAuthPage.vue';
 import { useOAuth } from '~/composables/account/use-oauth';
 import { usePageSeoNoIndex } from '~/composables/use-page-seo';

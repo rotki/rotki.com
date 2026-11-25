@@ -3,6 +3,7 @@ import type { ThreeDSecure, ThreeDSecureVerificationData, ThreeDSecureVerifyOpti
 import { CARD_NOT_IN_VAULT_MESSAGE, findVaultBin } from '@rotki/card-payment-common/utils/saved-card';
 import { CheckoutPaymentMethods, CheckoutSteps, parseBraintreeError, PaymentServerEvents, PaymentUserError } from '@rotki/sigil';
 import { get, set } from '@vueuse/shared';
+import { onUnmounted, shallowRef } from 'vue';
 import { useBraintreeToken } from '~/modules/checkout/composables/use-braintree-token';
 import { usePaymentCards } from '~/modules/checkout/composables/use-payment-cards';
 import { usePaymentLogger } from '~/modules/checkout/composables/use-payment-logger';

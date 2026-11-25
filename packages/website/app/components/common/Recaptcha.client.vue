@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
+import { nextTick, onMounted, ref, toRef, useTemplateRef } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useHead, useRuntimeConfig } from '#app';
 
 const { theme = 'light', size = 'normal', invalid = false, useRecaptchaNet = false } = defineProps<{
   theme?: 'light' | 'dark';

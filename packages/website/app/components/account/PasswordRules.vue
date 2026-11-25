@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { RuiIcon } from '@rotki/ui-library/components';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { isOnlyDigits, PASSWORD_MIN_LENGTH } from '~/utils/validation';
 
 const { password, errors, invalid = false } = defineProps<{

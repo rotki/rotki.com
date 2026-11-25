@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { get, set } from '@vueuse/shared';
+import { computed, onMounted, ref } from 'vue';
 
 /**
  * "We sent a link to <address>. Open it to ..." with the address on its own line. The form before

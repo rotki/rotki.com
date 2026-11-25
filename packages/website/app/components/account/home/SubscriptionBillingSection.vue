@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Subscription as UserSubscription } from '@rotki/card-payment-common/schemas/subscription';
 import { isCancelledButActive } from '@rotki/card-payment-common/utils/subscription';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const { subscription, formattedDate, relativeTime } = defineProps<{
   subscription: UserSubscription;

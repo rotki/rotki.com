@@ -1,4 +1,6 @@
 import { get, set } from '@vueuse/shared';
+import { readonly } from 'vue';
+import { useCookie, useRoute } from '#app';
 
 const REFERRAL_COOKIE_NAME = 'referral_code';
 const REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
