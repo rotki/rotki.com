@@ -2,19 +2,25 @@
 import { onBeforeMount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useHead, useRuntimeConfig } from '#app';
+import { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 import { definePageMeta } from '#app/composables/pages';
-import DownloadCallToAction from '~/components/common/DownloadCallToAction.vue';
 import DynamicMessageDisplay from '~/components/home/DynamicMessageDisplay.vue';
-import FeatureList from '~/components/home/features/FeatureList.vue';
 import HomeBanner from '~/components/home/HomeBanner.vue';
-import HomeFaq from '~/components/home/HomeFaq.vue';
-import McpSpotlight from '~/components/home/McpSpotlight.vue';
-import PremiumFeatures from '~/components/home/PremiumFeatures.vue';
-import Testimonials from '~/components/home/testimonials/Testimonials.vue';
-import WhyRotki from '~/components/home/WhyRotki.vue';
-import PricingSection from '~/components/pricings/PricingSection.vue';
 import { useDynamicMessages } from '~/composables/use-dynamic-messages';
 import { usePageSeo } from '~/composables/use-page-seo';
+
+/*
+ * Everything below the hero is prerendered as usual but loads its code only when it scrolls into
+ * view, so the first paint does not share the connection with it.
+ */
+const FeatureList = defineLazyHydrationComponent('visible', () => import('~/components/home/features/FeatureList.vue'));
+const WhyRotki = defineLazyHydrationComponent('visible', () => import('~/components/home/WhyRotki.vue'));
+const McpSpotlight = defineLazyHydrationComponent('visible', () => import('~/components/home/McpSpotlight.vue'));
+const Testimonials = defineLazyHydrationComponent('visible', () => import('~/components/home/testimonials/Testimonials.vue'));
+const PremiumFeatures = defineLazyHydrationComponent('visible', () => import('~/components/home/PremiumFeatures.vue'));
+const PricingSection = defineLazyHydrationComponent('visible', () => import('~/components/pricings/PricingSection.vue'));
+const HomeFaq = defineLazyHydrationComponent('visible', () => import('~/components/home/HomeFaq.vue'));
+const DownloadCallToAction = defineLazyHydrationComponent('visible', () => import('~/components/common/DownloadCallToAction.vue'));
 
 const { t } = useI18n({ useScope: 'global' });
 

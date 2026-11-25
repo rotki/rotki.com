@@ -169,6 +169,50 @@ make test-go       # Go tests
 The e2e tests need Chromium once: `pnpm --filter @rotki/website exec playwright install chromium`.
 [CONTRIBUTING.md](CONTRIBUTING.md#checks-before-a-pull-request) lists every check and when to run it.
 
+## Performance budgets
+
+The main public pages are where most visitors arrive, often on a phone. Before the first screen
+can paint, the browser fetches the page's stylesheet and every script the page preloads, and on a
+slow connection those share the same bandwidth. Each extra kilobyte up front delays the first
+paint, even when the code is only needed further down the page.
+
+`pnpm --filter @rotki/website check:initial-chunks` reads the generated site (run it after
+`pnpm build`) and fails, in CI as well, when:
+
+- a page loads wallet or payment code up front,
+- a heavy ui-library widget (data table, autocomplete, menu select, text area) loads on most
+  pages, or
+- one of the pages below goes over its budget.
+
+| Page                 | Initial JS budget (gzip) | Measured (2026-11) |
+| -------------------- | ------------------------ | ------------------ |
+| `/`                  | 245 KB                   | 237 KB             |
+| `/products`          | 245 KB                   | 237 KB             |
+| `/pricing`           | 255 KB                   | 251 KB             |
+| `/download`          | 280 KB                   | 273 KB             |
+| `/integrations`      | 255 KB                   | 246 KB             |
+| `/integrations/aave` | 245 KB                   | 236 KB             |
+| `/compare`           | 255 KB                   | 247 KB             |
+| `/compare/koinly`    | 255 KB                   | 247 KB             |
+| `/features`          | 255 KB                   | 247 KB             |
+
+Those pages may also block their first paint on one stylesheet only (`entry.css`). A component
+that imports its own CSS gets a second `<link rel="stylesheet">`, which costs another round trip
+before anything shows. Import such CSS in `app/assets/css/tailwind.css` instead.
+
+**Why these numbers.** Each budget is the page's size after the November 2026 trim plus 5 to 10 KB
+of room. The trim took the home page from 303 to 237 KB and its Lighthouse mobile score from 64
+to 76 on a local build (LCP 5.3 s to 4.4 s, total blocking time 255 ms to 109 ms). The budgets
+exist to keep that gain, not as a target to fill.
+
+**When a page goes over.** The usual cause is a section below the first screen imported
+eagerly. Load it with `defineLazyHydrationComponent('visible', () => import('...'))` from
+`#app/composables/lazy-hydration`, as `app/pages/index.vue` does: the section is still
+prerendered for search engines, and its code loads when it scrolls into view. If the extra code
+is really needed up front, raise the budget in `PAGE_BUDGETS_KB`
+(`packages/website/scripts/check-initial-chunks.ts`) in the same pull request and say why in its
+description.
+
 ## Links sent in emails
 
 The Python backend (rotki-web) sends emails that link to these pages. Changing a path or a query

@@ -144,9 +144,10 @@ pnpm --filter @rotki/website check:initial-chunks
 ```
 
 Run it after the same build. It lists how much JavaScript each page loads before it becomes
-interactive, and fails when a public page loads wallet or payment code up front. Compare the
-**JS (gzip KB)** column for the pages you touched against a build of `main`: a jump of more than
-a few KB on `/` or `/pricing` needs a reason.
+interactive. It fails when a public page loads wallet or payment code up front, or when one of
+the main public pages goes over its budget or blocks on a second stylesheet. The budgets, why
+they are set where they are and what to do when a page goes over are in
+[README.md](README.md#performance-budgets).
 
 ### Lighthouse (performance, accessibility, best practices, SEO)
 

@@ -1,4 +1,8 @@
 @import 'swiper/css' layer(base);
+
+/* In the main stylesheet rather than the slider's own, which would block the first paint as a second request. */
+@import 'swiper/css/pagination' layer(base);
+@import 'swiper/css/navigation' layer(base);
 @import 'tailwindcss' source(none);
 @import '@rotki/ui-library/tailwind.css';
 

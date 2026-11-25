@@ -7,8 +7,6 @@ import { ref } from 'vue';
 import { useHead } from '#app';
 import Carousel from '~/components/common/carousel/Carousel.vue';
 import CarouselControls from '~/components/common/carousel/CarouselControls.vue';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
 
 defineProps<{
   hideThumbnail?: boolean;

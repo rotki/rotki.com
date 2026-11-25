@@ -2,7 +2,6 @@
 import type { Swiper } from 'swiper/types';
 import { RuiFooterStepper } from '@rotki/ui-library/components';
 import { get, set } from '@vueuse/shared';
-import 'swiper/css';
 
 const swiper = defineModel<Swiper>('swiper');
 

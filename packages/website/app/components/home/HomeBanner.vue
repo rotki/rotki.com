@@ -5,10 +5,13 @@ import { get } from '@vueuse/shared';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRuntimeConfig } from '#app';
+import { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 import { NuxtLink } from '#components';
-import AppShowcaseSlider from '~/components/common/AppShowcaseSlider.vue';
 import ButtonLink from '~/components/common/ButtonLink.vue';
 import { useIntegrationsData } from '~/composables/use-integrations-data';
+
+// The slider is prerendered; its swiper code loads once the page is idle, after the first paint.
+const AppShowcaseSlider = defineLazyHydrationComponent('idle', () => import('~/components/common/AppShowcaseSlider.vue'));
 
 const { t } = useI18n({ useScope: 'global' });
 

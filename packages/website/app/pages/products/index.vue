@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import CampaignRibbon from '@rotki/checkout-ui/components/CampaignRibbon.vue';
 import { useI18n } from 'vue-i18n';
+import { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 import { definePageMeta } from '#app/composables/pages';
-import PricingSection from '~/components/pricings/PricingSection.vue';
-import ProductsAnalytics from '~/components/products/ProductsAnalytics.vue';
 import ProductsBlocks from '~/components/products/ProductsBlocks.vue';
-import ProductsFooter from '~/components/products/ProductsFooter.vue';
 import ProductsHeading from '~/components/products/ProductsHeading.vue';
-import ProductsLimits from '~/components/products/ProductsLimits.vue';
-import ProductsNewFeatures from '~/components/products/ProductsNewFeatures.vue';
-import ProductsTimeframe from '~/components/products/ProductsTimeframe.vue';
 import { useAppConfig } from '~/composables/use-app-config';
 import { usePageSeo } from '~/composables/use-page-seo';
+
+// Prerendered as usual; the code below the first screen loads when it scrolls into view.
+const ProductsNewFeatures = defineLazyHydrationComponent('visible', () => import('~/components/products/ProductsNewFeatures.vue'));
+const ProductsAnalytics = defineLazyHydrationComponent('visible', () => import('~/components/products/ProductsAnalytics.vue'));
+const ProductsLimits = defineLazyHydrationComponent('visible', () => import('~/components/products/ProductsLimits.vue'));
+const ProductsTimeframe = defineLazyHydrationComponent('visible', () => import('~/components/products/ProductsTimeframe.vue'));
+const PricingSection = defineLazyHydrationComponent('visible', () => import('~/components/pricings/PricingSection.vue'));
+const ProductsFooter = defineLazyHydrationComponent('visible', () => import('~/components/products/ProductsFooter.vue'));
 
 const { t } = useI18n({ useScope: 'global' });
 

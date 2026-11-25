@@ -5,10 +5,12 @@
  * through the static `import` statements of the built chunks, reports the
  * gzipped total, and fails when:
  *
- * - a page reaches a chunk that only wallet or payment flows need, or
- * - most pages load one of the ui-library's heavy form or table widgets.
+ * - a page reaches a chunk that only wallet or payment flows need,
+ * - most pages load one of the ui-library's heavy form or table widgets, or
+ * - one of the main public pages goes over its JavaScript budget or blocks its
+ *   first paint on more than one stylesheet (`PAGE_BUDGETS_KB`).
  *
- * Why: both regressions are silent, the site just gets slower.
+ * Why: these regressions are silent, the site just gets slower.
  * - The chunk layout in nuxt.config.ts depends on group order. When a heavy group
  *   claims a shared module (Vue, Vite's preload helper, `destr`), every page
  *   starts downloading the wallet SDKs.
@@ -51,6 +53,29 @@ const HEAVY_UI_COMPONENTS: readonly string[] = [
 /** A heavy ui-library component loaded by more than this share of pages fails the check. */
 const MAX_UI_COMPONENT_PAGE_SHARE = 0.5;
 
+/**
+ * Initial JavaScript budgets (gzip KB) for the most visited public pages: their measured size plus
+ * a little room. A page over budget usually imports a below-the-fold section eagerly; load it with
+ * `defineLazyHydrationComponent` instead, or raise the budget in the same pull request and say why.
+ */
+const PAGE_BUDGETS_KB: Readonly<Record<string, number>> = {
+  '/': 245,
+  '/products': 245,
+  '/pricing': 255,
+  '/download': 280,
+  '/integrations': 255,
+  '/integrations/aave': 245,
+  '/compare': 255,
+  '/compare/koinly': 255,
+  '/features': 255,
+};
+
+/**
+ * Stylesheets those pages may block their first paint on. Each extra one costs a round trip before
+ * anything shows; put component CSS in `app/assets/css/tailwind.css` instead.
+ */
+const MAX_BLOCKING_STYLESHEETS = 1;
+
 const STATIC_IMPORT_RE = /(?:from|import)\s*"\.\/([^"]+\.js)"/g;
 const COMPONENT_NAME_RE = /__name:`(Rui\w+)`/g;
 
@@ -58,6 +83,7 @@ interface PageReport {
   route: string;
   chunks: number;
   gzipBytes: number;
+  stylesheets: number;
   heavy: string[];
   uiComponents: Set<string>;
 }
@@ -126,12 +152,31 @@ function closure(roots: string[], readChunk: (file: string) => ChunkInfo): Set<s
   return seen;
 }
 
+/** Appends the budget table to `lines` and returns the budgeted routes that fail. */
+function checkBudgets(reports: PageReport[], lines: string[]): string[] {
+  const failed: string[] = [];
+  lines.push(
+    '\n| Budgeted page | JS (gzip KB) | Budget | Blocking stylesheets |',
+    '| --- | --- | --- | --- |',
+  );
+  for (const [route, budgetKb] of Object.entries(PAGE_BUDGETS_KB)) {
+    const page = reports.find(r => r.route === route);
+    const isOver = !page || page.gzipBytes / 1024 > budgetKb || page.stylesheets > MAX_BLOCKING_STYLESHEETS;
+    if (isOver)
+      failed.push(route);
+    const js = page ? (page.gzipBytes / 1024).toFixed(1) : 'not generated';
+    lines.push(`| ${isOver ? '🔴 ' : ''}\`${route}\` | ${js} | ${budgetKb} | ${page?.stylesheets ?? '-'} / ${MAX_BLOCKING_STYLESHEETS} |`);
+  }
+  return failed;
+}
+
 function main(): void {
   const readChunk = createChunkReader(path.join(DIST, '_nuxt'));
 
   const reports: PageReport[] = [];
   for (const page of collectPages(DIST)) {
-    const roots = initialScripts(readFileSync(path.join(DIST, page), 'utf8'));
+    const html = readFileSync(path.join(DIST, page), 'utf8');
+    const roots = initialScripts(html);
     if (roots.length === 0)
       continue;
     const chunks = [...closure(roots, readChunk)];
@@ -139,6 +184,7 @@ function main(): void {
       route: routeFor(page),
       chunks: chunks.length,
       gzipBytes: chunks.reduce((sum, file) => sum + readChunk(file).gzipBytes, 0),
+      stylesheets: Array.from(html.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/gi)).length,
       heavy: chunks.filter(file => HEAVY_CHUNKS.some(prefix => file.startsWith(prefix))),
       uiComponents: new Set(chunks.flatMap(file => readChunk(file).components)
         .filter(name => HEAVY_UI_COMPONENTS.includes(name))),
@@ -177,12 +223,15 @@ function main(): void {
     lines.push(`| ${icon}\`${c.name}\` | ${c.pages} |`);
   }
 
+  const overBudget = checkBudgets(reports, lines);
+
   const report = lines.join('\n');
   console.log(report);
   if (process.env.GITHUB_STEP_SUMMARY)
     appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${report}\n`);
 
-  if (failing.length > 0 || leakedComponents.length > 0)
+  const problems = failing.length + leakedComponents.length + overBudget.length;
+  if (problems > 0)
     process.exit(1);
 }
 
