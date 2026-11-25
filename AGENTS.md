@@ -41,7 +41,7 @@ make test-go      # Run Go tests
 
 - Start `make dev` in the background and open `http://localhost:3000`, never `:3001`. Wait for `/health` and the first page compile (up to a minute).
 - With a Chromium MCP, check every page the change touches: console free of errors, `[Vue warn]` and hydration warnings, screenshots at 375, 768 and 1280 px, the changed interactions, no unexplained failed `/webapi` calls.
-- Run `pnpm lint`, `pnpm typecheck` and `pnpm test` for every change. CI does not run typecheck. For routing, data loading or config changes, also `pnpm build`, `pnpm check:routes` and `pnpm test:e2e`.
+- Run `pnpm lint`, `pnpm typecheck` and `pnpm test` for every change. For routing, data loading or config changes, also `pnpm build`, `pnpm check:routes` and `pnpm test:e2e`.
 - For public pages, build with `NUXT_PUBLIC_BASE_URL=https://rotki.com`, then run `seo:audit`, `check:initial-chunks` and `pnpm lighthouse` and compare with `main`, not with absolute targets (see "SEO and Lighthouse on public pages" in CONTRIBUTING.md).
 - Only one `nuxi dev` runs per checkout. `pnpm test:e2e` uses its own ports and build folder, so it can run beside `make dev`.
 - Never type real passwords, card numbers or seed phrases. Never commit `.env` files.

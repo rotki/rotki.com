@@ -193,8 +193,8 @@ To check a single page, including one Lighthouse CI does not cover:
 
 ## Checks before a pull request
 
-Run these from the repository root. CI runs all of them except `pnpm typecheck` and
-`pnpm i18n:check`, so those two only get checked here.
+Run these from the repository root. CI runs all of them except `pnpm i18n:check`, so that one
+only gets checked here.
 
 | Command                                   | What it checks                                                                                             | Time    |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------- |

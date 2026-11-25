@@ -114,6 +114,10 @@ jobs:
       - name: Run linter 👀
         run: pnpm run lint:all
 
+      # Nothing is auto-imported, so a missing import only shows up here (and in the build, much later).
+      - name: Typecheck 🔎
+        run: pnpm run typecheck
+
       - name: Build 🚧
         run: pnpm run build
 

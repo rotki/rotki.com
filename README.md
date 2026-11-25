@@ -162,7 +162,7 @@ make lint          # Go + frontend
 pnpm test          # unit tests (Vitest)
 pnpm test:watch    # unit tests in watch mode
 pnpm test:e2e      # end-to-end tests (Playwright)
-pnpm typecheck     # not run by CI, so run it before a pull request
+pnpm typecheck     # TypeScript and Vue templates, including missing imports
 make test-go       # Go tests
 ```
 

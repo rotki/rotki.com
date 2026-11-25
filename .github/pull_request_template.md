@@ -8,7 +8,7 @@ Closes #(issue_number)
 
 ## Checklist
 
-- [ ] `pnpm lint` and `pnpm typecheck` pass (CI does not run typecheck)
+- [ ] `pnpm lint` and `pnpm typecheck` pass
 - [ ] `pnpm test` passes
 - [ ] Changed pages checked in the browser at 375, 768 and 1280 px, console clean
 - [ ] For routing, data loading or config changes: `pnpm build`, `pnpm check:routes` and `pnpm test:e2e` pass
