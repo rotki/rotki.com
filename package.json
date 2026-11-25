@@ -29,6 +29,8 @@
     "coverage": "pnpm -r coverage",
     "check:card-bundle": "node scripts/check-card-bundle.mjs",
     "check:routes": "node scripts/check-routes.mjs",
+    "lighthouse": "rimraf .lighthouseci && npx -y @lhci/cli@0.15.1 autorun --config=./lighthouserc.json",
+    "lighthouse:summary": "node scripts/lighthouse-summary.mjs",
     "i18n:check": "node scripts/check-i18n.mjs",
     "i18n:clean": "node scripts/check-i18n.mjs --delete",
     "prepare": "husky",
