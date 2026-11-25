@@ -163,11 +163,14 @@ browser to see what each audit flags.
 Read the numbers like this:
 
 - **SEO** should be 100 and **Accessibility** 95 or higher. These do not depend on the machine.
-- **Performance** depends on the machine and on the local server, which does not compress files
-  the way production does. Local mobile scores of 65 to 80 are normal. Do not chase the 90 target
-  locally; compare against a run on `main` on the same machine instead. A drop of more than 5
-  points, or a higher LCP (largest contentful paint) or TBT (total blocking time), points to the
-  change.
+- **Performance** depends on the machine and on the server. The local server speaks HTTP/1.1
+  while production uses HTTP/2, and Lighthouse's simulated slow phone loads the ~80 script files
+  much more slowly over HTTP/1.1. Local mobile scores come out about 10 points below production
+  (late 2026: home 65 locally, 76 on rotki.com). Do not chase the 90 target locally; compare
+  against a run on `main` on the same machine instead. A drop of more than 5 points, or a higher
+  LCP (largest contentful paint) or TBT (total blocking time), points to the change.
+- To measure production itself, run Lighthouse against it:
+  `npx -y @lhci/cli@0.15.1 collect --url=https://rotki.com/ --numberOfRuns=3`.
 - **CLS** (layout shift) should stay at 0. Anything above 0.1 means content jumps while loading,
   usually an image without a size or text that appears late.
 
