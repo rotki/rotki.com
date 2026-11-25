@@ -72,7 +72,15 @@ const modes: { icon: RuiIcons; title: string; description: string; isDefault?: b
             {{ t('home.mcp.learn_more') }}
           </ButtonLink>
           <ButtonLink
-            to="https://docs.rotki.com/usage-guides/mcp.html"
+            to="/features/local-finance-data-for-ai-agents"
+            color="primary"
+            variant="outlined"
+            rounded
+          >
+            {{ t('home.mcp.build_with_rotki') }}
+          </ButtonLink>
+          <ButtonLink
+            to="https://docs.rotki.com/usage-guides/mcp.html?utm_source=rotki.com&utm_medium=referral&utm_campaign=build-on-rotki"
             external
             color="primary"
             variant="outlined"

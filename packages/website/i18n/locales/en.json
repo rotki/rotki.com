@@ -912,7 +912,8 @@
     },
     "explore_features": "Explore all features",
     "mcp": {
-      "badge": "New in 1.44",
+      "badge": "Local, private and read-only",
+      "build_with_rotki": "Build with rotki",
       "detail": "rotki runs an MCP server on your own computer, so an assistant such as Claude Code, OpenCode or ChatGPT can query your history and balances. Access is read-only, and identifiers are masked before anything reaches the assistant.",
       "learn_more": "How it works",
       "modes": {
