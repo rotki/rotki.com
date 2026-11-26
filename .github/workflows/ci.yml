@@ -140,6 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write # Codecov upload over OIDC
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -214,7 +215,8 @@ jobs:
           files: packages/website/coverage/lcov.info,packages/sigil/coverage/lcov.info,packages/card-payment-common/coverage/lcov.info,packages/card-payment/coverage/lcov.info,packages/checkout-ui/coverage/lcov.info
           disable_search: true
           flags: unit
-          token: ${{ secrets.CODECOV_TOKEN }}
+          # A fork PR gets no OIDC token; Codecov accepts its upload without one.
+          use_oidc: ${{ !github.event.pull_request.head.repo.fork }}
 
       - name: Set .env
         run: cp .env.test .env
@@ -229,7 +231,7 @@ jobs:
           files: packages/website/tests/e2e/coverage/lcov.info
           disable_search: true
           flags: e2e
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: ${{ !github.event.pull_request.head.repo.fork }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -252,6 +254,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write # Codecov upload over OIDC
     defaults:
       run:
         working-directory: backend
@@ -279,7 +282,8 @@ jobs:
           files: backend/coverage.out
           disable_search: true
           flags: backend
-          token: ${{ secrets.CODECOV_TOKEN }}
+          # A fork PR gets no OIDC token; Codecov accepts its upload without one.
+          use_oidc: ${{ !github.event.pull_request.head.repo.fork }}
 
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
