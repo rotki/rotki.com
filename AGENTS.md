@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to coding agents working with code in this repository.
+This file provides guidance to coding agents working with code in this repository. `CLAUDE.md` only imports it, so edit this file.
 
 ## Project Overview
 
@@ -52,6 +52,18 @@ make test-go      # Run Go tests
 ```bash
 pnpm release      # Bump version and generate changelog
 ```
+
+### Commits and Maintenance
+
+- Conventional commits (`type(scope): subject`), one change per commit, with a body saying what changed and why.
+- Record the model and harness as trailers, as rotki does. Never add `Co-Authored-By` for an AI tool, session links or "Generated with" lines:
+
+  ```text
+  LLM-Model: anthropic/<model-id>
+  Harness: Claude Code <version>
+  ```
+
+- For dependency updates, GitHub Actions changes (zizmor and actionlint) and releases, follow "Maintenance" in [README.md](README.md#maintenance).
 
 ## Architecture Overview
 
