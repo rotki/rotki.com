@@ -231,6 +231,149 @@ Saved cards now live on `/home/billing`. The Go server redirects `/home/saved-ca
 name `/home/payment-methods`, which still appears in sent emails, to `/home/billing`; keep both
 redirects.
 
+## Maintenance
+
+This section is for maintainers. To make a change and check it, start with
+[CONTRIBUTING.md](CONTRIBUTING.md), which lists the checks, the branch names and the commit format.
+
+The [maintainers](https://github.com/orgs/rotki/teams/maintainers) team owns every path (see
+`CODEOWNERS`). Pull requests target `main` and are squash merged, so the PR title becomes the commit
+on `main` and its subject becomes a line in the release notes.
+
+### Commits written with an agent
+
+Agent instructions live in [AGENTS.md](AGENTS.md). `CLAUDE.md` holds only `@AGENTS.md`, so Claude
+Code reads the same file as Codex and other agents. Edit `AGENTS.md`, never `CLAUDE.md`, and update
+it when a convention changes: the agent follows what it says, not what the code happens to do.
+
+A commit written with an agent records the model and the harness as trailers, as rotki does. Do not
+add `Co-Authored-By` for an AI tool, a session link or a "Generated with" line:
+
+```text
+fix(checkout): keep the plan when the card form reloads
+
+<what changed and why>
+
+LLM-Model: anthropic/claude-opus-5-5
+Harness: Claude Code 2.1.318
+```
+
+Every non-trivial fix or feature gets a body that says what changed and why, with the root cause
+for a bug. A dependency update says which breaking changes were checked and why they do not apply.
+
+### Lessons from working with agents
+
+- **Run the checks before saying they passed**, and say which ones did not run. The list per change
+  is in [CONTRIBUTING.md](CONTRIBUTING.md#what-to-run-for-what-change).
+- **Read the code before acting on a finding.** Agent reviews report missing error handling or
+  validation that sits one call deeper. Trace the call first.
+- **Fix what stricter checks find instead of silencing it.** Strict template type-checking and the
+  sonarjs rules each found real bugs (an unimported component, an event that never fired, a dead
+  branch). Prefer a fix over `eslint-disable` or an `as` cast.
+- **Keep the lint-enforced writing rules.** The slop rules reject em dashes and long comments.
+  Comments say why in a sentence or two; the commit body carries the rest.
+- **Every override and exception says when to drop it.** Entries under `overrides` and
+  `trustPolicyExclude` in `pnpm-workspace.yaml` carry a comment with the reason (an advisory ID
+  where there is one). Remove them once the reason is gone.
+
+### Dependency updates
+
+Renovate lists updates on the dependency dashboard issue and opens a PR only once a maintainer
+approves it there; maintainers also update by hand. Security alert PRs are the exception: Renovate
+opens them right away, without approval or the release age wait.
+
+- **A release must be 7 days old** (`minimumReleaseAge` in `pnpm-workspace.yaml` and Renovate).
+  First-party `@rotki/*` packages are exempt. Apply the same wait to Go modules and pinned actions.
+  To take a release early on purpose, add its exact versions (`nuxt@4.7.0`) to
+  `minimumReleaseAgeExclude` with a comment, never a bare name.
+- **Versions live in the catalog** in `pnpm-workspace.yaml`, pinned exactly (`saveExact`).
+  Packages refer to them as `catalog:`.
+- **Same-major updates go together** in one `chore(deps): update dependencies` commit. **Each
+  major gets its own commit**, after reading its changelog, with a body saying what changed for us.
+- `@types/node` stays on the Node major in `.nvmrc`; `tailwindcss` and `@tailwindcss/vite` move
+  together.
+
+A same-major update by hand:
+
+```bash
+pnpm outdated -r                  # what is behind
+# bump the catalog entries whose newest same-major release is at least 7 days old
+pnpm install
+pnpm audit                        # transitive advisories left
+cd backend && go list -m -u all   # Go modules: go get <module>@<version>, go mod tidy
+```
+
+Then run the checks for a `nuxt.config.ts` change from CONTRIBUTING.md, plus `make test-go`.
+
+When `pnpm audit` still reports a transitive package whose parent's range allows the fixed
+version, try `pnpm dedupe` first. pnpm often keeps the version it already resolved, so if the
+advisory remains, add a narrow override (`pkg@^x: x.y.z`) with its advisory ID. When the fix
+needs a range the parent does not allow, leave it and list it in the commit body, unless the
+advisory is critical and the override is tested.
+
+`trustPolicy: no-downgrade` fails the install when a new version lost the provenance an older one
+had. Do not add a `trustPolicyExclude` entry without finding out why the provenance went away.
+
+### GitHub Actions changes
+
+Actions are pinned to a full commit SHA with the tag in a comment (`helpers:pinGitHubActionDigests`
+in Renovate). Workflows start with `permissions: {}`, each job asks for what it needs, and checkouts
+use `persist-credentials: false`. When updating an action, check that the SHA matches the tag and
+that every input the workflow passes still exists at that SHA.
+
+Run both linters on any workflow change before pushing:
+
+```bash
+zizmor .github/workflows
+actionlint -ignore 'step must run script'
+```
+
+zizmor finds security problems (template injection, broad permissions, credential leaks) and must
+report nothing. Its support for `parallel:` step groups is experimental, so read the steps inside
+them yourself too. The actionlint ignore is there because actionlint (1.7.12) does not know the
+`parallel:` step groups in `ci.yml`; any other report is real.
+
+Codecov uploads authenticate with OIDC (`use_oidc`, which needs `id-token: write` on the job), so
+no `CODECOV_TOKEN` secret is used. A pull request from a fork gets no OIDC token, so `use_oidc` is
+off for it and it uploads tokenless, which Codecov accepts for fork branches of a public
+repository.
+
+### Releases
+
+Versions follow the calendar: `YYYY.M.patch` (`v2026.10.0`, then `v2026.10.1` for a fix in the
+same month). Release from an up-to-date `main` with CI green:
+
+```bash
+git switch main && git pull
+pnpm release                      # bumpp: pick the version, bump every package, commit and tag
+git push origin main --follow-tags
+```
+
+`pnpm release` writes the `chore: release vX` commit and an annotated `vX` tag without pushing. The
+tag push runs the `Release` workflow, which builds the GitHub release notes from the conventional
+commits with changelogithub, so the commit subjects are the changelog.
+
+### Optional agent skills
+
+Agent skills give an agent library documentation it would otherwise guess at. None are required,
+and the repository ships none. These were useful here; install them for your own agent with the
+[skills CLI](https://github.com/vercel-labs/skills): `npx skills add <source>`, or
+`npx skills add <source> --skill <name>` for one skill.
+
+| Source                     | Skills                                                                          | Use                                                    |
+| -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `antfu/skills`             | `nuxt`, `vue`, `pinia`, `vite`, `vitest`, `pnpm`, `nitro`, `antfu-simplify`     | Framework APIs; `antfu-simplify` trims a finished diff |
+| `vuejs-ai/skills`          | `vue-best-practices`, `vue-router-best-practices`, `vue-testing-best-practices` | Vue 3 patterns, router guards, component tests         |
+| `vueuse/skills`            | `vueuse-functions`                                                              | Picking the right VueUse composable                    |
+| `rolldown/tsdown`          | `tsdown`                                                                        | Building the shared packages                           |
+| `kelsos/plainfp`           | `plainfp`                                                                       | `Result` and `Option` code in the website and card app |
+| `wshobson/agents`          | `e2e-testing-patterns`, `typescript-advanced-types`                             | Playwright tests, complex types                        |
+| `vercel-labs/agent-skills` | `web-design-guidelines`                                                         | Accessibility and UI review                            |
+
+Claude Code also has built-in commands that fit these checks: `/code-review` for a review of the
+branch, `/simplify` for cleanup and `/security-review` for payment and auth changes. Treat their
+findings like any review and verify each one in the code before changing anything.
+
 ## License
 
 rotki.com is licensed under the [GNU Affero General Public License v3.0](LICENSE.md).
