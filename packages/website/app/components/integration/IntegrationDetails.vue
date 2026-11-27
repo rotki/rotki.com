@@ -49,7 +49,13 @@ function cleanString(text: string) {
 
 const { data: integrationData, filterDuplicateData } = useIntegrationsData();
 
-const data = computed<Record<string, { title: string; description: string; data: { label: string; image: string }[] }>>(() => {
+interface IntegrationSection {
+  title: string;
+  description: string;
+  data: { label: string; image: string }[];
+}
+
+const data = computed<Record<string, IntegrationSection>>(() => {
   const searchVal = get(searchDebounced);
 
   const filter = (data: { label: string; image: string }[]) => data.filter(item => cleanString(item.label).includes(cleanString(searchVal)));
@@ -77,6 +83,28 @@ const data = computed<Record<string, { title: string; description: string; data:
 
 const isAllSelected = computed<boolean>(() => get(tab) === 'all');
 const total = computed<number>(() => Object.values(get(data)).reduce((accumulator, item) => accumulator + item.data.length, 0));
+
+interface DisplayEntry {
+  key: string;
+  section?: IntegrationSection;
+}
+
+/**
+ * The outer TransitionGroup's children as one flat keyed list. A v-if/v-else or a
+ * `<template v-for>` directly inside the group makes the server render fragment and
+ * v-if comments that the client TransitionGroup drops, which breaks hydration.
+ * An entry without a section is the "no results" message.
+ */
+const displayEntries = computed<DisplayEntry[]>(() => {
+  const allSelected = get(isAllSelected);
+  if (allSelected && get(total) === 0)
+    return [{ key: 'not-found' }];
+
+  const selectedTab = get(tab);
+  return Object.entries(get(data))
+    .filter(([key, section]) => (allSelected && section.data.length > 0) || selectedTab === key)
+    .map(([key, section]) => ({ key, section }));
+});
 
 const [DefineNotFound, ReuseNotFound] = createReusableTemplate<{
   keyword: string;
@@ -129,28 +157,26 @@ const { isMdAndUp } = useBreakpoint();
         leave-to-class="opacity-0"
         class="flex-1 flex flex-col gap-10"
       >
-        <div v-if="isAllSelected && total === 0">
-          <ReuseNotFound :keyword="searchDebounced" />
-        </div>
-        <template
-          v-for="(datum, key) in data"
-          v-else
-          :key="key"
+        <div
+          v-for="entry in displayEntries"
+          :key="entry.key"
+          :class="{ 'flex flex-col gap-10': entry.section }"
         >
-          <div
-            v-if="(isAllSelected && datum.data.length > 0) || tab === key"
-            class="flex flex-col gap-10"
-          >
+          <ReuseNotFound
+            v-if="!entry.section"
+            :keyword="searchDebounced"
+          />
+          <template v-else>
             <div class="flex flex-col gap-4">
               <h2 class="text-h3">
-                {{ datum.title }}
+                {{ entry.section.title }}
               </h2>
               <p class="text-rui-text-secondary text-body-1">
-                {{ datum.description }}
+                {{ entry.section.description }}
               </p>
             </div>
             <ReuseNotFound
-              v-if="datum.data.length === 0"
+              v-if="entry.section.data.length === 0"
               :keyword="searchDebounced"
             />
             <TransitionGroup
@@ -164,13 +190,13 @@ const { isMdAndUp } = useBreakpoint();
               class="flex flex-wrap gap-4"
             >
               <IntegrationTile
-                v-for="item in datum.data"
+                v-for="item in entry.section.data"
                 :key="item.label"
                 :item="item"
               />
             </TransitionGroup>
-          </div>
-        </template>
+          </template>
+        </div>
       </TransitionGroup>
     </div>
   </div>
