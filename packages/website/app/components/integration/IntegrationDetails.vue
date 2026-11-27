@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { IntegrationItem } from '~/types/integrations';
 import { RuiDivider, RuiTab, RuiTabs, RuiTextField } from '@rotki/ui-library/components';
 import { useBreakpoint } from '@rotki/ui-library/composables';
 import { createReusableTemplate, refDebounced } from '@vueuse/core';
@@ -52,13 +53,13 @@ const { data: integrationData, filterDuplicateData } = useIntegrationsData();
 interface IntegrationSection {
   title: string;
   description: string;
-  data: { label: string; image: string }[];
+  data: IntegrationItem[];
 }
 
 const data = computed<Record<string, IntegrationSection>>(() => {
   const searchVal = get(searchDebounced);
 
-  const filter = (data: { label: string; image: string }[]) => data.filter(item => cleanString(item.label).includes(cleanString(searchVal)));
+  const filter = (data: IntegrationItem[]): IntegrationItem[] => data.filter(item => cleanString(item.label).includes(cleanString(searchVal)));
 
   const integrationDataVal = filterDuplicateData({ ...get(integrationData) });
 
@@ -82,7 +83,6 @@ const data = computed<Record<string, IntegrationSection>>(() => {
 });
 
 const isAllSelected = computed<boolean>(() => get(tab) === 'all');
-const total = computed<number>(() => Object.values(get(data)).reduce((accumulator, item) => accumulator + item.data.length, 0));
 
 interface DisplayEntry {
   key: string;
@@ -96,14 +96,20 @@ interface DisplayEntry {
  * An entry without a section is the "no results" message.
  */
 const displayEntries = computed<DisplayEntry[]>(() => {
-  const allSelected = get(isAllSelected);
-  if (allSelected && get(total) === 0)
+  const entries = Object.entries(get(data));
+
+  if (!get(isAllSelected)) {
+    const selectedTab = get(tab);
+    return entries
+      .filter(([key]) => key === selectedTab)
+      .map(([key, section]) => ({ key, section }));
+  }
+
+  const nonEmpty = entries.filter(([, section]) => section.data.length > 0);
+  if (nonEmpty.length === 0)
     return [{ key: 'not-found' }];
 
-  const selectedTab = get(tab);
-  return Object.entries(get(data))
-    .filter(([key, section]) => (allSelected && section.data.length > 0) || selectedTab === key)
-    .map(([key, section]) => ({ key, section }));
+  return nonEmpty.map(([key, section]) => ({ key, section }));
 });
 
 const [DefineNotFound, ReuseNotFound] = createReusableTemplate<{
@@ -160,7 +166,7 @@ const { isMdAndUp } = useBreakpoint();
         <div
           v-for="entry in displayEntries"
           :key="entry.key"
-          :class="{ 'flex flex-col gap-10': entry.section }"
+          class="flex flex-col gap-10"
         >
           <ReuseNotFound
             v-if="!entry.section"
