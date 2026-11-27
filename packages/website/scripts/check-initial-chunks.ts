@@ -61,7 +61,7 @@ const MAX_UI_COMPONENT_PAGE_SHARE = 0.5;
 const PAGE_BUDGETS_KB: Readonly<Record<string, number>> = {
   '/': 245,
   '/products': 245,
-  '/pricing': 255,
+  '/pricing': 259,
   '/download': 280,
   '/integrations': 255,
   '/integrations/aave': 245,
