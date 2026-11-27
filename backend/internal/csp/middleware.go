@@ -27,7 +27,9 @@ const maxBufferSize = 512 << 10 // 512KB — SSG pages are small
 func Middleware(next http.Handler, devConnectSrc ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Only intercept GET/HEAD for HTML pages (not API routes, assets, etc.)
-		if !shouldInjectCSP(r.URL.Path) {
+		// Protocol upgrades (WebSockets) carry no HTML and need the connection
+		// itself, which the buffered writer below cannot hand over.
+		if !shouldInjectCSP(r.URL.Path) || r.Header.Get("Upgrade") != "" {
 			next.ServeHTTP(w, r)
 			return
 		}

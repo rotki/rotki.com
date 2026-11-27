@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -81,21 +82,9 @@ func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps, error) {
 		mux.Handle("/", static)
 	}
 
-	// Wrap with middleware (outermost runs first)
-	var handler http.Handler = mux
-	if cfg.DevMode {
-		// Allow Vite HMR WebSocket connections in dev mode
-		handler = cspmod.Middleware(handler, "ws:", "wss:")
-	} else {
-		handler = cspmod.Middleware(handler)
-	}
-	handler = securityHeaders(handler)
-	handler = requestLogger(handler, logger)
-	handler = recovery(handler, logger)
-
 	return &http.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.Port),
-		Handler:           handler,
+		Handler:           withMiddleware(mux, cfg.DevMode, logger),
 		ReadHeaderTimeout: 10 * time.Second,
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      60 * time.Second,
@@ -107,6 +96,21 @@ func New(cfg *config.Config, logger *slog.Logger) (*http.Server, *Deps, error) {
 		// a few seconds of each other.
 		IdleTimeout: 30 * time.Second,
 	}, deps, nil
+}
+
+// withMiddleware wraps the router with the CSP, security header, request
+// logging and panic recovery middleware (outermost runs first).
+func withMiddleware(mux http.Handler, devMode bool, logger *slog.Logger) http.Handler {
+	handler := mux
+	if devMode {
+		// Allow Vite HMR WebSocket connections in dev mode
+		handler = cspmod.Middleware(handler, "ws:", "wss:")
+	} else {
+		handler = cspmod.Middleware(handler)
+	}
+	handler = securityHeaders(handler)
+	handler = requestLogger(handler, logger)
+	return recovery(handler, logger)
 }
 
 // handleHealth returns a JSON health check response with version info.
@@ -192,4 +196,23 @@ func (rw *responseWriter) Write(b []byte) (int, error) {
 	n, err := rw.ResponseWriter.Write(b)
 	rw.bytes += n
 	return n, err
+}
+
+// Unwrap returns the wrapped writer, so http.ResponseController can reach its
+// Flusher and deadline setters.
+func (rw *responseWriter) Unwrap() http.ResponseWriter {
+	return rw.ResponseWriter
+}
+
+// Hijack hands over the underlying connection. httputil.ReverseProxy hijacks
+// it to proxy WebSocket upgrades such as the Vite HMR socket in dev mode, and
+// writes the 101 response on the raw connection, past WriteHeader. It does so
+// only after the upstream answered 101, so the request is logged as 101.
+func (rw *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	conn, brw, err := http.NewResponseController(rw.ResponseWriter).Hijack()
+	if err == nil {
+		rw.status = http.StatusSwitchingProtocols
+		rw.wroteHeader = true
+	}
+	return conn, brw, err
 }

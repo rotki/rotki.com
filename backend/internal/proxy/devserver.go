@@ -65,7 +65,9 @@ func NewDevServer(rawURL string, logger *slog.Logger) *DevServer {
 }
 
 // ServeHTTP proxies the request to the Nuxt dev server.
-// WebSocket upgrade requests (HMR) are handled transparently by httputil.ReverseProxy.
+// WebSocket upgrade requests (HMR) are hijacked and proxied by
+// httputil.ReverseProxy, so every middleware writer must offer Hijack,
+// directly or through Unwrap.
 func (d *DevServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d.proxy.ServeHTTP(w, r) //nolint:gosec // G704: target URL is from validated config (NuxtDevURL), not user input
 }
